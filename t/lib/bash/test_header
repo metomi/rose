@@ -65,6 +65,8 @@
 #     poll COMMAND
 #         Run COMMAND in 1 second intervals for a minute until COMMAND returns
 #         a non-zero value.
+#     port_is_busy $PORT
+#         Return 0 if $PORT is busy or 1 if $PORT is not busy.
 #-------------------------------------------------------------------------------
 set -eu
 
@@ -227,6 +229,17 @@ function poll() {
     while (($(date +%s) < TIMEOUT)) && eval "$@"; do
         sleep 1
     done
+}
+
+function port_is_busy() {
+    local PORT="${1}"
+    if type -P netcat 1>/dev/null; then
+        HOSTNAME="${HOSTNAME:-"$(hostname)"}"
+        HOSTNAME="${HOSTNAME:-'localhost'}"
+        netcat -z "${HOSTNAME}" "${PORT}"
+    else
+        netstat -atun | grep -q "127.0.0.1:${PORT}"
+    fi
 }
 
 ROSE_HOME=${ROSE_HOME:-$(cd $(dirname $BASH_SOURCE)/../../.. && pwd)}

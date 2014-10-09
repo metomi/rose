@@ -202,7 +202,6 @@ TIP_TOOLBAR_VIEW_WEB = "View Web"
 
 # Window settings
 
-PREFIX_LEN = 5
 TITLEBAR = "{0} - rosie go"
 
 # User-relevant: Generic Settings

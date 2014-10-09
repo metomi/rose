@@ -27,23 +27,23 @@ import gtk
 import rose.external
 from rose.opt_parse import RoseOptionParser
 import rosie.browser
-import rosie.ws_client
+from rosie.suite_id import SuiteId
 
-STATUS_ICON = {rosie.ws_client.STATUS_CR: gtk.STOCK_DIALOG_ERROR,
-               rosie.ws_client.STATUS_DO: gtk.STOCK_MEDIA_FORWARD,
-               rosie.ws_client.STATUS_NO: None,
-               rosie.ws_client.STATUS_OK: gtk.STOCK_HOME,
-               rosie.ws_client.STATUS_MO: gtk.STOCK_EDIT,
-               rosie.ws_client.STATUS_SW: gtk.STOCK_CONVERT,
-               rosie.ws_client.STATUS_UP: gtk.STOCK_MEDIA_REWIND}
+STATUS_ICON = {SuiteId.STATUS_CR: gtk.STOCK_DIALOG_ERROR,
+               SuiteId.STATUS_DO: gtk.STOCK_MEDIA_FORWARD,
+               SuiteId.STATUS_NO: None,
+               SuiteId.STATUS_OK: gtk.STOCK_HOME,
+               SuiteId.STATUS_MO: gtk.STOCK_EDIT,
+               SuiteId.STATUS_SW: gtk.STOCK_CONVERT,
+               SuiteId.STATUS_UP: gtk.STOCK_MEDIA_REWIND}
 
-STATUS_TIP = {rosie.ws_client.STATUS_CR: rosie.browser.LOCAL_STATUS_CORRUPT,
-              rosie.ws_client.STATUS_DO: rosie.browser.LOCAL_STATUS_DOWNDATE,
-              rosie.ws_client.STATUS_NO: rosie.browser.LOCAL_STATUS_NO,
-              rosie.ws_client.STATUS_OK: rosie.browser.LOCAL_STATUS_OK,
-              rosie.ws_client.STATUS_MO: rosie.browser.LOCAL_STATUS_MODIFIED,
-              rosie.ws_client.STATUS_SW: rosie.browser.LOCAL_STATUS_SWITCH,
-              rosie.ws_client.STATUS_UP: rosie.browser.LOCAL_STATUS_UPDATE}
+STATUS_TIP = {SuiteId.STATUS_CR: rosie.browser.LOCAL_STATUS_CORRUPT,
+              SuiteId.STATUS_DO: rosie.browser.LOCAL_STATUS_DOWNDATE,
+              SuiteId.STATUS_NO: rosie.browser.LOCAL_STATUS_NO,
+              SuiteId.STATUS_OK: rosie.browser.LOCAL_STATUS_OK,
+              SuiteId.STATUS_MO: rosie.browser.LOCAL_STATUS_MODIFIED,
+              SuiteId.STATUS_SW: rosie.browser.LOCAL_STATUS_SWITCH,
+              SuiteId.STATUS_UP: rosie.browser.LOCAL_STATUS_UPDATE}
 
 
 class DisplayBox(gtk.VBox):
@@ -64,8 +64,8 @@ class DisplayBox(gtk.VBox):
         self.display_cols_getter = display_cols_getter
         self.treestore = gtk.TreeStore(*self.TREE_COLUMNS)
         self.treeview = rose.gtk.util.TooltipTreeView(
-                             model=self.treestore,
-                             get_tooltip_func=self._get_treeview_tooltip)
+            model=self.treestore,
+            get_tooltip_func=self._get_treeview_tooltip)
         self.treeview.show()
         self.treeview.set_rules_hint(True)
         self.treeview_scroll = gtk.ScrolledWindow()
@@ -75,9 +75,9 @@ class DisplayBox(gtk.VBox):
         self.treeview_scroll.add(self.treeview)
         self.treeview_scroll.set_shadow_type(gtk.SHADOW_IN)
         self.treeview.enable_model_drag_source(
-                  gtk.gdk.BUTTON1_MASK,
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_COPY)
+            gtk.gdk.BUTTON1_MASK,
+            [('text/plain', 0, 0)],
+            gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_COPY)
         self.pack_start(self.treeview_scroll, expand=True, fill=True)
         self.show()
 
@@ -210,28 +210,25 @@ class DisplayBox(gtk.VBox):
 
     def _update_local_status_row(self, model, path, r_iter, data):
         """Update the status for a row of the treeview"""
-        (index_map, local_suites, search_manager, id_formatter) = data
+        index_map, local_suites = data[0:2]
         idx = model.get_value(r_iter, index_map["idx"])
         branch = model.get_value(r_iter, index_map["branch"])
         revision = int(model.get_value(r_iter, index_map["revision"]))
-        local_status = rosie.ws_client.get_local_status(
-                             local_suites, search_manager.get_datasource(),
-                             idx, branch, revision)
-        old_results = self._result_info[idx, branch, revision] 
-        loc = STATUS_TIP[local_status]
-        id_text = id_formatter(idx, branch, revision)
-        new_results = ""
-        for line in old_results.split("\n"):
-            if line == id_text or ":" in line or line == "":
-                new_results += line + "\n"
+        suite_id = SuiteId.from_idx_branch_revision(idx, branch, revision)
+        status = suite_id.get_status()
+        model.set_value(r_iter, index_map["local"], status)
+        suite_id_text = suite_id.to_string_with_version()
+        results = ""
+        for line in self._result_info[idx, branch, revision].splitlines():
+            if line == suite_id_text or ":" in line or not line:
+                results += line + "\n"
             else:
-                new_results += loc + "\n"
-        self._result_info[idx, branch, revision] = new_results
-        model.set_value(r_iter, index_map["local"], local_status)
+                results += STATUS_TIP[status] + "\n"
+        self._result_info[idx, branch, revision] = results
         return False
 
     def update_result_info(self, id_tuple, result_map, local_status,
-                           search_manager, id_formatter):
+                           id_formatter):
         """Update the cached info for a suite."""
         idx, branch, revision = id_tuple
         id_text = id_formatter(idx, branch, revision)
@@ -278,7 +275,7 @@ class DisplayBox(gtk.VBox):
             this_row = (row_vals + [""] *
                         (len(self.TREE_COLUMNS) - 1 - len(values)))
             if (this_row[0] in row_group_headers and
-                self.group_index is not None):
+                    self.group_index is not None):
                 prev_row = row_group_headers[this_row[0]]
                 self.treestore.insert(prev_row, i, this_row + [False])
             else:
@@ -290,16 +287,14 @@ class DisplayBox(gtk.VBox):
                 path = self.treestore.get_path(row_iter)
                 self.treeview.expand_to_path(path)
 
-    def update_treemodel_local_status(self, local_suites, search_manager,
-                                      id_formatter):
+    def update_treemodel_local_status(self, local_suites, ws_client):
         """Update the local status column in the main tree model."""
         keys = ["local", "idx", "branch", "revision"]
         index_map = {}
         for key in keys:
             index_map.update({key: self.get_column_index_by_name(key)})
         self.treestore.foreach(self._update_local_status_row,
-                               (index_map, local_suites, search_manager,
-                                id_formatter))
+                               (index_map, local_suites, ws_client))
 
     def update_treeview(self, activation_handler, visibility_getter,
                         query_rows=None, sort_title=None, descending=False):

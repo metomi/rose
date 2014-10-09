@@ -37,6 +37,7 @@ from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
+import shlex
 import string
 import sys
 import traceback
@@ -50,8 +51,7 @@ class SvnCaller(RosePopener):
     def __call__(self, *args):
         environ = dict(os.environ)
         environ["LANG"] = "C"
-        out, err = self.run_ok("svn", env=environ, *args)
-        return out
+        return self.run_ok("svn", env=environ, *args)[0]
 
 
 class SuiteIdError(ValueError):
@@ -121,10 +121,17 @@ class SuiteId(object):
     REV_HEAD = "HEAD"
     svn = SvnCaller()
 
+    STATUS_CR = "X"
+    STATUS_DO = ">"
+    STATUS_OK = "="
+    STATUS_MO = "M"
+    STATUS_NO = " "
+    STATUS_SW = "S"
+    STATUS_UP = "<"
+
     @classmethod
     def get_latest(cls, prefix=None):
         """Return the previous (latest) ID in the suite repository."""
-        config = ResourceLocator.default().get_conf()
         if not prefix:
             prefix = cls.get_prefix_default()
         dir_url = cls.get_prefix_location(prefix)
@@ -136,7 +143,7 @@ class SuiteId(object):
                 if i == 0:
                     return None
                 raise SuiteIdLatestError(prefix)
-            dirs = filter(lambda line: line.endswith("/"), out.splitlines())
+            dirs = [line for line in out.splitlines() if line.endswith("/")]
             # Note - 'R/O/S/I/E' sorts to top for lowercase initial idx letter
             dir_url = dir_url + "/" + sorted(dirs)[-1].rstrip("/")
 
@@ -144,6 +151,7 @@ class SuiteId(object):
         state = {"idx-sid": None, "stack": [], "try_text": False}
 
         def _handle_tag0(state, name, attr_map):
+            """Handle XML start tag."""
             if state["idx-sid"]:
                 return
             state["stack"].append(name)
@@ -152,12 +160,14 @@ class SuiteId(object):
                 and attr_map.get("kind") == "dir"
                 and attr_map.get("action") == "A")
 
-        def _handle_tag1(state, name):
+        def _handle_tag1(state, _):
+            """Handle XML end tag."""
             if state["idx-sid"]:
                 return
             state["stack"].pop()
 
         def _handle_text(state, text):
+            """Handle XML text."""
             if state["idx-sid"] or not state["try_text"]:
                 return
             names = text.strip().lstrip("/").split("/", cls.SID_LEN)
@@ -176,34 +186,61 @@ class SuiteId(object):
         return cls(id_text=cls.FORMAT_IDX % (prefix, state["idx-sid"]))
 
     @classmethod
-    def get_local_copy_root(cls):
+    def get_checked_out_suite_ids(cls, prefix=None, user=None):
+        """Returns a list of suite IDs with local copies."""
+        local_copies = []
+        local_copy_root = cls.get_local_copy_root(user)
+
+        if not os.path.isdir(local_copy_root):
+            return local_copies
+        for path in os.listdir(local_copy_root):
+            location = os.path.join(local_copy_root, path)
+            try:
+                id_ = cls(location=location)
+            except SuiteIdError:
+                continue
+            if (prefix is None or id_.prefix == prefix) and str(id_) == path:
+                local_copies.append(id_)
+        return local_copies
+
+    @classmethod
+    def get_local_copy_root(cls, user=None):
         """Return the root directory for hosting the local suite copies."""
         config = ResourceLocator.default().get_conf()
         value = config.get_value(["rosie-id", "local-copy-root"])
-        if value:
-            local_copy_root = value
+        if user:
+            # N.B. Only default location at the moment.
+            # In theory, we can try obtaining the setting from the user's
+            # "~/.metomi/rose.conf", but it may contain environment variables
+            # that are only correct in the user's environment.
+            local_copy_root = os.path.expanduser(
+                os.path.join("~" + user, "roses"))
+        elif value:
+            local_copy_root = rose.env.env_var_process(value)
         else:
-            local_copy_root = "$HOME/roses"
-        local_copy_root = rose.env.env_var_process(local_copy_root)
+            local_copy_root = os.path.expanduser(os.path.join("~", "roses"))
         return local_copy_root
 
     @classmethod
     def from_idx_branch_revision(cls, idx, branch=None, revision=None):
+        """Factory method from idx, (branch and revision)."""
         id_ = cls(id_text=idx)
         if not branch:
-            branch = self.BRANCH_TRUNK
+            branch = cls.BRANCH_TRUNK
         if not revision:
-            revision = self.REV_HEAD
+            revision = cls.REV_HEAD
         id_.branch = branch
         id_.revision = revision
-        return cls(id_text=id_.to_string_with_version())
+        if id_.revision == cls.REV_HEAD:
+            id_.to_string_with_version()
+        return id_
 
     @classmethod
     def get_next(cls, prefix=None):
         """Return the next available ID in a repository."""
-        id = cls.get_latest(prefix)
-        if id:
-            return id.incr()
+        id_ = cls.get_latest(prefix)
+        if id_:
+            return id_.incr()
         elif prefix:
             return cls(id_text=cls.FORMAT_IDX % (prefix, cls.SID_0))
         else:
@@ -214,9 +251,9 @@ class SuiteId(object):
         """Return the default prefix."""
         config = ResourceLocator.default().get_conf()
         value = config.get_value(["rosie-id", "prefix-default"])
-        if value is None:
+        if not value or not value.strip():
             raise SuiteIdPrefixError()
-        return value
+        return shlex.split(value)[0]
 
     @classmethod
     def get_prefix_location(cls, prefix=None):
@@ -259,26 +296,31 @@ class SuiteId(object):
             raise SuiteIdPrefixError(prefix)
         return value.rstrip("/")
 
-    def __init__(self, id_text=None, location=None, skip_status=False):
+    def __init__(self, id_text=None, location=None):
         """Initialise either from an id_text or from a location."""
         self.prefix = None  # Repos id e.g. repo1
         self.sid = None     # Short/Sub/Suffix id e.g. aa000
         self.idx = None     # Full idx, join of self.prefix and self.sid
         self.branch = None
         self.revision = None
-        self.modified = False
-        self.corrupt = False
+        # self.statuses = {
+        #     None: STATUS_??, # current user
+        #     "user1": STATUS_??,
+        #     # ...
+        # }
+        self.statuses = None
         if id_text:
             self._from_id_text(id_text)
         elif location:
-            self._from_location(location, skip_status=skip_status)
+            self._from_location(location)
 
     def __str__(self):
         return self.idx
 
     def __eq__(self, other):
-        return (self.to_string_with_version() == other.to_string_with_version()
-                and self.modified == other.modified)
+        return (
+            self.to_string_with_version() == other.to_string_with_version() and
+            self.get_status() == other.get_status())
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -286,31 +328,36 @@ class SuiteId(object):
     __repr__ = __str__
 
     def _get_sid(self):
+        """Strip ID of prefix and return the result."""
         return self.idx.split("-", 1)[1]
 
     def _from_id_text(self, id_text):
+        """Parse the ID text."""
         match = self.REC_IDX.match(id_text)
         if not match:
             raise SuiteIdTextError(id_text)
         self.prefix, self.sid, self.branch, self.revision = match.groups()
+        try:
+            self.revision = int(self.revision)
+        except (TypeError, ValueError):
+            pass
         if not self.prefix:
-            config = ResourceLocator.default().get_conf()
             self.prefix = self.get_prefix_default()
             if not self.prefix:
                 raise SuiteIdPrefixError(id_text)
         self.idx = self.FORMAT_IDX % (self.prefix, self.sid)
 
-    def _from_location(self, location, skip_status=False):
+    def _from_location(self, location):
         """Return the ID of a location (origin URL or local copy path).
         """
         # FIXME: not sure why a closure for "state" does not work here?
         info_parser = SvnInfoXMLParser()
         try:
             info_entry = info_parser.parse(self.svn("info", "--xml", location))
-        except RosePopenError as e:
+        except RosePopenError:
             raise SuiteIdLocationError(location)
 
-        if not info_entry.has_key("url"):
+        if "url" not in info_entry:
             raise SuiteIdLocationError(location)
         root = info_entry["repository:root"]
         url = info_entry["url"]
@@ -332,29 +379,54 @@ class SuiteId(object):
         sid = "".join(names[0:self.SID_LEN])
         if not self.REC_IDX.match(sid):
             raise SuiteIdLocationError(location)
-        self.idx = self.FORMAT_IDX %(self.prefix, sid)
+        self.idx = self.FORMAT_IDX % (self.prefix, sid)
         self.sid = sid
         if len(names) > self.SID_LEN:
             self.branch = names[self.SID_LEN]
-        if info_entry.has_key("commit:revision"):
+        if "commit:revision" in info_entry:
             self.revision = info_entry["commit:revision"]
-        if not skip_status:
-            self._set_statuses(location)
 
-    def _set_statuses(self, path):
-        if os.path.exists(path):
-            try:
-                out = self.svn("st", path)
-            except RosePopenError:
-                # Corrupt working copy.
-                self.corrupt = True
-                self.modified = True
+    def get_status(self, user=None, force_mode=False):
+        """Determine and return local status for this suite.
+
+        If user is not specified, assume current user ID.
+
+        If force_mode is specified, always update status. Otherwise, use
+        previously determined status.
+
+        """
+        if (not force_mode and
+                self.statuses is not None and
+                self.statuses.get(user) is not None):
+            return self.statuses.get(user)
+        if self.statuses is None:
+            self.statuses = {}
+        if user not in self.statuses:
+            self.statuses[user] = {}
+        location = self.to_local_copy(user)
+        try:
+            location_suite_id = SuiteId(location=location)
+        except SuiteIdLocationError:
+            self.statuses[user] = self.STATUS_NO
+        else:
+            if self.branch != location_suite_id.branch:
+                self.statuses[user] = self.STATUS_SW
+            elif int(self.revision) > int(location_suite_id.revision):
+                self.statuses[user] = self.STATUS_UP
+            elif int(self.revision) < int(location_suite_id.revision):
+                self.statuses[user] = self.STATUS_DO
             else:
-                for line in out.splitlines():
-                    if line[:7].strip():
-                        self.modified = True
-                    if self.modified:
-                        break
+                try:
+                    out = self.svn("status", location)
+                except RosePopenError:
+                    # Corrupt working copy.
+                    self.statuses[user] = self.STATUS_CR
+                else:
+                    if any([line[:7].strip() for line in out.splitlines()]):
+                        self.statuses[user] = self.STATUS_MO
+                    else:
+                        self.statuses[user] = self.STATUS_OK
+        return self.statuses[user]
 
     def incr(self):
         """Return an SuiteId object that represents the ID after this ID."""
@@ -376,35 +448,38 @@ class SuiteId(object):
             if incr_next and i == 0:
                 raise SuiteIdOverflowError(self)
         self.sid = "".join(sid_chars)
-        return self.__class__(id_text=self.FORMAT_IDX % (self.prefix,
-                                                         self.sid))
+        return self.__class__(
+            id_text=self.FORMAT_IDX % (self.prefix, self.sid))
 
     def to_origin(self):
         """Return the origin URL of this ID."""
         return (self.get_prefix_location(self.prefix) + "/" +
                 "/".join(self._get_sid()))
 
-    def to_local_copy(self):
+    def to_local_copy(self, user=None):
         """Return the local copy path of this ID."""
-        local_copy_root = self.get_local_copy_root()
-        return os.path.join(local_copy_root, self.idx)
+        return os.path.join(self.get_local_copy_root(user), self.idx)
 
     def to_string_with_version(self):
-        location = self.to_origin()
-        info_parser = SvnInfoXMLParser()
-        try:
-            info_entry = info_parser.parse(self.svn("info", "--xml", location))
-        except RosePopenError as e:
-            raise SuiteIdTextError(location)
-
+        """Return the full ID in the form prefix-idx/branch@rev."""
         branch = self.branch
         if not branch:
             branch = self.BRANCH_TRUNK
         revision = self.revision
-        if not revision or revision == self.REV_HEAD:
+        if not revision:
             revision = self.REV_HEAD
-            if info_entry.has_key("commit:revision"):
-                revision = str(info_entry["commit:revision"])
+        if revision == self.REV_HEAD:
+            location = self.to_origin()
+            location += self.FORMAT_VERSION % (branch, str(revision))
+            info_parser = SvnInfoXMLParser()
+            try:
+                info_entry = info_parser.parse(
+                    self.svn("info", "--xml", location))
+            except RosePopenError as exc:
+                raise SuiteIdTextError(location)
+            else:
+                if "commit:revision" in info_entry:
+                    revision = int(info_entry["commit:revision"])
         return str(self) + self.FORMAT_VERSION % (branch, revision)
 
     def to_web(self):
@@ -422,8 +497,8 @@ class SuiteId(object):
 
     def to_output(self):
         """Return the output directory for this suite."""
-        p = SuiteEngineProcessor.get_processor()
-        return p.get_suite_log_url(None, str(self))
+        proc = SuiteEngineProcessor.get_processor()
+        return proc.get_suite_log_url(None, str(self))
 
 
 def main():
@@ -433,7 +508,7 @@ def main():
                               "to_output", "to_web")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
-    SuiteId.svn.event_handler = report # FIXME: ugly?
+    SuiteId.svn.event_handler = report  # FIXME: ugly?
     arg = None
     if args:
         arg = args[0]
@@ -444,7 +519,8 @@ def main():
                 report(str(SuiteId(id_text=arg).to_origin()) + "\n", level=0)
         elif opts.to_local_copy:
             for arg in args:
-                report(str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0)
+                report(
+                    str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0)
         elif opts.to_output:
             for arg in args:
                 url = SuiteId(id_text=arg).to_output()
@@ -455,21 +531,21 @@ def main():
             for arg in args:
                 report(str(SuiteId(id_text=arg).to_web()) + "\n", level=0)
         elif opts.latest:
-            s = SuiteId.get_latest(prefix=arg)
-            if s is not None:
-                report(str(s) + "\n", level=0)
+            suite_id = SuiteId.get_latest(prefix=arg)
+            if suite_id is not None:
+                report(str(suite_id) + "\n", level=0)
         elif opts.next:
-            s = SuiteId.get_next(prefix=arg)
-            if s is not None:
-                report(str(s) + "\n", level=0)
+            suite_id = SuiteId.get_next(prefix=arg)
+            if suite_id is not None:
+                report(str(suite_id) + "\n", level=0)
         else:
             if not arg:
                 arg = os.getcwd()
             report(str(SuiteId(location=arg)) + "\n", level=0)
-    except SuiteIdError as e:
-        report(e)
+    except SuiteIdError as exc:
+        report(exc)
         if opts.debug_mode:
-            traceback.print_exc(e)
+            traceback.print_exc(exc)
         sys.exit(1)
 
 

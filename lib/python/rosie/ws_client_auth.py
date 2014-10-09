@@ -20,6 +20,7 @@
 """The authentication manager for the Rosie web service client."""
 
 
+import ast
 from getpass import getpass
 try:
     import gnomekeyring
@@ -35,6 +36,7 @@ import rose.config
 from rose.env import env_var_process
 from rose.popen import RosePopener
 from rose.resource import ResourceLocator
+import shlex
 from urlparse import urlparse
 
 
@@ -85,6 +87,28 @@ class RosieWSClientAuthManager(object):
                 break
         else:
             self.password_store = None
+
+        self.requests_kwargs = {}
+        self._init_https_params()
+
+    def _init_https_params(self):
+        """Helper for __init__. Initialise HTTPS related parameters."""
+        res_loc = ResourceLocator.default()
+        https_ssl_verify_mode_str = res_loc.default().get_conf().get_value([
+            "rosie-id",
+            "prefix-https-ssl-verify." + self.prefix])
+        if https_ssl_verify_mode_str:
+            https_ssl_verify_mode = ast.literal_eval(https_ssl_verify_mode_str)
+            self.requests_kwargs["verify"] = bool(https_ssl_verify_mode)
+        https_ssl_cert_str = res_loc.default().get_conf().get_value([
+            "rosie-id",
+            "prefix-https-ssl-cert." + self.prefix])
+        if https_ssl_cert_str:
+            https_ssl_cert = shlex.split(https_ssl_cert_str)
+            if len(https_ssl_cert) == 1:
+                self.requests_kwargs["cert"] = https_ssl_cert[0]
+            else:
+                self.requests_kwargs["cert"] = tuple(https_ssl_cert[0:2])
 
     def get_auth(self, is_retry=False):
         """Return the authentication information for self.prefix."""

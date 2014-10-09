@@ -94,9 +94,9 @@ class PrefixRoot(object):
         return data
 
     @cherrypy.expose
-    def query(self, q, all_revs=None, format=None):
+    def query(self, q, all_revs=0, format=None):
         """Search database for rows with data matching the query string."""
-        all_revs = (all_revs is not None)
+        all_revs = int(all_revs)
         filters = []
         if not isinstance(q, list):
             q = [q]
@@ -107,9 +107,9 @@ class PrefixRoot(object):
         return self._render(all_revs, data, filters=filters)
 
     @cherrypy.expose
-    def search(self, s, all_revs=None, format=None):
+    def search(self, s, all_revs=0, format=None):
         """Search database for rows with data matching the query string."""
-        all_revs = (all_revs is not None)
+        all_revs = int(all_revs)
         data = self.dao.search(s, all_revs)
         if format == "json":
             return simplejson.dumps(data)
@@ -133,7 +133,7 @@ class PrefixRoot(object):
         if format == "json":
             return simplejson.dumps(self.dao.get_optional_keys())
 
-    def _render(self, all_revs=False, data=None, filters=None, s=None):
+    def _render(self, all_revs=0, data=None, filters=None, s=None):
         """Render return data with a template."""
         if data:
             for item in data:

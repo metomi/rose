@@ -30,6 +30,7 @@ import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 import rosie.browser
 from rosie.suite_id import SuiteId
+from rosie.ws_client import RosieWSClientError
 
 
 class AddressBar(rose.gtk.util.ToolBar):
@@ -45,7 +46,7 @@ class AddressBar(rose.gtk.util.ToolBar):
                                             as_tool=True)
         self.previous_search_button.add(button)
         self.previous_search_button.set_tooltip_text(
-                                                rosie.browser.TIP_PREV_SEARCH)
+            rosie.browser.TIP_PREV_SEARCH)
         self.previous_search_button.set_sensitive(False)
         self.previous_search_button.show()
         self.insert(self.previous_search_button, -1)
@@ -88,7 +89,7 @@ class AddressBar(rose.gtk.util.ToolBar):
         self.simple_search_entry.show()
         self.simple_search_entry.set_width_chars(20)
         self.simple_search_entry.set_tooltip_text(
-                           rosie.browser.TIP_SEARCH_SIMPLE_ENTRY)
+            rosie.browser.TIP_SEARCH_SIMPLE_ENTRY)
         search_toolitem = gtk.ToolItem()
         search_toolitem.add(self.simple_search_entry)
         search_toolitem.show()
@@ -98,9 +99,9 @@ class AddressBar(rose.gtk.util.ToolBar):
                                          gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.search_button = gtk.ToolItem()
         button = rose.gtk.util.CustomButton(
-                               label=rosie.browser.LABEL_SEARCH_SIMPLE,
-                               stock_id=gtk.STOCK_FIND,
-                               as_tool=True)
+            label=rosie.browser.LABEL_SEARCH_SIMPLE,
+            stock_id=gtk.STOCK_FIND,
+            as_tool=True)
         self.search_button.add(button)
         self.search_button.set_tooltip_text(rosie.browser.TIP_SEARCH_BUTTON)
         self.search_button.show()
@@ -109,8 +110,8 @@ class AddressBar(rose.gtk.util.ToolBar):
         if expand_control is not None:
             self.expander = gtk.ToolItem()
             button = rose.gtk.util.CustomExpandButton(
-                                   expander_function=expand_control,
-                                   as_tool=True)
+                expander_function=expand_control,
+                as_tool=True)
             self.expander.add(button)
             if expander_tip is not None:
                 self.expander.set_tooltip_text(expander_tip)
@@ -126,7 +127,7 @@ class AddressBar(rose.gtk.util.ToolBar):
         for h in hist:
             if h.h_type == "url":
                 if (self.address_box.get_model().iter_n_children(None) <
-                                                rosie.browser.SIZE_ADDRESS):
+                        rosie.browser.SIZE_ADDRESS):
                     self.address_box.append_text(h.details)
                 else:
                     break
@@ -259,13 +260,13 @@ class HistoryTreeview(gtk.VBox):
         self.treeview_hist.set_search_column(1)
         self.close_pane = gtk.HBox()
         self.close_button = rose.gtk.util.CustomButton(
-                             stock_id=gtk.STOCK_CLOSE,
-                             tip_text=rosie.browser.TIP_CLOSE_HISTORY_BUTTON)
+            stock_id=gtk.STOCK_CLOSE,
+            tip_text=rosie.browser.TIP_CLOSE_HISTORY_BUTTON)
 
         style = gtk.RcStyle()
         style.xthickness = 0
         style.ythickness = 0
-        setattr(style, "inner-border", [0, 0, 0, 0] )
+        setattr(style, "inner-border", [0, 0, 0, 0])
         self.close_button.modify_style(style)
 
         self.close_button.show()
@@ -357,41 +358,41 @@ class MenuBar(object):
                       ('About', gtk.STOCK_DIALOG_INFO,
                        rosie.browser.TOP_MENU_ABOUT)]
 
-    radio_action_details = []
+    prefixes_action_details = []
 
     toggle_action_details = [
-                             ('View advanced controls', None,
-                              'View advanced _controls'),
-                             ('Include history', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_ALL_REVISIONS),
-                             ('Show search history', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_SEARCH_HISTORY,
-                              rosie.browser.ACCEL_HISTORY_SHOW)]
+        ('View advanced controls', None, 'View advanced _controls'),
+        ('Include history', None,
+         rosie.browser.TOGGLE_ACTION_VIEW_ALL_REVISIONS),
+        ('Show search history', None,
+         rosie.browser.TOGGLE_ACTION_VIEW_SEARCH_HISTORY,
+         rosie.browser.ACCEL_HISTORY_SHOW)]
 
-    def __init__(self, known_keys):
+    def __init__(self, known_keys, ws_client):
         self.known_keys = known_keys
+        self.ws_client = ws_client
         self.uimanager = gtk.UIManager()
         self.actiongroup = gtk.ActionGroup('MenuBar')
         self.add_prefix_choices()
         self.add_key_choices()
         self.actiongroup.add_actions(self.action_details)
-        self.actiongroup.add_radio_actions(self.radio_action_details)
+        self.actiongroup.add_toggle_actions(self.prefixes_action_details)
         self.actiongroup.add_toggle_actions(self.toggle_action_details)
         self.uimanager.insert_action_group(self.actiongroup, pos=0)
         self.uimanager.add_ui_from_string(self.ui_config_string)
 
     def add_prefix_choices(self):
         """Add the prefix choices."""
-        self.prefixes = SuiteId.get_prefix_locations().keys()
+        self.prefixes = self.ws_client.auth_managers.keys()
         self.prefixes.sort()
         self.prefixes.reverse()
         for prefix in self.prefixes:
-            search = '<menu action="Source">'
-            repl = search + '<menuitem action="_{0}_"/>'.format(prefix)
+            source = '<menu action="Source">'
+            repl = source + '<menuitem action="_{0}_"/>'.format(prefix)
             self.ui_config_string = self.ui_config_string.replace(
-                                            search, repl, 1)
-            self.radio_action_details.append(
-                              ("_{0}_".format(prefix), None, prefix))
+                source, repl, 1)
+            self.prefixes_action_details.append(
+                ("_{0}_".format(prefix), None, prefix))
 
     def add_key_choices(self):
         """Add the key choices."""
@@ -400,10 +401,11 @@ class MenuBar(object):
             view = '<menu action="View">'
             repl = view + '<menuitem action="View _{0}_"/>'.format(key)
             self.ui_config_string = self.ui_config_string.replace(
-                                            view, repl, 1)
-            self.toggle_action_details.append(
-                                ("View _{0}_".format(key), None,
-                                 "View " + key.replace("_","__")))
+                view, repl, 1)
+            self.toggle_action_details.append((
+                "View _{0}_".format(key),
+                None,
+                "View " + key.replace("_", "__")))
 
     def set_accelerators(self, accel_dict):
         """Add the keyboard accelerators."""
@@ -416,10 +418,9 @@ class MenuBar(object):
             key, mod = gtk.accelerator_parse(key_press)
             self.accelerators.lookup[str(key) + str(mod)] = accel_func
             self.accelerators.connect_group(
-                              key, mod,
-                              gtk.ACCEL_VISIBLE,
-                              lambda a, c, k, m:
-                                self.accelerators.lookup[str(k) + str(m)]())
+                key, mod,
+                gtk.ACCEL_VISIBLE,
+                lambda a, c, k, m: self.accelerators.lookup[str(k) + str(m)]())
 
 
 class StatusBarWidget(gtk.VBox):
@@ -427,7 +428,7 @@ class StatusBarWidget(gtk.VBox):
     """Class to create a statusbar with a datasource box, messagebox and a
        progressbar."""
 
-    def __init__(self, prefix=""):
+    def __init__(self, prefixes_str=""):
         """Generate the status bar."""
         super(StatusBarWidget, self).__init__()
         self.statusbar = gtk.VBox()
@@ -438,13 +439,12 @@ class StatusBarWidget(gtk.VBox):
         hbox = gtk.HBox()
 
         self.datasource_display = rose.gtk.util.AsyncLabel()
-        self.datasource_display.set_text(prefix)
-        self.datasource_display.set_width_chars(rosie.browser.PREFIX_LEN)
+        self.datasource_display.set_text(prefixes_str)
+        self.datasource_display.set_width_chars(len(prefixes_str))
         self.datasource_display.set_justify(gtk.JUSTIFY_CENTER)
         self.datasource_display.set_tooltip_text(
-                                            rosie.browser.TIP_STATUSBAR_SOURCE)
-        hbox.pack_start(self.datasource_display, expand=False,
-                                  fill=False)
+            rosie.browser.TIP_STATUSBAR_SOURCE)
+        hbox.pack_start(self.datasource_display, expand=False, fill=False)
         self.datasource_display.show()
         vline = gtk.VSeparator()
         vline.show()
@@ -467,9 +467,9 @@ class StatusBarWidget(gtk.VBox):
         self.pack_start(self.statusbar, fill=True)
         self.show()
 
-    def set_datasource(self, prefix):
+    def set_datasource(self, prefixes_str):
         """Set the datasource to display on the statusbar."""
-        self.datasource_display.set_text(prefix)
+        self.datasource_display.set_text(prefixes_str)
 
     def set_status_text(self, msg, instant=True):
         """Set the statusbar text."""
@@ -494,7 +494,7 @@ class AdvancedSearchWidget(gtk.VBox):
 
     """Widget to create and manipulate the query panel"""
 
-    def __init__(self, search_manager, adv_controls_on, query_handler,
+    def __init__(self, ws_client, adv_controls_on, query_handler,
                  display_redrawer):
         """Create a list of filters and a "search" button."""
         super(AdvancedSearchWidget, self).__init__()
@@ -502,9 +502,9 @@ class AdvancedSearchWidget(gtk.VBox):
         self.adv_controls_on = adv_controls_on
         self.display_redrawer = display_redrawer
         try:
-            known_keys = search_manager.ws_client.get_known_keys()
-            query_operators = search_manager.ws_client.get_query_operators()
-        except rosie.ws_client.QueryError as e:
+            known_keys = ws_client.get_known_keys()
+            query_operators = ws_client.get_query_operators()
+        except RosieWSClientError as e:
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        str(e))
             sys.exit(str(e))
@@ -512,8 +512,7 @@ class AdvancedSearchWidget(gtk.VBox):
         self.display_filters = {}
         for column in self.display_columns:
             self.display_filters.update(
-                         {column:
-                          column in rosie.browser.COLUMNS_SHOWN})
+                {column: column in rosie.browser.COLUMNS_SHOWN})
         self.filter_columns = [c for c in self.display_columns if c != "local"]
         self.filter_exprs = []
         for operator in query_operators:
@@ -524,8 +523,7 @@ class AdvancedSearchWidget(gtk.VBox):
         self.num_filters = 0
         self.filter_expr_getters = []
         filter_scroll = gtk.ScrolledWindow()
-        filter_scroll.set_policy(gtk.POLICY_AUTOMATIC,
-                                 gtk.POLICY_AUTOMATIC)
+        filter_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         filter_scroll.show()
         filter_sub_scroll = gtk.HBox()
         filter_sub_scroll.show()
@@ -533,22 +531,21 @@ class AdvancedSearchWidget(gtk.VBox):
         filter_table_vbox.show()
         filter_table_vbox.pack_start(self.filter_table,
                                      expand=False, fill=False)
-        filter_sub_scroll.pack_start(filter_table_vbox,
-                                     expand=True, fill=True)
+        filter_sub_scroll.pack_start(filter_table_vbox, expand=True, fill=True)
         self.add_button = rose.gtk.util.CustomButton(
-                          stock_id=gtk.STOCK_ADD,
-                          label=rosie.browser.LABEL_ADD_FILTER,
-                          tip_text=rosie.browser.TIP_ADD_FILTER_BUTTON)
+            stock_id=gtk.STOCK_ADD,
+            label=rosie.browser.LABEL_ADD_FILTER,
+            tip_text=rosie.browser.TIP_ADD_FILTER_BUTTON)
         self.add_button.connect("clicked", lambda b: self.add_filter())
         self.search_button = rose.gtk.util.CustomButton(
-                             stock_id=gtk.STOCK_FIND,
-                             label=rosie.browser.LABEL_SEARCH_ADVANCED,
-                             tip_text=rosie.browser.TIP_SEARCH_BUTTON)
+            stock_id=gtk.STOCK_FIND,
+            label=rosie.browser.LABEL_SEARCH_ADVANCED,
+            tip_text=rosie.browser.TIP_SEARCH_BUTTON)
         self.search_button.connect("clicked", self.handle_query)
         self.clear_button = rose.gtk.util.CustomButton(
-                             stock_id=gtk.STOCK_CLEAR,
-                             label=rosie.browser.LABEL_CLEAR_ADVANCED,
-                             tip_text=rosie.browser.TIP_CLEAR_BUTTON)
+            stock_id=gtk.STOCK_CLEAR,
+            label=rosie.browser.LABEL_CLEAR_ADVANCED,
+            tip_text=rosie.browser.TIP_CLEAR_BUTTON)
         self.clear_button.connect("clicked", self.clear_filters)
 
         button_bar = gtk.HBox()
@@ -574,11 +571,11 @@ class AdvancedSearchWidget(gtk.VBox):
         """Create a row of widgets for a filter."""
         added_ok = True
         close_button = rose.gtk.util.CustomButton(
-                            stock_id=gtk.STOCK_CLOSE,
-                            tip_text=rosie.browser.TIP_REMOVE_FILTER_BUTTON,
-                            as_tool=True)
+            stock_id=gtk.STOCK_CLOSE,
+            tip_text=rosie.browser.TIP_REMOVE_FILTER_BUTTON,
+            as_tool=True)
         conj_box = rosie.browser.util.ConjunctionWidget(
-                                             choices=self.filter_ops)
+            choices=self.filter_ops)
         left_group_num = 0
         column_combo = gtk.combo_box_new_text()
         for column in self.filter_columns:
@@ -607,7 +604,7 @@ class AdvancedSearchWidget(gtk.VBox):
             while len(query_pieces) > 4:
                 query_pieces[3] += " " + query_pieces.pop(4)
             try:
-                if len(query_pieces) == 3:  #catch for empty string searches
+                if len(query_pieces) == 3:  # catch for empty string searches
                     query_pieces.append('')
                 conjunction, col, expr, text = query_pieces
             except ValueError:
@@ -616,7 +613,7 @@ class AdvancedSearchWidget(gtk.VBox):
             else:
                 try:
                     conj_box.combo.set_active(
-                                   self.filter_ops.index(conjunction))
+                        self.filter_ops.index(conjunction))
                 except (IndexError, ValueError):
                     added_ok = False
                     self.run_invalid_query_dialog(conjunction)
@@ -634,13 +631,13 @@ class AdvancedSearchWidget(gtk.VBox):
         if not added_ok:
             return False
         left_bracket_box = rosie.browser.util.BracketWidget(
-                                      number=left_group_num,
-                                      is_end=False,
-                                      change_hook=self.update_filter_grouping)
+            number=left_group_num,
+            is_end=False,
+            change_hook=self.update_filter_grouping)
         right_bracket_box = rosie.browser.util.BracketWidget(
-                                      number=right_group_num,
-                                      is_end=True,
-                                      change_hook=self.update_filter_grouping)
+            number=right_group_num,
+            is_end=True,
+            change_hook=self.update_filter_grouping)
         getter = lambda: self.get_filter(conj_box.combo, left_bracket_box,
                                          column_combo, expr_combo,
                                          string_entry, right_bracket_box)
@@ -652,54 +649,54 @@ class AdvancedSearchWidget(gtk.VBox):
                 lowest_row = child_row
         this_row = lowest_row + 1
         self.filter_table.attach(
-                          conj_box,
-                          0, 1,
-                          this_row, this_row + 1,
-                          xoptions=gtk.FILL,
-                          xpadding=5,
-                          ypadding=5)
+            conj_box,
+            0, 1,
+            this_row, this_row + 1,
+            xoptions=gtk.FILL,
+            xpadding=5,
+            ypadding=5)
         if self.filter_table.get_children()[-1] == conj_box:
             conj_box.set_sensitive(False)
         self.filter_table.attach(
-                         left_bracket_box,
-                         1, 2,
-                         this_row, this_row + 1,
-                         xoptions=gtk.FILL,
-                         ypadding=5)
+            left_bracket_box,
+            1, 2,
+            this_row, this_row + 1,
+            xoptions=gtk.FILL,
+            ypadding=5)
         self.filter_table.attach(
-                         column_combo,
-                         2, 3,
-                         this_row, this_row + 1,
-                         xoptions=gtk.FILL,
-                         xpadding=5,
-                         ypadding=5)
+            column_combo,
+            2, 3,
+            this_row, this_row + 1,
+            xoptions=gtk.FILL,
+            xpadding=5,
+            ypadding=5)
         self.filter_table.attach(
-                         expr_combo,
-                         3, 4,
-                         this_row, this_row + 1,
-                         xoptions=gtk.FILL,
-                         xpadding=5,
-                         ypadding=5)
+            expr_combo,
+            3, 4,
+            this_row, this_row + 1,
+            xoptions=gtk.FILL,
+            xpadding=5,
+            ypadding=5)
         self.filter_table.attach(
-                         string_entry,
-                         4, 5,
-                         this_row, this_row + 1,
-                         xoptions=gtk.EXPAND|gtk.FILL,
-                         xpadding=5,
-                         ypadding=5)
+            string_entry,
+            4, 5,
+            this_row, this_row + 1,
+            xoptions=(gtk.EXPAND | gtk.FILL),
+            xpadding=5,
+            ypadding=5)
         self.filter_table.attach(
-                         right_bracket_box,
-                         5, 6,
-                         this_row, this_row + 1,
-                         xoptions=gtk.FILL,
-                         ypadding=5)
+            right_bracket_box,
+            5, 6,
+            this_row, this_row + 1,
+            xoptions=gtk.FILL,
+            ypadding=5)
         self.filter_table.attach(
-                         close_button,
-                         6, 7,
-                         this_row, this_row + 1,
-                         xoptions=gtk.FILL,
-                         xpadding=5,
-                         ypadding=5)
+            close_button,
+            6, 7,
+            this_row, this_row + 1,
+            xoptions=gtk.FILL,
+            xpadding=5,
+            ypadding=5)
         close_button._number = this_row
         close_button.connect('clicked',
                              lambda b: self.remove_filter(b._number))
@@ -733,9 +730,9 @@ class AdvancedSearchWidget(gtk.VBox):
             value = widget.get_active()
             if value == -1:
                 rose.gtk.dialog.run_dialog(
-                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                         rosie.browser.DIALOG_MESSAGE_UNCOMPLETED_FILTER,
-                         rosie.browser.DIALOG_TITLE_UNCOMPLETED_FILTER)
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    rosie.browser.DIALOG_MESSAGE_UNCOMPLETED_FILTER,
+                    rosie.browser.DIALOG_TITLE_UNCOMPLETED_FILTER)
                 raise FilterError
             filter_strings.append(f_list[value])
             if widget == and_or_combo:
@@ -765,7 +762,7 @@ class AdvancedSearchWidget(gtk.VBox):
                 group_num += len(filter_tuple[1])
                 offset = 1
             if (len(filter_tuple) > 4 + offset and
-                all([s == ")" for s in filter_tuple[-1]])):
+                    all([s == ")" for s in filter_tuple[-1]])):
                 group_num -= len(filter_tuple[-1])
             filters.append(" ".join(filter_tuple))
         if group_num != 0:
@@ -800,7 +797,7 @@ class AdvancedSearchWidget(gtk.VBox):
                         child, "left_attach")[0]
                     xoptions, yoptions, xpadding, ypadding = (
                         self.filter_table.child_get(
-                            child,"x-options", "y-options",
+                            child, "x-options", "y-options",
                             "x-padding", "y-padding"
                         )
                     )
@@ -877,7 +874,7 @@ class AdvancedSearchWidget(gtk.VBox):
 def launch_about_dialog(self, *args):
     """Create a dialog showing the 'About' information."""
     return rose.gtk.dialog.run_about_dialog(
-                rosie.browser.PROGRAM_NAME,
-                rosie.browser.COPYRIGHT,
-                rosie.browser.LOGO_PATH,
-                rosie.browser.PROJECT_URL)
+        rosie.browser.PROGRAM_NAME,
+        rosie.browser.COPYRIGHT,
+        rosie.browser.LOGO_PATH,
+        rosie.browser.PROJECT_URL)

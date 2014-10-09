@@ -24,10 +24,11 @@
 #     rosie hello [--prefix=PREIFX]
 #
 # DESCRIPTION
-#     Set up connection to a Rosie web service server.
+#     Set up connection to one or more Rosie web service servers.
 #
 # OPTIONS
 #     --prefix=PREFIX
-#         Specify the name of the Rosie web service to use.
+#         Specify the name of one or more Rosie web service servers to use.
+#         This option can be used multiple times.
 #-------------------------------------------------------------------------------
-exec python -m rosie.ws_client hello "$@"
+exec python -m rosie.ws_client_cli hello "$@"

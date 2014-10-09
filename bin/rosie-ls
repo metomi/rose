@@ -40,8 +40,8 @@
 #
 # OPTIONS
 #     --prefix=PREFIX
-#         Display locally checked out suites from the specified suite
-#         repository.
+#         Display locally checked out suites from only the specified web
+#         services. This option can be used multiple times.
 #     --no-headers, -H
 #         Do not print column headers.
 #     --print-format=FORMAT, --format=FORMAT, -f FORMAT
@@ -61,4 +61,4 @@
 #     --verbose, -v
 #         Display full info for each returned suite.
 #-------------------------------------------------------------------------------
-exec python -m rosie.ws_client list_local_suites "$@"
+exec python -m rosie.ws_client_cli list_local_suites "$@"
