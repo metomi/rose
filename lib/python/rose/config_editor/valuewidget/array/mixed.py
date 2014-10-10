@@ -58,7 +58,6 @@ class MixedArrayValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.last_value = value
         self.value_array = rose.variable.array_split(value)
         self.extra_array = []  # For new rows
         self.element_values = []
@@ -134,7 +133,6 @@ class MixedArrayValueWidget(gtk.HBox):
         if any(new_values):
             self.value_array = self.value_array + new_values
             self.value = rose.variable.array_join(self.value_array)
-            self.last_value = self.value
             self.set_value(self.value)
             self.set_num_rows()
         self.normalise_width_widgets()
@@ -148,7 +146,7 @@ class MixedArrayValueWidget(gtk.HBox):
         for r, widget_list in enumerate(self.rows):
             for i, widget in enumerate(widget_list):
                 val = self.value_array[r * self.num_cols + i]
-                prefix_text = get_next_delimiter(self.last_value[len(text):],
+                prefix_text = get_next_delimiter(self.value[len(text):],
                                                  val)
                 if widget == self.entry_table.focus_child:
                     if hasattr(widget, "get_focus_index"):
@@ -370,9 +368,8 @@ class MixedArrayValueWidget(gtk.HBox):
             self.value_array[array_index] = element_value
         new_val = rose.variable.array_join(self.value_array)
         if new_val != self.value:
-            self.last_value = new_val
-            self.set_value(new_val)
             self.value = new_val
+            self.set_value(new_val)
 
 
 class ArrayElementSetter(object):

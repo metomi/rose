@@ -49,7 +49,6 @@ class EntryArrayValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.last_value = value
         self.max_length = self.metadata[rose.META_PROP_LENGTH]
 
         value_array = rose.variable.array_split(self.value)
@@ -113,7 +112,7 @@ class EntryArrayValueWidget(gtk.HBox):
                 val = rose.config_editor.util.text_from_character_widget(val)
             elif self.is_quoted_array:
                 val = rose.config_editor.util.text_from_quoted_widget(val)
-            prefix = get_next_delimiter(self.last_value[len(text):], val)
+            prefix = get_next_delimiter(self.value[len(text):], val)
             if entry == self.entry_table.focus_child:
                 return len(text + prefix) + entry.get_position()
             text += prefix + val
@@ -395,9 +394,8 @@ class EntryArrayValueWidget(gtk.HBox):
         entries_have_commas = any(["," in v for v in val_array])
         new_value = rose.variable.array_join(val_array)
         if new_value != self.value:
-            self.last_value = new_value
-            self.set_value(new_value)
             self.value = new_value
+            self.set_value(new_value)
             if (entries_have_commas and
                 not (self.is_char_array or self.is_quoted_array)):
                 new_val_array = rose.variable.array_split(new_value)
@@ -455,6 +453,7 @@ class EntryArrayValueWidget(gtk.HBox):
 
 
 def get_next_delimiter(array_text, next_element):
+    """Return the part of array_text immediately preceding next_element."""
     v = array_text.index(next_element)
     if v == 0 and len(array_text) > 1:  # Null or whitespace element.
         while array_text[v].isspace():
