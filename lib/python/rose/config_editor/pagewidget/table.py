@@ -250,8 +250,11 @@ class PageArrayTable(PageTable):
         for variable in self.panel_data + self.ghost_data:
             length = variable.metadata.get(rose.META_PROP_LENGTH)
             if (length is not None and length.isdigit() and
-                int(length) > max_meta_length):
+                    int(length) > max_meta_length):
                 max_meta_length = int(length)
+            types = variable.metadata.get(rose.META_PROP_TYPE)
+            if isinstance(types, list) and len(types) > max_meta_length:
+                max_meta_length = len(types)
             values_length = len(rose.variable.array_split(variable.value))
             if values_length > max_values_length:
                 max_values_length = values_length
