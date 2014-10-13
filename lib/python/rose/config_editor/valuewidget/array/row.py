@@ -284,8 +284,9 @@ class RowArrayValueWidget(gtk.HBox):
         """Create a row of widgets from type_list."""
         widget_list = []
         new_values = []
+        actual_num_cols = len(self.get_types())
         for c, el_piece_type in enumerate(self.get_types()):
-            unwrapped_index = row_index * self.num_cols + c
+            unwrapped_index = row_index * actual_num_cols + c
             value_index = unwrapped_index
             if (not isinstance(self.type, list) and
                 value_index >= len(self.value_array)):
@@ -302,7 +303,7 @@ class RowArrayValueWidget(gtk.HBox):
                 widget_list.append(widget)
                 continue
             while value_index > len(self.value_array) - 1:
-                value_index -= len(self.get_types())
+                value_index -= actual_num_cols
             if value_index < 0:
                 w_value = rose.variable.get_value_from_metadata(
                                {rose.META_PROP_TYPE: el_piece_type})
@@ -429,8 +430,9 @@ class RowArrayValueWidget(gtk.HBox):
 
     def setter(self, array_index, element_value):
         """Update the value."""
-        widget_row = self.rows[array_index / self.num_cols]
-        widget = widget_row[array_index % self.num_cols]
+        actual_num_cols = len(self.get_types())
+        widget_row = self.rows[array_index / actual_num_cols]
+        widget = widget_row[array_index % actual_num_cols]
         self._normalise_width_chars(widget)
         i = array_index - len(self.value_array)
         if i >= 0:
