@@ -1434,6 +1434,8 @@ class MainController(object):
         else:
             configs = [only_this_config]
         for config_name in configs:
+            if self.data.config[config_name].is_preview:
+                continue
             self.data.clear_meta_lookups(config_name)
             config = self.data.dump_to_internal_config(config_name)
             config_data = self.data.config[config_name]
