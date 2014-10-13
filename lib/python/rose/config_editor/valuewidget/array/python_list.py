@@ -50,7 +50,6 @@ class PythonListValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.last_value = value
         self.max_length = ":"
         value_array = python_array_split(self.value)
         self.chars_width = max([len(v) for v in value_array] + [1]) + 1
@@ -89,7 +88,7 @@ class PythonListValueWidget(gtk.HBox):
         text = '['
         for entry in self.entries:
             val = entry.get_text()
-            prefix = get_next_delimiter(self.last_value[len(text):], val)
+            prefix = get_next_delimiter(self.value[len(text):], val)
             if entry == self.entry_table.focus_child:
                 return len(text + prefix) + entry.get_position()
             text += prefix + val
@@ -358,9 +357,8 @@ class PythonListValueWidget(gtk.HBox):
         entries_have_commas = any(["," in v for v in val_array])
         new_value = python_array_join(val_array)
         if new_value != self.value:
-            self.last_value = new_value
-            self.set_value(new_value)
             self.value = new_value
+            self.set_value(new_value)
             if entries_have_commas:
                 new_val_array = python_array_split(new_value)
                 if len(new_val_array) != len(self.entries):

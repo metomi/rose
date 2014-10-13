@@ -49,7 +49,6 @@ class RowArrayValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.last_value = value
         self.value_array = rose.variable.array_split(value)
         self.extra_array = []  # For new rows
         self.element_values = []
@@ -146,7 +145,6 @@ class RowArrayValueWidget(gtk.HBox):
                                {rose.META_PROP_TYPE: self.type})
         self.value_array = self.value_array + [w_value]
         self.value = rose.variable.array_join(self.value_array)
-        self.last_value = self.value
         self.set_value(self.value)
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
@@ -164,7 +162,6 @@ class RowArrayValueWidget(gtk.HBox):
         if any(new_values):
             self.value_array = self.value_array + new_values
             self.value = rose.variable.array_join(self.value_array)
-            self.last_value = self.value
             self.set_value(self.value)
             self.set_num_rows()
         self.normalise_width_widgets()
@@ -179,7 +176,7 @@ class RowArrayValueWidget(gtk.HBox):
                 if value_index > len(self.value_array) - 1:
                     return len(text)
                 val = self.value_array[r * self.num_cols + i]
-                prefix_text = get_next_delimiter(self.last_value[len(text):],
+                prefix_text = get_next_delimiter(self.value[len(text):],
                                                  val)
                 if widget == self.entry_table.focus_child:
                     if hasattr(widget, "get_focus_index"):
@@ -227,7 +224,6 @@ class RowArrayValueWidget(gtk.HBox):
         """Create a new element (non-derived types)."""
         self.value_array.pop()
         self.value = rose.variable.array_join(self.value_array)
-        self.last_value = self.value
         self.set_value(self.value)
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
@@ -452,9 +448,8 @@ class RowArrayValueWidget(gtk.HBox):
             self.value_array[array_index] = element_value
         new_val = rose.variable.array_join(self.value_array)
         if new_val != self.value:
-            self.last_value = new_val
-            self.set_value(new_val)
             self.value = new_val
+            self.set_value(new_val)
 
 
 class ArrayElementSetter(object):

@@ -87,7 +87,7 @@ class SpacedListValueWidget(gtk.HBox):
         text = ''
         for entry in self.entries:
             val = entry.get_text()
-            prefix = get_next_delimiter(self.last_value[len(text):], val)
+            prefix = get_next_delimiter(self.value[len(text):], val)
             if entry == self.entry_table.focus_child:
                 return len(text + prefix) + entry.get_position()
             text += prefix + val
@@ -349,8 +349,8 @@ class SpacedListValueWidget(gtk.HBox):
         new_value = spaced_array_join(val_array)
         if new_value != self.value:
             self.last_value = self.value
-            self.set_value(new_value)
             self.value = new_value
+            self.set_value(new_value)
             if entries_have_spaces:
                 new_val_array = spaced_array_split(new_value)
                 if len(new_val_array) != len(self.entries):
@@ -407,6 +407,7 @@ class SpacedListValueWidget(gtk.HBox):
 
 
 def get_next_delimiter(array_text, next_element):
+    """Return the part of array_text immediately preceding next_element."""
     v = array_text.index(next_element)
     return array_text[:v]
 
