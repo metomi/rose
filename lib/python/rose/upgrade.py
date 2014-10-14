@@ -520,7 +520,9 @@ def main():
     except OSError as e:
         reporter(e)
         sys.exit(1)
-    ok_versions = upgrade_manager.get_tags(only_named=not opts.all_versions)
+
+    need_all_versions = opts.all_versions or args
+    ok_versions = upgrade_manager.get_tags(only_named=not need_all_versions)
     if args:
         user_choice = args[0]
     else:
