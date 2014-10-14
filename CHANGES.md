@@ -5,6 +5,43 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-Q4?)
+
+Rose release 20. This release will work best with
+[Cylc](https://github.com/cylc/cylc/) 6.0.1 and beyond.
+
+### Highlighted Changes
+
+[#1395](https://github.com/metomi/rose/pull/1395):
+rosie.ws_client: support multiple sources.
+* Rosie discovery service clients `rosie go`, `rosie lookup` and `rosie ls`
+  will automatically work with all `[rosie-id]prefix-ws.*` services in
+  site/user configuration.
+* The `--prefix=PREFIX` option for `rosie go`, `rosie lookup` and `rosie ls`
+  can now be specified multiple times. The lookup mode is rationalised into a
+  single option, with aliases.
+* `rosie go` updated to allow users to select any data source combination.
+* This change requires a pickle-safe version of python-requests.
+  (We have tested with version 2.2.1.)
+
+### Noteworthy Changes
+
+[#1432](https://github.com/metomi/rose/pull/1432):
+rose config-edit: fix derived type array in column page.
+
+[#1431](https://github.com/metomi/rose/pull/1431):
+rose config-edit: fix preview app metadata refresh.
+
+[#1430](https://github.com/metomi/rose/pull/1430):
+rose config-edit: fix spaced widget bug. The problem was misuse of the
+`last_value` property across all array widgets, which happened to work as it
+was always set to the actual current value, except in the spaced_list widget.
+
+[#1428](https://github.com/metomi/rose/pull/1428):
+rose_arch: improve documentation.
+
+--------------------------------------------------------------------------------
+
 ## 2014.10.0 (2014-10-02)
 
 19th release of Rose. This release works best with
