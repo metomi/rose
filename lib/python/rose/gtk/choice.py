@@ -186,6 +186,9 @@ class ChoicesListView(gtk.TreeView):
 
     def _remove_iter(self, iter_):
         self.get_model().remove(iter_)
+        if self.get_model() is None:
+            # Removing the last iter makes get_model return None...
+            self._populate()
         self._handle_reordering()
         self._populate()
 
