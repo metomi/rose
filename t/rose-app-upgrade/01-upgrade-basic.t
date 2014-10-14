@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 73
+tests 80
 
 #-------------------------------------------------------------------------------
 # Check basic upgrading.
@@ -310,8 +310,46 @@ __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
 #-------------------------------------------------------------------------------
-# Check the next step in the upgrade
+# Check the next minor step in the upgrade
 TEST_KEY=$TEST_KEY_BASE-upgrade-change-minor
+init <<'__CONFIG__'
+meta=test-app-upgrade/0.5
+
+[env]
+Z=1
+__CONFIG__
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.5.1
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
+[U] Upgrade_0.5-0.5.1: changes: 2
+    env=C=8
+        Added with value '8'
+    =meta=test-app-upgrade/0.5.1
+        Upgraded from 0.5 to 0.5.1
+__OUTPUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.file" ../config/rose-app.conf <<'__CONFIG__'
+meta=test-app-upgrade/0.5.1
+
+[env]
+C=8
+Z=1
+__CONFIG__
+
+#-----------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-upgrade-change-minor-end-version
+# Check correct end version
+run_pass "$TEST_KEY" rose app-upgrade \
+ --meta-path=../rose-meta/ -C ../config/
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
+= 0.5.1
+* 1.0
+__OUTPUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+
+#-------------------------------------------------------------------------------
+# Check the next minor step in the upgrade
+TEST_KEY=$TEST_KEY_BASE-upgrade-change-minor-all
 init <<'__CONFIG__'
 meta=test-app-upgrade/0.5
 
@@ -337,7 +375,7 @@ Z=1
 __CONFIG__
 
 #-----------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-upgrade-change-minor-end-version
+TEST_KEY=$TEST_KEY_BASE-upgrade-change-minor-end-version-all
 # Check correct end version
 run_pass "$TEST_KEY" rose app-upgrade \
  --meta-path=../rose-meta/ -C ../config/
