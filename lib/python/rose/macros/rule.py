@@ -24,6 +24,7 @@ import re
 import sys
 
 import jinja2
+import jinja2.exceptions
 
 import rose.macro
 import rose.variable
@@ -74,6 +75,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
     RULE_WARNING_NAME = "warn-if"
     RULE_FAIL_FORMAT = "{0}: {1}"
     RULE_MSG_FAIL_FORMAT = "({0}) {1}: {2}"
+    RULE_SYNTAX_FAIL_FORMAT = "Syntax error ({0}) {1}: {2}"
     WARNING_RULE_FAILED = "warn because"
 
     def validate(self, config, meta_config):
@@ -117,23 +119,31 @@ class FailureRuleChecker(rose.macro.MacroBase):
             for setting_id, rule_msg_list in rule_data[rule_type].items():
                 section, option = self._get_section_option_from_id(setting_id)
                 for (rule, message) in rule_msg_list:
+                    info = None
                     try:
                         test_failed = evaluator.evaluate_rule(
                             rule, setting_id, config, meta_config)
                     except (ZeroDivisionError, TypeError, 
-                            ValueError,IndexError) as e:
+                            ValueError,IndexError) as exc:
                         test_failed = True
-                        message = e
-                    except RuleValueError as e:
+                        info = self.RULE_MSG_FAIL_FORMAT.format(
+                            exc, f_type, rule)
+                    except jinja2.exceptions.TemplateError as exc:
+                        test_failed = True
+                        info = self.RULE_SYNTAX_FAIL_FORMAT.format(
+                            rule_type, rule, exc)
+                    except RuleValueError:
                         continue
+
                     if test_failed:
                         value = config.get([section, option]).value
-                        if message is None:
-                            info = self.RULE_FAIL_FORMAT.format(f_type, rule)
-                        else:
-                            info = self.RULE_MSG_FAIL_FORMAT.format(message,
-                                                                    f_type,
-                                                                    rule)
+                        if info is None:
+                            if message is None:
+                                info = self.RULE_FAIL_FORMAT.format(
+                                    f_type, rule)
+                            else:
+                                info = self.RULE_MSG_FAIL_FORMAT.format(
+                                    message, f_type, rule)
                         self.add_report(section, option, value, info,
                                         is_warning)
         return self.reports

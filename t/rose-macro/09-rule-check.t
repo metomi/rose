@@ -20,6 +20,12 @@
 # Test "rose macro" in built-in failure condition checking mode.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+#-------------------------------------------------------------------------------
+tests 6
+#-------------------------------------------------------------------------------
+# Check fail-if and warn-if checking.
+TEST_KEY=$TEST_KEY_BASE-ok
+setup
 init <<'__CONFIG__'
 [simple:scalar_test]
 test_var_div_zero_fail=0
@@ -94,12 +100,6 @@ test_var_2 = -1
 test_var_1 = -1
 test_var_2 = 2
 __CONFIG__
-#-------------------------------------------------------------------------------
-tests 3
-#-------------------------------------------------------------------------------
-# Check compulsory checking.
-TEST_KEY=$TEST_KEY_BASE-rule
-setup
 init_meta <<__META_CONFIG__
 [complex:array_test]
 
@@ -421,6 +421,36 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         (Probably should not be less than 0.) warn because: this < 0
     simple:warn_test=test_var_3=-1
         (Cube should be less than 100.) warn because: this * this * this < 100
+__CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Check bad syntax for fail-if (note: can't be done by metadata-check).
+TEST_KEY=$TEST_KEY_BASE-syntax-err
+setup
+init <<'__CONFIG__'
+[syntax:bad_before_id_expansion]
+foo=0
+bar='whatever'
+
+[syntax:bad_after_id_expansion]
+foo=2
+bar='dunno'
+__CONFIG__
+init_meta <<__META_CONFIG__
+[syntax:bad_before_id_expansion=foo]
+fail-if=oh no bad syntax, syntax:bad_before_id_expansion=bar
+
+[syntax:bad_after_id_expansion=foo]
+fail-if=this * 20 syntax:bad_after_id_expansion=bar
+__META_CONFIG__
+run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+[V] rose.macros.DefaultValidators: issues: 2
+    syntax:bad_after_id_expansion=foo=2
+        Syntax error (fail-if) this * 20 syntax:bad_after_id_expansion=bar: expected token 'end of statement block', got '_id0'
+    syntax:bad_before_id_expansion=foo=0
+        Syntax error (fail-if) oh no bad syntax, syntax:bad_before_id_expansion=bar: expected token 'end of statement block', got 'no'
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
