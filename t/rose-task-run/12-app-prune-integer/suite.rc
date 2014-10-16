@@ -1,0 +1,31 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout handler = rose suite-hook --shutdown
+        timeout = PT1M
+[scheduling]
+    initial cycle point = 1
+    final cycle point   = 3
+    cycling mode = integer
+    [[dependencies]]
+        [[[P1]]]
+            graph = prune[-P1] => my_task_1 => prune
+
+[runtime]
+    [[root]]
+        command scripting = rose task-run -v -v --debug
+        [[[event hooks]]]
+           succeeded handler            = rose suite-hook
+           failed handler               = rose suite-hook
+           submission failed handler    = rose suite-hook
+           submission timeout handler   = rose suite-hook
+           execution timeout handler    = rose suite-hook
+           submission timeout           = PT1M
+           execution timeout            = PT1M
+    [[my_task_1]]
+{% if HOST is defined %}
+        [[[remote]]]
+            host = {{HOST}}
+{% endif %}
+    [[prune]]

@@ -135,14 +135,21 @@ class RosePruneApp(BuiltinApp):
             offset = args.pop(0)
             cycle = offset
             if ref_time_point:
-                try:
-                    time_point, parse_format = date_time_oper.date_parse()
-                    time_point = date_time_oper.date_shift(time_point, offset)
-                    cycle = date_time_oper.date_format(
-                        parse_format,
-                        time_point)
-                except ValueError:
-                    pass
+                if os.getenv("ROSE_CYCLING_MODE") == "integer":
+                    try:
+                        cycle = str(int(ref_time_point) + 
+                                    int(offset.replace("P","")))
+                    except ValueError:
+                        pass
+                else:
+                    try:
+                        time_point, parse_format = date_time_oper.date_parse()
+                        time_point = date_time_oper.date_shift(time_point, offset)
+                        cycle = date_time_oper.date_format(
+                            parse_format,
+                            time_point)
+                    except ValueError:
+                        pass
             if max_args:
                 items.append((cycle, args))
             else:
