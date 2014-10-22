@@ -28,9 +28,9 @@ import re
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
-from rose.suite_engine_proc import \
-        SuiteEngineProcessor, SuiteScanResult, \
-        SuiteEngineGlobalConfCompatError, TaskProps
+from rose.suite_engine_proc import (
+    SuiteEngineProcessor, SuiteScanResult,
+    SuiteEngineGlobalConfCompatError, TaskProps)
 import socket
 import sqlite3
 import tarfile
@@ -64,31 +64,31 @@ class CylcProcessor(SuiteEngineProcessor):
                    "success": 3, "fail": 3, "fail(%s)": 4}
     JOB_LOGS_DB = "log/rose-job-logs.db"
     ORDERS = {
-            "time_desc":
-            "time DESC, task_events.submit_num DESC, name DESC, cycle DESC",
-            "time_asc":
-            "time ASC, task_events.submit_num ASC, name ASC, cycle ASC",
-            "cycle_desc_name_asc":
-            "cycle DESC, name ASC, task_events.submit_num DESC",
-            "cycle_desc_name_desc":
-            "cycle DESC, name DESC, task_events.submit_num DESC",
-            "cycle_asc_name_asc":
-            "cycle ASC, name ASC, task_events.submit_num DESC",
-            "cycle_asc_name_desc":
-            "cycle ASC, name DESC, task_events.submit_num DESC",
-            "name_asc_cycle_asc":
-            "name ASC, cycle ASC, task_events.submit_num DESC",
-            "name_desc_cycle_asc":
-            "name DESC, cycle ASC, task_events.submit_num DESC",
-            "name_asc_cycle_desc":
-            "name ASC, cycle DESC, task_events.submit_num DESC",
-            "name_desc_cycle_desc":
-            "name DESC, cycle DESC, task_events.submit_num DESC"}
+        "time_desc":
+        "time DESC, task_events.submit_num DESC, name DESC, cycle DESC",
+        "time_asc":
+        "time ASC, task_events.submit_num ASC, name ASC, cycle ASC",
+        "cycle_desc_name_asc":
+        "cycle DESC, name ASC, task_events.submit_num DESC",
+        "cycle_desc_name_desc":
+        "cycle DESC, name DESC, task_events.submit_num DESC",
+        "cycle_asc_name_asc":
+        "cycle ASC, name ASC, task_events.submit_num DESC",
+        "cycle_asc_name_desc":
+        "cycle ASC, name DESC, task_events.submit_num DESC",
+        "name_asc_cycle_asc":
+        "name ASC, cycle ASC, task_events.submit_num DESC",
+        "name_desc_cycle_asc":
+        "name DESC, cycle ASC, task_events.submit_num DESC",
+        "name_asc_cycle_desc":
+        "name ASC, cycle DESC, task_events.submit_num DESC",
+        "name_desc_cycle_desc":
+        "name DESC, cycle DESC, task_events.submit_num DESC"}
     PGREP_CYLC_RUN = r"python.*cylc-(run|restart) .*\<%s\>"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
     REC_CYCLE_TIME = re.compile(
-        r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z") # Good enough?
+        r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     REC_SIGNALLED = re.compile(r"Task\sjob\sscript\sreceived\ssignal\s(\S+)")
     SCHEME = "cylc"
@@ -100,7 +100,7 @@ class CylcProcessor(SuiteEngineProcessor):
     SUITE_DB = "cylc-suite.db"
     SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
-    TIMEOUT = 5 # seconds
+    TIMEOUT = 5  # seconds
 
     def __init__(self, *args, **kwargs):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
@@ -118,12 +118,12 @@ class CylcProcessor(SuiteEngineProcessor):
         expected = os.path.join("~", self.SUITE_DIR_REL_ROOT)
         expected = os.path.expanduser(expected)
         for key in ["[hosts][localhost]run directory",
-                     "[hosts][localhost]work directory"]:
+                    "[hosts][localhost]work directory"]:
             out = self.popen("cylc", "get-global-config", "-i", key)[0]
             lines = out.splitlines()
             if lines and lines[0] != expected:
                 raise SuiteEngineGlobalConfCompatError(
-                            self.SCHEME, key, lines[0])
+                    self.SCHEME, key, lines[0])
 
     def clean_hook(self, suite_name=None):
         """Run "cylc refresh --unregister" (at end of "rose suite-clean")."""
@@ -168,8 +168,8 @@ class CylcProcessor(SuiteEngineProcessor):
         old_suite_rc_processed = None
         if os.path.exists(suite_rc_processed):
             f_desc, old_suite_rc_processed = mkstemp(
-                                                dir=suite_dir,
-                                                prefix="suite.rc.processed.")
+                dir=suite_dir,
+                prefix="suite.rc.processed.")
             os.close(f_desc)
             os.rename(suite_rc_processed, old_suite_rc_processed)
         try:
@@ -325,10 +325,6 @@ class CylcProcessor(SuiteEngineProcessor):
             entries.append(entry)
             events = events_str.split(",")
             times = times_str.split(",")
-            if messages_str:
-                messages = messages_str.split(",")
-            else:
-                messages = events
             event_rank = -1
             for event, time_ in zip(events, times):
                 my_event = self.EVENTS.get(event)
@@ -569,10 +565,10 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         try:
             out = self.popen(
-                    "cylc", "get-config", "-o",
-                    "-i", "[runtime][%s][remote]owner" % task_name,
-                    "-i", "[runtime][%s][remote]host" % task_name,
-                    suite_name)[0]
+                "cylc", "get-config", "-o",
+                "-i", "[runtime][%s][remote]owner" % task_name,
+                "-i", "[runtime][%s][remote]host" % task_name,
+                suite_name)[0]
         except RosePopenError:
             return
         user, host = (None, None)
@@ -726,14 +722,14 @@ class CylcProcessor(SuiteEngineProcessor):
                     cols = line.split()
                     if cols[0].isdigit():
                         proc_reasons.append({
-                                    "host": host,
-                                    "reason_key": self.REASON_KEY_PROC,
-                                    "reason_value": line})
+                            "host": host,
+                            "reason_key": self.REASON_KEY_PROC,
+                            "reason_value": line})
                     else:
                         file_reasons.append({
-                                    "host": host,
-                                    "reason_key": self.REASON_KEY_FILE,
-                                    "reason_value": line})
+                            "host": host,
+                            "reason_key": self.REASON_KEY_FILE,
+                            "reason_value": line})
             if host_proc_dict:
                 sleep(0.1)
 
@@ -745,7 +741,7 @@ class CylcProcessor(SuiteEngineProcessor):
         #      port file is reported.
         if ("localhost" in hosts and
                 os.path.exists(os.path.expanduser(port_file))):
-            return [{"host":"localhost",
+            return [{"host": "localhost",
                      "reason_key": self.REASON_KEY_FILE,
                      "reason_value": port_file}]
 
@@ -894,9 +890,9 @@ class CylcProcessor(SuiteEngineProcessor):
                     if includes:
                         data["glob_"] = includes[-1][1:]  # Remove leading /
                     cmd = self.popen.get_cmd(
-                            "ssh", auth,
-                            ("cd %(log_dir_rel)s && " +
-                             "(! test -f %(uuid)s && ls -d %(glob_)s)") % data)
+                        "ssh", auth,
+                        ("cd %(log_dir_rel)s && " +
+                         "(! test -f %(uuid)s && ls -d %(glob_)s)") % data)
                     ret_code, ssh_ls_out, _ = self.popen.run(*cmd)
                     if ret_code:
                         continue
@@ -916,8 +912,8 @@ class CylcProcessor(SuiteEngineProcessor):
                         continue
                     try:
                         cmd = self.popen.get_cmd(
-                                "ssh", auth,
-                                "cd %(log_dir_rel)s && rm -fr %(glob_)s" % data)
+                            "ssh", auth,
+                            "cd %(log_dir_rel)s && rm -fr %(glob_)s" % data)
                         self.popen(*cmd)
                     except RosePopenError as exc:
                         self.handle_event(exc, level=Reporter.WARN)
@@ -967,8 +963,8 @@ class CylcProcessor(SuiteEngineProcessor):
         host_proc_dict = {}
         for host in sorted(hosts):
             proc = self.popen.run_bg(
-                    "cylc", "ping", "--host=" + host, suite_name,
-                    "--pyro-timeout=" + str(timeout))
+                "cylc", "ping", "--host=" + host, suite_name,
+                "--pyro-timeout=" + str(timeout))
             host_proc_dict[host] = proc
         ping_ok_hosts = []
         while host_proc_dict:
@@ -1025,8 +1021,8 @@ class CylcProcessor(SuiteEngineProcessor):
         # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
         # that the log will be redirected back via "ssh" to the localhost.
         bash_cmd = r"cylc %s%s %s %s" % (
-                run_mode, opt_force, suite_name,
-                self.popen.list_to_shell_str(args))
+            run_mode, opt_force, suite_name,
+            self.popen.list_to_shell_str(args))
         if host:
             bash_cmd_prefix = "set -eu\ncd\n"
             log_dir = self.get_suite_dir_rel(suite_name, "log")
@@ -1060,19 +1056,16 @@ class CylcProcessor(SuiteEngineProcessor):
             hosts = ["localhost"]
         if timeout is None:
             timeout = self.TIMEOUT
+        cmd = ["cylc", "scan", "--pyro-timeout=%s" % timeout] + list(hosts)
         procs = {}
+        procs[(_PORT_SCAN, None, tuple(cmd))] = self.popen.run_bg(*cmd)
         for host in sorted(hosts):
-            cmd = ["cylc", "scan", "--host=" + host,
-                   "--pyro-timeout=%s" % timeout]
-            proc = self.popen.run_bg(*cmd)
-            procs[(host, _PORT_SCAN, tuple(cmd))] = proc
             sh_cmd = "whoami && cd ~/.cylc/ports/ && ls || true"
             if host == "localhost":
                 cmd = ["bash", "-c", sh_cmd]
             else:
                 cmd = self.popen.get_cmd("ssh", host, sh_cmd)
-            proc = self.popen.run_bg(*cmd)
-            procs[(host, _PORT_FILE, tuple(cmd))] = proc
+            procs[(_PORT_FILE, host, tuple(cmd))] = self.popen.run_bg(*cmd)
         results = {}
         exceptions = []
         while procs:
@@ -1081,31 +1074,29 @@ class CylcProcessor(SuiteEngineProcessor):
                 if ret_code is None:
                     continue
                 procs.pop(keys)
-                host, key, cmd = keys
+                key, host, cmd = keys
                 if ret_code == 0:
                     if key == _PORT_SCAN:
                         for line in proc.communicate()[0].splitlines():
                             name, user, host, port = line.split()
-                            auth = "%s@%s:%s" % (user, host, port)
-                            result = SuiteScanResult(name, auth)
-                            results[(name, host, key)] = result
+                            results[(name, host, key)] = SuiteScanResult(
+                                name, "%s@%s:%s" % (user, host, port))
                             # N.B. Trust port-scan over port-file
                             for i_host in hosts:
                                 try:
                                     results.pop((name, i_host, _PORT_FILE))
                                 except KeyError:
                                     pass
-                    else: # if key == _PORT_FILE:
+                    else:  # if key == _PORT_FILE:
                         lines = proc.communicate()[0].splitlines()
                         user = lines.pop(0)
                         for name in lines:
                             # N.B. Trust port-scan over port-file
                             if (name, host, _PORT_SCAN) in results:
                                 continue
-                            location = "%s@%s:%s" % (
-                                    user, host, "~/.cylc/ports/" + name)
-                            result = SuiteScanResult(name, location)
-                            results[(name, host, key)] = result
+                            results[(name, host, key)] = SuiteScanResult(
+                                name, "%s@%s:%s" % (
+                                    user, host, "~/.cylc/ports/" + name))
                 else:
                     out, err = proc.communicate()
                     exceptions.append(RosePopenError(cmd, ret_code, out, err))
@@ -1134,7 +1125,7 @@ class CylcProcessor(SuiteEngineProcessor):
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
         self.popen.run_simple(
-                *command, env=environ, stderr=stderr, stdout=stdout)
+            *command, env=environ, stderr=stderr, stdout=stdout)
 
     def _db_close(self, db_name, user_name, suite_name):
         """Close a named database connection."""
@@ -1156,7 +1147,7 @@ class CylcProcessor(SuiteEngineProcessor):
             if user_name:
                 prefix += user_name
             db_f_name = os.path.expanduser(os.path.join(
-                    prefix, self.get_suite_dir_rel(suite_name, db_name)))
+                prefix, self.get_suite_dir_rel(suite_name, db_name)))
             self.daos[db_name][key] = DAO(db_f_name)
         return self.daos[db_name][key]
 
@@ -1279,5 +1270,4 @@ class SuiteNotRegisteredError(Exception):
 
     """An exception raised when a suite is not registered."""
     def __str__(self):
-        return ("%s: not a registered suite."
-                 % self.args[0])
+        return "%s: not a registered suite." % self.args[0]
