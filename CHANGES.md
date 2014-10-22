@@ -13,7 +13,7 @@ Rose release 20. This release will work best with
 ### Highlighted Changes
 
 [#1395](https://github.com/metomi/rose/pull/1395):
-rosie.ws_client: support multiple sources.
+rosie.ws\_client: support multiple sources.
 * Rosie discovery service clients `rosie go`, `rosie lookup` and `rosie ls`
   will automatically work with all `[rosie-id]prefix-ws.*` services in
   site/user configuration.
@@ -26,6 +26,24 @@ rosie.ws_client: support multiple sources.
 
 ### Noteworthy Changes
 
+[#1437](https://github.com/metomi/rose/pull/1437):
+rose\_prune: now support integer cycling.
+
+[#1436](https://github.com/metomi/rose/pull/1436):
+rose config-edit and rose macro: improve error message on `fail-if` syntax
+error.
+
+[#1435](https://github.com/metomi/rose/pull/1435):
+rose config-edit: fix copy-and-paste large amount of text into a spaced list
+widget now works correctly.
+
+[#1434](https://github.com/metomi/rose/pull/1434):
+rose app-upgrade: allow users to upgrade to non-named version without using the
+`--all-versions` option.
+
+[#1433](https://github.com/metomi/rose/pull/1433):
+rose config-edit: fix choices widget empty error.
+
 [#1432](https://github.com/metomi/rose/pull/1432):
 rose config-edit: fix derived type array in column page.
 
@@ -35,10 +53,10 @@ rose config-edit: fix preview app metadata refresh.
 [#1430](https://github.com/metomi/rose/pull/1430):
 rose config-edit: fix spaced widget bug. The problem was misuse of the
 `last_value` property across all array widgets, which happened to work as it
-was always set to the actual current value, except in the spaced_list widget.
+was always set to the actual current value, except in the spaced\_list widget.
 
 [#1428](https://github.com/metomi/rose/pull/1428):
-rose_arch: improve documentation.
+rose\_arch: improve documentation.
 
 --------------------------------------------------------------------------------
 
@@ -62,7 +80,7 @@ isodatetime: update to release 2014.10.0.
 rose date: don't display unecessary float in a duration format.
 
 [#1422](https://github.com/metomi/rose/pull/1422):
-rose suite-* commands: improve the pattern used in `pgrep` to detect whether
+rose suite-\* commands: improve the pattern used in `pgrep` to detect whether
 a suite is still running or not.
 
 [#1421](https://github.com/metomi/rose/pull/1421):
