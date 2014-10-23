@@ -258,7 +258,7 @@ Rosie.query = function() {
         var suffix = row.attr("id").substr(1);
     });
     if ($("#query-all").attr("checked")) {
-        q += "&all_revs"
+        q += "&all_revs=1"
     }
     if (q_open_groups != 0) {
         alert("Parenthesis error");
@@ -400,10 +400,10 @@ $(function() {
 {% endif %}
       <label for="search-all">all revisions</label>
 {% if all_revs %}
-      <input id="search-all" type="checkbox" name="all_revs"
+      <input id="search-all" type="checkbox" name="all_revs" value="1"
       checked="checked" />
 {% else %}
-      <input id="search-all" type="checkbox" name="all_revs" />
+      <input id="search-all" type="checkbox" name="all_revs" value="1" />
 {% endif %}
       <input type="submit" value="search"/>
     </div>
@@ -503,10 +503,10 @@ $(function() {
       <button type="button" onclick="javascript: Rosie.query_add();">+</button>
       <label for="query-all">all revisions</label>
 {%- if all_revs %}
-      <input id="query-all" type="checkbox" name="all_revs"
+      <input id="query-all" type="checkbox" name="all_revs" value="1"
       checked="checked" />
 {%- else %}
-      <input id="query-all" type="checkbox" name="all_revs" />
+      <input id="query-all" type="checkbox" name="all_revs" value="1" />
 {%- endif %}
       <label for="show-groups">group controls</label>
       <input id="show-groups" type="checkbox" name="show_groups"
