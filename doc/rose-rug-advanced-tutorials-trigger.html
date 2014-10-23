@@ -174,7 +174,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
       <samp>trigger-ignored</samp>.</p>
 
       <p>You can fix them on the command line by running <code>rose macro
-      --fix</code> or <code>rose macro -F</code> - this is what you would do if
+      --fix</code> or <code>rose macro -F</code> in the app directory (one level up from the meta directory) - this is what you would do if
       you were working with a text editor and made changes to values.</p>
     </div>
 
@@ -296,6 +296,14 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
       irrelevant and will also be <samp>trigger-ignored</samp>.</p>
     </div>
 
+    <p>We need to add <var>no_mushrooms</var> to the <var>[namelist:pizza_order=pizza_type]</var> section so that it is <samp>trigger-ignored</samp> when no pizza can be ordered - replace the
+      <samp>[namelist:pizza_order=pizza_type]</samp> trigger with:</p>
+      <pre class="prettyprint lang-rose_conf">
+trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
+        namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
+        namelist:pizza_order=no_mushrooms;
+     </pre>
+
     <div class="slide">
       <h3 class="alwayshidden">Cascading Triggering Continued</h3>
 
@@ -338,6 +346,7 @@ values='Garlic','Sour Cream','Salsa','Brown Sauce','Mustard'
       <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
+        namelist:pizza_order=no_mushrooms;
         namelist:pizza_order=dip_type;
 </pre>
 
