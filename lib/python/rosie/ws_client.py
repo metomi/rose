@@ -81,7 +81,11 @@ class RosieWSClient(object):
                 self.auth_managers[prefix] = RosieWSClientAuthManager(
                     prefix, popen=self.popen, prompt_func=self.prompt_func)
         if not prefixes:
-            prefixes = sorted(self.auth_managers.keys())
+            prefixes_str = conf_rosie_id.get_value(["prefixes-ws-default"])
+            if prefixes_str:
+                prefixes = shlex.split(prefixes_str)
+            else:
+                prefixes = sorted(self.auth_managers.keys())
         self.set_prefixes(prefixes)
 
     def set_prefixes(self, prefixes):
