@@ -626,7 +626,7 @@ class CylcProcessor(SuiteEngineProcessor):
         task_name = os.environ["CYLC_TASK_NAME"]
         task_cycle_time = os.environ["CYLC_TASK_CYCLE_TIME"]
         cycling_mode = os.environ.get("CYLC_CYCLING_MODE", "gregorian")
-        if task_cycle_time == "1":
+        if task_cycle_time == "1" and not cycling_mode == "integer":
             task_cycle_time = None
         task_log_root = os.environ["CYLC_TASK_LOG_ROOT"]
         task_is_cold_start = "false"
