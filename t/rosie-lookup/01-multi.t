@@ -24,7 +24,7 @@
 if ! python -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all 'python: cherrypy or sqlalchemy not installed'
 fi
-tests 15
+tests 18
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.
 export TZ='UTC'
@@ -41,7 +41,7 @@ SVN_URL_BAR="file://${PWD}/repos/bar"
 # Setup configuration file.
 mkdir conf
 cat >conf/rose.conf <<__ROSE_CONF__
-opts=port
+opts=port (default)
 
 [rosie-db]
 repos.bar=$PWD/repos/bar
@@ -136,6 +136,20 @@ file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-search-single"
 run_pass "${TEST_KEY}" rosie lookup --prefix=foo 'bus'
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
+local suite             owner project title
+      foo-aa000/trunk@1 billy bus     Wheels on the bus
+url: http://${HOSTNAME}:${PORT}/foo/search?s=bus
+__OUT__
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-search-single-by-default"
+cat >'conf/opt/rose-default.conf' <<__ROSE_CONF__
+[rosie-id]
+prefixes-ws-default=foo
+__ROSE_CONF__
+run_pass "${TEST_KEY}" rosie lookup 'bus'
+rm 'conf/opt/rose-default.conf'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
 local suite             owner project title
       foo-aa000/trunk@1 billy bus     Wheels on the bus

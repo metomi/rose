@@ -281,10 +281,15 @@
 #  prefix-web.PREFIX=URL
 ## E.g.:
 #  prefix-web.foo=http://host/projects/foo/intertrac/source:
-## Web service URL of an ID prefix
+## Discovery service URL of an ID prefix
 #  prefix-ws.PREFIX=URL
 ## E.g.:
 #  prefix-ws.foo=http://host:port/rosie/foo
+## List of default discovery services (space delimited list of prefixes)
+## that will be used by a Rosie discovery service client
+#  prefixes-ws-default=PREFIX ...
+## E.g.:
+#  prefixes-ws-default=foo bar baz
 [rosie-id]
 
 # Configuration related to the adhoc Rosie web service server
