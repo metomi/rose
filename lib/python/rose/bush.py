@@ -354,6 +354,8 @@ class Root(object):
         else:
             file_content = self.suite_engine_proc.is_conf(path)
         template = self.template_env.get_template("view.html")
+        data = {}
+        data.update(self._get_suite_logs_info(user, suite))
         return template.render(
                 rose_version=self.rose_version,
                 script=cherrypy.request.script_name,
@@ -366,7 +368,8 @@ class Root(object):
                 f_name=f_name,
                 mode=mode,
                 file_content=file_content,
-                lines=lines)
+                lines=lines,
+                **data)
 
     def _get_suite_logs_info(self, user, suite):
         data = {"info": {}, "files": {}}
