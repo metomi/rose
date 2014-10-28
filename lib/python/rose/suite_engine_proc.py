@@ -549,7 +549,7 @@ class SuiteEngineProcessor(object):
                             sign_factor = -1
                         offset_val = cycle_offset.replace("__", "")
                         cycle_time = str(int(task_cycle_time)
-                             + sign_factor * int(offset_val.replace("P","")))
+                             + sign_factor * int(offset_val.replace("P", "")))
                     else:
                         cycle_offset = get_cycle_offset(v)
                         cycle_time = self._get_offset_cycle_time(
