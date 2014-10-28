@@ -492,6 +492,14 @@ class CylcProcessor(SuiteEngineProcessor):
             break
         if not of_n_entries:
             return ([], 0)
+
+        integer_mode = True
+        stmt = "SELECT DISTINCT cycle FROM task_states"
+        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
+            if not row[0].isdigit():
+                integer_mode = False
+                break
+
         stmt_args = self.state_of.keys()
         stmt = (
             "SELECT cycle, fail_count, max(time_updated), group_concat(status)"
@@ -505,7 +513,11 @@ class CylcProcessor(SuiteEngineProcessor):
             if i:
                 stmt += " OR"
             stmt += " status==?"
-        stmt += ") GROUP BY cycle ORDER BY cycle DESC"
+        if integer_mode:
+            stmt += ") GROUP BY cycle ORDER BY cast(cycle as number) DESC"
+        else:
+            stmt += ") GROUP BY cycle ORDER BY cycle DESC"
+
         if limit:
             stmt += " LIMIT ? OFFSET ?"
             stmt_args += [limit, offset]
