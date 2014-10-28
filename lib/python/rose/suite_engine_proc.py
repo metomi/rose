@@ -648,10 +648,7 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def launch_suite_log_browser(self, user_name, suite_name):
-        """Launch web browser to view suite log.        if offset_text.startswith("__"):
-            self.sign_factor = 1
-        else:
-            self.sign_factor = -1
+        """Launch web browser to view suite log.
 
         Return URL of suite log on success, None otherwise.
 
