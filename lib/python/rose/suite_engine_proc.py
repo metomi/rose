@@ -541,9 +541,19 @@ class SuiteEngineProcessor(object):
                 for v in kwargs.get("cycle_offsets"):
                     cycle_offset_strings.extend(v.split(","))
                 for v in cycle_offset_strings:
-                    cycle_offset = get_cycle_offset(v)
-                    cycle_time = self._get_offset_cycle_time(
-                            task_cycle_time, cycle_offset)
+                    if t.cycling_mode == "integer":
+                        cycle_offset = v
+                        if cycle_offset.startswith("__"):
+                            sign_factor = 1
+                        else:
+                            sign_factor = -1
+                        offset_val = cycle_offset.replace("__", "")
+                        cycle_time = str(int(task_cycle_time)
+                             + sign_factor * int(offset_val.replace("P", "")))
+                    else:
+                        cycle_offset = get_cycle_offset(v)
+                        cycle_time = self._get_offset_cycle_time(
+                                task_cycle_time, cycle_offset)
                     t.dir_data_cycle_offsets[str(cycle_offset)] = os.path.join(
                             t.dir_data, cycle_time)
 
