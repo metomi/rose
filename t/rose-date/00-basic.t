@@ -113,9 +113,9 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Parse format and print format (4).
 TEST_KEY=$TEST_KEY_BASE-parse-print-4
-run_pass "$TEST_KEY" rose date -p "%Y%m%d%H%M%S" -f "%s" '20140402100000'
+run_pass "$TEST_KEY" rose date -u -p "%Y%m%d%H%M%S" -f "%s" '20140402100000'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-1396429200
+1396432800
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
