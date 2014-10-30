@@ -107,7 +107,6 @@
         <li>Cylc basic usage</li>
 
         <li>basic suite design</li>
-
       </ul>
     </div>
 
@@ -455,16 +454,16 @@ default=echo 'Hello World'
             WORLD = neptune
 </pre>
 
-    <div class="slide">
-      <h2 id="remote-hosts">Remote Hosts</h2>
+      <div class="slide">
+        <h2 id="remote-hosts">Remote Hosts</h2>
 
-      <p>So far, the example tasks run on the localhost - it is usually better
-      to farm off tasks to a remote host like a compute server or a
-      cluster/supercomputer.</p>
+        <p>So far, the example tasks run on the localhost - it is usually
+        better to farm off tasks to a remote host like a compute server or a
+        cluster/supercomputer.</p>
 
-      <p>We could set <samp>hello_eris</samp> to run on a given host by setting
-      <samp>[[[remote]]]</samp> section settings:</p>
-      <pre class="prettyprint lang-cylc">
+        <p>We could set <samp>hello_eris</samp> to run on a given host by
+        setting <samp>[[[remote]]]</samp> section settings:</p>
+        <pre class="prettyprint lang-cylc">
     [[hello_eris]]
         inherit = HELLO_FAMILY
         [[[environment]]]
@@ -472,7 +471,7 @@ default=echo 'Hello World'
         [[[remote]]]
             host = voyager_1
 </pre>
-    </div>
+      </div>
 
       <p>The order in which they are combined is essentially last to first -
       e.g. <samp>HELLO_FAMILY</samp> will override any shared setting in
@@ -744,8 +743,8 @@ type=boolean
         <li>Go through the <a href="rose-rug-suite-writing-tutorial.html">Suite
         Writing Tutorial</a>.</li>
 
-        <li>If you have time, look at some of the
-        <a href="rose.html#advanced">Advanced Suite Tutorials</a>.</li>
+        <li>If you have time, look at some of the <a href=
+        "rose.html#advanced">Advanced Suite Tutorials</a>.</li>
       </ul>
     </div>
   </div>
