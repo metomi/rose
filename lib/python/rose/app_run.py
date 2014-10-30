@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 """Implement "rose app-run"."""
 
+from glob import glob
 import os
 from rose.config import ConfigDumper
 from rose.env import env_var_process, UnboundEnvironmentVariableError
@@ -293,7 +294,7 @@ class AppRunner(Runner):
             is_done = self.popen.run(
                 test, shell=True, stdout=sys.stdout, stderr=sys.stderr)[0] == 0
         else:
-            is_done = os.path.exists(file_)
+            is_done = bool(glob(file_))
         self.handle_event(PollEvent(time(), "file:" + file_, is_done))
         return is_done
 
