@@ -200,7 +200,7 @@ touch meta/lib/python/macros/planet.py
       <pre class="prettyprint">
     def _get_allowed_planets(self):
         # Retrieve planets less than a certain distance away.
-        cmd_strings = ["wget", "-q", "-O", "-",
+        cmd_strings = ["curl", "-s",
                        "http://www.heavens-above.com/planetsummary.aspx"]
         p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
         text = p.communicate()[0]
