@@ -423,6 +423,24 @@ value-titles=low, medium, high
         <samp>high</samp> for <samp>2</samp>.</p>
       </dd>
 
+      <dt id="meta.conf.value.value-hints">value-hints</dt>
+
+      <dd>
+        <p>Define a comma <kbd>,</kbd> separated list of suggested values for
+        a variable as <code>value-hints</code>, but still allows the user to
+       provide their own override. This is like an auto-complete widget.
+        </p>
+        <p>For example, given the following metadata:</p>
+        <pre class="prettyprint lang-rose_conf">
+[env=suggested_fruit]
+value-hints=pineapple,cherry,banana,apple,pear,mango,kiwi,grapes,peach,fig,
+           =orange,strawberry,blackberry,blackcurrent,raspberry,melon,plumb
+</pre>
+
+        <p>the config editor will display possible option values when the 
+        user starts typing if they match a suggested value.</p>
+      </dd>
+
       <dt id="meta.conf.value.range">range</dt>
 
       <dd>

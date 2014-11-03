@@ -188,6 +188,17 @@ def _check_values(value):
         return INVALID_SYNTAX.format(value)
 
 
+def _check_value_hints(hints_value):
+    """Checks that the input is a valid format"""
+    try:
+        hints_list = rose.variable.array_split(hints_value,
+                                               only_this_delim=",")
+    except Exception as exc:
+        return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
+    if not hints_list:
+        return INCOMPATIBLE.format(rose.META_PROP_VALUES)
+
+
 def _check_widget(value, module_files=None, meta_dir=None):
     if module_files is None:
         module_files = _get_module_files(meta_dir)

@@ -81,6 +81,7 @@ META_PROP_TYPE = "type"
 META_PROP_URL = "url"
 META_PROP_VALUES = "values"
 META_PROP_VALUE_TITLES = "value-titles"
+META_PROP_VALUE_HINTS = "value-hints"
 META_PROP_WARN_IF = "warn-if"
 META_PROP_WIDGET = "widget"
 
