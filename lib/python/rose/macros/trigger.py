@@ -23,6 +23,7 @@ import os
 
 import rose.config
 import rose.config_tree
+import rose.env
 import rose.macro
 import rose.macros.rule
 import rose.resource
@@ -472,6 +473,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             else:
                 if string == value:
                     return True
+        if rose.env.contains_env_var(value):
+            # Assume a match in this case.
+            return True
         return False
 
     def evaluate_trig_rule(self, rule, setting_id, value):
