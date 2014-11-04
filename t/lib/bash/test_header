@@ -139,22 +139,12 @@ function file_cmp() {
     local TEST_KEY=$1
     local FILE_ACTUAL=$2
     local FILE_EXPECT=${3:--}
-    if diff -u $FILE_EXPECT $FILE_ACTUAL >&2; then
+    if cmp -s $FILE_EXPECT $FILE_ACTUAL; then
         pass $TEST_KEY
         return
     fi
     fail $TEST_KEY
-}
-
-function file_xxdiff() {
-    local TEST_KEY=$1
-    local FILE_ACTUAL=$2
-    local FILE_EXPECT=${3:--}
-    if xxdiff -D $FILE_ACTUAL $FILE_EXPECT; then
-        pass $TEST_KEY
-        return
-    fi
-    fail $TEST_KEY
+    ${DIFFTOOL} "${FILE_EXPECT}" "${FILE_ACTUAL}" >&2
 }
 
 function file_test() {
@@ -244,6 +234,8 @@ function port_is_busy() {
 
 ROSE_HOME=${ROSE_HOME:-$(cd $(dirname $BASH_SOURCE)/../../.. && pwd)}
 PATH=$ROSE_HOME/bin:$PATH
+
+DIFFTOOL=$(rose config '--default=diff -u' t difftool)
 
 TEST_KEY_BASE=$(basename $0 .t)
 TEST_SOURCE_DIR=$(cd $(dirname $0) && pwd)

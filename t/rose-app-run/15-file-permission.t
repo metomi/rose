@@ -39,9 +39,9 @@ test_setup
 mkdir read_only_dest
 chmod u-w read_only_dest
 run_fail "$TEST_KEY" rose app-run --config=../config -q
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] [Errno 13] Permission denied: 'read_only_dest/foo.nl'
 __ERR__
 chmod u+w read_only_dest
@@ -58,9 +58,9 @@ TEST_KEY=$TEST_KEY_BASE-no-read-target-file
 touch $TEST_DIR/no_read_target
 chmod u-r $TEST_DIR/no_read_target
 run_fail "$TEST_KEY" rose app-run --config=../config -q
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] [Errno 13] Permission denied: '$TEST_DIR/no_read_target'
 __ERR__
 chmod u+r $TEST_DIR/no_read_target
@@ -78,7 +78,7 @@ TEST_KEY=$TEST_KEY_BASE-no-read-target-dir
 mkdir $TEST_DIR/no_read_target_dir
 chmod u-r $TEST_DIR/no_read_target_dir
 run_fail "$TEST_KEY" rose app-run --config=../config -q
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 file_grep "$TEST_KEY.err" "Permission denied" "$TEST_KEY.err"
 chmod u+r $TEST_DIR/no_read_target_dir
@@ -97,9 +97,9 @@ mkdir $TEST_DIR/no_read_target_dir
 touch $TEST_DIR/no_read_target_dir/qux
 chmod u-x $TEST_DIR/no_read_target_dir
 run_fail "$TEST_KEY" rose app-run --config=../config -q
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] file:qux=source=$TEST_DIR/no_read_target_dir/qux: bad setting
 __ERR__
 chmod u+x $TEST_DIR/no_read_target_dir

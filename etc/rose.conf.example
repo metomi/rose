@@ -312,6 +312,12 @@
 
 # Test Battery Configuration
 #
+## Tool to compare 2 files when there are differences.
+## (default="diff -u")
+#  difftool=COMMAND ...
+## E.g.:
+#  difftool=xxdiff
+#
 ## List of selectable host groups
 #  host-groups=GROUP ...
 ## E.g.:
