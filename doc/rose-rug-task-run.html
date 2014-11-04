@@ -299,12 +299,18 @@ greet_martians=echo Greeting Martians
       <li><dfn>Poll all files</dfn> This can be configured by adding the
       <var>[poll]all-files</var> setting in the application configuration file.
       The value of the setting is expected to be a list of space delimited list
-      of file paths. This test passes only if all file paths in the list
-      exist.</li>
+      of items. Each item can be a file path or a file glob pattern. This test
+      passes only if all items in the list exist. E.g. a list with <kbd>file1
+      file2 file3*</kbd> means that <samp>file1</samp>, <samp>file2</samp>
+      <strong>and</strong> any file matching the glob pattern
+      <samp>file3*</samp> must exist for the test to pass.</li>
 
       <li><dfn>Poll any files</dfn> This can be configured by adding the
       <var>[poll]any-files</var> setting in the application configuration file,
-      as above. This test passes if any file path in the list exists.</li>
+      as above. This test passes if any item in the list exists. E.g. a list
+      with <kbd>file1 file2 file3*</kbd> means that <samp>file1</samp>,
+      <samp>file2</samp> <strong>or</strong> any file matching the glob pattern
+      <samp>file3*</samp> must exist for the test to pass.</li>
 
       <li><dfn>Poll with a shell command</dfn> This can be configured by adding
       the <var>[poll]test</var> setting in the application configuration file.

@@ -7,12 +7,13 @@ for a full listing of issues for each release.
 
 ## Next Release (2014-Q4?)
 
-Rose release 20. This release will work best with
-[Cylc](https://github.com/cylc/cylc/) 6.0.1 and beyond.
+Rose release 20. This release will work best with the upcoming
+[Cylc](https://github.com/cylc/cylc/) 6.1.0 and beyond.
 
 ### Highlighted Changes
 
-[#1395](https://github.com/metomi/rose/pull/1395):
+[#1395](https://github.com/metomi/rose/pull/1395),
+[#1438](https://github.com/metomi/rose/pull/1438):
 rosie.ws\_client: support multiple sources.
 * Rosie discovery service clients `rosie go`, `rosie lookup` and `rosie ls`
   will automatically work with all `[rosie-id]prefix-ws.*` services in
@@ -26,8 +27,24 @@ rosie.ws\_client: support multiple sources.
 
 ### Noteworthy Changes
 
-[#1437](https://github.com/metomi/rose/pull/1437):
-rose\_prune: now support integer cycling.
+[#1447](https://github.com/metomi/rose/pull/1447):
+Rose Bush: file view: navigation menu now links to top level suite files.
+
+[#1442](https://github.com/metomi/rose/pull/1442):
+rosie web: fix `all revisions` checkbox. It was sending `all_revs=on` to the
+server instead of `all_revs=1`.
+
+[#1441](https://github.com/metomi/rose/pull/1441):
+rose app-run: poll: globs can now be specified in `any-files` and `all-files`.
+
+[#1439](https://github.com/metomi/rose/pull/1439):
+rose suite-scan: take advantage of new functionality of `cylc scan` multiple
+host support.
+
+[#1437](https://github.com/metomi/rose/pull/1437),
+[#1446](https://github.com/metomi/rose/pull/1446),
+[#1449](https://github.com/metomi/rose/pull/1449):
+rose task-env, rose\_prune and Rose Bush: now support integer cycling.
 
 [#1436](https://github.com/metomi/rose/pull/1436):
 rose config-edit and rose macro: improve error message on `fail-if` syntax

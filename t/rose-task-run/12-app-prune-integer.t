@@ -24,9 +24,9 @@
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
     JOB_HOST=$(rose host-select $JOB_HOST)
-    tests 16
+    tests 15
 else
-    tests 13
+    tests 12
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
@@ -39,24 +39,13 @@ if [[ -n ${JOB_HOST:-} ]]; then
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
         --no-gcontrol --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\""
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" \
+        -- --debug
 else
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost
-fi
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
+        --no-gcontrol --host=localhost \
+        -- --debug
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-work
@@ -84,6 +73,6 @@ if [[ -n "$JOB_HOST" ]]; then
     run_pass "$TEST_KEY.3" ssh "$JOB_HOST" "ls -d ~/cylc-run/$NAME/log/job/3"
 fi
 #-------------------------------------------------------------------------------
-#rose suite-clean --name=$NAME
+rose suite-clean -y --name=$NAME
 #-------------------------------------------------------------------------------
 exit 0

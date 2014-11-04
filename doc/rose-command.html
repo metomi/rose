@@ -2204,7 +2204,7 @@ launcher-preopts.mpiexec=-n $NPROC
           <li>A <var>__</var> (double underscore) prefix denotes a cycle time
           in the future. Otherwise, it is a cycle time in the past.</li>
 
-          <li>The rest should be an <a href=
+          <li>The rest should be either an <a href=
           "http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>
           duration, such as:
 
@@ -2218,6 +2218,15 @@ launcher-preopts.mpiexec=-n $NPROC
               <li><samp>P4M</samp> - 4 months</li>
 
               <li><samp>PT5M</samp> - 5 minutes</li>
+            </ul>
+          </li>
+
+          <li>Or, for the case of integer cycling suites:
+
+            <ul>
+              <li><samp>P1</samp> - 1 cycle before the current cycle</li>
+
+              <li><samp>P5</samp> - 5 cycles before the current cycle</li>
             </ul>
           </li>
 
