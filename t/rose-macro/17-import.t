@@ -91,7 +91,7 @@ SPONGE_DENSITY=20.0
 __CONFIG__
 run_fail "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [V] rose.macros.DefaultValidators: issues: 4
     env=ICECREAM_FLAVOUR=chocolate
         Value chocolate should be vanilla
@@ -128,7 +128,7 @@ class SpongeDeSoggifier(rose.macro.MacroBase):
         return config, self.reports
 __MACRO__
 run_pass "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [T] desoggy.SpongeDeSoggifier
@@ -136,18 +136,18 @@ file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [T] rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 __OUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Run the custom macro.
 TEST_KEY=$TEST_KEY_BASE-basic-custom-macro-run
 # Check that it gets the correct metadata.
 run_pass "$TEST_KEY" rose macro -y -M $TEST_DIR/rose-meta --config=../config desoggy.SpongeDeSoggifier
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [T] desoggy.SpongeDeSoggifier: changes: 1
     env=SPONGE_DENSITY=0.3
         de-soggified
 __OUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 exit

@@ -33,8 +33,8 @@ tests 15
 TEST_KEY=$TEST_KEY_BASE-base
 setup
 run_fail "$TEST_KEY" rose metadata-graph --debug
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [FAIL] Could not load metadata 
 __CONTENT__
 teardown
@@ -43,8 +43,8 @@ teardown
 TEST_KEY=$TEST_KEY_BASE-C
 setup
 run_fail "$TEST_KEY" rose metadata-graph --debug -C ../config
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] Could not load metadata 
 __CONTENT__
 teardown
@@ -53,8 +53,8 @@ teardown
 TEST_KEY=$TEST_KEY_BASE-unknown-option
 setup
 run_fail "$TEST_KEY" rose metadata-graph --unknown-option
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 Usage: rose metadata-graph [OPTIONS] [SECTION ...]
 
 rose metadata-graph: error: no such option: --unknown-option
@@ -66,8 +66,8 @@ init </dev/null
 TEST_KEY=$TEST_KEY_BASE-no-metadata
 setup
 run_fail "$TEST_KEY" rose metadata-graph --debug -C ../config
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [FAIL] Could not load metadata 
 __ERROR__
 teardown
@@ -78,8 +78,8 @@ init_meta </dev/null
 TEST_KEY=$TEST_KEY_BASE-null-metadata
 setup
 run_fail "$TEST_KEY" rose metadata-graph --debug -C ../config
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [FAIL] Could not load metadata 
 __ERROR__
 teardown

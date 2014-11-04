@@ -38,7 +38,7 @@ run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config/meta
 sort "$TEST_KEY.out" -o "$TEST_KEY.out"
 sed -i -e 's/\(pos\|bb\|width\|height\|lp\)="[^"]*\("\|$\)//g;' \
        -e 's/[, ]*\]\?;\? *$//g; /^\t/!d;' "$TEST_KEY.out"
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 		
 	"env=CONTROL" -> "env=CONTROL=None" [color=grey
 	"env=CONTROL" -> "env=CONTROL=bar" [color=grey

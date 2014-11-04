@@ -75,7 +75,7 @@ TEST_KEY=$TEST_KEY_BASE-add-and-trigger-non-interactive
 # Check adding
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.2
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade_0.1-0.2: changes: 2
     env=Z=1
         only one Z

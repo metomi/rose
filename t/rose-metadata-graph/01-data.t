@@ -37,7 +37,7 @@ run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config
 sort "$TEST_KEY.out" -o "$TEST_KEY.out"
 sed -i -e 's/\(pos\|bb\|width\|height\|lp\)="[^"]*\("\|$\)//g;' \
        -e 's/[, ]*\]\?;\? *$//g; /^\t/!d;' "$TEST_KEY.out"
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 		
 	"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 	"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
@@ -93,7 +93,7 @@ file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 	graph [
 	node [label="\N"
 __OUTPUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Check specific section graphing.
 TEST_KEY=$TEST_KEY_BASE-ok-sub-section
@@ -102,7 +102,7 @@ run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config namelist:qux
 sort "$TEST_KEY.out" -o "$TEST_KEY.out"
 sed -i -e 's/\(pos\|bb\|width\|height\|lp\)="[^"]*\("\|$\)//g;' \
        -e 's/[, ]*\]\?;\? *$//g; /^\t/!d;' "$TEST_KEY.out"
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 		
 	"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
 	"env=CONTROL_NAMELIST_QUX" [color=green, shape=rectangle
@@ -118,7 +118,7 @@ file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 	graph [
 	node [label="\N"
 __OUTPUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Check specific property graphing.
 TEST_KEY=$TEST_KEY_BASE-ok-property
@@ -128,7 +128,7 @@ run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config \
 sort "$TEST_KEY.out" -o "$TEST_KEY.out"
 sed -i -e 's/\(pos\|bb\|width\|height\|lp\)="[^"]*\("\|$\)//g;' \
        -e 's/[, ]*\]\?;\? *$//g; /^\t/!d;' "$TEST_KEY.out"
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 		
 	"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 	"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
@@ -184,7 +184,7 @@ file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 	graph [
 	node [label="\N"
 __OUTPUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Check specific section and specific property graphing.
 TEST_KEY=$TEST_KEY_BASE-ok-property-sub-section
@@ -194,7 +194,7 @@ run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config \
 sort "$TEST_KEY.out" -o "$TEST_KEY.out"
 sed -i -e 's/\(pos\|bb\|width\|height\|lp\)="[^"]*\("\|$\)//g;' \
        -e 's/[, ]*\]\?;\? *$//g; /^\t/!d;' "$TEST_KEY.out"
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 		
 	"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 	"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
@@ -241,6 +241,6 @@ file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 	graph [
 	node [label="\N"
 __OUTPUT__
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 exit

@@ -41,7 +41,7 @@ setup
 CONFIG_DIR=$(cd .. && pwd -P)/config
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [FAIL] $CONFIG_DIR: not an application directory.
 __CONTENT__
 teardown
