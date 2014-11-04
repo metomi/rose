@@ -1394,7 +1394,7 @@ rose date 19700101T000000Z 20380119T031407Z
 
     <h3>CONFIGURATION</h3>
 
-    <p>The command reads its settings from the <var>[rose-host-select]</var>
+    <p>The command reads its settings from the <var>[rose-mpi-launch]</var>
     section in <var>$ROSE_HOME/etc/rose.conf</var> and
     <var>$HOME/.metomi/rose.conf</var>. Valid settings are:</p>
 
@@ -1421,8 +1421,8 @@ launcher-fileopts.poe=-cmdfile $ROSE_COMMAND_FILE
 </pre>
       </dd>
 
-      <dt><kbd>launcher-preopts.LAUNCHER=OPTIONS</kbd><br />
-      <kbd>launcher-postopts.LAUNCHER=OPTIONS</kbd></dt>
+      <dt><kbd>launcher-preopts.LAUNCHER=OPTION-TEMPLATE</kbd><br />
+      <kbd>launcher-postopts.LAUNCHER=OPTION-TEMPLATE</kbd></dt>
 
       <dd>
         Specify the options to a <var>LAUNCHER</var> for launching with a
