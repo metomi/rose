@@ -261,6 +261,8 @@ def get_value_from_metadata(meta_data):
             var_value = "''"
         elif var_type == 'quoted':
             var_value = '""'
+    elif rose.META_PROP_VALUE_HINTS in meta_data:
+        var_value = array_split(meta_data[rose.META_PROP_VALUE_HINTS])[0]
     return var_value
 
 

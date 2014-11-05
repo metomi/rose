@@ -76,4 +76,7 @@ class HintsValueWidget(gtk.HBox):
         completion.set_model(model)
         completion.set_text_column(0)
         completion.set_inline_completion(True)
+        completion.set_minimum_key_length(0)
         self.entry.set_completion(completion)
+
+    
