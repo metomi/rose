@@ -10,11 +10,18 @@ for a full listing of issues for each release.
 Rose release 20. This release works best with
 [cylc-6.1.0](https://github.com/cylc/cylc/releases/tag/6.1.0).
 
+### New Package Requirements
+
+* This release adds the requirement for a pickle-safe version of python-requests.
+  (We have tested with version 2.2.1.)
+
 ### Highlighted Changes
 
 [#1395](https://github.com/metomi/rose/pull/1395),
 [#1438](https://github.com/metomi/rose/pull/1438):
 rosie.ws\_client: support multiple sources.
+* This change requires a pickle-safe version of python-requests.
+  (We have tested with version 2.2.1.)
 * Rosie discovery service clients `rosie go`, `rosie lookup` and `rosie ls`
   will automatically work with all `[rosie-id]prefix-ws.*` services in
   site/user configuration.
@@ -22,10 +29,12 @@ rosie.ws\_client: support multiple sources.
   can now be specified multiple times. The lookup mode is rationalised into a
   single option, with aliases.
 * `rosie go` updated to allow users to select any data source combination.
-* This change requires a pickle-safe version of python-requests.
-  (We have tested with version 2.2.1.)
 
 ### Noteworthy Changes
+
+[#1453](https://github.com/metomi/rose/pull/1453):
+Rose training materials: Rose User Guide: Suites divided up to facilitate training
+delivery.
 
 [#1447](https://github.com/metomi/rose/pull/1447):
 Rose Bush: file view: navigation menu now links to top level suite files.
