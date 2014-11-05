@@ -20,11 +20,13 @@ Rose release 20. This release works best with
 [#1395](https://github.com/metomi/rose/pull/1395),
 [#1438](https://github.com/metomi/rose/pull/1438):
 rosie.ws\_client: support multiple sources.
-* This change requires a pickle-safe version of python-requests.
+* This change requires a pickle-safe version of
+  [python-requests](http://docs.python-requests.org/en/latest/).
   (We have tested with version 2.2.1.)
 * Rosie discovery service clients `rosie go`, `rosie lookup` and `rosie ls`
   will automatically work with all `[rosie-id]prefix-ws.*` services in
-  site/user configuration.
+  site/user configuration. The `[rosie-id]prefixes-ws-default` setting can
+  be used to restrict the default to use a sub-set of the services.
 * The `--prefix=PREFIX` option for `rosie go`, `rosie lookup` and `rosie ls`
   can now be specified multiple times. The lookup mode is rationalised into a
   single option, with aliases.
