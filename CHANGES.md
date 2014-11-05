@@ -5,10 +5,10 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q4?)
+## 2014.11.0 (2014-11-05)
 
-Rose release 20. This release will work best with the upcoming
-[Cylc](https://github.com/cylc/cylc/) 6.1.0 and beyond.
+Rose release 20. This release works best with
+[cylc-6.1.0](https://github.com/cylc/cylc/releases/tag/6.1.0).
 
 ### Highlighted Changes
 
