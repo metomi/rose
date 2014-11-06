@@ -41,6 +41,14 @@ import time
 from urlparse import urlparse
 
 
+CREATE_INFO_CONFIG_COMMENT = """
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
+"""
+
+
 class FileExistError(Exception):
     """Raised when a file exists and can't be overwritten.
 
@@ -310,8 +318,9 @@ class RosieVCClient(object):
                 from_title = from_config.get(["title"]).value
 
         res_loc = ResourceLocator.default()
-        info_config = rose.config.load(
-                res_loc.locate("rosie-create/rose-suite.info"))
+        info_config = rose.config.ConfigNode()
+
+        # Determine prefix
         if from_id is not None:
             prefix = from_id.prefix
         elif prefix is None:
@@ -339,6 +348,7 @@ class RosieVCClient(object):
             owner = pwd.getpwuid(os.getuid())[0]
         info_config.set(["owner"], owner)
 
+        # Determine project and title
         if from_project:
             info_config.set(["project"], from_project)
         else:
@@ -348,6 +358,12 @@ class RosieVCClient(object):
                             (from_id.to_string_with_version(), from_title))
         else:
             info_config.set(["title"], "")
+
+        # Determine access list
+        access_list_str = res_loc.get_conf().get_value(
+            ["rosie-vc", "access-list-default"])
+        if access_list_str:
+            info_config.set(["access-list"], access_list_str)
         return info_config
 
     def _copy(self, info_config, from_id):
@@ -441,6 +457,7 @@ def create(argv):
         info_file = tempfile.NamedTemporaryFile(delete=False)
         try:
             rose.config.dump(info_config, info_file)
+            info_file.write(CREATE_INFO_CONFIG_COMMENT)
             info_file.close()
             command_list = client.popen.get_cmd("editor", info_file.name)
             client.popen(*command_list, stdout=sys.stdout)

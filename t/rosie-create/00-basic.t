@@ -21,11 +21,13 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 40
+tests 44
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
 cat >rose.conf <<__ROSE_CONF__
+opts=(access)
+
 [external]
 editor=$TEST_SOURCE_DIR/$TEST_KEY_BASE-edit
 
@@ -36,6 +38,7 @@ prefix-username.foo=fred
 prefix-location.foo=$URL
 prefix-location.bar=https://my-host/bar
 __ROSE_CONF__
+mkdir 'opt'
 export ROSE_CONF_PATH=$PWD
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-empty-info-file
@@ -84,10 +87,14 @@ title=this should never fail
 __INFO__
 run_pass "$TEST_KEY" rosie create <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
-access-list=*
 owner=fred
 project=
 title=
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
 __INFO__
 {
     echo -n 'Create? y/n (default n) '
@@ -96,6 +103,36 @@ __INFO__
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-info-edit-with-access-list-default
+cat >'opt/rose-access.conf' <<'__CONF__'
+[rosie-vc]
+access-list-default=holly ivy
+__CONF__
+cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
+access-list=*
+owner=$USER
+project=don't fail
+title=this should never fail
+__INFO__
+run_fail "$TEST_KEY" rosie create <<<n
+file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+access-list=holly ivy
+owner=fred
+project=
+title=
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
+__INFO__
+{
+    echo -n 'Create? y/n (default n) '
+}>"$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+rm -f 'opt/rose-access.conf'
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-info-edit-with-svn-servers-conf
 cat >"$TEST_KEY_BASE-svn-servers-conf" <<'__CONF__'
@@ -114,10 +151,14 @@ __INFO__
 ROSIE_SUBVERSION_SERVERS_CONF="$PWD/$TEST_KEY_BASE-svn-servers-conf" \
     run_fail "$TEST_KEY" rosie create --prefix=bar <<<n
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
-access-list=*
 owner=barn.owl
 project=
 title=
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
 __INFO__
 echo -n 'Create? y/n (default n) ' >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -132,10 +173,14 @@ title=this should never ever fail
 __INFO__
 run_pass "$TEST_KEY" rosie create --no-checkout <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
-access-list=*
 owner=fred
 project=
 title=
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
 __INFO__
 {
     echo -n 'Create? y/n (default n) '
@@ -153,10 +198,14 @@ title=divide and conquer 2
 __INFO__
 run_pass "$TEST_KEY" rosie create foo-aa002 <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
-access-list=*
 owner=fred
 project=don't fail please
 title=Copy of foo-aa002/trunk@3: this should never ever fail
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
 __INFO__
 {
     echo -n 'Create? y/n (default n) '
@@ -176,10 +225,14 @@ title=divide and conquer 4
 __INFO__
 run_pass "$TEST_KEY" rosie create foo-aa002/trunk@HEAD <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
-access-list=*
 owner=fred
 project=don't fail please
 title=Copy of foo-aa002/trunk@3: this should never ever fail
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
 __INFO__
 {
     echo -n 'Create? y/n (default n) '
@@ -210,10 +263,14 @@ title=divide and conquer
 __INFO__
 run_pass "$TEST_KEY" rosie create foo-aa001 <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
-access-list=*
 owner=fred
 project=don't fail
 title=Copy of foo-aa001/trunk@6: this should never fail
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
 __INFO__
 {
     echo -n 'Create? y/n (default n) '
@@ -243,10 +300,14 @@ title=divide and conquer 3
 __INFO__
 run_pass "$TEST_KEY" rosie create foo-aa001/trunk@HEAD <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
-access-list=*
 owner=fred
 project=don't fail
 title=Copy of foo-aa001/trunk@8: this should never fail
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description", "sub-project", and "issue-list".
 __INFO__
 {
     echo -n 'Create? y/n (default n) '
