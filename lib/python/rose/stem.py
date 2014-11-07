@@ -221,9 +221,25 @@ class StemRunner(object):
                 if kpresult:
                     project = kpresult.group(1)
                     break
-        # Remove anything after a point
-        project = re.sub(r'\..*', r'', project)
         return project
+
+    def _deduce_mirror(self, source_dict, project):
+        """Deduce the mirror location of this source tree."""
+        
+        # Root location for project
+        proj_root = source_dict['root'] + '/' + source_dict['project']
+
+        # Swap project to mirror
+        project = re.sub(r'\.x$', r'.xm', project)
+        mirror_repo = "fcm:" + project
+
+        # Generate mirror location
+        mirror = re.sub(proj_root, mirror_repo, source_dict['url'])
+        
+        # Add forwards slash after .xm if missing
+        if '.xm/' not in mirror:
+            mirror = re.sub(r'\.xm', r'.xm/', mirror)
+        return mirror
 
     def _ascertain_project(self, item):
         """Set the project name and top-level from 'fcm loc-layout'.
@@ -240,6 +256,7 @@ class StemRunner(object):
 
         source_dict =  self._get_base_dir(item)
         project = self._get_project_from_url(source_dict)
+        mirror = self._deduce_mirror(source_dict, project)
 
         if not project:
             raise ProjectNotFoundException(item)
@@ -260,11 +277,14 @@ class StemRunner(object):
         item = re.sub(r'/$',r'',item)
         base = re.sub(r'/$',r'',base)
 
-        return project, item, base, revision
+        # Remove anything after a point
+        project = re.sub(r'\..*', r'', project)
+        return project, item, base, revision, mirror
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
-        dummy, basedir, dummy2, dummy3 = self._ascertain_project(os.getcwd())
+        dummy, basedir, dummy2, dummy3, dummy4 = self._ascertain_project(
+                                                                 os.getcwd())
         name = os.path.basename(basedir)
         return name
 
@@ -276,7 +296,8 @@ class StemRunner(object):
         if self.opts.source:
             basedir = self.opts.source[0]
         else:
-            dummy, basedir, dum2, dum3 = self._ascertain_project(os.getcwd())
+            dummy, basedir, dum2, dum3, dum4 = self._ascertain_project(
+                                                               os.getcwd())
 
         suitedir = os.path.join(basedir, DEFAULT_TEST_DIR)
         suitefile = os.path.join(suitedir, "rose-suite.conf")
@@ -316,7 +337,7 @@ class StemRunner(object):
         self.opts.project = list()
 
         for i, url in enumerate(self.opts.source):
-            project, url, base, rev = self._ascertain_project(url)
+            project, url, base, rev, mirror = self._ascertain_project(url)
             self.opts.source[i] = url
             self.opts.project.append(project)
             if project in repos:
@@ -327,6 +348,8 @@ class StemRunner(object):
                                         '"' + rev + '"')
                 self._add_define_option('SOURCE_' + project.upper() + '_BASE', 
                                         '"' + base + '"')
+                self._add_define_option('SOURCE_' + project.upper() + 
+                             '_MIRROR', '"' + mirror + '"')
             self.reporter(SourceTreeAddedAsBranchEvent(url))
         for project, branches in repos.iteritems():
             var = 'SOURCE_' + project.upper()
