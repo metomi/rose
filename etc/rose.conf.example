@@ -292,6 +292,14 @@
 #  prefixes-ws-default=foo bar baz
 [rosie-id]
 
+# Configuration related to the Rosie version control client
+#
+## Default access-list setting on suite creation
+#  access-list-default=USER-ID ...
+## E.g. to grant access to all users by default:
+#  access-list-default=*
+[rosie-vc]
+
 # Configuration related to the adhoc Rosie web service server
 #
 ## Adhoc Rosie web server log directory
