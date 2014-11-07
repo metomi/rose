@@ -283,8 +283,7 @@ class StemRunner(object):
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
-        dummy, basedir, dummy2, dummy3, dummy4 = self._ascertain_project(
-                                                                 os.getcwd())
+        basedir = self._ascertain_project(os.getcwd())[1]
         name = os.path.basename(basedir)
         return name
 
@@ -296,8 +295,7 @@ class StemRunner(object):
         if self.opts.source:
             basedir = self.opts.source[0]
         else:
-            dummy, basedir, dum2, dum3, dum4 = self._ascertain_project(
-                                                               os.getcwd())
+            basedir = self._ascertain_project(os.getcwd())[1]
 
         suitedir = os.path.join(basedir, DEFAULT_TEST_DIR)
         suitefile = os.path.join(suitedir, "rose-suite.conf")
