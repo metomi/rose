@@ -113,6 +113,27 @@ class ConfigNode(object):
     def __iter__(self, key):
         return self.value.items()
 
+    def __eq__(self, other):
+        if self is other:
+            return True
+        try:
+            for keys_1, node_1 in self.walk(no_ignore=True):
+                node_2 = other.get(keys_1, no_ignore=True)
+                if (type(node_1) != type(node_2) or
+                        (not isinstance(node_1.value, dict) and
+                         node_1.value != node_2.value) or
+                        node_1.comments != node_2.comments):
+                    return False
+            for keys_2, node_2 in other.walk(no_ignore=True):
+                if self.get(keys_2, no_ignore=True) is None:
+                    return False
+        except AttributeError:  # Should handle "other is None"
+            return False
+        return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def is_ignored(self):
         """Return true if current node is in the "ignored" state."""
         return self.state != self.STATE_NORMAL

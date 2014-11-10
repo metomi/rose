@@ -29,9 +29,20 @@ if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
     skip_all "cannot start mock SMTP server"
 fi
 
+TEST_CONF="${TEST_SOURCE_DIR}/${TEST_KEY_BASE}.conf"
+# Get recipients from configuration
+get_recips() {
+    local KEY="$1"
+    perl -e \
+        'print(join(", ", map {"'"'"'" . $_ . "'"'"'"} sort(@ARGV)), "\n")' \
+        $(rose config -E -f "${TEST_CONF}" "recips.$KEY")
+}
+
 # Sort email recipients
 sort_recips() {
-    perl -e 'print(join(", ", sort(@ARGV)), "\n")' "$@"
+    perl -e \
+        'print(join(", ", map {"'"'"'" . $_ . "'"'"'"} sort(@ARGV)), "\n")' \
+        "$@"
 }
 
 mkdir repos
@@ -39,9 +50,11 @@ svnadmin create repos/foo
 SVN_URL=file://$PWD/repos/foo
 
 mkdir conf
+NOTIFY_WHO=$(rose config -E -f "$TEST_CONF" 'notify-who')
 cat >conf/rose.conf <<__CONF__
 [rosa-svn]
 notification-from=notifications@nowhere.org
+notify-who-on-trunk-commit=${NOTIFY_WHO}
 smtp-host=$TEST_SMTPD_HOST
 user-tool=passwd
 
@@ -68,7 +81,7 @@ chmod +x repos/foo/hooks/post-commit
 export LANG=C
 $ROSE_HOME/sbin/rosa db-create -q
 
-tests 27
+tests 30
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-new"
 cat >rose-suite.info <<__ROSE_SUITE_INFO
@@ -80,7 +93,20 @@ title=test post commit hook: create
 __ROSE_SUITE_INFO
 cat /dev/null >"$TEST_SMTPD_LOG"
 rosie create -q -y --info-file=rose-suite.info --no-checkout
-file_cmp "$TEST_KEY-smtpd.log" "$TEST_SMTPD_LOG" </dev/null
+RECIPS=$(get_recips 'new')
+if [[ -z $RECIPS ]]; then
+    skip 4 'no recipient'
+else
+    file_grep "$TEST_KEY-smtpd.log.recips" \
+        "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
+    file_grep "$TEST_KEY-smtpd.log.subject" \
+        "^Data: '.*Subject: foo-aa000/trunk@1" \
+        "$TEST_SMTPD_LOG"
+    file_grep "$TEST_KEY-smtpd.log.text" \
+        "^Data: '.*A   a/a/0/0/0/trunk/rose-suite.info" \
+        "$TEST_SMTPD_LOG"
+    file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
+fi
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-new-access-list"
 cat >rose-suite.info <<__ROSE_SUITE_INFO
@@ -95,13 +121,13 @@ rosie create -q -y --info-file=rose-suite.info --no-checkout
 
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-RECIPS=$(sort_recips "'$USER'" "'root'")
+RECIPS=$(get_recips 'new-access-list')
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa001/trunk@2\\] owner/access-list change" \
+    "^Data: '.*Subject: foo-aa001/trunk@2" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
-    "^Data: '.*+ owner=$USER.*+ access-list=root'$" \
+    "^Data: '.*A   a/a/0/0/1/trunk/rose-suite.info" \
     "$TEST_SMTPD_LOG"
 file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
 #-------------------------------------------------------------------------------
@@ -125,13 +151,13 @@ svn ci -q -m'foo-aa000: chown' $PWD/roses/foo-aa000/rose-suite.info
 rm -fr $PWD/roses/foo-aa000
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-RECIPS=$(sort_recips "'$USER'" "'root'")
+RECIPS=$(get_recips 'mod-owner')
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa000/trunk@4\\] owner/access-list change" \
+    "^Data: '.*Subject: foo-aa000/trunk@4" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
-    "^Data: '.*- owner=$USER.*+ owner=root'$" \
+    "^Data: '.*-owner=$USER.*+owner=root" \
     "$TEST_SMTPD_LOG"
 file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
 #-------------------------------------------------------------------------------
@@ -149,13 +175,13 @@ svn ci -q -m'foo-aa001: chown' $PWD/roses/foo-aa001/rose-suite.info
 rm -fr $PWD/roses/foo-aa001
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-RECIPS=$(sort_recips "'$USER'" "'root'")
+RECIPS=$(get_recips 'mod-access-list')
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa001/trunk@5\\] owner/access-list change" \
+    "^Data: '.*Subject: foo-aa001/trunk@5" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
-    "^Data: '.*- access-list=root.*+ access-list=\\*'$" \
+    "^Data: '.*-access-list=root.*+access-list=\\*" \
     "$TEST_SMTPD_LOG"
 file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
 #-------------------------------------------------------------------------------
@@ -173,13 +199,13 @@ svn ci -q -m'foo-aa001: chown' $PWD/roses/foo-aa001/rose-suite.info
 rm -fr $PWD/roses/foo-aa001
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-RECIPS=$(sort_recips "'bin'" "'$USER'" "'root'")
+RECIPS=$(get_recips 'mod-access-list-2')
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa001/trunk@6\\] owner/access-list change" \
+    "^Data: '.*Subject: foo-aa001/trunk@6" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
-    "^Data: '.*- access-list=\\*.*+ access-list=root bin'$" \
+    "^Data: '.*-access-list=\\*.*+access-list=root bin" \
     "$TEST_SMTPD_LOG"
 file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
 #-------------------------------------------------------------------------------
@@ -188,13 +214,13 @@ cat /dev/null >"$TEST_SMTPD_LOG"
 rosie delete -y -q foo-aa001
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-RECIPS=$(sort_recips "'bin'" "'$USER'" "'root'")
+RECIPS=$(get_recips 'del')
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa001/trunk@7\\] owner/access-list change" \
+    "^Data: '.*Subject: foo-aa001/trunk@7" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
-    "^Data: '.*- owner=$USER.*- access-list=root bin'$" \
+    "^Data: '.*D   a/a/0/0/1//trunk/'$" \
     "$TEST_SMTPD_LOG"
 file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
 #-------------------------------------------------------------------------------
