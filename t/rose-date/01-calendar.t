@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 12
+tests 20
 #-------------------------------------------------------------------------------
 # Check correct setting of 360 day calendar via environment.
 TEST_KEY=$TEST_KEY_BASE-360-env
@@ -43,6 +43,28 @@ file_cmp "$TEST_KEY-back.out" "$TEST_KEY-back.out" <<__OUT__
 20130230
 __OUT__
 run_pass "$TEST_KEY-fwd" rose date 20130230 --offset=P1D --calendar=360day
+file_cmp "$TEST_KEY-fwd.out" "$TEST_KEY-fwd.out" <<__OUT__
+20130301
+__OUT__
+#-------------------------------------------------------------------------------
+# Check correct setting of 365 day calendar via args.
+TEST_KEY=$TEST_KEY_BASE-365-switch
+run_pass "$TEST_KEY-back" rose date 20130301 --offset=-P1D --calendar=365day
+file_cmp "$TEST_KEY-back.out" "$TEST_KEY-back.out" <<__OUT__
+20130228
+__OUT__
+run_pass "$TEST_KEY-fwd" rose date 20130228 --offset=P1D --calendar=365day
+file_cmp "$TEST_KEY-fwd.out" "$TEST_KEY-fwd.out" <<__OUT__
+20130301
+__OUT__
+#-------------------------------------------------------------------------------
+# Check correct setting of 366 day calendar via args.
+TEST_KEY=$TEST_KEY_BASE-366-switch
+run_pass "$TEST_KEY-back" rose date 20130301 --offset=-P1D --calendar=366day
+file_cmp "$TEST_KEY-back.out" "$TEST_KEY-back.out" <<__OUT__
+20130229
+__OUT__
+run_pass "$TEST_KEY-fwd" rose date 20130229 --offset=P1D --calendar=366day
 file_cmp "$TEST_KEY-fwd.out" "$TEST_KEY-fwd.out" <<__OUT__
 20130301
 __OUT__
