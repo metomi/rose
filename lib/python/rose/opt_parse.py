@@ -77,7 +77,7 @@ class RoseOptionParser(OptionParser):
         "calendar": [
             ["--calendar"],
             {"action": "store",
-             "choices": ["360day", "gregorian"],
+             "choices": ["360day", "365day", "366day", "gregorian"],
              "metavar": "MODE",
              "help": "Set the calendar mode."}],
         "case_mode": [
