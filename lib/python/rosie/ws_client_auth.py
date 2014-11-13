@@ -32,11 +32,14 @@ except (ImportError, RuntimeError):
 #except ImportError:
 #    pass
 import os
+import re
 import rose.config
 from rose.env import env_var_process
 from rose.popen import RosePopener
 from rose.resource import ResourceLocator
 import shlex
+import socket
+import sys
 from urlparse import urlparse
 
 
@@ -48,6 +51,15 @@ class UndefinedRosiePrefixWS(Exception):
         return "[rosie-id]prefix-ws.%s: configuration not defined" % self.args
 
 
+
+class GPGAgentStoreConnectionError(Exception):
+
+    """Raised if a client can't (safely) connect to the gpg-agent daemon."""
+
+    def __str__(self):
+        return "Cannot connect to gpg-agent: %s" % self.args[0]
+
+
 class RosieWSClientAuthManager(object):
 
     """Manage authentication info for a Rosie web service client."""
@@ -56,6 +68,7 @@ class RosieWSClientAuthManager(object):
     ST_MOD = "MOD"  # Item is modified
     PASSWORD_STORE_NAMES = [
         "GnomekeyringStore",
+        "GPGAgentStore",
         #KeyringStore,
     ]
     PROMPT_USERNAME = "Username for %(prefix)s: "
@@ -165,7 +178,8 @@ class RosieWSClientAuthManager(object):
         Prompt with zenity or raw_input/getpass.
 
         """
-        if callable(self.prompt_func):
+        if (callable(self.prompt_func) and
+                not hasattr(self.password_store, "prompt_password")):
             self.username, self.password = self.prompt_func(
                 self.username, self.password, is_retry)
             return
@@ -196,7 +210,10 @@ class RosieWSClientAuthManager(object):
         if self.username and self.password is None or is_retry:
             prompt = self.PROMPT_PASSWORD % {"prefix": self.prefix,
                                              "username": self.username}
-            if self.popen.which("zenity") and os.getenv("DISPLAY"):
+            if hasattr(self.password_store, "prompt_password"):
+                password = self.password_store.prompt_password(
+                    prompt, self.scheme, self.host, self.username)
+            elif self.popen.which("zenity") and os.getenv("DISPLAY"):
                 password = self.popen.run(
                     "zenity", "--entry", "--hide-text",
                     "--title=Rosie",
@@ -255,6 +272,99 @@ class GnomekeyringStore(object):
                 gnomekeyring.NoKeyringDaemonError):
             pass
         self.item_ids[(scheme, host, username)] = (None, item_id)
+
+
+class GPGAgentStore(object):
+
+    """Password management with gpg-agent."""
+
+    RECV_BUFSIZE = 4096
+
+    @classmethod
+    def usable(cls):
+        """Can this store be used?"""
+        try:
+            gpg_socket = cls.get_socket()
+        except GPGAgentStoreConnectionError as exc:
+            return False
+        return True
+
+    @classmethod
+    def get_socket(cls):
+        """Get a connected, ready-to-use socket for gpg-agent."""
+        agent_info = os.environ.get("GPG_AGENT_INFO")
+        if agent_info is None:
+            raise GPGAgentStoreConnectionError("no $GPG_AGENT_INFO env var")
+        socket_address = agent_info.split(":")[0]
+        gpg_socket = socket.socket(socket.AF_UNIX)
+        try:
+            gpg_socket.connect(socket_address)
+        except socket.error as exc:
+            raise GPGAgentStoreConnectionError("socket error: %s" % exc)
+        cls._socket_receive(gpg_socket, "^OK .*\n")
+        gpg_socket.send("GETINFO socket_name\n")
+        reply = cls._socket_receive(gpg_socket, "^(?!OK)[^ ]+ .*\n")
+        if not reply.startswith("D"):
+            raise GPGAgentStoreConnectionError(
+                "socket: bad reply: %r" % reply)
+        reply_socket_address = reply.split()[1]
+        if reply_socket_address != socket_address:
+            # The gpg-agent documentation advises making this check.
+            raise GPGAgentStoreConnectionError("daemon socket mismatch")
+        tty = os.environ.get("GPG_TTY")
+        if tty is None:
+            if not sys.stdin.isatty():
+                raise GPGAgentStoreConnectionError(
+                    "no $GPG_TTY env var and failed to extrapolate it")
+            tty = os.ttyname(sys.stdin.fileno())
+        gpg_socket.send("OPTION putenv=GPG_TTY=%s\n" % tty)
+        cls._socket_receive(gpg_socket, "^OK\n")
+        for name in ("TERM", "LANG", "LC_ALL", "DISPLAY"):
+            val = os.environ.get(name)
+            if val is not None:
+                gpg_socket.send("OPTION putenv=%s=%s\n" % (name, val))
+                cls._socket_receive(gpg_socket, "^OK\n")
+        return gpg_socket
+
+    @classmethod
+    def _socket_receive(cls, gpg_socket, pattern):
+        reply = ""
+        while not reply or not re.search(pattern, reply, re.M):
+            reply += gpg_socket.recv(cls.RECV_BUFSIZE)
+        return reply
+
+    def __init__(self):
+        pass
+
+    def find_password(self, scheme, host, username):
+        """Return the password of username@root."""
+        return self.get_password(scheme, host, username, no_ask=True)
+
+    def get_password(self, scheme, host, username, no_ask=False, prompt=None):
+        """Store and retrieve the password."""
+        gpg_socket = self.get_socket()
+        no_ask_option = ""
+        if no_ask:
+            no_ask_option = "--no-ask"
+        if prompt is None:
+            prompt = "X"
+        else:
+            prompt = prompt.replace(" ", "_")
+        gpg_socket.send("GET_PASSPHRASE --data %s %s:%s:%s X X %s\n" % (
+            no_ask_option, scheme, host, username, prompt))
+        reply = self._socket_receive(gpg_socket, "^(?!OK)[^ ]+ .*\n")
+        for line in reply.splitlines():
+            if line.startswith("D"):
+                return line.split(None, 1)[1]
+        return None
+
+    def prompt_password(self, prompt, scheme, host, username):
+        """Prompt for the password of username@root."""
+        return self.get_password(scheme, host, username, prompt=prompt)
+
+    def store_password(self, scheme, host, username, password):
+        """Store the password of username@root... but it's already stored."""
+        pass
 
 
 #class KeyringStore(object):
