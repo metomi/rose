@@ -5,6 +5,30 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-Q4?)
+
+Rose release 21? This release will work best with
+[cylc-6.1.0](https://github.com/cylc/cylc/releases/tag/6.1.0) or beyond.
+
+### Highlighted Changes
+
+-none yet-
+
+### Noteworthy Changes
+
+[#1463](https://github.com/metomi/rose/pull/1463):
+rose date: fix `--calendar=365day|366day` option.
+The option arguments were documented but not implemented.
+
+[#1461](https://github.com/metomi/rose/pull/1461):
+rose stem: add `MIRROR` Jinja2 variable.
+
+[#1460](https://github.com/metomi/rose/pull/1460):
+rosie create: configurable default `access-list`. The unconfigured default is
+now to leave `access-list` unset.
+
+--------------------------------------------------------------------------------
+
 ## 2014.11.0 (2014-11-05)
 
 Rose release 20. This release works best with
