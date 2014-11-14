@@ -473,10 +473,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             else:
                 if string == value:
                     return True
-        if rose.env.contains_env_var(value):
-            # Assume a match in this case.
-            return True
-        return False
+        return rose.env.contains_env_var(value)
 
     def evaluate_trig_rule(self, rule, setting_id, value):
         """Launch an evaluation of a custom trigger expression."""
