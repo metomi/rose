@@ -349,7 +349,7 @@ class GPGAgentStore(object):
         if prompt is None:
             prompt = "X"
         else:
-            prompt = prompt.replace(" ", "_")
+            prompt = prompt.replace(" ", "+")
         gpg_socket.send("GET_PASSPHRASE --data %s %s:%s:%s X X %s\n" % (
             no_ask_option, scheme, host, username, prompt))
         reply = self._socket_receive(gpg_socket, "^(?!OK)[^ ]+ .*\n")
