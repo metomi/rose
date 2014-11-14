@@ -38,7 +38,7 @@ atrig = 2
 btrig = 3
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 18
+tests 21
 #-------------------------------------------------------------------------------
 # Check trigger checking - this is nearly cyclic but should be fine.
 TEST_KEY=$TEST_KEY_BASE-ok
@@ -171,6 +171,25 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
     namelist:dupl_nl=a=None
         Badly defined trigger - namelist:dupl_nl is 'duplicate'
 __CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Check trigger checking - environment variable value.
+TEST_KEY=$TEST_KEY_BASE-err-dupl-external
+setup
+init <<'__CONFIG__'
+[env]
+FOO=$BAR
+FOO_SUB=2
+__CONFIG__
+init_meta <<__META_CONFIG__
+[env=FOO]
+trigger=env=FOO_SUB: qux;
+
+[env=FOO_SUB]
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 # Check trigger state checking.

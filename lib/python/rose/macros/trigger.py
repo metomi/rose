@@ -23,6 +23,7 @@ import os
 
 import rose.config
 import rose.config_tree
+import rose.env
 import rose.macro
 import rose.macros.rule
 import rose.resource
@@ -472,7 +473,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             else:
                 if string == value:
                     return True
-        return False
+        return rose.env.contains_env_var(value)
 
     def evaluate_trig_rule(self, rule, setting_id, value):
         """Launch an evaluation of a custom trigger expression."""
