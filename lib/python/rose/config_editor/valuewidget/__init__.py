@@ -34,7 +34,7 @@ import intspin
 import meta
 import radiobuttons
 import text
-
+import valuehints
 
 class ValueWidgetHook(object):
 
@@ -69,10 +69,12 @@ def chooser(value, metadata, error):
     m_type = metadata.get(rose.META_PROP_TYPE)
     m_values = metadata.get(rose.META_PROP_VALUES)
     m_length = metadata.get(rose.META_PROP_LENGTH)
-    if m_type is None and m_values is None and m_length is None:
+    m_hint = metadata.get(rose.META_PROP_VALUE_HINTS)
+    if (m_type is None and m_values is None and m_length is None and
+       m_hint is None):
         return text.RawValueWidget
-    if (m_values is None and m_length is None and
-        m_type in ['logical', 'boolean']):
+    if (m_values is None and m_length is None and m_hint is None and
+       m_type in ['logical', 'boolean']):
         return booltoggle.BoolToggleValueWidget
     if m_length is None:
         if m_values is not None and len(m_values) <= 4:
@@ -100,4 +102,6 @@ def chooser(value, metadata, error):
         return array.spaced_list.SpacedListValueWidget
     if type(m_type) is list:
         return array.mixed.MixedArrayValueWidget
+    if m_hint is not None:
+        return valuehints.HintsValueWidget
     return text.RawValueWidget

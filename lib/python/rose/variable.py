@@ -104,6 +104,13 @@ class Variable(object):
             val_list = rose.variable.array_split(self.metadata['value-titles'])
             self.metadata['value-titles'] = val_list
 
+        if ('value-hints' in self.metadata and
+           not isinstance(self.metadata['value-hints'], list)):
+            # Replace this kind of thing with a proper metadata handler later.
+            val_list = rose.variable.array_split(self.metadata['value-hints'],
+                                                 only_this_delim=",")
+            self.metadata['value-hints'] = val_list
+
         return self.metadata
 
     def to_hashable(self):
@@ -254,6 +261,8 @@ def get_value_from_metadata(meta_data):
             var_value = "''"
         elif var_type == 'quoted':
             var_value = '""'
+    elif rose.META_PROP_VALUE_HINTS in meta_data:
+        var_value = array_split(meta_data[rose.META_PROP_VALUE_HINTS])[0]
     return var_value
 
 
