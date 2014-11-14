@@ -71,8 +71,8 @@ class RosieWSClientAuthManager(object):
         "GPGAgentStore",
         #KeyringStore,
     ]
-    PROMPT_USERNAME = "Username for %(prefix)s: "
-    PROMPT_PASSWORD = "Password for %(username)s at %(prefix)s: "
+    PROMPT_USERNAME = "Username for %(prefix)r: "
+    PROMPT_PASSWORD = "Password for %(username)s at %(prefix)r: "
 
     def __init__(self, prefix, popen=None, prompt_func=None):
         self.prefix = prefix
@@ -350,8 +350,8 @@ class GPGAgentStore(object):
             prompt = "X"
         else:
             prompt = prompt.replace(" ", "+")
-        gpg_socket.send("GET_PASSPHRASE --data %s %s:%s:%s X X %s\n" % (
-            no_ask_option, scheme, host, username, prompt))
+        gpg_socket.send("GET_PASSPHRASE --data %s %s:%s X X %s\n" % (
+            no_ask_option, scheme, host, prompt))
         reply = self._socket_receive(gpg_socket, "^(?!OK)[^ ]+ .*\n")
         for line in reply.splitlines():
             if line.startswith("D"):
