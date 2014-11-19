@@ -36,7 +36,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
-from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_engine_proc import SuiteEngineProcessor, NoSuiteLogError
 import shlex
 import string
 import sys
@@ -524,8 +524,6 @@ def main():
         elif opts.to_output:
             for arg in args:
                 url = SuiteId(id_text=arg).to_output()
-                if not url:
-                    url = ""
                 report(str(url) + "\n", level=0)
         elif opts.to_web:
             for arg in args:
@@ -542,7 +540,7 @@ def main():
             if not arg:
                 arg = os.getcwd()
             report(str(SuiteId(location=arg)) + "\n", level=0)
-    except SuiteIdError as exc:
+    except (NoSuiteLogError, SuiteIdError) as exc:
         report(exc)
         if opts.debug_mode:
             traceback.print_exc(exc)

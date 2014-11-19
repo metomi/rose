@@ -49,7 +49,8 @@ from rose.popen import RosePopenError
 import rose.reporter
 from rose.resource import ResourceLocator, ResourceError
 from rose.suite_control import SuiteControl
-from rose.suite_engine_proc import SuiteEngineProcessor, WebBrowserEvent
+from rose.suite_engine_proc import (
+    NoSuiteLogError, SuiteEngineProcessor, WebBrowserEvent)
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.status
@@ -989,9 +990,13 @@ class MainWindow(gtk.Window):
         path = kwargs.get("path", None)
         id_ = SuiteId(id_text=self.get_selected_suite_id(path))
         if kwargs.get("test", False):
-            url = self.suite_engine_proc.get_suite_log_url(self.viewing_user,
-                                                           str(id_))
-            return (url is not None)
+            try:
+                url = self.suite_engine_proc.get_suite_log_url(
+                    self.viewing_user, str(id_))
+            except NoSuiteLogError:
+                return False
+            else:
+                return (url is not None)
         else:
             self.suite_engine_proc.launch_suite_log_browser(self.viewing_user,
                                                             str(id_))
