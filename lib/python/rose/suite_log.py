@@ -23,7 +23,7 @@ import pwd
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
-from rose.suite_engine_proc import NoSuiteLogError, SuiteEngineProcessor
+from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_control import get_suite_name
 import sys
 from time import sleep

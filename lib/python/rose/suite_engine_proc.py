@@ -42,7 +42,11 @@ class NoSuiteLogError(Exception):
     """An exception raised on a missing suite log."""
 
     def __str__(self):
-        return "%s: suite log not found" % self.args[0]
+        user_name, suite_name = self.args[0:2]
+        arg = suite_name
+        if user_name:
+            arg += " ~" + user_name
+        return "%s: suite log not found" % arg
 
 
 class WebBrowserEvent(Event):
@@ -442,7 +446,7 @@ class SuiteEngineProcessor(object):
         suite_d = os.path.join(prefix, self.get_suite_dir_rel(suite_name))
         suite_d = os.path.expanduser(suite_d)
         if not os.path.isdir(suite_d):
-            return None
+            raise NoSuiteLogError(user_name, suite_name)
         rose_bush_status_f_name = os.path.expanduser(
                     "~/.metomi/rose-bush.status")
         rose_bush_url = None
@@ -654,11 +658,6 @@ class SuiteEngineProcessor(object):
 
         """
         url = self.get_suite_log_url(user_name, suite_name)
-        if not url:
-            arg = suite_name
-            if user_name:
-                arg += " ~" + user_name
-            raise NoSuiteLogError(arg)
         w = webbrowser.get()
         w.open(url, new=True, autoraise=True)
         self.handle_event(WebBrowserEvent(w.name, url))
