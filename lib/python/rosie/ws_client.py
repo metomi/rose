@@ -175,6 +175,8 @@ class RosieWSClient(object):
             try:
                 response.raise_for_status()
             except requests.exceptions.RequestException:
+                if request_detail["auth_manager"] is not None:
+                    request_detail["auth_manager"].clear_password()
                 self.event_handler(
                     RosieWSClientError(url, kwargs, response.status_code),
                     level=1)

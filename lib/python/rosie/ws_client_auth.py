@@ -137,6 +137,12 @@ class RosieWSClientAuthManager(object):
         else:
             return ()
 
+    def clear_password(self):
+        """Clear stored password information in password_store."""
+        if self.password_store is not None:
+            self.password_store.clear_password(
+                self.scheme, self.host, self.username)
+
     def store_password(self):
         """Store the authentication information for self.prefix."""
         if self.username and self.username_orig != self.username:
@@ -243,6 +249,15 @@ class GnomekeyringStore(object):
     def __init__(self):
         self.item_ids = {}
 
+    def clear_password(self, scheme, host, username):
+        """Remove the password from the cache."""
+        try:
+            if (scheme, host, username) in self.item_ids:
+                ring_id, item_id = self.item_ids[(scheme, host, username)]
+                gnomekeyring.item_delete_sync(ring_id, item_id)
+        except gnomekeyring.NoKeyringDaemonError:
+            pass
+
     def find_password(self, scheme, host, username):
         """Return the password of username@root."""
         try:
@@ -257,10 +272,8 @@ class GnomekeyringStore(object):
 
     def store_password(self, scheme, host, username, password):
         """Return the password of username@root."""
+        self.clear_password(scheme, host, username)
         try:
-            if (scheme, host, username) in self.item_ids:
-                ring_id, item_id = self.item_ids[(scheme, host, username)]
-                gnomekeyring.item_delete_sync(ring_id, item_id)
             item_id = gnomekeyring.item_create_sync(
                 None,
                 gnomekeyring.ITEM_NETWORK_PASSWORD,
@@ -336,6 +349,13 @@ class GPGAgentStore(object):
     def __init__(self):
         pass
 
+    def clear_password(self, scheme, host, username):
+        """Remove the password from the cache."""
+        gpg_socket = self.get_socket()
+        gpg_socket.send("CLEAR_PASSPHRASE rosie:%s:%s\n" % (scheme, host))
+        # This command always returns 'OK', even when the cache id is invalid.
+        reply = self._socket_receive(gpg_socket, "^OK")
+
     def find_password(self, scheme, host, username):
         """Return the password of username@root."""
         return self.get_password(scheme, host, username, no_ask=True)
@@ -350,7 +370,7 @@ class GPGAgentStore(object):
             prompt = "X"
         else:
             prompt = prompt.replace(" ", "+")
-        gpg_socket.send("GET_PASSPHRASE --data %s %s:%s X X %s\n" % (
+        gpg_socket.send("GET_PASSPHRASE --data %s rosie:%s:%s X X %s\n" % (
             no_ask_option, scheme, host, prompt))
         reply = self._socket_receive(gpg_socket, "^(?!OK)[^ ]+ .*\n")
         for line in reply.splitlines():
