@@ -93,7 +93,6 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
 TEST_KEY=$TEST_KEY_BASE-1-to-output.1
 run_fail "$TEST_KEY" rosie id --to-output foo-aa000
-# FIXME: "None" is not a nice output for a shell command.
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] foo-aa000: suite log not found
