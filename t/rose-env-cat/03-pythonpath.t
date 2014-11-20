@@ -22,44 +22,47 @@
 # See #1244.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-#-------------------------------------------------------------------------------
+
 tests 7
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-null"
 PYTHONPATH= rose env-cat <<<'$PYTHONPATH' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$ROSE_HOME/lib/python"
+run_pass "$TEST_KEY.out" \
+    grep -q "^${ROSE_HOME}/lib/python\(:[^:]*\)*$" "${TEST_KEY}.out"
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-head-1"
 PYTHONPATH="$ROSE_HOME/lib/python" \
     rose env-cat <<<'$PYTHONPATH' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$ROSE_HOME/lib/python"
+run_pass "$TEST_KEY.out" \
+    grep -q "^${ROSE_HOME}/lib/python\(:[^:]*\)*$" "${TEST_KEY}.out"
 #-------------------------------------------------------------------------------
 mkdir -p {foo,bar}/lib/python
 EXPECTED="$ROSE_HOME/lib/python:$PWD/foo/lib/python:$PWD/bar/lib/python"
+PATTERN="^${ROSE_HOME}/lib/python\(:[^:]*\)*:${PWD}/foo/lib/python:${PWD}/bar/lib/python$"
 
 TEST_KEY="$TEST_KEY_BASE-head-2"
-PYTHONPATH="$EXPECTED" \
+PYTHONPATH="$ROSE_HOME/lib/python:$PWD/foo/lib/python:$PWD/bar/lib/python" \
     rose env-cat <<<'$PYTHONPATH' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$EXPECTED"
+run_pass "$TEST_KEY.out" grep -q "${PATTERN}" "${TEST_KEY}.out"
 
 TEST_KEY="$TEST_KEY_BASE-tail"
 PYTHONPATH="$PWD/foo/lib/python:$PWD/bar/lib/python:$ROSE_HOME/lib/python" \
     rose env-cat <<<'$PYTHONPATH' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$EXPECTED"
+run_pass "$TEST_KEY.out" grep -q "${PATTERN}" "${TEST_KEY}.out"
 
 TEST_KEY="$TEST_KEY_BASE-body-1"
 PYTHONPATH="$PWD/foo/lib/python:$ROSE_HOME/lib/python:$PWD/bar/lib/python" \
     rose env-cat <<<'$PYTHONPATH' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$EXPECTED"
+run_pass "$TEST_KEY.out" grep -q "${PATTERN}" "${TEST_KEY}.out"
 
 TEST_KEY="$TEST_KEY_BASE-body-2"
 PYTHONPATH="$PWD/foo/lib/python:$ROSE_HOME/lib/python:$ROSE_HOME/lib/python:$PWD/bar/lib/python" \
     rose env-cat <<<'$PYTHONPATH' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$EXPECTED"
+run_pass "$TEST_KEY.out" grep -q "${PATTERN}" "${TEST_KEY}.out"
 
 TEST_KEY="$TEST_KEY_BASE-body-tail"
 PYTHONPATH="$PWD/foo/lib/python:$ROSE_HOME/lib/python:$PWD/bar/lib/python:$ROSE_HOME/lib/python" \
     rose env-cat <<<'$PYTHONPATH' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$EXPECTED"
+run_pass "$TEST_KEY.out" grep -q "${PATTERN}" "${TEST_KEY}.out"
 #-------------------------------------------------------------------------------
 exit
