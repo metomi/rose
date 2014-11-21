@@ -12,7 +12,9 @@ Rose release 21? This release will work best with
 
 ### Highlighted Changes
 
--none yet-
+[#1464](https://github.com/metomi/rose/pull/1464):
+rosie go, rosie lookup, rosie ls: support caching of credentials using a
+`gpg-agent` session.
 
 ### Noteworthy Changes
 
@@ -26,6 +28,14 @@ rose stem: add `MIRROR` Jinja2 variable.
 [#1460](https://github.com/metomi/rose/pull/1460):
 rosie create: configurable default `access-list`. The unconfigured default is
 now to leave `access-list` unset.
+
+[#1458](https://github.com/metomi/rose/pull/1458):
+rose metadata: `value-hints` new setting that can support suggested values for
+a variable, but still allows the user to provide their own override.
+
+[#1456](https://github.com/metomi/rose/pull/1456):
+rose metadata: fix the default behaviour when triggering from a value with
+environment variable substitution syntax.
 
 --------------------------------------------------------------------------------
 
