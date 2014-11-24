@@ -70,15 +70,24 @@
 #
 ## Admin users allowed to write to the trunk of any suite.
 #  super-users=USER1 ...
-## E.g.
+## E.g.:
 #  super-users=spiderman batman
+## List of user roles to notify on trunk commits. A user role can be:
+## * "author" for the author of the change.
+## * "owner" for the owner of the affected suite.
+## * "access-list" for the users in the access-list of the affected suite.
+## N.B. If author is not in the list, (s)he will not be notified regardless
+##      his/her role as owner or member of the access-list.
+#  notify-who-on-trunk-commit=ROLE1 ...
+## E.g.:
+#  notify-who-on-trunk-commit=author owner access-list
 ## Notification email address (for the "From:" field in notification emails)
 #  notification-from=EMAIL-ADDRESS
 ## E.g.:
 #  notification-from=notifications@my-host.my-org.org
 ## Tool to obtain user information. LDAP or Unix getpwnam.
 #  user-tool=ldap|passwd
-## E.g.
+## E.g.:
 #  user-tool=ldap
 [rosa-svn]
 
