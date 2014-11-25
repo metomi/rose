@@ -18,6 +18,9 @@ rosie go, rosie lookup, rosie ls: support caching of credentials using a
 
 ### Noteworthy Changes
 
+[#1471](https://github.com/metomi/rose/pull/1471):
+rosa svn-post-commit: now support configurable notification on trunk commits.
+
 [#1463](https://github.com/metomi/rose/pull/1463):
 rose date: fix `--calendar=365day|366day` option.
 The option arguments were documented but not implemented.
@@ -26,8 +29,9 @@ The option arguments were documented but not implemented.
 rose stem: add `MIRROR` Jinja2 variable.
 
 [#1460](https://github.com/metomi/rose/pull/1460):
-rosie create: configurable default `access-list`. The unconfigured default is
-now to leave `access-list` unset.
+rosie create: the default `access-list` is now configurable for each prefix on
+the client side. If a default is not configured, the client will not set
+`access-list` by default.
 
 [#1458](https://github.com/metomi/rose/pull/1458):
 rose metadata: `value-hints` new setting that can support suggested values for
