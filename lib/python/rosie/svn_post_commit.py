@@ -163,9 +163,7 @@ class RosieSvnPostCommitHook(object):
             if branch_attribs["has_changed_known_keys_file"]:
                 self._update_known_keys(dao, changeset_attribs)
             # Update suite info database
-            if (branch_attribs["status"] != self.ST_EMPTY or
-                    branch_attribs["status_info_file"] != self.ST_EMPTY):
-                self._update_info_db(dao, changeset_attribs, branch_attribs)
+            self._update_info_db(dao, changeset_attribs, branch_attribs)
             # Notification on trunk changes
             # Notification on owner and access-list changes
             if branch_attribs["branch"] == "trunk":
@@ -215,10 +213,10 @@ class RosieSvnPostCommitHook(object):
                         branch_attribs["old_info"] = self._load_info(
                             repos, int(revision) - 1, sid, branch)
                         if (branch_attribs["old_info"] !=
-                                branch_attribs["info"]):
-                            if branch_attribs["status"] != self.ST_ADDED:
-                                branch_attribs["status_info_file"] = (
-                                    self.ST_MODIFIED)
+                                branch_attribs["info"] and
+                                branch_attribs["status"] != self.ST_ADDED):
+                            branch_attribs["status_info_file"] = (
+                                self.ST_MODIFIED)
                 elif tail:
                     # ROSIE meta known keys file change
                     if path == self.KNOWN_KEYS_FILE_PATH:
@@ -381,10 +379,21 @@ class RosieSvnPostCommitHook(object):
         idx = changeset_attribs["prefix"] + "-" + branch_attribs["sid"]
         branch = branch_attribs["branch"]
         revision = changeset_attribs["revision"]
+        # Latest table
+        try:
+            dao.delete(LATEST_TABLE_NAME, idx=idx, branch=branch)
+        except al.exc.IntegrityError:
+            # idx and branch were just added: there is no previous record.
+            pass
+        if branch_attribs["status"] != self.ST_DELETED:
+            dao.insert(
+                LATEST_TABLE_NAME, idx=idx, branch=branch, revision=revision)
         # N.B. deleted suite branch only has old info
         info_key = "info"
         if branch_attribs["status"] == self.ST_DELETED:
             info_key = "old_info"
+        if branch_attribs[info_key] is None:
+            return
         # Main table
         main_fields = {
             "author": changeset_attribs["author"],
@@ -408,15 +417,6 @@ class RosieSvnPostCommitHook(object):
             dao.insert(
                 OPTIONAL_TABLE_NAME, idx=idx, branch=branch, revision=revision,
                 name=name, value=value)
-        # Latest table
-        try:
-            dao.delete(LATEST_TABLE_NAME, idx=idx, branch=branch)
-        except al.exc.IntegrityError:
-            # idx and branch were just added: there is no previous record.
-            pass
-        if branch_attribs["status"] != self.ST_DELETED:
-            dao.insert(
-                LATEST_TABLE_NAME, idx=idx, branch=branch, revision=revision)
 
     def _update_known_keys(self, dao, changeset_attribs):
         """Update the known_keys in the meta table."""

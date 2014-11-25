@@ -30,4 +30,4 @@
 #     determine the list of databases to create.
 #     Does not override existing databases.
 #-------------------------------------------------------------------------------
-exec python -m rosie.db "$@"
+exec python -m rosie.db_create "$@"

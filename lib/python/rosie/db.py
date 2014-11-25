@@ -17,27 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Module containing classes for data retrieval.
+"""Rosie web service data access object.
 
 Classes:
     DAO - data access object.
 
-Functions:
-    create - initialises a new database.
-
 """
 
-import os
-
 import sqlalchemy as al
-
-import rose.config
-from rose.fs_util import FileSystemUtil
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener
-from rose.reporter import Reporter, Event
-from rose.resource import ResourceLocator
-import rosie.suite_id
 
 
 LATEST_TABLE_NAME = "latest"
@@ -47,12 +34,14 @@ OPTIONAL_TABLE_NAME = "optional"
 
 
 def _col_by_key(table, key):
-    for c in table.c:
-        if c.key == key:
-            return c
+    """Return the column in "table" matched by "key"."""
+    for col in table.c:
+        if col.key == key:
+            return col
 
 
 def _col_keys(table):
+    """Return the column keys in "table"."""
     return [c.key for c in table.c]
 
 
@@ -75,16 +64,22 @@ class DAO(object):
 
     def __init__(self, db_url):
         self.db_url = db_url
+        self.db_engine = None
+        self.db_connection = None
+        self.db_metadata = None
+        self.results = None
+        self.tables = {}
 
     def _connect(self):
+        """Connect to the database file."""
         self.db_engine = al.create_engine(self.db_url)
         self.db_connection = self.db_engine.connect()
         self.db_metadata = al.MetaData(self.db_engine)
         self.results = None
         self.tables = {}
-        for n in [LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME,
-                  OPTIONAL_TABLE_NAME]:
-            self.tables[n] = al.Table(n, self.db_metadata, autoload=True)
+        for name in [LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME,
+                     OPTIONAL_TABLE_NAME]:
+            self.tables[name] = al.Table(name, self.db_metadata, autoload=True)
 
     def _execute(self, query):
         """Execute the query and store the database results."""
@@ -103,9 +98,6 @@ class DAO(object):
         optional_table = self.tables[OPTIONAL_TABLE_NAME]
         joined_column_keys = [c.key for c in main_table.c]
         joined_column_keys += ["name", "value"]
-        joined_columns = list(main_table.c) + [
-            optional_table.c.name, optional_table.c.value]
-        expr = al.sql.select(joined_columns)
         join_main_clause = latest_table.c.idx == main_table.c.idx
         join_main_clause &= latest_table.c.branch == main_table.c.branch
         join_main_clause &= latest_table.c.revision == main_table.c.revision
@@ -135,9 +127,6 @@ class DAO(object):
         optional_table = self.tables["optional"]
         joined_column_keys = [c.key for c in main_table.c]
         joined_column_keys += ["name", "value"]
-        joined_columns = list(main_table.c) + [
-            optional_table.c.name, optional_table.c.value]
-        expr = al.sql.select(joined_columns)
         join_optional_clause = main_table.c.idx == optional_table.c.idx
         join_optional_clause &= main_table.c.branch == optional_table.c.branch
         join_optional_clause &= (
@@ -152,7 +141,7 @@ class DAO(object):
                     break
         return from_obj, return_cols
 
-    def get_common_keys(self, *args):
+    def get_common_keys(self, *_):
         """Return the names of the main and changeset table fields."""
         self._connect()
         self.results = _col_keys(self.tables["main"])
@@ -173,7 +162,7 @@ class DAO(object):
         self.results.sort()
         return self.results
 
-    def get_optional_keys(self, *args):
+    def get_optional_keys(self, *_):
         """Return the names of the optional fields."""
         self._connect()
         select = al.sql.select([self.tables["optional"].c.name])
@@ -182,7 +171,7 @@ class DAO(object):
         self.results.sort()
         return self.results
 
-    def get_query_operators(self, *args):
+    def get_query_operators(self, *_):
         """Return the query operators."""
         return self.QUERY_OPERATORS
 
@@ -236,15 +225,15 @@ class DAO(object):
         """Construct an SQL expression from a list of string-tuples."""
         self._connect()
         if from_obj is None:
-            from_obj, cols = self._get_join_and_columns()
+            from_obj = self._get_join_and_columns()[0]
         item_list = []
         current_expr = []
         for filter_tuple in filters:
             for i, entry in enumerate(filter_tuple):
                 if ((entry in ["and", "or"] and i == 0) or
-                    entry and (
-                     all([e == "(" for e in entry]) or
-                     all([e == ")" for e in entry]))):
+                        entry and (
+                            all([e == "(" for e in entry]) or
+                            all([e == ")" for e in entry]))):
                     if current_expr:
                         item_list.append(current_expr)
                         current_expr = []
@@ -289,7 +278,7 @@ class DAO(object):
                     for j in range(i - 1, -1, -1):
                         for down_items in levels[j]:
                             ind = -1
-                            for k in range(down_items.count(items[1])):
+                            for _ in range(down_items.count(items[1])):
                                 ind = down_items.index(items[1], ind + 1) - 1
                                 if down_items[ind: ind + len(items)] == items:
                                     del down_items[ind: ind + len(items)]
@@ -301,6 +290,7 @@ class DAO(object):
         return False
 
     def _get_sql_expr(self, expr_tuple, from_obj):
+        """Return database expression."""
         optional_name_col = _col_by_key(from_obj, "name")
         optional_value_col = _col_by_key(from_obj, "value")
         column, operator, value = expr_tuple
@@ -323,7 +313,8 @@ class DAO(object):
             expr = expr1 & expr2
         return expr
 
-    def _get_expr_join(self, expr_items):
+    @staticmethod
+    def _get_expr_join(expr_items):
         """Return an operator-precedence left-to-right logical join."""
         items = list(expr_items)
         while "and" in items:
@@ -352,7 +343,6 @@ class DAO(object):
         else:
             from_obj, cols = self._get_join_and_columns()
         where = None
-        optional_value_col = _col_by_key(from_obj, "value")
         if not isinstance(s, list):
             s = s.split()
         where = None
@@ -374,12 +364,11 @@ class DAO(object):
         return_maps = self._rows_to_maps(values_list, cols)
         return return_maps
 
-    def _rows_to_maps(self, rows, cols):
+    @staticmethod
+    def _rows_to_maps(rows, cols):
         """Translate each result row into a map with optional values."""
         results = []
         col_keys = [c.key for c in cols]
-        name_index = [c.key for c in cols].index("name")
-        value_index = [c.key for c in cols].index("value")
         id_keys = ["idx", "branch", "revision"]
         prev_id = None
         for row in rows:
@@ -399,181 +388,3 @@ class DAO(object):
                 value = value.split()
             results[-1].update({name: value})
         return results
-
-
-class RosieDatabaseCreateEvent(Event):
-
-    """Event raised when a Rosie database is created."""
-
-    def __str__(self):
-        return "%s: DB created." % (self.args[0])
-
-
-class RosieDatabaseCreateSkipEvent(Event):
-
-    """Event raised when a Rosie database creation is skipped."""
-
-    KIND = Event.KIND_ERR
-
-    def __str__(self):
-        return "%s: DB already exists, skip." % (self.args[0])
-
-
-class RosieDatabaseLoadEvent(Event):
-
-    """Event raised when a Rosie database has loaded with I of N revisions."""
-
-    LEVEL = Event.V
-
-    def __str__(self):
-        return "%s: DB loaded, r%d of %d." % self.args
-
-
-class RosieDatabaseLoadSkipEvent(Event):
-
-    """Event raised when a Rosie database load is skipped."""
-
-    KIND = Event.KIND_ERR
-
-    def __str__(self):
-        return "%s: DB not loaded." % (self.args[0])
-
-
-class RosieDatabaseInitiator(object):
-
-    """Initiate a database file from the repository information."""
-
-    LEN_DB_STRING = 1024
-    LEN_STATUS = 2
-    SQLITE_PREFIX = "sqlite:///"
-
-    def __init__(self, event_handler=None, popen=None, fs_util=None):
-        if event_handler is None:
-            event_handler = self._dummy
-        self.event_handler = event_handler
-        if popen is None:
-            popen = RosePopener(event_handler)
-        self.popen = popen
-        if fs_util is None:
-            fs_util = FileSystemUtil(event_handler)
-        self.fs_util = fs_util
-
-    def _dummy(*args, **kwargs):
-        pass
-
-    def create_and_load(self, db_url, repos_path):
-        try:
-            self.create(db_url)
-        except al.exc.OperationalError as e:
-            pass
-        else:
-            self.load(db_url, repos_path)
-
-    __call__ = create_and_load
-
-    def handle_event(self, *args, **kwargs):
-        """Handle an event using the runner's event handler."""
-        if callable(self.event_handler):
-            return self.event_handler(*args, **kwargs)
-
-    def create(self, db_url):
-        """Create database tables."""
-        if db_url.startswith(self.SQLITE_PREFIX):
-            d = os.path.dirname(db_url[len(self.SQLITE_PREFIX):])
-            self.fs_util.makedirs(d)
-        try:
-            engine = al.create_engine(db_url)
-            metadata = al.MetaData()
-            db_string = al.String(self.LEN_DB_STRING)
-            tables = []
-            tables.append(al.Table(
-                    LATEST_TABLE_NAME, metadata,
-                    al.Column("idx", db_string, nullable=False,
-                              primary_key=True),
-                    al.Column("branch", db_string, nullable=False,
-                              primary_key=True),
-                    al.Column("revision", al.Integer, nullable=False,
-                              primary_key=True)))
-            tables.append(al.Table(
-                    MAIN_TABLE_NAME, metadata,
-                    al.Column("idx", db_string, nullable=False,
-                              primary_key=True),
-                    al.Column("branch", db_string, nullable=False,
-                              primary_key=True),
-                    al.Column("revision", al.Integer, nullable=False,
-                              primary_key=True),
-                    al.Column("owner", db_string, nullable=False),
-                    al.Column("project", db_string, nullable=False),
-                    al.Column("title", db_string, nullable=False),
-                    al.Column("author", db_string, nullable=False),
-                    al.Column("date", al.Integer, nullable=False),
-                    al.Column("status", al.String(self.LEN_STATUS),
-                              nullable=False),
-                    al.Column("from_idx", db_string)))
-            tables.append(al.Table(
-                    OPTIONAL_TABLE_NAME, metadata,
-                    al.Column("idx", db_string, nullable=False,
-                              primary_key=True),
-                    al.Column("branch", db_string, nullable=False,
-                              primary_key=True),
-                    al.Column("revision", al.Integer, nullable=False,
-                              primary_key=True),
-                    al.Column("name", db_string, nullable=False,
-                              primary_key=True),
-                    al.Column("value", db_string)))
-            tables.append(al.Table(
-                    META_TABLE_NAME, metadata,
-                    al.Column("name", db_string, primary_key=True,
-                              nullable=False),
-                    al.Column("value", db_string)))
-            for table in tables:
-                table.create(engine)
-            connection = engine.connect()
-            self.handle_event(RosieDatabaseCreateEvent(db_url))
-        except al.exc.OperationalError as e:
-            self.handle_event(RosieDatabaseCreateSkipEvent(db_url))
-            raise e
-
-    def load(self, db_url, repos_path):
-        """Load database contents from a repository."""
-        if not repos_path or not os.path.exists(repos_path):
-            self.handle_event(RosieDatabaseLoadSkipEvent(repos_path))
-            return
-        repos_path = os.path.abspath(repos_path)
-        youngest = int(self.popen("svnlook", "youngest", repos_path)[0])
-        util_home = ResourceLocator.default().get_util_home()
-        rosa = os.path.join(util_home, "sbin", "rosa")
-        revision = 1
-        while revision <= youngest:
-            out, err = self.popen(rosa, "svn-post-commit", repos_path,
-                                  str(revision))
-            event = RosieDatabaseLoadEvent(repos_path, revision, youngest)
-            if revision == youngest:
-                # Check if any new revisions have been added.
-                youngest = self.popen("svnlook", "youngest", repos_path)[0]
-                youngest = int(youngest)
-            if revision == youngest:
-                event.level = event.DEFAULT
-            self.handle_event(event)
-            revision += 1
-        return revision
-
-
-def main():
-    """rosa db-create."""
-    db_conf = ResourceLocator.default().get_conf().get(["rosie-db"])
-    databases = {}
-    if db_conf is not None:
-        opts, args = RoseOptionParser().parse_args()
-        reporter = Reporter(opts.verbosity - opts.quietness)
-        init = RosieDatabaseInitiator(event_handler=reporter)
-        conf = ResourceLocator.default().get_conf()
-        for key, node in db_conf.value.items():
-            if key.startswith("db."):
-                prefix = key.replace("db.", "", 1)
-                db_url = conf.get_value(["rosie-db", "db." + prefix])
-                repos_path = conf.get_value(["rosie-db", "repos." + prefix])
-                init(db_url, repos_path)
-
-if __name__ == "__main__":
-    main()
