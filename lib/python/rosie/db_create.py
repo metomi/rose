@@ -193,10 +193,10 @@ class RosieDatabaseInitiator(object):
                 youngest = int(youngest)
             if revision == youngest:
                 event.level = event.DEFAULT
+            if sys.stdout.isatty():
+                sys.stdout.write("\r")
             self.handle_event(event)
             revision += 1
-        if sys.stdout.isatty():
-            sys.stdout.write("\r")
         return revision
 
 
