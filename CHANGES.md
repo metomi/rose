@@ -5,10 +5,10 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q4?)
+## 2014.11.1 (2014-11-26)
 
-Rose release 21? This release will work best with
-[cylc-6.1.0](https://github.com/cylc/cylc/releases/tag/6.1.0) or beyond.
+Rose release 21. This release works best with
+[cylc-6.1.0](https://github.com/cylc/cylc/releases/tag/6.1.0).
 
 ### Highlighted Changes
 
@@ -18,7 +18,12 @@ rosie go, rosie lookup, rosie ls: support caching of credentials using a
 
 ### Noteworthy Changes
 
-[#1471](https://github.com/metomi/rose/pull/1471):
+[#1473](https://github.com/metomi/rose/pull/1473):
+file install: improve error message when no `source` is specified for
+`mode=symlink`.
+
+[#1471](https://github.com/metomi/rose/pull/1471),
+[#1472](https://github.com/metomi/rose/pull/1472):
 rosa svn-post-commit: now support configurable notification on trunk commits.
 
 [#1463](https://github.com/metomi/rose/pull/1463):
