@@ -100,7 +100,7 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] file:qux=source=$TEST_DIR/no_read_target_dir/qux: bad setting
+[FAIL] file:qux=source=$TEST_DIR/no_read_target_dir/qux: bad or missing value
 __ERR__
 chmod u+x $TEST_DIR/no_read_target_dir
 rm $TEST_DIR/no_read_target_dir/qux
