@@ -165,6 +165,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         sources[source_name].used_by_names.append(name)
                         target_sources.append(sources[source_name])
             targets[name].dep_locs = target_sources
+            if (targets[name].mode == targets[name].MODE_SYMLINK and
+                    not targets[name].real_name):
+                raise ConfigProcessError([key, "source"], None)
 
         # Determine the scheme of the location from configuration.
         config_schemes_str = conf_tree.node.get_value(["schemes"])

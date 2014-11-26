@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose app-run", file installation, bad mode value.
+# Test "rose app-run", file installation, symlink mode, no source.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
+. "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
 tests 3
 #-------------------------------------------------------------------------------
@@ -28,17 +28,15 @@ test_init <<'__CONFIG__'
 default=true
 
 [file:COPYING]
-source=$ROSE_HOME/COPYING
-# Oops, typos
-mode=5ym1ink
+mode=symlink
 __CONFIG__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE
+TEST_KEY="${TEST_KEY_BASE}"
 test_setup
-run_fail "$TEST_KEY" rose app-run --config=../config -q
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] file:COPYING=mode=5ym1ink: bad or missing value
+run_fail "${TEST_KEY}" rose app-run --config=../config -q
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" </dev/null
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
+[FAIL] file:COPYING=source: bad or missing value
 __ERR__
 test_teardown
 #-------------------------------------------------------------------------------

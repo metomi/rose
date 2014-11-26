@@ -63,8 +63,9 @@ class ConfigProcessError(Exception):
                 setting_str += "=%s" % str(self.value)
             e_str = str(self.e)
             if self.e is None:
-                e_str = "bad setting"
+                e_str = "bad or missing value"
             return "%s: %s" % (setting_str, e_str)
+
 
 class ConfigProcessorBase(object):
 
@@ -95,7 +96,7 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         self.fs_util = fs_util
         p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         SchemeHandlersManager.__init__(
-                self, [p], "rose.config_processors", ["process"])
+            self, [p], "rose.config_processors", ["process"])
 
     def handle_event(self, *args, **kwargs):
         if callable(self.event_handler):
