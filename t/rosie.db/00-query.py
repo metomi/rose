@@ -22,7 +22,8 @@
 
 import ast
 import sys
-from rosie.db import DAO, RosieDatabaseInitiator
+from rosie.db import DAO
+from rosie.db_create import RosieDatabaseInitiator
 from tempfile import NamedTemporaryFile
 
 
