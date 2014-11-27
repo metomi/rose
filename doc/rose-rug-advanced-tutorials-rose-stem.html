@@ -270,16 +270,21 @@ fcm_make_spaceship =&gt; spaceship =&gt; rose_ana_position
       <div class="slide">
         <h2>The <code>rose-suite.conf</code> file</h2>
 
-        <p>You should now initialise the <code>rose-suite.conf</code> with the
-        default values of <code>RUN_NAMES</code> and
-        <code>SOURCE_SPACESHIP</code>:</p>
+        <p>The suites associated with rose-stem require a version number
+        indicating the version of the <kbd>rose stem</kbd> command with which
+        they are compatible. This is specified in the 
+        <code>rose-suite.conf</code> file, together with the default values 
+        of <code>RUN_NAMES</code> and <code>SOURCE_SPACESHIP</code>. Paste
+        the following into your <code>rose-suite.conf</code> file:</p>
         <pre>
+ROSE_STEM_VERSION=1
+        
 [jinja2:suite.rc]
 RUN_NAMES=[]
 SOURCE_SPACESHIP='fcm:spaceship_tr@head'
 </pre>
 
-        <p>Both of these variables will be overriden by the user when they
+        <p>Both of the Jinja2 variables will be overriden by the user when they
         execute <code>rose stem</code> on the command line.</p>
       </div>
 
