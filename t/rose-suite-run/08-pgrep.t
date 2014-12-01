@@ -35,11 +35,12 @@ if [[ $TEST_KEY_BASE == *conf ]]; then
 fi
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
-N_TESTS=4
-tests $N_TESTS
+tests 5
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
+SUITE_RUN_DIR0=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery-XXXXXX')
+NAME0=$(basename "${SUITE_RUN_DIR0}")
+SUITE_RUN_DIR=$(mktemp -d "${SUITE_RUN_DIR0}-XXXXXX")
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME $OPT_HOST \
     --no-gcontrol
@@ -73,7 +74,10 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 $SUITE_PROC
 [FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
-run_pass "$TEST_KEY.NAME1" \
+run_pass "$TEST_KEY.NAME0" \
+    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE "--name=${NAME0}" \
+    $OPT_HOST --no-gcontrol
+run_pass "$TEST_KEY.NAME+1" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=${NAME}1 \
     $OPT_HOST --no-gcontrol
 run_pass "$TEST_KEY.SHORTNAME" \
@@ -84,11 +88,11 @@ set +e
 sleep 1
 $CMD_PREFIX "mv $NAME.port ~/.cylc/ports/$NAME"
 SHUTDOWN_OPTS='--kill --max-polls=24 --interval=5'
-for N in $NAME ${NAME}1 ${NAME%?}; do
+for N in $NAME ${NAME0} ${NAME}1 ${NAME%?}; do
     if $CMD_PREFIX test -f ~/.cylc/ports/$N; then
         rose suite-shutdown --debug -q -y -n $N \
             -- $SHUTDOWN_OPTS 1>/dev/null 2>&1
     fi
 done
-rose suite-clean --debug -q -y $NAME ${NAME}1 ${NAME%?}
+rose suite-clean --debug -q -y $NAME ${NAME0} ${NAME}1 ${NAME%?}
 exit 0
