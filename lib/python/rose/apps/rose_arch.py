@@ -324,7 +324,6 @@ class RoseArchApp(BuiltinApp):
                 else:
                     target.status = target.ST_NEW
                     app_runner.handle_event(err, kind=Event.KIND_ERR)
-                    app_runner.handle_event(out)
                 app_runner.handle_event(out)
                 target.command_rc = ret_code
                 dao.update_command_rc(target)
