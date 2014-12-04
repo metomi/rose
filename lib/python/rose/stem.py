@@ -299,8 +299,7 @@ class StemRunner(object):
             basedir = self._ascertain_project(os.getcwd())[1]
         except ProjectNotFoundException:
             if self.opts.conf_dir:
-                basedir = self.opts.conf_dir
-                basedir = re.sub(r'\.', os.getcwd(), basedir)
+                basedir = os.path.abspath(self.opts.conf_dir)
             else:
                 basedir = os.getcwd()
         name = os.path.basename(basedir)
