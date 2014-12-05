@@ -5,6 +5,27 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-12-??)
+
+This will be Rose release 22. This release will work best with
+[cylc-6.1.1](https://github.com/cylc/cylc/releases/tag/6.1.1).
+
+### Highlighted Changes
+
+-none yet-
+
+### Noteworthy Changes
+
+[#1482](https://github.com/metomi/rose/pull/1482):
+rose_arch: fix duplicated archive STDOUT print out.
+
+[#1480](https://github.com/metomi/rose/pull/1480):
+rose suite-clean, rose-suite-run, etc: improve `pgrep` `cylc run` pattern for
+detecting whether a suite is still running or not. The old pattern was stopping
+`foo` from starting if `foo-bar` was running.
+
+--------------------------------------------------------------------------------
+
 ## 2014.11.1 (2014-11-26)
 
 Rose release 21. This release works best with
