@@ -61,6 +61,18 @@ class ConfigSourceTreeSetEvent(Event):
    __str__ = __repr__
 
 
+class NameSetEvent(Event):
+
+   """Event to report a name for the suite being set."""
+
+   LEVEL = Event.V
+
+   def __repr__(self):
+       return "Suite is named %s"%(self.args[0])
+
+   __str__ = __repr__
+
+
 class ProjectNotFoundException(Exception):
 
     """Exception class when unable to determine project a source belongs to."""
@@ -283,8 +295,15 @@ class StemRunner(object):
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
-        basedir = self._ascertain_project(os.getcwd())[1]
+        try:
+            basedir = self._ascertain_project(os.getcwd())[1]
+        except ProjectNotFoundException:
+            if self.opts.conf_dir:
+                basedir = os.path.abspath(self.opts.conf_dir)
+            else:
+                basedir = os.getcwd()
         name = os.path.basename(basedir)
+        self.reporter(NameSetEvent(name))
         return name
 
     def _this_suite(self):
