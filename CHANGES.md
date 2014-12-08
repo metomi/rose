@@ -12,7 +12,7 @@ Rose release 22. This release works best with
 
 ### Highlighted Changes
 
--none yet-
+-none-
 
 ### Noteworthy Changes
 
