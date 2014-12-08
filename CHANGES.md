@@ -10,10 +10,6 @@ for a full listing of issues for each release.
 Rose release 22. This release works best with
 [cylc-6.1.2](https://github.com/cylc/cylc/releases/tag/6.1.2).
 
-### Highlighted Changes
-
--none-
-
 ### Noteworthy Changes
 
 [#1484](https://github.com/metomi/rose/pull/1484):
