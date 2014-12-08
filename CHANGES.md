@@ -5,10 +5,10 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-12-??)
+## 2014.12.0 (2014-12-08)
 
-This will be Rose release 22. This release will work best with
-[cylc-6.1.1](https://github.com/cylc/cylc/releases/tag/6.1.1).
+Rose release 22. This release works best with
+[cylc-6.1.2](https://github.com/cylc/cylc/releases/tag/6.1.2).
 
 ### Highlighted Changes
 
@@ -16,8 +16,16 @@ This will be Rose release 22. This release will work best with
 
 ### Noteworthy Changes
 
+[#1484](https://github.com/metomi/rose/pull/1484):
+rosie.ws_client_auth: when saving the user name for a web service, create
+the `~/.metomi/rose.conf` file if it does not already exist.
+
 [#1482](https://github.com/metomi/rose/pull/1482):
 rose_arch: fix duplicated archive STDOUT print out.
+
+[#1481](https://github.com/metomi/rose/pull/1481):
+rose stem: fix logic to ascertain name of a suite when the current working
+directory is not a Subversion working copy.
 
 [#1480](https://github.com/metomi/rose/pull/1480):
 rose suite-clean, rose-suite-run, etc: improve `pgrep` `cylc run` pattern for
