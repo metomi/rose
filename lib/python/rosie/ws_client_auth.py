@@ -150,9 +150,11 @@ class RosieWSClientAuthManager(object):
                                                ResourceLocator.ROSE_CONF)
             if os.access(user_rose_conf_path, os.F_OK | os.R_OK | os.W_OK):
                 config = rose.config.load(user_rose_conf_path)
-                config.set(["rosie-id", "prefix-username." + self.prefix],
-                           self.username)
-                rose.config.dump(config, user_rose_conf_path)
+            else:
+                config = rose.config.ConfigNode()
+            config.set(
+                ["rosie-id", "prefix-username." + self.prefix], self.username)
+            rose.config.dump(config, user_rose_conf_path)
         if (self.password_store is not None and
                 self.password and self.password_orig != self.password):
             self.password_store.store_password(
