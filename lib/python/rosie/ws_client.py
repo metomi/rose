@@ -293,13 +293,13 @@ class RosieWSClient(object):
         for suite_id in suite_ids:
             if (suite_id.idx, suite_id.branch) in result_idx_branches:
                 continue
-                # A branch may have been deleted - we need all_revs True.
+                # A branch may have been deleted - we need all_revs=1.
                 # We only want to use all_revs on demand as it's slow.
             q_list.append("or ( idx eq %s" % suite_id.idx)
             q_list.append("and branch eq %s )" % suite_id.branch)
         if q_list:
             more_results = []
-            for data, _ in self.query(q_list, all_revs=True):
+            for data, _ in self.query(q_list, all_revs=1):
                 more_results.extend(data)
             new_results = {}
             for result in more_results:

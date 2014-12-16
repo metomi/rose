@@ -175,7 +175,7 @@ class DAO(object):
         """Return the query operators."""
         return self.QUERY_OPERATORS
 
-    def query(self, filters, all_revs=False):
+    def query(self, filters, all_revs=0):
         """Return the results of a series of filters on both tables.
 
         filters is a list of tuples, each tuple containing:
@@ -204,9 +204,9 @@ class DAO(object):
         order in which they are given - e.g. [A, B, C] -> (A & B) & C
         This will be overridden by any bracketed groups.
 
-        If all_revs is True, matching deleted suites and old revisions
+        If all_revs == 1, matching deleted suites and old revisions
         of suites will be returned.
-        If all_revs is False, they won't be.
+        If all_revs == 0, they won't be.
 
         """
         self._connect()
@@ -329,12 +329,12 @@ class DAO(object):
             items.insert(i - 1, expr)
         return items.pop()
 
-    def search(self, s, all_revs=False):
+    def search(self, s, all_revs=0):
         """Search database for rows with values matching the words in "s".
 
-        If all_revs is True, matching deleted suites and old revisions
+        If all_revs == 1, matching deleted suites and old revisions
         of suites will be returned.
-        If all_revs is False, they won't be.
+        If all_revs == 0, they won't be.
 
         """
         self._connect()
