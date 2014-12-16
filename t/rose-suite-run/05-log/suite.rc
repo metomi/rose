@@ -2,18 +2,15 @@
 [cylc]
     UTC mode = True
     [[event hooks]]
-        timeout handler = "rose suite-hook --shutdown"
-        timeout = 1
+        timeout handler = rose suite-hook --shutdown
+        timeout = PT1M
 [scheduling]
-    initial cycle point = 2013010100
-    final cycle point = 2012010100 # deliberate, so no task is run
+    initial cycle point = 20130101T00Z
+    final cycle point = 20130101T00Z
     [[dependencies]]
-        [[[0]]]
-            graph = """
-my_task_1
-"""
+        [[[T00]]]
+            graph = my_task_1
 
 [runtime]
-    [[root]]
-        command scripting = "true"
     [[my_task_1]]
+        command scripting = true
