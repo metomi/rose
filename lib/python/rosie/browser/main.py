@@ -394,7 +394,8 @@ class MainWindow(gtk.Window):
         self.menubar = rosie.browser.util.MenuBar(
             self.advanced_search_widget.display_columns,
             self.ws_client)
-        menu_list = [('/TopMenuBar/File/New Suite', self.handle_create),
+        menu_list = [('/TopMenuBar/File/New Suite',
+                      lambda m: self.handle_create()),
                      ('/TopMenuBar/File/Quit', self.handle_destroy),
                      ('/TopMenuBar/Edit/Preferences', lambda m: False),
                      ('/TopMenuBar/View/View advanced controls',
