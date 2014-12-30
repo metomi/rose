@@ -651,6 +651,15 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
+    def job_logs_remove_on_server(self, suite_name, items):
+        """Remove cycle job logs.
+
+        suite_name -- The name of a suite.
+        items -- A list of relevant items.
+
+        """
+        raise NotImplementedError()
+
     def launch_suite_log_browser(self, user_name, suite_name):
         """Launch web browser to view suite log.
 
