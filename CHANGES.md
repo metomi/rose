@@ -5,6 +5,26 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q1?)
+
+Rose release 22. This release will work best with
+[cylc-6.1.2](https://github.com/cylc/cylc/releases/tag/6.1.2) and beyond.
+
+### Highlighted Changes
+
+-none yet-
+
+### Noteworthy Changes
+
+[#1493](https://github.com/metomi/rose/pull/1493):
+rosie go: fix `File -> New Suite`.
+
+[#1486](https://github.com/metomi/rose/pull/1486):
+rosie ls: send `all_revs=1` to the web service server instead of
+`all_revs=True`.
+
+--------------------------------------------------------------------------------
+
 ## 2014.12.0 (2014-12-08)
 
 Rose release 22. This release works best with
