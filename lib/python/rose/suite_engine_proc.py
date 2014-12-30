@@ -651,7 +651,7 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def job_logs_remove_server(self, suite_name, items):
+    def job_logs_remove_on_server(self, suite_name, items):
         """Remove cycle job logs.
 
         suite_name -- The name of a suite.
