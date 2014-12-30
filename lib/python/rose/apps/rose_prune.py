@@ -46,17 +46,33 @@ class RosePruneApp(BuiltinApp):
             return
         prune_remote_logs_cycles = self._get_conf(conf_tree,
                                                   "prune-remote-logs-at")
+        prune_server_logs_cycles = self._get_conf(conf_tree,
+                                                  "prune-server-logs-at")
         archive_logs_cycles = self._get_conf(conf_tree, "archive-logs-at")
-        if prune_remote_logs_cycles or archive_logs_cycles:
+        if (prune_remote_logs_cycles or
+            prune_server_logs_cycles or
+            archive_logs_cycles):
             tmp_prune_remote_logs_cycles = []
             for cycle in prune_remote_logs_cycles:
                 if cycle not in archive_logs_cycles:
                     tmp_prune_remote_logs_cycles.append(cycle)
             prune_remote_logs_cycles = tmp_prune_remote_logs_cycles
+
+            tmp_prune_server_logs_cycles = []
+            for cycle in prune_server_logs_cycles:
+                if cycle not in archive_logs_cycles:
+                    tmp_prune_server_logs_cycles.append(cycle)
+            prune_server_logs_cycles = tmp_prune_server_logs_cycles
+
             if prune_remote_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_pull_remote(
                             suite_name, prune_remote_logs_cycles,
                             prune_remote_mode=True)
+
+            if prune_server_logs_cycles:
+                app_runner.suite_engine_proc.job_logs_remove_server(
+                            suite_name, prune_server_logs_cycles)
+
             if archive_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_archive(
                             suite_name, archive_logs_cycles)
@@ -112,6 +128,7 @@ class RosePruneApp(BuiltinApp):
         E.g.:
 
         prune-remote-logs-at=-6h -12h
+        prune-server-logs-at=-7d
         prune-datac-at=-6h:foo/* -12h:'bar/* baz/*' -1d
         prune-work-at=-6h:t1*:*.tar -12h:t1*: -12h:*.gz -1d
 

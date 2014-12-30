@@ -968,6 +968,46 @@ class CylcProcessor(SuiteEngineProcessor):
         dao.commit()
         dao.close()
 
+    def job_logs_remove_server(self, suite_name, items):
+        """Remove cycle job logs.
+
+        suite_name -- The name of a suite.
+        items -- A list of relevant items.
+
+        """
+        cycles = []
+        if "*" in items:
+            stmt = "SELECT DISTINCT cycle FROM task_events"
+            for row in self._db_exec(self.SUITE_DB, None, suite_name, stmt):
+                cycles.append(row[0])
+            self._db_close(self.SUITE_DB, None, suite_name)
+        else:
+            for item in items:
+                cycle = self._parse_task_cycle_id(item)[0]
+                if cycle:
+                    cycles.append(cycle)
+
+        cwd = os.getcwd()
+        self.fs_util.chdir(self.get_suite_dir(suite_name))
+        try:
+            for cycle in cycles:
+                # tar.gz files
+                archive_file_name = os.path.join("log",
+                                                 "job-" + cycle + ".tar.gz")
+                if os.path.exists(archive_file_name):
+                    self.fs_util.delete(archive_file_name)
+                # cycle directories
+                dir_name_prefix = os.path.join("log","job")
+                dir_name = os.path.join(dir_name_prefix, cycle)
+                if os.path.exists(dir_name):
+                    self.fs_util.delete(dir_name)
+        finally:
+            try:
+                self.fs_util.chdir(cwd)
+            except OSError:
+                pass
+
+
     def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
         if not hosts:

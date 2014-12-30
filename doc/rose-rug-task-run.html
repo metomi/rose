@@ -620,6 +620,11 @@ source=stuffing-*.txt
       <dd>Re-sync remote job logs at these cycles and remove them from remote
       hosts.</dd>
 
+      <dt><kbd>prune-server-logs-at=cycle ...</kbd></dt>
+
+      <dd>Remove logs on the suite server. Removes both log directories and 
+      archived logs.</dd>
+
       <dt><kbd>archive-logs-at=cycle ...</kbd></dt>
 
       <dd>Archive all job logs at these cycles. Remove remote job logs on
@@ -656,6 +661,7 @@ mode=rose_prune
 [prune]
 prune-remote-logs-at=-PT6H
 archive-logs-at=-P1D
+prune-server-logs-at=-P7D
 prune-work-at=-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H
 prune-datac-at=-PT6H:foo* -PT12H:'bar* *.baz*' -P1D
 </pre>
