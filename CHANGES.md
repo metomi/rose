@@ -16,6 +16,9 @@ Rose release 23. This release will work best with
 
 ### Noteworthy Changes
 
+[#1496](https://github.com/metomi/rose/pull/1496):
+rose_prune: new setting for pruning logs and log archives on the suite host.
+
 [#1493](https://github.com/metomi/rose/pull/1493):
 rosie go: fix `File -> New Suite`.
 
