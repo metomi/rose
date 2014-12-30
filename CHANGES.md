@@ -7,7 +7,7 @@ for a full listing of issues for each release.
 
 ## Next Release (2015-Q1?)
 
-Rose release 22. This release will work best with
+Rose release 23. This release will work best with
 [cylc-6.1.2](https://github.com/cylc/cylc/releases/tag/6.1.2) and beyond.
 
 ### Highlighted Changes
