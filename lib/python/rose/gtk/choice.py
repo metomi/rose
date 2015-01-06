@@ -24,7 +24,6 @@ import gtk
 
 import rose
 
-
 class ChoicesListView(gtk.TreeView):
 
     """Class to hold and display an ordered list of strings.
@@ -72,6 +71,8 @@ class ChoicesListView(gtk.TreeView):
         col = gtk.TreeViewColumn()
         col.set_title(title)
         cell_text = gtk.CellRendererText()
+        cell_text.set_property('editable', True)
+        cell_text.connect('edited', self._handle_edited)
         col.pack_start(cell_text, expand=True)
         col.set_cell_data_func(cell_text, self._set_cell_text)
         self.append_column(col)
@@ -125,6 +126,14 @@ class ChoicesListView(gtk.TreeView):
             model.append([sel.data])
             path = None
         self._handle_reordering(model, path)
+
+    def _handle_edited(self, cell, path, new_text):
+        """Handle cell text so it can be edited. """
+        liststore = self.get_model()
+        iter_ = liststore.get_iter(path)
+        liststore.set_value(iter_, 0, new_text)
+        self._handle_reordering()
+        return
 
     def _handle_reordering(self, model=None, path=None):
         """Handle a drag-and-drop rearrangement in the main list view."""
