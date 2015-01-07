@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
-# (C) British Crown Copyright 2012-4 Met Office.
+# (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -237,7 +237,7 @@ TITLE_INVALID_PREFIX = "Error"
 TITLE_INVALID_QUERY = "Error"
 
 # Miscellaneous
-COPYRIGHT = "(C) British Crown Copyright 2012-4 Met Office."
+COPYRIGHT = "(C) British Crown Copyright 2012-5 Met Office."
 DEFAULT_FILTER_EXPR = "eq"
 DEFAULT_QUERY = "list_my_suites"
 DELIM_KEYVAL = ": "
