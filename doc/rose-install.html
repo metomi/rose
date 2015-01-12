@@ -9,7 +9,11 @@
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -80,8 +84,10 @@
 
         <p><dfn>tested with version:</dfn> 2.16 (with GTK 2.18.9 and 2.20.1).</p>
 
-        <p><dfn>minimum version required:</dfn> 2.12 (some degraded
-        functionality with versions prior to 2.16).</p>
+        <p><dfn>minimum version required:</dfn> 2.12.</p>
+
+        <p><dfn>remark:</dfn> Some degraded
+        functionality with versions prior to 2.16.</p>
       </dd>
 
       <dt>Python: <a href="http://www.cherrypy.org/">cherrypy</a></dt>
@@ -89,7 +95,7 @@
       <dd>
         <p><dfn>used by:</dfn> Rose Bush and Rosie web service.</p>
 
-        <p><dfn>tested with version:</dfn> 3.1.2</p>
+        <p><dfn>tested with version:</dfn> 3.1.2.</p>
       </dd>
 
       <dt>Python: <a href="http://jinja.pocoo.org/">jinja2</a></dt>
@@ -111,6 +117,12 @@
         <p><dfn>tested with version:</dfn> 2.2.1.</p>
 
         <p><dfn>minimum version required:</dfn> 2.2.1.</p>
+
+        <p><dfn>remark:</dfn> Development of this module is moving extremely
+        fast, and it may not be easy to find a package for a compatible version
+        in your Linux distribution. It may be necessary to do some manual
+        installation by downloading a release tar ball, which should have all
+        its dependencies embedded.</p>
       </dd>
 
       <dt>Python: <a href=
@@ -312,10 +324,23 @@
 
     <h2 id="rose">Configuring Rose</h2>
 
-    <p><samp>lib/bash/rose_init_site/</samp>: If you do not have root access to
+    <p><samp>lib/bash/rose_init_site</samp>: If you do not have root access to
     install the required Python libraries, you may need to edit this file to
     ensure Python libraries are included in the <var>PYTHONPATH</var>
-    environment variable.</p>
+    environment variable. For example, if you have installed some essential
+    Python libraries in your <var>HOME</var> directory, you can add a
+    <samp>lib/bash/rose_init_site</samp> file with the following contents:</p>
+
+    <pre class="prettyprint lang_sh">
+# Essential Python libraries installed under
+# "/home/daisy/usr/lib/python2.6/site-packages/"
+if [[ -n "${PYTHONPATH:-}" ]]; then
+    PYTHONPATH="/home/daisy/usr/lib/python2.6/site-packages:${PYTHONPATH}"
+else
+    PYTHONPATH="/home/daisy/usr/lib/python2.6/site-packages"
+fi
+export PYTHONPATH
+</pre>
 
     <p><samp>etc/rose.conf</samp>: You should add/edit this file to meet the
     requirement of your site. Examples can be found at the
@@ -340,9 +365,9 @@
     <samp>myhost001/svn-repos</samp>) with given repository base name
     <var>NAME</var> (e.g. <samp>roses_mo1</samp>), change into a new directory
     and enter the following commands:</p>
-    <pre>
-svn co -q svn://${HOST_AND_PATH}/${NAME}/
-svn ps fcm:layout -F - ${NAME} &lt;&lt;'__FCM_LAYOUT__'
+    <pre class="prettyprint lang_sh">
+svn co -q "svn://${HOST_AND_PATH}/${NAME}/"
+svn ps fcm:layout -F - "${NAME}" &lt;&lt;'__FCM_LAYOUT__'
 depth-project = 5
 depth-branch = 1
 depth-tag = 1
@@ -354,8 +379,8 @@ level-owner-tag =
 template-branch =
 template-tag =
 __FCM_LAYOUT__
-svn ci -m 'fcm:layout: defined.' ${NAME}
-rm -rf ${NAME}
+svn ci -m 'fcm:layout: defined.' "${NAME}"
+rm -fr "${NAME}"
 </pre>
 
     <p>Add the following hook scripts to the repository:</p>
@@ -364,7 +389,7 @@ rm -rf ${NAME}
       <dt><code>pre-commit</code></dt>
 
       <dd>
-        <pre>
+        <pre class="prettyprint lang_sh">
 #!/bin/bash
 exec /path/to/rose/sbin/rosa svn-pre-commit "$@"
 </pre>
@@ -373,7 +398,7 @@ exec /path/to/rose/sbin/rosa svn-pre-commit "$@"
       <dt><code>post-commit</code></dt>
 
       <dd>
-        <pre>
+        <pre class="prettyprint lang_sh">
 #!/bin/bash
 exec /path/to/rose/sbin/rosa svn-post-commit "$@"
 </pre>
@@ -392,7 +417,7 @@ exec /path/to/rose/sbin/rosa svn-post-commit "$@"
     relevant paths such as the location for your repository and database.</p>
 
     <p>Once you have done that, create the Rosie database by running:</p>
-    <pre>
+    <pre class="prettyprint lang_sh">
 /path/to/rose/sbin/rosa db-create
 </pre>
 
@@ -403,7 +428,7 @@ exec /path/to/rose/sbin/rosa svn-post-commit "$@"
     Edit the <var>[rosie-ws]</var> settings in <samp>etc/rose.conf</samp> to
     configure the web server's log directory and port number. Start the web
     server by running:</p>
-    <pre>
+    <pre class="prettyprint lang_sh">
 setsid /path/to/rose/sbin/rosa ws 0&lt;/dev/null 1&lt;/dev/null 2&gt;&amp;1 &amp;
 </pre>
 
@@ -422,14 +447,14 @@ WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
     <p>Hopefully, you should now have a working Rosie service. Configure the
     client settings by editing the <var>[rosie-id]</var> settings in
     <samp>etc/rose.conf</samp>. When you are done, test it by running:</p>
-    <pre>
+    <pre class="prettyprint lang_sh">
 rosie create
 </pre>
 
     <p>which will create the first suite in your repository, with an ID ending
     in <samp>aa000</samp> - e.g. <samp>mo1-aa000</samp>. Locate it by
     running:</p>
-    <pre>
+    <pre class="prettyprint lang_sh">
 rosie lookup 000
 </pre>
 
@@ -464,7 +489,7 @@ sub-project experiment model
     <h2 id="rose-bush">Configuring Rose Bush</h2>
 
     <p>You can start an ad-hoc Rose Bush web server by running:</p>
-    <pre>
+    <pre class="prettyprint lang_sh">
 setsid /path/to/rose/bin/rose bush start 0&lt;/dev/null 1&gt;/dev/null 2&gt;&amp;1 &amp;
 </pre>
 
