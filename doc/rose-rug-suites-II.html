@@ -145,8 +145,8 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        [[[0, 6, 12, 18]]]
-            graph = a[T-6] =&gt; a
+        [[[T00, T06, T12, T18]]]
+            graph = a[-PT6H] =&gt; a
 </pre>
 
       <p>If task <var>b</var> depends on the previous cycle's task <var>a</var>
@@ -154,8 +154,8 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        [[[0, 6, 12, 18]]]
-            graph = a[T-6]:fail =&gt; b
+        [[[T00, T06, T12, T18]]]
+            graph = a[-PT6H]:fail =&gt; b
 </pre>
     </div>
 
