@@ -306,19 +306,19 @@ SOURCE_SPACESHIP='fcm:spaceship_tr@head'
 comparison=Exact
 extract=OutputGrepper:'^\s*Position:\s*(.*?)\s*,'
 kgo1file=/home/user/spaceship/kgo.txt
-resultfile=../spaceship.1/output.txt
+resultfile=../spaceship/output.txt
 
 [Check Y position at each timestep]
 comparison=Exact
 extract=OutputGrepper:'^\s*Position:.*?,\s*(.*?)\s*,'
 kgo1file=/home/user/spaceship/kgo.txt
-resultfile=../spaceship.1/output.txt
+resultfile=../spaceship/output.txt
 
 [Check Z position at each timestep]
 comparison=Exact
 extract=OutputGrepper:'^\s*Position:.*,\s*(.*)\s*$'
 kgo1file=/home/user/spaceship/kgo.txt
-resultfile=../spaceship.1/output.txt
+resultfile=../spaceship/output.txt
 </pre>
 
         <p>This will check that the positions reported by the program match
