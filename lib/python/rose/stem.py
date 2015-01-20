@@ -282,8 +282,10 @@ class StemRunner(object):
 
         # Remove subtree from base and item
         if 'sub_tree' in source_dict:
-            item = item.replace(source_dict['sub_tree'], '', 1)
-            base = base.replace(source_dict['sub_tree'], '', 1)
+            item = re.sub(r'(.*)%s/?$' % (source_dict['sub_tree']), r'\1', 
+                     item, count=1)
+            base = re.sub(r'(.*)%s/?$' % (source_dict['sub_tree']), r'\1', 
+                     base, count=1)
 
         # Remove trailing forwards-slash
         item = re.sub(r'/$',r'',item)
