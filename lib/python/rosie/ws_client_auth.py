@@ -73,6 +73,7 @@ class RosieWSClientAuthManager(object):
     ]
     PROMPT_USERNAME = "Username for %(prefix)r: "
     PROMPT_PASSWORD = "Password for %(username)s at %(prefix)r: "
+    STR_CANCELLED = "cancelled by user"
 
     def __init__(self, prefix, popen=None, prompt_func=None):
         self.prefix = prefix
@@ -208,7 +209,7 @@ class RosieWSClientAuthManager(object):
             else:
                 username = raw_input(prompt)
             if not username:
-                raise KeyboardInterrupt()
+                raise KeyboardInterrupt(self.STR_CANCELLED)
             if username and username != self.username:
                 self.username = username
                 self._load_password()
@@ -230,7 +231,7 @@ class RosieWSClientAuthManager(object):
             else:
                 password = getpass(prompt)
             if not password:
-                raise KeyboardInterrupt()
+                raise KeyboardInterrupt(self.STR_CANCELLED)
             if password and password != self.password:
                 self.password = password
 

@@ -155,10 +155,15 @@ class RosieWSClient(object):
                     request_detail["can_retry"] = False
                     requests_kwargs = request_detail["requests_kwargs"]
                     auth_manager = request_detail["auth_manager"]
-                    requests_kwargs["auth"] = auth_manager.get_auth(
-                        is_retry=True)
-                    results[url] = pool.apply_async(
-                        requests.get, [url], requests_kwargs)
+                    try:
+                        requests_kwargs["auth"] = auth_manager.get_auth(
+                            is_retry=True)
+                    except KeyboardInterrupt as exc:
+                        error = RosieWSClientError(url, kwargs, exc)
+                        self.event_handler(error, level=1)
+                    else:
+                        results[url] = pool.apply_async(
+                            requests.get, [url], requests_kwargs)
                     continue
                 request_detail["response"] = response
             if results:
