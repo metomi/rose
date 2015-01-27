@@ -5,6 +5,33 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q1?)
+
+Rose release 24? This release will work best with
+[cylc-6.1.2](https://github.com/cylc/cylc/releases/tag/6.1.2) or beyond.
+
+### Highlighted Changes
+
+-none yet-
+
+### Noteworthy Changes
+
+[#1513](https://github.com/metomi/rose/pull/1513):
+Rosie web service clients: gracefully handle the `Cancel` key press event when
+user is prompted for a password for a prefix. The client will now report the
+event, but continue with other prefixes.
+
+[#1511](https://github.com/metomi/rose/pull/1511):
+rose stem: the command now works under the `rose-stem/` sub-directory of a
+working copy of a branch.
+
+[#1504](https://github.com/metomi/rose/pull/1504):
+rose app-run, rose suite-run, rose task-run: the commands in `-v` mode now
+report the loading of the run configuration, any optional keys, and/or CLI
+defined `key=value` pairs.
+
+--------------------------------------------------------------------------------
+
 ## 2015.01.0 (2015-01-07)
 
 Rose release 23. This release works best with
