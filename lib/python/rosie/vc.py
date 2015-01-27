@@ -469,8 +469,15 @@ def create(argv):
     else:
         info_config = rose.config.load(opts.info_file)
     if not opts.non_interactive:
+        if from_id:
+            question = "Copy \"%s\"?" % from_id.to_string_with_version()
+        else:
+            prefix = opts.prefix
+            if not prefix:
+                prefix = SuiteId.get_prefix_default()
+            question = "Create suite at \"%s\"?" % prefix
         try:
-            response = raw_input("Create? y/n (default n) ")
+            response = raw_input(question + " y/n (default n) ")
         except EOFError:
             sys.exit(1)
         if response != 'y':
