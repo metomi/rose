@@ -32,7 +32,7 @@ NAME=$(basename $SUITE_RUN_DIR)
 TEST_KEY="$TEST_KEY_BASE-local-install"
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/greet_earth -n $NAME -l
-(cd ~/cylc-run/$NAME; find app bin -type f | sort) >"$TEST_KEY.find"
+(cd ~/cylc-run/$NAME; find app bin -type f | LANG=C sort) >"$TEST_KEY.find"
 file_cmp "$TEST_KEY.find" "$TEST_KEY.find" <<'__FIND__'
 app/hello/rose-app.conf
 bin/my-hello
@@ -68,7 +68,7 @@ else
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-suite-run-my-hello.log"
-sort $SUITE_RUN_DIR/my-hello.log >"$TEST_KEY"
+LANG=C sort $SUITE_RUN_DIR/my-hello.log >"$TEST_KEY"
 file_cmp "$TEST_KEY" "$TEST_KEY" <<'__LOG__'
 [2013010100] Greet Earth
 [2013010100] Greet Moon

@@ -33,14 +33,14 @@ TEST_CONF="${TEST_SOURCE_DIR}/${TEST_KEY_BASE}.conf"
 # Get recipients from configuration
 get_recips() {
     local KEY="$1"
-    perl -e \
+    LANG=C perl -e \
         'print(join(", ", map {"'"'"'" . $_ . "'"'"'"} sort(@ARGV)), "\n")' \
         $(rose config -E -f "${TEST_CONF}" "recips.$KEY")
 }
 
 # Sort email recipients
 sort_recips() {
-    perl -e \
+    LANG=C perl -e \
         'print(join(", ", map {"'"'"'" . $_ . "'"'"'"} sort(@ARGV)), "\n")' \
         "$@"
 }

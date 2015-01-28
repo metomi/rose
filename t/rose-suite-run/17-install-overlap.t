@@ -36,7 +36,7 @@ run_pass "$TEST_KEY-1" rose suite-run \
     -n $NAME --no-gcontrol -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i
 run_pass "$TEST_KEY-2" rose suite-run \
     -n $NAME --no-gcontrol -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i
-(cd $SUITE_RUN_DIR/etc; find -type f) | sort >"$TEST_KEY.find"
+(cd $SUITE_RUN_DIR/etc; find -type f) | LANG=C sort >"$TEST_KEY.find"
 file_cmp "$TEST_KEY.find" "$TEST_KEY.find" <<'__FIND__'
 ./foo/bar/baz/bacon.txt
 ./foo/bar/egg/humpty.txt

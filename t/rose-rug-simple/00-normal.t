@@ -43,7 +43,7 @@ file_cmp "$TEST_KEY_BASE.hello.log" \
 __LOG__
 sqlite3 $SUITE_RUN_DIR/cylc-suite.db \
     'select cycle,name,status from task_states where status=="succeeded";' \
-    | sort >"$TEST_KEY_BASE.db"
+    | LANG=C sort >"$TEST_KEY_BASE.db"
 file_cmp "$TEST_KEY_BASE.db" "$TEST_KEY_BASE.db" <<'__DB__'
 20130101T0000Z|hello|succeeded
 20130101T0600Z|hello|succeeded
