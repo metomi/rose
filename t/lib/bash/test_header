@@ -143,10 +143,12 @@ function file_cmp() {
     cat "${FILE_EXPECT}" >"${FILE_EXPECT_DISK}"
     if cmp -s "${FILE_EXPECT_DISK}" "${FILE_ACTUAL}"; then
         pass $TEST_KEY
+        rm "${FILE_EXPECT_DISK}"
         return
     fi
     fail $TEST_KEY
     ${DIFFTOOL} "${FILE_EXPECT_DISK}" "${FILE_ACTUAL}" >&2
+    rm "${FILE_EXPECT_DISK}"
 }
 
 function file_test() {
