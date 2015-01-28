@@ -36,7 +36,7 @@ run_pass "$TEST_KEY" \
 #-------------------------------------------------------------------------------
 # Results, good ones
 TEST_KEY="$TEST_KEY_BASE-find-foo"
-(cd $SUITE_RUN_DIR; find foo -type f |sort) >"$TEST_KEY.out"
+(cd $SUITE_RUN_DIR; find foo -type f | LANG=C sort) >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_SOURCE_DIR/$TEST_KEY.out" "$TEST_KEY.out"
 for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY="$TEST_KEY_BASE-$CYCLE.out"
@@ -46,13 +46,13 @@ for CYCLE in 2013010100 2013010112 2013010200; do
          $SUITE_RUN_DIR/log/job/$CYCLE/archive/0*/job.out >"$TEST_KEY"
     file_cmp "$TEST_KEY" "$TEST_KEY" $TEST_SOURCE_DIR/$TEST_KEY_BASE-$CYCLE.out
     TEST_KEY="$TEST_KEY_BASE-planet-n"
-    tar -tzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/planet-n.tar.gz | sort \
-        >"$TEST_KEY-$CYCLE.out"
+    tar -tzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/planet-n.tar.gz | \
+        LANG=C sort >"$TEST_KEY-$CYCLE.out"
     file_cmp "$TEST_KEY-$CYCLE.out" \
         "$TEST_KEY-$CYCLE.out" "$TEST_SOURCE_DIR/$TEST_KEY.out"
     TEST_KEY="$TEST_KEY_BASE-unknown-stuff"
-    tar -tf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/unknown/stuff.pax | sort \
-        >"$TEST_KEY-$CYCLE.out"
+    tar -tf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/unknown/stuff.pax | \
+        LANG=C sort >"$TEST_KEY-$CYCLE.out"
     sed "s/\\\$CYCLE/$CYCLE/" "$TEST_SOURCE_DIR/$TEST_KEY.out" \
         >"$TEST_KEY-$CYCLE.out.expected"
     file_cmp "$TEST_KEY-$CYCLE.out" \

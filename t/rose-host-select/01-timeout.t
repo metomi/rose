@@ -34,7 +34,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [WARN] sleepy2: (ssh failed)
 [FAIL] No hosts selected.
 __ERR__
-cut -f2- mock-ssh.out | sort >mock-ssh.out.sorted
+cut -f2- mock-ssh.out | LANG=C sort >mock-ssh.out.sorted
 # N.B. Tab between 1 and sleepy?
 file_cmp "$TEST_KEY.mock-ssh.out" mock-ssh.out.sorted <<'__OUT__'
 sleepy1	bash

@@ -111,7 +111,7 @@ if [[ -n ${JOB_HOST:-} ]]; then
 [INFO] delete: $JOB_HOST:log/job/2013010112/
 __OUT__
     ssh -oBatchMode=yes $JOB_HOST ls "~/cylc-run/$NAME/log/job" \
-        | sort >"$TEST_KEY.ls"
+        | LANG=C sort >"$TEST_KEY.ls"
     file_cmp "$TEST_KEY.ls" "$TEST_KEY.ls" <<<'2013010200'
 else
     skip 3 "$TEST_KEY: [t]job-host not defined"

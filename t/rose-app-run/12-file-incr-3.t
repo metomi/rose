@@ -97,26 +97,26 @@ __CONFIG__
 TEST_KEY="$TEST_KEY_BASE-null-change"
 test_setup
 rose app-run --config=../config -q || exit 1
-find hello -type f | sort >'find-hello-before.out'
+find hello -type f | LANG=C sort >'find-hello-before.out'
 touch timeline # Nothing should be created after "timeline"
 sleep 1
 run_pass "$TEST_KEY" rose app-run --config=../config -q
-find hello -type f | sort >'find-hello-after.out'
+find hello -type f | LANG=C sort >'find-hello-after.out'
 file_cmp "$TEST_KEY.find-hello" 'find-hello-before.out' 'find-hello-after.out'
-find hello -type f -newer timeline | sort >'find-hello-after-newer.out'
+find hello -type f -newer timeline | LANG=C sort >'find-hello-after-newer.out'
 file_cmp "$TEST_KEY.find-hello-newer" 'find-hello-after-newer.out' </dev/null
 test_teardown
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-change-source"
 test_setup
 rose app-run --config=../config -q || exit 1
-find hello -type f | sort >'find-hello-before.out'
+find hello -type f | LANG=C sort >'find-hello-before.out'
 touch timeline # Only changes updated after "timeline"
 sleep 1
 run_pass "$TEST_KEY" rose app-run --config=../config -O1.1 -q
-find hello -type f | sort >'find-hello-after.out'
+find hello -type f | LANG=C sort >'find-hello-after.out'
 file_cmp "$TEST_KEY.find-hello" 'find-hello-before.out' 'find-hello-after.out'
-find hello -type f -newer timeline | sort >'find-hello-after-newer.out'
+find hello -type f -newer timeline | LANG=C sort >'find-hello-after-newer.out'
 file_cmp "$TEST_KEY.find-hello-newer" 'find-hello-after-newer.out' <<'__OUT__'
 hello/stranger1.txt
 __OUT__
@@ -125,7 +125,7 @@ test_teardown
 TEST_KEY="$TEST_KEY_BASE-change-content"
 test_setup
 rose app-run --config=../config -q || exit 1
-find hello -type f | sort >'find-hello-before.out'
+find hello -type f | LANG=C sort >'find-hello-before.out'
 touch timeline # Only changes updated after "timeline"
 sleep 1
 set -e
@@ -134,14 +134,14 @@ echo "chicken" >$TEST_DIR/hello/animals/birds/chicken.txt
 rsync -a $TEST_DIR/hello $JOB_HOST:$JOB_HOST_TEST_DIR/
 set +e
 run_pass "$TEST_KEY" rose app-run --config=../config -q
-find hello -type f | sort >'find-hello-after.out'
+find hello -type f | LANG=C sort >'find-hello-after.out'
 {
     echo 'hello/animals/chicken.txt'
     cat 'find-hello-before.out'
 } >'find-hello-after-expected.out'
 file_cmp "$TEST_KEY.find-hello" \
     'find-hello-after-expected.out' 'find-hello-after.out'
-find hello -type f -newer timeline | sort >'find-hello-after-newer.out'
+find hello -type f -newer timeline | LANG=C sort >'find-hello-after-newer.out'
 file_cmp "$TEST_KEY.find-hello-newer" 'find-hello-after-newer.out' <<'__OUT__'
 hello/animals/chicken.txt
 hello/stranger1.txt

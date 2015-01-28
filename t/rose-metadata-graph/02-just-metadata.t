@@ -35,7 +35,7 @@ init_meta < $TEST_SOURCE_DIR/lib/rose-meta.conf
 META_CONFIG_PATH=$(cd ../config/meta && pwd -P)
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config/meta
 # Sort and filter out non-essential properties from the output file.
-sort "$TEST_KEY.out" -o "$TEST_KEY.out"
+LANG=C sort "$TEST_KEY.out" -o "$TEST_KEY.out"
 sed -i -e 's/\(pos\|bb\|width\|height\|lp\)="[^"]*\("\|$\)//g;' \
        -e 's/[, ]*\]\?;\? *$//g; /^\t/!d;' "$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__

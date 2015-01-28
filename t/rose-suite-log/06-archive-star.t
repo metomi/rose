@@ -79,7 +79,7 @@ log/job/2013010200/my_task_1/01/job.err||job.err
 log/job/2013010200/my_task_1/01/job.out||job.out
 __OUT__
 N_JOB_LOGS=$(wc -l "$TEST_KEY-list-job-logs-before.out" | cut -d' ' -f1)
-(cd $SUITE_RUN_DIR/log && ls job/*) | sort >foo
+(cd $SUITE_RUN_DIR/log && ls job/*) | LANG=C sort >foo
 run_pass "$TEST_KEY-command" rose suite-log -n $NAME --archive '*' --debug
 run_fail "$TEST_KEY-list-job-logs-after" ls $SUITE_RUN_DIR/log/job/*
 if [[ -n ${JOB_HOST:-} ]]; then
