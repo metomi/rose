@@ -139,12 +139,11 @@ function file_cmp() {
     local TEST_KEY=$1
     local FILE_ACTUAL=$2
     local FILE_EXPECT=${3:--}
-    if cmp -s $FILE_EXPECT $FILE_ACTUAL; then
+    if diff -u "${FILE_EXPECT}" "${FILE_ACTUAL}" >&2; then
         pass $TEST_KEY
         return
     fi
     fail $TEST_KEY
-    ${DIFFTOOL} "${FILE_EXPECT}" "${FILE_ACTUAL}" >&2
 }
 
 function file_test() {
