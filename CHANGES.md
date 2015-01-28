@@ -16,6 +16,9 @@ Rose release 24? This release will work best with
 
 ### Noteworthy Changes
 
+[#1516](https://github.com/metomi/rose/pull/1516):
+rosie create: improve prompt.
+
 [#1513](https://github.com/metomi/rose/pull/1513):
 Rosie web service clients: gracefully handle the `Cancel` key press event when
 user is prompted for a password for a prefix. The client will now report the
