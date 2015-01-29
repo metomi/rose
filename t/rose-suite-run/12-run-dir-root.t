@@ -20,13 +20,13 @@
 # Test "rose suite-run", modification of the suite run root directory.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+if [[ -z $TMPDIR || -z $USER || $TMPDIR/$USER == $HOME ]]; then
+    skip_all "TMPDIR or USER not defined or TMPDIR/USER is HOME"
+fi
 #-------------------------------------------------------------------------------
 N_TESTS=7
 tests $N_TESTS
 #-------------------------------------------------------------------------------
-if [[ -z $TMPDIR || -z $USER || $TMPDIR/$USER == $HOME ]]; then
-    skip_all "TMPDIR or USER not defined or TMPDIR/USER is HOME"
-fi
 cp -r $TEST_SOURCE_DIR/$TEST_KEY_BASE/* .
 cat >rose-suite.conf <<__CONF__
 root-dir=*=\$TMPDIR/\$USER

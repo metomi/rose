@@ -30,16 +30,14 @@ run_suite() {
     ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
     set +e
 }
-
-#-------------------------------------------------------------------------------
-tests 2
-#-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 JOB_HOST_WORK=$(rose config --default= 't' 'job-host-run-root')
 if [[ -z "$JOB_HOST" || -z "$JOB_HOST_WORK" ]]; then
     skip_all '[t]job-host or [t]job-host-run-root not defined'
 fi
 JOB_HOST=$(rose host-select $JOB_HOST)
+#-------------------------------------------------------------------------------
+tests 2
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=$PWD/conf
 
