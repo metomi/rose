@@ -47,10 +47,14 @@
 #     run_fail TEST_KEY COMMAND ...
 #         Run $COMMAND. pass/fail $TEST_KEY if $COMMAND returns false/true.
 #         Write STDOUT and STDERR in $TEST_KEY.out and $TEST_KEY.err.
-#     file_cmp TEST_KEY FILE_ACTUAL [$FILE_EXPECT]
+#     file_cmp TEST_KEY FILE_ACTUAL [FILE_EXPECT]
 #         Compare contents in $FILE_ACTUAL and $FILE_EXPECT. pass/fail
 #         $TEST_KEY if contents are identical/different. If $FILE_EXPECT is "-"
 #         or not defined, compare $FILE_ACTUAL with STDIN to this function.
+#     file_cmp_any TEST_KEY FILE_ACTUAL [FILE_EXPECT]
+#         As file_cmp, but FILE_EXPECT should consist of more than one
+#         contents set to compare against, separated by a line matching
+#         /^__filesep__$/. Iff any contents match, the test passes.
 #     file_test TEST_KEY FILE [OPTION]
 #         pass/fail $TEST_KEY if "test $OPTION $FILE" returns 0/1. $OPTION is
 #         -e if not specified.
@@ -143,6 +147,25 @@ function file_cmp() {
         pass $TEST_KEY
         return
     fi
+    fail $TEST_KEY
+}
+
+function file_cmp_any() {
+    local TEST_KEY=$1
+    local FILE_ACTUAL=$2
+    local FILE_EXPECT=${3:--}
+    cat $FILE_EXPECT | \
+        csplit --prefix="$TEST_KEY-cmp-any-csplit" -  /^__filesep__$/ {*}
+    for SPLIT_FILENAME in $TEST_KEY-cmp-any-csplit*; do
+        sed -i "/^__filesep__$/d" $SPLIT_FILENAME
+        if cmp -s $SPLIT_FILENAME $FILE_ACTUAL; then
+            pass $TEST_KEY
+            return
+        fi
+    done
+    for SPLIT_FILENAME in $TEST_KEY-cmp-any-csplit*; do
+        diff -u $SPLIT_FILENAME $FILE_ACTUAL >&2
+    done
     fail $TEST_KEY
 }
 

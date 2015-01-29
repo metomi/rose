@@ -52,8 +52,10 @@ run_pass "$TEST_KEY" $TEST_PARSER \
     '[["and", "description", "eq", "shiny"],
       ["or", "title", "eq", "Something"],
       ["and", "simulation", "contains", "Matrix"]]'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+file_cmp_any "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 optional.name = :name_1 AND optional.value = :value_1 OR main.title = :title_1 AND optional.name = :name_2 AND optional.value LIKE '%%' || :value_2 || '%%'
+__filesep__
+optional.name = :name_1 AND optional.value = :value_1 OR main.title = :title_1 AND optional.name = :name_2 AND (optional.value LIKE '%%' || :value_2 || '%%')
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -74,8 +76,10 @@ run_pass "$TEST_KEY" $TEST_PARSER \
     '[["and", "(", "description", "eq", "shiny"],
       ["or", "title", "eq", "Something", ")"],
       ["and", "simulation", "contains", "Matrix"]]'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+file_cmp_any "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 (optional.name = :name_1 AND optional.value = :value_1 OR main.title = :title_1) AND optional.name = :name_2 AND optional.value LIKE '%%' || :value_2 || '%%'
+__filesep__
+(optional.name = :name_1 AND optional.value = :value_1 OR main.title = :title_1) AND optional.name = :name_2 AND (optional.value LIKE '%%' || :value_2 || '%%')
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -90,8 +94,10 @@ run_pass "$TEST_KEY" $TEST_PARSER \
       ["or", "((", "author", "contains", "fr"],
       ["or", "revision", "lt", "100", ")"],
       ["or", "title", "contains", "x", ")"]]'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+file_cmp_any "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 optional.name = :name_1 AND optional.value = :value_1 OR main.title = :title_1 AND (main.owner = :owner_1 OR main.owner = :owner_2) OR main.author LIKE '%%' || :author_1 || '%%' OR latest.revision < :revision_1 OR main.title LIKE '%%' || :title_2 || '%%'
+__filesep__
+optional.name = :name_1 AND optional.value = :value_1 OR main.title = :title_1 AND (main.owner = :owner_1 OR main.owner = :owner_2) OR (main.author LIKE '%%' || :author_1 || '%%') OR latest.revision < :revision_1 OR (main.title LIKE '%%' || :title_2 || '%%')
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -107,8 +113,10 @@ run_pass "$TEST_KEY" $TEST_PARSER \
       ["or", "((", "author", "contains", "fr"],
       ["or", "revision", "lt", "100", ")"],
       ["and", "title", "eq", "x", ")"]]'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+file_cmp_any "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 (optional.name = :name_1 AND optional.value = :value_1 OR main.title = :title_1 OR main.title = :title_2) AND (main.owner = :owner_1 OR main.owner = :owner_2) OR (main.author LIKE '%%' || :author_1 || '%%' OR latest.revision < :revision_1) AND main.title = :title_3
+__filesep__
+(optional.name = :name_1 AND optional.value = :value_1 OR main.title = :title_1 OR main.title = :title_2) AND (main.owner = :owner_1 OR main.owner = :owner_2) OR ((main.author LIKE '%%' || :author_1 || '%%') OR latest.revision < :revision_1) AND main.title = :title_3
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
