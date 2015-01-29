@@ -434,7 +434,7 @@ __rose_get_rose_dir() {
 }
 
 __rose_get_users() {
-    getent aliases | cut -f1 -d" " | sort -u
+    getent passwd | sed "s/^\([^:]\+\):.*/\1/g" | LANG=C sort -u
 }
     
 __rose_help() {
