@@ -79,17 +79,21 @@ TEST_KEY=$TEST_KEY_BASE-v1
 test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config
 DIR=$(cd ..; pwd)
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
+python -c "import re, sys
+print ''.join(sorted(sys.stdin.readlines(),
+                     key=re.compile('hello(\d+)').findall)).rstrip()" \
+    <"$TEST_KEY.out" >"$TEST_KEY.sorted.out"
+file_cmp "$TEST_KEY.sorted.out" "$TEST_KEY.sorted.out" <<__CONTENT__
 [INFO] export PATH=$PATH
+$OUT
+[INFO] install: hello1
+[INFO]     source: $DIR/config/file/hello1
+[INFO] command: cat hello1 hello2 hello3/text
 [INFO] install: hello2
 [INFO]     source: $DIR/config/file/hello2
 [INFO] create: hello3
 [INFO] install: hello3
 [INFO]     source: $DIR/config/file/hello3
-[INFO] install: hello1
-[INFO]     source: $DIR/config/file/hello1
-[INFO] command: cat hello1 hello2 hello3/text
-$OUT
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 # ... and in incremental mode
