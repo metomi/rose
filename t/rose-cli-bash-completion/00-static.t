@@ -568,7 +568,7 @@ COMP_WORDS=( rose suite-hook --mail-cc = "" )
 COMP_CWORD=4
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-getent aliases | cut -f1 -d" " | LANG=C sort | uniq > ok_users
+getent passwd | cut -d: -f1 | LANG=C sort -u > ok_users
 compreply_cmp "$TEST_KEY.reply" < ok_users
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -581,7 +581,7 @@ COMP_WORDS=( rose suite-log --user = "" )
 COMP_CWORD=4
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-getent aliases | cut -f1 -d" " | LANG=C sort | uniq > ok_users
+getent passwd | cut -d: -f1 | LANG=C sort -u > ok_users
 compreply_cmp "$TEST_KEY.reply" < ok_users
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
