@@ -54,6 +54,7 @@ class JobManager(object):
         for name in names:
             self.ready_jobs.append(self.jobs[name])
         self.working_jobs = {}
+        self.dead_jobs = []
 
     def get_job(self):
         """Return the next job that requires processing."""
@@ -77,13 +78,13 @@ class JobManager(object):
                 return job
 
     def get_dead_jobs(self):
-        """Return pending jobs if there are no ready/working ones."""
+        """Return failed/pending jobs when there are no ready/working ones."""
+        jobs = self.dead_jobs
         if not self.has_jobs:
-            jobs = []
             for job in self.jobs.values():
                 if job.pending_for:
                     jobs.append(job)
-            return jobs
+        return jobs
 
     def has_jobs(self):
         """Return True if there are ready jobs or working jobs."""
@@ -97,13 +98,16 @@ class JobManager(object):
         """Tell the manager that a job has completed."""
         job = self.working_jobs.pop(job_proxy.name)
         job.update(job_proxy)
-        job.state = job.ST_DONE
-        for up_key, up_job in job.needed_by.items():
-            job.needed_by.pop(up_key)
-            up_job.pending_for.pop(job.name)
-            if not up_job.pending_for:
-                self.ready_jobs.append(up_job)
-                up_job.state = up_job.ST_READY
+        if job_proxy.exc is None:
+            job.state = job.ST_DONE
+            for up_key, up_job in job.needed_by.items():
+                job.needed_by.pop(up_key)
+                up_job.pending_for.pop(job.name)
+                if not up_job.pending_for:
+                    self.ready_jobs.append(up_job)
+                    up_job.state = up_job.ST_READY
+        else:
+            self.dead_jobs.append(job)
         return job
 
 
@@ -138,6 +142,7 @@ class JobProxy(object):
         self.event_level = event_level
         self.needed_by = {}
         self.state = self.ST_READY
+        self.exc = None
 
     def __str__(self):
         return str(self.context)
@@ -198,8 +203,11 @@ class JobRunner(object):
                     for args_of_event in args_of_events:
                         self.job_processor.handle_event(*args_of_event)
                     job = job_manager.put_job(job_proxy)
-                    self.job_processor.post_process_job(job, *args)
-                    self.job_processor.handle_event(JobEvent(job))
+                    if job_proxy.exc is None:
+                        self.job_processor.post_process_job(job, *args)
+                        self.job_processor.handle_event(JobEvent(job))
+                    else:
+                        self.job_processor.handle_event(job_proxy.exc)
             # Add some more jobs into the worker pool, as they are ready
             while job_manager.has_ready_jobs():
                 job = job_manager.get_job()
@@ -224,10 +232,10 @@ def _job_run(job_processor, job_proxy, *args):
     job_processor.set_event_handler(event_handler)
     try:
         job_processor.process_job(job_proxy, *args)
-    except Exception as e:
+    except Exception as exc:
         #import traceback
-        #traceback.print_exc(e)
-        raise e
+        #traceback.print_exc(exc)
+        job_proxy.exc = exc
     finally:
         job_processor.set_event_handler(None)
     return (job_proxy, event_handler.events)
@@ -253,6 +261,6 @@ class JobRunnerNotCompletedError(Exception):
     """Error raised when there are no ready/working jobs but pending ones."""
     def __str__(self):
         ret = ""
-        for job in self.args:
-            ret += "[DEAD TASK] %s\n" % str(job)
+        for job in self.args[0]:
+            ret += "%s\n" % str(job.context)
         return ret
