@@ -56,7 +56,7 @@ import rosie.browser.result
 import rosie.browser.status
 import rosie.browser.suite
 import rosie.browser.util
-from rosie.suite_id import SuiteId
+from rosie.suite_id import SuiteId, SuiteIdError
 import rosie.vc
 from rosie.ws_client import RosieWSClient, RosieWSClientError
 from rosie.ws_client_auth import UndefinedRosiePrefixWS
@@ -387,7 +387,11 @@ class MainWindow(gtk.Window):
 
     def format_suite_id(self, idx, branch, revision):
         """Convenience method for formatting the suite id."""
-        return "{0}/{1}@{2}".format(idx, branch, revision)
+        suite_id = SuiteId.from_idx_branch_revision(idx, branch, revision)
+        if suite_id is None:
+            return
+        else:
+            return suite_id.to_string_with_version()
 
     def generate_menu(self):
         """Generate the top menu."""
@@ -1008,12 +1012,21 @@ class MainWindow(gtk.Window):
             text = rosie.browser.STATUS_OPENING_LOG.format(event.url)
             self.statusbar.set_status_text(text, instant=True)
 
-    def handle_view_web(self, *args):
+    def handle_view_web(self, *args, **kwargs):
         """View a suite's web source URL."""
-        this_id = SuiteId(id_text=self.get_selected_suite_id())
-        webbrowser.open(this_id.to_web(), new=True, autoraise=True)
-        self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_WEB,
-                                       instant=True)
+        path = kwargs.get("path", None)
+        try:
+            url = SuiteId(id_text=self.get_selected_suite_id(path)).to_web()
+        except SuiteIdError:
+            return False
+        if url is None:
+            return False
+        elif kwargs.get("test", False):
+            return True
+        else:
+            webbrowser.open(url, new=True, autoraise=True)
+            self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_WEB,
+                                           instant=True)
 
     def initial_filter(self, opts, args):
         """Get some initial results to display on startup."""
@@ -1163,6 +1176,7 @@ class MainWindow(gtk.Window):
         delete_item.set_sensitive(owner == os.getlogin())
         source_item = uimanager.get_widget("/Popup/View Web")
         source_item.connect("activate", self.handle_view_web)
+        source_item.set_sensitive(self.handle_view_web(test=True, path=path))
         output_item = uimanager.get_widget("/Popup/View Output")
         output_item.connect("activate", self.handle_view_output)
         output_item.set_sensitive(self.handle_view_output(test=True,
