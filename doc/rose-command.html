@@ -158,7 +158,7 @@
 
       <dt><a href="#rose-suite-restart">rose suite-restart</a></dt>
 
-      <dd>(=suite-run --restart)</dd>
+      <dd>Restart a Cylc suite without re-installing its contents.</dd>
 
       <dt><a href="#rose-suite-run">rose suite-run</a></dt>
 
@@ -1862,8 +1862,70 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <h2 id="rose-suite-restart">rose suite-restart</h2>
 
-    <p>See <a href="#rose-suite-run">rose suite-run</a> and its
-    <kbd>--restart</kbd> option.</p>
+    <h3>NAME</h3>
+
+    <p><kbd>rose suite-restart</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <dl>
+      <dt><kbd>rose suite-restart [OPTIONS] [[--] CYLC-RESTART-ARGS]</kbd></dt>
+
+      <dd>Restart a cylc suite with name equal to the base name of current
+      working directory.</dd>
+
+      <dt><kbd>rose suite-restart --name=foobar</kbd></dt>
+
+      <dd>Restart Cylc suite <samp>foobar</samp></dd>
+
+      <dt><kbd>rose suite-restart --name=foobar --
+      state.20141118T161121.195326Z</kbd></dt>
+
+      <dd>Restart Cylc suite <samp>foobar</samp> with a given state dump</dd>
+
+      <dt><kbd>rose suite-restart --name=foobar --host=my-suite-host</kbd></dt>
+
+      <dd>Restart Cylc suite <samp>foobar</samp> on given host</dd>
+    </dl>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Restart a Cylc suite without re-installing its contents.</p>
+
+    <p>If re-installation is required, use <code>rose suite-run
+    --restart</code>.</p>
+
+    <h3>ARGUMENTS</h3>
+
+    <p>Arguments (and options after <code>--</code>) are passed to <code>cylc
+    restart</code>.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--host=HOST</kbd></dt>
+
+      <dd>Specify a host for restarting the suite.</dd>
+
+      <dt><kbd>--name=NAME, -n NAME</kbd></dt>
+
+      <dd>Specify the suite <var>NAME</var> in cylc, instead of using the
+      basename of the current working directory.</dd>
+
+      <dt><kbd>--no-gcontrol</kbd></dt>
+
+      <dd>Do not run <kbd>cylc gui</kbd>. Default is to run <kbd>cylc gui</kbd>
+      if the suite is running and the <var>DISPLAY</var> environment variable
+      is defined.</dd>
+
+      <dt><kbd>--quiet, -q</kbd></dt>
+
+      <dd>Decrement verbosity.</dd>
+
+      <dt><kbd>--verbose, -v</kbd></dt>
+
+      <dd>Increment verbosity.</dd>
+    </dl>
 
     <h2 id="rose-suite-run">rose suite-run</h2>
 

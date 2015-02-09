@@ -26,7 +26,6 @@ from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Event, Reporter
-from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_scan import SuiteScanner
 import sys
@@ -101,20 +100,7 @@ class SuiteControl(object):
         if host:
             hosts = [host]
         else:
-            conf = ResourceLocator.default().get_conf()
-            hosts = None
-
-            known_hosts = self.host_selector.expand(
-              conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
-              ["localhost"])[0]
-            known_hosts = list(set(known_hosts))
-
-            if known_hosts:
-                hosts = self.suite_engine_proc.ping(
-                        suite_name,
-                        known_hosts)
-
+            hosts = self.suite_engine_proc.ping(suite_name)
             if not hosts:
                 # Try the "rose-suite.host" file in the suite log directory
                 log = self.suite_engine_proc.get_suite_dir(suite_name, "log")
@@ -146,11 +132,13 @@ class SuiteNotFoundError(Exception):
 def get_suite_name(event_handler=None):
     """Find the top level of a suite directory structure"""
     fs_util = FileSystemUtil(event_handler)
-    suite_name = None
     conf_dir = os.getcwd()
     while True:
         if os.path.basename(conf_dir) != "rose-stem":
-            for tail in ["rose-suite.conf", "rose-stem/rose-suite.conf"]:
+            for tail in [
+                    "rose-suite.conf",
+                    "log/rose-suite-run.conf",
+                    "rose-stem/rose-suite.conf"]:
                 conf = os.path.join(conf_dir, tail)
                 if os.path.exists(conf):
                     return os.path.basename(conf_dir)

@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 16
+tests 12
 #-------------------------------------------------------------------------------
 export PAGER=cat
 
@@ -30,7 +30,6 @@ config-edit edit
 suite-gcontrol sgc
 suite-hook task-hook
 suite-log slv suite-log-view
-suite-run suite-init suite-restart
 __TXT__
 cat >'rosie-aliases.txt' <<'__TXT__'
 create copy

@@ -61,34 +61,9 @@ class SuiteRunCleaner(object):
 
         """
         os.chdir(os.path.expanduser('~'))
-        self._check_not_running(suite_name)
+        self.suite_engine_proc.check_suite_not_running(suite_name)
         self._clean(suite_name, only_items)
         self.suite_engine_proc.clean_hook(suite_name)
-
-    def _check_not_running(self, suite_name):
-        """Check that the suite is not still running."""
-        suite_dir_rel = self.suite_engine_proc.get_suite_dir_rel(suite_name)
-        if not os.path.isdir(suite_dir_rel):
-            return
-        hostnames = ["localhost"]
-        host_file_path = self.suite_engine_proc.get_suite_dir_rel(
-            suite_name, "log", "rose-suite-run.host")
-        try:
-            for line in open(host_file_path):
-                hostnames.append(line.strip())
-        except IOError:
-            pass
-        conf = ResourceLocator.default().get_conf()
-        hostnames = self.host_selector.expand(
-            ["localhost"] +
-            conf.get_value(["rose-suite-run", "hosts"], "").split() +
-            conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
-        hostnames = list(set(hostnames))
-        hosts = []
-        for hostname in hostnames:
-            if hostname not in hosts:
-                hosts.append(hostname)
-        self.suite_engine_proc.check_suite_not_running(suite_name, hosts)
 
     def _clean(self, suite_name, only_items=None):
         """Perform the cleaning operations."""
