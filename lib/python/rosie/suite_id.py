@@ -224,6 +224,8 @@ class SuiteId(object):
     @classmethod
     def from_idx_branch_revision(cls, idx, branch=None, revision=None):
         """Factory method from idx, (branch and revision)."""
+        if idx is None:
+            return None
         id_ = cls(id_text=idx)
         if not branch:
             branch = cls.BRANCH_TRUNK
@@ -313,6 +315,8 @@ class SuiteId(object):
             self._from_id_text(id_text)
         elif location:
             self._from_location(location)
+        else:
+            raise SuiteIdTextError(None)
 
     def __str__(self):
         return self.idx
