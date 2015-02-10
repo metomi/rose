@@ -16,6 +16,27 @@ Rose release 24? This release will work best with
 
 ### Noteworthy Changes
 
+[#1537](https://github.com/metomi/rose/pull/1537):
+rose config-edit: fix variable menu when it has a macro warning.
+
+[#1535](https://github.com/metomi/rose/pull/1535):
+rose_prune: prune command now uses `bash -O extglob`, which means that glob
+patterns can now be any extended globs supported by `bash`.
+
+[#1532](https://github.com/metomi/rose/pull/1532):
+rosie go: fix suite ID pop up menu web browser menu item. The menu item is now
+enabled only if a web URL is available for browsing the suite.
+
+[#1530](https://github.com/metomi/rose/pull/1530):
+rose app-run: file installation: correctly handle exception associated with the
+source.
+
+[#1529](https://github.com/metomi/rose/pull/1529):
+rose_prune: added configuration metadata for server log pruning setting.
+
+[#1522](https://github.com/metomi/rose/pull/1522):
+rose bash completion: fix use of `getent` for user names.
+
 [#1516](https://github.com/metomi/rose/pull/1516):
 rosie create: improve prompt.
 
