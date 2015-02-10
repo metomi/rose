@@ -43,6 +43,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] [Errno 13] Permission denied: 'read_only_dest/foo.nl'
+[FAIL] install: read_only_dest/foo.nl
+[FAIL]     source: namelist:foo
 __ERR__
 chmod u+w read_only_dest
 #-------------------------------------------------------------------------------

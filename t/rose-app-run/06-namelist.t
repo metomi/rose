@@ -230,6 +230,7 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] namelist:hello=greeting: NO_SUCH_VARIABLE: unbound variable
+[FAIL] source: namelist:hello
 __CONTENT__
 test_teardown
 #-------------------------------------------------------------------------------
