@@ -112,9 +112,10 @@ class MenuWidget(gtk.HBox):
             old_middle = option_ui_middle
             option_ui_middle = ''
             for warn in variable.warning:
-                option_ui_middle += "<menuitem action='Warn_" + warn + "'/>"
-                w_string = "(" + warn + ")"
-                actions.append(("Warn_" + warn, gtk.STOCK_DIALOG_INFO,
+                warn_name = warn.replace("/", "_")
+                option_ui_middle += "<menuitem action='Warn_" + warn_name + "'/>"
+                w_string = "(" + warn.replace("_", "__") + ")"
+                actions.append(("Warn_" + warn_name, gtk.STOCK_DIALOG_INFO,
                                 w_string))
             option_ui_middle += "<separator name='sepWarning'/>" + old_middle
         if variable.error:
@@ -238,12 +239,12 @@ class MenuWidget(gtk.HBox):
                                               self.my_variable.error[error],
                                               title, search_function))
         for warning in warnings:
-            action_name = "Warn_" + warning
+            action_name = "Warn_" + warning.replace("/", "_")
             if "action='" + action_name + "'" not in option_ui:
                 continue
             warn_item = uimanager.get_widget('/Options/' + action_name)
             title = rose.config_editor.DIALOG_VARIABLE_WARNING_TITLE.format(
-                                warning, self.my_variable.metadata["id"])
+                warning, self.my_variable.metadata["id"])
             warn_item.set_tooltip_text(self.my_variable.warning[warning])
             warn_item.connect("activate",
                               lambda e: dialog_func(
