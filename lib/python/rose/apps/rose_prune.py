@@ -83,8 +83,9 @@ class RosePruneApp(BuiltinApp):
         suite_dir_rel = suite_engine_proc.get_suite_dir_rel(suite_name)
         form_dict = {"d": suite_dir_rel, "g": " ".join(globs)}
         sh_cmd_head = r"set -e; cd %(d)s; " % form_dict
-        sh_cmd_tail = (r"ls -d %(g)s 2>/dev/null || true; rm -rf %(g)s" %
-                       form_dict)
+        sh_cmd = (
+            r"set +e; ls -d %(g)s; " +
+            r"set -e; rm -fr %(g)s") % form_dict
         cwd = os.getcwd()
         for host in hosts + ["localhost"]:
             sdir = None
@@ -92,10 +93,12 @@ class RosePruneApp(BuiltinApp):
                 if host == "localhost":
                     sdir = suite_engine_proc.get_suite_dir(suite_name)
                     app_runner.fs_util.chdir(sdir)
-                    out = app_runner.popen.run_ok(sh_cmd_tail, shell=True)[0]
+                    out = app_runner.popen.run_ok(
+                        "bash", "-O" , "extglob", "-c", sh_cmd)[0]
                 else:
-                    cmd = app_runner.popen.get_cmd("ssh", host,
-                                                   sh_cmd_head + sh_cmd_tail)
+                    cmd = app_runner.popen.get_cmd(
+                        "ssh", host,
+                        "bash -O extglob -c '" + sh_cmd_head + sh_cmd + "'")
                     out = app_runner.popen.run_ok(*cmd)[0]
             except RosePopenError as exc:
                 app_runner.handle_event(exc)
