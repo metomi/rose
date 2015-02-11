@@ -988,10 +988,14 @@ class MainMenuHandler(object):
         self.mainwindow.launch_prefs()
 
     def launch_browser(self):
+        start_directory = self.data.top_level_directory
         if self.data.top_level_directory is None:
-            rose.external.launch_fs_browser(os.getcwd())
-        else:
-            rose.external.launch_fs_browser(self.data.top_level_directory)
+            start_directory = os.getcwd()
+        try:
+            rose.external.launch_fs_browser(start_directory)
+        except rose.popen.RosePopenError as exc:
+            rose.gtk.dialog.run_exception_dialog(exc)
+
 
     def launch_graph(self, namespace, allowed_sections=None):
         try:
@@ -1013,7 +1017,10 @@ class MainMenuHandler(object):
                     self.data.helper.get_sections_from_namespace(namespace))
         cmd = (shlex.split(rose.config_editor.LAUNCH_COMMAND_GRAPH) +
                [config_data.directory] + allowed_sections)
-        rose.popen.RosePopener().run_bg(*cmd)
+        try:
+            rose.popen.RosePopener().run_bg(*cmd)
+        except rose.popen.RosePopenError as exc:
+            rose.gtk.dialog.run_exception_dialog(exc)
 
     def launch_scheduler(self, *args):
         """Run the scheduler for a suite open in config edit."""
@@ -1033,11 +1040,8 @@ class MainMenuHandler(object):
         # Handle a launch terminal request.
         try:
             rose.external.launch_terminal()
-        except rose.popen.RosePopenError as e:
-            rose.gtk.dialog.run_dialog(
-                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                str(e),
-                                rose.config_editor.DIALOG_TITLE_ERROR)
+        except rose.popen.RosePopenError as exc:
+            rose.gtk.dialog.run_exception_dialog(exc)
 
     def launch_output_viewer(self):
         """View a suite's output, if any."""

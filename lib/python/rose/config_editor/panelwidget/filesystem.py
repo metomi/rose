@@ -95,10 +95,8 @@ class FileSystemPanel(gtk.ScrolledWindow):
                 target_func = rose.external.launch_geditor
         try:
             target_func(target)
-        except Exception as e:
-            title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       str(e), title)
+        except Exception as exc:
+            rose.gtk.dialog.run_exception_dialog(exc)
 
     def _handle_click(self, view, event):
         pathinfo = view.get_path_at_pos(int(event.x), int(event.y))
