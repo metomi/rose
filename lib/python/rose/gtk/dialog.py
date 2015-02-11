@@ -55,6 +55,7 @@ DIALOG_TEXT_SHUTDOWN_ASAP = "Shutdown ASAP."
 DIALOG_TEXT_SHUTTING_DOWN = "Shutting down."
 DIALOG_TEXT_UNCAUGHT_EXCEPTION = ("{0} has crashed. {1}" +
                                   "\n\n<b>{2}</b>: {3}\n{4}")
+DIALOG_TITLE_ERROR = "Error"
 DIALOG_TITLE_UNCAUGHT_EXCEPTION = "Critical error"
 DIALOG_TITLE_EXTRA_INFO = "Further information"
 DIALOG_TYPE_ERROR = gtk.MESSAGE_ERROR
@@ -421,6 +422,12 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     else:
         ok_button.connect("clicked", lambda b: dialog.destroy())
         dialog.show()
+
+
+def run_exception_dialog(exception):
+    """Run a dialog displaying an exception."""
+    text = type(exception).__name__ + ": " + str(exception)
+    return run_dialog(DIALOG_TYPE_ERROR, text, DIALOG_TITLE_ERROR)
 
 
 def run_hyperlink_dialog(stock_id=None, text="", title=None,
