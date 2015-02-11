@@ -996,7 +996,6 @@ class MainMenuHandler(object):
         except rose.popen.RosePopenError as exc:
             rose.gtk.dialog.run_exception_dialog(exc)
 
-
     def launch_graph(self, namespace, allowed_sections=None):
         try:
             import pygraphviz
