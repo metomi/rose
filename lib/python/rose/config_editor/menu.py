@@ -1003,6 +1003,7 @@ class MainMenuHandler(object):
             title = rose.config_editor.WARNING_CANNOT_GRAPH
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        str(e), title)
+            return
         config_name, subsp = self.util.split_full_ns(self.data, namespace)
         self.update_config(config_name)
         config_data = self.data.config[config_name]
@@ -1017,7 +1018,8 @@ class MainMenuHandler(object):
         cmd = (shlex.split(rose.config_editor.LAUNCH_COMMAND_GRAPH) +
                [config_data.directory] + allowed_sections)
         try:
-            rose.popen.RosePopener().run_bg(*cmd)
+            rose.popen.RosePopener().run_bg(
+                *cmd, stdout=sys.stdout, stderr=sys.stderr)
         except rose.popen.RosePopenError as exc:
             rose.gtk.dialog.run_exception_dialog(exc)
 
