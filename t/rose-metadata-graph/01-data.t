@@ -19,51 +19,13 @@
 #-------------------------------------------------------------------------------
 # Test "rose metadata-graph" against configuration and configuration metadata.
 #-------------------------------------------------------------------------------
+. $(dirname $0)/test_header_extra
 . $(dirname $0)/test_header
 
 python -c "import pygraphviz" 2>/dev/null || \
     skip_all 'pygraphviz not installed'
 #-------------------------------------------------------------------------------
 tests 12
-#-------------------------------------------------------------------------------
-# Filter graphviz output.
-function filter_graphviz() {
-    FILTER_TMP_FILE=$(mktemp)
-    cat >"$FILTER_TMP_FILE"
-    # Sort and filter out non-essential properties from the output file.
-    # Get rid of line-broken newer graphviz output (replace ",\n").
-    # Append all lines to the pattern space, then substitute.
-    sed -i ':a; N; $!ba; s/,\n\s\s*/, /g' "$FILTER_TMP_FILE"
-    # Make sure the gap between name and properties is consistent.
-    sed -i 's/\s\s*\[/ \[/g' "$FILTER_TMP_FILE"
-    # Sort the file.
-    LANG=C sort "$FILTER_TMP_FILE" -o "$FILTER_TMP_FILE"
-    # Remove non-color properties and non-relevant lines.
-    python << __PYTHON__
-import re
-filename = '$FILTER_TMP_FILE'
-f = open(filename, 'r')
-lines = f.readlines()
-f.close()
-f = open(filename, 'w')
-for line in lines:
-	if '[' not in line:
-	    f.write(line + '\n')
-	    continue
-	props = dict([_.strip().split('=', 1) for _ in
-	              re.split(', ',
-	                       line.split('[', 1)[1].replace('];', ''))])
-	new_prop_string = ''
-	for key in ['arrowhead', 'color', 'label', 'rankdir', 'shape', 'style']:
-	    if key in props:
-	        new_prop_string += key + '=' + props[key] + ', '
-	new_prop_string = new_prop_string.rstrip().rstrip(',')
-	f.write(line.split('[')[0] + '[' + new_prop_string + '\n')
-__PYTHON__
-    sed -i '/^\t/!d; /^\s*\];\s*$/d; /graph \[$/d' "$FILTER_TMP_FILE"
-    cat "$FILTER_TMP_FILE"
-    rm "$FILTER_TMP_FILE"
-}
 #-------------------------------------------------------------------------------
 # Check full graphing of our example configuration & configuration metadata.
 TEST_KEY=$TEST_KEY_BASE-ok-full
@@ -74,58 +36,58 @@ CONFIG_PATH=$(cd ../config && pwd -P)
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
-	"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
-	"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
-	"env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
-	"env=CONTROL" -> "env=CONTROL=foo" [color=green, label=foo
-	"env=CONTROL" [color=green
-	"env=CONTROL=None" -> "env=DEPENDENT3" [color=green
-	"env=CONTROL=None" [color=green, label=None, shape=box, style=filled
-	"env=CONTROL=bar" -> "env=DEPENDENT1" [color=red
-	"env=CONTROL=bar" -> "env=DEPENDENT2" [color=red
-	"env=CONTROL=bar" -> "env=DEPENDENT_MISSING1" [arrowhead=empty, color=red
-	"env=CONTROL=bar" [color=red, label=bar, shape=box, style=filled
-	"env=CONTROL=baz" -> "env=DEPENDENT1" [color=red
-	"env=CONTROL=baz" [color=red, label=baz, shape=box, style=filled
-	"env=CONTROL=foo" -> "env=DEPENDENT_MISSING1" [color=green
-	"env=CONTROL=foo" [color=green, label=foo, shape=box, style=filled
-	"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
-	"env=CONTROL_NAMELIST_QUX" [color=green
-	"env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
-	"env=CONTROL_NAMELIST_QUX=bar" [color=red, label=bar, shape=box, style=filled
-	"env=CONTROL_NAMELIST_WIBBLE" -> "env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar
-	"env=CONTROL_NAMELIST_WIBBLE" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE=bar" -> "namelist:wibble" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar, shape=box, style=filled
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" -> "env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=foo
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" -> "namelist:wibble=wubble" [color=red
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=bar, shape=box, style=filled
-	"env=DEPENDENT1" [color=red, label="!!env=DEPENDENT1"
-	"env=DEPENDENT2" [color=red, label="!!env=DEPENDENT2"
-	"env=DEPENDENT3" [color=green
-	"env=DEPENDENT_DEPENDENT1" [color=red, label="!!env=DEPENDENT_DEPENDENT1"
-	"env=DEPENDENT_MISSING1" -> "env=DEPENDENT_MISSING1=None" [color=grey
-	"env=DEPENDENT_MISSING1" [color=grey
-	"env=DEPENDENT_MISSING1=None" -> "env=DEPENDENT_DEPENDENT1" [color=grey
-	"env=DEPENDENT_MISSING1=None" [color=grey, label=None, shape=box, style=filled
-	"env=MISSING_VARIABLE" [color=grey
-	"env=USER_IGNORED" [color=orange, label="!env=USER_IGNORED"
-	"namelist:qux" [color=red, label="!!namelist:qux", shape=octagon
-	"namelist:qux=wobble" -> "namelist:qux=wobble=.true." [color=red, label=".false."
-	"namelist:qux=wobble" [color=red, label="^namelist:qux=wobble"
-	"namelist:qux=wobble=.true." -> "namelist:qux=wubble" [color=red
-	"namelist:qux=wobble=.true." [color=red, label=".true.", shape=box, style=filled
-	"namelist:qux=wubble" [color=red, label="^!!namelist:qux=wubble"
-	"namelist:wibble" [color=green, shape=octagon
-	"namelist:wibble=wobble" -> "namelist:wibble=wobble=.true." [color=green, label=".true."
-	"namelist:wibble=wobble" [color=green
-	"namelist:wibble=wobble=.true." -> "namelist:wibble=wubble" [color=green
-	"namelist:wibble=wobble=.true." [color=green, label=".true.", shape=box, style=filled
-	"namelist:wibble=wubble" [color=red, label="!!namelist:wibble=wubble"
-	env [color=green, shape=octagon
-	graph [label="$CONFIG_PATH", rankdir=LR
-	node [label="\N"
+"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
+"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
+"env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
+"env=CONTROL" -> "env=CONTROL=foo" [color=green, label=foo
+"env=CONTROL" [color=green
+"env=CONTROL=None" -> "env=DEPENDENT3" [color=green
+"env=CONTROL=None" [color=green, label=None, shape=box, style=filled
+"env=CONTROL=bar" -> "env=DEPENDENT1" [color=red
+"env=CONTROL=bar" -> "env=DEPENDENT2" [color=red
+"env=CONTROL=bar" -> "env=DEPENDENT_MISSING1" [arrowhead=empty, color=red
+"env=CONTROL=bar" [color=red, label=bar, shape=box, style=filled
+"env=CONTROL=baz" -> "env=DEPENDENT1" [color=red
+"env=CONTROL=baz" [color=red, label=baz, shape=box, style=filled
+"env=CONTROL=foo" -> "env=DEPENDENT_MISSING1" [color=green
+"env=CONTROL=foo" [color=green, label=foo, shape=box, style=filled
+"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
+"env=CONTROL_NAMELIST_QUX" [color=green
+"env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
+"env=CONTROL_NAMELIST_QUX=bar" [color=red, label=bar, shape=box, style=filled
+"env=CONTROL_NAMELIST_WIBBLE" -> "env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar
+"env=CONTROL_NAMELIST_WIBBLE" [color=green
+"env=CONTROL_NAMELIST_WIBBLE=bar" -> "namelist:wibble" [color=green
+"env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar, shape=box, style=filled
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" -> "env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=foo
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" [color=green
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" -> "namelist:wibble=wubble" [color=red
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=bar, shape=box, style=filled
+"env=DEPENDENT1" [color=red, label="!!env=DEPENDENT1"
+"env=DEPENDENT2" [color=red, label="!!env=DEPENDENT2"
+"env=DEPENDENT3" [color=green
+"env=DEPENDENT_DEPENDENT1" [color=red, label="!!env=DEPENDENT_DEPENDENT1"
+"env=DEPENDENT_MISSING1" -> "env=DEPENDENT_MISSING1=None" [color=grey
+"env=DEPENDENT_MISSING1" [color=grey
+"env=DEPENDENT_MISSING1=None" -> "env=DEPENDENT_DEPENDENT1" [color=grey
+"env=DEPENDENT_MISSING1=None" [color=grey, label=None, shape=box, style=filled
+"env=MISSING_VARIABLE" [color=grey
+"env=USER_IGNORED" [color=orange, label="!env=USER_IGNORED"
+"namelist:qux" [color=red, label="!!namelist:qux", shape=octagon
+"namelist:qux=wobble" -> "namelist:qux=wobble=.true." [color=red, label=".false."
+"namelist:qux=wobble" [color=red, label="^namelist:qux=wobble"
+"namelist:qux=wobble=.true." -> "namelist:qux=wubble" [color=red
+"namelist:qux=wobble=.true." [color=red, label=".true.", shape=box, style=filled
+"namelist:qux=wubble" [color=red, label="^!!namelist:qux=wubble"
+"namelist:wibble" [color=green, shape=octagon
+"namelist:wibble=wobble" -> "namelist:wibble=wobble=.true." [color=green, label=".true."
+"namelist:wibble=wobble" [color=green
+"namelist:wibble=wobble=.true." -> "namelist:wibble=wubble" [color=green
+"namelist:wibble=wobble=.true." [color=green, label=".true.", shape=box, style=filled
+"namelist:wibble=wubble" [color=red, label="!!namelist:wibble=wubble"
+env [color=green, shape=octagon
+graph [label="$CONFIG_PATH", rankdir=LR
+node [label="\N"
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -134,18 +96,18 @@ TEST_KEY=$TEST_KEY_BASE-ok-sub-section
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config namelist:qux
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
-	"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
-	"env=CONTROL_NAMELIST_QUX" [color=green, shape=rectangle
-	"env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
-	"env=CONTROL_NAMELIST_QUX=bar" [color=red, label=bar, shape=box, style=filled
-	"namelist:qux" [color=red, label="!!namelist:qux", shape=octagon
-	"namelist:qux=wobble" -> "namelist:qux=wobble=.true." [color=red, label=".false."
-	"namelist:qux=wobble" [color=red, label="^namelist:qux=wobble"
-	"namelist:qux=wobble=.true." -> "namelist:qux=wubble" [color=red
-	"namelist:qux=wobble=.true." [color=red, label=".true.", shape=box, style=filled
-	"namelist:qux=wubble" [color=red, label="^!!namelist:qux=wubble"
-	graph [label="$CONFIG_PATH: namelist:qux", rankdir=LR
-	node [label="\N"
+"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
+"env=CONTROL_NAMELIST_QUX" [color=green, shape=rectangle
+"env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
+"env=CONTROL_NAMELIST_QUX=bar" [color=red, label=bar, shape=box, style=filled
+"namelist:qux" [color=red, label="!!namelist:qux", shape=octagon
+"namelist:qux=wobble" -> "namelist:qux=wobble=.true." [color=red, label=".false."
+"namelist:qux=wobble" [color=red, label="^namelist:qux=wobble"
+"namelist:qux=wobble=.true." -> "namelist:qux=wubble" [color=red
+"namelist:qux=wobble=.true." [color=red, label=".true.", shape=box, style=filled
+"namelist:qux=wubble" [color=red, label="^!!namelist:qux=wubble"
+graph [label="$CONFIG_PATH: namelist:qux", rankdir=LR
+node [label="\N"
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -155,58 +117,58 @@ run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config \
     --property=trigger
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
-	"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
-	"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
-	"env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
-	"env=CONTROL" -> "env=CONTROL=foo" [color=green, label=foo
-	"env=CONTROL" [color=green
-	"env=CONTROL=None" -> "env=DEPENDENT3" [color=green
-	"env=CONTROL=None" [color=green, label=None, shape=box, style=filled
-	"env=CONTROL=bar" -> "env=DEPENDENT1" [color=red
-	"env=CONTROL=bar" -> "env=DEPENDENT2" [color=red
-	"env=CONTROL=bar" -> "env=DEPENDENT_MISSING1" [arrowhead=empty, color=red
-	"env=CONTROL=bar" [color=red, label=bar, shape=box, style=filled
-	"env=CONTROL=baz" -> "env=DEPENDENT1" [color=red
-	"env=CONTROL=baz" [color=red, label=baz, shape=box, style=filled
-	"env=CONTROL=foo" -> "env=DEPENDENT_MISSING1" [color=green
-	"env=CONTROL=foo" [color=green, label=foo, shape=box, style=filled
-	"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
-	"env=CONTROL_NAMELIST_QUX" [color=green
-	"env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
-	"env=CONTROL_NAMELIST_QUX=bar" [color=red, label=bar, shape=box, style=filled
-	"env=CONTROL_NAMELIST_WIBBLE" -> "env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar
-	"env=CONTROL_NAMELIST_WIBBLE" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE=bar" -> "namelist:wibble" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar, shape=box, style=filled
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" -> "env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=foo
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" -> "namelist:wibble=wubble" [color=red
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=bar, shape=box, style=filled
-	"env=DEPENDENT1" [color=red, label="!!env=DEPENDENT1"
-	"env=DEPENDENT2" [color=red, label="!!env=DEPENDENT2"
-	"env=DEPENDENT3" [color=green
-	"env=DEPENDENT_DEPENDENT1" [color=red, label="!!env=DEPENDENT_DEPENDENT1"
-	"env=DEPENDENT_MISSING1" -> "env=DEPENDENT_MISSING1=None" [color=grey
-	"env=DEPENDENT_MISSING1" [color=grey
-	"env=DEPENDENT_MISSING1=None" -> "env=DEPENDENT_DEPENDENT1" [color=grey
-	"env=DEPENDENT_MISSING1=None" [color=grey, label=None, shape=box, style=filled
-	"env=MISSING_VARIABLE" [color=grey
-	"env=USER_IGNORED" [color=orange, label="!env=USER_IGNORED"
-	"namelist:qux" [color=red, label="!!namelist:qux", shape=octagon
-	"namelist:qux=wobble" -> "namelist:qux=wobble=.true." [color=red, label=".false."
-	"namelist:qux=wobble" [color=red, label="^namelist:qux=wobble"
-	"namelist:qux=wobble=.true." -> "namelist:qux=wubble" [color=red
-	"namelist:qux=wobble=.true." [color=red, label=".true.", shape=box, style=filled
-	"namelist:qux=wubble" [color=red, label="^!!namelist:qux=wubble"
-	"namelist:wibble" [color=green, shape=octagon
-	"namelist:wibble=wobble" -> "namelist:wibble=wobble=.true." [color=green, label=".true."
-	"namelist:wibble=wobble" [color=green
-	"namelist:wibble=wobble=.true." -> "namelist:wibble=wubble" [color=green
-	"namelist:wibble=wobble=.true." [color=green, label=".true.", shape=box, style=filled
-	"namelist:wibble=wubble" [color=red, label="!!namelist:wibble=wubble"
-	env [color=green, shape=octagon
-	graph [label="$CONFIG_PATH (trigger)", rankdir=LR
-	node [label="\N"
+"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
+"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
+"env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
+"env=CONTROL" -> "env=CONTROL=foo" [color=green, label=foo
+"env=CONTROL" [color=green
+"env=CONTROL=None" -> "env=DEPENDENT3" [color=green
+"env=CONTROL=None" [color=green, label=None, shape=box, style=filled
+"env=CONTROL=bar" -> "env=DEPENDENT1" [color=red
+"env=CONTROL=bar" -> "env=DEPENDENT2" [color=red
+"env=CONTROL=bar" -> "env=DEPENDENT_MISSING1" [arrowhead=empty, color=red
+"env=CONTROL=bar" [color=red, label=bar, shape=box, style=filled
+"env=CONTROL=baz" -> "env=DEPENDENT1" [color=red
+"env=CONTROL=baz" [color=red, label=baz, shape=box, style=filled
+"env=CONTROL=foo" -> "env=DEPENDENT_MISSING1" [color=green
+"env=CONTROL=foo" [color=green, label=foo, shape=box, style=filled
+"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
+"env=CONTROL_NAMELIST_QUX" [color=green
+"env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
+"env=CONTROL_NAMELIST_QUX=bar" [color=red, label=bar, shape=box, style=filled
+"env=CONTROL_NAMELIST_WIBBLE" -> "env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar
+"env=CONTROL_NAMELIST_WIBBLE" [color=green
+"env=CONTROL_NAMELIST_WIBBLE=bar" -> "namelist:wibble" [color=green
+"env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar, shape=box, style=filled
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" -> "env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=foo
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" [color=green
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" -> "namelist:wibble=wubble" [color=red
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=bar, shape=box, style=filled
+"env=DEPENDENT1" [color=red, label="!!env=DEPENDENT1"
+"env=DEPENDENT2" [color=red, label="!!env=DEPENDENT2"
+"env=DEPENDENT3" [color=green
+"env=DEPENDENT_DEPENDENT1" [color=red, label="!!env=DEPENDENT_DEPENDENT1"
+"env=DEPENDENT_MISSING1" -> "env=DEPENDENT_MISSING1=None" [color=grey
+"env=DEPENDENT_MISSING1" [color=grey
+"env=DEPENDENT_MISSING1=None" -> "env=DEPENDENT_DEPENDENT1" [color=grey
+"env=DEPENDENT_MISSING1=None" [color=grey, label=None, shape=box, style=filled
+"env=MISSING_VARIABLE" [color=grey
+"env=USER_IGNORED" [color=orange, label="!env=USER_IGNORED"
+"namelist:qux" [color=red, label="!!namelist:qux", shape=octagon
+"namelist:qux=wobble" -> "namelist:qux=wobble=.true." [color=red, label=".false."
+"namelist:qux=wobble" [color=red, label="^namelist:qux=wobble"
+"namelist:qux=wobble=.true." -> "namelist:qux=wubble" [color=red
+"namelist:qux=wobble=.true." [color=red, label=".true.", shape=box, style=filled
+"namelist:qux=wubble" [color=red, label="^!!namelist:qux=wubble"
+"namelist:wibble" [color=green, shape=octagon
+"namelist:wibble=wobble" -> "namelist:wibble=wobble=.true." [color=green, label=".true."
+"namelist:wibble=wobble" [color=green
+"namelist:wibble=wobble=.true." -> "namelist:wibble=wubble" [color=green
+"namelist:wibble=wobble=.true." [color=green, label=".true.", shape=box, style=filled
+"namelist:wibble=wubble" [color=red, label="!!namelist:wibble=wubble"
+env [color=green, shape=octagon
+graph [label="$CONFIG_PATH (trigger)", rankdir=LR
+node [label="\N"
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -216,49 +178,49 @@ run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config \
     --property=trigger env
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
-	"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
-	"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
-	"env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
-	"env=CONTROL" -> "env=CONTROL=foo" [color=green, label=foo
-	"env=CONTROL" [color=green
-	"env=CONTROL=None" -> "env=DEPENDENT3" [color=green
-	"env=CONTROL=None" [color=green, label=None, shape=box, style=filled
-	"env=CONTROL=bar" -> "env=DEPENDENT1" [color=red
-	"env=CONTROL=bar" -> "env=DEPENDENT2" [color=red
-	"env=CONTROL=bar" -> "env=DEPENDENT_MISSING1" [arrowhead=empty, color=red
-	"env=CONTROL=bar" [color=red, label=bar, shape=box, style=filled
-	"env=CONTROL=baz" -> "env=DEPENDENT1" [color=red
-	"env=CONTROL=baz" [color=red, label=baz, shape=box, style=filled
-	"env=CONTROL=foo" -> "env=DEPENDENT_MISSING1" [color=green
-	"env=CONTROL=foo" [color=green, label=foo, shape=box, style=filled
-	"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
-	"env=CONTROL_NAMELIST_QUX" [color=green
-	"env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
-	"env=CONTROL_NAMELIST_QUX=bar" [color=red, label=bar, shape=box, style=filled
-	"env=CONTROL_NAMELIST_WIBBLE" -> "env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar
-	"env=CONTROL_NAMELIST_WIBBLE" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE=bar" -> "namelist:wibble" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar, shape=box, style=filled
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" -> "env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=foo
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" [color=green
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" -> "namelist:wibble=wubble" [color=red
-	"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=bar, shape=box, style=filled
-	"env=DEPENDENT1" [color=red, label="!!env=DEPENDENT1"
-	"env=DEPENDENT2" [color=red, label="!!env=DEPENDENT2"
-	"env=DEPENDENT3" [color=green
-	"env=DEPENDENT_DEPENDENT1" [color=red, label="!!env=DEPENDENT_DEPENDENT1"
-	"env=DEPENDENT_MISSING1" -> "env=DEPENDENT_MISSING1=None" [color=grey
-	"env=DEPENDENT_MISSING1" [color=grey
-	"env=DEPENDENT_MISSING1=None" -> "env=DEPENDENT_DEPENDENT1" [color=grey
-	"env=DEPENDENT_MISSING1=None" [color=grey, label=None, shape=box, style=filled
-	"env=MISSING_VARIABLE" [color=grey
-	"env=USER_IGNORED" [color=orange, label="!env=USER_IGNORED"
-	"namelist:qux" [color=red, label="!!namelist:qux", shape=rectangle
-	"namelist:wibble" [color=green, shape=rectangle
-	"namelist:wibble=wubble" [color=red, label="!!namelist:wibble=wubble", shape=rectangle
-	env [color=green, shape=octagon
-	graph [label="$CONFIG_PATH: env (trigger)", rankdir=LR
-	node [label="\N"
+"env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
+"env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
+"env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
+"env=CONTROL" -> "env=CONTROL=foo" [color=green, label=foo
+"env=CONTROL" [color=green
+"env=CONTROL=None" -> "env=DEPENDENT3" [color=green
+"env=CONTROL=None" [color=green, label=None, shape=box, style=filled
+"env=CONTROL=bar" -> "env=DEPENDENT1" [color=red
+"env=CONTROL=bar" -> "env=DEPENDENT2" [color=red
+"env=CONTROL=bar" -> "env=DEPENDENT_MISSING1" [arrowhead=empty, color=red
+"env=CONTROL=bar" [color=red, label=bar, shape=box, style=filled
+"env=CONTROL=baz" -> "env=DEPENDENT1" [color=red
+"env=CONTROL=baz" [color=red, label=baz, shape=box, style=filled
+"env=CONTROL=foo" -> "env=DEPENDENT_MISSING1" [color=green
+"env=CONTROL=foo" [color=green, label=foo, shape=box, style=filled
+"env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
+"env=CONTROL_NAMELIST_QUX" [color=green
+"env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
+"env=CONTROL_NAMELIST_QUX=bar" [color=red, label=bar, shape=box, style=filled
+"env=CONTROL_NAMELIST_WIBBLE" -> "env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar
+"env=CONTROL_NAMELIST_WIBBLE" [color=green
+"env=CONTROL_NAMELIST_WIBBLE=bar" -> "namelist:wibble" [color=green
+"env=CONTROL_NAMELIST_WIBBLE=bar" [color=green, label=bar, shape=box, style=filled
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" -> "env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=foo
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE" [color=green
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" -> "namelist:wibble=wubble" [color=red
+"env=CONTROL_NAMELIST_WIBBLE_WUBBLE=bar" [color=red, label=bar, shape=box, style=filled
+"env=DEPENDENT1" [color=red, label="!!env=DEPENDENT1"
+"env=DEPENDENT2" [color=red, label="!!env=DEPENDENT2"
+"env=DEPENDENT3" [color=green
+"env=DEPENDENT_DEPENDENT1" [color=red, label="!!env=DEPENDENT_DEPENDENT1"
+"env=DEPENDENT_MISSING1" -> "env=DEPENDENT_MISSING1=None" [color=grey
+"env=DEPENDENT_MISSING1" [color=grey
+"env=DEPENDENT_MISSING1=None" -> "env=DEPENDENT_DEPENDENT1" [color=grey
+"env=DEPENDENT_MISSING1=None" [color=grey, label=None, shape=box, style=filled
+"env=MISSING_VARIABLE" [color=grey
+"env=USER_IGNORED" [color=orange, label="!env=USER_IGNORED"
+"namelist:qux" [color=red, label="!!namelist:qux", shape=rectangle
+"namelist:wibble" [color=green, shape=rectangle
+"namelist:wibble=wubble" [color=red, label="!!namelist:wibble=wubble", shape=rectangle
+env [color=green, shape=octagon
+graph [label="$CONFIG_PATH: env (trigger)", rankdir=LR
+node [label="\N"
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
