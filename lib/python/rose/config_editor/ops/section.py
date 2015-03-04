@@ -273,11 +273,11 @@ class SectionOperations(object):
         save_section = config_data.sections.save.get(section)
         if this_section is None:
             if save_section is not None:
-                return rose.config_editor.KEY_TIP_ADDED
+                return rose.config_editor.KEY_TIP_MISSING
             # Ignore both-missing scenarios (no actual diff in output).
             return ""
         if save_section is None:
-            return rose.config_editor.KEY_TIP_MISSING
+            return rose.config_editor.KEY_TIP_ADDED
         if this_section.to_hashable() == save_section.to_hashable():
             return ""
         if this_section.comments != save_section.comments:
