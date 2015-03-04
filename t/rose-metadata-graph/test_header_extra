@@ -1,0 +1,58 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-5 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# Provides extra functions for rose metadata-graph testing.
+#-------------------------------------------------------------------------------
+
+function filter_graphviz() {
+    FILTER_TMP_FILE=$(mktemp)
+    cat >"$FILTER_TMP_FILE"
+    # Sort and filter out non-essential properties from the output file.
+    # Get rid of line-broken newer graphviz output (replace ",\n").
+    # Sort the file.
+    python << __PYTHON__
+import re
+filename = '$FILTER_TMP_FILE'
+f = open(filename, 'r')
+text = f.read()
+f.close()
+text = text.replace(",\n", ", ")
+text = re.sub("\s+\[", " [", text)
+lines = text.splitlines()
+f = open(filename, 'w')
+for line in lines:
+    if '[' not in line:
+        if line.startswith("\t") and line.strip() != "];":
+            f.write(line.lstrip() + '\n')
+        continue
+    props = dict([_.strip().split('=', 1) for _ in
+                  re.split(', ',
+                           line.split('[', 1)[1].replace('];', ''))])
+    new_prop_string = ''
+    for key in ['arrowhead', 'color', 'label', 'rankdir', 'shape', 'style']:
+        if key in props:
+            new_prop_string += key + '=' + props[key] + ', '
+    new_prop_string = new_prop_string.rstrip().rstrip(',')
+    new_line = line.lstrip().split('[')[0] + '[' + new_prop_string + '\n'
+    if new_line.strip() != 'graph [':
+        f.write(new_line)
+__PYTHON__
+    LANG=C sort "$FILTER_TMP_FILE"
+    rm "$FILTER_TMP_FILE"
+}
