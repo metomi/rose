@@ -145,8 +145,14 @@ class MacroUpgrade(rose.macro.MacroBase):
                 info = self.INFO_ADDED_VAR.format(repr(value))
         if option is not None and config.get([section]) is None:
             self.add_setting(config, [section])
-        if config.get([section, option]) is not None:
-            if forced:
+        option_in_config = None
+        for existing_option in config.get([section]).value.keys():
+            if (existing_option == option or
+                    existing_option.startswith(option + "(")):
+                option_in_config = existing_option
+                break
+        if option_in_config is not None:
+            if forced and option_in_config == option:
                 return self.change_setting_value(config, keys, value, state,
                                                  comments, info)
             return False
