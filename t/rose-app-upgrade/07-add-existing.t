@@ -28,6 +28,10 @@ meta=park/no-dinosaurs
 
 [env]
 DINOSAURS(1)=velociraptor
+SOFTWARE_QA=bad
+
+[food(1)]
+humans=4
 __CONFIG__
 setup
 init_meta park no-dinosaurs dinosaurs HEAD
@@ -49,6 +53,8 @@ class UpgradeAddDinosaurs(rose.upgrade.MacroUpgrade):
     def upgrade(self, config, meta_config=None):
         self.add_setting(config, ['env', 'DINOSAURS'], 'compy,t-rex')
         self.add_setting(config, ['env', 'FENCES'], 'electric,electric')
+        self.add_setting(config, ['env', 'SOFTWARE_QA'], 'ok')
+        self.add_setting(config, ['food(1)'])
         return config, self.reports
 __MACRO__
 #-----------------------------------------------------------------------------
@@ -70,6 +76,10 @@ meta=park/dinosaurs
 [env]
 DINOSAURS(1)=velociraptor
 FENCES=electric,electric
+SOFTWARE_QA=bad
+
+[food(1)]
+humans=4
 __CONFIG__
 #-----------------------------------------------------------------------------
 teardown
