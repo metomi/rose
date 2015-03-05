@@ -518,12 +518,12 @@ rosie UTIL [OPTS] [ARG ...]
 
       <dd>Print the <var>SECTION</var> keys.</dd>
 
-      <dt><kbd>rose config --has SECTION OPTION</kbd></dt>
+      <dt><kbd>rose config -q SECTION OPTION</kbd></dt>
 
       <dd>Exit with 0 if <var>OPTION</var> exists in <var>SECTION</var>, or 1
       otherwise.</dd>
 
-      <dt><kbd>rose config --has SECTION</kbd></dt>
+      <dt><kbd>rose config -q SECTION</kbd></dt>
 
       <dd>Exit with 0 if <var>SECTION</var> exists, or 1 otherwise.</dd>
 
@@ -568,11 +568,6 @@ rosie UTIL [OPTS] [ARG ...]
       <var>$HOME/.metomi/rose.conf</var> (where <var>$THIS</var> is the
       location of this command).</dd>
 
-      <dt><kbd>--has, --quiet, -q</kbd></dt>
-
-      <dd>Exit with 0 if the specified <var>SECTION</var> and/or
-      <var>OPTION</var> exist in the configuration, or 1 otherwise.</dd>
-
       <dt><kbd>--keys, -k</kbd></dt>
 
       <dd>If specified, only print the <var>SECTION</var> keys in the
@@ -604,6 +599,11 @@ rosie UTIL [OPTS] [ARG ...]
 
       <dd>If specified, the program will print ignored <var>!OPTION=VALUE</var>
       where relevant.</dd>
+
+      <dt><kbd>--quiet, -q</kbd></dt>
+
+      <dd>Exit with 0 if the specified <var>SECTION</var> and/or
+      <var>OPTION</var> exist in the configuration, or 1 otherwise.</dd>
     </dl>
 
     <h3>ENVIRONMENT VARIABLES</h3>
