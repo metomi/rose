@@ -17,13 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose app-upgrade" for broken macros.
+# Test "rose app-upgrade" when trying to add existing options.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 tests 4
 #-------------------------------------------------------------------------------
-# Check complex upgrading
 init <<'__CONFIG__'
 meta=park/no-dinosaurs
 
