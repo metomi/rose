@@ -143,16 +143,53 @@ class MacroUpgrade(rose.macro.MacroBase):
                 info = self.INFO_ADDED_SECT
             else:
                 info = self.INFO_ADDED_VAR.format(repr(value))
+
+        # Search for existing conflicting settings.
+        found_setting = False
+        if config.get([section, option]) is None:
+            strip_dupl = rose.macro.REC_ID_STRIP
+            for keys, node in config.walk():
+                existing_section = keys[0]
+                existing_base_section = (
+                    rose.macro.REC_ID_STRIP.sub("", existing_section))
+                if len(keys) == 1:
+                    existing_option = None
+                    existing_base_option = None
+                else:
+                    existing_option = keys[1]
+                    existing_base_option = (
+                        rose.macro.REC_ID_STRIP_DUPL.sub("", existing_option))
+                if option is None:
+                    # For section 'foo', look for 'foo', 'foo{bar}', 'foo(1)'.
+                    if (existing_section == section or
+                            existing_base_section == section):
+                        found_setting = True
+                        break
+                # For option 'foo', look for 'foo', 'foo(1)'.
+                elif (existing_section == section and
+                        (existing_option == option or
+                         existing_base_option == option)):
+                    found_setting = True
+                    break
+        else:
+            found_setting = True
+
+        # If already added, quit, unless "forced".
+        if found_setting:
+            if forced:
+                # If forced, override the existing properties.
+                return self.change_setting_value(
+                    config, keys, value, state, comments, info)
+            return False
+
+        # Add parent section if missing.
         if option is not None and config.get([section]) is None:
             self.add_setting(config, [section])
-        if config.get([section, option]) is not None:
-            if forced:
-                return self.change_setting_value(config, keys, value, state,
-                                                 comments, info)
-            return False
         if value is not None and not isinstance(value, basestring):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(repr(value), id_))
+
+        # Set (add) the section/option.
         config.set([section, option], value=value, state=state,
                    comments=comments)
         self.add_report(section, option, value, info)
