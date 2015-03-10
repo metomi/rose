@@ -378,3 +378,11 @@ class VariableOperations(object):
         config_name = self.__util.split_full_ns(
                              self.__data, namespace)[0]
         return self.__data.config[config_name].meta_files
+
+    def get_sections(self, namespace):
+        """Retrieve all real sections (empty or not) for this ns's config."""
+        config_name = self.__util.split_full_ns(
+                             self.__data, namespace)[0]
+        section_objects = self.__data.config[config_name].sections.get_all(
+            skip_latent=True)
+        return [_.name for _ in section_objects]

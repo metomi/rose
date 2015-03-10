@@ -34,7 +34,6 @@ class MenuWidget(gtk.HBox):
     """This class generates a button with a menu for variable actions."""
 
     MENU_ICON_ERRORS = 'rose-gtk-gnome-package-system-errors'
-    MENU_ICON_FILE = 'gtk-harddisk'
     MENU_ICON_WARNINGS = 'rose-gtk-gnome-package-system-warnings'
     MENU_ICON_LATENT = 'rose-gtk-gnome-add'
     MENU_ICON_LATENT_ERRORS = 'rose-gtk-gnome-add-errors'
@@ -93,9 +92,6 @@ class MenuWidget(gtk.HBox):
                                             ''))
         var_type = variable.metadata.get(rose.META_PROP_TYPE, '')
         var_values = variable.metadata.get(rose.META_PROP_VALUES, range(2))
-        if (isinstance(var_type, basestring)
-            and var_type.startswith('file')):
-            menu_icon_id = self.MENU_ICON_FILE
         error_types = rose.config_editor.WARNING_TYPES_IGNORE
         if (set(error_types) & set(variable.error.keys()) or
             set(error_types) & set(variable.warning.keys()) or
