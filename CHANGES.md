@@ -5,6 +5,28 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q1?)
+
+Rose release 25. This release will work best with
+[cylc-6.3.1](https://github.com/cylc/cylc/releases/tag/6.3.1) or beyond.
+
+### Noteworthy Changes
+
+[#1555](https://github.com/metomi/rose/pull/1555):
+rose app-upgrade: allow upgrade category packages to avoid module name
+conflicts.
+
+[#1550](https://github.com/metomi/rose/pull/1550):
+rose app-upgrade: fix check for existing indexed variable.
+
+[#1548](https://github.com/metomi/rose/pull/1548):
+rose config-edit: fix incorrect added-section description.
+
+[#1542](https://github.com/metomi/rose/pull/1542):
+rose config-edit: now report errors from *metadata-graph*.
+
+--------------------------------------------------------------------------------
+
 ## 2015.02.0 (2015-02-11)
 
 Rose release 24. This release works best with
