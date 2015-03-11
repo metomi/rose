@@ -349,19 +349,17 @@ class MacroUpgradeManager(object):
                                                        is_upgrade=True)
         if meta_path is None:
             raise OSError(rose.macro.ERROR_LOAD_CONF_META_NODE)
+        meta_path = os.path.abspath(meta_path)        
         self.named_tags = []
         for node in os.listdir(meta_path):
             node_meta = os.path.join(meta_path, node, rose.META_CONFIG_NAME)
             if os.path.exists(node_meta):
                 self.named_tags.append(node)
-        if not os.path.exists(os.path.join(meta_path, MACRO_UPGRADE_MODULE + ".py")):
+        self.version_module = get_meta_upgrade_module(meta_path)
+        if self.version_module is None:
             # No versions.py.
             self._load_version_macros([])
             return
-        sys.path.append(os.path.abspath(meta_path))
-        # Let ImportErrors bubble up so they can be reported
-        self.version_module = __import__(MACRO_UPGRADE_MODULE)
-        sys.path.pop()
         macro_info_tuples = rose.macro.get_macro_class_methods(
                                            [self.version_module])
         version_macros = []
@@ -512,27 +510,31 @@ class MacroUpgradeManager(object):
                 break
 
 
-def get_meta_upgrade_module(meta_key):
-    """Import and return the versions.py module for a given meta_key.
+def get_meta_upgrade_module(meta_path):
+    """Import and return the versions.py module for a given meta_path.
 
-    The meta_key should not contain a version, just the category.
-    For example, it should be 'my-command' rather than
-    'my-command/vn9.1'.
+    The meta_path should not contain a version, just the category.
+    For example, it should be '/some/path/to/rose-meta/my-command'
+    rather than '/some/path/to/my-command/vn9.1'.
+
+    Let ImportErrors bubble up so they can be reported.
 
     """
-    config = rose.config.ConfigNode()
-    config.set([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],
-               meta_key)
-    meta_path, warning = rose.macro.load_meta_path(config, is_upgrade=True)
-    if meta_path is None:
-        return None
     meta_path = os.path.abspath(meta_path)
-    print meta_path
     if not os.path.isfile(os.path.join(meta_path, MACRO_UPGRADE_MODULE_PATH)):
         return None
-    sys.path.insert(0, os.path.abspath(meta_path))
-    version_module = __import__(MACRO_UPGRADE_MODULE)
-    sys.path.pop(0)
+    category = os.path.basename(meta_path)
+    version_module = None
+    if os.path.exists(os.path.join(meta_path, "__init__.py")):
+        # The category directory is a package.
+        sys.path.insert(0, os.path.dirname(meta_path))        
+        category_package = __import__(category)
+        version_module = getattr(category_package, MACRO_UPGRADE_MODULE, None)
+        sys.path.pop(0)
+    else:
+        sys.path.insert(0, meta_path)
+        version_module = __import__(MACRO_UPGRADE_MODULE)
+        sys.path.pop(0)
     return version_module
 
 

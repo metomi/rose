@@ -864,6 +864,16 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
     <samp>versions.py</samp> file -
     <samp>rose-meta/CATEGORY/versions.py</samp>.</p>
 
+    <p>If you have many upgrade macros, you may want to separate them into
+    different modules in the same directory. You can then import from those in
+    <samp>versions.py</samp>, so that they are still exposed in that module.
+    You'll need to make your directory a package by creating an
+    <samp>__init__.py</samp> file, which should contain the line <samp>import
+    versions</samp>. To avoid conflict with other <samp>CATEGORY</samp> upgrade
+    modules (or other Python modules), please name these very modules carefully
+    or use absolute or package level imports like this: <samp>from
+    .versionXX_YY import FooBar</samp>.</p>
+
     <p>Upgrade macros are subclasses of <code>rose.upgrade.MacroUpgrade</code>.
     They have all the functionality of the transform macros documented above.
     <code>rose.upgrade.MacroUpgrade</code> also has some additional convenience
