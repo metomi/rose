@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose app-run", optional configuration selection.
+# Test "rose app-run", poll.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 test_init <<'__CONFIG__'
@@ -30,7 +30,29 @@ any-files=file3 file4 file6*
 test=test -e file5
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 22
+tests 31
+#-------------------------------------------------------------------------------
+# Garbage syntax.
+TEST_KEY="${TEST_KEY_BASE}-garbage"
+test_setup
+run_fail "${TEST_KEY}" \
+    rose app-run --config=../config -q -D '[poll]delays=it will take ages'
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" </dev/null
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+[FAIL] [poll]delays=it will take ages: configuration value error: syntax
+__ERR__
+test_teardown
+#-------------------------------------------------------------------------------
+# Mix ISO8601 and legacy syntax.
+TEST_KEY="${TEST_KEY_BASE}-mix"
+test_setup
+run_fail "${TEST_KEY}" \
+    rose app-run --config=../config -q -D '[poll]delays=PT1S,1s'
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" </dev/null
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+[FAIL] [poll]delays=PT1S,1s: configuration value error: ISO8601 duration mixed with legacy duration
+__ERR__
+test_teardown
 #-------------------------------------------------------------------------------
 # Timeout test 1.
 TEST_KEY=$TEST_KEY_BASE-timeout-1
@@ -38,7 +60,7 @@ test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err.0" \
-    '\[FAIL\] ....-..-..T..:..:.. poll timeout after .s' "$TEST_KEY.err"
+    '\[FAIL\] ....-..-..T..:..:....* poll timeout after PT..*S' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.1" '* test' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.2" '* any-files' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.3" '* all-files:file0\* file1 file2' "$TEST_KEY.err"
@@ -53,8 +75,18 @@ test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err.0" \
-    '\[FAIL\] ....-..-..T..:..:.. poll timeout after .s' "$TEST_KEY.err"
+    '\[FAIL\] ....-..-..T..:..:....* poll timeout after PT..*S' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.1" '* all-files:file2' "$TEST_KEY.err"
+test_teardown
+#-------------------------------------------------------------------------------
+# Timeout test 3. With ISO8601 syntax.
+TEST_KEY="${TEST_KEY_BASE}-timeout-iso8601"
+test_setup
+run_fail "${TEST_KEY}" \
+    rose app-run --config=../config -q -D '[poll]delays=PT0S,2*PT0M,3*PT0H0S'
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" </dev/null
+file_grep "$TEST_KEY.err.0" \
+    '\[FAIL\] ....-..-..T..:..:....* poll timeout after PT..*S' "$TEST_KEY.err"
 test_teardown
 #-------------------------------------------------------------------------------
 # OK test 1.

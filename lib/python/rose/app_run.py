@@ -21,6 +21,13 @@
 
 from glob import glob
 import os
+import shlex
+import sys
+from time import localtime, sleep, strftime, time
+import traceback
+
+from isodatetime.data import get_timepoint_for_now
+from isodatetime.parsers import DurationParser, ISO8601SyntaxError
 from rose.config import ConfigDumper
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.opt_parse import RoseOptionParser
@@ -28,16 +35,13 @@ from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
 from rose.run import Runner
 from rose.scheme_handler import SchemeHandlersManager
-import shlex
-import sys
-from time import localtime, sleep, strftime, time
-import traceback
 
 
 class ConfigValueError(Exception):
 
     """An exception raised when a config value is incorrect."""
 
+    DURATION_LEGACY_MIX = "ISO8601 duration mixed with legacy duration"
     SYNTAX = "syntax"
     ERROR_FORMAT = "%s=%s: configuration value error: %s"
 
@@ -70,12 +74,11 @@ class PollTimeoutError(Exception):
     """An exception raised when time is out for polling."""
 
     def __str__(self):
-        sec, delay, items = self.args
+        time_point, delay, items = self.args
         items_str = ""
         for item in items:
             items_str += "\n* " + item
-        return "%s poll timeout after %ds:%s" % (
-            strftime("%Y-%m-%dT%H:%M:%S", localtime(sec)), delay, items_str)
+        return "%s poll timeout after %s:%s" % (time_point, delay, items_str)
 
 
 class UnknownBuiltinAppError(Exception):
@@ -149,6 +152,7 @@ class AppRunner(Runner):
 
     """Invoke a Rose application."""
 
+    OLD_DURATION_UNITS = {"h": 3600, "m": 60, "s": 1}
     NAME = "app"
     OPTIONS = ["app_mode", "command_key", "conf_dir", "defines",
                "install_only_mode", "new_mode", "no_overwrite_mode",
@@ -159,6 +163,7 @@ class AppRunner(Runner):
         path = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         self.builtins_manager = SchemeHandlersManager(
             [path], "rose.apps", ["run"], None, *args, **kwargs)
+        self.duration_parser = DurationParser()
 
     def run_impl(self, opts, args, uuid, work_files):
         """The actual logic for a run."""
@@ -211,16 +216,13 @@ class AppRunner(Runner):
                                        ConfigValueError.SYNTAX)
         poll_delays = []
         if poll_test or poll_all_files or poll_any_files:
-            # Parse something like this: delays=10,4*30s,2.5m,2*1h
-            # No unit or s: seconds
-            # m: minutes
-            # h: hours
-            # N*: repeat the value N times
-            poll_delays_value = conf_tree.node.get_value(["poll", "delays"],
-                                                         default="")
-            poll_delays_value = poll_delays_value.strip()
-            units = {"h": 3600, "m": 60, "s": 1}
+            # Parse something like this: delays=10,4*PT30S,PT2M30S,2*PT1H
+            # R*DURATION: repeat the value R times
+            conf_keys = ["poll", "delays"]
+            poll_delays_value = conf_tree.node.get_value(
+                conf_keys, default="").strip()
             if poll_delays_value:
+                is_legacy0 = None
                 for item in poll_delays_value.split(","):
                     value = item.strip()
                     repeat = 1
@@ -229,27 +231,44 @@ class AppRunner(Runner):
                         try:
                             repeat = int(repeat)
                         except ValueError as exc:
-                            raise ConfigValueError(["poll", "delays"],
+                            raise ConfigValueError(conf_keys,
                                                    poll_delays_value,
                                                    ConfigValueError.SYNTAX)
-                    unit = None
-                    if value[-1].lower() in units.keys():
-                        unit = units[value[-1]]
-                        value = value[:-1]
                     try:
-                        value = float(value)
-                    except ValueError as exc:
-                        raise ConfigValueError(["poll", "delays"],
-                                               poll_delays_value,
-                                               ConfigValueError.SYNTAX)
-                    if unit:
-                        value *= unit
+                        value = self.duration_parser.parse(value).get_seconds()
+                        is_legacy = False
+                    except ISO8601SyntaxError:
+                        # Legacy mode: nnnU
+                        # nnn is a float, U is the unit
+                        # No unit or s: seconds
+                        # m: minutes
+                        # h: hours
+                        unit = None
+                        if value[-1].lower() in self.OLD_DURATION_UNITS:
+                            unit = self.OLD_DURATION_UNITS[value[-1].lower()]
+                            value = value[:-1]
+                        try:
+                            value = float(value)
+                        except ValueError as exc:
+                            raise ConfigValueError(conf_keys,
+                                                   poll_delays_value,
+                                                   ConfigValueError.SYNTAX)
+                        if unit:
+                            value *= unit
+                        is_legacy = True
+                    if is_legacy0 is None:
+                        is_legacy0 = is_legacy
+                    elif is_legacy0 != is_legacy:
+                        raise ConfigValueError(
+                            conf_keys,
+                            poll_delays_value,
+                            ConfigValueError.DURATION_LEGACY_MIX)
                     poll_delays += [value] * repeat
             else:
                 poll_delays = [0]  # poll once without a delay
 
         # Poll
-        t_init = time()
+        t_init = get_timepoint_for_now()
         while poll_delays and (poll_test or poll_any_files or poll_all_files):
             poll_delay = poll_delays.pop(0)
             if poll_delay:
@@ -282,7 +301,7 @@ class AppRunner(Runner):
             failed_items.append("all-files:" +
                                 self.popen.list_to_shell_str(poll_all_files))
         if failed_items:
-            now = time()
+            now = get_timepoint_for_now()
             raise PollTimeoutError(now, now - t_init, failed_items)
 
     def _poll_file(self, file_, poll_file_test):
