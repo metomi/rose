@@ -16,6 +16,9 @@ Rose release 25. This release will work best with
 rose app-upgrade: allow upgrade category packages to avoid module name
 conflicts.
 
+[#1553](https://github.com/metomi/rose/pull/1553):
+rose app-run: poll delays can now be specified as ISO8601 durations.
+
 [#1550](https://github.com/metomi/rose/pull/1550):
 rose app-upgrade: fix check for existing indexed variable.
 
