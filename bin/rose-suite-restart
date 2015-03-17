@@ -17,6 +17,45 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Alias of "rose suite-run --restart".
+# NAME
+#     rose suite-restart
+#
+# SYNOPSIS
+#     rose suite-restart [OPTIONS] [[--] CYLC-RESTART-ARGS]
+#
+#     # Restart Cylc suite with name equal to basename of $PWD.
+#     rose suite-restart
+#
+#     # Restart Cylc suite NAME
+#     rose suite-restart --name=NAME
+#
+#     # Restart Cylc suite NAME with a given state dump
+#     rose suite-restart --name=NAME -- state.20141118T161121.195326Z
+#
+#     # Restart Cylc suite NAME on given host
+#     rose suite-restart --name=NAME --host=my-suite-host
+#
+# DESCRIPTION
+#     Restart a shutdown suite from its last known state without reinstalling
+#     it.
+#
+#     If re-installation is required, use "rose suite-run --restart".
+#
+# ARGUMENTS
+#    Arguments (and options after --) are passed to "cylc restart".
+#
+# OPTIONS
+#     --host=HOST
+#         Specify a host for restarting the suite.
+#     --name=NAME, -n NAME
+#         Specify the suite NAME in Cylc, instead of using the basename of the
+#         current working directory.
+#     --no-gcontrol
+#         Do not run "cylc gui". Default is to run "cylc gui" if the suite is
+#         running and the DISPLAY environment variable is defined.
+#     --quiet, -q
+#         Decrement verbosity.
+#     --verbose, -v
+#         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec $(dirname $0)/rose-suite-run --restart "$@"
+exec python -m rose.suite_restart "$@"

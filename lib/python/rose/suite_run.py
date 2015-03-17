@@ -174,17 +174,6 @@ class SuiteRunner(Runner):
         hosts = []
         if opts.host:
             hosts.append(opts.host)
-        conf = ResourceLocator.default().get_conf()
-
-        known_hosts = self.host_selector.expand(
-              conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
-              ["localhost"])[0]
-        known_hosts = list(set(known_hosts))
-
-        for known_host in known_hosts:
-            if known_host not in hosts:
-                hosts.append(known_host)
         if opts.run_mode == "reload":
             suite_run_hosts = self.suite_engine_proc.ping(suite_name, hosts)
             if not suite_run_hosts:
@@ -314,6 +303,7 @@ class SuiteRunner(Runner):
             work_files.append(uuid_file)
 
         # Install items to user@host
+        conf = ResourceLocator.default().get_conf()
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
         queue = [] # [[pipe, command, "ssh"|"rsync", auth], ...]
         for auth in sorted(auths):
@@ -394,24 +384,19 @@ class SuiteRunner(Runner):
         # Start the suite
         self.fs_util.chdir("log")
         ret = 0
-        host = hosts[0]
         # FIXME: should sync files to suite host?
-        if opts.host:
-            hosts = [host]
+        if opts.run_mode != "reload":
+            if opts.host:
+                hosts = [opts.host]
+            else:
+                hosts = self.suite_engine_proc.get_suite_hosts()
 
-        # For run and restart, get host for running the suite
-        if opts.run_mode != "reload" and not opts.host:
-            hosts = []
-            val = conf.get_value(["rose-suite-run", "hosts"], "localhost")
-            known_hosts = self.host_selector.expand(val.split())[0]
-            for known_host in known_hosts:
-                if known_host not in hosts:
-                    hosts.append(known_host)
-
-        if hosts == ["localhost"]:
+        if hosts and hosts == ["localhost"]:
             host = hosts[0]
-        else:
+        elif hosts:
             host = self.host_selector(hosts)[0][0]
+        else:
+            host = "localhost"
         self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
         # FIXME: values in environ were expanded in the localhost
         self.suite_engine_proc.run(

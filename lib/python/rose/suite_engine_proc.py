@@ -29,6 +29,7 @@ import re
 from rose.date import RoseDateTimeOperator, OffsetValueError
 from rose.env import env_var_process
 from rose.fs_util import FileSystemUtil
+from rose.host_select import HostSelector
 from rose.popen import RosePopener
 from rose.reporter import Event
 from rose.resource import ResourceLocator
@@ -334,7 +335,8 @@ class SuiteEngineProcessor(object):
             key = cls.SCHEME_DEFAULT
         return cls.SCHEME_HANDLER_MANAGER.get_handler(key)
 
-    def __init__(self, event_handler=None, popen=None, fs_util=None, **kwargs):
+    def __init__(self, event_handler=None, popen=None, fs_util=None,
+                 host_selector=None, **kwargs):
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -342,6 +344,9 @@ class SuiteEngineProcessor(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
+        if host_selector is None:
+            host_selector = HostSelector(event_handler, popen)
+        self.host_selector = host_selector
         self.date_time_oper = RoseDateTimeOperator()
 
     def check_global_conf_compat(self):
@@ -354,7 +359,8 @@ class SuiteEngineProcessor(object):
 
     def check_suite_not_running(self, suite_name, hosts=None):
         """Raise SuiteStillRunningError if suite is still running."""
-        reasons = self.is_suite_running(None, suite_name, hosts)
+        reasons = self.is_suite_running(
+            None, suite_name, self.get_suite_hosts(suite_name, hosts))
         if reasons:
             raise SuiteStillRunningError(suite_name, reasons)
 
@@ -401,6 +407,44 @@ class SuiteEngineProcessor(object):
 
         """
         raise NotImplementedError()
+
+    def get_suite_hosts(self, suite_name=None, hosts=None):
+        """Return names of potential suite hosts.
+
+        If "suite_name" is specified, return all possible hosts including what
+        is written in the "log/rose-suite-run.host" file.
+
+        If "suite_name" is not specified and if "[rose-suite-run]hosts" is
+        defined, split and return the setting.
+
+        Otherwise, return ["localhost"].
+
+        """
+        conf = ResourceLocator.default().get_conf()
+        hostnames = []
+        if hosts:
+            hostnames += hosts
+        if suite_name:
+            hostnames.append("localhost")
+            # Get host name from "log/rose-suite-run.host" file
+            host_file_path = self.get_suite_dir(
+                suite_name, "log", "rose-suite-run.host")
+            try:
+                for line in open(host_file_path):
+                    hostnames.append(line.strip())
+            except IOError:
+                pass
+            # Scan-able list
+            suite_hosts = conf.get_value(
+                ["rose-suite-run", "scan-hosts"], "").split()
+            if suite_hosts:
+                hostnames += self.host_selector.expand(suite_hosts)[0]
+        # Normal list
+        suite_hosts = conf.get_value(["rose-suite-run", "hosts"], "").split()
+        if suite_hosts:
+            hostnames += self.host_selector.expand(suite_hosts)[0]
+        hostnames = list(set(hostnames))
+        return hostnames
 
     def get_suite_job_events(self, user_name, suite_name, cycles, tasks,
                              no_statuses, order, limit, offset):
@@ -672,7 +716,7 @@ class SuiteEngineProcessor(object):
         self.handle_event(WebBrowserEvent(w.name, url))
         return url
 
-    def ping(self, suite_name, host_names=None, timeout=10):
+    def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
         raise NotImplementedError()
 
