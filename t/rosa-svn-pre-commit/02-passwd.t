@@ -28,7 +28,7 @@ super-users=rosie
 user-tool=passwd
 __ROSE_CONF__
 #-------------------------------------------------------------------------------
-tests 11
+tests 13
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo
@@ -110,6 +110,20 @@ sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] NO SUCH USER: U   a/a/0/0/0/trunk/rose-suite.info: access-list=no-such-user-550
 [FAIL] NO SUCH USER: U   a/a/0/0/0/trunk/rose-suite.info: access-list=no-such-user-551
+__ERR__
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-copy-with-bad-owner"
+svn co -q "${SVN_URL}/a/a/0/0/" 'aa00'
+svn mkdir -q 'aa00/1'
+svn cp -q 'aa00/0/trunk' 'aa00/1/'
+cat >'aa00/1/trunk/rose-suite.info' <<'__ROSE_SUITE_INFO__'
+owner=no-such-user-550
+access-list=*
+__ROSE_SUITE_INFO__
+run_fail "$TEST_KEY" svn commit -q -m 't' --non-interactive 'aa00/1'
+sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] NO SUCH USER: U   a/a/0/0/1/trunk/rose-suite.info: owner=no-such-user-550
 __ERR__
 #-------------------------------------------------------------------------------
 exit 0
