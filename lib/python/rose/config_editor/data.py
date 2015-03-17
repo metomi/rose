@@ -340,10 +340,15 @@ class ConfigDataManager(object):
             meta_config_tree = self.load_meta_config_tree(
                 config_type=config_type)
         else:
-            meta_config_tree = self.load_meta_config_tree(
-                config, config_directory,
-                config_type=config_type
-            )
+            try:
+                meta_config_tree = self.load_meta_config_tree(
+                    config, config_directory,
+                    config_type=config_type
+                )
+            except IOError as exc:
+                rose.gtk.dialog.run_exception_dialog(exc)
+                meta_config_tree = rose.config_tree.ConfigTree()
+
         meta_config = meta_config_tree.node
         opt_conf_lookup = self.load_optional_configs(config_directory)
 
