@@ -36,7 +36,8 @@
 #     rose suite-restart --name=NAME --host=my-suite-host
 #
 # DESCRIPTION
-#     Restart a Cylc suite without re-installing its contents.
+#     Restart a shutdown suite from its last known state without reinstalling
+#     it.
 #
 #     If re-installation is required, use "rose suite-run --restart".
 #
