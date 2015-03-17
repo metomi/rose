@@ -309,10 +309,10 @@ class ConfigDataHelper(object):
                     else:
                         subspace = node.value + '/' + str(match.groups()[1])
                 elif section.startswith(rose.SUB_CONFIG_FILE_DIR + ":"):
-                    subspace = section.replace('/', ':')
+                    subspace = section.rstrip('/').replace('/', ':')
                     subspace = subspace.replace(':', '/', 1)
                 else:
-                    subspace = section.replace(':', '/')
+                    subspace = section.rstrip('/').replace(':', '/')
             section_ns = config_name + '/' + subspace
             if not subspace:
                 section_ns = config_name
