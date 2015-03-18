@@ -29,6 +29,7 @@ my_fixed_array = red, red, red, red, red
 my_char = 'orange'
 my_num = 56
 my_raw = something"(")\,
+my_location = 'Exeter, England'
 
 [namelist:values_nl2{mod1}]
 my_num = 4
@@ -37,12 +38,12 @@ my_num = 4
 my_num = 5
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 12
+tests 17
 #-------------------------------------------------------------------------------
 # Check single values checking.
 TEST_KEY=$TEST_KEY_BASE-single-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_fixed_array]
 length=:
 values = red
@@ -54,7 +55,7 @@ values = 'orange'
 values = 56
 
 [namelist:values_nl1=my_raw]
-values = something"(")\,
+values = something"(")\\\,
 
 [namelist:values_nl2]
 duplicate = true
@@ -73,7 +74,7 @@ teardown
 # Check single values checking errs.
 TEST_KEY=$TEST_KEY_BASE-single-err
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_fixed_array]
 length=:
 values = 'purple'
@@ -98,7 +99,7 @@ values = 5
 __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_char='orange'
         Value 'orange' should be 'maroon'
@@ -118,7 +119,7 @@ teardown
 # Check multiple values checking.
 TEST_KEY=$TEST_KEY_BASE-multiple-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_char_array]
 length=:
 values = 'red', 'green', 'orange', 'purple'
@@ -142,7 +143,7 @@ values = 'red', 'green', 'orange'
 values = 56, 5, 1
 
 [namelist:values_nl1=my_raw]
-values = something"(")\,, something_else
+values = something"(")\\\,, something_else
 
 [namelist:values_nl2]
 duplicate = true
@@ -155,7 +156,7 @@ teardown
 # Check multiple values checking errs.
 TEST_KEY=$TEST_KEY_BASE-multiple-err
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_char_array]
 length=:
 values = 'orange', 'purple'
@@ -186,7 +187,7 @@ duplicate = true
 __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_char='orange'
         Value 'orange' not in allowed values ["'maroon'", "'turquoise'"]
@@ -201,6 +202,48 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
     namelist:values_nl1=my_raw_array=red,green,red
         Value red not in allowed values ['blue', 'yellow']
 __CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Check comma escape in "values"
+TEST_KEY="${TEST_KEY_BASE}-comma-esc-1"
+setup
+init_meta <<'__META_CONFIG__'
+[namelist:values_nl1=my_location]
+values = 'Exeter\, England'
+__META_CONFIG__
+run_pass "${TEST_KEY}" rose macro -V --config='../config'
+teardown
+
+TEST_KEY="${TEST_KEY_BASE}-comma-esc-1-comma"
+setup
+init_meta <<'__META_CONFIG__'
+[namelist:values_nl1=my_location]
+values = 'Exeter\, England',
+__META_CONFIG__
+run_pass "${TEST_KEY}" rose macro -V --config='../config'
+teardown
+
+TEST_KEY="${TEST_KEY_BASE}-comma-esc-2"
+setup
+init_meta <<'__META_CONFIG__'
+[namelist:values_nl1=my_location]
+values = 'Exeter\, England', 'Aberdeen\, Scotland'
+__META_CONFIG__
+run_pass "${TEST_KEY}" rose macro -V --config='../config'
+teardown
+
+TEST_KEY="${TEST_KEY_BASE}-comma-esc-bad"
+setup
+init_meta <<'__META_CONFIG__'
+[namelist:values_nl1=my_location]
+values = 'Manchester\, England', 'Glasgow\, Scotland'
+__META_CONFIG__
+run_fail "${TEST_KEY}" rose macro -V --config='../config'
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[V] rose.macros.DefaultValidators: issues: 1
+    namelist:values_nl1=my_location='Exeter, England'
+        Value 'Exeter, England' not in allowed values ["'Manchester, England'", "'Glasgow, Scotland'"]
+__ERR__
 teardown
 #-------------------------------------------------------------------------------
 exit

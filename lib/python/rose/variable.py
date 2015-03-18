@@ -91,25 +91,17 @@ class Variable(object):
             not isinstance(self.metadata['type'], list)):
             self.metadata['type'] = parse_type_expression(
                                                self.metadata['type'])
-        if ('values' in self.metadata and
-            not isinstance(self.metadata['values'], list)):
-            # Replace this kind of thing with a proper metadata handler later.
-            val_list = rose.variable.array_split(self.metadata['values'],
-                                                 only_this_delim=",")
-            self.metadata['values'] = val_list
-
-        if ('value-titles' in self.metadata and
-            not isinstance(self.metadata['value-titles'], list)):
-            # Replace this kind of thing with a proper metadata handler later.
-            val_list = rose.variable.array_split(self.metadata['value-titles'])
-            self.metadata['value-titles'] = val_list
-
-        if ('value-hints' in self.metadata and
-           not isinstance(self.metadata['value-hints'], list)):
-            # Replace this kind of thing with a proper metadata handler later.
-            val_list = rose.variable.array_split(self.metadata['value-hints'],
-                                                 only_this_delim=",")
-            self.metadata['value-hints'] = val_list
+        # Replace this kind of thing with a proper metadata handler later.
+        for key, delim in [
+                ("values", ","),
+                ("value-titles", None),
+                ("value-hints", ",")]:
+            if (key in self.metadata and
+                    not isinstance(self.metadata[key], list)):
+                self.metadata[key] = array_split(
+                    self.metadata[key],
+                    only_this_delim=delim,
+                    remove_esc_char=True)
 
         return self.metadata
 
@@ -144,14 +136,15 @@ class Variable(object):
         return text
 
 
-def array_split(value, only_this_delim=None):
+def array_split(value, only_this_delim=None, remove_esc_char=False):
     """Splits a value into array elements, 1 if no array syntax."""
     delim = ","
     if only_this_delim is not None:
         delim = only_this_delim
     if delim not in value and only_this_delim is None:
         delim = ' '
-    return [i.strip() for i in _scan_string(value, delim)]
+    lex = _scan_string(value.strip(), delim, remove_esc_char)
+    return [item.strip() for item in lex]
 
 
 def array_join(array):
@@ -160,40 +153,41 @@ def array_join(array):
     return delim.join(array)
 
 
-def _scan_string(string, delim=','):
+def _scan_string(value, delim=',', remove_esc_char=False):
+    """Split "value" by "delim", handling quotes."""
     item = ''
     skip_inds = []
-    for quote_pair_match in re.finditer(r"""(''|"")$""", string):
-        skip_inds.extend([quote_pair_match.start(0),
-                          quote_pair_match.end(0)])
+    for quote_pair_match in re.finditer(r"""(''|"")$""", value):
+        skip_inds.extend([quote_pair_match.start(0), quote_pair_match.end(0)])
     is_in_quotes = {'"': False, "'": False}
     other_quote = {'"': "'", "'": '"'}
     esc_char = "\\"
     was_escaped = False
     is_escaped = False
     letter = None
-    for i, letter in enumerate(string):
+    for i, letter in enumerate(value):
         if (letter in is_in_quotes and
-            i not in skip_inds and
-            not is_in_quotes[other_quote[letter]] and
-            not is_escaped):
+                i not in skip_inds and
+                not is_in_quotes[other_quote[letter]] and
+                not is_escaped):
             is_in_quotes[letter] = not is_in_quotes[letter]
         was_escaped = is_escaped
         is_escaped = (letter == esc_char and not is_escaped)
-        if (letter == delim and
-            not any(is_in_quotes.values()) and
-            not was_escaped):
+        if remove_esc_char and was_escaped and letter in (delim + esc_char):
+            item = item[:-1] + letter
+        elif (letter == delim and
+                not any(is_in_quotes.values()) and
+                not was_escaped):
             yield item
             item = ''
-        elif item + letter == string:
+        elif item + letter == value:
             item += letter
             yield item
             item = ''
         else:
             item += letter
-    if (item != '' or
-        (letter == delim and not any(is_in_quotes.values()) and
-         not was_escaped)):
+    if (item or (letter == delim and
+                 not any(is_in_quotes.values()) and not was_escaped)):
         yield item
 
 
