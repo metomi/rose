@@ -10,7 +10,20 @@ for a full listing of issues for each release.
 Rose release 25. This release will work best with
 [cylc-6.3.1](https://github.com/cylc/cylc/releases/tag/6.3.1) or beyond.
 
+### Highlighted Changes
+
+[#1541](https://github.com/metomi/rose/pull/1541):
+rose suite-restart: the command is no longer an alias of
+`rose suite-run --restart`. It now restarts a shutdown suite from its last
+known state without reinstalling it.
+
 ### Noteworthy Changes
+
+[#1561](https://github.com/metomi/rose/pull/1561):
+rose config-edit: improve handling of bad macro imports from metadata.
+
+[#1560](https://github.com/metomi/rose/pull/1560):
+rose config-edit: fix blank name-space for a trailing slash section.
 
 [#1555](https://github.com/metomi/rose/pull/1555):
 rose app-upgrade: allow upgrade category packages to avoid module name
@@ -33,7 +46,8 @@ rose config-edit: now report errors from *metadata-graph*.
 ## 2015.02.0 (2015-02-11)
 
 Rose release 24. This release works best with
-[cylc-6.1.2](https://github.com/cylc/cylc/releases/tag/6.1.2).
+[cylc-6.1.2](https://github.com/cylc/cylc/releases/tag/6.1.2) and
+[cylc-6.3.1](https://github.com/cylc/cylc/releases/tag/6.3.1).
 
 ### Noteworthy Changes
 
