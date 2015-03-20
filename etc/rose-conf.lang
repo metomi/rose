@@ -19,9 +19,12 @@
  along with Rose. If not, see <http://www.gnu.org/licenses/>.
  _____________________________________________________________________
  = Instructions =
-
- Create this directory if it doesn't already exist:
+ 
+ Create a language-specs directory, if it doesn't already exist:
+ (GNOME 2 / gedit 2):
  ~/.local/share/gtksourceview-2.0/language-specs/
+ (GNOME 3 / gedit 3):
+ ~/.local/share/gtksourceview-3.0/language-specs/
 
  Place this file in that directory (or symlink it)
 
