@@ -147,7 +147,7 @@ class SuiteRunner(Runner):
         jinja2_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
         my_rose_version = ResourceLocator.default().get_version()
         suite_engine_key = self.suite_engine_proc.get_version_env_name()
-        if opts.run_mode == "reload":
+        if opts.run_mode in ["reload", "restart"]:
             prev_config_path = self.suite_engine_proc.get_suite_dir(
                     suite_name, "log", "rose-suite-run.conf")
             prev_config = ConfigLoader()(prev_config_path)
