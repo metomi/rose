@@ -384,7 +384,7 @@ class ConfigPage(gtk.VBox):
 
     def update_info(self):
         """Driver routine to update non-variable information."""
-        button_list, label_list = self._get_page_info_widgets()
+        button_list, label_list, info = self._get_page_info_widgets()
         if [l.get_text() for l in label_list] == self._last_info_labels:
             # No change - do not redraw.
             return False
@@ -397,12 +397,12 @@ class ConfigPage(gtk.VBox):
         elif has_content:
             self.main_vpaned.pack1(self.info_panel)
 
-    def generate_page_info(self, button_list=None, label_list=None):
+    def generate_page_info(self, button_list=None, label_list=None, info=None):
         """Generate a widget giving information about sections."""
         info_container = gtk.VBox(homogeneous=False)
         info_container.show()
-        if button_list is None or label_list is None:
-            button_list, label_list = self._get_page_info_widgets()
+        if button_list is None or label_list is None or info is None:
+            button_list, label_list, info = self._get_page_info_widgets()
         self._last_info_labels = [l.get_text() for l in label_list]
         for button, label in zip(button_list, label_list):
             var_hbox = gtk.HBox(homogeneous=False)
@@ -428,8 +428,12 @@ class ConfigPage(gtk.VBox):
             help_label_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
             help_label_window.show()
             width, height = help_label_window.size_request()
-            height = min([rose.config_editor.SIZE_WINDOW[1] / 3,
-                          help_label.size_request()[1]])
+            if info == "Blank page - no data":
+                self.main_vpaned.set_position(
+                    rose.config_editor.SIZE_WINDOW[1]*100)
+            else:
+                height = min([rose.config_editor.SIZE_WINDOW[1] / 3,
+                              help_label.size_request()[1]])
             help_label_window.set_size_request(width, height)
             help_hbox = gtk.HBox()
             help_hbox.pack_start(help_label_window, expand=True, fill=True,
@@ -1122,6 +1126,7 @@ class ConfigPage(gtk.VBox):
     def _get_page_info_widgets(self):
         button_list = []
         label_list = []
+        info = ""
         # No content warning, if applicable.
         has_no_content = (self.section is None and
                           not self.ghost_data and
@@ -1216,4 +1221,4 @@ class ConfigPage(gtk.VBox):
             macro_label.show()
             button_list.append(macro_button)
             label_list.append(macro_label)
-        return button_list, label_list
+        return button_list, label_list, info
