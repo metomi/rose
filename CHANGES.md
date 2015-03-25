@@ -19,11 +19,25 @@ known state without reinstalling it.
 
 ### Noteworthy Changes
 
+[#1565](https://github.com/metomi/rose/pull/1565):
+rose suite-run --restart: export `CYLC_VERSION` to match that of the original
+suite run.
+
+[#1563](https://github.com/metomi/rose/pull/1563):
+rose metadata: remove escape characters for `values`, `value-titles` and
+`value-hints`.
+
+[#1562](https://github.com/metomi/rose/pull/1562):
+rosa svn-pre-commit: now prevents suite copy with bad owner.
+
 [#1561](https://github.com/metomi/rose/pull/1561):
 rose config-edit: improve handling of bad macro imports from metadata.
 
 [#1560](https://github.com/metomi/rose/pull/1560):
 rose config-edit: fix blank name-space for a trailing slash section.
+
+[#1557](https://github.com/metomi/rose/pull/1557):
+rose config-edit: improve page display.
 
 [#1555](https://github.com/metomi/rose/pull/1555):
 rose app-upgrade: allow upgrade category packages to avoid module name
