@@ -29,10 +29,11 @@ export ROSE_CONF_PATH=$TEST_SOURCE_DIR/$TEST_KEY_BASE/etc
 TEST_KEY=$TEST_KEY_BASE
 run_fail "$TEST_KEY" rose host-select sleepy1 sleepy2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+LANG=C sort "$TEST_KEY.err" -o "$TEST_KEY.sorted.err"
+file_cmp "$TEST_KEY.sorted.err" "$TEST_KEY.sorted.err" <<'__ERR__'
+[FAIL] No hosts selected.
 [WARN] sleepy1: (ssh failed)
 [WARN] sleepy2: (ssh failed)
-[FAIL] No hosts selected.
 __ERR__
 cut -f2- mock-ssh.out | LANG=C sort >mock-ssh.out.sorted
 # N.B. Tab between 1 and sleepy?
