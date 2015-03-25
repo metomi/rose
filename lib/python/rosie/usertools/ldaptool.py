@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 """User information via LDAP."""
 
 try:
@@ -25,6 +25,7 @@ except ImportError:
     pass
 import os
 from rose.resource import ResourceLocator
+
 
 class LDAPUserTool(object):
 
@@ -51,13 +52,12 @@ class LDAPUserTool(object):
     def verify_users(cls, users):
         """Verify list of users are in the LDAP directory.
 
-        Return a tuple with 2 lists (good_users, bad_users).
+        Return a list of bad users.
 
         """
         # N.B. Will they be unique?
         good_users = cls._search(users, cls.UID_IDX)
-        bad_users = [user for user in users if user not in good_users]
-        return (good_users, bad_users)
+        return [user for user in users if user not in good_users]
 
     @classmethod
     def _search(cls, users, attr_idx):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 """A pre-commit hook on a Rosie Subversion repository.
 
 Ensure that commits conform to the rules of Rosie.
@@ -101,7 +101,7 @@ class RosieSvnPreCommitHook(object):
         self.popen = popen
         path = os.path.dirname(os.path.dirname(sys.modules["rosie"].__file__))
         self.usertools_manager = SchemeHandlersManager(
-                [path], "rosie.usertools", ["verify_users"])
+            [path], "rosie.usertools", ["verify_users"])
 
     def _get_access_info(self, repos, path_head, txn=None):
         """Return the owner and the access list of a suite (path_head)."""
@@ -139,35 +139,35 @@ class RosieSvnPreCommitHook(object):
         user_tool = self.usertools_manager.get_handler(user_tool_name)
         txn_users = set([txn_owner] + txn_access_list)
         txn_users.discard("*")
-        bad_users = user_tool.verify_users(txn_users)[1]
+        bad_users = user_tool.verify_users(txn_users)
         for bad_user in bad_users:
             if txn_owner == bad_user:
                 bad_change = BadChange(
-                                status,
-                                path,
-                                BadChange.USER,
-                                "owner=" + bad_user)
+                    status,
+                    path,
+                    BadChange.USER,
+                    "owner=" + bad_user)
                 bad_changes.append(bad_change)
             if bad_user in txn_access_list:
                 bad_change = BadChange(
-                                status,
-                                path,
-                                BadChange.USER,
-                                "access-list=" + bad_user)
+                    status,
+                    path,
+                    BadChange.USER,
+                    "access-list=" + bad_user)
                 bad_changes.append(bad_change)
         return bool(bad_users)
 
     def run(self, repos, txn):
         """Apply the rule engine on transaction "txn" to repository "repos"."""
 
-        changes = set() # set([(status, path), ...])
+        changes = set()  # set([(status, path), ...])
         for line in self._svnlook("changed", "-t", txn, repos).splitlines():
             status, path = line.split(None, 1)
             changes.add((status, path))
         bad_changes = []
         author = None
         super_users = None
-        access_info_map = {} # {path-id: (owner, access-list), ...}
+        access_info_map = {}  # {path-id: (owner, access-list), ...}
         txn_access_info_map = {}
 
         conf = ResourceLocator.default().get_conf()
@@ -208,13 +208,13 @@ class RosieSvnPreCommitHook(object):
             if status[0] == self.ST_ADD and len(names) == self.LEN_ID:
                 if (self.ST_ADD, path + "trunk/") not in changes:
                     bad_changes.append(
-                            BadChange(status, path, BadChange.NO_TRUNK))
+                        BadChange(status, path, BadChange.NO_TRUNK))
                     continue
                 path_trunk_info_file = path + self.TRUNK_INFO_FILE
                 if ((self.ST_ADD, path_trunk_info_file) not in changes and
-                    (self.ST_UPDATE, path_trunk_info_file) not in changes):
+                        (self.ST_UPDATE, path_trunk_info_file) not in changes):
                     bad_changes.append(
-                            BadChange(status, path, BadChange.NO_INFO))
+                        BadChange(status, path, BadChange.NO_INFO))
                 continue
 
             # The rest are trunk changes in a suite
@@ -228,18 +228,22 @@ class RosieSvnPreCommitHook(object):
                     shlex.split(out)
                 except ValueError:
                     bad_changes.append(
-                            BadChange(status, path, BadChange.VALUE))
+                        BadChange(status, path, BadChange.VALUE))
                     continue
 
-            # New suite trunk information file must have an owner
-            if status == self.ST_ADD and path_tail == self.TRUNK_INFO_FILE:
+            # Suite trunk information file must have an owner
+            # User IDs of owner and access list must be real
+            if (status not in self.ST_DELETE and
+                    path_tail == self.TRUNK_INFO_FILE):
                 txn_owner, txn_access_list = self._get_access_info(
-                                                        repos, path_head, txn)
+                    repos, path_head, txn)
                 if not txn_owner:
                     bad_changes.append(
-                            BadChange(status, path, BadChange.NO_OWNER))
-                self._verify_users(status, path, txn_owner, txn_access_list,
-                                   bad_changes)
+                        BadChange(status, path, BadChange.NO_OWNER))
+                    continue
+                if self._verify_users(
+                        status, path, txn_owner, txn_access_list, bad_changes):
+                    continue
 
             # New suite trunk: ignore the rest
             if (self.ST_ADD, path_head + "trunk/") in changes:
@@ -249,14 +253,14 @@ class RosieSvnPreCommitHook(object):
             if status == self.ST_DELETE and path_tail == self.TRUNK_INFO_FILE:
                 if (self.ST_DELETE, path_head) not in changes:
                     bad_changes.append(
-                            BadChange(status, path, BadChange.NO_INFO))
+                        BadChange(status, path, BadChange.NO_INFO))
                 continue
 
             # Can only remove trunk with suite
             if status == self.ST_DELETE and path_tail == "trunk/":
                 if (self.ST_DELETE, path_head) not in changes:
                     bad_changes.append(
-                            BadChange(status, path, BadChange.NO_TRUNK))
+                        BadChange(status, path, BadChange.NO_TRUNK))
                 continue
 
             # See whether author has permission to make changes
@@ -304,17 +308,12 @@ class RosieSvnPreCommitHook(object):
             if author not in admin_users:
                 if owner != txn_owner:
                     bad_changes.append(BadChange(status, path, BadChange.PERM,
-                                              "owner=" + txn_owner))
-                else: # access list
+                                                 "owner=" + txn_owner))
+                else:  # access list
                     bad_change = BadChange(
-                                    status, path, BadChange.PERM,
-                                    "access-list=" + " ".join(txn_access_list))
+                        status, path, BadChange.PERM,
+                        "access-list=" + " ".join(txn_access_list))
                     bad_changes.append(bad_change)
-                continue
-
-            # The owner and names in access list must be real users
-            if self._verify_users(status, path, txn_owner, txn_access_list,
-                                  bad_changes):
                 continue
 
         if bad_changes:

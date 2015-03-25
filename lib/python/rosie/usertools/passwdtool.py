@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,10 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 """User information via Unix password info."""
 
 from pwd import getpwnam
+
 
 class PasswdUserTool(object):
 
@@ -37,22 +38,27 @@ class PasswdUserTool(object):
         This assumes that it is possible to email the user IDs.
 
         """
-        return cls.verify_users(users)[0]
+        good_users = []
+        for user in users:
+            try:
+                getpwnam(user)
+            except KeyError:
+                pass
+            else:
+                good_users.append(user)
+        return good_users
 
     @classmethod
     def verify_users(cls, users):
         """Verify list of users are in the Unix password file.
 
-        Return a tuple with 2 lists (good_users, bad_users).
+        Return a list of bad users.
 
         """
-        good_users = []
         bad_users = []
         for user in users:
             try:
                 getpwnam(user)
             except KeyError:
                 bad_users.append(user)
-            else:
-                good_users.append(user)
-        return (good_users, bad_users)
+        return bad_users
