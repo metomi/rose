@@ -5,10 +5,10 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2015-Q1?)
+## 2015.03.0 (2015-03-26)
 
-Rose release 25. This release will work best with
-[cylc-6.3.1](https://github.com/cylc/cylc/releases/tag/6.3.1) or beyond.
+Rose release 25. This release works best with
+[cylc-6.3.1](https://github.com/cylc/cylc/releases/tag/6.3.1).
 
 ### Highlighted Changes
 
