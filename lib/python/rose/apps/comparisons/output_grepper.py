@@ -23,7 +23,7 @@ from rose.apps.rose_ana import DataLengthError, data_from_regexp
 import re
 
 REGEXPS = {
-  'um_wallclock' : r"Total Elapsed CPU Time:\s*(\S+)",
+  'um_wallclock' : r"Maximum Elapsed Wallclock Time:\s*(\S+)",
   'um_initial_norms' : r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
   'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)", }
 
