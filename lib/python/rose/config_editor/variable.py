@@ -35,6 +35,7 @@ import rose.config_editor.keywidget
 import rose.config_editor.menuwidget
 import rose.config_editor.valuewidget
 import rose.config_editor.valuewidget.array.row as row
+import rose.config_editor.valuewidget.source
 import rose.config_editor.util
 import rose.gtk.dialog
 import rose.gtk.util
@@ -52,7 +53,8 @@ class VariableWidget(object):
 
     """
 
-    def __init__(self, variable, var_ops, is_ghost=False, show_modes=None):
+    def __init__(self, variable, var_ops, is_ghost=False, show_modes=None,
+                 hide_keywidget_subtext=False):
         self.variable = variable
         self.key = variable.name
         self.value = variable.value
@@ -94,11 +96,9 @@ class VariableWidget(object):
 
         """
         widget = rose.config_editor.keywidget.KeyWidget(
-                             variable,
-                             self.var_ops,
-                             self.launch_help,
-                             self.update_status,
-                             show_modes)
+            variable, self.var_ops, self.launch_help, self.update_status,
+            show_modes
+        )
         widget.show()
         return widget
 
@@ -143,6 +143,11 @@ class VariableWidget(object):
     def generate_valuewidget(self, variable, override_custom=False,
                              use_this_valuewidget=None):
         """Creates the valuewidget attribute, based on value and metadata."""
+        custom_arg = None
+        if variable.metadata.get("type") == rose.config_editor.FILE_TYPE_NORMAL:
+            use_this_valuewidget = (rose.config_editor.
+                                    valuewidget.source.SourceValueWidget)
+            custom_arg = self.var_ops
         set_value = self._valuewidget_set_value
         hook_object = rose.config_editor.valuewidget.ValueWidgetHook(
                                   rose.config_editor.false_function,
@@ -152,15 +157,16 @@ class VariableWidget(object):
             self.valuewidget = use_this_valuewidget(variable.value,
                                                     metadata,
                                                     set_value,
-                                                    hook_object)
+                                                    hook_object,
+                                                    custom_arg)
         elif (rose.config_editor.META_PROP_WIDGET in self.meta and
             not override_custom):
             w_val = self.meta[rose.config_editor.META_PROP_WIDGET]
             info = w_val.split(None, 1)
             if len(info) > 1:
-                widget_path, widget_args = info
+                widget_path, custom_arg = info
             else:
-                widget_path, widget_args = info[0], None
+                widget_path, custom_arg = info[0], None
             files = self.var_ops.get_ns_metadata_files(metadata["full_ns"])
             lib = os.path.join("lib", "python", "widget")
             widget_fpath = os.path.join(lib, *widget_path.split(".")[:-1])
@@ -178,7 +184,7 @@ class VariableWidget(object):
                                           metadata,
                                           set_value,
                                           hook_object,
-                                          widget_args)
+                                          custom_arg)
             except Exception as e:
                 self.handle_bad_valuewidget(str(e), variable,
                                             set_value)
@@ -188,7 +194,7 @@ class VariableWidget(object):
                                 variable.error)
             self.valuewidget = widget_maker(variable.value,
                                             metadata, set_value,
-                                            hook_object)
+                                            hook_object, custom_arg)
         for child in self.valuewidget.get_children():
             child.connect('focus-in-event', self.handle_focus_in)
             child.connect('focus-out-event', self.handle_focus_out)

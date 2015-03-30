@@ -33,7 +33,8 @@ class ChoicesListView(gtk.TreeView):
     ordered list of included names to display.
     handle_search is a function that accepts a name and triggers a
     search for it.
-    title is displayed as the column header, if given.
+    title is a string or gtk.Widget displayed as the column header, if
+    given.
     get_custom_menu_items, if given, should be a function that
     accepts no arguments and returns a list of gtk.MenuItem-derived
     instances. The listview model and current TreeIter will be 
@@ -69,7 +70,10 @@ class ChoicesListView(gtk.TreeView):
         self.connect("row-activated", self._handle_activation)
         self.show()
         col = gtk.TreeViewColumn()
-        col.set_title(title)
+        if isinstance(title, gtk.Widget):
+            col.set_widget(title)
+        else:
+            col.set_title(title)
         cell_text = gtk.CellRendererText()
         cell_text.set_property('editable', True)
         cell_text.connect('edited', self._handle_edited)
@@ -226,7 +230,7 @@ class ChoicesTreeView(gtk.TreeView):
     available names and returns groups that supercede name.
     get_is_implicit is an optional function that accepts a name and
     returns whether the name is implicitly included in the content.
-    title is displayed as the column header, if given.
+    title is a string displayed as the column header, if given.
     get_is_included is an optional function that accepts a name and
     an optional list of included names to test whether a
     name is already included.

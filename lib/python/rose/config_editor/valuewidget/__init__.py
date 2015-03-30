@@ -87,9 +87,6 @@ def chooser(value, metadata, error):
         return array.entry.EntryArrayValueWidget
     if m_type == 'integer':
         return intspin.IntSpinButtonValueWidget
-    if m_type in [rose.config_editor.FILE_TYPE_NORMAL,
-                  rose.config_editor.FILE_TYPE_INTERNAL]:
-        return files.FileChooserValueWidget
     if m_type == 'meta':
         return meta.MetaValueWidget
     if m_type == 'str_multi':

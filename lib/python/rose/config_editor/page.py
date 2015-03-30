@@ -529,10 +529,6 @@ class ConfigPage(gtk.VBox):
                 if variable.metadata['id'] == item.var_id:
                     self.add_row(variable)
                     return
-        if isinstance(self.main_container,
-                      rose.config_editor.pagewidget.chooser.PageFormatTree):
-            # This page only contains a file section.
-            return None
         add_ui_start = """<ui> <popup name='Popup'>
                          <menu action="Add meta">"""
         add_ui_end = """</menu> </popup> </ui>"""
@@ -668,25 +664,8 @@ class ConfigPage(gtk.VBox):
             else:
                 return
         std_table = rose.config_editor.pagewidget.table.PageTable
-        file_chooser = rose.config_editor.pagewidget.chooser.PageFormatTree
         disc_table = rose.config_editor.pagewidget.table.PageLatentTable
-        ok_file_variable_names = set(
-            [rose.FILE_VAR_CHECKSUM, rose.FILE_VAR_MODE,
-             rose.FILE_VAR_SOURCE]
-        )
-        variable_names = set(
-            [v.name for v in self.panel_data + self.ghost_data])
-        if (len(self.sections) == 1 and
-                self.sections[0].name.startswith('file:') and
-                variable_names.issubset(ok_file_variable_names)):
-            # This page only contains a file section and file variables.
-            self.main_container = file_chooser(
-                                       self.panel_data,
-                                       self.ghost_data,
-                                       self.variable_ops,
-                                       self.show_modes,
-                                       self.trigger_ask_for_config_keys)
-        elif self.namespace == "/discovery":
+        if self.namespace == "/discovery":
             self.main_container = disc_table(self.panel_data,
                                              self.ghost_data,
                                              self.variable_ops,
