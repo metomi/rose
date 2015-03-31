@@ -53,6 +53,7 @@ IGNORE_MAP = {rose.config.ConfigNode.STATE_NORMAL: "enabled",
               rose.config.ConfigNode.STATE_USER_IGNORED: "user-ignored",
               rose.config.ConfigNode.STATE_SYST_IGNORED: "trig-ignored"}
 
+
 class UpgradeVersionError(NameError):
 
     """Raise this error when an incorrect upgrade version is selected."""
@@ -543,7 +544,8 @@ def main():
     return_objects = rose.macro.parse_macro_mode_args("upgrade")
     if return_objects is None:
         sys.exit(1)
-    app_config, meta_config, config_name, args, opts = return_objects
+    app_config, config_map, meta_config, config_name, args, opts = (
+        return_objects)
     if opts.conf_dir is not None:
         os.chdir(opts.conf_dir)
     verbosity = 1 + opts.verbosity - opts.quietness
@@ -587,35 +589,46 @@ def main():
         sys.exit(1)
     upgrade_manager.set_new_tag(user_choice)
     macro_config = copy.deepcopy(app_config)
-    new_config, change_list = upgrade_manager.transform(
-                               macro_config, meta_config, opts.non_interactive)
+    combined_config_map = rose.macro.combine_opt_config_map(config_map)
+    macro_function = (
+        lambda conf, meta: upgrade_manager.transform(
+            conf, meta, opts.non_interactive)
+    )
     method_id = UPGRADE_METHOD.upper()[0]
     if opts.downgrade:
         method_id = DOWNGRADE_METHOD.upper()[0]
     macro_id = rose.macro.MACRO_OUTPUT_ID.format(method_id,
                                                  upgrade_manager.get_name())
-    has_changed = rose.macro.handle_transform(app_config, new_config,
-                                              change_list, macro_id,
+    new_config_map, changes_map = rose.macro.apply_macro_to_config_map(
+        combined_config_map, meta_config, macro_function, macro_name=macro_id)
+    has_changes = rose.macro.handle_transform(config_map, new_config_map,
+                                              changes_map, macro_id,
                                               opts.conf_dir, opts.output_dir,
                                               opts.non_interactive, reporter)
+    if not has_changes:
+        return
     new_meta_config = rose.macro.load_meta_config(
-        new_config, directory=opts.conf_dir, config_type=rose.SUB_CONFIG_NAME,
+        new_config_map[None], directory=opts.conf_dir,
+        config_type=rose.SUB_CONFIG_NAME,
         ignore_meta_error=True
     )
-    if has_changed:
-        new_trig_config, change_list = (
-            rose.macros.trigger.TriggerMacro().transform(
-                new_config, new_meta_config)
-        )
-        trig_macro_id = rose.macro.MACRO_OUTPUT_ID.format(
-            rose.macro.TRANSFORM_METHOD.upper()[0],
-            MACRO_UPGRADE_TRIGGER_NAME
-        )
-        if change_list:
-            rose.macro.handle_transform(app_config, new_config,
-                                        change_list, trig_macro_id,
-                                        opts.conf_dir, opts.output_dir,
-                                        opts.non_interactive, reporter)
+    config_map = new_config_map
+    combined_config_map = rose.macro.combine_opt_config_map(config_map)
+    macro_function = (
+        lambda conf, meta:
+        rose.macros.trigger.TriggerMacro().transform(conf, meta)
+    )
+    new_config_map, changes_map = rose.macro.apply_macro_to_config_map(
+        combined_config_map, new_meta_config, macro_function, macro_name=macro_id)
+    trig_macro_id = rose.macro.MACRO_OUTPUT_ID.format(
+        rose.macro.TRANSFORM_METHOD.upper()[0],
+        MACRO_UPGRADE_TRIGGER_NAME
+    )
+    if any(changes_map.values()):
+        rose.macro.handle_transform(config_map, new_config_map,
+                                    changes_map, trig_macro_id,
+                                    opts.conf_dir, opts.output_dir,
+                                    opts.non_interactive, reporter)
 
 if __name__ == "__main__":
     rose.macro.add_site_meta_paths()

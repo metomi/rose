@@ -366,9 +366,8 @@ def main():
     macro_id = rose.macro.MACRO_OUTPUT_ID.format(
                                 rose.macro.VALIDATE_METHOD.upper()[0],
                                 "rose.metadata_check.MetadataChecker")
-    text = rose.macro.get_reports_as_text(
-                                    reports,
-                                    macro_id)
+    reports_map = {None: reports}
+    text = rose.macro.get_reports_as_text(reports_map, macro_id)
     if reports:
         reporter(text, kind=reporter.KIND_ERR, level=reporter.FAIL, prefix="")
         sys.exit(1)

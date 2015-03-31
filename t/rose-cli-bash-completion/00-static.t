@@ -258,7 +258,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
-# List option arguments for "rose app-upgrade ".
+# List arguments for "rose app-upgrade ".
 TEST_KEY=$TEST_KEY_BASE-rose-app-upgrade
 setup
 init <<'__CONFIG__'

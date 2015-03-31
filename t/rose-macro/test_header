@@ -26,6 +26,12 @@ function init() {
     cat >$TEST_DIR/config/rose-app.conf
 }
 
+function init_opt() {
+    local opt_key=$1
+    mkdir -p $TEST_DIR/config/opt/
+    cat >$TEST_DIR/config/opt/rose-app-$opt_key.conf
+}
+
 function init_meta() {
     mkdir -p $TEST_DIR/config/meta
     cat >$TEST_DIR/config/meta/rose-meta.conf

@@ -854,8 +854,9 @@ class ConfigDataManager(object):
             text = rose.config_editor.ERROR_METADATA_CHECKER_TEXT.format(
                                             len(reports), meta_dir_path)
             self._bad_meta_dir_paths.append(meta_dir_path)
+            reports_map = {None: reports}
             reports_text = rose.macro.get_reports_as_text(
-                                      reports,
+                                      reports_map,
                                       "rose.metadata_check.MetadataChecker")
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        text, title, modal=False,
