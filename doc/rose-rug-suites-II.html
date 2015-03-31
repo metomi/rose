@@ -369,15 +369,21 @@
     "roses directory vs. cylc-run directory" /></div>
 
     <div class="slide">
-      <h3 class="alwayshidden">cylc-run directories: work/share</h3>
+      <h3 class="alwayshidden">cylc-run directories: share/, share/cycle/,
+      work/</h3>
 
-      <p><samp>work/</samp>, <samp>share/</samp> sub-directories:</p>
+      <p><samp>share/</samp>, <samp>share/cycle/</samp> and <samp>work/</samp>
+      sub-directories:</p>
 
       <ul class="incremental">
         <li>Usually symbolic links to data directories.</li>
 
         <li><samp>share/</samp> is intended for any files that need to be
-        shared between tasks.</li>
+        shared between tasks during the lifetime of the suite.</li>
+
+        <li><samp>share/cycle/</samp> is intended for any files that need to be
+        shared are regularly generated, archived and removed by cycling
+        tasks.</li>
 
         <li><samp>work/</samp> contains task <q>working</q> directories, e.g.
         containing Rose application namelists and other temporary files</li>
@@ -547,10 +553,10 @@
 
       <p>You can delete your suite output in <var>~/cylc-run/SUITE_NAME/</var>
       in the normal way, or run <code>rose suite-clean SUITE_NAME</code>. The
-      latter removes the actual locations of <var>share/</var> and
-      <var>work/</var> (which may be symbolic links), as well as the
-      <var>~/cylc-run/SUITE_NAME/</var> directory structure in each job host of
-      the latest run.</p>
+      latter removes the actual locations of <var>share/</var>,
+      <var>share/cycle/</var> and <var>work/</var> (which may be symbolic
+      links), as well as the <var>~/cylc-run/SUITE_NAME/</var> directory
+      structure in each job host of the latest run.</p>
     </div>
 
     <div class="slide">

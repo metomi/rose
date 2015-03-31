@@ -19,15 +19,12 @@
 #-----------------------------------------------------------------------------
 """Suite engine processor management."""
 
-from datetime import datetime, timedelta
-from glob import glob
 from isodatetime.data import Duration
-from isodatetime.parsers import DurationParser
+from isodatetime.parsers import DurationParser, ISO8601SyntaxError
 import os
 import pwd
 import re
 from rose.date import RoseDateTimeOperator, OffsetValueError
-from rose.env import env_var_process
 from rose.fs_util import FileSystemUtil
 from rose.host_select import HostSelector
 from rose.popen import RosePopener
@@ -295,21 +292,21 @@ class TaskProps(object):
                 setattr(self, key, None)
 
     def __iter__(self):
-         for key, env_key in sorted(self.ATTRS.items()):
-             value = getattr(self, key)
-             if value is not None:
-                 if isinstance(value, dict):
-                     for k, v in value.items():
-                         yield (env_key % k, str(v))
-                 else:
-                     yield (env_key, str(value))
+        for key, env_key in sorted(self.ATTRS.items()):
+            value = getattr(self, key)
+            if value is not None:
+                if isinstance(value, dict):
+                    for k, v in value.items():
+                        yield (env_key % k, str(v))
+                else:
+                    yield (env_key, str(value))
 
     def __str__(self):
-         ret = ""
-         for name, value in self:
-             if value is not None:
-                 ret += "%s=%s\n" % (name, str(value))
-         return ret
+        ret = ""
+        for name, value in self:
+            if value is not None:
+                ret += "%s=%s\n" % (name, str(value))
+        return ret
 
 
 class SuiteEngineProcessor(object):
@@ -564,7 +561,7 @@ class SuiteEngineProcessor(object):
 
             try:
                 cycle_offset = get_cycle_offset(kwargs["cycle"])
-            except Exception:
+            except ISO8601SyntaxError:
                 t.task_cycle_time = kwargs["cycle"]
             else:
                 if t.task_cycle_time:
@@ -581,7 +578,8 @@ class SuiteEngineProcessor(object):
         t.dir_data = os.path.join(t.suite_dir, "share", "data")
         if t.task_cycle_time is not None:
             task_cycle_time = t.task_cycle_time
-            t.dir_data_cycle = os.path.join(t.dir_data, str(task_cycle_time))
+            t.dir_data_cycle = os.path.join(
+                t.suite_dir, "share", "cycle", str(task_cycle_time))
 
             # Offset cycles
             if kwargs.get("cycle_offsets"):
@@ -596,14 +594,15 @@ class SuiteEngineProcessor(object):
                         else:
                             sign_factor = -1
                         offset_val = cycle_offset.replace("__", "")
-                        cycle_time = str(int(task_cycle_time)
-                             + sign_factor * int(offset_val.replace("P", "")))
+                        cycle_time = str(
+                            int(task_cycle_time) +
+                            sign_factor * int(offset_val.replace("P", "")))
                     else:
                         cycle_offset = get_cycle_offset(v)
                         cycle_time = self._get_offset_cycle_time(
-                                task_cycle_time, cycle_offset)
+                            task_cycle_time, cycle_offset)
                     t.dir_data_cycle_offsets[str(cycle_offset)] = os.path.join(
-                            t.dir_data, cycle_time)
+                        t.suite_dir, "share", "cycle", cycle_time)
 
         # Create data directories if necessary
         # Note: should we create the offsets directories?

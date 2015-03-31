@@ -309,9 +309,12 @@ rose suite-run
     <div class="slide">
       <h3 class="alwayshidden">Run the Suite: share and work directories</h3>
 
-      <p>The <samp>share/</samp> sub-directory is used by the tasks in the
-      suite to share files. In this example suite, the build created by the
-      <var>fcm_make</var> task can be found here.</p>
+      <p>The <samp>share/</samp> sub-directory is used by the tasks in the suite
+      to share files over the lifetime of the suite. In this example suite, the
+      build created by the <var>fcm_make</var> task can be found here.</p>
+
+      <p>The <samp>share/cycle/</samp> sub-directory is to share files that are
+      regularly generated, archived and removed by cycling tasks.</p>
 
       <p>The <samp>work/</samp> sub-directory contains the working directory
       for the tasks at their run times. It can be used by the tasks to create

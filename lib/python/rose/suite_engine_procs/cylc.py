@@ -204,7 +204,7 @@ class CylcProcessor(SuiteEngineProcessor):
         Return None if named item not supported.
 
         """
-        dict_ = {"datac": "share/data/%(cycle)s", "work": "work/%(cycle)s"}
+        dict_ = {"datac": "share/cycle/%(cycle)s", "work": "work/%(cycle)s"}
         return [dict_.get(name) % {"cycle": cycle}]
 
     def get_suite_dir_rel(self, suite_name, *paths):

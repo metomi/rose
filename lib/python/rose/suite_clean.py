@@ -39,7 +39,7 @@ class SuiteRunCleaner(object):
 
     """Logic to remove items created by the previous runs of suites."""
 
-    CLEANABLE_ROOTS = ["share", "work"]
+    CLEANABLE_ROOTS = ["share", "share/cycle", "work"]
 
     def __init__(self, event_handler=None, host_selector=None,
                  suite_engine_proc=None):
@@ -90,12 +90,13 @@ class SuiteRunCleaner(object):
                 else:
                     locs.append(suite_dir_rel)
                 if item and os.path.normpath(item) in self.CLEANABLE_ROOTS:
-                    conf_key = "root-dir-" + item
+                    item_root = node.get_value(["root-dir{" + item + "}"])
+                    if item_root is None:  # backward compat
+                        item_root = node.get_value(["root-dir-" + item])
                 elif item == "":
-                    conf_key = "root-dir"
+                    item_root = node.get_value(["root-dir"])
                 else:
                     continue
-                item_root = node.get_value([conf_key])
                 if item_root:
                     loc_rel = suite_dir_rel
                     if item:

@@ -1786,13 +1786,13 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <h3>DESCRIPTION</h3>
 
-    <p>Remove items created by the previous suite runs.</p>
+    <p>Remove items created by <a href="#rose-suite-run">rose suite-run</a>.</p>
 
     <p>If no argument is specified, use the base-name of <var>$PWD</var> as the
     suite name.</p>
 
-    <p>Correctly remove the <var>share/</var> and <var>work/</var> directories
-    and suite runtime directories on remote job hosts.</p>
+    <p>Correctly remove suite runtime directories created by <code>rose
+    suite-run</code> including those on remote job hosts.</p>
 
     <h3>OPTIONS</h3>
 

@@ -54,9 +54,9 @@ run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/work/2
 run_pass "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/work/3
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-share
-run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/share/data/1
-run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/share/data/2
-run_pass "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/share/data/3
+run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/share/cycle/1
+run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/share/cycle/2
+run_pass "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/share/cycle/3
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-archive
 TEST_KEY=$TEST_KEY_BASE-share

@@ -78,7 +78,7 @@ file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ls
 run_pass "$TEST_KEY" \
-    ls $SUITE_RUN_DIR/log/job-*.tar.gz $SUITE_RUN_DIR/{log/job,share/data,work}
+    ls $SUITE_RUN_DIR/log/job-*.tar.gz $SUITE_RUN_DIR/{log/job,share/cycle,work}
 sed "s?\\\$SUITE_RUN_DIR?$SUITE_RUN_DIR?g" \
     $TEST_SOURCE_DIR/$TEST_KEY.out >expected-ls.out
 if [[ -z $JOB_HOST ]]; then
@@ -90,7 +90,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 if [[ -n $JOB_HOST ]]; then
     TEST_KEY=$TEST_KEY_BASE-host-ls
     run_pass "$TEST_KEY" ssh -oBatchMode=yes $JOB_HOST \
-        ls cylc-run/$NAME/{log/job,share/data,work}
+        ls cylc-run/$NAME/{log/job,share/cycle,work}
     sed "s/\\\$NAME/$NAME/g" \
         $TEST_SOURCE_DIR/$TEST_KEY.out >expected-host-ls.out
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-host-ls.out

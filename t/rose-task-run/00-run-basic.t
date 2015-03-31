@@ -65,10 +65,10 @@ for CYCLE in 2013010100 2013010112 2013010200; do
         "ROSE_TASK_LOG_ROOT=${FILE%/job.txt}/job" $FILE
     file_grep "$TEST_KEY-ROSE_DATA" "ROSE_DATA=$SUITE_RUN_DIR/share/data" $FILE
     file_grep "$TEST_KEY-ROSE_DATAC" \
-        "ROSE_DATAC=$SUITE_RUN_DIR/share/data/$CYCLE" $FILE
+        "ROSE_DATAC=$SUITE_RUN_DIR/share/cycle/$CYCLE" $FILE
     if [[ -n $PREV_CYCLE ]]; then
         file_grep "$TEST_KEY-ROSE_DATACT12H" \
-            "ROSE_DATACT12H=$SUITE_RUN_DIR/share/data/$PREV_CYCLE" $FILE
+            "ROSE_DATACT12H=$SUITE_RUN_DIR/share/cycle/$PREV_CYCLE" $FILE
     fi
     file_grep "$TEST_KEY-ROSE_ETC" "ROSE_ETC=$SUITE_RUN_DIR/etc" $FILE
     file_grep "$TEST_KEY-ROSE_TASK_PREFIX" "ROSE_TASK_PREFIX=my" $FILE

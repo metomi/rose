@@ -1,7 +1,7 @@
 cylc-run/$NAME/log/job:
 2013010300
 
-cylc-run/$NAME/share/data:
+cylc-run/$NAME/share/cycle:
 2013010200
 2013010212
 2013010300

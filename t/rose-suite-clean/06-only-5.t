@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-clean", --only= mode and a remote host root-dir-* setting.
+# Test "rose suite-clean", --only= mode and a remote host root-dir{*} setting.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
@@ -44,7 +44,7 @@ export ROSE_CONF_PATH=$PWD/conf
 mkdir 'conf'
 cat >'conf/rose.conf' <<__CONF__
 [rose-suite-run]
-root-dir-work=$JOB_HOST=$JOB_HOST_WORK
+root-dir{work}=$JOB_HOST=$JOB_HOST_WORK
 __CONF__
 JOB_HOST_WORK=$(ssh -oBatchMode=yes "$JOB_HOST" \
     "bash -l -c \"echo \\$JOB_HOST_WORK\"" | tail -1)

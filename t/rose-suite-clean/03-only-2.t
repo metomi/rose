@@ -55,31 +55,31 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_suite
 TEST_KEY="$TEST_KEY_BASE-share-tens"
 run_pass "$TEST_KEY" \
-    rose suite-clean -y -n "$NAME" --only=share/data/20?00101T0000Z
+    rose suite-clean -y -n "$NAME" --only=share/cycle/20?00101T0000Z
 sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 LANG=C sort "$TEST_KEY.out" >"$TEST_KEY.sorted.out"
 if [[ -n "$JOB_HOST" ]]; then
     # We do not know the relative sort order of $SUITE_RUN_DIR and $JOB_HOST.
     LANG=C sort >"$TEST_KEY.expected.out" <<__OUT__
-[INFO] delete: $SUITE_RUN_DIR/share/data/20000101T0000Z/
-[INFO] delete: $SUITE_RUN_DIR/share/data/20100101T0000Z/
-[INFO] delete: $SUITE_RUN_DIR/share/data/20200101T0000Z/
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/data/20000101T0000Z
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/data/20100101T0000Z
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/data/20200101T0000Z
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20000101T0000Z/
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20100101T0000Z/
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20200101T0000Z/
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20000101T0000Z
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20100101T0000Z
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20200101T0000Z
 __OUT__
 else
     cat >"$TEST_KEY.expected.out" <<__OUT__
-[INFO] delete: $SUITE_RUN_DIR/share/data/20000101T0000Z/
-[INFO] delete: $SUITE_RUN_DIR/share/data/20100101T0000Z/
-[INFO] delete: $SUITE_RUN_DIR/share/data/20200101T0000Z/
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20000101T0000Z/
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20100101T0000Z/
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20200101T0000Z/
 __OUT__
 fi
 file_cmp "$TEST_KEY.sorted.out" "$TEST_KEY.sorted.out" "$TEST_KEY.expected.out"
 TEST_KEY="$TEST_KEY_BASE-multiples"
 run_pass "$TEST_KEY" \
     rose suite-clean -y -n "$NAME" \
-    --only=share/data/*/hello-world.out \
+    --only=share/cycle/*/hello-world.out \
     --only=etc/*/greet-earth.out
 sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 if [[ -n "$JOB_HOST" ]]; then
@@ -89,15 +89,15 @@ if [[ -n "$JOB_HOST" ]]; then
 [INFO] delete: $SUITE_RUN_DIR/etc/20100101T0000Z/greet-earth.out
 [INFO] delete: $SUITE_RUN_DIR/etc/20150101T0000Z/greet-earth.out
 [INFO] delete: $SUITE_RUN_DIR/etc/20200101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/share/data/20050101T0000Z/hello-world.out
-[INFO] delete: $SUITE_RUN_DIR/share/data/20150101T0000Z/hello-world.out
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20050101T0000Z/hello-world.out
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20150101T0000Z/hello-world.out
 [INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20000101T0000Z/greet-earth.out
 [INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20050101T0000Z/greet-earth.out
 [INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20100101T0000Z/greet-earth.out
 [INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20150101T0000Z/greet-earth.out
 [INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20200101T0000Z/greet-earth.out
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/data/20050101T0000Z/hello-world.out
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/data/20150101T0000Z/hello-world.out
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20050101T0000Z/hello-world.out
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20150101T0000Z/hello-world.out
 __OUT__
 else
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
@@ -106,8 +106,8 @@ else
 [INFO] delete: $SUITE_RUN_DIR/etc/20100101T0000Z/greet-earth.out
 [INFO] delete: $SUITE_RUN_DIR/etc/20150101T0000Z/greet-earth.out
 [INFO] delete: $SUITE_RUN_DIR/etc/20200101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/share/data/20050101T0000Z/hello-world.out
-[INFO] delete: $SUITE_RUN_DIR/share/data/20150101T0000Z/hello-world.out
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20050101T0000Z/hello-world.out
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20150101T0000Z/hello-world.out
 __OUT__
 fi
 #-------------------------------------------------------------------------------

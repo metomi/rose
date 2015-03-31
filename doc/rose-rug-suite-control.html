@@ -106,9 +106,9 @@
 
     <ul>
       <li>The runtime directory structure of the suite, including the
-      <var>log/</var>, the <var>share/</var> and the <var>work/</var>
-      directories. (See also <a href="#rose-suite-run.log">Log
-      Rotation</a> and <a href="#rose-suite-run.root">Configuring the Install Root
+      <var>log/</var>, the <var>share/</var>, and the <var>work/</var>
+      directories. (See also <a href="#rose-suite-run.log">Log Rotation</a> and
+      <a href="#rose-suite-run.root">Configuring the Install Root
       Locations</a>.)</li>
 
       <li>Everything in the suite configuration directory, except hidden files
@@ -321,9 +321,11 @@ root-dir=hpc*=$WORKDIR
     create <var>~/cylc-run/$NAME</var> as a symbolic link to
     <var>$WORKDIR/cylc-run/$NAME/</var>.</p>
 
-    <p>In addition to the main suite directory, the <var>share/</var> and
-    <var>work/</var> sub-directories can also be configured using the settings
-    <var>root-dir-share</var> and <var>root-dir-work</var> respectively.</p>
+    <p>In addition to the main suite directory, the <var>share/</var>,
+    <var>share/cycle/</var> and <var>work/</var> sub-directories can also be
+    configured using the settings <var>root-dir{share}</var>,
+    <var>root-dir{share/cycle}</var>, and <var>root-dir{work}</var>
+    respectively.</p>
 
     <h2 id="rose-bush">Rose Bush</h2>
 

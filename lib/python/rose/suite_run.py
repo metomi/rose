@@ -96,7 +96,9 @@ class SuiteRunner(Runner):
                "restart_mode", "run_mode", "strict_mode"]
 
     REC_DONT_SYNC = re.compile(
-            r"\A(?:\..*|cylc-suite\.db.*|log(?:\..*)*|state|share|work)\Z")
+        r"\A" +
+        r"(?:\..*|cylc-suite\.db.*|log(?:\..*)*|state|share(?:cycle)?|work)" +
+        r"\Z")
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
@@ -251,9 +253,9 @@ class SuiteRunner(Runner):
         self.suite_engine_proc.job_logs_db_create(suite_name, close=True)
 
         # Install share/work directories (local)
-        for name in ["share", "work"]:
-            self._run_init_dir_work(opts, suite_name, name, conf_tree,
-                                    locs_conf=locs_conf)
+        for name in ["share", "share/cycle", "work"]:
+            self._run_init_dir_work(
+                opts, suite_name, name, conf_tree, locs_conf=locs_conf)
 
         # Process Environment Variables
         environ = self.config_pm(conf_tree, "env")
@@ -297,7 +299,7 @@ class SuiteRunner(Runner):
             return
 
         # Install suite files to each remote [user@]host
-        for name in ["", "log/", "share/", "work/"]:
+        for name in ["", "log/", "share/", "share/cycle/", "work/"]:
             uuid_file = os.path.abspath(name + uuid)
             open(uuid_file, "w").close()
             work_files.append(uuid_file)
@@ -332,7 +334,11 @@ class SuiteRunner(Runner):
             if not opts.log_archive_mode:
                 rose_sr += " --no-log-archive"
             rose_sr += " --run=" + opts.run_mode
-            host_confs = ["root-dir", "root-dir-share", "root-dir-work"]
+            host_confs = [
+                "root-dir",
+                "root-dir{share}",
+                "root-dir{share/cycle}",
+                "root-dir{work}"]
             rose_sr += " --remote=uuid=" + uuid
             locs_conf.set([auth])
             for key in host_confs:
@@ -366,7 +372,7 @@ class SuiteRunner(Runner):
                     break
             else:
                 filters = {"excludes": [], "includes": []}
-                for name in ["", "log/", "share/", "work/"]:
+                for name in ["", "log/", "share/", "share/cycle/", "work/"]:
                     filters["excludes"].append(name + uuid)
                 target = auth + ":" + suite_dir_rel
                 cmd = self._get_cmd_rsync(target, **filters)
@@ -537,14 +543,20 @@ class SuiteRunner(Runner):
         """Create a named suite's directory."""
         item_path = os.path.realpath(name)
         item_path_source = item_path
-        key = "root-dir-" + name
+        key = "root-dir{" + name + "}"
         item_root = self._run_conf(key, conf_tree=conf_tree, r_opts=r_opts)
-        if item_root is not None:
+        if item_root is None:  # backward compat
+            item_root = self._run_conf(
+                "root-dir-" + name, conf_tree=conf_tree, r_opts=r_opts)
+        if item_root:
             if locs_conf is not None:
                 locs_conf.set(["localhost", key], item_root)
             item_root = env_var_process(item_root)
             suite_dir_rel = self._suite_dir_rel(suite_name)
-            item_path_source = os.path.join(item_root, suite_dir_rel, name)
+            if os.path.isabs(item_root):
+                item_path_source = os.path.join(item_root, suite_dir_rel, name)
+            else:
+                item_path_source = item_root
             item_path_source = os.path.realpath(item_path_source)
         if item_path == item_path_source:
             if opts.new_mode:
@@ -554,7 +566,19 @@ class SuiteRunner(Runner):
             if opts.new_mode:
                 self.fs_util.delete(item_path_source)
             self.fs_util.makedirs(item_path_source)
-            self.fs_util.symlink(item_path_source, name, opts.no_overwrite_mode)
+            if os.sep in name:
+                dirname_of_name = os.path.dirname(name)
+                self.fs_util.makedirs(dirname_of_name)
+                item_path_source_rel = os.path.relpath(
+                    item_path_source, os.path.realpath(dirname_of_name))
+            else:
+                item_path_source_rel = os.path.relpath(item_path_source)
+            if len(item_path_source_rel) < len(item_path_source):
+                self.fs_util.symlink(
+                    item_path_source_rel, name, opts.no_overwrite_mode)
+            else:
+                self.fs_util.symlink(
+                    item_path_source, name, opts.no_overwrite_mode)
 
     def _run_remote(self, opts, suite_name):
         """rose suite-run --remote=KEY=VALUE,..."""
@@ -571,7 +595,7 @@ class SuiteRunner(Runner):
         if opts.run_mode == "run":
             self._run_init_dir(opts, suite_name, r_opts=r_opts)
         os.chdir(suite_dir_rel)
-        for name in ["share", "work"]:
+        for name in ["share", "share/cycle", "work"]:
             uuid_file = os.path.join(name, r_opts["uuid"])
             if os.path.exists(uuid_file):
                 self.handle_event(name + "/" + r_opts["uuid"] + "\n", level=0)

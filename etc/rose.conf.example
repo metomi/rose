@@ -225,12 +225,16 @@
 #          =*=$HOME
 ## Root location of a suite run's "share/" directory (default=$HOME)
 ## Syntax is the same as "root-dir".
-#  root-dir-share=HOST-GLOB=$HOST-DIR
-#                =...
+#  root-dir{share}=HOST-GLOB=$HOST-DIR
+#                 =...
+## Root location of a suite run's "share/cycle/" directory (default=$HOME)
+## Syntax is the same as "root-dir".
+#  root-dir{share/cycle}=HOST-GLOB=$HOST-DIR
+#                       =...
 ## Root location of a suite run's "work/" directory (default=$HOME)
 ## Syntax is the same as "root-dir".
-#  root-dir-work=HOST-GLOB=$HOST-DIR
-#               =...
+#  root-dir{work}=HOST-GLOB=$HOST-DIR
+#                =...
 [rose-suite-run]
 
 # Configuration related to "rose task-run".
