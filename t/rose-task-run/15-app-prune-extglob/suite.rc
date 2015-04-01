@@ -10,8 +10,7 @@
     [[dependencies]]
         [[[P1D]]]
             graph="""
-creator
-creator[-P1D] => pruner
+creator[-P1D] => pruner => creator
 """
 
 [runtime]
