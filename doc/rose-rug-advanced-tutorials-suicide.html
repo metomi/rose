@@ -260,6 +260,343 @@
         <li>triggering off a cleanup task in the suite</li>
       </ul>
     </div>
+
+    <div class="slide">
+          <h2 id="advanced-example">Advanced suicide triggers example</h2>
+
+    <div class="slide">
+        <h3 id="example-task2">Advanced Example 1</h3>
+
+      <p>The first example checks the failure of an unreliable task, if it 
+      meets the criteria in the checking task then it tries a recovery task.
+      If the recovery task succeeds then the suite carries on, else if it fails 
+      then the suite stops as it cannot be recovered.</p>
+
+      <p>Possible Outcomes:</p>
+      <p>If <samp>flaky_activity</samp> fails then run <samp>check</samp>, the
+      <samp>check</samp> checks to see if the suite is recoverable, if it is
+      then <samp>recovery</samp> succeeds and the suite can continue. 
+      If it is not recoverable, i.e., <samp>check</samp> fails then don't run 
+      housekeep as the suite cannnot carry on and needs human interaction to 
+      fix.</p>
+
+      <p>If <samp>flaky_activity</samp> succeeds the suite carries on as 
+      normal, i.e., going straight to <samp>housekeep</samp> and not running 
+      either of the <samp>check</samp> or <samp>recovery</samp> tasks.</p>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory somewhere - e.g. in your homespace) containing a
+      <samp>suite.rc</samp> file that looks like this:</p>
+    </div>
+
+    <div class="slide">
+          <h3 class="alwayshidden">Advanced example 1 suite.rc</h3>
+<pre class="prettyprint lang-cylc">
+# Check the failure of `flaky_activity` and if it meets the criteria in the 
+# `check` task then try a recovery task, `recovery`. If `recovery` succeeds 
+# then the suite carrys on else if it fails then the suite stops as it cannot 
+# be recovered.
+
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = rose suite-hook --mail --shutdown
+        timeout = P3D
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            start_install  =&gt flaky_activity 
+
+            flaky_activity =&gt !check
+            flaky_activity | recovery   =&gt housekeep
+            flaky_activity:fail         =&gt check =&gt recovery
+
+            check:fail | flaky_activity =&gt !recovery
+            check:fail    =&gt !housekeep
+        """
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+             succeeded handler          = rose suite-hook
+             failed handler             = rose suite-hook --mail
+             submission failed handler  = rose suite-hook --mail
+             submission timeout handler = rose suite-hook --mail
+             execution timeout handler  = rose suite-hook --mail
+             execution timeout          = PT3M
+             submission timeout         = PT24M
+
+    [[check]]
+        command scripting = """
+            sleep 10;
+            echo ${CYLC_SUITE_LOG_DIR%suite}job/$CYLC_TASK_CYCLE_POINT/flaky_activity/NN/job.out
+            grep -F 'Fail, but I can recover, try recovery.' ${CYLC_SUITE_LOG_DIR%suite}job/$CYLC_TASK_CYCLE_POINT/flaky_activity/NN/job.out
+            if echo $? ; then
+                echo 'This may recover'; true;
+            fi
+        """
+
+    [[flaky_activity]]
+        command scripting = """ 
+            sleep 10;
+            if (($RANDOM % 2)); then
+                echo 'Success'; true;
+            else
+                if (($RANDOM % 2)); then
+                    echo 'Fail, but I can recover, try recovery.'; false;
+                else
+                    echo 'Fail, I will never figure this out!'; false;
+                fi
+            fi
+        """
+
+    [[housekeep]]
+        command scripting = """ sleep 10;
+            echo 'finishing, I always run as expected, usually a housekeeping task.'
+        """
+
+    [[recovery]]
+        command scripting = """
+            sleep 10;
+            if (($RANDOM % 2)); then
+                echo 'Success, I could be helped by the recovery task'; true;
+            else
+                echo 'Fail, I could not be helped by the recovery task'; false;
+            fi
+       """
+
+    [[start_install]]
+        command scripting = """ sleep 10;
+            echo 'starting up, I always run as expected, usually an install task.'
+       """
+</pre>
+    </div>
+
+    <div class="slide">
+            <h3 id="example-task3">Advanced Example 2</h3>
+
+      <p>In this example if a member of a specific family fails carry on.
+      If then an important task to that cycle fails go to the end of that
+      cycle and remove the failed task from the task pool.</p>
+
+      <p>Possible Outcomes:</p>
+      <p>If <samp>sometimes_fail</samp> fails then go to the 
+      <samp>housekeep</samp> task.</p>
+      <p>If  <samp>sometimes_fail</samp> succeeds and <samp>FAMILY_PASS</samp>
+      all succeed and <samp>SOME_DO_SOME_DONT</samp> all finish no matter if 
+      they succeed or fail then then go to the <samp>housekeep</samp> task.</p>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory somewhere - e.g. in your homespace) containing a
+      <samp>suite.rc</samp> file that looks like this:</p>
+    </div>
+
+    <div class="slide">
+        <h3 class="alwayshidden">Advanced example 2 suite-.rc</h3>
+<pre class="prettyprint lang-cylc">
+# If a member of family `SOME_DO_SOME_DONT` fails then carry on regardless.
+# If then the `sometimes_fail` task fails go to the end of that cycle and 
+# remove the failed task from the task pool.
+
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = rose suite-hook --mail --shutdown
+        timeout = P3D
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            start_install                =&gt sometimes_fail =&gt FAMILY_PASS
+            FAMILY_PASS:succeed-all      =&gt SOME_DO_SOME_DONT
+            SOME_DO_SOME_DONT:finish-all =&gt dependent_on_families
+            sometimes_fail:fail          =&gt !sometimes_fail &amp\
+            !FAMILY_PASS &amp !SOME_DO_SOME_DONT &amp !dependent_on_families
+            dependent_on_families | sometimes_fail:fail =&gt housekeep
+        """
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+             succeeded handler          = rose suite-hook
+             failed handler             = rose suite-hook --mail
+             submission failed handler  = rose suite-hook --mail
+             submission timeout handler = rose suite-hook --mail
+             execution timeout handler  = rose suite-hook --mail
+             execution timeout          = PT3M
+             submission timeout         = PT24M
+
+    [[FAMILY_PASS]]
+        command scripting = sleep 10;
+
+    [[SOME_DO_SOME_DONT]]
+        command scripting = sleep 5;
+
+    [[bar]]
+        inherit = FAMILY_PASS
+        command scripting = echo 'bar always succeeds'
+
+    [[dependent_on_families]]
+       command scripting = """
+           sleep 10;
+           echo 'I can only run if all FAMILY_PASS succeed and 
+                 SOME_DO_SOME_DONT finish'
+           """
+
+    [[foo]]
+        inherit = FAMILY_PASS
+        command scripting = echo 'foo always succeeds'
+                           
+    [[flaky_member]]
+        inherit = SOME_DO_SOME_DONT
+        command scripting = """
+            echo 'flaky member is going to:'
+            sleep 10;
+            if (($RANDOM % 2)); then
+                echo 'Success'; true; 
+            else
+                echo 'Fail'; false;
+            fi
+        """
+
+    [[housekeep]]
+        command scripting = """ sleep 10;
+            echo 'finishing, I always run as expected, usually a housekeeping task.'
+        """
+
+    [[sometimes_fail]]
+       command scripting = """
+           sleep 10;
+           if (($RANDOM % 2)); then
+               echo 'Success'; true;
+           else
+               echo 'Fail'; false;
+           fi
+       """
+
+    [[start_install]]
+        command scripting = """ sleep 10;
+            echo 'starting up, I always run as expected, usually an install task.'
+        """
+
+    [[stable_member]]
+        inherit = SOME_DO_SOME_DONT
+        command scripting = echo 'stable member always succeeds'
+</pre>
+    </div>
+
+    <div class="slide">
+        <h3 id="example-task4">Advanced Example 3</h3>
+
+      <p>For the third example if a specified task fails go to the end of the 
+      cycle. 
+      If the next task fails go to the second from last task and then to the
+      end of that cycle.</p>
+
+      <p>Possible Outcomes:</p>
+      <p>If <samp>check_files_exist</samp> fails then go to the 
+      <samp>housekeep</samp> task.</p>
+      <p>If <samp>check_files_exist</samp> succeeds but 
+      <samp>generate_plots</samp> fails go to <samp>move_data</samp> then go 
+      to the<samp>housekeep</samp>.</p>
+      <p>If <samp>check_files_exist</samp> succeeds go to 
+      <samp>generate_plots</samp> if that succeeds go to 
+      <samp>raise_alert</samp> if that succeeds go to <samp>move_data</samp> 
+      then go to the<samp>housekeep</samp> task.</p>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory somewhere - e.g. in your homespace) containing a
+      <samp>suite.rc</samp> file that looks like this:</p>
+    </div>
+
+    <div class="slide">
+        <h3 class="alwayshidden">Advanced example 3 suite.rc</h3>
+<pre class="prettyprint lang-cylc">
+# If the `check_files_exist` task fails go to the end of the cycle and only do
+# the `housekeep` task, or if `generate_plots` task fails go to the second 
+# from last task, `raise_alert` and then to the end of that cycle and do the 
+# `housekeep` task.
+
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = rose suite-hook --mail --shutdown
+        timeout = P3D
+
+[scheduling]
+    [[dependencies]]
+         graph = """
+             start_install          =&gt check_files_exist
+             check_files_exist      =&gt generate_plots
+             check_files_exist:fail =&gt !generate_plots &amp !move_data
+             check_files_exist:fail | move_data =&gt housekeep
+
+             generate_plots:fail | check_files_exist:fail =&gt !raise_alert
+             generate_plots:fail | raise_alert =&gt move_data
+             generate_plots         =&gt raise_alert
+         """
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+             succeeded handler          = rose suite-hook
+             failed handler             = rose suite-hook --mail
+             submission failed handler  = rose suite-hook --mail
+             submission timeout handler = rose suite-hook --mail
+             execution timeout handler  = rose suite-hook --mail
+             execution timeout          = PT3M
+             submission timeout         = PT24M
+
+    [[check_files_exist]]
+        command scripting = """
+            echo 'Do the files exist?'
+            sleep 10;
+            if (($RANDOM % 2)); then
+                echo 'Yes, then success'; true; 
+            else
+                echo 'No, then fail'; false;
+            fi
+        """
+
+    [[generate_plots]]
+        command scripting = """
+            echo 'You could run a script to plot data, but did they finish?'
+            sleep 10;
+            if (($RANDOM % 2)); then
+                echo 'Yes, then success'; true; 
+            else
+                echo 'No, then fail'; false;
+            fi
+        """
+
+    [[housekeep]]
+        command scripting = """ sleep 10;
+            echo 'finishing, I always run as expected, usually a housekeeping task.'
+        """
+
+    [[move_data]]
+        command scripting = """
+            sleep 10;
+            echo 'You could run a script to move data'
+        """
+
+    [[raise_alert]]
+        command scripting = """
+            sleep 10;
+            echo 'You need to raise an alert: ALERT!'
+        """
+
+    [[start_install]]
+        command scripting = """ sleep 10;
+            echo 'starting up, I always run as expected, usually an install task.'
+        """
+</pre>
+    </div>
+
+
+
+   </div>
   </div>
 </body>
 </html>

@@ -357,6 +357,31 @@ root-dir=hpc*=$WORKDIR
       access to their <var>$HOME/cylc-run/</var> directory.</li>
     </ul>
 
+    <p>Remember Rose Bush is not a monitoring tool, <code>cylc gsummary</code> 
+    and <code>cylc gpanel</code> are designed for this and provide interactive 
+    tools to monitor and interrogate your suites. 
+    Rose Bush has been designed to view any suite provided it has access to the 
+    <var>$HOME/cylc-run/</var> directory of a user.
+    It also provides an aesthetically pleasing and user friendly web view of 
+    the suites files including: <var>rose files</var> for example 
+    <var>log/rose-suite-run.conf/log/version</var> and 
+    <var>cylc files</var>, <var>.log</var>, <var>.err</var>, <var>.out</var> 
+    and <var>.stats</var> of tasks, etc.
+    It allows you to filter the <var>Display Options</var> using the tool 
+    provided in a drop down section for example by <var>Task names globs</var>, 
+    <var>Cycle globs</var>, etc or by <var>cycles list</var> or 
+    <var>jobs list</var>.</p>
+
+    <p>To invoke Rose Bush, the suite log viewer using the command line, in the
+    suite directory: E.g.:</p>
+    <pre class="shell">
+rose suite-log
+</pre>
+<p>or</p>
+    <pre class="shell">
+rose slv
+</pre>
+
     <h2 id="rose-suite-hook">rose suite-hook</h2>
 
     <p>This command provide a common way to handle the suite and task events of
