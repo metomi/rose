@@ -22,11 +22,17 @@
 import re
 from rose.apps.rose_ana import DataLengthError
 
-OUTPUT_STRING = "%s %s%% %s %s: File %s c.f. %s (%s values)"
-OUTPUT_STRING_WITH_POSN = "%s %s%% %s %s: File %s c.f. %s (value %s of %s)"
-OUTPUT_STRING_WITH_VALS = "%s %s%% %s %s: File %s (%s) c.f. %s (%s)"
+OUTPUT_STRING = "%(extract)s %(percent)s%% %(sign)s %(tolerance)s: " + \
+                "File %(file1)s c.f. %(file2)s (%(numvals)s values)"
+OUTPUT_STRING_WITH_POSN = "%(extract)s %(percent)s%% %(sign)s " + \
+                          "%(tolerance)s: File %(file1)s c.f. " + \
+                          "%(file2)s (value %(valnum)s of %(numvals)s)"
+OUTPUT_STRING_WITH_VALS = "%(extract)s %(percent)s%% %(sign)s " + \
+                          "%(tolerance)s: File %(file1)s " + \
+                          "(%(val1)s) c.f. %(file2)s (%(val2)s)"
 PASS = "<="
 FAIL = ">"
+
 
 class Within(object):
     def run(self, task):
@@ -41,8 +47,7 @@ class Within(object):
             val2 = float(val2)
             lwr = 0
             upr = 0
-            result = re.search(r"%",task.tolerance) # Percentage or absolute
-                                                    # difference?
+            result = re.search(r"%", task.tolerance)  # Percentage or absolute
             if result:
                 tol = float(re.sub(r"%", r"", task.tolerance))
                 lwr = val2 * (1.0 - 0.01 * tol)
@@ -50,7 +55,7 @@ class Within(object):
             else:
                 lwr = val2 - float(task.tolerance)
                 upr = val2 + float(task.tolerance)
-            if  not lwr <= val1 <= upr:
+            if not lwr <= val1 <= upr:
                 task.set_failure(WithinComparisonFailure(task, val1, val2,
                                                          val_num))
                 return task
@@ -72,25 +77,33 @@ class WithinComparisonFailure(object):
             self.extract = self.extract + ":" + task.subextract
         self.tolerance = task.tolerance
         try:
-          self.val1 = float(val1)
-          self.val2 = float(val2)
-          self.percentage = abs((self.val1 - self.val2) / self.val2 * 100.0)
+            self.val1 = float(val1)
+            self.val2 = float(val2)
+            self.percentage = abs((self.val1 - self.val2) / self.val2 * 100.0)
         except ValueError:
-          self.val1 = val1
-          self.val2 = val2
-          self.percentage = "XX"
+            self.val1 = 'Unknown'
+            self.val2 = 'Unknown'
+            self.percentage = "XX"
 
     def __repr__(self):
         if self.numvals == 1:
-            return OUTPUT_STRING_WITH_VALS % ( self.extract, self.percentage, 
-                                               FAIL, self.tolerance, 
-                                               self.resultfile, self.val1,
-                                               self.kgo1file,  self.val2 )
+            return OUTPUT_STRING_WITH_VALS % {'extract': self.extract,
+                                              'percent': self.percentage,
+                                              'sign': FAIL,
+                                              'tolerance': self.tolerance,
+                                              'file1': self.resultfile,
+                                              'val1': self.val1,
+                                              'file2': self.kgo1file,
+                                              'val2': self.val2}
         else:
-            return OUTPUT_STRING_WITH_POSN % ( self.extract, self.percentage, 
-                                               FAIL, self.tolerance, 
-                                               self.resultfile, self.kgo1file,  
-                                               self.valnum, self.numvals )
+            return OUTPUT_STRING_WITH_POSN % {'extract': self.extract,
+                                              'percent': self.percentage,
+                                              'sign': FAIL,
+                                              'tolerance': self.tolerance,
+                                              'file1': self.resultfile,
+                                              'file2': self.kgo1file,
+                                              'valnum': self.valnum,
+                                              'numvals': self.numvals}
 
     __str__ = __repr__
 
@@ -109,9 +122,12 @@ class WithinComparisonSuccess(object):
         self.tolerance = task.tolerance
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, "all", PASS, self.tolerance,
-                                 self.resultfile, self.kgo1file,
-                                 self.numvals )
+        return OUTPUT_STRING % {'extract': self.extract,
+                                'percent': 'all',
+                                'sign': PASS,
+                                'tolerance': self.tolerance,
+                                'file1': self.resultfile,
+                                'file2': self.kgo1file,
+                                'numvals': self.numvals}
 
     __str__ = __repr__
-
