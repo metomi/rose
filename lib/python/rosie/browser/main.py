@@ -207,7 +207,7 @@ class MainWindow(gtk.Window):
             items = {}
 
             #set the all revisions to the setting specified *by the url*
-            self.history_menuitem.set_active("all_revs=" in address_url)
+            self.history_menuitem.set_active("all_revs=1" in address_url)
 
             try:
                 items.update({"url": address_url})
@@ -787,7 +787,7 @@ class MainWindow(gtk.Window):
             self.statusbar.set_progressbar_pulsing(True)
             items = {}
             if self.search_history:
-                items.update({"all_revs": ""})
+                items.update({"all_revs": 1})
             try:
                 results, url = self._ws_client_lookup(
                     self.ws_client.query, [filters], items)
@@ -874,7 +874,7 @@ class MainWindow(gtk.Window):
         self.statusbar.set_progressbar_pulsing(True)
         items = {}
         if self.search_history:
-            items.update({"all_revs": ""})
+            items.update({"all_revs": 1})
         try:
             results, url = self._ws_client_lookup(
                 self.ws_client.search, [search_text], items)
