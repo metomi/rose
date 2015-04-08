@@ -1,0 +1,22 @@
+#!jinja2
+[cylc]
+UTC mode=True
+    [[event hooks]]
+        timeout handler=rose suite-hook --shutdown
+        timeout=5
+
+[scheduling]
+    [[dependencies]]
+        graph="""
+          rose_ana_t1 # basic
+        """
+
+[runtime]
+    [[root]]
+        command scripting=rose task-run -v -v --debug
+        [[[event hooks]]]
+            succeeded handler=rose suite-hook
+            failed handler=rose suite-hook --shutdown
+            submission failed handler=rose suite-hook --shutdown
+
+    [[rose_ana_t1]]
