@@ -126,7 +126,7 @@ class RosieSvnPostCommitHook(object):
         self.usertools_manager = SchemeHandlersManager(
             [path], "rosie.usertools", ["get_emails"])
 
-    def run(self, repos, revision):
+    def run(self, repos, revision, no_notification=False):
         """Update database with changes in a changeset."""
         # Lookup prefix of repos
         # Do nothing if prefix is not registered
@@ -166,7 +166,7 @@ class RosieSvnPostCommitHook(object):
             self._update_info_db(dao, changeset_attribs, branch_attribs)
             # Notification on trunk changes
             # Notification on owner and access-list changes
-            if branch_attribs["branch"] == "trunk":
+            if not no_notification and branch_attribs["branch"] == "trunk":
                 self._notify_trunk_changes(
                     changeset_attribs, branch_attribs)
 
