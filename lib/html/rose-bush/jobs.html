@@ -91,7 +91,8 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-0"
 href="#filter"><i class="icon-wrench"></i> Display Options</a>
 </div>
-<div id="filter" class="accordion-body collapse in">
+<div id="filter"
+class="accordion-body collapse{% if not is_option_on %} in{% endif %}">
 <div class="accordion-inner">
 <form action="{{script}}/jobs">
 <input type="hidden" name="user" value="{{user}}" />
@@ -151,7 +152,7 @@ value="{{status}}" />
 No {{status}}?</label>
 {% endfor -%}
 </div>
-<div class="span5">
+<div class="span4">
 <select name="order" title="Sort order">
 {% for k, v in [("time_desc", "new-&gt;old"),
                 ("time_asc", "old-&gt;new"),
@@ -171,8 +172,11 @@ value="{{k}}">{{v}}</option>
 {% endfor -%}
 </select>
 </div>
-<div class="span1">
+<div class="span2 btn-toolbar">
+<div class="btn-group pull-right">
+<input type="reset" class="btn" value="reset" />
 <input type="submit" class="btn btn-primary" value="update" />
+</div>
 </div>
 </div>
 </fieldset>

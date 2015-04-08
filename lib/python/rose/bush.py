@@ -169,6 +169,13 @@ class Root(object):
             ["rose-bush", "jobs-per-page"], self.JOBS_PER_PAGE))
         per_page_max = int(conf.get_value(
             ["rose-bush", "jobs-per-page-max"], self.JOBS_PER_PAGE_MAX))
+        is_option_on = (
+            cycles or
+            tasks or
+            no_status is not None or
+            order is not None and order != "time_desc" or
+            per_page and per_page != per_page_default
+        )
         if not isinstance(per_page, int):
             if per_page:
                 per_page = int(per_page)
@@ -186,6 +193,7 @@ class Root(object):
             "user": user,
             "suite": suite,
             "cycles": cycles,
+            "is_option_on": is_option_on,
             "tasks": tasks,
             "no_statuses": no_statuses,
             "order": order,
