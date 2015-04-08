@@ -26,6 +26,7 @@ below:
 * Andrew Clark (Met Office, UK)
 * Kerry Day (Met Office, UK)
 * Ben Fitzpatrick (Met Office, UK)
+* Craig MacLachlan (Met Office, UK)
 * Joseph Mancell (Met Office, UK)
 * Dave Matthews (Met Office, UK)
 * Hilary Oliver (National Institute of Water and Atmospheric Research, New Zealand)
