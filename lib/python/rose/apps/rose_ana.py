@@ -281,6 +281,12 @@ class Analyse(object):
             newtask = AnalysisTask()
             newtask.name = task
             value = self.config.get_value([task, "resultfile"])
+
+            # If the task is ignored, this will be None, so continue
+            # on to the next task
+            if value is None:
+                continue
+
             if "{}" in value:
                 newtask.resultfile = value.replace("{}", self.args[0])
             else:
