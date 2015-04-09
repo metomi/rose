@@ -363,7 +363,7 @@ export PYTHONPATH
     allow branching and merging with FCM in the Rosie convention. For example,
     if your repository is served from <var>HOST_AND_PATH</var> (e.g.
     <samp>myhost001/svn-repos</samp>) with given repository base name
-    <var>NAME</var> (e.g. <samp>roses_mo1</samp>), change into a new directory
+    <var>NAME</var> (e.g. <samp>roses_foo</samp>), change into a new directory
     and enter the following commands:</p>
     <pre class="prettyprint lang_sh">
 svn co -q "svn://${HOST_AND_PATH}/${NAME}/"
@@ -432,6 +432,16 @@ exec /path/to/rose/sbin/rosa svn-post-commit "$@"
 setsid /path/to/rose/sbin/rosa ws 0&lt;/dev/null 1&lt;/dev/null 2&gt;&amp;1 &amp;
 </pre>
 
+    <p>Check that the server is up and running using <code>curl</code> or a
+    local web browser. E.g. If you have configured the server's port to be 1234,
+    you can do:</p>
+
+    <pre class="prettyprint lang_sh">
+curl -I http://localhost:1234/
+</pre>
+
+    <p>It should return a HTTP code 200.</p>
+
     <p>Alternatively you can run the Rosie web service under Apache mod_wsgi.
     To do this you will need to set up an Apache module configuration file
     (typically in <samp>/etc/httpd/conf.d/rose-wsgi.conf</samp>) containing
@@ -444,15 +454,31 @@ WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
     <p>Use the Apache log at e.g. <samp>/var/log/httpd/</samp> to debug
     problems. See also <a href="#rose-bush">Configuring Rose Bush</a> below.</p>
 
-    <p>Hopefully, you should now have a working Rosie service. Configure the
+    <p>Hopefully, you should now have a working Rosie service server. Configure the
     client settings by editing the <var>[rosie-id]</var> settings in
-    <samp>etc/rose.conf</samp>. When you are done, test it by running:</p>
+    <samp>etc/rose.conf</samp>. If you are using the built-in web server, you
+    should ensure that you include the port number in the URL. E.g.:</p>
+
+    <pre class="prettyprint lang-rose_conf">
+[rosie-id]
+prefix-ws.foo=http://127.0.0.1:1234/foo
+</pre>
+
+    <p>You should now be able to talk to the Rosie web service server using the
+    Rosie web service client. Test by doing:</p>
+
+    <pre class="prettyprint lang_sh">
+rosie hello
+</pre>
+    
+    <p>To test that everything is connecting together, create your first suite
+    in the repository by doing:</p>
     <pre class="prettyprint lang_sh">
 rosie create
 </pre>
 
     <p>which will create the first suite in your repository, with an ID ending
-    in <samp>aa000</samp> - e.g. <samp>mo1-aa000</samp>. Locate it by
+    in <samp>aa000</samp> - e.g. <samp>foo-aa000</samp>. Locate it by
     running:</p>
     <pre class="prettyprint lang_sh">
 rosie lookup 000
@@ -462,7 +488,7 @@ rosie lookup 000
 
     <p>You can define a special suite in each Rosie repository that provides
     some additional repository-specific data and metadata. The suite ID will
-    end with <samp>ROSIE</samp> - e.g. <samp>mo1-ROSIE</samp>.</p>
+    end with <samp>ROSIE</samp> - e.g. <samp>foo-ROSIE</samp>.</p>
 
     <p>This can be created by running <code>rosie create
     --meta-suite</code>.</p>
@@ -508,20 +534,66 @@ WSGIScriptAlias /rose-bush /path/to/rose/lib/python/rose/bush.py
     <p>Use the Apache log at e.g. <samp>/var/log/httpd/</samp> to debug
     problems. See also <a href="#rosie">Configuring Rosie</a> above.</p>
 
-    <h2 id="meta">Storing Configuration Metadata</h2>
+    <h2 id="meta">Deploying Configuration Metadata</h2>
 
-    <p>Some <a href="rose-configuration-metadata.html">configuration
-    metadata</a> will need to be centrally stored in a globally readable
-    location. Projects using Rose will usually have metadata stored under a
-    <samp>rose-meta</samp> directory in their source tree, and this needs to be
-    centrally located in order to be retrieved by Rose utilities such as the
-    config editor.</p>
+    <p>You may want to deploy <a href=
+    "rose-configuration-metadata.html">configuration metadata</a> for projects
+    using Rose in a globally readable location at your site, so that they can be
+    easily accessed by users when using Rose utilities such as <code>rose
+    config-edit</code> or <code>rose macro</code>.</p>
 
-    <p>Each sub-directory under a <samp>rose-meta</samp> directory needs to be
-    replicated under a central location. The central location should be stored
-    as the value of the site configuration <samp>meta-path</samp> option.</p>
+    <p>If the source tree of a project is version controlled under a trusted
+    Subversion repository, it is possible to automatically deploy their
+    configuration metadata. Assuming that the projects follow our recommendation
+    and store Rose configuration metadata under the <samp>rose-meta/</samp>
+    directory of their source tree, you can:</p>
+    
+    <ol>
+      <li>Check out a working copy for each sub-directory under the
+      <samp>rose-meta/<samp> directory.</li>
+      
+      <li>Set up a <code>crontab</code> job to regularly update the working
+      copies.</li>
+    </ol>
 
-    <p>For full details, see <a href=
+    <p>For example, suppose you want to deploy Rose configuration metadata under
+    <samp>/etc/rose-meta/</samp> at your site. You can do:</p>
+
+    <pre class="prettyprint lang_sh">
+# Deployment location
+DEST='/etc/rose-meta'
+cd "${DEST}"
+
+# Assume only Rose metadata configuration directories under "rose-meta/"
+URL1='https://somehost/foo/main/trunk/rose-meta'
+URL2='https://anotherhost/bar/main/trunk/rose-meta'
+# ...
+
+# Checkout a working copy for each metadata configuration directory
+for URL in "${URL1}" "${URL2}"; do
+    for NAME in $(svn ls "${URL}"); do
+        svn checkout -q "${URL}/${NAME}"
+    done
+done
+
+# Set up a crontab job to update the working copies, e.g. every 10 minutes
+crontab -l || true &gt;'crontab.tmp'
+{
+    echo '# Update Rose configuration metadata every 10 minutes'
+    echo "*/10 * * * * svn update -q ${DEST}/*"
+} &gt;&gt;'crontab.tmp'
+crontab 'crontab.tmp'
+rm 'crontab.tmp'
+
+# Finally add the root level "meta-path" setting to site's "rose.conf"
+# E.g. if Rose is installed under "/opt/rose/":
+{
+    echo '[]'
+    echo "meta-path=${DEST}"
+} &gt;&gt;'/opt/rose/etc/rose.conf'
+</pre>
+
+    <p>See also <a href=
     "rose-configuration-metadata.html#appendix-metadata-location">Metadata
     Location</a>.</p>
   </div>
