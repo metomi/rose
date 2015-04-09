@@ -84,8 +84,6 @@ class Root(object):
     def cycles(self, user, suite, page=1, per_page=None, form=None):
         """List cycles of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
-        if not os.path.isdir(user_suite_dir):
-            raise cherrypy.HTTPError(400)
         if not isinstance(per_page, int):
             if per_page:
                 per_page = int(per_page)
@@ -162,8 +160,6 @@ class Root(object):
 
         """
         user_suite_dir = self._get_user_suite_dir(user, suite)
-        if not os.path.isdir(user_suite_dir):
-            raise cherrypy.HTTPError(400)
         conf = ResourceLocator.default().get_conf()
         per_page_default = int(conf.get_value(
             ["rose-bush", "jobs-per-page"], self.JOBS_PER_PAGE))
@@ -298,8 +294,6 @@ class Root(object):
     def view(self, user, suite, path, path_in_tar=None, mode=None):
         """View a text log file."""
         f_name = self._get_user_suite_dir(user, suite, path)
-        if not os.access(f_name, os.F_OK | os.R_OK):
-            raise cherrypy.HTTPError(404)
         conf = ResourceLocator.default().get_conf()
         view_size_max = int(conf.get_value(
             ["rose-bush", "view-size-max"], self.VIEW_SIZE_MAX))
@@ -419,23 +413,45 @@ class Root(object):
 
         return data
 
+    @classmethod
+    def _check_dir_access(cls, path):
+        """Check directory is accessible.
+
+        Raise 404 if path does not exist, or 403 if path not accessible.
+
+        Return path on success.
+
+        """
+        if not os.path.exists(path):
+            raise cherrypy.HTTPError(404)
+        if not os.access(path, os.R_OK):
+            raise cherrypy.HTTPError(403)
+        return path
+
     def _get_user_home(self, user):
+        """Return, e.g. ~/cylc-run/ for a cylc suite.
+
+        N.B. os.path.expanduser does not fail if ~user is invalid.
+
+        """
         try:
             return pwd.getpwnam(user).pw_dir
         except KeyError:
             raise cherrypy.HTTPError(404)
 
     def _get_user_suite_dir_root(self, user):
-        return os.path.join(
-                    self._get_user_home(user),
-                    self.suite_engine_proc.SUITE_DIR_REL_ROOT)
+        """Return, e.g. ~user/cylc-run/ for a cylc suite."""
+        return self._check_dir_access(os.path.join(
+            self._get_user_home(user),
+            self.suite_engine_proc.SUITE_DIR_REL_ROOT))
 
     def _get_user_suite_dir(self, user, suite, *paths):
-        return os.path.join(
-                    self._get_user_home(user),
-                    self.suite_engine_proc.SUITE_DIR_REL_ROOT,
-                    suite,
-                    *paths)
+        """Return, e.g. ~user/cylc-run/suite/... for a cylc suite."""
+        return self._check_dir_access(os.path.join(
+            self._get_user_home(user),
+            self.suite_engine_proc.SUITE_DIR_REL_ROOT,
+            suite,
+            *paths))
 
     def _sort_summary_entries(self, a, b):
         return (cmp(b.get("last_activity_time"),
@@ -444,7 +460,7 @@ class Root(object):
 
 
 def _handle_error():
-    # Handle an error occurring during a request in cherrypy.
+    """Handle an error occurring during a request in cherrypy."""
     cherrypy.response.status = 500
     print cherrypy._cperror.format_exc()
 
