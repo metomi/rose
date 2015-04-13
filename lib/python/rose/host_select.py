@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Select an available host machine by load or by random."""
 
 import os
@@ -75,9 +75,9 @@ class HostThresholdNotMetEvent(Event):
                    "method": threshold_conf.method,
                    "method_arg": threshold_conf.method_arg,
                    "value": threshold_conf.value}
-        for k, v in fmt_map.items():
-            if v == None:
-                fmt_map[k] = ""
+        for key, value in fmt_map.items():
+            if value is None:
+                fmt_map[key] = ""
         return self.FMT % fmt_map
 
 
@@ -98,10 +98,10 @@ class RankMethodEvent(Event):
     LEVEL = Event.V
 
     def __str__(self):
-        s = "Rank method: " + self.args[0]
+        value = "Rank method: " + self.args[0]
         if self.args[1] is not None:
-            s += ":" + self.args[1]
-        return s
+            value += ":" + self.args[1]
+        return value
 
 
 class TimedOutHostEvent(Event):
@@ -137,11 +137,11 @@ class HostSelector(object):
         """Return a suitable scorer for a given scoring method."""
         if method is None:
             method = self.RANK_METHOD_DEFAULT
-        if not self.scorers.has_key(method):
+        if method not in self.scorers:
             for value in globals().values():
                 if (isinstance(value, type) and
-                    issubclass(value, RandomScorer) and
-                    value.KEY == method):
+                        issubclass(value, RandomScorer) and
+                        value.KEY == method):
                     self.scorers[method] = value()
         return self.scorers[method]
 
@@ -181,22 +181,23 @@ class HostSelector(object):
             if value is None:
                 host_names.append(name)
             else:
-                for v in value.split():
-                    names.append(v)
+                for val in value.split():
+                    names.append(val)
                 if rank_method is None:
                     key = "method{" + name + "}"
-                    m = conf.get_value(["rose-host-select", key])
-                    if m is None:
+                    method_str = conf.get_value(["rose-host-select", key])
+                    if method_str is None:
                         rank_method_set.add(self.RANK_METHOD_DEFAULT)
                     else:
-                        rank_method_set.add(m)
+                        rank_method_set.add(method_str)
                 if thresholds is None:
                     key = "thresholds{" + name + "}"
-                    t = conf.get_value(["rose-host-select", key])
-                    if t is None:
+                    threshold_str = conf.get_value(["rose-host-select", key])
+                    if threshold_str is None:
                         thresholds_set.add(())
                     else:
-                        thresholds_set.add(tuple(sorted(shlex.split(t))))
+                        thresholds_set.add(
+                            tuple(sorted(shlex.split(threshold_str))))
 
         # If default rank method differs in hosts, use load:15.
         if rank_method is None:
@@ -218,18 +219,18 @@ class HostSelector(object):
 
         names: a list of known host groups or host names.
         rank_method: the ranking method. Can be one of:
-                     load:1, load:5, load:15 (=load =default), fs:FS and random.
-                     The "load" methods determines the load using the average
-                     load as returned by the "uptime" command divided by the
-                     number of CPUs. The "fs" method determines the load using
-                     the usage in the file system specified by FS. The "mem"
-                     method ranks by highest free memory. The "random" method
-                     ranks everything by random.
+                     load:1, load:5, load:15 (=load =default), fs:FS and
+                     random.  The "load" methods determines the load using the
+                     average load as returned by the "uptime" command divided
+                     by the number of CPUs. The "fs" method determines the load
+                     using the usage in the file system specified by FS. The
+                     "mem" method ranks by highest free memory. The "random"
+                     method ranks everything by random.
 
         thresholds: a list of thresholds which each host must not exceed.
-                    Should be in the format rank_method:value, where rank_method
-                    is one of load:1, load:5, load:15 or fs:FS; and value is
-                    number that must be be exceeded.
+                    Should be in the format rank_method:value, where
+                    rank_method is one of load:1, load:5, load:15 or fs:FS; and
+                    value is number that must be be exceeded.
 
         ssh_cmd_timeout: timeout of SSH commands to hosts. A float in seconds.
 
@@ -284,7 +285,8 @@ class HostSelector(object):
                 command = self.popen.get_cmd("ssh", host_name, "true")
                 proc = self.popen.run_bg(*command, preexec_fn=os.setpgrp)
                 time0 = time()
-                while (proc.poll() is None and time() - time0 <= ssh_cmd_timeout):
+                while (proc.poll() is None and
+                       time() - time0 <= ssh_cmd_timeout):
                     sleep(self.SSH_CMD_POLL_DELAY)
                 if proc.poll() is None:
                     os.killpg(proc.pid, signal.SIGTERM)
@@ -328,12 +330,12 @@ class HostSelector(object):
                     self.handle_event(DeadHostEvent(host_name))
                     host_proc_dict.pop(host_name)
                 else:
-                    out, err = proc.communicate()
+                    out = proc.communicate()[0]
                     host_proc_dict.pop(host_name)
                     for threshold_conf in threshold_confs:
                         if threshold_conf.check_threshold(out):
                             self.handle_event(HostThresholdNotMetEvent(
-                                    host_name, threshold_conf, score))
+                                host_name, threshold_conf, score))
                             break
                     else:
                         score = rank_conf.command_out_parser(out)
@@ -352,8 +354,8 @@ class HostSelector(object):
         if not host_score_list:
             raise NoHostSelectError()
         host_score_list.sort(
-                    lambda a, b: cmp(a[1], b[1]),
-                    reverse=rank_conf.scorer.SIGN < 0)
+            lambda a, b: cmp(a[1], b[1]),
+            reverse=rank_conf.scorer.SIGN < 0)
         return host_score_list
 
     __call__ = select
@@ -395,7 +397,7 @@ class RandomScorer(object):
     KEY = "random"
     CMD = "true\n"
     CMD_IS_FORMAT = False
-    SIGN = 1 # Positive
+    SIGN = 1  # Positive
 
     def get_command(self, method_arg=None):
         """Return a shell command to get the info for scoring a host."""
@@ -405,7 +407,8 @@ class RandomScorer(object):
         else:
             return self.CMD
 
-    def command_out_parser(self, out, method_arg=None):
+    @classmethod
+    def command_out_parser(cls, out, method_arg=None):
         """Parse command output to return a numeric score.
 
         Sub-class should override this to parse "out", the standard output
@@ -448,7 +451,7 @@ class MemoryScorer(RandomScorer):
 
     KEY = "mem"
     CMD = """echo mem=$(free -m | sed '3!d; s/^.* //')\n"""
-    SIGN = -1 # Negative
+    SIGN = -1  # Negative
 
     def command_out_parser(self, out, method_arg=None):
         if method_arg is None:
@@ -487,14 +490,14 @@ def main():
     select = HostSelector(event_handler=report, popen=popen)
     try:
         host_score_list = select(
-                names=args,
-                rank_method=opts.rank_method,
-                thresholds=opts.thresholds,
-                ssh_cmd_timeout=opts.timeout)
-    except Exception as e:
-        report(e)
+            names=args,
+            rank_method=opts.rank_method,
+            thresholds=opts.thresholds,
+            ssh_cmd_timeout=opts.timeout)
+    except (NoHostError, NoHostSelectError) as exc:
+        report(exc)
         if opts.debug_mode:
-            traceback.print_exc(e)
+            traceback.print_exc(exc)
         sys.exit(1)
     opts.choice = int(opts.choice)
     report(choice(host_score_list[0:opts.choice])[0] + "\n", level=0)
