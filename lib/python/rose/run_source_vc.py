@@ -41,6 +41,8 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
         handle = output
     else:
         handle = open(output, "wb")
+    environ = dict(os.environ)
+    environ["LANG"] = "C"
     for vcs, cmds in [("svn", ["info", "status", "diff"]),
                       ("git", ["describe", "status", "diff"])]:
         if not popen.which(vcs):
@@ -49,7 +51,7 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
         os.chdir(run_source_dir)
         try:
             for cmd in cmds:
-                rc, out, err = popen.run(vcs, cmd)
+                rc, out, err = popen.run(vcs, cmd, env=environ)
                 if out:
                     handle.write("#" * 80 + "\n")
                     handle.write(("# %s %s\n" % (vcs, cmd)).upper())

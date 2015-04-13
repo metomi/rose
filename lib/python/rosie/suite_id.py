@@ -258,6 +258,17 @@ class SuiteId(object):
         return shlex.split(value)[0]
 
     @classmethod
+    def get_prefix_from_location_root(cls, root):
+        locations = cls.get_prefix_locations()
+        if not locations:
+            raise SuiteIdLocationError(root)
+        for key, value in locations.items():
+            if value == root:
+                return key
+        else:
+            raise SuiteIdPrefixError(root)
+
+    @classmethod
     def get_prefix_location(cls, prefix=None):
         """Return the repository location of a given prefix."""
         if prefix is None:
@@ -352,9 +363,39 @@ class SuiteId(object):
         self.idx = self.FORMAT_IDX % (self.prefix, self.sid)
 
     def _from_location(self, location):
-        """Return the ID of a location (origin URL or local copy path).
-        """
-        # FIXME: not sure why a closure for "state" does not work here?
+        """Return the ID of a location (origin URL or local copy path)."""
+        # Is location a "~/cylc-run/$SUITE/" directory?
+        # Use a hacky way to read the "log/rose-suite-run.version" file
+        suite_engine_proc = SuiteEngineProcessor.get_processor()
+        suite_dir_rel_root = getattr(
+            suite_engine_proc, "SUITE_DIR_REL_ROOT", None)
+        if suite_dir_rel_root and "/" + suite_dir_rel_root + "/" in location:
+            loc = location
+            while "/" + suite_dir_rel_root + "/" in loc:
+                suite_version_file_name = os.path.join(
+                    loc, "log/rose-suite-run.version")
+                loc = os.path.dirname(loc)
+                if not os.access(suite_version_file_name, os.F_OK | os.R_OK):
+                    continue
+                state = None
+                url = None
+                rev = None
+                for i, line in enumerate(open(suite_version_file_name)):
+                    line = line.strip()
+                    if state is None:
+                        if line == "# SVN INFO":
+                            state = line
+                    elif state == "# SVN INFO":
+                        if line.startswith("URL:"):
+                            url = line.split(":", 1)[1].strip()
+                        elif line.startswith("Revision:"):
+                            rev = line.split(":", 1)[1].strip()
+                        elif not line:
+                            break
+                location = url + "@" + rev
+                break
+
+        # Assume location is a Subversion working copy of a Rosie suite
         info_parser = SvnInfoXMLParser()
         try:
             info_entry = info_parser.parse(self.svn("info", "--xml", location))
@@ -368,15 +409,7 @@ class SuiteId(object):
         path = url[len(root):]
         if not path:
             raise SuiteIdLocationError(location)
-        locations = self.get_prefix_locations()
-        if not locations:
-            raise SuiteIdLocationError(location)
-        for key, value in locations.items():
-            if value == root:
-                self.prefix = key
-                break
-        else:
-            raise SuiteIdPrefixError(location)
+        self.prefix = self.get_prefix_from_location_root(root)
         names = path.lstrip("/").split("/", self.SID_LEN + 1)
         if len(names) < self.SID_LEN:
             raise SuiteIdLocationError(location)
@@ -501,8 +534,8 @@ class SuiteId(object):
 
     def to_output(self):
         """Return the output directory for this suite."""
-        proc = SuiteEngineProcessor.get_processor()
-        return proc.get_suite_log_url(None, str(self))
+        suite_engine_proc = SuiteEngineProcessor.get_processor()
+        return suite_engine_proc.get_suite_log_url(None, str(self))
 
 
 def main():
