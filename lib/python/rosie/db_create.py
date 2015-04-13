@@ -185,7 +185,8 @@ class RosieDatabaseInitiator(object):
                     "\r%s... loading revision %d of %d" %
                     (Reporter.PREFIX_INFO, revision, youngest))
                 sys.stdout.flush()
-            self.post_commit_hook.run(repos_path, str(revision))
+            self.post_commit_hook.run(
+                repos_path, str(revision), no_notification=True)
             event = RosieDatabaseLoadEvent(repos_path, revision, youngest)
             if revision == youngest:
                 # Check if any new revisions have been added.
