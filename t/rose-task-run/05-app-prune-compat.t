@@ -18,6 +18,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # Test rose_prune built-in application, basic cycle housekeep usage.
+# Backward compatibility, with pre- isodatetime syntax.
+# Backward compatibility, with pre- prune{anything} syntax.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 

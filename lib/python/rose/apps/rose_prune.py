@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 """Builtin application: rose_prune: suite housekeeping application."""
 
 import os
@@ -26,6 +26,7 @@ from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 import shlex
+
 
 class RosePruneApp(BuiltinApp):
 
@@ -44,14 +45,17 @@ class RosePruneApp(BuiltinApp):
         suite_name = os.getenv("ROSE_SUITE_NAME")
         if not suite_name:
             return
-        prune_remote_logs_cycles = self._get_conf(conf_tree,
-                                                  "prune-remote-logs-at")
-        prune_server_logs_cycles = self._get_conf(conf_tree,
-                                                  "prune-server-logs-at")
+
+        # Tar-gzip job logs on suite host
+        # Prune job logs on remote hosts and suite host
+        prune_remote_logs_cycles = self._get_conf(
+            conf_tree, "prune-remote-logs-at")
+        prune_server_logs_cycles = self._get_conf(
+            conf_tree, "prune-server-logs-at")
         archive_logs_cycles = self._get_conf(conf_tree, "archive-logs-at")
         if (prune_remote_logs_cycles or
-            prune_server_logs_cycles or
-            archive_logs_cycles):
+                prune_server_logs_cycles or
+                archive_logs_cycles):
             tmp_prune_remote_logs_cycles = []
             for cycle in prune_remote_logs_cycles:
                 if cycle not in archive_logs_cycles:
@@ -66,18 +70,19 @@ class RosePruneApp(BuiltinApp):
 
             if prune_remote_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_pull_remote(
-                            suite_name, prune_remote_logs_cycles,
-                            prune_remote_mode=True)
+                    suite_name, prune_remote_logs_cycles,
+                    prune_remote_mode=True)
 
             if prune_server_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_remove_on_server(
-                            suite_name, prune_server_logs_cycles)
+                    suite_name, prune_server_logs_cycles)
 
             if archive_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_archive(
-                            suite_name, archive_logs_cycles)
-        globs = (self._get_prune_globs(app_runner, conf_tree, "datac") +
-                 self._get_prune_globs(app_runner, conf_tree, "work"))
+                    suite_name, archive_logs_cycles)
+
+        # Prune other directories
+        globs = self._get_prune_globs(conf_tree)
         suite_engine_proc = app_runner.suite_engine_proc
         hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
         suite_dir_rel = suite_engine_proc.get_suite_dir_rel(suite_name)
@@ -94,7 +99,7 @@ class RosePruneApp(BuiltinApp):
                     sdir = suite_engine_proc.get_suite_dir(suite_name)
                     app_runner.fs_util.chdir(sdir)
                     out = app_runner.popen.run_ok(
-                        "bash", "-O" , "extglob", "-c", sh_cmd)[0]
+                        "bash", "-O", "extglob", "-c", sh_cmd)[0]
                 else:
                     cmd = app_runner.popen.get_cmd(
                         "ssh", host,
@@ -130,10 +135,10 @@ class RosePruneApp(BuiltinApp):
         are delimited by colons ":".
         E.g.:
 
-        prune-remote-logs-at=-6h -12h
-        prune-server-logs-at=-7d
-        prune-datac-at=-6h:foo/* -12h:'bar/* baz/*' -1d
-        prune-work-at=-6h:t1*:*.tar -12h:t1*: -12h:*.gz -1d
+        prune-remote-logs-at=-PT6H -PT12H
+        prune-server-logs-at=-P7D
+        prune-datac-at=-PT6H:foo/* -PT12H:'bar/* baz/*' -P1D
+        prune-work-at=-PT6H:t1*:*.tar -PT12H:t1*: -PT12H:*.gz -P1D
 
         If max_args == 0, return a list of cycles.
         If max_args > 0, return a list of (cycle, [arg, ...])
@@ -147,49 +152,70 @@ class RosePruneApp(BuiltinApp):
         except UnboundEnvironmentVariableError as exc:
             raise ConfigValueError([self.SECTION, key], items_str, exc)
         items = []
-        ref_time_point = os.getenv(
+        ref_point_str = os.getenv(
             RoseDateTimeOperator.TASK_CYCLE_TIME_MODE_ENV)
-        date_time_oper = RoseDateTimeOperator(ref_time_point=ref_time_point)
-        for item_str in shlex.split(items_str):
-            args = item_str.split(":", max_args)
-            offset = args.pop(0)
-            cycle = offset
-            if ref_time_point:
-                if os.getenv("ROSE_CYCLING_MODE") == "integer":
+        try:
+            date_time_oper = None
+            ref_time_point = None
+            parse_format = None
+            for item_str in shlex.split(items_str):
+                args = item_str.split(":", max_args)
+                when = args.pop(0)
+                cycle = when
+                if (ref_point_str and
+                        os.getenv("ROSE_CYCLING_MODE") == "integer"):
+                    # Integer cycling
+                    if "P" in when:  # "when" is an offset
+                        cycle = str(int(ref_point_str) +
+                                    int(when.replace("P", "")))
+                    else:  # "when" is a cycle point
+                        cycle = str(when)
+                elif ref_point_str:
+                    # Date-time cycling
+                    if date_time_oper is None:
+                        date_time_oper = RoseDateTimeOperator(
+                            ref_time_point=ref_point_str)
+                        ref_time_point, ref_fmt = date_time_oper.date_parse()
                     try:
-                        cycle = str(int(ref_time_point) + 
-                                    int(offset.replace("P","")))
+                        time_point = date_time_oper.date_parse(when)[0]
                     except ValueError:
-                        pass
+                        time_point = date_time_oper.date_shift(
+                            ref_time_point, when)
+                    cycle = date_time_oper.date_format(ref_fmt, time_point)
+                if max_args:
+                    items.append((cycle, args))
                 else:
-                    try:
-                        time_point, parse_format = date_time_oper.date_parse()
-                        time_point = date_time_oper.date_shift(time_point, offset)
-                        cycle = date_time_oper.date_format(
-                            parse_format,
-                            time_point)
-                    except ValueError:
-                        pass
-            if max_args:
-                items.append((cycle, args))
-            else:
-                items.append(cycle)
+                    items.append(cycle)
+        except ValueError as exc:
+            raise ConfigValueError([self.SECTION, key], items_str, exc)
         return items
 
-    def _get_prune_globs(self, app_runner, conf_tree, key):
-        """Return prune globs for "key"."""
+    def _get_prune_globs(self, conf_tree):
+        """Return prune globs."""
         globs = []
-        for cycle, cycle_args in self._get_conf(conf_tree,
-                                                "prune-" + key + "-at",
-                                                max_args=1):
-            tail_globs = None
-            if cycle_args:
-                tail_globs = shlex.split(cycle_args.pop())
-            for head in app_runner.suite_engine_proc.get_cycle_items_globs(
-                    key, cycle):
-                if tail_globs:
-                    for tail_glob in tail_globs:
-                        globs.append(os.path.join(head, tail_glob))
+        nodes = conf_tree.node.get_value([self.SECTION])
+        if nodes is None:
+            return []
+        for key, node in sorted(nodes.items()):
+            if node.is_ignored():
+                continue
+            if key == "prune-datac-at":  # backward compat
+                head = "share/cycle"
+            elif key == "prune-work-at":  # backward compat
+                head = "work"
+            elif key.startswith("prune{") and key.endswith("}"):
+                head = key[6:-1].strip()  # remove "prune{" and "}"
+            else:
+                continue
+            for cycle, cycle_args in self._get_conf(
+                    conf_tree, key, max_args=1):
+                if cycle_args:
+                    for tail_glob in shlex.split(cycle_args.pop()):
+                        if "%(cycle)s" in tail_glob:
+                            globs.append(os.path.join(
+                                head, tail_glob % {"cycle": cycle}))
+                        else:
+                            globs.append(os.path.join(head, cycle, tail_glob))
                 else:
-                    globs.append(head)
+                    globs.append(os.path.join(head, cycle))
         return globs

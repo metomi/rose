@@ -376,18 +376,6 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_cycle_items_globs(self, name, cycle):
-        """Return a glob to match named items created for a given cycle.
-
-        E.g.:
-        suite_engine_proc.get_cycle_items_globs("datac", "20130101T0000Z")
-        # return "share/data/20130101T0000Z"
-
-        Return None if named item not supported.
-
-        """
-        raise NotImplementedError()
-
     def get_suite_dir(self, suite_name, *paths):
         """Return the path to the suite running directory.
 

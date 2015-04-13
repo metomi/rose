@@ -170,7 +170,7 @@ class RoseDateTimeOperator(object):
                 time_point = self.time_point_parser.parse(
                     time_point_str,
                     dump_as_parsed=True)
-                parse_format = None
+                parse_format = time_point.dump_format
         if self.utc_mode:
             time_point.set_time_zone_to_utc()
         return time_point, parse_format

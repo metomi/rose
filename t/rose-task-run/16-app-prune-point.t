@@ -17,36 +17,36 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose_arch" built-in application, archive command STDOUT.
+# Test "rose_prune" built-in application:
+# Prune items at a fixed cycle point, instead of an offset against the current.
+# Prune items in a location other than datac or work.
 #-------------------------------------------------------------------------------
-. "$(dirname "$0")/test_header"
-
-#-------------------------------------------------------------------------------
+. $(dirname $0)/test_header
 tests 2
-#-------------------------------------------------------------------------------
-# Run the suite, and wait for it to complete
-export CYLC_CONF_PATH=
+
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
+SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME="$(basename "${SUITE_RUN_DIR}")"
-rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host=localhost -- --debug
 #-------------------------------------------------------------------------------
-FOO_UUID=$(<"${SUITE_RUN_DIR}/foo-uuid")
-grep -F "${FOO_UUID}" "${SUITE_RUN_DIR}/log/job/1/archive/NN/job.out" \
-    >"${TEST_KEY_BASE}.out"
-# This ensures that the STDOUT of the "foo" command is only printed out once.
-file_cmp "${TEST_KEY_BASE}.out" "${TEST_KEY_BASE}.out" <<__OUT__
-[INFO] ${FOO_UUID} share/namelist/x.nl ${SUITE_RUN_DIR}/share/backup/x.nl
-__OUT__
-# This tests that the "foo" command has done what it is asked to do.
-file_cmp "${TEST_KEY_BASE}.content" \
-    "${SUITE_RUN_DIR}/share/backup/x.nl" <<'__NL__'
-&x
-MMXIV=2014,
-/
-__NL__
+TEST_KEY="${TEST_KEY_BASE}"
+run_pass "${TEST_KEY}" \
+    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
+    --no-gcontrol --host='localhost' --debug -- --debug
+cat "${TEST_KEY}.err" >&2
+
+TEST_KEY="${TEST_KEY_BASE}-prune.log"
+sed '/^\[INFO\] export ROSE_TASK_CYCLE_TIME=/p;/^\[INFO\] delete: /!d' \
+    "${SUITE_RUN_DIR}/prune.log" >'edited-prune.log'
+file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
+[INFO] export ROSE_TASK_CYCLE_TIME=19900101T0000Z
+[INFO] delete: var/19700101T0000Z/a.file
+[INFO] delete: var/19700101T0000Z/b.file
+[INFO] delete: var/19700101T0000Z/c.file
+[INFO] delete: var/19800101T0000Z
+[INFO] delete: work/19700101T0000Z
+[INFO] delete: work/19800101T0000Z
+__LOG__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
 exit 0

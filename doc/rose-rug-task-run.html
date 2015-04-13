@@ -605,9 +605,10 @@ source=stuffing-*.txt
     in a <var>rose-app.conf</var>.</p>
 
     <p>All settings are expressed as a space delimited list of cycles, normally
-    as date/time offsets relative to the current cycle, in a format recognised
-    by the <code>--offset=OFFSET</code> option of <code>rose date</code>. E.g.
-    <kbd>-P1DT6H</kbd> is 1 day and 6 hours before the current cycle time.</p>
+    as cycle points or a offsets relative to the current cycle. For date time
+    cycles, the format of a cycle point should be an ISO8601 date-time, and an
+    offset should be an ISO8601 duration. E.g.  <kbd>-P1DT6H</kbd> is 1 day and
+    6 hours before the current cycle point.</p>
 
     <p>The cycles of some settings also accept an optional argument followed by
     a colon. In these, the argument should be globs for matching items in the
@@ -633,27 +634,39 @@ source=stuffing-*.txt
       <dd>Archive all job logs at these cycles. Remove remote job logs on
       success.</dd>
 
-      <dt><kbd>prune-work-at=cycle[:globs] ...</kbd></dt>
+      <dt><kbd>prune{item-root}=cycle[:globs] ...</kbd></dt>
 
       <dd>
-        Remove the work directories of the specified cycles. E.g. In cylc, if
-        current cycle is <samp>20141225T1200Z</samp>,
-        <kbd>prune-work-at=-PT12H</kbd> will clear out
-        <var>work/20141225T0000Z/</var>.
+        Remove the sub-directories under <var>item-root</var> (e.g.
+        <samp>work/</samp> of the specified cycles. E.g. In cylc, if current
+        cycle is <samp>20141225T1200Z</samp>, <kbd>prune{work}=-PT12H</kbd> will
+        clear out <var>work/20141225T0000Z/</var>.
 
         <p>If <var>globs</var> are specified for a cycle, it will attempt to
-        prune only items matching <var>work/CYCLE/GLOBS</var>. E.g. In cylc,
-        if current cycle is <samp>20141225T1200Z</samp>,
-        <kbd>prune-work-at=-PT12H:wild*</kbd> will clear out all items matching
-        <var>work/20141225T0000Z/wild*</var>.</p>
+        prune only items matching <var>CYCLE/GLOBS</var> under
+        <var>item-root</var>. E.g. In cylc, if current cycle is
+        <samp>20141225T1200Z</samp>, <kbd>prune{share/cycle}=-PT12H:wild*</kbd>
+        will clear out all items matching
+        <var>share/cycle/20141225T0000Z/wild*</var>.</p>
+
+        <p>A glob can also be specified as a formatting string containing a
+        single substitution <code>%(cycle)s</code>. In this mode, the cycle
+        string will not be added as a sub-directory of the item-root. E.g. In
+        cylc, if current cycle is <samp>20141225T1200Z</samp>,
+        <kbd>prune{share}=-PT12H:hello-*-at-%(cycle)s.txt</kbd> will clear
+        out all items matching
+        <var>share/hello-*-at-20141225T0000Z.txt</var>.</p>
       </dd>
+
+      <dt><kbd>prune-work-at=cycle[:globs] ...</kbd></dt>
+
+      <dd><em>Deprecated.</em> Equivalent to
+      <kbd>prune{work}=cycle[:globs] ...</kbd></dd>
 
       <dt><kbd>prune-datac-at=cycle[:globs] ...</kbd></dt>
 
-      <dd>Remove the <var>ROSE_DATAC</var> of the specified cycles. If
-      <var>globs</var> are specified for a cycle, only items matching the globs
-      in the <var>ROSE_DATAC</var> directories of the specified cycle will be
-      pruned.</dd>
+      <dd><em>Deprecated.</em> Equivalent to
+      <kbd>prune{share/cycle}=cycle[:globs] ...</kbd></dd>
     </dl>
 
     <p>E.g.:</p>
@@ -665,8 +678,9 @@ mode=rose_prune
 prune-remote-logs-at=-PT6H
 archive-logs-at=-P1D
 prune-server-logs-at=-P7D
-prune-work-at=-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H
-prune-datac-at=-PT6H:foo* -PT12H:'bar* *.baz*' -P1D
+prune{work}=-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H
+prune{share}=-P1D:hello-*-at-%(cycle)s.txt
+prune{share/cycle}=-PT6H:foo* -PT12H:'bar* *.baz*' -P1D
 </pre>
 
     <h2 id="rose-task-env">rose task-env</h2>
