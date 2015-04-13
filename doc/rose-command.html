@@ -1098,6 +1098,10 @@ rose date 19700101T000000Z 20380119T031407Z
       <var>mem</var> must be greater than threshold. A host not meeting a
       threshold condition will be excluded from the ranking list.</dd>
 
+      <dt><kbd>--timeout=FLOAT</kbd></dt>
+
+      <dd>Set the timeout in seconds of SSH commands to hosts.</dd>
+
       <dt><kbd>--verbose, -v</kbd></dt>
 
       <dd>Increment verbosity.</dd>
@@ -1126,6 +1130,11 @@ rose date 19700101T000000Z 20380119T031407Z
       <dt><kbd>thresholds{NAME}=[METHOD[:METHOD-ARG]:]VALUE</kbd></dt>
 
       <dd>Declare the default threshold(s) for a group of hosts.</dd>
+
+      <dt><kbd>timeout=FLOAT</kbd></dt>
+
+      <dd>Set the timeout in seconds of SSH commands to hosts.
+      (default=10.0)</dd>
     </dl>
 
     <p>Type <kbd>rose config rose-host-select</kbd> to print settings.</p>

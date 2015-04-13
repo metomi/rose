@@ -123,7 +123,8 @@ class HostSelector(object):
     RANK_METHOD_RANDOM = "random"
     RANK_METHOD_MEM = "mem"
     RANK_METHOD_DEFAULT = RANK_METHOD_LOAD
-    TIMEOUT_DELAY = 1.0
+    SSH_CMD_POLL_DELAY = 0.05
+    SSH_CMD_TIMEOUT = 10.0
 
     def __init__(self, event_handler=None, popen=None):
         self.event_handler = event_handler
@@ -210,7 +211,8 @@ class HostSelector(object):
 
         return host_names, rank_method, thresholds
 
-    def select(self, names=None, rank_method=None, thresholds=None):
+    def select(self, names=None, rank_method=None, thresholds=None,
+               ssh_cmd_timeout=None):
         """Return a list. Element 0 is most desirable.
         Each element of the list is a tuple (host, score).
 
@@ -228,6 +230,9 @@ class HostSelector(object):
                     Should be in the format rank_method:value, where rank_method
                     is one of load:1, load:5, load:15 or fs:FS; and value is
                     number that must be be exceeded.
+
+        ssh_cmd_timeout: timeout of SSH commands to hosts. A float in seconds.
+
         """
 
         host_names, rank_method, thresholds = self.expand(names, rank_method,
@@ -265,6 +270,11 @@ class HostSelector(object):
                                             method_arg, value)
                 threshold_confs.append(threshold_conf)
 
+        if ssh_cmd_timeout is None:
+            conf = ResourceLocator.default().get_conf()
+            ssh_cmd_timeout = conf.get_value(
+                ["rose-host-select", "timeout"], self.SSH_CMD_TIMEOUT)
+
         # Random selection with no thresholds. Return the 1st available host.
         if rank_conf.method == self.RANK_METHOD_RANDOM and not threshold_confs:
             shuffle(host_names)
@@ -272,7 +282,17 @@ class HostSelector(object):
                 if host_name == "localhost":
                     return [("localhost", 1)]
                 command = self.popen.get_cmd("ssh", host_name, "true")
-                if self.popen.run(*command)[0] == 0:
+                proc = self.popen.run_bg(*command, preexec_fn=os.setpgrp)
+                time0 = time()
+                while (proc.poll() is None and time() - time0 <= ssh_cmd_timeout):
+                    sleep(self.SSH_CMD_POLL_DELAY)
+                if proc.poll() is None:
+                    os.killpg(proc.pid, signal.SIGTERM)
+                    proc.wait()
+                    self.handle_event(TimedOutHostEvent(host_name))
+                elif proc.wait():
+                    self.handle_event(DeadHostEvent(host_name))
+                else:
                     return [(host_name, 1)]
             else:
                 raise NoHostSelectError()
@@ -298,7 +318,9 @@ class HostSelector(object):
 
         # Retrieve score for each host name
         host_score_list = []
+        time0 = time()
         while host_proc_dict:
+            sleep(self.SSH_CMD_POLL_DELAY)
             for host_name, proc in host_proc_dict.items():
                 if proc.poll() is None:
                     score = None
@@ -316,7 +338,10 @@ class HostSelector(object):
                     else:
                         score = rank_conf.command_out_parser(out)
                         host_score_list.append((host_name, score))
-                        self.handle_event(HostSelectScoreEvent(host_name, score))
+                        self.handle_event(
+                            HostSelectScoreEvent(host_name, score))
+            if time() - time0 > ssh_cmd_timeout:
+                break
 
         # Report timed out hosts
         for host_name, proc in sorted(host_proc_dict.items()):
@@ -455,7 +480,7 @@ class FileSystemScorer(RandomScorer):
 def main():
     """Implement the "rose host-select" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("choice", "rank_method", "thresholds")
+    opt_parser.add_my_options("choice", "rank_method", "thresholds", "timeout")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     popen = RosePopener(event_handler=report)
@@ -464,7 +489,8 @@ def main():
         host_score_list = select(
                 names=args,
                 rank_method=opts.rank_method,
-                thresholds=opts.thresholds)
+                thresholds=opts.thresholds,
+                ssh_cmd_timeout=opts.timeout)
     except Exception as e:
         report(e)
         if opts.debug_mode:
