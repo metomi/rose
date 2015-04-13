@@ -28,7 +28,8 @@ from rose.popen import RosePopener
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
-from smtplib import SMTP
+from smtplib import SMTP, SMTPException
+import socket
 
 class RoseSuiteHook(object):
 
@@ -68,6 +69,7 @@ class RoseSuiteHook(object):
             self.suite_engine_proc.job_logs_pull_remote(suite_name, task_ids)
 
         # Send email notification if required
+        email_exc = None
         if should_mail:
             text = ""
             if task_id:
@@ -96,13 +98,20 @@ class RoseSuiteHook(object):
             msg["Subject"] = "[%s] %s" % (hook_event, suite_name)
             smtp_host = conf.get_value(["rose-suite-hook", "smtp-host"],
                                        default="localhost")
-            smtp = SMTP(smtp_host)
-            smtp.sendmail(msg["From"], [msg["To"]] + mail_cc_list, msg.as_string())
-            smtp.quit()
+            try:
+                smtp = SMTP(smtp_host)
+                smtp.sendmail(
+                    msg["From"], [msg["To"]] + mail_cc_list, msg.as_string())
+                smtp.quit()
+            except (socket.error, SMTPException) as email_exc:
+                pass
 
         # Shut down if required
         if should_shutdown:
             self.suite_engine_proc.shutdown(suite_name, args=["--kill"])
+
+        if email_exc is not None:
+            raise
 
     __call__ = run
 
