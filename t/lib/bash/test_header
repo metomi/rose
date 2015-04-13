@@ -60,6 +60,9 @@
 #         -e if not specified.
 #     file_grep TEST_KEY PATTERN FILE
 #         Run "grep -q PATTERN FILE". pass/fail $TEST_KEY accordingly.
+#     file_grep_fail TEST_KEY PATTERN FILE
+#         Run "grep -q PATTERN FILE". pass $TEST_KEY if $PATTERN is not present
+#         and fail otherwise.
 #     mock_smtpd_init
 #         Start a mock SMTP server daemon for testing. Write host:port setting
 #         to the variable TEST_SMTPD_HOST. Write pid of daemon to

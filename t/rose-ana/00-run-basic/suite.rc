@@ -9,6 +9,7 @@ UTC mode=True
     [[dependencies]]
         graph="""
           rose_ana_t1 # basic
+          rose_ana_t2_activated:fail => rose_ana_t2_deactivated 
         """
 
 [runtime]
@@ -20,3 +21,9 @@ UTC mode=True
             submission failed handler=rose suite-hook --shutdown
 
     [[rose_ana_t1]]
+
+    [[rose_ana_t2_activated]]
+        command scripting = rose task-run -v -v --debug --app-key=rose_ana_t2
+
+    [[rose_ana_t2_deactivated]]
+        command scripting = rose task-run -v -v --debug --app-key=rose_ana_t2 --opt-conf-key=deactivate
