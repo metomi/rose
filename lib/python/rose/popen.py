@@ -85,8 +85,10 @@ class RosePopener(object):
     """Wrap Python's subprocess.Popen."""
 
     CMDS = {
+        "diff_tool": ["diff", "-u"],
         "editor": ["vi"],
         "fs_browser": ["nautilus"],
+        "gdiff_tool": ["gvimdiff"],
         "geditor": ["gedit"],
         "image_viewer": ["eog", "--new-instance"],
         "rsync": ["rsync", "-a", "--exclude=.*", "--timeout=1800",

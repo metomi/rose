@@ -70,6 +70,10 @@
 
       <dd>Parse a set of rose configuration files.</dd>
 
+      <dt><a href="#rose-config-diff">rose config-diff</a></dt>
+
+      <dd>Display the metadata-annotated difference between two Rose config files.</dd>
+
       <dt><a href="#rose-config-dump">rose config-dump</a></dt>
 
       <dd>Re-dump Rose configuration files in the common format.</dd>
@@ -613,6 +617,85 @@ rosie UTIL [OPTS] [ARG ...]
       <dt><kbd>optional ROSE_META_PATH</kbd></dt>
 
       <dd>Prepend <var>$ROSE_META_PATH</var> to the metadata search path.</dd>
+    </dl>
+
+    <h2 id="rose-config-diff">rose config-diff</h2>
+
+    <h3>NAME</h3><kbd>rose config-diff</kbd>
+
+    <h3>SYNOPSIS</h3>
+
+    <dl>
+      <dt><kbd>rose config-diff</kbd></dt>
+
+      <dd>Display the metadata-annotated difference between two Rose configs.</dd>
+
+      <dt><kbd>rose config-diff --ignore=namelist:foo FILE1 FILE2</kbd></dt>
+
+      <dd>Display the diff, ignoring particular setting patterns.</dd>
+
+      <dt><kbd>rose config-diff --diff-tool=kdiff3 FILE1 FILE2</kbd></dt>
+
+      <dd>Display the diff with a particular diff tool.</dd>
+
+      <dt><kbd>rose config-diff FILE1 FILE2 -- [DIFF_OPTIONS] [DIFF_ARGUMENTS]</kbd></dt>
+
+      <dd>Display the diff with some diff tool specific options/arguments.</dd>
+    </dl>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Display the metadata-annotated difference between two Rose config files.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--diff-tool=TOOL</kbd></dt>
+
+      <dd>Specify an alternate diff tool like diffuse or kompare.</dd>
+
+      <dt><kbd>--graphical, -g</kbd></dt>
+
+      <dd>Use a graphical diff tool.</dd>
+
+      <dt><kbd>--ignore=PATTERN, -i PATTERN</kbd></dt>
+
+      <dd><p>Ignore settings that contain the regular expression PATTERN in their
+        id. Can be specified more than once. PATTERN may also be a key used
+        in site or user configuration which expands to a list of patterns:</p>
+        <pre>
+        [rose-config-diff]
+        ignore{PATTERN}=PATTERN1,PATTERN2,...</pre></dd>
+
+      <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
+
+      <dd>Prepend <var>PATH</var> to the metadata search path (look here first).
+        This option can be used repeatedly to load multiple paths.</dd>
+
+      <dt><kbd>--properties=PROPERTIES, -p PROPERTIES</kbd></dt>
+
+      <dd>Only display these metadata properties. This should be a comma separated list such as <samp>title,description,help</samp>.</dd>
+    
+    </dl>
+
+    <h3>ENVIRONMENT VARIABLES</h3>
+
+    <dl>
+      <dt><kbd>optional ROSE_META_PATH</kbd></dt>
+
+      <dd>Prepend <var>$ROSE_META_PATH</var> to the metadata search path.</dd>
+    </dl>
+
+    <h3>ARGUMENTS</h3>
+
+    <dl>
+      <dt><kbd>FILE1, FILE2</kbd></dt>
+
+      <dd>Two Rose configuration files (e.g. two rose-app.conf files) to compare. '-' for FILE1 or FILE2 denotes read in from standard input.</dd>
+    
+      <dt><kbd>--</kbd></dt>
+
+      <dd>Options and arguments after a -- token are passed directly to the diff tool. 
     </dl>
 
     <h2 id="rose-config-dump">rose config-dump</h2>

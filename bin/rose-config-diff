@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-5 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose config-diff
+#
+# SYNOPSIS
+#     # Display the metadata-annotated difference between two Rose configs.
+#     rose config-diff FILE1 FILE2
+#
+#     # Display the diff, ignoring particular setting patterns
+#     rose config-diff --ignore=namelist:foo FILE1 FILE2
+#
+#     # Display the diff with a particular diff tool
+#     rose config-diff --diff-tool=kdiff3 FILE1 FILE2
+#
+#     # Display the diff with some diff tool specific options/arguments
+#     rose config-diff FILE1 FILE2 -- [DIFF_OPTIONS] [DIFF_ARGUMENTS]
+#
+# DESCRIPTION
+#     Display the metadata-annotated difference between two Rose config files.
+#
+# OPTIONS
+#     --diff-tool=TOOL
+#         Specify an alternate diff tool like diffuse or kompare.
+#     --graphical, -g
+#         Use a graphical diff tool.
+#     --ignore=PATTERN, -i PATTERN
+#         Ignore settings that contain the regular expression PATTERN in their
+#         id. Can be specified more than once. PATTERN may also be a key used
+#         in site or user configuration which expands to a list of patterns:
+#         [rose-config-diff]
+#         ignore{PATTERN}=PATTERN1,PATTERN2,...
+#     --meta-path=PATH, -M PATH
+#         Prepend PATH to the metadata search path (look here first).
+#         This option can be used repeatedly to load multiple paths.
+#     --properties=PROPERTIES, -p PROPERTIES
+#         Only display these metadata properties. This should be a comma
+#         separated list of metadata options, such as title,description,help.
+#
+# ENVIRONMENT VARIABLES
+#     optional ROSE_META_PATH
+#         Prepend $ROSE_META_PATH to the metadata search path.
+#
+# ARGUMENTS
+#     FILE1, FILE2
+#         Two Rose configuration files (e.g. two rose-app.conf files) to
+#         compare. '-' for FILE1 or FILE2 denotes read in from standard input.
+#     --
+#         Options and arguments after a -- token are passed directly to the
+#         diff tool.
+#-------------------------------------------------------------------------------
+exec python -m rose.config_diff "$@"
