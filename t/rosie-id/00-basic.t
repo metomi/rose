@@ -114,7 +114,7 @@ file://$HOME/cylc-run/foo-aa000
 __OUT__
 fi
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-rm -rf $HOME/cylc-run/foo-aa000
+rm -fr "${HOME}/cylc-run/foo-aa000"
 
 TEST_KEY=$TEST_KEY_BASE-1-full-wc-id
 run_pass "$TEST_KEY" rosie id roses/foo-aa000
