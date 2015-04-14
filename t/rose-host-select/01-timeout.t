@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose host-select", timeout argument passed and subprocesses killed.
+# Test "rose host-select", subprocesses killed.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
@@ -32,14 +32,14 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 LANG=C sort "$TEST_KEY.err" -o "$TEST_KEY.sorted.err"
 file_cmp "$TEST_KEY.sorted.err" "$TEST_KEY.sorted.err" <<'__ERR__'
 [FAIL] No hosts selected.
-[WARN] sleepy1: (ssh failed)
-[WARN] sleepy2: (ssh failed)
+[WARN] sleepy1: (timed out)
+[WARN] sleepy2: (timed out)
 __ERR__
 cut -f2- mock-ssh.out | LANG=C sort >mock-ssh.out.sorted
 # N.B. Tab between 1 and sleepy?
 file_cmp "$TEST_KEY.mock-ssh.out" mock-ssh.out.sorted <<'__OUT__'
-sleepy1	bash
-sleepy2	bash
+sleepy1 bash
+sleepy2 bash
 __OUT__
 # Make sure there is no lingering processes
 run_fail "$TEST_KEY.ps" ps $(cut -f1 mock-ssh.out)

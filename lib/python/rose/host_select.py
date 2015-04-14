@@ -273,8 +273,8 @@ class HostSelector(object):
 
         if ssh_cmd_timeout is None:
             conf = ResourceLocator.default().get_conf()
-            ssh_cmd_timeout = conf.get_value(
-                ["rose-host-select", "timeout"], self.SSH_CMD_TIMEOUT)
+            ssh_cmd_timeout = float(conf.get_value(
+                ["rose-host-select", "timeout"], self.SSH_CMD_TIMEOUT))
 
         # Random selection with no thresholds. Return the 1st available host.
         if rank_conf.method == self.RANK_METHOD_RANDOM and not threshold_confs:
