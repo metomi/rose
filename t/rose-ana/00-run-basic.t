@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-N_TESTS=17
+N_TESTS=16
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
@@ -70,11 +70,11 @@ TEST_KEY=$TEST_KEY_BASE-ignore-basic-2
 file_grep $TEST_KEY "[ OK ].*Class" $OUTPUT
 # Then test that ignoring a test means the output is not present
 OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t2_deactivated/01/job.out
-TEST_KEY=$TEST_KEY_BASE-ignore-notpresent-1
-file_grep $TEST_KEY "[ OK ].*Class" $OUTPUT
-TEST_KEY=$TEST_KEY_BASE-ignore-notpresent-2
+TEST_KEY=$TEST_KEY_BASE-ignore-notpresent
 file_grep_fail $TEST_KEY "[FAIL].*Species" $OUTPUT
 #-------------------------------------------------------------------------------
+#Wait for filesystem
+sleep 30
 #Clean suite
 rose suite-clean -q -y $NAME
 #-------------------------------------------------------------------------------
