@@ -67,8 +67,8 @@ class RosieWSClientAuthManager(object):
     ST_UNC = "UNC"  # Item is unchanged
     ST_MOD = "MOD"  # Item is modified
     PASSWORD_STORE_NAMES = [
-        "GnomekeyringStore",
         "GPGAgentStore",
+        "GnomekeyringStore",
         #KeyringStore,
     ]
     PROMPT_USERNAME = "Username for %(prefix)r: "
