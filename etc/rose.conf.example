@@ -34,10 +34,10 @@
 #  diff_tool=diff -y
 ## Launch text editor (default=vi).
 #  editor=gvim -f
-## Launch graphical text editor (default=gedit).
-#  geditor=gvim -f
 ## Launch graphical diff tool (default=gvimdiff).
 #  gdiff_tool=meld
+## Launch graphical text editor (default=gedit).
+#  geditor=gvim -f
 ## Launch graphical file system browser (default=nautilus).
 #  fs_browser=konqueror
 ## Launch image viewer (default=eog).
