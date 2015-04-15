@@ -23,12 +23,12 @@ import ast
 import re
 import os
 import shlex
-import shutil
 import StringIO
 import sys
 import tempfile
 
 import rose.config
+import rose.fs_util
 import rose.opt_parse
 import rose.popen
 import rose.resource
@@ -123,8 +123,7 @@ def format_metadata_as_text(metadata, only_these_options=None):
         id_node.set([property_], value=value)
     string_file = StringIO.StringIO()
     rose.config.dump(id_node, target=string_file)
-    string_file.seek(0)
-    return string_file.read()
+    return string_file.getvalue()
 
 
 def main():
@@ -133,18 +132,15 @@ def main():
     opt_parser.add_my_options("diff_tool", "graphical",
                               "ignore", "meta_path", "properties")
     my_sys_args = list(sys.argv)
-    if "--" in sys.argv:
-        my_sys_args = sys.argv[:sys.argv.index("--")]
-        diff_args = sys.argv[sys.argv.index("--") + 1:]
-    else:
-        diff_args = []
 
     opts, args = opt_parser.parse_args(my_sys_args[1:])
     rose.macro.add_site_meta_paths()
     rose.macro.add_env_meta_paths()
     rose.macro.add_opt_meta_paths(opts.meta_path)
 
-    if len(args) != 2:
+    paths, diff_args = args[:2], args[2:]
+
+    if len(paths) != 2:
         sys.exit(opt_parser.get_usage())
 
     config_loader = rose.config.ConfigLoader()
@@ -159,18 +155,17 @@ def main():
 
     output_filenames = []
     config_type = rose.SUB_CONFIG_NAME
-    for path in args:
+    for path in paths:
         if path == "-":
             continue
-        config_type = path.split(os.sep)[-1]
-    for path in args:
+        config_type = os.path.basename(path)
+    for path in paths:
         if path == "-":
             path = sys.stdin
             filename = config_type
             directory = None
         else:
-            filename = path.split(os.sep)[-1]
-            directory = path.rsplit(os.sep, 1)[0]
+            directory, filename = path.rsplit(os.sep, 1)
         config = config_loader.load_with_opts(path)
         meta_config_tree = rose.macro.load_meta_config_tree(
             config, directory=directory, config_type=filename)
@@ -201,8 +196,9 @@ def main():
         sys.stdout.write(stdout)
         sys.stderr.write(stderr)
     finally:
+        fs_util = rose.fs_util.FileSystemUtil()
         for path in output_filenames:
-            shutil.rmtree(os.path.dirname(path))
+            fs_util.delete(os.path.dirname(path))
     sys.exit(return_code)
 
 
