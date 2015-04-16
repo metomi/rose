@@ -20,7 +20,6 @@
 # Test "rose suite-hook --mail", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-
 mock_smtpd_init
 if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
     skip_all "cannot start SMTP server"

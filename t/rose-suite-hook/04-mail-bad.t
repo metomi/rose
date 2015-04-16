@@ -17,22 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-hook --mail --shutdown" when email does not work. #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
-mock_smtpd_init
-if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
-    skip_all "cannot start SMTP server"
-fi
-mkdir conf
-cat >conf/rose.conf <<__CONF__
-[rose-suite-hook]
-smtp-host=$TEST_SMTPD_HOST
-__CONF__
-export ROSE_CONF_PATH=$PWD/conf
-# Now kill the server so we can't contact it.
-mock_smtpd_kill
+# Test "rose suite-hook --mail --shutdown" when email does not work.
 #-------------------------------------------------------------------------------
-tests 4
+. $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 # Run the suite.
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
@@ -41,11 +28,25 @@ rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost -q
 sleep 5
 #-------------------------------------------------------------------------------
+# Start and stop the mail server.
+bad_smtpd_init
+if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
+    skip_all "cannot start fake SMTP server"
+fi
+mkdir conf
+cat >conf/rose.conf <<__CONF__
+[rose-suite-hook]
+smtp-host=$TEST_SMTPD_HOST
+__CONF__
+export ROSE_CONF_PATH=$PWD/conf
+#-------------------------------------------------------------------------------
+tests 4
+#-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
 run_fail "$TEST_KEY" rose suite-hook --mail --shutdown \
     some-event "$NAME" some-msg
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" "^socket.error: " "$TEST_KEY.err"
+file_grep "$TEST_KEY.err" "^smtplib.SMTPServerDisconnected: " "$TEST_KEY.err"
 TIMEOUT=$(($(date +%s) + 30)) # Wait a maximum of 30 seconds
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
@@ -56,5 +57,6 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
+bad_smtpd_kill
 rose suite-clean -q -y $NAME
 exit 0
