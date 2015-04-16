@@ -134,6 +134,10 @@
 ## E.g.:
 #  thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
 #  thresholds{linux}=mem:8000
+## Set the timeout in seconds of SSH commands to hosts. (default=10.0)
+#  timeout=FLOAT
+## E.g.:
+#  timeout=5.0
 [rose-host-select]
 
 # Configuration related to "rose stem".

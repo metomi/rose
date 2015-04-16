@@ -60,6 +60,8 @@
 #         case.) "load" and "fs" must not exceed threshold while "mem"
 #         must be greater than threshold. A host not meeting a threshold
 #         condition will be excluded from the ranking list.
+#     --timeout=FLOAT
+#         Set the timeout in seconds of SSH commands to hosts.
 #     --verbose, -v
 #         Increment verbosity.
 #
@@ -75,6 +77,9 @@
 #             Declare the default ranking method for a group of hosts.
 #         thresholds{NAME} = [METHOD[:METHOD-ARG]:]VALUE ...
 #             Declare the default threshold(s) for a group of hosts.
+#         timeout = FLOAT
+#             Set the timeout in seconds of SSH commands to hosts.
+#             (default=10.0)
 #
 #     Type "rose config rose-host-select" to print settings.
 #-------------------------------------------------------------------------------

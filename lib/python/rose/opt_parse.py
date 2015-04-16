@@ -531,8 +531,8 @@ class RoseOptionParser(OptionParser):
              "help": "Specify one or more threshold."}],
         "timeout": [
             ["--timeout"],
-            {"metavar": "DELAY",
-             "help": "Set a timeout."}],
+            {"metavar": "FLOAT",
+             "help": "Set a timeout in seconds."}],
         "to_local_copy": [
             ["--to-local-copy"],
             {"action": "store_true",
