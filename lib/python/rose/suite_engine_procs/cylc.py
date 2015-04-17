@@ -84,7 +84,7 @@ class CylcProcessor(SuiteEngineProcessor):
         "name ASC, cycle DESC, task_events.submit_num DESC",
         "name_desc_cycle_desc":
         "name DESC, cycle DESC, task_events.submit_num DESC"}
-    PGREP_CYLC_RUN = r"python.*cylc-(run|restart) .*\<%s\>( |$)"
+    PGREP_CYLC_RUN = r"python.*cylc-(run|restart)( | .+ )%s( |$)"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
     REC_CYCLE_TIME = re.compile(
