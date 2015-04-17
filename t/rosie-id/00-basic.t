@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 42
+tests 45
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -114,7 +114,7 @@ file://$HOME/cylc-run/foo-aa000
 __OUT__
 fi
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-rm -rf  $HOME/cylc-run/foo-aa000
+rm -fr "${HOME}/cylc-run/foo-aa000"
 
 TEST_KEY=$TEST_KEY_BASE-1-full-wc-id
 run_pass "$TEST_KEY" rosie id roses/foo-aa000
@@ -138,6 +138,27 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 foo-aa000
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+
+TEST_KEY="${TEST_KEY_BASE}-run"
+SUITE_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
+SUITE_NAME="$(basename "${SUITE_DIR}")"
+svn co -q "${URL}/a/a/0/0/0/trunk" 'foo-aa000'
+touch 'foo-aa000/rose-suite.conf'
+cat >'foo-aa000/suite.rc' <<'__SUITE_RC__'
+[scheduling]
+    [[dependencies]]
+        graph='t1'
+[runtime]
+    [[t1]]
+__SUITE_RC__
+rose suite-run -l -q -C "${PWD}/foo-aa000" --name="${SUITE_NAME}"
+run_pass "$TEST_KEY" rosie id "${HOME}/cylc-run/${SUITE_NAME}"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+foo-aa000
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+rose suite-clean -y --name="${SUITE_NAME}"
+rm -fr 'foo-aa000'
 #-------------------------------------------------------------------------------
 # Latest and next should still be correct if latest suite removed from HEAD
 TEST_KEY=$TEST_KEY_BASE-latest-not-at-head
