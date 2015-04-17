@@ -17,12 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose config", basic usage.
+# Test "rose config-diff", basic usage.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 27
+tests 39
 #-------------------------------------------------------------------------------
+setup
 init app 1 <<'__APP__'
 [env]
 # 1 reverse, 5 forward
@@ -56,14 +57,89 @@ description=Different choices of locking methods, if available.
 [namelist:locking=air_locking]
 title=Air Locking?
 __META__
+init_rose_meta app2 HEAD <<'__META__'
+[namelist:locking]
+description=Different choices of locking methods, if available.
+
+[namelist:locking=air_locking]
+title=Air Locking?
+__META__
 export ROSE_CONF_PATH=$PWD
+export ROSE_META_PATH=$TEST_DIR/rose-meta
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE
-setup
+TEST_KEY=$TEST_KEY_BASE-one-arg
+run_fail "$TEST_KEY" rose config-diff $TEST_DIR/app1/rose-app.conf
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+Usage: Display the metadata-annotated diff between two Rose config files.
+
+__ERROR__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-bad-dir
+run_fail "$TEST_KEY" rose config-diff $TEST_DIR/app1/rose-app.conf $TEST_DIR
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_grep "$TEST_KEY.err" "$TEST_DIR: rose\*.conf not found." "$TEST_KEY.err" #-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-files
 run_fail "$TEST_KEY" rose config-diff $TEST_DIR/app{1,2}/rose-app.conf
 sed -i "/rose-app.conf/d" "$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
 @@ -1,12 +1,8 @@
+ # description=Environment variable configuration
+ [env]
+-# description=The number of gears available.
+-# title=Gearbox Gears
+-# 1 reverse, 5 forward
+-GEARBOX_GEARS=6
+-# help=1  3  5
+-#     =|  |  |
+-#     =-------
+-#     =|  |  |
+-#     =2  4  R
+ GEARSTICK_DECORATION=golfball
++
++# description=Different choices of locking methods, if available.
++[namelist:locking]
++# title=Air Locking?
++air_locking=.false.
+__DIFF__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-dirs
+run_fail "$TEST_KEY" rose config-diff $TEST_DIR/app{1,2}/
+sed -i "/rose-app.conf/d" "$TEST_KEY.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
+@@ -1,12 +1,8 @@
+ # description=Environment variable configuration
+ [env]
+-# description=The number of gears available.
+-# title=Gearbox Gears
+-# 1 reverse, 5 forward
+-GEARBOX_GEARS=6
+-# help=1  3  5
+-#     =|  |  |
+-#     =-------
+-#     =|  |  |
+-#     =2  4  R
+ GEARSTICK_DECORATION=golfball
++
++# description=Different choices of locking methods, if available.
++[namelist:locking]
++# title=Air Locking?
++air_locking=.false.
+__DIFF__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-stdin
+# Use the rose-meta location, as a meta sub-directory will not be found.
+sed -i '1imeta=app2' $TEST_DIR/app2/rose-app.conf
+run_fail "$TEST_KEY" rose config-diff $TEST_DIR/app1/ - <$TEST_DIR/app2/rose-app.conf
+sed -i '1d' $TEST_DIR/app2/rose-app.conf
+sed -i "/rose-app.conf/d" "$TEST_KEY.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
+@@ -1,12 +1,11 @@
++# description=Default id or type of application, used to find the metadata directory
++meta=app2
++
  # description=Environment variable configuration
  [env]
 -# description=The number of gears available.

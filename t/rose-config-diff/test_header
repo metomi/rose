@@ -35,6 +35,13 @@ function init_meta() {
     cat >"$TEST_DIR/$ROSE_TYPE$NUMBER/meta/rose-meta.conf"
 }
 
+function init_rose_meta() {
+    local category=$1
+    local version=$2    
+    mkdir -p $TEST_DIR/rose-meta/$category/$version
+    cat >$TEST_DIR/rose-meta/$category/$version/rose-meta.conf
+}
+
 function setup() {
     mkdir $TEST_DIR/run
     cd $TEST_DIR/run

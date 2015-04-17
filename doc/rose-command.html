@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -33,7 +33,8 @@
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
       "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
-    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" name=
+    "rose-icon" />
 
     <p><a href=".">Rose Documentation</a></p>
   </div>
@@ -72,7 +73,8 @@
 
       <dt><a href="#rose-config-diff">rose config-diff</a></dt>
 
-      <dd>Display the metadata-annotated difference between two Rose config files.</dd>
+      <dd>Display the metadata-annotated difference between two Rose config
+      files.</dd>
 
       <dt><a href="#rose-config-dump">rose config-dump</a></dt>
 
@@ -626,9 +628,15 @@ rosie UTIL [OPTS] [ARG ...]
     <h3>SYNOPSIS</h3>
 
     <dl>
-      <dt><kbd>rose config-diff</kbd></dt>
+      <dt><kbd>rose config-diff FILE1 FILE2</kbd></dt>
 
-      <dd>Display the metadata-annotated difference between two Rose configs.</dd>
+      <dd>Display the metadata-annotated diff between two Rose config
+      files.</dd>
+
+      <dt><kbd>rose config-diff DIR1 DIR2</kbd></dt>
+
+      <dd>Display the metadata-annotated diff between two Rose config files in
+      these directories.</dd>
 
       <dt><kbd>rose config-diff --ignore=namelist:foo FILE1 FILE2</kbd></dt>
 
@@ -638,14 +646,16 @@ rosie UTIL [OPTS] [ARG ...]
 
       <dd>Display the diff with a particular diff tool.</dd>
 
-      <dt><kbd>rose config-diff FILE1 FILE2 -- [DIFF_OPTIONS] [DIFF_ARGUMENTS]</kbd></dt>
+      <dt><kbd>rose config-diff FILE1 FILE2 -- [DIFF_OPTIONS]
+      [DIFF_ARGUMENTS]</kbd></dt>
 
       <dd>Display the diff with some diff tool specific options/arguments.</dd>
     </dl>
 
     <h3>DESCRIPTION</h3>
 
-    <p>Display the metadata-annotated difference between two Rose config files.</p>
+    <p>Display the metadata-annotated difference between two Rose config
+    files.</p>
 
     <h3>OPTIONS</h3>
 
@@ -660,22 +670,22 @@ rosie UTIL [OPTS] [ARG ...]
 
       <dt><kbd>--ignore=PATTERN, -i PATTERN</kbd></dt>
 
-      <dd><p>Ignore settings that contain the regular expression PATTERN in their
-        id. Can be specified more than once. PATTERN may also be a key used
-        in site or user configuration which expands to a list of patterns:</p>
-        <pre>
-        [rose-config-diff]
-        ignore{PATTERN}=PATTERN1,PATTERN2,...</pre></dd>
+      <dd>
+        <p>Ignore settings that contain the regular expression <var>PATTERN</var> in their
+        id. Can be specified more than once. <var>PATTERN</var> may also be a key used in
+        site or user configuration which expands to a list of patterns. See
+        CONFIGURATION below.</p>
+      </dd>
 
       <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
 
-      <dd>Prepend <var>PATH</var> to the metadata search path (look here first).
-        This option can be used repeatedly to load multiple paths.</dd>
+      <dd>Prepend <var>PATH</var> to the metadata search path (look here
+      first). This option can be used repeatedly to load multiple paths.</dd>
 
       <dt><kbd>--properties=PROPERTIES, -p PROPERTIES</kbd></dt>
 
-      <dd>Only display these metadata properties. This should be a comma separated list such as <samp>title,description,help</samp>.</dd>
-    
+      <dd>Only display these metadata properties. This should be a comma
+      separated list such as <samp>title,description,help</samp>.</dd>
     </dl>
 
     <h3>ENVIRONMENT VARIABLES</h3>
@@ -689,13 +699,65 @@ rosie UTIL [OPTS] [ARG ...]
     <h3>ARGUMENTS</h3>
 
     <dl>
-      <dt><kbd>FILE1, FILE2</kbd></dt>
+      <dt><kbd>PATH1, PATH2</kbd></dt>
 
-      <dd>Two Rose configuration files (e.g. two rose-app.conf files) to compare. '-' for FILE1 or FILE2 denotes read in from standard input.</dd>
-    
+      <dd>Two Rose configuration files or directories to compare. If the path
+      is a directory, look underneath for a Rose configuration file. '-' for
+      FILE1 or FILE2 denotes read in from standard input.</dd>
+
       <dt><kbd>--</kbd></dt>
 
-      <dd>Options and arguments after a -- token are passed directly to the diff tool. 
+      <dd>Options and arguments after a -- token are passed directly to the
+      diff tool.</dd>
+    </dl>
+
+    <h3>CONFIGURATION</h3>
+
+    <dl>
+      <dt><kbd>[external]diff-tool, [external]gdiff-tool</kbd></dt>
+
+      <dd>
+        <p>You can override the default non-graphical and graphical diff tools
+        by setting e.g.:</p>
+        <pre>
+[external]
+diff-tool=diff3
+gdiff-tool=kompare
+</pre>
+
+        <p>in your site or user Rose configuration
+        (<samp>rose.conf</samp>).</p>
+      </dd>
+
+      <dt><kbd>[rose-config-diff]properties,
+      [rose-config-diff]ignore{...}</kbd></dt>
+
+      <dd>
+        <p>You can override the default metadata properties to display by
+        setting e.g.:</p>
+        <pre>
+[rose-config-diff]
+properties=title,ns,description,help
+</pre>
+
+        <p>in your site or user Rose configuration
+        (<samp>rose.conf</samp>).</p>
+
+        <p>You can also set shorthand ignore patterns by setting e.g.:</p>
+        <pre>
+[rose-config-diff]
+ignore{foo}=namelist:bar,namelist:baz
+</pre>
+
+        <p>in the same location. This will allow you to run:<samp>rose
+        config-diff --ignore=foo ...</samp> instead of <samp>rose config-diff
+        --ignore=namelist:bar --ignore=namelist:baz</samp>.</p>
+      </dd>
+
+      <dt><kbd>--</kbd></dt>
+
+      <dd>Options and arguments after a -- token are passed directly to the
+      diff tool.</dd>
     </dl>
 
     <h2 id="rose-config-dump">rose config-dump</h2>
@@ -828,7 +890,6 @@ rosie UTIL [OPTS] [ARG ...]
     <p><kbd>rose-date</kbd></p>
 
     <h3>SYNOPSIS</h3>
-
     <pre class="shell">
 # 1. Print date time point
 # 1.1 Current date time with an optional offset
@@ -868,8 +929,7 @@ rose date 19700101T000000Z 20380119T031407Z
       <li>With 0 or 1 argument. Print the current or the specified date time
       point with an optional offset.</li>
 
-      <li>With 2 arguments. Print the duration between the 2
-      arguments.</li>
+      <li>With 2 arguments. Print the duration between the 2 arguments.</li>
     </ol>
 
     <h3>OPTIONS</h3>
@@ -877,29 +937,29 @@ rose date 19700101T000000Z 20380119T031407Z
     <dl>
       <dt><kbd>--calendar=gregorian|360day|365day|366day</kbd></dt>
 
-      <dd>Specify the calendar mode.
-      See <a href="#rose-date-calendar-mode">CALENDER MODE</a> below.</dd>
+      <dd>Specify the calendar mode. See <a href=
+      "#rose-date-calendar-mode">CALENDER MODE</a> below.</dd>
 
-      <dt><kbd>--offset1=OFFSET</kbd>, <kbd>--offset=OFFSET</kbd>,
-      <kbd>-s OFFSET</kbd>, <kbd>-1 OFFSET</kbd></dt>
+      <dt><kbd>--offset1=OFFSET</kbd>, <kbd>--offset=OFFSET</kbd>, <kbd>-s
+      OFFSET</kbd>, <kbd>-1 OFFSET</kbd></dt>
 
       <dd>Specify 1 or more offsets to add to argument 1 or the current time.
       See <a href="#rose-date-offset-format">OFFSET FORMAT</a> below.</dd>
 
       <dt><kbd>--offset2=OFFSET</kbd>, <kbd>-2 OFFSET</kbd></dt>
 
-      <dd>Specify 1 or more offsets to add to argument 2.
-      See <a href="#rose-date-offset-format">OFFSET FORMAT</a> below.</dd>
+      <dd>Specify 1 or more offsets to add to argument 2. See <a href=
+      "#rose-date-offset-format">OFFSET FORMAT</a> below.</dd>
 
       <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>-p FORMAT</kbd></dt>
 
-      <dd>Specify a format for parsing <var>DATE-TIME</var>. See
-      <a href="#rose-date-parse-format">PARSE FORMAT</a> below.</dd>
+      <dd>Specify a format for parsing <var>DATE-TIME</var>. See <a href=
+      "#rose-date-parse-format">PARSE FORMAT</a> below.</dd>
 
       <dt><kbd>--print-format=FORMAT</kbd>, <kbd>-f FORMAT</kbd></dt>
 
-      <dd>Specify a format for print the result. See
-      <a href="#rose-date-print-format">PRINT FORMAT</a> below.</dd>
+      <dd>Specify a format for print the result. See <a href=
+      "#rose-date-print-format">PRINT FORMAT</a> below.</dd>
 
       <dt><kbd>--use-task-cycle-time, -c</kbd></dt>
 
@@ -930,48 +990,48 @@ rose date 19700101T000000Z 20380119T031407Z
     <var>nU</var> where <var>U</var> is the unit (Y, M, D, H, M, S) and
     <var>n</var> is a positive integer, where T delimits the date series from
     the time series if any time units are used. <var>n</var> may also have a
-    decimal (e.g. <samp>PT5.5M</samp>) part for a unit provided no smaller units
-    are supplied. It is not necessary to specify zero values for units. If
-    <var>OFFSET</var> is negative, prefix a <samp>-</samp>. For example:</p>
+    decimal (e.g. <samp>PT5.5M</samp>) part for a unit provided no smaller
+    units are supplied. It is not necessary to specify zero values for units.
+    If <var>OFFSET</var> is negative, prefix a <samp>-</samp>. For example:</p>
 
     <dl>
       <dt>P6D</dt>
-    
+
       <dd>6 day offset</dd>
 
       <dt>PT6H</dt>
-      
+
       <dd>6 hour offset</dd>
 
       <dt>PT1M</dt>
-      
+
       <dd>1 minute offset</dd>
 
       <dt>-PT1M</dt>
-      
+
       <dd>(negative) 1 minute offset</dd>
 
       <dt>P3M</dt>
-      
+
       <dd>3 month offset</dd>
 
       <dt>P2W</dt>
-      
+
       <dd>2 week offset (note no other units may be combined with weeks)</dd>
 
       <dt>P2DT5.5H</dt>
-      
+
       <dd>2 day, 5.5 hour offset</dd>
 
       <dt>-P2YT4S</dt>
-      
+
       <dd>(negative) 2 year, 4 second offset</dd>
     </dl>
 
     <p>The following deprecated syntax is supported: <var>OFFSET</var> in the
     form <var>nU</var> where <var>U</var> is the unit (w for weeks, d for days,
-    h for hours, m for minutes and s for seconds) and <var>n</var> is a positive
-    or negative integer.</p>
+    h for hours, m for minutes and s for seconds) and <var>n</var> is a
+    positive or negative integer.</p>
 
     <h3 id="rose-date-parse-format">PARSE FORMAT</h3>
 
@@ -979,26 +1039,28 @@ rose date 19700101T000000Z 20380119T031407Z
     POSIX strptime template format (see the strptime command help), with the
     following subset supported across all date/time ranges:</p>
 
-    <blockquote><kbd>%F, %H, %M, %S, %Y, %d, %j, %m, %s, %z</kbd></blockquote>
+    <blockquote>
+      <kbd>%F, %H, %M, %S, %Y, %d, %j, %m, %s, %z</kbd>
+    </blockquote>
 
     <p>If not specified, the system will attempt to parse <var>DATE-TIME</var>
     using the following formats:</p>
 
     <dl>
       <dt>ctime</dt>
-      
+
       <dd><var>%a %b %d %H:%M:%S %Y</var></dd>
 
       <dt>Unix date</dt>
-      
+
       <dd><var>%a %b %d %H:%M:%S %Z %Y</var></dd>
 
       <dt>Basic ISO8601</dt>
-      
+
       <dd><var>%Y-%m-%dT%H:%M:%S</var>, <var>%Y%m%dT%H%M%S</var></dd>
 
       <dt>Cylc (deprecated mode)</dt>
-      
+
       <dd><var>%Y%m%d%H</var></dd>
     </dl>
 
@@ -1007,11 +1069,10 @@ rose date 19700101T000000Z 20380119T031407Z
 
     <h3 id="rose-date-print-format">PRINT FORMAT</h3>
 
-    <p>For printing a date time point, the print format will default to the same
-    format as the parse format. Also supports the isodatetime library dump
+    <p>For printing a date time point, the print format will default to the
+    same format as the parse format. Also supports the isodatetime library dump
     syntax for these operations which follows ISO 8601 example syntax - for
     example:</p>
-
     <pre>
 'CCYY-MM-DDThh:mm:ss' -&gt; '1955-11-05T09:28:00',
 'CCYY' -&gt; '1955',
@@ -1019,8 +1080,8 @@ rose date 19700101T000000Z 20380119T031407Z
 'CCYY-Www-D' -&gt; '1955-W44-6'.
 </pre>
 
-    <p>Usage of this ISO 8601-like syntax should be as ISO 8601-compliant
-    as possible.</p>
+    <p>Usage of this ISO 8601-like syntax should be as ISO 8601-compliant as
+    possible.</p>
 
     <p>Note that specifying an explicit timezone in this format (e.g.
     <var>CCYY-MM-DDThh:mm:ss+0100</var> or <var>CCYYDDDThhmmZ</var> will
@@ -1032,15 +1093,19 @@ rose date 19700101T000000Z 20380119T031407Z
 
     <ul>
       <li>y: years</li>
+
       <li>m: months</li>
+
       <li>d: days</li>
+
       <li>h: hours</li>
+
       <li>M: minutes</li>
+
       <li>s: seconds</li>
     </ul>
 
     <p>For example, for a duration <samp>P57DT12H</samp>:</p>
-
     <pre>
 'y,m,d,h' -&gt; '0,0,57,12'
 </pre>
@@ -2784,23 +2849,24 @@ environment scripting = "eval $(rose task-env)"
 
     <p>Launch the Rosie client GTK+ GUI.</p>
 
-    <p>If arguments are specified, rosie go will perform an initial lookup based
-    on the arguments, which can be an address, a query, or search words. See
-    <a href="#rosie-lookup">rosie lookup</a> for detail.</p>
+    <p>If arguments are specified, rosie go will perform an initial lookup
+    based on the arguments, which can be an address, a query, or search words.
+    See <a href="#rosie-lookup">rosie lookup</a> for detail.</p>
 
     <p>Unless an option is used to specify the initial search type the argument
     is interpreted as follows:</p>
 
     <ul>
       <li>A string beginning with <em>http</em> - an address</li>
+
       <li>A string not beginning with <em>http</em> - search words</li>
     </ul>
 
     <p>An address URL may contain shell meta characters, so remember to put it
     in quotes.</p>
 
-    <p>If no argument is specified, <code>rosie go</code> will display a list of
-    all your locally checked out suites.</p>
+    <p>If no argument is specified, <code>rosie go</code> will display a list
+    of all your locally checked out suites.</p>
 
     <h3>OPTIONS</h3>
 
@@ -2858,8 +2924,8 @@ environment scripting = "eval $(rose task-env)"
     <dl>
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
-      <dd>Specify the name of one or more Rosie web service servers to use. This
-      option can be used multiple times.</dd>
+      <dd>Specify the name of one or more Rosie web service servers to use.
+      This option can be used multiple times.</dd>
     </dl>
 
     <h2 id="rosie-id">rosie id</h2>
@@ -2966,6 +3032,7 @@ environment scripting = "eval $(rose task-env)"
 
     <ul>
       <li>A string beginning with <em>http</em> - an address</li>
+
       <li>A string not beginning with <em>http</em> - search words</li>
     </ul>
 
@@ -3100,8 +3167,8 @@ abc01 from daisy
       column names or properties preceded by <kbd>%</kbd>.</dd>
 
       <dd>
-        For example: <kbd>rosie ls --format="%idx from %owner"</kbd>
-        might give:
+        For example: <kbd>rosie ls --format="%idx from %owner"</kbd> might
+        give:
         <pre>
 abc01 from daisy
 </pre>

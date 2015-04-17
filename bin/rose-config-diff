@@ -21,8 +21,11 @@
 #     rose config-diff
 #
 # SYNOPSIS
-#     # Display the metadata-annotated difference between two Rose configs.
+#     # Display the metadata-annotated diff between two Rose config files.
 #     rose config-diff FILE1 FILE2
+#
+#     # Display the metadata-annotated diff between two Rose config dirs.
+#     rose config-diff DIR1 DIR2
 #
 #     # Display the diff, ignoring particular setting patterns
 #     rose config-diff --ignore=namelist:foo FILE1 FILE2
@@ -44,9 +47,8 @@
 #     --ignore=PATTERN, -i PATTERN
 #         Ignore settings that contain the regular expression PATTERN in their
 #         id. Can be specified more than once. PATTERN may also be a key used
-#         in site or user configuration which expands to a list of patterns:
-#         [rose-config-diff]
-#         ignore{PATTERN}=PATTERN1,PATTERN2,...
+#         in site or user configuration which expands to a list of patterns.
+#         See CONFIGURATION below.
 #     --meta-path=PATH, -M PATH
 #         Prepend PATH to the metadata search path (look here first).
 #         This option can be used repeatedly to load multiple paths.
@@ -59,11 +61,35 @@
 #         Prepend $ROSE_META_PATH to the metadata search path.
 #
 # ARGUMENTS
-#     FILE1, FILE2
-#         Two Rose configuration files (e.g. two rose-app.conf files) to
-#         compare. '-' for FILE1 or FILE2 denotes read in from standard input.
+#     PATH1, PATH2
+#         Two Rose configuration files or directories to compare.
+#         If the path is a directory, look underneath for a Rose configuration
+#         file.
+#         '-' for PATH1 or PATH2 denotes read in from standard input.
 #     --
 #         Options and arguments after a -- token are passed directly to the
 #         diff tool.
+#
+# CONFIGURATION
+#     [external]diff-tool, [external]gdiff-tool
+#         You can override the default non-graphical and graphical diff tools
+#         by setting e.g.:
+#         [external]
+#         diff-tool=diff3
+#         gdiff-tool=kompare
+#         in your site or user Rose configuration (rose.conf).
+#     [rose-config-diff]properties, [rose-config-diff]ignore{...}
+#         You can override the default metadata properties to display by
+#         setting e.g.:
+#         [rose-config-diff]
+#         properties=title,ns,description,help
+#         in your site or user Rose configuration (rose.conf).
+#         You can also set shorthand ignore patterns by setting e.g.:
+#         [rose-config-diff]
+#         ignore{foo}=namelist:bar,namelist:baz
+#         in the same location. This will allow you to run:
+#         rose config-diff --ignore=foo ...
+#         instead of:
+#         rose config-diff --ignore=namelist:bar --ignore=namelist:baz ...
 #-------------------------------------------------------------------------------
 exec python -m rose.config_diff "$@"

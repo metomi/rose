@@ -29,10 +29,11 @@ import tempfile
 
 import rose.config
 import rose.fs_util
+import rose.macro
 import rose.opt_parse
 import rose.popen
 import rose.resource
-import rose.macro
+import rose.run
 
 
 class ConfigDiffDefaults(object):
@@ -155,11 +156,25 @@ def main():
 
     output_filenames = []
     config_type = rose.SUB_CONFIG_NAME
+    file_paths = []
     for path in paths:
         if path == "-":
+            file_paths.append(path)
             continue
-        config_type = os.path.basename(path)
-    for path in paths:
+        if os.path.isdir(path):
+            for filename in rose.CONFIG_NAMES:
+                file_path = os.path.join(path, filename)
+                if os.path.isfile(file_path):
+                    config_type = filename
+                    file_paths.append(file_path)
+                    break
+            else:
+                raise rose.run.ConfigNotFoundError(
+                    path, rose.GLOB_CONFIG_FILE)
+        else:
+            config_type = os.path.basename(path)
+            file_paths.append(path)
+    for path in file_paths:
         if path == "-":
             path = sys.stdin
             filename = config_type
@@ -192,9 +207,8 @@ def main():
         diff_cmd = shlex.split(opts.diff_tool) + cmd_opts_args
     return_code = 1
     try:
-        return_code, stdout, stderr = popener.run(*diff_cmd)
-        sys.stdout.write(stdout)
-        sys.stderr.write(stderr)
+        return_code, stdout, stderr = popener.run(
+            *diff_cmd, stdout=sys.stdout, stderr=sys.stderr)
     finally:
         fs_util = rose.fs_util.FileSystemUtil()
         for path in output_filenames:
