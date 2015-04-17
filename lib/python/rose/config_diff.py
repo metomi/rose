@@ -207,8 +207,9 @@ def main():
         diff_cmd = shlex.split(opts.diff_tool) + cmd_opts_args
     return_code = 1
     try:
-        return_code, stdout, stderr = popener.run(
-            *diff_cmd, stdout=sys.stdout, stderr=sys.stderr)
+        return_code, stdout, stderr = popener.run(*diff_cmd)
+        sys.stdout.write(stdout)
+        sys.stderr.write(stderr)
     finally:
         fs_util = rose.fs_util.FileSystemUtil()
         for path in output_filenames:
