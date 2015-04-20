@@ -149,6 +149,12 @@ class RoseOptionParser(OptionParser):
              "dest": "diff",
              "default": None,
              "help": "Set a datetime to subtract from DATE-TIME."}],
+        "diff_tool": [
+            ["--diff-tool"],
+            {"action": "store",
+             "dest": "diff_tool",
+             "default": None,
+             "help": "Specify an alternate diff tool like diffuse."}],
         "downgrade": [
             ["--downgrade", "-d"],
             {"action": "store_true",
@@ -175,6 +181,12 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "force_mode",
              "help": "Switch on force mode."}],
+        "graphical": [
+            ["--graphical", "-g"],
+            {"action": "store_true",
+             "dest": "graphical_mode",
+             "default": False,
+             "help": "Run in graphical mode (X windows, etc.)"}],
         "gcontrol_mode": [
             ["--no-gcontrol"],
             {"action": "store_false",
@@ -190,6 +202,12 @@ class RoseOptionParser(OptionParser):
             ["--host"],
             {"metavar": "HOST",
              "help": "Specify a host"}],
+        "ignore": [
+            ["--ignore", "-i"],
+            {"action": "append",
+             "dest": "ignore_patterns",
+             "metavar": "PATTERN",
+             "help": "Ignore setting ids that contain (regex) PATTERN."}],
         "info_file": [
             ["--info-file"],
             {"metavar": "FILE",
@@ -431,6 +449,11 @@ class RoseOptionParser(OptionParser):
             {"action": "append",
              "metavar": "PROPERTY",
              "help": "Specify a property."}],
+        "properties": [
+            ["--properties", "-p"],
+            {"action": "store",
+             "metavar": "PROPERTIES",
+             "help": "Specify a comma-separated list of properties."}],
         "prune_remote_mode": [
             ["--prune-remote", "--tidy-remote"],
             {"action": "store_true",

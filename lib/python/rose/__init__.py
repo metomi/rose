@@ -29,6 +29,7 @@ CONFIG_DELIMITER = "="
 # Filenames and directory names
 CONFIG_NAMES = ["rose-app.conf", "rose-meta.conf",
                 "rose-suite.conf", "rose-suite.info"]
+GLOB_CONFIG_FILE = "rose*.conf"
 META_CONFIG_NAME = "rose-meta.conf"
 CONFIG_META_DIR = "meta"
 SUB_CONFIG_NAME = "rose-app.conf"

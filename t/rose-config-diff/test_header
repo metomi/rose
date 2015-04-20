@@ -1,0 +1,53 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-5 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# Provides header for "rose config-dump" tests.
+#-------------------------------------------------------------------------------
+. $(dirname $0)/../lib/bash/test_header
+
+function init() {
+    local ROSE_TYPE=$1
+    local NUMBER=$2
+    mkdir "$TEST_DIR/$ROSE_TYPE$NUMBER/"
+    cat >"$TEST_DIR/$ROSE_TYPE$NUMBER/rose-$ROSE_TYPE.conf"
+}
+
+function init_meta() {
+    local ROSE_TYPE=$1
+    local NUMBER=$2
+    mkdir -p "$TEST_DIR/$ROSE_TYPE$NUMBER/meta/"
+    cat >"$TEST_DIR/$ROSE_TYPE$NUMBER/meta/rose-meta.conf"
+}
+
+function init_rose_meta() {
+    local category=$1
+    local version=$2    
+    mkdir -p $TEST_DIR/rose-meta/$category/$version
+    cat >$TEST_DIR/rose-meta/$category/$version/rose-meta.conf
+}
+
+function setup() {
+    mkdir $TEST_DIR/run
+    cd $TEST_DIR/run
+}
+
+function teardown() {
+    cd $TEST_DIR
+    rm -rf $TEST_DIR/run
+}
