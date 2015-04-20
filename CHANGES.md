@@ -5,6 +5,62 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q2)
+
+Rose release 26. This release will work best with
+[cylc-6.4.0](https://github.com/cylc/cylc/releases/tag/6.4.0) and beyond.
+
+### Highlighted Changes
+
+[#1591](https://github.com/metomi/rose/pull/1591):
+rose config-diff: new command to display metadata-annotated config diffs.
+
+### Noteworthy Changes
+
+[#1598](https://github.com/metomi/rose/pull/1598):
+rosie id: now accepts `~/cylc-run/SUITE/` as an argument.
+
+[#1594](https://github.com/metomi/rose/pull/1594):
+rose suite-run: allow suite `bar` when suite `foo-bar` is also running.
+
+[#1592](https://github.com/metomi/rose/pull/1592):
+Rosie Clients will now attempt to use gpg-agent before GnomeKeyring.
+
+[#1590](https://github.com/metomi/rose/pull/1590):
+rose suite-hook: `--shutdown` even if `--mail` fails
+
+[#1588](https://github.com/metomi/rose/pull/1588):
+rose host-select: reinstate timeout for SSH commands - kill SSH commands if
+they take too long to run - useful for catching situations not caught by the
+`-oConnectTimeout=SECS` option. Improve random and no threshold selection
+logic - run SSH commands in serial to reduce loads to the system.
+
+[#1586](https://github.com/metomi/rose/pull/1586):
+rose_ana: allow ignoring tasks.
+
+[#1584](https://github.com/metomi/rose/pull/1584):
+rose bush: now correctly returns HTTP 403 or 404 for relevant items.
+
+[#1581](https://github.com/metomi/rose/pull/1581):
+rosie go: rephrase *view all revisions* to *search all revisions*.
+
+[#1580](https://github.com/metomi/rose/pull/1580):
+rosa db-create: will no longer run `post-commit` hooks with unnecessary
+notification.
+
+[#1579](https://github.com/metomi/rose/pull/1579):
+rose bush: jobs: Only hide the *Display Options* form if all options are set as
+defaults.
+
+[#1574](https://github.com/metomi/rose/pull/1574):
+rose_ana: improve output and fix test on wallclock time.
+
+[#1568](https://github.com/metomi/rose/pull/1568):
+rose config-edit: better handling of file source. The page is now a normal page
+with a special source value widget.
+
+--------------------------------------------------------------------------------
+
 ## 2015.03.0 (2015-03-26)
 
 Rose release 25. This release works best with
