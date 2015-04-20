@@ -31,7 +31,6 @@ tests 24
 TEST_KEY=$TEST_KEY_BASE-no-metadata
 setup
 run_pass "$TEST_KEY" rose config -f $FILE --meta
-cat $TEST_KEY.out >/dev/tty
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

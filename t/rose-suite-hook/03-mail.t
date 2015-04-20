@@ -20,7 +20,6 @@
 # Test "rose suite-hook --mail", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-
 mock_smtpd_init
 if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
     skip_all "cannot start SMTP server"
@@ -84,9 +83,9 @@ file_grep "$TEST_KEY.smtp.content.1" "Task: t1.1" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.content.2" "See: file://$SUITE_RUN_DIR" smtpd-tail.out
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-at-host
-cat >conf/rose.conf <<'__CONF__'
+cat >conf/rose.conf <<__CONF__
 [rose-suite-hook]
-smtp-host=localhost:8025
+smtp-host=$TEST_SMTPD_HOST
 email-host=hms.beagle
 __CONF__
 run_pass "$TEST_KEY" rose suite-hook \
