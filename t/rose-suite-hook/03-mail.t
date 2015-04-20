@@ -85,7 +85,7 @@ file_grep "$TEST_KEY.smtp.content.2" "See: file://$SUITE_RUN_DIR" smtpd-tail.out
 TEST_KEY=$TEST_KEY_BASE-at-host
 cat >conf/rose.conf <<'__CONF__'
 [rose-suite-hook]
-smtp-host=localhost:8025
+smtp-host=$TEST_SMTP_HOST
 email-host=hms.beagle
 __CONF__
 run_pass "$TEST_KEY" rose suite-hook \

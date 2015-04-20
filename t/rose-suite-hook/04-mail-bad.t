@@ -26,7 +26,6 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost -q
-sleep 5
 #-------------------------------------------------------------------------------
 # Start and stop the mail server.
 bad_smtpd_init
