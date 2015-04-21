@@ -184,12 +184,17 @@ class SuiteDirector():
         config = editor.output_config_objects()['/discovery']
         finish_function(config)
 
-    def run_new_suite_wizard(self, config, create_suite, parent_window,
-                             window=None):
+    def run_new_suite_wizard(self, config, from_id, prefix, create_suite,
+                             parent_window, window=None):
         """Run the suite wizard."""
         if window is None:
-            window = gtk.Dialog(title=rosie.browser.TITLE_NEW_SUITE_WIZARD,
-                                parent=parent_window)
+            if from_id:
+                title = rosie.browser.TITLE_NEW_SUITE_WIZARD_FROMID.format(
+                    from_id)
+            else:
+                title = rosie.browser.TITLE_NEW_SUITE_WIZARD_PREFIX.format(
+                    prefix)
+            window = gtk.Dialog(title=title, parent=parent_window)
             window.set_default_size(*rosie.browser.SIZE_WINDOW_NEW_SUITE)
             window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
             window.set_modal(False)
@@ -200,10 +205,8 @@ class SuiteDirector():
             window.destroy()
             return None
         config.set(["project"], project)
-        back_hook = lambda *a: self.run_new_suite_wizard(config,
-                                                         create_suite,
-                                                         parent_window,
-                                                         window)
+        back_hook = lambda *a: self.run_new_suite_wizard(
+            config, from_id, prefix, create_suite, parent_window, window)
         finish_hook = create_suite
         self._edit_config(config, window, back_hook, finish_hook)
 
