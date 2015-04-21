@@ -3,24 +3,18 @@
 UTC mode=True
     [[event hooks]]
         timeout handler=rose suite-hook --shutdown
-        timeout=5
+        timeout=PT30S
 
 [scheduling]
     [[dependencies]]
         graph="""
           rose_ana_t1 # basic
-          rose_ana_t2_activated:fail => rose_ana_t2_deactivated 
+          rose_ana_t2_activated:fail => rose_ana_t2_deactivated
         """
 
 [runtime]
-    [[root]]
-        command scripting=rose task-run -v -v --debug
-        [[[event hooks]]]
-            succeeded handler=rose suite-hook
-            failed handler=rose suite-hook --shutdown
-            submission failed handler=rose suite-hook --shutdown
-
     [[rose_ana_t1]]
+        command scripting = rose task-run -v -v --debug
 
     [[rose_ana_t2_activated]]
         command scripting = rose task-run -v -v --debug --app-key=rose_ana_t2
