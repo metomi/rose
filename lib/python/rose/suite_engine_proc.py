@@ -716,6 +716,10 @@ class SuiteEngineProcessor(object):
         self.handle_event(WebBrowserEvent(w.name, url))
         return url
 
+    def parse_job_log_rel_path(self, f_name):
+        """Return (cycle, task, submit_num, ext) for a job log rel path."""
+        raise NotImplementedError()
+
     def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
         raise NotImplementedError()

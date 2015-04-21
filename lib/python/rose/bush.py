@@ -351,6 +351,18 @@ class Root(object):
         name = path
         if path_in_tar:
             name = path_in_tar
+        job_entry = None
+        if name.startswith("log/job/"):
+            names = self.suite_engine_proc.parse_job_log_rel_path(name)
+            if len(names) == 4:
+                cycle, task, submit_num, ext = names
+                entries = self.suite_engine_proc.get_suite_job_events(
+                    user, suite, [cycle], [task], None, None, None, None)[0]
+                print entries
+                for entry in entries:
+                    if entry["submit_num"] == int(submit_num):
+                        job_entry = entry
+                        break
         if fnmatch(os.path.basename(path), "rose*.conf"):
             file_content = "rose-conf"
         else:
@@ -359,19 +371,20 @@ class Root(object):
         data = {}
         data.update(self._get_suite_logs_info(user, suite))
         return template.render(
-                rose_version=self.rose_version,
-                script=cherrypy.request.script_name,
-                time=strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
-                host=self.host_name,
-                user=user,
-                suite=suite,
-                path=path,
-                path_in_tar=path_in_tar,
-                f_name=f_name,
-                mode=mode,
-                file_content=file_content,
-                lines=lines,
-                **data)
+            rose_version=self.rose_version,
+            script=cherrypy.request.script_name,
+            time=strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+            host=self.host_name,
+            user=user,
+            suite=suite,
+            path=path,
+            path_in_tar=path_in_tar,
+            f_name=f_name,
+            mode=mode,
+            file_content=file_content,
+            lines=lines,
+            entry=job_entry,
+            **data)
 
     def _get_suite_logs_info(self, user, suite):
         data = {"info": {}, "files": {}}

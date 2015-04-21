@@ -796,7 +796,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 f_bsize = os.statvfs(".").f_bsize
                 tar = tarfile.open(archive_file_name0, "w", bufsize=f_bsize)
                 for name in names:
-                    cycle, task, s_n, ext = self._parse_job_log_base_name(name)
+                    cycle, task, s_n, ext = self.parse_job_log_rel_path(name)
                     if s_n == "NN" or ext == "job.status":
                         continue
                     tar.add(name, name.replace("log/", "", 1))
@@ -808,7 +808,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 self.fs_util.delete(os.path.join("log", "job", cycle))
                 for name in names:
                     # cycle, task, submit_num, extension
-                    cycle, task, s_n, ext = self._parse_job_log_base_name(name)
+                    cycle, task, s_n, ext = self.parse_job_log_rel_path(name)
                     if s_n == "NN" or ext == "job.status":
                         continue
                     stmt_args = [
@@ -958,8 +958,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 stat = os.stat(f_name)
                 rel_f_name = f_name[len(dir_) + 1:]
                 # cycle, task, submit_num, extension
-                cycle, task, s_n, ext = self._parse_job_log_base_name(
-                    rel_f_name)
+                cycle, task, s_n, ext = self.parse_job_log_rel_path(rel_f_name)
                 if s_n == "NN":
                     continue
                 stmt_args = [cycle, task, int(s_n), ext, rel_f_name, "",
@@ -1007,6 +1006,10 @@ class CylcProcessor(SuiteEngineProcessor):
             except OSError:
                 pass
 
+    @classmethod
+    def parse_job_log_rel_path(cls, f_name):
+        """Return (cycle, task, submit_num, ext)."""
+        return f_name.replace("log/job/", "").split("/", 3)
 
     def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
@@ -1200,11 +1203,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 prefix, self.get_suite_dir_rel(suite_name, db_name)))
             self.daos[db_name][key] = DAO(db_f_name)
         return self.daos[db_name][key]
-
-    @classmethod
-    def _parse_job_log_base_name(cls, f_name):
-        """Return (cycle, task, submit_num, ext)."""
-        return f_name.replace("log/job/", "").split("/", 3)
 
     def _parse_task_cycle_id(self, item):
         """Parse name.cycle. Return (cycle, name)."""
