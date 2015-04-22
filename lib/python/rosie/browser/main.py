@@ -677,10 +677,13 @@ class MainWindow(gtk.Window):
             prefix = None
         config = self.suite_director.vc_client.generate_info_config(
             from_id, prefix)
-        finish_func = functools.partial(
-            self._create_suite_hook, config, from_id, prefix)
+        finish_func = lambda c: self._create_suite_hook(c, from_id, prefix)
+        if from_id:
+            title = rosie.browser.TITLE_NEW_SUITE_WIZARD_FROMID.format(from_id)
+        else:
+            title = rosie.browser.TITLE_NEW_SUITE_WIZARD_PREFIX.format(prefix)
         return self.suite_director.run_new_suite_wizard(
-            config, from_id, prefix, finish_func, self)
+            title, config, finish_func, self)
 
     def handle_delete(self, *args):
         """"Handles deletion of a suite."""

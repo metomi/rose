@@ -110,7 +110,7 @@ class SuiteDirector():
 
         return False
 
-    def _edit_config(self, config, window, back_function, finish_function):
+    def _edit_config(self, config, window, back_func, finish_func):
         project = config.get(["project"]).value
         config.set(["project"], project)
         meta_config = rose.macro.load_meta_config(config)
@@ -138,10 +138,10 @@ class SuiteDirector():
         ok_button.connect(
                   "clicked",
                   lambda b: self._finish_config(page_box, window,
-                                                editor, finish_function))
+                                                editor, finish_func))
         ok_button.show()
         back_button = gtk.Button(stock=gtk.STOCK_GO_BACK)
-        back_button.connect("clicked", back_function)
+        back_button.connect("clicked", back_func)
         back_button.show()
         cancel_button = gtk.Button(stock=gtk.STOCK_CANCEL)
         cancel_button.connect("clicked",
@@ -165,7 +165,7 @@ class SuiteDirector():
         vbox.grab_focus()
         window.resize(*rosie.browser.SIZE_WINDOW_NEW_SUITE_EDIT)
 
-    def _finish_config(self, page_container, window, editor, finish_function):
+    def _finish_config(self, page_container, window, editor, finish_func):
         page = page_container.get_children()[0]
         if page.validate_errors():
             ok_dialog = gtk.MessageDialog(
@@ -181,19 +181,12 @@ class SuiteDirector():
             if response != gtk.RESPONSE_ACCEPT:
                 return False
         window.destroy()
-        config = editor.output_config_objects()['/discovery']
-        finish_function(config)
+        finish_func(editor.output_config_objects()['/discovery'])
 
-    def run_new_suite_wizard(self, config, from_id, prefix, create_suite,
+    def run_new_suite_wizard(self, title, config, finish_func,
                              parent_window, window=None):
         """Run the suite wizard."""
         if window is None:
-            if from_id:
-                title = rosie.browser.TITLE_NEW_SUITE_WIZARD_FROMID.format(
-                    from_id)
-            else:
-                title = rosie.browser.TITLE_NEW_SUITE_WIZARD_PREFIX.format(
-                    prefix)
             window = gtk.Dialog(title=title, parent=parent_window)
             window.set_default_size(*rosie.browser.SIZE_WINDOW_NEW_SUITE)
             window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
@@ -205,10 +198,9 @@ class SuiteDirector():
             window.destroy()
             return None
         config.set(["project"], project)
-        back_hook = lambda *a: self.run_new_suite_wizard(
-            config, from_id, prefix, create_suite, parent_window, window)
-        finish_hook = create_suite
-        self._edit_config(config, window, back_hook, finish_hook)
+        back_func = lambda *a: self.run_new_suite_wizard(
+            title, config, finish_func, parent_window, window)
+        self._edit_config(config, window, back_func, finish_func)
 
     def _select_project(self, project, window):
         for child in window.action_area:
