@@ -131,7 +131,6 @@ class MainWindow(gtk.Window):
                               rosie.browser.PROGRAM_NAME))
         self.suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=self.handle_view_output_event)
-        self.prefix = SuiteId.get_prefix_default()
         rose.macro.add_site_meta_paths()
         rose.macro.add_env_meta_paths()
         self.show()
@@ -259,13 +258,13 @@ class MainWindow(gtk.Window):
         self.menubar.uimanager.get_widget(
             '/TopMenuBar/History/Show search history').set_active(False)
 
-    def _create_suite_hook(self, config, from_id=None):
+    def _create_suite_hook(self, config, from_id, prefix):
         """Hook function to create a suite from a configuration."""
         if config is None:
             return
         try:
             new_id = self.suite_director.vc_client.create(
-                config, from_id, self.prefix)
+                config, from_id, prefix)
         except Exception as exc:
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        type(exc).__name__ + ": " + str(exc),
@@ -657,12 +656,34 @@ class MainWindow(gtk.Window):
 
     def handle_create(self, from_id=None):
         """Create a new suite."""
+        if from_id is None:
+            if len(self.ws_client.prefixes) > 1:
+                choices = {}
+                for value in self.ws_client.prefixes:
+                    key = value + " - " + SuiteId.get_prefix_location(value)
+                    choices[key] = value
+                choice = rose.gtk.dialog.run_choices_dialog(
+                    rosie.browser.DIALOG_MESSAGE_CREATE_PREFIX,
+                    sorted(choices.keys()),
+                    rosie.browser.DIALOG_TITLE_CREATE_PREFIX)
+                if choice is None:
+                    return
+                prefix = choices[choice]
+            elif self.ws_client.prefixes:
+                prefix = self.ws_client.prefixes[0]
+            else:
+                SuiteId.get_prefix_default()
+        else:
+            prefix = None
         config = self.suite_director.vc_client.generate_info_config(
-            from_id, self.prefix)
-        finish_func = functools.partial(self._create_suite_hook,
-                                        from_id=from_id)
+            from_id, prefix)
+        finish_func = lambda c: self._create_suite_hook(c, from_id, prefix)
+        if from_id:
+            title = rosie.browser.TITLE_NEW_SUITE_WIZARD_FROMID.format(from_id)
+        else:
+            title = rosie.browser.TITLE_NEW_SUITE_WIZARD_PREFIX.format(prefix)
         return self.suite_director.run_new_suite_wizard(
-            config, finish_func, self)
+            title, config, finish_func, self)
 
     def handle_delete(self, *args):
         """"Handles deletion of a suite."""

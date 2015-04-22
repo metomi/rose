@@ -149,6 +149,7 @@ LOCAL_STATUS_UPDATE = "Local copy at older revision"
 # Dialog text
 
 DIALOG_MESSAGE_CHECKOUT = "checkout {0}"
+DIALOG_MESSAGE_CREATE_PREFIX = "Choose a repository to create the new suite:"
 DIALOG_MESSAGE_CLEAR_HISTORY_CONFIRMATION = ("Delete search history?")
 DIALOG_MESSAGE_DELETE_LOCAL_CONFIRM = ("You are about to delete your local" +
                                        " copy of {0}")
@@ -160,6 +161,7 @@ DIALOG_MESSAGE_UNCOMPLETED_FILTER = "Uncompleted filter"
 DIALOG_MESSAGE_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +
                                      "suite {0} is not registered.")
 DIALOG_TITLE_CHECKOUT = "Checkout"
+DIALOG_TITLE_CREATE_PREFIX = "Create"
 DIALOG_TITLE_DELETE = "Confirm Delete"
 DIALOG_TITLE_HISTORY_ERROR = "History Error"
 DIALOG_TITLE_INFO = "Suite Info"
@@ -228,7 +230,8 @@ LABEL_ERROR_DISCOVERY = "Ignore errors in suite info?"
 LABEL_ERROR_LOCAL = "Unable to retrieve details for local suites."
 LABEL_ERROR_PREFIX = "Unable to retrieve settings for prefix: {0}"
 LABEL_HISTORY_TREEVIEW = "Search History"
-TITLE_NEW_SUITE_WIZARD = "Edit new suite information"
+TITLE_NEW_SUITE_WIZARD_FROMID = "Create suite from {0}: edit suite information"
+TITLE_NEW_SUITE_WIZARD_PREFIX = "Create suite at {0}: edit suite information"
 TITLE_ERROR_DISCOVERY = "Errors found"
 TITLE_HISTORY_IO_ERROR = "History read/write error"
 TITLE_HISTORY_NAVIGATION_ERROR = "History navigation error"
