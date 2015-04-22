@@ -95,7 +95,15 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 <abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
 </small></div>
 {% endif -%}
+
+{% if entry -%}
+<hr />
+<div class="container-fluid">
+{% include "job-entry.html" %}
 </div>
+{% endif -%}
+</div>
+
 <div class="container-fluid">
 <div class="row-fluid">
 <div class="span1 text-right">
