@@ -17,6 +17,15 @@ rose config-diff: new command to display metadata-annotated config diffs.
 
 ### Noteworthy Changes
 
+[#1601](https://github.com/metomi/rose/pull/1601):
+rosie go: create new suite: if multiple data sources are specified, display
+dialog box for user to select a prefix from the prefixes associated with the
+selected data sources; if a single data source is specified, automatically
+select the prefix associated with the specified data source.
+
+[#1600](https://github.com/metomi/rose/pull/1600):
+rose bush: view: will now link to related job logs when viewing a job log file.
+
 [#1598](https://github.com/metomi/rose/pull/1598):
 rosie id: now accepts `~/cylc-run/SUITE/` as an argument.
 
