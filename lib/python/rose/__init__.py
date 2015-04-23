@@ -56,9 +56,15 @@ INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=issue-list",
                                 "=title",]
 SUB_CONFIG_DEFAULT_META_IDS = ["=file-install-root", "=meta", "=mode",
                                "=opts", "command", "file:", "poll"]
-TOP_CONFIG_DEFAULT_META_IDS = ["file:", "jinja2:suite.rc", "=meta", "=opts",
-                               "=root-dir", "=root-dir-share",
-                               "=root-dir-work"]
+TOP_CONFIG_DEFAULT_META_IDS = [
+    "file:",
+    "jinja2:suite.rc",
+    "=meta",
+    "=opts",
+    "=root-dir",
+    "=root-dir{share}",
+    "=root-dir{share/cycle}",
+    "=root-dir{work}"]
 CONFIG_SETTING_INDEX_DEFAULT = "1"
 
 

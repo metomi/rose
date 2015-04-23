@@ -60,7 +60,7 @@ for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY="$TEST_KEY_BASE-db"
     for TRY in 1 2; do
         FILE=$SUITE_RUN_DIR/work/$CYCLE/archive/rose-arch-db-$TRY.out
-        sed "s?\\\$ROSE_DATAC?$SUITE_RUN_DIR/share/data/$CYCLE?" \
+        sed "s?\\\$ROSE_DATAC?$SUITE_RUN_DIR/share/cycle/$CYCLE?" \
             "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" >$FILE.expected
         file_cmp "$TEST_KEY-$CYCLE.out" $FILE.expected $FILE
     done
@@ -111,7 +111,7 @@ file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5/01/job.err" <<'__ERR__'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}6/01/job.err" <<__ERR__
-[FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/data/2013010112/hello/mars.txt # return-code=1, stderr=
+[FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/cycle/2013010112/hello/mars.txt # return-code=1, stderr=
 [FAIL] foo: push: unknown action
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-7"
@@ -132,8 +132,8 @@ file_cmp "$TEST_KEY.out" \
 sed 's?\(hello/planet-5.txt\) .*\(/hello/planet-5.txt\)?\1 \2?' \
     "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.err" >"$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] my-bad-command $SUITE_RUN_DIR/share/data/2013010112/hello/planet-5.txt /hello/planet-5.txt # return-code=1, stderr=
-[FAIL] [my-bad-command] $SUITE_RUN_DIR/share/data/2013010112/hello/planet-5.txt /hello/planet-5.txt
+[FAIL] my-bad-command $SUITE_RUN_DIR/share/cycle/2013010112/hello/planet-5.txt /hello/planet-5.txt # return-code=1, stderr=
+[FAIL] [my-bad-command] $SUITE_RUN_DIR/share/cycle/2013010112/hello/planet-5.txt /hello/planet-5.txt
 __ERR__
 
 #-------------------------------------------------------------------------------

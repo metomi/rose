@@ -369,8 +369,8 @@ accel-find-next=F3
       <li><samp>opt/</samp> directory. For detail, see <a href="#opts">Optional
       Configuration</a>.</li>
 
-      <li>Other items, as long as they do not clash with the scheduler's
-      working directories. E.g. for a cylc suite, <samp>log*/</samp>,
+      <li>Other items, as long as they do not clash with the scheduler's working
+      directories. E.g. for a cylc suite, <samp>log*/</samp>,
       <samp>share/</samp>, <samp>state/</samp> and <samp>work/</samp> should be
       avoided.</li>
     </ul>
@@ -459,19 +459,34 @@ root-dir=hpc*=$WORKDIR
         <var>$WORKDIR/cylc-run/$NAME/</var>.</p>
       </dd>
 
-      <dt><code>root-dir-share=LIST</code></dt>
+      <dt><code>root-dir{share}=LIST</code></dt>
 
       <dd>A new line delimited list of <var>PATTERN=DIR</var> pairs. The
       <var>PATTERN</var> should be a glob-like pattern for matching a host
       name. The <var>DIR</var> should be the root directory where the suite's
       share directory should be created.</dd>
 
-      <dt><code>root-dir-work=LIST</code></dt>
+      <dt><code>root-dir{share/cycle}=LIST</code></dt>
+
+      <dd>A new line delimited list of <var>PATTERN=DIR</var> pairs. The
+      <var>PATTERN</var> should be a glob-like pattern for matching a host
+      name. The <var>DIR</var> should be the root directory where the suite's
+      sharecycle directory should be created.</dd>
+
+      <dt><code>root-dir{work}=LIST</code></dt>
 
       <dd>A new line delimited list of <var>PATTERN=DIR</var> pairs. The
       <var>PATTERN</var> should be a glob-like pattern for matching a host
       name. The <var>DIR</var> should be the root directory where the suite's
       work directory for tasks should be created.</dd>
+
+      <dt><code>root-dir-share=LIST</code></dt>
+
+      <dd>Deprecated. Same as <code>root-dir{share}=LIST</code>.</dd>
+
+      <dt><code>root-dir-work=LIST</code></dt>
+
+      <dd>Deprecated. Same as <code>root-dir{work}=LIST</code>.</dd>
     </dl>
 
     <h3 id="suite.info">Suite Configuration: Suite Information</h3>

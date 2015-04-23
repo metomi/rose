@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-clean", --only= glob and a localhost root-dir-* setting.
+# Test "rose suite-clean", --only= glob and a localhost root-dir{*} setting.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
@@ -39,7 +39,7 @@ export ROOT_DIR_WORK=$PWD/work
 mkdir 'conf' 'work'
 cat >'conf/rose.conf' <<'__CONF__'
 [rose-suite-run]
-root-dir-work=*=$ROOT_DIR_WORK
+root-dir{work}=*=$ROOT_DIR_WORK
 __CONF__
 
 mkdir -p $HOME/cylc-run
