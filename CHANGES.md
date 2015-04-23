@@ -15,6 +15,32 @@ Rose release 26. This release will work best with
 [#1591](https://github.com/metomi/rose/pull/1591):
 rose config-diff: new command to display metadata-annotated config diffs.
 
+[#1571](https://github.com/metomi/rose/pull/1571):
+rose suite-run, rose suite-clean, rose-task-env, rose task-run:
+The `rose suite-run` command will now create the `share/cycle/` sub-directory of a suite. (The `rose suite-clean` command will do the reverse.)
+Commands such as `rose task-env` and `rose task-run` will now export
+`ROSE_DATAC` (and friends) to point to cycle point directories under the
+`share/cycle/` directory.
+E.g. If current cycle point is `20150430T0000Z`, `ROSE_DATAC` will become
+`$HOME/cylc-run/my-suite/share/cycle/20150430T0000Z`.
+The root of the real location of the `share/`,
+`share/cycle/` `work/` sub-directory of a suite can now be configured using
+the settings `root-dir{share}`, `root-dir{share/cycle}` and `root-dir{work}` in
+the `rose-suite.conf` file, or under the `[rose-suite-run]` section in the
+site/user configuration file. The `root-dir-share` and `root-dir-work` settings
+are deprecated and are equivalent to `root-dir{share}` and `root-dir{work}`
+respectively.
+This change allows shared cycling data to be placed in a different file system
+than shared non-cycling data. E.g. Shared cycling data are typically larger and
+more regularly house-kept, and so are more suitable for a large file system
+with a short retention period. On the other hand, shared non-cycling data will
+typically be used by tasks throughout the life time of the suite, and so are
+more suitable for a file system with a long retention period (or without one).
+The setting `root-dir{share/cycle}=HOST=share/data` can be used to provide
+backward compatibility for the location of `ROSE_DATAC`, if required. This
+setting will ensure that the `share/cycle/` directory is created as a symbolic
+link to the `share/data/` directory.
+
 ### Noteworthy Changes
 
 [#1601](https://github.com/metomi/rose/pull/1601):
@@ -32,8 +58,13 @@ rosie id: now accepts `~/cylc-run/SUITE/` as an argument.
 [#1594](https://github.com/metomi/rose/pull/1594):
 rose suite-run: allow suite `bar` when suite `foo-bar` is also running.
 
+[#1597](https://github.com/metomi/rose/pull/1597),
 [#1592](https://github.com/metomi/rose/pull/1592):
-Rosie Clients will now attempt to use gpg-agent before GnomeKeyring.
+Rosie Clients will now attempt to use gpg-agent before GnomeKeyring by default.
+If this is not desirable, you can add the setting
+`prefix-password-store.PREFIX=gnomekeyring` (where `PREFIX` is the prefix of a
+Rosie web service that requires authentication by password) under the
+`[rosie-id]` section of the site/user configuration file.
 
 [#1590](https://github.com/metomi/rose/pull/1590):
 rose suite-hook: `--shutdown` even if `--mail` fails
