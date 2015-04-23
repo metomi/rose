@@ -301,6 +301,14 @@
 #  prefix-location.PREFIX=URL
 ## E.g.:
 #  prefix-location.foo=svn://host/foo
+## The password store to use.
+## Default is to try "gpgagent", then "gnomekeyring"
+#  prefix-password-store.PREFIX=gpgagent|gnomekeyring
+## E.g.:
+#  prefix-password-store.foo=gnomekeyring
+## For HTTPS requests, location(s) of certificate + private key files
+#  prefix-https-ssl-cert.PREFIX=/path/to/server.pem
+#  prefix-https-ssl-cert.PREFIX=/path/to/server.crt /path/to/key
 ## Default user name for services in prefix
 #  prefix-username.PREFIX=USER-ID
 ## E.g.:
@@ -339,12 +347,6 @@
 ## E.g.:
 #  port=8080
 [rosie-ws]
-
-# Configuration related to Rosie web service clients
-#
-## A boolean
-#  https-verify-ssl.PREFIX=True|False
-[rosie-ws-client-requests]
 
 # Test Battery Configuration
 #
