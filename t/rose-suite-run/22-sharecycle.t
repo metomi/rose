@@ -17,9 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-run" installation of share/cycle/ sub-directory using the
-# backward compatable configuration setting of
-# "root-dir{share/cycle}=HOST=share/data".
+# Test "rose suite-run" installation of share/cycle/ sub-directory.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 
