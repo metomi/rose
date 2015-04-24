@@ -56,7 +56,7 @@ fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-prune-log
 sed '/^\[INFO\] \(create\|delete\|update\)/!d;
-     /^\[INFO\] create.*share/cycle/d;
+     /^\[INFO\] create.*share\/cycle/d;
      /^\[INFO\] delete: \.rose-suite-log.lock/d;
      /\.json/d;
      /[0-9a-h]\{8\}\(-[0-9a-h]\{4\}\)\{3\}-[0-9a-h]\{12\}$/d' \
