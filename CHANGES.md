@@ -16,7 +16,7 @@ Rose release 26. This release will work best with
 rose_prune: can now prune any item with a cycle point in its path name.
 * New `prune{ITEM}=CYCLE[:GLOBS] ...` setting allow prune of items under any
   sub-directories. The old `prune-work-at` and `prune-datac-at` are now
-  deprecated aliases of `prune{work}` and `prune{sharecycle}`.
+  deprecated aliases of `prune{work}` and `prune{share/cycle}`.
 * Cycle points can now be date-time points or offsets of the current cycle
   point.
 * Each glob in the GLOBS string can now contain a `%(cycle)s` substitution.
