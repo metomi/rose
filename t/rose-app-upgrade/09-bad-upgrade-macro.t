@@ -66,7 +66,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Upgraded from 0.1 to 0.2
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-[FAIL] Error: Namelist option mismatch; 
+[FAIL] Error: case mismatch; 
 [FAIL]  Chewie does not match chewie, please only use lowercase.
 [FAIL] 
 __ERROR__

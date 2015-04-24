@@ -388,5 +388,4 @@ def validate_config(config, meta_config, add_report_func):
             value = node.value
             is_error = (option.lower() != option)
         if is_error:
-            add_report_func(section, option, value,
-                            ERROR_UPPERCASE, is_warning=False)
+            add_report_func(section, option, value, ERROR_UPPERCASE)
