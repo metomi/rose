@@ -61,7 +61,7 @@ def main():
         t = NamedTemporaryFile()
         node = ConfigLoader()(file_name)
         if not opts.no_pretty_mode and file_name != META_CONFIG_NAME:
-            pretty_format_config(node)
+            pretty_format_config(node, ignore_error=True)
         ConfigDumper()(node, t)
         t.seek(0)
         if not filecmp.cmp(t.name, file_name, shallow=False):

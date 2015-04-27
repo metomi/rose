@@ -1213,7 +1213,7 @@ class MainController(object):
                     config_data.config_type == rose.INFO_CONFIG_NAME):
                 directory = self.data.top_level_directory
             save_path = os.path.join(directory, filename)
-            rose.macro.pretty_format_config(config)
+            rose.macro.pretty_format_config(config, ignore_error=True)
             try:
                 rose.config.dump(config, save_path)
             except (OSError, IOError) as e:

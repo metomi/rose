@@ -50,6 +50,8 @@ ERROR_LOAD_METADATA = "Could not load metadata {0}\n"
 ERROR_LOAD_CHOSEN_META_PATH = "Could not find metadata for {0}, using {1}\n"
 ERROR_LOAD_META_PATH = "Could not find metadata for {0}"
 ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
+ERROR_MACRO_CASE_MISMATCH = ("Error: case mismatch; \n {0} does not match {1},"
+                              " please only use lowercase.")
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACROS = "Please specify a macro name.\n"
 ERROR_RETURN_TYPE = "{0}: {1}: invalid returned type: {2}, expect {3}"
@@ -708,7 +710,7 @@ def transform_config(config, meta_config, transformer_macro, modules,
     return config, []
 
 
-def pretty_format_config(config):
+def pretty_format_config(config, ignore_error=False):
     """Improve configuration prettiness."""
     for s_key, s_node in config.value.items():
         scheme = s_key
@@ -723,12 +725,16 @@ def pretty_format_config(config):
         for keylist, node in list(s_node.walk()):
             # FIXME: Surely, only the scheme know how to splits its array?
             values = rose.variable.array_split(node.value, ",")
-            node.value = pretty_format_value(values)   
+            node.value = pretty_format_value(values)
             new_keylist = pretty_format_keys(keylist)
             if new_keylist != keylist:
                 s_node.unset(keylist)
                 s_node.set(new_keylist, node.value, node.state, node.comments)
-                
+                if ignore_error is False:
+                    _report_error(text=ERROR_MACRO_CASE_MISMATCH.format(
+                                  keylist[1], new_keylist[1]))
+                    sys.exit(0)
+
 
 def standard_format_config(config):
     """Standardise any degenerate representations e.g. namelist repeats."""
