@@ -10,25 +10,7 @@ for a full listing of issues for each release.
 Rose release 26. This release will work best with
 [cylc-6.4.0](https://github.com/cylc/cylc/releases/tag/6.4.0) and beyond.
 
-### Highlighted Changes
-
-[#1593](https://github.com/metomi/rose/pull/1593):
-rose_prune: can now prune any item with a cycle point in its path name.
-* New `prune{ITEM}=CYCLE[:GLOBS] ...` setting allow prune of items under any
-  sub-directories. The old `prune-work-at` and `prune-datac-at` are now
-  deprecated aliases of `prune{work}` and `prune{share/cycle}`.
-* Cycle points can now be date-time points or offsets of the current cycle
-  point.
-* Each glob in the GLOBS string can now contain a `%(cycle)s` substitution.
-  When a glob is specified like so, the program will not add the cycle under
-  `ITEM` as a sub-directory, but will substitute `%(cycle)s` in the glob with
-  the cycle.
-* The application will now fail if a cycle point in the configuration has a bad
-  syntax.
-
-[#1591](https://github.com/metomi/rose/pull/1591):
-rose config-diff: new command to display the difference between 2 Rose
-configuration files with annotated metadata.
+### Suite Run Time Location Changes
 
 [#1571](https://github.com/metomi/rose/pull/1571):
 rose suite-run, rose suite-clean, rose-task-env, rose task-run:
@@ -39,10 +21,10 @@ rose suite-run, rose suite-clean, rose-task-env, rose task-run:
   `share/cycle/` directory.
   E.g. If current cycle point is `20150430T0000Z`, `ROSE_DATAC` will become
   `$HOME/cylc-run/my-suite/share/cycle/20150430T0000Z`.
-* The root of the real location of the `share/`,
-  `share/cycle/` `work/` sub-directory of a suite can now be configured using
-  the settings `root-dir{share}`, `root-dir{share/cycle}` and `root-dir{work}`
-  in the `rose-suite.conf` file, or under the `[rose-suite-run]` section in the
+* The root of the real location of the `share/`, `share/cycle/`, and `work/`
+  sub-directory of a suite can now be configured using the settings
+  `root-dir{share}`, `root-dir{share/cycle}` and `root-dir{work}` in the
+  `rose-suite.conf` file, or under the `[rose-suite-run]` section in the
   site/user configuration file. The `root-dir-share` and `root-dir-work`
   settings are deprecated and are equivalent to `root-dir{share}` and
   `root-dir{work}` respectively.
@@ -56,7 +38,28 @@ than shared non-cycling data. E.g. Shared cycling data are typically larger and
 more regularly house-kept, and so are more suitable for a large file system
 with a short retention period. On the other hand, shared non-cycling data will
 typically be used by tasks throughout the life time of the suite, and so are
-more suitable for a file system with a long retention period (or without one).
+more suitable for a file system with a long or permanent retention period.
+
+[#1593](https://github.com/metomi/rose/pull/1593):
+rose_prune: can now prune any item with a cycle point in its path name.
+* New `prune{ITEM}=CYCLE[:GLOBS] ...` setting allow prune of items under any
+  sub-directories. The `prune-work-at` and `prune-datac-at` settings are
+  deprecated and are equivalent to `prune{work}` and `prune{share/cycle}`
+  respectively.
+* Cycle points can now be date-time points or offsets of the current cycle
+  point.
+* Each glob in the GLOBS string can now contain a `%(cycle)s` substitution.
+  When a glob is specified like so, the program will not add the cycle under
+  `ITEM` as a sub-directory, but will substitute `%(cycle)s` in the glob with
+  the cycle.
+* The application will now fail if a cycle point in the configuration has a bad
+  syntax.
+
+### Highlighted Changes
+
+[#1591](https://github.com/metomi/rose/pull/1591):
+rose config-diff: new command to display the difference between 2 Rose
+configuration files with annotated metadata.
 
 ### Noteworthy Changes
 
