@@ -72,9 +72,6 @@ select the prefix associated with the specified data source.
 [#1600](https://github.com/metomi/rose/pull/1600):
 rose bush: view: will now link to related job logs when viewing a job log file.
 
-[#1598](https://github.com/metomi/rose/pull/1598):
-rosie id: now accepts `~/cylc-run/SUITE/` as an argument.
-
 [#1594](https://github.com/metomi/rose/pull/1594):
 rose suite-run: allow suite `bar` when suite `foo-bar` is also running.
 
@@ -88,6 +85,9 @@ Rosie web service that requires authentication by password) under the
 
 [#1590](https://github.com/metomi/rose/pull/1590):
 rose suite-hook: `--shutdown` even if `--mail` fails
+
+[#1589](https://github.com/metomi/rose/pull/1589):
+rosie id: now accepts `~/cylc-run/SUITE/` as an argument.
 
 [#1588](https://github.com/metomi/rose/pull/1588):
 rose host-select: reinstate timeout for SSH commands - kill SSH commands if
