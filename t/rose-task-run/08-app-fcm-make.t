@@ -24,8 +24,7 @@ if ! fcm help make 1>/dev/null 2>&1; then
     skip_all 'fcm make unavailable'
 fi
 #-------------------------------------------------------------------------------
-N_TESTS=10
-tests $N_TESTS
+tests 8
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
@@ -34,32 +33,18 @@ fi
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 if [[ -n ${JOB_HOST:-} ]]; then
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\""
+    timeout 60 rose suite-run -q \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
+        --no-gcontrol --host='localhost' \
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --debug
 else
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost
-fi
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
+    timeout 60 rose suite-run -q \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
+        --no-gcontrol --host='localhost' -- --debug
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-status"
@@ -111,13 +96,13 @@ else
         "\\[INFO\\] export ROSE_TASK_MIRROR_TARGET=$JOB_HOST:cylc-run/$NAME/share/fcm_make_t5" \
         $SUITE_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
     file_grep "$TEST_KEY.out.cmd" \
-        "\\[INFO\\] fcm make -f .*$SUITE_RUN_DIR/work/1/fcm_make_t5/fcm-make.cfg -C .*$SUITE_RUN_DIR/share/fcm_make_t5 -j 4" \
+        "\\[INFO\\] fcm make -f .*$SUITE_RUN_DIR/work/1/fcm_make_t5/fcm-make.cfg -C .*$SUITE_RUN_DIR/share/fcm_make_t5 -j 4 mirror\\.target=${JOB_HOST}:cylc-run/${NAME}/share/fcm_make_t5" \
         $SUITE_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
 
     TEST_KEY="$TEST_KEY_BASE-t5-part-2"
     rose suite-log -q --name=$NAME --update fcm_make2_t5
     file_grep "$TEST_KEY.out" \
-        "\\[INFO\\] fcm make -C .*$NAME/share/fcm_make_t5 -j 4" \
+        "\\[INFO\\] fcm make -C .*/cylc-run/${NAME}/share/fcm_make_t5 -n 2 -j 4" \
         $SUITE_RUN_DIR/log/job/1/fcm_make2_t5/01/job.out
 fi
 #-------------------------------------------------------------------------------

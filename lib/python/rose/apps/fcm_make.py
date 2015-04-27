@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 """Builtin application: run "fcm make"."""
 
 from rose.env import env_export
@@ -25,19 +25,21 @@ import os
 import shlex
 import sys
 
+ORIG = 0
+CONT = 1
+
+
 class FCMMakeApp(BuiltinApp):
 
     """Run "fcm make"."""
 
     OPT_JOBS = "4"
     SCHEME = "fcm_make"
-    SCHEME2 = SCHEME + "2"
+    ORIG2CONT = (SCHEME, SCHEME + "2")
 
     def get_app_key(self, name):
         """Return the fcm_make* application key if name is fcm_make2*."""
-        if name.startswith(self.SCHEME2):
-            return self.SCHEME + name.replace(self.SCHEME2, "")
-        return name
+        return name.replace(self.ORIG2CONT[1], self.ORIG2CONT[0])
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Run "fcm make".
@@ -45,61 +47,90 @@ class FCMMakeApp(BuiltinApp):
         This application will only work under "rose task-run".
 
         """
-        t = app_runner.suite_engine_proc.get_task_props()
+        task_name_orig2cont = conf_tree.node.get_value(
+            ["task-name-orig2cont"], ":".join(self.ORIG2CONT)).split(":", 1)
+        task = app_runner.suite_engine_proc.get_task_props()
 
-        if t.task_name.startswith(self.SCHEME2):
-            self._run2(app_runner, conf_tree, opts, args, uuid, work_files, t)
-            return
-
-        task2_name = self.SCHEME2 + t.task_name.replace(self.SCHEME, "")
-
-        use_pwd = conf_tree.node.get_value(["use-pwd"]) in ["True", "true"]
-        auth = app_runner.suite_engine_proc.get_task_auth(
-                t.suite_name, task2_name)
-        if auth is not None:
-            target = auth + ":"
-            if use_pwd:
-                target += os.path.join(t.suite_dir_rel, "work", t.task_id)
-            else:
-                target += os.path.join(t.suite_dir_rel, "share", t.task_name)
-            env_export("ROSE_TASK_MIRROR_TARGET", target,
-                       app_runner.event_handler)
-            # N.B. MIRROR_TARGET deprecated
-            env_export("MIRROR_TARGET", target, app_runner.event_handler)
+        if task_name_orig2cont[CONT] in task.task_name:
+            return self._run_cont(
+                app_runner, conf_tree, args, task, task_name_orig2cont)
 
         cmd = ["fcm", "make"]
-        for cfg in ["fcm-make.cfg",
-                    os.path.join(t.suite_dir, "etc", t.task_name + ".cfg")]:
+        use_pwd = conf_tree.node.get_value(["use-pwd"]) in ["True", "true"]
+        for cfg in [
+                "fcm-make.cfg",
+                os.path.join(task.suite_dir, "etc", task.task_name + ".cfg")]:
             if os.access(cfg, os.F_OK | os.R_OK):
                 if cfg != "fcm-make.cfg" or not use_pwd:
                     cmd += ["-f", os.path.abspath(cfg)]
                 break
         if not use_pwd:
-            cmd += ["-C", os.path.join(t.suite_dir, "share", t.task_name)]
-        cmd_opt_jobs = conf_tree.node.get_value(
-                ["opt.jobs"], os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))
-        cmd += ["-j", cmd_opt_jobs]
-        cmd_args = conf_tree.node.get_value(["args"],
-                                            os.getenv("ROSE_TASK_OPTIONS"))
+            cmd += [
+                "-C",
+                os.path.join(task.suite_dir, "share", task.task_name)]
+        cmd += ["-j", conf_tree.node.get_value(
+            ["opt.jobs"], os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))]
+        cmd_args = conf_tree.node.get_value(
+            ["args"], os.getenv("ROSE_TASK_OPTIONS"))
         if cmd_args:
             cmd += shlex.split(cmd_args)
         if args:
             cmd += args
+
+        # "mirror" for backward compat. Use can specify a null string as value
+        # to switch off the mirror target configuration.
+        task_name_cont = task.task_name.replace(
+            task_name_orig2cont[ORIG], task_name_orig2cont[CONT])
+        auth = app_runner.suite_engine_proc.get_task_auth(
+            task.suite_name, task_name_cont)
+        if auth is not None:
+            target = auth + ":"
+            if use_pwd:
+                target += os.path.join(
+                    task.suite_dir_rel, "work", task.task_cycle_time,
+                    task_name_cont)
+            else:
+                target += os.path.join(
+                    task.suite_dir_rel, "share", task.task_name)
+            # Environment variables for backward compat. "fcm make"
+            # supports arguments as extra configurations since version
+            # 2014-03.
+            for name in ["ROSE_TASK_MIRROR_TARGET", "MIRROR_TARGET"]:
+                env_export(name, target, app_runner.event_handler)
+
+            mirror_step = conf_tree.node.get_value(["mirror-step"], "mirror")
+            if mirror_step:
+                cmd.append("%s.target=%s" % (mirror_step, target))
+                make_name_cont = conf_tree.node.get_value(
+                    ["make-name-cont"],
+                    task_name_orig2cont[CONT].replace(
+                        task_name_orig2cont[ORIG], ""))
+                if make_name_cont:
+                    cmd.append("%s.prop{config-file.name}=%s" % (
+                        mirror_step, make_name_cont))
+
         app_runner.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
 
-    def _run2(self, app_runner, conf_tree, opts, args, uuid, work_files, t):
+    def _run_cont(self, app_runner, conf_tree, args, task,
+                  task_name_orig2cont):
+        """Continue "fcm make" in mirror location."""
         cmd = ["fcm", "make"]
-        if conf_tree.node.get_value(["use-pwd"]) in ["True", "true"]:
-            task1_id = self.SCHEME + t.task_id.replace(self.SCHEME2, "")
-            cmd += ["-C", os.path.join(t.suite_dir, "work", task1_id)]
-        else:
-            task1_name = self.SCHEME + t.task_name.replace(self.SCHEME2, "")
-            cmd += ["-C", os.path.join(t.suite_dir, "share", task1_name)]
-        cmd_opt_jobs = conf_tree.node.get_value(
-                ["opt.jobs"], os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))
-        cmd += ["-j", cmd_opt_jobs]
-        cmd_args = conf_tree.node.get_value(["args"],
-                                            os.getenv("ROSE_TASK_OPTIONS"))
+
+        if not conf_tree.node.get_value(["use-pwd"]) in ["True", "true"]:
+            task_name_orig = task.task_name.replace(
+                task_name_orig2cont[CONT], task_name_orig2cont[ORIG])
+            dest = os.path.join(task.suite_dir, "share", task_name_orig)
+            cmd += ["-C", dest]
+        make_name_cont = conf_tree.node.get_value(
+            ["make-name-cont"],
+            task_name_orig2cont[CONT].replace(task_name_orig2cont[ORIG], ""))
+        if make_name_cont:
+            cmd += ["-n", make_name_cont]
+
+        cmd += ["-j", conf_tree.node.get_value(
+            ["opt.jobs"], os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))]
+        cmd_args = conf_tree.node.get_value(
+            ["args"], os.getenv("ROSE_TASK_OPTIONS"))
         if cmd_args:
             cmd += shlex.split(cmd_args)
         if args:

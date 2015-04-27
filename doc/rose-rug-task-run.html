@@ -362,41 +362,80 @@ delays=0,6*10s,60*1m,1h
     <p>The <code>fcm_make</code> built-in applications is provided for running
     <code>fcm make</code>.</p>
 
-    <p>N.B. If a task has a name that starts with <var>fcm_make*</var>,
-    <code>rose task-run</code> will run this built-in application.</p>
+    <p>N.B.:</p>
+    
+    <ul>
+      <li>If a task has a name that contains the string <var>fcm_make</var>,
+      <code>rose task-run</code> will run this built-in application
+      automatically.</li>
 
-    <p>N.B. If a task has a name that starts with <var>fcm_make2*</var> and it
-    does not have its own application configuration, <code>rose task-run</code>
-    will attempt to associate it with the corresponding <var>fcm_make*</var>
-    application configuration.</p>
+      <li>N.B. If a task has a name that contains the string
+      <var>fcm_make2*</var> and it does not have its own application
+      configuration, <code>rose task-run</code> will attempt to associate it
+      with the corresponding <var>fcm_make*</var> application
+      configuration.</li>
+
+      <li>In the default setting, the <samp>bin/</samp> directories of builds
+      will be prepended to the <var>PATH</var> environment variable by
+      <code>rose task-env</code> and/or <code>rose task-run</code> commands run
+      by subsequent tasks in the suite.</li>
+    </ul>
 
     <p>The <code>fcm_make</code> application expects a file
     <var>file/fcm-make.cfg</var> in its application configuration. It runs
     <code>fcm make</code> using this configuration file.</p>
 
-    <p>The <code>fcm make</code> application will also look for a matching
-    <code>fcm_make2*</code> task in the suite which would normally be a
-    continuation of the <code>fcm make</code> command as a separate
-    <var>USER@HOST</var>. If so, will export an environment variable
-    <var>ROSE_TASK_MIRROR_TARGET</var> to the <code>fcm make</code> command to
-    substitute the mirror target.</p>
-
     <p>You can configure these applications with environment variables or
     settings in <var>rose-app.conf</var>. (Settings in <var>rose-app.conf</var>
     override their equivalent environment variables.)</p>
 
-    <p><kbd>use-pwd=true</kbd>: By default, the application changes the working
-    directory to <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var>. This option
-    will stop this, and the working directory is the normal working directory
-    of the task.</p>
+    <dl>
+      <dt><kbd>args=ARG ...</kbd> or the environment variable
+      <var>ROSE_TASK_OPTIONS</var></dt>
 
-    <p><kbd>opt.jobs=N</kbd> or the environment variable
-    <var>ROSE_TASK_N_JOBS</var>: This can be used to control the number of
-    processes <code>fcm make</code> would use in parallel. (default=4)</p>
+      <dd>This can be used to pass extra arguments to the <code>fcm make</code>
+      command.</dd>
 
-    <p><kbd>args</kbd> or the environment variable
-    <var>ROSE_TASK_OPTIONS</var>: This can be used to pass extra arguments to
-    the <code>fcm make</code> command.</p>
+      <dt><kbd>opt.jobs=N</kbd> or the environment variable
+      <var>ROSE_TASK_N_JOBS</var></dt>
+
+      <dd>This can be used to control the number of processes <code>fcm
+      make</code> would use in parallel. (default=4)</dd>
+
+      <dt><kbd>make-name-cont=NAME</kbd></dt>
+
+      <dd>Specify the context name of the continuation make. If the default
+      <code>fcm_make</code> &rarr; <code>fcm_make2</code> mapping is used, the
+      context name of the continuation make will be set to <code>2</code>. You
+      can specify an alternate context name if this is undesirable. The
+      continuation command will be invoked with the <code>--name=NAME</code>
+      option of <code>fcm make</code>.</dd>
+
+      <dt><kbd>mirror-step=STEP-NAME</kbd></dt>
+
+      <dd>Specify the name of the mirror step, if not <samp>mirror</samp>. The
+      application will normally look for a matching task in the suite (e.g.
+      <code>fcm_make</code> &rarr; <code>fcm_make2</code>) which will continue
+      the <code>fcm make</code> command at a remote <var>HOST</var>. If such a
+      task is found, it will add the configuration
+      <var>mirror.target=HOST:cylc-run/$ROSE_SUITE_NAME/share/$ROSE_TASK_NAME</var>
+      as an argument to the <code>fcm make</code> command to substitute the
+      mirror target. To switch off this feature, set <var>STEP-NAME</var> to a
+      null string, i.e. <kbd>mirror-step=</kbd>.</dd>
+
+      <dt><kbd>task-name-orig2cont=ORIG-NAME:CONT-NAME</kbd></dt>
+
+      <dd>This setting allows you to override the default <code>fcm_make</code>
+      &rarr; <code>fcm_make2</code> mapping the suite task names between the
+      original and the continuation.</dd>
+
+      <dt><kbd>use-pwd=true</kbd></dt>
+
+      <dd>By default, the application changes the working directory to
+      <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var>. This option will stop
+      this, and the working directory is the normal working directory of the
+      task.</dd>
+    </dl>
 
     <p>E.g.:</p>
     <pre class="prettyprint lang-rose_conf">
@@ -626,7 +665,7 @@ source=stuffing-*.txt
 
       <dt><kbd>prune-server-logs-at=cycle ...</kbd></dt>
 
-      <dd>Remove logs on the suite server. Removes both log directories and 
+      <dd>Remove logs on the suite server. Removes both log directories and
       archived logs.</dd>
 
       <dt><kbd>archive-logs-at=cycle ...</kbd></dt>
