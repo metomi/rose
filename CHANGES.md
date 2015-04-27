@@ -63,6 +63,9 @@ configuration files with annotated metadata.
 
 ### Noteworthy Changes
 
+[#1602](https://github.com/metomi/rose/pull/1602):
+rose macro: fail if uppercase namelist options are added.
+
 [#1601](https://github.com/metomi/rose/pull/1601):
 rosie go: create new suite: if multiple data sources are specified, display
 dialog box for user to select a prefix from the prefixes associated with the
