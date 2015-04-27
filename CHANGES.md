@@ -5,9 +5,9 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2015-Q2)
+## 2015.04.0 (2015-04-27)
 
-Rose release 26. This release will work best with
+Rose release 26. This release works best with
 [cylc-6.4.0](https://github.com/cylc/cylc/releases/tag/6.4.0) and beyond.
 
 ### Suite Run Time Location Changes
