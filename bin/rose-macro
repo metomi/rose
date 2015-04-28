@@ -26,6 +26,13 @@
 # DESCRIPTION
 #     List or run macros associated with a suite or application.
 #
+#     If a configuration contains optional configurations:
+#       * For validator macros, validate the main configuration, then
+#         validate each main + optional configuration in turn.
+#       * For transform macros, transform the main configuration, then
+#         transform each main + optional configuration, recreating each
+#         optional configuration as the diff vs the transformed main.
+#
 # OPTIONS
 #     --config=DIR, -C DIR
 #         Use configuration in DIR instead of $PWD.

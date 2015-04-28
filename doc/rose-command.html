@@ -401,6 +401,10 @@ rosie UTIL [OPTS] [ARG ...]
       <li><code>*</code> indicates the default version to change to.</li>
     </ul>
 
+    <p>If an application contains optional configurations, loop through each
+    one, combine with the main, upgrade it, and re-create it as a diff vs the
+    upgraded main configuration.</p>
+
     <h3>OPTIONS</h3>
 
     <dl>
@@ -671,10 +675,10 @@ rosie UTIL [OPTS] [ARG ...]
       <dt><kbd>--ignore=PATTERN, -i PATTERN</kbd></dt>
 
       <dd>
-        <p>Ignore settings that contain the regular expression <var>PATTERN</var> in their
-        id. Can be specified more than once. <var>PATTERN</var> may also be a key used in
-        site or user configuration which expands to a list of patterns. See
-        CONFIGURATION below.</p>
+        <p>Ignore settings that contain the regular expression
+        <var>PATTERN</var> in their id. Can be specified more than once.
+        <var>PATTERN</var> may also be a key used in site or user configuration
+        which expands to a list of patterns. See CONFIGURATION below.</p>
       </dd>
 
       <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
@@ -890,7 +894,6 @@ ignore{foo}=namelist:bar,namelist:baz
     <p><kbd>rose-date</kbd></p>
 
     <h3>SYNOPSIS</h3>
-
     <pre class="shell">
 # 1. Print date time point
 # 1.1 Current date time with an optional offset
@@ -930,8 +933,7 @@ rose date 19700101T000000Z 20380119T031407Z
       <li>With 0 or 1 argument. Print the current or the specified date time
       point with an optional offset.</li>
 
-      <li>With 2 arguments. Print the duration between the 2
-      arguments.</li>
+      <li>With 2 arguments. Print the duration between the 2 arguments.</li>
     </ol>
 
     <h3>OPTIONS</h3>
@@ -939,29 +941,29 @@ rose date 19700101T000000Z 20380119T031407Z
     <dl>
       <dt><kbd>--calendar=gregorian|360day|365day|366day</kbd></dt>
 
-      <dd>Specify the calendar mode.
-      See <a href="#rose-date-calendar-mode">CALENDER MODE</a> below.</dd>
+      <dd>Specify the calendar mode. See <a href=
+      "#rose-date-calendar-mode">CALENDER MODE</a> below.</dd>
 
-      <dt><kbd>--offset1=OFFSET</kbd>, <kbd>--offset=OFFSET</kbd>,
-      <kbd>-s OFFSET</kbd>, <kbd>-1 OFFSET</kbd></dt>
+      <dt><kbd>--offset1=OFFSET</kbd>, <kbd>--offset=OFFSET</kbd>, <kbd>-s
+      OFFSET</kbd>, <kbd>-1 OFFSET</kbd></dt>
 
       <dd>Specify 1 or more offsets to add to argument 1 or the current time.
       See <a href="#rose-date-offset-format">OFFSET FORMAT</a> below.</dd>
 
       <dt><kbd>--offset2=OFFSET</kbd>, <kbd>-2 OFFSET</kbd></dt>
 
-      <dd>Specify 1 or more offsets to add to argument 2.
-      See <a href="#rose-date-offset-format">OFFSET FORMAT</a> below.</dd>
+      <dd>Specify 1 or more offsets to add to argument 2. See <a href=
+      "#rose-date-offset-format">OFFSET FORMAT</a> below.</dd>
 
       <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>-p FORMAT</kbd></dt>
 
-      <dd>Specify a format for parsing <var>DATE-TIME</var>. See
-      <a href="#rose-date-parse-format">PARSE FORMAT</a> below.</dd>
+      <dd>Specify a format for parsing <var>DATE-TIME</var>. See <a href=
+      "#rose-date-parse-format">PARSE FORMAT</a> below.</dd>
 
       <dt><kbd>--print-format=FORMAT</kbd>, <kbd>-f FORMAT</kbd></dt>
 
-      <dd>Specify a format for print the result. See
-      <a href="#rose-date-print-format">PRINT FORMAT</a> below.</dd>
+      <dd>Specify a format for print the result. See <a href=
+      "#rose-date-print-format">PRINT FORMAT</a> below.</dd>
 
       <dt><kbd>--use-task-cycle-time, -c</kbd></dt>
 
@@ -992,48 +994,48 @@ rose date 19700101T000000Z 20380119T031407Z
     <var>nU</var> where <var>U</var> is the unit (Y, M, D, H, M, S) and
     <var>n</var> is a positive integer, where T delimits the date series from
     the time series if any time units are used. <var>n</var> may also have a
-    decimal (e.g. <samp>PT5.5M</samp>) part for a unit provided no smaller units
-    are supplied. It is not necessary to specify zero values for units. If
-    <var>OFFSET</var> is negative, prefix a <samp>-</samp>. For example:</p>
+    decimal (e.g. <samp>PT5.5M</samp>) part for a unit provided no smaller
+    units are supplied. It is not necessary to specify zero values for units.
+    If <var>OFFSET</var> is negative, prefix a <samp>-</samp>. For example:</p>
 
     <dl>
       <dt>P6D</dt>
-    
+
       <dd>6 day offset</dd>
 
       <dt>PT6H</dt>
-      
+
       <dd>6 hour offset</dd>
 
       <dt>PT1M</dt>
-      
+
       <dd>1 minute offset</dd>
 
       <dt>-PT1M</dt>
-      
+
       <dd>(negative) 1 minute offset</dd>
 
       <dt>P3M</dt>
-      
+
       <dd>3 month offset</dd>
 
       <dt>P2W</dt>
-      
+
       <dd>2 week offset (note no other units may be combined with weeks)</dd>
 
       <dt>P2DT5.5H</dt>
-      
+
       <dd>2 day, 5.5 hour offset</dd>
 
       <dt>-P2YT4S</dt>
-      
+
       <dd>(negative) 2 year, 4 second offset</dd>
     </dl>
 
     <p>The following deprecated syntax is supported: <var>OFFSET</var> in the
     form <var>nU</var> where <var>U</var> is the unit (w for weeks, d for days,
-    h for hours, m for minutes and s for seconds) and <var>n</var> is a positive
-    or negative integer.</p>
+    h for hours, m for minutes and s for seconds) and <var>n</var> is a
+    positive or negative integer.</p>
 
     <h3 id="rose-date-parse-format">PARSE FORMAT</h3>
 
@@ -1041,26 +1043,28 @@ rose date 19700101T000000Z 20380119T031407Z
     POSIX strptime template format (see the strptime command help), with the
     following subset supported across all date/time ranges:</p>
 
-    <blockquote><kbd>%F, %H, %M, %S, %Y, %d, %j, %m, %s, %z</kbd></blockquote>
+    <blockquote>
+      <kbd>%F, %H, %M, %S, %Y, %d, %j, %m, %s, %z</kbd>
+    </blockquote>
 
     <p>If not specified, the system will attempt to parse <var>DATE-TIME</var>
     using the following formats:</p>
 
     <dl>
       <dt>ctime</dt>
-      
+
       <dd><var>%a %b %d %H:%M:%S %Y</var></dd>
 
       <dt>Unix date</dt>
-      
+
       <dd><var>%a %b %d %H:%M:%S %Z %Y</var></dd>
 
       <dt>Basic ISO8601</dt>
-      
+
       <dd><var>%Y-%m-%dT%H:%M:%S</var>, <var>%Y%m%dT%H%M%S</var></dd>
 
       <dt>Cylc (deprecated mode)</dt>
-      
+
       <dd><var>%Y%m%d%H</var></dd>
     </dl>
 
@@ -1069,11 +1073,10 @@ rose date 19700101T000000Z 20380119T031407Z
 
     <h3 id="rose-date-print-format">PRINT FORMAT</h3>
 
-    <p>For printing a date time point, the print format will default to the same
-    format as the parse format. Also supports the isodatetime library dump
+    <p>For printing a date time point, the print format will default to the
+    same format as the parse format. Also supports the isodatetime library dump
     syntax for these operations which follows ISO 8601 example syntax - for
     example:</p>
-
     <pre>
 'CCYY-MM-DDThh:mm:ss' -&gt; '1955-11-05T09:28:00',
 'CCYY' -&gt; '1955',
@@ -1081,8 +1084,8 @@ rose date 19700101T000000Z 20380119T031407Z
 'CCYY-Www-D' -&gt; '1955-W44-6'.
 </pre>
 
-    <p>Usage of this ISO 8601-like syntax should be as ISO 8601-compliant
-    as possible.</p>
+    <p>Usage of this ISO 8601-like syntax should be as ISO 8601-compliant as
+    possible.</p>
 
     <p>Note that specifying an explicit timezone in this format (e.g.
     <var>CCYY-MM-DDThh:mm:ss+0100</var> or <var>CCYYDDDThhmmZ</var> will
@@ -1094,15 +1097,19 @@ rose date 19700101T000000Z 20380119T031407Z
 
     <ul>
       <li>y: years</li>
+
       <li>m: months</li>
+
       <li>d: days</li>
+
       <li>h: hours</li>
+
       <li>M: minutes</li>
+
       <li>s: seconds</li>
     </ul>
 
     <p>For example, for a duration <samp>P57DT12H</samp>:</p>
-
     <pre>
 'y,m,d,h' -&gt; '0,0,57,12'
 </pre>
@@ -1297,6 +1304,17 @@ rose date 19700101T000000Z 20380119T031407Z
     <h3>DESCRIPTION</h3>
 
     <p>List or run macros associated with a suite or application.</p>
+
+    <p>If a configuration contains optional configurations:</p>
+
+    <ul>
+      <li>For validation macros, validate the main configuration, then validate
+      each main + optional configuration in turn.</li>
+
+      <li>For transform macros, transform the main configuration, then
+      transform each main + optional configuration, recreating each optional
+      configuration as the diff vs the transformed main.</li>
+    </ul>
 
     <h3>OPTIONS</h3>
 
@@ -1783,7 +1801,8 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <h3>DESCRIPTION</h3>
 
-    <p>Remove items created by <a href="#rose-suite-run">rose suite-run</a>.</p>
+    <p>Remove items created by <a href="#rose-suite-run">rose
+    suite-run</a>.</p>
 
     <p>If no argument is specified, use the base-name of <var>$PWD</var> as the
     suite name.</p>
@@ -2352,7 +2371,8 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>-- --EXTRA-ARGS</kbd></dt>
 
-      <dd>See the cylc documentation, cylc shutdown for options and details on EXTRA-ARGS.</dd>
+      <dd>See the cylc documentation, cylc shutdown for options and details on
+      EXTRA-ARGS.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -2859,23 +2879,24 @@ environment scripting = "eval $(rose task-env)"
 
     <p>Launch the Rosie client GTK+ GUI.</p>
 
-    <p>If arguments are specified, rosie go will perform an initial lookup based
-    on the arguments, which can be an address, a query, or search words. See
-    <a href="#rosie-lookup">rosie lookup</a> for detail.</p>
+    <p>If arguments are specified, rosie go will perform an initial lookup
+    based on the arguments, which can be an address, a query, or search words.
+    See <a href="#rosie-lookup">rosie lookup</a> for detail.</p>
 
     <p>Unless an option is used to specify the initial search type the argument
     is interpreted as follows:</p>
 
     <ul>
       <li>A string beginning with <em>http</em> - an address</li>
+
       <li>A string not beginning with <em>http</em> - search words</li>
     </ul>
 
     <p>An address URL may contain shell meta characters, so remember to put it
     in quotes.</p>
 
-    <p>If no argument is specified, <code>rosie go</code> will display a list of
-    all your locally checked out suites.</p>
+    <p>If no argument is specified, <code>rosie go</code> will display a list
+    of all your locally checked out suites.</p>
 
     <h3>OPTIONS</h3>
 
@@ -2933,8 +2954,8 @@ environment scripting = "eval $(rose task-env)"
     <dl>
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
-      <dd>Specify the name of one or more Rosie web service servers to use. This
-      option can be used multiple times.</dd>
+      <dd>Specify the name of one or more Rosie web service servers to use.
+      This option can be used multiple times.</dd>
     </dl>
 
     <h2 id="rosie-id">rosie id</h2>
@@ -3041,6 +3062,7 @@ environment scripting = "eval $(rose task-env)"
 
     <ul>
       <li>A string beginning with <em>http</em> - an address</li>
+
       <li>A string not beginning with <em>http</em> - search words</li>
     </ul>
 
@@ -3175,8 +3197,8 @@ abc01 from daisy
       column names or properties preceded by <kbd>%</kbd>.</dd>
 
       <dd>
-        For example: <kbd>rosie ls --format="%idx from %owner"</kbd>
-        might give:
+        For example: <kbd>rosie ls --format="%idx from %owner"</kbd> might
+        give:
         <pre>
 abc01 from daisy
 </pre>
