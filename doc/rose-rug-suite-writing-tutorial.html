@@ -788,9 +788,10 @@ rose suite-log
       <pre>
   lat = (180.0/pi) * lat
   long = (180.0/pi) * long
-  WRITE(*,'(A, F7.4, A, F7.4, A, F7.4, A, F7.4, A, F7.4, A, F7.4, A, A)') &amp;
-        "&lt;a href='http://www.google.com/maps/dir/",lat,",",long,&amp;
-        "/",new_lat,",",new_long,"/@",new_lat,',',new_long,",9z",&amp;
+  WRITE(*,'(A, F7.4, A, F7.4, A, F7.4, A, F7.4, A, F7.4, A, F7.4, A)') &amp;
+        "&lt;a href='https://maps.googleapis.com/maps/api/staticmap?center=",&amp;
+        lat,",",long,"&amp;zoom=7&amp;size=600x300&amp;markers=color:blue|label:A|",&amp;
+        lat,",",long,"&amp;markers=color:red|label:B|",new_lat,",",new_long,&amp;
         "''&gt;Ye chart!&lt;/a&gt;"
 </pre>
 
