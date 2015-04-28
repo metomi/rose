@@ -5,6 +5,19 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2015.04.1 (2015-04-28)
+
+Rose release 26, bug fix 1. This release works best with
+[cylc-6.4.0](https://github.com/cylc/cylc/releases/tag/6.4.0) and beyond.
+
+### Bug Fixes
+
+[#1605](https://github.com/metomi/rose/pull/1605):
+rose config-edit: remove an obsolete import that was causing the program to
+fail.
+
+--------------------------------------------------------------------------------
+
 ## 2015.04.0 (2015-04-27)
 
 Rose release 26. This release works best with
