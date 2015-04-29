@@ -24,14 +24,14 @@
 tests 1
 #-------------------------------------------------------------------------------
 # No .pyc files without a corresponding .py file.
-TEST_KEY=$TEST_KEY_BASE
+TEST_KEY="$TEST_KEY_BASE"
 set -eu
-for pyc_file in $(find $ROSE_HOME/lib/python -name "*.pyc"); do
-    py_file=${pyc_file%c}
-    if [[ ! -f $py_file ]]; then
-        echo ".pyc file exists without .py file: $pyc_file" >&2
-        fail $TEST_KEY
+for pyc_file in $(find "$ROSE_HOME/lib/python" -type f -name "*.pyc"); do
+    py_file="${pyc_file%c}"
+    if [[ ! -f "$py_file" ]]; then
+        echo '.pyc file exists without .py file: '$pyc_file >&2
+        fail "$TEST_KEY"
         exit 0
     fi
 done
-pass $TEST_KEY
+pass "$TEST_KEY"
