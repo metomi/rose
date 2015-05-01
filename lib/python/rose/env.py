@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 """Environment variable substitution in strings.
 
 Note: os.path.expandvars(path) does not work correctly because unbound
@@ -29,59 +29,62 @@ import re
 from rose.reporter import Event
 
 
-#_RE_DEFAULT = re.compile(r"""
-#    \A                                 # start
-#    (?P<head>.*?)                      # shortest of anything
-#    (?P<escape>\\*)                    # escapes
-#    (?P<symbol>                        # start symbol
-#        \$                                 # variable sigil, dollar
-#        (?P<brace_open>\{)?                # brace open, optional
-#        (?P<name>[A-z_]\w*)                # variable name
-#        (?(brace_open)\})                  # brace close, if brace_open
-#    )                                  # end symbol
-#    (?P<tail>.*)                       # rest of string
-#    \Z                                 # end
-#""", re.M | re.S | re.X)
+# _RE_DEFAULT = re.compile(r"""
+#     \A                                 # start
+#     (?P<head>.*?)                      # shortest of anything
+#     (?P<escape>\\*)                    # escapes
+#     (?P<symbol>                        # start symbol
+#         \$                                 # variable sigil, dollar
+#         (?P<brace_open>\{)?                # brace open, optional
+#         (?P<name>[A-z_]\w*)                # variable name
+#         (?(brace_open)\})                  # brace close, if brace_open
+#     )                                  # end symbol
+#     (?P<tail>.*)                       # rest of string
+#     \Z                                 # end
+# """, re.M | re.S | re.X)
 _RE_DEFAULT = re.compile(
-                 r"\A"
-                 r"(?P<head>.*?)"
-                 r"(?P<escape>\\*)"
-                 r"(?P<symbol>"
-                 r"\$"
-                 r"(?P<brace_open>\{)?"
-                 r"(?P<name>[A-z_]\w*)"
-                 r"(?(brace_open)\})"
-                 r")"
-                 r"(?P<tail>.*)"
-                 r"\Z",
-                 re.M | re.S)
+    r"\A"
+    r"(?P<head>.*?)"
+    r"(?P<escape>\\*)"
+    r"(?P<symbol>"
+    r"\$"
+    r"(?P<brace_open>\{)?"
+    r"(?P<name>[A-z_]\w*)"
+    r"(?(brace_open)\})"
+    r")"
+    r"(?P<tail>.*)"
+    r"\Z",
+    re.M | re.S)
 
 
-#_RE_BRACE = re.compile(r"""
-#    \A                                 # start
-#    (?P<head>.*?)                      # shortest of anything
-#    (?P<escape>\\*)                    # escapes
-#    (?P<symbol>\$\{                    # start symbol ${
-#        (?P<name>[A-z_]\w*)                # variable name
-#    \})                                # } end symbol
-#    (?P<tail>.*)                       # rest of string
-#    \Z                                 # end
-#""", re.M | re.S | re.X)
+# _RE_BRACE = re.compile(r"""
+#     \A                                 # start
+#     (?P<head>.*?)                      # shortest of anything
+#     (?P<escape>\\*)                    # escapes
+#     (?P<symbol>\$\{                    # start symbol ${
+#         (?P<name>[A-z_]\w*)                # variable name
+#     \})                                # } end symbol
+#     (?P<tail>.*)                       # rest of string
+#     \Z                                 # end
+# """, re.M | re.S | re.X)
 _RE_BRACE = re.compile(
-                 r"\A"
-                 r"(?P<head>.*?)"
-                 r"(?P<escape>\\*)"
-                 r"(?P<symbol>\$\{"
-                 r"(?P<name>[A-z_]\w*)"
-                 r"\})"
-                 r"(?P<tail>.*)"
-                 r"\Z",
-                 re.M | re.S)
+    r"\A"
+    r"(?P<head>.*?)"
+    r"(?P<escape>\\*)"
+    r"(?P<symbol>\$\{"
+    r"(?P<name>[A-z_]\w*)"
+    r"\})"
+    r"(?P<tail>.*)"
+    r"\Z",
+    re.M | re.S)
 
 
 _MATCH_MODES = {"brace": _RE_BRACE,
                 "default": _RE_DEFAULT,
                 None: _RE_DEFAULT}
+
+
+_EXPORTED_ENVS = {}
 
 
 class EnvExportEvent(Event):
@@ -107,9 +110,13 @@ class UnboundEnvironmentVariableError(Exception):
 
 def env_export(key, value, event_handler=None):
     """Export an environment variable."""
-    os.environ[key] = value
-    if callable(event_handler):
-        event_handler(EnvExportEvent(key, value))
+    if key not in _EXPORTED_ENVS or os.environ.get(key) != value:
+        # N.B. Should be safe, because the list of environment variables is
+        #      normally quite small.
+        _EXPORTED_ENVS[key] = value
+        os.environ[key] = value
+        if callable(event_handler):
+            event_handler(EnvExportEvent(key, value))
 
 
 def env_var_escape(text, match_mode=None):
@@ -155,7 +162,7 @@ def env_var_process(text, unbound=None, match_mode=None):
                 else:
                     raise UnboundEnvironmentVariableError(groups["name"])
             ret += (groups["head"] +
-                    groups["escape"][0 : len(groups["escape"]) / 2] +
+                    groups["escape"][0:len(groups["escape"]) / 2] +
                     substitute)
             tail = groups["tail"]
         else:
@@ -168,3 +175,38 @@ def contains_env_var(text, match_mode=None):
     """Check if a string contains unescaped $NAME and/or ${NAME} syntax."""
     match = _MATCH_MODES[match_mode].match(text)
     return (match and len(match.groupdict()["escape"]) % 2 == 0)
+
+
+if __name__ == "__main__":
+    import unittest
+
+    class _TestEnvExport(unittest.TestCase):
+        """Test "env_export" function."""
+
+        def test_report_new(self):
+            """Ensure that env_export only reports 1st time or on change."""
+            events = []
+            event_handler = lambda event: events.append(event)
+            env_export("FOO", "foo", event_handler)
+            env_export("FOO", "foo", event_handler)
+            env_export("FOO", "food", event_handler)
+            env_export("FOO", "foot", event_handler)
+            env_export("FOO", "foot", event_handler)
+            event_args = [event.args[1] for event in events]
+            self.assertEqual(event_args, ["foo", "food", "foot"], "events")
+
+        def test_report_old(self):
+            """Ensure that env_export only reports 1st time or on change."""
+            events = []
+            event_handler = lambda event: events.append(event)
+            os.environ["BAR"] = "bar"
+            env_export("BAR", "bar", event_handler)
+            env_export("BAR", "bar", event_handler)
+            env_export("BAR", "bar", event_handler)
+            env_export("BAR", "barley", event_handler)
+            env_export("BAR", "barley", event_handler)
+            env_export("BAR", "barber", event_handler)
+            event_args = [event.args[1] for event in events]
+            self.assertEqual(event_args, ["bar", "barley", "barber"], "events")
+
+    unittest.main()
