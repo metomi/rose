@@ -35,11 +35,11 @@ class FCMMakeApp(BuiltinApp):
 
     OPT_JOBS = "4"
     SCHEME = "fcm_make"
-    ORIG2CONT = (SCHEME, SCHEME + "2")
+    ORIG_CONT_MAP = (SCHEME, SCHEME + "2")
 
     def get_app_key(self, name):
         """Return the fcm_make* application key if name is fcm_make2*."""
-        return name.replace(self.ORIG2CONT[1], self.ORIG2CONT[0])
+        return name.replace(self.ORIG_CONT_MAP[1], self.ORIG_CONT_MAP[0])
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Run "fcm make".
@@ -47,13 +47,13 @@ class FCMMakeApp(BuiltinApp):
         This application will only work under "rose task-run".
 
         """
-        task_name_orig2cont = conf_tree.node.get_value(
-            ["task-name-orig2cont"], ":".join(self.ORIG2CONT)).split(":", 1)
+        orig_cont_map = conf_tree.node.get_value(
+            ["orig-cont-map"], ":".join(self.ORIG_CONT_MAP)).split(":", 1)
         task = app_runner.suite_engine_proc.get_task_props()
 
-        if task_name_orig2cont[CONT] in task.task_name:
+        if orig_cont_map[CONT] in task.task_name:
             return self._run_cont(
-                app_runner, conf_tree, args, task, task_name_orig2cont)
+                app_runner, conf_tree, args, task, orig_cont_map)
 
         cmd = ["fcm", "make"]
         use_pwd = conf_tree.node.get_value(["use-pwd"]) in ["True", "true"]
@@ -80,7 +80,7 @@ class FCMMakeApp(BuiltinApp):
         # "mirror" for backward compat. Use can specify a null string as value
         # to switch off the mirror target configuration.
         task_name_cont = task.task_name.replace(
-            task_name_orig2cont[ORIG], task_name_orig2cont[CONT])
+            orig_cont_map[ORIG], orig_cont_map[CONT])
         auth = app_runner.suite_engine_proc.get_task_auth(
             task.suite_name, task_name_cont)
         if auth is not None:
@@ -103,8 +103,7 @@ class FCMMakeApp(BuiltinApp):
                 cmd.append("%s.target=%s" % (mirror_step, target))
                 make_name_cont = conf_tree.node.get_value(
                     ["make-name-cont"],
-                    task_name_orig2cont[CONT].replace(
-                        task_name_orig2cont[ORIG], ""))
+                    orig_cont_map[CONT].replace(orig_cont_map[ORIG], ""))
                 if make_name_cont:
                     cmd.append("%s.prop{config-file.name}=%s" % (
                         mirror_step, make_name_cont))
@@ -112,18 +111,18 @@ class FCMMakeApp(BuiltinApp):
         app_runner.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
 
     def _run_cont(self, app_runner, conf_tree, args, task,
-                  task_name_orig2cont):
+                  orig_cont_map):
         """Continue "fcm make" in mirror location."""
         cmd = ["fcm", "make"]
 
         if not conf_tree.node.get_value(["use-pwd"]) in ["True", "true"]:
             task_name_orig = task.task_name.replace(
-                task_name_orig2cont[CONT], task_name_orig2cont[ORIG])
+                orig_cont_map[CONT], orig_cont_map[ORIG])
             dest = os.path.join(task.suite_dir, "share", task_name_orig)
             cmd += ["-C", dest]
         make_name_cont = conf_tree.node.get_value(
             ["make-name-cont"],
-            task_name_orig2cont[CONT].replace(task_name_orig2cont[ORIG], ""))
+            orig_cont_map[CONT].replace(orig_cont_map[ORIG], ""))
         if make_name_cont:
             cmd += ["-n", make_name_cont]
 
