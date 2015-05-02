@@ -85,6 +85,7 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 <div class="page-header">
 </div>
 
+<div class="top_nav">
 <div class="container-fluid">
 <div class="row-fluid">
 {% if of_n_entries == 0 -%}
@@ -153,6 +154,17 @@ class="btn btn-link"
 {% endif -%}
 </div>
 </div>
+</div>
+
+<style type="text/css">
+    @media screen {
+        div.top_nav {
+            position: fixed;
+            bottom: 0;
+        }
+    }
+</style>
+
 {% for entry in entries -%}
 <div class="row-fluid entry">
 <div class="span2">
