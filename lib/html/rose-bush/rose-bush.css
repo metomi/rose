@@ -29,4 +29,7 @@ pre {
     .previous {
         background: white
      }
+    .page_entries select {
+        width: 300px;
+     } 
 }
