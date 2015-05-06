@@ -188,10 +188,11 @@ value="{{k}}">{{v}}</option>
 </div>
 </div>
 
+<div class="top_nav">
 <div class="container-fluid">
 <div class="row-fluid">
 {% if of_n_entries == 0 -%}
-<div class="span11">
+<div class="span12">
 <span class="label">Result loaded
 <abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
 <span class="text-info">No match</span>
@@ -203,7 +204,7 @@ value="{{k}}">{{v}}</option>
 <span class="text-info">Page 1 of 1 Entries 1-{{of_n_entries}}</span>
 </div>
 {% else -%}
-<div class="span11">
+<div class="span12">
 <form action="{{script}}/jobs" class="form-inline">
 <input type="hidden" name="user" value="{{user}}" />
 <input type="hidden" name="suite" value="{{suite}}" />
@@ -268,7 +269,13 @@ class="btn btn-link"
 </form>
 </div><!-- pager -->
 {% endif -%}
-<div class="span1 text-right">
+</div>
+</div>
+</div>
+
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12 text-right">
 <small id="toggle-fuzzy-time"><a href="#">toggle &Delta;t</a></small>
 </div>
 </div>

@@ -16,3 +16,17 @@ pre {
     padding-right: 10px;
 }
 
+
+@media screen {
+    div.top_nav {
+        position: fixed;
+        bottom: 0;
+        background-color:lightgrey;
+     }
+    .next {
+        background: white
+     }
+    .previous {
+        background: white
+     }
+}
