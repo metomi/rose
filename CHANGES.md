@@ -5,6 +5,34 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q2?)
+
+Rose release 27. This release works best with
+[cylc-6.4.0](https://github.com/cylc/cylc/releases/tag/6.4.0) and beyond.
+
+### Highlighted Changes
+
+[#1604](https://github.com/metomi/rose/pull/1604):
+fcm make 2: improve support. Add `mirror.target=` to `fcm make` argument list
+as extra configuration. Support `-n 2` option where possible - this allows the
+continuation make in the same physical location. Allow flexible naming of the
+`mirror` step. Allow flexible mapping of the original and continuation task
+names. See also [metomi/fcm#188](https://github.com/metomi/fcm/pull/188).
+
+### Noteworthy Changes
+
+[#1613](https://github.com/metomi/rose/pull/1613):
+rosie go: display URLs of data sources.
+
+[#1612](https://github.com/metomi/rose/pull/1612):
+rose bush: page navigation always visible at the bottom.
+
+[#1611](https://github.com/metomi/rose/pull/1611):
+rose.env.env_export: only report for 1st time and on change. This fixes, e.g.
+`rose task-run` reporting `export PATH=...` twice.
+
+--------------------------------------------------------------------------------
+
 ## 2015.04.1 (2015-04-28)
 
 Rose release 26, bug fix 1. This release works best with
