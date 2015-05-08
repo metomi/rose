@@ -391,8 +391,9 @@ class MenuBar(object):
             repl = source + '<menuitem action="_{0}_"/>'.format(prefix)
             self.ui_config_string = self.ui_config_string.replace(
                 source, repl, 1)
-            self.prefixes_action_details.append(
-                ("_{0}_".format(prefix), None, prefix))
+            label_str = prefix + " - " + SuiteId.get_prefix_location(prefix)
+            self.prefixes_action_details.append((
+                "_{0}_".format(prefix), None, label_str.replace("_", "__")))
 
     def add_key_choices(self):
         """Add the key choices."""
