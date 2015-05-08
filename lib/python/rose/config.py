@@ -321,28 +321,33 @@ class ConfigNodeDiff(object):
 
     """Represent differences between two ConfigNode instances."""
 
+    KEY_ADDED = "added"
+    KEY_MODIFIED = "modified"
+    KEY_REMOVED = "removed"
+
     def __init__(self):
-        self._data = {"added": {}, "removed": {}, "modified": {}}
+        self._data = {self.KEY_ADDED: {}, self.KEY_REMOVED: {},
+                      self.KEY_MODIFIED: {}}
 
     def set_from_configs(self, config_node_1, config_node_2):
         """Create diff data from two ConfigNode instances."""
-        first_settings = {}
-        second_settings = {}
-        for config_node, settings in [(config_node_1, first_settings),
-                                      (config_node_2, second_settings)]:
+        settings_1 = {}
+        settings_2 = {}
+        for config_node, settings in [(config_node_1, settings_1),
+                                      (config_node_2, settings_2)]:
             for keys, node in config_node.walk():
                 value = node.value
                 if type(node.value) is dict:
                     value = None
                 settings[tuple(keys)] = (value, node.state, node.comments)
-        for keys in set(second_settings) - set(first_settings):
-            self.set_added_setting(keys, second_settings[keys])
-        for keys in set(first_settings) - set(second_settings):
-            self.set_removed_setting(keys, first_settings[keys])
-        for keys in set(first_settings).intersection(set(second_settings)):
-            if first_settings[keys] != second_settings[keys]:
-                self.set_modified_setting(keys, first_settings[keys],
-                                          second_settings[keys])
+        for keys in set(settings_2) - set(settings_1):
+            self.set_added_setting(keys, settings_2[keys])
+        for keys in set(settings_1) - set(settings_2):
+            self.set_removed_setting(keys, settings_1[keys])
+        for keys in set(settings_1).intersection(set(settings_2)):
+            if settings_1[keys] != settings_2[keys]:
+                self.set_modified_setting(keys, settings_1[keys],
+                                          settings_2[keys])
 
     def get_as_opt_config(self):
         """Return a ConfigNode such that main + new_node = main + diff.
@@ -368,15 +373,15 @@ class ConfigNodeDiff(object):
 
     def set_added_setting(self, keys, data):
         """Set a setting to be "added"."""
-        self._data["added"][keys] = data
+        self._data[self.KEY_ADDED][keys] = data
 
     def set_modified_setting(self, keys, old_data, data):
         """Set a setting to be "modified"."""
-        self._data["modified"][keys] = (old_data, data)
+        self._data[self.KEY_MODIFIED][keys] = (old_data, data)
 
     def set_removed_setting(self, keys, data):
         """Set a setting to be "removed"."""
-        self._data["removed"][keys] = data
+        self._data[self.KEY_REMOVED][keys] = data
 
     def get_added(self):
         """Return a list of tuples of added keys with their data.
@@ -385,7 +390,7 @@ class ConfigNodeDiff(object):
         set to None for sections.
 
         """
-        return sorted(self._data["added"].items())
+        return sorted(self._data[self.KEY_ADDED].items())
 
     def get_modified(self):
         """Return a dict of altered keys with before and after data.
@@ -394,7 +399,7 @@ class ConfigNodeDiff(object):
         state, comments, where value is set to None for sections.
 
         """
-        return sorted(self._data["modified"].items())
+        return sorted(self._data[self.KEY_MODIFIED].items())
 
     def get_removed(self):
         """Return a dict of removed keys with their data.
@@ -403,13 +408,14 @@ class ConfigNodeDiff(object):
         set to None for sections.
 
         """
-        return sorted(self._data["removed"].items())
+        return sorted(self._data[self.KEY_REMOVED].items())
 
     def get_all_keys(self):
         """Return all changed keys."""
         return sorted(
-            set(self._data["added"]) | set(self._data["modified"]) |
-            set(self._data["removed"]))
+            set(self._data[self.KEY_ADDED]) |
+            set(self._data[self.KEY_MODIFIED]) |
+            set(self._data[self.KEY_REMOVED]))
 
 
 class ConfigDumper(object):
