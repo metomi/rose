@@ -82,7 +82,8 @@ class Root(object):
             traceback.print_exc(e)
 
     @cherrypy.expose
-    def cycles(self, user, suite, page=1, per_page=None, form=None):
+    def cycles(self, user, suite, page=1, order=None, cycles=None,
+               per_page=None, form=None):
         """List cycles of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
         if not isinstance(per_page, int):
@@ -100,6 +101,8 @@ class Root(object):
             "host": self.host_name,
             "user": user,
             "suite": suite,
+            "cycles": cycles,
+            "order": order,
             "rose_version": self.rose_version,
             "script": cherrypy.request.script_name,
             "states": {},
@@ -109,7 +112,8 @@ class Root(object):
         data["offset"] = (page - 1) * per_page
         entries, of_n_entries = (
                         self.suite_engine_proc.get_suite_cycles_summary(
-                                        user, suite, per_page, data["offset"]))
+                                        user, suite, order, per_page, 
+                                        data["offset"]))
         data["entries"] = entries
         data["of_n_entries"] = of_n_entries
         if per_page:
