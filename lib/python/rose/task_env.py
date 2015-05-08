@@ -30,7 +30,7 @@ import sys
 import traceback
 
 PATH_GLOBS = {
-    "PATH": ["share/fcm[_-]make*/*/bin", "work/1/fcm[_-]make*/*/bin"],
+    "PATH": ["share/fcm[_-]make*/*/bin", "work/*/fcm[_-]make*/*/bin"],
 }
 
 
