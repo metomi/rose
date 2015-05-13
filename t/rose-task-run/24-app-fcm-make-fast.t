@@ -18,46 +18,47 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # Test fcm_make built-in application:
-# * alternate ctx name for continuation
-# * alternate mapping for original and continuation task names
-# On job host with or without shared file system
+# * fast dest root
 #
-# N.B. Test requires compatible versions of "rose" and "fcm make" on the job
-#      host, as well as "gfortran" being installed and available there.
+# N.B. Test requires compatible versions of "rose" and "fcm make", as well as
+#      "gfortran" being installed and available.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
+. "$(dirname "$0")/test_header"
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all 'fcm make unavailable'
 fi
 if ! gfortran --version 1>/dev/null 2>&1; then
     skip_all 'gfortran unavailable'
 fi
-if [[ "${TEST_KEY_BASE}" == *-with-share ]]; then
-    JOB_HOST="$(rose config --default= 't' 'job-host-with-share')"
-else
-    JOB_HOST="$(rose config --default= 't' 'job-host')"
-fi
-if [[ -n "${JOB_HOST}" ]]; then
-    JOB_HOST="$(rose host-select "${JOB_HOST}")"
-fi
-if [[ -z "${JOB_HOST}" ]]; then
-    skip_all '"[t]job-host" not defined or not available'
-fi
 #-------------------------------------------------------------------------------
-tests 1
+tests 4
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
+mkdir 'fast'
+MTIME_OF_FAST_BEFORE=$(stat '-c%y' 'fast')
 #-------------------------------------------------------------------------------
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
-timeout 120 rose suite-run -v -v --debug \
+timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' \
-    -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --debug
+    --no-gcontrol --host='localhost' -S "FAST_DEST_ROOT=\"${PWD}/fast\"" \
+    -- --debug
 #-------------------------------------------------------------------------------
-ssh -n -oBatchMode=yes "${JOB_HOST}" \
-    cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'
-file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<<'Hello World!'
+file_cmp "${TEST_KEY_BASE}" "${SUITE_RUN_DIR}/share/hello.txt" <<__TXT__
+${SUITE_RUN_DIR}/share/hello-make/build/bin/hello
+Hello World!
+__TXT__
+HOST=$(hostname)
+file_grep "${TEST_KEY_BASE}.log" \
+    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make.1.${NAME}" \
+    "${SUITE_RUN_DIR}/share/hello-make/fcm-make.log"
+file_grep "${TEST_KEY_BASE}-bin.log" \
+    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make-bin.1.${NAME}" \
+    "${SUITE_RUN_DIR}/share/hello-make/fcm-make-bin.log"
+# Prove that the fast directory has been modified
+MTIME_OF_FAST_AFTER=$(stat '-c%y' 'fast')
+run_pass "${TEST_KEY_BASE}-mtime-of-fast" \
+    test "${MTIME_OF_FAST_BEFORE}" '!=' "${MTIME_OF_FAST_AFTER}"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
 exit 0

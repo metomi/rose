@@ -365,10 +365,18 @@
 #  job-host=HOST
 ## E.g.:
 #  job-host=my-hpc01
+## A fast file system for working with small files in job-host
+#  job-host-fast-dest-root=PATH
+## E.g.:
+#  job-host-fast-dest-root=/var/tmp/$USER
 ## A remote host that shares its HOME directory with localhost
 #  job-host-with-share=HOST
 ## E.g.:
 #  job-host-with-share=my-cluster01
+## A fast file system for working with small files in job-host-with-share
+#  job-host-with-share-fast-dest-root=PATH
+## E.g.:
+#  job-host-with-share-fast-dest-root=/var/run/$USER
 #
 ## Options for "prove" when calling "rose test-battery" with no arguments.
 ## (default="-j9 -s")

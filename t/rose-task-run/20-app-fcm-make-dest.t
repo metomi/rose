@@ -18,9 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # Test fcm_make built-in application:
-# * alternate ctx name for continuation
-# * alternate mapping for original and continuation task names
-# On job host with or without shared file system
+# * alternate dest-orig (and dest-cont)
 #
 # N.B. Test requires compatible versions of "rose" and "fcm make" on the job
 #      host, as well as "gfortran" being installed and available there.
@@ -43,6 +41,11 @@ fi
 if [[ -z "${JOB_HOST}" ]]; then
     skip_all '"[t]job-host" not defined or not available'
 fi
+if [[ "${TEST_KEY_BASE}" == *-cont-alt* ]]; then
+    GREET='greet'
+else
+    GREET=
+fi
 #-------------------------------------------------------------------------------
 tests 1
 export ROSE_CONF_PATH=
@@ -50,14 +53,25 @@ mkdir -p "${HOME}/cylc-run"
 #-------------------------------------------------------------------------------
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
-timeout 120 rose suite-run -v -v --debug \
+timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host='localhost' \
-    -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --debug
+    -S "HOST=\"${JOB_HOST}\"" -S "GREET=\"${GREET}\"" -- --debug
 #-------------------------------------------------------------------------------
+JOB_HOST_HOME=$(ssh -n -oBatchMode=yes "${JOB_HOST}" 'echo "${HOME}"' | tail -1)
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
     cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'
-file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<<'Hello World!'
+if [[ -n "${GREET}" ]]; then
+    file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<__TXT__
+${JOB_HOST_HOME}/cylc-run/${NAME}/opt/greet/build/bin/hello
+Hello World!
+__TXT__
+else
+    file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<__TXT__
+${JOB_HOST_HOME}/cylc-run/${NAME}/opt/hello/build/bin/hello
+Hello World!
+__TXT__
+fi
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
 exit 0

@@ -18,14 +18,12 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # Test fcm_make built-in application:
-# * alternate ctx name for continuation
-# * alternate mapping for original and continuation task names
-# On job host with or without shared file system
+# * new mode, orig make only
 #
-# N.B. Test requires compatible versions of "rose" and "fcm make" on the job
-#      host, as well as "gfortran" being installed and available there.
+# N.B. Test requires compatible versions of "rose" and "fcm make", as well as
+#      "gfortran" being installed and available.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
+. "$(dirname "$0")/test_header"
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all 'fcm make unavailable'
 fi
@@ -44,13 +42,20 @@ if [[ -z "${JOB_HOST}" ]]; then
     skip_all '"[t]job-host" not defined or not available'
 fi
 #-------------------------------------------------------------------------------
-tests 1
+tests 2
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
-#-------------------------------------------------------------------------------
+
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
-timeout 120 rose suite-run -v -v --debug \
+
+# Add some garbage before running the suite
+ssh -n -oBatchMode=yes "${JOB_HOST}" \
+    "mkdir -p 'cylc-run/${NAME}/share/hello-make/junk2'"
+ssh -n -oBatchMode=yes "${JOB_HOST}" \
+    "touch 'cylc-run/${NAME}/share/hello-make/junk1'"
+
+timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host='localhost' \
     -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --debug
@@ -58,6 +63,9 @@ timeout 120 rose suite-run -v -v --debug \
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
     cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'
 file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<<'Hello World!'
+run_fail "${TEST_KEY_BASE}" \
+    ssh -n -oBatchMode=yes "${JOB_HOST}" \
+    "ls 'cylc-run/${NAME}/share/hello-make/junk'*"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
 exit 0

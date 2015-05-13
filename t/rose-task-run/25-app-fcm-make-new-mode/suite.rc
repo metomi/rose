@@ -1,0 +1,15 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+[scheduling]
+    [[dependencies]]
+        graph = """hello-make => hello-run"""
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            failed handler = rose suite-hook --shutdown
+    [[hello-make]]
+        script = rose task-run --app-key=make --new
+    [[hello-run]]
+        script = rose task-run --app-key=run --path=share/hello-make/build/bin
