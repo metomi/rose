@@ -334,6 +334,7 @@ class HostSelector(object):
                     host_proc_dict.pop(host_name)
                     for threshold_conf in threshold_confs:
                         if threshold_conf.check_threshold(out):
+                            score = threshold_conf.command_out_parser(out)
                             self.handle_event(HostThresholdNotMetEvent(
                                 host_name, threshold_conf, score))
                             break
@@ -378,7 +379,8 @@ class ScorerConf(object):
     def check_threshold(self, out):
         """Parse command output. Return True if threshold not met."""
         score = self.command_out_parser(out)
-        return (self.scorer.SIGN * cmp(score, self.value) > 0)
+        return (float(score) * self.scorer.SIGN >
+                float(self.value) * self.scorer.SIGN)
 
     def command_out_parser(self, out):
         """Parse command output to return a numeric score."""
