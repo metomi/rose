@@ -392,8 +392,8 @@ class RosieVCClient(object):
             self.popen("svn", "cp", "-q", from_id_url, os.path.join(d, "trunk"))
             rose.config.dump(info_config,
                              os.path.join(d, "trunk", "rose-suite.info"))
-            message = "%s: new suite, a copy of %s/%s@%s" % (new_id, from_id, 
-                       from_id.branch, from_id.to_string_with_version())
+            message = "%s: new suite, a copy of %s" % (new_id,
+                       from_id.to_string_with_version())
             try:
                 self.popen("svn", "commit", "-q", "-m", message, temp_local_copy)
                 self.event_handler(SuiteCreateEvent(new_id))
