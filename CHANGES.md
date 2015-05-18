@@ -7,8 +7,8 @@ for a full listing of issues for each release.
 
 ## Next Release (2015-Q2?)
 
-Rose release 27. This release works best with
-[cylc-6.4.0](https://github.com/cylc/cylc/releases/tag/6.4.0) and beyond.
+Rose release 27. This release will work best with
+[cylc-6.4.1](https://github.com/cylc/cylc/releases/tag/6.4.1) and/or beyond.
 
 ### Highlighted Changes
 
@@ -20,6 +20,14 @@ continuation make in the same physical location. Allow flexible naming of the
 names. See also [metomi/fcm#188](https://github.com/metomi/fcm/pull/188).
 
 ### Noteworthy Changes
+
+[#1618](https://github.com/metomi/rose/pull/1618):
+rosie create/copy: fix malformed log message for the Subversion changeset on
+suite copy.
+
+[#1616](https://github.com/metomi/rose/pull/1616):
+rose host-select: fix incorrect threshold logic introduced by
+[#1588](https://github.com/metomi/rose/pull/1588).
 
 [#1613](https://github.com/metomi/rose/pull/1613):
 rosie go: display URLs of data sources.
