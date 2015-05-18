@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 44
+tests 49
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -215,6 +215,10 @@ __INFO__
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+svn propget --revprop -r 'HEAD' 'svn:log' "${URL}" >"${TEST_KEY}.log"
+file_cmp "${TEST_KEY}.log" "${TEST_KEY}.log" <<'__LOG__'
+foo-aa003: new suite, a copy of foo-aa002/trunk@3
+__LOG__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-copy-empty-trunk-head
 cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
@@ -242,6 +246,10 @@ __INFO__
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+svn propget --revprop -r 'HEAD' 'svn:log' "${URL}" >"${TEST_KEY}.log"
+file_cmp "${TEST_KEY}.log" "${TEST_KEY}.log" <<'__LOG__'
+foo-aa004: new suite, a copy of foo-aa002/trunk@3
+__LOG__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-copy-not-empty
 # Add something to an existing suite working copy
@@ -280,6 +288,10 @@ __INFO__
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+svn propget --revprop -r 'HEAD' 'svn:log' "${URL}" >"${TEST_KEY}.log"
+file_cmp "${TEST_KEY}.log" "${TEST_KEY}.log" <<'__LOG__'
+foo-aa005: new suite, a copy of foo-aa001/trunk@6
+__LOG__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-copy-not-empty-trunk-head
 # Add something to an existing suite working copy
@@ -317,6 +329,10 @@ __INFO__
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+svn propget --revprop -r 'HEAD' 'svn:log' "${URL}" >"${TEST_KEY}.log"
+file_cmp "${TEST_KEY}.log" "${TEST_KEY}.log" <<'__LOG__'
+foo-aa006: new suite, a copy of foo-aa001/trunk@8
+__LOG__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-copy-mkdir-parents"
 set -e
@@ -336,5 +352,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] foo-aa012: copied items from foo-aa001
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+svn propget --revprop -r 'HEAD' 'svn:log' "${URL}" >"${TEST_KEY}.log"
+file_cmp "${TEST_KEY}.log" "${TEST_KEY}.log" <<'__LOG__'
+foo-aa012: new suite, a copy of foo-aa001/trunk@8
+__LOG__
 #-------------------------------------------------------------------------------
 exit 0
