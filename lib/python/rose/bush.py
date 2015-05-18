@@ -32,6 +32,7 @@ import signal
 import socket
 import sys
 import rose.config
+from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
@@ -63,7 +64,7 @@ class Root(object):
         self.exposed = True
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
         self.template_env = template_env
-        self.host_name = socket.gethostname()
+        self.host_name = HostSelector().get_local_host()
         if self.host_name and "." in self.host_name:
             self.host_name = self.host_name.split(".", 1)[0]
         self.rose_version = ResourceLocator.default().get_version()

@@ -24,6 +24,7 @@ from rose.app_run import BuiltinApp, ConfigValueError
 from rose.date import RoseDateTimeOperator
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
+from rose.host_select import HostSelector
 from rose.popen import RosePopenError
 import shlex
 
@@ -92,10 +93,12 @@ class RosePruneApp(BuiltinApp):
             r"set +e; ls -d %(g)s; " +
             r"set -e; rm -fr %(g)s") % form_dict
         cwd = os.getcwd()
-        for host in hosts + ["localhost"]:
+        host_selector = HostSelector(
+            app_runner.event_handler, app_runner.popen)
+        for host in hosts + [host_selector.get_local_host()]:
             sdir = None
             try:
-                if host == "localhost":
+                if host_selector.is_local_host(host):
                     sdir = suite_engine_proc.get_suite_dir(suite_name)
                     app_runner.fs_util.chdir(sdir)
                     out = app_runner.popen.run_ok(
@@ -113,7 +116,7 @@ class RosePruneApp(BuiltinApp):
                                             host + ":" + suite_dir_rel)
                     app_runner.handle_event(event)
                 for line in sorted(out.splitlines()):
-                    if host != "localhost":
+                    if not host_selector.is_local_host(host):
                         line = host + ":" + line
                     event = FileSystemEvent(FileSystemEvent.DELETE, line)
                     app_runner.handle_event(event)
