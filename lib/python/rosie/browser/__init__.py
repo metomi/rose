@@ -226,7 +226,7 @@ SIZE_HISTORY = 100
 
 LABEL_ADVANCED_SEARCH = "Advanced Search"
 LABEL_EDIT_PROJECT = "New suite project:"
-LABEL_ERROR_DISCOVERY = "Ignore errors in suite info?"
+LABEL_ERROR_DISCOVERY = "Error against metadata. Abort creating suite?"
 LABEL_ERROR_LOCAL = "Unable to retrieve details for local suites."
 LABEL_ERROR_PREFIX = "Unable to retrieve settings for prefix: {0}"
 LABEL_HISTORY_TREEVIEW = "Search History"

@@ -26,7 +26,13 @@ import pwd
 import re
 import rose.config
 import rose.external
+import rose.metadata_check
+import rose.reporter
 from rose.fs_util import FileSystemUtil
+from rose.config_cli import get_meta_path
+from rose.macro import (load_meta_config, add_site_meta_paths,
+                        add_env_meta_paths)
+from rose.macros import DefaultValidators
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
@@ -45,7 +51,7 @@ CREATE_INFO_CONFIG_COMMENT = """
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 """
 
 
@@ -81,6 +87,12 @@ class SuiteInfoFieldError(Exception):
     """Raised when the rose-suite.info doesn't contain a required field."""
     def __str__(self):
         return "rose-suite.info: compulsory field \"%s\" not defined" % self.args[0]
+
+
+class SuiteInfoError(Exception):
+    """Raised when the rose-suite.info doesn't contain a required information."""
+    def __str__(self):
+        return "rose-suite.info:\n \"%s\"" % self.args[0]
 
 
 class LocalCopyCreateEvent(Event):
@@ -218,7 +230,8 @@ class RosieVCClient(object):
         return id
 
     def create(self, info_config, from_id=None, prefix=None,
-               meta_suite_mode=False):
+               meta_suite_mode=True, new_id=None, report_error=False,
+               mode_cli=False):
         """Create a suite.
 
         info_config -- A rose.config.ConfigNode object, which will be used as
@@ -233,12 +246,55 @@ class RosieVCClient(object):
         Return the SuiteId of the suite on success.
 
         """
+
         for key in ["owner", "project", "title"]:
             if not info_config.get([key], no_ignore=True):
-                raise SuiteInfoFieldError(key)
+                info_config_new = info_config
+                report_error = True
+                if mode_cli:
+                    question = ("rose-suite.info: \n compulsory field \"%s\"" +
+                                " not defined,\n try again?") % key
+                    try:
+                        response = raw_input(question + " y/n (default n) ")
+                    except EOFError:
+                        sys.exit(1)
+                    if response != 'y':
+                        sys.exit(1)
+                    return info_config_new, report_error
+                else:                
+                    raise SuiteInfoFieldError(key)
+
+        meta_config = load_meta_config(info_config, directory=None,
+                                       config_type=rose.INFO_CONFIG_NAME,
+                                       error_handler=None,
+                                       ignore_meta_error=False)
+        reports = DefaultValidators().validate(info_config, meta_config)
+        if reports != []:
+            reports_map = {None: reports}
+            text = (rose.macro.get_reports_as_text
+                    (reports_map, "rose.macro.DefaultValidators"))
+            if mode_cli:
+                reporter = rose.reporter.Reporter()
+                reporter(text, kind=reporter.KIND_ERR,
+                         level=reporter.FAIL, prefix="")
+                info_config_new = info_config
+                report_error = True
+                question = "Metadata issue, do you want to try again?"
+                try:
+                    response = raw_input(question + " y/n (default n) ")
+                except EOFError:
+                    sys.exit(1)
+                if response != 'y':
+                    sys.exit(1)
+                return info_config_new, report_error
+            else:
+                raise SuiteInfoError(text) 
+        elif report_error is True:
+            return report_error
+        elif report_error is False and new_id is not None:
+            return info_config, report_error
         if from_id is not None:
             return self._copy(info_config, from_id)
-        new_id = None
         while new_id is None:
             if meta_suite_mode:
                 if prefix is None:
@@ -295,7 +351,8 @@ class RosieVCClient(object):
             self.event_handler(SuiteDeleteEvent(id))
         return id
 
-    def generate_info_config(self, from_id=None, prefix=None):
+    def generate_info_config(self, from_id=None, prefix=None, project=None,
+                             info_config=""):
         """Generate a rose.config.ConfigNode for a rose-suite.info.
 
         This is suitable for passing into the create method of this
@@ -306,19 +363,45 @@ class RosieVCClient(object):
         """
         from_project = None
         from_title = None
+
         if from_id is not None:
             from_info_url = "%s/%s/rose-suite.info@%s" % (from_id.to_origin(),
                                                           from_id.branch,
                                                           from_id.revision)
             out_data = self.popen("svn", "cat", from_info_url)[0]
             from_config = rose.config.load(StringIO(out_data))
-            if from_config.get(["project"]) is not None:
-                from_project = from_config.get(["project"]).value
-            if from_config.get(["title"]) is not None:
-                from_title = from_config.get(["title"]).value
 
         res_loc = ResourceLocator.default()
+        older_config = None
+        if info_config != "":
+            older_config = info_config
         info_config = rose.config.ConfigNode()
+ 
+        # Determine project if given as a command-line option on create
+        if from_id is None and project is not None:
+            info_config.set(["project"], project)
+
+        # Set the compulsory fields and use the project and metadata if
+        #  available.
+        meta_config = load_meta_config(info_config, directory=None,
+                                       config_type=rose.INFO_CONFIG_NAME,
+                                       error_handler=None,
+                                       ignore_meta_error=False)
+        if from_id is None and project is not None:
+            for node_keys, node in meta_config.walk(no_ignore=True):
+                if isinstance(node.value, dict):
+                    continue
+                sect, key = node_keys
+                value = node.value
+                sect = sect.translate(None, '=')
+                if key == "compulsory" and value == "true":
+                    info_config.set([sect], "")
+            info_config.set(["project"], project)
+        else:
+            if from_project is None:
+                info_config.set(["project"], "")
+            if from_title is None:
+                info_config.set(["title"], "")
 
         # Determine prefix
         if from_id is not None:
@@ -348,22 +431,63 @@ class RosieVCClient(object):
             owner = pwd.getpwuid(os.getuid())[0]
         info_config.set(["owner"], owner)
 
-        # Determine project and title
-        if from_project:
-            info_config.set(["project"], from_project)
-        else:
-            info_config.set(["project"], "")
-        if from_title:
-            info_config.set(["title"], "Copy of %s: %s" % 
-                            (from_id.to_string_with_version(), from_title))
-        else:
-            info_config.set(["title"], "")
+        # Copy description
+        try:
+            from_id.to_string_with_version()
+            info_config.set(["description"], "Copy of %s" %
+                            (from_id.to_string_with_version()))
+        except AttributeError:
+            pass
+
+        # Copy fields provided by the user
+        try:
+            from_config.walk(no_ignore=False)
+            for node_keys, node in from_config.walk(no_ignore=False):
+                if isinstance(node.value, dict):
+                    continue
+                sect, key = node_keys
+                value = node.value
+                if (key == "description" or key == "owner" or
+                    key == "access-list" or
+                    (key == "project" and from_project is not None)):
+                    pass
+                else:
+                    info_config.set([key], value)
+        except UnboundLocalError:
+            pass
 
         # Determine access list
         access_list_str = res_loc.get_conf().get_value(
             ["rosie-vc", "access-list-default"])
         if access_list_str:
             info_config.set(["access-list"], access_list_str)
+
+        # Use metadata to give value hints
+        meta_config = load_meta_config(info_config, directory=None,
+                                       config_type=rose.INFO_CONFIG_NAME,
+                                       error_handler=None,
+                                       ignore_meta_error=False)
+        if from_id is None and project is not None:
+            for node_keys, node in meta_config.walk(no_ignore=True):
+                if isinstance(node.value, dict):
+                    continue
+                sect, key = node_keys
+                value = node.value
+                sect = sect.translate(None, '=')
+                if key == "value-hints" or key == "values":
+                    reminder = ("please remove all commented hints/lines " +
+                                "in the main/top section before saving.")
+                    info_config.set([sect],
+                                    rose.variable.array_split(value)[0],
+                                    comments=[value, reminder])
+        if older_config is not None:
+            for node_keys, node in older_config.walk(no_ignore=True):
+                if isinstance(node.value, dict):
+                    continue
+                sect, key = node_keys
+                value = node.value
+                info_config.set([key], value)
+
         return info_config
 
     def _copy(self, info_config, from_id):
@@ -434,7 +558,8 @@ def create(argv):
     """CLI function: create and copy."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("checkout_mode", "info_file",
-                              "meta_suite_mode", "non_interactive", "prefix")
+                              "meta_suite_mode", "non_interactive", "prefix",
+                              "project")
     opts, args = opt_parser.parse_args(argv)
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
@@ -448,13 +573,30 @@ def create(argv):
         if from_id.revision is None:
             from_id.revision = from_id.REV_HEAD
             from_id = SuiteId(id_text=from_id.to_string_with_version())
+    info_config_new = None
     if opts.info_file is None:
         try:
-            info_config = client.generate_info_config(from_id, opts.prefix)
+            info_config = client.generate_info_config(from_id, opts.prefix,
+                                                      opts.project)
         except (RosePopenError) as e:
             report(e)
             sys.exit(1)
         info_file = tempfile.NamedTemporaryFile(delete=False)
+        if args:
+            meta_config = load_meta_config(info_config, directory=None,
+                                           config_type=rose.INFO_CONFIG_NAME,
+                                           error_handler=None,
+                                           ignore_meta_error=False)
+            for node_keys, node in meta_config.walk(no_ignore=True):
+                if isinstance(node.value, dict):
+                    continue
+                sect, key = node_keys
+                value = node.value
+                sect = sect.translate(None, '=')
+                if key == "copy-mode" and value == "clear":
+                    info_config.set([sect], "")
+                if key == "copy-mode" and value == "never":
+                    info_config.unset([sect])
         try:
             rose.config.dump(info_config, info_file)
             info_file.write(CREATE_INFO_CONFIG_COMMENT)
@@ -464,6 +606,47 @@ def create(argv):
             info_config = rose.config.load(info_file.name)
         finally:
             os.unlink(info_file.name)
+        new_id = ""
+        try:
+            info_config_new, report_error = client.create(info_config,
+                                                          from_id,
+                                                          opts.prefix,
+                                                          opts.meta_suite_mode,
+                                                          new_id, mode_cli=True)
+        except (RosePopenError, SuiteInfoFieldError,
+                SuiteIdOverflowError) as e:
+            report(e)
+            sys.exit(1)
+        while report_error is True:
+            info_file = tempfile.NamedTemporaryFile(delete=False)
+            info_config = info_config_new
+            if (info_config.get(["project"]).value is not None and
+                opts.project is None):
+                project = info_config.get(["project"]).value
+                info_config = client.generate_info_config(from_id,
+                                                          opts.prefix,
+                                                          project,
+                                                          info_config)
+            try:
+                rose.config.dump(info_config, info_file)
+                info_file.write(CREATE_INFO_CONFIG_COMMENT)
+                info_file.close()
+                command_list = client.popen.get_cmd("editor", info_file.name)
+                client.popen(*command_list, stdout=sys.stdout)
+                info_config = rose.config.load(info_file.name)
+            finally:
+                os.unlink(info_file.name)
+            try:
+                info_config_new, report_error = client.create(info_config,
+                                                     from_id,
+                                                     opts.prefix,
+                                                     opts.meta_suite_mode,
+                                                     new_id, mode_cli=True)
+            except (RosePopenError, SuiteInfoFieldError,
+                    SuiteIdOverflowError) as e:
+                report(e)
+                sys.exit(1)
+
     elif opts.info_file == "-":
         info_config = rose.config.load(sys.stdin)
     else:
@@ -484,7 +667,7 @@ def create(argv):
             sys.exit(1)
     try:
         id = client.create(info_config, from_id, opts.prefix,
-                           opts.meta_suite_mode)
+                           opts.meta_suite_mode, mode_cli=True)
     except (RosePopenError, SuiteInfoFieldError, SuiteIdOverflowError) as e:
         report(e)
         sys.exit(1)
@@ -542,6 +725,8 @@ def delete(argv):
 
 def main():
     """Launcher for the CLI functions."""
+    add_site_meta_paths()
+    add_env_meta_paths()
     argv = sys.argv[1:]
     if not argv:
         return sys.exit(1)
