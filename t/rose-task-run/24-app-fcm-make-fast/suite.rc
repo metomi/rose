@@ -1,0 +1,25 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+[scheduling]
+    [[dependencies]]
+        graph = """hello-make => hello-make-bin => hello-run"""
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            failed handler = rose suite-hook --shutdown
+    [[MAKE]]
+        script = """
+rose task-run --app-key=make \
+    --define=fast-dest-root-orig={{FAST_DEST_ROOT}} \
+    --define=fast-dest-root-cont={{FAST_DEST_ROOT}}
+"""
+    [[hello-make]]
+        inherit = MAKE
+    [[hello-make-bin]]
+        inherit = MAKE
+    [[hello-run]]
+        script = """
+rose task-run --app-key=run --path=share/hello-make/build/bin
+"""

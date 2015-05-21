@@ -92,7 +92,7 @@ class RosePopener(object):
         "geditor": ["gedit"],
         "image_viewer": ["eog", "--new-instance"],
         "rsync": ["rsync", "-a", "--exclude=.*", "--timeout=1800",
-                  "--rsh=ssh -oBatchMode=yes"],
+                  "--rsh=ssh -oBatchMode=yes -oConnectTimeout=10"],
         "ssh": ["ssh", "-oBatchMode=yes", "-oConnectTimeout=10"],
         "terminal": ["xterm"],
     }

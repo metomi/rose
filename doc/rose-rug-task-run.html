@@ -396,11 +396,50 @@ delays=0,6*10s,60*1m,1h
       <dd>This can be used to pass extra options and arguments to the <code>fcm
       make</code> command.</dd>
 
-      <dt><kbd>opt.jobs=N</kbd> or the environment variable
-      <var>ROSE_TASK_N_JOBS</var></dt>
+      <dt><kbd>dest-orig=PATH</kbd></dt>
 
-      <dd>This can be used to control the number of processes <code>fcm
-      make</code> would use in parallel. (default=4)</dd>
+      <dd>Specify the path to the destination of the original make. This is
+      normally specified as a relative path under <var>$ROSE_SUITE_DIR/</var>.
+      The default is <var>share/$ROSE_TASK_NAME</var>. If <code>rose
+      task-run</code> is invoked in <code>--new</code> mode, the application
+      will remove this directory before running <code>fcm make
+      --new</code>.</dd>
+
+      <dt><kbd>dest-cont=PATH</kbd></dt>
+
+      <dd>Specify the path to the destination of the continuation make. This is
+      normally specified as a relative path under <var>$ROSE_SUITE_DIR/</var>.
+      The default is to use the same location as <var>dest-orig</var>. If
+      <code>rose task-run</code> is invoked in <code>--new</code> mode, the
+      application will remove this directory before running <code>fcm make
+      --new</code>. (If this location is in the same physical location of the
+      destination of the original make, you should only invoke <code>rose
+      task-run --new</code> on the original make. Otherwise, contents generated
+      by the original make will be wiped clean before the continuation make
+      begins.)</dd>
+
+      <dt><kbd>fast-dest-root-orig=PATH</kbd></dt>
+
+      <dd>Specify the path to an existing location that can be used as a fast
+      working directory for the original make. If this is specified, the
+      <code>fcm make</code> command will be invoked in a temporary directory
+      under this location before being copied back to the actual
+      destination.</dd>
+
+      <dt><kbd>fast-dest-root-cont=PATH</kbd></dt>
+
+      <dd>Specify the path to an existing location that can be used as a fast
+      working directory for the continuation make. If this is specified, the
+      <code>fcm make</code> command will be invoked in a temporary directory
+      under this location before being copied back to the actual
+      destination.</dd>
+
+      <dt><kbd>make-name-orig=NAME</kbd></dt>
+
+      <dd>Specify the context name of the original make. The default is a null
+      string. You can specify an alternate context name if this is undesirable.
+      The <code>fcm make</code> command will be invoked with the
+      <code>--name=NAME</code> option of <code>fcm make</code>.</dd>
 
       <dt><kbd>make-name-cont=NAME</kbd></dt>
 
@@ -422,6 +461,12 @@ delays=0,6*10s,60*1m,1h
       as an argument to the <code>fcm make</code> command to substitute the
       mirror target. To switch off this feature, set <var>STEP-NAME</var> to a
       null string, i.e. <kbd>mirror-step=</kbd>.</dd>
+
+      <dt><kbd>opt.jobs=N</kbd> or the environment variable
+      <var>ROSE_TASK_N_JOBS</var></dt>
+
+      <dd>This can be used to control the number of processes <code>fcm
+      make</code> would use in parallel. (default=4)</dd>
 
       <dt><kbd>orig-cont-map=ORIG-NAME:CONT-NAME</kbd></dt>
 

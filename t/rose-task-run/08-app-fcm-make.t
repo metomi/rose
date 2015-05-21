@@ -23,6 +23,9 @@
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all 'fcm make unavailable'
 fi
+if ! gfortran --version 1>/dev/null 2>&1; then
+    skip_all 'gfortran unavailable'
+fi
 #-------------------------------------------------------------------------------
 tests 8
 #-------------------------------------------------------------------------------
