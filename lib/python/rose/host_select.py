@@ -27,6 +27,7 @@ from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 import shlex
 import signal
+import socket
 from socket import gethostbyname, gethostname, getfqdn
 import sys
 from time import sleep, time
@@ -139,19 +140,18 @@ class HostSelector(object):
         """Return a list of names associated with the current host."""
         if self.local_host_strs is None:
             self.local_host_strs = []
-            for item in gethostname, getfqdn, "localhost":
-                if callable(item):
+            items = []
+            for item in gethostname, getfqdn:
+                try:
+                    items.append(item())
+                except socket.error:
+                    pass
+            for item in items + ["localhost"]:
+                if item not in self.local_host_strs:
+                    self.local_host_strs.append(item)
                     try:
-                        name = item()
-                    except IOError:
-                        name = None
-                else:
-                    name = item
-                if name and name not in self.local_host_strs:
-                    self.local_host_strs.append(name)
-                    try:
-                        address = gethostbyname(name)
-                    except IOError:
+                        address = gethostbyname(item)
+                    except socket.error:
                         pass
                     else:
                         if address not in self.local_host_strs:
