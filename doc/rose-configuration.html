@@ -273,6 +273,29 @@ opts=ketchup (mayonnaise)
       KEY</code>.</li>
     </ol>
 
+    <h3 id="opts-meta">Optional Configurations and Metadata</h3>
+
+    <p>Metadata utilities such as <code>rose app-upgrade</code> and <code>rose
+    macro</code> treat each main + optional configuration as a separate entity
+    to be transformed, upgraded, or validated. Use cases with more than one
+    optional configuration are not handled.</p>
+
+    <p>When transforming or upgrading, each optional configuration is treated
+    separately and re-created after the transform as a functional difference
+    from the main upgraded configuration.</p>
+
+    <p>The logic for transforming or upgrading a main configuration
+    <var>C</var> with optional configurations <var>O1</var> and <var>O2</var>
+    into a new main configuration <var>Ct</var> and new optional configurations
+    <var>O1t</var> and <var>O2t</var> can be represented like this:</p>
+    <pre>
+C =&gt; Ct
+C + O1 =&gt; C1t
+C + O2 =&gt; C2t
+O1t = C1t - Ct
+O2t = C2t - Ct
+</pre>
+
     <h2 id="import">Import Configuration</h2>
 
     <p>A root level <var>import=PATH1 PATH2...</var> setting in the main
@@ -369,8 +392,8 @@ accel-find-next=F3
       <li><samp>opt/</samp> directory. For detail, see <a href="#opts">Optional
       Configuration</a>.</li>
 
-      <li>Other items, as long as they do not clash with the scheduler's working
-      directories. E.g. for a cylc suite, <samp>log*/</samp>,
+      <li>Other items, as long as they do not clash with the scheduler's
+      working directories. E.g. for a cylc suite, <samp>log*/</samp>,
       <samp>share/</samp>, <samp>state/</samp> and <samp>work/</samp> should be
       avoided.</li>
     </ul>
@@ -786,8 +809,8 @@ delays=0,6*10s,60*1m,1h
     Application: rose_prune</h3>
 
     <p>See <a href=
-    "rose-rug-task-run.html#rose-task-run.built-in-app.rose_prune">Running Tasks
-    &gt; rose task-run &gt; Built-in Application: rose_prune</a>.</p>
+    "rose-rug-task-run.html#rose-task-run.built-in-app.rose_prune">Running
+    Tasks &gt; rose task-run &gt; Built-in Application: rose_prune</a>.</p>
 
     <h2 id="meta">Configuration Metadata</h2>
 

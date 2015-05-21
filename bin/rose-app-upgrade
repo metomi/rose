@@ -15,6 +15,10 @@
 #         "=" indicates the current version.
 #         "*" indicates the default version to change to.
 #
+#     If an application contains optional configurations, loop through
+#     each one, combine with the main, upgrade it, and re-create it as
+#     a diff vs the upgraded main configuration.
+#
 # OPTIONS
 #     --all-versions, -a
 #         Use all tagged versions.

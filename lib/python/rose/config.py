@@ -35,6 +35,7 @@ Synopsis:
 
 Classes:
     ConfigNode - represents an individual node (setting or section).
+    ConfigNodeDiff - represent differences between ConfigNode instances.
     ConfigDumper - dumps a configuration to stdout or a file.
     ConfigLoader - loads a configuration into a Config instance.
 
@@ -54,7 +55,7 @@ What about the standard library ConfigParser? Well, it is problematic:
 
 """
 
-import errno
+import copy
 import os.path
 import re
 from rose.env import env_var_escape
@@ -278,6 +279,144 @@ class ConfigNode(object):
         except (KeyError, AttributeError):
             return None
 
+    def add(self, config_diff):
+        """Apply a config node diff object to self."""
+        for added_key, added_data in config_diff.get_added():
+            value, state, comments = added_data
+            self.set(keys=added_key, value=value, state=state,
+                     comments=comments)
+        for modified_key, modified_data in config_diff.get_modified():
+            # Should we check that the original data matches what we have?
+            orig_value = modified_data[0][0]
+            value, state, comments = modified_data[1]
+            if orig_value is None and value is None:
+                # A section - be careful not to change an existing node value.
+                subnode = self.get(keys=modified_key)
+                if subnode is None:
+                    self.set(
+                        keys=modified_key, state=state, comments=comments)
+                else:
+                    subnode.state = state
+                    subnode.comments = comments
+            else:
+                self.set(keys=modified_key, value=value, state=state,
+                         comments=comments)
+        for removed_key, removed_data in config_diff.get_removed():
+            self.unset(keys=removed_key)
+
+    def __add__(self, config_diff):
+        """Return a new node by applying a config node diff object to self."""
+        new_node = copy.deepcopy(self)
+        new_node.add(config_diff)
+        return new_node
+
+    def __sub__(self, other_config_node):
+        """Produce a diff from another node."""
+        diff = ConfigNodeDiff()
+        diff.set_from_configs(other_config_node, self)
+        return diff
+
+
+class ConfigNodeDiff(object):
+
+    """Represent differences between two ConfigNode instances."""
+
+    KEY_ADDED = "added"
+    KEY_MODIFIED = "modified"
+    KEY_REMOVED = "removed"
+
+    def __init__(self):
+        self._data = {self.KEY_ADDED: {}, self.KEY_REMOVED: {},
+                      self.KEY_MODIFIED: {}}
+
+    def set_from_configs(self, config_node_1, config_node_2):
+        """Create diff data from two ConfigNode instances."""
+        settings_1 = {}
+        settings_2 = {}
+        for config_node, settings in [(config_node_1, settings_1),
+                                      (config_node_2, settings_2)]:
+            for keys, node in config_node.walk():
+                value = node.value
+                if type(node.value) is dict:
+                    value = None
+                settings[tuple(keys)] = (value, node.state, node.comments)
+        for keys in set(settings_2) - set(settings_1):
+            self.set_added_setting(keys, settings_2[keys])
+        for keys in set(settings_1) - set(settings_2):
+            self.set_removed_setting(keys, settings_1[keys])
+        for keys in set(settings_1).intersection(set(settings_2)):
+            if settings_1[keys] != settings_2[keys]:
+                self.set_modified_setting(keys, settings_1[keys],
+                                          settings_2[keys])
+
+    def get_as_opt_config(self):
+        """Return a ConfigNode such that main + new_node = main + diff.
+
+        Add all the added settings, add all the modified settings,
+        add all the removed settings as user-ignored.
+
+        """
+        node = ConfigNode()
+        for keys, info in self.get_added():
+            value, state, comments = info
+            node.set(keys, value=value, state=state, comments=comments)
+        for keys, old_and_new_info in self.get_modified():
+            old_info, info = old_and_new_info
+            value, state, comments = info
+            node.set(keys, value=value, state=state, comments=comments)
+        for keys, info in self.get_removed():
+            # Need to add as user-ignored.
+            value, state, comments = info
+            node.set(keys, value=value, state=node.STATE_USER_IGNORED,
+                     comments=comments)
+        return node
+
+    def set_added_setting(self, keys, data):
+        """Set a setting to be "added"."""
+        self._data[self.KEY_ADDED][keys] = data
+
+    def set_modified_setting(self, keys, old_data, data):
+        """Set a setting to be "modified"."""
+        self._data[self.KEY_MODIFIED][keys] = (old_data, data)
+
+    def set_removed_setting(self, keys, data):
+        """Set a setting to be "removed"."""
+        self._data[self.KEY_REMOVED][keys] = data
+
+    def get_added(self):
+        """Return a list of tuples of added keys with their data.
+
+        The data is a tuple of value, state, comments, where value is
+        set to None for sections.
+
+        """
+        return sorted(self._data[self.KEY_ADDED].items())
+
+    def get_modified(self):
+        """Return a dict of altered keys with before and after data.
+
+        The data is a list of two tuples (before and after) of value,
+        state, comments, where value is set to None for sections.
+
+        """
+        return sorted(self._data[self.KEY_MODIFIED].items())
+
+    def get_removed(self):
+        """Return a dict of removed keys with their data.
+
+        The data is a tuple of value, state, comments, where value is
+        set to None for sections.
+
+        """
+        return sorted(self._data[self.KEY_REMOVED].items())
+
+    def get_all_keys(self):
+        """Return all changed keys."""
+        return sorted(
+            set(self._data[self.KEY_ADDED]) |
+            set(self._data[self.KEY_MODIFIED]) |
+            set(self._data[self.KEY_REMOVED]))
+
 
 class ConfigDumper(object):
 
@@ -430,7 +569,7 @@ class ConfigLoader(object):
             + r"\s*(?P<value>.*)$")
 
     def load_with_opts(self, source, node=None, more_keys=None,
-                       used_keys=None):
+                       used_keys=None, return_config_map=False):
         """Read a source configuration file with optional configurations.
 
         Arguments:
@@ -446,11 +585,19 @@ class ConfigLoader(object):
                      that are specified in more_keys will not raise an error.
                      If not defined, any missing optional configuration will
                      trigger an OSError.
+        return_config_map -- (default False) if True, construct and return a
+                              dict (config_map) containing config names vs
+                              their uncombined nodes. Optional configurations
+                              use their opt keys as keys, and the main
+                              configuration uses 'None'.
 
-        Return node.
+        Return node if return_config_map is False (default).
+        Return node, config_map if return_config_map is True.
 
         """
         node = self.load(source, node)
+        if return_config_map:
+            config_map = {None: copy.deepcopy(node)}
         opt_conf_keys_node = node.unset(["opts"])
         if opt_conf_keys_node is None or opt_conf_keys_node.is_ignored():
             opt_conf_keys = []
@@ -459,6 +606,8 @@ class ConfigLoader(object):
         if more_keys:
             opt_conf_keys += more_keys
         if not opt_conf_keys:
+            if return_config_map:
+                return node, config_map
             return node
         source_dir = os.path.dirname(source)
         source_root, source_ext = os.path.splitext(os.path.basename(source))
@@ -480,6 +629,10 @@ class ConfigLoader(object):
             else:
                 if used_keys is not None and key not in used_keys:
                     used_keys.append(key)
+                if return_config_map:
+                    config_map[key] = self.load(opt_conf_file_name)
+        if return_config_map:
+            return node, config_map
         return node
 
     def load(self, source, node=None):

@@ -401,6 +401,10 @@ rosie UTIL [OPTS] [ARG ...]
       <li><code>*</code> indicates the default version to change to.</li>
     </ul>
 
+    <p>If an application contains optional configurations, loop through each
+    one, combine with the main, upgrade it, and re-create it as a diff vs the
+    upgraded main configuration.</p>
+
     <h3>OPTIONS</h3>
 
     <dl>
@@ -671,10 +675,10 @@ rosie UTIL [OPTS] [ARG ...]
       <dt><kbd>--ignore=PATTERN, -i PATTERN</kbd></dt>
 
       <dd>
-        <p>Ignore settings that contain the regular expression <var>PATTERN</var> in their
-        id. Can be specified more than once. <var>PATTERN</var> may also be a key used in
-        site or user configuration which expands to a list of patterns. See
-        CONFIGURATION below.</p>
+        <p>Ignore settings that contain the regular expression
+        <var>PATTERN</var> in their id. Can be specified more than once.
+        <var>PATTERN</var> may also be a key used in site or user configuration
+        which expands to a list of patterns. See CONFIGURATION below.</p>
       </dd>
 
       <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
@@ -1301,6 +1305,17 @@ rose date 19700101T000000Z 20380119T031407Z
 
     <p>List or run macros associated with a suite or application.</p>
 
+    <p>If a configuration contains optional configurations:</p>
+
+    <ul>
+      <li>For validation macros, validate the main configuration, then validate
+      each main + optional configuration in turn.</li>
+
+      <li>For transform macros, transform the main configuration, then
+      transform each main + optional configuration, recreating each optional
+      configuration as the diff vs the transformed main.</li>
+    </ul>
+
     <h3>OPTIONS</h3>
 
     <dl>
@@ -1786,7 +1801,8 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <h3>DESCRIPTION</h3>
 
-    <p>Remove items created by <a href="#rose-suite-run">rose suite-run</a>.</p>
+    <p>Remove items created by <a href="#rose-suite-run">rose
+    suite-run</a>.</p>
 
     <p>If no argument is specified, use the base-name of <var>$PWD</var> as the
     suite name.</p>
@@ -2355,7 +2371,8 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>-- --EXTRA-ARGS</kbd></dt>
 
-      <dd>See the cylc documentation, cylc shutdown for options and details on EXTRA-ARGS.</dd>
+      <dd>See the cylc documentation, cylc shutdown for options and details on
+      EXTRA-ARGS.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
