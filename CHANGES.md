@@ -12,12 +12,25 @@ Rose release 27. This release will work best with
 
 ### Highlighted Changes
 
+[#1621](https://github.com/metomi/rose/pull/1621),
 [#1604](https://github.com/metomi/rose/pull/1604):
-fcm make 2: improve support. Add `mirror.target=` to `fcm make` argument list
-as extra configuration. Support `-n 2` option where possible - this allows the
-continuation make in the same physical location. Allow flexible naming of the
-`mirror` step. Allow flexible mapping of the original and continuation task
-names. See also [metomi/fcm#188](https://github.com/metomi/fcm/pull/188).
+fcm_make built-in application: improve flexibility.
+* Add `mirror.target=` to `fcm make` argument list as extra configuration.
+* Support `-n 2` option where possible - this allows the continuation make to be
+  in the same physical location.
+* Allow flexible naming of the `mirror` step.
+* Allow flexible mapping of the original and continuation task names.
+* It is now possible to set:
+  * the destination for both orig and cont runs.
+  * fast locations for both orig and cont runs.
+* `rose task-run --new` on orig will now:
+  * clear orig and cont dests.
+  * invoke `fcm make --new`.
+
+See also
+[metomi/fcm#188](https://github.com/metomi/fcm/pull/188),
+[metomi/fcm#189](https://github.com/metomi/fcm/pull/189),
+[metomi/fcm#190](https://github.com/metomi/fcm/pull/190).
 
 ### Noteworthy Changes
 
