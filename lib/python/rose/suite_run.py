@@ -157,7 +157,7 @@ class SuiteRunner(Runner):
                     ["env", suite_engine_key])
         else:
             suite_engine_version = self.suite_engine_proc.get_version()
-        auto_items = {"ROSE_ORIG_HOST": socket.gethostname(),
+        auto_items = {"ROSE_ORIG_HOST": self.host_selector.get_local_host(),
                       "ROSE_VERSION": ResourceLocator.default().get_version(),
                       suite_engine_key: suite_engine_version}
         for key, val in auto_items.items():
@@ -397,8 +397,9 @@ class SuiteRunner(Runner):
             else:
                 hosts = self.suite_engine_proc.get_suite_hosts()
 
-        if hosts and hosts == ["localhost"]:
-            host = hosts[0]
+        if (hosts and len(hosts) == 1 and
+                self.host_selector.is_local_host(hosts[0])):
+            host = "localhost"
         elif hosts:
             host = self.host_selector(hosts)[0][0]
         else:

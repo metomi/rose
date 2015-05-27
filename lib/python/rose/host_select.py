@@ -27,6 +27,8 @@ from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 import shlex
 import signal
+import socket
+from socket import gethostbyname, gethostname, getfqdn
 import sys
 from time import sleep, time
 import traceback
@@ -132,6 +134,37 @@ class HostSelector(object):
             popen = RosePopener(event_handler=event_handler)
         self.popen = popen
         self.scorers = {}
+        self.local_host_strs = None
+
+    def get_local_host_strs(self):
+        """Return a list of names associated with the current host."""
+        if self.local_host_strs is None:
+            self.local_host_strs = []
+            items = []
+            for item in gethostname, getfqdn:
+                try:
+                    items.append(item())
+                except socket.error:
+                    pass
+            for item in items + ["localhost"]:
+                if item not in self.local_host_strs:
+                    self.local_host_strs.append(item)
+                    try:
+                        address = gethostbyname(item)
+                    except socket.error:
+                        pass
+                    else:
+                        if address not in self.local_host_strs:
+                            self.local_host_strs.append(address)
+        return self.local_host_strs
+
+    def get_local_host(self):
+        """Return the normal name of the current host."""
+        return self.get_local_host_strs()[0]
+
+    def is_local_host(self, name):
+        """Return True is name appears to be the localhost."""
+        return name in self.get_local_host_strs()
 
     def get_scorer(self, method=None):
         """Return a suitable scorer for a given scoring method."""
@@ -276,11 +309,20 @@ class HostSelector(object):
             ssh_cmd_timeout = float(conf.get_value(
                 ["rose-host-select", "timeout"], self.SSH_CMD_TIMEOUT))
 
+        host_name_list = list(host_names)
+        host_names = []
+        for host_name in host_name_list:
+            if self.is_local_host(host_name):
+                if self.get_local_host() not in host_names:
+                    host_names.append(self.get_local_host())
+            else:
+                host_names.append(host_name)
+
         # Random selection with no thresholds. Return the 1st available host.
         if rank_conf.method == self.RANK_METHOD_RANDOM and not threshold_confs:
             shuffle(host_names)
             for host_name in host_names:
-                if host_name == "localhost":
+                if self.is_local_host(host_name):
                     return [("localhost", 1)]
                 command = self.popen.get_cmd("ssh", host_name, "true")
                 proc = self.popen.run_bg(*command, preexec_fn=os.setpgrp)
@@ -303,7 +345,7 @@ class HostSelector(object):
         host_proc_dict = {}
         for host_name in sorted(host_names):
             command = []
-            if host_name != "localhost":
+            if not self.is_local_host(host_name):
                 command_args = []
                 command_args.append(host_name)
                 command = self.popen.get_cmd("ssh", *command_args)

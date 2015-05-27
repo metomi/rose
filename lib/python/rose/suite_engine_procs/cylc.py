@@ -699,7 +699,7 @@ class CylcProcessor(SuiteEngineProcessor):
         if user_name:
             opt_user = "-u " + user_name
         for host in sorted(hosts):
-            if host == "localhost":
+            if self.host_selector.is_local_host(host):
                 continue
             r_cmd_tmpl = (
                 r"pgrep -f -l %s '" + self.PGREP_CYLC_RUN + r"' || ls '%s'")
@@ -1043,14 +1043,8 @@ class CylcProcessor(SuiteEngineProcessor):
         """
 
         # Check that "host" is not the localhost
-        if host:
-            localhosts = ["localhost"]
-            try:
-                localhosts.append(socket.gethostname())
-            except IOError:
-                pass
-            if host in localhosts:
-                host = None
+        if host and self.host_selector.is_local_host(host):
+            host = None
 
         # Invoke "cylc run" or "cylc restart"
         if run_mode not in ["reload", "restart", "run"]:
@@ -1101,7 +1095,7 @@ class CylcProcessor(SuiteEngineProcessor):
         procs[(_PORT_SCAN, None, tuple(cmd))] = self.popen.run_bg(*cmd)
         for host in sorted(hosts):
             sh_cmd = "whoami && cd ~/.cylc/ports/ && ls || true"
-            if host == "localhost":
+            if self.host_selector.is_local_host(host):
                 cmd = ["bash", "-c", sh_cmd]
             else:
                 cmd = self.popen.get_cmd("ssh", host, sh_cmd)
@@ -1218,7 +1212,8 @@ class CylcProcessor(SuiteEngineProcessor):
         if host and ("`" in host or "$" in host):
             command = ["bash", "-ec", "H=" + host + "; echo $H"]
             host = self.popen(*command)[0].strip()
-        if host in ["None", "localhost", self.host]:
+        if (host in ["None", self.host] or
+                self.host_selector.is_local_host(host)):
             host = None
         if user and host:
             auth = user + "@" + host

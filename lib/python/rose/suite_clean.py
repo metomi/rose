@@ -102,7 +102,7 @@ class SuiteRunCleaner(object):
                     if item:
                         loc_rel = os.path.join(suite_dir_rel, item)
                     locs.append(os.path.join(item_root, loc_rel))
-            if auth == "localhost":
+            if self.host_selector.is_local_host(auth):
                 for loc in locs:
                     loc = os.path.abspath(env_var_process(loc))
                     for name in sorted(glob(loc)):
