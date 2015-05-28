@@ -187,7 +187,7 @@
       <p>Edit the <samp>rose-app.conf</samp> file to look like this:</p>
       <pre class="prettyprint lang-cylc">
 [poll]
-delays=10*5s
+delays=10*PT5S
 test=test -e $ROSE_DATA/letter.txt
 
 [command]
@@ -244,7 +244,7 @@ default=echo 'Ooh, a letter!'
       look like the following:</p>
       <pre class="prettyprint lang-cylc">
 [poll]
-delays=10*5s
+delays=10*PT5S
 all-files=$ROSE_DATA/letter.txt
 
 [command]
