@@ -338,22 +338,24 @@ file-test=test -e {} &amp;&amp; grep -q 'hello' {}
     with delays between them. If the prerequisites are still not met after the
     number of delays, <code>rose task-run</code> will fail with a time out. The
     delays list is a comma-separated list. The syntax looks like
-    <var>[R*]T[U]</var>, where <var>U</var> is a unit (<kbd>s</kbd> for seconds
-    (default), <kbd>m</kbd> for minutes and <kbd>h</kbd> for hours),
-    <var>T</var> is the number of units, and <var>R</var> is the number of
-    repeats. E.g.:</p>
+    <var>[R*][P or P T or PT]T[U]</var>, where <var>U</var> is a unit
+    (<kbd>S</kbd> for seconds (default), <kbd>M</kbd> for minutes and
+    <kbd>H</kbd> for hours), <var>T</var> is the number of units,
+    <var>P or P Tor PT</var> are the ISO8601 date-time format, and
+    <var>R</var> is the number of repeats. E.g.:</p>
     <pre class="prettyprint lang-rose_conf">
 # Default
 delays=0
 
 # Poll 1 minute after the runner begins, repeat every minute 10 times
-delays=10*1m
+delays=10*PT1M
 
 # Poll when runner begins,
 # repeat every 10 seconds 6 times,
 # repeat every minute 60 times,
-# repeat once after 1 hour
-delays=0,6*10s,60*1m,1h
+# repeat once after 1 hour,
+# repeat once after 1 day and 6 hours
+delays=0,6*PT10S,60*PT1M,PT1H,P1DT6H
 </pre>
 
     <h2 id="rose-task-run.built-in-app.fcm_make">Built-in Application:
