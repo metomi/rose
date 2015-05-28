@@ -58,7 +58,7 @@ rose host-select: fix incorrect threshold logic introduced by
 rosie go: display URLs of data sources.
 
 [#1612](https://github.com/metomi/rose/pull/1612):
-rose bush: page navigation always visible at the bottom.
+rose bush: page navigation always visible at the bottom of the window.
 
 [#1611](https://github.com/metomi/rose/pull/1611):
 rose.env.env_export: only report for 1st time and on change. This fixes, e.g.
