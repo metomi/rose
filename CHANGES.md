@@ -5,10 +5,11 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2015-Q2?)
+## 2015.05.0 (2015-05-28)
 
-Rose release 27. This release will work best with
-[cylc-6.4.1](https://github.com/cylc/cylc/releases/tag/6.4.1) and/or beyond.
+Rose release 27. This release works best with
+[cylc-6.4.1](https://github.com/cylc/cylc/releases/tag/6.4.1) and
+[fcm-2015.05.0](https://github.com/metomi/fcm/releases/tag/2015.05.0).
 
 ### Highlighted Changes
 
@@ -32,7 +33,18 @@ See also
 [metomi/fcm#189](https://github.com/metomi/fcm/pull/189),
 [metomi/fcm#190](https://github.com/metomi/fcm/pull/190).
 
+[#1576](https://github.com/metomi/rose/pull/1576):
+rose app-upgrade, rose macro: handle optional configurations.
+If an application contains optional configurations, loop through each one,
+combine with the main, upgrade it, and re-create it as a diff vs the upgraded
+main configuration.
+
 ### Noteworthy Changes
+
+[#1620](https://github.com/metomi/rose/pull/1620):
+rose host-select: improve recognition for `localhost` - the logic will now
+check for `localhost`, its hostname, its fqdn hostname, and the associated IP
+addresses.
 
 [#1618](https://github.com/metomi/rose/pull/1618):
 rosie create/copy: fix malformed log message for the Subversion changeset on
