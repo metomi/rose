@@ -21,14 +21,18 @@
 #-------------------------------------------------------------------------------
 
 # Common site configuration.
+[]
+#
 ## Paths to locate configuration metadata
 #  meta-path=DIR1[:DIR2[:...]]
 ## E.g.:
 #  meta-path=/opt/rose-meta
 ## URL to Rose documentation.
 #  rose-doc=http://metomi.github.io/rose/doc/
+[]
 
 # Configuration of external commands.
+[external]
 #
 ## Launch diff tool (default='diff -u')
 #  diff_tool=diff -y
@@ -51,6 +55,7 @@
 [external]
 
 ## LDAP settings are only relevant if "[rosa-svn]user-tool=ldap".
+[rosa-ldap]
 #
 ## The attributes for UID, common name and email in the LDAP directory.
 ## (default=uid cn mail)
@@ -71,6 +76,7 @@
 [rosa-ldap]
 
 # Configuration for "rosa svn-pre-commit" and "rosa svn-post-commit".
+[rosa-svn]
 #
 ## Admin users allowed to write to the trunk of any suite.
 #  super-users=USER1 ...
@@ -96,6 +102,7 @@
 [rosa-svn]
 
 # Configuration for Rose Bush server. (Examples are default values.)
+[rose-bush]
 #
 ## Cycles list view: default number of cycles per page
 #  cycles-per-page=100
@@ -108,6 +115,8 @@
 [rose-bush]
 
 # Configuration specific to "rose config-diff".
+[rose-config-diff]
+#
 ## Metadata properties to use (default='title,ns,description,help')
 # properties=title,ns,description,help
 ## Shorthand expressions for ignore-setting regexes
@@ -115,8 +124,9 @@
 [rose-config-diff]
 
 # Configuration specific to "rose config-edit".
-# See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
+[rose-config-edit]
 #
+# See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
 ## Path to a picture containing the suite engine icon.
 #  icon-path-scheduler=/opt/cylc/images/icon.svg
 ## Hyperlink to Rose project page. (default=https://github.com/metomi/rose/).
@@ -124,6 +134,7 @@
 [rose-config-edit]
 
 # Configuration related to "rose host-select".
+[rose-host-select]
 #
 ## The default arguments to use for this command.
 #  default=GROUP/HOST ...
@@ -152,6 +163,8 @@
 [rose-host-select]
 
 # Configuration related to "rose stem".
+[rose-stem]
+#
 ## Automatic options. These are added as if the user added them with 
 ## --define-suite on the command line and can be accessed as Jinja2 variables 
 ## in the suite.rc file. E.g.:
@@ -160,6 +173,7 @@
 [rose-stem]
 
 # Configuration related to "rose suite-hook"
+[rose-suite-hook]
 #
 ## Default host name for email addresses. (Use "localhost" if not specified.)
 #  email-host=HOST
@@ -173,6 +187,7 @@
 [rose-suite-hook]
 
 # Configuration related to "rose suite-log"
+[rose-suite-log]
 #
 ## Mapping $HOME/cylc-run/SUITE to a http:// URL.
 ## E.g. If $HOME/public_html/cylc-run is a symlink of $HOME/cylc-run
@@ -183,6 +198,7 @@
 [rose-suite-log]
 
 # Configuration related to "rose mpi-launch".
+[rose-mpi-launch]
 #
 ## Specify a list of launcher commands.
 #  launcher-list=LAUNCHER ...
@@ -207,6 +223,7 @@
 [rose-mpi-launch]
 
 # Configuration related to "rose suite-run".
+[rose-suite-run]
 #
 ## Hosts in [rose-host-select] section that can be used to run a suite.
 #  hosts=HOST-GROUP|HOST ...
@@ -238,6 +255,7 @@
 [rose-suite-run]
 
 # Configuration related to "rose task-run".
+[rose-task-run]
 #
 ## Items to prepend to the PATH environment variable
 #  path-prepend=/path/1 /path/2
@@ -246,6 +264,7 @@
 [rose-task-run]
 
 # Calling "rose" on a remote host.
+[rose-home-at]
 #
 ## Alternate path to "rose" for all hosts
 #  * =/opt/rose
@@ -254,12 +273,14 @@
 [rose-home-at]
 
 # Configuration related to the built-in "rose_ana" application.
+[rose-ana]
 #
 ## Items to prepend to the search path for user methods
 #  method-path=/path/1 /path2
 [rose-ana]
 
 # Configuration related to the database of the Rosie web service server
+[rosie-db]
 #
 ## The database location of a given repository prefix, from within the server
 #  db.PREFIX=URL
@@ -273,6 +294,7 @@
 
 # Configuration related to "rosie go" GUI
 # See the $ROSE_HOME/lib/python/rosie/browser/__init__.py for detail.
+[rosie-go]
 #
 ## Path to a picture containing the suite engine icon.
 #  icon-path-scheduler=/opt/cylc/images/icon.svg
@@ -281,6 +303,7 @@
 [rosie-go]
 
 # Configuration related to Rosie client commands
+[rosie-id]
 #
 ## Root directory of local (working) copies of suites (default=$HOME/roses)
 #  local-copy-root=DIR
@@ -329,6 +352,7 @@
 [rosie-id]
 
 # Configuration related to the Rosie version control client
+[rosie-vc]
 #
 ## Default access-list setting on suite creation
 #  access-list-default=USER-ID ...
@@ -337,6 +361,7 @@
 [rosie-vc]
 
 # Configuration related to the adhoc Rosie web service server
+[rosie-ws]
 #
 ## Adhoc Rosie web server log directory
 #  log-dir=DIR
@@ -349,6 +374,7 @@
 [rosie-ws]
 
 # Test Battery Configuration
+[t]
 #
 ## Tool to compare 2 files when there are differences.
 ## (default="diff -u")

@@ -183,9 +183,13 @@
         keywords in file configurations; <code>rose app-run</code> has built-in
         applications for running <code>fcm make</code>.</p>
 
-        <p><dfn>tested with version:</dfn> HEAD.</p>
+        <p><dfn>tested with version:</dfn> See <a href=
+        "https://github.com/metomi/rose/blob/master/CHANGES.md">Rose Changes</a>
+        for compatible FCM versions for this release of Rose.</p>
 
-        <p><dfn>minimum version required:</dfn> 2.3.</p>
+        <p><dfn>minimum version required:</dfn> See <a href=
+        "https://github.com/metomi/rose/blob/master/CHANGES.md">Rose Changes</a>
+        for compatible FCM versions for this release of Rose.</p>
       </dd>
 
       <dt><a href="http://www.perl.org/">Perl</a></dt>
@@ -346,14 +350,159 @@ export PYTHONPATH
     requirement of your site. Examples can be found at the
     <samp>etc/rose.conf.example</samp> file in your Rose distribution.</p>
 
-    <h2 id="rosie">Configuring Rosie</h2>
+    <h2 id="rosie-client">Configuring Rosie Client</h2>
 
-    <p>Rosie is the optional suite storage and discovery system.</p>
+    <p>Rosie is a suite storage and discovery system.</p>
 
     <p>Rosie stores suites using Subversion repositories, with databases behind
-    a web interface for suite discovery and lookup. You will need to select a
-    machine to host the Subversion repositories. This machine will also host
-    the web server and databases.</p>
+    a web interface for suite discovery and lookup.</p>
+
+    <p>If users at your site are able to access Rosie services on the Internet
+    or if someone else has already configured Rosie services at your site, all
+    you need to do is configure the client to talk to the servers. Refer to the
+    <a href="#rosie-server">Configuring a Rosie Server</a> section if you need
+    to configure a Rosie server for your site.</p>
+    
+    <p>To set up the Rosie client for the site, add/modify the
+    <code>[rosie-id]</code> section of <samp>etc/rose.conf</samp>. E.g.:</p>
+
+    <pre class="prettyprint lang-rose_conf">
+[rosie-id]
+prefix-default=x
+prefixes-ws-default=x myorg
+
+prefix-location.x=https://somehost.on.the.internet/svn/roses-x
+prefix-web.x=https://somehost.on.the.internet/trac/roses-x/intertrac/source:
+prefix-ws.x=https://somehost.on.the.internet/rosie/x
+
+prefix-location.myorg=svn://myhost.myorg/roses-myorg
+prefix-web.myorg=http://myhost.myorg/trac/roses-myorg/intertrac/source:
+prefix-ws.myorg=http://myhost.myorg/rosie/myorg
+</pre>
+
+    <p>Check the following:</p>
+
+    <ol>
+      <li>You can access the Rosie Subversion repository without being prompt
+      for a username and a password. This may require configuring Subversion to
+      cache your authentication information with a keyring. (See <a href=
+      "http://svnbook.red-bean.com/nightly/en/svn.serverconfig.netmodel.html#svn.serverconfig.netmodel.creds">Subversion
+      Book &gt; Advanced Topics &gt; Network Model &gt; Client Credentials</a>
+      for a discussion on how to do this.)</li>
+
+      <li>The Rosie web service is up and running and you can access the Rosie
+      web service from your computer. E.g. if the Rosie web service is hosted at
+      <samp>https://somehost.on.the.internet/rosie/x</samp>, you can check that
+      you have access by typing the following on the command line <code>curl -I
+      https://somehost.on.the.internet/rosie/x</code>. It should return a HTTP
+      code 200. If you are prompted for a username and a password, you may need
+      to have access to a keyring to cache the authentication information.</li>
+
+      <li>You can access the Rosie web service using the Rosie client.  E.g.
+      using the above configuration for the prefix <em>x</em>, type the
+      following on the command line: <code>rosie hello --prefix=x</code>. It
+      should return a greeting, e.g. <samp>Hello user</samp>.</li>
+    </ol>
+
+    <h2 id="meta">Deploying Configuration Metadata</h2>
+
+    <p>You may want to deploy <a href=
+    "rose-configuration-metadata.html">configuration metadata</a> for projects
+    using Rose in a globally readable location at your site, so that they can be
+    easily accessed by users when using Rose utilities such as <code>rose
+    config-edit</code> or <code>rose macro</code>.</p>
+
+    <p>If the source tree of a project is version controlled under a trusted
+    Subversion repository, it is possible to automatically deploy their
+    configuration metadata. Assuming that the projects follow our recommendation
+    and store Rose configuration metadata under the <samp>rose-meta/</samp>
+    directory of their source tree, you can:</p>
+    
+    <ol>
+      <li>Check out a working copy for each sub-directory under the
+      <samp>rose-meta/</samp> directory.</li>
+      
+      <li>Set up a <code>crontab</code> job to regularly update the working
+      copies.</li>
+    </ol>
+
+    <p>For example, suppose you want to deploy Rose configuration metadata under
+    <samp>/etc/rose-meta/</samp> at your site. You can do:</p>
+
+    <pre class="prettyprint lang_sh">
+# Deployment location
+DEST='/etc/rose-meta'
+cd "${DEST}"
+
+# Assume only Rose metadata configuration directories under "rose-meta/"
+URL1='https://somehost/foo/main/trunk/rose-meta'
+URL2='https://anotherhost/bar/main/trunk/rose-meta'
+# ...
+
+# Checkout a working copy for each metadata configuration directory
+for URL in "${URL1}" "${URL2}"; do
+    for NAME in $(svn ls "${URL}"); do
+        svn checkout -q "${URL}/${NAME}"
+    done
+done
+
+# Set up a crontab job to update the working copies, e.g. every 10 minutes
+crontab -l || true &gt;'crontab.tmp'
+{
+    echo '# Update Rose configuration metadata every 10 minutes'
+    echo "*/10 * * * * svn update -q ${DEST}/*"
+} &gt;&gt;'crontab.tmp'
+crontab 'crontab.tmp'
+rm 'crontab.tmp'
+
+# Finally add the root level "meta-path" setting to site's "rose.conf"
+# E.g. if Rose is installed under "/opt/rose/":
+{
+    echo '[]'
+    echo "meta-path=${DEST}"
+} &gt;&gt;'/opt/rose/etc/rose.conf'
+</pre>
+
+    <p>See also <a href=
+    "rose-configuration-metadata.html#appendix-metadata-location">Metadata
+    Location</a>.</p>
+
+    <h2 id="rose-bush">Configuring Rose Bush</h2>
+
+    <p>Rose Bush provides an intranet web service at your site for users to view
+    their suite logs using a web browser. Depending on settings at your site,
+    you may or may not be able to set up this service.</p>
+
+    <p>You can start an ad-hoc Rose Bush web server by running:</p>
+    <pre class="prettyprint lang_sh">
+setsid /path/to/rose/bin/rose bush start 0&lt;/dev/null 1&gt;/dev/null 2&gt;&amp;1 &amp;
+</pre>
+
+    <p>You will find the access and error logs under
+    <samp>~/.metomi/rose-bush*</samp>.</p>
+
+    <p>Alternatively you can run the Rose Bush web service under Apache mod_wsgi.
+    To do this you will need to set up an Apache module configuration file
+    (typically in <samp>/etc/httpd/conf.d/rose-wsgi.conf</samp>) containing
+    the following (with the paths set appropriately):</p>
+    <pre>
+WSGIPythonPath /path/to/rose/lib/python
+WSGIScriptAlias /rose-bush /path/to/rose/lib/python/rose/bush.py
+</pre>
+
+    <p>Use the Apache log at e.g. <samp>/var/log/httpd/</samp> to debug
+    problems. See also <a href="#rosie-server">Configuring Rosie Server</a>
+    below.</p>
+
+    <h2 id="rosie-server">Configuring a Rosie Server</h2>
+
+    <p>You should only need to configure and run your own Rosie service if you
+    do not have access to Rosie services on the Internet, or if you need a
+    private Rosie service for your site. Depending on settings at your site,
+    you may or may not be able to set up this service.</p>
+    
+    <p>You will need to select a machine to host the Subversion repositories.
+    This machine will also host the web server and databases.</p>
 
     <p>Login to your host, create one or more Subversion FSFS repositories.</p>
 
@@ -424,7 +573,7 @@ exec /path/to/rose/sbin/rosa svn-post-commit "$@"
     <p>Make sure that the account that runs the repository hooks has read/write
     access to the database and database directory.</p>
 
-    <p>You can test that everything is working using the built in web server.
+    <p>You can test that everything is working using the built-in web server.
     Edit the <var>[rosie-ws]</var> settings in <samp>etc/rose.conf</samp> to
     configure the web server's log directory and port number. Start the web
     server by running:</p>
@@ -511,91 +660,6 @@ sub-project experiment model
 
     <p>You can continue to modify the list by changing the file contents and
     committing.</p>
-
-    <h2 id="rose-bush">Configuring Rose Bush</h2>
-
-    <p>You can start an ad-hoc Rose Bush web server by running:</p>
-    <pre class="prettyprint lang_sh">
-setsid /path/to/rose/bin/rose bush start 0&lt;/dev/null 1&gt;/dev/null 2&gt;&amp;1 &amp;
-</pre>
-
-    <p>You will find the access and error logs under
-    <samp>~/.metomi/rose-bush*</samp>.</p>
-
-    <p>Alternatively you can run the Rose Bush web service under Apache mod_wsgi.
-    To do this you will need to set up an Apache module configuration file
-    (typically in <samp>/etc/httpd/conf.d/rose-wsgi.conf</samp>) containing
-    the following (with the paths set appropriately):</p>
-    <pre>
-WSGIPythonPath /path/to/rose/lib/python
-WSGIScriptAlias /rose-bush /path/to/rose/lib/python/rose/bush.py
-</pre>
-
-    <p>Use the Apache log at e.g. <samp>/var/log/httpd/</samp> to debug
-    problems. See also <a href="#rosie">Configuring Rosie</a> above.</p>
-
-    <h2 id="meta">Deploying Configuration Metadata</h2>
-
-    <p>You may want to deploy <a href=
-    "rose-configuration-metadata.html">configuration metadata</a> for projects
-    using Rose in a globally readable location at your site, so that they can be
-    easily accessed by users when using Rose utilities such as <code>rose
-    config-edit</code> or <code>rose macro</code>.</p>
-
-    <p>If the source tree of a project is version controlled under a trusted
-    Subversion repository, it is possible to automatically deploy their
-    configuration metadata. Assuming that the projects follow our recommendation
-    and store Rose configuration metadata under the <samp>rose-meta/</samp>
-    directory of their source tree, you can:</p>
-    
-    <ol>
-      <li>Check out a working copy for each sub-directory under the
-      <samp>rose-meta/</samp> directory.</li>
-      
-      <li>Set up a <code>crontab</code> job to regularly update the working
-      copies.</li>
-    </ol>
-
-    <p>For example, suppose you want to deploy Rose configuration metadata under
-    <samp>/etc/rose-meta/</samp> at your site. You can do:</p>
-
-    <pre class="prettyprint lang_sh">
-# Deployment location
-DEST='/etc/rose-meta'
-cd "${DEST}"
-
-# Assume only Rose metadata configuration directories under "rose-meta/"
-URL1='https://somehost/foo/main/trunk/rose-meta'
-URL2='https://anotherhost/bar/main/trunk/rose-meta'
-# ...
-
-# Checkout a working copy for each metadata configuration directory
-for URL in "${URL1}" "${URL2}"; do
-    for NAME in $(svn ls "${URL}"); do
-        svn checkout -q "${URL}/${NAME}"
-    done
-done
-
-# Set up a crontab job to update the working copies, e.g. every 10 minutes
-crontab -l || true &gt;'crontab.tmp'
-{
-    echo '# Update Rose configuration metadata every 10 minutes'
-    echo "*/10 * * * * svn update -q ${DEST}/*"
-} &gt;&gt;'crontab.tmp'
-crontab 'crontab.tmp'
-rm 'crontab.tmp'
-
-# Finally add the root level "meta-path" setting to site's "rose.conf"
-# E.g. if Rose is installed under "/opt/rose/":
-{
-    echo '[]'
-    echo "meta-path=${DEST}"
-} &gt;&gt;'/opt/rose/etc/rose.conf'
-</pre>
-
-    <p>See also <a href=
-    "rose-configuration-metadata.html#appendix-metadata-location">Metadata
-    Location</a>.</p>
   </div>
 </body>
 </html>
