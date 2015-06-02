@@ -426,10 +426,10 @@ value-titles=low, medium, high
       <dt id="meta.conf.value.value-hints">value-hints</dt>
 
       <dd>
-        <p>Define a comma <kbd>,</kbd> separated list of suggested values for
-        a variable as <code>value-hints</code>, but still allows the user to
-       provide their own override. This is like an auto-complete widget.
-        </p>
+        <p>Define a comma <kbd>,</kbd> separated list of suggested values for a
+        variable as <code>value-hints</code>, but still allows the user to
+        provide their own override. This is like an auto-complete widget.</p>
+
         <p>For example, given the following metadata:</p>
         <pre class="prettyprint lang-rose_conf">
 [env=suggested_fruit]
@@ -437,8 +437,8 @@ value-hints=pineapple,cherry,banana,apple,pear,mango,kiwi,grapes,peach,fig,
            =orange,strawberry,blackberry,blackcurrent,raspberry,melon,plum
 </pre>
 
-        <p>the config editor will display possible option values when the 
-        user starts typing if they match a suggested value.</p>
+        <p>the config editor will display possible option values when the user
+        starts typing if they match a suggested value.</p>
       </dd>
 
       <dt id="meta.conf.value.range">range</dt>
@@ -469,7 +469,7 @@ value-hints=pineapple,cherry,banana,apple,pear,mango,kiwi,grapes,peach,fig,
 
       <dd>
         <p>Specify a regular expression (Python's extended regular expression
-        syntax) that the value of the setting must match.</p>
+        syntax) to compare against the whole value of the setting.</p>
 
         <p>For example, if we write the following metadata:</p>
         <pre class="prettyprint lang-rose_conf">
@@ -481,6 +481,19 @@ pattern=^"[A-Z].+"$
         start with a double quote (<samp>^"</samp>), begin with an uppercase
         letter (<samp>[A-Z]</samp>), contain some other characters or spaces
         (<samp>.+</samp>), and end with a quote (<samp>"$</samp>).</p>
+
+        <p>If you have an array variable (for example,
+        <samp>TARTAN_PAINT_COLOURS='blue','red','blue'</samp>) and you want to
+        specify a pattern that each element of the array must match, you can
+        construct a regular expression that repeats and includes commas. For
+        example, if each element in our <samp>TARTAN_PAINT_COLOURS</samp> array
+        must obey the regular expression <samp>'red'|'blue'</samp>, then we can
+        write:</p>
+        <pre class="prettyprint lang-rose_conf">
+[env=TARTAN_PAINT_COLOURS]
+length=:
+pattern=^('red'|'blue')(?:,('red'|'blue'))*$
+</pre>
       </dd>
 
       <dt id="meta.conf.value.fail-if">fail-if, warn-if</dt>
