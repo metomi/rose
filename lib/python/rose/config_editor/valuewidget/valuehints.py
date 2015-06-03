@@ -31,7 +31,7 @@ import rose.variable
 class HintsValueWidget(gtk.HBox):
     """This class generates a widget for entering value-hints."""
 
-    def __init__(self, value, metadata, set_value, hook):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(HintsValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
