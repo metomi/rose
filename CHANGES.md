@@ -5,6 +5,19 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q2?)
+
+Rose release 28. This release will work best with
+[cylc-6.4.1](https://github.com/cylc/cylc/releases/tag/6.4.1) and
+[fcm-2015.05.0](https://github.com/metomi/fcm/releases/tag/2015.05.0).
+
+### Noteworthy Changes
+
+[#1626](https://github.com/metomi/rose/pull/1626):
+rose config-edit: fix value hints widget initialisation
+
+--------------------------------------------------------------------------------
+
 ## 2015.05.0 (2015-05-28)
 
 Rose release 27. This release works best with
