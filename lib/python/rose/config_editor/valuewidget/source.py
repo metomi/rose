@@ -25,7 +25,10 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
+import rose.config
 import rose.config_editor
+import rose.formats
+import rose.gtk.choice
 
 
 class SourceValueWidget(gtk.HBox):
