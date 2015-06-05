@@ -47,6 +47,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
+    CYCLE_ORDERS = {"time_desc": " DESC", "time_asc": " ASC"}
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "fail(submit)",
               "submitting now": "submit-init",
@@ -63,7 +64,7 @@ class CylcProcessor(SuiteEngineProcessor):
     EVENT_RANKS = {"submit-init": 0, "submit": 1, "fail(submit)": 1, "init": 2,
                    "success": 3, "fail": 3, "fail(%s)": 4}
     JOB_LOGS_DB = "log/rose-job-logs.db"
-    ORDERS = {
+    JOB_ORDERS = {
         "time_desc":
         "time DESC, task_events.submit_num DESC, name DESC, cycle DESC",
         "time_asc":
@@ -294,7 +295,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 where +
                 " GROUP BY cycle, name, task_events.submit_num" +
                 " ORDER BY " +
-                self.ORDERS.get(order, self.ORDERS["time_desc"]))
+                self.JOB_ORDERS.get(order, self.JOB_ORDERS["time_desc"]))
         stmt_args_head = [
             "submitting now", "incrementing submit number",
             "submission failed", "started", "succeeded", "failed", "signaled"]
@@ -442,7 +443,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                   "size": f_stat.st_size}
         return ("cylc", logs_info)
 
-    def get_suite_cycles_summary(self, user_name, suite_name, limit, offset):
+    def get_suite_cycles_summary(self, user_name, suite_name, order, limit,
+                                 offset):
         """Return a the state summary (of each cycle) of a user's suite.
 
         user -- A string containing a valid user ID
@@ -497,9 +499,19 @@ class CylcProcessor(SuiteEngineProcessor):
                 stmt += " OR"
             stmt += " status==?"
         if integer_mode:
-            stmt += ") GROUP BY cycle ORDER BY cast(cycle as number) DESC"
+            try:
+                self.CYCLE_ORDERS.get(order)
+                stmt += ") GROUP BY cycle ORDER BY cast(cycle as number) " + (
+                         self.CYCLE_ORDERS.get(order))
+            except:
+                stmt += ") GROUP BY cycle ORDER BY cast(cycle as number) DESC"
         else:
-            stmt += ") GROUP BY cycle ORDER BY cycle DESC"
+            try:
+                self.CYCLE_ORDERS.get(order)
+                stmt += ") GROUP BY cycle ORDER BY cycle " + (
+                         self.CYCLE_ORDERS.get(order))
+            except:
+                stmt += ") GROUP BY cycle ORDER BY cycle DESC"
 
         if limit:
             stmt += " LIMIT ? OFFSET ?"

@@ -83,6 +83,28 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 </div>
 </div>
 <div class="page-header">
+
+<div id="filter">
+<form action="{{script}}/cycles">
+<input type="hidden" name="user" value="{{user}}" />
+<input type="hidden" name="suite" value="{{suite}}" />
+<input type="hidden" name="per_page" value="{{per_page}}" />
+<div class="input-append">
+<select name="order" title="Sort order">
+{% for k, v in [("time_desc", "new-&gt;old"),
+                ("time_asc", "old-&gt;new")] -%}
+<option
+{% if order and order == k -%}
+selected="selected"
+{% endif -%}
+value="{{k}}">{{v}}</option>
+{% endfor -%}
+</select>
+<input type="submit" class="btn btn-primary" value="update" />
+</div>
+</form>
+
+</div>
 </div>
 
 <div class="top_nav">
