@@ -306,14 +306,14 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            start_install  =&gt flaky_activity 
+            start_install  =&gt; flaky_activity 
 
-            flaky_activity =&gt !check
-            flaky_activity | recovery   =&gt housekeep
-            flaky_activity:fail         =&gt check =&gt recovery
+            flaky_activity =&gt; !check
+            flaky_activity | recovery   =&gt; housekeep
+            flaky_activity:fail         =&gt; check =&gt; recovery
 
-            check:fail | flaky_activity =&gt !recovery
-            check:fail    =&gt !housekeep
+            check:fail | flaky_activity =&gt; !recovery
+            check:fail    =&gt; !housekeep
         """
 
 [runtime]
@@ -408,12 +408,12 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            start_install                =&gt sometimes_fail =&gt FAMILY_PASS
-            FAMILY_PASS:succeed-all      =&gt SOME_DO_SOME_DONT
-            SOME_DO_SOME_DONT:finish-all =&gt dependent_on_families
-            sometimes_fail:fail          =&gt !sometimes_fail &amp\
-            !FAMILY_PASS &amp !SOME_DO_SOME_DONT &amp !dependent_on_families
-            dependent_on_families | sometimes_fail:fail =&gt housekeep
+            start_install                =&gt; sometimes_fail =&gt; FAMILY_PASS
+            FAMILY_PASS:succeed-all      =&gt; SOME_DO_SOME_DONT
+            SOME_DO_SOME_DONT:finish-all =&gt; dependent_on_families
+            sometimes_fail:fail          =&gt; !sometimes_fail &amp;\
+            !FAMILY_PASS &amp; !SOME_DO_SOME_DONT &amp; !dependent_on_families
+            dependent_on_families | sometimes_fail:fail =&gt; housekeep
         """
 
 [runtime]
@@ -527,14 +527,14 @@
 [scheduling]
     [[dependencies]]
          graph = """
-             start_install          =&gt check_files_exist
-             check_files_exist      =&gt generate_plots
-             check_files_exist:fail =&gt !generate_plots &amp !move_data
-             check_files_exist:fail | move_data =&gt housekeep
+             start_install          =&gt; check_files_exist
+             check_files_exist      =&gt; generate_plots
+             check_files_exist:fail =&gt; !generate_plots &amp; !move_data
+             check_files_exist:fail | move_data =&gt; housekeep
 
-             generate_plots:fail | check_files_exist:fail =&gt !raise_alert
-             generate_plots:fail | raise_alert =&gt move_data
-             generate_plots         =&gt raise_alert
+             generate_plots:fail | check_files_exist:fail =&gt; !raise_alert
+             generate_plots:fail | raise_alert =&gt; move_data
+             generate_plots         =&gt; raise_alert
          """
 
 [runtime]
