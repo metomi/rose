@@ -26,6 +26,8 @@
 </script>
   <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
   <script type="text/javascript" src="rose-version.js">
@@ -119,8 +121,8 @@
     </div>
 
     <div class="slide">
-    <h3 class="alwayshidden">Example suite.rc</h3>
-    <pre class="prettyprint lang-cylc">
+      <h3 class="alwayshidden">Example suite.rc</h3>
+      <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
@@ -140,8 +142,8 @@
     </div>
 
     <div class="slide">
-       <h3 class="alwayshidden">Example suite.rc (2)</h3>
-       <pre class="prettyprint lang-cylc">
+     <h3 class="alwayshidden">Example suite.rc (2)</h3>
+     <pre class="prettyprint lang-cylc">
     [[create_files]]
         command scripting = """
             echo 'zip' &gt;&gt; $ROSE_DATAC/file_zip
@@ -283,7 +285,7 @@ source=file_list?
       <h3>Results of "archiving"</h3>
 
       <p>Change to the <var>$ROSE_DATA/ARCHVING/</var> directory of the suite 
-      i.e.
+      i.e.</p>
       <pre class="shell">
 cd ~cylc-run/SUITE_ID/share/data/ARCHIVING/
 </pre>
@@ -320,16 +322,17 @@ file_list1  file_list2 file_list3
       directory.</p>
 
       <p>Change diectory to <em>ARCHIVING/rename/</em> and list the files:</p>
-      <pre class="shell">
-      cd ..
-      cd rename
-      ls
-      </pre>       
+<pre class="shell">
+cd ..
+cd rename
+ls
+</pre>       
       <p>The following should be returned:</p>
       <pre class="prettyprint lang-cylc">
 1_1_file_list1 1_2_file_list2 1_3_file_list3 
 </pre>
      <p>These are the renamed files.</p>
+    </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Archiving commands</h3>
@@ -383,7 +386,7 @@ file_list1  file_list2 file_list3
     </div>
 
     <div class="slide">
-      <h2 class="alwayshidden">Some Arch Options</h2>
+      <h3 class="alwayshidden">Some Arch Options</h3>
 
       <p>As well as <code>[arch]</code> and <code>[arch:TARGET]</code> other 
       options can be provided to the app, for example, <code>[env]</code>, 
@@ -407,6 +410,5 @@ file_list1  file_list2 file_list3
             Built-in Applications: rose_arch</a>.</p>
     </div>
   </div>
-</div>
 </body>
 </html>
