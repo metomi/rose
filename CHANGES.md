@@ -13,8 +13,15 @@ Rose release 28. This release will work best with
 
 ### Noteworthy Changes
 
+[#1628](https://github.com/metomi/rose/pull/1628):
+rose config-edit: source widget for displaying `file:*` sections: fix
+traceback on initialisation.
+
 [#1626](https://github.com/metomi/rose/pull/1626):
-rose config-edit: fix value hints widget initialisation
+rose config-edit: fix value hints widget initialisation.
+
+[#1615](https://github.com/metomi/rose/pull/1615):
+rose bush: cycles: add `new->old`/`old->new` option.
 
 --------------------------------------------------------------------------------
 
