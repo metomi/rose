@@ -25,6 +25,7 @@ copying sections with their variables, and so on.
 
 """
 
+import copy
 import re
 import time
 
@@ -51,6 +52,192 @@ class GroupOperations(object):
         self.view_page_func = view_page_func
         self.update_ns_sub_data_func = update_ns_sub_data_func
         self.reload_ns_tree_func = reload_ns_tree_func
+
+    def apply_diff(self, config_name, config_diff, origin_name=None,
+                   triggers_ok=False):
+        """Apply a rose.config.ConfigNodeDiff object to the config."""
+        state_reason_dict = {
+            rose.config.ConfigNode.STATE_NORMAL: {},
+            rose.config.ConfigNode.STATE_USER_IGNORED: {
+                rose.variable.IGNORED_BY_USER:
+                rose.config_editor.IGNORED_STATUS_MACRO
+            },
+            rose.config.ConfigNode.STATE_SYST_IGNORED: {
+                rose.variable.IGNORED_BY_SYSTEM:
+                rose.config_editor.IGNORED_STATUS_MACRO
+            }
+        }
+        nses = []
+        ids = []
+        # Handle added sections.
+        for keys, data in sorted(config_diff.get_added(),
+                                 key=lambda _: len(_[0])):
+            value, state, comments = data
+            reason = state_reason_dict[state]
+            if len(keys) == 1:
+                # Section.
+                sect = keys[0]
+                ids.append(sect)
+                nses.append(
+                    self.sect_ops.add_section(config_name, sect,
+                                              comments=comments,
+                                              ignored_reason=reason,
+                                              skip_update=True,
+                                              skip_undo=True)
+                )
+            else:
+                sect, opt = keys
+                var_id = self.util.get_id_from_section_option(sect, opt)
+                ids.append(var_id)
+                metadata = self.data.helper.get_metadata_for_config_id(
+                    var_id, config_name)
+                variable = rose.variable.Variable(opt, value, metadata)
+                variable.comments = copy.deepcopy(comments)
+                variable.ignored_reason = copy.deepcopy(reason)
+                self.data.load_ns_for_node(variable, config_name)
+                nses.append(
+                    self.var_ops.add_var(variable, skip_update=True,
+                                         skip_undo=True)
+                )
+
+        # Handle modified settings.
+        sections = self.data.config[config_name].sections
+        for keys, data in config_diff.get_modified():
+            old_value, old_state, old_comments = data[0]
+            value, state, comments = data[1]
+            comments = copy.deepcopy(comments)
+            old_reason = state_reason_dict[old_state]
+            reason = copy.deepcopy(state_reason_dict[state])
+            sect = keys[0]
+            sect_data = sections.now[sect]
+            opt = None
+            var = None
+            if len(keys) > 1:
+                opt = keys[1]
+                var_id = self.util.get_id_from_section_option(sect, opt)
+                ids.append(var_id)
+                var = self.data.helper.get_variable_by_id(var_id, config_name)
+            else:
+                ids.append(sect)
+            if comments != old_comments:
+                # Change the comments.
+                if opt is None:
+                    # Section.
+                    nses.append(
+                        self.sect_ops.set_section_comments(config_name, sect,
+                                                           comments,
+                                                           skip_update=True,
+                                                           skip_undo=True)
+                    )
+                else:
+                    nses.append(
+                        self.var_ops.set_var_comments(
+                            variable, comments, )
+                    )
+
+            if opt is not None and value != old_value:
+                # Change the value (has to be a variable).
+                nses.append(self.var_ops.set_var_value(var, value))
+
+            if opt is None:
+                ignored_changed = True
+                is_ignored = False
+                if (rose.variable.IGNORED_BY_USER in old_reason and
+                        rose.variable.IGNORED_BY_USER not in reason):
+                    # Enable from user-ignored.
+                    is_ignored = False
+                    nses.extend(
+                        self.sect_ops.ignore_section(config_name, sect, False,
+                                                     override=True,
+                                                     skip_update=True,
+                                                     skip_undo=True)
+                    )
+                elif (rose.variable.IGNORED_BY_USER not in old_reason and
+                          rose.variable.IGNORED_BY_USER in reason):
+                    # User-ignore from enabled.
+                    is_ignored = True
+                    nses.extend(
+                        self.sect_ops.ignore_section(config_name, sect, True,
+                                                     override=True,
+                                                     skip_update=True,
+                                                     skip_undo=True)
+                    )
+                elif (triggers_ok and
+                          rose.variable.IGNORED_BY_SYSTEM not in old_reason
+                          and rose.variable.IGNORED_BY_SYSTEM in reason):
+                    # Trigger-ignore.
+                    sect_data.error.setdefault(
+                              rose.config_editor.WARNING_TYPE_ENABLED,
+                              rose.config_editor.IGNORED_STATUS_MACRO)
+                    is_ignored = True
+                    nses.extend(
+                        self.sect_ops.ignore_section(config_name, sect, True,
+                                                     override=True,
+                                                     skip_update=True,
+                                                     skip_undo=True)
+                    )
+                elif (triggers_ok and
+                          rose.variable.IGNORED_BY_SYSTEM in old_reason and
+                          rose.variable.IGNORED_BY_SYSTEM not in reason):
+                    # Enabled from trigger-ignore.
+                    sect_data.error.setdefault(
+                              rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED,
+                              rose.config_editor.IGNORED_STATUS_MACRO)
+                    is_ignored = False
+                else:
+                    ignored_changed = False
+                if ignored_changed:
+                    nses.extend(
+                        self.sect_ops.ignore_section(config_name, sect,
+                                                     is_ignored,
+                                                     override=True,
+                                                     skip_update=True,
+                                                     skip_undo=True)
+                    )
+            elif set(reason) != set(old_reason):
+                nses.append(
+                    self.var_ops.set_var_ignored(var, new_reason_dict=reason,
+                                                 override=True)
+                )
+
+        for keys, data in sorted(config_diff.get_removed(),
+                                 key=lambda _: -len(_[0])):
+            # Sort so that variables are removed first.
+            sect = keys[0]
+            if len(keys) == 1:
+                ids.append(sect)
+                nses.extend(
+                    self.sect_ops.remove_section(config_name, sect,
+                                                 skip_update=True,
+                                                 skip_undo=True))
+            else:
+                sect = keys[0]
+                opt = keys[1]
+                var_id = self.util.get_id_from_section_option(sect, opt)
+                ids.append(var_id)
+                var = self.data.helper.get_variable_by_id(var_id, config_name)
+                nses.append(
+                    self.var_ops.remove_var(
+                        var, skip_update=True, skip_undo=True)
+                )
+        reverse_diff = config_diff.get_reversed()
+        stack_item = rose.config_editor.stack.StackItem(
+            config_name,
+            rose.config_editor.STACK_ACTION_DIFF,
+            reverse_diff,
+            self.apply_diff,
+            (config_name, reverse_diff, origin_name, triggers_ok),
+            custom_name = origin_name
+        )
+        self.undo_stack.append(stack_item)
+        del self.redo_stack[:]
+        self.reload_ns_tree_func()
+        for ns in set(nses):
+            self.sect_ops.trigger_update(ns, skip_sub_data_update=True)
+            self.sect_ops.trigger_info_update(ns)
+        self.sect_ops.trigger_update_sub_data()
+        self.sect_ops.trigger_update(config_name)
+        return ids
 
     def add_section_with_options(self, config_name, new_section_name,
                                  opt_map=None):

@@ -33,11 +33,14 @@ class StackItem(object):
 
     def __init__(self, page_label, action_text, node,
                        undo_function, undo_args=None,
-                       group=None):
+                       group=None, custom_name=None):
         self.page_label = page_label
         self.action = action_text
         self.node = node
-        self.name = self.node.name
+        if custom_name is None:
+            self.name = self.node.name
+        else:
+            self.name = custom_name
         self.group = group
         if hasattr(self.node, "value"):
             self.value = self.node.value
@@ -70,6 +73,8 @@ class StackViewer(gtk.Window):
                 rose.config_editor.COLOUR_STACK_CHANGED,
                 rose.config_editor.STACK_ACTION_CHANGED_COMMENTS:
                 rose.config_editor.COLOUR_STACK_CHANGED_COMMENTS,
+                rose.config_editor.STACK_ACTION_DIFF:
+                rose.config_editor.COLOUR_STACK_DIFF,
                 rose.config_editor.STACK_ACTION_ENABLED:
                 rose.config_editor.COLOUR_STACK_ENABLED,
                 rose.config_editor.STACK_ACTION_IGNORED:

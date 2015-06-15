@@ -436,6 +436,7 @@ STACK_GROUP_REORDER = "Reorder"
 STACK_ACTION_ADDED = "Added"
 STACK_ACTION_CHANGED = "Changed"
 STACK_ACTION_CHANGED_COMMENTS = "Changed #"
+STACK_ACTION_DIFF = "Patched"
 STACK_ACTION_ENABLED = "Enabled"
 STACK_ACTION_IGNORED = "Ignored"
 STACK_ACTION_REMOVED = "Removed"
@@ -447,11 +448,13 @@ COLOUR_STACK_ADDED = "green"
 COLOUR_STACK_CHANGED = "blue"
 # Configure the colour for 'changed comments' action.
 COLOUR_STACK_CHANGED_COMMENTS = "dark blue"
-# Configure the colour for 'light green' action.
+# Configure the colour for 'apply a diff from a macro' action.
+COLOUR_STACK_DIFF = "purple"
+# Configure the colour for 'enabled' action.
 COLOUR_STACK_ENABLED = "light green"
-# Configure the colour for 'grey' action.
+# Configure the colour for 'ignore' action.
 COLOUR_STACK_IGNORED = "grey"
-# Configure the colour for 'red' action.
+# Configure the colour for 'remove' action.
 COLOUR_STACK_REMOVED = "red"
 
 # User-relevant: Macro Dialog Colours

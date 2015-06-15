@@ -24,6 +24,8 @@ objects should be interacted with. There are also some utility methods.
 
 """
 
+import copy
+
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -40,6 +42,7 @@ class SectionOperations(object):
     def __init__(self, data, util, reporter, undo_stack, redo_stack,
                  check_cannot_enable_func=rose.config_editor.false_function,
                  update_ns_func=rose.config_editor.false_function,
+                 update_sub_data_func=rose.config_editor.false_function,
                  update_info_func=rose.config_editor.false_function,
                  update_comments_func=rose.config_editor.false_function,
                  update_tree_func=rose.config_editor.false_function,
@@ -53,6 +56,7 @@ class SectionOperations(object):
         self.__redo_stack = redo_stack
         self.check_cannot_enable_setting = check_cannot_enable_func
         self.trigger_update = update_ns_func
+        self.trigger_update_sub_data = update_sub_data_func
         self.trigger_info_update = update_info_func
         self.trigger_reload_tree = update_tree_func
         self.search_id_func = search_id_func
@@ -60,7 +64,8 @@ class SectionOperations(object):
         self.kill_page_func = kill_page_func
 
     def add_section(self, config_name, section, skip_update=False,
-                    page_launch=False):
+                    page_launch=False, comments=None, ignored_reason=None,
+                    skip_undo=False):
         """Add a section to this configuration."""
         config_data = self.__data.config[config_name]
         new_section_data = None
@@ -79,6 +84,10 @@ class SectionOperations(object):
             metadata = self.__data.helper.get_metadata_for_config_id(
                                               section, config_name)
             new_section_data = rose.section.Section(section, [], metadata)
+        if comments is not None:
+            new_section_data.comments = copy.deepcopy(comments)
+        if ignored_reason is not None:
+            new_section_data.ignored_reason = copy.deepcopy(ignored_reason)
         config_data.sections.now.update({section: new_section_data})
         self.__data.add_section_to_config(section, config_name)
         self.__data.load_ns_for_node(new_section_data, config_name)
@@ -96,22 +105,24 @@ class SectionOperations(object):
             self.trigger_reload_tree(ns)
         if rose.META_PROP_DUPLICATE in metadata:
             self.__data.load_namespace_has_sub_data(config_name)
-        copy_section_data = new_section_data.copy()
-        stack_item = rose.config_editor.stack.StackItem(
-                          ns,
-                          rose.config_editor.STACK_ACTION_ADDED,
-                          copy_section_data,
-                          self.remove_section,
-                          (config_name, section, skip_update))
-        self.__undo_stack.append(stack_item)
-        del self.__redo_stack[:]
+        if not skip_undo:
+            copy_section_data = new_section_data.copy()
+            stack_item = rose.config_editor.stack.StackItem(
+                ns,
+                rose.config_editor.STACK_ACTION_ADDED,
+                copy_section_data,
+                self.remove_section,
+                (config_name, section, skip_update))
+            self.__undo_stack.append(stack_item)
+            del self.__redo_stack[:]
         if page_launch and not skip_update:
             self.view_page_func(ns)
         if not skip_update:
             self.trigger_update(ns)
+        return ns
 
     def ignore_section(self, config_name, section, is_ignored,
-                       override=False, skip_update=False):
+                       override=False, skip_update=False, skip_undo=False):
         """Ignore or enable a section for this configuration.
 
         Returns a list of namespaces that need further updates. This is
@@ -170,14 +181,16 @@ class SectionOperations(object):
             action = rose.config_editor.STACK_ACTION_ENABLED
         ns = sect_data.metadata["full_ns"]
         copy_sect_data = sect_data.copy()
-        stack_item = rose.config_editor.stack.StackItem(
-                          ns,
-                          action,
-                          copy_sect_data,
-                          self.ignore_section,
-                          (config_name, section, not is_ignored, True))
-        self.__undo_stack.append(stack_item)
-        del self.__redo_stack[:]
+        if not skip_undo:
+            stack_item = rose.config_editor.stack.StackItem(
+                ns,
+                action,
+                copy_sect_data,
+                self.ignore_section,
+                (config_name, section, not is_ignored, True)
+            )
+            self.__undo_stack.append(stack_item)
+            del self.__redo_stack[:]
         for var in (config_data.vars.now.get(section, []) +
                     config_data.vars.latent.get(section, [])):
             self.trigger_info_update(var)
@@ -199,7 +212,8 @@ class SectionOperations(object):
         self.trigger_update(config_name)
         return []
 
-    def remove_section(self, config_name, section, skip_update=False):
+    def remove_section(self, config_name, section, skip_update=False,
+                       skip_undo=False):
         """Remove a section from this configuration."""
         config_data = self.__data.config[config_name]
         old_section_data = config_data.sections.now.pop(section)
@@ -214,36 +228,44 @@ class SectionOperations(object):
             if sections == [section]:
                 if ns not in ns_list:
                     ns_list.append(ns)
-        stack_item = rose.config_editor.stack.StackItem(
-                          namespace,
-                          rose.config_editor.STACK_ACTION_REMOVED,
-                          old_section_data.copy(),
-                          self.add_section,
-                          (config_name, section, skip_update))
-        for ns in ns_list:
-            self.kill_page_func(ns)
-        self.__undo_stack.append(stack_item)
-        del self.__redo_stack[:]
+        if not skip_undo:
+            stack_item = rose.config_editor.stack.StackItem(
+                namespace,
+                rose.config_editor.STACK_ACTION_REMOVED,
+                old_section_data.copy(),
+                self.add_section,
+                (config_name, section, skip_update)
+            )
+            for ns in ns_list:
+                self.kill_page_func(ns)
+            self.__undo_stack.append(stack_item)
+            del self.__redo_stack[:]
         if not skip_update:
             self.trigger_reload_tree(only_this_namespace=namespace)
+        return ns_list
 
-    def set_section_comments(self, config_name, section, comments):
+    def set_section_comments(self, config_name, section, comments,
+                             skip_update=False, skip_undo=False):
         """Change the comments field for the section object."""
         config_data = self.__data.config[config_name]
         sect_data = config_data.sections.now[section]
         old_sect_data = sect_data.copy()
         last_comments = old_sect_data.comments
         sect_data.comments = comments
-        ns = sect_data.metadata["full_ns"]
-        stack_item = rose.config_editor.stack.StackItem(
-                             ns,
-                             rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
-                             old_sect_data,
-                             self.set_section_comments,
-                             (config_name, section, last_comments))
-        self.__undo_stack.append(stack_item)
-        del self.__redo_stack[:]
-        self.trigger_update(ns)
+        if not skip_undo:
+            ns = sect_data.metadata["full_ns"]
+            stack_item = rose.config_editor.stack.StackItem(
+                ns,
+                rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
+                old_sect_data,
+                self.set_section_comments,
+                (config_name, section, last_comments)
+            )
+            self.__undo_stack.append(stack_item)
+            del self.__redo_stack[:]
+        if not skip_update:
+            self.trigger_update(ns)
+        return ns
 
     def is_section_modified(self, section_object):
         """Check against the last saved section object reference."""

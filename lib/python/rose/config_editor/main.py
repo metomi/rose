@@ -205,6 +205,7 @@ class MainController(object):
             self.undo_stack, self.redo_stack,
             self.check_cannot_enable_setting,
             self.update_namespace,
+            self.update_namespace_sub_data,
             self.update_ns_info,
             update_tree_func=self.reload_namespace_tree,
             view_page_func=self.view_page,
@@ -240,6 +241,7 @@ class MainController(object):
             self.update_config,
             self.apply_macro_transform,
             self.apply_macro_validation,
+            self.group_ops,
             self.section_ops,
             self.variable_ops,
             self.perform_find_by_ns_id
@@ -822,6 +824,7 @@ class MainController(object):
             self.undo_stack, self.redo_stack,
             self.check_cannot_enable_setting,
             self.updater.update_namespace,
+            self.updater.update_ns_sub_data,
             self.updater.update_ns_info,
             update_tree_func=self.reload_namespace_tree,
             view_page_func=self.view_page,
@@ -1083,6 +1086,10 @@ class MainController(object):
     def update_namespace(self, *args, **kwargs):
         """Placeholder for updater function of the same name."""
         self.updater.update_namespace(*args, **kwargs)
+
+    def update_namespace_sub_data(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.update_ns_sub_data(*args, **kwargs)
 
     def update_ns_info(self, *args, **kwargs):
         """Placeholder for updater function of the same name."""
@@ -1715,7 +1722,11 @@ class MainController(object):
         for stack_item in do_list:
             action = stack_item.action
             node = stack_item.node
-            node_id = node.metadata.get('id')
+            node_id = None
+            try:
+                node_id = node.metadata['id']
+            except (AttributeError, KeyError):
+                pass
             # We need to handle namespace and metadata changes
             if node_id is None:
                 # Not a variable or section
@@ -1928,7 +1939,7 @@ def main():
                                         metadata_off=opts.no_metadata)""",
                         globals(), locals(), f.name)
         p = pstats.Stats(f.name)
-        p.strip_dirs().sort_stats("cumulative").print_stats(50)
+        p.strip_dirs().sort_stats("cumulative").print_stats(100)
         f.close()
     else:
         spawn_window(cwd, debug_mode=opts.debug_mode,

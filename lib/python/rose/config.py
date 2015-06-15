@@ -417,6 +417,17 @@ class ConfigNodeDiff(object):
             set(self._data[self.KEY_MODIFIED]) |
             set(self._data[self.KEY_REMOVED]))
 
+    def get_reversed(self):
+        """Return an inverse (add->remove, etc) copy of this diff."""
+        rev_diff = ConfigNodeDiff()
+        for keys, data in self.get_removed():
+            rev_diff.set_added_setting(keys, data)
+        for keys, data in self.get_modified():
+            rev_diff.set_modified_setting(keys, data[1], data[0])
+        for keys, data in self.get_added():
+            rev_diff.set_removed_setting(keys, data)
+        return rev_diff
+
 
 class ConfigDumper(object):
 
