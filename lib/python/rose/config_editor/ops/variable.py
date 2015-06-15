@@ -127,7 +127,7 @@ class VariableOperations(object):
             latent_variables.remove(variable)
             if not config_data.vars.latent[sect]:
                 config_data.vars.latent.pop(sect)
-            return
+            return None
         if variable in variables:
             variables.remove(variable)
             if not config_data.vars.now[sect]:
@@ -206,7 +206,7 @@ class VariableOperations(object):
         variable.ignored_reason = new_reason_dict.copy()
         if not set(old_reason.keys()) ^ set(new_reason_dict.keys()):
             # No practical difference, so don't do anything.
-            return
+            return None
         # Protect against user-enabling of triggered ignored.
         if (not override and
             rose.variable.IGNORED_BY_SYSTEM in old_reason and
@@ -249,7 +249,7 @@ class VariableOperations(object):
         variable = self._get_proper_variable(variable)
         if variable.value == new_value:
             # A bad valuewidget setter.
-            return False
+            return None
         variable.old_value = variable.value
         variable.value = new_value
         if not skip_undo:

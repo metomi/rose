@@ -1798,9 +1798,14 @@ class MainController(object):
                 self.update_bar_widgets()
                 self.updater.update_stack_viewer_if_open()
             if not is_group:
-                self.updater.focus_sub_page_if_open(namespace, node_id)
+                if namespace is not None:
+                    self.updater.focus_sub_page_if_open(namespace, node_id)
+                if node_id is None:
+                    title = stack_item.name
+                else:
+                    title = node_id
                 id_text = rose.config_editor.EVENT_UNDO_ACTION_ID.format(
-                    action, node_id)
+                    action, title)
                 self.reporter.report(event_text.format(id_text))
         if is_group:
             group_name = do_list[0].group.split("-")[0]

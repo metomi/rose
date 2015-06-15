@@ -54,7 +54,7 @@ class GroupOperations(object):
         self.reload_ns_tree_func = reload_ns_tree_func
 
     def apply_diff(self, config_name, config_diff, origin_name=None,
-                   triggers_ok=False):
+                   triggers_ok=False, is_reversed=False):
         """Apply a rose.config.ConfigNodeDiff object to the config."""
         state_reason_dict = {
             rose.config.ConfigNode.STATE_NORMAL: {},
@@ -132,12 +132,16 @@ class GroupOperations(object):
                 else:
                     nses.append(
                         self.var_ops.set_var_comments(
-                            variable, comments, )
+                            variable, comments, skip_undo=True,
+                            skip_update=True)
                     )
 
             if opt is not None and value != old_value:
                 # Change the value (has to be a variable).
-                nses.append(self.var_ops.set_var_value(var, value))
+                nses.append(
+                    self.var_ops.set_var_value(
+                        var, value, skip_undo=True, skip_update=True)
+                )
 
             if opt is None:
                 ignored_changed = True
@@ -197,7 +201,8 @@ class GroupOperations(object):
             elif set(reason) != set(old_reason):
                 nses.append(
                     self.var_ops.set_var_ignored(var, new_reason_dict=reason,
-                                                 override=True)
+                                                 override=True, skip_undo=True,
+                                                 skip_update=True)
                 )
 
         for keys, data in sorted(config_diff.get_removed(),
@@ -221,18 +226,26 @@ class GroupOperations(object):
                         var, skip_update=True, skip_undo=True)
                 )
         reverse_diff = config_diff.get_reversed()
+        if is_reversed:
+            action = rose.config_editor.STACK_ACTION_REVERSED
+        else:
+            action = rose.config_editor.STACK_ACTION_APPLIED
         stack_item = rose.config_editor.stack.StackItem(
-            config_name,
-            rose.config_editor.STACK_ACTION_DIFF,
+            None,
+            action,
             reverse_diff,
             self.apply_diff,
-            (config_name, reverse_diff, origin_name, triggers_ok),
+            (config_name, reverse_diff, origin_name, triggers_ok,
+             not is_reversed),
             custom_name = origin_name
         )
         self.undo_stack.append(stack_item)
         del self.redo_stack[:]
         self.reload_ns_tree_func()
         for ns in set(nses):
+            if ns is None:
+                # Invalid or zero-change operation, e.g. by a corrupt macro.
+                continue
             self.sect_ops.trigger_update(ns, skip_sub_data_update=True)
             self.sect_ops.trigger_info_update(ns)
         self.sect_ops.trigger_update_sub_data()
