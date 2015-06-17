@@ -5,9 +5,9 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2015-Q2?)
+## 2015.06.0 (2015-06-17)
 
-Rose release 28. This release will work best with
+Rose release 28. This release works best with
 [cylc-6.4.1](https://github.com/cylc/cylc/releases/tag/6.4.1) and
 [fcm-2015.05.0](https://github.com/metomi/fcm/releases/tag/2015.05.0).
 
