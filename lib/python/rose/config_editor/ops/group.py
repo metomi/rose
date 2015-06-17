@@ -150,22 +150,10 @@ class GroupOperations(object):
                         rose.variable.IGNORED_BY_USER not in reason):
                     # Enable from user-ignored.
                     is_ignored = False
-                    nses.extend(
-                        self.sect_ops.ignore_section(config_name, sect, False,
-                                                     override=True,
-                                                     skip_update=True,
-                                                     skip_undo=True)
-                    )
                 elif (rose.variable.IGNORED_BY_USER not in old_reason and
                           rose.variable.IGNORED_BY_USER in reason):
                     # User-ignore from enabled.
                     is_ignored = True
-                    nses.extend(
-                        self.sect_ops.ignore_section(config_name, sect, True,
-                                                     override=True,
-                                                     skip_update=True,
-                                                     skip_undo=True)
-                    )
                 elif (triggers_ok and
                           rose.variable.IGNORED_BY_SYSTEM not in old_reason
                           and rose.variable.IGNORED_BY_SYSTEM in reason):
@@ -174,12 +162,6 @@ class GroupOperations(object):
                               rose.config_editor.WARNING_TYPE_ENABLED,
                               rose.config_editor.IGNORED_STATUS_MACRO)
                     is_ignored = True
-                    nses.extend(
-                        self.sect_ops.ignore_section(config_name, sect, True,
-                                                     override=True,
-                                                     skip_update=True,
-                                                     skip_undo=True)
-                    )
                 elif (triggers_ok and
                           rose.variable.IGNORED_BY_SYSTEM in old_reason and
                           rose.variable.IGNORED_BY_SYSTEM not in reason):
@@ -191,13 +173,15 @@ class GroupOperations(object):
                 else:
                     ignored_changed = False
                 if ignored_changed:
-                    nses.extend(
+                    ignore_nses, ignore_ids = (
                         self.sect_ops.ignore_section(config_name, sect,
                                                      is_ignored,
                                                      override=True,
                                                      skip_update=True,
                                                      skip_undo=True)
                     )
+                    nses.extend(ignore_nses)
+                    ids.extend(ignore_ids)
             elif set(reason) != set(old_reason):
                 nses.append(
                     self.var_ops.set_var_ignored(var, new_reason_dict=reason,

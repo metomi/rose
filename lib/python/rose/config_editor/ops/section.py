@@ -132,6 +132,8 @@ class SectionOperations(object):
         config_data = self.__data.config[config_name]
         sect_data = config_data.sections.now[section]
         nses_to_do = [sect_data.metadata["full_ns"]]
+        ids_to_do = [section]
+
         if is_ignored:
             # User-ignore request for this section.
             # The section must be enabled and optional.
@@ -179,6 +181,7 @@ class SectionOperations(object):
                 if error in my_errors:
                     sect_data.error.pop(error)
             action = rose.config_editor.STACK_ACTION_ENABLED
+
         ns = sect_data.metadata["full_ns"]
         copy_sect_data = sect_data.copy()
         if not skip_undo:
@@ -196,6 +199,7 @@ class SectionOperations(object):
             self.trigger_info_update(var)
             if var.metadata['full_ns'] not in nses_to_do:
                 nses_to_do.append(var.metadata['full_ns'])
+            ids_to_do.append(var.metadata['id'])
             if is_ignored:
                 var.ignored_reason.update(
                             {rose.variable.IGNORED_BY_SECTION:
@@ -205,12 +209,12 @@ class SectionOperations(object):
             else:
                 continue
         if skip_update:
-            return nses_to_do
+            return nses_to_do, ids_to_do
         for ns in nses_to_do:
             self.trigger_update(ns)
             self.trigger_info_update(ns)
         self.trigger_update(config_name)
-        return []
+        return [], []
 
     def remove_section(self, config_name, section, skip_update=False,
                        skip_undo=False):
