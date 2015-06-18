@@ -1,0 +1,26 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout handler = rose suite-hook --shutdown
+        timeout = PT1M
+[scheduling]
+    initial cycle point = 2020
+    final cycle point   = 2020
+    [[dependencies]]
+        [[[R1]]]
+            graph = t1
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+           succeeded handler = rose suite-hook
+           failed handler = rose suite-hook --shutdown
+           submission failed handler = rose suite-hook --shutdown
+           submission timeout handler = rose suite-hook
+           execution timeout handler = rose suite-hook
+           submission timeout = PT30S
+           execution timeout  = PT30S
+    [[t1]]
+        env-script = eval $(rose task-env --path='opt/world/bin')
+        script = rose task-run --path='opt/earth/bin'
