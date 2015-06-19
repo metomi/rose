@@ -23,7 +23,8 @@
 import os
 import re
 from rosie.suite_id import SuiteId
-from rosie.ws_client import RosieWSClient, RosieWSClientError
+from rosie.ws_client import (
+    RosieWSClient, RosieWSClientError, RosieWSClientConfError)
 from rosie.ws_client_auth import UndefinedRosiePrefixWS
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopenError
@@ -262,7 +263,8 @@ def main():
         sys.exit(func(argv[1:]))
     except KeyboardInterrupt:
         pass
-    except (RosieWSClientError, UndefinedRosiePrefixWS) as exc:
+    except (RosieWSClientError, RosieWSClientConfError,
+            UndefinedRosiePrefixWS) as exc:
         sys.exit(str(exc))
 
 

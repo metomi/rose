@@ -58,7 +58,8 @@ import rosie.browser.suite
 import rosie.browser.util
 from rosie.suite_id import SuiteId, SuiteIdError
 import rosie.vc
-from rosie.ws_client import RosieWSClient, RosieWSClientError
+from rosie.ws_client import (
+    RosieWSClient, RosieWSClientError, RosieWSClientConfError)
 from rosie.ws_client_auth import UndefinedRosiePrefixWS
 
 
@@ -77,6 +78,13 @@ class MainWindow(gtk.Window):
                               rosie.browser.SPLASH_SEARCH_MANAGER))
         try:
             self.ws_client = RosieWSClient(opts.prefixes)
+        except RosieWSClientConfError as exc:
+            splash_updater.stop()
+            rose.gtk.dialog.run_dialog(
+                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                str(exc),
+                rosie.browser.TITLE_ERROR)
+            sys.exit(1)
         except UndefinedRosiePrefixWS as exc:
             prefix = exc.args[0]
             splash_updater.stop()

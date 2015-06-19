@@ -37,6 +37,14 @@ import simplejson
 from time import sleep
 
 
+class RosieWSClientConfError(Exception):
+
+    """Raised if no Rosie service server is configured."""
+
+    def __str__(self):
+        return "[rosie-id] settings not defined in site/user configuration."
+
+
 class RosieWSClientError(Exception):
 
     """Raised if no data were retrieved from the server."""
@@ -73,13 +81,14 @@ class RosieWSClient(object):
         self.auth_managers = {}
         conf = ResourceLocator.default().get_conf()
         conf_rosie_id = conf.get(["rosie-id"], no_ignore=True)
-        if conf_rosie_id is not None:
-            for key, node in conf_rosie_id.value.items():
-                if node.is_ignored() or not key.startswith("prefix-ws."):
-                    continue
-                prefix = key.replace("prefix-ws.", "")
-                self.auth_managers[prefix] = RosieWSClientAuthManager(
-                    prefix, popen=self.popen, prompt_func=self.prompt_func)
+        if conf_rosie_id is None:
+            raise RosieWSClientConfError()
+        for key, node in conf_rosie_id.value.items():
+            if node.is_ignored() or not key.startswith("prefix-ws."):
+                continue
+            prefix = key.replace("prefix-ws.", "")
+            self.auth_managers[prefix] = RosieWSClientAuthManager(
+                prefix, popen=self.popen, prompt_func=self.prompt_func)
         if not prefixes:
             prefixes_str = conf_rosie_id.get_value(["prefixes-ws-default"])
             if prefixes_str:
