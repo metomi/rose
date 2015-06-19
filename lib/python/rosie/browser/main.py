@@ -83,7 +83,7 @@ class MainWindow(gtk.Window):
             rose.gtk.dialog.run_dialog(
                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                 str(exc),
-                str(exc))
+                rosie.browser.TITLE_ERROR)
             sys.exit(1)
         except UndefinedRosiePrefixWS as exc:
             prefix = exc.args[0]
