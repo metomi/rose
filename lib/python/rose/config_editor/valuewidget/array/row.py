@@ -26,6 +26,7 @@ pygtk.require('2.0')
 import gtk
 import pango
 
+from . import entry
 import rose.gtk.util
 import rose.variable
 
@@ -176,8 +177,10 @@ class RowArrayValueWidget(gtk.HBox):
                 if value_index > len(self.value_array) - 1:
                     return len(text)
                 val = self.value_array[r * self.num_cols + i]
-                prefix_text = get_next_delimiter(self.value[len(text):],
-                                                 val)
+                prefix_text = entry.get_next_delimiter(self.value[len(text):],
+                                                       val)
+                if prefix_text is None:
+                    return
                 if widget == self.entry_table.focus_child:
                     if hasattr(widget, "get_focus_index"):
                         position = widget.get_focus_index()
@@ -209,8 +212,10 @@ class RowArrayValueWidget(gtk.HBox):
                 widgets[0].set_focus_index(focus_index)
             return
         for i, val in enumerate(value_array):
-            prefix = get_next_delimiter(self.value[len(text):],
-                                        val)
+            prefix = entry.get_next_delimiter(self.value[len(text):],
+                                              val)
+            if prefix_text is None:
+                return
             if len(text + prefix + val) >= focus_index:
                 if len(widgets) > i:
                     widgets[i].grab_focus()
@@ -464,13 +469,3 @@ class ArrayElementSetter(object):
 
     def set_value(self, value):
         self.setter_function(self.index, value)
-
-
-def get_next_delimiter(array_text, next_element):
-    v = array_text.index(next_element)
-    if v == 0 and len(array_text) > 1:  # Null or whitespace element.
-        while array_text[v].isspace():
-            v += 1
-        if array_text[v] == ",":
-            v += 1
-    return array_text[:v]

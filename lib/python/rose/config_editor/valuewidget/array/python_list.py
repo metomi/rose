@@ -27,6 +27,7 @@ pygtk.require('2.0')
 import gtk
 import pango
 
+from . import entry
 import rose.config_editor.util
 import rose.gtk.util
 import rose.variable
@@ -86,11 +87,13 @@ class PythonListValueWidget(gtk.HBox):
         if not self.value.startswith("["):
             return
         text = '['
-        for entry in self.entries:
-            val = entry.get_text()
-            prefix = get_next_delimiter(self.value[len(text):], val)
-            if entry == self.entry_table.focus_child:
-                return len(text + prefix) + entry.get_position()
+        for my_entry in self.entries:
+            val = my_entry.get_text()
+            prefix = entry.get_next_delimiter(self.value[len(text):], val)
+            if prefix is None:
+                return
+            if my_entry == self.entry_table.focus_child:
+                return len(text + prefix) + my_entry.get_position()
             text += prefix + val
         return None
 
@@ -105,8 +108,10 @@ class PythonListValueWidget(gtk.HBox):
         for i, val in enumerate(value_array):
             j = len(text)
             v = self.value[j:].index(val)
-            prefix = get_next_delimiter(self.value[len(text):],
-                                        val)
+            prefix = entry.get_next_delimiter(self.value[len(text):],
+                                              val)
+            if prefix is None:
+                return
             if (len(text + prefix + val) >= focus_index or
                 i == len(value_array) - 1):
                 if len(self.entries) > i:
@@ -412,16 +417,6 @@ class PythonListValueWidget(gtk.HBox):
         if event.button == 2:
             self.setter(widget)
         return False
-
-
-def get_next_delimiter(array_text, next_element):
-    v = array_text.index(next_element)
-    if v == 0 and len(array_text) > 1:  # Null or whitespace element.
-        while array_text[v].isspace():
-            v += 1
-        if array_text[v] == ",":
-            v += 1
-    return array_text[:v]
 
 
 def python_array_join(values):

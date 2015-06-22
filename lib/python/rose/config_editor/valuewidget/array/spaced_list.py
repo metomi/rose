@@ -85,11 +85,13 @@ class SpacedListValueWidget(gtk.HBox):
     def get_focus_index(self):
         """Get the focus and position within the table of entries."""
         text = ''
-        for entry in self.entries:
-            val = entry.get_text()
+        for my_entry in self.entries:
+            val = my_entry.get_text()
             prefix = get_next_delimiter(self.value[len(text):], val)
-            if entry == self.entry_table.focus_child:
-                return len(text + prefix) + entry.get_position()
+            if prefix is None:
+                return
+            if my_entry == self.entry_table.focus_child:
+                return len(text + prefix) + my_entry.get_position()
             text += prefix + val
         return None
 
@@ -407,7 +409,10 @@ class SpacedListValueWidget(gtk.HBox):
 
 def get_next_delimiter(array_text, next_element):
     """Return the part of array_text immediately preceding next_element."""
-    v = array_text.index(next_element)
+    try:
+        v = array_text.index(next_element)
+    except ValueError:
+        return
     return array_text[:v]
 
 

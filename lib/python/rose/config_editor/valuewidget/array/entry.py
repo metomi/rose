@@ -113,6 +113,8 @@ class EntryArrayValueWidget(gtk.HBox):
             elif self.is_quoted_array:
                 val = rose.config_editor.util.text_from_quoted_widget(val)
             prefix = get_next_delimiter(self.value[len(text):], val)
+            if prefix is None:
+                return None
             if entry == self.entry_table.focus_child:
                 return len(text + prefix) + entry.get_position()
             text += prefix + val
@@ -129,6 +131,8 @@ class EntryArrayValueWidget(gtk.HBox):
             v = self.value[j:].index(val)
             prefix = get_next_delimiter(self.value[len(text):],
                                         val)
+            if prefix is None:
+                return
             if (len(text + prefix + val) >= focus_index or
                 i == len(value_array) - 1):
                 if len(self.entries) > i:
@@ -454,7 +458,11 @@ class EntryArrayValueWidget(gtk.HBox):
 
 def get_next_delimiter(array_text, next_element):
     """Return the part of array_text immediately preceding next_element."""
-    v = array_text.index(next_element)
+    try:
+        v = array_text.index(next_element)
+    except ValueError:
+        # Substring not found.
+        return
     if v == 0 and len(array_text) > 1:  # Null or whitespace element.
         while array_text[v].isspace():
             v += 1
