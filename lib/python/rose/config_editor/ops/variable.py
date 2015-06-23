@@ -216,16 +216,20 @@ class VariableOperations(object):
             if rose.config_editor.WARNING_TYPE_NOT_TRIGGER in variable.error:
                 variable.error.pop(
                          rose.config_editor.WARNING_TYPE_NOT_TRIGGER)
-        if len(variable.ignored_reason.keys()) > len(old_reason.keys()):
+        my_ignored_keys = variable.ignored_reason.keys()
+        if rose.variable.IGNORED_BY_SECTION in my_ignored_keys:
+            my_ignored_keys.remove(rose.variable.IGNORED_BY_SECTION)
+        old_ignored_keys = old_reason.keys()
+        if rose.variable.IGNORED_BY_SECTION in old_ignored_keys:
+            old_ignored_keys.remove(rose.variable.IGNORED_BY_SECTION)
+        if len(my_ignored_keys) > len(old_ignored_keys):
             action_text = rose.config_editor.STACK_ACTION_IGNORED
-            if (not old_reason and
+            if (not old_ignored_keys and
                 rose.config_editor.WARNING_TYPE_ENABLED in variable.error):
                 variable.error.pop(rose.config_editor.WARNING_TYPE_ENABLED)
         else:
             action_text = rose.config_editor.STACK_ACTION_ENABLED
-            if (not variable.ignored_reason.keys() or
-                    variable.ignored_reason.keys() ==
-                    [rose.variable.IGNORED_BY_SECTION]):
+            if not my_ignored_keys:
                 for err_type in rose.config_editor.WARNING_TYPES_IGNORE:
                     if err_type in variable.error:
                         variable.error.pop(err_type)

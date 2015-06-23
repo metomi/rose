@@ -210,7 +210,6 @@ class Updater(object):
             self.update_sections(namespace)
             self.update_ignored_statuses(namespace)
             if not are_errors_done and not is_loading:
-                print "Perform error check", namespace
                 self.perform_error_check(namespace)
             self.update_tree_status(namespace)
             if not is_loading:
