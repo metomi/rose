@@ -223,7 +223,9 @@ class VariableOperations(object):
                 variable.error.pop(rose.config_editor.WARNING_TYPE_ENABLED)
         else:
             action_text = rose.config_editor.STACK_ACTION_ENABLED
-            if len(variable.ignored_reason.keys()) == 0:
+            if (not variable.ignored_reason.keys() or
+                    variable.ignored_reason.keys() ==
+                    [rose.variable.IGNORED_BY_SECTION]):
                 for err_type in rose.config_editor.WARNING_TYPES_IGNORE:
                     if err_type in variable.error:
                         variable.error.pop(err_type)
