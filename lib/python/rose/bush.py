@@ -279,11 +279,14 @@ class Root(object):
                 rose_suite_info = os.path.join(user_suite_dir_root, name,
                                                "rose-suite.info")
                 if os.access(rose_suite_info, os.F_OK | os.R_OK):
-                    info_root = rose.config.load(rose_suite_info)
-                    for key, node in info_root.value.items():
-                        if node.is_ignored() or not isinstance(node.value, str):
-                            continue
-                        entry["info"][key] = node.value
+                    try:
+                        info_root = rose.config.load(rose_suite_info)
+                        for key, node in info_root.value.items():
+                            if node.is_ignored() or not isinstance(node.value, str):
+                                continue
+                            entry["info"][key] = node.value
+                    except rose.config.ConfigSyntaxError as err:
+                        pass
             data["entries"].sort(self._sort_summary_entries)
         data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
         if form == "json":
@@ -398,11 +401,14 @@ class Root(object):
         # rose-suite.info
         info_name = os.path.join(user_suite_dir, "rose-suite.info")
         if os.path.isfile(info_name):
-            info_root = rose.config.load(info_name)
-            for key, node in info_root.value.items():
-                if node.is_ignored() or not isinstance(node.value, str):
-                    continue
-                data["info"][key] = node.value
+            try:
+                info_root = rose.config.load(info_name)
+                for key, node in info_root.value.items():
+                    if node.is_ignored() or not isinstance(node.value, str):
+                        continue
+                    data["info"][key] = node.value
+            except rose.config.ConfigSyntaxError as err:
+                pass
 
         # rose-suite-run.conf, rose-suite-run.log, rose-suite-run.version
         data["files"]["rose"] = {}
