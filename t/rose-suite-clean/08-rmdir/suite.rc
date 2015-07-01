@@ -1,0 +1,35 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout handler = rose suite-hook --shutdown
+        timeout = PT2M
+[scheduling]
+    initial cycle point = 2020
+    final cycle point = 2020
+    [[dependencies]]
+        [[[R1]]]
+            graph = """
+t-1
+{% if JOB_HOST is defined %}
+t-2
+{% endif %}
+"""
+
+[runtime]
+    [[root]]
+        script = rose task-run --app-key=t-1
+        [[[event hooks]]]
+           succeeded handler = rose suite-hook
+           failed handler = rose suite-hook --shutdown
+           submission failed handler = rose suite-hook --shutdown
+           submission timeout handler = rose suite-hook
+           execution timeout handler = rose suite-hook
+           submission timeout = PT1M
+           execution timeout  = PT1M
+    [[t-1]]
+{% if JOB_HOST is defined %}
+    [[t-2]]
+        [[[remote]]]
+            host = {{JOB_HOST}}
+{% endif %}

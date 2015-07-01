@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,11 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 """Implement the "rose suite-clean" command."""
 
 from glob import glob
 import os
+from pipes import quote
 from rose.config import ConfigLoader, ConfigNode, ConfigSyntaxError
 from rose.env import env_var_process
 from rose.fs_util import FileSystemEvent
@@ -28,7 +29,6 @@ from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopenError
 from rose.reporter import Reporter
-from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor, SuiteStillRunningError
 import sys
 import traceback
@@ -39,7 +39,7 @@ class SuiteRunCleaner(object):
 
     """Logic to remove items created by the previous runs of suites."""
 
-    CLEANABLE_ROOTS = ["share", "share/cycle", "work"]
+    CLEANABLE_PATHS = ["share", "share/cycle", "work"]
 
     def __init__(self, event_handler=None, host_selector=None,
                  suite_engine_proc=None):
@@ -76,20 +76,20 @@ class SuiteRunCleaner(object):
             ConfigLoader().load(locs_file_path, locs_conf)
         except IOError:
             pass
-        items = self.CLEANABLE_ROOTS + [""]
+        items = self.CLEANABLE_PATHS + [""]
         if only_items:
             items = only_items
         items.sort()
         uuid_str = str(uuid4())
-        for auth, node in sorted(
-                locs_conf.value.items(), self._auth_node_cmp):
+        for auth, node in sorted(locs_conf.value.items(), self._auth_node_cmp):
             locs = []
+            roots = set([""])
             for item in items:
                 if item:
                     locs.append(os.path.join(suite_dir_rel, item))
                 else:
                     locs.append(suite_dir_rel)
-                if item and os.path.normpath(item) in self.CLEANABLE_ROOTS:
+                if item and os.path.normpath(item) in self.CLEANABLE_PATHS:
                     item_root = node.get_value(["root-dir{" + item + "}"])
                     if item_root is None:  # backward compat
                         item_root = node.get_value(["root-dir-" + item])
@@ -102,11 +102,37 @@ class SuiteRunCleaner(object):
                     if item:
                         loc_rel = os.path.join(suite_dir_rel, item)
                     locs.append(os.path.join(item_root, loc_rel))
+                    roots.add(item_root)
             if self.host_selector.is_local_host(auth):
+                # Clean relevant items
                 for loc in locs:
                     loc = os.path.abspath(env_var_process(loc))
                     for name in sorted(glob(loc)):
                         engine.fs_util.delete(name)
+                # Clean empty directories
+                # Change directory to root level to avoid cleaning them as well
+                # For cylc suites, e.g. it can clean up to an empty "cylc-run/"
+                # directory.
+                for root in sorted(roots):
+                    cwd = os.getcwd()
+                    if root:
+                        try:
+                            os.chdir(env_var_process(root))
+                        except OSError:
+                            continue
+                    # Reverse sort to ensure that e.g. "share/cycle/" is
+                    # cleaned before "share/"
+                    for name in sorted(self.CLEANABLE_PATHS, reverse=True):
+                        try:
+                            os.removedirs(os.path.join(suite_dir_rel, name))
+                        except OSError:
+                            pass
+                    try:
+                        os.removedirs(suite_dir_rel)
+                    except OSError:
+                        pass
+                    if root:
+                        os.chdir(cwd)
             else:
                 # Invoke bash as a login shell. The root location of a path may
                 # be in $DIR syntax, which can only be expanded correctly in a
@@ -115,12 +141,30 @@ class SuiteRunCleaner(object):
                 # as a delimiter. Only output after the UUID lines are
                 # desirable lines.
                 command = engine.popen.get_cmd("ssh", auth, "bash", "-l", "-c")
-                command += [
-                    "'echo %(uuid)s; ls -d %(locs)s|sort; rm -rf %(locs)s'" % {
-                        "locs": engine.popen.list_to_shell_str(locs),
-                        "uuid": uuid_str,
-                    },
-                ]
+                sh_command = (
+                    "echo %(uuid)s; ls -d %(locs)s|sort; rm -fr %(locs)s"
+                ) % {
+                    "locs": engine.popen.list_to_shell_str(locs),
+                    "uuid": uuid_str,
+                }
+                # Clean empty directories
+                # Change directory to root level to avoid cleaning them as well
+                # For cylc suites, e.g. it can clean up to an empty "cylc-run/"
+                # directory.
+                for root in roots:
+                    names = []
+                    # Reverse sort to ensure that e.g. "share/cycle/" is
+                    # cleaned before "share/"
+                    for name in sorted(self.CLEANABLE_PATHS, reverse=True):
+                        names.append(os.path.join(suite_dir_rel, name))
+                    sh_command += (
+                        "; " +
+                        "(cd %(root)s; rmdir -p %(names)s 2>/dev/null || true)"
+                    ) % {
+                        "root": root,
+                        "names": engine.popen.list_to_shell_str(names),
+                    }
+                command.append(quote(sh_command))
                 is_after_uuid_str = False
                 for line in engine.popen(*command)[0].splitlines():
                     if is_after_uuid_str:
@@ -131,7 +175,8 @@ class SuiteRunCleaner(object):
 
     __call__ = clean
 
-    def _auth_node_cmp(self, item1, item2):
+    @staticmethod
+    def _auth_node_cmp(item1, item2):
         """Compare (auth1, node1) and (auth2, node2)."""
         ret = cmp(item1, item2)
         if ret:
