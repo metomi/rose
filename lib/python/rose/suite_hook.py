@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 """Hook functionalities for a suite."""
 
@@ -31,6 +31,7 @@ from rose.suite_engine_proc import SuiteEngineProcessor
 from smtplib import SMTP, SMTPException
 import socket
 
+
 class RoseSuiteHook(object):
 
     """Hook functionalities for a suite."""
@@ -42,7 +43,7 @@ class RoseSuiteHook(object):
         self.popen = popen
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
-                    event_handler=event_handler, popen=popen)
+                event_handler=event_handler, popen=popen)
         self.suite_engine_proc = suite_engine_proc
 
     def handle_event(self, *args, **kwargs):
@@ -62,7 +63,7 @@ class RoseSuiteHook(object):
         3. If "should_shutdown", shut down the suite.
 
         """
-        # Retrieve log and generate code view
+        # Retrieve log and populate job logs database
         task_ids = []
         if task_id:
             task_ids = [task_id]
@@ -117,6 +118,7 @@ class RoseSuiteHook(object):
 
 
 def main():
+    """Implement "rose suite-hook" command."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("mail_cc", "mail", "shutdown")
     opts, args = opt_parser.parse_args()
@@ -126,10 +128,10 @@ def main():
             for value in getattr(opts, key):
                 values.extend(value.split(","))
         setattr(opts, key, values)
-    report = Reporter(opts.verbosity - opts.quietness - 1) # Reduced default
+    report = Reporter(opts.verbosity - opts.quietness - 1)  # Reduced default
     popen = RosePopener(event_handler=report)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
-            event_handler=report, popen=popen)
+        event_handler=report, popen=popen)
     args = suite_engine_proc.process_suite_hook_args(*args, **vars(opts))
     hook = RoseSuiteHook(event_handler=report,
                          popen=popen,

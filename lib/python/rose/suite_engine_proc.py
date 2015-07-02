@@ -672,12 +672,14 @@ class SuiteEngineProcessor(object):
         """Create the job logs database."""
         raise NotImplementedError()
 
-    def job_logs_pull_remote(self, suite_name, items, prune_remote_mode=False):
+    def job_logs_pull_remote(self, suite_name, items,
+                             prune_remote_mode=False, force_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
         items -- A list of relevant items.
         prune_remote_mode -- Remove remote job logs after pulling them.
+        force_mode -- Force retrieval, even if it may not be necessary.
 
         """
         raise NotImplementedError()
