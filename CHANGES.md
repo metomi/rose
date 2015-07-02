@@ -5,6 +5,30 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q3?)
+
+Rose release 29. This release will work best with
+[cylc-6.4.1](https://github.com/cylc/cylc/releases/tag/6.4.1) and
+[fcm-2015.05.0](https://github.com/metomi/fcm/releases/tag/2015.05.0)?
+
+### Noteworthy Changes
+
+[#1644](https://github.com/metomi/rose/pull/1644):
+rose suite-clean: will now clean empty suite directories.
+
+[#1641](https://github.com/metomi/rose/pull/1641):
+rose bush: no longer fail when it is unable to parse a bad `rose-suite.info`
+file in a suite.
+
+[#1639](https://github.com/metomi/rose/pull/1639):
+rose config-edit: array widgets: protect against unsaved null text.
+
+[#1635](https://github.com/metomi/rose/pull/1635):
+rosie go, and other rosie web service clients: now fail gracefully if it has
+no site/user configuration settings.
+
+--------------------------------------------------------------------------------
+
 ## 2015.06.0 (2015-06-17)
 
 Rose release 28. This release works best with
