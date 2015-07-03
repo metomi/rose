@@ -1,5 +1,6 @@
 <div class="row-fluid entry"><!-- entry row -->
-<div class="span8"><!-- entry: cycle, name, submit_num, files -->
+<div class="span4">
+<!-- entry: cycle, name, submit_num, files -->
 <!-- entry: status -->
 {% if entry.status and "fail" in entry.status -%}
 <span class="label label-important">
@@ -27,8 +28,9 @@
 {% if entry.cycle != "1" -%}
 <a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle|replace('+', '%2B')}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
 {% endif -%}
-<a href="{{script}}/jobs/{{user}}/{{suite}}?tasks={{entry.name}}">{{entry.name}}</a>
-{% if entry.submit_num_max > 1 -%}
+<a href="{{script}}/jobs/{{user}}/{{suite}}?tasks={{entry.name}}">
+<span title="{{entry.name}}">{{entry.name|truncate(40, True)}}</span>
+</a>
 {% if entry.submit_num == entry.submit_num_max -%}
 <span class="badge badge-inverse"
 title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
@@ -36,13 +38,9 @@ title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
 <span class="badge"
 title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
 {% endif -%}
-{% endif -%}
-<!-- entry: host, submit_method and submit_method_id -->
-{% if entry.status and entry.status == "init" and entry.submit_method_id -%}
-<code class="pull-right">{{entry.host}}: {{entry.submit_method}}: {{entry.submit_method_id}}</code>
-{% endif -%}
-<br/>
+</div>
 
+<div class="span4">
 {% if entry.logs -%}
 <ul class="inline">
 {% for key, log in entry.logs|dictsort if not log.seq_key -%}
@@ -73,9 +71,9 @@ title="{{log.size}} bytes">{{key}}</a>
 {% endif -%}
 {% endif -%}
 {% elif log.exists -%}
-<span class="muted" title="{{log.size}} bytes">{{key}} <small>(empty)</small></span>
+<span class="muted" title="{{log.size}} bytes">{{key}}</span>
 {% else -%}
-<span class="muted" title="{{log.size}} bytes">{{key}} <small>(gone)</small></span>
+<span class="muted" title="{{log.size}} bytes, gone">{{key}}</span>
 {% endif -%}
 </li>
 {% endfor -%}
@@ -87,7 +85,7 @@ title="{{log.size}} bytes">{{key}}</a>
 <input type="hidden" name="suite" value="{{suite}}"/>
 {% if entry.logs[indexes.values()|first].path_in_tar -%}
 <input type="hidden" name="path" value="{{entry.logs[indexes.values()|first].path}}"/>
-<select class="seq_log" name="path_in_tar">
+<select class="seq_log input-small" name="path_in_tar">
 <option disabled="disabled" selected="selected">{{seq_key}}</option>
 {% for index, key in indexes|dictsort -%}
 {% set log = entry.logs[key] -%}
@@ -95,7 +93,7 @@ title="{{log.size}} bytes">{{key}}</a>
 {% endfor -%}
 </select>
 {% else -%}
-<select class="seq_log" name="path">
+<select class="seq_log input-small" name="path">
 <option disabled="disabled" selected="selected">{{seq_key}}</option>
 {% for index, key in indexes|dictsort -%}
 {% set log = entry.logs[key] -%}
@@ -107,10 +105,10 @@ title="{{log.size}} bytes">{{key}}</a>
 </li>
 {% endfor -%}
 </ul>
-{% endif -%}
+{% endif -%}<!-- entry.logs -->
+</div>
 
-</div><!-- entry: cycle, name, submit_num, files -->
-<div class="span4 text-right"><!-- entry: time -->
+<div class="span4">
 <small>
 <i class="icon-info-sign" title="Submitted"></i> <abbr class="t_submit livestamp"
 title="{{entry.events[0]}}">{{entry.events[0]}}</abbr>
@@ -127,5 +125,11 @@ title="{{entry.events[2]}}">{{entry.events[2]}}</abbr>
 {% endif -%}
 <!-- entry: exit time -->
 </small>
-</div><!-- time and status -->
+<!-- entry: host, submit_method and submit_method_id -->
+{% if entry.host and entry.submit_method and entry.submit_method_id -%}
+<i class="icon-map-marker" title="Location"></i>
+{{entry.host}}: {{entry.submit_method}} {{entry.submit_method_id}}
+{% endif -%}
+</div>
+
 </div><!-- entry row -->

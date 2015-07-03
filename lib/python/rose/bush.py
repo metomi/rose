@@ -366,7 +366,6 @@ class Root(object):
                 cycle, task, submit_num, ext = names
                 entries = self.suite_engine_proc.get_suite_job_events(
                     user, suite, [cycle], [task], None, None, None, None)[0]
-                print entries
                 for entry in entries:
                     if entry["submit_num"] == int(submit_num):
                         job_entry = entry
