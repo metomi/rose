@@ -1,0 +1,27 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout handler = rose suite-hook --shutdown
+        timeout = PT2M
+[scheduling]
+    [[dependencies]]
+        graph = """
+task-1
+task-2
+"""
+
+[runtime]
+    [[root]]
+        script = echo "Hello from ${CYLC_TASK_ID}" >"${CYLC_TASK_LOG_ROOT}.txt"
+        [[[events]]]
+            handlers = rose suite-hook
+            handler events = succeeded, failed
+            handler retry delays = PT20S
+        [[[remote]]]
+            host = {{HOST}}
+    [[task-1]]
+        [[[remote]]]
+            retrieve job logs = True
+            retrieve job logs retry delays = PT0S, PT10S
+    [[task-2]]
