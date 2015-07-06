@@ -60,7 +60,8 @@ def main():
     for file_name in file_names:
         t = NamedTemporaryFile()
         node = ConfigLoader()(file_name)
-        if not opts.no_pretty_mode and file_name != META_CONFIG_NAME:
+        if (not opts.no_pretty_mode and
+                os.path.basename(file_name) != META_CONFIG_NAME):
             pretty_format_config(node, ignore_error=True)
         ConfigDumper()(node, t)
         t.seek(0)
