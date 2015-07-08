@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-5 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rosie graph
+#
+# SYNOPSIS
+#     rosie graph [OPTIONS] [ID]
+#
+# DESCRIPTION
+#     Graph suite copy ancestry.
+#
+# OPTIONS
+#     --output=FILE, -o FILE
+#         The name of the file for dumping the output. Otherwise,
+#         the output will go to a temporary file which will get
+#         tidied up. The extension of the filename determines the
+#         output format - see graphviz AGraph.draw documentation.
+#     --prefix=PREFIX
+#         Display suites from only the specified web services.
+#         This option can be used multiple times.
+#     --property=PROPERTY, -p PROPERTY
+#         Add a certain suite property to the node labels - e.g.
+#         owner or title. This option can be used multiple times.
+# ARGUMENTS
+#     ID
+#         A suite id to graph. If given, only the suites that are
+#         connected to this id by copy history will be graphed.
+#-------------------------------------------------------------------------------
+exec python -m rosie.graph "$@"
