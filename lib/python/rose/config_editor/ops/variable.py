@@ -60,7 +60,7 @@ class VariableOperations(object):
         var_id = possible_copy_variable.metadata['id']
         return self.__data.helper.get_ns_variable(var_id, config_name)
 
-    def add_var(self, variable, skip_update=False):
+    def add_var(self, variable, skip_update=False, skip_undo=False):
         """Add a variable to the internal list."""
         existing_variable = self._get_proper_variable(variable)
         namespace = variable.metadata.get('full_ns')
@@ -98,19 +98,22 @@ class VariableOperations(object):
                     latent_variables.remove(latent_var)
             config_data.vars.now.setdefault(sect, [])
             config_data.vars.now[sect].append(variable)
-            self.__undo_stack.append(
-                   rose.config_editor.stack.StackItem(
-                                      variable.metadata['full_ns'],
-                                      rose.config_editor.STACK_ACTION_ADDED,
-                                      copy_var,
-                                      self.remove_var,
-                                      [copy_var, skip_update],
-                                      group=group))
-            del self.__redo_stack[:]
+            if not skip_undo:
+                self.__undo_stack.append(
+                    rose.config_editor.stack.StackItem(
+                        variable.metadata['full_ns'],
+                        rose.config_editor.STACK_ACTION_ADDED,
+                        copy_var,
+                        self.remove_var,
+                        [copy_var, skip_update],
+                        group=group)
+                )
+                del self.__redo_stack[:]
         if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
+        return variable.metadata['full_ns']
 
-    def remove_var(self, variable, skip_update=False):
+    def remove_var(self, variable, skip_update=False, skip_undo=False):
         """Remove the variable entry from the internal lists."""
         variable = self._get_proper_variable(variable)
         namespace = variable.metadata.get('full_ns')
@@ -124,7 +127,7 @@ class VariableOperations(object):
             latent_variables.remove(variable)
             if not config_data.vars.latent[sect]:
                 config_data.vars.latent.pop(sect)
-            return
+            return None
         if variable in variables:
             variables.remove(variable)
             if not config_data.vars.now[sect]:
@@ -132,17 +135,20 @@ class VariableOperations(object):
             if variable.name:
                 config_data.vars.latent.setdefault(sect, [])
                 config_data.vars.latent[sect].append(variable)
-        copy_var = variable.copy()
-        self.__undo_stack.append(
-                    rose.config_editor.stack.StackItem(
-                                variable.metadata['full_ns'],
-                                rose.config_editor.STACK_ACTION_REMOVED,
-                                copy_var,
-                                self.add_var,
-                                [copy_var, skip_update]))
-        del self.__redo_stack[:]
+        if not skip_undo:
+            copy_var = variable.copy()
+            self.__undo_stack.append(
+                rose.config_editor.stack.StackItem(
+                    variable.metadata['full_ns'],
+                    rose.config_editor.STACK_ACTION_REMOVED,
+                    copy_var,
+                    self.add_var,
+                    [copy_var, skip_update]))
+            del self.__redo_stack[:]
         if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
+        return variable.metadata['full_ns']
+        
 
     def fix_var_ignored(self, variable):
         """Fix any variable ignore state errors."""
@@ -178,7 +184,8 @@ class VariableOperations(object):
                                    rose.config_editor.IGNORED_STATUS_MANUAL}
         self.set_var_ignored(variable, new_reason_dict)
 
-    def set_var_ignored(self, variable, new_reason_dict=None, override=False):
+    def set_var_ignored(self, variable, new_reason_dict=None, override=False,
+                        skip_update=False, skip_undo=False):
         """Set the ignored flag data for the variable.
 
         new_reason_dict replaces the variable.ignored_reason attribute,
@@ -199,7 +206,7 @@ class VariableOperations(object):
         variable.ignored_reason = new_reason_dict.copy()
         if not set(old_reason.keys()) ^ set(new_reason_dict.keys()):
             # No practical difference, so don't do anything.
-            return
+            return None
         # Protect against user-enabling of triggered ignored.
         if (not override and
             rose.variable.IGNORED_BY_SYSTEM in old_reason and
@@ -209,62 +216,83 @@ class VariableOperations(object):
             if rose.config_editor.WARNING_TYPE_NOT_TRIGGER in variable.error:
                 variable.error.pop(
                          rose.config_editor.WARNING_TYPE_NOT_TRIGGER)
-        if len(variable.ignored_reason.keys()) > len(old_reason.keys()):
+        my_ignored_keys = variable.ignored_reason.keys()
+        if rose.variable.IGNORED_BY_SECTION in my_ignored_keys:
+            my_ignored_keys.remove(rose.variable.IGNORED_BY_SECTION)
+        old_ignored_keys = old_reason.keys()
+        if rose.variable.IGNORED_BY_SECTION in old_ignored_keys:
+            old_ignored_keys.remove(rose.variable.IGNORED_BY_SECTION)
+        if len(my_ignored_keys) > len(old_ignored_keys):
             action_text = rose.config_editor.STACK_ACTION_IGNORED
-            if (not old_reason and
+            if (not old_ignored_keys and
                 rose.config_editor.WARNING_TYPE_ENABLED in variable.error):
                 variable.error.pop(rose.config_editor.WARNING_TYPE_ENABLED)
         else:
             action_text = rose.config_editor.STACK_ACTION_ENABLED
-            if len(variable.ignored_reason.keys()) == 0:
+            if not my_ignored_keys:
                 for err_type in rose.config_editor.WARNING_TYPES_IGNORE:
                     if err_type in variable.error:
                         variable.error.pop(err_type)
-        copy_var = variable.copy()
-        self.__undo_stack.append(
-                    rose.config_editor.stack.StackItem(
-                                       variable.metadata['full_ns'],
-                                       action_text,
-                                       copy_var,
-                                       self.set_var_ignored,
-                                       [copy_var, old_reason, True]))
-        del self.__redo_stack[:]
-        self.trigger_ignored_update(variable)
-        self.trigger_update(variable.metadata['full_ns'])
+        if not skip_undo:
+            copy_var = variable.copy()
+            self.__undo_stack.append(
+                rose.config_editor.stack.StackItem(
+                    variable.metadata['full_ns'],
+                    action_text,
+                    copy_var,
+                    self.set_var_ignored,
+                    [copy_var, old_reason, True])
+            )
+            del self.__redo_stack[:]
+        self.trigger_ignored_update(variable)        
+        if not skip_update:
+            self.trigger_update(variable.metadata['full_ns'])
+        return variable.metadata['full_ns']
 
-    def set_var_value(self, variable, new_value):
+    def set_var_value(self, variable, new_value, skip_update=False,
+                      skip_undo=False):
         """Set the value of the variable."""
         variable = self._get_proper_variable(variable)
         if variable.value == new_value:
             # A bad valuewidget setter.
-            return False
+            return None
         variable.old_value = variable.value
         variable.value = new_value
-        copy_var = variable.copy()
-        self.__undo_stack.append(rose.config_editor.stack.StackItem(
-                                    variable.metadata['full_ns'],
-                                    rose.config_editor.STACK_ACTION_CHANGED,
-                                    copy_var,
-                                    self.set_var_value,
-                                    [copy_var, copy_var.old_value]))
-        del self.__redo_stack[:]
-        self.trigger_update(variable.metadata['full_ns'])
+        if not skip_undo:
+            copy_var = variable.copy()
+            self.__undo_stack.append(
+                rose.config_editor.stack.StackItem(
+                    variable.metadata['full_ns'],
+                    rose.config_editor.STACK_ACTION_CHANGED,
+                    copy_var,
+                    self.set_var_value,
+                    [copy_var, copy_var.old_value])
+            )
+            del self.__redo_stack[:]
+        if not skip_update:
+            self.trigger_update(variable.metadata['full_ns'])
+        return variable.metadata['full_ns']
 
-    def set_var_comments(self, variable, comments):
+    def set_var_comments(self, variable, comments,
+                         skip_update=False, skip_undo=False):
         """Set the comments field for the variable."""
         variable = self._get_proper_variable(variable)
         copy_variable = variable.copy()
         old_comments = copy_variable.comments
         variable.comments = comments
-        self.__undo_stack.append(
-                    rose.config_editor.stack.StackItem(
-                            variable.metadata['full_ns'],
-                            rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
-                            copy_variable,
-                            self.set_var_comments,
-                            [copy_variable, old_comments]))
-        del self.__redo_stack[:]
-        self.trigger_update(variable.metadata['full_ns'])
+        if not skip_undo:
+            self.__undo_stack.append(
+                rose.config_editor.stack.StackItem(
+                    variable.metadata['full_ns'],
+                    rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
+                    copy_variable,
+                    self.set_var_comments,
+                    [copy_variable, old_comments])
+            )
+            del self.__redo_stack[:]
+        if not skip_update:
+            self.trigger_update(variable.metadata['full_ns'])
+        return variable.metadata['full_ns']
 
     def get_var_original_comments(self, variable):
         """Get the original comments, if any."""

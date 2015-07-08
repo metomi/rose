@@ -359,7 +359,8 @@ class MainMenuHandler(object):
                  undo_stack, redo_stack, undo_func,
                  update_config_func,
                  apply_macro_transform_func, apply_macro_validation_func,
-                 section_ops_inst, variable_ops_inst, find_ns_id_func):
+                 group_ops_inst, section_ops_inst, variable_ops_inst,
+                 find_ns_id_func):
         self.data = data
         self.util = util
         self.reporter = reporter
@@ -370,6 +371,7 @@ class MainMenuHandler(object):
         self.update_config = update_config_func
         self.apply_macro_transform = apply_macro_transform_func
         self.apply_macro_validation = apply_macro_validation_func
+        self.group_ops = group_ops_inst
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self.find_ns_id_func = find_ns_id_func
@@ -815,104 +817,12 @@ class MainMenuHandler(object):
             if not proceed_ok:
                 self._report_macro_transform(config_name, macro_name, 0)
                 return 0
-        changed_ids = []
-        sections = self.data.config[config_name].sections
-        for item in sect_changes:
-            sect = item.section
-            if sect is None:
-                continue
-            changed_ids.append(sect)
-            macro_node = macro_config.get([sect])
-            if macro_node is None:
-                sect_removes.append(sect)
-                continue
-            if sect in sections.now:
-                sect_data = sections.now[sect]
-            else:
-                self.sect_ops.add_section(config_name, sect)
-                sect_data = sections.now[sect]
-            if (rose.variable.IGNORED_BY_USER in sect_data.ignored_reason and
-                macro_node.state !=
-                rose.config.ConfigNode.STATE_USER_IGNORED):
-                # Enable.
-                self.sect_ops.ignore_section(config_name, sect, False,
-                                             override=True)
-            elif (macro_node.state ==
-                  rose.config.ConfigNode.STATE_USER_IGNORED and
-                  rose.variable.IGNORED_BY_USER not in
-                  sect_data.ignored_reason):
-                self.sect_ops.ignore_section(config_name, sect, True,
-                                             override=True)
-            elif (triggers_ok and macro_node.state ==
-                  rose.config.ConfigNode.STATE_SYST_IGNORED and
-                  rose.variable.IGNORED_BY_SYSTEM not in
-                  sect_data.ignored_reason):
-                sect_data.error.setdefault(
-                          rose.config_editor.WARNING_TYPE_ENABLED,
-                          rose.config_editor.IGNORED_STATUS_MACRO)
-                self.sect_ops.ignore_section(config_name, sect, True,
-                                             override=True)
-            elif (triggers_ok and macro_node.state ==
-                  rose.config.ConfigNode.STATE_NORMAL and
-                  rose.variable.IGNORED_BY_SYSTEM in
-                  sect_data.ignored_reason):
-                sect_data.error.setdefault(
-                          rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED,
-                          rose.config_editor.IGNORED_STATUS_MACRO)
-                self.sect_ops.ignore_section(config_name, sect, False,
-                                             override=True)
-        for item in var_changes:
-            sect = item.section
-            opt = item.option
-            val = item.value
-            warning = item.info
-            var_id = self.util.get_id_from_section_option(sect, opt)
-            changed_ids.append(var_id)
-            var = self.data.helper.get_variable_by_id(var_id, config_name)
-            macro_node = macro_config.get([sect, opt])
-            if macro_node is None:
-                if var is not None:
-                    self.var_ops.remove_var(var)
-                continue
-            if var is None:
-                value = macro_node.value
-                metadata = self.data.helper.get_metadata_for_config_id(
-                                            var_id, config_name)
-                variable = rose.variable.Variable(opt, value, metadata)
-                self.data.load_ns_for_node(variable, config_name)
-                self.var_ops.add_var(variable)
-                var = self.data.helper.get_variable_by_id(var_id, config_name)
-                continue
-            if var.value != macro_node.value:
-                self.var_ops.set_var_value(var, macro_node.value)
-            elif (rose.variable.IGNORED_BY_USER in var.ignored_reason and
-                  macro_node.state !=
-                  rose.config.ConfigNode.STATE_USER_IGNORED):
-                # Enable.
-                self.var_ops.set_var_ignored(var, {}, override=True)
-            elif (macro_node.state ==
-                  rose.config.ConfigNode.STATE_USER_IGNORED and
-                  rose.variable.IGNORED_BY_USER not in var.ignored_reason):
-                self.var_ops.set_var_ignored(
-                             var,
-                             {rose.variable.IGNORED_BY_USER:
-                              rose.config_editor.IGNORED_STATUS_MACRO},
-                             override=True)
-            elif (triggers_ok and macro_node.state ==
-                  rose.config.ConfigNode.STATE_SYST_IGNORED and
-                  rose.variable.IGNORED_BY_SYSTEM not in var.ignored_reason):
-                self.var_ops.set_var_ignored(
-                             var,
-                             {rose.variable.IGNORED_BY_SYSTEM:
-                              rose.config_editor.IGNORED_STATUS_MACRO},
-                             override=True)
-            elif (triggers_ok and macro_node.state ==
-                  rose.config.ConfigNode.STATE_NORMAL and
-                  rose.variable.IGNORED_BY_SYSTEM in var.ignored_reason):
-                self.var_ops.set_var_ignored(var, {}, override=True)
-        for sect in sect_removes:
-            self.sect_ops.remove_section(config_name, sect)
-        self.apply_macro_transform(config_name, macro_type, changed_ids)
+        config_diff = macro_config - self.data.config[config_name].config
+        changed_ids = self.group_ops.apply_diff(config_name, config_diff,
+                                                origin_name=macro_type,
+                                                triggers_ok=triggers_ok)
+        self.apply_macro_transform(
+            config_name, changed_ids, skip_update=True)
         self._report_macro_transform(config_name, macro_name, len(change_list))
         return len(change_list)
 

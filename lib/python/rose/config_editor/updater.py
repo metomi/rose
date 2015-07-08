@@ -130,7 +130,7 @@ class Updater(object):
                 self.update_ns_sub_data(only_this_namespace)
 
     def refresh_ids(self, config_name, setting_ids, is_loading=False,
-                    are_errors_done=False):
+                    are_errors_done=False, skip_update=True):
         """Refresh and redraw settings if needed."""
         self.pagelist = self.get_pagelist_func()
         nses_to_do = []
@@ -155,8 +155,9 @@ class Updater(object):
                     page.refresh(changed_id)
             if ns not in nses_to_do and not are_errors_done:
                 nses_to_do.append(ns)
-        for ns in nses_to_do:
-            self.update_namespace(ns, is_loading=is_loading)
+        if not skip_update:
+            for ns in nses_to_do:
+                self.update_namespace(ns, is_loading=is_loading)
 
     def update_all(self, only_this_config=None, is_loading=False,
                    skip_checking=False, skip_sub_data_update=False):
@@ -753,6 +754,7 @@ class Updater(object):
                          is_loading,
                          are_errors_done=is_macro_dynamic)
 
-    def apply_macro_transform(self, config_name, macro_type, changed_ids):
+    def apply_macro_transform(self, config_name, changed_ids,
+                              skip_update=False):
         """Refresh pages with changes."""
-        self.refresh_ids(config_name, changed_ids)
+        self.refresh_ids(config_name, changed_ids, skip_update=skip_update)

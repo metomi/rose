@@ -33,11 +33,14 @@ class StackItem(object):
 
     def __init__(self, page_label, action_text, node,
                        undo_function, undo_args=None,
-                       group=None):
+                       group=None, custom_name=None):
         self.page_label = page_label
         self.action = action_text
         self.node = node
-        self.name = self.node.name
+        if custom_name is None:
+            self.name = self.node.name
+        else:
+            self.name = custom_name
         self.group = group
         if hasattr(self.node, "value"):
             self.value = self.node.value
@@ -66,6 +69,8 @@ class StackViewer(gtk.Window):
         self.action_colour_map = {
                 rose.config_editor.STACK_ACTION_ADDED:
                 rose.config_editor.COLOUR_STACK_ADDED,
+                rose.config_editor.STACK_ACTION_APPLIED:
+                rose.config_editor.COLOUR_STACK_APPLIED,
                 rose.config_editor.STACK_ACTION_CHANGED:
                 rose.config_editor.COLOUR_STACK_CHANGED,
                 rose.config_editor.STACK_ACTION_CHANGED_COMMENTS:
@@ -75,7 +80,9 @@ class StackViewer(gtk.Window):
                 rose.config_editor.STACK_ACTION_IGNORED:
                 rose.config_editor.COLOUR_STACK_IGNORED,
                 rose.config_editor.STACK_ACTION_REMOVED:
-                rose.config_editor.COLOUR_STACK_REMOVED}
+                rose.config_editor.COLOUR_STACK_REMOVED,
+                rose.config_editor.STACK_ACTION_REVERSED:
+                rose.config_editor.COLOUR_STACK_REVERSED}
         self.undo_func = undo_func
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack
@@ -173,7 +180,10 @@ class StackViewer(gtk.Window):
                 colour = self.action_colour_map[stack_item.action]
                 marked_up_action = ("<span foreground='" + colour + "'>"
                                      + stack_item.action + "</span>")
-            short_label = re.sub('^/[^/]+/', '', stack_item.page_label)
+            if stack_item.page_label is None:
+                short_label = 'None'
+            else:
+                short_label = re.sub('^/[^/]+/', '', stack_item.page_label)
             model.append((short_label, marked_up_action,
                           stack_item.name, repr(stack_item.value),
                           repr(stack_item.old_value), False))
