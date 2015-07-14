@@ -1,0 +1,66 @@
+{% extends "suite-base.html" %}
+{% block title_name %}broadcasts list{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+{% if broadcast_states %}
+<div class="row-fluid"><div class="span12">
+<h1>Broadcast States</h1>
+<table class="table table-bordered" summary="broadcast states">
+  <thead>
+    <tr>
+      <th>point</th>
+      <th>namespace</th>
+      <th>key</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in broadcast_states %}
+      <tr>
+        {% for item in row %}
+          <td>{{item}}</td>
+        {% endfor %}{# item in row #}
+      </tr>
+    {% endfor %}{# row in broadcast_states #}
+  </tbody>
+</table>
+</div></div>
+{% endif %}{# broadcast_states #}
+
+{% if broadcast_events %}
+<div class="row-fluid"><div class="span12">
+<h1>Broadcast Events</h1>
+<table class="table table-bordered" summary="broadcast events">
+  <thead>
+    <tr>
+      <th>time</th>
+      <th>change</th>
+      <th>point</th>
+      <th>namespace</th>
+      <th>key</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in broadcast_events %}
+      <tr>
+        <td><abbr class="livestamp" title="{{row[0]}}">{{row[0]}}</td>
+        {% if row[1] == "+" %}{# change #}
+          <td><i class="icon-plus" title="{{row[1]}}"></i></td>
+        {% else %}{# if row[1] == "-" #}
+          <td><i class="icon-minus" title="{{row[1]}}"></i></td>
+        {% endif %}{# row[1] #}
+        {% for item in row[2:] %}
+          <td>{{item}}</td>
+        {% endfor %}{# item in row #}
+      </tr>
+    {% endfor %}{# row in broadcast_events #}
+  </tbody>
+</table>
+</div></div>
+{% endif %}{# broadcast_events #}
+
+</div>
+{% endblock %}

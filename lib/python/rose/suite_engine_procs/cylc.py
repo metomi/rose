@@ -185,6 +185,42 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
 
+    def get_suite_broadcasts(self, user_name, suite_name):
+        """Return broadcast states and events as a dict.
+
+        {"broadcast_states": [[point, name, key, value], ...],
+         "broadcast_events": [[time, change, point, name, key, value], ...]}
+
+        """
+        # Check if "broadcast_states" table is available or not
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?",
+                ["broadcast_states"]):
+            break
+        else:
+            return {}
+
+        broadcast_states = []
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT point,namespace,key,value FROM broadcast_states" +
+                " ORDER BY point ASC, namespace ASC, key ASC"):
+            point, namespace, key, value = row
+            broadcast_states.append([point, namespace, key, value])
+        broadcast_events = []
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT time,change,point,namespace,key,value" +
+                " FROM broadcast_events" +
+                " ORDER BY time DESC, point DESC, namespace DESC, key DESC"):
+            time, change, point, namespace, key, value = row
+            broadcast_events.append(
+                (time, change, point, namespace, key, value))
+        return {
+            "broadcast_states": broadcast_states,
+            "broadcast_events": broadcast_events}
+
     def get_suite_dir_rel(self, suite_name, *paths):
         """Return the relative path to the suite running directory.
 

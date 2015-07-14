@@ -82,6 +82,32 @@ class Root(object):
             traceback.print_exc(e)
 
     @cherrypy.expose
+    def broadcasts(self, user, suite, form=None):
+        """List broadcasts of a running or completed suite."""
+        user_suite_dir = self._get_user_suite_dir(user, suite)
+        data = {
+            "host": self.host_name,
+            "user": user,
+            "suite": suite,
+            "rose_version": self.rose_version,
+            "script": cherrypy.request.script_name,
+            "states": {},
+            "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        }
+        data["states"].update(
+                self.suite_engine_proc.get_suite_state_summary(user, suite))
+        data.update(self._get_suite_logs_info(user, suite))
+        data.update(self.suite_engine_proc.get_suite_broadcasts(user, suite))
+        if form == "json":
+            return simplejson.dumps(data)
+        try:
+            template = self.template_env.get_template("broadcasts.html")
+            return template.render(**data)
+        except Exception as e:
+            traceback.print_exc(e)
+        return simplejson.dumps(data)
+
+    @cherrypy.expose
     def cycles(self, user, suite, page=1, order=None, cycles=None,
                per_page=None, form=None):
         """List cycles of a running or completed suite."""
