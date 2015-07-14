@@ -101,7 +101,7 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None):
         node_stack = []
         node_stack = [filter_id]
         add_node(graph, filter_id, node_rosie_properties.get(filter_id),
-                 color="red", shape="rectangle")
+                 fillcolor="lightgrey", style="filled")
 
         ok_nodes = set([])
         while node_stack:
