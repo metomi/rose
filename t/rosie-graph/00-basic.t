@@ -25,7 +25,7 @@
 if ! python -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all 'python: cherrypy or sqlalchemy not installed'
 fi
-tests 18
+tests 27
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.
 export TZ='UTC'
@@ -200,12 +200,45 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
 "foo-aa002" -> "foo-aa003" [
 "foo-aa002" [label="foo-aa002"
 "foo-aa003" -> "foo-aa004" [
-"foo-aa003" [color=red, label="foo-aa003", shape=rectangle
+"foo-aa003" [label="foo-aa003", style=filled
 "foo-aa004" [label="foo-aa004"
 graph [rankdir=LR
 node [label="\N"
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-filter-id-distance-1
+run_pass "$TEST_KEY" rosie graph --debug --distance=1 foo-aa004
+filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
+"foo-aa003" -> "foo-aa004" [
+"foo-aa003" [label="foo-aa003"
+"foo-aa004" [label="foo-aa004", style=filled
+graph [rankdir=LR
+node [label="\N"
+__OUTPUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-filter-id-distance-2
+run_pass "$TEST_KEY" rosie graph --debug --distance=1 foo-aa002
+filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
+"foo-aa002" -> "foo-aa003" [
+"foo-aa002" [label="foo-aa002", style=filled
+"foo-aa003" [label="foo-aa003"
+graph [rankdir=LR
+node [label="\N"
+__OUTPUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-no-filter-id-distance
+run_fail "$TEST_KEY" rosie graph --debug --distance=1
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+Usage: rosie graph [OPTIONS] [ID]
+
+rosie graph: error: distance option requires an ID
+__ERROR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-property-owner
 run_pass "$TEST_KEY" rosie graph --debug --property=owner
@@ -262,7 +295,7 @@ TEST_KEY=$TEST_KEY_BASE-no-copy-tree
 run_pass "$TEST_KEY" rosie graph --debug foo-aa005
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
-"foo-aa005" [color=red, label="foo-aa005", shape=rectangle
+"foo-aa005" [label="foo-aa005", style=filled
 graph [rankdir=LR
 node [label="\N"
 __OUTPUT__

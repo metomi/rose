@@ -2956,6 +2956,14 @@ environment scripting = "eval $(rose task-env)"
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--distance=DISTANCE, -d DISTANCE</kbd></dt>
+
+      <dd>The maximum distance (graph depth) for suites related to
+      <var>ID</var> to be plotted. For example, if the distance is
+      <samp>1</samp>, only the parents and children (but not siblings) of
+      <var>ID</var> will be plotted. If not given, this is unlimited. Requires
+      <var>ID</var> to be specified.</dd>
+
       <dt><kbd>--output=FILE, -O FILE</kbd></dt>
 
       <dd>The name of the file for dumping the output. Otherwise, the output

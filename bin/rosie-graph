@@ -27,6 +27,11 @@
 #     Graph suite copy ancestry.
 #
 # OPTIONS
+#     --distance=DISTANCE, -d DISTANCE
+#         The maximum distance (graph depth) for suites related to ID
+#         to be plotted. For example, if the distance is 1, only the
+#         parents and children (but not siblings) of ID will be plotted.
+#         If not given, this is unlimited. Requires ID to be specified.
 #     --output=FILE, -o FILE
 #         The name of the file for dumping the output. Otherwise,
 #         the output will go to a temporary file which will get

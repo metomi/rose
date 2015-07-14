@@ -48,7 +48,8 @@ class NoConnectionsEvent(rose.reporter.Event):
         return "%s: no copy relationships to other suites" % id
 
 
-def calculate_edges(graph, prefix, filter_id=None, properties=None):
+def calculate_edges(graph, prefix, filter_id=None, properties=None,
+                    max_distance=None):
     """Get all connected suites for a prefix, optionally filtered."""
     if properties is None:
         properties = []
@@ -99,18 +100,20 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None):
         # Only plot the connections involving filter_id.
         nodes = [n for edge in edges for n in edge]
         node_stack = []
-        node_stack = [filter_id]
+        node_stack = [(filter_id, 0)]
         add_node(graph, filter_id, node_rosie_properties.get(filter_id),
                  fillcolor="lightgrey", style="filled")
 
         ok_nodes = set([])
         while node_stack:
-            node = node_stack.pop()
+            node, distance = node_stack.pop()
+            if max_distance is not None and distance > max_distance:
+                continue
             ok_nodes.add(node)
             for neighbour_node in (forward_edges.get(node, []) +
                                    back_edges.get(node, [])):
                 if neighbour_node not in ok_nodes:
-                    node_stack.append(neighbour_node)
+                    node_stack.append((neighbour_node, distance + 1))
 
         if len(ok_nodes) == 1:
             # There are no related suites.
@@ -119,8 +122,7 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None):
 
         for edge in sorted(edges):
             node0, node1 = edge
-            if node0 in ok_nodes:
-                # Implies 'or node1 in ok_nodes'.
+            if node0 in ok_nodes and node1 in ok_nodes:
                 add_node(graph, node0, node_rosie_properties.get(node0))
                 add_node(graph, node1, node_rosie_properties.get(node1))
                 graph.add_edge(node0, node1)
@@ -137,7 +139,7 @@ def add_node(graph, node, node_label_properties, **kwargs):
     graph.add_node(node, **kwargs)
 
 
-def make_graph(prefix, filter_id, properties):
+def make_graph(prefix, filter_id, properties, max_distance=None):
     """Construct the pygraphviz graph."""
     graph = pygraphviz.AGraph(directed=True)
     graph.graph_attr["rankdir"] = "LR"
@@ -145,7 +147,8 @@ def make_graph(prefix, filter_id, properties):
         graph.graph_attr["name"] = filter_id + " copy tree"
     else:
         graph.graph_attr["name"] = prefix + " copy tree"
-    calculate_edges(graph, prefix, filter_id, properties)
+    calculate_edges(graph, prefix, filter_id, properties,
+                    max_distance=max_distance)
     return graph
 
 
@@ -158,7 +161,8 @@ def output_graph(graph, filename=None, debug_mode=False):
 def main():
     """Provide the CLI interface."""
     opt_parser = rose.opt_parse.RoseOptionParser()
-    opt_parser.add_my_options("output_file",
+    opt_parser.add_my_options("distance",
+                              "output_file",
                               "prefix",
                               "property")
     opts, args = opt_parser.parse_args()
@@ -172,7 +176,10 @@ def main():
         prefix = opts.prefix
     else:
         prefix = rosie.suite_id.SuiteId.get_prefix_default()
-    graph = make_graph(prefix, filter_id, opts.property)
+    if opts.distance and not args:
+        opt_parser.error("distance option requires an ID")
+    graph = make_graph(prefix, filter_id, opts.property,
+                       max_distance=opts.distance)
     output_graph(graph, filename=opts.output_file, debug_mode=opts.debug_mode)
 
 
