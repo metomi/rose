@@ -21,9 +21,10 @@ rel="stylesheet" media="screen" />
 <ul class="nav">
 <li><a href="{{script}}/suites/{{user}}">{{user}}</a></li>
 <li><a><strong>{{suite}}</strong></a></li>
-{% for method, name, icon in [("broadcasts", "broadcasts list", "icon-bullhorn"),
-                              ("cycles", "cycles list", "icon-tasks"),
-                              ("jobs", "jobs list", "icon-th-list")] %}
+{% for method, name, icon in [
+    ("cycles", "cycles list", "icon-tasks"),
+    ("jobs", "jobs list", "icon-th-list"),
+    ("broadcast_states", "broadcasts list", "icon-bullhorn")] %}
 {% if name == self.title_name %}
 <li class="active"><a>
 <i class="icon {{icon}}" title="{{name}}"></i> {{name}}</a></li>

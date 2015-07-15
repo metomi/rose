@@ -124,12 +124,14 @@ title="{{entry.events[1]}}">{{entry.events[1]}}</abbr>
 title="{{entry.events[2]}}">{{entry.events[2]}}</abbr>
 {% endif -%}
 <!-- entry: exit time -->
-</small>
 <!-- entry: host, submit_method and submit_method_id -->
 {% if entry.host and entry.submit_method and entry.submit_method_id -%}
 <i class="icon-map-marker" title="Location"></i>
-{{entry.host}}: {{entry.submit_method}} {{entry.submit_method_id}}
+{{entry.host}}:
+{{entry.submit_method}}
+{{entry.submit_method_id}}
 {% endif -%}
+</small>
 </div>
 
 </div><!-- entry row -->

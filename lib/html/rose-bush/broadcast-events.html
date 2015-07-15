@@ -4,34 +4,15 @@
 {% block content %}
 <div class="container-fluid">
 
-{% if broadcast_states %}
 <div class="row-fluid"><div class="span12">
-<h1>Broadcast States</h1>
-<table class="table table-bordered" summary="broadcast states">
-  <thead>
-    <tr>
-      <th>point</th>
-      <th>namespace</th>
-      <th>key</th>
-      <th>value</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in broadcast_states %}
-      <tr>
-        {% for item in row %}
-          <td>{{item}}</td>
-        {% endfor %}{# item in row #}
-      </tr>
-    {% endfor %}{# row in broadcast_states #}
-  </tbody>
-</table>
-</div></div>
-{% endif %}{# broadcast_states #}
+<ul class="inline pull-right">
+  <li><a href="{{script}}/broadcast_states/{{user}}/{{suite}}">states</a></li>
+  <li>events</li>
+</ul>
 
 {% if broadcast_events %}
 <div class="row-fluid"><div class="span12">
-<h1>Broadcast Events</h1>
+<h1>Broadcasts List (Events)</h1>
 <table class="table table-bordered" summary="broadcast events">
   <thead>
     <tr>
@@ -52,9 +33,12 @@
         {% else %}{# if row[1] == "-" #}
           <td><i class="icon-minus" title="{{row[1]}}"></i></td>
         {% endif %}{# row[1] #}
-        {% for item in row[2:] %}
+        {% for item in row[2:4] %}
           <td>{{item}}</td>
-        {% endfor %}{# item in row #}
+        {% endfor %}{# item in row[2:4] #}
+        {% for item in row[4:] %}
+          <td><code>{{item}}</code></td>
+        {% endfor %}{# item in row[4:] #}
       </tr>
     {% endfor %}{# row in broadcast_events #}
   </tbody>

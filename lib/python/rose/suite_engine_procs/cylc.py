@@ -185,11 +185,10 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
 
-    def get_suite_broadcasts(self, user_name, suite_name):
-        """Return broadcast states and events as a dict.
+    def get_suite_broadcast_states(self, user_name, suite_name):
+        """Return broadcast states of a suite.
 
-        {"broadcast_states": [[point, name, key, value], ...],
-         "broadcast_events": [[time, change, point, name, key, value], ...]}
+        [[point, name, key, value], ...]
 
         """
         # Check if "broadcast_states" table is available or not
@@ -199,7 +198,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 ["broadcast_states"]):
             break
         else:
-            return {}
+            return
 
         broadcast_states = []
         for row in self._db_exec(
@@ -208,6 +207,23 @@ class CylcProcessor(SuiteEngineProcessor):
                 " ORDER BY point ASC, namespace ASC, key ASC"):
             point, namespace, key, value = row
             broadcast_states.append([point, namespace, key, value])
+        return broadcast_states
+
+    def get_suite_broadcast_events(self, user_name, suite_name):
+        """Return broadcast events of a suite.
+
+        [[time, change, point, name, key, value], ...]
+
+        """
+        # Check if "broadcast_events" table is available or not
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?",
+                ["broadcast_events"]):
+            break
+        else:
+            return {}
+
         broadcast_events = []
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name,
@@ -217,9 +233,7 @@ class CylcProcessor(SuiteEngineProcessor):
             time, change, point, namespace, key, value = row
             broadcast_events.append(
                 (time, change, point, namespace, key, value))
-        return {
-            "broadcast_states": broadcast_states,
-            "broadcast_events": broadcast_events}
+        return broadcast_events
 
     def get_suite_dir_rel(self, suite_name, *paths):
         """Return the relative path to the suite running directory.
