@@ -732,11 +732,9 @@ class CylcProcessor(SuiteEngineProcessor):
             " max(time_updated)," +
             " sum(" + states_stmt["active"] + ") AS n_active," +
             " sum(" + states_stmt["success"] + ") AS n_success,"
-            " sum(" + states_stmt["fail"] + ") AS n_fail,"
-            " sum(submit_status==1 OR run_status==1) AS n_job_fail"
-            " FROM task_states JOIN task_jobs USING (cycle)" +
-            " GROUP BY cycle"
-        )
+            " sum(" + states_stmt["fail"] + ") AS n_fail"
+            " FROM task_states" +
+            " GROUP BY cycle")
         if integer_mode:
             stmt += " ORDER BY cast(cycle as number)"
         else:
@@ -746,26 +744,36 @@ class CylcProcessor(SuiteEngineProcessor):
         if limit:
             stmt += " LIMIT ? OFFSET ?"
             stmt_args += [limit, offset]
+        entry_of = {}
         entries = []
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
-            (
-                cycle,
-                max_time_updated,
-                n_active,
-                n_success,
-                n_fail,
-                n_job_fail) = row
-            entries.append({
+            cycle, max_time_updated, n_active, n_success, n_fail = row
+            entry_of[cycle] = {
                 "cycle": cycle,
                 "max_time_updated": max_time_updated,
                 "n_states": {
                     "active": n_active,
                     "success": n_success,
                     "fail": n_fail,
-                    "job_fails": n_job_fail,
+                    "job_fails": 0,
                 },
-            })
+            }
+            entries.append(entry_of[cycle])
+        # Note: A single query with a JOIN is probably a more elegant solution.
+        # However, timing tests suggest that it is cheaper with 2 queries.
+        # This 2nd query may return more results than is necessary, but should
+        # be a very cheap query as it does not have to do a lot of work.
+        stmt = (
+            "SELECT cycle," +
+            " sum(submit_status==1 OR run_status==1) AS n_job_fail" +
+            " FROM task_jobs GROUP BY cycle")
+        for cycle, n_job_fail in self._db_exec(
+                self.SUITE_DB, user_name, suite_name, stmt):
+            try:
+                entry_of[cycle]["n_states"]["job_fails"] = n_job_fail
+            except KeyError:
+                pass
         return entries, of_n_entries
 
     def _get_suite_cycles_summary_old(

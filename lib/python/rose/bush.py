@@ -164,15 +164,12 @@ class Root(object):
             "page": page,
         }
         data["offset"] = (page - 1) * per_page
-        entries, of_n_entries = (
-                        self.suite_engine_proc.get_suite_cycles_summary(
-                                        user, suite, order, per_page, 
-                                        data["offset"]))
-        data["entries"] = entries
-        data["of_n_entries"] = of_n_entries
+        data["entries"], data["of_n_entries"] = (
+            self.suite_engine_proc.get_suite_cycles_summary(
+                user, suite, order, per_page, data["offset"]))
         if per_page:
-            data["n_pages"] = of_n_entries / per_page
-            if of_n_entries % per_page != 0:
+            data["n_pages"] = data["of_n_entries"] / per_page
+            if data["of_n_entries"] % per_page != 0:
                 data["n_pages"] += 1
         else:
             data["n_pages"] = 1
