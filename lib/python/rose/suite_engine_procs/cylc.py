@@ -86,7 +86,7 @@ class CylcProcessor(SuiteEngineProcessor):
     STATUSES = {"active": ["ready", "queued", "submitting", "submitted",
                            "submit-retrying", "running", "retrying"],
                 "fail": ["submission failed", "failed"],
-                "success": ["succeeded"]}
+                "success": ["expired", "succeeded"]}
     SUITE_CONF = "suite.rc"
     SUITE_DB = "cylc-suite.db"
     SUITE_DIR_REL_ROOT = "cylc-run"
@@ -669,8 +669,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                   "size": f_stat.st_size}
         return ("cylc", logs_info)
 
-    def get_suite_cycles_summary(self, user_name, suite_name, order, limit,
-                                 offset):
+    def get_suite_cycles_summary(
+            self, user_name, suite_name, order, limit, offset):
         """Return a the state summary (of each cycle) of a user's suite.
 
         user -- A string containing a valid user ID
@@ -696,6 +696,81 @@ class CylcProcessor(SuiteEngineProcessor):
         and of_n_entries is the total number of entries.
 
         """
+        # Check if "task_jobs" table is available or not
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
+            break
+        else:
+            return self._get_suite_cycles_summary_old(
+                user_name, suite_name, cycles, tasks, no_statuses, order,
+                limit, offset)
+
+        of_n_entries = 0
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT COUNT(DISTINCT cycle) FROM task_states"):
+            of_n_entries = row[0]
+            break
+        if not of_n_entries:
+            return ([], 0)
+
+        # FIXME: Not strictly correct, if cycle is in basic date-only format
+        integer_mode = False
+        stmt = "SELECT cycle FROM task_states LIMIT 1"
+        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
+            integer_mode = row[0].isdigit()
+            break
+
+        states_stmt = {}
+        for key, names in self.STATUSES.items():
+            states_stmt[key] = " OR ".join(
+                ["status=='%s'" % (name) for name in names])
+        stmt = (
+            "SELECT" +
+            " cycle," +
+            " max(time_updated)," +
+            " sum(" + states_stmt["active"] + ") AS n_active," +
+            " sum(" + states_stmt["success"] + ") AS n_success,"
+            " sum(" + states_stmt["fail"] + ") AS n_fail,"
+            " sum(submit_status==1 OR run_status==1) AS n_job_fail"
+            " FROM task_states JOIN task_jobs USING (cycle)" +
+            " GROUP BY cycle"
+        )
+        if integer_mode:
+            stmt += " ORDER BY cast(cycle as number)"
+        else:
+            stmt += " ORDER BY cycle"
+        stmt += self.CYCLE_ORDERS.get(order, self.CYCLE_ORDERS["time_desc"])
+        stmt_args = []
+        if limit:
+            stmt += " LIMIT ? OFFSET ?"
+            stmt_args += [limit, offset]
+        entries = []
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
+            (
+                cycle,
+                max_time_updated,
+                n_active,
+                n_success,
+                n_fail,
+                n_job_fail) = row
+            entries.append({
+                "cycle": cycle,
+                "max_time_updated": max_time_updated,
+                "n_states": {
+                    "active": n_active,
+                    "success": n_success,
+                    "fail": n_fail,
+                    "job_fails": n_job_fail,
+                },
+            })
+        return entries, of_n_entries
+
+    def _get_suite_cycles_summary_old(
+            self, user_name, suite_name, order, limit, offset):
+        """See "get_suite_cycles_summary"."""
         stmt = "SELECT COUNT(DISTINCT cycle) FROM task_states"
         of_n_entries = 0
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
