@@ -25,7 +25,7 @@ rel="stylesheet" media="screen" />
     ("cycles", "cycles list", "icon-tasks"),
     ("jobs", "jobs list", "icon-th-list"),
     ("broadcast_states", "broadcasts list", "icon-bullhorn")] %}
-{% if name == self.title_name %}
+{% if name == self.title_name() %}
 <li class="active"><a>
 <i class="icon {{icon}}" title="{{name}}"></i> {{name}}</a></li>
 {% else %}
