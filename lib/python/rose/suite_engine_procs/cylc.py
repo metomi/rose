@@ -696,16 +696,6 @@ class CylcProcessor(SuiteEngineProcessor):
         and of_n_entries is the total number of entries.
 
         """
-        # Check if "task_jobs" table is available or not
-        for row in self._db_exec(
-                self.SUITE_DB, user_name, suite_name,
-                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
-            break
-        else:
-            return self._get_suite_cycles_summary_old(
-                user_name, suite_name, cycles, tasks, no_statuses, order,
-                limit, offset)
-
         of_n_entries = 0
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name,
@@ -760,87 +750,38 @@ class CylcProcessor(SuiteEngineProcessor):
                 },
             }
             entries.append(entry_of[cycle])
+
+        # Check if "task_jobs" table is available or not
+        can_use_task_jobs_table = False
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
+            can_use_task_jobs_table = True
+            break
+
         # Note: A single query with a JOIN is probably a more elegant solution.
         # However, timing tests suggest that it is cheaper with 2 queries.
         # This 2nd query may return more results than is necessary, but should
         # be a very cheap query as it does not have to do a lot of work.
-        stmt = (
-            "SELECT cycle," +
-            " sum(submit_status==1 OR run_status==1) AS n_job_fail" +
-            " FROM task_jobs GROUP BY cycle")
+        if can_use_task_jobs_table:
+            stmt = (
+                "SELECT cycle," +
+                " sum(submit_status==1 OR run_status==1) AS n_job_fail" +
+                " FROM task_jobs GROUP BY cycle")
+        else:
+            fail_events_stmt = " OR ".join(
+                ["event=='%s'" % (name) for name in self.STATUSES["fail"]])
+            stmt = (
+                "SELECT cycle," +
+                " sum(" + fail_events_stmt + ") AS n_job_fail" +
+                " FROM task_events GROUP BY cycle")
         for cycle, n_job_fail in self._db_exec(
-                self.SUITE_DB, user_name, suite_name, stmt):
+                self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
             try:
                 entry_of[cycle]["n_states"]["job_fails"] = n_job_fail
             except KeyError:
                 pass
-        return entries, of_n_entries
 
-    def _get_suite_cycles_summary_old(
-            self, user_name, suite_name, order, limit, offset):
-        """See "get_suite_cycles_summary"."""
-        stmt = "SELECT COUNT(DISTINCT cycle) FROM task_states"
-        of_n_entries = 0
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
-            of_n_entries = row[0]
-            break
-        if not of_n_entries:
-            return ([], 0)
-
-        # FIXME: Not strictly correct, if cycle is in basic date-only format
-        integer_mode = False
-        stmt = "SELECT cycle FROM task_states LIMIT 1"
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
-            integer_mode = row[0].isdigit()
-            break
-
-        stmt_args = self.state_of.keys()
-        stmt = (
-            "SELECT cycle, fail_count, max(time_updated), group_concat(status)"
-            " FROM task_states"
-            " LEFT JOIN (SELECT cycle, count(*) AS fail_count"
-            " FROM task_events"
-            " WHERE event=='failed' OR event='submission failed'"
-            " GROUP BY cycle) USING (cycle) WHERE ("
-        )
-        for i in range(len(stmt_args)):
-            if i:
-                stmt += " OR"
-            stmt += " status==?"
-        if integer_mode:
-            try:
-                self.CYCLE_ORDERS.get(order)
-                stmt += ") GROUP BY cycle ORDER BY cast(cycle as number) " + (
-                    self.CYCLE_ORDERS.get(order))
-            except:
-                stmt += ") GROUP BY cycle ORDER BY cast(cycle as number) DESC"
-        else:
-            try:
-                self.CYCLE_ORDERS.get(order)
-                stmt += ") GROUP BY cycle ORDER BY cycle " + (
-                    self.CYCLE_ORDERS.get(order))
-            except:
-                stmt += ") GROUP BY cycle ORDER BY cycle DESC"
-
-        if limit:
-            stmt += " LIMIT ? OFFSET ?"
-            stmt_args += [limit, offset]
-        entries = []
-        for row in self._db_exec(
-                self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
-            cycle, n_job_fails, max_time_updated, statuses_str = row
-            entry = {
-                "cycle": cycle,
-                "n_states": {
-                    "active": 0, "success": 0, "fail": 0, "job_fails": 0,
-                },
-                "max_time_updated": max_time_updated,
-            }
-            if n_job_fails is not None:
-                entry["n_states"]["job_fails"] = n_job_fails
-            entries.append(entry)
-            for status in statuses_str.split(","):
-                entry["n_states"][self.state_of[status]] += 1
         return entries, of_n_entries
 
     def get_suite_state_summary(self, user_name, suite_name):
