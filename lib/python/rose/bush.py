@@ -78,8 +78,8 @@ class Root(object):
             return template.render(host=self.host_name,
                                    rose_version=self.rose_version,
                                    script=cherrypy.request.script_name)
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception as exc:
+            traceback.print_exc(exc)
 
     @cherrypy.expose
     def broadcast_states(self, user, suite, form=None):
@@ -104,8 +104,8 @@ class Root(object):
         try:
             template = self.template_env.get_template("broadcast-states.html")
             return template.render(**data)
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception as exc:
+            traceback.print_exc(exc)
         return simplejson.dumps(data)
 
     @cherrypy.expose
@@ -131,8 +131,8 @@ class Root(object):
         try:
             template = self.template_env.get_template("broadcast-events.html")
             return template.render(**data)
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception as exc:
+            traceback.print_exc(exc)
         return simplejson.dumps(data)
 
     @cherrypy.expose
@@ -182,8 +182,8 @@ class Root(object):
         try:
             template = self.template_env.get_template("cycles.html")
             return template.render(**data)
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception as exc:
+            traceback.print_exc(exc)
         return simplejson.dumps(data)
 
     @cherrypy.expose
@@ -284,8 +284,8 @@ class Root(object):
         try:
             template = self.template_env.get_template("jobs.html")
             return template.render(**data)
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception as exc:
+            traceback.print_exc(exc)
 
     @cherrypy.expose
     def list(self, user, suite, page=1, cycles=None, tasks=None,

@@ -354,12 +354,11 @@ class CylcProcessor(SuiteEngineProcessor):
                 self.SUITE_DB, user_name, suite_name, stmt,
                 where_args + limit_args):
             (
-                time,
                 cycle, name, submit_num, submit_num_max,
                 time_submit, submit_status,
                 time_run, time_run_exit, run_signal, run_status,
                 user_at_host, batch_sys_name, batch_sys_job_id
-            ) = row
+            ) = row[1:]
             entry = {
                 "cycle": cycle,
                 "name": name,
