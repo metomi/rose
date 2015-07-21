@@ -4,12 +4,13 @@
 {% block content %}
 <div class="container-fluid">
 
-{% if broadcast_states %}
 <div class="row-fluid"><div class="span12">
 <ul class="inline pull-right">
   <li>states</li>
   <li><a href="{{script}}/broadcast_events/{{user}}/{{suite}}">events</a></li>
 </ul>
+
+{% if broadcast_states %}
 <h1>Broadcasts List (States)</h1>
 <table class="table table-bordered" summary="broadcast states">
   <thead>
