@@ -27,7 +27,7 @@
   <tbody>
     {% for row in broadcast_events %}
       <tr>
-        <td><abbr class="livestamp" title="{{row[0]}}">{{row[0]}}</td>
+        <td><abbr class="livestamp" title="{{row[0]}}">{{row[0]}}</abbr></td>
         {% if row[1] == "+" %}{# change #}
           <td><i class="icon-plus" title="{{row[1]}}"></i></td>
         {% else %}{# if row[1] == "-" #}
