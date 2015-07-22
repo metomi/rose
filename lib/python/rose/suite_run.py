@@ -95,10 +95,16 @@ class SuiteRunner(Runner):
                "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
                "restart_mode", "run_mode", "strict_mode"]
 
-    REC_DONT_SYNC = re.compile(
-        r"\A" +
-        r"(?:\..*|cylc-suite\.db.*|log(?:\..*)*|state|share(?:cycle)?|work)" +
-        r"\Z")
+    # Lists of rsync (always) exclude globs
+    SYNC_EXCLUDES = (
+        "/.*",
+        "/cylc-suite.db",
+        "/log",
+        "/log.*",
+        "/state",
+        "/share",
+        "/work",
+    )
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
@@ -264,7 +270,8 @@ class SuiteRunner(Runner):
         cwd = os.getcwd()
         for rel_path, conf_dir in conf_tree.files.items():
             if (conf_dir == cwd or
-                    self.REC_DONT_SYNC.match(rel_path) or
+                    any([fnmatchcase(os.sep + rel_path, exclude)
+                         for exclude in self.SYNC_EXCLUDES]) or
                     conf_tree.node.get(["jinja2:" + rel_path]) is not None):
                 continue
             # No sub-directories, very slow otherwise
@@ -616,14 +623,12 @@ class SuiteRunner(Runner):
             excludes = []
         if includes is None:
             includes = []
-        cmd = self.popen.get_cmd("rsync", "--delete-excluded")
-        for exclude in excludes:
+        cmd = self.popen.get_cmd("rsync")
+        for exclude in excludes + list(self.SYNC_EXCLUDES):
             cmd.append("--exclude=" + exclude)
         for include in includes:
             cmd.append("--include=" + include)
-        for item in os.listdir("."):
-            if not self.REC_DONT_SYNC.match(item) or item in excludes:
-                cmd.append(item)
+        cmd.append("./")
         cmd.append(target)
         return cmd
 
