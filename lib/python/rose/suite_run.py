@@ -600,7 +600,7 @@ class SuiteRunner(Runner):
             self.handle_event("/" + r_opts["uuid"] + "\n", level=0)
         elif opts.new_mode:
             self.fs_util.delete(suite_dir_rel)
-        if opts.run_mode == "run":
+        if opts.run_mode == "run" or not os.path.exists(suite_dir_rel):
             self._run_init_dir(opts, suite_name, r_opts=r_opts)
         os.chdir(suite_dir_rel)
         for name in ["share", "share/cycle", "work"]:
