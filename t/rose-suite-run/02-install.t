@@ -19,14 +19,14 @@
 #-------------------------------------------------------------------------------
 # Test "rose suite-run", with and without site/user configurations.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
+. "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
-JOB_HOST=$(rose config --default= 't' 'job-host')
-if [[ -n $JOB_HOST ]]; then
-    JOB_HOST=$(rose host-select $JOB_HOST)
+JOB_HOST="$(rose config --default= 't' 'job-host')"
+if [[ -n "${JOB_HOST}" ]]; then
+    JOB_HOST="$(rose host-select "${JOB_HOST}")"
 fi
 #-------------------------------------------------------------------------------
-if [[ $TEST_KEY_BASE == *conf ]]; then
+if [[ "${TEST_KEY_BASE}" == *conf ]]; then
     if ! rose config -q 'rose-suite-run' 'hosts'; then
         skip_all '[rose-suite-run]hosts not defined'
     fi
@@ -34,55 +34,55 @@ else
     export ROSE_CONF_PATH=
 fi
 #-------------------------------------------------------------------------------
-N_TESTS=6
-tests $N_TESTS
+tests 6
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
-OPTION=-i
-if [[ $TEST_KEY_BASE == *local* ]]; then
-    OPTION=-l
+TEST_KEY="${TEST_KEY_BASE}"
+mkdir -p "${HOME}/cylc-run"
+SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
+NAME="$(basename "${SUITE_RUN_DIR}")"
+OPTION='-i'
+if [[ "${TEST_KEY_BASE}" == *local* ]]; then
+    OPTION='-l'
 fi
-if [[ -n $JOB_HOST ]]; then
-    run_pass "$TEST_KEY" rose suite-run --debug \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE $OPTION --name=$NAME --no-gcontrol \
-        -S "HOST=\"$JOB_HOST\""
+if [[ -n "${JOB_HOST}" ]]; then
+    run_pass "${TEST_KEY}" rose suite-run --debug \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" "${OPTION}" \
+        --name="${NAME}" --no-gcontrol \
+        -S "HOST=\"${JOB_HOST}\""
 else
-    run_pass "$TEST_KEY" rose suite-run --debug \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE $OPTION --name=$NAME --no-gcontrol
+    run_pass "${TEST_KEY}" rose suite-run --debug \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" "${OPTION}" \
+        --name="${NAME}" --no-gcontrol
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-port-file
-run_fail "$TEST_KEY" test -e $HOME/.cylc/ports/$NAME
+TEST_KEY="${TEST_KEY_BASE}-port-file"
+run_fail "${TEST_KEY}" test -e "${HOME}/.cylc/ports/${NAME}"
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-items
-run_pass "$TEST_KEY" ls $SUITE_RUN_DIR/{app,etc}
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-$SUITE_RUN_DIR/app:
-my_task_1
-
-$SUITE_RUN_DIR/etc:
-junk
+TEST_KEY="${TEST_KEY_BASE}-items"
+run_pass "${TEST_KEY}" find "${SUITE_RUN_DIR}/"{app,colon:is:ok,etc} -type f
+sort "${TEST_KEY}.out" >"${TEST_KEY}.out.sort"
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.sort" <<__OUT__
+${SUITE_RUN_DIR}/app/my_task_1/rose-app.conf
+${SUITE_RUN_DIR}/colon:is:ok
+${SUITE_RUN_DIR}/etc/junk
 __OUT__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-items-$JOB_HOST
-if [[ $TEST_KEY_BASE == *local* ]]; then
-    skip 2 "$TEST_KEY: local-install-only"
-elif [[ -n $JOB_HOST ]]; then
-    run_pass "$TEST_KEY" \
-        ssh -oBatchMode=yes $JOB_HOST ls cylc-run/$NAME/{app,etc}
-    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-cylc-run/$NAME/app:
-my_task_1
-
-cylc-run/$NAME/etc:
-junk
+TEST_KEY="${TEST_KEY_BASE}-items-${JOB_HOST}"
+if [[ "${TEST_KEY_BASE}" == *local* ]]; then
+    skip 2 "${TEST_KEY}: local-install-only"
+elif [[ -n "${JOB_HOST}" ]]; then
+    run_pass "${TEST_KEY}" \
+        ssh -oBatchMode=yes "${JOB_HOST}" \
+        "find 'cylc-run/${NAME}/'{app,colon:is:ok,etc} -type f"
+    sort "${TEST_KEY}.out" >"${TEST_KEY}.out.sort"
+    file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.sort" <<__OUT__
+cylc-run/${NAME}/app/my_task_1/rose-app.conf
+cylc-run/${NAME}/colon:is:ok
+cylc-run/${NAME}/etc/junk
 __OUT__
 else
-    skip 2 "$TEST_KEY_BASE-items: [t]job-host not defined"
+    skip 2 "${TEST_KEY_BASE}-items: [t]job-host not defined"
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+rose suite-clean -q -y "${NAME}"
 exit 0
