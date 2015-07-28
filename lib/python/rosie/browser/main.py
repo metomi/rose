@@ -98,6 +98,12 @@ class MainWindow(gtk.Window):
                               rosie.browser.PROGRAM_NAME,
                               rosie.browser.SPLASH_CONFIG))
         self.config = locator.get_conf()
+
+        self.usernames = {}
+        for prefix in self.ws_client.auth_managers.keys():
+            self.usernames[prefix] = self.config.get_value(
+                ["rosie-id", "prefix-username." + prefix]) or os.getlogin()
+
         self.set_icon(rose.gtk.util.get_icon(system="rosie"))
         if rosie.browser.ICON_PATH_SCHEDULER is None:
             self.sched_icon_path = None
@@ -1124,6 +1130,7 @@ class MainWindow(gtk.Window):
         model = self.display_box.treeview.get_model()
         this_iter = model.get_iter(path)
         idx = model.get_value(this_iter, suite_col_index)
+        prefix = idx.split('-')[0]
         col_index = self.display_box.treeview.get_columns().index(col)
         col_widget = (
             self.display_box.treeview.get_columns()[col_index].get_widget())
@@ -1202,7 +1209,7 @@ class MainWindow(gtk.Window):
         delete_item = uimanager.get_widget("/Popup/Delete")
         delete_item.connect("activate", self.handle_delete)
         owner = self.display_box._get_treeview_path_owner(path)
-        delete_item.set_sensitive(owner == os.getlogin())
+        delete_item.set_sensitive(owner == self.usernames[prefix])
         source_item = uimanager.get_widget("/Popup/View Web")
         source_item.connect("activate", self.handle_view_web)
         source_item.set_sensitive(self.handle_view_web(test=True, path=path))
