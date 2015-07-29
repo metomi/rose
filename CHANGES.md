@@ -13,12 +13,25 @@ Rose release 29. This release will work best with
 
 ### Noteworthy Changes
 
+[#1658](https://github.com/metomi/rose/pull/1658):
+rose suite-run --reload: new task hosts no longer cause the command to fail.
+
+[#1657](https://github.com/metomi/rose/pull/1657):
+rose suite-run: job hosts install: files and directories with colons in their
+names no longer cause the command to fail.
+
+[#1654](https://github.com/metomi/rose/pull/1654):
+rose config-dump: don't prettify configuration metadata.
+
 [#1644](https://github.com/metomi/rose/pull/1644):
 rose suite-clean: will now clean empty suite directories.
 
 [#1641](https://github.com/metomi/rose/pull/1641):
 rose bush: no longer fail when it is unable to parse a bad `rose-suite.info`
 file in a suite.
+
+[#1640](https://github.com/metomi/rose/pull/1640):
+rose config-edit: speed up macro changes.
 
 [#1639](https://github.com/metomi/rose/pull/1639):
 rose config-edit: array widgets: protect against unsaved null text.
