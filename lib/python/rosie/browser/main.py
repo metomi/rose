@@ -1022,7 +1022,10 @@ class MainWindow(gtk.Window):
     def handle_view_output(self, *args, **kwargs):
         """View a suite's output, if any."""
         path = kwargs.get("path", None)
-        id_ = SuiteId(id_text=self.get_selected_suite_id(path))
+        id_text = self.get_selected_suite_id(path)
+        if id_text is None:
+            return False
+        id_ = SuiteId(id_text=id_text)
         if kwargs.get("test", False):
             try:
                 url = self.suite_engine_proc.get_suite_log_url(
