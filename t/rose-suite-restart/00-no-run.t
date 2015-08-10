@@ -20,7 +20,7 @@
 # Test "rose suite-restart" on suites that don't exist.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-tests 6
+tests 7
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-pwd"
 ROSE_CONF_PATH= run_fail "${TEST_KEY}" rose suite-restart
@@ -40,10 +40,12 @@ NAME="$(uuidgen)"
 mkdir -p "${HOME}/cylc-run/${NAME}"
 ROSE_CONF_PATH= run_fail "${TEST_KEY}" rose suite-restart -n "${NAME}"
 # N.B. This relies on output of "cylc restart"
-file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+head -1 "${TEST_KEY}.err" >"${TEST_KEY}.err.head"
+file_cmp "${TEST_KEY}.err.head" "${TEST_KEY}.err.head" <<__ERR__
 [FAIL] cylc restart ${NAME}  # return-code=1, stderr=
-[FAIL] 'ERROR: Suite not found ${NAME}'
 __ERR__
+file_grep "${TEST_KEY}.err.grep" \
+    "'ERROR: Suite not found ${NAME}'" "${TEST_KEY}.err"
 rmdir "${HOME}/cylc-run/${NAME}"
 #-------------------------------------------------------------------------------
 exit

@@ -43,7 +43,6 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] install: suite.rc
 [INFO] chdir: log/
 [INFO] $NAME: will reload on localhost
-[INFO] Command queued
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" /dev/null
 poll ! grep -q \
