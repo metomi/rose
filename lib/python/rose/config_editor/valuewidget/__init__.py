@@ -71,7 +71,9 @@ def chooser(value, metadata, error):
     m_length = metadata.get(rose.META_PROP_LENGTH)
     m_hint = metadata.get(rose.META_PROP_VALUE_HINTS)
     if (m_type is None and m_values is None and m_length is None and
-       m_hint is None):
+            m_hint is None):
+        if value and "\n" in value:
+            return text.TextMultilineValueWidget
         return text.RawValueWidget
     if (m_values is None and m_length is None and m_hint is None and
        m_type in ['logical', 'boolean']):
