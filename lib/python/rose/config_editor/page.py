@@ -1038,10 +1038,12 @@ class ConfigPage(gtk.VBox):
         for variable in datavars:
             title = variable.metadata.get(rose.META_PROP_TITLE, variable.name)
             var_id = variable.metadata.get('id', variable.name)
-            key = ((variable.metadata.get(rose.META_PROP_SORT_KEY, '~')),
-                                                                     var_id)
+            key = (
+                variable.metadata.get(rose.META_PROP_SORT_KEY, '~'),
+                var_id
+            )
             if variable.name == '':
-                key = '~'
+                key = ('~', '')
             sorted_data.append((key, title, variable.name,
                                 variable.value, variable))
         ascending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x[0],
