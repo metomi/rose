@@ -222,6 +222,10 @@
 
       <dd>Launch the Rosie client GTK+ GUI.</dd>
 
+      <dt><a href="#rosie-graph">rosie graph</a></dt>
+
+      <dd>Graph suite copy ancestry.</dd>
+
       <dt><a href="#rosie-hello">rosie hello</a></dt>
 
       <dd>Set up connection to a Rosie web service server.</dd>
@@ -2926,6 +2930,58 @@ environment scripting = "eval $(rose task-env)"
     <p><a href="#rosie-lookup">rosie lookup</a></p>
 
     <p><a href="#rosie-ls">rosie ls</a></p>
+
+    <h2 id="rosie-graph">rosie graph</h2>
+
+    <h3>NAME</h3>
+
+    <p><kbd>rosie graph</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <p><kbd>rosie graph [OPTIONS] [ID]</kbd></p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Graph suite copy ancestry.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--distance=DISTANCE, -d DISTANCE</kbd></dt>
+
+      <dd>The maximum distance (graph depth) for suites related to
+      <var>ID</var> to be plotted. For example, if the distance is
+      <samp>1</samp>, only the parents and children (but not siblings) of
+      <var>ID</var> will be plotted. If not given, this is unlimited. Requires
+      <var>ID</var> to be specified.</dd>
+
+      <dt><kbd>--output=FILE, -O FILE</kbd></dt>
+
+      <dd>The name of the file for dumping the output. Otherwise, the output
+      will go to a temporary file which will get tidied up. The extension of
+      the filename determines the output format - see graphviz AGraph.draw
+      documentation.</dd>
+
+      <dt><kbd>--prefix=PREFIX</kbd></dt>
+
+      <dd>Display suites from only the specified web services. This option can
+      be used multiple times.</dd>
+
+      <dt><kbd>--property=PROPERTY, -p PROPERTY</kbd></dt>
+
+      <dd>Add a certain suite property to the node labels - e.g. owner or
+      title. This option can be used multiple times.</dd>
+    </dl>
+
+    <h3>ARGUMENTS</h3>
+
+    <dl>
+      <dt><kbd>ID</kbd></dt>
+
+      <dd>A suite id to graph. If given, only the suites that are connected to
+      this id by copy history will be graphed.</dd>
+    </dl>
 
     <h2 id="rosie-hello">rosie hello</h2>
 

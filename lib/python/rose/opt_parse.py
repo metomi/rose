@@ -155,6 +155,13 @@ class RoseOptionParser(OptionParser):
              "dest": "diff_tool",
              "default": None,
              "help": "Specify an alternate diff tool like diffuse."}],
+        "distance": [
+            ["--distance", "-d"],
+            {"action": "store",
+             "dest": "distance",
+             "default": None,
+             "type": "int",
+             "help": "Specify a maximum distance."}],
         "downgrade": [
             ["--downgrade", "-d"],
             {"action": "store_true",
