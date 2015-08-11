@@ -78,8 +78,62 @@ class Root(object):
             return template.render(host=self.host_name,
                                    rose_version=self.rose_version,
                                    script=cherrypy.request.script_name)
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception as exc:
+            traceback.print_exc(exc)
+
+    @cherrypy.expose
+    def broadcast_states(self, user, suite, form=None):
+        """List current broadcasts of a running or completed suite."""
+        user_suite_dir = self._get_user_suite_dir(user, suite)
+        data = {
+            "host": self.host_name,
+            "user": user,
+            "suite": suite,
+            "rose_version": self.rose_version,
+            "script": cherrypy.request.script_name,
+            "states": {},
+            "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+        }
+        data["states"].update(
+                self.suite_engine_proc.get_suite_state_summary(user, suite))
+        data.update(self._get_suite_logs_info(user, suite))
+        data["broadcast_states"] = (
+            self.suite_engine_proc.get_suite_broadcast_states(user, suite))
+        if form == "json":
+            return simplejson.dumps(data)
+        try:
+            template = self.template_env.get_template("broadcast-states.html")
+            return template.render(**data)
+        except Exception as exc:
+            traceback.print_exc(exc)
+        return simplejson.dumps(data)
+
+    @cherrypy.expose
+    def broadcast_events(self, user, suite, form=None):
+        """List broadcasts history of a running or completed suite."""
+        user_suite_dir = self._get_user_suite_dir(user, suite)
+        data = {
+            "host": self.host_name,
+            "user": user,
+            "suite": suite,
+            "rose_version": self.rose_version,
+            "script": cherrypy.request.script_name,
+            "states": {},
+            "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        }
+        data["states"].update(
+                self.suite_engine_proc.get_suite_state_summary(user, suite))
+        data.update(self._get_suite_logs_info(user, suite))
+        data["broadcast_events"] = (
+            self.suite_engine_proc.get_suite_broadcast_events(user, suite))
+        if form == "json":
+            return simplejson.dumps(data)
+        try:
+            template = self.template_env.get_template("broadcast-events.html")
+            return template.render(**data)
+        except Exception as exc:
+            traceback.print_exc(exc)
+        return simplejson.dumps(data)
 
     @cherrypy.expose
     def cycles(self, user, suite, page=1, order=None, cycles=None,
@@ -110,15 +164,12 @@ class Root(object):
             "page": page,
         }
         data["offset"] = (page - 1) * per_page
-        entries, of_n_entries = (
-                        self.suite_engine_proc.get_suite_cycles_summary(
-                                        user, suite, order, per_page, 
-                                        data["offset"]))
-        data["entries"] = entries
-        data["of_n_entries"] = of_n_entries
+        data["entries"], data["of_n_entries"] = (
+            self.suite_engine_proc.get_suite_cycles_summary(
+                user, suite, order, per_page, data["offset"]))
         if per_page:
-            data["n_pages"] = of_n_entries / per_page
-            if of_n_entries % per_page != 0:
+            data["n_pages"] = data["of_n_entries"] / per_page
+            if data["of_n_entries"] % per_page != 0:
                 data["n_pages"] += 1
         else:
             data["n_pages"] = 1
@@ -131,8 +182,8 @@ class Root(object):
         try:
             template = self.template_env.get_template("cycles.html")
             return template.render(**data)
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception as exc:
+            traceback.print_exc(exc)
         return simplejson.dumps(data)
 
     @cherrypy.expose
@@ -233,8 +284,8 @@ class Root(object):
         try:
             template = self.template_env.get_template("jobs.html")
             return template.render(**data)
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception as exc:
+            traceback.print_exc(exc)
 
     @cherrypy.expose
     def list(self, user, suite, page=1, cycles=None, tasks=None,
@@ -366,7 +417,6 @@ class Root(object):
                 cycle, task, submit_num, ext = names
                 entries = self.suite_engine_proc.get_suite_job_events(
                     user, suite, [cycle], [task], None, None, None, None)[0]
-                print entries
                 for entry in entries:
                     if entry["submit_num"] == int(submit_num):
                         job_entry = entry

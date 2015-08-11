@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+"""Implement "rose suite-log" CLI."""
 
 import os
 import pwd
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Event, Reporter
-from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_control import get_suite_name
 import sys
@@ -38,7 +38,9 @@ class RoseBushStartEvent(Event):
         return ("""Rose bush started:\n%s""" % self.args[0] +
                 """Run "rose bush stop" when no longer required.""")
 
+
 def main():
+    """Implement "rose suite-log" CLI."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("archive_mode", "force_mode", "name",
                               "non_interactive", "prune_remote_mode",
@@ -48,20 +50,20 @@ def main():
 
     try:
         suite_log_view(opts, args, report)
-    except Exception as e:
-        report(e)
+    except Exception as exc:
+        report(exc)
         if opts.debug_mode:
-            traceback.print_exc(e)
+            traceback.print_exc(exc)
         sys.exit(1)
 
 
 def suite_log_view(opts, args, event_handler=None):
+    """Implement "rose suite-log" CLI functionality."""
     suite_engine_proc = SuiteEngineProcessor.get_processor(
-                                    event_handler=event_handler)
-    if opts.archive_mode:
-        opts.update_mode = True
+        event_handler=event_handler)
+    opts.update_mode = (
+        opts.update_mode or opts.archive_mode or opts.force_mode)
     if opts.force_mode:
-        opts.update_mode = True
         args = ["*"]
     if not opts.name:
         opts.name = get_suite_name(event_handler)
@@ -70,19 +72,19 @@ def suite_log_view(opts, args, event_handler=None):
     if opts.archive_mode:
         suite_engine_proc.job_logs_archive(opts.name, args)
     elif opts.update_mode:
-        suite_engine_proc.job_logs_pull_remote(opts.name, args,
-                                               opts.prune_remote_mode)
+        suite_engine_proc.job_logs_pull_remote(
+            opts.name, args, opts.prune_remote_mode, opts.force_mode)
     if opts.view_mode or not opts.update_mode:
         n_tries_left = 1
         is_rose_bush_started = False
         url = suite_engine_proc.get_suite_log_url(opts.user, opts.name)
         if url.startswith("file://"):
             if (opts.non_interactive or
-                raw_input("Start rose bush? [y/n] (default=n) ") == "y"):
+                    raw_input("Start rose bush? [y/n] (default=n) ") == "y"):
                 suite_engine_proc.popen.run_bg(
-                            "rose", "bush", "start", preexec_fn=os.setpgrp)
+                    "rose", "bush", "start", preexec_fn=os.setpgrp)
                 is_rose_bush_started = True
-                n_tries_left = 5 # Give the server a chance to start
+                n_tries_left = 5  # Give the server a chance to start
         while n_tries_left:
             n_tries_left -= 1
             if n_tries_left:

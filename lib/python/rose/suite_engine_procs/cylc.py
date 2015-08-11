@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
 import filecmp
@@ -65,26 +65,16 @@ class CylcProcessor(SuiteEngineProcessor):
                    "success": 3, "fail": 3, "fail(%s)": 4}
     JOB_LOGS_DB = "log/rose-job-logs.db"
     JOB_ORDERS = {
-        "time_desc":
-        "time DESC, task_events.submit_num DESC, name DESC, cycle DESC",
-        "time_asc":
-        "time ASC, task_events.submit_num ASC, name ASC, cycle ASC",
-        "cycle_desc_name_asc":
-        "cycle DESC, name ASC, task_events.submit_num DESC",
-        "cycle_desc_name_desc":
-        "cycle DESC, name DESC, task_events.submit_num DESC",
-        "cycle_asc_name_asc":
-        "cycle ASC, name ASC, task_events.submit_num DESC",
-        "cycle_asc_name_desc":
-        "cycle ASC, name DESC, task_events.submit_num DESC",
-        "name_asc_cycle_asc":
-        "name ASC, cycle ASC, task_events.submit_num DESC",
-        "name_desc_cycle_asc":
-        "name DESC, cycle ASC, task_events.submit_num DESC",
-        "name_asc_cycle_desc":
-        "name ASC, cycle DESC, task_events.submit_num DESC",
-        "name_desc_cycle_desc":
-        "name DESC, cycle DESC, task_events.submit_num DESC"}
+        "time_desc": "time DESC, submit_num DESC, name DESC, cycle DESC",
+        "time_asc": "time ASC, submit_num ASC, name ASC, cycle ASC",
+        "cycle_desc_name_asc": "cycle DESC, name ASC, submit_num DESC",
+        "cycle_desc_name_desc": "cycle DESC, name DESC, submit_num DESC",
+        "cycle_asc_name_asc": "cycle ASC, name ASC, submit_num DESC",
+        "cycle_asc_name_desc": "cycle ASC, name DESC, submit_num DESC",
+        "name_asc_cycle_asc": "name ASC, cycle ASC, submit_num DESC",
+        "name_desc_cycle_asc": "name DESC, cycle ASC, submit_num DESC",
+        "name_asc_cycle_desc": "name ASC, cycle DESC, submit_num DESC",
+        "name_desc_cycle_desc": "name DESC, cycle DESC, submit_num DESC"}
     PGREP_CYLC_RUN = r"python.*cylc-(run|restart)( | .+ )%s( |$)"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
@@ -96,7 +86,7 @@ class CylcProcessor(SuiteEngineProcessor):
     STATUSES = {"active": ["ready", "queued", "submitting", "submitted",
                            "submit-retrying", "running", "retrying"],
                 "fail": ["submission failed", "failed"],
-                "success": ["succeeded"]}
+                "success": ["expired", "succeeded"]}
     SUITE_CONF = "suite.rc"
     SUITE_DB = "cylc-suite.db"
     SUITE_DIR_REL_ROOT = "cylc-run"
@@ -195,6 +185,56 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
 
+    def get_suite_broadcast_states(self, user_name, suite_name):
+        """Return broadcast states of a suite.
+
+        [[point, name, key, value], ...]
+
+        """
+        # Check if "broadcast_states" table is available or not
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?",
+                ["broadcast_states"]):
+            break
+        else:
+            return
+
+        broadcast_states = []
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT point,namespace,key,value FROM broadcast_states" +
+                " ORDER BY point ASC, namespace ASC, key ASC"):
+            point, namespace, key, value = row
+            broadcast_states.append([point, namespace, key, value])
+        return broadcast_states
+
+    def get_suite_broadcast_events(self, user_name, suite_name):
+        """Return broadcast events of a suite.
+
+        [[time, change, point, name, key, value], ...]
+
+        """
+        # Check if "broadcast_events" table is available or not
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?",
+                ["broadcast_events"]):
+            break
+        else:
+            return {}
+
+        broadcast_events = []
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT time,change,point,namespace,key,value" +
+                " FROM broadcast_events" +
+                " ORDER BY time DESC, point DESC, namespace DESC, key DESC"):
+            time, change, point, namespace, key, value = row
+            broadcast_events.append(
+                (time, change, point, namespace, key, value))
+        return broadcast_events
+
     def get_suite_dir_rel(self, suite_name, *paths):
         """Return the relative path to the suite running directory.
 
@@ -203,9 +243,10 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(self.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
-    def get_suite_job_events(self, user_name, suite_name, cycles, tasks,
-                             no_statuses, order, limit, offset):
-        """Return suite job events.
+    def get_suite_job_events(
+            self, user_name, suite_name, cycles, tasks, no_statuses, order,
+            limit, offset):
+        """Return suite task job events.
 
         user -- A string containing a valid user ID
         suite -- A string containing a valid suite ID
@@ -237,6 +278,191 @@ class CylcProcessor(SuiteEngineProcessor):
                       ...}}
 
         """
+        # Check if "task_jobs" table is available or not
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
+            break
+        else:
+            return self._get_suite_job_events_old(
+                user_name, suite_name, cycles, tasks, no_statuses, order,
+                limit, offset)
+
+        # Build the WHERE expression to filter by cycles, tasks, statuses
+        where_exprs = []
+        where_args = []
+        if cycles:
+            cycle_where_exprs = []
+            for cycle in cycles:
+                if cycle.startswith("before "):
+                    where_args.append(cycle.split(None, 1)[-1])
+                    cycle_where_exprs.append("cycle <= ?")
+                elif cycle.startswith("after "):
+                    where_args.append(cycle.split(None, 1)[-1])
+                    cycle_where_exprs.append("cycle >= ?")
+                else:
+                    where_args.append(cycle)
+                    cycle_where_exprs.append("cycle GLOB ?")
+            where_exprs.append(" OR ".join(cycle_where_exprs))
+        if tasks:
+            where_exprs.append(" OR ".join(["name GLOB ?"] * len(tasks)))
+            where_args += tasks
+        if no_statuses:
+            for no_status in no_statuses:
+                statuses = self.STATUSES.get(no_status, [])
+                where_exprs.append(
+                    " OR ".join(["status != ?"] * len(statuses)))
+                where_args += statuses
+        if where_exprs:
+            where_expr = " WHERE (" + ") AND (".join(where_exprs) + ")"
+        else:
+            where_expr = ""
+
+        # Get number of entries
+        of_n_entries = 0
+        stmt = ("SELECT COUNT(*)" +
+                " FROM task_jobs JOIN task_states USING (name, cycle)" +
+                where_expr)
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name, stmt, where_args):
+            of_n_entries = row[0]
+            break
+        else:
+            self._db_close(self.SUITE_DB, user_name, suite_name)
+            return ([], 0)
+
+        # Get entries
+        entries = []
+        entry_of = {}
+        stmt = ("SELECT" +
+                " task_states.time_updated AS time," +
+                " cycle, name," +
+                " task_jobs.submit_num AS submit_num," +
+                " task_states.submit_num AS submit_num_max," +
+                " time_submit, submit_status," +
+                " time_run, time_run_exit, run_signal, run_status," +
+                " user_at_host, batch_sys_name, batch_sys_job_id" +
+                " FROM task_jobs JOIN task_states USING (cycle, name)" +
+                where_expr +
+                " ORDER BY " +
+                self.JOB_ORDERS.get(order, self.JOB_ORDERS["time_desc"]))
+        limit_args = []
+        if limit:
+            stmt += " LIMIT ? OFFSET ?"
+            limit_args = [limit, offset]
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name, stmt,
+                where_args + limit_args):
+            (
+                cycle, name, submit_num, submit_num_max,
+                time_submit, submit_status,
+                time_run, time_run_exit, run_signal, run_status,
+                user_at_host, batch_sys_name, batch_sys_job_id
+            ) = row[1:]
+            entry = {
+                "cycle": cycle,
+                "name": name,
+                "submit_num": submit_num,
+                "submit_num_max": submit_num_max,
+                "events": [time_submit, time_run, time_run_exit],
+                "status": None,
+                "host": user_at_host,
+                "submit_method": batch_sys_name,
+                "submit_method_id": batch_sys_job_id,
+                "logs": {},
+                "seq_logs_indexes": {}}
+            if run_status and run_signal:
+                entry["status"] = "fail(%s)" % (run_signal)
+            elif run_status:
+                entry["status"] = "fail"
+            elif run_status == 0:
+                entry["status"] = "success"
+            elif submit_status:
+                entry["status"] = "fail(submit)"
+            elif submit_status == 0 and time_run:
+                entry["status"] = "init"
+            elif submit_status == 0:
+                entry["status"] = "submit"
+            else:
+                entry["status"] = "submit-init"
+            entries.append(entry)
+            entry_of[(cycle, name, submit_num)] = entry
+        self._db_close(self.SUITE_DB, user_name, suite_name)
+        if not entries:
+            return (entries, of_n_entries)
+
+        # Job logs DB
+        stmt = ("SELECT" +
+                " cycle, task AS name, submit_num," +
+                " key, path, path_in_tar, mtime, size" +
+                " FROM log_files")
+        where_exprs = []
+        where_args = []
+        if cycles:
+            cycle_where_exprs = []
+            for cycle in cycles:
+                if cycle.startswith("before "):
+                    where_args.append(cycle.split(None, 1)[-1])
+                    cycle_where_exprs.append("cycle <= ?")
+                elif cycle.startswith("after "):
+                    where_args.append(cycle.split(None, 1)[-1])
+                    cycle_where_exprs.append("cycle >= ?")
+                else:
+                    where_args.append(cycle)
+                    cycle_where_exprs.append("cycle GLOB ?")
+            where_exprs.append(" OR ".join(cycle_where_exprs))
+        if tasks:
+            where_exprs.append(" OR ".join(["name GLOB ?"] * len(tasks)))
+            where_args += tasks
+        if where_exprs:
+            stmt += " WHERE (" + ") AND (".join(where_exprs) + ")"
+
+        prefix = "~"
+        if user_name:
+            prefix += user_name
+        user_suite_dir = os.path.join(
+            os.path.expanduser(prefix), self.get_suite_dir_rel(suite_name))
+        for row in self._db_exec(
+                self.JOB_LOGS_DB, user_name, suite_name, stmt, where_args):
+            cycle, name, submit_num, key, path, path_in_tar, mtime, size = row
+            try:
+                entry = entry_of[(cycle, name, int(submit_num))]
+            except KeyError:
+                continue
+            abs_path = os.path.join(user_suite_dir, path)
+            entry["logs"][key] = {
+                "path": path,
+                "path_in_tar": path_in_tar,
+                "mtime": mtime,
+                "size": size,
+                "exists": os.path.exists(abs_path),
+                "seq_key": None}
+            seq_log_match = self.REC_SEQ_LOG.match(key)
+            if seq_log_match:
+                head, index_str, tail = seq_log_match.groups()
+                if not tail:
+                    tail = ""
+                seq_key = head + "*" + tail
+                entry["logs"][key]["seq_key"] = seq_key
+                if seq_key not in entry["seq_logs_indexes"]:
+                    entry["seq_logs_indexes"][seq_key] = {}
+                entry["seq_logs_indexes"][seq_key][int(index_str)] = key
+        self._db_close(self.JOB_LOGS_DB, user_name, suite_name)
+
+        for entry in entries:
+            for seq_key, indexes in entry["seq_logs_indexes"].items():
+                if len(indexes) <= 1:
+                    entry["seq_logs_indexes"].pop(seq_key)
+            for key, log_dict in entry["logs"].items():
+                if log_dict["seq_key"] not in entry["seq_logs_indexes"]:
+                    log_dict["seq_key"] = None
+
+        return (entries, of_n_entries)
+
+    def _get_suite_job_events_old(
+            self, user_name, suite_name, cycles, tasks, no_statuses, order,
+            limit, offset):
+        """The "get_suite_job_events" method for older cylc versions."""
         # Build WHERE expression to select by cycles and/or task names
         where = ""
         stmt_args = []
@@ -244,15 +470,14 @@ class CylcProcessor(SuiteEngineProcessor):
             where_fragments = []
             for cycle in cycles:
                 if cycle.startswith("before "):
-                    value = cycle.split(None, 1)[-1]
+                    stmt_args.append(cycle.split(None, 1)[-1])
                     where_fragments.append("cycle <= ?")
                 elif cycle.startswith("after "):
-                    value = cycle.split(None, 1)[-1]
+                    stmt_args.append(cycle.split(None, 1)[-1])
                     where_fragments.append("cycle >= ?")
                 else:
-                    value = cycle
+                    stmt_args.append(cycle)
                     where_fragments.append("cycle GLOB ?")
-                stmt_args.append(value)
             where += " AND (" + " OR ".join(where_fragments) + ")"
         if tasks:
             where_fragments = []
@@ -284,7 +509,7 @@ class CylcProcessor(SuiteEngineProcessor):
         # Execute query to get entries
         entries = []
         stmt = ("SELECT" +
-                " cycle, name, task_events.submit_num," +
+                " cycle, name, task_events.submit_num AS submit_num," +
                 " group_concat(time), group_concat(event)," +
                 " group_concat(message) " +
                 " FROM" +
@@ -443,8 +668,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                   "size": f_stat.st_size}
         return ("cylc", logs_info)
 
-    def get_suite_cycles_summary(self, user_name, suite_name, order, limit,
-                                 offset):
+    def get_suite_cycles_summary(
+            self, user_name, suite_name, order, limit, offset):
         """Return a the state summary (of each cycle) of a user's suite.
 
         user -- A string containing a valid user ID
@@ -470,68 +695,92 @@ class CylcProcessor(SuiteEngineProcessor):
         and of_n_entries is the total number of entries.
 
         """
-        stmt = "SELECT COUNT(DISTINCT cycle) FROM task_states"
         of_n_entries = 0
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT COUNT(DISTINCT cycle) FROM task_states"):
             of_n_entries = row[0]
             break
         if not of_n_entries:
             return ([], 0)
 
-        integer_mode = True
-        stmt = "SELECT DISTINCT cycle FROM task_states"
+        # FIXME: Not strictly correct, if cycle is in basic date-only format
+        integer_mode = False
+        stmt = "SELECT cycle FROM task_states LIMIT 1"
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
-            if not row[0].isdigit():
-                integer_mode = False
-                break
+            integer_mode = row[0].isdigit()
+            break
 
-        stmt_args = self.state_of.keys()
+        states_stmt = {}
+        for key, names in self.STATUSES.items():
+            states_stmt[key] = " OR ".join(
+                ["status=='%s'" % (name) for name in names])
         stmt = (
-            "SELECT cycle, fail_count, max(time_updated), group_concat(status)"
-            " FROM task_states"
-            " LEFT JOIN (SELECT cycle, count(*) AS fail_count"
-            " FROM task_events"
-            " WHERE event=='failed' OR event='submission failed'"
-            " GROUP BY cycle) USING (cycle) WHERE ("
-        )
-        for i in range(len(stmt_args)):
-            if i:
-                stmt += " OR"
-            stmt += " status==?"
+            "SELECT" +
+            " cycle," +
+            " max(time_updated)," +
+            " sum(" + states_stmt["active"] + ") AS n_active," +
+            " sum(" + states_stmt["success"] + ") AS n_success,"
+            " sum(" + states_stmt["fail"] + ") AS n_fail"
+            " FROM task_states" +
+            " GROUP BY cycle")
         if integer_mode:
-            try:
-                self.CYCLE_ORDERS.get(order)
-                stmt += ") GROUP BY cycle ORDER BY cast(cycle as number) " + (
-                         self.CYCLE_ORDERS.get(order))
-            except:
-                stmt += ") GROUP BY cycle ORDER BY cast(cycle as number) DESC"
+            stmt += " ORDER BY cast(cycle as number)"
         else:
-            try:
-                self.CYCLE_ORDERS.get(order)
-                stmt += ") GROUP BY cycle ORDER BY cycle " + (
-                         self.CYCLE_ORDERS.get(order))
-            except:
-                stmt += ") GROUP BY cycle ORDER BY cycle DESC"
-
+            stmt += " ORDER BY cycle"
+        stmt += self.CYCLE_ORDERS.get(order, self.CYCLE_ORDERS["time_desc"])
+        stmt_args = []
         if limit:
             stmt += " LIMIT ? OFFSET ?"
             stmt_args += [limit, offset]
+        entry_of = {}
         entries = []
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
-            cycle, n_job_fails, max_time_updated, statuses_str = row
-            entry = {
+            cycle, max_time_updated, n_active, n_success, n_fail = row
+            entry_of[cycle] = {
                 "cycle": cycle,
-                "n_states": {
-                    "active": 0, "success": 0, "fail": 0, "job_fails": 0,
-                },
                 "max_time_updated": max_time_updated,
+                "n_states": {
+                    "active": n_active,
+                    "success": n_success,
+                    "fail": n_fail,
+                    "job_fails": 0,
+                },
             }
-            if n_job_fails is not None:
-                entry["n_states"]["job_fails"] = n_job_fails
-            entries.append(entry)
-            for status in statuses_str.split(","):
-                entry["n_states"][self.state_of[status]] += 1
+            entries.append(entry_of[cycle])
+
+        # Check if "task_jobs" table is available or not
+        can_use_task_jobs_table = False
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
+            can_use_task_jobs_table = True
+            break
+
+        # Note: A single query with a JOIN is probably a more elegant solution.
+        # However, timing tests suggest that it is cheaper with 2 queries.
+        # This 2nd query may return more results than is necessary, but should
+        # be a very cheap query as it does not have to do a lot of work.
+        if can_use_task_jobs_table:
+            stmt = (
+                "SELECT cycle," +
+                " sum(submit_status==1 OR run_status==1) AS n_job_fail" +
+                " FROM task_jobs GROUP BY cycle")
+        else:
+            fail_events_stmt = " OR ".join(
+                ["event=='%s'" % (name) for name in self.STATUSES["fail"]])
+            stmt = (
+                "SELECT cycle," +
+                " sum(" + fail_events_stmt + ") AS n_job_fail" +
+                " FROM task_events GROUP BY cycle")
+        for cycle, n_job_fail in self._db_exec(
+                self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
+            try:
+                entry_of[cycle]["n_states"]["job_fails"] = n_job_fail
+            except KeyError:
+                pass
+
         return entries, of_n_entries
 
     def get_suite_state_summary(self, user_name, suite_name):
@@ -845,12 +1094,14 @@ class CylcProcessor(SuiteEngineProcessor):
             dao.close()
         return dao
 
-    def job_logs_pull_remote(self, suite_name, items, prune_remote_mode=False):
+    def job_logs_pull_remote(self, suite_name, items,
+                             prune_remote_mode=False, force_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
         items -- A list of relevant items.
         prune_remote_mode -- Remove remote job logs after pulling them.
+        force_mode -- Pull even if "job.out" already exists.
 
         """
         # Pull from remote.
@@ -874,6 +1125,13 @@ class CylcProcessor(SuiteEngineProcessor):
                         arch_f_name = "job-" + cycle + ".tar.gz"
                         if os.path.exists(arch_f_name):
                             continue
+                    # Don't bother if "job.out" already exists
+                    # Unless forced to do so
+                    if (cycle is not None and name is not None and
+                            not prune_remote_mode and not force_mode and
+                            os.path.exists(os.path.join(
+                                log_dir, str(cycle), name, "NN", "job.out"))):
+                        continue
                     auths = self.get_suite_jobs_auths(suite_name, cycle, name)
                     if auths:
                         includes = []
@@ -995,7 +1253,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 if os.path.exists(archive_file_name):
                     self.fs_util.delete(archive_file_name)
                 # cycle directories
-                dir_name_prefix = os.path.join("log","job")
+                dir_name_prefix = os.path.join("log", "job")
                 dir_name = os.path.join(dir_name_prefix, cycle)
                 if os.path.exists(dir_name):
                     self.fs_util.delete(dir_name)

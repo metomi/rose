@@ -1,0 +1,10 @@
+<ul class="nav pull-right">
+{% if mode != "text" -%}
+<li class="active"><a>Normal</a></li>
+<li><a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}{%- if path_in_tar -%}&amp;path_in_tar={{path_in_tar}}{%- endif -%}&amp;mode=text">Text</a></li>
+{% else -%}
+<li><a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}{%- if path_in_tar -%}&amp;path_in_tar={{path_in_tar}}{%- endif -%}">Normal</a></li>
+<li class="active"><a>Text</a></li>
+{% endif -%}
+<li><a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}{%- if path_in_tar -%}&amp;path_in_tar={{path_in_tar}}{%- endif -%}&amp;mode=download">Raw</a></li>
+</ul>

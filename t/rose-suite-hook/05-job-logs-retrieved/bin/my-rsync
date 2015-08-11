@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo "$0 $@" >>"${TEST_DIR}/my-rsync.log"
+exec rsync -a --rsh='ssh -oBatchMode=yes' "$@"
