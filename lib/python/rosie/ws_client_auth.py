@@ -246,8 +246,8 @@ class RosieWSClientAuthManager(object):
         "gnomekeyring": GnomekeyringStore,
         #KeyringStore,
     }
-    PROMPT_USERNAME = "Username for %(host)r: "
-    PROMPT_PASSWORD = "Password for %(username)s at %(host)r: "
+    PROMPT_USERNAME = "Username for %(prefix)r - %(root)r: "
+    PROMPT_PASSWORD = "Password for %(username)s at %(prefix)r - %(root)r: "
     STR_CANCELLED = "cancelled by user"
 
     def __init__(self, prefix, popen=None, prompt_func=None):
@@ -379,7 +379,7 @@ class RosieWSClientAuthManager(object):
             if self.username:
                 username = ""
 
-            prompt = self.PROMPT_USERNAME % {"host": self.root}
+            prompt = self.PROMPT_USERNAME % {"prefix": self.prefix, "root": self.root}
             if self.popen.which("zenity") and os.getenv("DISPLAY"):
                 username = self.popen.run(
                     "zenity", "--entry",
@@ -397,7 +397,8 @@ class RosieWSClientAuthManager(object):
                     return
 
         if self.username and self.password is None or is_retry:
-            prompt = self.PROMPT_PASSWORD % {"host": self.root,
+            prompt = self.PROMPT_PASSWORD % {"prefix": self.prefix,
+                                             "root": self.root, 
                                              "username": self.username}
             if hasattr(self.password_store, "prompt_password"):
                 password = self.password_store.prompt_password(
