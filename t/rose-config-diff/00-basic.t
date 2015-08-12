@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 39
+tests 43
 #-------------------------------------------------------------------------------
 setup
 init app 1 <<'__APP__'
@@ -128,6 +128,35 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
 +air_locking=.false.
 __DIFF__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-dirs-cwd
+cd $TEST_DIR/app1
+run_fail "$TEST_KEY" rose config-diff rose-app.conf ../app2/
+sed -i "/rose-app.conf/d" "$TEST_KEY.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
+@@ -1,12 +1,8 @@
+ # description=Environment variable configuration
+ [env]
+-# description=The number of gears available.
+-# title=Gearbox Gears
+-# 1 reverse, 5 forward
+-GEARBOX_GEARS=6
+-# help=1  3  5
+-#     =|  |  |
+-#     =-------
+-#     =|  |  |
+-#     =2  4  R
+ GEARSTICK_DECORATION=golfball
++
++# description=Different choices of locking methods, if available.
++[namelist:locking]
++# title=Air Locking?
++air_locking=.false.
+__DIFF__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+rm "$TEST_KEY.out" "$TEST_KEY.err"
+cd -
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-stdin
 # Use the rose-meta location, as a meta sub-directory will not be found.
