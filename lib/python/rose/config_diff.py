@@ -161,6 +161,7 @@ def main():
         if path == "-":
             file_paths.append(path)
             continue
+        path = os.path.abspath(path)
         if os.path.isdir(path):
             for filename in rose.CONFIG_NAMES:
                 file_path = os.path.join(path, filename)
