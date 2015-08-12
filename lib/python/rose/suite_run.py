@@ -538,9 +538,14 @@ class SuiteRunner(Runner):
                     continue
                 log_tar = log + ".tar"
                 f_bsize = os.statvfs(log).f_bsize
-                tar_handle = tarfile.open(log_tar, "w", bufsize=f_bsize)
+                tar_f = open(log_tar, "w")
+                tar_handle = tarfile.open(mode="w", fileobj=tar_f,
+                                          bufsize=f_bsize)
                 tar_handle.add(log)
                 tar_handle.close()
+                tar_f.flush()
+                os.fsync(tar_f.fileno())           
+                tar_f.close()
                 # N.B. Python's gzip is slow
                 self.popen.run_simple("gzip", "-f", log_tar)
                 self.handle_event(SuiteLogArchiveEvent(log_tar + ".gz", log))
