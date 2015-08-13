@@ -1382,9 +1382,17 @@ class CylcProcessor(SuiteEngineProcessor):
                 if ret_code == 0:
                     if key == _PORT_SCAN:
                         for line in proc.communicate()[0].splitlines():
-                            name, user, host, port = line.split()
-                            results[(name, host, key)] = SuiteScanResult(
-                                name, "%s@%s:%s" % (user, host, port))
+                            try:
+                                # Releases after cylc 6.5.0
+                                name, location = line.split()
+                                host = location.split("@")[1].split(":")[0]
+                                results[(name, host, key)] = SuiteScanResult(
+                                    name, location)
+                            except ValueError:
+                                # Backward compat cylc 6.5.0 or before
+                                name, user, host, port = line.split()
+                                results[(name, host, key)] = SuiteScanResult(
+                                    name, "%s@%s:%s" % (user, host, port))
                             # N.B. Trust port-scan over port-file
                             for i_host in hosts:
                                 try:
