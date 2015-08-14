@@ -8,10 +8,33 @@ for a full listing of issues for each release.
 ## Next Release (2015-Q3?)
 
 Rose release 29. This release will work best with
-[cylc-6.4.1](https://github.com/cylc/cylc/releases/tag/6.4.1) and
-[fcm-2015.05.0](https://github.com/metomi/fcm/releases/tag/2015.05.0)?
+[cylc-6.5.0](https://github.com/cylc/cylc/releases/tag/6.5.0) and
+[fcm-2015.07.0](https://github.com/metomi/fcm/releases/tag/2015.07.0)?
 
 ### Noteworthy Changes
+
+[#1673](https://github.com/metomi/rose/pull/1673):
+rose config-diff: fix crash when an input path is specified with no directory
+name.
+
+[#1670](https://github.com/metomi/rose/pull/1670):
+rose suite-scan: handle new `cylc scan` output introduced by
+[cylc/cylc#1480](https://github.com/cylc/cylc/pull/1480).
+
+[#1669](https://github.com/metomi/rose/pull/1669):
+rose config-edit: fix crash when attempting to close a page with a newly added
+variable that is yet to be given a name.
+
+[#1667](https://github.com/metomi/rose/pull/1667):
+rosie go: fix crash on invalid search.
+
+[#1666](https://github.com/metomi/rose/pull/1666):
+rosie web service clients: display URL as well as prefix in authentication
+prompts.
+
+[#1664](https://github.com/metomi/rose/pull/1664):
+rosie go: fix delete option sensitivity if current user ID is not the same as
+the user ID of a web service location.
 
 [#1658](https://github.com/metomi/rose/pull/1658):
 rose suite-run --reload: new task hosts no longer cause the command to fail.
@@ -22,6 +45,17 @@ names no longer cause the command to fail.
 
 [#1654](https://github.com/metomi/rose/pull/1654):
 rose config-dump: don't prettify configuration metadata.
+
+[#1652](https://github.com/metomi/rose/pull/1652):
+rosie graph: new command for plotting suite ancestry.
+
+[#1649](https://github.com/metomi/rose/pull/1649):
+Take advantage of cylc event handler enhancements introduced at
+[cylc/cylc#1503](https://github.com/cylc/cylc/pull/1503):
+* `rose suite-hook`: don't pull remote log if `job.out` already in place.
+* Rose Bush:
+  * cycles list and jobs list: speed improvements.
+  * broadcasts list: new page to display broadcast tates and events.
 
 [#1644](https://github.com/metomi/rose/pull/1644):
 rose suite-clean: will now clean empty suite directories.
