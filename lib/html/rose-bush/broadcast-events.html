@@ -12,36 +12,11 @@
 
 {% if broadcast_events %}
 <h1>Broadcasts List (Events)</h1>
-<table class="table table-bordered" summary="broadcast events">
-  <thead>
-    <tr>
-      <th>time</th>
-      <th>change</th>
-      <th>point</th>
-      <th>namespace</th>
-      <th>key</th>
-      <th>value</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in broadcast_events %}
-      <tr>
-        <td><abbr class="livestamp" title="{{row[0]}}">{{row[0]}}</abbr></td>
-        {% if row[1] == "+" %}{# change #}
-          <td><i class="icon-plus" title="{{row[1]}}"></i></td>
-        {% else %}{# if row[1] == "-" #}
-          <td><i class="icon-minus" title="{{row[1]}}"></i></td>
-        {% endif %}{# row[1] #}
-        {% for item in row[2:4] %}
-          <td>{{item}}</td>
-        {% endfor %}{# item in row[2:4] #}
-        {% for item in row[4:] %}
-          <td><code>{{item}}</code></td>
-        {% endfor %}{# item in row[4:] #}
-      </tr>
-    {% endfor %}{# row in broadcast_events #}
-  </tbody>
-</table>
+<pre>
+  {%- for time, change, point, namespace, key, value in broadcast_events %}
+    {{time}} {{change}} [{{namespace}}.{{point}}] {{key}}={{value|e}}
+  {%- endfor %}{# row in broadcast_events #}
+</pre>
 {% endif %}{# broadcast_events #}
 
 </div></div>
