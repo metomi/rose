@@ -35,6 +35,7 @@ below:
 * Matt Shin (Met Office, UK)
 * Stuart Whitehouse (Met Office, UK)
 * Steve Wardle (Met Office, UK)
+* Scott Wales (ARC Centre of Excellence for Climate Systems Science, Australia)
 
 (All contributors are identifiable with email addresses in the version control
 logs or otherwise.)
