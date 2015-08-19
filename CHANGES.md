@@ -5,11 +5,16 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2015-Q3?)
+## 2015.08.0 (2015-08-19)
 
-Rose release 29. This release will work best with
-[cylc-6.5.0](https://github.com/cylc/cylc/releases/tag/6.5.0) and
-[fcm-2015.07.0](https://github.com/metomi/fcm/releases/tag/2015.07.0)?
+Rose release 29. This release works best with
+[cylc-6.6.0](https://github.com/cylc/cylc/releases/tag/6.6.0) and
+[fcm-2015.08.0](https://github.com/metomi/fcm/releases/tag/2015.08.0).
+
+### Highlighted Changes
+
+[#1652](https://github.com/metomi/rose/pull/1652):
+rosie graph: new command for plotting suite ancestry.
 
 ### Noteworthy Changes
 
@@ -46,9 +51,7 @@ names no longer cause the command to fail.
 [#1654](https://github.com/metomi/rose/pull/1654):
 rose config-dump: don't prettify configuration metadata.
 
-[#1652](https://github.com/metomi/rose/pull/1652):
-rosie graph: new command for plotting suite ancestry.
-
+[#1674](https://github.com/metomi/rose/pull/1674),
 [#1649](https://github.com/metomi/rose/pull/1649):
 Take advantage of cylc event handler enhancements introduced at
 [cylc/cylc#1503](https://github.com/cylc/cylc/pull/1503):
