@@ -43,7 +43,7 @@ export ROSE_CONF_PATH=$PWD
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-empty-info-file
 touch rose-suite.info
-run_fail "$TEST_KEY" rosie create -y --info-file=rose-suite.info
+run_fail "$TEST_KEY" rosie create -y --info-file=rose-suite.info <<<n
 {
 'rose-suite.info: 
  compulsory field "owner" not defined,
