@@ -232,7 +232,10 @@ class SplashScreenProcess(object):
 
     def stop(self):
         if self.process is not None and not self.process.stdin.closed:
-            self.process.communicate(input=json.dumps("stop") + "\n")
+            try: 
+                self.process.communicate(input=json.dumps("stop") + "\n")
+            except IOError as e: 
+                pass
         self.process = None
 
 
