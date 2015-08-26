@@ -30,6 +30,7 @@ below:
 * Joseph Mancell (Met Office, UK)
 * Dave Matthews (Met Office, UK)
 * Hilary Oliver (National Institute of Water and Atmospheric Research, New Zealand)
+* Annette Osprey (NCAS Computational Modelling Services, UK)
 * Stephen Oxley (Met Office, UK)
 * Matt Pryor (Met Office, UK)
 * Matt Shin (Met Office, UK)
