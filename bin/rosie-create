@@ -47,8 +47,7 @@
 #         Specify the prefix (i.e. the suite repository) to use.
 #         The default behaviour is to use the site default.
 #     --project=PROJECT
-#         Specify a project to check/query any available metadata when
-#         using rosie create.
+#         Specify a project to check/query any available metadata.
 #         The default behaviour is to use no project and metadata.
 #     --quiet, -q
 #         Decrement verbosity.

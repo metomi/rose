@@ -64,9 +64,7 @@ def _check_compulsory(value):
 
 def _check_copy_mode(value):
     """Check that the value for copy-mode is allowed."""
-    allowed_values = [rose.COPY_MODE_NEVER,
-                      rose.COPY_MODE_CLEAR]
-    if value not in allowed_values:
+    if value not in [rose.COPY_MODE_NEVER, rose.COPY_MODE_CLEAR]:
         return INVALID_SYNTAX.format(value)
 
 

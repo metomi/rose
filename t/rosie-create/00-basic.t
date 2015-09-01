@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 48
+tests 49
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -43,13 +43,11 @@ export ROSE_CONF_PATH=$PWD
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-empty-info-file
 touch rose-suite.info
-run_fail "$TEST_KEY" rosie create -y --info-file=rose-suite.info <<<n
-{
-'rose-suite.info: 
- compulsory field "owner" not defined,
- try again? y/n (default n)'
-}>"$TEST_KEY.out.1"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out.1" </dev/null
+run_fail "$TEST_KEY" rosie create -y --info-file=rose-suite.info
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] rose-suite.info: compulsory field "owner" not defined
+__ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-empty-ans
 cat >rose-suite.info <<__INFO__

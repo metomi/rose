@@ -125,7 +125,7 @@ type=success
 __INFO__
 run_fail "$TEST_KEY" rosie create --info-file=rose-suite.info <<<y
 {
-    echo -n 'Create suite at "foo"? y/n (default n) Metadata issue, do you want to try again? y/n (default n) '
+    echo -n 'Metadata issue, do you want to try again? y/n (default n) Create suite at "foo"? y/n (default n) '
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
