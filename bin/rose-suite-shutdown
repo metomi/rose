@@ -21,7 +21,7 @@
 #     rose suite-shutdown
 #
 # SYNOPSIS
-#     rose suite-shutdown [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS ...]
+#     rose suite-shutdown [OPTIONS] [--name=SUITE-NAME] [[--] EXTRA-ARGS ...]
 #
 # DESCRIPTION
 #     Shutdown a running suite.
