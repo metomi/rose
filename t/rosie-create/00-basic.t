@@ -94,7 +94,7 @@ title=
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 __INFO__
 {
     echo -n 'Create suite at "foo"? y/n (default n) '
@@ -125,7 +125,7 @@ title=
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 __INFO__
 {
     echo -n 'Create suite at "foo"? y/n (default n) '
@@ -158,7 +158,7 @@ title=
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 __INFO__
 echo -n 'Create suite at "bar"? y/n (default n) ' >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -180,7 +180,7 @@ title=
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 __INFO__
 {
     echo -n 'Create suite at "foo"? y/n (default n) '
@@ -198,14 +198,15 @@ title=divide and conquer 2
 __INFO__
 run_pass "$TEST_KEY" rosie create foo-aa002 <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+description=Copy of foo-aa002/trunk@3
 owner=fred
 project=don't fail please
-title=Copy of foo-aa002/trunk@3: this should never ever fail
+title=this should never ever fail
 
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 __INFO__
 {
     echo -n 'Copy "foo-aa002/trunk@3"? y/n (default n) '
@@ -229,14 +230,15 @@ title=divide and conquer 4
 __INFO__
 run_pass "$TEST_KEY" rosie create foo-aa002/trunk@HEAD <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+description=Copy of foo-aa002/trunk@3
 owner=fred
 project=don't fail please
-title=Copy of foo-aa002/trunk@3: this should never ever fail
+title=this should never ever fail
 
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 __INFO__
 {
     echo -n 'Copy "foo-aa002/trunk@3"? y/n (default n) '
@@ -271,14 +273,15 @@ title=divide and conquer
 __INFO__
 run_pass "$TEST_KEY" rosie create foo-aa001 <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+description=Copy of foo-aa001/trunk@6
 owner=fred
 project=don't fail
-title=Copy of foo-aa001/trunk@6: this should never fail
+title=this should never fail
 
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 __INFO__
 {
     echo -n 'Copy "foo-aa001/trunk@6"? y/n (default n) '
@@ -312,14 +315,15 @@ title=divide and conquer 3
 __INFO__
 run_pass "$TEST_KEY" rosie create foo-aa001/trunk@HEAD <<<y
 file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+description=Copy of foo-aa001/trunk@8
 owner=fred
 project=don't fail
-title=Copy of foo-aa001/trunk@8: this should never fail
+title=this should never fail
 
 # Make changes ABOVE these lines.
 # The "owner", "project" and "title" fields are compulsory.
 # Any KEY=VALUE pairs can be added. Known fields include:
-# "access-list", "description", "sub-project", and "issue-list".
+# "access-list", "description" and "sub-project".
 __INFO__
 {
     echo -n 'Copy "foo-aa001/trunk@8"? y/n (default n) '

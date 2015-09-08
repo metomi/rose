@@ -51,9 +51,9 @@ CONFIG_OPT_META_PATH = "meta-path"
 CONFIG_OPT_META_TYPE = "meta"
 CONFIG_OPT_OWNER = "owner"
 CONFIG_OPT_PROJECT = "project"
-INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=issue-list",
-                                "=owner", "=project", "=sub-project",
-                                "=title",]
+INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=owner",
+                                "=project", "=sub-project", "=title",
+                                "=type",]
 SUB_CONFIG_DEFAULT_META_IDS = ["=file-install-root", "=meta", "=mode",
                                "=opts", "command", "file:", "poll"]
 TOP_CONFIG_DEFAULT_META_IDS = [
@@ -72,6 +72,7 @@ CONFIG_SETTING_INDEX_DEFAULT = "1"
 META_DIR_MACRO = "macros"
 META_DIR_WIDGET = "widget"
 META_PROP_COMPULSORY = "compulsory"
+META_PROP_COPY_MODE = "copy-mode"
 META_PROP_DESCRIPTION = "description"
 META_PROP_DUPLICATE = "duplicate"
 META_PROP_FAIL_IF = "fail-if"
@@ -91,6 +92,10 @@ META_PROP_VALUE_TITLES = "value-titles"
 META_PROP_VALUE_HINTS = "value-hints"
 META_PROP_WARN_IF = "warn-if"
 META_PROP_WIDGET = "widget"
+
+# Value used to denote copy mode never or clear for a metadata setting.
+COPY_MODE_NEVER = "never" 
+COPY_MODE_CLEAR = "clear"
 
 # Value used to denote "on" for a metadata setting.
 META_PROP_VALUE_TRUE = "true"

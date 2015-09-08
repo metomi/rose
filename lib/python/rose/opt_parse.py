@@ -451,6 +451,10 @@ class RoseOptionParser(OptionParser):
              "default": False,
              "dest": "profile_mode",
              "help": "Switch on profiling."}],
+        "project": [
+            ["--project"],
+            {"metavar": "PROJECT",
+             "help": "Create using project metadata."}],
         "property": [
             ["--property", "-p"],
             {"action": "append",

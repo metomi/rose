@@ -369,8 +369,8 @@ class MacroReport(object):
 
     def __repr__(self):
         id = get_id_from_section_option(self.section, self.option)
-        return ("<MacroReport section=%s option=%s value=%s info=%s " +
-                "is_warning=%s>" % (
+        return (("<MacroReport section=%s option=%s value=%s info=%s " +
+                 "is_warning=%s>") % (
                     self.section, self.option, self.value, self.info,
                     self.is_warning))
 
