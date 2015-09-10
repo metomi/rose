@@ -401,7 +401,7 @@ class Root(object):
                 cherrypy.response.headers["Content-Type"] = mime
                 return cherrypy.lib.static.serve_file(f_name, mime)
             s = open(f_name).read()
-        if mode == "text":
+        if mode is None:
             s = jinja2.escape(s)
         try:
             lines = [unicode(line) for line in s.splitlines()]
