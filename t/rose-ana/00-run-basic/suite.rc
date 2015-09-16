@@ -4,6 +4,7 @@ UTC mode=True
     [[event hooks]]
         timeout handler=rose suite-hook --shutdown
         timeout=PT30S
+        abort on timeout=False
 
 [scheduling]
     [[dependencies]]
