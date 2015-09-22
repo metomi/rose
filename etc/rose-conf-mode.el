@@ -23,11 +23,12 @@
 ;; = Instructions =
 ;;    Place this file in a directory on your emacs load path (or symlink it)
 ;;    e.g.
-;;         ln -s $ROSE_HOME/etc/rose-conf-mode.el ~/.emacs.d/
+;;         mkdir -p ~/.emacs.d/lisp
+;;         ln -s $ROSE_HOME/etc/rose-conf-mode.el ~/.emacs.d/lisp/
 ;;
 ;;    and in your .emacs file:
 ;;
-;;         (add-to-list 'load-path "~/.emacs.d/")
+;;         (add-to-list 'load-path "~/.emacs.d/lisp/")
 ;;         (require 'rose-conf-mode)
 ;;
 ;;    This mode introduces one non-standard face, for the ignored
@@ -103,6 +104,7 @@
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("rose-.*.conf" . rose-conf-mode))
+(add-to-list 'auto-mode-alist '("rose-suite\\.info\\'" . rose-conf-mode))
 
 (provide 'rose-conf-mode)
 
