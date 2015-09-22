@@ -112,13 +112,13 @@ class ConfigTreeLoader(object):
             conf_dir, self._get_base_names, conf_name, conf_dir_paths,
             opt_keys, used_keys, nodes)
 
-        if opt_keys:
-            bad_keys = []
-            for opt_key in opt_keys:
-                if opt_key not in used_keys:
-                    bad_keys.append(opt_key)
-            if bad_keys:
-                raise BadOptionalConfigurationKeysError(bad_keys)
+        bad_keys = []
+        for opt_key in opt_keys:
+            if (opt_key not in used_keys and
+                    not self.node_loader.can_miss_opt_conf_key(opt_key)):
+                bad_keys.append(opt_key)
+        if bad_keys:
+            raise BadOptionalConfigurationKeysError(bad_keys)
 
         if conf_node is None:
             conf_tree.node = ConfigNode()
