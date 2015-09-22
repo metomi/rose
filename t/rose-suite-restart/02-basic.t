@@ -38,7 +38,7 @@ file_grep "${TEST_KEY}.out.1" \
     "${TEST_KEY}.out"
 # N.B. This relies on output from "cylc restart"
 file_grep "${TEST_KEY}.out.2" \
-    "\\[INFO\\] cylc job-submit ${SUITE_RUN_DIR}/log/job/1/t2/01/job" \
+    "\\[INFO\\] cylc jobs-submit --debug -- ${SUITE_RUN_DIR}/log/job 1/t2/01" \
     "${TEST_KEY}.out"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" '/dev/null'
 #-------------------------------------------------------------------------------
