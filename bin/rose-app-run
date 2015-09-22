@@ -57,9 +57,11 @@
 #         works with the --config=DIR option and if $PWD is not DIR.
 #     --no-overwrite
 #         Do not overwrite existing files.
-#     --opt-conf-key=KEY, -O KEY
+#     --opt-conf-key=KEY, -O KEY, --opt-conf-key='(KEY)', -O '(KEY)'
 #         Each of these switches on an optional configuration identified by KEY.
-#         The configurations are applied first-to-last.
+#         The configurations are applied first-to-last. The '(KEY)' syntax
+#         denotes an optional configuration that can be missing. Otherwise, the
+#         optional configuration must exist.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v
