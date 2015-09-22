@@ -65,6 +65,7 @@ class RosieWSClient(object):
 
     """A client for the Rosie web service."""
 
+    MAX_LOCAL_QUERIES = 64
     POLL_DELAY = 0.1
     REMOVABLE_PARAMS = ["all_revs=0", "format=json"]
 
@@ -293,25 +294,39 @@ class RosieWSClient(object):
         if not suite_ids:
             return []
 
-        q_list = []
-        for suite_id in suite_ids:
-            q_list.append("or ( idx eq %s" % suite_id.idx)
-            q_list.append("and branch eq %s )" % suite_id.branch)
+        # Simple query
         results = []
-        for data, _ in self.query(q_list):
-            results.extend(data)
+        queued_suite_ids = list(suite_ids)
+        while queued_suite_ids:  # Batch up queries
+            q_list = []
+            for _ in range(self.MAX_LOCAL_QUERIES):
+                if not queued_suite_ids:
+                    break
+                suite_id = queued_suite_ids.pop()
+                q_list.append("or ( idx eq %s" % suite_id.idx)
+                q_list.append("and branch eq %s )" % suite_id.branch)
+            for data, _ in self.query(q_list):
+                results.extend(data)
         result_idx_branches = []
         for result in results:
             result_idx_branches.append((result[u"idx"], result[u"branch"]))
-        q_list = []
+
+        # A branch may have been deleted - query with all_revs=1.
+        # We only want to use all_revs on demand as it's slow.
+        queued_suite_ids = []
         for suite_id in suite_ids:
-            if (suite_id.idx, suite_id.branch) in result_idx_branches:
-                continue
-                # A branch may have been deleted - we need all_revs=1.
-                # We only want to use all_revs on demand as it's slow.
-            q_list.append("or ( idx eq %s" % suite_id.idx)
-            q_list.append("and branch eq %s )" % suite_id.branch)
-        if q_list:
+            if (suite_id.idx, suite_id.branch) not in result_idx_branches:
+                queued_suite_ids.append(suite_id)
+        if not queued_suite_ids:
+            return results
+        while queued_suite_ids:  # Batch up queries
+            q_list = []
+            for _ in range(self.MAX_LOCAL_QUERIES):
+                if not queued_suite_ids:
+                    break
+                suite_id = queued_suite_ids.pop()
+                q_list.append("or ( idx eq %s" % suite_id.idx)
+                q_list.append("and branch eq %s )" % suite_id.branch)
             more_results = []
             for data, _ in self.query(q_list, all_revs=1):
                 more_results.extend(data)

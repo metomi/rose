@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Basic tests for "rosie lookup".
+# Basic tests for "rosie ls", with 2 repositories.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
@@ -141,8 +141,6 @@ done
 if ! port_is_busy "${PORT}"; then
     exit 1
 fi
-
-set +x
 
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}"
