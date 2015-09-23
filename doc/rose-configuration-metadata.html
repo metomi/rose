@@ -831,6 +831,31 @@ main             beef      spaghetti   coq au vin       lamb
 petits_fours    .false.     .true.       .false.       .true.
 </pre>
       </dd>
+      <dt id="meta.conf.behaviour.copy-mode">copy-mode (metadata useage with
+      the rose-suite.info file)</dt>
+
+      <dd>
+        <p>Setting copy-mode in the metadata allows for the field to be
+           either "never" copied or copied with any value associated 
+           to be "clear".</p>
+
+        <p>For example: in a rose-suite.info file</p>
+        <pre class="prettyprint lang-rose_conf">
+[ensemble members]
+copy-mode=never
+</pre>
+        <p>The setting the <var>ensemble members</var> field to include
+        <var>copy-mode=never</var> means that the ensemble members field would
+        never be copied.</p>
+        <pre class="prettyprint lang-rose_conf">
+[additional info]
+copy-mode=clear
+</pre>
+        <p>The setting the <var>additional info</var> field to include
+        <var>copy-mode=never</var> means that the additional info field
+        would be copied, but any value associated with it would be cleared.</p>
+
+      </dd>
     </dl>
 
     <h3 id="meta.conf.help">Metadata for Help</h3>
