@@ -5,6 +5,27 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-09-??)
+
+Rose release 30. This release will work best with
+[cylc-6.6.1](https://github.com/cylc/cylc/releases/tag/6.6.1) and
+[fcm-2015.08.0](https://github.com/metomi/fcm/releases/tag/2015.08.0).
+
+### Highlighted Changes
+
+[#1633](https://github.com/metomi/rose/pull/1633):
+rosie create and rosie copy: improve checking and generation of settings in
+`rose-suite.info`:
+* Settings can now be validated on known `project` values.
+* New setting `copy-mode=never|clear` allows a more intelligent selection of
+  settings on suite copy.
+
+### Noteworthy Changes
+
+Various bug fixes and documentation updates.
+
+--------------------------------------------------------------------------------
+
 ## 2015.08.0 (2015-08-19)
 
 Rose release 29. This release works best with
