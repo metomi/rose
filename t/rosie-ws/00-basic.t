@@ -24,17 +24,6 @@ if ! python -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all 'python: cherrypy or sqlalchemy not installed'
 fi
 #-------------------------------------------------------------------------------
-ROSA_WS_PID=
-function finally() {
-    FINALLY $S
-    if [[ -n $ROSA_WS_PID ]]; then
-        kill $ROSA_WS_PID 1>/dev/null 2>&1 || true
-    fi
-}
-for S in $SIGNALS; do
-    trap "finally $S" $S
-done
-#-------------------------------------------------------------------------------
 tests 21
 #-------------------------------------------------------------------------------
 mkdir svn
@@ -53,16 +42,13 @@ repos.foo=$PWD/svn/foo
 local-copy-root=$PWD/roses
 prefix-default=foo
 prefix-location.foo=$SVN_URL
-
-[rosie-ws]
-log-dir=$PWD/rosie/log
-port=$PORT
 __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD
 $ROSE_HOME/sbin/rosa db-create -q
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-rosa-ws
-$ROSE_HOME/sbin/rosa ws 0</dev/null 1>rosa-ws.out 2>rosa-ws.err &
+"${ROSE_HOME}/sbin/rosa" 'ws' 'start' "${PORT}" \
+    0<'/dev/null' 1>'rosa-ws.out' 2>'rosa-ws.err' &
 ROSA_WS_PID=$!
 T_INIT=$(date +%s)
 while ! port_is_busy $PORT && (($(date +%s) < T_INIT + 60)); do
@@ -235,4 +221,6 @@ sys.exit(len(d) != len(expected_d) or
          d[1]["revision"] != expected_d[1]["revision"])
 __PYTHON__
 #-------------------------------------------------------------------------------
+kill "${ROSA_WS_PID}"
+wait 2>'/dev/null'
 exit 0

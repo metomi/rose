@@ -28,13 +28,9 @@ import os
 import pwd
 import shlex
 import simplejson
-import signal
 import socket
-import sys
 import rose.config
 from rose.host_select import HostSelector
-from rose.opt_parse import RoseOptionParser
-from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import tarfile
@@ -44,30 +40,32 @@ import traceback
 import urllib
 
 
-UTIL = "bush"
-ROSE_UTIL = "rose-bush"
-LOG_ROOT = os.path.expanduser("~/.metomi/" + ROSE_UTIL)
-LOG_STATUS = LOG_ROOT + ".status"
 MIME_TEXT_PLAIN = "text/plain"
 
 
-class Root(object):
+class RoseBushService(object):
 
     """Serves the index page."""
 
+    NS = "rose"
+    UTIL = "bush"
     CYCLES_PER_PAGE = 100
     JOBS_PER_PAGE = 15
     JOBS_PER_PAGE_MAX = 300
     VIEW_SIZE_MAX = 10 * 1024 * 1024 # 10MB
 
-    def __init__(self, template_env):
+    def __init__(self, *args, **kwargs):
         self.exposed = True
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
-        self.template_env = template_env
         self.host_name = HostSelector().get_local_host()
         if self.host_name and "." in self.host_name:
             self.host_name = self.host_name.split(".", 1)[0]
         self.rose_version = ResourceLocator.default().get_version()
+        res_loc = ResourceLocator.default()
+        template_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
+            ResourceLocator.default().get_util_home(
+                "lib", "html", "template", "rose-bush")))
+        self.template_env = template_env
 
     @cherrypy.expose
     def index(self):
@@ -533,121 +531,9 @@ class Root(object):
                 cmp(a["name"], b["name"]))
 
 
-def _handle_error():
-    """Handle an error occurring during a request in cherrypy."""
-    cherrypy.response.status = 500
-    print cherrypy._cperror.format_exc()
-
-def main():
-    """Start quick server."""
-    opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("non_interactive")
-    opts, args = opt_parser.parse_args()
-    arg = None
-    if sys.argv[1:]:
-        arg = sys.argv[1]
-    if arg == "start":
-        port = None
-        if sys.argv[2:]:
-            port = sys.argv[2]
-        start(is_main=True, port=port)
-    else:
-        report = Reporter(opts.verbosity - opts.quietness)
-        status = rose_bush_quick_server_status()
-        level = Reporter.DEFAULT
-        if arg != "stop":
-           level = 0
-        for k, v in sorted(status.items()):
-            report("%s=%s\n" % (k, v), level=level)
-        if (arg == "stop" and status.get("pid") and
-            (opts.non_interactive or
-             raw_input("Stop server? y/n (default=n)") == "y")):
-            os.killpg(int(status["pid"]), signal.SIGTERM)
-            # TODO: should check whether it is killed or not
-
-
-def start(is_main=False, port=None):
-    """Create the server.
-
-    If is_main, invoke cherrypy.quickstart.
-    Otherwise, return a cherrypy.Application instance.
-
-    """
-    # Environment variables (not normally defined in WSGI mode)
-    if os.getenv("ROSE_HOME") is None:
-        path = os.path.abspath(__file__)
-        while os.path.dirname(path) != path: # not root
-            if os.path.basename(path) == "lib":
-                os.environ["ROSE_HOME"] = os.path.dirname(path)
-                break
-            path = os.path.dirname(path)
-    for k, v in [("ROSE_NS", "rose"), ("ROSE_UTIL", "bush")]:
-        if os.getenv(k) is None:
-            os.environ[k] = v
-
-    # Configuration for HTML library
-    rose_home = os.getenv("ROSE_HOME")
-    html_lib = os.path.join(rose_home, "lib/html")
-    icon_path = os.path.join(rose_home, "etc/images/rose-icon-trim.png")
-    css_path = os.path.join(html_lib, ROSE_UTIL, "rose-bush.css")
-    js_path = os.path.join(html_lib, ROSE_UTIL, "rose-bush.js")
-    config = {"/etc": {
-                    "tools.staticdir.dir": os.path.join(html_lib, "external"),
-                    "tools.staticdir.on": True},
-              "/favicon.ico": {
-                    "tools.staticfile.filename": icon_path,
-                    "tools.staticfile.on": True},
-              "/rose-bush.css": {
-                    "tools.staticfile.filename": css_path,
-                    "tools.staticfile.on": True},
-              "/rose-bush.js": {
-                    "tools.staticfile.filename": js_path,
-                    "tools.staticfile.on": True}}
-    tmpl_loader = jinja2.FileSystemLoader(os.path.join(html_lib, ROSE_UTIL))
-    root = Root(jinja2.Environment(loader=tmpl_loader))
-
-    # Start server or return WSGI application
-    cherrypy.config["tools.encode.on"] = True
-    cherrypy.config["tools.encode.encoding"] = "utf-8"
-    if is_main:
-        # Quick server
-        if not os.path.isdir(os.path.dirname(LOG_ROOT)):
-            os.makedirs(os.path.dirname(LOG_ROOT))
-        cherrypy.config["log.access_file"] = LOG_ROOT + "-access.log"
-        open(cherrypy.config["log.access_file"], "w").close()
-        cherrypy.config["log.error_file"] = LOG_ROOT + "-error.log"
-        open(cherrypy.config["log.error_file"], "w").close()
-        cherrypy.config["request.error_response"] = _handle_error
-        config["global"] = {"server.socket_host": "0.0.0.0"}
-        if port:
-            config["global"] = {"server.socket_port": int(port)}
-        f = open(LOG_STATUS, "w")
-        f.write("host=%s\n" % cherrypy.server.socket_host)
-        f.write("port=%d\n" % cherrypy.server.socket_port)
-        f.write("pid=%d\n" % os.getpid())
-        f.close()
-        try:
-            return cherrypy.quickstart(root, "/", config=config)
-        finally:
-            os.unlink(LOG_STATUS)
-    else:
-        # WSGI server
-        return cherrypy.Application(root, script_name=None, config=config)
-
-
-def rose_bush_quick_server_status():
-    ret = {}
-    try:
-        for line in open(LOG_STATUS):
-            k, v = line.strip().split("=", 1)
-            ret[k] = v
-    except:
-        pass
-    return ret
-
-
 if __name__ == "__main__":
-    main()
+    from rose.ws import ws_cli
+    ws_cli(RoseBushService)
 else:
-    # WSGI server
-    application = start()
+    from rose.ws import wsgi_app
+    application = wsgi_app(RoseBushService)

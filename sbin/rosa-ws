@@ -22,8 +22,12 @@
 #
 # SYNOPSIS
 #     rosa ws
+#     rosa ws start [PORT] # start ad-hoc web service server (on PORT)
+#     rosa ws stop         # stop ad-hoc web service server
 #
 # DESCRIPTION
-#     Launch the Rosie web service.
+#     Start/stop ad-hoc Rosie suite discovery web service server.
+#
+#     For "rosa ws start", if PORT is not specified, use port 8080.
 #-------------------------------------------------------------------------------
 exec python -m rosie.ws "$@"
