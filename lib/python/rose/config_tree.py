@@ -115,7 +115,8 @@ class ConfigTreeLoader(object):
         if opt_keys:
             bad_keys = []
             for opt_key in opt_keys:
-                if opt_key not in used_keys:
+                if (opt_key not in used_keys and
+                        not self.node_loader.can_miss_opt_conf_key(opt_key)):
                     bad_keys.append(opt_key)
             if bad_keys:
                 raise BadOptionalConfigurationKeysError(bad_keys)
