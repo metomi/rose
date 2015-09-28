@@ -579,6 +579,14 @@ class ConfigLoader(object):
             + char_assign
             + r"\s*(?P<value>.*)$")
 
+    @staticmethod
+    def can_miss_opt_conf_key(key):
+        """Return KEY if key is a string like "(KEY)", None otherwise."""
+        if key.startswith("(") and key.endswith(")"):
+            return key[1:-1]
+        else:
+            return
+
     def load_with_opts(self, source, node=None, more_keys=None,
                        used_keys=None, return_config_map=False):
         """Read a source configuration file with optional configurations.
@@ -623,17 +631,18 @@ class ConfigLoader(object):
         source_dir = os.path.dirname(source)
         source_root, source_ext = os.path.splitext(os.path.basename(source))
         for opt_conf_key in opt_conf_keys:
-            key = opt_conf_key
-            is_optional = (key.startswith("(") and key.endswith(")"))
-            if is_optional:
-                key = opt_conf_key[1:-1]
+            can_miss_opt_conf_key = self.can_miss_opt_conf_key(opt_conf_key)
+            if can_miss_opt_conf_key:
+                key = can_miss_opt_conf_key
+            else:
+                key = opt_conf_key
             opt_conf_file_name_base = source_root + "-" + key + source_ext
             opt_conf_file_name = os.path.join(
                 source_dir, OPT_CONFIG_DIR, opt_conf_file_name_base)
             try:
                 self.load(opt_conf_file_name, node)
             except IOError:
-                if is_optional or (
+                if can_miss_opt_conf_key or (
                         used_keys is not None and opt_conf_key in more_keys):
                     continue
                 raise

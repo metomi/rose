@@ -89,6 +89,8 @@ compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 --no-overwrite
 --opt-conf-key=
 -O
+--opt-conf-key=
+-O
 --quiet
 -q
 --verbose
@@ -158,6 +160,8 @@ compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 --new
 -N
 --no-overwrite
+--opt-conf-key=
+-O
 --opt-conf-key=
 -O
 --quiet
