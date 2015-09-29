@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Basic tests for "rosie.ws".
+# Basic tests for "rosie disco".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 if ! python -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
