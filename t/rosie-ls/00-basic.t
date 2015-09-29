@@ -129,8 +129,8 @@ cat >'conf/opt/rose-port.conf' <<__ROSE_CONF__
 prefix-ws.bar=http://${HOSTNAME}:${PORT}/bar
 prefix-ws.foo=http://${HOSTNAME}:${PORT}/foo
 __ROSE_CONF__
-"${ROSE_HOME}/sbin/rosa" 'ws' 'start' "${PORT}" \
-    0<'/dev/null' 1>'rosa-ws.out' 2>'rosa-ws.err' &
+rosie disco 'start' "${PORT}" \
+    0<'/dev/null' 1>'rosie-disco.out' 2>'rosie-disco.err' &
 ROSA_WS_PID="${!}"
 T_INIT="$(date +%s)"
 while ! port_is_busy "${PORT}" && (($(date +%s) < T_INIT + 60)); do

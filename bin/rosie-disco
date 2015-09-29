@@ -18,18 +18,16 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 # NAME
-#     rosa ws
+#     rosie disco
 #
 # SYNOPSIS
-#     rosa ws
-#     rosa ws start [PORT] # start ad-hoc web service server (on PORT)
-#     rosa ws stop         # stop ad-hoc web service server
+#     rosie disco
+#     rosie disco start [PORT] # start ad-hoc web service server (on PORT)
+#     rosie disco stop         # stop ad-hoc web service server
 #
 # DESCRIPTION
 #     Start/stop ad-hoc Rosie suite discovery web service server.
 #
-#     For "rosa ws start", if PORT is not specified, use port 8080.
-#
-#     This command is deprecated. Use "rosie disco" instead.
+#     For "rosie disco start", if PORT is not specified, use port 8080.
 #-------------------------------------------------------------------------------
 exec python -m rosie.ws "$@"

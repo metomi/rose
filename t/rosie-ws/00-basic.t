@@ -46,9 +46,9 @@ __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD
 $ROSE_HOME/sbin/rosa db-create -q
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-rosa-ws
-"${ROSE_HOME}/sbin/rosa" 'ws' 'start' "${PORT}" \
-    0<'/dev/null' 1>'rosa-ws.out' 2>'rosa-ws.err' &
+TEST_KEY=$TEST_KEY_BASE-rosie-disco
+rosie disco 'start' "${PORT}" \
+    0<'/dev/null' 1>'rosie-disco.out' 2>'rosie-disco.err' &
 ROSA_WS_PID=$!
 T_INIT=$(date +%s)
 while ! port_is_busy $PORT && (($(date +%s) < T_INIT + 60)); do
