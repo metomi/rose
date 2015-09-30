@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose_arch" built-in application, archive command STDOUT.
+# Test "rose_arch" built-in application, archive with optional sources.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 
 #-------------------------------------------------------------------------------
-tests 2
+tests 4
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export CYLC_CONF_PATH=
@@ -33,20 +33,23 @@ NAME="$(basename "${SUITE_RUN_DIR}")"
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host=localhost -- --debug
 #-------------------------------------------------------------------------------
-FOO_UUID=$(<"${SUITE_RUN_DIR}/foo-uuid")
-grep -F "${FOO_UUID}" "${SUITE_RUN_DIR}/log/job/1/archive/NN/job.out" \
-    >"${TEST_KEY_BASE}.out"
-# This ensures that the STDOUT of the "foo" command is only printed out once.
-file_cmp "${TEST_KEY_BASE}.out" "${TEST_KEY_BASE}.out" <<__OUT__
-[INFO] ${FOO_UUID} share/namelist/x.nl ${SUITE_RUN_DIR}/share/backup/x.nl
-__OUT__
-# This tests that the "foo" command has done what it is asked to do.
-file_cmp "${TEST_KEY_BASE}.content" \
-    "${SUITE_RUN_DIR}/share/backup/x.nl" <<'__NL__'
-&x
-MMXIV=2014,
-/
-__NL__
+TEST_KEY="${TEST_KEY_BASE}-job.status"
+file_grep "${TEST_KEY}-archive1-01" \
+    'CYLC_JOB_EXIT=SUCCEEDED' \
+    "${SUITE_RUN_DIR}/log/job/1/archive1/01/job.status"
+file_grep "${TEST_KEY}-archive2-01" \
+    'CYLC_JOB_EXIT=ERR' \
+    "${SUITE_RUN_DIR}/log/job/1/archive2/01/job.status"
+file_grep "${TEST_KEY}-archive2-02" \
+    'CYLC_JOB_EXIT=SUCCEEDED' \
+    "${SUITE_RUN_DIR}/log/job/1/archive2/02/job.status"
+TEST_KEY="${TEST_KEY_BASE}-find"
+(cd "${SUITE_RUN_DIR}/share/backup" && find -type f) | sort >"${TEST_KEY}.out"
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<'__FIND__'
+./archive1.d/2014.txt
+./archive1.d/2016.txt
+./archive2.d/2015.txt
+__FIND__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
 exit 0
