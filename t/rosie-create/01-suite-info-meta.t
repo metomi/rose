@@ -17,26 +17,22 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Copy tests for "rosie create".
+# Test "rosie create" with configuration metadata for "rose-suite.info".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 11
+tests 14
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
-cat >rose.conf <<__ROSE_CONF__
-opts=(access)
-
-[external]
-editor=$TEST_SOURCE_DIR/$TEST_KEY_BASE-edit
+cat >'rose.conf' <<__ROSE_CONF__
+opts=(editor)
 
 [rosie-id]
 local-copy-root=$PWD/roses
 prefix-default=foo
 prefix-username.foo=$USER
 prefix-location.foo=$URL
-prefix-location.bar=https://my-host/bar
 __ROSE_CONF__
 mkdir 'opt'
 export ROSE_CONF_PATH=$PWD
@@ -71,9 +67,8 @@ unknown=I am an unknow field but do include me
 # Any KEY=VALUE pairs can be added. Known fields include:
 # "access-list", "description" and "sub-project".
 __INFO__
-run_pass "$TEST_KEY" rosie create --info-file=rose-suite.info <<<y
+run_pass "$TEST_KEY" rosie create -y --info-file='rose-suite.info'
 {
-    echo -n 'Create suite at "foo"? y/n (default n) '
     echo "[INFO] foo-aa000: created at $URL/a/a/0/0/0"
     echo "[INFO] create: $PWD/roses"
     echo "[INFO] foo-aa000: local copy created at $PWD/roses/foo-aa000"
@@ -83,11 +78,10 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-info-copy-mode
 export ROSE_META_PATH=$PWD/rose-meta
-run_pass "$TEST_KEY" rosie create foo-aa000 <<<y
+run_pass "$TEST_KEY" rosie create -y 'foo-aa000'
 {
-    echo -n 'Copy "foo-aa000/trunk@1"? y/n (default n) '
     echo "[INFO] foo-aa001: created at $URL/a/a/0/0/1"
-    echo "[INFO] foo-aa001: copied items from foo-aa000"
+    echo "[INFO] foo-aa001: copied items from foo-aa000/trunk@1"
     echo "[INFO] foo-aa001: local copy created at $PWD/roses/foo-aa001"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -106,7 +100,7 @@ unknown=I am an unknow field but do include me
 __INFO__
 file_cmp "$TEST_KEY_BASE-info-copy-mode.out" "$TEST_KEY_BASE-info-copy-mode.out" "$TEST_KEY-copy-mode-edit.out" 
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-info-copy-meta-pass
+TEST_KEY="${TEST_KEY_BASE}-info-copy-meta-try-0"
 export ROSE_META_PATH=$PWD/rose-meta
 cat >"rose-suite.info" <<__INFO__
 access-list=*
@@ -123,14 +117,59 @@ type=success
 # Any KEY=VALUE pairs can be added. Known fields include:
 # "access-list", "description" and "sub-project".
 __INFO__
-run_fail "$TEST_KEY" rosie create --info-file=rose-suite.info <<<y
+run_fail "$TEST_KEY" rosie create --info-file='rose-suite.info' <<<'n'
 {
-    echo -n 'Metadata issue, do you want to try again? y/n (default n) Create suite at "foo"? y/n (default n) '
+    echo -n 'rose-suite.info has invalid settings. Try again? [y or n (default)] '
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-rose.macro.DefaultValidators: issues: 1
-    =sub-project=failure is not an option
-        failed because: 'hello' not in this
+[FAIL] rose-suite.info: issues: 1
+[FAIL]     =sub-project=failure is not an option
+[FAIL]         failed because: 'hello' not in this
 __ERROR__
-exit 0
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-info-copy-meta-try-2"
+export ROSE_META_PATH=$PWD/rose-meta
+cat >'opt/rose-editor.conf' <<__ROSE_CONF__
+[external]
+editor=sed -ci -e 's/^sub-project=greet.*$/sub-project=hello/' -e 's/^sub-project=failure.*$/sub-project=greet/'
+__ROSE_CONF__
+cat >'rose-suite.info' <<__INFO__
+access-list=*
+description=not a fail
+owner=$USER
+period=Forever
+project=dont-fail
+sub-project=failure is not an option
+title=this should never fail
+type=success
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description" and "sub-project".
+__INFO__
+# "yes" command does not work here, because we cannot use a pipe
+for I in $(seq 1 3); do
+    echo 'y'
+done >'yes-file'
+run_pass "$TEST_KEY" rosie create --info-file='rose-suite.info' <'yes-file'
+{
+    echo -n 'rose-suite.info has invalid settings. Try again? [y or n (default)] '
+    echo -n 'rose-suite.info has invalid settings. Try again? [y or n (default)] '
+    echo -n 'Create suite as "foo-?????"? [y or n (default)] '
+    echo "[INFO] foo-aa002: created at ${URL}/a/a/0/0/2"
+    echo "[INFO] foo-aa002: local copy created at $PWD/roses/foo-aa002"
+}>"$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+[FAIL] rose-suite.info: issues: 1
+[FAIL]     =sub-project=failure is not an option
+[FAIL]         failed because: 'hello' not in this
+[FAIL] rose-suite.info: issues: 1
+[FAIL]     =sub-project=greet
+[FAIL]         failed because: 'hello' not in this
+__ERROR__
+rm 'opt/rose-editor.conf'
+#-------------------------------------------------------------------------------
+exit
