@@ -81,11 +81,9 @@ done
 cat >'conf/opt/rose-port.conf' <<__ROSE_CONF__
 [rosie-id]
 prefix-ws.foo=http://${HOSTNAME}:${PORT}/foo
-
-[rosie-ws]
-port=${PORT}
 __ROSE_CONF__
-"${ROSE_HOME}/sbin/rosa" ws 0<'/dev/null' 1>'rosa-ws.out' 2>'rosa-ws.err' &
+rosie disco 'start' "${PORT}" \
+    0<'/dev/null' 1>'rosie-disco.out' 2>'rosie-disco.err' &
 ROSA_WS_PID="${!}"
 T_INIT="$(date +%s)"
 while ! port_is_busy "${PORT}" && (($(date +%s) < T_INIT + 60)); do
@@ -111,5 +109,5 @@ file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <"${TEST_KEY}.out.expected"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
-wait
+wait 2>'/dev/null'
 exit

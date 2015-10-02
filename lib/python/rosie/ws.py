@@ -17,49 +17,58 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Web server frontend for a database, using a JSON API.
+"""Rosie discovery service.
 
 Classes:
-    Root - represents the root web page.
-    PrefixRoot - represents the interface page for a given prefix.
-
-Functions:
-    main - setup the server.
+    RosieDiscoServiceRoot - discovery service root web page.
+    RosieDiscoService - discovery service for a given prefix.
 
 """
 
 import cherrypy
 import jinja2
-import os
 import simplejson
-from rose.env import env_var_process
 from rose.resource import ResourceLocator
 import rosie.db
 from rosie.suite_id import SuiteId
 
 
-class Root(object):
+class RosieDiscoServiceRoot(object):
 
-    """Serves the index page."""
+    """Serves the Rosie discovery service index page."""
 
-    def __init__(self, template_env, db_url_map):
+    NS = "rosie"
+    UTIL = "disco"
+
+    def __init__(self, *args, **kwargs):
         self.exposed = True
+        res_loc = ResourceLocator.default()
+        template_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
+            ResourceLocator.default().get_util_home(
+                "lib", "html", "template", "rosie-disco")))
         self.template_env = template_env
+        db_url_map = {}
+        rose_conf = ResourceLocator.default().get_conf()
+        for key, node in rose_conf.get(["rosie-db"]).value.items():
+            if key.startswith("db.") and key[3:]:
+                db_url_map[key[3:]] = node.value
         self.db_url_map = db_url_map
         if not self.db_url_map:
             self.db_url_map = {}
         for key, db_url in self.db_url_map.items():
-            setattr(self, key, PrefixRoot(self.template_env, key, db_url))
+            setattr(
+                self, key,
+                RosieDiscoService(self.template_env, key, db_url))
 
     @cherrypy.expose
     def index(self, *_):
         """Provide the root index page."""
         template = self.template_env.get_template("index.html")
-        return template.render(web_prefix=cherrypy.request.script_name,
+        return template.render(script=cherrypy.request.script_name,
                                keys=sorted(self.db_url_map.keys()))
 
 
-class PrefixRoot(object):
+class RosieDiscoService(object):
 
     """Serves the index page of the database of a given prefix."""
 
@@ -142,7 +151,7 @@ class PrefixRoot(object):
                 item["href"] = suite_id.to_web()
         template = self.template_env.get_template("prefix-index.html")
         return template.render(
-                        web_prefix=cherrypy.request.script_name,
+                        script=cherrypy.request.script_name,
                         prefix=self.prefix,
                         prefix_source_url=self.source_url,
                         known_keys=self.dao.get_known_keys(),
@@ -175,77 +184,9 @@ def _query_parse_string(q_str):
     return filt
 
 
-def _handle_error():
-    """Handle an error occurring during a request in cherrypy."""
-    cherrypy.response.status = 500
-    print cherrypy._cperror.format_exc()
-
-
-def start(is_main=False):
-    """Create the server.
-
-    If is_main, invoke cherrypy.quickstart.
-    Otherwise, return a cherrypy.Application instance.
-
-    """
-    # Environment variables (not normally defined in WSGI mode)
-    if os.getenv("ROSE_HOME") is None:
-        path = os.path.abspath(__file__)
-        while os.path.dirname(path) != path: # not root
-            if os.path.basename(path) == "lib":
-                os.environ["ROSE_HOME"] = os.path.dirname(path)
-                break
-            path = os.path.dirname(path)
-    for key, value in [("ROSE_NS", "rosa"), ("ROSE_UTIL", "ws")]:
-        if os.getenv(key) is None:
-            os.environ[key] = value
-
-    # CherryPy quick server configuration
-    rose_conf = ResourceLocator.default().get_conf()
-    if is_main and rose_conf.get_value(["rosie-ws", "log-dir"]) is not None:
-        log_dir_value = rose_conf.get_value(["rosie-ws", "log-dir"])
-        log_dir = env_var_process(os.path.expanduser(log_dir_value))
-        if not os.path.isdir(log_dir):
-            os.makedirs(log_dir)
-        log_file = os.path.join(log_dir, "server.log")
-        log_error_file = os.path.join(log_dir, "server.err.log")
-        cherrypy.config["log.error_file"] = log_error_file
-        cherrypy.config["log.access_file"] = log_file
-        cherrypy.config["request.error_response"] = _handle_error
-    cherrypy.config["log.screen"] = False
-    # Configuration for dynamic pages
-    db_url_map = {}
-    for key, node in rose_conf.get(["rosie-db"]).value.items():
-        if key.startswith("db.") and key[3:]:
-            db_url_map[key[3:]] = node.value
-    res_loc = ResourceLocator.default()
-    html_lib = res_loc.get_util_home("lib", "html")
-    icon_path = res_loc.locate("images/rosie-icon-trim.png")
-    tmpl_loader = jinja2.FileSystemLoader(os.path.join(html_lib, "rosie-ws"))
-    root = Root(jinja2.Environment(loader=tmpl_loader), db_url_map)
-
-    # Configuration for static pages
-    config = {"/etc": {
-                    "tools.staticdir.dir": os.path.join(html_lib, "external"),
-                    "tools.staticdir.on": True},
-              "/favicon.ico": {
-                    "tools.staticfile.on": True,
-                    "tools.staticfile.filename": icon_path}}
-    if is_main:
-        port = int(rose_conf.get_value(["rosie-ws", "port"], 8080))
-        config.update({"global": {"server.socket_host": "0.0.0.0",
-                                  "server.socket_port": port}})
-
-    # Start server or return WSGI application
-    if is_main:
-        return cherrypy.quickstart(root, "/", config=config)
-    else:
-        return cherrypy.Application(root, script_name=None, config=config)
-
-
 if __name__ == "__main__":
-    # Quick server
-    start(is_main=True)
+    from rose.ws import ws_cli
+    ws_cli(RosieDiscoServiceRoot)
 else:
-    # WSGI server
-    application = start()
+    from rose.ws import wsgi_app
+    application = wsgi_app(RosieDiscoServiceRoot)

@@ -218,6 +218,10 @@
 
       <dd>Delete suites.</dd>
 
+      <dt><a href="#rosie-disco">rosie disco</a></dt>
+
+      <dd>Start/stop ad-hoc Rosie Discovery web service server.</dd>
+
       <dt><a href="#rosie-go">rosie go</a></dt>
 
       <dd>Launch the Rosie client GTK+ GUI.</dd>
@@ -2871,6 +2875,35 @@ environment scripting = "eval $(rose task-env)"
 
       <dd>Increment verbosity.</dd>
     </dl>
+
+    <h2 id="rosie-disco">rosie disco</h2>
+
+    <h3>NAME</h3>
+
+    <p><kbd>rosie disco</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <dl>
+      <dt><kbd>rosie disco start [PORT]</kbd></dt>
+
+      <dd>Start ad-hoc web service server (on <var>PORT</var>)</dd>
+
+      <dt><kbd>rosie disco stop</kbd></dt>
+
+      <dd>Stop ad-hoc web service server</dd>
+
+      <dt><kbd>rosie disco</kbd></dt>
+
+      <dd>Print status of ad-hoc web service server</dd>
+    </dl>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Start/stop ad-hoc Rosie Discovery web service server.</p>
+
+    <p>For <code>rosie disco start</code>, if <var>PORT</var> is not specified,
+    use port 8080.</p>
 
     <h2 id="rosie-go">rosie go</h2>
 
