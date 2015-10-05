@@ -589,7 +589,11 @@ opt.jobs=8
       using quotes or backslashes, like in a shell.)  Paths, if not absolute
       (beginning with a <var>/</var>), are assumed to be relative to
       <var>$ROSE_SUITE_DIR</var> or to <var>$ROSE_SUITE_DIR/PREFIX</var> if
-      <kbd>source-prefix=PREFIX</kbd> is specified.</dd>
+      <kbd>source-prefix=PREFIX</kbd> is specified. If a name or glob is given
+      in a pair of brackets, e.g. <code>(hello-world.*)</code>, the source is
+      considered optional and will not cause a failure if it does not match any
+      source file names. However, a target that ends up with no matching source
+      file will be considered a failure.</dd>
 
       <dt><kbd>source-edit-format=FORMAT</kbd></dt>
 
@@ -647,6 +651,14 @@ source=hello/planet.out
 # Archive files matched by a glob to a directory
 [arch:worlds/]
 source=hello/worlds/*
+
+# Archive multiple files matched by globs or names to a directory
+[arch:worlds/]
+source=hello/worlds/* greeting/worlds/* hi/worlds/*
+
+# As above, but "greeting/worlds/*" may return an empty list
+[arch:worlds/]
+source=hello/worlds/* (greeting/worlds/*) hi/worlds/*
 
 # Auto tar-gzip
 [arch:galaxies.tar.gz]

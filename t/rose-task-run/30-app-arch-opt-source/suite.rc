@@ -1,0 +1,37 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[event hooks]]
+        timeout=PT1M
+        abort on timeout=True
+[scheduling]
+    [[dependencies]]
+        graph="""
+archive1
+archive2
+"""
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            succeeded handler=rose suite-hook
+            failed handler=rose suite-hook --shutdown
+            submission failed handler=rose suite-hook --shutdown
+            submission timeout handler=rose suite-hook
+            execution timeout handler=rose suite-hook
+            submission timeout=PT1M
+            execution timeout=PT1M
+    [[archive1]]
+        script="""
+echo 'MMXIV' >'2014.txt'
+echo 'MMXVI' >'2016.txt'
+rose task-run --debug
+"""
+    [[archive2]]
+        script="""
+if ((${CYLC_TASK_TRY_NUMBER} > 1)); then
+    echo 'MMXV' >'2015.txt'
+fi
+rose task-run --debug
+"""
+        retry delays = PT0S
