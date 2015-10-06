@@ -21,8 +21,14 @@
 
 
 import errno
-from hashlib import md5
+import hashlib
 import os
+
+from rose.resource import ResourceLocator
+
+
+_DEFAULT_DEFAULT_KEY = "md5"
+_DEFAULT_KEY = None
 
 
 def get_checksum(name, checksum_func=None):
@@ -72,32 +78,42 @@ def get_checksum(name, checksum_func=None):
 def get_checksum_func(key=None):
     """Return a checksum function suitable for get_checksum.
 
-    If key=="md5" or not specified, return function to do MD5 checksum.
-    if key=="mtime+size", return function generate a string that contains the
-    source name, its modified time and its size.
-    Otherwise, raise KeyError(key).
+    "key" can be "mtime+size" or the name of a hash object from hashlib.
+    If "key" is not specified, return function to do MD5 checksum.
+
+    Raise KeyError(key) if "key" is not a recognised hash object.
 
     """
-    if not key or key == "md5sum":
-        return _md5_hexdigest
-    elif key == "mtime+size":
+    if key is None:
+        if _DEFAULT_KEY is None:
+            _DEFAULT_KEY = ResourceLocator.default().get_conf().get_value(
+                ["checksum-method"], _DEFAULT_DEFAULT_KEY)
+        key = _DEFAULT_KEY
+    if key == "mtime+size":
         return _mtime_and_size
-    else:
+    if not hasattr(hashlib, key.replace("sum", "")):
         raise KeyError(key)
+    return lambda source, *_: _get_hexdigest(key, source)
 
 
-def _md5_hexdigest(source, _):
-    """Load content of source into an md5 object, and return its hexdigest."""
-    md5sum = md5()
-    handle = open(source)
-    f_bsize = os.statvfs(source).f_bsize
+def _get_hexdigest(key, source):
+    """Load content of source into an hash object, and return its hexdigest."""
+    hashobj = getattr(hashlib, key)()
+    if hasattr(source, "read"):
+        handle = source
+    else:
+        handle = open(source)
+    try:
+        f_bsize = os.statvfs(handle.name).f_bsize
+    except (AttributeError, OSError):
+        f_bsize = 4096
     while True:
         bytes_ = handle.read(f_bsize)
         if not bytes_:
             break
-        md5sum.update(bytes_)
+        hashobj.update(bytes_)
     handle.close()
-    return md5sum.hexdigest()
+    return hashobj.hexdigest()
 
 
 def _mtime_and_size(source, root):

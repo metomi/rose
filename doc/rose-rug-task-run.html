@@ -623,13 +623,18 @@ opt.jobs=8
       slash (or whatever is relevant for the archiving system) should be added
       for a directory.</dd>
 
-      <dt><kbd>update-check=md5sum|mtime+size</kbd></dt>
+      <dt><kbd>update-check=mtime+size|md5|sha1|...</kbd></dt>
 
-      <dd>Optional. Specify the method for checking whether a source has
-      changed since the previous run. The default is to use the MD5 checksum of
-      the content of each source file. The alternate method is to use the
-      modified time and size of the source, which is useful for large files,
-      but is less correct.</dd>
+      <dd>Optional. Specify the method for checking whether a source has changed
+      since the previous run. If the value is <kbd>mtime+size</kbd>, the
+      application will use the modified time and size of the source, which is
+      useful for large files, but is less correct. Otherwise, the value, if
+      specified, should be the name of a hash object in <a href=
+      "https://docs.python.org/2/library/hashlib.html">Python's hashlib</a>,
+      such as <kbd>md5</kbd> (default), <kbd>sha1</kbd>, etc. In this mode, the
+      application will use the checksum (based on the specified hashing method)
+      of the content of each source file to determine if it has changed or
+      not.</dd>
     </dl>
 
     <p>E.g.:</p>

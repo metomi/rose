@@ -187,7 +187,7 @@ class RoseArchApp(BuiltinApp):
                 )
             )
         update_check_str = self._get_conf(
-            config, t_node, "update-check", default="md5sum")
+            config, t_node, "update-check", default="md5")
         try:
             checksum_func = get_checksum_func(update_check_str)
         except KeyError as exc:

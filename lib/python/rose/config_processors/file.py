@@ -23,7 +23,7 @@ from fnmatch import fnmatch
 from glob import glob
 import hashlib
 import os
-from rose.checksum import get_checksum
+from rose.checksum import get_checksum, get_checksum_func
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemUtil
@@ -34,6 +34,7 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 from shutil import rmtree
 import sqlite3
+from StringIO import StringIO
 import sys
 from tempfile import mkdtemp
 from urlparse import urlparse
@@ -354,9 +355,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def _source_pull(self, source, conf_tree, work_dir):
         """Pulls a source to its cache in the work directory."""
-        md5 = hashlib.md5()
-        md5.update(source.name)
-        source.cache = os.path.join(work_dir, md5.hexdigest())
+        source.cache = os.path.join(
+            work_dir, get_checksum_func()(StringIO(source.name)))
         return self.loc_handlers_manager.pull(source, conf_tree)
 
     def _target_install(self, target, conf_tree, work_dir):

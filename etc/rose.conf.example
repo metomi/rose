@@ -23,6 +23,11 @@
 # Common site configuration.
 []
 #
+## Default method for checksum calculation
+## Values can be any algorithm available from Python's hashlib
+#  checksum-method=md5|sha1|...
+## E.g.:
+#  checksum-method=sha1
 ## Paths to locate configuration metadata
 #  meta-path=DIR1[:DIR2[:...]]
 ## E.g.:
