@@ -8,8 +8,8 @@ for a full listing of issues for each release.
 ## Next Release (2015-10-??)
 
 Rose release 30. This release will work best with
-[cylc-6.6.1](https://github.com/cylc/cylc/releases/tag/6.6.1) and
-[fcm-2015.08.0](https://github.com/metomi/fcm/releases/tag/2015.08.0).
+[cylc-6.7.0](https://github.com/cylc/cylc/releases/tag/6.7.0) and
+[fcm-2015.09.0](https://github.com/metomi/fcm/releases/tag/2015.09.0).
 
 ### Highlighted Changes
 
