@@ -5,7 +5,7 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2015-09-??)
+## Next Release (2015-10-??)
 
 Rose release 30. This release will work best with
 [cylc-6.6.1](https://github.com/cylc/cylc/releases/tag/6.6.1) and
@@ -22,7 +22,22 @@ rosie create and rosie copy: improve checking and generation of settings in
 
 ### Noteworthy Changes
 
-Various bug fixes and documentation updates.
+[#1708](https://github.com/metomi/rose/pull/1708):
+rose_arch: archive sources can now be optional. A source specified using the
+`(source)` syntax will no longer result in a failure if it is missing.
+(However, a target with no actual source will result in a failure.)
+
+[#1705](https://github.com/metomi/rose/pull/1705):
+rose bush and rosie disco: this change unifies the interface for starting up a
+Rose Bush server and a Rosie discovery service server. The command `rosa ws`
+has been rebranded as `rosie disco`. This change also fixes the problem in
+`mod_wsgi` mode where a success request still results in an entry in the Apache
+error log.
+
+[#1701](https://github.com/metomi/rose/pull/1701):
+rose app-run, rose suite-run, rose task-run: the `-O` option now accepts
+`'(key)'` syntax to indicate that `key` can be a missing optional
+configuration.
 
 --------------------------------------------------------------------------------
 
