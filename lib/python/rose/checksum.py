@@ -22,6 +22,7 @@
 
 import errno
 import hashlib
+import inspect
 import os
 
 from rose.resource import ResourceLocator
@@ -29,6 +30,9 @@ from rose.resource import ResourceLocator
 
 _DEFAULT_DEFAULT_KEY = "md5"
 _DEFAULT_KEY = None
+_HASH_LENGTHS = None
+
+MTIME_AND_SIZE = "mtime+size"
 
 
 def get_checksum(name, checksum_func=None):
@@ -75,30 +79,48 @@ def get_checksum(name, checksum_func=None):
     return path_and_checksum_list
 
 
-def get_checksum_func(key=None):
+def get_checksum_func(algorithm=None):
     """Return a checksum function suitable for get_checksum.
 
-    "key" can be "mtime+size" or the name of a hash object from hashlib.
-    If "key" is not specified, return function to do MD5 checksum.
+    "algorithm" can be "mtime+size" or the name of a hash object from hashlib.
+    If "algorithm" is not specified, return function to do MD5 checksum.
 
-    Raise KeyError(key) if "key" is not a recognised hash object.
+    Raise ValueError(algorithm) if "algorithm" is not a recognised hash object.
 
     """
-    if key is None:
+    if not algorithm:
+        global _DEFAULT_KEY
         if _DEFAULT_KEY is None:
             _DEFAULT_KEY = ResourceLocator.default().get_conf().get_value(
                 ["checksum-method"], _DEFAULT_DEFAULT_KEY)
-        key = _DEFAULT_KEY
-    if key == "mtime+size":
+        algorithm = _DEFAULT_KEY
+    if algorithm == MTIME_AND_SIZE:
         return _mtime_and_size
-    if not hasattr(hashlib, key.replace("sum", "")):
-        raise KeyError(key)
-    return lambda source, *_: _get_hexdigest(key, source)
+    hashobj = hashlib.new(algorithm.replace("sum", ""))
+    return lambda source, *_: _get_hexdigest(hashobj, source)
 
 
-def _get_hexdigest(key, source):
+def guess_checksum_algorithm(checksum):
+    """Guess algorithm of "checksum".
+    
+    If "checksum" starts with "source=", returns MTIME_AND_SIZE.
+    Otherwise, use length of checksum to guess algorithm, based on the built-in
+    functions from hashlib.
+    Return None if it fails to make a guess.
+
+    """
+    if checksum.startswith("source="):
+        return MTIME_AND_SIZE
+    global _HASH_LENGTHS
+    if _HASH_LENGTHS is None:
+        _HASH_LENGTHS = {}
+        for algorithm, func in inspect.getmembers(hashlib, inspect.isbuiltin):
+            _HASH_LENGTHS[len(func().hexdigest())] = algorithm
+    return _HASH_LENGTHS.get(len(checksum))
+
+
+def _get_hexdigest(hashobj, source):
     """Load content of source into an hash object, and return its hexdigest."""
-    hashobj = getattr(hashlib, key)()
     if hasattr(source, "read"):
         handle = source
     else:

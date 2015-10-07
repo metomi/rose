@@ -23,7 +23,8 @@ from fnmatch import fnmatch
 from glob import glob
 import hashlib
 import os
-from rose.checksum import get_checksum, get_checksum_func
+from rose.checksum import (
+    get_checksum, get_checksum_func, guess_checksum_algorithm)
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemUtil
@@ -328,10 +329,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             if checksum_expected is None:
                 continue
             checksum = target.paths[0].checksum
-            if checksum_expected and checksum_expected != checksum:
-                exc = ChecksumError(checksum_expected, checksum)
-                raise ConfigProcessError(keys, checksum_expected, exc)
-            event = ChecksumEvent(target.name, checksum)
+            if checksum_expected:
+                if len(checksum_expected) != len(checksum):
+                    algorithm = guess_checksum_algorithm(checksum_expected)
+                    if algorithm:
+                        checksum = get_checksum_func(algorithm)(target.name)
+                if checksum_expected != checksum:
+                    exc = ChecksumError(checksum_expected, checksum)
+                    raise ConfigProcessError(keys, checksum_expected, exc)
+            event = ChecksumEvent(target.name, target.paths[0].checksum)
             self.handle_event(event)
 
     def process_job(self, job, conf_tree, loc_dao, work_dir):
