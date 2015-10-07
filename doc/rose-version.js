@@ -18,4 +18,4 @@
  *
  ******************************************************************************/
 /* N.B. The following line is also used by a shell script. Do not add spaces. */
-ROSE_VERSION="2015.08.0";
+ROSE_VERSION="2015.10.0";
