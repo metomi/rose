@@ -35,7 +35,7 @@ JOB_HOST=$(rose config 't' 'job-host')
 JOB_HOST_RUN_ROOT=$(rose config 't' 'job-host-run-root')
 JOB_HOST_OPT=
 if [[ -n $JOB_HOST && -n $JOB_HOST_RUN_ROOT ]]; then
-    export JOB_HOST=$(rose host-select $JOB_HOST)
+    export JOB_HOST=$(rose host-select -q $JOB_HOST)
     export JOB_HOST_RUN_ROOT
     JOB_HOST_OPT='-O job-host'
     mkdir opt

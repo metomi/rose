@@ -22,7 +22,7 @@
 . "$(dirname "$0")/test_header"
 JOB_HOST="$(rose config --default= 't' 'job-host')"
 if [[ -n "${JOB_HOST}" ]]; then
-    JOB_HOST="$(rose host-select "${JOB_HOST}")"
+    JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
 fi
 if [[ -z "${JOB_HOST}" ]]; then
     skip_all '[t]job-host not defined'

@@ -29,7 +29,7 @@ else
     if [[ -z $HOSTS ]]; then
         skip_all '[rose-suite-run]hosts not defined'
     fi
-    HOST=$(rose host-select $HOSTS)
+    HOST=$(rose host-select -q $HOSTS)
 fi
 #-------------------------------------------------------------------------------
 tests 9

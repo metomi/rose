@@ -30,7 +30,7 @@ fi
 tests 9
 #-------------------------------------------------------------------------------
 set -e
-JOB_HOST=$(rose host-select $JOB_HOST)
+JOB_HOST=$(rose host-select -q $JOB_HOST)
 JOB_HOST_TEST_DIR=$(ssh -oBatchMode=yes $JOB_HOST 'TMPDIR=$HOME mktemp -d')
 JOB_HOST_TEST_DIR=$(tail -1 <<<"$JOB_HOST_TEST_DIR")
 MY_FINALLY() {

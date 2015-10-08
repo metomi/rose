@@ -30,7 +30,7 @@ JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -z $JOB_HOST ]]; then
     skip 3 '[t]job-host not defined'
 else
-    JOB_HOST=$(rose host-select $JOB_HOST)
+    JOB_HOST=$(rose host-select -q $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.

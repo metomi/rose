@@ -23,7 +23,7 @@
 . $(dirname $0)/test_header
 
 T_HOST=$(rose config --default= t job-host)
-T_HOST=$(rose host-select $T_HOST)
+T_HOST=$(rose host-select -q $T_HOST)
 T_HOST_RUN_ROOT=$(rose config --default= t job-host-run-root)
 if [[ -z "$T_HOST" || -z "$T_HOST_RUN_ROOT" ]]; then
     skip_all '[t]job-host or [t]job-host-run-root not defined'

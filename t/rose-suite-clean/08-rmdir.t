@@ -31,7 +31,7 @@ JOB_HOST="$(rose config 't' 'job-host')"
 JOB_HOST_RUN_ROOT="$(rose config 't' 'job-host-run-root')"
 JOB_HOST_OPT=
 if [[ -n "${JOB_HOST}" && -n "${JOB_HOST_RUN_ROOT}" ]]; then
-    export JOB_HOST="$(rose host-select "${JOB_HOST}")"
+    export JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
     export JOB_HOST_RUN_ROOT
     cat >>"${NAME}/rose-suite.conf" <<__CONF__
 root-dir{share/cycle}=${JOB_HOST}=${JOB_HOST_RUN_ROOT}

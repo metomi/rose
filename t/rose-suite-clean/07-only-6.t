@@ -35,7 +35,7 @@ JOB_HOST_WORK=$(rose config --default= 't' 'job-host-run-root')
 if [[ -z "$JOB_HOST" || -z "$JOB_HOST_WORK" ]]; then
     skip_all '[t]job-host or [t]job-host-run-root not defined'
 fi
-JOB_HOST=$(rose host-select $JOB_HOST)
+JOB_HOST=$(rose host-select -q $JOB_HOST)
 #-------------------------------------------------------------------------------
 tests 2
 #-------------------------------------------------------------------------------
