@@ -27,7 +27,8 @@ default = cat
 [file:STDIN]
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 21
+tests 24
+export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 # Normal mode, empty STDIN.
 TEST_KEY=$TEST_KEY_BASE-empty
@@ -74,8 +75,8 @@ __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 test_teardown
 #-------------------------------------------------------------------------------
-# Normal mode, STDIN is /etc/passwd, --checksum.
-TEST_KEY=$TEST_KEY_BASE-checksum
+# Normal mode, STDIN is /etc/passwd, MD5 checksum.
+TEST_KEY=$TEST_KEY_BASE-md5
 test_setup
 run_pass "$TEST_KEY" rose app-run \
      -q \
@@ -86,8 +87,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" /etc/passwd
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 test_teardown
 #-------------------------------------------------------------------------------
-# Normal mode, STDIN is /etc/passwd, --checksum, --verbose.
-TEST_KEY=$TEST_KEY_BASE-checksum-verbose
+# Normal mode, STDIN is /etc/passwd, MD5 checksum, --verbose.
+TEST_KEY=$TEST_KEY_BASE-md5-verbose
 test_setup
 MD5_EXP=$(md5sum /etc/passwd | cut -d\  -f1)
 run_pass "$TEST_KEY" rose app-run -v \
@@ -106,8 +107,8 @@ __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 test_teardown
 #-------------------------------------------------------------------------------
-# Normal mode, STDIN is /etc/passwd, --checksum, incorrect checksum.
-TEST_KEY=$TEST_KEY_BASE-checksum-incorrect
+# Normal mode, STDIN is /etc/passwd, MD5 checksum, incorrect checksum.
+TEST_KEY=$TEST_KEY_BASE-md5-incorrect
 test_setup
 run_fail "$TEST_KEY" rose app-run \
      -q \
@@ -120,6 +121,18 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [FAIL] file:STDIN=checksum=$MD5_EXP: Unmatched checksum, expected=$MD5_EXP, actual=$MD5_ACT
 __CONTENT__
+test_teardown
+#-------------------------------------------------------------------------------
+# Normal mode, STDIN is /etc/passwd, SHA1 checksum.
+TEST_KEY="${TEST_KEY_BASE}-sha1"
+test_setup
+run_pass "${TEST_KEY}" rose app-run \
+     -q \
+     -C '../config' \
+    '--define=[file:STDIN]source=/etc/passwd' \
+    "--define=[file:STDIN]checksum=$(sha1sum '/etc/passwd' | cut -d\  -f1)"
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" '/etc/passwd'
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
 test_teardown
 #-------------------------------------------------------------------------------
 exit

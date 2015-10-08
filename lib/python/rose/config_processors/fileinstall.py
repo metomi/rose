@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,12 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 """Process "file:*" sections in node of a rose.config_tree.ConfigTree."""
 
 from fnmatch import fnmatch
 from glob import glob
-import hashlib
 import os
 from rose.checksum import (
     get_checksum, get_checksum_func, guess_checksum_algorithm)
@@ -300,7 +299,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if jobs:
             work_dir = mkdtemp()
             try:
-                nproc_keys = ["rose.config_processors.file", "nproc"]
+                nproc_keys = ["rose.config_processors.fileinstall", "nproc"]
                 nproc_str = conf_tree.node.get_value(nproc_keys)
                 nproc = None
                 if nproc_str is not None:
