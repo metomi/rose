@@ -189,7 +189,7 @@ class RoseArchApp(BuiltinApp):
         update_check_str = self._get_conf(config, t_node, "update-check")
         try:
             checksum_func = get_checksum_func(update_check_str)
-        except KeyError as exc:
+        except ValueError as exc:
             raise RoseArchValueError(
                 target.name,
                 "update-check",

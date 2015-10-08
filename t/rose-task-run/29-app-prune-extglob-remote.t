@@ -61,5 +61,5 @@ file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
 [INFO] delete: work/20150101T0000Z
 __LOG__
 #-------------------------------------------------------------------------------
-#rose suite-clean -q -y "${NAME}"
+rose suite-clean -q -y "${NAME}"
 exit 0

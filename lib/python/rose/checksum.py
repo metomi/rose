@@ -96,8 +96,9 @@ def get_checksum_func(algorithm=None):
         algorithm = _DEFAULT_KEY
     if algorithm == MTIME_AND_SIZE:
         return _mtime_and_size
-    hashobj = hashlib.new(algorithm.replace("sum", ""))
-    return lambda source, *_: _get_hexdigest(hashobj, source)
+    algorithm = algorithm.replace("sum", "")
+    hashlib.new(algorithm)  # raise ValueError for a bad "algorithm" string
+    return lambda source, *_: _get_hexdigest(algorithm, source)
 
 
 def guess_checksum_algorithm(checksum):
@@ -119,8 +120,9 @@ def guess_checksum_algorithm(checksum):
     return _HASH_LENGTHS.get(len(checksum))
 
 
-def _get_hexdigest(hashobj, source):
+def _get_hexdigest(algorithm, source):
     """Load content of source into an hash object, and return its hexdigest."""
+    hashobj = hashlib.new(algorithm)
     if hasattr(source, "read"):
         handle = source
     else:
