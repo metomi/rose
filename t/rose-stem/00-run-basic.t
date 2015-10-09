@@ -23,7 +23,7 @@ export ROSE_CONF_PATH=
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 if ! fcm --version 1>/dev/null 2>&1; then
-    skip_all 'FCM not installed'
+    skip_all '"FCM" not installed'
 fi
 #-------------------------------------------------------------------------------
 #Create repository to run on

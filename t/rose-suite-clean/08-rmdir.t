@@ -57,9 +57,11 @@ test -d "${HOME}/cylc-run/${NAME}"
 test -e "${HOME}/.cylc/${NAME}"
 test -e "${HOME}/.cylc/REGDB/${NAME}"
 test -d "${PWD}/root.d/cylc-run/${NAME}"
-SSH='ssh -n -oBatchMode=yes'
-${SSH} "${JOB_HOST}" \
-    "bash -l -c 'ls -d cylc-run/${NAME} ${JOB_HOST_RUN_ROOT}/cylc-run/${NAME}'"
+if [[ -n "${JOB_HOST}" && -n "${JOB_HOST_RUN_ROOT}" ]]; then
+    SSH='ssh -n -oBatchMode=yes'
+    ${SSH} "${JOB_HOST}" \
+        "bash -l -c 'ls -d cylc-run/${NAME} ${JOB_HOST_RUN_ROOT}/cylc-run/${NAME}'"
+fi
 set +e
 
 TEST_KEY="${TEST_KEY_BASE}"
@@ -68,9 +70,11 @@ run_fail "${TEST_KEY}-test-d-cylc-run" test -d "${HOME}/cylc-run/${NAME}"
 run_fail "${TEST_KEY}-test-d-dot-cylc-1" test -e "${HOME}/.cylc/${NAME}"
 run_fail "${TEST_KEY}-test-d-dot-cylc-2" test -e "${HOME}/.cylc/REGDB/${NAME}"
 run_fail "${TEST_KEY}-test-d-root-x" test -d "${PWD}/root.d/cylc-run/${NAME}"
-run_pass "${TEST_KEY}-test-d-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
-    "bash -l -c '! test -d cylc-run/${NAME}'"
-run_pass "${TEST_KEY}-test-d-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
-    "bash -l -c '! test -d ${JOB_HOST_RUN_ROOT}/cylc-run/${NAME}'"
+if [[ -n "${JOB_HOST}" && -n "${JOB_HOST_RUN_ROOT}" ]]; then
+    run_pass "${TEST_KEY}-test-d-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
+        "bash -l -c '! test -d cylc-run/${NAME}'"
+    run_pass "${TEST_KEY}-test-d-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
+        "bash -l -c '! test -d ${JOB_HOST_RUN_ROOT}/cylc-run/${NAME}'"
+fi
 #-------------------------------------------------------------------------------
 exit 0

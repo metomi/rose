@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 if [[ -z ${TMPDIR:-} || -z ${USER:-} || $TMPDIR/$USER == $HOME ]]; then
-    skip_all "TMPDIR or USER not defined or TMPDIR/USER is HOME"
+    skip_all '"TMPDIR" or "USER" not defined or "TMPDIR"/"USER" is "HOME"'
 fi
 #-------------------------------------------------------------------------------
 N_TESTS=7

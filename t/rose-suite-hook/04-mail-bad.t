@@ -30,7 +30,7 @@ rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
 # Start and stop the mail server.
 bad_smtpd_init
 if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
-    skip_all "cannot start fake SMTP server"
+    skip_all "cannot start bad SMTP server"
 fi
 mkdir conf
 cat >conf/rose.conf <<__CONF__

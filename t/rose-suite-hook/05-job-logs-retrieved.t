@@ -25,7 +25,7 @@
 #-------------------------------------------------------------------------------
 HOST="$(rose config 't' 'job-host')"
 if [[ -z $HOST ]]; then
-    skip_all "[t]job-host not defined"
+    skip_all '"[t]job-host" not defined'
 fi
 HOST="$(rose host-select -q "${HOST}")"
 export ROSE_CONF_PATH="${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/conf"

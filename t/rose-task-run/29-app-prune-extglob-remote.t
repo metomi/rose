@@ -25,11 +25,11 @@ JOB_HOST_OPT=
 if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
     JOB_HOST=$(rose config --default= 't' 'job-host')
     if [[ -z "${JOB_HOST}" ]]; then
-        skip_all '[t]job-host not defined'
+        skip_all '"[t]job-host" not defined'
     fi
     JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
     if [[ -z "${JOB_HOST}" ]]; then
-        skip_all '[t]job-host not available'
+        skip_all '"[t]job-host" not available'
     fi
     JOB_HOST_OPT="-S JOB_HOST=\"${JOB_HOST}\""
 fi

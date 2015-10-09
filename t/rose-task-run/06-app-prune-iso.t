@@ -22,9 +22,6 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-JOB_HOST=$(rose config --default= 't' 'job-host')
-JOB_HOST=$(rose host-select -q "$JOB_HOST")
-#-------------------------------------------------------------------------------
 # Test the suite.
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then

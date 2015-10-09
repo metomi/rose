@@ -27,7 +27,7 @@ if [[ $TEST_KEY_BASE == *localhost ]]; then
 else
     HOSTS=$(rose config rose-suite-run hosts)
     if [[ -z $HOSTS ]]; then
-        skip_all '[rose-suite-run]hosts not defined'
+        skip_all '"[rose-suite-run]hosts" not defined'
     fi
     HOST=$(rose host-select -q $HOSTS)
 fi

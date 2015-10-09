@@ -27,7 +27,7 @@ if [[ -n "${HOSTS}" ]]; then
     HOST="$(rose host-select -q "${HOSTS}")"
 fi
 if [[ -z "${HOST}" ]]; then
-    skip_all '[rose-suite-run]hosts not defined or no suite host available'
+    skip_all '"[rose-suite-run]hosts" not defined or no suite host available'
 fi
 tests 4
 #-------------------------------------------------------------------------------

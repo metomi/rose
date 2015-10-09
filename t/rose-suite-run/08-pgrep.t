@@ -28,7 +28,7 @@ OPT_HOST=
 if [[ $TEST_KEY_BASE == *conf ]]; then
     HOST_GROUP=$(rose config --default= 'rose-suite-run' 'hosts')
     if [[ -z $HOST_GROUP ]]; then
-        skip_all '[rose-suite-run]hosts not defined'
+        skip_all '"[rose-suite-run]hosts" not defined'
     fi
     HOST=$(rose 'host-select' -q $HOST_GROUP)
     OPT_HOST="--host=$HOST"

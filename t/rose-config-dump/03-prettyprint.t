@@ -87,7 +87,7 @@ __CONF__
 file_cmp "$TEST_KEY.f2" f2 rose-app.conf
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-basic-metadata
-rm rose-app.conf
+rm -f 'rose-app.conf'
 cat > f3 <<'__CONF__'
 [namelist:sequences=fibonacci]
 help=Here are some values in the sequence:
@@ -102,7 +102,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.f3" f3 rose-meta.conf
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-basic-metadata-subdir
-rm rose-app.conf
+rm -f 'rose-app.conf'
 cat > f4 <<'__CONF__'
 [namelist:sequences=fibonacci]
 help=Here are some values in the sequence:

@@ -28,7 +28,7 @@ fi
 #-------------------------------------------------------------------------------
 if [[ "${TEST_KEY_BASE}" == *conf ]]; then
     if ! rose config -q 'rose-suite-run' 'hosts'; then
-        skip_all '[rose-suite-run]hosts not defined'
+        skip_all '"[rose-suite-run]hosts" not defined'
     fi
 else
     export ROSE_CONF_PATH=
@@ -44,7 +44,8 @@ OPTION='-i'
 if [[ "${TEST_KEY_BASE}" == *local* ]]; then
     OPTION='-l'
 fi
-cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" .
+mkdir "${TEST_KEY_BASE}"
+cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${TEST_KEY_BASE}"
 touch "${TEST_KEY_BASE}/colon:is:ok"
 if [[ -n "${JOB_HOST}" ]]; then
     run_pass "${TEST_KEY}" rose suite-run --debug \

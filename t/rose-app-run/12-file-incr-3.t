@@ -24,7 +24,7 @@
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -z $JOB_HOST ]]; then
-    skip_all "$TEST_KEY_BASE: [t]job-host not defined"
+    skip_all '"[t]job-host" not defined'
 fi
 #-------------------------------------------------------------------------------
 tests 9

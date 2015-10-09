@@ -24,7 +24,7 @@
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 if ! python -c 'import sqlalchemy' 2>/dev/null; then
-    skip_all 'python: sqlalchemy not installed'
+    skip_all '"sqlalchemy" not installed'
 fi
 tests 16
 #-------------------------------------------------------------------------------

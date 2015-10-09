@@ -23,7 +23,7 @@
 . $(dirname $0)/test_header
 
 python -c "import pygraphviz" 2>/dev/null || \
-    skip_all 'pygraphviz not installed'
+    skip_all '"pygraphviz" not installed'
 
 #-------------------------------------------------------------------------------
 tests 3

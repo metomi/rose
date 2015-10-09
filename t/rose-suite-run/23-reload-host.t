@@ -25,7 +25,7 @@ if [[ -n "${JOB_HOST}" ]]; then
     JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
 fi
 if [[ -z "${JOB_HOST}" ]]; then
-    skip_all '[t]job-host not defined'
+    skip_all '"[t]job-host" not defined'
 fi
 tests 2
 export ROSE_CONF_PATH=

@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 python -c "import pygraphviz" 2>/dev/null || \
-    skip_all 'pygraphviz not installed'
+    skip_all '"pygraphviz" not installed'
 
 init </dev/null
 rm config/rose-app.conf
