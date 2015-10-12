@@ -282,6 +282,9 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         old_total = self.data_store.get_value(row_iter, total_col)
         old_int = self.data_store.get_value(row_iter, int_col)
         diff_int_count = ind_count - old_int
+        if diff_int_count == 0:
+            # No change.
+            return False
         new_total = old_total + diff_int_count
         self.data_store.set_value(row_iter, int_col, ind_count)
         self.data_store.set_value(row_iter, total_col, new_total)
