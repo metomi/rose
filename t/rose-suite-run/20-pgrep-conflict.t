@@ -79,4 +79,5 @@ do
     kill $FAKE_SUITE_PID 2>'/dev/null' || true
 done
 #-------------------------------------------------------------------------------
+rose suite-clean -q -y "${NAME}"
 exit 0

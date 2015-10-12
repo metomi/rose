@@ -21,8 +21,18 @@
 
 
 import errno
-from hashlib import md5
+import hashlib
+import inspect
 import os
+
+from rose.resource import ResourceLocator
+
+
+_DEFAULT_DEFAULT_KEY = "md5"
+_DEFAULT_KEY = None
+_HASH_LENGTHS = None
+
+MTIME_AND_SIZE = "mtime+size"
 
 
 def get_checksum(name, checksum_func=None):
@@ -69,35 +79,65 @@ def get_checksum(name, checksum_func=None):
     return path_and_checksum_list
 
 
-def get_checksum_func(key=None):
+def get_checksum_func(algorithm=None):
     """Return a checksum function suitable for get_checksum.
 
-    If key=="md5" or not specified, return function to do MD5 checksum.
-    if key=="mtime+size", return function generate a string that contains the
-    source name, its modified time and its size.
-    Otherwise, raise KeyError(key).
+    "algorithm" can be "mtime+size" or the name of a hash object from hashlib.
+    If "algorithm" is not specified, return function to do MD5 checksum.
+
+    Raise ValueError(algorithm) if "algorithm" is not a recognised hash object.
 
     """
-    if not key or key == "md5sum":
-        return _md5_hexdigest
-    elif key == "mtime+size":
+    if not algorithm:
+        global _DEFAULT_KEY
+        if _DEFAULT_KEY is None:
+            _DEFAULT_KEY = ResourceLocator.default().get_conf().get_value(
+                ["checksum-method"], _DEFAULT_DEFAULT_KEY)
+        algorithm = _DEFAULT_KEY
+    if algorithm == MTIME_AND_SIZE:
         return _mtime_and_size
+    algorithm = algorithm.replace("sum", "")
+    hashlib.new(algorithm)  # raise ValueError for a bad "algorithm" string
+    return lambda source, *_: _get_hexdigest(algorithm, source)
+
+
+def guess_checksum_algorithm(checksum):
+    """Guess algorithm of "checksum".
+    
+    If "checksum" starts with "source=", returns MTIME_AND_SIZE.
+    Otherwise, use length of checksum to guess algorithm, based on the built-in
+    functions from hashlib.
+    Return None if it fails to make a guess.
+
+    """
+    if checksum.startswith("source="):
+        return MTIME_AND_SIZE
+    global _HASH_LENGTHS
+    if _HASH_LENGTHS is None:
+        _HASH_LENGTHS = {}
+        for algorithm, func in inspect.getmembers(hashlib, inspect.isbuiltin):
+            _HASH_LENGTHS[len(func().hexdigest())] = algorithm
+    return _HASH_LENGTHS.get(len(checksum))
+
+
+def _get_hexdigest(algorithm, source):
+    """Load content of source into an hash object, and return its hexdigest."""
+    hashobj = hashlib.new(algorithm)
+    if hasattr(source, "read"):
+        handle = source
     else:
-        raise KeyError(key)
-
-
-def _md5_hexdigest(source, _):
-    """Load content of source into an md5 object, and return its hexdigest."""
-    md5sum = md5()
-    handle = open(source)
-    f_bsize = os.statvfs(source).f_bsize
+        handle = open(source)
+    try:
+        f_bsize = os.statvfs(handle.name).f_bsize
+    except (AttributeError, OSError):
+        f_bsize = 4096
     while True:
         bytes_ = handle.read(f_bsize)
         if not bytes_:
             break
-        md5sum.update(bytes_)
+        hashobj.update(bytes_)
     handle.close()
-    return md5sum.hexdigest()
+    return hashobj.hexdigest()
 
 
 def _mtime_and_size(source, root):

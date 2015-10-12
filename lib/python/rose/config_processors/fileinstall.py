@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,14 +16,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 """Process "file:*" sections in node of a rose.config_tree.ConfigTree."""
 
 from fnmatch import fnmatch
 from glob import glob
-import hashlib
 import os
-from rose.checksum import get_checksum
+from rose.checksum import (
+    get_checksum, get_checksum_func, guess_checksum_algorithm)
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemUtil
@@ -34,6 +34,7 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 from shutil import rmtree
 import sqlite3
+from StringIO import StringIO
 import sys
 from tempfile import mkdtemp
 from urlparse import urlparse
@@ -298,7 +299,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if jobs:
             work_dir = mkdtemp()
             try:
-                nproc_keys = ["rose.config_processors.file", "nproc"]
+                nproc_keys = ["rose.config_processors.fileinstall", "nproc"]
                 nproc_str = conf_tree.node.get_value(nproc_keys)
                 nproc = None
                 if nproc_str is not None:
@@ -327,10 +328,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             if checksum_expected is None:
                 continue
             checksum = target.paths[0].checksum
-            if checksum_expected and checksum_expected != checksum:
-                exc = ChecksumError(checksum_expected, checksum)
-                raise ConfigProcessError(keys, checksum_expected, exc)
-            event = ChecksumEvent(target.name, checksum)
+            if checksum_expected:
+                if len(checksum_expected) != len(checksum):
+                    algorithm = guess_checksum_algorithm(checksum_expected)
+                    if algorithm:
+                        checksum = get_checksum_func(algorithm)(target.name)
+                if checksum_expected != checksum:
+                    exc = ChecksumError(checksum_expected, checksum)
+                    raise ConfigProcessError(keys, checksum_expected, exc)
+            event = ChecksumEvent(target.name, target.paths[0].checksum)
             self.handle_event(event)
 
     def process_job(self, job, conf_tree, loc_dao, work_dir):
@@ -354,9 +360,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def _source_pull(self, source, conf_tree, work_dir):
         """Pulls a source to its cache in the work directory."""
-        md5 = hashlib.md5()
-        md5.update(source.name)
-        source.cache = os.path.join(work_dir, md5.hexdigest())
+        source.cache = os.path.join(
+            work_dir, get_checksum_func()(StringIO(source.name)))
         return self.loc_handlers_manager.pull(source, conf_tree)
 
     def _target_install(self, target, conf_tree, work_dir):

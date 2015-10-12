@@ -20,7 +20,6 @@
 """Process namelist: sections in a rose.config.ConfigNode matching a name."""
 
 
-from hashlib import md5
 import os
 import re
 import rose.config
