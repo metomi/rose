@@ -357,6 +357,9 @@ def _expand_repeats(val_item):
     search = REC_VALUE_REPEAT.search(val_item)
     if search:
         repeat, data = search.groups()
+        if data is None:
+            # null string, e.g. '7*'
+            data = ""
         return ",".join([data] * int(repeat))
     else:
         return val_item
@@ -366,6 +369,7 @@ def pretty_format_value(values):
     """Pretty-format a namelist value list."""
     nm_item = NamelistObject("", values)
     return nm_item.get_rhs_as_string(wrapped=True)
+
 
 def pretty_format_keys(keys):
     """Pretty-format namelist keys."""
