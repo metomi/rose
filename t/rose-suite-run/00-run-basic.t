@@ -24,7 +24,7 @@
 # Run the suite.
 if [[ $TEST_KEY_BASE == *conf ]]; then
     if ! rose config -q 'rose-suite-run' 'hosts'; then
-        skip_all '[rose-suite-run]hosts not defined'
+        skip_all '"[rose-suite-run]hosts" not defined'
     fi
 else
     export ROSE_CONF_PATH=

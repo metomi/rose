@@ -23,12 +23,12 @@
 #-------------------------------------------------------------------------------
 JOB_HOST="$(rose config --default= 't' 'job-host')"
 if [[ -n "${JOB_HOST}" ]]; then
-    JOB_HOST="$(rose host-select "${JOB_HOST}")"
+    JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
 fi
 #-------------------------------------------------------------------------------
 if [[ "${TEST_KEY_BASE}" == *conf ]]; then
     if ! rose config -q 'rose-suite-run' 'hosts'; then
-        skip_all '[rose-suite-run]hosts not defined'
+        skip_all '"[rose-suite-run]hosts" not defined'
     fi
 else
     export ROSE_CONF_PATH=
@@ -44,14 +44,17 @@ OPTION='-i'
 if [[ "${TEST_KEY_BASE}" == *local* ]]; then
     OPTION='-l'
 fi
+mkdir "${TEST_KEY_BASE}"
+cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${TEST_KEY_BASE}"
+touch "${TEST_KEY_BASE}/colon:is:ok"
 if [[ -n "${JOB_HOST}" ]]; then
     run_pass "${TEST_KEY}" rose suite-run --debug \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" "${OPTION}" \
+        -C "${TEST_KEY_BASE}" "${OPTION}" \
         --name="${NAME}" --no-gcontrol \
         -S "HOST=\"${JOB_HOST}\""
 else
     run_pass "${TEST_KEY}" rose suite-run --debug \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" "${OPTION}" \
+        -C "${TEST_KEY_BASE}" "${OPTION}" \
         --name="${NAME}" --no-gcontrol
 fi
 #-------------------------------------------------------------------------------

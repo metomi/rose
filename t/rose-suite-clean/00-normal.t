@@ -38,7 +38,7 @@ install_suite() {
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
-    JOB_HOST=$(rose host-select $JOB_HOST)
+    JOB_HOST=$(rose host-select -q $JOB_HOST)
     tests 15
 else
     tests 10

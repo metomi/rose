@@ -22,13 +22,10 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-JOB_HOST=$(rose config --default= 't' 'job-host')
-JOB_HOST=$(rose host-select "$JOB_HOST")
-#-------------------------------------------------------------------------------
 # Test the suite.
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
-    JOB_HOST=$(rose host-select $JOB_HOST)
+    JOB_HOST=$(rose host-select -q $JOB_HOST)
 fi
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE

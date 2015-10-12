@@ -27,9 +27,9 @@
 KEY=${TEST_KEY_BASE#0?-}
 HOST=$(rose config 't' $KEY)
 if [[ -z $HOST ]]; then
-    skip_all "[t]$KEY not defined"
+    skip_all "\"[t]$KEY\" not defined"
 fi
-HOST=$(rose host-select $HOST)
+HOST=$(rose host-select -q $HOST)
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 tests 3

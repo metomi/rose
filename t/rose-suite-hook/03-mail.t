@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 mock_smtpd_init
 if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
-    skip_all "cannot start SMTP server"
+    skip_all "cannot start mock SMTP server"
 fi
 mkdir conf
 cat >conf/rose.conf <<__CONF__

@@ -21,17 +21,17 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 if ! fcm help make 1>/dev/null 2>&1; then
-    skip_all 'fcm make unavailable'
+    skip_all '"fcm make" unavailable'
 fi
 if ! gfortran --version 1>/dev/null 2>&1; then
-    skip_all 'gfortran unavailable'
+    skip_all '"gfortran" unavailable'
 fi
 #-------------------------------------------------------------------------------
 tests 8
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
-    JOB_HOST=$(rose host-select $JOB_HOST)
+    JOB_HOST=$(rose host-select -q $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.

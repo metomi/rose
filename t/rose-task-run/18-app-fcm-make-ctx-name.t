@@ -27,10 +27,10 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 if ! fcm help make 1>/dev/null 2>&1; then
-    skip_all 'fcm make unavailable'
+    skip_all '"fcm make" unavailable'
 fi
 if ! gfortran --version 1>/dev/null 2>&1; then
-    skip_all 'gfortran unavailable'
+    skip_all '"gfortran" unavailable'
 fi
 if [[ "${TEST_KEY_BASE}" == *-with-share ]]; then
     JOB_HOST="$(rose config --default= 't' 'job-host-with-share')"
@@ -38,7 +38,7 @@ else
     JOB_HOST="$(rose config --default= 't' 'job-host')"
 fi
 if [[ -n "${JOB_HOST}" ]]; then
-    JOB_HOST="$(rose host-select "${JOB_HOST}")"
+    JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
 fi
 if [[ -z "${JOB_HOST}" ]]; then
     skip_all '"[t]job-host" not defined or not available'
