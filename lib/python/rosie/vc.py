@@ -580,7 +580,7 @@ def create(argv):
         if opts.info_file == "-":
             file_ = sys.stdin
         info_config = rose.config.load(file_)
-    _validate_info_config(opts, client, info_config)
+    info_config = _validate_info_config(opts, client, info_config)
     if interactive_mode:
         prefix = opts.prefix
         if from_id:
@@ -595,7 +595,7 @@ def create(argv):
             response = raw_input(question)
         except EOFError:
             sys.exit(1)
-        if response != 'y':
+        if response != YES:
             sys.exit(1)
     try:
         id_ = client.create(
@@ -628,7 +628,7 @@ def _validate_info_config(opts, client, info_config):
                 sys.exit(1)
             info_config = _edit_info_config(opts, client, info_config)
         else:
-            break
+            return info_config
 
 
 def _edit_info_config(opts, client, info_config):

@@ -2733,6 +2733,21 @@ environment scripting = "eval $(rose task-env)"
     <p>Assign an <var>ID</var> and create the directory structure in the
     central repository for a new suite.</p>
 
+    <p>The location of the repository for the new suite is determined in order
+    of preference:</p>
+
+    <ol>
+      <li><code>--prefix=PREFIX</code> option</li>
+      <li>prefix of the <var>FROM-ID</var></li>
+      <li><code>[rosie-id]prefix-default</code> option in the site/user
+      configuration.</li>
+    </ol>
+
+    <p>If <var>FROM-ID</var> is specified, copy items from the existing suite
+    <var>FROM-ID</var> when the suite is created. It is worth noting that
+    revision history of the copied items can only be preserved if
+    <var>FROM-ID</var> is in the same repository of the new suite.</p>
+
     <h3>OPTIONS</h3>
 
     <dl>
@@ -2754,8 +2769,7 @@ environment scripting = "eval $(rose task-env)"
 
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
-      <dd>Specify the prefix (i.e. the suite repository) to use. The default
-      behaviour is to use the site default.</dd>
+      <dd>Specify the prefix (i.e. the suite repository) to use.</dd>
 
       <dt><kbd>--project=PROJECT</kbd></dt>
 

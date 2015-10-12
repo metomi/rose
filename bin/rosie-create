@@ -30,6 +30,17 @@
 #     Assign an ID and create the directory structure in the central repository
 #     for a new suite.
 #
+#     The location of the repository for the new suite is determined in order
+#     of preference:
+#         1. "--prefix=PREFIX" option
+#         2. prefix of the "FROM-ID"
+#         3. "[rosie-id]prefix-default" option in the site/user configuration.
+#
+#     If FROM-ID is specified, copy items from the existing suite FROM-ID when
+#     the suite is created. It is worth noting that revision history of the
+#     copied items can only be preserved if FROM-ID is in the same repository
+#     of the new suite.
+#
 # OPTIONS
 #     --info-file=FILE
 #         Specify a FILE containing the discovery information for the
@@ -45,7 +56,6 @@
 #         Switch off interactive prompting (=answer yes to everything)
 #     --prefix=PREFIX
 #         Specify the prefix (i.e. the suite repository) to use.
-#         The default behaviour is to use the site default.
 #     --project=PROJECT
 #         Specify a project to check/query any available metadata.
 #         The default behaviour is to use no project and metadata.

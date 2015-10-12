@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 14
+tests 21
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -75,6 +75,18 @@ run_pass "$TEST_KEY" rosie create -y --info-file='rose-suite.info'
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "${TEST_KEY}-rose-suite.info" \
+    "${PWD}/roses/foo-aa000/rose-suite.info" <<__INFO__
+access-list=*
+description=not a fail
+owner=${USER}
+period=Forever
+project=dont-fail
+sub-project=hello failure is not an option
+title=this should never fail
+type=success
+unknown=I am an unknow field but do include me
+__INFO__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-info-copy-mode
 export ROSE_META_PATH=$PWD/rose-meta
@@ -98,7 +110,18 @@ sub-project=hello failure is not an option
 title=this should never fail
 unknown=I am an unknow field but do include me
 __INFO__
-file_cmp "$TEST_KEY_BASE-info-copy-mode.out" "$TEST_KEY_BASE-info-copy-mode.out" "$TEST_KEY-copy-mode-edit.out" 
+file_cmp "$TEST_KEY_BASE-info-copy-mode.out" \
+    "$TEST_KEY_BASE-info-copy-mode.out" "$TEST_KEY-copy-mode-edit.out" 
+file_cmp "${TEST_KEY}-rose-suite.info" \
+    "${PWD}/roses/foo-aa001/rose-suite.info" <<__INFO__
+description=Copy of foo-aa000/trunk@1
+owner=${USER}
+period=
+project=dont-fail
+sub-project=hello failure is not an option
+title=this should never fail
+unknown=I am an unknow field but do include me
+__INFO__
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-info-copy-meta-try-0"
 export ROSE_META_PATH=$PWD/rose-meta
@@ -171,5 +194,69 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [FAIL]         failed because: 'hello' not in this
 __ERROR__
 rm 'opt/rose-editor.conf'
+file_cmp "${TEST_KEY}-rose-suite.info" \
+    "${PWD}/roses/foo-aa002/rose-suite.info" <<__INFO__
+access-list=*
+description=not a fail
+owner=${USER}
+period=Forever
+project=dont-fail
+sub-project=hello
+title=this should never fail
+type=success
+__INFO__
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-info-copy-meta-try-2-project"
+export ROSE_META_PATH=$PWD/rose-meta
+cat >'opt/rose-editor.conf' <<__ROSE_CONF__
+[external]
+editor=sed -ci -e 's/^!project=/project=dont-fail/' -e 's/^project=$/!project=/'
+__ROSE_CONF__
+cat >'rose-suite.info' <<__INFO__
+description=not a fail
+owner=$USER
+period=Forever
+project=
+sub-project=hello world
+title=this should never fail
+type=success
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory.
+# Any KEY=VALUE pairs can be added. Known fields include:
+# "access-list", "description" and "sub-project".
+__INFO__
+# "yes" command does not work here, because we cannot use a pipe
+for I in $(seq 1 3); do
+    echo 'y'
+done >'yes-file'
+run_pass "$TEST_KEY" rosie create --info-file='rose-suite.info' <'yes-file'
+{
+    echo -n 'rose-suite.info has invalid settings. Try again? [y or n (default)] '
+    echo -n 'rose-suite.info has invalid settings. Try again? [y or n (default)] '
+    echo -n 'Create suite as "foo-?????"? [y or n (default)] '
+    echo "[INFO] foo-aa003: created at ${URL}/a/a/0/0/3"
+    echo "[INFO] foo-aa003: local copy created at $PWD/roses/foo-aa003"
+}>"$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+[FAIL] rose-suite.info: issues: 1
+[FAIL]     =project=
+[FAIL]         Value  does not contain the pattern: ^.+(?# Must not be empty)
+[FAIL] rose-suite.info: issues: 1
+[FAIL]     =project=
+[FAIL]         Compulsory settings should not be user-ignored.
+__ERROR__
+rm 'opt/rose-editor.conf'
+file_cmp "${TEST_KEY}-rose-suite.info" \
+    "${PWD}/roses/foo-aa003/rose-suite.info" <<__INFO__
+description=not a fail
+owner=${USER}
+period=Forever
+project=dont-fail
+sub-project=hello world
+title=this should never fail
+type=success
+__INFO__
 #-------------------------------------------------------------------------------
 exit
