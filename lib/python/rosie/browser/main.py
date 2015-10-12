@@ -145,8 +145,7 @@ class MainWindow(gtk.Window):
                               rosie.browser.PROGRAM_NAME))
         self.suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=self.handle_view_output_event)
-        rose.macro.add_site_meta_paths()
-        rose.macro.add_env_meta_paths()
+        rose.macro.add_meta_paths()
         self.show()
 
     def setup_window(self):

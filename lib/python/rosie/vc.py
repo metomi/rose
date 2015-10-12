@@ -28,8 +28,7 @@ import rose.external
 import rose.metadata_check
 import rose.reporter
 from rose.fs_util import FileSystemUtil
-from rose.macro import (load_meta_config, add_site_meta_paths,
-                        add_env_meta_paths)
+from rose.macro import add_meta_paths, load_meta_config
 from rose.macros import DefaultValidators
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
@@ -696,8 +695,7 @@ def delete(argv):
 
 def main():
     """Launcher for the CLI functions."""
-    add_site_meta_paths()
-    add_env_meta_paths()
+    add_meta_paths()
     argv = sys.argv[1:]
     if not argv:
         return sys.exit(1)

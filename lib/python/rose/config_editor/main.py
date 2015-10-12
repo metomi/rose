@@ -122,8 +122,7 @@ class MainController(object):
         if config_objs is None:
             config_objs = {}
         if pluggable:
-            rose.macro.add_site_meta_paths()
-            rose.macro.add_env_meta_paths()
+            rose.macro.add_meta_paths()
         if load_updater is None:
             load_updater = rose.gtk.splash.NullSplashScreenProcess()
         self.is_pluggable = pluggable
@@ -1916,8 +1915,7 @@ def main():
     if args:
         opt_parser.print_usage(sys.stderr)
         sys.exit(2)
-    rose.macro.add_site_meta_paths()
-    rose.macro.add_env_meta_paths()
+    rose.macro.add_meta_paths()
     rose.macro.add_opt_meta_paths(opts.meta_path)
     if opts.conf_dir:
         os.chdir(opts.conf_dir)

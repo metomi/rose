@@ -43,6 +43,8 @@ export LANG=C
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-bad-owner
 cat >rose-suite.info <<'__ROSE_SUITE_INFO__'
+project=rose
+title=${TEST_KEY}
 owner=no-such-user-550
 __ROSE_SUITE_INFO__
 run_fail "$TEST_KEY" \
@@ -55,6 +57,8 @@ __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-bad-access-list
 cat >rose-suite.info <<__ROSE_SUITE_INFO__
+project=rose
+title=${TEST_KEY}
 owner=$USER
 access-list=no-such-user-550
 __ROSE_SUITE_INFO__
@@ -68,6 +72,8 @@ __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-good-owner
 cat >rose-suite.info <<__ROSE_SUITE_INFO__
+project=rose
+title=${TEST_KEY}
 owner=$USER
 access-list=*
 __ROSE_SUITE_INFO__
@@ -78,6 +84,8 @@ run_pass "$TEST_KEY" \
 TEST_KEY=$TEST_KEY_BASE-modify-bad-owner
 svn co -q $SVN_URL/a/a/0/0/0/trunk aa000
 cat >aa000/rose-suite.info <<'__ROSE_SUITE_INFO__'
+project=rose
+title=${TEST_KEY}
 owner=no-such-user-550
 access-list=*
 __ROSE_SUITE_INFO__
@@ -90,6 +98,8 @@ __ERR__
 TEST_KEY=$TEST_KEY_BASE-modify-bad-owner
 #svn co -q $SVN_URL/a/a/0/0/0/trunk aa000
 cat >aa000/rose-suite.info <<__ROSE_SUITE_INFO__
+project=rose
+title=${TEST_KEY}
 owner=$USER
 access-list=no-such-user-550
 __ROSE_SUITE_INFO__
@@ -102,6 +112,8 @@ __ERR__
 TEST_KEY=$TEST_KEY_BASE-modify-bad-owner-2
 #svn co -q $SVN_URL/a/a/0/0/0/trunk aa000
 cat >aa000/rose-suite.info <<__ROSE_SUITE_INFO__
+project=rose
+title=${TEST_KEY}
 owner=$USER
 access-list=no-such-user-550 root no-such-user-551
 __ROSE_SUITE_INFO__
@@ -117,6 +129,8 @@ svn co -q "${SVN_URL}/a/a/0/0/" 'aa00'
 svn mkdir -q 'aa00/1'
 svn cp -q 'aa00/0/trunk' 'aa00/1/'
 cat >'aa00/1/trunk/rose-suite.info' <<'__ROSE_SUITE_INFO__'
+project=rose
+title=${TEST_KEY}
 owner=no-such-user-550
 access-list=*
 __ROSE_SUITE_INFO__
