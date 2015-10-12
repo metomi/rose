@@ -50,7 +50,7 @@ FAKE_SUITE_PID=$!
 run_fail rose suite-run -q --no-gcontrol \
     -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
 disown $FAKE_SUITE_PID  # Don't report 'Terminated...' stuff on kill.
-kill $FAKE_SUITE_PID >'/dev/null' || true
+kill $FAKE_SUITE_PID 2>'/dev/null' || true
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-self-check-hold
 # Check that this approach causes rose suite-run failure.
@@ -59,7 +59,7 @@ FAKE_SUITE_PID=$!
 run_fail rose suite-run -q --no-gcontrol \
     -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
 disown $FAKE_SUITE_PID
-kill $FAKE_SUITE_PID >'/dev/null' || true
+kill $FAKE_SUITE_PID 2>'/dev/null' || true
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-similar-suite-names
 for ALT_NAME in foo$NAME foo-$NAME foo_$NAME \
@@ -70,13 +70,13 @@ do
     run_fail rose suite-run -q --no-gcontrol \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
     disown $FAKE_SUITE_PID
-    kill $FAKE_SUITE_PID >'/dev/null' || true
+    kill $FAKE_SUITE_PID 2>'/dev/null' || true
     python $TEST_DIR/cylc-run $ALT_NAME --debug 1>/dev/null 2>&1 &
     FAKE_SUITE_PID=$!
     run_fail rose suite-run -q --no-control \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
     disown $FAKE_SUITE_PID
-    kill $FAKE_SUITE_PID >'/dev/null' || true
+    kill $FAKE_SUITE_PID 2>'/dev/null' || true
 done
 #-------------------------------------------------------------------------------
 exit 0
