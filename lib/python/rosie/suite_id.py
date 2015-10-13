@@ -383,16 +383,17 @@ class SuiteId(object):
                 for i, line in enumerate(open(suite_version_file_name)):
                     line = line.strip()
                     if state is None:
-                        if line == "# SVN INFO":
+                        if line.startswith("# svn info"):
                             state = line
-                    elif state == "# SVN INFO":
+                    elif state.startswith("# svn info"):
                         if line.startswith("URL:"):
                             url = line.split(":", 1)[1].strip()
                         elif line.startswith("Revision:"):
                             rev = line.split(":", 1)[1].strip()
                         elif not line:
                             break
-                location = url + "@" + rev
+                if url and rev:
+                    location = url + "@" + rev
                 break
 
         # Assume location is a Subversion working copy of a Rosie suite

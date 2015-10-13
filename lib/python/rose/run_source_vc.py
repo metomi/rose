@@ -43,18 +43,23 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
         handle = open(output, "wb")
     environ = dict(os.environ)
     environ["LANG"] = "C"
-    for vcs, cmds in [("svn", ["info", "status", "diff"]),
-                      ("git", ["describe", "status", "diff"])]:
+    for vcs, args_list in [
+            ("svn", [
+                ["info", "--non-interactive"],
+                ["status", "--non-interactive"],
+                ["diff", "--internal-diff", "--non-interactive"]]),
+            ("git", [["describe"], ["status"], ["diff"]])]:
         if not popen.which(vcs):
             continue
         cwd = os.getcwd()
         os.chdir(run_source_dir)
         try:
-            for cmd in cmds:
-                rc, out, err = popen.run(vcs, cmd, env=environ)
+            for args in args_list:
+                cmd = [vcs] + args
+                rc, out, err = popen.run(*cmd, env=environ)
                 if out:
                     handle.write("#" * 80 + "\n")
-                    handle.write(("# %s %s\n" % (vcs, cmd)).upper())
+                    handle.write(("# %s\n" % popen.list_to_shell_str(cmd)))
                     handle.write("#" * 80 + "\n")
                     handle.write(out)
                 if rc: # If cmd fails once, chances are, it will fail again
