@@ -246,8 +246,8 @@ class MacroBaseRoseEdit(MacroBase):
             for key, node in config_data.value.items():
                 if isinstance(node.value, dict):
                     sections.append(key)
-                elif "" not in sections:
-                    sections.append("")
+            if "" not in sections:
+                sections.append("")
         else:
             for key in set(config_data["sections"].keys() +
                            config_data["variables"].keys()):

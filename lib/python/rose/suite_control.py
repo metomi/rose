@@ -32,7 +32,7 @@ import sys
 
 
 YES = "y"
-PROMPT = "Really %s %s at %s? [" + YES + "/n] "
+PROMPT = "Really %s %s at %s? [" + YES + " or n (default)] "
 
 
 class SuiteControl(object):

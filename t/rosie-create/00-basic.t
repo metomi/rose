@@ -42,11 +42,17 @@ mkdir 'opt'
 export ROSE_CONF_PATH=$PWD
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-empty-info-file
-touch rose-suite.info
+touch 'rose-suite.info'
 run_fail "$TEST_KEY" rosie create -y --info-file=rose-suite.info
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] rose-suite.info: compulsory field "owner" not defined
+[FAIL] rose-suite.info: issues: 3
+[FAIL]     =owner=None
+[FAIL]         Variable set as compulsory, but not in configuration.
+[FAIL]     =project=None
+[FAIL]         Variable set as compulsory, but not in configuration.
+[FAIL]     =title=None
+[FAIL]         Variable set as compulsory, but not in configuration.
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-empty-ans
@@ -57,7 +63,7 @@ project=don't fail
 title=this should not fail
 __INFO__
 run_fail "$TEST_KEY" rosie create --info-file=rose-suite.info </dev/null
-echo -n 'Create suite at "foo"? y/n (default n) ' >"$TEST_KEY.out.1"
+echo -n 'Create suite as "foo-?????"? [y or n (default)] ' >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -70,7 +76,7 @@ title=this should not fail
 __INFO__
 run_pass "$TEST_KEY" rosie create --info-file=rose-suite.info <<<y
 {
-    echo -n 'Create suite at "foo"? y/n (default n) '
+    echo -n 'Create suite as "foo-?????"? [y or n (default)] '
     echo "[INFO] foo-aa000: created at $URL/a/a/0/0/0"
     echo "[INFO] create: $PWD/roses"
     echo "[INFO] foo-aa000: local copy created at $PWD/roses/foo-aa000"
@@ -97,7 +103,7 @@ title=
 # "access-list", "description" and "sub-project".
 __INFO__
 {
-    echo -n 'Create suite at "foo"? y/n (default n) '
+    echo -n 'Create suite as "foo-?????"? [y or n (default)] '
     echo "[INFO] foo-aa001: created at $URL/a/a/0/0/1"
     echo "[INFO] foo-aa001: local copy created at $PWD/roses/foo-aa001"
 }>"$TEST_KEY.out.1"
@@ -128,7 +134,7 @@ title=
 # "access-list", "description" and "sub-project".
 __INFO__
 {
-    echo -n 'Create suite at "foo"? y/n (default n) '
+    echo -n 'Create suite as "foo-?????"? [y or n (default)] '
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -160,7 +166,7 @@ title=
 # Any KEY=VALUE pairs can be added. Known fields include:
 # "access-list", "description" and "sub-project".
 __INFO__
-echo -n 'Create suite at "bar"? y/n (default n) ' >"$TEST_KEY.out.1"
+echo -n 'Create suite as "bar-?????"? [y or n (default)] ' >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -183,7 +189,7 @@ title=
 # "access-list", "description" and "sub-project".
 __INFO__
 {
-    echo -n 'Create suite at "foo"? y/n (default n) '
+    echo -n 'Create suite as "foo-?????"? [y or n (default)] '
     echo "[INFO] foo-aa002: created at $URL/a/a/0/0/2"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -209,9 +215,9 @@ title=this should never ever fail
 # "access-list", "description" and "sub-project".
 __INFO__
 {
-    echo -n 'Copy "foo-aa002/trunk@3"? y/n (default n) '
+    echo -n 'Copy "foo-aa002/trunk@3" to "foo-?????"? [y or n (default)] '
     echo "[INFO] foo-aa003: created at $URL/a/a/0/0/3"
-    echo '[INFO] foo-aa003: copied items from foo-aa002'
+    echo '[INFO] foo-aa003: copied items from foo-aa002/trunk@3'
     echo "[INFO] foo-aa003: local copy created at $PWD/roses/foo-aa003"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -241,9 +247,9 @@ title=this should never ever fail
 # "access-list", "description" and "sub-project".
 __INFO__
 {
-    echo -n 'Copy "foo-aa002/trunk@3"? y/n (default n) '
+    echo -n 'Copy "foo-aa002/trunk@3" to "foo-?????"? [y or n (default)] '
     echo "[INFO] foo-aa004: created at $URL/a/a/0/0/4"
-    echo '[INFO] foo-aa004: copied items from foo-aa002'
+    echo '[INFO] foo-aa004: copied items from foo-aa002/trunk@3'
     echo "[INFO] foo-aa004: local copy created at $PWD/roses/foo-aa004"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -284,9 +290,9 @@ title=this should never fail
 # "access-list", "description" and "sub-project".
 __INFO__
 {
-    echo -n 'Copy "foo-aa001/trunk@6"? y/n (default n) '
+    echo -n 'Copy "foo-aa001/trunk@6" to "foo-?????"? [y or n (default)] '
     echo "[INFO] foo-aa005: created at $URL/a/a/0/0/5"
-    echo '[INFO] foo-aa005: copied items from foo-aa001'
+    echo '[INFO] foo-aa005: copied items from foo-aa001/trunk@6'
     echo "[INFO] foo-aa005: local copy created at $PWD/roses/foo-aa005"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -326,9 +332,9 @@ title=this should never fail
 # "access-list", "description" and "sub-project".
 __INFO__
 {
-    echo -n 'Copy "foo-aa001/trunk@8"? y/n (default n) '
+    echo -n 'Copy "foo-aa001/trunk@8" to "foo-?????"? [y or n (default)] '
     echo "[INFO] foo-aa006: created at $URL/a/a/0/0/6"
-    echo '[INFO] foo-aa006: copied items from foo-aa001'
+    echo '[INFO] foo-aa006: copied items from foo-aa001/trunk@8'
     echo "[INFO] foo-aa006: local copy created at $PWD/roses/foo-aa006"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -353,7 +359,7 @@ set +e
 run_pass "$TEST_KEY" rosie create foo-aa001 -y --no-checkout
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] foo-aa012: created at $URL/a/a/0/1/2
-[INFO] foo-aa012: copied items from foo-aa001
+[INFO] foo-aa012: copied items from foo-aa001/trunk@8
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 svn propget --revprop -r 'HEAD' 'svn:log' "${URL}" >"${TEST_KEY}.log"
