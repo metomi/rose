@@ -33,7 +33,7 @@ from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 
 
-LOG_ROOT_TMPL = "~/.metomi/%s-%s"
+LOG_ROOT_TMPL = "~/.metomi/%(ns)s-%(util)s-%(host)s-%(port)d"
 
 
 def wsgi_app(service_cls, *args, **kwargs):
@@ -96,16 +96,19 @@ def _ws_init(service_cls, port, *args, **kwargs):
     if port:
         cherrypy.config["server.socket_port"] = int(port)
     port = cherrypy.server.socket_port
-    log_root = os.path.expanduser(
-        LOG_ROOT_TMPL % (service_cls.NS, service_cls.UTIL))
+    log_root = os.path.expanduser(LOG_ROOT_TMPL % {
+        "ns": service_cls.NS,
+        "util": service_cls.UTIL,
+        "host": cherrypy.server.socket_host,
+        "port": cherrypy.server.socket_port})
     log_status = log_root + ".status"
+    if not os.path.isdir(os.path.dirname(log_root)):
+        os.makedirs(os.path.dirname(log_root))
     with open(log_status, "w") as handle:
         handle.write("host=%s\n" % cherrypy.server.socket_host)
         handle.write("port=%d\n" % cherrypy.server.socket_port)
         handle.write("pid=%d\n" % os.getpid())
 
-    if not os.path.isdir(os.path.dirname(log_root)):
-        os.makedirs(os.path.dirname(log_root))
     cherrypy.config["log.access_file"] = log_root + "-access.log"
     open(cherrypy.config["log.access_file"], "w").close()
     cherrypy.config["log.error_file"] = log_root + "-error.log"

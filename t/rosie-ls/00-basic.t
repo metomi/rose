@@ -195,4 +195,5 @@ svn up -q "$PWD/roses/bar-aa000"
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
+rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}*
 exit

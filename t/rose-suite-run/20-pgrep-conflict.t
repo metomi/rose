@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 set -eu
 #-------------------------------------------------------------------------------
-tests 19
+tests 18
 #-------------------------------------------------------------------------------
 cat >$TEST_DIR/cylc-run <<'__PYTHON__'
 #!/usr/bin/env python
@@ -34,15 +34,9 @@ NAME=$(basename "${SUITE_RUN_DIR}")
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-self-check-suite-check
 # Check that the suite actually runs by itself.
-run_pass "$TEST_KEY" rose suite-run -q --no-gcontrol \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
+rose suite-run -q --no-gcontrol \
+    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -- --debug
 #------------------------------------------------------------------------------
-TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-while (($(date +%s) < TIMEOUT)) && [[ -f ~/.cylc/ports/$NAME ]]
-do
-    sleep 1
-done
-#-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-self-check
 # Check that this approach causes rose suite-run failure.
 python $TEST_DIR/cylc-run $NAME 1>/dev/null 2>&1 &

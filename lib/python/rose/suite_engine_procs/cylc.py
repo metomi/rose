@@ -31,11 +31,12 @@ from rose.reporter import Event, Reporter
 from rose.suite_engine_proc import (
     SuiteEngineProcessor, SuiteScanResult,
     SuiteEngineGlobalConfCompatError, TaskProps)
+import signal
 import socket
 import sqlite3
 import tarfile
 from tempfile import mkstemp
-from time import sleep
+from time import sleep, time
 from uuid import uuid4
 
 
@@ -91,7 +92,7 @@ class CylcProcessor(SuiteEngineProcessor):
     SUITE_DB = "cylc-suite.db"
     SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
-    TIMEOUT = 5  # seconds
+    TIMEOUT = 8  # seconds
 
     def __init__(self, *args, **kwargs):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
@@ -1368,11 +1369,13 @@ class CylcProcessor(SuiteEngineProcessor):
             if self.host_selector.is_local_host(host):
                 cmd = ["bash", "-c", sh_cmd]
             else:
-                cmd = self.popen.get_cmd("ssh", host, sh_cmd)
-            procs[(_PORT_FILE, host, tuple(cmd))] = self.popen.run_bg(*cmd)
+                cmd = self.popen.get_cmd("ssh", "-n", host, sh_cmd)
+            procs[(_PORT_FILE, host, tuple(cmd))] = self.popen.run_bg(
+                *cmd, preexec_fn=os.setpgrp)
         results = {}
         exceptions = []
-        while procs:
+        end_time = time() + timeout
+        while procs and time() < end_time:
             for keys, proc in procs.items():
                 ret_code = proc.poll()
                 if ret_code is None:
@@ -1414,6 +1417,16 @@ class CylcProcessor(SuiteEngineProcessor):
                     exceptions.append(RosePopenError(cmd, ret_code, out, err))
             if procs:
                 sleep(0.1)
+        # Timed out, kill remaining processes
+        for key, proc in procs.items():
+            try:
+                os.killpg(proc.pid, signal.SIGTERM)
+            except OSError:
+                pass
+            else:
+                ret_code = proc.wait()
+                out, err = proc.communicate()
+                exceptions.append(RosePopenError(keys[2], ret_code, out, err))
         return (sorted(results.values()), exceptions)
 
     def shutdown(self, suite_name, host=None, engine_version=None, args=None,

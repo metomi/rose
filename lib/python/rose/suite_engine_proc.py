@@ -21,6 +21,7 @@
 
 from isodatetime.data import Duration
 from isodatetime.parsers import DurationParser, ISO8601SyntaxError
+from glob import glob
 import os
 import pwd
 import re
@@ -476,12 +477,10 @@ class SuiteEngineProcessor(object):
         suite_d = os.path.expanduser(suite_d)
         if not os.path.isdir(suite_d):
             raise NoSuiteLogError(user_name, suite_name)
-        rose_bush_status_f_name = os.path.expanduser(
-            "~/.metomi/rose-bush.status")
         rose_bush_url = None
-        if os.path.isfile(rose_bush_status_f_name):
+        for f_name in glob(os.path.expanduser("~/.metomi/rose-bush*.status")):
             status = {}
-            for line in open(rose_bush_status_f_name):
+            for line in open(f_name):
                 k, v = line.strip().split("=", 1)
                 status[k] = v
             if status.get("host"):
@@ -489,6 +488,7 @@ class SuiteEngineProcessor(object):
                 if status.get("port"):
                     rose_bush_url += ":" + status["port"]
             rose_bush_url += "/"
+            break
         if not rose_bush_url:
             conf = ResourceLocator.default().get_conf()
             rose_bush_url = conf.get_value(["rose-suite-log", "rose-bush"])

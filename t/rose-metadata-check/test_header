@@ -27,13 +27,15 @@ function init() {
 }
 
 function init_macro() {
-    mkdir -p $TEST_DIR/config/lib/python/macros/
-    cat >$TEST_DIR/config/lib/python/macros/$1
+    mkdir -p "${TEST_DIR}/config/lib/python/macros/"
+    rm -f "${TEST_DIR}/config/lib/python/macros/${1}c"
+    cat >"${TEST_DIR}/config/lib/python/macros/${1}"
 }
 
 function init_widget() {
-    mkdir -p $TEST_DIR/config/lib/python/widget
-    cat >$TEST_DIR/config/lib/python/widget/$1
+    mkdir -p "${TEST_DIR}/config/lib/python/widget"
+    rm -f "${TEST_DIR}/config/lib/python/widget/${1}c"
+    cat >"${TEST_DIR}/config/lib/python/widget/${1}"
 }
 
 function setup() {

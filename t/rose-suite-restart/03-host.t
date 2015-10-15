@@ -52,5 +52,5 @@ file_grep "${TEST_KEY}.out.2" \
     "${TEST_KEY}.out"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" '/dev/null'
 #-------------------------------------------------------------------------------
-rose suite-clean -y "${NAME}"
+rose suite-clean -q -y "${NAME}"
 exit
