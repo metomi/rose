@@ -165,6 +165,10 @@ class Updater(object):
         """Loop over all namespaces and update."""
         unique_namespaces = self.data.helper.get_all_namespaces(
             only_this_config)
+
+        for ns in unique_namespaces:
+            self.data.helper.clear_namespace_cached_statuses(ns)
+
         if only_this_config is None:
             configs = self.data.config.keys()
         else:
@@ -202,6 +206,7 @@ class Updater(object):
                          skip_sub_data_update=False):
         """Update driver function. Updates the page if open."""
         self.pagelist = self.get_pagelist_func()
+        self.data.helper.clear_namespace_cached_statuses(namespace)
         if namespace in [p.namespace for p in self.pagelist]:
             index = [p.namespace for p in self.pagelist].index(namespace)
             page = self.pagelist[index]

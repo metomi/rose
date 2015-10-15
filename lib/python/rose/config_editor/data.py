@@ -190,6 +190,8 @@ class ConfigDataManager(object):
         self.trigger_id_trees = {}  # Stores trigger dependencies
         self.trigger_id_value_lookup = {}  # Stores old values of trigger vars
         self.namespace_meta_lookup = {}  # Stores titles etc of namespaces
+        self.namespace_cached_statuses = {
+            'latent': {}, 'ignored': {}}  # Caches ns statuses
         self._config_section_namespace_lookup = {}  # Store section namespaces
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
 
