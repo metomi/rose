@@ -5,6 +5,33 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2015.10.1 (2015-10-??)
+
+Rose release 31. This release will work best with
+[cylc-6.7.1](https://github.com/cylc/cylc/releases/tag/6.7.0) and
+[fcm-2015.10.0](https://github.com/metomi/fcm/releases/tag/2015.10.0).
+
+### Noteworthy Changes
+
+[#1720](https://github.com/metomi/rose/pull/1720):
+rose macro: fix parsing of blank value repeats in settings of a `namelist:`
+section.
+
+[#1718](https://github.com/metomi/rose/pull/1718):
+rose suite-run: fix hang up of `svn diff`. Call to `svn diff` may hang if user
+has an alternate diff command configured that hangs. This change should force
+`svn diff` to use its internal diff logic.
+
+[#1714](https://github.com/metomi/rose/pull/1714):
+rose app-run, rose suite-run, rose_arch, etc: This change allows any hash
+object in Python's `hashlib` to be used to calculate the check sum of a file.
+(Only `md5` was allowed before.)
+
+[#1713](https://github.com/metomi/rose/pull/1713):
+rosie copy/create: support copy to another repository.
+
+--------------------------------------------------------------------------------
+
 ## 2015.10.0 (2015-10-07)
 
 Rose release 30. This release works best with
