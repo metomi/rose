@@ -39,7 +39,7 @@ from rosie.suite_id import SuiteId, SuiteIdOverflowError, SuiteIdPrefixError
 import shutil
 from StringIO import StringIO
 import sys
-import tempfile
+from tempfile import mkdtemp, mkstemp
 from urlparse import urlparse
 
 
@@ -209,7 +209,7 @@ class RosieVCClient(object):
     def _get_work_dir(self):
         """Create a temporary working directory."""
         if self._work_dir is None:
-            self._work_dir = tempfile.mkdtemp()
+            self._work_dir = mkdtemp()
         return self._work_dir
 
     def checkout(self, id_):
@@ -635,18 +635,21 @@ def _edit_info_config(opts, client, info_config):
     """Helper for "create", launch editor to edit the suite info."""
     if opts.non_interactive:
         return info_config
-    info_file = tempfile.NamedTemporaryFile()
-    rose.config.dump(info_config, info_file)
-    info_file.write(CREATE_INFO_CONFIG_COMMENT)
-    info_file.seek(0)
-    command_list = client.popen.get_cmd("editor", info_file.name)
+    temp_desc, temp_name = mkstemp()
     try:
+        temp_file = os.fdopen(temp_desc, "w")
+        rose.config.dump(info_config, temp_file)
+        temp_file.write(CREATE_INFO_CONFIG_COMMENT)
+        temp_file.close()
+        command_list = client.popen.get_cmd("editor", temp_name)
         client.popen(*command_list, stdout=sys.stdout)
-    except RosePopenError as exc:
+    except (IOError, OSError, RosePopenError) as exc:
         client.event_handler(exc)
         sys.exit(1)
-    info_file.seek(0)
-    return rose.config.load(info_file)
+    else:
+        return rose.config.load(temp_name)
+    finally:
+        os.unlink(temp_name)
 
 
 def delete(argv):

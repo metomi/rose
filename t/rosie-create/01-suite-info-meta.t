@@ -155,7 +155,7 @@ TEST_KEY="${TEST_KEY_BASE}-info-copy-meta-try-2"
 export ROSE_META_PATH=$PWD/rose-meta
 cat >'opt/rose-editor.conf' <<__ROSE_CONF__
 [external]
-editor=sed -ci -e 's/^sub-project=greet.*$/sub-project=hello/' -e 's/^sub-project=failure.*$/sub-project=greet/'
+editor=sed -i -e 's/^sub-project=greet.*$/sub-project=hello/' -e 's/^sub-project=failure.*$/sub-project=greet/'
 __ROSE_CONF__
 cat >'rose-suite.info' <<__INFO__
 access-list=*
@@ -210,7 +210,7 @@ TEST_KEY="${TEST_KEY_BASE}-info-copy-meta-try-2-project"
 export ROSE_META_PATH=$PWD/rose-meta
 cat >'opt/rose-editor.conf' <<__ROSE_CONF__
 [external]
-editor=sed -ci -e 's/^!project=/project=dont-fail/' -e 's/^project=$/!project=/'
+editor=sed -i -e 's/^!project=/project=dont-fail/' -e 's/^project=$/!project=/'
 __ROSE_CONF__
 cat >'rose-suite.info' <<__INFO__
 description=not a fail
