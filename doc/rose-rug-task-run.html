@@ -692,6 +692,114 @@ source=stuffing-*.txt
 # ...
 </pre>
 
+    <h2 id="rose-task-run.util.rose_bunch">Built-in Application:rose_bunch</h2>
+
+    <p>This built-in application allows running of multiple command variants in
+    parallel under a single job, as defined by the application
+    configuration.</p>
+
+    <p>The application is normally configured in the
+    <kbd>[bunch-settings]</kbd> and <kbd>[bunch-args]</kbd> sections in
+    <var>rose-app.conf</var>.</p>
+
+    <p>Each variant of the command is run in the same working directory with
+    its output directed to separate <var>.out</var> and <var>.err</var> files
+    of the form <var>bunch.&lt;name&gt;.out</var>. Should you need separate working
+    directories your should configure your command to create the appropriate
+    subdirectory for working in.</p>
+
+    <p>Note that, when running under batch submission systems, you will need
+    to set resource requests to reflect the resources required by running
+    multiple commands at once e.g. if one command would require 1GB memory and
+    you have configured your app to run up to 4 commands at once then you will
+    need to request 4GB of memory.</p>
+
+    <p>The following <kbd>[bunch-settings]</kbd> settings are accepted:</p>
+
+    <dl>
+      <dt><kbd>command-format=FORMAT</kbd></dt>
+
+      <dd>Compulsory. A Pythonic <code>printf</code> style format string to
+      construct the commands to run. Insert placeholders <var>%(ARGNAME)s</var>
+      for substitution of the arguments specified under <kbd>[bunch-args]</kbd>
+      to the invoked command. The placeholder <var>%(instances)s</var> is
+      reserved for inserting an automatically generated index for the command
+      invocation when using the <kbd>instances</kbd> setting.</dd>
+
+      <dt><kbd>instances=N</kbd></dt>
+
+      <dd>Optional. Allows the user to specify an integer value for the number
+      of instances of a command they want to run. This generates the values
+      used by the <var>%(instances)s</var> value in <kbd>command-format</kbd>
+      Useful for cases where the only difference between invocations would be
+      an index number e.g. ensemble members. Note indexes start at 
+      <var>0</var>.</dd>
+
+      <dt><kbd>limit=N</kbd></dt>
+
+      <dd>Optional. Allows the user to limit the number of concurrently running
+      commands. If not specified then all command variations will be run at
+      the same time.</dd>
+
+      <dt><kbd>fail-handle=continue|abort</kbd></dt>
+
+      <dd>Optional (default=continue). Specify what action you want the job to
+      take on failure of a command it is trying to run. If set to
+      <var>continue</var> it will run all command variants . If set to
+      <var>abort</var> then on failure of on of the command variants it will
+      stop trying to run any new variants N.B. the job will wait for any
+      already running commands to finish before exiting.</dd>
+
+      <dt><kbd>incremental=True|False</kbd></dt>
+
+      <dd>Optional (default=False). If set to <var>True</var> then only failed
+      commands will be re-run on retrying running of the job. If any changes
+      are made to the configuration being run then all variants will be re-run.
+      Similarly, running the app with the <kbd>--new</kbd> option to <kbd>rose
+      task-run</kbd> will result in all commands being run.</dd>
+
+      <dt><kbd>names=name1 name2 ...</kbd></dt>
+
+      <dd>Optional. Allows defining names for each of the command variants to
+      be run, facilitating identification in logs. If not set then commands
+      will be identified by their index. The number of entries in the names
+      must be the same as the number of entries in each of the args to be
+      used.</dd>
+
+    </dl>
+
+    <p>The <kbd>[bunch-args]</kbd> section is used to specify the various 
+    combinations of args to be passed to the command specified under 
+    <kbd>[bunch-settings]command-format=</kbd>:</p>
+
+      <dt><kbd>argname=val1 val2 ...</kbd></dt>
+
+      <dd>Optional. Allows defining named lists of argument values to pass to
+      <kbd>[bunch-settings]command-format=</kbd>. Multiple named sets of
+      arguments can be defined. Each <var>argname</var> can be referenced in
+      the using <var>%(argname)s</var>. The only disallowed name is
+      <var>instances</var>, which is reserved for the auto-generated list of
+      instances when the <kbd>[bunch-settings]instances=N</kbd> option is
+      used.</dd>
+
+    <p>E.g.:</p>
+    <pre class="prettyprint lang-rose_conf">
+meta=rose_bunch
+mode=rose_bunch
+
+[bunch-args]
+arg1=1 2 3 4
+arg2=foo bar baz qux
+
+[bunch-settings]
+command-format=echo arg1 is %(arg1)s, arg2 is %(arg2)s, instance is %(instances)s
+fail-handle = abort
+incremental = True
+instances = 4
+limit=2
+names = foo1 bar2 baz3 qux4
+</pre>
+
     <h2 id="rose-task-run.util.rose_prune">Built-in Application:
     rose_prune</h2>
 

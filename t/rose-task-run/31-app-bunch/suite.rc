@@ -1,0 +1,35 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[event hooks]]
+        timeout handler=rose suite-hook --shutdown
+        timeout=1
+[scheduling]
+    initial cycle point=2010010000
+    final cycle point=2010010000
+    [[dependencies]]
+        [[[ 00 ]]]
+            graph="""BUNCH_TASKS:finish-all => dummy
+                     dummy => !BUNCH_TASKS"""
+
+[runtime]
+    [[root]]
+        command scripting=rose task-run -v -v --debug
+        [[[event hooks]]]
+            succeeded handler=rose suite-hook
+            failed handler=rose suite-hook
+            submission failed handler=rose suite-hook --shutdown
+            submission timeout handler=rose suite-hook
+            execution timeout handler=rose suite-hook
+            submission timeout=1
+            execution timeout=1
+    [[BUNCH_TASKS]]
+    [[bunch]]
+        inherit = BUNCH_TASKS
+    [[bunch_fail]]
+        inherit = BUNCH_TASKS
+    [[bunch_incremental]]
+        inherit = BUNCH_TASKS
+        retry delays = 0.01
+    [[dummy]]
+        command scripting = true
