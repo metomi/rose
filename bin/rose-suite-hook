@@ -27,8 +27,7 @@
 #
 # DESCRIPTION
 #     Provide a common event hook for Cylc suites and tasks.
-#     * (Task event only) Pull remote task logs back to server host.
-#     * Generate suite log view.
+#     * (Task event only) Retrieve remote task logs back to server host.
 #     * Email user if --mail specified.
 #     * Shutdown suite if --shutdown specified.
 #
@@ -40,6 +39,8 @@
 #         comma separated list of additional addresses to email.
 #     --mail
 #         Trigger an email notification to the user.
+#     --retrieve-job-logs
+#         Retrieve remote task job logs.
 #     --shutdown
 #         Trigger a shutdown of the suite.
 #     --quiet, -q

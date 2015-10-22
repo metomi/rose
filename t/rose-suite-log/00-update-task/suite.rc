@@ -15,7 +15,7 @@ my_task_2
     [[root]]
         command scripting = echo Hello
         [[[event hooks]]]
-            failed handler = rose suite-hook --shutdown
+            failed handler = rose suite-hook --shutdown --retrieve-job-logs
             submission failed handler = rose suite-hook --shutdown
             submission timeout handler = rose suite-hook
             execution timeout handler = rose suite-hook
@@ -27,5 +27,5 @@ my_task_2
 {% endif %}
     [[my_task_1]]
         [[[event hooks]]]
-           succeeded handler = rose suite-hook
+           succeeded handler = rose suite-hook --retrieve-job-logs
     [[my_task_2]]
