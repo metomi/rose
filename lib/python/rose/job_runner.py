@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """A multiprocessing runner of jobs with dependencies."""
 
 from multiprocessing import Pool
@@ -63,7 +63,7 @@ class JobManager(object):
             for dep_key, dep_job in job.pending_for.items():
                 if dep_job.state == dep_job.ST_DONE:
                     job.pending_for.pop(dep_key)
-                    if dep_job.needed_by.has_key(job.name):
+                    if job.name in dep_job.needed_by:
                         dep_job.needed_by.pop(job.name)
                 else:
                     dep_job.needed_by[job.name] = job
@@ -115,7 +115,6 @@ class JobProxy(object):
     """Represent the state of the job."""
 
     ST_DONE = "ST_DONE"
-    #ST_FAILED = "ST_FAILED"
     ST_PENDING = "ST_PENDING"
     ST_READY = "ST_READY"
     ST_WORKING = "ST_WORKING"
@@ -233,8 +232,6 @@ def _job_run(job_processor, job_proxy, *args):
     try:
         job_processor.process_job(job_proxy, *args)
     except Exception as exc:
-        #import traceback
-        #traceback.print_exc(exc)
         job_proxy.exc = exc
     finally:
         job_processor.set_event_handler(None)

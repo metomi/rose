@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) Crown copyright Met Office. All rights reserved.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import httplib
 
@@ -29,7 +29,7 @@ class URLChecker(rose.macro.MacroBase):
                     continue
                 value = config.get([section, option]).value
                 if (not value.isdigit() and " " not in value and
-                    "," not in value):
+                        "," not in value):
                     try:
                         connection = httplib.HTTPConnection(value, 80)
                         connection.request("HEAD", "")

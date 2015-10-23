@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Module to convert from a Fortran namelist file to a Rose configuration.
 
@@ -38,8 +38,9 @@ STD_FILE_ARG = "-"
 
 
 def tr_case(string, case_mode=None):
-    """Return the string with its case translated to upper, lower or unchanged
-    depending on the value of "case_mode", which can be "upper", "lower" or None.
+    """Return the string with its case translated.
+
+    "case_mode" can be "upper", "lower" or None.
     """
     if case_mode == "lower":
         return string.lower()
@@ -89,11 +90,11 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
     index_of_group = {}
     for group in groups:
         name = group.name.lower()
-        if not groups_by_name.has_key(name):
+        if name not in groups_by_name:
             groups_by_name[name] = []
         groups_by_name[name].append(group)
         index_of_group[group] = len(groups_by_name[name])
-        if not groups_in_file.has_key(group.file):
+        if group.file not in groups_in_file:
             groups_in_file[group.file] = []
         groups_in_file[group.file].append(group)
 

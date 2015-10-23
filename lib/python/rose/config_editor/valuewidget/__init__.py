@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
 
@@ -35,6 +35,7 @@ import meta
 import radiobuttons
 import text
 import valuehints
+
 
 class ValueWidgetHook(object):
 
@@ -83,7 +84,7 @@ def chooser(value, metadata, error):
             return combobox.ComboBoxValueWidget
     elif type(m_type) is not list:
         if m_type in ['logical', 'boolean']:
-           return array.logical.LogicalArrayValueWidget
+            return array.logical.LogicalArrayValueWidget
         return array.entry.EntryArrayValueWidget
     if m_type == 'integer':
         return intspin.IntSpinButtonValueWidget

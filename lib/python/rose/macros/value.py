@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import copy
 import re
@@ -130,20 +130,18 @@ class ValueChecker(rose.macro.MacroBase):
             if num_elements != -1:
                 if len(val_list) > num_elements * len(type_list):
                     text = self.WARNING_WRONG_LENGTH.format(
-                                        len(val_list),
-                                        num_elements * len(type_list))
+                        len(val_list), num_elements * len(type_list))
                     self.bad_value_meta_map[goodness_id] = text
                     self.add_report(sect, key, value, text)
                     return
                 elif len(val_list) % len(type_list) != 0:
-                    text = self.WARNING_INVALID_LENGTH.format(
-                                        len(val_list))
+                    text = self.WARNING_INVALID_LENGTH.format(len(val_list))
                     self.bad_value_meta_map[goodness_id] = text
                     self.add_report(sect, key, value, text)
                     return
             num_elements = len(val_list)
         skip_nulls = (metadata.get(rose.META_PROP_COMPULSORY) !=
-                        rose.META_PROP_VALUE_TRUE and num_elements != 1)
+                      rose.META_PROP_VALUE_TRUE and num_elements != 1)
         if rose.META_PROP_VALUES in metadata:
             meta_values = metadata[rose.META_PROP_VALUES]
             for val in val_list:
@@ -152,23 +150,22 @@ class ValueChecker(rose.macro.MacroBase):
                 if val not in meta_values:
                     if len(meta_values) > 1:
                         text = self.WARNING_WRONG_VALUES.format(
-                                            val, repr(meta_values))
+                            val, repr(meta_values))
                     else:
                         text = self.WARNING_WRONG_VALUE_FIXED.format(
-                                            val, meta_values[0])
+                            val, meta_values[0])
                     self.bad_value_meta_map[goodness_id] = text
                     self.add_report(sect, key, value, text)
                     break
         elif rose.META_PROP_TYPE in metadata:
             meta_type = metadata[rose.META_PROP_TYPE]
-            if (num_elements == 1 and
-                isinstance(meta_type, basestring)):
+            if (num_elements == 1 and isinstance(meta_type, basestring)):
                 # A standard, non array variable.
                 for val in val_list:
                     try:
                         if not self.meta_check(val, meta_type, sect, key):
                             self.bad_value_meta_map[goodness_id] = (
-                                                self.reports[-1].info)
+                                self.reports[-1].info)
                     except KeyError:
                         pass
 
@@ -191,7 +188,7 @@ class ValueChecker(rose.macro.MacroBase):
                     try:
                         if not self.meta_check(val, type_name, sect, key):
                             self.bad_value_meta_map[goodness_id] = (
-                                                self.reports[-1].info)
+                                self.reports[-1].info)
                             break
                     except KeyError:
                         pass
@@ -199,10 +196,9 @@ class ValueChecker(rose.macro.MacroBase):
             pattern = metadata[rose.META_PROP_PATTERN]
             if pattern not in self.pattern_comp_map:
                 self.pattern_comp_map[pattern] = re.compile(
-                                            pattern, re.VERBOSE)
+                    pattern, re.VERBOSE)
             if not self.pattern_comp_map[pattern].search(value):
-                text = self.WARNING_BAD_PATTERN.format(
-                                    value, pattern)
+                text = self.WARNING_BAD_PATTERN.format(value, pattern)
                 self.bad_value_meta_map[goodness_id] = text
                 self.add_report(sect, key, value, text)
                 return
@@ -216,8 +212,8 @@ class ValueChecker(rose.macro.MacroBase):
                 self.add_report(sect, key, value, text)
                 return
         if (not self.reports or
-            not (sect == self.reports[-1].section and
-                    key == self.reports[-1].option)):
+                not (sect == self.reports[-1].section and
+                     key == self.reports[-1].option)):
             # Then this value correctly matches the metadata.
             if goodness_id not in self.good_value_meta_map:
                 self.good_value_meta_map[goodness_id] = None
@@ -309,7 +305,7 @@ class TypeFixer(rose.macro.MacroBase):
             m_type = metadata.get(rose.META_PROP_TYPE)
             if m_type in ["boolean", "character", "logical", "quoted"]:
                 if (metadata.get(rose.META_PROP_LENGTH, '').isdigit() or
-                    metadata.get(rose.META_PROP_LENGTH) == ':'):
+                        metadata.get(rose.META_PROP_LENGTH) == ':'):
                     val_list = rose.variable.array_split(value)
                     for i, val in enumerate(val_list):
                         val_list[i] = self.meta_transform(val, m_type)

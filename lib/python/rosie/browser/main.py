@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Implement "rosie go"."""
 
 import ast
@@ -219,7 +219,7 @@ class MainWindow(gtk.Window):
         else:
             items = {}
 
-            #set the all revisions to the setting specified *by the url*
+            # set the all revisions to the setting specified *by the url*
             self.history_menuitem.set_active("all_revs=1" in address_url)
 
             try:

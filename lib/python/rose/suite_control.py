@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Launch suite engine's control commands from the correct suite host."""
 
 import os
@@ -46,7 +46,7 @@ class SuiteControl(object):
         self.popen = popen
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
-                    event_handler=event_handler, popen=popen)
+                event_handler=event_handler, popen=popen)
         self.suite_engine_proc = suite_engine_proc
         if host_selector is None:
             host_selector = HostSelector(event_handler, popen)
@@ -73,7 +73,7 @@ class SuiteControl(object):
         engine_version = self._get_engine_version(suite_name)
         for host in self._get_hosts(suite_name, host):
             self.suite_engine_proc.gcontrol(
-                    suite_name, host, engine_version, args)
+                suite_name, host, engine_version, args)
 
     def shutdown(self, suite_name, host=None, confirm=None, stderr=None,
                  stdout=None, *args):
@@ -94,7 +94,7 @@ class SuiteControl(object):
         for host in self._get_hosts(suite_name, host):
             if confirm is None or confirm("shutdown", suite_name, host):
                 self.suite_engine_proc.shutdown(
-                        suite_name, host, engine_version, args, stderr, stdout)
+                    suite_name, host, engine_version, args, stderr, stdout)
 
     def _get_hosts(self, suite_name, host):
         if host:
@@ -115,7 +115,7 @@ class SuiteControl(object):
 
     def _get_engine_version(self, suite_name):
         conf_path = self.suite_engine_proc.get_suite_dir(
-                suite_name, "log", "rose-suite-run.conf")
+            suite_name, "log", "rose-suite-run.conf")
         if os.access(conf_path, os.F_OK | os.R_OK):
             conf = rose.config.load(conf_path)
             key = self.suite_engine_proc.get_version_env_name()
@@ -147,11 +147,13 @@ def get_suite_name(event_handler=None):
             raise SuiteNotFoundError(os.getcwd())
         conf_dir = up_dir
 
+
 def prompt(action, suite_name, host):
     """Prompt user to confirm action for suite_name at host."""
     if not host:
         host = "localhost"
     return raw_input(PROMPT % (action, suite_name, host)).strip() in [YES]
+
 
 def main():
     """Implement "rose suite-gcontrol" and "rose suite-shutdown"."""

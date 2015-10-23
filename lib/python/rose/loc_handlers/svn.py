@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,13 +16,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """A handler of Subversion locations."""
 
 import os
 from tempfile import mkdtemp
 from urlparse import urlparse
 import xml.parsers.expat
+
 
 class SvnLocHandler(object):
     """Handler of Subversion locations."""
@@ -60,7 +61,7 @@ class SvnLocHandler(object):
         info_entry = SvnInfoXMLParser()(xml_str)
         if info_entry["kind"] == "dir":
             loc.loc_type = loc.TYPE_TREE
-        else: # if info_entry ["kind"] == "file":
+        else:  # if info_entry ["kind"] == "file":
             loc.loc_type = loc.TYPE_BLOB
         loc.real_name = "%s@%s" % (info_entry["url"], info_entry["revision"])
         loc.key = info_entry["commit:revision"]

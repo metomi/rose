@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import copy
 
@@ -46,17 +46,16 @@ class SuiteDirector():
         else:
             id_text = id_.to_string_with_version()
         rc = rose.gtk.dialog.DialogProcess(
-                      [self.vc_client.checkout, id_],
-                      description=rosie.browser.DIALOG_MESSAGE_CHECKOUT.format(
-                                                id_text),
-                      title=rosie.browser.DIALOG_TITLE_CHECKOUT).run()
+            [self.vc_client.checkout, id_],
+            description=rosie.browser.DIALOG_MESSAGE_CHECKOUT.format(id_text),
+            title=rosie.browser.DIALOG_TITLE_CHECKOUT).run()
         if rc != 0:
             return False
 
     def delete(self, to_delete, *args):
         """"Handles deletion of a suite."""
         warning = rosie.browser.DIALOG_MESSAGE_DELETE_CONFIRMATION.format(
-                                                                   to_delete)
+            to_delete)
         label = gtk.Label(warning)
         label.set_line_wrap(True)
         dialog = gtk.MessageDialog(None,
@@ -74,10 +73,10 @@ class SuiteDirector():
                                            rosie.browser.ERROR_PERMISSIONS +
                                            "\n\n" + str(e))
             except rosie.vc.LocalCopyStatusError as e:
-                 rose.gtk.dialog.run_dialog(
-                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                          rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
-                          "\n\n" + str(e))
+                rose.gtk.dialog.run_dialog(
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
+                    "\n\n" + str(e))
             return True
 
         return False
@@ -102,10 +101,10 @@ class SuiteDirector():
                                            rosie.browser.ERROR_PERMISSIONS +
                                            "\n\n" + str(e))
             except rosie.vc.LocalCopyStatusError as e:
-                 rose.gtk.dialog.run_dialog(
-                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                          rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
-                          "\n\n" + str(e))
+                rose.gtk.dialog.run_dialog(
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
+                    "\n\n" + str(e))
             return True
 
         return False
@@ -125,10 +124,9 @@ class SuiteDirector():
                 break
             window.vbox.remove(child)
         editor = rose.config_editor.main.MainController(
-                             config_objs={"discovery": config_copy},
-                             config_obj_types={"discovery":
-                                               rose.INFO_CONFIG_NAME},
-                             pluggable=True)
+            config_objs={"discovery": config_copy},
+            config_obj_types={"discovery": rose.INFO_CONFIG_NAME},
+            pluggable=True)
         page_box = editor.get_orphan_page("/discovery")
         page = page_box.get_children()[0]
         vbox = gtk.VBox()
@@ -136,9 +134,9 @@ class SuiteDirector():
         vbox.show()
         ok_button = gtk.Button(stock=gtk.STOCK_OK)
         ok_button.connect(
-                  "clicked",
-                  lambda b: self._finish_config(page_box, window,
-                                                editor, finish_func))
+            "clicked",
+            lambda b: self._finish_config(
+                page_box, window, editor, finish_func))
         ok_button.show()
         back_button = gtk.Button(stock=gtk.STOCK_GO_BACK)
         back_button.connect("clicked", back_func)
@@ -155,9 +153,9 @@ class SuiteDirector():
                                                 label="Add property",
                                                 tip_text="Add a new property")
         add_button.connect(
-                   "button-press-event",
-                   lambda b, e: page_box.get_children()[0].launch_add_menu(
-                                             e.button, e.time))
+            "button-press-event",
+            lambda b, e: page_box.get_children()[0].launch_add_menu(
+                e.button, e.time))
         hbox.pack_start(add_button, expand=False, fill=False)
         hbox.show()
         window.vbox.pack_start(hbox, expand=False, fill=False)
@@ -169,10 +167,10 @@ class SuiteDirector():
         page = page_container.get_children()[0]
         if page.validate_errors():
             ok_dialog = gtk.MessageDialog(
-                           parent=window,
-                           message_format=rosie.browser.LABEL_ERROR_DISCOVERY,
-                           type=gtk.MESSAGE_ERROR,
-                           buttons=gtk.BUTTONS_NONE)
+                parent=window,
+                message_format=rosie.browser.LABEL_ERROR_DISCOVERY,
+                type=gtk.MESSAGE_ERROR,
+                buttons=gtk.BUTTONS_NONE)
             ok_dialog.set_title(rosie.browser.TITLE_ERROR_DISCOVERY)
             ok_dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
             ok_dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)

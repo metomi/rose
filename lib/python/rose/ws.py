@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Web service CLI and mod_wsgi functions.
 
 wsgi_app - Return a WSGI application for a web service.
@@ -78,7 +78,7 @@ def ws_cli(service_cls, *args, **kwargs):
         status = _get_server_status(service_cls)
         level = Reporter.DEFAULT
         if arg != "stop":
-           level = 0
+            level = 0
         for key, value in sorted(status.items()):
             report("%s=%s\n" % (key, value), level=level)
         if (arg == "stop" and status.get("pid") and
@@ -124,7 +124,7 @@ def _configure(service_cls):
     # Environment variables (not normally defined in WSGI mode)
     if not os.getenv("ROSE_HOME"):
         path = os.path.abspath(__file__)
-        while os.path.dirname(path) != path: # not root
+        while os.path.dirname(path) != path:  # not root
             if os.path.basename(path) == "lib":
                 os.environ["ROSE_HOME"] = os.path.dirname(path)
                 break

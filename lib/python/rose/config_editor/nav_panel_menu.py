@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import os
 import time
@@ -64,7 +64,7 @@ class NavPanelHandler(object):
                 help_str = ''
             else:
                 sections = self.data.helper.get_sections_from_namespace(
-                                                              base_ns)
+                    base_ns)
                 if sections == []:
                     help_str = subsp.replace('/', ':')
                 else:
@@ -79,10 +79,11 @@ class NavPanelHandler(object):
             config_name = None
         choices_help = self.data.helper.get_missing_sections(config_name)
 
-        config_names = [n for n in self.data.config if not self.ask_is_preview(n)]
-        config_names.sort(lambda x, y: (y == config_name) -(x == config_name))
+        config_names = [
+            n for n in self.data.config if not self.ask_is_preview(n)]
+        config_names.sort(lambda x, y: (y == config_name) - (x == config_name))
         config_name, section = self.mainwindow.launch_add_dialog(
-                                    config_names, choices_help, help_str)
+            config_names, choices_help, help_str)
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section, page_launch=True)
 
@@ -132,8 +133,8 @@ class NavPanelHandler(object):
         if base_ns is not None and '/' in base_ns:
             config_name, subsp = self.util.split_full_ns(self.data, base_ns)
             prefer_name_sections = {
-                  config_name: self.data.helper.get_sections_from_namespace(
-                                                                  base_ns)}
+                config_name:
+                self.data.helper.get_sections_from_namespace(base_ns)}
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
@@ -153,18 +154,15 @@ class NavPanelHandler(object):
                     if not is_ignored:
                         co = sect_data.metadata.get(rose.META_PROP_COMPULSORY)
                         if (not sect_data.ignored_reason or
-                            co == rose.META_PROP_VALUE_TRUE):
+                                co == rose.META_PROP_VALUE_TRUE):
                             continue
                     config_sect_dict[config_name].append(section)
-            config_sect_dict[config_name].sort(
-                             rose.config.sort_settings)
+            config_sect_dict[config_name].sort(rose.config.sort_settings)
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                            rose.config.sort_settings)
+                    rose.config.sort_settings)
         config_name, section = self.mainwindow.launch_ignore_dialog(
-                                               config_sect_dict,
-                                               prefer_name_sections,
-                                               is_ignored)
+            config_sect_dict, prefer_name_sections, is_ignored)
         if config_name in self.data.config and section is not None:
             self.sect_ops.ignore_section(config_name, section, is_ignored)
 
@@ -183,9 +181,9 @@ class NavPanelHandler(object):
             return False
         if len(sections) > 1:
             section = rose.gtk.dialog.run_choices_dialog(
-                          rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_EDIT,
-                          sections,
-                          rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
+                rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_EDIT,
+                sections,
+                rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
         else:
             section = sections[0]
         if section is None:
@@ -193,7 +191,7 @@ class NavPanelHandler(object):
         title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(section)
         text = "\n".join(config_data.sections.now[section].comments)
         finish = lambda t: self.sect_ops.set_section_comments(
-                                     config_name, section,t.splitlines())
+            config_name, section, t.splitlines())
         rose.gtk.dialog.run_edit_dialog(text, finish_hook=finish, title=title)
 
     def fix_request(self, base_ns):
@@ -227,7 +225,7 @@ class NavPanelHandler(object):
             sect_data = config_data.sections.now.get(section)
             if sect_data is not None:
                 rose.config_editor.util.launch_node_info_dialog(
-                            sect_data, "", search_function)
+                    sect_data, "", search_function)
 
     def graph_request(self, namespace):
         """Handle a graph request for namespace info."""
@@ -239,8 +237,8 @@ class NavPanelHandler(object):
         if base_ns is not None and '/' in base_ns:
             config_name, subsp = self.util.split_full_ns(self.data, base_ns)
             prefer_name_sections = {
-                  config_name: self.data.helper.get_sections_from_namespace(
-                                                                  base_ns)}
+                config_name:
+                self.data.helper.get_sections_from_namespace(base_ns)}
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
@@ -248,24 +246,21 @@ class NavPanelHandler(object):
         for config_name in config_names:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = config_data.sections.now.keys()
-            config_sect_dict[config_name].sort(
-                             rose.config.sort_settings)
+            config_sect_dict[config_name].sort(rose.config.sort_settings)
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                            rose.config.sort_settings)
+                    rose.config.sort_settings)
         config_name, section = self.mainwindow.launch_remove_dialog(
-                                               config_sect_dict,
-                                               prefer_name_sections)
+            config_sect_dict, prefer_name_sections)
         if config_name in self.data.config and section is not None:
             start_stack_index = len(self.undo_stack)
-            group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(
-                                                                 time.time())
+            group = (
+                rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time()))
             config_data = self.data.config[config_name]
             sect_data = config_data.sections.now[section]
             ns = sect_data.metadata["full_ns"]
             variable_sorter = lambda v, w: rose.config.sort_settings(
-                                                        v.metadata['id'],
-                                                        w.metadata['id'])
+                v.metadata['id'], w.metadata['id'])
             variables = list(config_data.vars.now.get(section, []))
             variables.sort(variable_sorter)
             variables.reverse()
@@ -333,13 +328,11 @@ class NavPanelHandler(object):
             has_content = self.data.helper.is_ns_content(namespace)
             is_unsaved = self.data.helper.get_config_has_unsaved_changes(
                 config_name)
-            ignored_sections = self.data.helper.get_ignored_sections(
-                                                namespace)
+            ignored_sections = self.data.helper.get_ignored_sections(namespace)
             enabled_sections = self.data.helper.get_ignored_sections(
-                                                namespace, get_enabled=True)
+                namespace, get_enabled=True)
             is_latent = self.data.helper.get_ns_latent_status(namespace)
-            latent_sections = self.data.helper.get_latent_sections(
-                                                   namespace)
+            latent_sections = self.data.helper.get_latent_sections(namespace)
             metadata, comments = self.get_ns_metadata_and_comments(namespace)
             if is_latent:
                 for i, section in enumerate(latent_sections):
@@ -395,22 +388,18 @@ class NavPanelHandler(object):
         uimanager.add_ui_from_string(ui_config_string)
         if namespace is None or (is_top or is_empty):
             new_item = uimanager.get_widget('/Popup/New')
-            new_item.connect("activate",
-                             lambda b: self.create_request())
+            new_item.connect("activate", lambda b: self.create_request())
             new_item.set_sensitive(not is_empty)
         add_item = uimanager.get_widget('/Popup/Add')
-        add_item.connect("activate",
-                         lambda b: self.add_dialog(namespace))
+        add_item.connect("activate", lambda b: self.add_dialog(namespace))
         add_item.set_sensitive(not is_empty)
         enable_item = uimanager.get_widget('/Popup/Enable')
         enable_item.connect(
-                    "activate",
-                    lambda b: self.ignore_request(namespace, False))
+            "activate", lambda b: self.ignore_request(namespace, False))
         enable_item.set_sensitive(not is_empty)
         ignore_item = uimanager.get_widget('/Popup/Ignore')
         ignore_item.connect(
-                    "activate",
-                    lambda b: self.ignore_request(namespace, True))
+            "activate", lambda b: self.ignore_request(namespace, True))
         ignore_item.set_sensitive(not is_empty)
         if namespace is not None:
             if is_latent:
@@ -418,9 +407,10 @@ class NavPanelHandler(object):
                     action_name = "Add {0}".format(i)
                     add_item = uimanager.get_widget("/Popup/" + action_name)
                     add_item._section = section
-                    add_item.connect("activate",
-                                     lambda b: self.sect_ops.add_section(
-                                                    config_name, b._section))
+                    add_item.connect(
+                        "activate",
+                        lambda b: self.sect_ops.add_section(
+                            config_name, b._section))
             if cloneable:
                 clone_item = uimanager.get_widget('/Popup/Clone')
                 clone_item.connect("activate",
@@ -428,10 +418,10 @@ class NavPanelHandler(object):
             if has_content:
                 edit_item = uimanager.get_widget('/Popup/Edit')
                 edit_item.connect("activate",
-                                    lambda b: self.edit_request(namespace))
+                                  lambda b: self.edit_request(namespace))
                 info_item = uimanager.get_widget('/Popup/Info')
                 info_item.connect("activate",
-                                    lambda b: self.info_request(namespace))
+                                  lambda b: self.info_request(namespace))
                 graph_item = uimanager.get_widget("/Popup/Graph")
                 graph_item.connect("activate",
                                    lambda b: self.graph_request(namespace))
@@ -441,27 +431,24 @@ class NavPanelHandler(object):
                 help_item = uimanager.get_widget('/Popup/Help')
                 help_title = namespace.split('/')[1:]
                 help_title = rose.config_editor.DIALOG_HELP_TITLE.format(
-                                                                  help_title)
+                    help_title)
                 search_function = lambda i: self.search_request(namespace, i)
                 help_item.connect(
-                          "activate",
-                          lambda b: rose.gtk.dialog.run_hyperlink_dialog(
-                                         gtk.STOCK_DIALOG_INFO,
-                                         help, help_title,
-                                         search_function))
+                    "activate",
+                    lambda b: rose.gtk.dialog.run_hyperlink_dialog(
+                        gtk.STOCK_DIALOG_INFO, help, help_title,
+                        search_function))
             if url is not None:
                 url_item = uimanager.get_widget('/Popup/URL')
                 url_item.connect(
-                            "activate",
-                            lambda b: webbrowser.open(url))
+                    "activate", lambda b: webbrowser.open(url))
             if is_fixable:
                 autofix_item = uimanager.get_widget('/Popup/Autofix')
                 autofix_item.connect("activate",
                                      lambda b: self.fix_request(namespace))
             remove_section_item = uimanager.get_widget('/Popup/Remove')
             remove_section_item.connect(
-                           "activate",
-                           lambda b: self.remove_request(namespace))
+                "activate", lambda b: self.remove_request(namespace))
         menu = uimanager.get_widget('/Popup')
         menu.popup(None, None, None, event.button, event.time)
         return False
@@ -488,7 +475,7 @@ class NavPanelHandler(object):
         for section in sections:
             errors += len(config_data.sections.get_sect(section).error)
         real_data, latent_data = self.data.helper.get_data_for_namespace(
-                                                               namespace)
+            namespace)
         errors += sum([len(v.error) for v in real_data + latent_data])
         return errors
 
@@ -503,11 +490,11 @@ class NavPanelHandler(object):
             # Always show this.
             return True
         show_ignored = self.data.page_ns_show_modes[
-                                      rose.config_editor.SHOW_MODE_IGNORED]
+            rose.config_editor.SHOW_MODE_IGNORED]
         show_user_ignored = self.data.page_ns_show_modes[
-                                 rose.config_editor.SHOW_MODE_USER_IGNORED]
+            rose.config_editor.SHOW_MODE_USER_IGNORED]
         show_latent = self.data.page_ns_show_modes[
-                                rose.config_editor.SHOW_MODE_LATENT]
+            rose.config_editor.SHOW_MODE_LATENT]
         if latent_status:
             if not show_latent:
                 # Latent page, no latent pages allowed.

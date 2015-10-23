@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
 import sys
@@ -71,11 +71,11 @@ class EntryArrayValueWidget(gtk.HBox):
         if self.is_char_array:
             for i, val in enumerate(value_array):
                 value_array[i] = (
-                      rose.config_editor.util.text_for_character_widget(val))
+                    rose.config_editor.util.text_for_character_widget(val))
         if self.is_quoted_array:
             for i, val in enumerate(value_array):
                 value_array[i] = (
-                      rose.config_editor.util.text_for_quoted_widget(val))
+                    rose.config_editor.util.text_for_quoted_widget(val))
         # Designate the number of allowed columns - 10 for 4 chars width
         self.num_allowed_columns = 3
         self.entry_table = gtk.Table(rows=1,
@@ -134,7 +134,7 @@ class EntryArrayValueWidget(gtk.HBox):
             if prefix is None:
                 return
             if (len(text + prefix + val) >= focus_index or
-                i == len(value_array) - 1):
+                    i == len(value_array) - 1):
                 if len(self.entries) > i:
                     self.entries[i].grab_focus()
                     val_offset = focus_index - len(text + prefix)
@@ -177,8 +177,7 @@ class EntryArrayValueWidget(gtk.HBox):
         right_event_box.show()
         right_event_box.add(right_arrow)
         right_event_box.connect(
-                        'button-press-event',
-                        lambda b, e: self.move_element(1))
+            'button-press-event', lambda b, e: self.move_element(1))
         right_event_box.connect('enter-notify-event', self._handle_arrow_enter)
         right_event_box.connect('leave-notify-event', self._handle_arrow_leave)
         right_event_box.set_tooltip_text(self.TIP_RIGHT)
@@ -203,7 +202,6 @@ class EntryArrayValueWidget(gtk.HBox):
         self.button_box = gtk.HBox()
         self.button_box.show()
         self.button_box.pack_start(self.arrow_box, expand=False, fill=True)
-        #self.button_box.pack_start(self.del_button, expand=False, fill=False)
         add_image = gtk.image_new_from_stock(gtk.STOCK_ADD, gtk.ICON_SIZE_MENU)
         add_image.show()
         self.add_button = gtk.EventBox()
@@ -217,8 +215,10 @@ class EntryArrayValueWidget(gtk.HBox):
         self.add_button.connect('leave-notify-event',
                                 lambda b, e: b.set_state(gtk.STATE_NORMAL))
         self.add_del_button_box = gtk.VBox()
-        self.add_del_button_box.pack_start(self.add_button, expand=False, fill=False)
-        self.add_del_button_box.pack_start(self.del_button, expand=False, fill=False)
+        self.add_del_button_box.pack_start(
+            self.add_button, expand=False, fill=False)
+        self.add_del_button_box.pack_start(
+            self.del_button, expand=False, fill=False)
         self.add_del_button_box.show()
 
     def _handle_arrow_enter(self, arrow_event_box, event):
@@ -244,7 +244,7 @@ class EntryArrayValueWidget(gtk.HBox):
             return
         old_index = self.entries.index(entry)
         if (old_index + num_places_right < 0 or
-            old_index + num_places_right > len(self.entries) - 1):
+                old_index + num_places_right > len(self.entries) - 1):
             return
         self.entries.remove(entry)
         self.entries.insert(old_index + num_places_right, entry)
@@ -285,26 +285,26 @@ class EntryArrayValueWidget(gtk.HBox):
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
         if (focus_widget is None and self.entry_table.is_focus()
-            and len(self.entries) > 0):
+                and len(self.entries) > 0):
             focus_widget = self.entries[-1]
             position = len(focus_widget.get_text())
         num_fields = len(self.entries + [self.button_box])
         num_rows_now = 1 + (num_fields - 1) / self.num_allowed_columns
         self.entry_table.resize(num_rows_now, self.num_allowed_columns)
         if (self.max_length.isdigit() and
-            len(self.entries) >= int(self.max_length)):
+                len(self.entries) >= int(self.max_length)):
             self.add_button.hide()
         else:
             self.add_button.show()
         if (self.max_length.isdigit() and
-            len(self.entries) <= int(self.max_length)):
+                len(self.entries) <= int(self.max_length)):
             self.del_button.hide()
         elif len(self.entries) == 0:
             self.del_button.hide()
         else:
             self.del_button.show()
         if (self.last_selected_src is not None and
-            self.last_selected_src in self.entries):
+                self.last_selected_src in self.entries):
             index = self.entries.index(self.last_selected_src)
             if index == 0:
                 self.set_arrow_sensitive(False, True)
@@ -331,8 +331,8 @@ class EntryArrayValueWidget(gtk.HBox):
             focus_widget.grab_focus()
             focus_widget.set_position(position)
             focus_widget.select_region(position, position)
-        self.grab_focus = lambda : self.hook.get_focus(
-                                                 self._get_widget_for_focus())
+        self.grab_focus = lambda: self.hook.get_focus(
+            self._get_widget_for_focus())
         self.check_resize()
 
     def reshape_table(self):
@@ -344,8 +344,7 @@ class EntryArrayValueWidget(gtk.HBox):
         each_entry_bound = entries_bound / len(self.entries)
         maximum_entry_number = float(total_x_bound) / float(each_entry_bound)
         rounded_max = int(maximum_entry_number) + 1
-        if (rounded_max != self.num_allowed_columns + 2 and
-            rounded_max > 2):
+        if rounded_max != self.num_allowed_columns + 2 and rounded_max > 2:
             self.num_allowed_columns = max(1, rounded_max - 2)
             self.populate_table()
 
@@ -356,13 +355,13 @@ class EntryArrayValueWidget(gtk.HBox):
         self._adjust_entry_length()
         self.populate_table(focus_widget=entry)
         if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
-            rose.META_PROP_VALUE_TRUE):
+                rose.META_PROP_VALUE_TRUE):
             self.setter(entry)
 
     def remove_entry(self):
         """Remove the last selected or the last entry."""
         if (self.last_selected_src is not None and
-            self.last_selected_src in self.entries):
+                self.last_selected_src in self.entries):
             text = self.last_selected_src.get_text()
             entry = self.entries.remove(self.last_selected_src)
             self.last_selected_src = None
@@ -371,7 +370,7 @@ class EntryArrayValueWidget(gtk.HBox):
             entry = self.entries.pop()
         self.populate_table()
         if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
-            rose.META_PROP_VALUE_TRUE or text):
+                rose.META_PROP_VALUE_TRUE or text):
             # Optional, or compulsory but not blank.
             self.setter(entry)
 
@@ -390,18 +389,18 @@ class EntryArrayValueWidget(gtk.HBox):
         if self.is_char_array:
             for i, val in enumerate(val_array):
                 val_array[i] = (
-                      rose.config_editor.util.text_from_character_widget(val))
+                    rose.config_editor.util.text_from_character_widget(val))
         elif self.is_quoted_array:
             for i, val in enumerate(val_array):
                 val_array[i] = (
-                      rose.config_editor.util.text_from_quoted_widget(val))
+                    rose.config_editor.util.text_from_quoted_widget(val))
         entries_have_commas = any(["," in v for v in val_array])
         new_value = rose.variable.array_join(val_array)
         if new_value != self.value:
             self.value = new_value
             self.set_value(new_value)
             if (entries_have_commas and
-                not (self.is_char_array or self.is_quoted_array)):
+                    not (self.is_char_array or self.is_quoted_array)):
                 new_val_array = rose.variable.array_split(new_value)
                 if len(new_val_array) != len(self.entries):
                     self.generate_entries()
@@ -410,7 +409,7 @@ class EntryArrayValueWidget(gtk.HBox):
                         if "," in val:
                             val_post_comma = val[:val.index(",") + 1]
                             focus_index = len(rose.variable.array_join(
-                                  new_val_array[:i] + [val_post_comma]))
+                                new_val_array[:i] + [val_post_comma]))
                     self.populate_table()
                     self.set_focus_index(focus_index)
         return False

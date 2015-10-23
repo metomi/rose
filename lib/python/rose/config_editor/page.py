@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
 import sys
@@ -46,7 +46,7 @@ class ConfigPage(gtk.VBox):
     """Returns a container for a tab."""
 
     def __init__(self, page_metadata, config_data, ghost_data, section_ops,
-                 variable_ops, sections, latent_sections, get_formats_func, 
+                 variable_ops, sections, latent_sections, get_formats_func,
                  reporter, directory=None, sub_data=None, sub_ops=None,
                  launch_info_func=None, launch_edit_func=None,
                  launch_macro_func=None):
@@ -93,8 +93,8 @@ class ConfigPage(gtk.VBox):
         self.ghost_data = ghost_data
         self.section_ops = section_ops
         self.variable_ops = variable_ops
-        self.trigger_ask_for_config_keys = lambda: get_formats_func(
-                                                       self.config_name)
+        self.trigger_ask_for_config_keys = (
+            lambda: get_formats_func(self.config_name))
         self.sort_data()
         self.sort_data(ghost=True)
         self._last_info_labels = None
@@ -113,7 +113,7 @@ class ConfigPage(gtk.VBox):
         self.scrolled_main_window.add_with_viewport(self.scrolled_vbox)
         self.scrolled_main_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
         self.scrolled_main_window.set_border_width(
-                           rose.config_editor.SPACING_SUB_PAGE)
+            rose.config_editor.SPACING_SUB_PAGE)
         self.scrolled_vbox.pack_start(self.main_container,
                                       expand=False, fill=True)
         self.scrolled_main_window.show()
@@ -149,8 +149,8 @@ class ConfigPage(gtk.VBox):
         self.show()
         self.scroll_vadj = self.scrolled_main_window.get_vadjustment()
         self.scrolled_main_window.connect(
-                     "button-press-event",
-                     self._handle_click_main_window)
+            "button-press-event",
+            self._handle_click_main_window)
 
     def _handle_click_main_window(self, widget, event):
         if event.button != 3:
@@ -185,13 +185,11 @@ class ConfigPage(gtk.VBox):
             label_box.pack_start(self.label_icon, expand=False, fill=False,
                                  padding=rose.config_editor.SPACING_SUB_PAGE)
         close_button = rose.gtk.util.CustomButton(
-                            stock_id=gtk.STOCK_CLOSE,
-                            size=gtk.ICON_SIZE_MENU,
-                            as_tool=True)
+            stock_id=gtk.STOCK_CLOSE, size=gtk.ICON_SIZE_MENU, as_tool=True)
         style = gtk.RcStyle()
         style.xthickness = 0
         style.ythickness = 0
-        setattr(style, "inner-border", [0, 0, 0, 0] )
+        setattr(style, "inner-border", [0, 0, 0, 0])
         close_button.modify_style(style)
 
         label_box.pack_start(label_event_box, expand=False, fill=False,
@@ -262,13 +260,13 @@ class ConfigPage(gtk.VBox):
         ui_config_string_start += """<menuitem action="Info"/>
                                      <menuitem action="Edit"/>"""
         actions = [
-               ('Open', gtk.STOCK_NEW, rose.config_editor.TAB_MENU_OPEN_NEW),
-               ('Info', gtk.STOCK_INFO, rose.config_editor.TAB_MENU_INFO),
-               ('Edit', gtk.STOCK_EDIT, rose.config_editor.TAB_MENU_EDIT),
-               ('Help', gtk.STOCK_HELP, rose.config_editor.TAB_MENU_HELP),
-               ('Web_Help', gtk.STOCK_HOME,
-                rose.config_editor.TAB_MENU_WEB_HELP),
-               ('Close', gtk.STOCK_CLOSE, rose.config_editor.TAB_MENU_CLOSE)]
+            ('Open', gtk.STOCK_NEW, rose.config_editor.TAB_MENU_OPEN_NEW),
+            ('Info', gtk.STOCK_INFO, rose.config_editor.TAB_MENU_INFO),
+            ('Edit', gtk.STOCK_EDIT, rose.config_editor.TAB_MENU_EDIT),
+            ('Help', gtk.STOCK_HELP, rose.config_editor.TAB_MENU_HELP),
+            ('Web_Help', gtk.STOCK_HOME,
+             rose.config_editor.TAB_MENU_WEB_HELP),
+            ('Close', gtk.STOCK_CLOSE, rose.config_editor.TAB_MENU_CLOSE)]
         if self.help is not None:
             help_string = """<separator name="helpsep"/>
                              <menuitem action="Help"/>"""
@@ -319,19 +317,19 @@ class ConfigPage(gtk.VBox):
         sep_vbox.set_border_width(rose.config_editor.SPACING_SUB_PAGE)
         sep_vbox.show()
         info_button = rose.gtk.util.CustomButton(
-                               stock_id=gtk.STOCK_INFO,
-                               as_tool=True,
-                               tip_text=rose.config_editor.TAB_MENU_INFO)
+            stock_id=gtk.STOCK_INFO,
+            as_tool=True,
+            tip_text=rose.config_editor.TAB_MENU_INFO)
         info_button.connect("clicked", lambda m: self.launch_info())
         help_button = rose.gtk.util.CustomButton(
-                               stock_id=gtk.STOCK_HELP,
-                               as_tool=True,
-                               tip_text=rose.config_editor.TAB_MENU_HELP)
+            stock_id=gtk.STOCK_HELP,
+            as_tool=True,
+            tip_text=rose.config_editor.TAB_MENU_HELP)
         help_button.connect("clicked", self.launch_help)
         url_button = rose.gtk.util.CustomButton(
-                              stock_id=gtk.STOCK_HOME,
-                              as_tool=True,
-                              tip_text=rose.config_editor.TAB_MENU_WEB_HELP)
+            stock_id=gtk.STOCK_HOME,
+            as_tool=True,
+            tip_text=rose.config_editor.TAB_MENU_WEB_HELP)
         url_button.connect("clicked", self.launch_url)
         button_hbox.pack_start(add_button, expand=False, fill=False)
         button_hbox.pack_start(revert_button, expand=False, fill=False)
@@ -351,7 +349,8 @@ class ConfigPage(gtk.VBox):
                              spacing=rose.config_editor.SPACING_PAGE)
         label_box.pack_start(self.get_label_widget(is_detached=True))
         label_box.show()
-        self.tool_hbox.pack_start(label_box, expand=True, fill=True, padding=10)
+        self.tool_hbox.pack_start(
+            label_box, expand=True, fill=True, padding=10)
         self.tool_hbox.show()
         self.pack_start(self.tool_hbox, expand=False, fill=False)
         self.reorder_child(self.tool_hbox, 0)
@@ -374,9 +373,7 @@ class ConfigPage(gtk.VBox):
         """Launch the page help."""
         title = rose.config_editor.DIALOG_HELP_TITLE.format(self.label)
         rose.gtk.dialog.run_hyperlink_dialog(
-                                 gtk.STOCK_DIALOG_INFO,
-                                 str(self.help),
-                                 title)
+            gtk.STOCK_DIALOG_INFO, str(self.help), title)
 
     def launch_url(self, *args):
         """Launch the page url help."""
@@ -414,7 +411,7 @@ class ConfigPage(gtk.VBox):
         # Add page help.
         if self.description:
             help_label = rose.gtk.util.get_hyperlink_label(
-                                  self.description, search_func=self.search_for_id)
+                self.description, search_func=self.search_for_id)
             help_label_window = gtk.ScrolledWindow()
             help_label_window.set_policy(gtk.POLICY_AUTOMATIC,
                                          gtk.POLICY_AUTOMATIC)
@@ -422,7 +419,8 @@ class ConfigPage(gtk.VBox):
             help_label_hbox.pack_start(help_label, expand=False, fill=False)
             help_label_hbox.show()
             help_label_vbox = gtk.VBox()
-            help_label_vbox.pack_start(help_label_hbox, expand=False, fill=False)
+            help_label_vbox.pack_start(
+                help_label_hbox, expand=False, fill=False)
             help_label_vbox.show()
             help_label_window.add_with_viewport(help_label_vbox)
             help_label_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
@@ -440,8 +438,8 @@ class ConfigPage(gtk.VBox):
                                  padding=rose.config_editor.SPACING_SUB_PAGE)
             help_hbox.show()
             info_container.pack_start(
-                                help_hbox, expand=True, fill=True,
-                                padding=rose.config_editor.SPACING_SUB_PAGE)
+                help_hbox, expand=True, fill=True,
+                padding=rose.config_editor.SPACING_SUB_PAGE)
         for child in self.info_panel.get_children():
             self.info_panel.remove(child)
         self.info_panel.pack_start(info_container, expand=True, fill=True)
@@ -449,8 +447,8 @@ class ConfigPage(gtk.VBox):
     def generate_filesystem_panel(self):
         """Generate a widget to view the file hierarchy."""
         self.filesystem_panel = (
-                rose.config_editor.panelwidget.filesystem.FileSystemPanel(
-                                                              self.directory))
+            rose.config_editor.panelwidget.filesystem.FileSystemPanel(
+                self.directory))
 
     def generate_sub_data_panel(self, override_custom=False):
         """Generate a panel giving a summary of other page data."""
@@ -468,31 +466,30 @@ class ConfigPage(gtk.VBox):
             else:
                 widget_path, widget_args = widget_name_args[0], None
             metadata_files = self.section_ops.get_ns_metadata_files(
-                                                  self.namespace)
+                self.namespace)
             widget_dir = rose.META_DIR_WIDGET
-            metadata_files.sort(lambda x, y: (widget_dir in y) -
-                                             (widget_dir in x))
+            metadata_files.sort(
+                lambda x, y: (widget_dir in y) - (widget_dir in x))
             prefix = re.sub("[^\w]", "_", self.config_name.strip("/"))
             prefix += "/" + rose.META_DIR_WIDGET + "/"
             custom_widget = rose.resource.import_object(
-                                        widget_path,
-                                        metadata_files,
-                                        self.handle_bad_custom_sub_widget,
-                                        module_prefix=prefix)
+                widget_path,
+                metadata_files,
+                self.handle_bad_custom_sub_widget,
+                module_prefix=prefix)
             if custom_widget is None:
                 text = rose.config_editor.ERROR_IMPORT_CLASS.format(
-                                                       self.custom_sub_widget)
+                    self.custom_sub_widget)
                 self.handle_bad_custom_sub_widget(text)
                 return False
             try:
-                self.sub_data_panel = custom_widget(*args,
-                                                    arg_str=widget_args)
+                self.sub_data_panel = custom_widget(*args, arg_str=widget_args)
             except Exception as e:
                 self.handle_bad_custom_sub_widget(str(e))
         else:
             panel_module = rose.config_editor.panelwidget.summary_data
             self.sub_data_panel = (
-                     panel_module.StandardSummaryDataPanel(*args))
+                panel_module.StandardSummaryDataPanel(*args))
 
     def handle_bad_custom_sub_widget(self, error_info):
         text = rose.config_editor.ERROR_IMPORT_WIDGET.format(
@@ -505,13 +502,13 @@ class ConfigPage(gtk.VBox):
         """Update the sub (summary) data panel."""
         if self.sub_data is None:
             if (hasattr(self, "sub_data_panel") and
-                self.sub_data_panel is not None):
+                    self.sub_data_panel is not None):
                 self.vpaned.remove(self.sub_data_panel)
                 self.sub_data_panel.destroy()
                 self.sub_data_panel = None
         else:
             if (hasattr(self, "sub_data_panel") and
-                self.sub_data_panel is not None):
+                    self.sub_data_panel is not None):
                 self.sub_data_panel.update(self.sub_data["sections"],
                                            self.sub_data["variables"])
 
@@ -532,8 +529,8 @@ class ConfigPage(gtk.VBox):
         add_ui_start = """<ui> <popup name='Popup'>
                          <menu action="Add meta">"""
         add_ui_end = """</menu> </popup> </ui>"""
-        actions =  [('Add meta',  gtk.STOCK_DIRECTORY,
-                     rose.config_editor.ADD_MENU_META)]
+        actions = [('Add meta',  gtk.STOCK_DIRECTORY,
+                    rose.config_editor.ADD_MENU_META)]
         missing_variables = []
         section_choices = []
         for sect_data in self.sections:
@@ -542,8 +539,8 @@ class ConfigPage(gtk.VBox):
         section_choices.sort(rose.config.sort_settings)
         if self.ns_is_default and section_choices:
             add_ui_start = add_ui_start.replace(
-                            "'Popup'>",
-                            """'Popup'><menuitem action="Add blank"/>""")
+                "'Popup'>",
+                """'Popup'><menuitem action="Add blank"/>""")
             text = rose.config_editor.ADD_MENU_BLANK
             if len(section_choices) > 1:
                 text = rose.config_editor.ADD_MENU_BLANK_MULTIPLE
@@ -555,7 +552,7 @@ class ConfigPage(gtk.VBox):
         for variable in ghost_list:
             label_text = variable.name
             if (not self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE] and
-                rose.META_PROP_TITLE in variable.metadata):
+                    rose.META_PROP_TITLE in variable.metadata):
                 label_text = variable.metadata[rose.META_PROP_TITLE]
             label_text = label_text.replace("_", "__")
             add_ui_start += ('<menuitem action="' +
@@ -571,9 +568,9 @@ class ConfigPage(gtk.VBox):
         if 'Add blank' in add_ui:
             blank_item = uimanager.get_widget('/Popup/Add blank')
             if len(section_choices) > 1:
-                blank_item.connect("activate",
-                                   lambda b: self._launch_section_chooser(
-                                                   section_choices))
+                blank_item.connect(
+                    "activate",
+                    lambda b: self._launch_section_chooser(section_choices))
             else:
                 blank_item.connect("activate", lambda b: self.add_row())
         for variable in ghost_list:
@@ -594,9 +591,9 @@ class ConfigPage(gtk.VBox):
     def _launch_section_chooser(self, section_choices):
         """Choose a section to add a blank variable to."""
         section = rose.gtk.dialog.run_choices_dialog(
-                       rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR,
-                       section_choices,
-                       rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
+            rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR,
+            section_choices,
+            rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
         if section is not None:
             self.add_row(section=section)
 
@@ -643,14 +640,14 @@ class ConfigPage(gtk.VBox):
             else:
                 widget_path, widget_args = widget_name_args[0], None
             metadata_files = self.section_ops.get_ns_metadata_files(
-                                                  self.namespace)
+                self.namespace)
             custom_widget = rose.resource.import_object(
-                                        widget_path,
-                                        metadata_files,
-                                        self.handle_bad_custom_main_widget)
+                widget_path,
+                metadata_files,
+                self.handle_bad_custom_main_widget)
             if custom_widget is None:
                 text = rose.config_editor.ERROR_IMPORT_CLASS.format(
-                                                       widget_path)
+                    widget_path)
                 self.handle_bad_custom_main_widget(text)
                 return
             try:
@@ -718,7 +715,7 @@ class ConfigPage(gtk.VBox):
                     var = widget.get_parent().variable
                     if var.name == focus_variable.name:
                         if (var.metadata.get('id') ==
-                            focus_variable.metadata.get('id')):
+                                focus_variable.metadata.get('id')):
                             widget.get_parent().grab_focus()
                             return
 
@@ -752,17 +749,16 @@ class ConfigPage(gtk.VBox):
                     return self.handle_add_var_widget(variable)
                 # Then it has an existing variable widget.
                 if ((rose.META_PROP_TYPE in widget.errors) !=
-                    (rose.META_PROP_TYPE in variable.error) and
-                    hasattr(widget, "needs_type_error_refresh") and
-                    not widget.needs_type_error_refresh()):
+                        (rose.META_PROP_TYPE in variable.error) and
+                        hasattr(widget, "needs_type_error_refresh") and
+                        not widget.needs_type_error_refresh()):
                     return widget.type_error_refresh(variable)
                 else:
                     return self.handle_reload_var_widget(variable)
             # Then there were no widgets for this variable. Insert it.
             return self.handle_add_var_widget(variable)
         else:
-            if (var_id in widget_for_var and
-                widget_for_var[var_id].is_ghost):
+            if var_id in widget_for_var and widget_for_var[var_id].is_ghost:
                 # It is a latent variable that needs a refresh.
                 return self.handle_reload_var_widget(variable)
             # It is a normal variable that has been removed.
@@ -803,7 +799,7 @@ class ConfigPage(gtk.VBox):
             focus_var = None
             focus_widget = self.get_toplevel().focus_child
             if (focus_widget is not None and
-                hasattr(focus_widget.get_parent(), 'variable')):
+                    hasattr(focus_widget.get_parent(), 'variable')):
                 focus_var = focus_widget.get_parent().variable
             self.main_container.destroy()
             self.generate_main_container()
@@ -854,20 +850,20 @@ class ConfigPage(gtk.VBox):
         widget_list = self.get_main_variable_widgets()
         for widget in widget_list:
             if (hasattr(widget.get_parent(), 'variable') and
-                widget.get_parent().variable.metadata['id'] == var_id):
+                    widget.get_parent().variable.metadata['id'] == var_id):
                 widget.get_parent().grab_focus(self.main_container)
                 return True
         for widget in widget_list:
             if (hasattr(widget, 'variable') and
-                widget.variable.metadata['id'] == var_id):
+                    widget.variable.metadata['id'] == var_id):
                 widget.grab_focus()
                 return True
         return False
 
     def set_sub_focus(self, node_id):
         if (self.sub_data is not None and
-            hasattr(self, "sub_data_panel") and
-            hasattr(self.sub_data_panel, "set_focus_node_id")):
+                hasattr(self, "sub_data_panel") and
+                hasattr(self.sub_data_panel, "set_focus_node_id")):
             self.sub_data_panel.set_focus_node_id(node_id)
 
     def react_to_show_modes(self, mode_key, is_mode_on):
@@ -918,12 +914,11 @@ class ConfigPage(gtk.VBox):
                 if hasattr(target, 'is_ignored') and target.is_ignored:
                     self._set_widget_ignored(target, '', enabled=True)
             if (any([e in target.errors for e in relevant_errs]) or
-                any([e in target.variable.error for e in relevant_errs])):
+                    any([e in target.variable.error for e in relevant_errs])):
                 if ([e in target.errors for e in relevant_errs] !=
-                    [e in target.variable.error for e in relevant_errs]):
-                        refresh_list.append(
-                                        target.variable.metadata['id'])
-                        target.errors = target.variable.error.keys()
+                        [e in target.variable.error for e in relevant_errs]):
+                    refresh_list.append(target.variable.metadata['id'])
+                    target.errors = target.variable.error.keys()
             target_widgets_done.append(target)
         if hasattr(self.main_container, "update_ignored"):
             self.main_container.update_ignored()
@@ -989,13 +984,13 @@ class ConfigPage(gtk.VBox):
                 if old_ign_set != new_ign_set:
                     # Reset the ignored state.
                     self.variable_ops.set_var_ignored(
-                                      old_variable,
-                                      variable.ignored_reason.copy(),
-                                      override=True)
+                        old_variable,
+                        variable.ignored_reason.copy(),
+                        override=True)
                 else:
                     # The types are the same, but pass on the info.
                     old_variable.ignored_reason = (
-                                         variable.ignored_reason.copy())
+                        variable.ignored_reason.copy())
                 old_variable.error = variable.error.copy()
                 old_variable.warning = variable.warning.copy()
             else:
@@ -1046,10 +1041,10 @@ class ConfigPage(gtk.VBox):
                 key = ('~', '')
             sorted_data.append((key, title, variable.name,
                                 variable.value, variable))
-        ascending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x[0],
-                                                                      y[0])
-        descending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x[0], 
-                                                                       y[0])
+        ascending_cmp = lambda x, y: rose.config_editor.util.null_cmp(
+            x[0], y[0])
+        descending_cmp = lambda x, y: rose.config_editor.util.null_cmp(
+            x[0], y[0])
         if ascending:
             sorted_data.sort(ascending_cmp)
         else:
@@ -1075,8 +1070,8 @@ class ConfigPage(gtk.VBox):
             macro_menuitem.show()
             macro_menuitem._macro = macro_name
             macro_menuitem.connect(
-                  "button-release-event",
-                  lambda m, e: self.launch_macro(m._macro))
+                "button-release-event",
+                lambda m, e: self.launch_macro(m._macro))
             menu.append(macro_menuitem)
         menu.popup(None, None, widget.position_menu, event.button,
                    event.time, widget)
@@ -1117,9 +1112,9 @@ class ConfigPage(gtk.VBox):
             info = rose.config_editor.PAGE_WARNING_NO_CONTENT
             tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
             error_button = rose.gtk.util.CustomButton(
-                                stock_id=gtk.STOCK_INFO,
-                                as_tool=True,
-                                tip_text=tip)
+                stock_id=gtk.STOCK_INFO,
+                as_tool=True,
+                tip_text=tip)
             error_label = gtk.Label()
             error_label.set_text(info)
             error_label.show()
@@ -1128,29 +1123,28 @@ class ConfigPage(gtk.VBox):
         if self.section is not None and self.section.ignored_reason:
             # This adds an ignored warning.
             info = rose.config_editor.PAGE_WARNING_IGNORED_SECTION.format(
-                        self.section.name)
+                self.section.name)
             tip = rose.config_editor.PAGE_WARNING_IGNORED_SECTION_TIP
             error_button = rose.gtk.util.CustomButton(
-                  stock_id=gtk.STOCK_NO,
-                  as_tool=True,
-                  tip_text=tip)
+                stock_id=gtk.STOCK_NO,
+                as_tool=True,
+                tip_text=tip)
             error_label = gtk.Label()
             error_label.set_text(info)
             error_label.show()
             button_list.append(error_button)
             label_list.append(error_label)
-        elif (self.see_also == '' or
-              rose.FILE_VAR_SOURCE not in self.see_also):
+        elif self.see_also == '' or rose.FILE_VAR_SOURCE not in self.see_also:
             # This adds an 'orphaned' warning, only if the section is enabled.
             if (self.section is not None and
-                self.section.name.startswith('namelist:')):
+                    self.section.name.startswith('namelist:')):
                 error_button = rose.gtk.util.CustomButton(
-                      stock_id=gtk.STOCK_DIALOG_WARNING,
-                      as_tool=True,
-                      tip_text=rose.config_editor.ERROR_ORPHAN_SECTION_TIP)
+                    stock_id=gtk.STOCK_DIALOG_WARNING,
+                    as_tool=True,
+                    tip_text=rose.config_editor.ERROR_ORPHAN_SECTION_TIP)
                 error_label = gtk.Label()
                 info = rose.config_editor.ERROR_ORPHAN_SECTION.format(
-                                                       self.section.name)
+                    self.section.name)
                 error_label.set_text(info)
                 error_label.show()
                 button_list.append(error_button)
@@ -1166,12 +1160,11 @@ class ConfigPage(gtk.VBox):
         if not has_data:
             # This is a latent namespace page.
             latent_button = rose.gtk.util.CustomButton(
-                         stock_id=gtk.STOCK_INFO,
-                         as_tool=True,
-                         tip_text=rose.config_editor.TIP_LATENT_PAGE)
+                stock_id=gtk.STOCK_INFO,
+                as_tool=True,
+                tip_text=rose.config_editor.TIP_LATENT_PAGE)
             latent_label = gtk.Label()
-            latent_label.set_text(
-                         rose.config_editor.PAGE_WARNING_LATENT)
+            latent_label.set_text(rose.config_editor.PAGE_WARNING_LATENT)
             latent_label.show()
             button_list.append(latent_button)
             label_list.append(latent_label)
@@ -1179,23 +1172,22 @@ class ConfigPage(gtk.VBox):
         for sect_data in self.sections + self.latent_sections:
             for err, info in sect_data.error.items():
                 error_button = rose.gtk.util.CustomButton(
-                      stock_id=gtk.STOCK_DIALOG_ERROR,
-                      as_tool=True,
-                      tip_text=info)
+                    stock_id=gtk.STOCK_DIALOG_ERROR,
+                    as_tool=True,
+                    tip_text=info)
                 error_label = gtk.Label()
-                error_label.set_text(
-                            rose.config_editor.PAGE_WARNING.format(
-                                 err, sect_data.name))
+                error_label.set_text(rose.config_editor.PAGE_WARNING.format(
+                    err, sect_data.name))
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)
         if self.custom_macros.items():
             macro_button = rose.gtk.util.CustomButton(
-                            label=rose.config_editor.LABEL_PAGE_MACRO_BUTTON,
-                            stock_id=gtk.STOCK_EXECUTE,
-                            tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
-                            as_tool=True, icon_at_start=True,
-                            has_menu=True)
+                label=rose.config_editor.LABEL_PAGE_MACRO_BUTTON,
+                stock_id=gtk.STOCK_EXECUTE,
+                tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
+                as_tool=True, icon_at_start=True,
+                has_menu=True)
             macro_button.connect("button-press-event",
                                  self._macro_menu_launch)
             macro_label = gtk.Label()

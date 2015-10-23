@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Module to list or run available custom macros for a configuration.
 
@@ -52,7 +52,7 @@ ERROR_LOAD_CHOSEN_META_PATH = "Could not find metadata for {0}, using {1}\n"
 ERROR_LOAD_META_PATH = "Could not find metadata for {0}"
 ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
 ERROR_MACRO_CASE_MISMATCH = ("Error: case mismatch; \n {0} does not match {1},"
-                              " please only use lowercase.")
+                             " please only use lowercase.")
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACROS = "Please specify a macro name.\n"
 ERROR_RETURN_TYPE = "{0}: {1}: invalid returned type: {2}, expect {3}"
@@ -286,8 +286,8 @@ class MacroBaseRoseEdit(MacroBase):
         ignored_reason = None
         if option is None:
             if section in config_data["sections"]:
-                 ignored_reason = (
-                     config_data["sections"][section].ignored_reason)
+                ignored_reason = (
+                    config_data["sections"][section].ignored_reason)
         else:
             for variable in config_data["variables"].get(section, []):
                 if variable.name == option:
@@ -371,8 +371,8 @@ class MacroReport(object):
         id = get_id_from_section_option(self.section, self.option)
         return (("<MacroReport section=%s option=%s value=%s info=%s " +
                  "is_warning=%s>") % (
-                    self.section, self.option, self.value, self.info,
-                    self.is_warning))
+                self.section, self.option, self.value, self.info,
+                self.is_warning))
 
     def __eq__(self, other):
         return (self.__hash__() == other.__hash__())
@@ -380,6 +380,7 @@ class MacroReport(object):
     def __hash__(self):
         return hash((
             self.section, self.option, self.value, self.info, self.is_warning))
+
 
 def add_site_meta_paths():
     """Load any metadata paths specified in a user or site configuration."""
@@ -559,7 +560,7 @@ def load_meta_macro_modules(meta_files, module_prefix=None):
     for meta_file in meta_files:
         meta_dir = os.path.dirname(meta_file)
         if (not meta_dir.endswith(MACRO_DIRNAME) or
-            not meta_file.endswith(MACRO_EXT)):
+                not meta_file.endswith(MACRO_EXT)):
             continue
         macro_name = os.path.basename(meta_file).rpartition(MACRO_EXT)[0]
         if module_prefix is None:
@@ -586,7 +587,7 @@ def get_macro_class_methods(macro_modules):
                 continue
             for att_name in ALLOWED_MACRO_CLASS_METHODS:
                 if (hasattr(obj, att_name) and
-                    callable(getattr(obj, att_name))):
+                        callable(getattr(obj, att_name))):
                     doc_string = obj.__doc__
                     macro_methods.append((macro_name, obj_name, att_name,
                                           doc_string))
@@ -630,7 +631,7 @@ def check_config_integrity(app_config):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node, "node", type(node), "rose.config.ConfigNode"))
         if (not isinstance(node.value, dict) and
-            not isinstance(node.value, basestring)):
+                not isinstance(node.value, basestring)):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.value, "node.value", type(node.value),
                 "dict, basestring"
@@ -650,12 +651,14 @@ def check_config_integrity(app_config):
             ))
         for comment in node.comments:
             if not isinstance(comment, basestring):
-                return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
-                    comment, "comment", type(comment), "basestring"))
+                return MacroReturnedCorruptConfigError(
+                    ERROR_RETURN_TYPE.format(
+                        comment, "comment", type(comment), "basestring"))
         for key in keys:
             if not isinstance(key, basestring):
-                return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
-                    key, "key", type(key), "basestring"))
+                return MacroReturnedCorruptConfigError(
+                    ERROR_RETURN_TYPE.format(
+                        key, "key", type(key), "basestring"))
 
 
 def validate_config(app_config, meta_config, run_macro_list, modules,
@@ -791,7 +794,7 @@ def get_metadata_for_config_id(setting_id, meta_config):
                 modifier = search_id.replace(no_modifier_id, "")
                 metadata[rose.META_PROP_TITLE] += " " + modifier
             if (setting_id != search_id and
-                rose.META_PROP_DUPLICATE in metadata):
+                    rose.META_PROP_DUPLICATE in metadata):
                 # foo{bar}(1) cannot inherit duplicate from foo.
                 metadata.pop(rose.META_PROP_DUPLICATE)
     node = meta_config.get([search_id], no_ignore=True)
@@ -811,8 +814,8 @@ def get_metadata_for_config_id(setting_id, meta_config):
             index = option.replace(search_option, "")
             metadata[rose.META_PROP_TITLE] += " " + index
     if (rose.META_PROP_LENGTH in metadata and
-        option is not None and search_option != option and
-        REC_ID_SINGLE_ELEMENT.search(option)):
+            option is not None and search_option != option and
+            REC_ID_SINGLE_ELEMENT.search(option)):
         # Option is a single element in an array, not a slice.
         metadata.pop(rose.META_PROP_LENGTH)
     metadata.update({'id': setting_id})
@@ -906,9 +909,9 @@ def run_macros(config_map, meta_config, config_name, macro_names,
             method_id = VALIDATE_METHOD.upper()[0]
             macro_id = MACRO_OUTPUT_ID.format(method_id, macro_name)
             reporter(
-               get_reports_as_text(
-                   config_problems_map, macro_id, is_from_transform=False),
-               level=reporter.V, kind=reporter.KIND_ERR, prefix=""
+                get_reports_as_text(
+                    config_problems_map, macro_id, is_from_transform=False),
+                level=reporter.V, kind=reporter.KIND_ERR, prefix=""
             )
 
     no_changes = True
@@ -1051,7 +1054,8 @@ def combine_opt_config_map(config_map):
 
 def _run_transform_macros(macros, config_name, config_map, meta_config,
                           modules, macro_tuples, opt_non_interactive=False,
-                          opt_conf_dir=None, opt_output_dir=None, reporter=None):
+                          opt_conf_dir=None, opt_output_dir=None,
+                          reporter=None):
     no_changes = True
     combined_config_map = combine_opt_config_map(config_map)
     for transformer_macro in macros:
@@ -1119,9 +1123,9 @@ def _get_user_accept():
 
 
 def get_user_values(options):
-    for k,v in options.items():
+    for k, v in options.items():
         entered = False
-        while entered == False:
+        while not entered:
             try:
                 user_input = raw_input("Value for " + str(k) + " (default " +
                                        str(v) + "): ")
@@ -1193,7 +1197,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
     config_file_path = os.path.join(opts.conf_dir,
                                     rose.SUB_CONFIG_NAME)
     if (not os.path.exists(config_file_path) or
-        not os.path.isfile(config_file_path)):
+            not os.path.isfile(config_file_path)):
         rose.reporter.Reporter()(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir),
                                  kind=rose.reporter.Reporter.KIND_ERR,
                                  level=rose.reporter.Reporter.FAIL)
@@ -1204,7 +1208,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
     optional_glob = os.path.join(optional_dir, rose.GLOB_OPT_CONFIG_FILE)
     for path in glob.glob(optional_glob):
         filename = os.path.basename(path)
-        # filename is a null string if path is to a directory.        
+        # filename is a null string if path is to a directory.
         result = re.match(rose.RE_OPT_CONFIG_FILE, filename)
         if not result:
             continue

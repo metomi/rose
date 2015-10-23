@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 This module contains the core processing of the config editor.
 
@@ -326,7 +326,7 @@ class MainController(object):
 
         self.update_bar_widgets()
 
-#------------------ Setting up main component functions ----------------------
+# ----------------- Setting up main component functions ----------------------
 
     def generate_toolbar(self):
         """Link in the toolbar functionality."""
@@ -653,7 +653,7 @@ class MainController(object):
             verbosity=rose.config_editor.STATUS_BAR_VERBOSITY)
         self._set_show_status_bar(rose.config_editor.SHOULD_SHOW_STATUS_BAR)
 
-#------------------ Page manipulation functions ------------------------------
+# ----------------- Page manipulation functions ------------------------------
 
     def handle_load_all(self, *args):
         """Handle a request to load all preview configurations."""
@@ -862,7 +862,7 @@ class MainController(object):
             launch_edit_func=launch_edit,
             launch_macro_func=self.main_handle.handle_run_custom_macro
         )
-        #FIXME: These three should go.
+        # FIXME: These three should go.
         page.trigger_tab_detach = lambda b: self._handle_detach_request(page)
         var_ops.trigger_ignored_update = lambda v: page.update_ignored()
         page.trigger_update_status = lambda: self.updater.update_status(page)
@@ -1069,7 +1069,7 @@ class MainController(object):
                     else:
                         self.orphan_pages.remove(page)
 
-#------------------ Update functions -----------------------------------------
+# ----------------- Update functions -----------------------------------------
 
     def reload_namespace_tree(self, *args, **kwargs):
         """Redraw the navigation namespace tree."""
@@ -1099,7 +1099,7 @@ class MainController(object):
         """Placeholder for updater function of the same name."""
         self.updater.update_ns_sub_data(*args, **kwargs)
 
-#------------------ Page viewer function -------------------------------------
+# ----------------- Page viewer function -------------------------------------
 
     def view_page(self, page_id, var_id=None):
         """Set focus by namespace (page_id), and optionally by var key."""
@@ -1133,7 +1133,7 @@ class MainController(object):
         self.set_current_page_indicator(page_id)
         return page
 
-#------------------ Primary menu functions -----------------------------------
+# ----------------- Primary menu functions -----------------------------------
 
     def load_from_file(self, somewidget=None):
         """Open a standard dialogue and load a config file, if selected."""
@@ -1274,7 +1274,7 @@ class MainController(object):
             return_dict.update({config_name: config})
         return return_dict
 
-#------------------ Secondary Menu/Dialog handling functions -----------------
+# ----------------- Secondary Menu/Dialog handling functions -----------------
 
     def apply_macro_transform(self, *args, **kwargs):
         """Placeholder for updater module function."""
@@ -1518,7 +1518,7 @@ class MainController(object):
                 if new_page is None:
                     continue
                 if page in [w.get_child() for w in self.tab_windows]:
-                     # Insert a new page into the old window.
+                    # Insert a new page into the old window.
                     tab_pages = [w.get_child() for w in self.tab_windows]
                     old_window = self.tab_windows[tab_pages.index(page)]
                     old_window.remove(page)
@@ -1550,7 +1550,7 @@ class MainController(object):
                 if current_namespace in page_namespaces:
                     self.view_page(current_namespace, current_id)
 
-#------------------ Data-intensive menu functions / utilities ----------------
+# ----------------- Data-intensive menu functions / utilities ----------------
 
     def _launch_find(self, *args):
         """Get the find expression from a dialog."""

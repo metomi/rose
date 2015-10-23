@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Re-dump all Rose configuration files in a directory."""
 
 
@@ -55,7 +55,7 @@ def main():
     else:
         for dirpath, dirnames, filenames in os.walk("."):
             for filename in fnmatch.filter(filenames, "rose-*.conf"):
-                p = os.path.join(dirpath, filename)[2:] # remove leading ./
+                p = os.path.join(dirpath, filename)[2:]  # remove leading ./
                 file_names.append(p)
     for file_name in file_names:
         t = NamedTemporaryFile()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import os
 import shlex
@@ -45,10 +45,10 @@ class FileChooserValueWidget(gtk.HBox):
         self.generate_entry()
         self.generate_editor_launcher()
         self.open_button = rose.gtk.util.CustomButton(
-                                             stock_id=gtk.STOCK_OPEN,
-                                             size=gtk.ICON_SIZE_MENU,
-                                             as_tool=False,
-                                             tip_text="Browse for a filename")
+            stock_id=gtk.STOCK_OPEN,
+            size=gtk.ICON_SIZE_MENU,
+            as_tool=False,
+            tip_text="Browse for a filename")
         self.open_button.show()
         self.open_button.connect("clicked", self.run_and_destroy)
         self.pack_end(self.open_button, expand=False, fill=False)
@@ -62,14 +62,14 @@ class FileChooserValueWidget(gtk.HBox):
         self.entry.connect("focus-in-event",
                            self.hook.trigger_scroll)
         self.pack_start(self.entry)
-        self.grab_focus = lambda : self.hook.get_focus(self.entry)
+        self.grab_focus = lambda: self.hook.get_focus(self.entry)
 
     def run_and_destroy(self, *args):
         file_chooser_widget = gtk.FileChooserDialog(
-                                  buttons=(gtk.STOCK_CANCEL,
-                                           gtk.RESPONSE_REJECT,
-                                           gtk.STOCK_OK,
-                                           gtk.RESPONSE_ACCEPT))
+            buttons=(gtk.STOCK_CANCEL,
+                     gtk.RESPONSE_REJECT,
+                     gtk.STOCK_OK,
+                     gtk.RESPONSE_ACCEPT))
         if os.path.exists(os.path.dirname(self.value)):
             file_chooser_widget.set_filename(self.value)
         response = file_chooser_widget.run()
@@ -81,13 +81,13 @@ class FileChooserValueWidget(gtk.HBox):
 
     def generate_editor_launcher(self):
         self.edit_button = rose.gtk.util.CustomButton(
-                                stock_id=gtk.STOCK_DND,
-                                size=gtk.ICON_SIZE_MENU,
-                                as_tool=False,
-                                tip_text="Edit the file")
+            stock_id=gtk.STOCK_DND,
+            size=gtk.ICON_SIZE_MENU,
+            as_tool=False,
+            tip_text="Edit the file")
         self.edit_button.connect(
-                  "clicked",
-                  lambda b: rose.external.launch_geditor(self.value))
+            "clicked",
+            lambda b: rose.external.launch_geditor(self.value))
         self.pack_end(self.edit_button, expand=False, fill=False)
 
     def setter(self, widget):
@@ -105,7 +105,7 @@ class FileEditorValueWidget(gtk.HBox):
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(FileEditorValueWidget, self).__init__(homogeneous=False,
-                                                     spacing=0)
+                                                    spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -116,11 +116,11 @@ class FileEditorValueWidget(gtk.HBox):
         root = self.metadata[rose.config_editor.META_PROP_INTERNAL]
         path = os.path.join(root, self.value)
         self.edit_button = rose.gtk.util.CustomButton(
-                                label=rose.config_editor.LABEL_EDIT,
-                                stock_id=gtk.STOCK_DND,
-                                size=gtk.ICON_SIZE_MENU,
-                                as_tool=False,
-                                tip_text="Edit the file")
+            label=rose.config_editor.LABEL_EDIT,
+            stock_id=gtk.STOCK_DND,
+            size=gtk.ICON_SIZE_MENU,
+            as_tool=False,
+            tip_text="Edit the file")
         self.edit_button.connect("clicked", self.on_click)
         self.pack_start(self.edit_button, expand=False, fill=False,
                         padding=rose.config_editor.SPACING_SUB_PAGE)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Module to produce Graphviz graphing of Rose configuration metadata."""
 
 import os
@@ -159,7 +159,7 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
                             has_success = True
                             break
                     elif trigger._check_values_ok(
-                                 setting_value, setting_id, [value]):
+                            setting_value, setting_id, [value]):
                         has_success = True
                         break
             for value in values:
@@ -174,7 +174,7 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
                                 not setting_is_section_ignored):
                             dependent_attrs["color"] = COLOUR_ENABLED
                     elif trigger._check_values_ok(
-                                 setting_value, setting_id, [value]):
+                            setting_value, setting_id, [value]):
                         dependent_attrs["color"] = COLOUR_ENABLED
                 if not graph.has_node(setting_id):
                     node_attrs = get_node_state_attrs(
@@ -260,7 +260,7 @@ def main():
     opt_parser.add_my_options(*options)
     opts, args = opt_parser.parse_args()
     if opts.conf_dir:
-       os.chdir(opts.conf_dir)
+        os.chdir(opts.conf_dir)
     opts.conf_dir = os.getcwd()
     sys.path.append(
         rose.resource.ResourceLocator.default().get_util_home())

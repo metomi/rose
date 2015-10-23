@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
 import Queue
@@ -28,12 +28,13 @@ import sys
 
 _DEFAULT_REPORTER = None
 
+
 class Reporter(object):
 
     """Report diagnostic messages.
 
-    Note: How about the "logging" module in the standard library?
-    It needs a lot of fiddling to get it working in our reporting model. We want:
+    Note: How about the "logging" module in the standard library? It needs a
+    lot of fiddling to get it working in our reporting model. We want:
     * [FAIL] in any verbosity to stderr.
     * [WARN] in default verbosity to stderr.
     * Raw output to stdout in any verbosity.
@@ -125,7 +126,7 @@ class Reporter(object):
         for key, context in self.contexts.items():
             insert_newline = False
             if context.is_closed():
-                self.contexts.pop(key) # remove contexts with closed file handles
+                self.contexts.pop(key)  # remove contexts with closed handles
                 continue
             if context.kind is not None and context.kind != kind:
                 continue

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import ast
 import inspect
@@ -34,7 +34,7 @@ class MetaType(object):
     @classmethod
     def get_meta_type(cls, key):
         """Return the class for a named meta data type."""
-        if cls.meta_type_classes.has_key(key):
+        if key in cls.meta_type_classes:
             return cls.meta_type_classes[key]
         for c in globals().values():
             if inspect.isclass(c):
@@ -77,8 +77,7 @@ class CharacterMetaType(MetaType):
             return [True, None]
 
     def transform(self, value):
-        if (value.startswith('"') and value.endswith('"') and
-            "'" not in value):
+        if value.startswith('"') and value.endswith('"') and "'" not in value:
             value = "'" + value[1:-1] + "'"
         else:
             if not value.endswith("'"):
@@ -115,6 +114,7 @@ class PythonListMetaType(MetaType):
             return [False, self.WARNING.format(repr(value))]
         return [True, None]
 
+
 class SpacedListMetaType(MetaType):
 
     KEY = "spaced_list"
@@ -123,8 +123,6 @@ class SpacedListMetaType(MetaType):
     def is_valid(self, value):
         try:
             cast_value = value.split(" ")
-            #for entry in cast_value:
-            #    ast.literal_eval(entry)
             if not isinstance(cast_value, list):
                 return [False, self.WARNING.format(repr(value))]
         except (SyntaxError, ValueError):
@@ -145,10 +143,10 @@ class LogicalMetaType(MetaType):
 
     def transform(self, value):
         if (value.upper() == '.F.' or
-            value.upper() == rose.TYPE_LOGICAL_VALUE_FALSE.upper()):
+                value.upper() == rose.TYPE_LOGICAL_VALUE_FALSE.upper()):
             return rose.TYPE_LOGICAL_VALUE_FALSE
         if (value.upper() == '.T.' or
-            value.upper() == rose.TYPE_LOGICAL_VALUE_TRUE.upper()):
+                value.upper() == rose.TYPE_LOGICAL_VALUE_TRUE.upper()):
             return rose.TYPE_LOGICAL_VALUE_TRUE
         return value
 
@@ -179,13 +177,13 @@ class QuotedMetaType(MetaType):
             num_end_esc = len(s) - len(s.rstrip("\\"))
             odd_num_end_esc = num_end_esc % 2 == 1
             if ((i == len(quote_segs) - 2 and odd_num_end_esc) or
-                (0 < i < len(quote_segs) - 2 and not odd_num_end_esc)):
+                    (0 < i < len(quote_segs) - 2 and not odd_num_end_esc)):
                 return [False, self.WARNING.format(repr(value))]
         return [True, None]
 
     def transform(self, value):
         if (value.startswith('"') and value.endswith('"') and
-            '"' not in value[1:-1] and "\\" not in value[1:-1]):
+                '"' not in value[1:-1] and "\\" not in value[1:-1]):
             value = '"' + value[1:-1] + '"'
         else:
             if not value.endswith('"'):

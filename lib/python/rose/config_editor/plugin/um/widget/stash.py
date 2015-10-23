@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import ast
 import os
@@ -41,7 +41,7 @@ import rose.config_editor.plugin.um.widget.stash_util as stash_util
 
 
 class BaseStashSummaryDataPanelv1(
-          rose.config_editor.panelwidget.summary_data.BaseSummaryDataPanel):
+        rose.config_editor.panelwidget.summary_data.BaseSummaryDataPanel):
 
     """This is a base class for displaying and editing STASH requests.
 
@@ -226,15 +226,15 @@ class BaseStashSummaryDataPanelv1(
         for section in sub_sect_names:
             row_data = []
             stash_sect_id = self.util.get_id_from_section_option(
-                                             section, self.STREQ_NL_SECT_OPT)
+                section, self.STREQ_NL_SECT_OPT)
             stash_item_id = self.util.get_id_from_section_option(
-                                             section, self.STREQ_NL_ITEM_OPT)
+                section, self.STREQ_NL_ITEM_OPT)
             sect_var = self.var_id_map.get(stash_sect_id)
             item_var = self.var_id_map.get(stash_item_id)
             stash_props = None
             if sect_var is not None and item_var is not None:
-                stash_props = self._stash_lookup.get(sect_var.value, {}).get(
-                                                     item_var.value)
+                stash_props = self._stash_lookup.get(
+                    sect_var.value, {}).get(item_var.value)
             if stash_props is None:
                 row_data.append(None)
             else:
@@ -258,7 +258,7 @@ class BaseStashSummaryDataPanelv1(
         return data_rows, column_names
 
     def get_section_column_index(self):
-        """(Override) Return the column index for the section (Rose section)."""
+        """(Override) Return the column index for the section (Rose section)"""
         return self.column_names.index(self.SECTION_INDEX_TITLE)
 
     def get_stashmaster_meta_lookup_dict(self):
@@ -312,7 +312,7 @@ class BaseStashSummaryDataPanelv1(
         if section is None:
             return cell.set_property("markup", None)
         if (col_index == sect_index or
-            self.column_names[col_index] == self.DESCRIPTION_TITLE):
+                self.column_names[col_index] == self.DESCRIPTION_TITLE):
             node_data = self.sections.get(section)
         else:
             option = self.column_names[col_index]
@@ -338,7 +338,7 @@ class BaseStashSummaryDataPanelv1(
         stash_section = model.get_value(row_iter, stash_section_index)
         stash_item = model.get_value(row_iter, stash_item_index)
         if (col_index == sect_index or
-            col_name in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]):
+                col_name in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]):
             option = None
             if section not in self.sections:
                 return False
@@ -366,20 +366,22 @@ class BaseStashSummaryDataPanelv1(
                 return True
             id_data = self.var_id_map[id_]
             value = str(model.get_value(row_iter, col_index))
-            tip_text = rose.CONFIG_DELIMITER.join([section, option, value]) + "\n"
-            if option in self.OPTION_NL_MAP and option in self._profile_location_map.keys():
+            tip_text = rose.CONFIG_DELIMITER.join(
+                [section, option, value]) + "\n"
+            if (option in self.OPTION_NL_MAP and
+                    option in self._profile_location_map.keys()):
                 profile_id = self._profile_location_map[option].get(value)
                 if profile_id is not None:
                     profile_sect = self.util.get_section_option_from_id(
-                                                                profile_id)[0]
+                        profile_id)[0]
                     tip_text += "See " + profile_sect
         tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
         if tip_text:
             tip_text += "\n"
         for key, value in id_data.error.items():
             tip_text += (
-                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
-                                                                key, value))
+                rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
+                    key, value))
         for key in id_data.ignored_reason:
             tip_text += "({0})\n".format(key)
         if option is None:
@@ -441,7 +443,8 @@ class BaseStashSummaryDataPanelv1(
         if profiles_menuitems:
             profiles_menu = gtk.Menu()
             profiles_menu.show()
-            profiles_root_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ABOUT)
+            profiles_root_menuitem = gtk.ImageMenuItem(
+                stock_id=gtk.STOCK_ABOUT)
             profiles_root_menuitem.set_label("View...")
             profiles_root_menuitem.show()
             profiles_root_menuitem.set_submenu(profiles_menu)
@@ -457,9 +460,9 @@ class BaseStashSummaryDataPanelv1(
         new_section = self.add_section(None, opt_map=new_opt_map)
         if launch_dialog:
             rose.gtk.dialog.run_dialog(
-                              rose.gtk.dialog.DIALOG_TYPE_INFO,
-                              "Added request as {0}".format(new_section),
-                              "New Request")
+                rose.gtk.dialog.DIALOG_TYPE_INFO,
+                "Added request as {0}".format(new_section),
+                "New Request")
 
     def generate_package_lookup(self):
         """Store a dictionary of package requests and domains."""
@@ -482,9 +485,9 @@ class BaseStashSummaryDataPanelv1(
                         profile_node = node.get([profile], no_ignore=True)
                         if profile_node is not None:
                             self._package_lookup[package].setdefault(
-                                                          profile, [])
+                                profile, [])
                             self._package_lookup[package][profile].append(
-                                                          profile_node.value)
+                                profile_node.value)
                 continue
             for profile, profile_nl in self.OPTION_NL_MAP.items():
                 if base_sect == profile_nl:
@@ -505,18 +508,18 @@ class BaseStashSummaryDataPanelv1(
                                                   self.package_config)
         self.generate_package_lookup()
         self._stashmaster_meta_lookup = (
-                          self.get_stashmaster_meta_lookup_dict())
+            self.get_stashmaster_meta_lookup_dict())
 
     def _add_new_diagnostic_launcher(self):
         # Create a button for launching the "Add new STASH" dialog.
         self._add_button = rose.gtk.util.CustomButton(
-                                   label=self.ADD_NEW_STASH_LABEL,
-                                   stock_id=gtk.STOCK_ADD,
-                                   tip_text=self.ADD_NEW_STASH_TIP)
+            label=self.ADD_NEW_STASH_LABEL,
+            stock_id=gtk.STOCK_ADD,
+            tip_text=self.ADD_NEW_STASH_TIP)
         package_button = rose.gtk.util.CustomButton(
-                                       label=self.PACKAGE_MANAGER_LABEL,
-                                       tip_text=self.PACKAGE_MANAGER_TIP,
-                                       has_menu=True)
+            label=self.PACKAGE_MANAGER_LABEL,
+            tip_text=self.PACKAGE_MANAGER_TIP,
+            has_menu=True)
         self.control_widget_hbox.pack_end(package_button, expand=False,
                                           fill=False)
         self.control_widget_hbox.pack_end(self._add_button,
@@ -595,9 +598,9 @@ class BaseStashSummaryDataPanelv1(
         request_lookup = {}
         for section in self.sections:
             stash_sect_id = self.util.get_id_from_section_option(
-                                             section, self.STREQ_NL_SECT_OPT)
+                section, self.STREQ_NL_SECT_OPT)
             stash_item_id = self.util.get_id_from_section_option(
-                                             section, self.STREQ_NL_ITEM_OPT)
+                section, self.STREQ_NL_ITEM_OPT)
             sect_var = self.var_id_map.get(stash_sect_id)
             item_var = self.var_id_map.get(stash_item_id)
             if sect_var is None or item_var is None:
@@ -609,7 +612,7 @@ class BaseStashSummaryDataPanelv1(
             request_lookup[st_sect][st_item][section] = {}
             for variable in self.variables.get(section, []):
                 request_lookup[st_sect][st_item][section].update(
-                                           {variable.name: variable.value})
+                    {variable.name: variable.value})
         return request_lookup
 
     def _get_request_changes(self):
@@ -633,7 +636,7 @@ class BaseStashSummaryDataPanelv1(
         request_lookup = self._get_request_lookup()
         request_changes = self._get_request_changes()
         add_new_func = lambda s, i: (
-                self.add_new_stash_request(s, i, launch_dialog=True))
+            self.add_new_stash_request(s, i, launch_dialog=True))
         self._diag_panel = stash_add.AddStashDiagnosticsPanelv1(
             self._stash_lookup,
             request_lookup,
@@ -701,13 +704,11 @@ class BaseStashSummaryDataPanelv1(
             cell.set_property("markup", None)
             cell.set_property("visible", False)
         max_len = rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
-        if (value is not None and len(value) > max_len
-            and col_index != 0):
+        if value is not None and len(value) > max_len and col_index != 0:
             cell.set_property("width-chars", max_len)
             cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         sect_index = self.get_section_column_index()
-        if (value is not None and col_index == sect_index and
-            self.is_duplicate):
+        if value is not None and col_index == sect_index and self.is_duplicate:
             value = value.split("(")[-1].rstrip(")")
         if col_index == 0 and treemodel.iter_parent(iter_) is not None:
             cell.set_property("visible", False)
@@ -724,7 +725,7 @@ class BaseStashSummaryDataPanelv1(
         for id_, value in self.sub_ops.get_var_id_values().items():
             section, option = self.util.get_section_option_from_id(id_)
             if (option in ok_var_names and
-                any([section.startswith(n) for n in ok_sect_names])):
+                    any([section.startswith(n) for n in ok_sect_names])):
                 self._profile_location_map.setdefault(option, {})
                 self._profile_location_map[option].update({value: id_})
                 self._available_profile_map.setdefault(option, [])
@@ -741,7 +742,7 @@ class BaseStashSummaryDataPanelv1(
             else:
                 for profile_name in values:
                     sect = self._package_profile_lookup[sect_type].get(
-                                                 profile_name)
+                        profile_name)
                     sections_for_adding.append(sect)
         for section in sections_for_adding:
             opt_name_values = {}
@@ -774,8 +775,8 @@ class BaseStashSummaryDataPanelv1(
             enable_menuitem.set_label(label="Enable all")
             enable_menuitem._connect_args = (package, False)
             enable_menuitem.connect(
-                   "button-release-event",
-                   lambda m, e: self._packages_enable(*m._connect_args))
+                "button-release-event",
+                lambda m, e: self._packages_enable(*m._connect_args))
             enable_menuitem.show()
             enable_menuitem.set_sensitive(any(ignored_list))
             package_menu.append(enable_menuitem)
@@ -783,8 +784,8 @@ class BaseStashSummaryDataPanelv1(
             ignore_menuitem.set_label(label="Ignore all")
             ignore_menuitem._connect_args = (package, True)
             ignore_menuitem.connect(
-                   "button-release-event",
-                   lambda m, e: self._packages_enable(*m._connect_args))
+                "button-release-event",
+                lambda m, e: self._packages_enable(*m._connect_args))
             ignore_menuitem.set_sensitive(any([not i for i in ignored_list]))
             ignore_menuitem.show()
             package_menu.append(ignore_menuitem)
@@ -792,8 +793,8 @@ class BaseStashSummaryDataPanelv1(
             remove_menuitem.set_label(label="Remove all")
             remove_menuitem._connect_args = (package,)
             remove_menuitem.connect(
-                   "button-release-event",
-                   lambda m, e: self._packages_remove(*m._connect_args))
+                "button-release-event",
+                lambda m, e: self._packages_remove(*m._connect_args))
             remove_menuitem.show()
             package_menu.append(remove_menuitem)
             package_menuitem.set_submenu(package_menu)
@@ -806,8 +807,8 @@ class BaseStashSummaryDataPanelv1(
             new_pack_menuitem = gtk.MenuItem(label=new_package)
             new_pack_menuitem._connect_args = (new_package,)
             new_pack_menuitem.connect(
-                     "button-release-event",
-                     lambda m, e: self._package_add(*m._connect_args))
+                "button-release-event",
+                lambda m, e: self._package_add(*m._connect_args))
             new_pack_menuitem.show()
             import_menu.append(new_pack_menuitem)
         if not new_packages:
@@ -833,9 +834,9 @@ class BaseStashSummaryDataPanelv1(
             for var in vars_:
                 if var.name == self.STREQ_NL_PACKAGE_OPT:
                     if (only_this_package is None or
-                        var.value == only_this_package):
+                            var.value == only_this_package):
                         sect, opt = self.util.get_section_option_from_id(
-                                                    var.metadata["id"])
+                            var.metadata["id"])
                         if sect not in sections_for_removing:
                             sections_for_removing.append(sect)
                 elif var.name in self.OPTION_NL_MAP:
@@ -848,11 +849,11 @@ class BaseStashSummaryDataPanelv1(
                 if all([s in streq_remove_list for s in streq_list]):
                     # This is only referenced by sections about to be removed.
                     profile_id = self._profile_location_map.get(
-                                               profile_type, {}).get(name)
+                        profile_type, {}).get(name)
                     if profile_id is None:
                         continue
                     profile_section = self.util.get_section_option_from_id(
-                                                            profile_id)[0]
+                        profile_id)[0]
                     sections_for_removing.append(profile_section)
         self.sub_ops.remove_sections(sections_for_removing)
 
@@ -863,12 +864,12 @@ class BaseStashSummaryDataPanelv1(
             for var in vars_:
                 if var.name == self.STREQ_NL_PACKAGE_OPT:
                     if (only_this_package is None or
-                        var.value == only_this_package):
+                            var.value == only_this_package):
                         sect, opt = self.util.get_section_option_from_id(
-                                                  var.metadata["id"])
+                            var.metadata["id"])
                         if sect not in sections_for_changing:
-                           is_ignored = (rose.variable.IGNORED_BY_USER in
-                                         self.sections[sect].ignored_reason)
-                           if is_ignored != disable:
-                               sections_for_changing.append(sect)
+                            is_ignored = (rose.variable.IGNORED_BY_USER in
+                                          self.sections[sect].ignored_reason)
+                            if is_ignored != disable:
+                                sections_for_changing.append(sect)
         self.sub_ops.ignore_sections(sections_for_changing, disable)

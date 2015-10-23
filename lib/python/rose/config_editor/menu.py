@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import ast
 import inspect
@@ -133,128 +133,129 @@ class MenuBar(object):
     </menubar>
     </ui>"""
 
-    action_details = [('File', None,
-                       rose.config_editor.TOP_MENU_FILE),
-                      ('Open...', gtk.STOCK_OPEN,
-                       rose.config_editor.TOP_MENU_FILE_OPEN,
-                       rose.config_editor.ACCEL_OPEN),
-                      ('Save', gtk.STOCK_SAVE,
-                       rose.config_editor.TOP_MENU_FILE_SAVE,
-                       rose.config_editor.ACCEL_SAVE),
-                      ('Check and save', gtk.STOCK_SPELL_CHECK,
-                       rose.config_editor.TOP_MENU_FILE_CHECK_AND_SAVE),
-                      ('Load All Apps', gtk.STOCK_CDROM,
-                       rose.config_editor.TOP_MENU_FILE_LOAD_APPS),
-                      ('Quit', gtk.STOCK_QUIT,
-                       rose.config_editor.TOP_MENU_FILE_QUIT,
-                       rose.config_editor.ACCEL_QUIT),
-                      ('Edit', None,
-                       rose.config_editor.TOP_MENU_EDIT),
-                      ('Undo', gtk.STOCK_UNDO,
-                       rose.config_editor.TOP_MENU_EDIT_UNDO,
-                       rose.config_editor.ACCEL_UNDO),
-                      ('Redo', gtk.STOCK_REDO,
-                       rose.config_editor.TOP_MENU_EDIT_REDO,
-                       rose.config_editor.ACCEL_REDO),
-                      ('Stack', gtk.STOCK_INFO,
-                       rose.config_editor.TOP_MENU_EDIT_STACK),
-                      ('Find', gtk.STOCK_FIND,
-                       rose.config_editor.TOP_MENU_EDIT_FIND,
-                       rose.config_editor.ACCEL_FIND),
-                      ('Find Next', gtk.STOCK_FIND,
-                       rose.config_editor.TOP_MENU_EDIT_FIND_NEXT,
-                       rose.config_editor.ACCEL_FIND_NEXT),
-                      ('Preferences', gtk.STOCK_PREFERENCES,
-                       rose.config_editor.TOP_MENU_EDIT_PREFERENCES),
-                      ('View', None,
-                       rose.config_editor.TOP_MENU_VIEW),
-                      ('Page', None,
-                       rose.config_editor.TOP_MENU_PAGE),
-                      ('Add variable', gtk.STOCK_ADD,
-                       rose.config_editor.TOP_MENU_PAGE_ADD),
-                      ('Revert', gtk.STOCK_REVERT_TO_SAVED,
-                       rose.config_editor.TOP_MENU_PAGE_REVERT),
-                      ('Page Info', gtk.STOCK_INFO,
-                       rose.config_editor.TOP_MENU_PAGE_INFO),
-                      ('Page Help', gtk.STOCK_HELP,
-                       rose.config_editor.TOP_MENU_PAGE_HELP),
-                      ('Page Web Help', gtk.STOCK_HOME,
-                       rose.config_editor.TOP_MENU_PAGE_WEB_HELP),
-                      ('Metadata', None,
-                       rose.config_editor.TOP_MENU_METADATA),
-                      ('Reload metadata', gtk.STOCK_REFRESH,
-                       rose.config_editor.TOP_MENU_METADATA_REFRESH,
-                       rose.config_editor.ACCEL_METADATA_REFRESH),
-                      ('Prefs', gtk.STOCK_PREFERENCES,
-                       rose.config_editor.TOP_MENU_METADATA_PREFERENCES),
-                      ('Upgrade', gtk.STOCK_GO_UP,
-                       rose.config_editor.TOP_MENU_METADATA_UPGRADE),
-                      ('All V', gtk.STOCK_DIALOG_QUESTION,
-                       rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
-                      ('Autofix', gtk.STOCK_CONVERT,
-                       rose.config_editor.TOP_MENU_METADATA_MACRO_AUTOFIX),
-                      ('Extra checks', gtk.STOCK_DIALOG_QUESTION,
-                       rose.config_editor.TOP_MENU_METADATA_CHECK),
-                      ('Graph', gtk.STOCK_SORT_ASCENDING,
-                       rose.config_editor.TOP_MENU_METADATA_GRAPH),
-                      ('Tools', None,
-                       rose.config_editor.TOP_MENU_TOOLS),
-                      ('Run Suite', gtk.STOCK_MEDIA_PLAY,
-                       rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN),
-                      ('Run Suite default', gtk.STOCK_MEDIA_PLAY,
-                       rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_DEFAULT,
-                       rose.config_editor.ACCEL_SUITE_RUN),
-                      ('Run Suite custom', gtk.STOCK_EDIT,
-                       rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_CUSTOM),
-                      ('Browser', gtk.STOCK_DIRECTORY,
-                       rose.config_editor.TOP_MENU_TOOLS_BROWSER,
-                       rose.config_editor.ACCEL_BROWSER),
-                      ('Terminal', gtk.STOCK_EXECUTE,
-                       rose.config_editor.TOP_MENU_TOOLS_TERMINAL,
-                       rose.config_editor.ACCEL_TERMINAL),
-                      ('View Output', gtk.STOCK_DIRECTORY,
-                       rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
-                      ('Open Suite GControl', "rose-gtk-scheduler",
-                       rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
-                      ('Help', None,
-                       rose.config_editor.TOP_MENU_HELP),
-                      ('GUI Help', gtk.STOCK_HELP,
-                       rose.config_editor.TOP_MENU_HELP_GUI,
-                       rose.config_editor.ACCEL_HELP_GUI),
-                      ('About', gtk.STOCK_DIALOG_INFO,
-                       rose.config_editor.TOP_MENU_HELP_ABOUT)]
+    action_details = [
+        ('File', None,
+         rose.config_editor.TOP_MENU_FILE),
+        ('Open...', gtk.STOCK_OPEN,
+         rose.config_editor.TOP_MENU_FILE_OPEN,
+         rose.config_editor.ACCEL_OPEN),
+        ('Save', gtk.STOCK_SAVE,
+         rose.config_editor.TOP_MENU_FILE_SAVE,
+         rose.config_editor.ACCEL_SAVE),
+        ('Check and save', gtk.STOCK_SPELL_CHECK,
+         rose.config_editor.TOP_MENU_FILE_CHECK_AND_SAVE),
+        ('Load All Apps', gtk.STOCK_CDROM,
+         rose.config_editor.TOP_MENU_FILE_LOAD_APPS),
+        ('Quit', gtk.STOCK_QUIT,
+         rose.config_editor.TOP_MENU_FILE_QUIT,
+         rose.config_editor.ACCEL_QUIT),
+        ('Edit', None,
+         rose.config_editor.TOP_MENU_EDIT),
+        ('Undo', gtk.STOCK_UNDO,
+         rose.config_editor.TOP_MENU_EDIT_UNDO,
+         rose.config_editor.ACCEL_UNDO),
+        ('Redo', gtk.STOCK_REDO,
+         rose.config_editor.TOP_MENU_EDIT_REDO,
+         rose.config_editor.ACCEL_REDO),
+        ('Stack', gtk.STOCK_INFO,
+         rose.config_editor.TOP_MENU_EDIT_STACK),
+        ('Find', gtk.STOCK_FIND,
+         rose.config_editor.TOP_MENU_EDIT_FIND,
+         rose.config_editor.ACCEL_FIND),
+        ('Find Next', gtk.STOCK_FIND,
+         rose.config_editor.TOP_MENU_EDIT_FIND_NEXT,
+         rose.config_editor.ACCEL_FIND_NEXT),
+        ('Preferences', gtk.STOCK_PREFERENCES,
+         rose.config_editor.TOP_MENU_EDIT_PREFERENCES),
+        ('View', None,
+         rose.config_editor.TOP_MENU_VIEW),
+        ('Page', None,
+         rose.config_editor.TOP_MENU_PAGE),
+        ('Add variable', gtk.STOCK_ADD,
+         rose.config_editor.TOP_MENU_PAGE_ADD),
+        ('Revert', gtk.STOCK_REVERT_TO_SAVED,
+         rose.config_editor.TOP_MENU_PAGE_REVERT),
+        ('Page Info', gtk.STOCK_INFO,
+         rose.config_editor.TOP_MENU_PAGE_INFO),
+        ('Page Help', gtk.STOCK_HELP,
+         rose.config_editor.TOP_MENU_PAGE_HELP),
+        ('Page Web Help', gtk.STOCK_HOME,
+         rose.config_editor.TOP_MENU_PAGE_WEB_HELP),
+        ('Metadata', None,
+         rose.config_editor.TOP_MENU_METADATA),
+        ('Reload metadata', gtk.STOCK_REFRESH,
+         rose.config_editor.TOP_MENU_METADATA_REFRESH,
+         rose.config_editor.ACCEL_METADATA_REFRESH),
+        ('Prefs', gtk.STOCK_PREFERENCES,
+         rose.config_editor.TOP_MENU_METADATA_PREFERENCES),
+        ('Upgrade', gtk.STOCK_GO_UP,
+         rose.config_editor.TOP_MENU_METADATA_UPGRADE),
+        ('All V', gtk.STOCK_DIALOG_QUESTION,
+         rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
+        ('Autofix', gtk.STOCK_CONVERT,
+         rose.config_editor.TOP_MENU_METADATA_MACRO_AUTOFIX),
+        ('Extra checks', gtk.STOCK_DIALOG_QUESTION,
+         rose.config_editor.TOP_MENU_METADATA_CHECK),
+        ('Graph', gtk.STOCK_SORT_ASCENDING,
+         rose.config_editor.TOP_MENU_METADATA_GRAPH),
+        ('Tools', None,
+         rose.config_editor.TOP_MENU_TOOLS),
+        ('Run Suite', gtk.STOCK_MEDIA_PLAY,
+         rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN),
+        ('Run Suite default', gtk.STOCK_MEDIA_PLAY,
+         rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_DEFAULT,
+         rose.config_editor.ACCEL_SUITE_RUN),
+        ('Run Suite custom', gtk.STOCK_EDIT,
+         rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_CUSTOM),
+        ('Browser', gtk.STOCK_DIRECTORY,
+         rose.config_editor.TOP_MENU_TOOLS_BROWSER,
+         rose.config_editor.ACCEL_BROWSER),
+        ('Terminal', gtk.STOCK_EXECUTE,
+         rose.config_editor.TOP_MENU_TOOLS_TERMINAL,
+         rose.config_editor.ACCEL_TERMINAL),
+        ('View Output', gtk.STOCK_DIRECTORY,
+         rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
+        ('Open Suite GControl', "rose-gtk-scheduler",
+         rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
+        ('Help', None,
+         rose.config_editor.TOP_MENU_HELP),
+        ('GUI Help', gtk.STOCK_HELP,
+         rose.config_editor.TOP_MENU_HELP_GUI,
+         rose.config_editor.ACCEL_HELP_GUI),
+        ('About', gtk.STOCK_DIALOG_INFO,
+         rose.config_editor.TOP_MENU_HELP_ABOUT)]
 
     toggle_action_details = [
-                      ('View latent vars', None,
-                       rose.config_editor.TOP_MENU_VIEW_LATENT_VARS),
-                      ('View fixed vars', None,
-                       rose.config_editor.TOP_MENU_VIEW_FIXED_VARS),
-                      ('View ignored vars', None,
-                       rose.config_editor.TOP_MENU_VIEW_IGNORED_VARS),
-                      ('View user-ignored vars', None,
-                       rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_VARS),
-                      ('View without descriptions', None,
-                       rose.config_editor.TOP_MENU_VIEW_WITHOUT_DESCRIPTIONS),
-                      ('View without help', None,
-                       rose.config_editor.TOP_MENU_VIEW_WITHOUT_HELP),
-                      ('View without titles', None,
-                       rose.config_editor.TOP_MENU_VIEW_WITHOUT_TITLES),
-                      ('View ignored pages', None,
-                       rose.config_editor.TOP_MENU_VIEW_IGNORED_PAGES),
-                      ('View user-ignored pages', None,
-                       rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_PAGES),
-                      ('View latent pages', None,
-                       rose.config_editor.TOP_MENU_VIEW_LATENT_PAGES),
-                      ('Flag opt config vars', None,
-                       rose.config_editor.TOP_MENU_VIEW_FLAG_OPT_CONF_VARS),
-                      ('Flag optional vars', None,
-                       rose.config_editor.TOP_MENU_VIEW_FLAG_OPTIONAL_VARS),
-                      ('Flag no-metadata vars', None,
-                       rose.config_editor.TOP_MENU_VIEW_FLAG_NO_METADATA_VARS),
-                      ('View status bar', None,
-                       rose.config_editor.TOP_MENU_VIEW_STATUS_BAR),
-                      ('Switch off metadata', None,
-                       rose.config_editor.TOP_MENU_METADATA_SWITCH_OFF)]
+        ('View latent vars', None,
+         rose.config_editor.TOP_MENU_VIEW_LATENT_VARS),
+        ('View fixed vars', None,
+         rose.config_editor.TOP_MENU_VIEW_FIXED_VARS),
+        ('View ignored vars', None,
+         rose.config_editor.TOP_MENU_VIEW_IGNORED_VARS),
+        ('View user-ignored vars', None,
+         rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_VARS),
+        ('View without descriptions', None,
+         rose.config_editor.TOP_MENU_VIEW_WITHOUT_DESCRIPTIONS),
+        ('View without help', None,
+         rose.config_editor.TOP_MENU_VIEW_WITHOUT_HELP),
+        ('View without titles', None,
+         rose.config_editor.TOP_MENU_VIEW_WITHOUT_TITLES),
+        ('View ignored pages', None,
+         rose.config_editor.TOP_MENU_VIEW_IGNORED_PAGES),
+        ('View user-ignored pages', None,
+         rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_PAGES),
+        ('View latent pages', None,
+         rose.config_editor.TOP_MENU_VIEW_LATENT_PAGES),
+        ('Flag opt config vars', None,
+         rose.config_editor.TOP_MENU_VIEW_FLAG_OPT_CONF_VARS),
+        ('Flag optional vars', None,
+         rose.config_editor.TOP_MENU_VIEW_FLAG_OPTIONAL_VARS),
+        ('Flag no-metadata vars', None,
+         rose.config_editor.TOP_MENU_VIEW_FLAG_NO_METADATA_VARS),
+        ('View status bar', None,
+         rose.config_editor.TOP_MENU_VIEW_STATUS_BAR),
+        ('Switch off metadata', None,
+         rose.config_editor.TOP_MENU_METADATA_SWITCH_OFF)]
 
     def __init__(self):
         self.uimanager = gtk.UIManager()
@@ -276,10 +277,9 @@ class MenuBar(object):
             key, mod = gtk.accelerator_parse(key_press)
             self.accelerators.lookup[str(key) + str(mod)] = accel_func
             self.accelerators.connect_group(
-                              key, mod,
-                              gtk.ACCEL_VISIBLE,
-                              lambda a, c, k, m:
-                                self.accelerators.lookup[str(k) + str(m)]())
+                key, mod,
+                gtk.ACCEL_VISIBLE,
+                lambda a, c, k, m: self.accelerators.lookup[str(k) + str(m)]())
 
     def clear_macros(self):
         """Reset menu to original configuration and clear macros."""
@@ -300,7 +300,7 @@ class MenuBar(object):
         config_menu_name = config_name.replace('/', ':').replace('_', '__')
         config_label_name = config_name.split('/')[-1].replace('_', '__')
         label = rose.config_editor.TOP_MENU_METADATA_MACRO_CONFIG.format(
-                                                     config_label_name)
+            config_label_name)
         config_address = macro_address + '/' + config_menu_name
         config_item = self.uimanager.get_widget(config_address)
         if config_item is None:
@@ -343,7 +343,7 @@ class MenuBar(object):
             all_item._rose_all_validators = True
             all_item.set_label(rose.config_editor.MACRO_MENU_ALL_VALIDATORS)
             all_item.set_tooltip_text(
-                     rose.config_editor.MACRO_MENU_ALL_VALIDATORS_TIP)
+                rose.config_editor.MACRO_MENU_ALL_VALIDATORS_TIP)
             all_item.show()
             all_item._run_data = [config_name, None, None, methodname]
             all_item.connect("activate",
@@ -376,7 +376,7 @@ class MainMenuHandler(object):
         self.var_ops = variable_ops_inst
         self.find_ns_id_func = find_ns_id_func
         self.bad_colour = rose.gtk.util.color_parse(
-                          rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
+            rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
 
     def about_dialog(self, args):
         self.mainwindow.launch_about_dialog()
@@ -416,7 +416,7 @@ class MainMenuHandler(object):
             configs_updated=True)
         if num_errors:
             text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL.format(
-                                                                 num_errors)
+                num_errors)
             kind = self.reporter.KIND_ERR
         else:
             text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL_OK
@@ -445,14 +445,14 @@ class MainMenuHandler(object):
                     error_count += len(return_value)
             except Exception as e:
                 rose.gtk.dialog.run_dialog(
-                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                         str(e),
-                         rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                            macro_fullname))
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    str(e),
+                    rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                        macro_fullname))
                 continue
             sorter = rose.config.sort_settings
             to_id = lambda s: self.util.get_id_from_section_option(
-                                                s.section, s.option)
+                s.section, s.option)
             return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
             self.handle_macro_validation(config_name, macro_fullname,
                                          config, return_value,
@@ -564,17 +564,17 @@ class MainMenuHandler(object):
         if not optionals:
             return {}
         res = {}
-        #create the text input field
+        # create the text input field
         entries = {}
         labels = {}
         errs = {}
         succeeded = False
         dialog = gtk.MessageDialog(
-                None,
-                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                gtk.MESSAGE_QUESTION,
-                gtk.BUTTONS_OK_CANCEL,
-                None)
+            None,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            gtk.MESSAGE_QUESTION,
+            gtk.BUTTONS_OK_CANCEL,
+            None)
         dialog.set_markup('Specify overrides for macro arguments:')
         dialog.set_title(methname)
         table = gtk.Table(len(optionals.items()), 2, False)
@@ -583,7 +583,7 @@ class MainMenuHandler(object):
             k, v = optionals.items()[i]
             label = gtk.Label(str(k) + ":")
             entry = gtk.Entry()
-            if isinstance(v,str):
+            if isinstance(v, str):
                 entry.set_text("'" + v + "'")
             else:
                 entry.set_text(str(v))
@@ -599,13 +599,12 @@ class MainMenuHandler(object):
             table.attach(hbox, 0, 1, i, i+1)
         dialog.show_all()
         response = dialog.run()
-        if (response == gtk.RESPONSE_CANCEL or
-            response == gtk.RESPONSE_CLOSE):
+        if response == gtk.RESPONSE_CANCEL or response == gtk.RESPONSE_CLOSE:
             res = optionals
             dialog.destroy()
         else:
             res = {}
-            for k,box in entries.items():
+            for k, box in entries.items():
                 res[k] = ast.literal_eval(box.get_text())
         dialog.destroy()
         return res
@@ -637,7 +636,8 @@ class MainMenuHandler(object):
         else:
             method_names = [method_name]
         if module_name is not None and config_name is not None:
-            config_mod_prefix = self.data.helper.get_macro_module_prefix(config_name)
+            config_mod_prefix = (
+                self.data.helper.get_macro_module_prefix(config_name))
             if not module_name.startswith(config_mod_prefix):
                 module_name = config_mod_prefix + module_name
         for config_name in configs:
@@ -650,8 +650,8 @@ class MainMenuHandler(object):
                 for obj_name, obj in inspect.getmembers(module):
                     for method_name in method_names:
                         if (not hasattr(obj, method_name) or
-                            obj_name.startswith("_") or
-                            not issubclass(obj, rose.macro.MacroBase)):
+                                obj_name.startswith("_") or
+                                not issubclass(obj, rose.macro.MacroBase)):
                             continue
                         if class_name is not None and obj_name != class_name:
                             continue
@@ -659,14 +659,14 @@ class MainMenuHandler(object):
                                                    obj_name,
                                                    method_name])
                         err_text = (
-                              rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                           macro_fullname))
+                            rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                                macro_fullname))
                         try:
                             macro_inst = obj()
                         except Exception as e:
                             rose.gtk.dialog.run_dialog(
-                                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                 str(e), err_text)
+                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                str(e), err_text)
                             continue
                         if hasattr(macro_inst, method_name):
                             macro_data.append((config_name, macro_inst,
@@ -696,16 +696,17 @@ class MainMenuHandler(object):
                 return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
                 rose.gtk.dialog.run_dialog(
-                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                         str(e),
-                         rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                            macro_fullname))
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    str(e),
+                    rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                        macro_fullname))
                 continue
             if methname == rose.macro.TRANSFORM_METHOD:
                 if (not isinstance(return_value, tuple) or
-                    len(return_value) != 2 or
-                    not isinstance(return_value[0], rose.config.ConfigNode) or
-                    not isinstance(return_value[1], list)):
+                        len(return_value) != 2 or
+                        not isinstance(
+                            return_value[0], rose.config.ConfigNode) or
+                        not isinstance(return_value[1], list)):
                     self._handle_bad_macro_return(macro_fullname, return_value)
                     continue
                 integrity_exception = rose.macro.check_config_integrity(
@@ -769,7 +770,7 @@ class MainMenuHandler(object):
     def _format_macro_config_names(self, config_names):
         if len(config_names) > 5:
             return rose.config_editor.EVENT_MACRO_CONFIGS.format(
-                                            len(config_names))
+                len(config_names))
         config_names = [c.lstrip("/") for c in config_names]
         return ", ".join(config_names)
 
@@ -812,8 +813,7 @@ class MainMenuHandler(object):
         search = lambda i: self.find_ns_id_func(config_name, i)
         if not no_display:
             proceed_ok = self.mainwindow.launch_macro_changes_dialog(
-                              config_name, macro_type, change_list,
-                              search_func=search)
+                config_name, macro_type, change_list, search_func=search)
             if not proceed_ok:
                 self._report_macro_transform(config_name, macro_name, 0)
                 return 0
@@ -835,10 +835,10 @@ class MainMenuHandler(object):
         kind = self.reporter.KIND_OUT
         if num_changes:
             info_text = rose.config_editor.EVENT_MACRO_TRANSFORM.format(
-                                    name, macro, num_changes)
+                name, macro, num_changes)
         else:
             info_text = rose.config_editor.EVENT_MACRO_TRANSFORM_OK.format(
-                                    name, macro)
+                name, macro)
         self.reporter.report(info_text, kind=kind)
 
     def handle_macro_validation(self, config_name, macro_name,
@@ -851,8 +851,8 @@ class MainMenuHandler(object):
                                       len(problem_list))
         if not no_display:
             self.mainwindow.launch_macro_changes_dialog(
-                            config_name, macro_type, problem_list,
-                            mode="validate", search_func=search)
+                config_name, macro_type, problem_list,
+                mode="validate", search_func=search)
 
     def _report_macro_validation(self, config_name, macro_name, num_errors):
         name = config_name.lstrip("/")
@@ -862,11 +862,11 @@ class MainMenuHandler(object):
             macro = macro_name.split('.')[-1]
         if num_errors:
             info_text = rose.config_editor.EVENT_MACRO_VALIDATE.format(
-                                name, macro, num_errors)
+                name, macro, num_errors)
             kind = self.reporter.KIND_ERR
         else:
             info_text = rose.config_editor.EVENT_MACRO_VALIDATE_OK.format(
-                                name, macro)
+                name, macro)
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
 
@@ -879,7 +879,7 @@ class MainMenuHandler(object):
                 continue
             self.update_config(config_name)
             if (only_this_config_name is None or
-                config_name == only_this_config_name):
+                    config_name == only_this_config_name):
                 config_dict[config_name] = {
                     "config": config_data.config,
                     "directory": config_data.directory
@@ -941,11 +941,11 @@ class MainMenuHandler(object):
             return scontrol.gcontrol(this_id)
         else:
             msg = rose.config_editor.DIALOG_TEXT_UNREGISTERED_SUITE.format(
-                                                                       this_id)
+                this_id)
             return rose.gtk.dialog.run_dialog(
-                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                          msg,
-                          rose.config_editor.DIALOG_TITLE_UNREGISTERED_SUITE)
+                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                msg,
+                rose.config_editor.DIALOG_TITLE_UNREGISTERED_SUITE)
 
     def launch_terminal(self):
         # Handle a launch terminal request.
@@ -961,10 +961,10 @@ class MainMenuHandler(object):
             g.launch_suite_log_browser(None, self.data.top_level_name)
         except rose.suite_engine_proc.NoSuiteLogError:
             rose.gtk.dialog.run_dialog(
-                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                rose.config_editor.ERROR_NO_OUTPUT.format(
-                                            self.data.top_level_name),
-                                rose.config_editor.DIALOG_TITLE_ERROR)
+                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                rose.config_editor.ERROR_NO_OUTPUT.format(
+                    self.data.top_level_name),
+                rose.config_editor.DIALOG_TITLE_ERROR)
 
     def get_run_suite_args(self, *args):
         """Ask the user for custom arguments to suite run."""
@@ -972,8 +972,8 @@ class MainMenuHandler(object):
         help_text = subprocess.Popen(help_cmds,
                                      stdout=subprocess.PIPE).communicate()[0]
         rose.gtk.dialog.run_command_arg_dialog(
-                            rose.config_editor.LAUNCH_SUITE_RUN,
-                            help_text, self.run_suite_check_args)
+            rose.config_editor.LAUNCH_SUITE_RUN,
+            help_text, self.run_suite_check_args)
 
     def run_suite_check_args(self, args):
         if args is None:
@@ -992,17 +992,17 @@ class MainMenuHandler(object):
     def transform_default(self, only_this_config=None):
         """Run the Rose built-in transformer macros."""
         if (only_this_config is not None and
-            only_this_config in self.data.config.keys()):
+                only_this_config in self.data.config.keys()):
             config_keys = [only_this_config]
             text = rose.config_editor.DIALOG_LABEL_AUTOFIX
         else:
             config_keys = sorted(self.data.config.keys())
             text = rose.config_editor.DIALOG_LABEL_AUTOFIX_ALL
         proceed = rose.gtk.dialog.run_dialog(
-                                  rose.gtk.dialog.DIALOG_TYPE_WARNING,
-                                  text,
-                                  rose.config_editor.DIALOG_TITLE_AUTOFIX,
-                                  cancel=True)
+            rose.gtk.dialog.DIALOG_TYPE_WARNING,
+            text,
+            rose.config_editor.DIALOG_TITLE_AUTOFIX,
+            cancel=True)
         if not proceed:
             return False
         sorter = rose.config.sort_settings
@@ -1015,5 +1015,5 @@ class MainMenuHandler(object):
             config, change_list = macro.transform(macro_config, meta_config)
             change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
             self.handle_macro_transforms(
-                        config_name, "Autofixer.transform",
-                        macro_config, change_list, triggers_ok=True)
+                config_name, "Autofixer.transform",
+                macro_config, change_list, triggers_ok=True)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Module that contains upgrade macro functionality."""
 
 import copy
@@ -350,7 +350,7 @@ class MacroUpgradeManager(object):
                                                        is_upgrade=True)
         if meta_path is None:
             raise OSError(rose.macro.ERROR_LOAD_CONF_META_NODE)
-        meta_path = os.path.abspath(meta_path)        
+        meta_path = os.path.abspath(meta_path)
         self.named_tags = []
         for node in os.listdir(meta_path):
             node_meta = os.path.join(meta_path, node, rose.META_CONFIG_NAME)
@@ -362,7 +362,7 @@ class MacroUpgradeManager(object):
             self._load_version_macros([])
             return
         macro_info_tuples = rose.macro.get_macro_class_methods(
-                                           [self.version_module])
+            [self.version_module])
         version_macros = []
         if self.downgrade:
             grade_method = DOWNGRADE_METHOD
@@ -497,12 +497,12 @@ class MacroUpgradeManager(object):
         while macro_insts:
             for macro in list(macro_insts):
                 if (self.downgrade and
-                    macro.AFTER_TAG == self.version_macros[-1].BEFORE_TAG):
+                        macro.AFTER_TAG == self.version_macros[-1].BEFORE_TAG):
                     macro_insts.remove(macro)
                     self.version_macros.append(macro)
                     break
                 if (not self.downgrade and
-                    macro.BEFORE_TAG == self.version_macros[-1].AFTER_TAG):
+                        macro.BEFORE_TAG == self.version_macros[-1].AFTER_TAG):
                     macro_insts.remove(macro)
                     self.version_macros.append(macro)
                     break
@@ -528,7 +528,7 @@ def get_meta_upgrade_module(meta_path):
     version_module = None
     if os.path.exists(os.path.join(meta_path, "__init__.py")):
         # The category directory is a package.
-        sys.path.insert(0, os.path.dirname(meta_path))        
+        sys.path.insert(0, os.path.dirname(meta_path))
         category_package = __import__(category)
         version_module = getattr(category_package, MACRO_UPGRADE_MODULE, None)
         sys.path.pop(0)
@@ -619,7 +619,8 @@ def main():
         rose.macros.trigger.TriggerMacro().transform(conf, meta)
     )
     new_config_map, changes_map = rose.macro.apply_macro_to_config_map(
-        combined_config_map, new_meta_config, macro_function, macro_name=macro_id)
+        combined_config_map, new_meta_config, macro_function,
+        macro_name=macro_id)
     trig_macro_id = rose.macro.MACRO_OUTPUT_ID.format(
         rose.macro.TRANSFORM_METHOD.upper()[0],
         MACRO_UPGRADE_TRIGGER_NAME

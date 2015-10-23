@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,12 +16,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Check a file does not contain a string."""
 
 OUTPUT_STRING = "%s: File %s %s %s"
 PASS = "!~"
 FAIL = "~~"
+
 
 class Prohibited(object):
     def run(self, task):
@@ -48,7 +49,7 @@ class ProhibitedStringResult(object):
             self.subextract = "unknown"
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, self.resultfile, self.status,
-                                 self.subextract)
+        return OUTPUT_STRING % (
+            self.extract, self.resultfile, self.status, self.subextract)
 
     __str__ = __repr__

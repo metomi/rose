@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """This package contains the Python code for Rose utilities.
 
 This module contains the constants that are used globally within these.
@@ -53,7 +53,7 @@ CONFIG_OPT_OWNER = "owner"
 CONFIG_OPT_PROJECT = "project"
 INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=owner",
                                 "=project", "=sub-project", "=title",
-                                "=type",]
+                                "=type"]
 SUB_CONFIG_DEFAULT_META_IDS = ["=file-install-root", "=meta", "=mode",
                                "=opts", "command", "file:", "poll"]
 TOP_CONFIG_DEFAULT_META_IDS = [
@@ -94,7 +94,7 @@ META_PROP_WARN_IF = "warn-if"
 META_PROP_WIDGET = "widget"
 
 # Value used to denote copy mode never or clear for a metadata setting.
-COPY_MODE_NEVER = "never" 
+COPY_MODE_NEVER = "never"
 COPY_MODE_CLEAR = "clear"
 
 # Value used to denote "on" for a metadata setting.

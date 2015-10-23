@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 This module contains a utility class to transform between data types.
 
@@ -114,8 +114,8 @@ def launch_node_info_dialog(node, changes, search_function):
     safe_str = rose.gtk.util.safe_str
     text = ''
     if changes:
-        text += rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(
-                                                        changes) + "\n"
+        text += (rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(changes) +
+                 "\n")
     text += rose.config_editor.DIALOG_NODE_INFO_DATA
     att_list = vars(node).items()
     att_list.sort()
@@ -129,7 +129,7 @@ def launch_node_info_dialog(node, changes, search_function):
     maxlen = rose.config_editor.DIALOG_NODE_INFO_MAX_LEN
     for i, (att_name, att_val) in enumerate(att_list):
         if (att_name == 'metadata' or att_name.startswith("_") or
-            callable(att_val)):
+                callable(att_val)):
             continue
         if i == metadata_start_index:
             text += "\n" + rose.config_editor.DIALOG_NODE_INFO_METADATA

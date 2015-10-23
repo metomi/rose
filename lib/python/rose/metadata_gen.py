@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Module to automatically generate metadata from a Rose configuration.
 """
@@ -53,9 +53,8 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
         modifier_sect = rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
         if sect and option is None:
             if (modifier_sect != meta_sect and
-                modifier_sect != sect and
-                meta_config.get([modifier_sect]) is None and
-                auto_type):
+                    modifier_sect != sect and
+                    meta_config.get([modifier_sect]) is None and auto_type):
                 meta_config.set([modifier_sect, rose.META_PROP_DUPLICATE],
                                 rose.META_PROP_VALUE_TRUE)
             if meta_config.get([meta_sect]) is not None:
