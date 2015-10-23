@@ -41,7 +41,7 @@ class AbortEvent(Event):
     """An event raised when a task failure will stop further task running"""
 
     LEVEL = Event.V
-    KIND = Event.KIND_OUT
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return "Closing task pool, no further commands will be run."
@@ -116,9 +116,8 @@ class RoseBunchApp(BuiltinApp):
     SLEEP_DURATION = 0.5
     TYPE_ABORT_ON_FAIL = "abort"
     TYPE_CONTINUE_ON_FAIL = "continue"
-    FAIL_HANDLE_TYPES = [TYPE_CONTINUE_ON_FAIL, TYPE_ABORT_ON_FAIL]
-    FAIL_HANDLE = TYPE_CONTINUE_ON_FAIL
-    INCREMENTAL = False
+    FAIL_MODE_TYPES = [TYPE_CONTINUE_ON_FAIL, TYPE_ABORT_ON_FAIL]
+
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """ Run multiple instaces of a command using sets of specified args"""
@@ -132,25 +131,18 @@ class RoseBunchApp(BuiltinApp):
                 raise ConfigValueError([self.SETTINGS_SECTION, "names"],
                                        self.invocation_names,
                                        "names must be unique")
-            if "job" in self.invocation_names:
-                raise ConfigValueError([self.SETTINGS_SECTION, "names"],
-                                       self.invocation_names,
-                                       "may not name an invocation 'job'")
 
-        fail_handle = conf_tree.node.get_value([self.SETTINGS_SECTION,
-                                          "fail-handle"])
-        if fail_handle:
-            if fail_handle in self.FAIL_HANDLE_TYPES:
-                self.FAIL_HANDLE=fail_handle
-            else:
-                raise ConfigValueError([self.SETTINGS_SECTION, "fail-handle"],
-                                       fail_handle,
-                                       "not a valid setting")
+        self.fail_mode = conf_tree.node.get_value([self.SETTINGS_SECTION,
+                                              "fail-mode"],
+                                             self.TYPE_CONTINUE_ON_FAIL)
 
-        incremental = conf_tree.node.get_value([self.SETTINGS_SECTION,
-                                                "incremental"])
-        if incremental == 'True':
-            self.INCREMENTAL=True
+        if self.fail_mode not in self.FAIL_MODE_TYPES:
+            raise ConfigValueError([self.SETTINGS_SECTION, "fail-mode"],
+                                   fail_mode,
+                                   "not a valid setting")
+
+        self.incremental = conf_tree.node.get_value([self.SETTINGS_SECTION,
+                                                "incremental"], False)
 
         multi_args = conf_tree.node.get_value([self.ARGS_SECTION])
         if not multi_args:
@@ -179,21 +171,20 @@ class RoseBunchApp(BuiltinApp):
             if len(shlex.split(val.value)) != arglength:
                 raise InconsistentArglength()
 
-        if conf_tree.node.get_value([self.ARGS_SECTION, "instances"]):
-            raise ConfigValueError([self.ARGS_SECTION, "instances"],
+        if conf_tree.node.get_value([self.ARGS_SECTION, "command-instances"]):
+            raise ConfigValueError([self.ARGS_SECTION, "command-instances"],
                                    conf_tree.node.get_value(
-                                    [self.ARGS_SECTION, "instances"]),
+                                    [self.ARGS_SECTION, "command-instances"]),
                                    "reserved keyword")
 
-        # Set up instances if needed
-        instances = conf_tree.node.get_value([self.SETTINGS_SECTION, "instances"])
+        # Set up command-instances if needed
+        instances = conf_tree.node.get_value([self.SETTINGS_SECTION, "command-instances"])
 
         if instances:
             try:
-                instances = int(instances)
-                instances = range(instances)
+                instances = range(int(instances))
             except ValueError as err:
-                raise ConfigValueError([self.SETTINGS_SECTION, "instances"],
+                raise ConfigValueError([self.SETTINGS_SECTION, "command-instances"],
                                        instances,
                                        "not an integer value")
             if arglength != len(instances):
@@ -201,14 +192,14 @@ class RoseBunchApp(BuiltinApp):
 
         # Set max number of processes to run at once
         max_procs = int(conf_tree.node.get_value(
-                                            [self.SETTINGS_SECTION, "limit"]))
+                                        [self.SETTINGS_SECTION, "pool-size"]))
         if max_procs:
             self.MAX_PROCS = int(max_procs)
         else:
             self.MAX_PROCS = arglength
 
 
-        if self.INCREMENTAL:
+        if self.incremental:
             self.dao = RoseBunchDAO(conf_tree)
         else:
             self.dao = None
@@ -223,9 +214,10 @@ class RoseBunchApp(BuiltinApp):
             commands[name] = invocation
 
         procs = {}
-        log_format = os.path.join(os.environ['ROSE_TASK_LOG_DIR'], "%s")
-        #log_stdout = log_prefix + ".out"
-        #log_stderr = log_prefix + ".err"
+        if 'ROSE_TASK_LOG_DIR' in os.environ:
+            log_format = os.path.join(os.environ['ROSE_TASK_LOG_DIR'], "%s")
+        else:
+            log_format = os.path.join(os.getcwd(), "%s")
 
         failed = {}
         abort = False
@@ -240,7 +232,7 @@ class RoseBunchApp(BuiltinApp):
                                         FailEvent(key, proc.returncode))
                         if self.dao:
                             self.dao.update_command_state(key, self.dao.S_FAIL)
-                        if self.FAIL_HANDLE == self.TYPE_ABORT_ON_FAIL:
+                        if self.fail_mode == self.TYPE_ABORT_ON_FAIL:
                             abort = True
                             app_runner.handle_event(AbortEvent())
                     else:
@@ -271,6 +263,11 @@ class RoseBunchApp(BuiltinApp):
                                                 stdout=open(cmd_stdout, 'w'),
                                                 stderr=open(cmd_stderr, 'w'))
             sleep(self.SLEEP_DURATION)
+
+        if abort and commands:
+            for command in commands:
+                cmd = command.get_command()
+                print "Not run: %s" % cmd
 
         if self.dao:
             self.dao.close()
@@ -314,8 +311,8 @@ class RoseBunchDAO(object):
 
     """Database object for rose_bunch"""
 
-    T_COMMANDS = "commands"
-    T_CONFIG = "config"
+    TABLE_COMMANDS = "commands"
+    TABLE_CONFIG = "config"
 
     S_PASS = "pass"
     S_FAIL = "fail"
@@ -324,7 +321,6 @@ class RoseBunchDAO(object):
     CONN_TIMEOUT = 0.1
     FILE_NAME = ".rose-bunch.db"
 
-    NEW_RUN = True
 
     def __init__(self, config):
         self.conn = None
@@ -332,9 +328,9 @@ class RoseBunchDAO(object):
         self.connect()
         self.create_tables()
 
-        if self.NEW_RUN:
+        if self.new_run:
             self.record_config(config)
-        elif not self.same_last_config(config):
+        elif not self.same_prev_config(config):
             self.clear_command_states()
             self.record_config(config, clear_db=True)
 
@@ -352,17 +348,16 @@ class RoseBunchDAO(object):
             "SELECT name FROM sqlite_master WHERE type=='table' ORDER BY name"):
             existing.append(row[0])
 
-        if existing:
-            self.NEW_RUN = False
+        self.new_run = not existing
 
-        if self.T_COMMANDS not in existing:
-            self.conn.execute("""CREATE TABLE """ + self.T_COMMANDS + """ (
+        if self.TABLE_COMMANDS not in existing:
+            self.conn.execute("""CREATE TABLE """ + self.TABLE_COMMANDS + """ (
                               name TEXT,
                               status TEXT,
                               PRIMARY KEY(name))""")
 
-        if self.T_CONFIG not in existing:
-            self.conn.execute("""CREATE TABLE """ + self.T_CONFIG + """ (
+        if self.TABLE_CONFIG not in existing:
+            self.conn.execute("""CREATE TABLE """ + self.TABLE_CONFIG + """ (
                               key TEXT,
                               value TEXT,
                               PRIMARY KEY(key))""")
@@ -371,14 +366,14 @@ class RoseBunchDAO(object):
 
     def add_command(self, name):
         """Add a command to the commands table"""
-        i_stmt = "INSERT OR REPLACE INTO " + self.T_COMMANDS + " VALUES (?, ?)"
+        i_stmt = "INSERT OR REPLACE INTO " + self.TABLE_COMMANDS + " VALUES (?, ?)"
         self.conn.execute(i_stmt, [name, self.S_STARTED])
         self.conn.commit()
         return
 
     def clear_command_states(self):
         """Deletes all recorded command entries"""
-        d_stmt = "DELETE FROM " + self.T_COMMANDS
+        d_stmt = "DELETE FROM " + self.TABLE_COMMANDS
         self.conn.execute(d_stmt)
         self.conn.commit()
         return
@@ -391,14 +386,14 @@ class RoseBunchDAO(object):
 
     def update_command_state(self, name, state):
         """Update command state in CMDS table"""
-        u_stmt = "UPDATE " + self.T_COMMANDS + " SET status=? WHERE name==?"
+        u_stmt = "UPDATE " + self.TABLE_COMMANDS + " SET status=? WHERE name==?"
         self.conn.execute(u_stmt, [state, name])
         self.conn.commit()
         return
 
     def check_has_succeeded(self, name):
         """See if a named command reached the "pass" state"""
-        s_stmt = ("SELECT * FROM " + self.T_COMMANDS +
+        s_stmt = ("SELECT * FROM " + self.TABLE_COMMANDS +
                   " WHERE name==? AND status==?")
         s_stmt_args = [name, self.S_PASS]
         has_succeeded = False
@@ -412,8 +407,7 @@ class RoseBunchDAO(object):
         keys_and_nodes = list(config.node.walk())
         for keys, node in keys_and_nodes:
             if not isinstance(node.value, dict):
-                if node.state not in [rose.config.ConfigNode.STATE_USER_IGNORED,
-                                      rose.config.ConfigNode.STATE_SYST_IGNORED]:
+                if not node.is_ignored():
                     flat["_".join(keys)] = node.value
         return flat
 
@@ -421,7 +415,7 @@ class RoseBunchDAO(object):
         """Take in a conf_tree object and record the entries"""
 
         if clear_db:
-            d_stmt = "DELETE FROM " + self.T_CONFIG
+            d_stmt = "DELETE FROM " + self.TABLE_CONFIG
             self.conn.execute(d_stmt)
             self.conn.commit()
 
@@ -432,14 +426,14 @@ class RoseBunchDAO(object):
         for key, value in res.items():
             args.append((key, value))
 
-        i_stmt = "INSERT OR REPLACE INTO " + self.T_CONFIG + " VALUES (?, ?)"
+        i_stmt = "INSERT OR REPLACE INTO " + self.TABLE_CONFIG + " VALUES (?, ?)"
         self.conn.executemany(i_stmt, args)
         self.conn.commit()
         return
 
-    def same_last_config(self, current):
+    def same_prev_config(self, current):
         """See if the current config is the same as the last one used"""
-        s_stmt = ("SELECT key, value FROM " + self.T_CONFIG)
+        s_stmt = ("SELECT key, value FROM " + self.TABLE_CONFIG)
         unchanged = True
         current = self.flatten_config(current)
         for key, value in self.conn.execute(s_stmt):

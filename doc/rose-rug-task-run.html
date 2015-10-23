@@ -704,12 +704,12 @@ source=stuffing-*.txt
 
     <p>Each variant of the command is run in the same working directory with
     its output directed to separate <var>.out</var> and <var>.err</var> files
-    of the form <var>bunch.&lt;name&gt;.out</var>. Should you need separate working
-    directories your should configure your command to create the appropriate
-    subdirectory for working in.</p>
+    of the form <var>bunch.&lt;name&gt;.out</var>. Should you need separate
+    working directories your should configure your command to create the 
+    appropriate subdirectory for working in.</p>
 
-    <p>Note that, when running under batch submission systems, you will need
-    to set resource requests to reflect the resources required by running
+    <p>Note that, under load balancing systems such as PBS or Slurm, you will
+    need to set resource requests to reflect the resources required by running
     multiple commands at once e.g. if one command would require 1GB memory and
     you have configured your app to run up to 4 commands at once then you will
     need to request 4GB of memory.</p>
@@ -726,22 +726,22 @@ source=stuffing-*.txt
       reserved for inserting an automatically generated index for the command
       invocation when using the <kbd>instances</kbd> setting.</dd>
 
-      <dt><kbd>instances=N</kbd></dt>
+      <dt><kbd>command-instances=N</kbd></dt>
 
       <dd>Optional. Allows the user to specify an integer value for the number
       of instances of a command they want to run. This generates the values
-      used by the <var>%(instances)s</var> value in <kbd>command-format</kbd>
-      Useful for cases where the only difference between invocations would be
-      an index number e.g. ensemble members. Note indexes start at 
-      <var>0</var>.</dd>
+      used by the <var>%(command-instances)s</var> value in
+      <kbd>command-format</kbd>. Useful for cases where the only difference 
+      between invocations would be an index number e.g. ensemble members. Note
+      indexes start at <var>0</var>.</dd>
 
-      <dt><kbd>limit=N</kbd></dt>
+      <dt><kbd>pool-size=N</kbd></dt>
 
       <dd>Optional. Allows the user to limit the number of concurrently running
       commands. If not specified then all command variations will be run at
       the same time.</dd>
 
-      <dt><kbd>fail-handle=continue|abort</kbd></dt>
+      <dt><kbd>fail-mode=continue|abort</kbd></dt>
 
       <dd>Optional (default=continue). Specify what action you want the job to
       take on failure of a command it is trying to run. If set to
