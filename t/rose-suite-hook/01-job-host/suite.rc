@@ -13,8 +13,8 @@ my_task_1
 [runtime]
     [[root]]
         [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
+           succeeded handler = "rose suite-hook --retrieve-job-logs"
+           failed handler = "rose suite-hook --shutdown --retrieve-job-logs"
            submission failed handler = "rose suite-hook --shutdown"
            submission timeout handler = "rose suite-hook"
            execution timeout handler = "rose suite-hook"
