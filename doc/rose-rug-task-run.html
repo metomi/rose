@@ -699,7 +699,7 @@ source=stuffing-*.txt
     configuration.</p>
 
     <p>The application is normally configured in the
-    <kbd>[bunch-settings]</kbd> and <kbd>[bunch-args]</kbd> sections in
+    <kbd>[bunch]</kbd> and <kbd>[bunch-args]</kbd> sections in
     <var>rose-app.conf</var>.</p>
 
     <p>Each variant of the command is run in the same working directory with
@@ -714,7 +714,7 @@ source=stuffing-*.txt
     you have configured your app to run up to 4 commands at once then you will
     need to request 4GB of memory.</p>
 
-    <p>The following <kbd>[bunch-settings]</kbd> settings are accepted:</p>
+    <p>The following <kbd>[bunch]</kbd> settings are accepted:</p>
 
     <dl>
       <dt><kbd>command-format=FORMAT</kbd></dt>
@@ -770,16 +770,16 @@ source=stuffing-*.txt
 
     <p>The <kbd>[bunch-args]</kbd> section is used to specify the various 
     combinations of args to be passed to the command specified under 
-    <kbd>[bunch-settings]command-format=</kbd>:</p>
+    <kbd>[bunch]command-format=</kbd>:</p>
 
       <dt><kbd>argname=val1 val2 ...</kbd></dt>
 
       <dd>Optional. Allows defining named lists of argument values to pass to
-      <kbd>[bunch-settings]command-format=</kbd>. Multiple named sets of
+      <kbd>[bunch]command-format=</kbd>. Multiple named sets of
       arguments can be defined. Each <var>argname</var> can be referenced in
       the using <var>%(argname)s</var>. The only disallowed name is
       <var>instances</var>, which is reserved for the auto-generated list of
-      instances when the <kbd>[bunch-settings]instances=N</kbd> option is
+      instances when the <kbd>[bunch]instances=N</kbd> option is
       used.</dd>
 
     <p>E.g.:</p>
@@ -787,17 +787,17 @@ source=stuffing-*.txt
 meta=rose_bunch
 mode=rose_bunch
 
-[bunch-args]
-arg1=1 2 3 4
-arg2=foo bar baz qux
-
-[bunch-settings]
-command-format=echo arg1 is %(arg1)s, arg2 is %(arg2)s, instance is %(instances)s
+[bunch]
+command-format=echo arg1: %(arg1)s, arg2: %(arg2)s, command-instance: %(command-instances)s
 fail-handle = abort
 incremental = True
 instances = 4
 limit=2
 names = foo1 bar2 baz3 qux4
+
+[bunch-args]
+arg1=1 2 3 4
+arg2=foo bar baz qux
 </pre>
 
     <h2 id="rose-task-run.util.rose_prune">Built-in Application:

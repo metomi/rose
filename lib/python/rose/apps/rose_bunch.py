@@ -57,15 +57,6 @@ class FailEvent(Event):
         name, rc = self.args
         return "Command %s failed with return code %s" % (name, rc)
 
-class InconsistentArglength(Exception):
-
-    """An event raised when arg lengths are not consistent"""
-
-    ERROR_MSG = "Inconsistent arg lengths"
-
-    def __str__(self):
-
-        return  self.ERROR_MSG
 
 class LaunchEvent(Event):
 
@@ -107,11 +98,8 @@ class RoseBunchApp(BuiltinApp):
     """Run multiple commands under one app"""
 
     SCHEME = "rose_bunch"
-    SECTION_PREFIX = "bunch"
-    ARGS_SUFFIX = "args"
-    SETTINGS_SUFFIX = "settings"
-    ARGS_SECTION = "-".join([SECTION_PREFIX, ARGS_SUFFIX])
-    SETTINGS_SECTION = "-".join([SECTION_PREFIX, SETTINGS_SUFFIX])
+    ARGS_SECTION = "bunch-args"
+    BUNCH_SECTION = "bunch"
     MAX_PROCS = None
     SLEEP_DURATION = 0.5
     TYPE_ABORT_ON_FAIL = "abort"
@@ -124,24 +112,24 @@ class RoseBunchApp(BuiltinApp):
 
         # Allow naming of individual calls
         self.invocation_names = conf_tree.node.get_value(
-                                            [self.SETTINGS_SECTION, "names"])
+                                            [self.BUNCH_SECTION, "names"])
         if self.invocation_names:
             self.invocation_names = shlex.split(self.invocation_names)
             if len(set(self.invocation_names)) != len(self.invocation_names):
-                raise ConfigValueError([self.SETTINGS_SECTION, "names"],
+                raise ConfigValueError([self.BUNCH_SECTION, "names"],
                                        self.invocation_names,
                                        "names must be unique")
 
-        self.fail_mode = conf_tree.node.get_value([self.SETTINGS_SECTION,
+        self.fail_mode = conf_tree.node.get_value([self.BUNCH_SECTION,
                                               "fail-mode"],
                                              self.TYPE_CONTINUE_ON_FAIL)
 
         if self.fail_mode not in self.FAIL_MODE_TYPES:
-            raise ConfigValueError([self.SETTINGS_SECTION, "fail-mode"],
+            raise ConfigValueError([self.BUNCH_SECTION, "fail-mode"],
                                    fail_mode,
                                    "not a valid setting")
 
-        self.incremental = conf_tree.node.get_value([self.SETTINGS_SECTION,
+        self.incremental = conf_tree.node.get_value([self.BUNCH_SECTION,
                                                 "incremental"], False)
 
         multi_args = conf_tree.node.get_value([self.ARGS_SECTION])
@@ -152,11 +140,11 @@ class RoseBunchApp(BuiltinApp):
                                         KeyError(self.ARGS_SECTION))
 
         self.command_format = conf_tree.node.get_value(
-                                    [self.SETTINGS_SECTION, "command-format"])
+                                    [self.BUNCH_SECTION, "command-format"])
 
         if not self.command_format:
             raise CompulsoryConfigValueError(
-                                    [self.SETTINGS_SECTION, "command-format"],
+                                    [self.BUNCH_SECTION, "command-format"],
                                      None, KeyError("command-format"))
 
         # Validate runlists
@@ -169,7 +157,10 @@ class RoseBunchApp(BuiltinApp):
 
         for item, val in sorted(multi_args.items()):
             if len(shlex.split(val.value)) != arglength:
-                raise InconsistentArglength()
+                raise ConfigValueError([self.ARGS_SECTION, item],
+                                       conf_tree.node.get_value(
+                                        [self.ARGS_SECTION, item]),
+                                       "inconsistent arg lengths")
 
         if conf_tree.node.get_value([self.ARGS_SECTION, "command-instances"]):
             raise ConfigValueError([self.ARGS_SECTION, "command-instances"],
@@ -178,21 +169,23 @@ class RoseBunchApp(BuiltinApp):
                                    "reserved keyword")
 
         # Set up command-instances if needed
-        instances = conf_tree.node.get_value([self.SETTINGS_SECTION, "command-instances"])
+        instances = conf_tree.node.get_value([self.BUNCH_SECTION, "command-instances"])
 
         if instances:
             try:
                 instances = range(int(instances))
             except ValueError as err:
-                raise ConfigValueError([self.SETTINGS_SECTION, "command-instances"],
+                raise ConfigValueError([self.BUNCH_SECTION, "command-instances"],
                                        instances,
                                        "not an integer value")
             if arglength != len(instances):
-                raise InconsistentArglength()
+                raise ConfigValueError([self.BUNCH_SECTION, "command-instances"],
+                                       instances,
+                                       "inconsitent arg lengths")
 
         # Set max number of processes to run at once
         max_procs = int(conf_tree.node.get_value(
-                                        [self.SETTINGS_SECTION, "pool-size"]))
+                                        [self.BUNCH_SECTION, "pool-size"]))
         if max_procs:
             self.MAX_PROCS = int(max_procs)
         else:
