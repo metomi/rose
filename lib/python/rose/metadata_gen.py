@@ -126,8 +126,7 @@ def main():
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("auto_type", "conf_dir", "output_dir")
     opts, args = opt_parser.parse_args()
-    rose.macro.add_site_meta_paths()
-    rose.macro.add_env_meta_paths()
+    rose.macro.add_meta_paths()
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
