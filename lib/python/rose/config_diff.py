@@ -135,8 +135,7 @@ def main():
     my_sys_args = list(sys.argv)
 
     opts, args = opt_parser.parse_args(my_sys_args[1:])
-    rose.macro.add_site_meta_paths()
-    rose.macro.add_env_meta_paths()
+    rose.macro.add_meta_paths()
     rose.macro.add_opt_meta_paths(opts.meta_path)
 
     paths, diff_args = args[:2], args[2:]

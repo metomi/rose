@@ -75,7 +75,7 @@ def chooser(value, metadata, error):
        m_hint is None):
         return text.RawValueWidget
     if (m_values is None and m_length is None and m_hint is None and
-       m_type in ['logical', 'boolean']):
+       m_type in ['logical', 'boolean', 'python_boolean']):
         return booltoggle.BoolToggleValueWidget
     if m_length is None:
         if m_values is not None and len(m_values) <= 4:

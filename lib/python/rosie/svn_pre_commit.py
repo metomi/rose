@@ -27,8 +27,11 @@ Ensure that commits conform to the rules of Rosie.
 from fnmatch import fnmatch
 import os
 import re
+import rose
 from rose.config import ConfigLoader
 from rose.opt_parse import RoseOptionParser
+from rose.macro import add_meta_paths, get_reports_as_text, load_meta_config
+from rose.macros import DefaultValidators
 from rose.popen import RosePopener
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
@@ -44,7 +47,8 @@ class BadChange(Exception):
     """An error representing a bad change in a commit transaction."""
 
     FMT_HEAD = "%s: %-4s%s"
-    FMT_TAIL = ": %s"
+    FMT_TAIL_1 = ": %s"
+    FMT_TAIL_M = ":\n%s"
     NO_INFO = "SUITE MUST HAVE INFO FILE"
     NO_OWNER = "SUITE MUST HAVE OWNER"
     NO_TRUNK = "SUITE MUST HAVE TRUNK"
@@ -61,8 +65,10 @@ class BadChange(Exception):
 
     def __str__(self):
         tail = ""
-        if self.content:
-            tail = self.FMT_TAIL % self.content
+        if self.content and "\n" in self.content:
+            tail = self.FMT_TAIL_M % self.content
+        elif self.content:
+            tail = self.FMT_TAIL_1 % self.content
         return self.FMT_HEAD % (self.reason, self.status, self.path) + tail
 
 
@@ -103,8 +109,19 @@ class RosieSvnPreCommitHook(object):
         self.usertools_manager = SchemeHandlersManager(
             [path], "rosie.usertools", ["verify_users"])
 
-    def _get_access_info(self, repos, path_head, txn=None):
-        """Return the owner and the access list of a suite (path_head)."""
+    def _get_access_info(self, info_node):
+        """Return (owner, access_list) from "info_node"."""
+        owner = info_node.get_value(["owner"])
+        access_list = info_node.get_value(["access-list"], "").split()
+        access_list.sort()
+        return owner, access_list
+
+    def _get_info(self, repos, path_head, txn=None):
+        """Return a ConfigNode for the "rose-suite.info" of a suite.
+
+        The suite is located under path_head.
+
+        """
         opt_txn = []
         if txn is not None:
             opt_txn = ["-t", txn]
@@ -112,12 +129,9 @@ class RosieSvnPreCommitHook(object):
         path = path_head + self.TRUNK_INFO_FILE
         t_handle.write(self._svnlook("cat", repos, path, *opt_txn))
         t_handle.seek(0)
-        node = ConfigLoader()(t_handle)
+        info_node = ConfigLoader()(t_handle)
         t_handle.close()
-        owner = node.get_value(["owner"])
-        access_list = node.get_value(["access-list"], "").split()
-        access_list.sort()
-        return owner, access_list
+        return info_node
 
     def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
@@ -167,8 +181,8 @@ class RosieSvnPreCommitHook(object):
         bad_changes = []
         author = None
         super_users = None
-        access_info_map = {}  # {path-id: (owner, access-list), ...}
-        txn_access_info_map = {}
+        rev_info_map = {}  # {path-id: (owner, access-list), ...}
+        txn_info_map = {}
 
         conf = ResourceLocator.default().get_conf()
         ignores_str = conf.get_value(["rosa-svn", "ignores"], self.IGNORES)
@@ -235,14 +249,27 @@ class RosieSvnPreCommitHook(object):
             # User IDs of owner and access list must be real
             if (status not in self.ST_DELETE and
                     path_tail == self.TRUNK_INFO_FILE):
+                if path_head not in txn_info_map:
+                    txn_info_map[path_head] = self._get_info(
+                        repos, path_head, txn)
                 txn_owner, txn_access_list = self._get_access_info(
-                    repos, path_head, txn)
+                    txn_info_map[path_head])
                 if not txn_owner:
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_OWNER))
                     continue
                 if self._verify_users(
                         status, path, txn_owner, txn_access_list, bad_changes):
+                    continue
+                reports = DefaultValidators().validate(
+                    txn_info_map[path_head],
+                    load_meta_config(
+                        txn_info_map[path_head],
+                        config_type=rose.INFO_CONFIG_NAME))
+                if reports:
+                    reports_str = get_reports_as_text({None: reports}, path)
+                    bad_changes.append(
+                        BadChange(status, path, BadChange.VALUE, reports_str))
                     continue
 
             # New suite trunk: ignore the rest
@@ -273,10 +300,10 @@ class RosieSvnPreCommitHook(object):
                     if value is not None:
                         super_users = shlex.split(value)
                         break
-            if path_head not in access_info_map:
-                access_info = self._get_access_info(repos, path_head)
-                access_info_map[path_head] = access_info
-            owner, access_list = access_info_map[path_head]
+            if path_head not in rev_info_map:
+                rev_info_map[path_head] = self._get_info(
+                    repos, path_head)
+            owner, access_list = self._get_access_info(rev_info_map[path_head])
             admin_users = super_users + [owner]
 
             # Only admin users can remove the suite
@@ -294,10 +321,11 @@ class RosieSvnPreCommitHook(object):
                 continue
 
             # The owner must not be deleted
-            if path_head not in txn_access_info_map:
-                txn_access_info = self._get_access_info(repos, path_head, txn)
-                txn_access_info_map[path_head] = txn_access_info
-            txn_owner, txn_access_list = txn_access_info_map[path_head]
+            if path_head not in txn_info_map:
+                txn_info_map[path_head] = self._get_info(
+                    repos, path_head, txn)
+            txn_owner, txn_access_list = self._get_access_info(
+                txn_info_map[path_head])
             if not txn_owner:
                 bad_changes.append(BadChange(status, path, BadChange.NO_OWNER))
                 continue
@@ -324,6 +352,7 @@ class RosieSvnPreCommitHook(object):
 
 def main():
     """Implement "rosa svn-pre-commit"."""
+    add_meta_paths()
     opt_parser = RoseOptionParser()
     opts, args = opt_parser.parse_args()
     repos, txn = args

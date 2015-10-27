@@ -73,9 +73,11 @@ my_real_array_slice_2d(5:90,1)=5.0,6.0,3.0
 my_python_list=["Spam", True, "Cheese", False, 2000.0]
 my_python_list_empty=[]
 my_spaced_list=1 2 3 "bob"
+my_python_boolean_true=True
+my_python_boolean_false=False
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 36
+tests 39
 #-------------------------------------------------------------------------------
 # Check boolean type checking.
 TEST_KEY=$TEST_KEY_BASE-boolean-ok
@@ -365,4 +367,18 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
+# Check python boolean type checking.
+TEST_KEY=$TEST_KEY_BASE-boolean-ok
+setup
+init_meta <<'__META_CONFIG__'
+[namelist:values_nl1=my_python_boolean_true]
+type=python_boolean
+
+[namelist:values_nl1=my_python_boolean_false]
+type=python_boolean
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro -V --config=../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
 exit

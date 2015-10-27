@@ -417,7 +417,6 @@ class AnalysisTask(object):
         self.warnonfail = False
         self.numkgofiles = 0
 
-
 # Variables to save settings before environment variable expansion (for
 # writing back to config file, rerunning, etc)
         self.resultfileconfig = self.resultfile

@@ -19,6 +19,10 @@
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 
+if ! pep8 --version 1>'/dev/null' 2>&1; then
+    skip_all '"pep8" command not available'
+fi
+
 tests 3
 
 run_pass "${TEST_KEY_BASE}" \

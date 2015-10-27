@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """Hook functionalities for a suite."""
 
@@ -52,7 +52,8 @@ class RoseSuiteHook(object):
             return self.event_handler(*args, **kwargs)
 
     def run(self, suite_name, task_id, hook_event, hook_message=None,
-            should_mail=False, mail_cc_list=None, should_shutdown=False):
+            should_mail=False, mail_cc_list=None, should_shutdown=False,
+            should_retrieve_job_logs=False):
         """
         Invoke the hook for a suite.
 
@@ -65,7 +66,7 @@ class RoseSuiteHook(object):
         """
         # Retrieve log and populate job logs database
         task_ids = []
-        if task_id:
+        if task_id and should_retrieve_job_logs:
             task_ids = [task_id]
             self.suite_engine_proc.job_logs_pull_remote(suite_name, task_ids)
 
@@ -120,7 +121,8 @@ class RoseSuiteHook(object):
 def main():
     """Implement "rose suite-hook" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("mail_cc", "mail", "shutdown")
+    opt_parser.add_my_options(
+        "mail_cc", "mail", "retrieve_job_logs", "shutdown")
     opts, args = opt_parser.parse_args()
     for key in ["mail_cc"]:
         values = []
@@ -139,7 +141,8 @@ def main():
     hook(*args,
          should_mail=opts.mail,
          mail_cc_list=opts.mail_cc,
-         should_shutdown=opts.shutdown)
+         should_shutdown=opts.shutdown,
+         should_retrieve_job_logs=opts.retrieve_job_logs)
 
 
 if __name__ == "__main__":

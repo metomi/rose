@@ -65,8 +65,7 @@ def main():
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
-    rose.macro.add_site_meta_paths()
-    rose.macro.add_env_meta_paths()
+    rose.macro.add_meta_paths()
 
     if opts.meta_key:
         opts.meta = True

@@ -145,8 +145,7 @@ class MainWindow(gtk.Window):
                               rosie.browser.PROGRAM_NAME))
         self.suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=self.handle_view_output_event)
-        rose.macro.add_site_meta_paths()
-        rose.macro.add_env_meta_paths()
+        rose.macro.add_meta_paths()
         self.show()
 
     def setup_window(self):
@@ -205,7 +204,7 @@ class MainWindow(gtk.Window):
                 address_url.startswith("search?s=") or
                 address_url.startswith("query?q=") or
                 (address_url.startswith("roses:") and
-                address_url.endswith("/"))):
+                 address_url.endswith("/"))):
             self.nav_bar.simple_search_entry.set_text(address_url)
             self.handle_search(None)
         elif address_url.startswith("roses:"):

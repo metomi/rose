@@ -382,6 +382,12 @@ class MacroReport(object):
             self.section, self.option, self.value, self.info, self.is_warning))
 
 
+def add_meta_paths():
+    """Call add_site_meta_paths and add_env_meta_paths."""
+    add_site_meta_paths()
+    add_env_meta_paths()
+
+
 def add_site_meta_paths():
     """Load any metadata paths specified in a user or site configuration."""
     conf = rose.resource.ResourceLocator.default().get_conf()
@@ -1258,8 +1264,7 @@ def _report_error(exception=None, text=""):
 
 def main():
     """Run rose macro."""
-    add_site_meta_paths()
-    add_env_meta_paths()
+    add_meta_paths()
     return_objects = parse_macro_mode_args()
     if return_objects is None:
         sys.exit(1)

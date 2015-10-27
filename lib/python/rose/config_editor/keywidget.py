@@ -37,18 +37,12 @@ class KeyWidget(gtk.VBox):
     """This class generates a label or entry box for a variable name."""
 
     FLAG_ICON_MAP = {
-        rose.config_editor.FLAG_TYPE_DEFAULT:
-            gtk.STOCK_INFO,
-        rose.config_editor.FLAG_TYPE_ERROR:
-            gtk.STOCK_DIALOG_WARNING,
-        rose.config_editor.FLAG_TYPE_FIXED:
-            gtk.STOCK_DIALOG_AUTHENTICATION,
-        rose.config_editor.FLAG_TYPE_OPT_CONF:
-            gtk.STOCK_INDEX,
-        rose.config_editor.FLAG_TYPE_OPTIONAL:
-            gtk.STOCK_ABOUT,
-        rose.config_editor.FLAG_TYPE_NO_META:
-            gtk.STOCK_DIALOG_QUESTION}
+        rose.config_editor.FLAG_TYPE_DEFAULT: gtk.STOCK_INFO,
+        rose.config_editor.FLAG_TYPE_ERROR: gtk.STOCK_DIALOG_WARNING,
+        rose.config_editor.FLAG_TYPE_FIXED: gtk.STOCK_DIALOG_AUTHENTICATION,
+        rose.config_editor.FLAG_TYPE_OPT_CONF: gtk.STOCK_INDEX,
+        rose.config_editor.FLAG_TYPE_OPTIONAL: gtk.STOCK_ABOUT,
+        rose.config_editor.FLAG_TYPE_NO_META: gtk.STOCK_DIALOG_QUESTION}
 
     MODIFIED_COLOUR = rose.gtk.util.color_parse(
         rose.config_editor.COLOUR_VARIABLE_CHANGED)

@@ -30,7 +30,7 @@ fi
 HOST="$(rose host-select -q "${HOST}")"
 export ROSE_CONF_PATH="${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/conf"
 
-tests 8
+tests 7
 
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}"
@@ -52,12 +52,6 @@ Hello from ${TASK}.1
 __CONTENT__
 done
 cd "${OLDPWD}"
-
-grep "${SUITE_RUN_DIR}/bin/my-rsync .* ${SUITE_RUN_DIR}/log/job" \
-    'my-rsync.log' >'my-rsync.log.edited'
-file_cmp "${TEST_KEY}-rsync" 'my-rsync.log.edited' <<__LOG__
-${SUITE_RUN_DIR}/bin/my-rsync --include=/1 --include=/1/task-2 --exclude=/* --exclude=/*/* ${HOST}:cylc-run/${NAME}/log/job/ ${SUITE_RUN_DIR}/log/job
-__LOG__
 
 sqlite3 "${SUITE_RUN_DIR}/log/rose-job-logs.db" \
     'SELECT cycle,task,path FROM log_files ORDER BY cycle,task,path;' \

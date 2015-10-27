@@ -15,7 +15,7 @@ task-2
     [[root]]
         script = echo "Hello from ${CYLC_TASK_ID}" >"${CYLC_TASK_LOG_ROOT}.txt"
         [[[events]]]
-            handlers = rose suite-hook
+            handlers = rose suite-hook --retrieve-job-logs
             handler events = succeeded, failed
             handler retry delays = PT20S
         [[[remote]]]

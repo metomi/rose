@@ -18,7 +18,7 @@ my_task_2
     [[root]]
         command scripting = "echo Hello"
         [[[event hooks]]]
-            failed handler = "rose suite-hook --shutdown"
+            failed handler = "rose suite-hook --shutdown --retrieve-job-logs"
             submission failed handler = "rose suite-hook --shutdown"
             submission timeout handler = "rose suite-hook"
             execution timeout handler = "rose suite-hook"

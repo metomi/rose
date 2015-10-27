@@ -43,6 +43,11 @@ class BoolToggleValueWidget(gtk.HBox):
                                    rose.TYPE_BOOLEAN_VALUE_TRUE]
             self.label_dict = dict(zip(self.allowed_values,
                                        self.allowed_values))
+        elif metadata.get(rose.META_PROP_TYPE) == "python_boolean":
+            self.allowed_values = [rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
+                                   rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE]
+            self.label_dict = dict(zip(self.allowed_values,
+                                       self.allowed_values))
         else:
             self.allowed_values = [rose.TYPE_LOGICAL_VALUE_FALSE,
                                    rose.TYPE_LOGICAL_VALUE_TRUE]

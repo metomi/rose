@@ -253,8 +253,7 @@ def _load_override_config():
 def main():
     """Run the metadata graphing from the command line."""
     _load_override_config()
-    rose.macro.add_site_meta_paths()
-    rose.macro.add_env_meta_paths()
+    rose.macro.add_meta_paths()
     opt_parser = rose.opt_parse.RoseOptionParser()
     options = ["conf_dir", "meta_path", "output_dir", "property"]
     opt_parser.add_my_options(*options)
