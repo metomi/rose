@@ -243,7 +243,7 @@ class RosieVCClient(object):
         return id_
 
     def create(self, info_config, from_id=None, prefix=None,
-               meta_suite_mode=True):
+               meta_suite_mode=False):
         """Create a suite.
 
         info_config -- A rose.config.ConfigNode object, which will be used as
