@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,34 +16,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Wrap version control system functionalities required by Rosie."""
 
 import atexit
 from fnmatch import fnmatch
 import os
 import pwd
-import re
 import rose.config
 import rose.external
 import rose.metadata_check
 import rose.reporter
 from rose.fs_util import FileSystemUtil
-from rose.config_cli import get_meta_path
-from rose.macro import (load_meta_config, add_site_meta_paths,
-                        add_env_meta_paths)
+from rose.macro import add_meta_paths, load_meta_config
 from rose.macros import DefaultValidators
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
 from rosie.suite_id import SuiteId, SuiteIdOverflowError, SuiteIdPrefixError
-import shlex
 import shutil
 from StringIO import StringIO
 import sys
-import tempfile
-import time
+from tempfile import mkdtemp, mkstemp
 from urlparse import urlparse
 
 
@@ -53,6 +48,17 @@ CREATE_INFO_CONFIG_COMMENT = """
 # Any KEY=VALUE pairs can be added. Known fields include:
 # "access-list", "description" and "sub-project".
 """
+YES = "y"
+YES_TO_ALL = "a"
+PROMPT_TAIL_YN = " [" + YES + " or n (default)] "
+PROMPT_TAIL_YNA = (
+    " [" + YES + " or n (default) or " + YES_TO_ALL + " (yes to all)] ")
+PROMPT_COPY = "Copy \"%s\" to \"%s-?????\"?" + PROMPT_TAIL_YN
+PROMPT_CREATE = "Create suite as \"%s-?????\"?" + PROMPT_TAIL_YN
+PROMPT_FIX_INFO_CONFIG = (
+    "rose-suite.info has invalid settings. Try again?" + PROMPT_TAIL_YN)
+PROMPT_DELETE = "%s: delete local+repository copies?" + PROMPT_TAIL_YNA
+PROMPT_DELETE_LOCAL = "%s: delete local copy?" + PROMPT_TAIL_YNA
 
 
 class FileExistError(Exception):
@@ -73,28 +79,21 @@ class LocalCopyStatusError(Exception):
     e.status is the "svn status" output of the local copy.
 
     """
-    def __init__(self, id, status):
-        self.id = id
+    def __init__(self, id_, status):
+        self.id_ = id_
         self.status = status
-        super(LocalCopyStatusError, self).__init__(id, status)
+        super(LocalCopyStatusError, self).__init__(id_, status)
 
     def __str__(self):
-        data = (str(self.id), self.id.to_local_copy(), self.status)
+        data = (str(self.id_), self.id_.to_local_copy(), self.status)
         return "%s: %s: local copy has uncommitted changes:\n%s" % data
 
 
-class SuiteInfoFieldError(Exception):
-    """Raised when the rose-suite.info doesn't contain a required field."""
-    def __str__(self):
-        return "rose-suite.info: compulsory field \"%s\" not defined" % self.args[0]
-
-
 class SuiteInfoError(Exception):
-    """Raised when the rose-suite.info doesn't contain the required
-    information.
-    """
+    """Raised when settings in rose-suite.info are invalid."""
     def __str__(self):
-        return "rose-suite.info:\n \"%s\"" % self.args[0]
+        return rose.macro.get_reports_as_text(
+            {None: self.args[0]}, "rose-suite.info")
 
 
 class LocalCopyCreateEvent(Event):
@@ -104,8 +103,8 @@ class LocalCopyCreateEvent(Event):
 
     """
     def __str__(self):
-        id = self.args[0]
-        return "%s: local copy created at %s" % (str(id), id.to_local_copy())
+        id_ = self.args[0]
+        return "%s: local copy created at %s" % (str(id_), id_.to_local_copy())
 
 
 class LocalCopyCreateSkipEvent(Event):
@@ -118,8 +117,9 @@ class LocalCopyCreateSkipEvent(Event):
     KIND = Reporter.KIND_ERR
 
     def __str__(self):
-        id = self.args[0]
-        return "%s: skip, local copy already exists at %s" % (str(id), id.to_local_copy())
+        id_ = self.args[0]
+        return "%s: skip, local copy already exists at %s" % (
+            str(id_), id_.to_local_copy())
 
 
 class SuiteCreateEvent(Event):
@@ -130,8 +130,8 @@ class SuiteCreateEvent(Event):
     """
 
     def __str__(self):
-        id = self.args[0]
-        return "%s: created at %s" % (str(id), id.to_origin())
+        id_ = self.args[0]
+        return "%s: created at %s" % (str(id_), id_.to_origin())
 
 
 class SuiteCopyEvent(Event):
@@ -143,7 +143,10 @@ class SuiteCopyEvent(Event):
     """
 
     def __str__(self):
-        return "%s: copied items from %s" % tuple(self.args)
+        new_id, from_id = self.args
+        return "%s: copied items from %s" % (
+            new_id,
+            from_id.to_string_with_version())
 
 
 class SuiteDeleteEvent(Event):
@@ -154,8 +157,8 @@ class SuiteDeleteEvent(Event):
     """
 
     def __str__(self):
-        id = self.args[0]
-        return "delete: %s" % id.to_origin()
+        id_ = self.args[0]
+        return "delete: %s" % id_.to_origin()
 
 
 class RosieVCClient(object):
@@ -163,6 +166,9 @@ class RosieVCClient(object):
     """Client for version control functionalities."""
 
     SUBVERSION_SERVERS_CONF = "~/.subversion/servers"
+    COMMIT_MESSAGE_COPY = "%s: new suite, a copy of %s"
+    COMMIT_MESSAGE_CREATE = "%s: new suite"
+    COMMIT_MESSAGE_DELETE = "%s: deleted"
 
     def __init__(self, event_handler=None, popen=None, fs_util=None,
                  force_mode=False):
@@ -184,41 +190,45 @@ class RosieVCClient(object):
             self.subversion_servers_conf = subversion_servers_conf
         else:
             subversion_servers_conf = os.path.expanduser(
-                                        self.SUBVERSION_SERVERS_CONF)
+                self.SUBVERSION_SERVERS_CONF)
             if os.path.exists(subversion_servers_conf):
                 self.subversion_servers_conf = subversion_servers_conf
 
     def _delete_work_dir(self):
+        """Remove the temporary working directory, if necessary."""
         if self._work_dir is not None and os.path.isdir(self._work_dir):
             shutil.rmtree(self._work_dir)
             self._work_dir = None
 
+    @staticmethod
     def _dummy(*args, **kwargs):
+        """Dummy event handler."""
         pass
 
     def _get_work_dir(self):
+        """Create a temporary working directory."""
         if self._work_dir is None:
-            self._work_dir = tempfile.mkdtemp()
+            self._work_dir = mkdtemp()
         return self._work_dir
 
-    def checkout(self, id):
+    def checkout(self, id_):
         """Create a local copy of a suite with the given ID.
 
         Return the SuiteId of the suite on success.
 
         """
-        if isinstance(id, str):
-            id = SuiteId(id_text=id)
-        if id.revision is None:
-            id.revision = id.REV_HEAD
-        if id.branch is None:
-            id.branch = id.BRANCH_TRUNK
-        local_copy = id.to_local_copy()
+        if isinstance(id_, str):
+            id_ = SuiteId(id_text=id_)
+        if id_.revision is None:
+            id_.revision = id_.REV_HEAD
+        if id_.branch is None:
+            id_.branch = id_.BRANCH_TRUNK
+        local_copy = id_.to_local_copy()
         if os.path.exists(local_copy):
             id0 = SuiteId(location=local_copy)
-            if id.to_string_with_version() == id0.to_string_with_version():
-                self.event_handler(LocalCopyCreateSkipEvent(id))
-                return id
+            if id_.to_string_with_version() == id0.to_string_with_version():
+                self.event_handler(LocalCopyCreateSkipEvent(id_))
+                return id_
             elif self.force_mode:
                 self.fs_util.delete(local_copy)
             else:
@@ -226,13 +236,13 @@ class RosieVCClient(object):
         local_copy_dir = os.path.dirname(local_copy)
         if not os.path.isdir(local_copy_dir):
             self.fs_util.makedirs(os.path.dirname(local_copy))
-        origin = "%s/%s@%s" % (id.to_origin(), id.branch, id.revision)
+        origin = "%s/%s@%s" % (id_.to_origin(), id_.branch, id_.revision)
         self.popen("svn", "checkout", "-q", origin, local_copy)
-        self.event_handler(LocalCopyCreateEvent(id))
-        return id
+        self.event_handler(LocalCopyCreateEvent(id_))
+        return id_
 
     def create(self, info_config, from_id=None, prefix=None,
-               meta_suite_mode=True):
+               meta_suite_mode=False):
         """Create a suite.
 
         info_config -- A rose.config.ConfigNode object, which will be used as
@@ -247,67 +257,82 @@ class RosieVCClient(object):
         Return the SuiteId of the suite on success.
 
         """
-        if from_id is not None:
-            return self._copy(info_config, from_id)
-        new_id = None
-        while new_id is None:
-            if meta_suite_mode:
-                if prefix is None:
-                    new_id = SuiteId(id_text="ROSIE")
-                else:
-                    idx = SuiteId.FORMAT_IDX % (prefix, "ROSIE")
-                    new_id = SuiteId(id_text=idx)
-            else:
-                new_id = SuiteId.get_next(prefix)
-            new_origin = new_id.to_origin() + "/" + new_id.BRANCH_TRUNK
-            dir = self._get_work_dir()
-            rose.config.dump(info_config, os.path.join(dir, "rose-suite.info"))
-            open(os.path.join(dir, "rose-suite.conf"), "w").close()
-            try:
-                self.popen("svn", "import",
-                           "-q",
-                           "-m", "%s: new suite." % str(new_id),
-                           dir,
-                           new_origin)
-                self.event_handler(SuiteCreateEvent(new_id))
-            except RosePopenError as e:
-                try:
-                    self.popen("svn", "info", new_origin)
-                    if not meta_suite_mode:
-                        new_id = None
-                except RosePopenError:
-                    raise e
-            finally:
-                self._delete_work_dir()
-        return new_id
+        if from_id is not None and (not prefix or from_id.prefix == prefix):
+            return self._copy1(info_config, from_id)
 
-    def delete(self, id, local_only=False):
+        dir_ = self._get_work_dir()
+        try:
+            # Create a temporary suite in the file system
+            if from_id:
+                from_id_url = "%s/%s@%s" % (
+                    from_id.to_origin(), from_id.branch, from_id.revision)
+                self.popen("svn", "export", "-q", "--force", from_id_url, dir_)
+            else:
+                open(os.path.join(dir_, "rose-suite.conf"), "w").close()
+            rose.config.dump(
+                info_config, os.path.join(dir_, "rose-suite.info"))
+
+            # Attempt to import the temporary suite to the repository
+            new_id = None
+            while new_id is None:
+                if meta_suite_mode:
+                    if prefix is None:
+                        new_id = SuiteId(id_text="ROSIE")
+                    else:
+                        idx = SuiteId.FORMAT_IDX % (prefix, "ROSIE")
+                        new_id = SuiteId(id_text=idx)
+                else:
+                    new_id = SuiteId.get_next(prefix)
+                new_origin = new_id.to_origin() + "/" + new_id.BRANCH_TRUNK
+                try:
+                    if from_id:
+                        message = self.COMMIT_MESSAGE_COPY % (
+                            new_id, from_id.to_string_with_version())
+                    else:
+                        message = self.COMMIT_MESSAGE_CREATE % str(new_id)
+                    self.popen(
+                        "svn", "import", "-q", "-m", message, dir_, new_origin)
+                    self.event_handler(SuiteCreateEvent(new_id))
+                    if from_id:
+                        self.event_handler(SuiteCopyEvent(new_id, from_id))
+                except RosePopenError as exc:
+                    try:
+                        self.popen("svn", "info", new_origin)
+                        if not meta_suite_mode:
+                            new_id = None
+                    except RosePopenError:
+                        raise exc
+            return new_id
+        finally:
+            self._delete_work_dir()
+
+    def delete(self, id_, local_only=False):
         """Delete the local copy and the origin of a suite.
 
         It takes the suite ID as an argument.
         Return the SuiteId of the suite on success.
 
         """
-        if isinstance(id, str):
-            id = SuiteId(id_text=id)
-        local_copy = id.to_local_copy()
+        if isinstance(id_, str):
+            id_ = SuiteId(id_text=id_)
+        local_copy = id_.to_local_copy()
         if os.path.exists(local_copy):
             if not self.force_mode:
                 status = self.popen("svn", "status", local_copy)[0]
                 if status:
-                    raise LocalCopyStatusError(id, status)
+                    raise LocalCopyStatusError(id_, status)
             if os.getcwd() == local_copy:
                 self.fs_util.chdir(os.path.expanduser("~"))
             self.fs_util.delete(local_copy)
         if not local_only:
-            self.popen("svn", "delete",
-                       "-q", "-m", "%s: deleted." % str(id),
-                       id.to_origin())
-            self.event_handler(SuiteDeleteEvent(id))
-        return id
+            self.popen(
+                "svn", "delete", "-q",
+                "-m", self.COMMIT_MESSAGE_DELETE % str(id_),
+                id_.to_origin())
+            self.event_handler(SuiteDeleteEvent(id_))
+        return id_
 
-    def generate_info_config(self, from_id=None, prefix=None, project=None,
-                             info_config=""):
+    def generate_info_config(self, from_id=None, prefix=None, project=None):
         """Generate a rose.config.ConfigNode for a rose-suite.info.
 
         This is suitable for passing into the create method of this
@@ -327,8 +352,6 @@ class RosieVCClient(object):
 
         res_loc = ResourceLocator.default()
         older_config = None
-        if info_config:
-            older_config = info_config
         info_config = rose.config.ConfigNode()
 
         # Determine project if given as a command-line option on create
@@ -337,10 +360,8 @@ class RosieVCClient(object):
 
         # Set the compulsory fields and use the project and metadata if
         #  available.
-        meta_config = load_meta_config(info_config, directory=None,
-                                       config_type=rose.INFO_CONFIG_NAME,
-                                       error_handler=None,
-                                       ignore_meta_error=False)
+        meta_config = load_meta_config(
+            info_config, config_type=rose.INFO_CONFIG_NAME)
         if from_id is None and project is not None:
             for node_keys, node in meta_config.walk(no_ignore=True):
                 if isinstance(node.value, dict):
@@ -369,12 +390,11 @@ class RosieVCClient(object):
         #    ~/.subversion/servers
         # 3. Current user ID
         owner = res_loc.get_conf().get_value(
-                        ["rosie-id", "prefix-username." + prefix])
+            ["rosie-id", "prefix-username." + prefix])
         if not owner and self.subversion_servers_conf:
             servers_conf = rose.config.load(self.subversion_servers_conf)
             groups_node = servers_conf.get(["groups"])
             if groups_node is not None:
-                group = None
                 prefix_loc = SuiteId.get_prefix_location(prefix)
                 prefix_host = urlparse(prefix_loc).hostname
                 for key, node in groups_node.value.items():
@@ -402,8 +422,7 @@ class RosieVCClient(object):
                     continue
                 sect, key = node_keys
                 value = node.value
-                if (key == "description" or key == "owner" or
-                    key == "access-list" or
+                if (key in ["description", "owner", "access-list"] or
                         (key == "project" and from_project is not None)):
                     pass
                 else:
@@ -416,12 +435,6 @@ class RosieVCClient(object):
             ["rosie-vc", "access-list-default"])
         if access_list_str:
             info_config.set(["access-list"], access_list_str)
-
-        # Use metadata to give value hints
-        meta_config = load_meta_config(info_config, directory=None,
-                                       config_type=rose.INFO_CONFIG_NAME,
-                                       error_handler=None,
-                                       ignore_meta_error=False)
         if from_id is None and project is not None:
             for node_keys, node in meta_config.walk(no_ignore=True):
                 if isinstance(node.value, dict):
@@ -445,64 +458,20 @@ class RosieVCClient(object):
 
         return info_config
 
-    def check_fields(self, info_config, interactive_mode, from_id=None,
-                     optional_file=None, prefix=None, error_reported=False):
-        """Check the fields in the info config"""
-        for key in ["owner", "project", "title"]:
-            if not info_config.get([key], no_ignore=True):
-                if optional_file is not None:
-                    raise SuiteInfoFieldError(key)
-                info_config_new = info_config
-                error_reported = True
-                if interactive_mode:
-                    question = ("rose-suite.info: \n compulsory field \"%s\"" +
-                                " not defined,\n try again?") % key
-                    try:
-                        response = raw_input(question + " y/n (default n) ")
-                    except EOFError:
-                        sys.exit(1)
-                    if response != 'y':
-                        sys.exit(1)
-                    return info_config_new, error_reported
-                else:
-                    raise SuiteInfoFieldError(key)
-        meta_config = load_meta_config(info_config, directory=None,
-                                       config_type=rose.INFO_CONFIG_NAME,
-                                       error_handler=None,
-                                       ignore_meta_error=False)
-        reports = DefaultValidators().validate(info_config, meta_config)
-        if reports != []:
-            reports_map = {None: reports}
-            text = (rose.macro.get_reports_as_text
-                    (reports_map, "rose.macro.DefaultValidators"))
-            if interactive_mode:
-                reporter = rose.reporter.Reporter()
-                reporter(text, kind=reporter.KIND_ERR,
-                         level=reporter.FAIL, prefix="")
-                info_config_new = info_config
-                error_reported = True
-                question = "Metadata issue, do you want to try again?"
-                try:
-                    response = raw_input(question + " y/n (default n) ")
-                except EOFError:
-                    sys.exit(1)
-                if response != 'y':
-                    sys.exit(1)
-                return info_config_new, error_reported
-            else:
-                raise SuiteInfoError(text)
-        elif error_reported:
-            return None, error_reported
-        elif error_reported is False:
-            return info_config, error_reported
-        if from_id is not None:
-            return self._copy(info_config, from_id)
-        return info_config, error_reported
+    @classmethod
+    def validate_info_config(cls, info_config):
+        """Validate contents in suite info file."""
+        reports = DefaultValidators().validate(
+            info_config,
+            load_meta_config(info_config, config_type=rose.INFO_CONFIG_NAME))
+        if reports:
+            raise SuiteInfoError(reports)
 
-    def _copy(self, info_config, from_id):
+    def _copy1(self, info_config, from_id):
+        """Copy a suite from the same repository."""
         from_id_url = "%s/%s@%s" % (from_id.to_origin(), from_id.branch,
                                     from_id.revision)
-        self.popen("svn", "info", from_id_url) # Die if from_id not exists
+        self.popen("svn", "info", from_id_url)  # Die if from_id not exists
         prefix = from_id.prefix
         temp_local_copy = os.path.join(self._get_work_dir(), "work")
         new_id = None
@@ -515,28 +484,30 @@ class RosieVCClient(object):
                        SuiteId.get_prefix_location(prefix), temp_local_copy)
             new_id = SuiteId.get_next(prefix)
             for i in range(len(new_id.sid)):
-                d = os.path.join(temp_local_copy,
-                                 os.sep.join(new_id.sid[0:i + 1]))
-                self.popen("svn", "update", "-q", "--depth", "empty", d)
-                if not os.path.isdir(d):
-                    os.mkdir(d)
-                    self.popen("svn", "add", "-q", d)
-            d = os.path.join(temp_local_copy, os.sep.join(new_id.sid))
-            self.popen("svn", "cp", "-q", from_id_url, os.path.join(d, "trunk"))
-            rose.config.dump(info_config,
-                             os.path.join(d, "trunk", "rose-suite.info"))
-            message = "%s: new suite, a copy of %s" % (new_id,
-                       from_id.to_string_with_version())
+                dir_ = os.path.join(
+                    temp_local_copy, os.sep.join(new_id.sid[0:i + 1]))
+                self.popen("svn", "update", "-q", "--depth", "empty", dir_)
+                if not os.path.isdir(dir_):
+                    os.mkdir(dir_)
+                    self.popen("svn", "add", "-q", dir_)
+            dir_ = os.path.join(temp_local_copy, os.sep.join(new_id.sid))
+            self.popen(
+                "svn", "cp", "-q", from_id_url, os.path.join(dir_, "trunk"))
+            rose.config.dump(
+                info_config, os.path.join(dir_, "trunk", "rose-suite.info"))
+            message = self.COMMIT_MESSAGE_COPY % (
+                new_id, from_id.to_string_with_version())
             try:
-                self.popen("svn", "commit", "-q", "-m", message, temp_local_copy)
+                self.popen(
+                    "svn", "commit", "-q", "-m", message, temp_local_copy)
                 self.event_handler(SuiteCreateEvent(new_id))
                 self.event_handler(SuiteCopyEvent(new_id, from_id))
-            except RosePopenError as e:
+            except RosePopenError as exc:
                 try:
                     self.popen("svn", "info", new_id.to_origin())
                     new_id = None
                 except RosePopenError:
-                    raise e
+                    raise exc
             finally:
                 self._delete_work_dir()
         return new_id
@@ -549,31 +520,30 @@ def checkout(argv):
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
     client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
-    SuiteId.svn.event_handler = client.event_handler # FIXME: ugly?
-    rc = 0
+    SuiteId.svn.event_handler = client.event_handler
+    ret_code = 0
     for arg in args:
         try:
             client.checkout(arg)
-        except (FileExistError, RosePopenError, SuiteIdPrefixError) as e:
-            rc = 1
-            report(e)
+        except (FileExistError, RosePopenError, SuiteIdPrefixError) as exc:
+            ret_code = 1
+            report(exc)
             if not opts.force_mode:
                 sys.exit(1)
-    if rc:
-        sys.exit(rc)
+    if ret_code:
+        sys.exit(ret_code)
 
 
 def create(argv):
     """CLI function: create and copy."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("checkout_mode", "info_file",
-                              "meta_suite_mode", "non_interactive", "prefix",
-                              "project")
+    opt_parser.add_my_options(
+        "checkout_mode", "info_file", "meta_suite_mode", "non_interactive",
+        "prefix", "project")
     opts, args = opt_parser.parse_args(argv)
     verbosity = opts.verbosity - opts.quietness
-    report = Reporter(verbosity)
-    client = RosieVCClient(event_handler=report)
-    SuiteId.svn.event_handler = client.event_handler # FIXME: ugly?
+    client = RosieVCClient(event_handler=Reporter(verbosity))
+    SuiteId.svn.event_handler = client.event_handler
     from_id = None
     if args:
         from_id = SuiteId(id_text=args[0])
@@ -582,21 +552,17 @@ def create(argv):
         if from_id.revision is None:
             from_id.revision = from_id.REV_HEAD
             from_id = SuiteId(id_text=from_id.to_string_with_version())
-    info_config_new = None
     interactive_mode = not opts.non_interactive
     if opts.info_file is None:
-        try:
-            info_config = client.generate_info_config(from_id, opts.prefix,
-                                                      opts.project)
-        except (RosePopenError) as e:
-            report(e)
-            sys.exit(1)
-        info_file = tempfile.NamedTemporaryFile()
-        if args:
-            meta_config = load_meta_config(info_config, directory=None,
-                                           config_type=rose.INFO_CONFIG_NAME,
-                                           error_handler=None,
-                                           ignore_meta_error=False)
+        info_config = client.generate_info_config(
+            from_id, opts.prefix, opts.project)
+        if from_id is not None:
+            meta_config = load_meta_config(
+                info_config,
+                directory=None,
+                config_type=rose.INFO_CONFIG_NAME,
+                error_handler=None,
+                ignore_meta_error=False)
             for node_keys, node in meta_config.walk(no_ignore=True):
                 if isinstance(node.value, dict):
                     continue
@@ -607,126 +573,110 @@ def create(argv):
                     info_config.set([sect], "")
                 if key == "copy-mode" and value == "never":
                     info_config.unset([sect])
-        rose.config.dump(info_config, info_file)
-        info_file.write(CREATE_INFO_CONFIG_COMMENT)
-        info_file.seek(0)
-        command_list = client.popen.get_cmd("editor", info_file.name)
-        client.popen(*command_list, stdout=sys.stdout)
-        info_config = rose.config.load(info_file)
-        try:
-            info_config_new, error_reported = client.check_fields(info_config,
-                                                              interactive_mode,
-                                                              from_id,
-                                                              opts.prefix)
-        except (RosePopenError, SuiteInfoFieldError,
-                SuiteIdOverflowError) as e:
-            report(e)
-            sys.exit(1)
-        while error_reported is True:
-            info_file = tempfile.NamedTemporaryFile()
-            info_config = info_config_new
-            if (info_config.get(["project"]).value is not None and
-               opts.project is None):
-                project = info_config.get(["project"]).value
-                info_config = client.generate_info_config(from_id, opts.prefix,
-                                                          project,
-                                                          info_config)
-            rose.config.dump(info_config, info_file)
-            info_file.write(CREATE_INFO_CONFIG_COMMENT)
-            info_file.seek(0)
-            command_list = client.popen.get_cmd("editor", info_file.name)
-            client.popen(*command_list, stdout=sys.stdout)
-            info_config = rose.config.load(info_file)
-            try:
-                info_config_new, error_reported = client.check_fields(
-                                                              info_config,
-                                                              interactive_mode,
-                                                              from_id,
-                                                              opts.prefix)
-            except (RosePopenError, SuiteInfoFieldError,
-                    SuiteIdOverflowError) as e:
-                report(e)
-                sys.exit(1)
-    elif opts.info_file == "-":
-        info_config = rose.config.load(sys.stdin)
-        try:
-            info_config_new, error_reported = client.check_fields(info_config,
-                                                          interactive_mode,
-                                                          from_id,
-                                                          opts.info_file,
-                                                          opts.prefix)
-        except (RosePopenError, SuiteInfoFieldError,
-                SuiteIdOverflowError) as e:
-            report(e)
-            sys.exit(1)
+        info_config = _edit_info_config(opts, client, info_config)
     else:
-        info_config = rose.config.load(opts.info_file)
-        try:
-            info_config_new, error_reported = client.check_fields(info_config,
-                                                          interactive_mode,
-                                                          from_id,
-                                                          opts.info_file,
-                                                          opts.prefix)
-        except (RosePopenError, SuiteInfoFieldError,
-                SuiteIdOverflowError) as e:
-            report(e)
-            sys.exit(1)
+        file_ = opts.info_file
+        if opts.info_file == "-":
+            file_ = sys.stdin
+        info_config = rose.config.load(file_)
+    info_config = _validate_info_config(opts, client, info_config)
     if interactive_mode:
+        prefix = opts.prefix
         if from_id:
-            question = "Copy \"%s\"?" % from_id.to_string_with_version()
+            if not prefix:
+                prefix = from_id.prefix
+            question = PROMPT_COPY % (from_id.to_string_with_version(), prefix)
         else:
-            prefix = opts.prefix
             if not prefix:
                 prefix = SuiteId.get_prefix_default()
-            question = "Create suite at \"%s\"?" % prefix
+            question = PROMPT_CREATE % prefix
         try:
-            response = raw_input(question + " y/n (default n) ")
+            response = raw_input(question)
         except EOFError:
             sys.exit(1)
-        if response != 'y':
+        if response != YES:
             sys.exit(1)
     try:
-        id = client.create(info_config, from_id, opts.prefix,
-                           opts.meta_suite_mode)
-    except (RosePopenError, SuiteInfoFieldError, SuiteIdOverflowError) as e:
-        report(e)
+        id_ = client.create(
+            info_config, from_id, opts.prefix, opts.meta_suite_mode)
+    except (RosePopenError, SuiteIdOverflowError) as exc:
+        client.event_handler(exc)
         sys.exit(1)
     if opts.checkout_mode:
         try:
-            client.checkout(id)
-        except (FileExistError, RosePopenError) as e:
-            report(e)
+            client.checkout(id_)
+        except (FileExistError, RosePopenError) as exc:
+            client.event_handler(exc)
             sys.exit(1)
+
+
+def _validate_info_config(opts, client, info_config):
+    """Validate content of suite info file, may prompt in interactive mode."""
+    while True:
+        try:
+            client.validate_info_config(info_config)
+        except SuiteInfoError as exc:
+            client.event_handler(exc)
+            if opts.non_interactive:
+                sys.exit(1)
+            try:
+                response = raw_input(PROMPT_FIX_INFO_CONFIG)
+            except EOFError:
+                sys.exit(1)
+            if response != YES:
+                sys.exit(1)
+            info_config = _edit_info_config(opts, client, info_config)
+        else:
+            return info_config
+
+
+def _edit_info_config(opts, client, info_config):
+    """Helper for "create", launch editor to edit the suite info."""
+    if opts.non_interactive:
+        return info_config
+    temp_desc, temp_name = mkstemp()
+    try:
+        temp_file = os.fdopen(temp_desc, "w")
+        rose.config.dump(info_config, temp_file)
+        temp_file.write(CREATE_INFO_CONFIG_COMMENT)
+        temp_file.close()
+        command_list = client.popen.get_cmd("editor", temp_name)
+        client.popen(*command_list, stdout=sys.stdout)
+    except (IOError, OSError, RosePopenError) as exc:
+        client.event_handler(exc)
+        sys.exit(1)
+    else:
+        return rose.config.load(temp_name)
+    finally:
+        os.unlink(temp_name)
 
 
 def delete(argv):
     """CLI function: delete."""
-    opt_parser = RoseOptionParser().add_my_options("force_mode",
-                                                   "non_interactive",
-                                                   "local_only")
+    opt_parser = RoseOptionParser().add_my_options(
+        "force_mode", "non_interactive", "local_only")
     opts, args = opt_parser.parse_args(argv)
     report = Reporter(opts.verbosity - opts.quietness)
     client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
-    SuiteId.svn.event_handler = client.event_handler # FIXME
+    SuiteId.svn.event_handler = client.event_handler
     if not args:
         args.append(SuiteId(location=os.getcwd()))
     interactive_mode = not opts.non_interactive
-    prompt = ("%s: delete local+repository copies? " +
-              "y/n/a (default n, a=yes-to-all) ")
+    prompt = PROMPT_DELETE
     if opts.local_only:
-        prompt = "%s: delete local copy? y/n/a (default n, a=yes-to-all) "
-    rc = 0
+        prompt = PROMPT_DELETE_LOCAL
+    ret_code = 0
     for arg in args:
         if interactive_mode:
             try:
                 response = raw_input(prompt % arg)
             except EOFError:
-                rc = 1
+                ret_code = 1
                 continue
-            if response == 'a':
+            if response == YES_TO_ALL:
                 interactive_mode = False
-            elif response != 'y':
-                rc = 1
+            elif response != YES:
+                ret_code = 1
                 continue
         if opts.debug_mode:
             client.delete(arg, opts.local_only)
@@ -734,19 +684,18 @@ def delete(argv):
             try:
                 client.delete(arg, opts.local_only)
             except (LocalCopyStatusError, RosePopenError,
-                    SuiteIdPrefixError) as e:
-                client.event_handler(e)
-                rc = 1
+                    SuiteIdPrefixError) as exc:
+                client.event_handler(exc)
+                ret_code = 1
                 if not opts.force_mode:
                     sys.exit(1)
-    if rc:
-        sys.exit(rc)
+    if ret_code:
+        sys.exit(ret_code)
 
 
 def main():
     """Launcher for the CLI functions."""
-    add_site_meta_paths()
-    add_env_meta_paths()
+    add_meta_paths()
     argv = sys.argv[1:]
     if not argv:
         return sys.exit(1)

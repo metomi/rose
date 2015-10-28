@@ -631,6 +631,5 @@ def main():
                                     opts.non_interactive, reporter)
 
 if __name__ == "__main__":
-    rose.macro.add_site_meta_paths()
-    rose.macro.add_env_meta_paths()
+    rose.macro.add_meta_paths()
     main()

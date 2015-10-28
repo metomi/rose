@@ -246,8 +246,8 @@ class MacroBaseRoseEdit(MacroBase):
             for key, node in config_data.value.items():
                 if isinstance(node.value, dict):
                     sections.append(key)
-                elif "" not in sections:
-                    sections.append("")
+            if "" not in sections:
+                sections.append("")
         else:
             for key in set(config_data["sections"].keys() +
                            config_data["variables"].keys()):
@@ -380,6 +380,11 @@ class MacroReport(object):
     def __hash__(self):
         return hash((
             self.section, self.option, self.value, self.info, self.is_warning))
+
+def add_meta_paths():
+    """Call add_site_meta_paths and add_env_meta_paths."""
+    add_site_meta_paths()
+    add_env_meta_paths()
 
 def add_site_meta_paths():
     """Load any metadata paths specified in a user or site configuration."""
@@ -1254,8 +1259,7 @@ def _report_error(exception=None, text=""):
 
 def main():
     """Run rose macro."""
-    add_site_meta_paths()
-    add_env_meta_paths()
+    add_meta_paths()
     return_objects = parse_macro_mode_args()
     if return_objects is None:
         sys.exit(1)

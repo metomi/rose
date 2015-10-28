@@ -89,8 +89,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 TEST_KEY=$TEST_KEY_BASE-normal-empty-ans
 run_fail "$TEST_KEY" rosie delete foo-aa002 </dev/null
 {
-    echo -n 'foo-aa002: delete local+repository copies? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa002: delete local+repository copies?'
+    echo -n ' [y or n (default) or a (yes to all)] '
 } >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -98,8 +98,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 TEST_KEY=$TEST_KEY_BASE-normal-ans-n
 run_fail "$TEST_KEY" rosie delete foo-aa002 <<<n
 {
-    echo -n 'foo-aa002: delete local+repository copies? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa002: delete local+repository copies?'
+    echo -n ' [y or n (default) or a (yes to all)] '
 } >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -108,8 +108,8 @@ TEST_KEY=$TEST_KEY_BASE-normal-ans-y
 rosie checkout -q foo-aa002
 run_pass "$TEST_KEY" rosie delete foo-aa002 <<<y
 {
-    echo -n 'foo-aa002: delete local+repository copies? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa002: delete local+repository copies?'
+    echo -n ' [y or n (default) or a (yes to all)] '
     echo "[INFO] delete: $PWD/roses/foo-aa002/"
     echo "[INFO] delete: $URL/a/a/0/0/2"
 } >"$TEST_KEY.out.1"
@@ -121,8 +121,8 @@ rosie checkout -q foo-aa003
 touch $PWD/roses/foo-aa003/file
 run_fail "$TEST_KEY" rosie delete foo-aa003 <<<y
 {
-    echo -n 'foo-aa003: delete local+repository copies? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa003: delete local+repository copies?'
+    echo -n ' [y or n (default) or a (yes to all)] '
 } >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
@@ -135,8 +135,8 @@ TEST_KEY=$TEST_KEY_BASE-normal-status-force
 #touch $PWD/roses/foo-aa003/file # done above
 run_pass "$TEST_KEY" rosie delete -f --local-only foo-aa003 <<<y
 {
-    echo -n 'foo-aa003: delete local copy? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa003: delete local copy?'
+    echo -n ' [y or n (default) or a (yes to all)] '
     echo "[INFO] delete: $PWD/roses/foo-aa003/"
 } >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -153,14 +153,14 @@ y
 y
 __IN__
 {
-    echo -n 'foo-aa003: delete local copy? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa003: delete local copy?'
+    echo -n ' [y or n (default) or a (yes to all)] '
     echo "[INFO] delete: $PWD/roses/foo-aa003/"
-    echo -n 'foo-aa004: delete local copy? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa004: delete local copy?'
+    echo -n ' [y or n (default) or a (yes to all)] '
     echo "[INFO] delete: $PWD/roses/foo-aa004/"
-    echo -n 'foo-aa005: delete local copy? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa005: delete local copy?'
+    echo -n ' [y or n (default) or a (yes to all)] '
     echo "[INFO] delete: $PWD/roses/foo-aa005/"
 } >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
@@ -173,8 +173,8 @@ rosie checkout -q foo-aa005
 run_pass "$TEST_KEY" \
     rosie delete -f foo-aa003 foo-aa004 foo-aa005 <<<a
 {
-    echo -n 'foo-aa003: delete local+repository copies? y/n/a '
-    echo -n '(default n, a=yes-to-all) '
+    echo -n 'foo-aa003: delete local+repository copies?'
+    echo -n ' [y or n (default) or a (yes to all)] '
     echo "[INFO] delete: $PWD/roses/foo-aa003/"
     echo "[INFO] delete: $URL/a/a/0/0/3"
     echo "[INFO] delete: $PWD/roses/foo-aa004/"

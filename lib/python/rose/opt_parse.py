@@ -504,6 +504,11 @@ class RoseOptionParser(OptionParser):
              "const": "restart",
              "dest": "run_mode",
              "help": "Shorthand for --run=restart."}],
+        "retrieve_job_logs": [
+            ["--retrieve-job-logs"],
+            {"action": "store_true",
+             "default": False,
+             "help": "Retrieve remote task job logs."}],
         "run_mode": [
             ["--run"],
             {"action": "store",

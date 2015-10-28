@@ -107,8 +107,10 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-good-1
-cat >rose-suite.info <<'__ROSE_SUITE_INFO__'
+cat >rose-suite.info <<__ROSE_SUITE_INFO__
 owner=daisy
+project=rose
+title=${TEST_KEY}
 __ROSE_SUITE_INFO__
 run_pass "$TEST_KEY" \
     svn import rose-suite.info -q -m 't' --non-interactive \

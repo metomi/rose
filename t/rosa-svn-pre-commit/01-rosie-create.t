@@ -92,7 +92,7 @@ run_pass "$TEST_KEY" \
     rosie create -y --info-file=rose-suite.info --no-checkout foo-aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] foo-aa001: created at $SVN_URL/a/a/0/0/1
-[INFO] foo-aa001: copied items from foo-aa000
+[INFO] foo-aa001: copied items from foo-aa000/trunk@2
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 # Changeset test

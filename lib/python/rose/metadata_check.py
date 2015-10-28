@@ -344,8 +344,7 @@ def _import_err_handler(exception):
 def main():
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "property")
-    rose.macro.add_site_meta_paths()
-    rose.macro.add_env_meta_paths()
+    rose.macro.add_meta_paths()
     opts, args = opt_parser.parse_args()
     reporter = rose.reporter.Reporter(opts.verbosity - opts.quietness)
     if opts.conf_dir is None:

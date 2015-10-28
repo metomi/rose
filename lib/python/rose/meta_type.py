@@ -101,6 +101,18 @@ class IntegerMetaType(MetaType):
         return [True, None]
 
 
+class PythonBooleanMetaType(MetaType):
+
+    KEY = "python_boolean"
+    WARNING = "Not a valid Python boolean format (True/False): {0}"
+
+    def is_valid(self, value):
+        if value not in [rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE,
+                         rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE]:
+            return [False, self.WARNING.format(repr(value))]
+        return [True, None]
+
+
 class PythonListMetaType(MetaType):
 
     KEY = "python_list"
