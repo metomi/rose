@@ -62,7 +62,6 @@ class LaunchEvent(Event):
 
     """An event raised when adding a command to the task pool."""
 
-    LEVEL = Event.V
     KIND = Event.KIND_OUT
 
     def __str__(self):
@@ -78,8 +77,8 @@ class SucceededEvent(Event):
     KIND = Event.KIND_OUT
 
     def __str__(self):
-        name, rc = self.args
-        return "Command %s completed successfully # rc = %s" % (name, rc)
+        name = self.args
+        return " %s " % (name)
 
 
 class SkippingEvent(Event):
@@ -90,7 +89,18 @@ class SkippingEvent(Event):
 
     def __str__(self):
         name = self.args
-        return "Skipping %s: previously ran and succeeded" % (name)
+        return " %s: previously ran and succeeded" % (name)
+
+
+class NotRunEvent(Event):
+
+    """An event used to report commands that will not be run."""
+
+    KIND = Event.KIND_OUT
+
+    def __str__(self):
+        name, cmd = self.args
+        return " Not run %s: %s " % (name, cmd)
 
 
 class RoseBunchApp(BuiltinApp):
@@ -105,6 +115,8 @@ class RoseBunchApp(BuiltinApp):
     TYPE_ABORT_ON_FAIL = "abort"
     TYPE_CONTINUE_ON_FAIL = "continue"
     FAIL_MODE_TYPES = [TYPE_CONTINUE_ON_FAIL, TYPE_ABORT_ON_FAIL]
+    PREFIX_OK = "[OK]"
+    PREFIX_SKIP = "[SKIP]"
 
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
@@ -191,7 +203,6 @@ class RoseBunchApp(BuiltinApp):
         else:
             self.MAX_PROCS = arglength
 
-
         if self.incremental:
             self.dao = RoseBunchDAO(conf_tree)
         else:
@@ -229,8 +240,8 @@ class RoseBunchApp(BuiltinApp):
                             abort = True
                             app_runner.handle_event(AbortEvent())
                     else:
-                        app_runner.handle_event(
-                                    SucceededEvent(key, proc.returncode))
+                        app_runner.handle_event(SucceededEvent(key),
+                                                prefix=self.PREFIX_OK)
                         if self.dao:
                             self.dao.update_command_state(key, self.dao.S_PASS)
 
@@ -244,7 +255,8 @@ class RoseBunchApp(BuiltinApp):
 
                 if self.dao:
                     if self.dao.check_has_succeeded(key):
-                        app_runner.handle_event(SkippingEvent(key))
+                        app_runner.handle_event(SkippingEvent(key),
+                                                prefix=self.PREFIX_SKIP)
                         continue
                     else:
                         self.dao.add_command(key)
@@ -258,9 +270,10 @@ class RoseBunchApp(BuiltinApp):
             sleep(self.SLEEP_DURATION)
 
         if abort and commands:
-            for command in commands:
-                cmd = command.get_command()
-                print "Not run: %s" % cmd
+            for key in self.invocation_names:
+                cmd = commands.pop(key).get_command()
+                app_runner.handle_event(NotRunEvent(key, cmd),
+                                        prefix=self.PREFIX_SKIP)
 
         if self.dao:
             self.dao.close()
@@ -282,7 +295,6 @@ class RoseBunchCmd(object):
         self.argsdict = {}
         self.name = name
         self.index = index
-
 
     def get_command(self):
         """Return the command that will be run"""

@@ -96,13 +96,13 @@ FILE=$LOG_DIR/$APP/02/job.out
 file_grep_fail $TEST_KEY_PREFIX-not-ran-0 \
     "\[INFO\] Adding command 0 to pool: true" $FILE
 file_grep $TEST_KEY_PREFIX-skip-0 \
-    "\[INFO\] Skipping 0: previously ran and succeeded" $FILE
+    "\[SKIP\] Skipping 0: previously ran and succeeded" $FILE
 file_grep $TEST_KEY_PREFIX-reran-1 \
     "\[INFO\] Adding command 1 to pool: false" $FILE
 file_grep_fail $TEST_KEY_PREFIX-not-ran-2 \
     "\[INFO\] Adding command 2 to pool: true" $FILE
 file_grep $TEST_KEY_PREFIX-skip-2 \
-    "\[INFO\] Skipping 2: previously ran and succeeded" $FILE
+    "\[SKIP\] 2: previously ran and succeeded" $FILE
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+#rose suite-clean -q -y $NAME
 exit 0
