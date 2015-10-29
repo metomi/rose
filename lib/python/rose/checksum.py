@@ -116,7 +116,10 @@ def guess_checksum_algorithm(checksum):
     if _HASH_LENGTHS is None:
         _HASH_LENGTHS = {}
         for algorithm, func in inspect.getmembers(hashlib, inspect.isbuiltin):
-            _HASH_LENGTHS[len(func().hexdigest())] = algorithm
+            try:
+                _HASH_LENGTHS[len(func().hexdigest())] = algorithm
+            except TypeError:
+                pass
     return _HASH_LENGTHS.get(len(checksum))
 
 

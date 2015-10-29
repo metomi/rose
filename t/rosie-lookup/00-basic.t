@@ -389,4 +389,5 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
+rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}*
 exit

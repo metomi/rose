@@ -28,6 +28,8 @@ class FileSystemLocHandler(object):
 
     """Handler of file system locations."""
 
+    SCHEME = "fs"
+
     def __init__(self, manager):
         self.manager = manager
 

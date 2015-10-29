@@ -58,7 +58,7 @@ file_grep "$TEST_KEY.smtp.to" "To: $USER@localhost" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.subject" \
     "Subject: \\[succeeded\\] $NAME" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.content.1" "Task: t1.1" smtpd-tail.out
-file_grep "$TEST_KEY.smtp.content.2" "See: file://$SUITE_RUN_DIR" smtpd-tail.out
+file_grep "$TEST_KEY.smtp.content.2" "See: .*/$NAME\\>" smtpd-tail.out
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-cc
 run_pass "$TEST_KEY" \
@@ -80,7 +80,7 @@ file_grep "$TEST_KEY.smtp.to" \
 file_grep "$TEST_KEY.smtp.subject" \
     "Subject: \\[succeeded\\] $NAME" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.content.1" "Task: t1.1" smtpd-tail.out
-file_grep "$TEST_KEY.smtp.content.2" "See: file://$SUITE_RUN_DIR" smtpd-tail.out
+file_grep "$TEST_KEY.smtp.content.2" "See: .*/$NAME\\>" smtpd-tail.out
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-at-host
 cat >conf/rose.conf <<__CONF__
@@ -109,7 +109,7 @@ file_grep "$TEST_KEY.smtp.to" \
 file_grep "$TEST_KEY.smtp.subject" \
     "Subject: \\[succeeded\\] $NAME" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.content.1" "Task: t1.1" smtpd-tail.out
-file_grep "$TEST_KEY.smtp.content.2" "See: file://$SUITE_RUN_DIR" smtpd-tail.out
+file_grep "$TEST_KEY.smtp.content.2" "See: .*/$NAME\\>" smtpd-tail.out
 tail -20 "$TEST_SMTPD_LOG" >smtpd-tail.out
 file_grep "$TEST_KEY.smtp.mail.from" \
     "^===> MAIL FROM:<$USER@hms.beagle>" smtpd-tail.out

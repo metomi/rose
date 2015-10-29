@@ -157,7 +157,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 foo-aa000
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-rose suite-clean -y --name="${SUITE_NAME}"
+rose suite-clean -q -y --name="${SUITE_NAME}"
 rm -fr 'foo-aa000'
 #-------------------------------------------------------------------------------
 # Latest and next should still be correct if latest suite removed from HEAD

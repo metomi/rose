@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 set -eu
 #-------------------------------------------------------------------------------
-tests 19
+tests 20
 #-------------------------------------------------------------------------------
 cat >$TEST_DIR/cylc-run <<'__PYTHON__'
 #!/usr/bin/env python
@@ -32,51 +32,49 @@ __PYTHON__
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery-XXXXXX')
 NAME=$(basename "${SUITE_RUN_DIR}")
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-self-check-suite-check
-# Check that the suite actually runs by itself.
-run_pass "$TEST_KEY" rose suite-run -q --no-gcontrol \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
-#------------------------------------------------------------------------------
-TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-while (($(date +%s) < TIMEOUT)) && [[ -f ~/.cylc/ports/$NAME ]]
-do
-    sleep 1
+# Check that "rose suite-run" fails if a "python cylc-run SUITE" process is
+# running.
+for ARG in '' '--hold'; do
+    TEST_KEY="${TEST_KEY_BASE}-self-check${ARG}"
+    python "${TEST_DIR}/cylc-run" "${NAME}" ${ARG} 1>'/dev/null' 2>&1 &
+    FAKE_SUITE_PID=$!
+    run_fail "${TEST_KEY}" rose suite-run -q --no-gcontrol \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" -- --debug
+    ARG_STR=
+    if [[ -n "${ARG}" ]]; then
+        ARG_STR=" ${ARG}"
+    fi
+    file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+[FAIL] Suite "${NAME}" may still be running.
+[FAIL] Host "localhost" has process:
+[FAIL]     ${FAKE_SUITE_PID} python ${TEST_DIR}/cylc-run ${NAME}${ARG_STR}
+[FAIL] Try "rose suite-shutdown --name=${NAME}" first?
+__ERR__
+    disown "${FAKE_SUITE_PID}" 2>'/dev/null'  # Don't report stuff on kill
+    kill "${FAKE_SUITE_PID}" 2>'/dev/null' || true
 done
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-self-check
-# Check that this approach causes rose suite-run failure.
-python $TEST_DIR/cylc-run $NAME 1>/dev/null 2>&1 &
-FAKE_SUITE_PID=$!
-run_fail rose suite-run -q --no-gcontrol \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
-disown $FAKE_SUITE_PID  # Don't report 'Terminated...' stuff on kill.
-kill $FAKE_SUITE_PID 2>'/dev/null' || true
-#-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-self-check-hold
-# Check that this approach causes rose suite-run failure.
-python $TEST_DIR/cylc-run $NAME --hold 1>/dev/null 2>&1 &
-FAKE_SUITE_PID=$!
-run_fail rose suite-run -q --no-gcontrol \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
-disown $FAKE_SUITE_PID
-kill $FAKE_SUITE_PID 2>'/dev/null' || true
-#-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-similar-suite-names
-for ALT_NAME in foo$NAME foo-$NAME foo_$NAME \
-                ${NAME}bar $NAME-bar ${NAME}_bar $NAME. .$NAME
+# Check that "rose suite-run" does not fail while suites with similar names are
+# running.
+for ALT_NAME in \
+    "foo${NAME}" \
+    "foo-${NAME}" \
+    "foo_${NAME}" \
+    "${NAME}bar" \
+    "${NAME}-bar" \
+    "${NAME}_bar" \
+    "${NAME}." \
+    ".${NAME}"
 do
-    python $TEST_DIR/cylc-run $ALT_NAME 1>/dev/null 2>&1 &
-    FAKE_SUITE_PID=$!
-    run_fail rose suite-run -q --no-gcontrol \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
-    disown $FAKE_SUITE_PID
-    kill $FAKE_SUITE_PID 2>'/dev/null' || true
-    python $TEST_DIR/cylc-run $ALT_NAME --debug 1>/dev/null 2>&1 &
-    FAKE_SUITE_PID=$!
-    run_fail rose suite-run -q --no-control \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME
-    disown $FAKE_SUITE_PID
-    kill $FAKE_SUITE_PID 2>'/dev/null' || true
+    for ARG in '' '--hold'; do
+        TEST_KEY="${TEST_KEY_BASE}-alt-name-${ALT_NAME}${ARG}"
+        python "${TEST_DIR}/cylc-run" "${ALT_NAME}" ${ARG} 1>'/dev/null' 2>&1 &
+        FAKE_SUITE_PID=$!
+        run_pass "${TEST_KEY}" rose suite-run -q --no-gcontrol \
+            -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" -- --debug
+        disown "${FAKE_SUITE_PID}" 2>'/dev/null'
+        kill "${FAKE_SUITE_PID}" 2>'/dev/null' || true
+    done
 done
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
