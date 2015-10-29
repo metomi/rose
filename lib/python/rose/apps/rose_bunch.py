@@ -131,12 +131,7 @@ class RoseBunchApp(BuiltinApp):
         self.incremental = conf_tree.node.get_value([self.BUNCH_SECTION,
                                                 "incremental"], False)
 
-        multi_args = conf_tree.node.get_value([self.ARGS_SECTION])
-        if not multi_args:
-            raise CompulsoryConfigValueError(
-                                        [self.ARGS_SECTION, "command-format"],
-                                        None,
-                                        KeyError(self.ARGS_SECTION))
+        multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
 
         self.command_format = conf_tree.node.get_value(
                                     [self.BUNCH_SECTION, "command-format"])
@@ -146,10 +141,26 @@ class RoseBunchApp(BuiltinApp):
                                     [self.BUNCH_SECTION, "command-format"],
                                      None, KeyError("command-format"))
 
+        # Set up command-instances if needed
+        instances = conf_tree.node.get_value([self.BUNCH_SECTION,
+                                              "command-instances"])
+
+        if instances:
+            try:
+                instances = range(int(instances))
+            except ValueError as err:
+                raise ConfigValueError([self.BUNCH_SECTION,
+                                        "command-instances"],
+                                       instances,
+                                       "not an integer value")
+
         # Validate runlists
         if not self.invocation_names:
-            item, val = sorted(multi_args.items())[0]
-            arglength = len(shlex.split(val.value))
+            if instances:
+                arglength = len(instances)
+            else:
+                item, val = sorted(multi_args.items())[0]
+                arglength = len(shlex.split(val.value))
             self.invocation_names = range(0, arglength)
         else:
             arglength = len(self.invocation_names)
@@ -167,23 +178,9 @@ class RoseBunchApp(BuiltinApp):
                                     [self.ARGS_SECTION, "command-instances"]),
                                    "reserved keyword")
 
-        # Set up command-instances if needed
-        instances = conf_tree.node.get_value([self.BUNCH_SECTION,
-                                              "command-instances"])
-
-        if instances:
-            try:
-                instances = range(int(instances))
-            except ValueError as err:
-                raise ConfigValueError([self.BUNCH_SECTION,
-                                        "command-instances"],
-                                       instances,
-                                       "not an integer value")
-            if arglength != len(instances):
-                raise ConfigValueError([self.BUNCH_SECTION,
-                                        "command-instances"],
-                                       instances,
-                                       "inconsitent arg lengths")
+        if instances and arglength != len(instances):
+            raise ConfigValueError([self.BUNCH_SECTION, "command-instances"],
+                                   instances, "inconsitent arg lengths")
 
         # Set max number of processes to run at once
         max_procs = conf_tree.node.get_value([self.BUNCH_SECTION, "pool-size"])
@@ -204,7 +201,7 @@ class RoseBunchApp(BuiltinApp):
             for key, vals in sorted(multi_args.items()):
                 invocation.argsdict[key] = shlex.split(vals.value)[index]
             if instances:
-                invocation.argsdict["instances"] = instances[index]
+                invocation.argsdict["command-instances"] = instances[index]
             commands[name] = invocation
 
         procs = {}
