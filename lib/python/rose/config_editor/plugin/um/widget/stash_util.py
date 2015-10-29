@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """This holds some shared functionality between stash and stash_add."""
 
 

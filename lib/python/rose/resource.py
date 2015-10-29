@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Convenient functions for searching resource files.
 """
@@ -30,6 +30,7 @@ import sys
 
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
+
 
 def get_util_home(*args):
     """Return ROSE_HOME or the dirname of the dirname of sys.argv[0].
@@ -218,8 +219,7 @@ def import_object(import_string, from_files, error_handler,
                 error_handler(exc)
             sys.path.pop(0)
     if module is None:
-        error_handler(
-              ERROR_LOCATE_OBJECT.format(module_name))
+        error_handler(ERROR_LOCATE_OBJECT.format(module_name))
         return None
     for submodule in module_name.split(".")[1:]:
         module = getattr(module, submodule)

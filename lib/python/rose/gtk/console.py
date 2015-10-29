@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import datetime
 import itertools
@@ -53,8 +53,8 @@ class ConsoleWindow(gtk.Window):
         self.categories = categories
         self.category_icons = []
         for id_ in category_stock_ids:
-            self.category_icons.append(self.render_icon(
-                                            id_, gtk.ICON_SIZE_MENU))
+            self.category_icons.append(
+                self.render_icon(id_, gtk.ICON_SIZE_MENU))
         self._destroy_hook = destroy_hook
         top_vbox = gtk.VBox()
         top_vbox.show()
@@ -172,7 +172,7 @@ class ConsoleWindow(gtk.Window):
     def _set_time_cell(self, column, cell, model, r_iter, index):
         message_time = model.get_value(r_iter, index)
         text = datetime.datetime.fromtimestamp(message_time).strftime(
-                                       rose.config_editor.EVENT_TIME_LONG)
+            rose.config_editor.EVENT_TIME_LONG)
         cell.set_property("text", text)
 
     def _sort_column(self, column, index):

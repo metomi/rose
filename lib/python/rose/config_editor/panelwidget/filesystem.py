@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import os
 
@@ -57,8 +57,8 @@ class FileSystemPanel(gtk.ScrolledWindow):
                 filepath = os.path.join(dirpath, name)
                 store.append(this_iter, [name, os.path.abspath(filepath)])
             for dirname in list(dirnames):
-                if (dirname.startswith(".") or
-                    dirname in [rose.SUB_CONFIGS_DIR, rose.CONFIG_META_DIR]):
+                if (dirname.startswith(".") or dirname in [
+                        rose.SUB_CONFIGS_DIR, rose.CONFIG_META_DIR]):
                     dirnames.remove(dirname)
             dirnames.sort()
         view.set_model(store)
@@ -101,14 +101,14 @@ class FileSystemPanel(gtk.ScrolledWindow):
     def _handle_click(self, view, event):
         pathinfo = view.get_path_at_pos(int(event.x), int(event.y))
         if (event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS and
-            pathinfo is None):
+                pathinfo is None):
             self._handle_activation()
         if event.button == 3:
             ui_string = """<ui><popup name='Popup'>
                            <menuitem action='Open'/>
                            </popup> </ui>"""
             actions = [('Open', gtk.STOCK_OPEN,
-                         rose.config_editor.FILE_PANEL_MENU_OPEN)]
+                        rose.config_editor.FILE_PANEL_MENU_OPEN)]
             uimanager = gtk.UIManager()
             actiongroup = gtk.ActionGroup('Popup')
             actiongroup.add_actions(actions)
@@ -121,7 +121,7 @@ class FileSystemPanel(gtk.ScrolledWindow):
                 path, col = pathinfo[:2]
             open_item = uimanager.get_widget('/Popup/Open')
             open_item.connect(
-                      "activate",
-                      lambda m: self._handle_activation(view, path, col))
+                "activate",
+                lambda m: self._handle_activation(view, path, col))
             this_menu = uimanager.get_widget('/Popup')
             this_menu.popup(None, None, None, event.button, event.time)

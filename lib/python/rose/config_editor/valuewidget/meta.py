@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
@@ -55,7 +55,7 @@ class MetaValueWidget(gtk.HBox):
                         padding=0)
         self.entry.connect('focus-in-event',
                            self.hook.trigger_scroll)
-        self.grab_focus = lambda : self.hook.get_focus(self.entry)
+        self.grab_focus = lambda: self.hook.get_focus(self.entry)
 
     def _check_diff(self, *args):
         text = self.entry.get_text()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """This package contains the code for the Rose config editor.
 
 This module contains constants that are only used in the config editor.
@@ -218,16 +218,15 @@ EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
 EVENT_MACRO_VALIDATE_ALL = "Custom Validators: {0}: {1} errors"
 EVENT_MACRO_VALIDATE_ALL_OK = "Custom Validators: {0}: all OK"
 EVENT_MACRO_VALIDATE_CHECK_ALL = (
-           "Custom Validators, FailureRuleChecker: {0} total problems found")
+    "Custom Validators, FailureRuleChecker: {0} total problems found")
 EVENT_MACRO_VALIDATE_CHECK_ALL_OK = (
-           "Custom Validators, FailureRuleChecker: No problems found")
+    "Custom Validators, FailureRuleChecker: No problems found")
 EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
 EVENT_MACRO_VALIDATE_NO_PROBLEMS = "Custom Validators: No problems found"
 EVENT_MACRO_VALIDATE_PROBLEMS_FOUND = "Custom Validators: {0} problems found"
-EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS = (
-                     "FailureRuleChecker: No problems found")
+EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS = "FailureRuleChecker: No problems found"
 EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND = (
-                     "FailureRuleChecker: {0} problems found")
+    "FailureRuleChecker: {0} problems found")
 EVENT_REDO = "{0}"
 EVENT_REVERT = "Reverted {0}"
 EVENT_TIME = "%H:%M:%S"
@@ -269,9 +268,9 @@ ERROR_LOAD_OPT_CONFS_TITLE = "Error loading opt configs"
 ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
 ERROR_METADATA_CHECKER_TITLE = "Flawed metadata warning"
 ERROR_METADATA_CHECKER_TEXT = (
-                       "{0} problem(s) found in metadata at {1}.\n" +
-                       "Some functionality has been switched off.\n\n" +
-                       "Run rose metadata-check for more info.")
+    "{0} problem(s) found in metadata at {1}.\n" +
+    "Some functionality has been switched off.\n\n" +
+    "Run rose metadata-check for more info.")
 ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
 ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
 ERROR_NO_OUTPUT = "No output found for {0}"
@@ -319,7 +318,8 @@ WARNING_NOT_FOUND = "No results"
 WARNING_NOT_FOUND_TITLE = "Couldn't find it"
 WARNING_NOT_IGNORED = "Should be ignored "
 WARNING_NOT_TRIGGER = "Not part of the trigger mechanism"
-WARNING_USER_NOT_TRIGGER_IGNORED = "User-ignored, but should be trigger-ignored"
+WARNING_USER_NOT_TRIGGER_IGNORED = (
+    "User-ignored, but should be trigger-ignored")
 WARNING_NOT_USER_IGNORABLE = "User-ignored, but is compulsory"
 WARNING_TYPE_ENABLED = "enabled"
 WARNING_TYPE_TRIGGER_IGNORED = "trigger-ignored"
@@ -506,7 +506,8 @@ DIALOG_BODY_REMOVE_SECTION = "Choose the section to remove"
 DIALOG_COLUMNS_UPGRADE = ["Name", "Version", "Upgrade Version", "Upgrade?"]
 DIALOG_HELP_TITLE = "Help for {0}"
 DIALOG_LABEL_AUTOFIX = "Run built-in transform (fixer) macros?"
-DIALOG_LABEL_AUTOFIX_ALL = "Run built-in transform (fixer) macros for all configurations?"
+DIALOG_LABEL_AUTOFIX_ALL = (
+    "Run built-in transform (fixer) macros for all configurations?")
 DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR = "Choose a section for the new variable:"
 DIALOG_LABEL_CHOOSE_SECTION_EDIT = "Choose a section to edit:"
 DIALOG_LABEL_CONFIG_CHOOSE_META = "Metadata id:"
@@ -560,8 +561,7 @@ DIALOG_NODE_INFO_ATTRIBUTE = "<b>{0}</b>"
 DIALOG_NODE_INFO_CHANGES = "<span foreground='blue'>{0}</span>\n"
 DIALOG_NODE_INFO_DATA = "<span foreground='blue'>Data</span>\n"
 DIALOG_NODE_INFO_DELIMITER = "  "
-DIALOG_NODE_INFO_METADATA = ("<span foreground='blue'>" +
-                                 "Metadata</span>\n")
+DIALOG_NODE_INFO_METADATA = ("<span foreground='blue'>Metadata</span>\n")
 DIALOG_NODE_INFO_MAX_LEN = 80
 DIALOG_NODE_INFO_SUB_ATTRIBUTE = "<i>{0}:</i>"
 STACK_VIEW_TITLE = "Undo and Redo Stack Viewer"
@@ -579,8 +579,8 @@ TITLE_PAGE_LATENT_MARKUP = ("<span foreground='" +
                             TITLE_PAGE_LATENT_COLOUR +
                             "'><i>{0}</i>" + "</span>")
 TITLE_PAGE_PREVIEW_MARKUP = ("<span foreground='" +
-                            TITLE_PAGE_LATENT_COLOUR +
-                            "'><u>{0}</u>" + "</span>")
+                             TITLE_PAGE_LATENT_COLOUR +
+                             "'><u>{0}</u>" + "</span>")
 TITLE_PAGE_ROOT_MARKUP = "<b>{0}</b>"
 TITLE_PAGE_SUITE = "suite conf"
 

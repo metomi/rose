@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
 
@@ -34,7 +34,7 @@ class QuotedTextValueWidget(gtk.HBox):
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(QuotedTextValueWidget, self).__init__(homogeneous=False,
-                                                   spacing=0)
+                                                    spacing=0)
         # Importing here prevents cyclic imports
         import rose.macros.value
         self.type = metadata.get(rose.META_PROP_TYPE)
@@ -42,17 +42,17 @@ class QuotedTextValueWidget(gtk.HBox):
         if self.type == "character":
             self.type_checker = checker.check_character
             self.format_text_in = (
-                        rose.config_editor.util.text_for_character_widget)
+                rose.config_editor.util.text_for_character_widget)
             self.format_text_out = (
-                        rose.config_editor.util.text_from_character_widget)
+                rose.config_editor.util.text_from_character_widget)
             self.quote_char = "'"
             self.esc_quote_chars = "''"
         elif self.type == "quoted":
             self.type_checker = checker.check_quoted
             self.format_text_in = (
-                        rose.config_editor.util.text_for_quoted_widget)
+                rose.config_editor.util.text_for_quoted_widget)
             self.format_text_out = (
-                        rose.config_editor.util.text_from_quoted_widget)
+                rose.config_editor.util.text_from_quoted_widget)
             self.quote_char = '"'
             self.esc_quote_chars = '\\"'
         self.value = value
@@ -76,7 +76,7 @@ class QuotedTextValueWidget(gtk.HBox):
         self.pack_start(self.entry, expand=True, fill=True,
                         padding=0)
         self.entry.connect('focus-in-event', self.hook.trigger_scroll)
-        self.grab_focus = lambda : self.hook.get_focus(self.entry)
+        self.grab_focus = lambda: self.hook.get_focus(self.entry)
 
     def set_entry_text(self):
         """Initialise the text in the widget."""

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Provide a common environment for a task in a cycling suite."""
 
 from glob import glob
@@ -106,7 +106,7 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=[],
                 for path in sorted(glob(path_glob)):
                     more_prepend_paths_map[name].append(path)
             else:
-                more_prepend_paths_map[name] = [] # empty value resets
+                more_prepend_paths_map[name] = []  # empty value resets
     for name, more_prepend_paths in more_prepend_paths_map.items():
         if name in prepend_paths_map:
             prepend_paths_map[name].extend(more_prepend_paths)
@@ -126,7 +126,7 @@ def main():
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness - 1)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
-            event_handler=report)
+        event_handler=report)
     kwargs = {}
     for k, v in vars(opts).items():
         kwargs[k] = v

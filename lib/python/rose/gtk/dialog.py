@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import multiprocessing
 import os
@@ -144,7 +144,7 @@ class DialogProcess(object):
         cmd_hbox.show()
         main_vbox.pack_start(cmd_hbox, expand=False, fill=True,
                              padding=DIALOG_SUB_PADDING)
-        #self.dialog.set_modal(True)
+        # self.dialog.set_modal(True)
         self.progress_bar = gtk.ProgressBar()
         self.progress_bar.set_pulse_step(0.1)
         self.progress_bar.show()
@@ -222,9 +222,7 @@ class DialogProcess(object):
                 self.label.hide()
                 self.progress_bar.hide()
                 self.cmd_label.set_markup(
-                         "<b>" +
-                         rose.gtk.util.safe_str(stderr.read()) +
-                         "</b>")
+                    "<b>" + rose.gtk.util.safe_str(stderr.read()) + "</b>")
                 self.ok_button.show()
                 for child in self.dialog.vbox.get_children():
                     if isinstance(child, gtk.HSeparator):
@@ -273,7 +271,6 @@ def _process(cmd_args, stdout=sys.stdout, stderr=sys.stderr):
     return p.poll()
 
 
-
 def run_about_dialog(name=None, copyright=None,
                      logo_path=None, website=None):
     parent_window = get_dialog_parent()
@@ -289,8 +286,7 @@ def run_about_dialog(name=None, copyright=None,
     about_dialog.set_logo(gtk.gdk.pixbuf_new_from_file(logo_path))
     about_dialog.set_website(website)
     gtk.about_dialog_set_url_hook(
-                        lambda u, v, w: webbrowser.open(w),
-                        about_dialog.get_website())
+        lambda u, v, w: webbrowser.open(w), about_dialog.get_website())
     about_dialog.run()
     about_dialog.destroy()
 
@@ -303,13 +299,12 @@ def run_command_arg_dialog(cmd_name, help_text, run_hook):
     dialog.set_title(cmd_name)
     help_label = gtk.stock_lookup(gtk.STOCK_HELP)[1].strip("_")
     help_button = rose.gtk.util.CustomButton(
-            stock_id=gtk.STOCK_HELP,
-            label=help_label,
-            size=gtk.ICON_SIZE_LARGE_TOOLBAR)
+        stock_id=gtk.STOCK_HELP,
+        label=help_label,
+        size=gtk.ICON_SIZE_LARGE_TOOLBAR)
     help_button.connect(
-                "clicked",
-                lambda b: run_scrolled_dialog(help_text,
-                                              title=help_label))
+        "clicked",
+        lambda b: run_scrolled_dialog(help_text, title=help_label))
     help_hbox = gtk.HBox()
     help_hbox.pack_start(help_button, expand=False, fill=False)
     help_hbox.show()
@@ -342,10 +337,9 @@ def run_dialog(dialog_type, text, title=None, modal=True,
         info_button = gtk.Button(stock=gtk.STOCK_INFO)
         info_button.show()
         info_title = DIALOG_TITLE_EXTRA_INFO
-        info_button.connect("clicked",
-                            lambda b:run_scrolled_dialog(
-                                         extra_text,
-                                         title=info_title))
+        info_button.connect(
+            "clicked",
+            lambda b: run_scrolled_dialog(extra_text, title=info_title))
         dialog.action_area.pack_start(info_button, expand=False, fill=False)
     ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
     if dialog_type == gtk.MESSAGE_INFO:
@@ -405,7 +399,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     if title is not None:
         dialog.set_title(title)
 
-    #ensure the dialog size does not exceed the maximum allowed
+    # ensure the dialog size does not exceed the maximum allowed
     max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
     my_size = dialog.size_request()
     new_size = [-1, -1]
@@ -485,7 +479,7 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     if "\n" in text:
         label.set_line_wrap(False)
     dialog.set_resizable(True)
-    #make sure the dialog size doesn't exceed the maximum - if so change it
+    # make sure the dialog size doesn't exceed the maximum - if so change it
     max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
     my_size = dialog.size_request()
     new_size = [-1, -1]
@@ -549,8 +543,6 @@ def run_scrolled_dialog(text, title=None):
     return False
 
 
-
-
 def get_naming_dialog(label, checker, ok_tip=None,
                       err_tip=None):
     """Return a dialog, container, and entry for entering a name."""
@@ -570,8 +562,8 @@ def get_naming_dialog(label, checker, ok_tip=None,
     name_entry.set_tooltip_text(ok_tip)
     name_entry.connect("changed", _name_checker, checker, ok_button,
                        ok_tip, err_tip)
-    name_entry.connect("activate", lambda b: dialog.response(
-                                                    gtk.RESPONSE_ACCEPT))
+    name_entry.connect(
+        "activate", lambda b: dialog.response(gtk.RESPONSE_ACCEPT))
     name_entry.show()
     name_hbox.pack_start(name_label, expand=False, fill=False,
                          padding=DIALOG_SUB_PADDING)
@@ -593,7 +585,7 @@ def get_naming_dialog(label, checker, ok_tip=None,
 def _name_checker(entry, checker, ok_button, ok_tip, err_tip):
     good_colour = ok_button.style.text[gtk.STATE_NORMAL]
     bad_colour = rose.gtk.util.color_parse(
-                         rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
+        rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
     name = entry.get_text()
     if checker(name):
         entry.modify_text(gtk.STATE_NORMAL, good_colour)
@@ -685,10 +677,10 @@ def run_edit_dialog(text, finish_hook=None, title=None):
                                             text_buffer.get_end_iter())
 
     max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
-    min_size = DIALOG_SIZE_PROCESS  #defines the minimum acceptable size for
-                                    #the edit dialog
+    # defines the minimum acceptable size for the edit dialog
+    min_size = DIALOG_SIZE_PROCESS
 
-    #hacky solution to get "true" size for dialog
+    # hacky solution to get "true" size for dialog
     dialog.show()
     start_size = dialog.size_request()
     scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -724,8 +716,7 @@ def get_dialog_parent():
     ok_windows = []
     max_size = -1
     for window in gtk.window_list_toplevels():
-        if (window.get_title() is not None and
-            window.get_toplevel() == window):
+        if window.get_title() is not None and window.get_toplevel() == window:
             ok_windows.append(window)
             size_proxy = window.get_size()[0] * window.get_size()[1]
             if size_proxy > max_size:

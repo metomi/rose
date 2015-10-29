@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import ast
 import shlex
@@ -75,27 +75,28 @@ class ChoicesValueWidget(gtk.HBox):
     #     Optional custom choice hints for the user, valid with --editable.
     """
 
-    OPTIONS = {"all_group": [
-                       ["--all-group"],
-                       {"action": "store",
-                        "metavar": "CHOICE"}],
-               "choices": [
-                       ["--choices"],
-                       {"action": "append",
-                        "default": None,
-                        "metavar": "CHOICE"}],
-               "editable": [
-                       ["--editable"],
-                       {"action": "store_true",
-                        "default": False}],
-               "format": [
-                       ["--format"],
-                       {"action": "store",
-                        "metavar": "FORMAT"}],
-               "guess_groups": [
-                       ["--guess-groups"],
-                       {"action": "store_true",
-                        "default": False}]}
+    OPTIONS = {
+        "all_group": [
+            ["--all-group"],
+            {"action": "store",
+             "metavar": "CHOICE"}],
+        "choices": [
+            ["--choices"],
+            {"action": "append",
+             "default": None,
+             "metavar": "CHOICE"}],
+        "editable": [
+            ["--editable"],
+            {"action": "store_true",
+             "default": False}],
+        "format": [
+            ["--format"],
+            {"action": "store",
+             "metavar": "FORMAT"}],
+        "guess_groups": [
+            ["--guess-groups"],
+            {"action": "store_true",
+             "default": False}]}
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(ChoicesValueWidget, self).__init__(homogeneous=False,
@@ -123,9 +124,9 @@ class ChoicesValueWidget(gtk.HBox):
         list_vbox = gtk.VBox()
         list_vbox.show()
         self._listview = rose.gtk.choice.ChoicesListView(
-                                       self._set_value_listview,
-                                       self._get_value_values,
-                                       self._handle_search)
+            self._set_value_listview,
+            self._get_value_values,
+            self._handle_search)
         self._listview.show()
         list_frame = gtk.Frame()
         list_frame.show()
@@ -135,11 +136,11 @@ class ChoicesValueWidget(gtk.HBox):
         tree_vbox = gtk.VBox()
         tree_vbox.show()
         self._treeview = rose.gtk.choice.ChoicesTreeView(
-                           self._set_value_treeview,
-                           self._get_value_values,
-                           self._get_available_values,
-                           self._get_groups,
-                           self._get_is_implicit)
+            self._set_value_treeview,
+            self._get_value_values,
+            self._get_available_values,
+            self._get_groups,
+            self._get_is_implicit)
         self._treeview.show()
         tree_frame = gtk.Frame()
         tree_frame.show()
@@ -153,7 +154,7 @@ class ChoicesValueWidget(gtk.HBox):
                                self.hook.trigger_scroll)
         self._treeview.connect('focus-in-event',
                                self.hook.trigger_scroll)
-        self.grab_focus = lambda : self.hook.get_focus(self._listview)
+        self.grab_focus = lambda: self.hook.get_focus(self._listview)
 
     def _handle_search(self, name):
         return False
@@ -163,10 +164,9 @@ class ChoicesValueWidget(gtk.HBox):
         add_entry = gtk.ComboBoxEntry()
         add_entry.connect("changed", self._handle_combo_choice)
         add_entry.child.connect(
-                  "key-press-event",
-                  lambda w, e: self._handle_text_choice(add_entry, e))
-        add_entry.set_tooltip_text(
-                        rose.config_editor.CHOICE_TIP_ENTER_CUSTOM)
+            "key-press-event",
+            lambda w, e: self._handle_text_choice(add_entry, e))
+        add_entry.set_tooltip_text(rose.config_editor.CHOICE_TIP_ENTER_CUSTOM)
         add_entry.show()
         self._set_available_hints(add_entry)
         add_hbox.pack_end(add_entry, expand=True, fill=True)
@@ -253,8 +253,7 @@ class ChoicesValueWidget(gtk.HBox):
         if self.all_group in values:
             return True
         for group in self.groups:
-            if (group in values and set(group).issubset(name) and
-                group != name):
+            if group in values and set(group).issubset(name) and group != name:
                 return True
         return False
 

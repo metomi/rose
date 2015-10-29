@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import sys
 
@@ -56,11 +56,9 @@ class SpinnerValueWidget(gtk.HBox):
         spin_button.set_numeric(True)
         spin_button.set_tooltip_text(tooltip_text)
         spin_button.show()
-        self.change_id = spin_button.connect(
-                            'value-changed',
-                            self.setter)
+        self.change_id = spin_button.connect('value-changed', self.setter)
         self.pack_start(spin_button, False, False, 0)
-        self.grab_focus = lambda : self.hook.get_focus(spin_button)
+        self.grab_focus = lambda: self.hook.get_focus(spin_button)
 
     def setter(self, widget):
         if str(widget.get_value_as_int()) != self.value:

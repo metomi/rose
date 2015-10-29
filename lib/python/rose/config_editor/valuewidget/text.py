@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
@@ -28,7 +28,7 @@ import rose.env
 import rose.gtk.util
 
 ENV_COLOUR = rose.gtk.util.color_parse(
-                     rose.config_editor.COLOUR_VARIABLE_TEXT_VAL_ENV)
+    rose.config_editor.COLOUR_VARIABLE_TEXT_VAL_ENV)
 
 
 class RawValueWidget(gtk.HBox):
@@ -43,14 +43,11 @@ class RawValueWidget(gtk.HBox):
         self.hook = hook
         self.entry = gtk.Entry()
         insensitive_colour = gtk.Style().bg[0]
-        self.entry.modify_bg(gtk.STATE_INSENSITIVE,
-                             insensitive_colour)
+        self.entry.modify_bg(gtk.STATE_INSENSITIVE, insensitive_colour)
         self.normal_colour = gtk.Style().fg[gtk.STATE_NORMAL]
         if rose.env.contains_env_var(self.value):
-            self.entry.modify_text(gtk.STATE_NORMAL,
-                                   ENV_COLOUR)
-            self.entry.set_tooltip_text(
-                       rose.config_editor.VAR_WIDGET_ENV_INFO)
+            self.entry.modify_text(gtk.STATE_NORMAL, ENV_COLOUR)
+            self.entry.set_tooltip_text(rose.config_editor.VAR_WIDGET_ENV_INFO)
         self.entry.set_text(self.value)
         self.entry.connect("button-release-event",
                            self._handle_middle_click_paste)
@@ -60,11 +57,10 @@ class RawValueWidget(gtk.HBox):
         self.entry.connect_after("button-release-event",
                                  lambda e, v: self.setter(e))
         self.entry.show()
-        self.pack_start(self.entry, expand=True, fill=True,
-                                    padding=0)
+        self.pack_start(self.entry, expand=True, fill=True, padding=0)
         self.entry.connect('focus-in-event',
                            self.hook.trigger_scroll)
-        self.grab_focus = lambda : self.hook.get_focus(self.entry)
+        self.grab_focus = lambda: self.hook.get_focus(self.entry)
 
     def setter(self, widget, *args):
         new_value = widget.get_text()
@@ -73,10 +69,8 @@ class RawValueWidget(gtk.HBox):
         self.value = new_value
         self.set_value(self.value)
         if rose.env.contains_env_var(self.value):
-            self.entry.modify_text(gtk.STATE_NORMAL,
-                                   ENV_COLOUR)
-            self.entry.set_tooltip_text(
-                       rose.config_editor.VAR_WIDGET_ENV_INFO)
+            self.entry.modify_text(gtk.STATE_NORMAL, ENV_COLOUR)
+            self.entry.set_tooltip_text(rose.config_editor.VAR_WIDGET_ENV_INFO)
         else:
             self.entry.set_tooltip_text(None)
         return False
@@ -122,7 +116,7 @@ class TextMultilineValueWidget(gtk.HBox):
         self.entry.connect('focus-in-event', self.hook.trigger_scroll)
         self.entry.show()
         self.entry_scroller.add(self.entry)
-        self.grab_focus = lambda : self.hook.get_focus(self.entry)
+        self.grab_focus = lambda: self.hook.get_focus(self.entry)
         self.entrybuffer.connect('changed', self.setter)
         self.pack_start(self.entry_scroller, expand=True, fill=True)
 

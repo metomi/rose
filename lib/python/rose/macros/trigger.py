@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import copy
 import os
@@ -152,7 +152,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         id_stack = []
         for start_id in start_ids:
             if (start_id in self.enabled_dict and
-                start_id not in self.ignored_dict):
+                    start_id not in self.ignored_dict):
                 has_ignored_parent = False
             if not sum([start_id in v for v in
                         self.trigger_family_lookup.values()]):
@@ -220,7 +220,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                         if this_id in self.ignored_dict.get(child_id, {}):
                             self.ignored_dict[child_id].pop(this_id)
                         if (child_id in self.ignored_dict and
-                            self.ignored_dict[child_id] == {}):
+                                self.ignored_dict[child_id] == {}):
                             self.ignored_dict.pop(child_id)
                         id_stack.insert(1, (child_id, False))
                     elif not self._check_values_ok(value, this_id, vals):
@@ -228,14 +228,13 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                         repr_value = self.PARENT_VALUE.format(value)
                         if len(vals) == 1:
                             help_text = self.IGNORED_STATUS_VALUE.format(
-                                             this_id, repr_value,
-                                             repr(vals[0]))
+                                this_id, repr_value, repr(vals[0]))
                         else:
                             help_text = self.IGNORED_STATUS_VALUES.format(
-                                             this_id, repr_value, repr(vals))
+                                this_id, repr_value, repr(vals))
                         self.ignored_dict.setdefault(child_id, {})
                         self.ignored_dict[child_id].update(
-                                                    {this_id: help_text})
+                            {this_id: help_text})
                         if child_id in self.enabled_dict:
                             child_list = self.enabled_dict[child_id]
                             if this_id in child_list:
@@ -251,7 +250,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                         if this_id in self.ignored_dict.get(child_id, {}):
                             self.ignored_dict[child_id].pop(this_id)
                         if (child_id in self.ignored_dict and
-                            self.ignored_dict[child_id] == {}):
+                                self.ignored_dict[child_id] == {}):
                             self.ignored_dict.pop(child_id)
                         id_stack.insert(1, (child_id, False))
             id_stack.pop(0)
@@ -321,8 +320,8 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                     tr_sect, tr_opt = self._get_section_option_from_id(tr_id)
                     if tr_sect != st_sect:
                         return self._get_error_report_for_id(
-                                         start_id, config,
-                                         self.ERROR_DUPL_TRIG.format(st_sect))
+                            start_id, config,
+                            self.ERROR_DUPL_TRIG.format(st_sect))
             for value_list in id_value_dict.values():
                 for string in [s for s in value_list if s is not None]:
                     if self.rec_rule.search(string):
@@ -332,8 +331,8 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                             continue
                         except Exception:
                             return self._get_error_report_for_id(
-                                         start_id, config,
-                                         self.ERROR_BAD_EXPR.format(string))
+                                start_id, config,
+                                self.ERROR_BAD_EXPR.format(string))
             stack = [(start_id, triggered_ids)]
             id_list = []
             while stack:
@@ -341,7 +340,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                 base_id = self._get_stripped_id(var_id, meta_config)
                 if base_id not in meta_settings:
                     return self._get_error_report_for_id(
-                                 var_id, config, self.ERROR_MISSING_METADATA)
+                        var_id, config, self.ERROR_MISSING_METADATA)
                 id_list.append(var_id)
                 child_ids.sort()
                 if var_id in config_sections:
@@ -350,25 +349,22 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                     base_id = self._get_stripped_id(child_id, meta_config)
                     if base_id not in meta_settings:
                         return self._get_error_report_for_id(
-                                       child_id, config,
-                                       self.ERROR_MISSING_METADATA)
+                            child_id, config, self.ERROR_MISSING_METADATA)
                     if child_id in self.trigger_family_lookup:
-                        grandchildren = self.trigger_family_lookup[
-                                                            child_id].keys()
+                        grandchildren = (
+                            self.trigger_family_lookup[child_id].keys())
                         grandchildren.sort()
                         stack.insert(1, (child_id, grandchildren))
                         if (id_list.count(child_id) + 1 >
-                            allowed_repetitions[child_id] and
-                            id_list.count(child_id) >= 2):
+                                allowed_repetitions[child_id] and
+                                id_list.count(child_id) >= 2):
                             # Then it may be looping cyclically.
                             duplicate_seq = self._get_dup_sequence(id_list,
                                                                    child_id)
                             if duplicate_seq:
                                 return self._get_error_report_for_id(
-                                            var_id,
-                                            config,
-                                            self.ERROR_CYCLIC.format(child_id,
-                                                                     var_id))
+                                    var_id, config,
+                                    self.ERROR_CYCLIC.format(child_id, var_id))
                 stack.pop(0)
         return []
 
@@ -400,8 +396,8 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         dupl_adjusted_items = []
         while items:
             child_id, vals = items.pop(0)
-            alt_ids = self._get_id_duplicates(child_id, config_data,
-                                                meta_config)
+            alt_ids = self._get_id_duplicates(
+                child_id, config_data, meta_config)
             if alt_ids:
                 for alt_id in alt_ids:
                     dupl_adjusted_items.append((alt_id, vals))
@@ -429,8 +425,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             sect = rose.macro.REC_ID_STRIP.sub("", sect)
             node = meta_config.get([sect, rose.META_PROP_DUPLICATE])
             self._id_is_duplicate[setting_id] = (
-                                  node is not None and
-                                  node.value == rose.META_PROP_VALUE_TRUE)
+                node is not None and node.value == rose.META_PROP_VALUE_TRUE)
         return self._id_is_duplicate[setting_id]
 
     def _get_stripped_id(self, setting_id, meta_config):
@@ -459,8 +454,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         if index_1 == 0:
             return id_copy_list
         index_2 = id_copy_list.index(child_id, index_1 + 1)
-        if (id_copy_list[:index_1] ==
-            id_copy_list[index_1 + 1: index_2]):
+        if (id_copy_list[:index_1] == id_copy_list[index_1 + 1: index_2]):
             return [i for i in reversed(id_copy_list[:index_2])]
         return []
 

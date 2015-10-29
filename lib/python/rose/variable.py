@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 This module contains:
  * the class Variable, which acts as a data structure for variable attributes.
@@ -38,9 +38,9 @@ RE_CAPT_REAL = '(' + RE_REAL + ')'
 REC_RANGE_NUM = re.compile(RE_CAPT_REAL + "$")
 REC_RANGE_SPLIT = re.compile('\s*(,)\s*')
 REC_RANGE_RANGE = re.compile(
-        "(" + RE_REAL + "?)" + "\s*:\s*" +
-        "(" + RE_REAL + "?)" +
-        "(?<!^:)$")  # Expression can't just be a colon.
+    "(" + RE_REAL + "?)" + "\s*:\s*" +
+    "(" + RE_REAL + "?)" +
+    "(?<!^:)$")  # Expression can't just be a colon.
 
 
 # Ignored types used in rose.variable.ignored_reason,
@@ -88,9 +88,9 @@ class Variable(object):
         if metadata is not None:
             self.metadata = metadata
         if ('type' in self.metadata and
-            not isinstance(self.metadata['type'], list)):
+                not isinstance(self.metadata['type'], list)):
             self.metadata['type'] = parse_type_expression(
-                                               self.metadata['type'])
+                self.metadata['type'])
         # Replace this kind of thing with a proper metadata handler later.
         for key, delim in [
                 ("values", ","),
@@ -125,7 +125,8 @@ class Variable(object):
 
     def __repr__(self):
         text = '<rose.variable :- name: ' + self.name + ', value: '
-        text += repr(self.value) + ', old value: ' + repr(self.old_value) + ', '
+        text += (
+            repr(self.value) + ', old value: ' + repr(self.old_value) + ', ')
         text += 'metadata: ' + str(self.metadata)
         text += ', ignored: ' + ['yes', 'no'][self.ignored_reason == {}]
         text += ', error: ' + str(self.error)
@@ -231,8 +232,7 @@ def _is_quote_state_change(string, index, quote_lookup, quote_state):
     prev_letters_escaped = (i % 2 == 0)
     if index < len(string) - 1:
         next_letter_is_same = (string[index + 1] == letter)
-    if (letter in quote_state and
-        not quote_state[quote_lookup[letter]]):
+    if (letter in quote_state and not quote_state[quote_lookup[letter]]):
         if prev_letters_escaped and not next_letter_is_same:
             return True
     return False
@@ -285,8 +285,8 @@ class RangeSubFunction(object):
 
     def __repr__(self):
         return "<RangeSubFunction operator:{0} values:{1}>".format(
-                                                            self.operator,
-                                                            self.values)
+            self.operator, self.values)
+
 
 class CombinedRangeSubFunction(object):
 
@@ -298,7 +298,7 @@ class CombinedRangeSubFunction(object):
 
     def __repr__(self):
         return ("<CombinedRangeSubFunction members:" +
-                 ", ".join([repr(r) for r in self.range_insts]) + ">")
+                ", ".join([repr(r) for r in self.range_insts]) + ">")
 
 
 class RangeSyntaxError(Exception):
@@ -390,8 +390,8 @@ def _scan_trigger_string(string):
         letter = string[i]
         is_letter_junk = False
         if (letter in is_in_quotes and
-            not is_in_quotes[other_quote[letter]] and
-            not is_escaped):
+                not is_in_quotes[other_quote[letter]] and
+                not is_escaped):
             # Quote state change.
             is_in_quotes[letter] = not is_in_quotes[letter]
         if not any(is_in_quotes.values()) and not is_escaped:
@@ -406,7 +406,7 @@ def _scan_trigger_string(string):
                     break
         is_escaped = (letter == esc_char and not is_escaped)
         if (letter == esc_char and is_escaped and
-            not any(is_in_quotes.values()) and i + 1 < len(string)):
+                not any(is_in_quotes.values()) and i + 1 < len(string)):
             for delim, token in delim_tokens.items():
                 if string[i + 1:i + 1 + len(delim)] == delim:
                     # A valid escape character before a delimiter.

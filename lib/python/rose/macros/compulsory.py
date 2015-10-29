@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
 
@@ -125,8 +125,8 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
         """
         self.reports = []
         if self.compulsory_data is None:
-            self.compulsory_data = self.get_compulsory_data(meta_config) 
-        self._generate_aliases_for_sections(config_data)   
+            self.compulsory_data = self.get_compulsory_data(meta_config)
+        self._generate_aliases_for_sections(config_data)
         if only_these_sections is None:
             basic_sections_to_check = self.compulsory_data.keys()
         else:
@@ -152,7 +152,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
                     present_section_aliases.append(alias_section)
                     if section_data[_SECTION_IS_COMPULSORY_KEY]:
                         check_user_ignored_ids.append(alias_section)
-            
+
             if not present_section_aliases:
                 # No sections in config_data that belong to basic_section.
                 if section_data[_SECTION_IS_COMPULSORY_KEY]:

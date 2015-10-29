@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
 import sys
@@ -55,10 +55,10 @@ class LogicalArrayValueWidget(gtk.HBox):
             self.allowed_values = [rose.TYPE_LOGICAL_VALUE_FALSE,
                                    rose.TYPE_LOGICAL_VALUE_TRUE]
             self.label_dict = {
-                       rose.TYPE_LOGICAL_VALUE_FALSE:
-                       rose.TYPE_LOGICAL_FALSE_TITLE,
-                       rose.TYPE_LOGICAL_VALUE_TRUE:
-                       rose.TYPE_LOGICAL_TRUE_TITLE}
+                rose.TYPE_LOGICAL_VALUE_FALSE:
+                rose.TYPE_LOGICAL_FALSE_TITLE,
+                rose.TYPE_LOGICAL_VALUE_TRUE:
+                rose.TYPE_LOGICAL_TRUE_TITLE}
 
         imgs = [(gtk.STOCK_MEDIA_STOP, gtk.ICON_SIZE_MENU),
                 (gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)]
@@ -83,8 +83,7 @@ class LogicalArrayValueWidget(gtk.HBox):
         self.entry_table.connect_after('size-allocate',
                                        lambda w, e: self.reshape_table())
         self.connect('focus-in-event',
-                     lambda w, e: self.hook.get_focus(
-                                                self.get_focus_entry()))
+                     lambda w, e: self.hook.get_focus(self.get_focus_entry()))
 
     def get_focus_entry(self):
         """Get either the last selected button or the last one."""
@@ -165,18 +164,18 @@ class LogicalArrayValueWidget(gtk.HBox):
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
         if (focus is None and self.entry_table.is_focus()
-            and len(self.entries) > 0):
+                and len(self.entries) > 0):
             focus = self.entries[-1]
         num_fields = len(self.entries)
         num_rows_now = 1 + (num_fields - 1) / self.num_allowed_columns
         self.entry_table.resize(num_rows_now, self.num_allowed_columns)
         if (self.max_length.isdigit() and
-            len(self.entries) >= int(self.max_length)):
+                len(self.entries) >= int(self.max_length)):
             self.add_button.hide()
         else:
             self.add_button.show()
         if (self.max_length.isdigit() and
-            len(self.entries) <= int(self.max_length)):
+                len(self.entries) <= int(self.max_length)):
             self.del_button.hide()
         else:
             self.del_button.show()
@@ -188,7 +187,7 @@ class LogicalArrayValueWidget(gtk.HBox):
                                     row, row + 1,
                                     xoptions=gtk.FILL,
                                     yoptions=gtk.SHRINK)
-        self.grab_focus = lambda : self.hook.get_focus(self.entries[-1])
+        self.grab_focus = lambda: self.hook.get_focus(self.entries[-1])
         self.check_resize()
 
     def reshape_table(self):
@@ -200,8 +199,7 @@ class LogicalArrayValueWidget(gtk.HBox):
         each_entry_bound = entries_bound / len(self.entries)
         maximum_entry_number = float(total_x_bound) / float(each_entry_bound)
         rounded_max = int(maximum_entry_number) + 1
-        if (rounded_max != self.num_allowed_columns + 2 and
-            rounded_max > 2):
+        if rounded_max != self.num_allowed_columns + 2 and rounded_max > 2:
             self.num_allowed_columns = max(1, rounded_max - 2)
             self.populate_table()
 

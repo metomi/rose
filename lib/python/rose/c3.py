@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Implement the C3 linearisation algorithm.
 
 See http://www.python.org/download/releases/2.3/mro/ for detail.
@@ -27,10 +27,10 @@ See http://www.python.org/download/releases/2.3/mro/ for detail.
 
 class MROError(Exception):
 
-   """Cannot resolve MRO."""
+    """Cannot resolve MRO."""
 
-   def __str__(self):
-       return "%s: cannot resolve MRO" % self.args[0]
+    def __str__(self):
+        return "%s: cannot resolve MRO" % self.args[0]
 
 
 def mro(target_name, get_base_names, *args, **kwargs):
@@ -46,10 +46,10 @@ def mro(target_name, get_base_names, *args, **kwargs):
     resolution order.
 
     """
-    results = {} # {name: mro_list, ...}
-    base_names_of = {} # {name: base_names_list, ...}
+    results = {}  # {name: mro_list, ...}
+    base_names_of = {}  # {name: base_names_list, ...}
     dependents_of = {}
-    stack = [target_name] # list of names not yet in results
+    stack = [target_name]  # list of names not yet in results
     while target_name not in results:
         name = stack.pop()
         if name in results:
@@ -63,7 +63,7 @@ def mro(target_name, get_base_names, *args, **kwargs):
                 # Walk the mro of each parent, breadth 1st.
                 # Generate a list of selection sequences.
                 seqs = []
-                q = list(base_names_of[name]) # queue
+                q = list(base_names_of[name])  # queue
                 while q:
                     base_name = q.pop(0)
                     for i in range(len(results[base_name])):
@@ -149,16 +149,18 @@ class _Test(object):
         self.base_names_of["X"] = ["C1", "A1"]
         self.base_names_of["Y"] = ["C1", "B1"]
         self.base_names_of["Z"] = ["Y", "X"]
-        self.test("diamond-1",
-           mro("Z", self.get_base_names),
-           ["Z", "Y", "X", "C1", "B1", "A1", "O"])
+        self.test(
+            "diamond-1",
+            mro("Z", self.get_base_names),
+            ["Z", "Y", "X", "C1", "B1", "A1", "O"])
 
         self.base_names_of["P"] = ["C1", "A1"]
         self.base_names_of["Q"] = ["B1", "C1"]
         self.base_names_of["R"] = ["Q", "P"]
-        self.test("diamond-2",
-           mro("R", self.get_base_names),
-           ["R", "Q", "B1", "P", "C1", "A1", "O"])
+        self.test(
+            "diamond-2",
+            mro("R", self.get_base_names),
+            ["R", "Q", "B1", "P", "C1", "A1", "O"])
 
         self.base_names_of["P"] = ["A1", "A2"]
         self.test("triangle", mro("P", self.get_base_names),

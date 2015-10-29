@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
+#!/bin/bash
+#-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -17,11 +16,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+. "$(dirname "$0")/test_header"
 
-import sys
+if ! pep8 --version 1>'/dev/null' 2>&1; then
+    skip_all '"pep8" command not available'
+fi
 
-import rose.variable
+tests 3
 
-if __name__ == "__main__":
-    print rose.variable.parse_trigger_expression(sys.argv[1])
+run_pass "${TEST_KEY_BASE}" \
+    pep8 "${ROSE_HOME}/lib/python/rose" "${ROSE_HOME}/lib/python/rosie"
+file_cmp "${TEST_KEY_BASE}.out" "${TEST_KEY_BASE}.out" <'/dev/null'
+file_cmp "${TEST_KEY_BASE}.err" "${TEST_KEY_BASE}.err" <'/dev/null'
+
+exit

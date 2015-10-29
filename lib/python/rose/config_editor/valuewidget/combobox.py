@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
@@ -65,7 +65,7 @@ class ComboBoxValueWidget(gtk.HBox):
                               lambda b: comboboxentry.grab_focus())
         comboboxentry.show()
         self.pack_start(comboboxentry, False, False, 0)
-        self.grab_focus = lambda : self.hook.get_focus(comboboxentry)
+        self.grab_focus = lambda: self.hook.get_focus(comboboxentry)
         self.set_contains_error = (lambda e:
                                    comboboxentry.modify_bg(gtk.STATE_NORMAL,
                                                            self.bad_colour))

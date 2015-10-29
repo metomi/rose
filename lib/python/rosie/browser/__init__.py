@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """This package contains the specific Python code driving rosie go.
 
 This module contains constants that are only used in rosie go.
@@ -112,7 +112,8 @@ LABEL_SEARCH_SIMPLE = "Search"
 
 ERROR_CORRUPTED_HISTORY_ITEM = "Corrupted history item"
 ERROR_ENTER_SEARCH = "Please enter something to search for."
-ERROR_HISTORY_LOAD = "An error occurred when trying to load your search history."
+ERROR_HISTORY_LOAD = (
+    "An error occurred when trying to load your search history.")
 ERROR_HISTORY_WRITE = "Unable to save your search history."
 ERROR_INVALID_QUERY = "Invalid query syntax: {0}"
 ERROR_MODIFIED_LOCAL_COPY_DELETE = "Error: Local copy has uncommitted changes"
@@ -153,10 +154,11 @@ DIALOG_MESSAGE_CREATE_PREFIX = "Choose a repository to create the new suite:"
 DIALOG_MESSAGE_CLEAR_HISTORY_CONFIRMATION = ("Delete search history?")
 DIALOG_MESSAGE_DELETE_LOCAL_CONFIRM = ("You are about to delete your local" +
                                        " copy of {0}")
-DIALOG_MESSAGE_DELETE_CONFIRMATION = ("Warning: you are about to delete " +
-                       "\"{0}\". This will permanently delete all branches, "+
-                       "trunk and any local copy." +
-                       "\n\nAre you sure you wish to proceed?")
+DIALOG_MESSAGE_DELETE_CONFIRMATION = (
+    "Warning: you are about to delete " +
+    "\"{0}\". This will permanently delete all branches, " +
+    "trunk and any local copy." +
+    "\n\nAre you sure you wish to proceed?")
 DIALOG_MESSAGE_UNCOMPLETED_FILTER = "Uncompleted filter"
 DIALOG_MESSAGE_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +
                                      "suite {0} is not registered.")

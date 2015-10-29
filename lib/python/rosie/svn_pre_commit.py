@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """A pre-commit hook on a Rosie Subversion repository.
 
 Ensure that commits conform to the rules of Rosie.

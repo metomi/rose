@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Shared utilities for app/suite/task run."""
 
 import os
@@ -115,7 +115,7 @@ class Runner(object):
         self.config_pm = config_pm
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
-                    event_handler=event_handler, popen=popen, fs_util=fs_util)
+                event_handler=event_handler, popen=popen, fs_util=fs_util)
         self.suite_engine_proc = suite_engine_proc
         self.conf_tree_loader = ConfigTreeLoader()
 
@@ -141,7 +141,7 @@ class Runner(object):
         while not os.access(os.path.join(conf_dir, conf_name),
                             os.F_OK | os.R_OK):
             conf_dir = self.fs_util.dirname(conf_dir)
-            if conf_dir == self.fs_util.dirname(conf_dir): # is root
+            if conf_dir == self.fs_util.dirname(conf_dir):  # is root
                 raise ConfigNotFoundError(conf_dir_orig, conf_name)
 
         # Optional configuration files

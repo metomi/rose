@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Wraps Python's subprocess.Popen."""
 
 import os
@@ -130,17 +130,17 @@ class RosePopener(object):
         args: if specified, will be added to the returned list
 
         """
-        if not self.cmds.has_key(key):
+        if key not in self.cmds:
             root_node = ResourceLocator.default().get_conf()
             node = root_node.get(["external", key], no_ignore=True)
             if node is not None:
                 self.cmds[key] = shlex.split(node.value)
-        if not self.cmds.has_key(key):
+        if key not in self.cmds:
             for name in self.ENVS_OF_CMDS.get(key, []):
-                if os.getenv(name): # not None, not null str
+                if os.getenv(name):  # not None, not null str
                     self.cmds[key] = shlex.split(os.getenv(name))
                     break
-        if not self.cmds.has_key(key):
+        if key not in self.cmds:
             self.cmds[key] = self.CMDS[key]
         return self.cmds[key] + list(args)
 
@@ -241,7 +241,6 @@ if __name__ == "__main__":
     import errno
     import unittest
 
-
     class _TestOSErrorFilename(unittest.TestCase):
         """Ensure an OSError has a filename."""
 
@@ -256,6 +255,5 @@ if __name__ == "__main__":
                 self.assertEqual(str(ose), e.stderr)
             else:
                 self.fail("should return OSError")
-
 
     unittest.main()

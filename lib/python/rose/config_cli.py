@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,11 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Implements the "rose config" command."""
 
-from rose.config \
-        import ConfigDumper, ConfigLoader, ConfigNode, ConfigSyntaxError
+from rose.config import (
+    ConfigDumper, ConfigLoader, ConfigNode, ConfigSyntaxError)
 from rose.env import env_var_process
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter, Event

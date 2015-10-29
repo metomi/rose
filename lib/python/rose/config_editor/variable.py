@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import copy
 import difflib
@@ -66,9 +66,9 @@ class VariableWidget(object):
         self.show_modes = show_modes
         self.insensitive_colour = gtk.Style().bg[0]
         self.bad_colour = rose.gtk.util.color_parse(
-                        rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
+            rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
         self.hidden_colour = rose.gtk.util.color_parse(
-                        rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT)
+            rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT)
         self.keywidget = self.get_keywidget(variable, show_modes)
         self.generate_valuewidget(variable)
         self.is_inconsistent = False
@@ -132,8 +132,10 @@ class VariableWidget(object):
         self.contentwidget.show()
         content_event_box = gtk.EventBox()
         content_event_box.show()
-        self.contentwidget.pack_start(self.valuewidget, expand=False, fill=False)
-        self.contentwidget.pack_start(content_event_box, expand=True, fill=True)
+        self.contentwidget.pack_start(
+            self.valuewidget, expand=False, fill=False)
+        self.contentwidget.pack_start(
+            content_event_box, expand=True, fill=True)
 
     def _valuewidget_set_value(self, value):
         # This is called by a valuewidget to change the variable value.
@@ -144,14 +146,15 @@ class VariableWidget(object):
                              use_this_valuewidget=None):
         """Creates the valuewidget attribute, based on value and metadata."""
         custom_arg = None
-        if variable.metadata.get("type") == rose.config_editor.FILE_TYPE_NORMAL:
+        if (variable.metadata.get("type") ==
+                rose.config_editor.FILE_TYPE_NORMAL):
             use_this_valuewidget = (rose.config_editor.
                                     valuewidget.source.SourceValueWidget)
             custom_arg = self.var_ops
         set_value = self._valuewidget_set_value
         hook_object = rose.config_editor.valuewidget.ValueWidgetHook(
-                                  rose.config_editor.false_function,
-                                  self._get_focus)
+            rose.config_editor.false_function,
+            self._get_focus)
         metadata = copy.deepcopy(variable.metadata)
         if use_this_valuewidget is not None:
             self.valuewidget = use_this_valuewidget(variable.value,
@@ -160,7 +163,7 @@ class VariableWidget(object):
                                                     hook_object,
                                                     custom_arg)
         elif (rose.config_editor.META_PROP_WIDGET in self.meta and
-            not override_custom):
+                not override_custom):
             w_val = self.meta[rose.config_editor.META_PROP_WIDGET]
             info = w_val.split(None, 1)
             if len(info) > 1:
@@ -171,13 +174,12 @@ class VariableWidget(object):
             lib = os.path.join("lib", "python", "widget")
             widget_fpath = os.path.join(lib, *widget_path.split(".")[:-1])
             error_handler = lambda e: self.handle_bad_valuewidget(
-                                           str(e), variable, set_value)
+                str(e), variable, set_value)
             widget = rose.resource.import_object(widget_path,
                                                  files,
                                                  error_handler)
             if widget is None:
-                text = rose.config_editor.ERROR_IMPORT_CLASS.format(
-                                                               w_val)
+                text = rose.config_editor.ERROR_IMPORT_CLASS.format(w_val)
                 self.handle_bad_valuewidget(text, variable, set_value)
             try:
                 self.valuewidget = widget(variable.value,
@@ -186,12 +188,11 @@ class VariableWidget(object):
                                           hook_object,
                                           custom_arg)
             except Exception as e:
-                self.handle_bad_valuewidget(str(e), variable,
-                                            set_value)
+                self.handle_bad_valuewidget(str(e), variable, set_value)
         else:
             widget_maker = rose.config_editor.valuewidget.chooser(
-                                variable.value, variable.metadata,
-                                variable.error)
+                variable.value, variable.metadata,
+                variable.error)
             self.valuewidget = widget_maker(variable.value,
                                             metadata, set_value,
                                             hook_object, custom_arg)
@@ -200,10 +201,9 @@ class VariableWidget(object):
             child.connect('focus-out-event', self.handle_focus_out)
             if hasattr(child, 'get_children'):
                 for grandchild in child.get_children():
-                     grandchild.connect('focus-in-event',
-                                        self.handle_focus_in)
-                     grandchild.connect('focus-out-event',
-                                        self.handle_focus_out)
+                    grandchild.connect('focus-in-event', self.handle_focus_in)
+                    grandchild.connect('focus-out-event',
+                                       self.handle_focus_out)
         self.valuewidget.show()
 
     def handle_bad_valuewidget(self, error_info, variable, set_value):
@@ -216,7 +216,7 @@ class VariableWidget(object):
     def handle_focus_in(self, widget, event):
         widget._first_colour = widget.style.base[gtk.STATE_NORMAL]
         new_colour = rose.gtk.util.color_parse(
-                         rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED)
+            rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED)
         widget.modify_base(gtk.STATE_NORMAL, new_colour)
 
     def handle_focus_out(self, widget, event):
@@ -259,19 +259,19 @@ class VariableWidget(object):
                              key_col + 1, key_col + 2,
                              row_index, row_index + 1,
                              xpadding=5,
-                             xoptions=gtk.EXPAND|gtk.FILL,
+                             xoptions=gtk.EXPAND | gtk.FILL,
                              yoptions=self.yoptions)
             self.valuewidget.trigger_scroll = (
-                             lambda b, e: self.force_scroll(b, container))
-            setattr(self, 'get_parent', lambda : container)
+                lambda b, e: self.force_scroll(b, container))
+            setattr(self, 'get_parent', lambda: container)
         elif isinstance(container, gtk.VBox):
             container.pack_start(self.labelwidget, expand=False, fill=True,
                                  padding=5)
             container.pack_start(self.contentwidget, expand=True, fill=True,
                                  padding=10)
             self.valuewidget.trigger_scroll = (
-                             lambda b, e: self.force_scroll(b, container))
-            setattr(self, 'get_parent', lambda : container)
+                lambda b, e: self.force_scroll(b, container))
+            setattr(self, 'get_parent', lambda: container)
 
         return container
 
@@ -288,10 +288,9 @@ class VariableWidget(object):
         vadj = scroll_container.get_vadjustment()
         if vadj.upper == 1.0 or y_coordinate == -1:
             if not self.force_signal_ids:
-                self.force_signal_ids.append(
-                         vadj.connect_after(
-                         'changed',
-                         lambda a: self.force_scroll(widget, container)))
+                self.force_signal_ids.append(vadj.connect_after(
+                    'changed',
+                    lambda a: self.force_scroll(widget, container)))
         else:
             for handler_id in self.force_signal_ids:
                 vadj.handler_block(handler_id)
@@ -349,15 +348,15 @@ class VariableWidget(object):
                 # Not ignored in itself, so give Ignore option.
                 if "'Enable'" in self.menuwidget.option_ui:
                     self.menuwidget.option_ui = re.sub(
-                                "<menuitem action='Enable'/>",
-                                r"<menuitem action='Ignore'/>",
-                                self.menuwidget.option_ui)
+                        "<menuitem action='Enable'/>",
+                        r"<menuitem action='Ignore'/>",
+                        self.menuwidget.option_ui)
             else:
                 # Ignored in itself, so needs Enable option.
                 self.menuwidget.option_ui = re.sub(
-                                "<menuitem action='Ignore'/>",
-                                r"<menuitem action='Enable'/>",
-                                self.menuwidget.option_ui)
+                    "<menuitem action='Ignore'/>",
+                    r"<menuitem action='Enable'/>",
+                    self.menuwidget.option_ui)
             self.update_status()
             self.set_sensitive(False)
         else:
@@ -365,9 +364,9 @@ class VariableWidget(object):
             self.is_ignored = False
             if "'Enable'" in self.menuwidget.option_ui:
                 self.menuwidget.option_ui = re.sub(
-                                    "<menuitem action='Enable'/>",
-                                    r"<menuitem action='Ignore'/>",
-                                    self.menuwidget.option_ui)
+                    "<menuitem action='Enable'/>",
+                    r"<menuitem action='Ignore'/>",
+                    self.menuwidget.option_ui)
             self.update_status()
             if not self.is_ghost:
                 self.set_sensitive(True)
@@ -399,11 +398,11 @@ class VariableWidget(object):
         if hasattr(self, 'valuewidget'):
             self.valuewidget.grab_focus()
             if (index is not None and
-                hasattr(self.valuewidget, 'set_focus_index')):
+                    hasattr(self.valuewidget, 'set_focus_index')):
                 self.valuewidget.set_focus_index(index)
             for child in self.valuewidget.get_children():
                 if (gtk.SENSITIVE & child.flags() and
-                    gtk.PARENT_SENSITIVE & child.flags()):
+                        gtk.PARENT_SENSITIVE & child.flags()):
                     break
             else:
                 if hasattr(self, 'menuwidget'):
@@ -417,7 +416,7 @@ class VariableWidget(object):
     def get_focus_index(self):
         """Get the current cursor position in the variable value string."""
         if (hasattr(self, "valuewidget") and
-            hasattr(self.valuewidget, "get_focus_index")):
+                hasattr(self.valuewidget, "get_focus_index")):
             return self.valuewidget.get_focus_index()
         diff = difflib.SequenceMatcher(None,
                                        self.variable.old_value,
@@ -433,26 +432,24 @@ class VariableWidget(object):
             if rose.META_PROP_HELP in self.meta:
                 text_or_url = None
                 if self.show_modes.get(
-                             rose.config_editor.SHOW_MODE_CUSTOM_HELP):
+                        rose.config_editor.SHOW_MODE_CUSTOM_HELP):
                     format_string = rose.config_editor.CUSTOM_FORMAT_HELP
                     text_or_url = rose.variable.expand_format_string(
-                                                       format_string,
-                                                       self.variable)
+                        format_string, self.variable)
                 if text_or_url is None:
                     text_or_url = self.meta[rose.META_PROP_HELP]
             elif 'url' in self.meta:
                 text_or_url = self.meta[rose.META_PROP_URL]
             else:
                 return
-        if (text_or_url.startswith('http://') or
-            text_or_url.startswith('www.')):
+        if text_or_url.startswith('http://') or text_or_url.startswith('www.'):
             webbrowser.open(text_or_url)
         else:
             self._launch_help_dialog(text_or_url)
 
     def _launch_help_dialog(self, text, url=None):
         title = rose.config_editor.DIALOG_HELP_TITLE.format(
-                                          self.variable.metadata['id'])
+            self.variable.metadata['id'])
         ns = self.variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
         rose.gtk.dialog.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO,
@@ -471,7 +468,7 @@ class VariableWidget(object):
             if isinstance(widget, gtk.RadioButton):
                 widget.set_active(False)
             if (hasattr(widget, 'get_group') and
-                hasattr(widget.get_group(), 'set_inconsistent')):
+                    hasattr(widget.get_group(), 'set_inconsistent')):
                 widget.get_group().set_inconsistent(True)
             if isinstance(widget, gtk.Entry):
                 widget.modify_fg(gtk.STATE_NORMAL, self.bad_colour)
@@ -504,7 +501,7 @@ class VariableWidget(object):
             if isinstance(widget, gtk.Entry):
                 widget.modify_fg(gtk.STATE_NORMAL, normal_fg)
             if (hasattr(widget, 'get_group') and
-                hasattr(widget.get_group(), 'set_inconsistent')):
+                    hasattr(widget.get_group(), 'set_inconsistent')):
                 widget.get_group().set_inconsistent(False)
 
     def _get_focus(self, widget_for_focus):
@@ -548,13 +545,13 @@ class RowVariableWidget(VariableWidget):
     def generate_valuewidget(self, variable, override_custom=False):
         """Creates the valuewidget attribute, based on value and metadata."""
         if (rose.META_PROP_LENGTH in variable.metadata or
-            isinstance(variable.metadata.get(rose.META_PROP_TYPE), list)):
+                isinstance(variable.metadata.get(rose.META_PROP_TYPE), list)):
             use_this_valuewidget = self.make_row_valuewidget
         else:
             use_this_valuewidget = None
         super(RowVariableWidget, self).generate_valuewidget(
-                           variable, override_custom=override_custom,
-                           use_this_valuewidget=use_this_valuewidget)
+            variable, override_custom=override_custom,
+            use_this_valuewidget=use_this_valuewidget)
 
     def make_row_valuewidget(self, *args, **kwargs):
         kwargs.update({"arg_str": str(self.length)})

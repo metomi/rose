@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,18 +16,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Compare two UM output files using cumf."""
 
 import os
 import re
 
-DIFF_INDEX = { "#" : 10,
-               "X" : 1,
-               "O" : 0.1,
-               "o" : 0.01,
-               ":" : 0,
-               "." : -1, }
+DIFF_INDEX = {"#": 10, "X": 1, "O": 0.1, "o": 0.01, ":": 0, ".": -1}
 MISSING_DATA = "~"
 OUTPUT_STRING = "Files %s: %s c.f. %s \n    (%s) %s"
 PASS = "compare"
@@ -64,7 +59,7 @@ class CumfWarnHeader(object):
     """As cumf, but issue a warning if only the header has changed"""
 
     RE_NUM_FIELDS = re.compile(
-                        r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D")
+        r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D")
 
     def __init__(self):
         self.cumf = Cumf()
@@ -96,7 +91,7 @@ class CumfComparisonFailure(object):
         if self.errors:
             for error in self.errors:
                 errors += "\n         %s: >%s%%" % (error, self.errors[error])
-        return OUTPUT_STRING % (FAIL, self.resultfile, self.kgo1file, 
+        return OUTPUT_STRING % (FAIL, self.resultfile, self.kgo1file,
                                 self.cumfdir, errors)
 
     __str__ = __repr__
@@ -113,7 +108,7 @@ class CumfComparisonSuccess(object):
         self.cumfdir = os.path.dirname(task.cumfsummaryfile)
 
     def __repr__(self):
-        return OUTPUT_STRING % (PASS, self.resultfile, self.kgo1file, 
+        return OUTPUT_STRING % (PASS, self.resultfile, self.kgo1file,
                                 self.cumfdir, "")
 
     __str__ = __repr__
@@ -130,7 +125,7 @@ class CumfComparisonHeaderWarning(object):
         self.cumfdir = os.path.dirname(task.cumfsummaryfile)
 
     def __repr__(self):
-        return OUTPUT_STRING % (HEADER, self.resultfile, self.kgo1file, 
+        return OUTPUT_STRING % (HEADER, self.resultfile, self.kgo1file,
                                 self.cumfdir,  "")
 
     __str__ = __repr__
@@ -211,7 +206,7 @@ def analyse_cumf_diff(task):
             for character in diffmap:
                 if character == MISSING_DATA:
                     continue
-                if not character in DIFF_INDEX:
+                if character not in DIFF_INDEX:
                     raise DiffNotUnderstoodException(task, character)
                 if DIFF_INDEX[character] > max_error:
                     max_error = DIFF_INDEX[character]

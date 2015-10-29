@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """The authentication manager for the Rosie web service client."""
 
 
@@ -27,10 +27,6 @@ try:
     import gtk
 except (ImportError, RuntimeError):
     pass
-#try:
-#    import keyring
-#except ImportError:
-#    pass
 import os
 import re
 import rose.config
@@ -49,7 +45,6 @@ class UndefinedRosiePrefixWS(Exception):
 
     def __str__(self):
         return "[rosie-id]prefix-ws.%s: configuration not defined" % self.args
-
 
 
 class GPGAgentStoreConnectionError(Exception):
@@ -214,26 +209,6 @@ class GPGAgentStore(object):
         pass
 
 
-#class KeyringStore(object):
-#
-#    """Password management with keyring."""
-#
-#    @classmethod
-#    def usable(cls):
-#        """Can this store be used?"""
-#        return "keyring" in globals()
-#
-#    @classmethod
-#    def find_password(cls, scheme, host, username):
-#        """Return the password of username@root."""
-#        return keyring.get_password(scheme + "://" + host, username)
-#
-#    @classmethod
-#    def store_password(cls, scheme, host, username, password):
-#        """Return the password of username@root."""
-#        keyring.set_password(scheme + "://" + host, username, password)
-
-
 class RosieWSClientAuthManager(object):
 
     """Manage authentication info for a Rosie web service client."""
@@ -244,7 +219,6 @@ class RosieWSClientAuthManager(object):
     PASSWORD_STORE_CLASSES = {
         "gpgagent": GPGAgentStore,
         "gnomekeyring": GnomekeyringStore,
-        #KeyringStore,
     }
     PROMPT_USERNAME = "Username for %(prefix)r - %(root)r: "
     PROMPT_PASSWORD = "Password for %(username)s at %(prefix)r - %(root)r: "
@@ -379,7 +353,8 @@ class RosieWSClientAuthManager(object):
             if self.username:
                 username = ""
 
-            prompt = self.PROMPT_USERNAME % {"prefix": self.prefix, "root": self.root}
+            prompt = self.PROMPT_USERNAME % {
+                "prefix": self.prefix, "root": self.root}
             if self.popen.which("zenity") and os.getenv("DISPLAY"):
                 username = self.popen.run(
                     "zenity", "--entry",
@@ -398,7 +373,7 @@ class RosieWSClientAuthManager(object):
 
         if self.username and self.password is None or is_retry:
             prompt = self.PROMPT_PASSWORD % {"prefix": self.prefix,
-                                             "root": self.root, 
+                                             "root": self.root,
                                              "username": self.username}
             if hasattr(self.password_store, "prompt_password"):
                 password = self.password_store.prompt_password(

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Implement "rosie go"."""
 
 import ast
@@ -204,7 +204,7 @@ class MainWindow(gtk.Window):
                 address_url.startswith("search?s=") or
                 address_url.startswith("query?q=") or
                 (address_url.startswith("roses:") and
-                address_url.endswith("/"))):
+                 address_url.endswith("/"))):
             self.nav_bar.simple_search_entry.set_text(address_url)
             self.handle_search(None)
         elif address_url.startswith("roses:"):
@@ -218,7 +218,7 @@ class MainWindow(gtk.Window):
         else:
             items = {}
 
-            #set the all revisions to the setting specified *by the url*
+            # set the all revisions to the setting specified *by the url*
             self.history_menuitem.set_active("all_revs=1" in address_url)
 
             try:

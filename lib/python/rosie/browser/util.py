@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import sys
 
@@ -460,7 +460,7 @@ class StatusBarWidget(gtk.VBox):
         self.statusbox.set_size_request(-1,
                                         self.progressbar.size_request()[1])
         hbox.pack_start(self.progressbar, expand=False, fill=False)
-        #only show the progressbar when in use
+        # only show the progressbar when in use
         hbox.show()
         self.statusbar.pack_start(hbox, fill=True)
         self.statusbar.show()

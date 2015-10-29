@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """This module deals with section-specific actions.
 
 The methods of SectionOperations are the only ways that section data
@@ -72,17 +72,17 @@ class SectionOperations(object):
         was_latent = False
         if not section or section in config_data.sections.now:
             rose.gtk.dialog.run_dialog(
-                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                     rose.config_editor.ERROR_SECTION_ADD.format(section),
-                     title=rose.config_editor.ERROR_SECTION_ADD_TITLE,
-                     modal=False)
+                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                rose.config_editor.ERROR_SECTION_ADD.format(section),
+                title=rose.config_editor.ERROR_SECTION_ADD_TITLE,
+                modal=False)
             return
         if section in config_data.sections.latent:
             new_section_data = config_data.sections.latent.pop(section)
             was_latent = True
         else:
             metadata = self.__data.helper.get_metadata_for_config_id(
-                                              section, config_name)
+                section, config_name)
             new_section_data = rose.section.Section(section, [], metadata)
         if comments is not None:
             new_section_data.comments = copy.deepcopy(comments)
@@ -137,27 +137,28 @@ class SectionOperations(object):
         if is_ignored:
             # User-ignore request for this section.
             # The section must be enabled and optional.
-            if (not override and (sect_data.ignored_reason or
-                sect_data.metadata.get(rose.META_PROP_COMPULSORY) ==
-                rose.META_PROP_VALUE_TRUE)):
+            if (not override and (
+                    sect_data.ignored_reason or
+                    sect_data.metadata.get(rose.META_PROP_COMPULSORY) ==
+                    rose.META_PROP_VALUE_TRUE)):
                 rose.gtk.dialog.run_dialog(
-                        rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                        rose.config_editor.WARNING_CANNOT_USER_IGNORE.format(
-                                        section),
-                        rose.config_editor.WARNING_CANNOT_IGNORE_TITLE)
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    rose.config_editor.WARNING_CANNOT_USER_IGNORE.format(
+                        section),
+                    rose.config_editor.WARNING_CANNOT_IGNORE_TITLE)
                 return []
             for error in [rose.config_editor.WARNING_TYPE_USER_IGNORED,
                           rose.config_editor.WARNING_TYPE_ENABLED]:
                 if error in sect_data.error:
-                    sect_data.ignored_reason.update(
-                              {rose.variable.IGNORED_BY_SYSTEM:
-                               rose.config_editor.IGNORED_STATUS_MANUAL})
+                    sect_data.ignored_reason.update({
+                        rose.variable.IGNORED_BY_SYSTEM:
+                        rose.config_editor.IGNORED_STATUS_MANUAL})
                     sect_data.error.pop(error)
                     break
             else:
-                sect_data.ignored_reason.update(
-                                  {rose.variable.IGNORED_BY_USER:
-                                   rose.config_editor.IGNORED_STATUS_MANUAL})
+                sect_data.ignored_reason.update({
+                    rose.variable.IGNORED_BY_USER:
+                    rose.config_editor.IGNORED_STATUS_MANUAL})
             action = rose.config_editor.STACK_ACTION_IGNORED
         else:
             # Enable request for this section.
@@ -171,10 +172,9 @@ class SectionOperations(object):
                 and self.check_cannot_enable_setting(config_name,
                                                      section)):
                 rose.gtk.dialog.run_dialog(
-                      rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                      rose.config_editor.WARNING_CANNOT_ENABLE.format(
-                                         section),
-                      rose.config_editor.WARNING_CANNOT_ENABLE_TITLE)
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    rose.config_editor.WARNING_CANNOT_ENABLE.format(section),
+                    rose.config_editor.WARNING_CANNOT_ENABLE_TITLE)
                 return []
             sect_data.ignored_reason.clear()
             for error in ign_errors:
@@ -202,8 +202,8 @@ class SectionOperations(object):
             ids_to_do.append(var.metadata['id'])
             if is_ignored:
                 var.ignored_reason.update(
-                            {rose.variable.IGNORED_BY_SECTION:
-                             rose.config_editor.IGNORED_STATUS_MANUAL})
+                    {rose.variable.IGNORED_BY_SECTION:
+                     rose.config_editor.IGNORED_STATUS_MANUAL})
             elif rose.variable.IGNORED_BY_SECTION in var.ignored_reason:
                 var.ignored_reason.pop(rose.variable.IGNORED_BY_SECTION)
             else:
@@ -221,8 +221,7 @@ class SectionOperations(object):
         """Remove a section from this configuration."""
         config_data = self.__data.config[config_name]
         old_section_data = config_data.sections.now.pop(section)
-        config_data.sections.latent.update(
-                             {section: old_section_data})
+        config_data.sections.latent.update({section: old_section_data})
         if section in config_data.vars.now:
             config_data.vars.now.pop(section)
         namespace = old_section_data.metadata["full_ns"]
@@ -317,6 +316,5 @@ class SectionOperations(object):
 
     def get_ns_metadata_files(self, namespace):
         """Retrieve filenames within the metadata for this namespace."""
-        config_name = self.__util.split_full_ns(
-                             self.__data, namespace)[0]
+        config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         return self.__data.config[config_name].meta_files

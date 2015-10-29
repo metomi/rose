@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import os
 import re
@@ -36,8 +36,8 @@ import rose.resource
 
 
 REC_SPLIT_MACRO_TEXT = re.compile(
-       '(.{' + str(rose.config_editor.DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH) +
-       '})')
+    '(.{' + str(rose.config_editor.DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH) +
+    '})')
 
 
 class MainWindow(object):
@@ -96,10 +96,11 @@ class MainWindow(object):
 
     def launch_about_dialog(self, somewidget=None):
         """Create a dialog showing the 'About' information."""
-        rose.gtk.dialog.run_about_dialog(name=rose.config_editor.PROGRAM_NAME,
-                                         copyright=rose.config_editor.COPYRIGHT,
-                                         logo_path="etc/images/rose-logo.png",
-                                         website=rose.config_editor.PROJECT_URL)
+        rose.gtk.dialog.run_about_dialog(
+            name=rose.config_editor.PROGRAM_NAME,
+            copyright=rose.config_editor.COPYRIGHT,
+            logo_path="etc/images/rose-logo.png",
+            website=rose.config_editor.PROJECT_URL)
 
     def _reload_choices(self, liststore, top_name, add_choices):
         liststore.clear()
@@ -137,16 +138,15 @@ class MainWindow(object):
         choices = []
         self._reload_choices(liststore, names[0], add_choices)
         section_box.show()
-        config_name_box.connect("changed",
-                                lambda c: self._reload_choices(
-                                            liststore,
-                                            names[c.get_active()],
-                                            add_choices))
+        config_name_box.connect(
+            "changed",
+            lambda c: self._reload_choices(
+                liststore, names[c.get_active()], add_choices))
         section_box.connect("activate",
                             lambda s: add_dialog.response(gtk.RESPONSE_OK))
-        section_box.connect("changed",
-                            lambda s: ok_button.set_sensitive(
-                                                    bool(s.get_text())))
+        section_box.connect(
+            "changed",
+            lambda s: ok_button.set_sensitive(bool(s.get_text())))
         vbox = gtk.VBox(spacing=10)
         vbox.pack_start(config_label, expand=False, fill=False, padding=5)
         vbox.pack_start(config_name_box, expand=False, fill=False, padding=5)
@@ -236,21 +236,21 @@ class MainWindow(object):
         else:
             section_title = rose.config_editor.DIALOG_BODY_ENABLE_SECTION
         return self._launch_config_section_chooser_dialog(
-                                 name_section_dict, prefs,
-                                 dialog_title, config_title,
-                                 section_title)
+            name_section_dict, prefs,
+            dialog_title, config_title,
+            section_title)
 
     def _launch_config_section_chooser_dialog(self, name_section_dict, prefs,
                                               dialog_title, config_title,
                                               section_title,
                                               null_section_choice=False):
         chooser_dialog = gtk.Dialog(
-                                title=dialog_title,
-                                parent=self.window,
-                                buttons=(gtk.STOCK_CANCEL,
-                                         gtk.RESPONSE_REJECT,
-                                         gtk.STOCK_OK,
-                                         gtk.RESPONSE_ACCEPT))
+            title=dialog_title,
+            parent=self.window,
+            buttons=(gtk.STOCK_CANCEL,
+                     gtk.RESPONSE_REJECT,
+                     gtk.STOCK_OK,
+                     gtk.RESPONSE_ACCEPT))
         config_label = gtk.Label(config_title)
         config_label.show()
         section_label = gtk.Label(section_title)
@@ -278,17 +278,15 @@ class MainWindow(object):
             null_section_checkbutton.set_active(True)
         index = config_name_box.get_active()
         self._reload_section_choices(
-                             section_box,
-                             name_section_dict[name_keys[index]],
-                             prefs.get(name_keys[index], []))
+            section_box,
+            name_section_dict[name_keys[index]],
+            prefs.get(name_keys[index], []))
         config_name_box.connect(
-                        'changed',
-                        lambda c: self._reload_section_choices(
-                                        section_box,
-                                        name_section_dict[name_keys[
-                                                          c.get_active()]],
-                                        prefs.get(name_keys[c.get_active()],
-                                                  [])))
+            'changed',
+            lambda c: self._reload_section_choices(
+                section_box,
+                name_section_dict[name_keys[c.get_active()]],
+                prefs.get(name_keys[c.get_active()], [])))
         vbox = gtk.VBox(spacing=rose.config_editor.SPACING_PAGE)
         vbox.pack_start(config_label, expand=False, fill=False)
         vbox.pack_start(config_name_box, expand=False, fill=False)
@@ -301,7 +299,7 @@ class MainWindow(object):
                         padding=rose.config_editor.SPACING_PAGE)
         hbox.show()
         chooser_dialog.vbox.pack_start(
-                hbox, padding=rose.config_editor.SPACING_PAGE)
+            hbox, padding=rose.config_editor.SPACING_PAGE)
         section_box.grab_focus()
         response = chooser_dialog.run()
         if response in [gtk.RESPONSE_OK, gtk.RESPONSE_YES,
@@ -336,9 +334,8 @@ class MainWindow(object):
         return vbox
 
     def launch_macro_changes_dialog(
-               self, config_name, macro_name, changes_list,
-               mode="transform",
-               search_func=rose.config_editor.false_function):
+            self, config_name, macro_name, changes_list, mode="transform",
+            search_func=rose.config_editor.false_function):
         """Launch a dialog explaining macro changes."""
         dialog = MacroChangesDialog(self.window, config_name, macro_name,
                                     mode, search_func)
@@ -352,19 +349,17 @@ class MainWindow(object):
         ok_tip_text = rose.config_editor.TIP_CONFIG_CHOOSE_NAME
         err_tip_text = rose.config_editor.TIP_CONFIG_CHOOSE_NAME_ERROR
         dialog, container, name_entry = rose.gtk.dialog.get_naming_dialog(
-                                                            label,
-                                                            checker_function,
-                                                            ok_tip_text,
-                                                            err_tip_text)
+            label, checker_function, ok_tip_text, err_tip_text)
         dialog.set_title(rose.config_editor.DIALOG_TITLE_CONFIG_CREATE)
         meta_hbox = gtk.HBox()
         meta_label = gtk.Label(
-                         rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_META)
+            rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_META)
         meta_label.show()
         meta_entry = gtk.Entry()
         tip_text = rose.config_editor.TIP_CONFIG_CHOOSE_META
         meta_entry.set_tooltip_text(tip_text)
-        meta_entry.connect("activate", lambda b: dialog.response(gtk.RESPONSE_ACCEPT))
+        meta_entry.connect(
+            "activate", lambda b: dialog.response(gtk.RESPONSE_ACCEPT))
         meta_entry.show()
         meta_hbox.pack_start(meta_label, expand=False, fill=False,
                              padding=rose.config_editor.SPACING_SUB_PAGE)
@@ -388,12 +383,12 @@ class MainWindow(object):
     def launch_open_dirname_dialog(self):
         """Launch a FileChooserDialog and return a directory, or None."""
         open_dialog = gtk.FileChooserDialog(
-                                title=rose.config_editor.DIALOG_TITLE_OPEN,
-                                action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                                buttons=(gtk.STOCK_CANCEL,
-                                         gtk.RESPONSE_CANCEL,
-                                         gtk.STOCK_OPEN,
-                                         gtk.RESPONSE_OK))
+            title=rose.config_editor.DIALOG_TITLE_OPEN,
+            action=gtk.FILE_CHOOSER_ACTION_OPEN,
+            buttons=(gtk.STOCK_CANCEL,
+                     gtk.RESPONSE_CANCEL,
+                     gtk.STOCK_OPEN,
+                     gtk.RESPONSE_OK))
         open_dialog.set_transient_for(self.window)
         open_dialog.set_icon(self.window.get_icon())
         open_dialog.set_default_response(gtk.RESPONSE_OK)
@@ -437,7 +432,7 @@ class MainWindow(object):
     def launch_view_stack(self, undo_stack, redo_stack, undo_func):
         """Load a view of the stack."""
         self.log_window = rose.config_editor.stack.StackViewer(
-                                      undo_stack, redo_stack, undo_func)
+            undo_stack, redo_stack, undo_func)
         self.log_window.set_transient_for(self.window)
 
 
@@ -474,7 +469,7 @@ class MacroChangesDialog(gtk.Dialog):
         button_list = tuple(button_list)
         super(MacroChangesDialog, self).__init__(buttons=button_list,
                                                  parent=window)
-        if not self.for_transform :
+        if not self.for_transform:
             self.set_modal(False)
         self.set_title(title.format(macro_name))
         self.label = gtk.Label()
@@ -483,8 +478,7 @@ class MacroChangesDialog(gtk.Dialog):
             stock_id = gtk.STOCK_DIALOG_WARNING
         else:
             stock_id = gtk.STOCK_CONVERT
-        image = gtk.image_new_from_stock(stock_id,
-                                         gtk.ICON_SIZE_LARGE_TOOLBAR)
+        image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_LARGE_TOOLBAR)
         image.show()
         hbox = gtk.HBox()
         hbox.pack_start(image, expand=False, fill=False,
@@ -494,10 +488,9 @@ class MacroChangesDialog(gtk.Dialog):
         hbox.show()
         self.treewindow = gtk.ScrolledWindow()
         self.treewindow.show()
-        self.treewindow.set_policy(gtk.POLICY_NEVER,
-                                   gtk.POLICY_NEVER)
+        self.treewindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
         self.treeview = rose.gtk.util.TooltipTreeView(
-                                      get_tooltip_func=self._get_tooltip)
+            get_tooltip_func=self._get_tooltip)
         self.treeview.show()
         self.treemodel = gtk.TreeStore(str, str, str, str, str)
 
@@ -516,12 +509,13 @@ class MacroChangesDialog(gtk.Dialog):
                 column.set_cell_data_func(cell, self._set_markup, i)
             self.treeview.append_column(column)
 
-        self.treeview.connect("row-activated", self._handle_treeview_activation)
+        self.treeview.connect(
+            "row-activated", self._handle_treeview_activation)
         self.treewindow.add(self.treeview)
         self.vbox.pack_end(self.treewindow, expand=True, fill=True,
                            padding=rose.config_editor.SPACING_PAGE)
         self.vbox.pack_end(hbox, expand=False, fill=True,
-                             padding=rose.config_editor.SPACING_PAGE)
+                           padding=rose.config_editor.SPACING_PAGE)
         self.set_focus(self.action_area.get_children()[0])
 
     def display(self, changes):
@@ -536,7 +530,7 @@ class MacroChangesDialog(gtk.Dialog):
             title = title.format(self.short_macro_name)
             text = rose.gtk.util.safe_str(text)
             return rose.gtk.dialog.run_dialog(
-                        rose.gtk.dialog.DIALOG_TYPE_INFO, text, title)
+                rose.gtk.dialog.DIALOG_TYPE_INFO, text, title)
         if self.for_validate:
             text = rose.config_editor.DIALOG_LABEL_MACRO_VALIDATE_ISSUES
         else:
@@ -584,7 +578,7 @@ class MacroChangesDialog(gtk.Dialog):
         else:
             self.show()
             self.action_area.get_children()[0].connect(
-                               "clicked", lambda b: self.destroy())
+                "clicked", lambda b: self.destroy())
 
     def _get_tooltip(self, view, row_iter, col_index, tip):
         tip.set_text(view.get_model().get_value(row_iter, col_index))

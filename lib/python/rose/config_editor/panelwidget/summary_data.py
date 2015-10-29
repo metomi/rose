@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
@@ -68,11 +68,10 @@ class BaseSummaryDataPanel(gtk.VBox):
         self._prev_store = None
         self._prev_sort_model = None
         self._view = rose.gtk.util.TooltipTreeView(
-                                   get_tooltip_func=self.set_tree_tip)
+            get_tooltip_func=self.set_tree_tip)
         self._view.set_rules_hint(True)
         self.sort_util = rose.gtk.util.TreeModelSortUtil(
-                              lambda: self._view.get_model(),
-                              multi_sort_num=2)
+            lambda: self._view.get_model(), multi_sort_num=2)
         self._view.show()
         self._view.connect("button-release-event",
                            self._handle_button_press_event)
@@ -145,15 +144,15 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def _get_control_widget_hbox(self):
         filter_label = gtk.Label(
-                      rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
+            rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
         filter_label.show()
         self._filter_widget = gtk.Entry()
         self._filter_widget.set_width_chars(
-                     rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
+            rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
         self._filter_widget.connect("changed", self._refilter)
         self._filter_widget.show()
         group_label = gtk.Label(
-                     rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
+            rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
         group_label.show()
         self._group_widget = gtk.ComboBox()
         cell = gtk.CellRendererText()
@@ -180,7 +179,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                 self.var_id_map[variable.metadata["id"]] = variable
         data_rows, column_names = self.get_model_data()
         data_rows, column_names, rows_are_descendants = self._apply_grouping(
-                                          data_rows, column_names, self.group_index)
+            data_rows, column_names, self.group_index)
         self.column_names = column_names
         should_redraw = self.column_names != self._last_column_names
         if data_rows:
@@ -222,7 +221,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             for i in range(len(self.column_names)):
                 sort_model.set_sort_func(i, self.sort_util.sort_column, i)
             if (self._prev_sort_model is not None and
-                prev_sort_id[0] is not None):
+                    prev_sort_id[0] is not None):
                 sort_model.set_sort_column_id(*prev_sort_id)
             self._prev_sort_model = sort_model
             sort_model.connect("sort-column-changed",
@@ -256,10 +255,10 @@ class BaseSummaryDataPanel(gtk.VBox):
             if old_cols != set(self.column_names):
                 iter_ = self._group_widget.get_active_iter()
                 if self.group_index is not None:
-                   current_model = self._group_widget.get_model()
-                   current_group = None
-                   if current_model is not None:
-                       current_group = current_model().get_value(iter_, 0)
+                    current_model = self._group_widget.get_model()
+                    current_group = None
+                    if current_model is not None:
+                        current_group = current_model().get_value(iter_, 0)
                 group_model = gtk.TreeStore(str)
                 group_model.append(None, [""])
                 start_index = 0
@@ -404,42 +403,40 @@ class BaseSummaryDataPanel(gtk.VBox):
         if self.is_duplicate and this_section is not None:
             add_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
             add_menuitem.set_label(
-                         rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
+                rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
             add_menuitem.connect("activate",
                                  lambda i: self.add_section())
             add_menuitem.show()
             menu.append(add_menuitem)
             copy_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_COPY)
             copy_menuitem.set_label(
-                          rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
+                rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
             copy_menuitem.connect("activate",
                                   lambda i: self.copy_section(this_section))
             copy_menuitem.show()
             menu.append(copy_menuitem)
             if (rose.variable.IGNORED_BY_USER in
-                self.sections[this_section].ignored_reason):
+                    self.sections[this_section].ignored_reason):
                 enab_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
                 enab_menuitem.set_label(
-                              rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
                 enab_menuitem.connect(
-                              "activate",
-                              lambda i: self.sub_ops.ignore_section(
-                                                           this_section, False))
+                    "activate",
+                    lambda i: self.sub_ops.ignore_section(this_section, False))
                 enab_menuitem.show()
                 menu.append(enab_menuitem)
             else:
                 ign_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
                 ign_menuitem.set_label(
-                             rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
                 ign_menuitem.connect(
-                             "activate",
-                             lambda i: self.sub_ops.ignore_section(
-                                                           this_section, True))
+                    "activate",
+                    lambda i: self.sub_ops.ignore_section(this_section, True))
                 ign_menuitem.show()
                 menu.append(ign_menuitem)
             rem_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
             rem_menuitem.set_label(
-                         rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
             rem_menuitem.connect("activate",
                                  lambda i: self.remove_section(this_section))
             rem_menuitem.show()
@@ -516,7 +513,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             group_index = self.column_names.index(col_name)
             # Any existing grouping changes the order of self.column_names.
             if (self.group_index is not None and
-                group_index <= self.group_index):
+                    group_index <= self.group_index):
                 group_index -= 1
         else:
             group_index = None
@@ -611,13 +608,12 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         col_index = self._view.get_columns().index(column)
         value = self._view.get_model().get_value(iter_, col_index)
         max_len = rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
-        if (value is not None and len(value) > max_len
-            and col_index != 0):
+        if value is not None and len(value) > max_len and col_index != 0:
             cell.set_property("width-chars", max_len)
             cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         sect_index = self.get_section_column_index()
         if (value is not None and col_index == sect_index and
-            self.is_duplicate):
+                self.is_duplicate):
             value = value.split("(")[-1].rstrip(")")
         if col_index == 0 and treemodel.iter_parent(iter_) is not None:
             cell.set_property("visible", False)
@@ -648,8 +644,8 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
             tip_text += "\n"
         for key, value in id_data.error.items():
             tip_text += (
-                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
-                                                                key, value))
+                rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
+                    key, value))
         for key in id_data.ignored_reason:
             tip_text += key + "\n"
         if option is not None:

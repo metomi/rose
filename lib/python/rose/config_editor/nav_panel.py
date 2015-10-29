@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import os
 import re
@@ -71,8 +71,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_OUT)
         self._rec_no_expand_leaves = re.compile(
-            rose.config_editor.TREE_PANEL_NO_EXPAND_LEAVES_REGEX
-        )       
+            rose.config_editor.TREE_PANEL_NO_EXPAND_LEAVES_REGEX)
         self.panel_top = gtk.TreeViewColumn()
         self.panel_top.set_title(rose.config_editor.TREE_PANEL_TITLE)
         self.cell_error_icon = gtk.CellRendererPixbuf()
@@ -105,7 +104,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self.error_icon = gtk.gdk.pixbuf_new_from_file(image_path +
                                                        '/error_icon.xpm')
         self.tree = rose.gtk.util.TooltipTreeView(
-                             get_tooltip_func=self.get_treeview_tooltip)
+            get_tooltip_func=self.get_treeview_tooltip)
         self.tree.append_column(self.panel_top)
         self.filter_model = self.data_store.filter_new()
         self.filter_model.set_visible_func(self._get_should_show)
@@ -157,7 +156,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
     def _timeout_launch(self, timeout_path):
         current_path = self.tree.get_cursor()[0]
         if (current_path == timeout_path and
-            self._last_tree_activation_path != timeout_path):
+                self._last_tree_activation_path != timeout_path):
             self._launch_ns_func(self.get_name(timeout_path),
                                  as_new=False)
         return False
@@ -243,7 +242,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                     title)
         if ignored_status:
             title = rose.config_editor.TITLE_PAGE_IGNORED_MARKUP.format(
-                                                  ignored_status, title)
+                ignored_status, title)
         cell.set_property("markup", title)
 
     def sort_tree_items(self, row_item_1, row_item_2):
@@ -351,7 +350,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                     text += rose.config_editor.TREE_PANEL_ERROR
                 else:
                     text += rose.config_editor.TREE_PANEL_ERRORS.format(
-                                                          num_errors)
+                        num_errors)
             if comment:
                 text += "\n" + comment
             if change:
@@ -469,7 +468,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 if pathinfo is not None:
                     path, col, cell_x, cell_y = pathinfo
                     if (treeview.get_expander_column() == col and
-                        cell_x < 1 + 18 * len(path)):  # Hardwired, bad.
+                            cell_x < 1 + 18 * len(path)):  # Hardwired, bad.
                         if event.button != 3:
                             return False
                         else:
@@ -479,10 +478,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                         self.popup_menu(path, event)
                     else:
                         treeview.grab_focus()
-                        treeview.set_cursor( pathinfo[0], col, 0)
-                elif event.button == 3: # Right clicked outside the rows
+                        treeview.set_cursor(pathinfo[0], col, 0)
+                elif event.button == 3:  # Right clicked outside the rows
                     self.popup_menu(None, event)
-                else: # Clicked outside the rows
+                else:  # Clicked outside the rows
                     return False
                 if event.button == 1:  # Left click event, replace old tab
                     self._last_tree_activation_path = path
@@ -510,10 +509,9 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         full_name = row_name
         for parent in [path[:i] for i in range(len(path) - 1, 0, -1)]:
             parent_iter = tree_model.get_iter(parent)
-            full_name = (
-                str(tree_model.get_value(parent_iter, self.COLUMN_NAME) +
+            full_name = str(
+                tree_model.get_value(parent_iter, self.COLUMN_NAME) +
                 "/" + full_name)
-            )
         return full_name
 
     def get_subtree_names(self, path=None):
@@ -570,7 +568,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             while child_iter is not None:
                 child_name = self.get_name(treemodel.get_path(child_iter))
                 metadata, comment = self._get_metadata_comments_func(
-                                                                child_name)
+                    child_name)
                 dupl = metadata.get(rose.META_PROP_DUPLICATE)
                 child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)
@@ -597,7 +595,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 return False
             iter_stack.append(model.iter_children(iter_))
             iter_stack.append(model.iter_next(iter_))
-        return True            
+        return True
 
     def _get_should_show(self, model, iter_):
         # Determine whether to show a row.

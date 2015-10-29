@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """This module contains:
 
 VarData -- class to store rose.variable.Variable instances
@@ -178,7 +178,7 @@ class ConfigDataManager(object):
         """Load the root configuration and all its sub-configurations."""
         self.util = util
         self.helper = rose.config_editor.data_helper.ConfigDataHelper(
-                                  self, util)
+            self, util)
         self.reporter = reporter
         self.page_ns_show_modes = page_ns_show_modes
         self.reload_ns_tree_func = reload_ns_tree_func
@@ -194,8 +194,8 @@ class ConfigDataManager(object):
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
 
     def load(self, top_level_directory, config_obj_dict,
-             config_obj_type_dict=None, load_all_apps=False, load_no_apps=False,
-             metadata_off=False):
+             config_obj_type_dict=None, load_all_apps=False,
+             load_no_apps=False, metadata_off=False):
         """Load configurations and their metadata."""
         if config_obj_type_dict is None:
             config_obj_type_dict = {}
@@ -245,17 +245,17 @@ class ConfigDataManager(object):
                             conf_path = os.path.join(config_container_dir,
                                                      config_dir)
                             if (os.path.isdir(conf_path) and
-                                not config_dir.startswith('.')):
-                                    self.app_count += 1
+                                    not config_dir.startswith('.')):
+                                self.app_count += 1
 
                         if (self.app_count >
-                            rose.config_editor.MAX_APPS_THRESHOLD):
+                                rose.config_editor.MAX_APPS_THRESHOLD):
                             preview = True
 
                 for config_dir in sub_contents:
                     conf_path = os.path.join(config_container_dir, config_dir)
                     if (os.path.isdir(conf_path) and
-                        not config_dir.startswith('.')):
+                            not config_dir.startswith('.')):
                         self.load_config(conf_path, preview=preview,
                                          metadata_off=metadata_off)
             self.load_config(top_level_directory)
@@ -283,8 +283,8 @@ class ConfigDataManager(object):
             s_config = copy.deepcopy(config)
             if not skip_load_event:
                 self.reporter.report_load_event(
-                              rose.config_editor.EVENT_LOAD_CONFIG.format(
-                                                       name.lstrip("/")))
+                    rose.config_editor.EVENT_LOAD_CONFIG.format(
+                        name.lstrip("/")))
         else:
             config_directory = config_directory.rstrip("/")
             if config_directory != self.top_level_directory:
@@ -308,22 +308,22 @@ class ConfigDataManager(object):
                 config_type = rose.TOP_CONFIG_NAME
             if not skip_load_event:
                 self.reporter.report_load_event(
-                              rose.config_editor.EVENT_LOAD_CONFIG.format(
-                                                       name.lstrip("/")))
+                    rose.config_editor.EVENT_LOAD_CONFIG.format(
+                        name.lstrip("/")))
             config_path = os.path.join(config_directory, rose.SUB_CONFIG_NAME)
             if not os.path.isfile(config_path):
                 if (os.path.abspath(config_directory) ==
-                    os.path.abspath(self.top_level_directory)):
+                        os.path.abspath(self.top_level_directory)):
                     config_path = os.path.join(config_directory,
                                                rose.TOP_CONFIG_NAME)
                     config_type = rose.TOP_CONFIG_NAME
                 else:
                     text = rose.config_editor.ERROR_NOT_FOUND.format(
-                                                              config_path)
+                        config_path)
                     title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
                     rose.gtk.dialog.run_dialog(
-                                        rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                        text, title)
+                        rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                        text, title)
                     sys.exit(2)
 
             if config_directory != self.top_level_directory and preview:
@@ -332,7 +332,6 @@ class ConfigDataManager(object):
                 s_config = rose.config.ConfigNode()
             else:
                 config, s_config = self.load_config_file(config_path)
-
 
         if config_directory != self.top_level_directory and preview:
             meta_config_tree = rose.config_tree.ConfigTree()
@@ -352,11 +351,10 @@ class ConfigDataManager(object):
         meta_config = meta_config_tree.node
         opt_conf_lookup = self.load_optional_configs(config_directory)
 
-
         macro_module_prefix = self.helper.get_macro_module_prefix(name)
         meta_files = self.load_meta_files(meta_config_tree)
         macros = rose.macro.load_meta_macro_modules(
-                      meta_files, module_prefix=macro_module_prefix)
+            meta_files, module_prefix=macro_module_prefix)
         meta_id = self.helper.get_config_meta_flag(
             name, from_this_config_obj=config)
         # Initialise configuration data object.
@@ -380,8 +378,8 @@ class ConfigDataManager(object):
 
         if not skip_load_event:
             self.reporter.report_load_event(
-                          rose.config_editor.EVENT_LOAD_METADATA.format(
-                                                        name.lstrip("/")))
+                rose.config_editor.EVENT_LOAD_METADATA.format(
+                    name.lstrip("/")))
         # Process namespaces and ignored statuses.
         self.load_node_namespaces(name)
         self.load_node_namespaces(name, from_saved=True)
@@ -396,11 +394,11 @@ class ConfigDataManager(object):
             config = rose.config.load(config_path)
         except rose.config.ConfigSyntaxError as e:
             text = rose.config_editor.ERROR_LOAD_SYNTAX.format(
-                                                    config_path, e)
+                config_path, e)
             title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
             rose.gtk.dialog.run_dialog(
-                            rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                            text, title)
+                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                text, title)
             sys.exit(2)
         else:
             master_config = rose.config.load(config_path)
@@ -448,10 +446,10 @@ class ConfigDataManager(object):
     def load_builtin_macros(self, config_name):
         """Load Rose builtin macros."""
         self.builtin_macros[config_name] = {
-                     rose.META_PROP_COMPULSORY:
-                     rose.macros.compulsory.CompulsoryChecker(),
-                     rose.META_PROP_TYPE:
-                     self._builtin_value_macro}
+            rose.META_PROP_COMPULSORY:
+            rose.macros.compulsory.CompulsoryChecker(),
+            rose.META_PROP_TYPE:
+            self._builtin_value_macro}
 
     def load_sections_from_config(self, config_name, save=False):
         """Return maps of section objects from the configuration."""
@@ -471,7 +469,7 @@ class ConfigDataManager(object):
                     sect_map[""].options.append(section)
                     continue
                 meta_data = self.helper.get_metadata_for_config_id(
-                                            "", config_name)
+                    "", config_name)
                 sect_map.update({"": rose.section.Section("", [section],
                                                           meta_data)})
                 real_sect_ids.append("")
@@ -489,8 +487,7 @@ class ConfigDataManager(object):
             )
             if node.is_ignored():
                 reason = {}
-                if (node.state ==
-                    rose.config.ConfigNode.STATE_SYST_IGNORED):
+                if node.state == rose.config.ConfigNode.STATE_SYST_IGNORED:
                     reason = {rose.variable.IGNORED_BY_SYSTEM:
                               rose.config_editor.IGNORED_STATUS_CONFIG}
                 elif (node.state ==
@@ -509,7 +506,7 @@ class ConfigDataManager(object):
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
             if (option is not None or section in real_sect_ids or
-                section in real_sect_basic_ids):
+                    section in real_sect_basic_ids):
                 continue
             ignored_reason = {}
             meta_data = {}
@@ -552,8 +549,8 @@ class ConfigDataManager(object):
             var_map = {}
             latent_var_map = {}
             if return_copies:
-                 var_map_copy = {}
-                 latent_var_map_copy = {}
+                var_map_copy = {}
+                latent_var_map_copy = {}
         meta_ns_ids = []
         real_var_ids = []
         basic_dupl_map = {}
@@ -571,18 +568,17 @@ class ConfigDataManager(object):
             ignored_reason = {}
             if section_map[section].ignored_reason:
                 ignored_reason.update({
-                        rose.variable.IGNORED_BY_SECTION:
-                        rose.config_editor.IGNORED_STATUS_CONFIG})
-            if (node.state ==
-                rose.config.ConfigNode.STATE_SYST_IGNORED):
+                    rose.variable.IGNORED_BY_SECTION:
+                    rose.config_editor.IGNORED_STATUS_CONFIG})
+            if node.state == rose.config.ConfigNode.STATE_SYST_IGNORED:
                 ignored_reason.update({
-                        rose.variable.IGNORED_BY_SYSTEM:
-                        rose.config_editor.IGNORED_STATUS_CONFIG})
+                    rose.variable.IGNORED_BY_SYSTEM:
+                    rose.config_editor.IGNORED_STATUS_CONFIG})
             elif (node.state ==
                   rose.config.ConfigNode.STATE_USER_IGNORED):
                 ignored_reason.update({
-                        rose.variable.IGNORED_BY_USER:
-                        rose.config_editor.IGNORED_STATUS_CONFIG})
+                    rose.variable.IGNORED_BY_USER:
+                    rose.config_editor.IGNORED_STATUS_CONFIG})
             cfg_comments = node.comments
             var_id = self.util.get_id_from_section_option(section, option)
             real_var_ids.append(var_id)
@@ -633,11 +629,10 @@ class ConfigDataManager(object):
                 # There is a matching duplicate e.g. foo(3) or foo{bar}(1)
                 for dupl_section in basic_dupl_map[section]:
                     dupl_id = self.util.get_id_from_section_option(
-                                               dupl_section, option)
+                        dupl_section, option)
                     id_node_stack.insert(0, (dupl_id, sect_node))
                 continue
-            if (only_this_section is not None and
-                section != only_this_section):
+            if only_this_section is not None and section != only_this_section:
                 continue
             if option is None:
                 # A section, not a variable.
@@ -660,8 +655,8 @@ class ConfigDataManager(object):
                 sect_data = latent_section_map.get(section)
             if sect_data is not None and sect_data.ignored_reason:
                 ignored_reason = {
-                        rose.variable.IGNORED_BY_SECTION:
-                        rose.config_editor.IGNORED_STATUS_CONFIG}
+                    rose.variable.IGNORED_BY_SECTION:
+                    rose.config_editor.IGNORED_STATUS_CONFIG}
             meta_data = {}
             for prop_opt, opt_node in sect_node.value.items():
                 if opt_node.is_ignored():
@@ -673,8 +668,7 @@ class ConfigDataManager(object):
             if return_copies:
                 latent_var_map_copy.setdefault(section, [])
             if update:
-                id_list = [v.metadata['id'] for v in
-                            latent_var_map[section]]
+                id_list = [v.metadata['id'] for v in latent_var_map[section]]
                 if setting_id in id_list:
                     for var in latent_var_map[section]:
                         if var.metadata['id'] == setting_id:
@@ -735,10 +729,10 @@ class ConfigDataManager(object):
             if opt_node is not None:
                 opt_sect_node = opt_config.get([section])
                 text = opt_conf_diff_format.format(opt_sect_node.state,
-                                                    section,
-                                                    opt_node.state,
-                                                    option,
-                                                    opt_node.value)
+                                                   section,
+                                                   opt_node.state,
+                                                   option,
+                                                   opt_node.value)
                 opt_flags[opt_name] = text
         return opt_flags
 
@@ -759,10 +753,9 @@ class ConfigDataManager(object):
             allowed_sections = set(sect_map.keys() + var_map.keys())
         else:
             allowed_sections = self.helper.get_sections_from_namespace(
-                                                             only_this_ns)
+                only_this_ns)
         for section in sect_map:
-            if (only_this_ns is not None and
-                section not in allowed_sections):
+            if only_this_ns is not None and section not in allowed_sections:
                 continue
             sections_to_be_dumped.append(section)
         for section in allowed_sections:
@@ -778,15 +771,15 @@ class ConfigDataManager(object):
                 value = variable.value
                 var_state = enabled_state
                 if variable.ignored_reason:
-                    if rose.variable.IGNORED_BY_USER in variable.ignored_reason:
+                    if (rose.variable.IGNORED_BY_USER in
+                            variable.ignored_reason):
                         var_state = user_ignored_state
                     elif (rose.variable.IGNORED_BY_SYSTEM in
                           variable.ignored_reason):
                         var_state = syst_ignored_state
                 var_comments = variable.comments
-                config.set([section, option], value,
-                            state=var_state,
-                            comments=var_comments)
+                config.set([section, option], value, state=var_state,
+                           comments=var_comments)
         for section_id in sections_to_be_dumped:
             comments = sect_map[section_id].comments
             if not section_id:
@@ -795,7 +788,7 @@ class ConfigDataManager(object):
             section_state = enabled_state
             if sect_map[section_id].ignored_reason:
                 if (rose.variable.IGNORED_BY_USER in
-                    sect_map[section_id].ignored_reason):
+                        sect_map[section_id].ignored_reason):
                     section_state = user_ignored_state
                 elif (rose.variable.IGNORED_BY_SYSTEM in
                       sect_map[section_id].ignored_reason):
@@ -816,7 +809,7 @@ class ConfigDataManager(object):
     def clear_meta_lookups(self, config_name):
         for ns in self.namespace_meta_lookup.keys():
             if (ns.startswith(config_name) and
-                self.util.split_full_ns(self, ns)[0] == config_name):
+                    self.util.split_full_ns(self, ns)[0] == config_name):
                 self.namespace_meta_lookup.pop(ns)
         if config_name in self._config_section_namespace_lookup:
             self._config_section_namespace_lookup.pop(config_name)
@@ -850,14 +843,13 @@ class ConfigDataManager(object):
         if reports and meta_dir_path not in self._bad_meta_dir_paths:
             # There are problems with some metadata.
             title = rose.config_editor.ERROR_METADATA_CHECKER_TITLE.format(
-                                                      meta_dir_path)
+                meta_dir_path)
             text = rose.config_editor.ERROR_METADATA_CHECKER_TEXT.format(
-                                            len(reports), meta_dir_path)
+                len(reports), meta_dir_path)
             self._bad_meta_dir_paths.append(meta_dir_path)
             reports_map = {None: reports}
             reports_text = rose.macro.get_reports_as_text(
-                                      reports_map,
-                                      "rose.metadata_check.MetadataChecker")
+                reports_map, "rose.metadata_check.MetadataChecker")
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        text, title, modal=False,
                                        extra_text=reports_text)
@@ -893,16 +885,15 @@ class ConfigDataManager(object):
             config_for_macro.set(keylist, copy.deepcopy(node.value))
         meta_config = self.config[config_name].meta
         bad_list = self.trigger[config_name].validate_dependencies(
-                                                      config_for_macro,
-                                                      meta_config)
+            config_for_macro, meta_config)
         if bad_list:
             self.trigger[config_name].trigger_family_lookup.clear()
             event = rose.config_editor.EVENT_INVALID_TRIGGERS.format(
-                                             config_name.strip("/"))
+                config_name.strip("/"))
             self.reporter.report(event, self.reporter.KIND_ERR)
             return
         trig_config, change_list = self.trigger[config_name].transform(
-                                        config_for_macro, meta_config)
+            config_for_macro, meta_config)
         self.trigger_id_value_lookup.setdefault(config_name, {})
         var_id_map = {}
         for variables in var_map.values():
@@ -910,8 +901,8 @@ class ConfigDataManager(object):
                 var_id_map.update({variable.metadata['id']: variable})
         latent_var_id_map = {}
         for variables in latent_var_map.values():
-             for variable in variables:
-                 latent_var_id_map.update({variable.metadata['id']: variable})
+            for variable in variables:
+                latent_var_id_map.update({variable.metadata['id']: variable})
         trig_ids = self.trigger[config_name].trigger_family_lookup.keys()
         while trig_ids:
             var_id = trig_ids.pop()
@@ -920,8 +911,7 @@ class ConfigDataManager(object):
                 value = None
             else:
                 value = var.value
-            self.trigger_id_value_lookup[config_name].update(
-                                  {var_id: value})
+            self.trigger_id_value_lookup[config_name].update({var_id: value})
             sect, opt = self.util.get_section_option_from_id(var_id)
             if sect.endswith(")"):
                 continue
@@ -931,7 +921,7 @@ class ConfigDataManager(object):
                 for section in sect_map:
                     if section.startswith(search_string):
                         new_id = self.util.get_id_from_section_option(
-                                                               section, opt)
+                            section, opt)
                         trig_ids.append(new_id)
         id_node_map = {}
         id_node_map.update(sect_map)
@@ -954,14 +944,14 @@ class ConfigDataManager(object):
             if trig_cfg_node is None:
                 # Latent variable or sections cannot be user-ignored.
                 if (setting_id in ignored_dict and
-                    setting_id not in enabled_dict):
+                        setting_id not in enabled_dict):
                     trig_cfg_state = syst_ignored_state
                 else:
                     trig_cfg_state = enabled_state
             else:
                 trig_cfg_state = trig_cfg_node.state
             if (trig_cfg_state == enabled_state and
-                not node_inst.ignored_reason):
+                    not node_inst.ignored_reason):
                 # For speed, skip the rest of the checking.
                 # Doc table: E -> E
                 continue
@@ -991,15 +981,15 @@ class ConfigDataManager(object):
                         # Doc table: E -> I_t
                         if is_latent:
                             # Fix this for latent settings.
-                            node_inst.ignored_reason.update(
-                                 {rose.variable.IGNORED_BY_SYSTEM:
-                                  rose.config_editor.IGNORED_STATUS_CONFIG})
+                            node_inst.ignored_reason.update({
+                                rose.variable.IGNORED_BY_SYSTEM:
+                                rose.config_editor.IGNORED_STATUS_CONFIG})
                         else:
                             # Flag an error for real settings.
-                            node_inst.error.update(
-                                 {rose.config_editor.WARNING_TYPE_ENABLED:
-                                  (rose.config_editor.WARNING_NOT_IGNORED +
-                                   help_str)})
+                            node_inst.error.update({
+                                rose.config_editor.WARNING_TYPE_ENABLED:
+                                (rose.config_editor.WARNING_NOT_IGNORED +
+                                 help_str)})
                 else:
                     # Otherwise, they both agree about trigger-ignored.
                     # Doc table: I_t -> I_t
@@ -1008,11 +998,11 @@ class ConfigDataManager(object):
                 # It should be enabled, but is trigger-ignored.
                 # Doc table: I_t
                 if (setting_id in enabled_dict and
-                    setting_id not in ignored_dict):
+                        setting_id not in ignored_dict):
                     # It is a valid trigger.
                     # Doc table: I_t -> E
                     parents = self.trigger[config_name].enabled_dict.get(
-                                                                setting_id)
+                        setting_id)
                     help_str = (rose.config_editor.WARNING_NOT_ENABLED +
                                 ', '.join(parents))
                     err_type = rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED
@@ -1059,15 +1049,14 @@ class ConfigDataManager(object):
                 file_sections.append(section)
         duplicate_file_sections = []
         for meta_id, sect_node in meta_config.value.items():
-            section, option = self.util.get_section_option_from_id(
-                                                                meta_id)
+            section, option = self.util.get_section_option_from_id(meta_id)
             if option is None:
                 if not isinstance(sect_node.value, dict):
                     continue
                 if not sect_node.is_ignored() and section.startswith("file:"):
                     file_sections.append(section)
                     if (sect_node.get_value([rose.META_PROP_DUPLICATE]) ==
-                        rose.META_PROP_VALUE_TRUE):
+                            rose.META_PROP_VALUE_TRUE):
                         duplicate_file_sections.append(section)
         # Remove metadata for individual duplicate sections - no need.
         for section in list(file_sections):
@@ -1080,8 +1069,7 @@ class ConfigDataManager(object):
         for setting_id, sect_node in meta_config.value.items():
             # The following 'wildcard-esque' id is an exception.
             # Wildcards are not supported in Rose metadata.
-            if (not sect_node.is_ignored() and
-                setting_id.startswith("file:*=")):
+            if not sect_node.is_ignored() and setting_id.startswith("file:*="):
                 file_ids.append(setting_id)
         for section in file_sections:
             title = meta_config.get_value([section, rose.META_PROP_TITLE])
@@ -1095,7 +1083,7 @@ class ConfigDataManager(object):
                         continue
                     prop_val = opt_node.value
                     new_id = section + '=' + file_entry.replace(
-                                                        'file:*=', '', 1)
+                        'file:*=', '', 1)
                     if meta_config.get([new_id, meta_prop]) is None:
                         meta_config.set([new_id, meta_prop], prop_val)
 
@@ -1105,8 +1093,7 @@ class ConfigDataManager(object):
         config_sections = self.config[config_name].sections
         config_vars = self.config[config_name].vars
         for section, variables in config_vars.foreach(from_saved):
-            if (only_this_section is not None and
-                section != only_this_section):
+            if only_this_section is not None and section != only_this_section:
                 continue
             for variable in variables:
                 self.load_ns_for_node(variable, config_name)
@@ -1129,7 +1116,7 @@ class ConfigDataManager(object):
         subspace = node.metadata.get(rose.META_PROP_NS)
         if subspace is None or option is None:
             new_namespace = self.helper.get_default_namespace_for_section(
-                                             section, config_name)
+                section, config_name)
         else:
             new_namespace = config_name + '/' + subspace
         if new_namespace == config_name + '/':
@@ -1227,7 +1214,8 @@ class ConfigDataManager(object):
                     if key == rose.META_PROP_MACRO:
                         macro_info = value
                         if key in ns_metadata:
-                            ns_metadata[rose.META_PROP_MACRO] += ", " + macro_info
+                            ns_metadata[rose.META_PROP_MACRO] += (
+                                ", " + macro_info)
                         else:
                             ns_metadata[rose.META_PROP_MACRO] = macro_info
                     else:
@@ -1237,22 +1225,19 @@ class ConfigDataManager(object):
             icon_path = self.helper.get_icon_path_for_config(config_name)
             self.namespace_meta_lookup.setdefault(config_name, {})
             self.namespace_meta_lookup[config_name].setdefault(
-                                                    "icon", icon_path)
+                "icon", icon_path)
             if self.config[config_name].config_type == rose.TOP_CONFIG_NAME:
                 self.namespace_meta_lookup[config_name].setdefault(
-                                    rose.META_PROP_TITLE,
-                                    rose.config_editor.TITLE_PAGE_SUITE)
+                    rose.META_PROP_TITLE,
+                    rose.config_editor.TITLE_PAGE_SUITE)
                 self.namespace_meta_lookup[config_name].setdefault(
-                                                  rose.META_PROP_SORT_KEY,
-                                                  " 1")
-            elif (self.config[config_name].config_type ==
-                      rose.INFO_CONFIG_NAME):
+                    rose.META_PROP_SORT_KEY, " 1")
+            elif self.config[config_name].config_type == rose.INFO_CONFIG_NAME:
                 self.namespace_meta_lookup[config_name].setdefault(
-                                    rose.META_PROP_TITLE,
-                                    rose.config_editor.TITLE_PAGE_INFO)
+                    rose.META_PROP_TITLE,
+                    rose.config_editor.TITLE_PAGE_INFO)
                 self.namespace_meta_lookup[config_name].setdefault(
-                                                  rose.META_PROP_SORT_KEY,
-                                                  " 0")
+                    rose.META_PROP_SORT_KEY, " 0")
 
     def load_namespace_has_sub_data(self, config_name=None):
         """Load namespace sub-data status."""
@@ -1273,11 +1258,11 @@ class ConfigDataManager(object):
             file_root_ns = alt_config_name + file_ns
             self.namespace_meta_lookup.setdefault(file_root_ns, {})
             self.namespace_meta_lookup[file_root_ns].setdefault(
-                                            "has_sub_data", True)
+                "has_sub_data", True)
         # Duplicate root pages have summary data for their members.
         for ns, prop_map in self.namespace_meta_lookup.items():
             if config_name is not None and not ns.startswith(config_name):
                 continue
             if (rose.META_PROP_DUPLICATE in prop_map and
-                ns_hierarchy.get(ns, [])):
+                    ns_hierarchy.get(ns, [])):
                 prop_map.setdefault("has_sub_data", True)

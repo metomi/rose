@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import multiprocessing
 import os
@@ -43,9 +43,9 @@ import rose.resource
 
 
 REC_HYPERLINK_ID_OR_URL = re.compile(
-                    r"""(?P<start_break>\b)
-                        (?P<url>[\w:-]+=\w+|https?://[^\s<]+)
-                        (?P<end_break>\b)""", re.X)
+    r"""(?P<start_break>\b)
+        (?P<url>[\w:-]+=\w+|https?://[^\s<]+)
+        (?P<end_break>\b)""", re.X)
 MARKUP_URL_HTML = (r"""\g<start_break>""" +
                    r"""<a href='\g<url>'>\g<url></a>""" +
                    r"""\g<end_break>""")
@@ -83,7 +83,7 @@ class CustomButton(gtk.Button):
                                    padding=5)
             else:
                 self.hbox.pack_start(self.label, expand=False, fill=False,
-                                   padding=5)
+                                     padding=5)
         if stock_id is not None:
             self.stock_id = stock_id
             self.icon = gtk.Image()
@@ -171,7 +171,7 @@ class CustomExpandButton(gtk.Button):
                                    padding=5)
             else:
                 self.hbox.pack_start(self.label, expand=False, fill=False,
-                                   padding=5)
+                                     padding=5)
         self.icon = gtk.Image()
         self.icon.set_from_stock(self.stock_id, size)
         self.icon.show()
@@ -488,7 +488,7 @@ class TooltipTreeView(gtk.TreeView):
         if path is None:
             return False
         if (path != self._last_tooltip_path or
-            column != self._last_tooltip_column):
+                column != self._last_tooltip_column):
             self._last_tooltip_path = path
             self._last_tooltip_column = column
             return False
@@ -538,8 +538,7 @@ class TreeModelSortUtil(object):
 
     def cmp_(self, value1, value2):
         """Perform a useful form of 'cmp'"""
-        if (isinstance(value1, basestring) and
-            isinstance(value2, basestring)):
+        if (isinstance(value1, basestring) and isinstance(value2, basestring)):
             if value1.isdigit() and value2.isdigit():
                 return cmp(float(value1), float(value2))
             return rose.config.sort_settings(value1, value2)
@@ -551,7 +550,7 @@ class TreeModelSortUtil(object):
         if id_ is None and order is None:
             return False
         if (self._sort_columns_stored and
-            self._sort_columns_stored[0][0] == id_):
+                self._sort_columns_stored[0][0] == id_):
             self._sort_columns_stored.pop(0)
         self._sort_columns_stored.insert(0, (id_, order))
         if len(self._sort_columns_stored) > 2:
@@ -598,8 +597,7 @@ def color_parse(color_specification):
     try:
         return gtk.gdk.color_parse(color_specification)
     except ValueError:
-        rose.reporter.Reporter().report(
-                ColourParseError(color_specification))
+        rose.reporter.Reporter().report(ColourParseError(color_specification))
         # Return a noticeable colour.
         return gtk.gdk.color_parse("#0000FF")  # Blue
 
@@ -619,12 +617,10 @@ def get_hyperlink_label(text, search_func=lambda i: False):
         except TypeError:  # No such signal before PyGTK 2.18
             label.connect("button-release-event",
                           lambda l, e: extract_link(l, search_func))
-            text = REC_HYPERLINK_ID_OR_URL.sub(
-                                        MARKUP_URL_UNDERLINE, text)
+            text = REC_HYPERLINK_ID_OR_URL.sub(MARKUP_URL_UNDERLINE, text)
             label.set_markup(text)
         else:
-            text = REC_HYPERLINK_ID_OR_URL.sub(
-                                        MARKUP_URL_HTML, text)
+            text = REC_HYPERLINK_ID_OR_URL.sub(MARKUP_URL_HTML, text)
             label.set_markup(text)
     return label
 
@@ -637,7 +633,7 @@ def get_icon(system="rose"):
         pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
     except Exception:
         icon_path = locator.locate(
-                            "etc/images/{0}-icon-trim.png".format(system))
+            "etc/images/{0}-icon-trim.png".format(system))
         pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
     return pixbuf
 
@@ -682,8 +678,8 @@ def setup_scheduler_icon(ipath=None):
     locator = rose.resource.ResourceLocator(paths=sys.path)
     iname = "rose-gtk-scheduler"
     if ipath is None:
-        new_icon_factory.add(iname, gtk.icon_factory_lookup_default(
-                                        gtk.STOCK_MISSING_IMAGE))
+        new_icon_factory.add(
+            iname, gtk.icon_factory_lookup_default(gtk.STOCK_MISSING_IMAGE))
     else:
         path = locator.locate(ipath)
         pixbuf = gtk.gdk.pixbuf_new_from_file(path)

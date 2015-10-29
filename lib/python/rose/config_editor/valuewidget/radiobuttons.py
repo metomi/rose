@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
@@ -60,7 +60,7 @@ class RadioButtonsValueWidget(gtk.HBox):
                                                use_underline=False)
                 radio_button.real_value = item
             if var_titles is not None and var_titles[k]:
-                radio_button.set_tooltip_text("("+item+")")
+                radio_button.set_tooltip_text("(" + item + ")")
             radio_button.set_active(False)
             if item == self.value:
                 radio_button.set_active(True)
@@ -76,7 +76,7 @@ class RadioButtonsValueWidget(gtk.HBox):
             radio_button.connect('focus-in-event',
                                  self.hook.trigger_scroll)
 
-        self.grab_focus = lambda : self.hook.get_focus(radio_button)
+        self.grab_focus = lambda: self.hook.get_focus(radio_button)
         if len(var_values) == 1 and self.value == var_values[0]:
             radio_button.set_sensitive(False)
 

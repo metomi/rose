@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Rosie discovery service.
 
 Classes:
@@ -80,7 +80,7 @@ class RosieDiscoService(object):
         self.prefix = prefix
         source_option = "prefix-web." + self.prefix
         source_url_node = ResourceLocator.default().get_conf().get(
-                                          ["rosie-id", source_option])
+            ["rosie-id", source_option])
         self.source_url = ""
         if source_url_node is not None:
             self.source_url = source_url_node.value
@@ -151,15 +151,15 @@ class RosieDiscoService(object):
                 item["href"] = suite_id.to_web()
         template = self.template_env.get_template("prefix-index.html")
         return template.render(
-                        script=cherrypy.request.script_name,
-                        prefix=self.prefix,
-                        prefix_source_url=self.source_url,
-                        known_keys=self.dao.get_known_keys(),
-                        query_operators=self.dao.get_query_operators(),
-                        all_revs=all_revs,
-                        filters=filters,
-                        s=s,
-                        data=data)
+            script=cherrypy.request.script_name,
+            prefix=self.prefix,
+            prefix_source_url=self.source_url,
+            known_keys=self.dao.get_known_keys(),
+            query_operators=self.dao.get_query_operators(),
+            all_revs=all_revs,
+            filters=filters,
+            s=s,
+            data=data)
 
 
 def _query_parse_string(q_str):
@@ -177,7 +177,7 @@ def _query_parse_string(q_str):
     filt.extend([key, operator])
     last_groups = value.rsplit(" ", 1)
     if (len(last_groups) > 1 and last_groups[1] and
-        all([s == ")" for s in last_groups[1]])):
+            all([s == ")" for s in last_groups[1]])):
         filt.extend(last_groups)
     else:
         filt.extend([value])

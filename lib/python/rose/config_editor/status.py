@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import datetime
 import sys
@@ -66,7 +66,8 @@ class StatusReporter(rose.reporter.Reporter):
             return self._load_updater.update(str(message), **message_kwargs)
         return self._status_bar_update_func(message, kind, level)
 
-    def report_load_event(self, text, no_progress=False, new_total_events=None):
+    def report_load_event(
+            self, text, no_progress=False, new_total_events=None):
         """Report a load-related event (to rose.gtk.util.SplashScreen)."""
         event = rose.reporter.Event(text,
                                     kind=self.EVENT_KIND_LOAD,
@@ -141,15 +142,15 @@ class StatusBar(gtk.VBox):
         self._error_widget.show()
         locator = rose.resource.ResourceLocator(paths=sys.path)
         icon_path = locator.locate(
-                            'etc/images/rose-config-edit/error_icon.xpm')
+            'etc/images/rose-config-edit/error_icon.xpm')
         image = gtk.image_new_from_file(icon_path)
         image.show()
         self._error_widget.pack_start(image, expand=False, fill=False)
         self._error_widget_label = gtk.Label()
         self._error_widget_label.show()
-        self._error_widget.pack_start(self._error_widget_label, expand=False,
-                                      fill=False,
-                                      padding=rose.config_editor.SPACING_SUB_PAGE)
+        self._error_widget.pack_start(
+            self._error_widget_label, expand=False, fill=False,
+            padding=rose.config_editor.SPACING_SUB_PAGE)
         self._update_error_widget()
 
     def _generate_message_widget(self):
@@ -160,22 +161,22 @@ class StatusBar(gtk.VBox):
         message_hbox.show()
         self._message_widget.add(message_hbox)
         self._message_widget.connect("enter-notify-event",
-                                           self._handle_enter_message_widget)
+                                     self._handle_enter_message_widget)
         self._message_widget_error_image = gtk.image_new_from_stock(
-                                                     gtk.STOCK_DIALOG_ERROR,
-                                                     gtk.ICON_SIZE_MENU)
+            gtk.STOCK_DIALOG_ERROR,
+            gtk.ICON_SIZE_MENU)
         self._message_widget_info_image = gtk.image_new_from_stock(
-                                                    gtk.STOCK_DIALOG_INFO,
-                                                    gtk.ICON_SIZE_MENU)
+            gtk.STOCK_DIALOG_INFO,
+            gtk.ICON_SIZE_MENU)
         self._message_widget_label = gtk.Label()
         self._message_widget_label.show()
         vsep = gtk.VSeparator()
         vsep.show()
         self._console_launcher = rose.gtk.util.CustomButton(
-                      stock_id=gtk.STOCK_INFO,
-                      size=gtk.ICON_SIZE_MENU,
-                      tip_text=rose.config_editor.STATUS_BAR_CONSOLE_TIP,
-                      as_tool=True)
+            stock_id=gtk.STOCK_INFO,
+            size=gtk.ICON_SIZE_MENU,
+            tip_text=rose.config_editor.STATUS_BAR_CONSOLE_TIP,
+            as_tool=True)
         self._console_launcher.connect("clicked", self._launch_console)
         style = gtk.RcStyle()
         style.xthickness = 0
@@ -183,20 +184,20 @@ class StatusBar(gtk.VBox):
         setattr(style, "inner-border", [0, 0, 0, 0])
         self._console_launcher.modify_style(style)
         message_hbox.pack_start(
-                     self._message_widget_error_image,
-                     expand=False, fill=False)
+            self._message_widget_error_image,
+            expand=False, fill=False)
         message_hbox.pack_start(
-                     self._message_widget_info_image,
-                     expand=False, fill=False)
+            self._message_widget_info_image,
+            expand=False, fill=False)
         message_hbox.pack_start(
-                     self._message_widget_label,
-                     expand=False, fill=False,
-                     padding=rose.config_editor.SPACING_SUB_PAGE)
-        message_hbox.pack_start(vsep, expand=False, fill=False,
-                     padding=rose.config_editor.SPACING_SUB_PAGE)
+            self._message_widget_label,
+            expand=False, fill=False,
+            padding=rose.config_editor.SPACING_SUB_PAGE)
         message_hbox.pack_start(
-                     self._console_launcher,
-                     expand=False, fill=False)
+            vsep, expand=False, fill=False,
+            padding=rose.config_editor.SPACING_SUB_PAGE)
+        message_hbox.pack_start(
+            self._console_launcher, expand=False, fill=False)
 
     def _update_error_widget(self):
         # Update the error display widget.
@@ -222,7 +223,7 @@ class StatusBar(gtk.VBox):
             else:
                 prefix = rose.reporter.Reporter.PREFIX_INFO
             suffix = datetime.datetime.fromtimestamp(message_time).strftime(
-                                       rose.config_editor.EVENT_TIME)
+                rose.config_editor.EVENT_TIME)
             tooltip_text += prefix + " " + message_text + " " + suffix + "\n"
         tooltip_text = tooltip_text.rstrip()
         self._message_widget_label.set_tooltip_text(tooltip_text)
@@ -250,10 +251,10 @@ class StatusBar(gtk.VBox):
         info_category = rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_INFO
         window = self.get_toplevel()
         self.console = rose.gtk.console.ConsoleWindow(
-                            [err_category, info_category], message_tuples,
-                            [gtk.STOCK_DIALOG_ERROR, gtk.STOCK_DIALOG_INFO],
-                            parent=window,
-                            destroy_hook=self._handle_destroy_console)
+            [err_category, info_category], message_tuples,
+            [gtk.STOCK_DIALOG_ERROR, gtk.STOCK_DIALOG_INFO],
+            parent=window,
+            destroy_hook=self._handle_destroy_console)
 
     def _update_console(self):
         if self.console is not None:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Compress archive sources in tar."""
 
 import os
@@ -44,9 +44,9 @@ class RoseArchTarGzip(object):
         sources = target.sources.values()
         scheme = target.compress_scheme
         if (len(sources) == 1 and
-            sources[0].path.endswith("." + target.compress_scheme)):
+                sources[0].path.endswith("." + target.compress_scheme)):
             target.work_source_path = sources[0].path
-            return # Assume that it has been done
+            return  # Assume that it has been done
         fd, tar_name = mkstemp(suffix=".tar", dir=work_dir)
         os.close(fd)
         target.work_source_path = tar_name

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
@@ -52,10 +52,10 @@ class BoolToggleValueWidget(gtk.HBox):
             self.allowed_values = [rose.TYPE_LOGICAL_VALUE_FALSE,
                                    rose.TYPE_LOGICAL_VALUE_TRUE]
             self.label_dict = {
-                       rose.TYPE_LOGICAL_VALUE_FALSE:
-                       rose.TYPE_LOGICAL_FALSE_TITLE,
-                       rose.TYPE_LOGICAL_VALUE_TRUE:
-                       rose.TYPE_LOGICAL_TRUE_TITLE}
+                rose.TYPE_LOGICAL_VALUE_FALSE:
+                rose.TYPE_LOGICAL_FALSE_TITLE,
+                rose.TYPE_LOGICAL_VALUE_TRUE:
+                rose.TYPE_LOGICAL_TRUE_TITLE}
 
         imgs = [gtk.image_new_from_stock(gtk.STOCK_MEDIA_STOP,
                                          gtk.ICON_SIZE_MENU),
@@ -74,7 +74,7 @@ class BoolToggleValueWidget(gtk.HBox):
         self.button.connect('toggled', self._switch_state_and_set)
         self.button.show()
         self.pack_start(self.button, expand=False, fill=False)
-        self.grab_focus = lambda : self.hook.get_focus(self.button)
+        self.grab_focus = lambda: self.hook.get_focus(self.button)
         self.button.connect('focus-in-event', self.hook.trigger_scroll)
 
     def _switch_state_and_set(self, widget):

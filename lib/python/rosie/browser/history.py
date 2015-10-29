@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import ast
 import os
@@ -31,7 +31,7 @@ class HistoryManager():
     def __init__(self, hist_path=None, hist_length=rosie.browser.SIZE_HISTORY):
         self.archive = []
         self.session_log = []
-        if hist_path != None:
+        if hist_path is not None:
             self.hist_path = os.path.expanduser(hist_path)
         else:
             self.hist_path = os.path.expanduser(rosie.browser.HISTORY_LOCATION)
@@ -210,7 +210,7 @@ class HistoryIO():
 
                 details = ""
 
-                for i in range(1,len(entry)-1):
+                for i in range(1, len(entry) - 1):
                     details = details + str(entry[i])
                     if i < (len(entry) - 2):
                         details = details + ","
@@ -225,7 +225,7 @@ class HistoryIO():
 
     def write_history(self, archive=False):
         """Write out the search history."""
-        if archive != False:
+        if archive:
             f = open(self.hist_path, 'w')
             for i, h in enumerate(archive):
                 if i < self.timescale and h.h_type != "home":
