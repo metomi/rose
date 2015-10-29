@@ -83,16 +83,16 @@
         <li>A Rose suite is a collection of scientific task configurations (or
         'applications') with a <q>common purpose</q><!-- (Hilary) -->.</li>
 
-        <li>Cylc is a suite engine that drives task submission and
+        <li>cylc is a suite engine that drives task submission and
         monitoring.</li>
       </ul>
     </div>
 
     <div class="slide">
-      <h3>That's too abstract - what's Cylc again?</h3>
+      <h3>That's too abstract - what's cylc again?</h3>
 
       <ul class="incremental">
-        <li>Cylc makes your Rose stuff happen.</li>
+        <li>cylc makes your Rose stuff happen.</li>
       </ul>
     </div>
 
@@ -102,9 +102,9 @@
       <p>What does this cover?</p>
 
       <ul class="incremental">
-        <li>Cylc background and philosophy</li>
+        <li>cylc background and philosophy</li>
 
-        <li>Cylc basic usage</li>
+        <li>cylc basic usage</li>
 
         <li>basic suite design</li>
       </ul>
@@ -128,7 +128,7 @@
     <div class="slide">
       <h3 class="alwayshidden">Background - NIWA</h3>
 
-      <p>Cylc was originally developed by <a href=
+      <p>cylc was originally developed by <a href=
       "https://github.com/hjoliver">Hilary Oliver</a> at <a href=
       "http://www.niwa.co.nz/">NIWA</a>. It runs their <a href=
       "http://ecoconnect.niwa.co.nz/">EcoConnect</a> operational
@@ -136,7 +136,7 @@
       "http://cylc.github.io/cylc/graphics/png/scaled/niwa-colour-small.png"
       alt="NIWA logo" />
 
-      <p>Cylc was developed to provide a fast, automated way of scheduling
+      <p>cylc was developed to provide a fast, automated way of scheduling
       tasks so that a suite could <em>catch up</em> after outages.</p>
     </div>
 
@@ -148,14 +148,14 @@
     <div class="slide">
       <h3>Background - Current</h3>
 
-      <p>Cylc is now a collaborative effort, involving the Met Office.</p>
+      <p>cylc is now a collaborative effort, involving the Met Office.</p>
 
-      <p>Cylc is written in <a href="www.python.org">Python</a> and uses
+      <p>cylc is written in <a href="www.python.org">Python</a> and uses
       <a href="www.pygtk.org">PyGTK</a> for its GUIs. It is open source and
       licensed under <a href="http://www.gnu.org/licenses/gpl.html">GPL
       v3</a>.</p>
 
-      <p>Cylc lives on <a href="http://github.com/cylc/">github</a>.</p>
+      <p>cylc lives on <a href="http://github.com/cylc/">github</a>.</p>
     </div>
 
     <div class="slide">
@@ -200,7 +200,7 @@
     <div class="slide">
       <h2 id="suite-rc">The suite.rc File</h2>
 
-      <p>Cylc has a single file to configure the suite, the
+      <p>cylc has a single file to configure the suite, the
       <samp>suite.rc</samp> file. It configures:</p>
 
       <ul class="incremental">
@@ -215,7 +215,7 @@
     <div class="slide">
       <h3 id="suite-rc-format">Format</h3>
 
-      <p>Cylc uses a nested INI-based configuration format that looks like
+      <p>cylc uses a nested INI-based configuration format that looks like
       this:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]                     # Scheduling section
@@ -229,7 +229,7 @@
     </div>
 
     <div class="slide">
-      <h2 id="hello-world">Hello World Cylc Suite</h2>
+      <h2 id="hello-world">Hello World cylc suite</h2>
 
       <p>A simple cylc suite has a single <samp>suite.rc</samp> file that looks
       like this:</p>
@@ -247,7 +247,7 @@
     </div>
 
     <div class="slide">
-      <h3 id="hello-world-demo">Demoing the Hello World Cylc Suite</h3>
+      <h3 id="hello-world-demo">Demoing the Hello World cylc suite</h3>
 
       <p>Demo this by creating and running the simple cylc suite:</p>
       <pre class="prettyprint lang_sh">
@@ -427,7 +427,7 @@ default=echo 'Hello World'
     <div class="slide">
       <h2 id="multiple-inheritance">Multiple Family Inheritance</h2>
 
-      <p>Cylc supports multiple inheritance, so tasks can combine useful
+      <p>cylc supports multiple inheritance, so tasks can combine useful
       configuration from more than one separate family. If you set up families
       like this:</p>
       <pre class="prettyprint lang-cylc">
@@ -511,7 +511,7 @@ default=echo 'Hello World'
     <div class="slide">
       <h2 id="jinja2">Jinja2</h2>
 
-      <p>Cylc uses a templating language called Jinja2 that you can use to
+      <p>cylc uses a templating language called Jinja2 that you can use to
       collapse duplicated portions of configuration or insert settings.</p>
 
       <p>This means that you can embed special instruction code in the
@@ -715,7 +715,7 @@ type=boolean
     <div class="slide">
       <h3 class="alwayshidden">Job Submission Methods</h3>
 
-      <p>Cylc supports the following job submission methods (potentially more
+      <p>cylc supports the following job submission methods (potentially more
       later):</p>
 
       <ul class="incremental">

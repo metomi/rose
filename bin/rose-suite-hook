@@ -26,7 +26,7 @@
 #     rose task-hook [OPTIONS] EVENT SUITE TASK_ID MSG
 #
 # DESCRIPTION
-#     Provide a common event hook for Cylc suites and tasks.
+#     Provide a common event hook for cylc suites and tasks.
 #     * (Task event only) Retrieve remote task logs back to server host.
 #     * Email user if --mail specified.
 #     * Shutdown suite if --shutdown specified.
