@@ -92,7 +92,7 @@ class CylcProcessor(SuiteEngineProcessor):
     SUITE_DB = "cylc-suite.db"
     SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
-    TIMEOUT = 8  # seconds
+    TIMEOUT = 60  # seconds
 
     def __init__(self, *args, **kwargs):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
