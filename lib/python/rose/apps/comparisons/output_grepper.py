@@ -25,7 +25,8 @@ import re
 REGEXPS = {
     'um_wallclock': r"Maximum Elapsed Wallclock Time:\s*(\S+)",
     'um_initial_norms': r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
-    'um_final_norms': r"Final\s*Absolute\s*Norm\s*:\s*(\S+)"}
+    'um_final_norms': r"Final\s*Absolute\s*Norm\s*:\s*(\S+)",
+}
 
 
 class OutputGrepper(object):
