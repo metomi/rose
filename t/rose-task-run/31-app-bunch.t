@@ -126,5 +126,5 @@ file_grep $TEST_KEY_PREFIX-ran-$NAME \
     "\[OK\] $NAME" $FILE
 done
 #-------------------------------------------------------------------------------
-#rose suite-clean -q -y $NAME
+rose suite-clean -q -y $NAME
 exit 0
