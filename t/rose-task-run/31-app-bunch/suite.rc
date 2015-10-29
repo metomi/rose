@@ -31,5 +31,9 @@
     [[bunch_incremental]]
         inherit = BUNCH_TASKS
         retry delays = 0.01
+    [[bunch_bigpop]]
+        inherit = BUNCH_TASKS
+    [[bunch_names]]
+        inherit = BUNCH_TASKS
     [[dummy]]
         command scripting = true

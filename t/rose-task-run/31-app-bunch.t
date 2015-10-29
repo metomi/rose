@@ -69,19 +69,19 @@ file_grep_fail $TEST_KEY_PREFIX-no-run \
     "\[INFO\] Adding command 2 to pool: banana" $FILE
 FILE=$LOG_DIR/$APP/NN/job.err
 file_grep $TEST_KEY_PREFIX-record-error \
-    "\[WARN\] Command 1 failed with return code 1" $FILE
+    "\[FAIL\] 1 # return-code=1" $FILE
 #-------------------------------------------------------------------------------
 # Testing incremental mode
 #-------------------------------------------------------------------------------
 APP=bunch_incremental
 #-------------------------------------------------------------------------------
 TEST_KEY_PREFIX=incremental
-FILE=$LOG_DIR/$APP/01/job.err
 #-------------------------------------------------------------------------------
 # First run files
 #-------------------------------------------------------------------------------
+FILE=$LOG_DIR/$APP/01/job.err
 file_grep $TEST_KEY_PREFIX-record-error \
-    "\[WARN\] Command 1 failed with return code 1" $FILE
+    "\[FAIL\] 1 # return-code=1" $FILE
 FILE=$LOG_DIR/$APP/01/job.out
 file_grep $TEST_KEY_PREFIX-ran-0 \
     "\[INFO\] Adding command 0 to pool: true" $FILE
@@ -96,7 +96,7 @@ FILE=$LOG_DIR/$APP/02/job.out
 file_grep_fail $TEST_KEY_PREFIX-not-ran-0 \
     "\[INFO\] Adding command 0 to pool: true" $FILE
 file_grep $TEST_KEY_PREFIX-skip-0 \
-    "\[SKIP\] Skipping 0: previously ran and succeeded" $FILE
+    "\[SKIP\] 0: previously ran and succeeded" $FILE
 file_grep $TEST_KEY_PREFIX-reran-1 \
     "\[INFO\] Adding command 1 to pool: false" $FILE
 file_grep_fail $TEST_KEY_PREFIX-not-ran-2 \
@@ -104,5 +104,14 @@ file_grep_fail $TEST_KEY_PREFIX-not-ran-2 \
 file_grep $TEST_KEY_PREFIX-skip-2 \
     "\[SKIP\] 2: previously ran and succeeded" $FILE
 #-------------------------------------------------------------------------------
+# Testing works ok with double digit population size
+#-------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------
+# Testing names works ok
+#-------------------------------------------------------------------------------
+
+
 #rose suite-clean -q -y $NAME
 exit 0

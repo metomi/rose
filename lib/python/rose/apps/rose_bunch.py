@@ -23,15 +23,13 @@
 import os
 import shlex
 import sqlite3
-from multiprocessing import Pool
 from time import sleep
 
-from rose.env import env_var_process
 from rose.app_run import (
     BuiltinApp,
     ConfigValueError,
     CompulsoryConfigValueError)
-from rose.popen import RosePopener
+from rose.popen import RosePopenError
 import rose.job_runner
 from rose.reporter import Event
 
@@ -45,17 +43,6 @@ class AbortEvent(Event):
 
     def __str__(self):
         return "Closing task pool, no further commands will be run."
-
-
-class FailEvent(Event):
-
-    """An event used to report failure of a task in the pool."""
-
-    KIND = Event.KIND_ERR
-
-    def __str__(self):
-        name, rc = self.args
-        return "Command %s failed with return code %s" % (name, rc)
 
 
 class LaunchEvent(Event):
@@ -181,29 +168,32 @@ class RoseBunchApp(BuiltinApp):
                                    "reserved keyword")
 
         # Set up command-instances if needed
-        instances = conf_tree.node.get_value([self.BUNCH_SECTION, "command-instances"])
+        instances = conf_tree.node.get_value([self.BUNCH_SECTION,
+                                              "command-instances"])
 
         if instances:
             try:
                 instances = range(int(instances))
             except ValueError as err:
-                raise ConfigValueError([self.BUNCH_SECTION, "command-instances"],
+                raise ConfigValueError([self.BUNCH_SECTION,
+                                        "command-instances"],
                                        instances,
                                        "not an integer value")
             if arglength != len(instances):
-                raise ConfigValueError([self.BUNCH_SECTION, "command-instances"],
+                raise ConfigValueError([self.BUNCH_SECTION,
+                                        "command-instances"],
                                        instances,
                                        "inconsitent arg lengths")
 
         # Set max number of processes to run at once
-        max_procs = int(conf_tree.node.get_value(
-                                        [self.BUNCH_SECTION, "pool-size"]))
+        max_procs = conf_tree.node.get_value([self.BUNCH_SECTION, "pool-size"])
+
         if max_procs:
             self.MAX_PROCS = int(max_procs)
         else:
             self.MAX_PROCS = arglength
 
-        if self.incremental:
+        if self.incremental == "true":
             self.dao = RoseBunchDAO(conf_tree)
         else:
             self.dao = None
@@ -233,7 +223,8 @@ class RoseBunchApp(BuiltinApp):
                     if proc.returncode:
                         failed[key] = proc.returncode
                         app_runner.handle_event(
-                                        FailEvent(key, proc.returncode))
+                                        RosePopenError(str(key), proc.returncode,
+                                                       None, None))
                         if self.dao:
                             self.dao.update_command_state(key, self.dao.S_FAIL)
                         if self.fail_mode == self.TYPE_ABORT_ON_FAIL:
@@ -329,6 +320,7 @@ class RoseBunchDAO(object):
 
     def __init__(self, config):
         self.conn = None
+        self.new_run = True
         self.db_file_name = os.path.abspath(self.FILE_NAME)
         self.connect()
         self.create_tables()
@@ -444,12 +436,10 @@ class RoseBunchDAO(object):
         for key, value in self.conn.execute(s_stmt):
             if key in current:
                 if current[key] != value:
-                    no_change = False
                     break
                 else:
                     current.pop(key)
             else:
-                no_change = False
                 break
         # If the two configs match there should be no entries left
         if current:
