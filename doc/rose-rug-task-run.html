@@ -720,7 +720,7 @@ source=stuffing-*.txt
       <dt><kbd>command-format=FORMAT</kbd></dt>
 
       <dd>Compulsory. A Pythonic <code>printf</code> style format string to
-      construct the commands to run. Insert placeholders <var>%(ARGNAME)s</var>
+      construct the commands to run. Insert placeholders <var>%(argname)s</var>
       for substitution of the arguments specified under <kbd>[bunch-args]</kbd>
       to the invoked command. The placeholder <var>%(instances)s</var> is
       reserved for inserting an automatically generated index for the command
@@ -746,9 +746,11 @@ source=stuffing-*.txt
       <dd>Optional (default=continue). Specify what action you want the job to
       take on failure of a command it is trying to run. If set to
       <var>continue</var> it will run all command variants . If set to
-      <var>abort</var> then on failure of on of the command variants it will
+      <var>abort</var> then on failure of one of the command variants it will
       stop trying to run any new variants N.B. the job will wait for any
-      already running commands to finish before exiting.</dd>
+      already running commands to finish before exiting. Commands that won't be
+      run due to aborting will be reported in the job output with a
+      <var>[SKIP]</var> prefix when running in verbose mode.</dd>
 
       <dt><kbd>incremental=true|false</kbd></dt>
 
@@ -756,7 +758,9 @@ source=stuffing-*.txt
       commands will be re-run on retrying running of the job. If any changes
       are made to the configuration being run then all variants will be re-run.
       Similarly, running the app with the <kbd>--new</kbd> option to <kbd>rose
-      task-run</kbd> will result in all commands being run.</dd>
+      task-run</kbd> will result in all commands being run. In verbose mode the
+      app will report commands that won't be run due to previous successes in
+      the job output with a <var>[PASS]</var> prefix.</dd>
 
       <dt><kbd>names=name1 name2 ...</kbd></dt>
 

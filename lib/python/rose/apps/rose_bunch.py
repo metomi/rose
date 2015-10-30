@@ -53,7 +53,7 @@ class LaunchEvent(Event):
 
     def __str__(self):
         name, cmd = self.args
-        return "Adding command %s to pool: %s" % (name, cmd)
+        return "%s: added to pool\n\t%s" % (name, cmd)
 
 
 class SucceededEvent(Event):
@@ -68,15 +68,15 @@ class SucceededEvent(Event):
         return " %s " % (name)
 
 
-class SkippingEvent(Event):
+class PreviousSuccessEvent(Event):
 
-    """Event raised when a command is skipped in incremental mode"""
+    """Event raised when a command is not run in incremental mode"""
     LEVEL = Event.V
     KIND = Event.KIND_OUT
 
     def __str__(self):
         name = self.args
-        return " %s: previously ran and succeeded" % (name)
+        return " %s" % (name)
 
 
 class NotRunEvent(Event):
@@ -87,7 +87,7 @@ class NotRunEvent(Event):
 
     def __str__(self):
         name, cmd = self.args
-        return " Not run %s: %s " % (name, cmd)
+        return " %s: %s" % (name, cmd)
 
 
 class RoseBunchApp(BuiltinApp):
@@ -103,7 +103,8 @@ class RoseBunchApp(BuiltinApp):
     TYPE_CONTINUE_ON_FAIL = "continue"
     FAIL_MODE_TYPES = [TYPE_CONTINUE_ON_FAIL, TYPE_ABORT_ON_FAIL]
     PREFIX_OK = "[OK]"
-    PREFIX_SKIP = "[SKIP]"
+    PREFIX_PASS = "[PASS]"
+    PREFIX_NOTRUN = "[SKIP]"
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """ Run multiple instaces of a command using sets of specified args"""
@@ -244,8 +245,8 @@ class RoseBunchApp(BuiltinApp):
 
                 if self.dao:
                     if self.dao.check_has_succeeded(key):
-                        app_runner.handle_event(SkippingEvent(key),
-                                                prefix=self.PREFIX_SKIP)
+                        app_runner.handle_event(PreviousSuccessEvent(key),
+                                                prefix=self.PREFIX_PASS)
                         continue
                     else:
                         self.dao.add_command(key)
@@ -262,7 +263,7 @@ class RoseBunchApp(BuiltinApp):
             for key in self.invocation_names:
                 cmd = commands.pop(key).get_command()
                 app_runner.handle_event(NotRunEvent(key, cmd),
-                                        prefix=self.PREFIX_SKIP)
+                                        prefix=self.PREFIX_NOTRUN)
 
         if self.dao:
             self.dao.close()

@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 39
+tests 40
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -46,7 +46,7 @@ FILE=$LOG_DIR/$APP/NN/job.out
 for ARGVALUE in 0 1 2 3; do
     TEST_KEY=$TEST_KEY_PREFIX-$ARGVALUE
     file_grep $TEST_KEY \
-    "\[INFO\] Adding command $ARGVALUE to pool: echo arg1: $(expr $ARGVALUE + 1)"\
+    "\[INFO\] $ARGVALUE: added to pool"\
      $FILE
 done
 #-------------------------------------------------------------------------------
@@ -67,6 +67,8 @@ TEST_KEY_PREFIX=abort-on-fail
 FILE=$LOG_DIR/$APP/NN/job.out
 file_grep_fail $TEST_KEY_PREFIX-no-run \
     "\[INFO\] Adding command 2 to pool: banana" $FILE
+file_grep $TEST_KEY_PREFIX-skip \
+    "\[SKIP\] 2: banana" $FILE
 FILE=$LOG_DIR/$APP/NN/job.err
 file_grep $TEST_KEY_PREFIX-record-error \
     "\[FAIL\] 1 # return-code=1" $FILE
@@ -84,25 +86,25 @@ file_grep $TEST_KEY_PREFIX-record-error \
     "\[FAIL\] 1 # return-code=1" $FILE
 FILE=$LOG_DIR/$APP/01/job.out
 file_grep $TEST_KEY_PREFIX-ran-0 \
-    "\[INFO\] Adding command 0 to pool: true" $FILE
+    "\[INFO\] 0: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-ran-1 \
-    "\[INFO\] Adding command 1 to pool: false" $FILE
+    "\[INFO\] 1: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-ran-2 \
-    "\[INFO\] Adding command 2 to pool: true" $FILE
+    "\[INFO\] 2: added to pool" $FILE
 #-------------------------------------------------------------------------------
 # Second run files
 #-------------------------------------------------------------------------------
 FILE=$LOG_DIR/$APP/02/job.out
 file_grep_fail $TEST_KEY_PREFIX-not-ran-0 \
-    "\[INFO\] Adding command 0 to pool: true" $FILE
+    "\[INFO\] 0: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-skip-0 \
-    "\[SKIP\] 0: previously ran and succeeded" $FILE
+    "\[PASS\] 0" $FILE
 file_grep $TEST_KEY_PREFIX-reran-1 \
-    "\[INFO\] Adding command 1 to pool: false" $FILE
+    "\[INFO\] 1: added to pool" $FILE
 file_grep_fail $TEST_KEY_PREFIX-not-ran-2 \
-    "\[INFO\] Adding command 2 to pool: true" $FILE
+    "\[INFO\] 2: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-skip-2 \
-    "\[SKIP\] 2: previously ran and succeeded" $FILE
+    "\[PASS\] 2" $FILE
 #-------------------------------------------------------------------------------
 # Testing works ok with double digit population size
 #-------------------------------------------------------------------------------
