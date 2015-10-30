@@ -150,7 +150,8 @@ meta/                   # Metadata for the Rose suite configuration:
         <li>See <a href="rose-configuration.html#format">Configuration
         Format</a>.</li>
 
-        <li>modified INI format:
+        <li>modified <a href="https://en.wikipedia.org/wiki/INI_file">INI
+        format</a>:
           <pre class="prettyprint lang-rose_conf">
 [command]
 default=hello.exe
@@ -414,7 +415,7 @@ source=svn://host/nice_things_svn/trunk/icecreams.dat@100
 
       <p>You can find out more at the <a href=
       "rose-configuration.html#appendix-file-creation-mode">File Creation
-      Reference Page</a>.</p>
+      Reference</a>.</p>
     </div>
 
     <div class="slide">
@@ -535,7 +536,8 @@ rose config --meta env=SPAM_NUMBER help
       <h3 class="alwayshidden">Other Useful Commands (2)</h3>
 
       <p>See the <a href="rose-command.html">CLI documentation</a> for details
-      of further options.</p>
+      of further options and the <a href="rose-quick-ref.html">Quick
+      Reference</a> for a list of commonly used Rose commands.</p>
     </div>
 
     <div class="slide">
@@ -559,14 +561,19 @@ rose config --meta env=SPAM_NUMBER help
 
       <p>However, when proposing or testing changes to a suite, it's usually
       better to use a branch (<code>fcm branch-create</code>).</p>
+
+      <p>To examine the ancestry of a suite - what suite it was copied from and
+      what suites have been copied from it - you can use <code>rosie graph
+      SUITEID</code> to get a graphical view.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Suite Version Control - config edit</h3>
 
-      <p>The config editor does not interface with Subversion/FCM - saving
-      changes purely modifies your working copy, just like a text editor.
-      Changes should be committed from the command line.</p>
+      <p>The config editor <strong>does not</strong> interface with
+      Subversion/FCM - saving changes purely modifies your working copy, just
+      like a text editor. Changes should be committed from the command line
+      using FCM commands.</p>
     </div>
 
     <div class="slide">

@@ -23,16 +23,16 @@
 # SYNOPSIS
 #     rose suite-restart [OPTIONS] [[--] CYLC-RESTART-ARGS]
 #
-#     # Restart Cylc suite with name equal to basename of $PWD.
+#     # Restart cylc suite with name equal to basename of $PWD.
 #     rose suite-restart
 #
-#     # Restart Cylc suite NAME
+#     # Restart cylc suite NAME
 #     rose suite-restart --name=NAME
 #
-#     # Restart Cylc suite NAME with a given state dump
+#     # Restart cylc suite NAME with a given state dump
 #     rose suite-restart --name=NAME -- state.20141118T161121.195326Z
 #
-#     # Restart Cylc suite NAME on given host
+#     # Restart cylc suite NAME on given host
 #     rose suite-restart --name=NAME --host=my-suite-host
 #
 # DESCRIPTION
@@ -48,7 +48,7 @@
 #     --host=HOST
 #         Specify a host for restarting the suite.
 #     --name=NAME, -n NAME
-#         Specify the suite NAME in Cylc, instead of using the basename of the
+#         Specify the suite NAME in cylc, instead of using the basename of the
 #         current working directory.
 #     --no-gcontrol
 #         Do not run "cylc gui". Default is to run "cylc gui" if the suite is
