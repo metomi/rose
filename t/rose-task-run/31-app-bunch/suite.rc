@@ -2,13 +2,13 @@
 [cylc]
     UTC mode=True
     [[event hooks]]
-        timeout handler=rose suite-hook --shutdown
-        timeout=1
+        timeout handler = rose suite-hook --shutdown
+        timeout         = PT1M
 [scheduling]
-    initial cycle point=2010010000
-    final cycle point=2010010000
+    initial cycle point = 20100101T00Z
+    final cycle point   = 20100101T00Z
     [[dependencies]]
-        [[[ 00 ]]]
+        [[[ T00 ]]]
             graph="""BUNCH_TASKS:finish-all => dummy
                      dummy => !BUNCH_TASKS"""
 
@@ -16,13 +16,13 @@
     [[root]]
         command scripting=rose task-run -v -v --debug
         [[[event hooks]]]
-            succeeded handler=rose suite-hook
-            failed handler=rose suite-hook
-            submission failed handler=rose suite-hook --shutdown
-            submission timeout handler=rose suite-hook
-            execution timeout handler=rose suite-hook
-            submission timeout=1
-            execution timeout=1
+            succeeded handler          = rose suite-hook
+            failed handler             = rose suite-hook
+            submission failed handler  = rose suite-hook --shutdown
+            submission timeout handler = rose suite-hook
+            execution timeout handler  = rose suite-hook
+            submission timeout         = PT1M
+            execution timeout          = PT1M
     [[BUNCH_TASKS]]
     [[bunch]]
         inherit = BUNCH_TASKS
@@ -30,7 +30,7 @@
         inherit = BUNCH_TASKS
     [[bunch_incremental]]
         inherit = BUNCH_TASKS
-        retry delays = 0.01
+        retry delays = PT1S
     [[bunch_bigpop]]
         inherit = BUNCH_TASKS
     [[bunch_names]]

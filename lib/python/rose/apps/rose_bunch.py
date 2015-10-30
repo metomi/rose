@@ -105,13 +105,12 @@ class RoseBunchApp(BuiltinApp):
     PREFIX_OK = "[OK]"
     PREFIX_SKIP = "[SKIP]"
 
-
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """ Run multiple instaces of a command using sets of specified args"""
 
         # Allow naming of individual calls
-        self.invocation_names = conf_tree.node.get_value(
-                                            [self.BUNCH_SECTION, "names"])
+        self.invocation_names = conf_tree.node.get_value([self.BUNCH_SECTION,
+                                                         "names"])
         if self.invocation_names:
             self.invocation_names = shlex.split(self.invocation_names)
             if len(set(self.invocation_names)) != len(self.invocation_names):
@@ -120,8 +119,8 @@ class RoseBunchApp(BuiltinApp):
                                        "names must be unique")
 
         self.fail_mode = conf_tree.node.get_value([self.BUNCH_SECTION,
-                                              "fail-mode"],
-                                             self.TYPE_CONTINUE_ON_FAIL)
+                                                  "fail-mode"],
+                                                  self.TYPE_CONTINUE_ON_FAIL)
 
         if self.fail_mode not in self.FAIL_MODE_TYPES:
             raise ConfigValueError([self.BUNCH_SECTION, "fail-mode"],
@@ -129,17 +128,19 @@ class RoseBunchApp(BuiltinApp):
                                    "not a valid setting")
 
         self.incremental = conf_tree.node.get_value([self.BUNCH_SECTION,
-                                                "incremental"], False)
+                                                    "incremental"],
+                                                    "true")
 
         multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
 
-        self.command_format = conf_tree.node.get_value(
-                                    [self.BUNCH_SECTION, "command-format"])
+        self.command_format = conf_tree.node.get_value([self.BUNCH_SECTION,
+                                                       "command-format"])
 
         if not self.command_format:
-            raise CompulsoryConfigValueError(
-                                    [self.BUNCH_SECTION, "command-format"],
-                                     None, KeyError("command-format"))
+            raise CompulsoryConfigValueError([self.BUNCH_SECTION,
+                                             "command-format"],
+                                             None,
+                                             KeyError("command-format"))
 
         # Set up command-instances if needed
         instances = conf_tree.node.get_value([self.BUNCH_SECTION,
@@ -148,7 +149,7 @@ class RoseBunchApp(BuiltinApp):
         if instances:
             try:
                 instances = range(int(instances))
-            except ValueError as err:
+            except ValueError:
                 raise ConfigValueError([self.BUNCH_SECTION,
                                         "command-instances"],
                                        instances,
@@ -169,13 +170,13 @@ class RoseBunchApp(BuiltinApp):
             if len(shlex.split(val.value)) != arglength:
                 raise ConfigValueError([self.ARGS_SECTION, item],
                                        conf_tree.node.get_value(
-                                        [self.ARGS_SECTION, item]),
+                                       [self.ARGS_SECTION, item]),
                                        "inconsistent arg lengths")
 
         if conf_tree.node.get_value([self.ARGS_SECTION, "command-instances"]):
             raise ConfigValueError([self.ARGS_SECTION, "command-instances"],
                                    conf_tree.node.get_value(
-                                    [self.ARGS_SECTION, "command-instances"]),
+                                   [self.ARGS_SECTION, "command-instances"]),
                                    "reserved keyword")
 
         if instances and arglength != len(instances):
@@ -219,9 +220,9 @@ class RoseBunchApp(BuiltinApp):
                     procs.pop(key)
                     if proc.returncode:
                         failed[key] = proc.returncode
-                        app_runner.handle_event(
-                                        RosePopenError(str(key), proc.returncode,
-                                                       None, None))
+                        app_runner.handle_event(RosePopenError(str(key),
+                                                proc.returncode,
+                                                None, None))
                         if self.dao:
                             self.dao.update_command_state(key, self.dao.S_FAIL)
                         if self.fail_mode == self.TYPE_ABORT_ON_FAIL:
@@ -250,11 +251,11 @@ class RoseBunchApp(BuiltinApp):
                         self.dao.add_command(key)
 
                 app_runner.handle_event(LaunchEvent(key, cmd))
-                procs[key] = app_runner.popen.run_bg(
-                                                cmd,
-                                                shell=True,
-                                                stdout=open(cmd_stdout, 'w'),
-                                                stderr=open(cmd_stderr, 'w'))
+                procs[key] = \
+                    app_runner.popen.run_bg(cmd,
+                                            shell=True,
+                                            stdout=open(cmd_stdout, 'w'),
+                                            stderr=open(cmd_stderr, 'w'))
             sleep(self.SLEEP_DURATION)
 
         if abort and commands:
@@ -314,7 +315,6 @@ class RoseBunchDAO(object):
     CONN_TIMEOUT = 0.1
     FILE_NAME = ".rose-bunch.db"
 
-
     def __init__(self, config):
         self.conn = None
         self.new_run = True
@@ -338,8 +338,8 @@ class RoseBunchDAO(object):
         """Create tables as appropriate"""
         existing = []
 
-        for row in self.conn.execute(
-            "SELECT name FROM sqlite_master WHERE type=='table' ORDER BY name"):
+        for row in self.conn.execute("SELECT name FROM sqlite_master " +
+                                     "WHERE type=='table'"):
             existing.append(row[0])
 
         self.new_run = not existing
@@ -360,7 +360,8 @@ class RoseBunchDAO(object):
 
     def add_command(self, name):
         """Add a command to the commands table"""
-        i_stmt = "INSERT OR REPLACE INTO " + self.TABLE_COMMANDS + " VALUES (?, ?)"
+        i_stmt = ("INSERT OR REPLACE INTO " + self.TABLE_COMMANDS +
+                  " VALUES (?, ?)")
         self.conn.execute(i_stmt, [name, self.S_STARTED])
         self.conn.commit()
         return
@@ -380,7 +381,8 @@ class RoseBunchDAO(object):
 
     def update_command_state(self, name, state):
         """Update command state in CMDS table"""
-        u_stmt = "UPDATE " + self.TABLE_COMMANDS + " SET status=? WHERE name==?"
+        u_stmt = ("UPDATE " + self.TABLE_COMMANDS +
+                  " SET status=? WHERE name==?")
         self.conn.execute(u_stmt, [state, name])
         self.conn.commit()
         return
@@ -396,7 +398,7 @@ class RoseBunchDAO(object):
         return has_succeeded
 
     def flatten_config(self, config):
-        """Flatten down a config node to set of keys and values for recording"""
+        """Flatten down a config node to set of keys and values to record"""
         flat = {}
         keys_and_nodes = list(config.node.walk())
         for keys, node in keys_and_nodes:
@@ -420,7 +422,8 @@ class RoseBunchDAO(object):
         for key, value in res.items():
             args.append((key, value))
 
-        i_stmt = "INSERT OR REPLACE INTO " + self.TABLE_CONFIG + " VALUES (?, ?)"
+        i_stmt = ("INSERT OR REPLACE INTO " + self.TABLE_CONFIG +
+                  " VALUES (?, ?)")
         self.conn.executemany(i_stmt, args)
         self.conn.commit()
         return

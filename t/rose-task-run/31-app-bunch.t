@@ -33,7 +33,7 @@ run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost -- --debug
 #-------------------------------------------------------------------------------
-CYCLE=2010010000
+CYCLE=20100101T0000Z
 LOG_DIR="$SUITE_RUN_DIR/log/job/$CYCLE"
 #-------------------------------------------------------------------------------
 # Testing successful runs
