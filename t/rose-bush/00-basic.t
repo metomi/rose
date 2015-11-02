@@ -91,7 +91,12 @@ cat >"${SUITE_DIR}/suite.rc" <<'__SUITE_RC__'
             graph = FOO
 [runtime]
     [[FOO]]
-        script = echo "Hello from ${CYLC_TASK_ID}.${CYLC_SUITE_NAME}"
+        script = """
+echo "Hello from ${CYLC_TASK_ID}.${CYLC_SUITE_NAME}"
+for I in $(seq -w 1 10); do
+    echo "[INFO] whatever stuff $I" >"$0.txt.$I"
+done
+"""
     [[foo0, foo1]]
         inherit = FOO
 __SUITE_RC__
@@ -186,7 +191,9 @@ json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 
 run_pass "${TEST_KEY}" curl "${URL}/jobs/${USER}/${SUITE_NAME}?form=json"
 FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
+FOO0_JOB='log/job/20000101T0000Z/foo0/01/job'
 FOO1="{'cycle': '20000101T0000Z', 'name': 'foo1', 'submit_num': 1}"
+FOO1_JOB='log/job/20000101T0000Z/foo1/01/job'
 json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('rose_version',), '$(rose version | cut -d' ' -f 2)']" \
     "[('host',), '$(hostname)']" \
@@ -210,9 +217,21 @@ json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('entries', ${FOO0}, 'status',), 'success']" \
     "[('entries', ${FOO0}, 'host',), 'localhost']" \
     "[('entries', ${FOO0}, 'submit_method',), 'background']" \
+    "[('entries', ${FOO0}, 'logs', 'job', 'path'), '${FOO0_JOB}']" \
+    "[('entries', ${FOO0}, 'logs', 'job.err', 'path'), '${FOO0_JOB}.err']" \
+    "[('entries', ${FOO0}, 'logs', 'job.out', 'path'), '${FOO0_JOB}.out']" \
+    "[('entries', ${FOO0}, 'logs', 'job.txt.01', 'seq_key'), 'job.txt.*']" \
+    "[('entries', ${FOO0}, 'logs', 'job.txt.05', 'seq_key'), 'job.txt.*']" \
+    "[('entries', ${FOO0}, 'logs', 'job.txt.10', 'seq_key'), 'job.txt.*']" \
     "[('entries', ${FOO1}, 'status',), 'success']" \
     "[('entries', ${FOO1}, 'host',), 'localhost']" \
-    "[('entries', ${FOO1}, 'submit_method',), 'background']"
+    "[('entries', ${FOO1}, 'submit_method',), 'background']" \
+    "[('entries', ${FOO1}, 'logs', 'job', 'path'), '${FOO1_JOB}']" \
+    "[('entries', ${FOO1}, 'logs', 'job.err', 'path'), '${FOO1_JOB}.err']" \
+    "[('entries', ${FOO1}, 'logs', 'job.out', 'path'), '${FOO1_JOB}.out']" \
+    "[('entries', ${FOO1}, 'logs', 'job.txt.01', 'seq_key'), 'job.txt.*']" \
+    "[('entries', ${FOO1}, 'logs', 'job.txt.05', 'seq_key'), 'job.txt.*']" \
+    "[('entries', ${FOO1}, 'logs', 'job.txt.10', 'seq_key'), 'job.txt.*']"
 
 for FILE in \
     'log/suite/log' \
