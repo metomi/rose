@@ -705,7 +705,7 @@ source=stuffing-*.txt
     <p>Each variant of the command is run in the same working directory with
     its output directed to separate <var>.out</var> and <var>.err</var> files
     of the form <var>bunch.&lt;name&gt;.out</var>. Should you need separate
-    working directories your should configure your command to create the 
+    working directories you should configure your command to create the
     appropriate subdirectory for working in.</p>
 
     <p>Note that, under load balancing systems such as PBS or Slurm, you will
@@ -744,13 +744,20 @@ source=stuffing-*.txt
       <dt><kbd>fail-mode=continue|abort</kbd></dt>
 
       <dd>Optional (default=continue). Specify what action you want the job to
-      take on failure of a command it is trying to run. If set to
-      <var>continue</var> it will run all command variants . If set to
-      <var>abort</var> then on failure of one of the command variants it will
-      stop trying to run any new variants N.B. the job will wait for any
-      already running commands to finish before exiting. Commands that won't be
-      run due to aborting will be reported in the job output with a
-      <var>[SKIP]</var> prefix when running in verbose mode.</dd>
+      take on the failure of a command that it is trying to run. If set to
+      <var>continue</var> all command variants will be run by the job and the
+      job will return a non-zero exit code upon completion e.g. if
+      three commands are to be run and the second one fails, all three will be
+      run and the job will exit with a return code of 1. Alternatively, if
+      <var>fail-mode</var> is set to <var>abort</var> then on failure of any
+      one of the command variants it will stop trying to run any further
+      variants N.B. the job will wait for any already running commands to
+      finish before exiting. Commands that won't be run due to aborting will be
+      reported in the job output with a <var>[SKIP]</var> prefix when running
+      in verbose mode. For example in the case of three command variants
+      with a pool-size of 1 and <var>fail-mode=abort</var>, if the second
+      variant failed then the job would exit with a non-zero error code without
+      having run the third variant.</dd>
 
       <dt><kbd>incremental=true|false</kbd></dt>
 
