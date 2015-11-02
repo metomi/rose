@@ -47,7 +47,7 @@ if [[ -d $SUITE_RUN_DIR/etc/your-path ]]; then
     fi
 fi
 PREV_CYCLE=
-for CYCLE in 2013010100 2013010112 2013010200; do
+for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
     TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
     TASK=my_task_1
     FILE=$HOME/cylc-run/$NAME/log/job/$CYCLE/$TASK/01/job.txt
