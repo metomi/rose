@@ -29,9 +29,9 @@ tests 21
 mkdir svn
 svnadmin create svn/foo
 SVN_URL=file://$PWD/svn/foo
-PORT=$RANDOM
+PORT="$((${RANDOM} + 10000))"
 while port_is_busy $PORT; do
-    PORT=$RANDOM
+    PORT="$((${RANDOM} + 10000))"
 done
 cat >rose.conf <<__ROSE_CONF__
 [rosie-db]
@@ -49,7 +49,7 @@ $ROSE_HOME/sbin/rosa db-create -q
 TEST_KEY=$TEST_KEY_BASE-rosie-disco
 rosie disco 'start' "${PORT}" \
     0<'/dev/null' 1>'rosie-disco.out' 2>'rosie-disco.err' &
-ROSA_WS_PID=$!
+ROSIE_DISCO_PID=$!
 T_INIT=$(date +%s)
 while ! port_is_busy $PORT && (($(date +%s) < T_INIT + 60)); do
     sleep 1
@@ -58,6 +58,9 @@ if port_is_busy $PORT; then
     pass "$TEST_KEY"
 else
     fail "$TEST_KEY"
+    kill "${ROSIE_DISCO_PID}" 2>'/dev/null'
+    wait 2>'/dev/null'
+    rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}* 2>'/dev/null'
     exit 1
 fi
 URL=http://$HOSTNAME:$PORT/
@@ -221,7 +224,7 @@ sys.exit(len(d) != len(expected_d) or
          d[1]["revision"] != expected_d[1]["revision"])
 __PYTHON__
 #-------------------------------------------------------------------------------
-kill "${ROSA_WS_PID}"
+kill "${ROSIE_DISCO_PID}" 2>'/dev/null'
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}*
+rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}* 2>'/dev/null'
 exit 0
