@@ -118,6 +118,8 @@ if port_is_busy "${PORT}"; then
     pass "${TEST_KEY}"
 else
     fail "${TEST_KEY}"
+    kill "${ROSE_BUSH_PID}" 2>'/dev/null'
+    wait 2>'/dev/null'
     exit 1
 fi
 URL="http://${HOSTNAME}:${PORT}/"
@@ -231,7 +233,7 @@ file_grep "${TEST_KEY}.out" 'HTTP/.* 404 Not Found' "${TEST_KEY}.out"
 
 #-------------------------------------------------------------------------------
 # Tidy up
-kill "${ROSE_BUSH_PID}"
+kill "${ROSE_BUSH_PID}" 2>'/dev/null'
 wait 2>'/dev/null'
 cylc unregister "${SUITE_NAME}" 1>'/dev/null' 2>&1
 rm -fr "${SUITE_DIR}" "${HOME}/.cylc/ports/${SUITE_NAME}" 2>'/dev/null'
