@@ -40,10 +40,16 @@
 </div>
 <div class="span11">
 <pre{% if file_content %} class="prettyprint lang-{{file_content}}"{% endif %}>
-{%- set PREFIXES = {"[FAIL]": "text-error", "[INFO]": "text-info", "[ OK ]": "text-success", "[WARN]": "text-warning"} -%}
+{%- set PREFIXES = {
+    "[DEBUG]": "muted",
+    "[FAIL] ": "text-error",
+    "[INFO] ": "text-info",
+    "[ OK ] ": "text-success",
+    "[WARN] ": "text-warning",
+} -%}
 {% for line in lines -%}
-{% if line|length > 6 and line[0:6] in PREFIXES -%}
-<span class={{PREFIXES[line[0:6]]}}>{{line[0:6]}}</span>{{line[6:]}}
+{% if line|length > 7 and line[0:7] in PREFIXES -%}
+<span class="{{PREFIXES[line[0:7]]}}">{{line[0:7]}}</span>{{line[7:]}}
 {% else -%}
 {{line}}
 {% endif -%}
