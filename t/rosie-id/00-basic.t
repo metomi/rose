@@ -102,17 +102,7 @@ mkdir -p $HOME/cylc-run/foo-aa000/log/job
 rose suite-log -q -U -n foo-aa000
 TEST_KEY=$TEST_KEY_BASE-1-to-output.2
 run_pass "$TEST_KEY" rosie id --to-output foo-aa000
-if [[ -f $HOME/.metomi/rose-bush.status ]]; then
-    HOST=$(awk -F= '$1 ~ /host/ {print $2}' $HOME/.metomi/rose-bush.status)
-    PORT=$(awk -F= '$1 ~ /port/ {print $2}' $HOME/.metomi/rose-bush.status)
-    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-http://$HOST:$PORT/list/$USER/foo-aa000
-__OUT__
-else
-    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-file://$HOME/cylc-run/foo-aa000
-__OUT__
-fi
+file_grep "$TEST_KEY.out" '/foo-aa000$' "$TEST_KEY.out"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 rm -fr "${HOME}/cylc-run/foo-aa000"
 

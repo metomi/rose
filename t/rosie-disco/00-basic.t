@@ -58,6 +58,9 @@ if port_is_busy $PORT; then
     pass "$TEST_KEY"
 else
     fail "$TEST_KEY"
+    kill "${ROSIE_DISCO_PID}" 2>'/dev/null'
+    wait 2>'/dev/null'
+    rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}* 2>'/dev/null'
     exit 1
 fi
 URL=http://$HOSTNAME:$PORT/
@@ -221,7 +224,7 @@ sys.exit(len(d) != len(expected_d) or
          d[1]["revision"] != expected_d[1]["revision"])
 __PYTHON__
 #-------------------------------------------------------------------------------
-kill "${ROSIE_DISCO_PID}"
+kill "${ROSIE_DISCO_PID}" 2>'/dev/null'
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}*
+rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}* 2>'/dev/null'
 exit 0
