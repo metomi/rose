@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pango
 import pygtk
@@ -88,8 +88,7 @@ class MenuWidget(gtk.HBox):
                    rose.META_PROP_VALUE_TRUE)
         if self.is_ghost or is_comp:
             option_ui_middle = (
-                   option_ui_middle.replace("<menuitem action='Ignore'/>",
-                                            ''))
+                option_ui_middle.replace("<menuitem action='Ignore'/>", ''))
         var_type = variable.metadata.get(rose.META_PROP_TYPE, '')
         var_values = variable.metadata.get(rose.META_PROP_VALUES, range(2))
         error_types = rose.config_editor.WARNING_TYPES_IGNORE
@@ -109,7 +108,8 @@ class MenuWidget(gtk.HBox):
             option_ui_middle = ''
             for warn in variable.warning:
                 warn_name = warn.replace("/", "_")
-                option_ui_middle += "<menuitem action='Warn_" + warn_name + "'/>"
+                option_ui_middle += (
+                    "<menuitem action='Warn_" + warn_name + "'/>")
                 w_string = "(" + warn.replace("_", "__") + ")"
                 actions.append(("Warn_" + warn_name, gtk.STOCK_DIALOG_INFO,
                                 w_string))
@@ -140,32 +140,28 @@ class MenuWidget(gtk.HBox):
             option_ui_middle += url_ui
         option_ui = option_ui_start + option_ui_middle + option_ui_end
         self.button = rose.gtk.util.CustomButton(
-                                    stock_id=menu_icon_id,
-                                    size=gtk.ICON_SIZE_MENU,
-                                    as_tool=True)
+            stock_id=menu_icon_id,
+            size=gtk.ICON_SIZE_MENU,
+            as_tool=True)
         self._set_hover_over(variable)
         self.option_ui = option_ui
         self.actions = actions
-        self.pack_start(self.button, expand=False, fill=False,
-                         padding=0)
+        self.pack_start(self.button, expand=False, fill=False, padding=0)
         self.button.connect(
-                "button-press-event",
-                lambda b, e: self._popup_option_menu(
-                                                self.option_ui,
-                                                self.actions,
-                                                e.button,
-                                                e.time))
+            "button-press-event",
+            lambda b, e: self._popup_option_menu(
+                self.option_ui, self.actions, e.button, e.time))
         # FIXME: Try to popup the menu at the button, instead of the cursor.
         self.button.connect(
-                "activate",
-                lambda b: self._popup_option_menu(
-                              self.option_ui,
-                              self.actions,
-                              1,
-                              gtk.gdk.Event(gtk.gdk.KEY_PRESS).time))
+            "activate",
+            lambda b: self._popup_option_menu(
+                self.option_ui,
+                self.actions,
+                1,
+                gtk.gdk.Event(gtk.gdk.KEY_PRESS).time))
         self.button.connect(
-                "enter-notify-event",
-                lambda b, e: self._set_hover_over(variable))
+            "enter-notify-event",
+            lambda b, e: self._set_hover_over(variable))
         self._set_hover_over(variable)
         self.button.show()
 
@@ -227,13 +223,13 @@ class MenuWidget(gtk.HBox):
                 continue
             err_item = uimanager.get_widget('/Options/' + action_name)
             title = rose.config_editor.DIALOG_VARIABLE_ERROR_TITLE.format(
-                                error, self.my_variable.metadata["id"])
+                error, self.my_variable.metadata["id"])
             err_item.set_tooltip_text(self.my_variable.error[error])
-            err_item.connect("activate",
-                             lambda e: dialog_func(
-                                              gtk.STOCK_DIALOG_WARNING,
-                                              self.my_variable.error[error],
-                                              title, search_function))
+            err_item.connect(
+                "activate",
+                lambda e: dialog_func(gtk.STOCK_DIALOG_WARNING,
+                                      self.my_variable.error[error],
+                                      title, search_function))
         for warning in warnings:
             action_name = "Warn_" + warning.replace("/", "_")
             if "action='" + action_name + "'" not in option_ui:
@@ -242,38 +238,37 @@ class MenuWidget(gtk.HBox):
             title = rose.config_editor.DIALOG_VARIABLE_WARNING_TITLE.format(
                 warning, self.my_variable.metadata["id"])
             warn_item.set_tooltip_text(self.my_variable.warning[warning])
-            warn_item.connect("activate",
-                              lambda e: dialog_func(
-                                          gtk.STOCK_DIALOG_INFO,
-                                          self.my_variable.warning[warning],
-                                          title, search_function))
+            warn_item.connect(
+                "activate",
+                lambda e: dialog_func(gtk.STOCK_DIALOG_INFO,
+                                      self.my_variable.warning[warning],
+                                      title, search_function))
         ignore_item = None
         enable_item = None
         if "action='Ignore'" in option_ui:
             ignore_item = uimanager.get_widget('/Options/Ignore')
             if (self.my_variable.metadata.get(rose.META_PROP_COMPULSORY) ==
-                rose.META_PROP_VALUE_TRUE or self.is_ghost):
+                    rose.META_PROP_VALUE_TRUE or self.is_ghost):
                 ignore_item.set_sensitive(False)
             # It is a non-trigger, optional, enabled variable.
             new_reason = {rose.variable.IGNORED_BY_USER:
                           rose.config_editor.IGNORED_STATUS_MANUAL}
             ignore_item.connect(
-                    "activate",
-                    lambda b: self.var_ops.set_var_ignored(
-                                 self.my_variable, new_reason))
+                "activate",
+                lambda b: self.var_ops.set_var_ignored(
+                    self.my_variable, new_reason))
         elif "action='Enable'" in option_ui:
             enable_item = uimanager.get_widget('/Options/Enable')
             enable_item.connect(
-                        "activate",
-                        lambda b: self.var_ops.set_var_ignored(
-                                       self.my_variable, {}))
+                "activate",
+                lambda b: self.var_ops.set_var_ignored(self.my_variable, {}))
         if "action='Fix Ignore'" in option_ui:
             fix_ignore_item = uimanager.get_widget('/Options/Fix Ignore')
             fix_ignore_item.set_tooltip_text(
-                  rose.config_editor.VAR_MENU_TIP_FIX_IGNORE)
-            fix_ignore_item.connect("activate",
-                                    lambda e: self.var_ops.fix_var_ignored(
-                                                           self.my_variable))
+                rose.config_editor.VAR_MENU_TIP_FIX_IGNORE)
+            fix_ignore_item.connect(
+                "activate",
+                lambda e: self.var_ops.fix_var_ignored(self.my_variable))
             if ignore_item is not None:
                 ignore_item.set_sensitive(False)
             if enable_item is not None:
@@ -281,7 +276,7 @@ class MenuWidget(gtk.HBox):
         info_item = uimanager.get_widget('/Options/Info')
         info_item.connect("activate", self._launch_info_dialog)
         if (self.my_variable.metadata.get(rose.META_PROP_COMPULSORY) ==
-            rose.META_PROP_VALUE_TRUE or self.is_ghost):
+                rose.META_PROP_VALUE_TRUE or self.is_ghost):
             remove_item.set_sensitive(False)
         help_item = uimanager.get_widget('/Options/Help')
         help_item.connect("activate",
@@ -290,13 +285,12 @@ class MenuWidget(gtk.HBox):
             help_item.set_sensitive(False)
         url_item = uimanager.get_widget('/Options/Web Help')
         if url_item is not None and 'url' in self.my_variable.metadata:
-            url_item.connect("activate",
-                             lambda b: self.launch_help(
-                                            self.my_variable.metadata['url']))
+            url_item.connect(
+                "activate",
+                lambda b: self.launch_help(self.my_variable.metadata['url']))
         if self.is_ghost:
             add_item = uimanager.get_widget('/Options/Add')
-            add_item.connect("activate",
-                            lambda b: self._perform_add())
+            add_item.connect("activate", lambda b: self._perform_add())
         option_menu = uimanager.get_widget('/Options')
         option_menu.attach_to_widget(self.button,
                                      lambda m, w: False)
@@ -315,7 +309,7 @@ class MenuWidget(gtk.HBox):
     def launch_edit(self, *args):
         text = "\n".join(self.my_variable.comments)
         title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
-                                   self.my_variable.metadata['id'])
+            self.my_variable.metadata['id'])
         rose.gtk.dialog.run_edit_dialog(text,
                                         finish_hook=self._edit_finish_hook,
                                         title=title)
@@ -339,8 +333,8 @@ class CheckedMenuWidget(MenuWidget):
         self.checkbutton = gtk.CheckButton()
         self.checkbutton.set_active(not self.is_ghost)
         meta = self.my_variable.metadata
-        if (not self.is_ghost and
-            meta.get(rose.META_PROP_COMPULSORY) == rose.META_PROP_VALUE_TRUE):
+        if not self.is_ghost and meta.get(
+                rose.META_PROP_COMPULSORY) == rose.META_PROP_VALUE_TRUE:
             self.checkbutton.set_sensitive(False)
         self.pack_start(self.checkbutton, expand=False, fill=False, padding=0)
         self.pack_start(self.button, expand=False, fill=False, padding=0)

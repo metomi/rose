@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """File system utilities with event reporting."""
 
 import errno
@@ -24,6 +24,7 @@ import os
 from rose.reporter import Event
 import shutil
 import sys
+
 
 class FileSystemEvent(Event):
 
@@ -110,8 +111,8 @@ class FileSystemUtil(object):
     def dirname(self, path):
         """Wrap os.path.dirname.
 
-        Unlike os.path.dirname, return "." instead of an empty string if result is
-        the current working directory.
+        Unlike os.path.dirname, return "." instead of an empty string if result
+        is the current working directory.
 
         """
 
@@ -170,7 +171,7 @@ class FileSystemUtil(object):
         try:
             os.symlink(source, target)
         except OSError as e:
-            if e.filename is None: # Python does not set filename :-(
+            if e.filename is None:  # Python does not set filename :-(
                 e.filename = target
             raise e
         event = FileSystemEvent(FileSystemEvent.SYMLINK, source, target)

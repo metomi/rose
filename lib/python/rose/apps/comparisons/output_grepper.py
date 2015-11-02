@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,29 +16,31 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Return a list of values matching a regular expression."""
 
 from rose.apps.rose_ana import DataLengthError, data_from_regexp
 import re
 
 REGEXPS = {
-  'um_wallclock' : r"Maximum Elapsed Wallclock Time:\s*(\S+)",
-  'um_initial_norms' : r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
-  'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)", }
+    'um_wallclock': r"Maximum Elapsed Wallclock Time:\s*(\S+)",
+    'um_initial_norms': r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
+    'um_final_norms': r"Final\s*Absolute\s*Norm\s*:\s*(\S+)",
+}
+
 
 class OutputGrepper(object):
     def run(self, task, variable):
         """Return a list of values matching a regular expression."""
-        filevar  = variable + "file"
+        filevar = variable + "file"
         filename = getattr(task, filevar)
         if task.subextract in REGEXPS:
             regexp = REGEXPS[task.subextract]
         else:
             if (task.subextract.startswith("'") and
-                task.subextract.endswith("'")):
+                    task.subextract.endswith("'")):
                 regexp = task.subextract[1:-1]
         numbers = data_from_regexp(regexp, filename)
-        datavar  = variable + "data"
+        datavar = variable + "data"
         setattr(task, datavar, numbers)
         return task

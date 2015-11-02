@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Module to provide checking facilities for Rose configuration metadata."""
 
 import os
@@ -50,7 +50,7 @@ def get_allowed_metadata_properties():
     properties = []
     for key in dir(rose):
         if (key.startswith("META_PROP_") and
-            key not in ["META_PROP_VALUE_TRUE", "META_PROP_VALUE_FALSE"]):
+                key not in ["META_PROP_VALUE_TRUE", "META_PROP_VALUE_FALSE"]):
             properties.append(getattr(rose, key))
     return properties
 
@@ -108,15 +108,14 @@ def _check_macro(value, module_files=None, meta_dir=None):
         macro_name = macro
         method = None
         if (macro.endswith("." + rose.macro.VALIDATE_METHOD) or
-            macro.endswith("." + rose.macro.TRANSFORM_METHOD)):
+                macro.endswith("." + rose.macro.TRANSFORM_METHOD)):
             macro_name, method = macro.rsplit(".", 1)
         try:
             macro_obj = rose.resource.import_object(
                 macro_name, module_files, _import_err_handler)
         except Exception as e:
             return INVALID_IMPORT.format(
-                                  macro,
-                                  type(e).__name__ + ": " + str(e))
+                macro, type(e).__name__ + ": " + str(e))
         if macro_obj is None:
             return INVALID_OBJECT.format(macro)
         elif method is not None:
@@ -139,7 +138,7 @@ def _check_range(value):
         test_id = "env=A"
         test_config.set(["env", "A"], "0")
         test_meta_config = rose.config.ConfigNode()
-        evaluator =  rose.macros.rule.RuleEvaluator()
+        evaluator = rose.macros.rule.RuleEvaluator()
         try:
             check_ok = evaluator.evaluate_rule(
                 value, test_id, test_config, test_meta_config)
@@ -175,7 +174,7 @@ def _check_type(value):
     types = rose.variable.parse_type_expression(value)
     if isinstance(types, basestring):
         types = [types]
-    if " " in value and not "," in value:
+    if " " in value and "," not in value:
         types = [value]
     bad_types = []
     for type_ in types:
@@ -232,7 +231,7 @@ def _get_module_files(meta_dir=None):
                 for filename in filenames:
                     if filename.endswith(".py"):
                         abs_filename = os.path.abspath(
-                                          os.path.join(dirpath, filename))
+                            os.path.join(dirpath, filename))
                         module_files.append(abs_filename)
     return module_files
 
@@ -251,7 +250,7 @@ def metadata_check(meta_config, meta_dir=None,
         if node.is_ignored() or not isinstance(node.value, dict):
             continue
         if (only_these_sections is not None and
-            section not in only_these_sections):
+                section not in only_these_sections):
             continue
         if node.get([rose.META_PROP_VALUES], no_ignore=True) is not None:
             # 'values' supercedes other type-like props, so don't use them.
@@ -263,26 +262,24 @@ def metadata_check(meta_config, meta_dir=None,
                     info = UNNECESSARY_VALUES_PROP
                     value = node.get([type_like_prop]).value
                     reports.append(rose.macro.MacroReport(
-                                              section, type_like_prop,
-                                              value, info))
+                        section, type_like_prop, value, info))
         if node.get_value([rose.META_PROP_TYPE]) == "python_list":
             if node.get_value([rose.META_PROP_LENGTH]):
                 info = INCOMPATIBLE.format(rose.META_PROP_TYPE)
                 value = node.get_value([rose.META_PROP_LENGTH])
                 reports.append(rose.macro.MacroReport(
-                                          section, rose.META_PROP_LENGTH,
-                                          value, info))
+                    section, rose.META_PROP_LENGTH, value, info))
         options = node.value.keys()
         options.sort(rose.config.sort_settings)
         for option in options:
             opt_node = node.value[option]
             if ((only_these_properties is not None and
                  option not in only_these_properties) or
-                opt_node.is_ignored()):
+                    opt_node.is_ignored()):
                 continue
             value = opt_node.value
             if (option not in allowed_properties and
-                not option.startswith(rose.META_PROP_WIDGET)):
+                    not option.startswith(rose.META_PROP_WIDGET)):
                 info = UNKNOWN_PROP.format(option)
                 reports.append(rose.macro.MacroReport(section, option,
                                                       value, info))
@@ -369,8 +366,8 @@ def main():
                              only_these_sections=sections,
                              only_these_properties=properties)
     macro_id = rose.macro.MACRO_OUTPUT_ID.format(
-                                rose.macro.VALIDATE_METHOD.upper()[0],
-                                "rose.metadata_check.MetadataChecker")
+        rose.macro.VALIDATE_METHOD.upper()[0],
+        "rose.metadata_check.MetadataChecker")
     reports_map = {None: reports}
     text = rose.macro.get_reports_as_text(reports_map, macro_id)
     if reports:

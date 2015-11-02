@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """This module deals with variable actions.
 
 The methods of VariableOperations are the only ways that variable data
@@ -148,7 +148,6 @@ class VariableOperations(object):
         if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
         return variable.metadata['full_ns']
-        
 
     def fix_var_ignored(self, variable):
         """Fix any variable ignore state errors."""
@@ -158,8 +157,8 @@ class VariableOperations(object):
         if rose.variable.IGNORED_BY_SECTION in old_reason:
             # Preserve section-ignored status.
             new_reason_dict.setdefault(
-                            rose.variable.IGNORED_BY_SECTION,
-                            old_reason[rose.variable.IGNORED_BY_SECTION])
+                rose.variable.IGNORED_BY_SECTION,
+                old_reason[rose.variable.IGNORED_BY_SECTION])
         if rose.variable.IGNORED_BY_SYSTEM in ignored_reasons:
             # Doc table I_t
             if rose.config_editor.WARNING_TYPE_ENABLED in variable.error:
@@ -198,8 +197,8 @@ class VariableOperations(object):
         old_reason = variable.ignored_reason.copy()
         if rose.variable.IGNORED_BY_SECTION in old_reason:
             new_reason_dict.setdefault(
-                            rose.variable.IGNORED_BY_SECTION,
-                            old_reason[rose.variable.IGNORED_BY_SECTION])
+                rose.variable.IGNORED_BY_SECTION,
+                old_reason[rose.variable.IGNORED_BY_SECTION])
         if rose.variable.IGNORED_BY_SECTION not in old_reason:
             if rose.variable.IGNORED_BY_SECTION in new_reason_dict:
                 new_reason_dict.pop(rose.variable.IGNORED_BY_SECTION)
@@ -209,13 +208,13 @@ class VariableOperations(object):
             return None
         # Protect against user-enabling of triggered ignored.
         if (not override and
-            rose.variable.IGNORED_BY_SYSTEM in old_reason and
-            rose.variable.IGNORED_BY_SYSTEM not in new_reason_dict):
+                rose.variable.IGNORED_BY_SYSTEM in old_reason and
+                rose.variable.IGNORED_BY_SYSTEM not in new_reason_dict):
             ns = variable.metadata['full_ns']
             config_name = self.__util.split_full_ns(self.__data, ns)[0]
             if rose.config_editor.WARNING_TYPE_NOT_TRIGGER in variable.error:
                 variable.error.pop(
-                         rose.config_editor.WARNING_TYPE_NOT_TRIGGER)
+                    rose.config_editor.WARNING_TYPE_NOT_TRIGGER)
         my_ignored_keys = variable.ignored_reason.keys()
         if rose.variable.IGNORED_BY_SECTION in my_ignored_keys:
             my_ignored_keys.remove(rose.variable.IGNORED_BY_SECTION)
@@ -225,7 +224,7 @@ class VariableOperations(object):
         if len(my_ignored_keys) > len(old_ignored_keys):
             action_text = rose.config_editor.STACK_ACTION_IGNORED
             if (not old_ignored_keys and
-                rose.config_editor.WARNING_TYPE_ENABLED in variable.error):
+                    rose.config_editor.WARNING_TYPE_ENABLED in variable.error):
                 variable.error.pop(rose.config_editor.WARNING_TYPE_ENABLED)
         else:
             action_text = rose.config_editor.STACK_ACTION_ENABLED
@@ -244,7 +243,7 @@ class VariableOperations(object):
                     [copy_var, old_reason, True])
             )
             del self.__redo_stack[:]
-        self.trigger_ignored_update(variable)        
+        self.trigger_ignored_update(variable)
         if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
         return variable.metadata['full_ns']
@@ -322,7 +321,7 @@ class VariableOperations(object):
         namespace = variable.metadata['full_ns']
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         save_variable = self.__data.helper.get_variable_by_id(
-                                    var_id, config_name, save=True)
+            var_id, config_name, save=True)
         if save_variable is None:
             return None
         return save_variable.value
@@ -384,13 +383,13 @@ class VariableOperations(object):
             if len(old_ignore) > len(variable.ignored_reason):
                 return rose.config_editor.KEY_TIP_ENABLED
             if (rose.variable.IGNORED_BY_SYSTEM in variable.ignored_reason
-                and rose.variable.IGNORED_BY_SYSTEM not in old_ignore):
+                    and rose.variable.IGNORED_BY_SYSTEM not in old_ignore):
                 return rose.config_editor.KEY_TIP_TRIGGER_IGNORED
             if (rose.variable.IGNORED_BY_USER in variable.ignored_reason
-                and rose.variable.IGNORED_BY_USER not in old_ignore):
+                    and rose.variable.IGNORED_BY_USER not in old_ignore):
                 return rose.config_editor.KEY_TIP_USER_IGNORED
             if (rose.variable.IGNORED_BY_SECTION in variable.ignored_reason
-                and rose.variable.IGNORED_BY_SECTION not in old_ignore):
+                    and rose.variable.IGNORED_BY_SECTION not in old_ignore):
                 return rose.config_editor.KEY_TIP_SECTION_IGNORED
             return rose.config_editor.KEY_TIP_ENABLED
         return ''
@@ -398,19 +397,17 @@ class VariableOperations(object):
     def search_for_var(self, config_name_or_namespace, setting_id):
         """Launch a search for a setting or variable id."""
         config_name = self.__util.split_full_ns(
-                             self.__data, config_name_or_namespace)[0]
+            self.__data, config_name_or_namespace)[0]
         self.search_id_func(config_name, setting_id)
 
     def get_ns_metadata_files(self, namespace):
         """Retrieve filenames within the metadata for this namespace."""
-        config_name = self.__util.split_full_ns(
-                             self.__data, namespace)[0]
+        config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         return self.__data.config[config_name].meta_files
 
     def get_sections(self, namespace):
         """Retrieve all real sections (empty or not) for this ns's config."""
-        config_name = self.__util.split_full_ns(
-                             self.__data, namespace)[0]
+        config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         section_objects = self.__data.config[config_name].sections.get_all(
             skip_latent=True)
         return [_.name for _ in section_objects]

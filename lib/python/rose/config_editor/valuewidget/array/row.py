@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
 import sys
@@ -36,7 +36,7 @@ class RowArrayValueWidget(gtk.HBox):
     """This is a class to represent a value as part of a row."""
 
     BAD_COLOUR = rose.gtk.util.color_parse(
-                        rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
+        rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
     CHECK_NAME_IS_ELEMENT = re.compile('.*\(\d+\)$').match
     TIP_ADD = 'Add array element'
     TIP_DELETE = 'Remove last array element'
@@ -108,7 +108,7 @@ class RowArrayValueWidget(gtk.HBox):
             self.num_rows = int(self.array_length)
             num, rem = divmod(len(self.value_array), columns)
             if self.num_rows == 0:
-               self.num_rows = 1
+                self.num_rows = 1
             self.max_rows = self.num_rows
         if rem != 0:
             # Then there is an incorrect number of entries.
@@ -143,7 +143,7 @@ class RowArrayValueWidget(gtk.HBox):
         """Create a new element (non-derived types)."""
         new_index = len(self.value_array)
         w_value = rose.variable.get_value_from_metadata(
-                               {rose.META_PROP_TYPE: self.type})
+            {rose.META_PROP_TYPE: self.type})
         self.value_array = self.value_array + [w_value]
         self.value = rose.variable.array_join(self.value_array)
         self.set_value(self.value)
@@ -272,7 +272,7 @@ class RowArrayValueWidget(gtk.HBox):
                 self.add_button.show()
         else:
             if (self.length is not None and self.length.isdigit() and
-                len(self.value_array) >= int(self.length)):
+                    len(self.value_array) >= int(self.length)):
                 self.add_button.hide()
                 self.del_button.show()
             else:
@@ -290,7 +290,7 @@ class RowArrayValueWidget(gtk.HBox):
             unwrapped_index = row_index * actual_num_cols + c
             value_index = unwrapped_index
             if (not isinstance(self.type, list) and
-                value_index >= len(self.value_array)):
+                    value_index >= len(self.value_array)):
                 widget = gtk.HBox()
                 eb0 = gtk.EventBox()
                 eb0.show()
@@ -299,7 +299,7 @@ class RowArrayValueWidget(gtk.HBox):
                 self.entry_table.attach(widget,
                                         c, c + 1,
                                         row_index, row_index + 1,
-                                        xoptions=gtk.EXPAND|gtk.FILL,
+                                        xoptions=(gtk.EXPAND | gtk.FILL),
                                         yoptions=gtk.SHRINK)
                 widget_list.append(widget)
                 continue
@@ -307,7 +307,7 @@ class RowArrayValueWidget(gtk.HBox):
                 value_index -= actual_num_cols
             if value_index < 0:
                 w_value = rose.variable.get_value_from_metadata(
-                               {rose.META_PROP_TYPE: el_piece_type})
+                    {rose.META_PROP_TYPE: el_piece_type})
             else:
                 w_value = self.value_array[value_index]
             new_values.append(w_value)
@@ -319,11 +319,11 @@ class RowArrayValueWidget(gtk.HBox):
                 except (TypeError, ValueError):
                     if w_value != '':
                         hover_text = self.TIP_INVALID_ENTRY.format(
-                                                            el_piece_type)
+                            el_piece_type)
                         w_error = {rose.META_PROP_TYPE: hover_text}
             w_meta = {rose.META_PROP_TYPE: el_piece_type}
             widget_cls = rose.config_editor.valuewidget.chooser(
-                                     w_value, w_meta, w_error)
+                w_value, w_meta, w_error)
             hook = self.hook
             setter = ArrayElementSetter(self.setter, unwrapped_index)
             widget = widget_cls(w_value, w_meta, setter.set_value, hook)
@@ -333,7 +333,7 @@ class RowArrayValueWidget(gtk.HBox):
             self.entry_table.attach(widget,
                                     c, c + 1,
                                     row_index, row_index + 1,
-                                    xoptions=gtk.EXPAND|gtk.FILL,
+                                    xoptions=(gtk.EXPAND | gtk.FILL),
                                     yoptions=gtk.SHRINK)
             widget_list.append(widget)
         self.rows.append(widget_list)
@@ -359,8 +359,7 @@ class RowArrayValueWidget(gtk.HBox):
             child_list = e_widget.get_children()
             while child_list:
                 child = child_list.pop()
-                if (isinstance(child, gtk.Entry) and
-                    hasattr(child, 'get_text')):
+                if isinstance(child, gtk.Entry) and hasattr(child, 'get_text'):
                     w = len(child.get_text())
                     if w > max_width.get(i, -1):
                         max_width.update({i: w})
@@ -382,7 +381,7 @@ class RowArrayValueWidget(gtk.HBox):
             while child_list:
                 child = child_list.pop()
                 if (isinstance(child, gtk.Entry) and
-                    hasattr(child, 'set_width_chars')):
+                        hasattr(child, 'set_width_chars')):
                     child.set_width_chars(max_width[i])
                 if hasattr(child, 'get_children'):
                     child_list.extend(child.get_children())
@@ -424,8 +423,10 @@ class RowArrayValueWidget(gtk.HBox):
         self.add_button.connect('leave-notify-event',
                                 lambda b, e: b.set_state(gtk.STATE_NORMAL))
         self.add_del_button_box = gtk.VBox()
-        self.add_del_button_box.pack_start(self.add_button, expand=False, fill=False)
-        self.add_del_button_box.pack_start(self.del_button, expand=False, fill=False)
+        self.add_del_button_box.pack_start(
+            self.add_button, expand=False, fill=False)
+        self.add_del_button_box.pack_start(
+            self.del_button, expand=False, fill=False)
         self.add_del_button_box.show()
         self._decide_show_buttons()
 
@@ -444,7 +445,7 @@ class RowArrayValueWidget(gtk.HBox):
             j = self.num_cols
             while j <= len(self.extra_array):
                 if (len(self.extra_array[:j]) % self.num_cols == 0 and
-                    all(self.extra_array[:j])):
+                        all(self.extra_array[:j])):
                     ok_index = j
                 else:
                     break

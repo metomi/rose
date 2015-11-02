@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 import rose.config_editor
@@ -51,8 +51,7 @@ class NavTreeManager(object):
                               skip_update=False):
         """Make the tree of namespaces and load to the tree panel."""
         # Clear the old namespace tree information (selectively if necessary).
-        if (only_this_namespace is not None and
-            only_this_config is None):
+        if only_this_namespace is not None and only_this_config is None:
             config_name = self.util.split_full_ns(self.data,
                                                   only_this_namespace)[0]
             only_this_config = config_name
@@ -63,7 +62,7 @@ class NavTreeManager(object):
         else:
             self.clear_namespace_tree()
         view_missing = self.data.page_ns_show_modes[
-                                 rose.config_editor.SHOW_MODE_LATENT]
+            rose.config_editor.SHOW_MODE_LATENT]
         # Reload the information into the tree.
         if only_this_config is None:
             configs = self.data.config.keys()
@@ -92,7 +91,7 @@ class NavTreeManager(object):
                 ns = section_data.metadata["full_ns"]
                 self.data.namespace_meta_lookup.setdefault(ns, {})
                 self.data.namespace_meta_lookup[ns].setdefault(
-                                    'title', ns.split('/')[-1])
+                    'title', ns.split('/')[-1])
                 spaces = ns.lstrip('/').split('/')
                 self.update_namespace_tree(spaces,
                                            self.namespace_tree,
@@ -102,7 +101,7 @@ class NavTreeManager(object):
                 ns = var.metadata['full_ns']
                 self.data.namespace_meta_lookup.setdefault(ns, {})
                 self.data.namespace_meta_lookup[ns].setdefault(
-                                    'title', ns.split('/')[-1])
+                    'title', ns.split('/')[-1])
                 spaces = ns.lstrip('/').split('/')
                 self.update_namespace_tree(spaces,
                                            self.namespace_tree,

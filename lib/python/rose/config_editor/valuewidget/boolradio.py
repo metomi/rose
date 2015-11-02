@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
@@ -46,10 +46,10 @@ class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
             self.allowed_values = [rose.TYPE_LOGICAL_VALUE_TRUE,
                                    rose.TYPE_LOGICAL_VALUE_FALSE]
             self.label_dict = {
-                       rose.TYPE_LOGICAL_VALUE_TRUE:
-                       rose.TYPE_LOGICAL_TRUE_TITLE,
-                       rose.TYPE_LOGICAL_VALUE_FALSE:
-                       rose.TYPE_LOGICAL_FALSE_TITLE}
+                rose.TYPE_LOGICAL_VALUE_TRUE:
+                rose.TYPE_LOGICAL_TRUE_TITLE,
+                rose.TYPE_LOGICAL_VALUE_FALSE:
+                rose.TYPE_LOGICAL_FALSE_TITLE}
 
         for k, item in enumerate(self.allowed_values):
             if item in self.label_dict:
@@ -74,7 +74,7 @@ class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
             self.pack_start(radio_button, False, False, 10)
             radio_button.show()
             radio_button.connect('focus-in-event', self.hook.trigger_scroll)
-        self.grab_focus = lambda : self.hook.get_focus(radio_button)
+        self.grab_focus = lambda: self.hook.get_focus(radio_button)
 
     def setter(self, widget, variable):
         if widget.get_active():

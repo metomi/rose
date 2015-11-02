@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Calculates the MD5 checksum for a file or files in a directory."""
 
 
@@ -103,7 +103,7 @@ def get_checksum_func(algorithm=None):
 
 def guess_checksum_algorithm(checksum):
     """Guess algorithm of "checksum".
-    
+
     If "checksum" starts with "source=", returns MTIME_AND_SIZE.
     Otherwise, use length of checksum to guess algorithm, based on the built-in
     functions from hashlib.
@@ -116,7 +116,10 @@ def guess_checksum_algorithm(checksum):
     if _HASH_LENGTHS is None:
         _HASH_LENGTHS = {}
         for algorithm, func in inspect.getmembers(hashlib, inspect.isbuiltin):
-            _HASH_LENGTHS[len(func().hexdigest())] = algorithm
+            try:
+                _HASH_LENGTHS[len(func().hexdigest())] = algorithm
+            except TypeError:
+                pass
     return _HASH_LENGTHS.get(len(checksum))
 
 

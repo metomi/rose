@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,13 +16,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
 import gtk
 
 import rose.config
+
 
 class FormatsChooserValueWidget(gtk.HBox):
 
@@ -56,12 +57,12 @@ class FormatsChooserValueWidget(gtk.HBox):
         image_event = gtk.EventBox()
         image_event.add(image)
         image_event.show()
-        self.add_box.pack_start(image_event, expand=False, fill=False, padding=5)
+        self.add_box.pack_start(
+            image_event, expand=False, fill=False, padding=5)
         self.data_chooser = gtk.combo_box_new_text()
         self.data_chooser.connect('focus-in-event',
                                   lambda d, e: self.load_data_chooser())
-        self.data_chooser.connect('changed', lambda d:
-                                            self.add_new_section())
+        self.data_chooser.connect('changed', lambda d: self.add_new_section())
         self.data_chooser.show()
         image_event.connect('button-press-event',
                             lambda i, w: (self.load_data_chooser() and
@@ -89,11 +90,9 @@ class FormatsChooserValueWidget(gtk.HBox):
             self.entry_table.remove(child)
         self.entry_table.resize(rows=len(self.entries) + 1, columns=1)
         for r, widget in enumerate(self.entries + [self.add_box]):
-            self.entry_table.attach(widget,
-                            0, 1,
-                            r, r + 1,
-                            xoptions=gtk.FILL)
-        self.grab_focus = lambda : self.hook.get_focus(self.entries[-1])
+            self.entry_table.attach(
+                widget, 0, 1, r, r + 1, xoptions=gtk.FILL)
+        self.grab_focus = lambda: self.hook.get_focus(self.entries[-1])
 
     def add_new_section(self):
         value = self.get_active_text(self.data_chooser)

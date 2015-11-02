@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Implement "rose task-run"."""
 
 import os
@@ -45,25 +45,25 @@ class TaskRunner(Runner):
 
     NAME = "task"
     OPTIONS = AppRunner.OPTIONS + [
-            "app_key", "cycle", "cycle_offsets", "path_globs", "prefix_delim",
-            "suffix_delim"]
+        "app_key", "cycle", "cycle_offsets", "path_globs", "prefix_delim",
+        "suffix_delim"]
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
         self.app_runner = AppRunner(
-                event_handler=self.event_handler,
-                popen=self.popen,
-                config_pm=self.config_pm,
-                fs_util=self.fs_util,
-                suite_engine_proc=self.suite_engine_proc)
+            event_handler=self.event_handler,
+            popen=self.popen,
+            config_pm=self.config_pm,
+            fs_util=self.fs_util,
+            suite_engine_proc=self.suite_engine_proc)
 
     def run_impl(self, opts, args, uuid, work_files):
         # "rose task-env"
         t = self.suite_engine_proc.get_task_props(
-                cycle=opts.cycle,
-                cycle_offsets=opts.cycle_offsets,
-                prefix_delim=opts.prefix_delim,
-                suffix_delim=opts.suffix_delim)
+            cycle=opts.cycle,
+            cycle_offsets=opts.cycle_offsets,
+            prefix_delim=opts.prefix_delim,
+            suffix_delim=opts.suffix_delim)
         is_changed = False
         for k, v in t:
             if os.getenv(k) != v:
@@ -105,8 +105,8 @@ class TaskRunner(Runner):
                 app_key = t.task_name
                 conf_dir = os.path.join(t.suite_dir, "app", t.task_name)
                 if (not os.path.isdir(conf_dir) and
-                    builtin_app is not None and
-                    builtin_app.get_app_key(t.task_name)):
+                        builtin_app is not None and
+                        builtin_app.get_app_key(t.task_name)):
                     # A builtin application may select a different app_key
                     # based on the task name.
                     app_key = builtin_app.get_app_key(t.task_name)

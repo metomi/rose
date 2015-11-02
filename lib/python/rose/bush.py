@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Web service for browsing users' Rose suite logs via an HTTP interface."""
 
 import cherrypy
@@ -52,7 +52,7 @@ class RoseBushService(object):
     CYCLES_PER_PAGE = 100
     JOBS_PER_PAGE = 15
     JOBS_PER_PAGE_MAX = 300
-    VIEW_SIZE_MAX = 10 * 1024 * 1024 # 10MB
+    VIEW_SIZE_MAX = 10 * 1024 * 1024  # 10MB
 
     def __init__(self, *args, **kwargs):
         self.exposed = True
@@ -93,7 +93,7 @@ class RoseBushService(object):
             "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
         }
         data["states"].update(
-                self.suite_engine_proc.get_suite_state_summary(user, suite))
+            self.suite_engine_proc.get_suite_state_summary(user, suite))
         data.update(self._get_suite_logs_info(user, suite))
         data["broadcast_states"] = (
             self.suite_engine_proc.get_suite_broadcast_states(user, suite))
@@ -120,7 +120,7 @@ class RoseBushService(object):
             "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
         }
         data["states"].update(
-                self.suite_engine_proc.get_suite_state_summary(user, suite))
+            self.suite_engine_proc.get_suite_state_summary(user, suite))
         data.update(self._get_suite_logs_info(user, suite))
         data["broadcast_events"] = (
             self.suite_engine_proc.get_suite_broadcast_events(user, suite))
@@ -173,7 +173,7 @@ class RoseBushService(object):
             data["n_pages"] = 1
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
-                self.suite_engine_proc.get_suite_state_summary(user, suite))
+            self.suite_engine_proc.get_suite_state_summary(user, suite))
         data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
         if form == "json":
             return simplejson.dumps(data)
@@ -262,12 +262,11 @@ class RoseBushService(object):
             tasks = shlex.split(str(tasks))
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
-                self.suite_engine_proc.get_suite_state_summary(user, suite))
+            self.suite_engine_proc.get_suite_state_summary(user, suite))
         data["offset"] = (page - 1) * per_page
         entries, of_n_entries = self.suite_engine_proc.get_suite_job_events(
-                                    user, suite,
-                                    cycles, tasks, no_statuses, order,
-                                    per_page, data["offset"])
+            user, suite, cycles, tasks, no_statuses, order, per_page,
+            data["offset"])
         data["entries"] = entries
         data["of_n_entries"] = of_n_entries
         if per_page:
@@ -311,15 +310,16 @@ class RoseBushService(object):
                 suite_conf = os.path.join(user_suite_dir_root, name,
                                           self.suite_engine_proc.SUITE_CONF)
                 job_logs_db = os.path.join(user_suite_dir_root, name,
-                                          self.suite_engine_proc.JOB_LOGS_DB)
-                if not os.path.exists(job_logs_db) and not os.path.exists(suite_conf):
+                                           self.suite_engine_proc.JOB_LOGS_DB)
+                if (not os.path.exists(job_logs_db) and
+                        not os.path.exists(suite_conf)):
                     continue
                 suite_db = os.path.join(user_suite_dir_root, name,
                                         self.suite_engine_proc.SUITE_DB)
                 try:
                     last_activity_time = strftime(
-                                "%Y-%m-%dT%H:%M:%S+0000",
-                                gmtime(os.stat(suite_db).st_mtime))
+                        "%Y-%m-%dT%H:%M:%S+0000",
+                        gmtime(os.stat(suite_db).st_mtime))
                 except OSError:
                     last_activity_time = None
                 entry = {"name": name, "info": {},
@@ -331,7 +331,8 @@ class RoseBushService(object):
                     try:
                         info_root = rose.config.load(rose_suite_info)
                         for key, node in info_root.value.items():
-                            if node.is_ignored() or not isinstance(node.value, str):
+                            if (node.is_ignored() or
+                                    not isinstance(node.value, str)):
                                 continue
                             entry["info"][key] = node.value
                     except rose.config.ConfigSyntaxError as err:
@@ -366,12 +367,12 @@ class RoseBushService(object):
                 mime = MIME_TEXT_PLAIN
             else:
                 mime = mimetypes.guess_type(
-                            urllib.pathname2url(path_in_tar))[0]
+                    urllib.pathname2url(path_in_tar))[0]
             f.seek(0)
             if (mode == "download" or
-                f_size > view_size_max or
-                mime and (not mime.startswith("text/") or
-                mime.endswith("html"))):
+                    f_size > view_size_max or
+                    mime and
+                    (not mime.startswith("text/") or mime.endswith("html"))):
                 t = NamedTemporaryFile()
                 f_bsize = os.fstatvfs(t.fileno()).f_bsize
                 while True:
@@ -393,9 +394,9 @@ class RoseBushService(object):
             else:
                 mime = mimetypes.guess_type(urllib.pathname2url(f_name))[0]
             if (mode == "download" or
-                f_size > view_size_max or
-                mime and (not mime.startswith("text/") or
-                mime.endswith("html"))):
+                    f_size > view_size_max or
+                    mime and
+                    (not mime.startswith("text/") or mime.endswith("html"))):
                 cherrypy.response.headers["Content-Type"] = mime
                 return cherrypy.lib.static.serve_file(f_name, mime)
             s = open(f_name).read()
@@ -465,9 +466,9 @@ class RoseBushService(object):
             if os.path.isfile(f_name):
                 s = os.stat(f_name)
                 data["files"]["rose"]["log/rose-suite-run." + key] = {
-                                "path": "log/rose-suite-run." + key,
-                                "mtime": s.st_mtime,
-                                "size": s.st_size}
+                    "path": "log/rose-suite-run." + key,
+                    "mtime": s.st_mtime,
+                    "size": s.st_size}
 
         # Other version files
         for f_name in glob(os.path.join(user_suite_dir, "log/*.version")):
@@ -476,9 +477,9 @@ class RoseBushService(object):
             name = os.path.join("log", os.path.basename(f_name))
             s = os.stat(f_name)
             data["files"]["rose"]["other:" + name] = {
-                                "path": name,
-                                "mtime": s.st_mtime,
-                                "size": s.st_size}
+                "path": name,
+                "mtime": s.st_mtime,
+                "size": s.st_size}
 
         k, logs_info = self.suite_engine_proc.get_suite_logs_info(user, suite)
         data["files"][k] = logs_info

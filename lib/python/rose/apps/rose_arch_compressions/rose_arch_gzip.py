@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Compress archive sources in gzip."""
 
 
@@ -41,11 +41,11 @@ class RoseArchGzip(object):
         """
         for source in target.sources.values():
             if source.path.endswith("." + target.compress_scheme):
-                continue # assume already done
+                continue  # assume already done
             name_gz = source.name + "." + target.compress_scheme
             work_path_gz = os.path.join(work_dir, name_gz)
             self.app_runner.fs_util.makedirs(
-                                self.app_runner.fs_util.dirname(work_path_gz))
+                self.app_runner.fs_util.dirname(work_path_gz))
             # N.B. Python's gzip is slow
             command = "gzip -c '%s' >'%s'" % (source.path, work_path_gz)
             self.app_runner.popen.run_simple(command, shell=True)

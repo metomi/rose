@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Plot suite ancestry."""
 
 import subprocess
@@ -64,10 +64,10 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None,
     dict_rows = ws_client.search(prefix, all_revs=1)[0][0]
     for dict_row in sorted(dict_rows, key=lambda _: _["revision"]):
         suite_id = rosie.suite_id.SuiteId.from_idx_branch_revision(
-                dict_row["idx"],
-                dict_row["branch"],
-                dict_row["revision"]
-            )
+            dict_row["idx"],
+            dict_row["branch"],
+            dict_row["revision"]
+        )
         dict_row["suite"] = suite_id.to_string_with_version()
         if "local" in properties:
             dict_row["local"] = suite_id.get_status()
@@ -168,7 +168,7 @@ def main():
     opts, args = opt_parser.parse_args()
     filter_id = None
     if args:
-        filter_id = args[0]    
+        filter_id = args[0]
         prefix = rosie.suite_id.SuiteId(id_text=filter_id).prefix
         if opts.prefix:
             opt_parser.error("No need to specify --prefix when specifying ID")

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Scan for running suites in suite hosts."""
 
 from rose.host_select import HostSelector
@@ -26,6 +26,7 @@ from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import sys
+
 
 class SuiteScanner(object):
 
@@ -39,7 +40,7 @@ class SuiteScanner(object):
         self.popen = popen
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
-                    event_handler=event_handler, popen=popen)
+                event_handler=event_handler, popen=popen)
         self.suite_engine_proc = suite_engine_proc
         if host_selector is None:
             host_selector = HostSelector(event_handler, popen)
@@ -61,9 +62,10 @@ class SuiteScanner(object):
         conf = ResourceLocator.default().get_conf()
         if not hosts:
             hosts = self.host_selector.expand(
-               ["localhost"] +
-               conf.get_value(["rose-suite-run", "hosts"], "").split() +
-               conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
+                ["localhost"] +
+                conf.get_value(["rose-suite-run", "hosts"], "").split() +
+                conf.get_value(["rose-suite-run", "scan-hosts"], "").split()
+            )[0]
         timeout = conf.get_value(["rose-suite-scan", "timeout"])
         if timeout:
             timeout = int(timeout)

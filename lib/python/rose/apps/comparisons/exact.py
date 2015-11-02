@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Compare two lists of numbers exactly."""
 
 from rose.apps.rose_ana import DataLengthError
@@ -24,6 +24,7 @@ from rose.apps.rose_ana import DataLengthError
 OUTPUT_STRING = "%s %s: %s%%: File %s %s %s (%s values)"
 PASS = "=="
 FAIL = "!="
+
 
 class Exact(object):
     def run(self, task):
@@ -38,8 +39,8 @@ class Exact(object):
         for val1, val2 in zip(task.resultdata, task.kgo1data):
             location += 1
             if val1 != val2:
-                task.set_failure(ExactComparisonFailure(task, val1, val2,
-                                   location))
+                task.set_failure(
+                    ExactComparisonFailure(task, val1, val2, location))
                 return task
             task.set_pass(ExactComparisonSuccess(task))
         return task
@@ -71,9 +72,9 @@ class ExactComparisonFailure(object):
         self.location = location
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, self.location, self.percentage,
-                                 self.resultfile, FAIL, self.kgo1file,
-                                 self.numvals)
+        return OUTPUT_STRING % (self.extract, self.location, self.percentage,
+                                self.resultfile, FAIL, self.kgo1file,
+                                self.numvals)
 
     __str__ = __repr__
 
@@ -91,8 +92,8 @@ class ExactComparisonSuccess(object):
             self.extract = self.extract + ":" + task.subextract
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, "all", 0,
-                                 self.resultfile, PASS, self.kgo1file, 
-                                 self.numvals)
+        return OUTPUT_STRING % (self.extract, "all", 0,
+                                self.resultfile, PASS, self.kgo1file,
+                                self.numvals)
 
     __str__ = __repr__

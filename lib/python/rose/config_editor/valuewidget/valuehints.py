@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import gobject
 import pygtk
@@ -78,5 +78,3 @@ class HintsValueWidget(gtk.HBox):
         completion.set_inline_completion(True)
         completion.set_minimum_key_length(0)
         self.entry.set_completion(completion)
-
-    

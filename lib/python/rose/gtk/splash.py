@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Invoke a splash screen from the command line."""
 
 import json
@@ -106,8 +106,8 @@ class SplashScreen(gtk.Window):
         if self.total_number_of_events == 0:
             fraction = 1.0
         else:
-            fraction = min([1.0, self.event_count /
-                                 self.total_number_of_events])
+            fraction = min(
+                [1.0, self.event_count / self.total_number_of_events])
         self._stop_pulse()
 
         if not no_progress:
@@ -129,7 +129,7 @@ class SplashScreen(gtk.Window):
     def _start_pulse(self, idle_fraction, idle_message):
         """Start the progress bar pulsing (moving side-to-side)."""
         if (self._progress_message != idle_message or
-            self._progress_fraction != idle_fraction):
+                self._progress_fraction != idle_fraction):
             return False
         self._is_progress_bar_pulsing = True
         gobject.timeout_add(self.TIME_INTERVAL_PULSE,
@@ -232,9 +232,9 @@ class SplashScreenProcess(object):
 
     def stop(self):
         if self.process is not None and not self.process.stdin.closed:
-            try: 
+            try:
                 self.process.communicate(input=json.dumps("stop") + "\n")
-            except IOError: 
+            except IOError:
                 pass
         self.process = None
 
@@ -286,14 +286,16 @@ class SplashScreenUpdaterThread(threading.Thread):
 
     def _update_splash_screen(self, update_input):
         """Update the splash screen with info extracted from stdin."""
-        self.splash_screen.update(*update_input["args"], **update_input["kwargs"])
+        self.splash_screen.update(
+            *update_input["args"], **update_input["kwargs"])
         return False
 
 if __name__ == "__main__":
     sys.path.append(os.getenv('ROSE_HOME'))
     splash_screen = SplashScreen(*sys.argv[1:])
     stop_event = threading.Event()
-    update_thread = SplashScreenUpdaterThread(splash_screen, stop_event, sys.stdin)
+    update_thread = SplashScreenUpdaterThread(
+        splash_screen, stop_event, sys.stdin)
     update_thread.start()
     try:
         gtk.main()

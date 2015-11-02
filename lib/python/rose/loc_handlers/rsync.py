@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,36 +16,44 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """A handler of locations on remote hosts."""
 
-import socket
 from tempfile import TemporaryFile
+from time import sleep, time
+from rose.popen import RosePopenError
 
 
 class RsyncLocHandler(object):
     """Handler of locations on remote hosts."""
 
+    SCHEME = "rsync"
+    TIMEOUT = 8
+
     def __init__(self, manager):
         self.manager = manager
         self.rsync = self.manager.popen.which("rsync")
-        self.bad_address = None
-        try:
-            self.bad_address = socket.gethostbyname("no-such-host")
-        except IOError:
-            pass
 
     def can_pull(self, loc):
         """Return true if loc.name looks like a path on a remote host."""
-        if self.rsync is None:
+        if self.rsync is None or ":" not in loc.name:
             return False
-        host = loc.name.split(":", 1)[0]
+        host, path = loc.name.split(":", 1)
+        if path.startswith("//") or host == "fcm":
+            # loc.name is a URL or FCM location keyword, not a host:path
+            return False
+        cmd = self.manager.popen.get_cmd("ssh", "-n", host, "test", "-e", path)
         try:
-            address = socket.gethostbyname(host)
-        except IOError:
+            proc = self.manager.popen.run_bg(*cmd)
+            end_time = time() + self.TIMEOUT
+            while proc.poll() is None and time < end_time:
+                sleep(0.1)
+            if proc.poll():
+                proc.kill()
+        except RosePopenError:
             return False
         else:
-            return self.bad_address is None or address != self.bad_address
+            return proc.wait() == 0
 
     def parse(self, loc, _):
         """Set loc.scheme, loc.loc_type, loc.paths."""

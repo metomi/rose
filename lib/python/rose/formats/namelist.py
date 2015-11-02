@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Utilities for parsing namelist files."""
 
 import re
@@ -50,25 +50,30 @@ REC_LOGICAL = _rec(r"\A(?:" + RE_LOGICAL + r")\Z")
 RE_CHARACTER = r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\""
 REC_CHARACTER = _rec(r"\A(?:" + RE_CHARACTER + r")\Z")
 # Matches a complex literal, capture real and imaginery parts
-RE_COMPLEX_R_I = r"\(\s*(" + RE_REAL + r")\s*" + RE_SEP + r"\s*(" + RE_REAL + r")\s*\)"
+RE_COMPLEX_R_I = (
+    r"\(\s*(" + RE_REAL + r")\s*" + RE_SEP + r"\s*(" + RE_REAL + r")\s*\)")
 REC_COMPLEX_R_I = _rec(RE_COMPLEX_R_I)
 # Matches a comment
 RE_COMMENT = r"(?:! .*)"
 # Matches a name, captures name
 RE_NAME = r"(?:[A-Za-z_]\w*)"
 # Matches an array index (range)
-RE_NAME_INDEX2  = r":(?:" + RE_INTEGER + r")?"
-RE_NAME_INDEX1  = RE_INTEGER + r"(?:" + RE_NAME_INDEX2 + r")?|" + RE_NAME_INDEX2
-RE_NAME_INDEX0  = r"\((?:(?:" + RE_NAME_INDEX1 + r")(?:," + RE_NAME_INDEX1 + r")*)\)"
-RE_NAME_INDEX   = r"(?:" + RE_NAME_INDEX0 + r"(?!" + RE_NAME_INDEX0 + r"))"
+RE_NAME_INDEX2 = r":(?:" + RE_INTEGER + r")?"
+RE_NAME_INDEX1 = (
+    RE_INTEGER + r"(?:" + RE_NAME_INDEX2 + r")?|" + RE_NAME_INDEX2)
+RE_NAME_INDEX0 = (
+    r"\((?:(?:" + RE_NAME_INDEX1 + r")(?:," + RE_NAME_INDEX1 + r")*)\)")
+RE_NAME_INDEX = r"(?:" + RE_NAME_INDEX0 + r"(?!" + RE_NAME_INDEX0 + r"))"
 # Matches a derived type component in a name
 RE_NAME_COMP = r"(?:\%" + RE_NAME + r")"
 # Matches an object name
-RE_OBJECT_NAME = r"(?:" + RE_NAME + r"(?:" + RE_NAME_COMP + r"|" + RE_NAME_INDEX + r")*)"
+RE_OBJECT_NAME = (
+    r"(?:" + RE_NAME + r"(?:" + RE_NAME_COMP + r"|" + RE_NAME_INDEX + r")*)")
 # Matches an object initialisation, captures designator
 RE_OBJECT_INIT = r"(" + RE_OBJECT_NAME + r")\s*="
 # Matches a value, captures value
-RE_VALUE = r"(" + r"|".join([RE_REAL, RE_LOGICAL, RE_CHARACTER, RE_COMPLEX]) + r")"
+RE_VALUE = (
+    r"(" + r"|".join([RE_REAL, RE_LOGICAL, RE_CHARACTER, RE_COMPLEX]) + r")")
 REC_VALUE = _rec(r"\A" + RE_VALUE + r"\Z")
 # Matches a repeat-value, captures count and value
 RE_VALUE_REPEAT = r"(" + RE_NATURAL + r")\*(?:" + RE_VALUE + r")?"
@@ -78,15 +83,17 @@ RE_GROUP_INIT = r"[^&]* &(" + RE_NAME + r")"
 # Matches a group termination
 RE_GROUP_TERM = r"/"
 # Real literal tidy
-REC_REAL_TIDY = [[_rec(r"[DdE]"), r"e"],                  # 1.d0, 1.D0, 1.E0 => 1.e0
-                 [_rec(r"\A([\+\-]?)\."), r"\g<1>0."],    # .1 => 0.1, -.1 => -0.1
-                 [_rec(r"\A([\+\-]?\d+)(e)"), r"\1.0\2"], # 1e1 => 1.0e1
-                 [_rec(r"e[\+\-]?0+\Z"), r""],            # 1.0e0 => 1.0
-                 [_rec(r"e0+"), r"e"],                    # 1.0e01 => 1.0e1
-                 [_rec(r"e([\+\-])0+"), r"e\1"],          # 1.0e-01 => 1.0e-1
-                 [_rec(r"\.(e|\Z)"), r".0\1"],            # 1. => 1.0, 1.e0 => 1.0e0
-                 [_rec(r"^0+(\d)"), r"\1"],               # 02.0 => 2.0, 000.5 => 0.5
-                 [_rec(r"^([+-])0+(\d)"), r"\1\2"]]       # +02.0 => +2.0, -000.5 => -0.5
+REC_REAL_TIDY = [
+    [_rec(r"[DdE]"), r"e"],                   # 1.d0, 1.D0, 1.E0 => 1.e0
+    [_rec(r"\A([\+\-]?)\."), r"\g<1>0."],     # .1 => 0.1, -.1 => -0.1
+    [_rec(r"\A([\+\-]?\d+)(e)"), r"\1.0\2"],  # 1e1 => 1.0e1
+    [_rec(r"e[\+\-]?0+\Z"), r""],             # 1.0e0 => 1.0
+    [_rec(r"e0+"), r"e"],                     # 1.0e01 => 1.0e1
+    [_rec(r"e([\+\-])0+"), r"e\1"],           # 1.0e-01 => 1.0e-1
+    [_rec(r"\.(e|\Z)"), r".0\1"],             # 1. => 1.0, 1.e0 => 1.0e0
+    [_rec(r"^0+(\d)"), r"\1"],                # 02.0 => 2.0, 000.5 => 0.5
+    [_rec(r"^([+-])0+(\d)"), r"\1\2"]]        # +02.0 => +2.0, -000.5 => -0.5
+
 
 class NamelistGroup(object):
     """Represent a namelist group.
@@ -95,7 +102,8 @@ class NamelistGroup(object):
     name: the name of the namelist group.
     objects: a list containing the objects (i.e. key=value pairs) of the
              namelist groups. Each object is a NamelistObject object.
-    file: (optional) the name of the source file containing this namelist group.
+    file: (optional) the name of the source file containing this namelist
+          group.
 
     """
 
@@ -119,9 +127,10 @@ class NamelistObject(object):
     namelist group.
 
     It has the following attributes:
-    lhs: left hand side (i.e. the key) of the assignment in the namelist object.
-    rhs: right hand side (i.e. the value) of the assignment in the namelist object.
-         It is a list of strings representing the values.
+    lhs: left hand side (i.e. the key) of the assignment in the namelist
+         object.
+    rhs: right hand side (i.e. the value) of the assignment in the namelist
+         object.  It is a list of strings representing the values.
 
     """
 
@@ -144,7 +153,7 @@ class NamelistObject(object):
         if len(self.rhs) < min_repeat_length:
             return [str(v) for v in self.rhs]
         R, V = (0, 1)
-        items = [] # ([value, repeat], ...)
+        items = []  # ([value, repeat], ...)
         for value in self.rhs:
             if items and str(value) == str(items[-1][V]):
                 items[-1][R] += 1
@@ -154,7 +163,7 @@ class NamelistObject(object):
         for item in items:
             if item[R] > 1:
                 if (item[R] >= min_repeat_length and
-                    REC_VALUE.search(str(item[V]))):
+                        REC_VALUE.search(str(item[V]))):
                     values.append(str(item[R]) + "*" + str(item[V]))
                 else:
                     values.extend([str(item[V])] * item[R])
@@ -245,7 +254,7 @@ def parse(in_files):
     ctx = _ParseContext()
     ctx.files += in_files
     for tag, filename, data in iter(lambda: _parse_func(ctx), None):
-        if handler_of.has_key(tag):
+        if tag in handler_of:
             handler_of[tag](groups, filename, data)
     return groups
 
@@ -286,7 +295,8 @@ def _parse_func(ctx):
             ctx.handle = ctx.files[0]
             if not isinstance(ctx.handle, file):
                 ctx.handle = open(ctx.handle, "r")
-            ctx.line_number = 0 # FIXME: may be incorrect for already opened file
+            # FIXME: may be incorrect for already opened file
+            ctx.line_number = 0
             ctx.state = ""
         while ctx.handle is not None:
             if ctx.tail:
@@ -339,7 +349,7 @@ def _handle_value(groups, file, data):
         value = data[0]
     if value and REC_CHARACTER.match(value):
         quote_mark = value[0]
-        value = value[1 : len(value) - 1]
+        value = value[1:len(value) - 1]
         value = value.replace(quote_mark + quote_mark, quote_mark)
         quote = True
     groups[-1].objects[-1].append_rhs(NamelistValue(value, quote), repeat)
@@ -374,7 +384,6 @@ def pretty_format_value(values):
 def pretty_format_keys(keys):
     """Pretty-format namelist keys."""
     return [item.lower() for item in keys]
-
 
 
 def validate_config(config, meta_config, add_report_func):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import copy
 import os
@@ -50,7 +50,7 @@ class UpgradeController(object):
         self.use_all_versions = False
         self.treemodel = gtk.TreeStore(str, str, str, bool)
         self.treeview = rose.gtk.util.TooltipTreeView(
-                                      get_tooltip_func=self._get_tooltip)
+            get_tooltip_func=self._get_tooltip)
         self.treeview.show()
         old_pwd = os.getcwd()
         for config_name in config_names:
@@ -107,13 +107,14 @@ class UpgradeController(object):
             self.treeview.append_column(column)
         self.treeview.connect("cursor-changed", self._handle_change_cursor)
         self.treewindow.add(self.treeview)
-        self.window.vbox.pack_start(self.treewindow, expand=True, fill=True,
-                                    padding=rose.config_editor.SPACING_PAGE)
+        self.window.vbox.pack_start(
+            self.treewindow, expand=True, fill=True,
+            padding=rose.config_editor.SPACING_PAGE)
         button_hbox = gtk.HBox()
         button_hbox.show()
         all_versions_toggle_button = gtk.CheckButton(
-                     label=rose.config_editor.DIALOG_LABEL_UPGRADE_ALL,
-                     use_underline=False)
+            label=rose.config_editor.DIALOG_LABEL_UPGRADE_ALL,
+            use_underline=False)
         all_versions_toggle_button.set_active(self.use_all_versions)
         all_versions_toggle_button.connect("toggled",
                                            self._handle_toggle_all_versions)
@@ -167,8 +168,8 @@ class UpgradeController(object):
                 macro_id = (type(manager).__name__ + "." +
                             rose.macro.TRANSFORM_METHOD)
                 if handle_transform_func(config_name, macro_id,
-                                            new_config, change_list,
-                                            triggers_ok=True):
+                                         new_config, change_list,
+                                         triggers_ok=True):
                     meta_config = rose.macro.load_meta_config(
                         new_config, config_type=rose.SUB_CONFIG_NAME,
                         ignore_meta_error=True
@@ -186,9 +187,9 @@ class UpgradeController(object):
                                 macro_config, meta_config)
                         )
                         handle_transform_func(config_name, macro_id,
-                                                new_trig_config,
-                                                trig_change_list,
-                                                triggers_ok=True)
+                                              new_trig_config,
+                                              trig_change_list,
+                                              triggers_ok=True)
                 iter_ = self.treemodel.iter_next(iter_)
         os.chdir(old_pwd)
         self.window.destroy()
@@ -227,7 +228,7 @@ class UpgradeController(object):
         iter_ = self.treemodel.get_iter(path)
         value = self.treemodel.get_value(iter_, col_index)
         if (self.treemodel.get_value(iter_, 1) ==
-            self.treemodel.get_value(iter_, 2)):
+                self.treemodel.get_value(iter_, 2)):
             self.treemodel.set_value(iter_, col_index, False)
         else:
             self.treemodel.set_value(iter_, col_index, not value)
@@ -268,14 +269,10 @@ class UpgradeController(object):
         next_tag = manager.get_new_tag(only_named=not self.use_all_versions)
         if next_tag is None:
             self.treemodel.append(
-                            None,
-                            [config_name, current_tag,
-                            current_tag, False])
+                None, [config_name, current_tag, current_tag, False])
         else:
             self.treemodel.append(
-                            None,
-                            [config_name, current_tag,
-                            next_tag, True])
+                None, [config_name, current_tag, next_tag, True])
         listmodel = gtk.ListStore(str)
         tags = manager.get_tags(only_named=not self.use_all_versions)
         if not tags:

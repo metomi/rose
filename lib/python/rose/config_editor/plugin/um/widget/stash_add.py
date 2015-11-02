@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pango
 import pygtk
@@ -107,10 +107,10 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self.control_widget_hbox = self._get_control_widget_hbox()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
         self._view = rose.gtk.util.TooltipTreeView(
-                                   get_tooltip_func=self.set_tree_tip)
+            get_tooltip_func=self.set_tree_tip)
         self._view.set_rules_hint(True)
         self.sort_util = rose.gtk.util.TreeModelSortUtil(
-                              lambda: self._view.get_model(), 2)
+            lambda: self._view.get_model(), 2)
         self._view.show()
         self._view.connect("button-press-event",
                            self._handle_button_press_event)
@@ -199,7 +199,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         """Construct a data model of other page data."""
         data_rows, cols = self.get_model_data_and_columns()
         data_rows, cols, rows_are_descendants = self._apply_grouping(
-                            data_rows, cols, self.group_index)
+            data_rows, cols, self.group_index)
         self.column_names = cols
         if data_rows:
             col_types = [str] * len(data_rows[0])
@@ -390,7 +390,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             return True
         for col_text in model.get(iter_, *range(len(self.column_names))):
             if (isinstance(col_text, basestring) and
-                filt_text.lower() in col_text.lower()):
+                    filt_text.lower() in col_text.lower()):
                 return True
         child_iter = model.iter_children(iter_)
         while child_iter is not None:
@@ -402,16 +402,16 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
     def _get_control_widget_hbox(self):
         # Build the control widgets for the dialog.
         filter_label = gtk.Label(
-                      rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
+            rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
         filter_label.show()
         self._filter_widget = gtk.Entry()
         self._filter_widget.set_width_chars(
-                     rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
+            rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
         self._filter_widget.connect("changed", self._filter_refresh)
         self._filter_widget.set_tooltip_text("Filter by literal values")
         self._filter_widget.show()
         group_label = gtk.Label(
-                     rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
+            rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
         group_label.show()
         self._group_widget = gtk.ComboBox()
         cell = gtk.CellRendererText()
@@ -419,25 +419,25 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._group_widget.add_attribute(cell, 'text', 0)
         self._group_widget.show()
         self._add_button = rose.gtk.util.CustomButton(
-                                label="Add",
-                                stock_id=gtk.STOCK_ADD,
-                                tip_text="Add a new request for this entry")
+            label="Add",
+            stock_id=gtk.STOCK_ADD,
+            tip_text="Add a new request for this entry")
         self._add_button.connect("activate",
                                  lambda b: self._handle_add_current_row())
         self._add_button.connect("clicked",
                                  lambda b: self._handle_add_current_row())
         self._refresh_button = rose.gtk.util.CustomButton(
-                                    label="Refresh",
-                                    stock_id=gtk.STOCK_REFRESH,
-                                    tip_text="Refresh namelist:streq statuses")
+            label="Refresh",
+            stock_id=gtk.STOCK_REFRESH,
+            tip_text="Refresh namelist:streq statuses")
         self._refresh_button.connect("activate",
                                      lambda b: self.refresh_stash_requests())
         self._refresh_button.connect("clicked",
                                      lambda b: self.refresh_stash_requests())
         self._view_button = rose.gtk.util.CustomButton(
-                                 label="View",
-                                 tip_text="Select view options",
-                                 has_menu=True)
+            label="View",
+            tip_text="Select view options",
+            has_menu=True)
         self._view_button.connect("button-press-event",
                                   self._popup_view_menu)
         filter_hbox = gtk.HBox()
@@ -519,7 +519,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             group_index = self.column_names.index(col_name)
             # Any existing grouping changes the order of self.column_names.
             if (self.group_index is not None and
-                group_index <= self.group_index):
+                    group_index <= self.group_index):
                 group_index -= 1
         else:
             group_index = None
@@ -575,9 +575,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                 view_streq_menuitem = gtk.MenuItem(label=streq)
                 view_streq_menuitem._section = streq
                 view_streq_menuitem.connect(
-                           "button-release-event",
-                           lambda m, e: self.navigate_to_stash_request(
-                                                      m._section))
+                    "button-release-event",
+                    lambda m, e: self.navigate_to_stash_request(m._section))
                 view_streq_menuitem.show()
                 view_menu.append(view_streq_menuitem)
             menu.append(view_menuitem)
@@ -596,7 +595,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             meta_menuitem.set_sensitive(False)
         menu.append(meta_menuitem)
         col_title_menuitem = gtk.CheckMenuItem(
-                  label="Show expanded column titles")
+            label="Show expanded column titles")
         if self._should_show_meta_column_titles:
             col_title_menuitem.set_active(True)
         col_title_menuitem.connect("toggled",
@@ -627,8 +626,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             col_menuitem.set_active(column.get_visible())
             col_menuitem._connect_args = (col_name,)
             col_menuitem.connect(
-                    "toggled",
-                    lambda c: self._toggle_show_column_name(*c._connect_args))
+                "toggled",
+                lambda c: self._toggle_show_column_name(*c._connect_args))
             show_column_menu.append(col_menuitem)
         menu.popup(None, None, widget.position_menu, event.button,
                    event.time, widget)
@@ -639,8 +638,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         col_index = self._view.get_columns().index(column)
         col_title = self.column_names[col_index]
         value = self._view.get_model().get_value(iter_, col_index)
-        if (col_title in self._visible_metadata_columns and
-            value is not None):
+        if col_title in self._visible_metadata_columns and value is not None:
             if col_title == "Section":
                 key = self.STASH_PARSE_SECT_OPT + "=" + value
             else:
@@ -653,8 +651,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             if desc:
                 value += ": " + desc
         max_len = 36
-        if (value is not None and len(value) > max_len
-            and col_index != 0):
+        if value is not None and len(value) > max_len and col_index != 0:
             cell.set_property("width-chars", max_len)
             cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         if col_index == 0 and treemodel.iter_parent(iter_) is not None:
@@ -695,8 +692,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._view.columns_autosize()
 
     def _toggle_show_meta_column_titles(self, widget):
-         self._should_show_meta_column_titles = widget.get_active()
-         self.generate_tree_view()
+        self._should_show_meta_column_titles = widget.get_active()
+        self.generate_tree_view()
 
     def _update_control_widget_sensitivity(self):
         section, item = self._get_current_section_item()

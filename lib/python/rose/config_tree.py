@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Rose configuration directory inheritance."""
 
 import os
@@ -58,7 +58,7 @@ class ConfigTree(object):
 
         A short hand of:
         os.path.join(conf_tree.files[key], key)
-        
+
         """
         return os.path.join(self.files[key], key)
 
@@ -67,7 +67,7 @@ class ConfigTree(object):
 
         Short hand for:
         [os.path.join(file_loc, key) for file_loc in conf_tree.file_locs[key]]
-        
+
         """
         return [
             os.path.join(file_loc, key) for file_loc in self.file_locs[key]]
@@ -132,7 +132,7 @@ class ConfigTreeLoader(object):
                     continue
                 if conf_tree.node.get(keys) is None:
                     conf_tree.node.set(keys, sub_node.value, sub_node.state,
-                                         sub_node.comments)
+                                       sub_node.comments)
             for dir_path, dir_names, file_names in os.walk(t_conf_dir):
                 names = [dir_ for dir_ in dir_names if dir_.startswith(".")]
                 for name in names:
@@ -159,12 +159,12 @@ class ConfigTreeLoader(object):
         i_conf_dirs = []
         for value in values:
             i_conf_dir = self._search(
-                    value, [os.path.dirname(my_conf_dir)] + conf_dir_paths)
+                value, [os.path.dirname(my_conf_dir)] + conf_dir_paths)
             i_conf_file_name = os.path.join(i_conf_dir, conf_name)
             if nodes.get(i_conf_dir) is None:
                 nodes[i_conf_dir] = self.node_loader.load_with_opts(
-                        i_conf_file_name, more_keys=opt_keys,
-                        used_keys=used_keys)
+                    i_conf_file_name, more_keys=opt_keys,
+                    used_keys=used_keys)
             i_conf_dirs.append(i_conf_dir)
         return i_conf_dirs
 
@@ -348,7 +348,7 @@ type=grilled
                    "etc/bread": t3_conf_dir,
                    "etc/tomato": t2_conf_dir})
         self.test("t3.conf_dirs", conf_tree.conf_dirs,
-             [t3_conf_dir, t2_conf_dir, t1_conf_dir])
+                  [t3_conf_dir, t2_conf_dir, t1_conf_dir])
 
     def test3_opt(self):
         """Test: configuration that imports t1 and t2, with opt conf."""
@@ -368,7 +368,7 @@ type=baked
 """)
         handle.close()
         conf_tree = self.config_tree_loader("t3", "rose-t.conf",
-                                         opt_keys=["go-large"])
+                                            opt_keys=["go-large"])
 
         string_io = StringIO()
         self.config_dumper(conf_tree.node, string_io)
@@ -416,7 +416,7 @@ size=large
         handle.write("50/50 slice bread\n")
         handle.close()
         conf_tree = self.config_tree_loader("t4", "rose-t.conf",
-                                         conf_dir_paths=["../a"])
+                                            conf_dir_paths=["../a"])
 
         string_io = StringIO()
         self.config_dumper(conf_tree.node, string_io)
@@ -450,14 +450,15 @@ type=grilled
         os.chdir("../a")
         t2_conf_dir = os.path.join(os.getcwd(), "t2")
         t1_conf_dir = os.path.join(os.getcwd(), "t1")
-        self.test("t4.files", conf_tree.files,
-             {"bin/make-breakfast": t2_conf_dir,
-              "etc/sausage": t2_conf_dir,
-              "etc/bread": t4_conf_dir,
-              "etc/tomato": t2_conf_dir,
-              "opt/rose-t-go-large.conf": t1_conf_dir})
+        self.test(
+            "t4.files", conf_tree.files,
+            {"bin/make-breakfast": t2_conf_dir,
+             "etc/sausage": t2_conf_dir,
+             "etc/bread": t4_conf_dir,
+             "etc/tomato": t2_conf_dir,
+             "opt/rose-t-go-large.conf": t1_conf_dir})
         self.test("t4.conf_dirs", conf_tree.conf_dirs,
-             [t4_conf_dir, t2_conf_dir, t1_conf_dir])
+                  [t4_conf_dir, t2_conf_dir, t1_conf_dir])
 
     def run(self):
         """Run the tests."""

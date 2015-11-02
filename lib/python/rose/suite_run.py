@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Implement "rose suite-run"."""
 
 import ast
@@ -110,9 +110,9 @@ class SuiteRunner(Runner):
         Runner.__init__(self, *args, **kwargs)
         self.host_selector = HostSelector(self.event_handler, self.popen)
         self.suite_run_cleaner = SuiteRunCleaner(
-                event_handler=self.event_handler,
-                host_selector=self.host_selector,
-                suite_engine_proc=self.suite_engine_proc)
+            event_handler=self.event_handler,
+            host_selector=self.host_selector,
+            suite_engine_proc=self.suite_engine_proc)
 
     def run_impl(self, opts, args, uuid, work_files):
         # Log file, temporary
@@ -157,10 +157,10 @@ class SuiteRunner(Runner):
         suite_engine_key = self.suite_engine_proc.get_version_env_name()
         if opts.run_mode in ["reload", "restart"]:
             prev_config_path = self.suite_engine_proc.get_suite_dir(
-                    suite_name, "log", "rose-suite-run.conf")
+                suite_name, "log", "rose-suite-run.conf")
             prev_config = ConfigLoader()(prev_config_path)
             suite_engine_version = prev_config.get_value(
-                    ["env", suite_engine_key])
+                ["env", suite_engine_key])
         else:
             suite_engine_version = self.suite_engine_proc.get_version()
         auto_items = {"ROSE_ORIG_HOST": self.host_selector.get_local_host(),
@@ -230,7 +230,7 @@ class SuiteRunner(Runner):
 
         # Install version information file
         write_source_vc_info(
-                suite_conf_dir, "log/" + prefix + ".version", self.popen)
+            suite_conf_dir, "log/" + prefix + ".version", self.popen)
 
         # If run through rose-stem, install version information files for
         # each source tree if they're a working copy
@@ -247,7 +247,7 @@ class SuiteRunner(Runner):
         # Move temporary log to permanent log
         if hasattr(self.event_handler, "contexts"):
             log_file_path = os.path.abspath(
-                    os.path.join("log", "rose-suite-run.log"))
+                os.path.join("log", "rose-suite-run.log"))
             log_file = open(log_file_path, "ab")
             temp_log_file = self.event_handler.contexts[uuid].handle
             temp_log_file.seek(0)
@@ -298,9 +298,7 @@ class SuiteRunner(Runner):
         # Ask suite engine to parse suite configuration
         # and determine if it is up to date (unchanged)
         suite_conf_unchanged = self.suite_engine_proc.cmp_suite_conf(
-                                                            suite_name,
-                                                            opts.strict_mode,
-                                                            opts.debug_mode)
+            suite_name, opts.strict_mode, opts.debug_mode)
 
         if opts.local_install_only_mode:
             return
@@ -314,7 +312,7 @@ class SuiteRunner(Runner):
         # Install items to user@host
         conf = ResourceLocator.default().get_conf()
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
-        queue = [] # [[pipe, command, "ssh"|"rsync", auth], ...]
+        queue = []  # [[pipe, command, "ssh"|"rsync", auth], ...]
         for auth in sorted(auths):
             host = auth
             if "@" in auth:
@@ -362,7 +360,7 @@ class SuiteRunner(Runner):
             sleep(self.SLEEP_PIPE)
             pipe, command, command_name, auth = queue.pop(0)
             if pipe.poll() is None:
-                queue.append([pipe, command, command_name, auth]) # put it back
+                queue.append([pipe, command, command_name, auth])  # put back
                 continue
             ret_code = pipe.wait()
             out, err = pipe.communicate()
@@ -414,7 +412,7 @@ class SuiteRunner(Runner):
         self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
         # FIXME: values in environ were expanded in the localhost
         self.suite_engine_proc.run(
-                suite_name, host, environ, opts.run_mode, args)
+            suite_name, host, environ, opts.run_mode, args)
         open("rose-suite-run.host", "w").write(host + "\n")
 
         # Disconnect log file handle, so monitoring tool command will no longer
@@ -475,7 +473,7 @@ class SuiteRunner(Runner):
             suite_dir_root = env_var_process(suite_dir_root)
         suite_dir_home = os.path.join(home, suite_dir_rel)
         if (suite_dir_root and
-            os.path.realpath(home) != os.path.realpath(suite_dir_root)):
+                os.path.realpath(home) != os.path.realpath(suite_dir_root)):
             suite_dir_real = os.path.join(suite_dir_root, suite_dir_rel)
             self.fs_util.makedirs(suite_dir_real)
             self.fs_util.symlink(suite_dir_real, suite_dir_home,
@@ -522,7 +520,7 @@ class SuiteRunner(Runner):
                         for file_ in files:
                             path = os.path.join(root, file_)
                             if (os.path.exists(path) and
-                                os.stat(path).st_mtime >= t_threshold):
+                                    os.stat(path).st_mtime >= t_threshold):
                                 keep = True
                                 break
                         if keep:
@@ -544,7 +542,7 @@ class SuiteRunner(Runner):
                 tar_handle.add(log)
                 tar_handle.close()
                 tar_f.flush()
-                os.fsync(tar_f.fileno())           
+                os.fsync(tar_f.fileno())
                 tar_f.close()
                 # N.B. Python's gzip is slow
                 self.popen.run_simple("gzip", "-f", log_tar)

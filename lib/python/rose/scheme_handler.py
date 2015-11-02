@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Load and select from a group of related functional classes."""
 
 
@@ -67,7 +67,7 @@ class SchemeHandlersManager(object):
         if ns:
             ns_path = os.path.join(*(ns.split("."))) + os.sep
         for path in paths:
-            os.chdir(path) # assuming that "" is at the front of sys.path
+            os.chdir(path)  # assuming that "" is at the front of sys.path
             sys.path.insert(0, path)
             try:
                 kwargs["manager"] = self
@@ -90,8 +90,8 @@ class SchemeHandlersManager(object):
                         if scheme0 is not None:
                             schemes = [scheme0]
                         for scheme in getattr(c, "SCHEMES", schemes):
-                            if self.handlers.has_key(scheme):
-                                raise ValueError(c) # scheme already used
+                            if scheme in self.handlers:
+                                raise ValueError(c)  # scheme already used
                             kwargs["manager"] = self
                             if handler is None:
                                 handler = c(*args, **kwargs)
@@ -107,9 +107,8 @@ class SchemeHandlersManager(object):
 
         """
         try:
-            if self.handlers.has_key(scheme):
-                return self.handlers[scheme]
-        except TypeError:
+            return self.handlers[scheme]
+        except (KeyError, TypeError):
             pass
 
     def guess_handler(self, item):

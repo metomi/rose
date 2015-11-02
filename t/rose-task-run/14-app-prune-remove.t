@@ -48,6 +48,6 @@ run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/log/job-20100102T0000Z.tar.gz
 run_fail "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/log/job-20100103T0000Z.tar.gz
 run_pass "$TEST_KEY.4" ls -d $HOME/cylc-run/$NAME/log/job-20100104T0000Z.tar.gz
 #-------------------------------------------------------------------------------
-rose suite-clean -y --name=$NAME
+rose suite-clean -q -y --name=$NAME
 #-------------------------------------------------------------------------------
 exit 0

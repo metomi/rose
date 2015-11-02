@@ -5,10 +5,48 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q4?)
+
+Rose release 32. This release will work best with
+[cylc-6.7.1](https://github.com/cylc/cylc/releases/tag/6.7.1) and
+[fcm-2015.10.0](https://github.com/metomi/fcm/releases/tag/2015.10.0).
+
+### User Interface Changes
+
+[#1735](https://github.com/metomi/rose/pull/1735):
+rose suite-hook: will no longer retrieve remote job logs by default. This
+should be handled by cylc. If this functionality is still required for whatever
+reason, use the `--retrieve-job-logs` option to switch it back on.
+
+[#1729](https://github.com/metomi/rose/pull/1729):
+rose suite-scan: will now time out after 60s by default. This can be configured
+via the `[rose-suite-scan]timeout=SECONDS` setting in the site/user
+configuration.
+
+### Noteworthy Changes
+
+[#1740](https://github.com/metomi/rose/pull/1740):
+Rose configuration metadata: new `type=python_boolean` setting.
+
+[#1738](https://github.com/metomi/rose/pull/1738):
+rosie go: the create functionality was creating the meta suite ROSIE instead of
+a normal suite. This fixes the problem.
+
+[#1729](https://github.com/metomi/rose/pull/1729):
+rose test-battery: now runs correctly in the absence of site/user configuration
+on recent Ubuntu distros.
+
+[#1727](https://github.com/metomi/rose/pull/1727):
+rosa svn-pre-commit: now checks `rose-suite.info` files of suites using site
+configuration metadata. A change that contains a `rose-suite.info` file that
+does not validate will be rejected.
+
+--------------------------------------------------------------------------------
+
 ## 2015.10.1 (2015-10-15)
 
 Rose release 31. This release works best with
-[cylc-6.7.1](https://github.com/cylc/cylc/releases/tag/6.7.0) and
+[cylc-6.7.1](https://github.com/cylc/cylc/releases/tag/6.7.1) and
 [fcm-2015.10.0](https://github.com/metomi/fcm/releases/tag/2015.10.0).
 
 ### Noteworthy Changes

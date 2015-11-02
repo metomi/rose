@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,13 +16,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import pygtk
 pygtk.require('2.0')
 import gtk
 
 import rose
+
 
 class ChoicesListView(gtk.TreeView):
 
@@ -37,7 +38,7 @@ class ChoicesListView(gtk.TreeView):
     given.
     get_custom_menu_items, if given, should be a function that
     accepts no arguments and returns a list of gtk.MenuItem-derived
-    instances. The listview model and current TreeIter will be 
+    instances. The listview model and current TreeIter will be
     available as attributes "_listview_model" and "_listview_iter" set
     on each menu item to optionally use during the menu item callbacks
     - this means that they can use them to modify the model
@@ -56,12 +57,9 @@ class ChoicesListView(gtk.TreeView):
         self._handle_search = handle_search
         self._get_custom_menu_items = get_custom_menu_items
         self.enable_model_drag_dest(
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_MOVE)
+            [('text/plain', 0, 0)], gtk.gdk.ACTION_MOVE)
         self.enable_model_drag_source(
-                  gtk.gdk.BUTTON1_MASK,
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_MOVE)
+            gtk.gdk.BUTTON1_MASK, [('text/plain', 0, 0)], gtk.gdk.ACTION_MOVE)
         self.connect("button-press-event", self._handle_button_press)
         self.connect("drag-data-get", self._handle_drag_get)
         self.connect_after("drag-data-received",
@@ -112,8 +110,7 @@ class ChoicesListView(gtk.TreeView):
         if not model.iter_n_children(None):
             model.append([rose.config_editor.CHOICE_LABEL_EMPTY])
 
-    def _handle_drag_received(self, treeview, drag, x, y, sel, info,
-                                       time):
+    def _handle_drag_received(self, treeview, drag, x, y, sel, info, time):
         """Handle an incoming drag request."""
         if sel.data is None:
             return False
@@ -122,7 +119,7 @@ class ChoicesListView(gtk.TreeView):
         if drop_info:
             path, position = drop_info
             if (position == gtk.TREE_VIEW_DROP_BEFORE or
-                position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+                    position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
                 model.insert(path[0], [sel.data])
             else:
                 model.insert(path[0] + 1, [sel.data])
@@ -252,12 +249,9 @@ class ChoicesTreeView(gtk.TreeView):
         self.set_headers_visible(True)
         self.set_rules_hint(True)
         self.enable_model_drag_dest(
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_MOVE)
+            [('text/plain', 0, 0)], gtk.gdk.ACTION_MOVE)
         self.enable_model_drag_source(
-                  gtk.gdk.BUTTON1_MASK,
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_MOVE)
+            gtk.gdk.BUTTON1_MASK, [('text/plain', 0, 0)], gtk.gdk.ACTION_MOVE)
         self.connect_after("button-release-event", self._handle_button)
         self.connect("drag-begin", self._handle_drag_begin)
         self.connect("drag-data-get", self._handle_drag_get)
@@ -337,7 +331,7 @@ class ChoicesTreeView(gtk.TreeView):
         is_implicit = model.get_value(r_iter, 2)
         r_iter = model.iter_children(r_iter)
         while r_iter is not None:
-            if model.get_value(r_iter, 1) == True:
+            if model.get_value(r_iter, 1):
                 is_in_value = True
                 break
             r_iter = model.iter_next(r_iter)
@@ -389,7 +383,7 @@ class ChoicesTreeView(gtk.TreeView):
         child_iter = model.iter_children(iter_)
         while child_iter is not None:
             if (model.get_value(child_iter, 1) or
-                model.get_value(child_iter, 2)):
+                    model.get_value(child_iter, 2)):
                 return False
             child_iter = model.iter_next(child_iter)
         return True
@@ -428,7 +422,7 @@ class ChoicesTreeView(gtk.TreeView):
         can_add = self._check_can_add(r_iter)
         should_add = False
         if ((should_turn_off is None or should_turn_off)
-            and self._get_is_included(this_name, ok_values)):
+                and self._get_is_included(this_name, ok_values)):
             ok_values.remove(this_name)
         elif should_turn_off is None or not should_turn_off:
             if not can_add:

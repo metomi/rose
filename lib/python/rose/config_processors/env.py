@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Process an env section in node of a rose.config_tree.ConfigTree."""
 
 import os
@@ -37,7 +37,7 @@ class ConfigProcessorForEnv(ConfigProcessorBase):
         env_node = conf_tree.node.get([item], no_ignore=True)
         if env_node is None:
             return
-        if os.environ.has_key("UNDEF"):
+        if "UNDEF" in os.environ:
             os.environ.pop("UNDEF")
         environ = {}
         if env_node and not env_node.state:
@@ -48,7 +48,7 @@ class ConfigProcessorForEnv(ConfigProcessorBase):
                     environ[key] = env_var_process(node.value)
                 except UnboundEnvironmentVariableError as e:
                     raise ConfigProcessError([item, key], node.value, e)
-                environ[key] = os.path.expanduser(environ[key]) # ~ expansion
+                environ[key] = os.path.expanduser(environ[key])  # ~ expansion
         for key, value in sorted(environ.items()):
             env_export(key, value, self.manager.event_handler)
         return environ

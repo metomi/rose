@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Builtin application: "rose ana", a comparison engine for Rose."""
 
 
@@ -76,6 +76,7 @@ class RoseAnaApp(BuiltinApp):
         num_failed, tasks = engine.analyse()
         if num_failed != 0:
             raise TestsFailedException(num_failed)
+
 
 class DataLengthError(Exception):
 
@@ -152,7 +153,7 @@ class Analyse(object):
         for task in self.tasks:
 
             if self.check_extract(task):
-            # Internal AnalysisEngine extract+comparison test
+                # Internal AnalysisEngine extract+comparison test
 
                 # Extract data from results and from kgoX
                 task = self.do_extract(task, "result")
@@ -163,7 +164,7 @@ class Analyse(object):
 
                 task = self.do_comparison(task)
             else:
-            # External program(s) doing test
+                # External program(s) doing test
 
                 # Command to run
                 command = task.extract
@@ -183,7 +184,7 @@ class Analyse(object):
                     # Run the command on the KGO file
                     task.kgo1data = self._run_command(kgocommand)
                 else:
-                # The command works on both files at the same time
+                    # The command works on both files at the same time
                     # Replace tokens $kgofile and $resultfile for actual values
                     command = self._expand_tokens(command, task)
 
@@ -239,8 +240,7 @@ class Analyse(object):
         filename = ''
         if var:
             filename = getattr(task, var + "file")
-        expansions = { 'resultfile' : task.resultfile,
-                       'file' : filename}
+        expansions = {'resultfile': task.resultfile, 'file': filename}
         for i in range(1, task.numkgofiles + 1):
             key = "kgo" + str(i) + "file"
             value = getattr(task, key)
@@ -300,8 +300,7 @@ class Analyse(object):
             newtask.comparison = self.config.get_value([task, "comparison"])
             newtask.tolerance = self.config.get_value([task, "tolerance"])
             newtask.warnonfail = (
-                    self.config.get_value([task, "warnonfail"]) in
-                    ["yes", "true"])
+                self.config.get_value([task, "warnonfail"]) in ["yes", "true"])
 
             # Allow for multiple KGO, e.g. kgo1file, kgo2file, for
             # statistical comparisons of results
@@ -312,7 +311,9 @@ class Analyse(object):
                 if self.config.get([task, kgofilevar]):
                     value = self.config.get([task, kgofilevar])[:]
                     if "{}" in value:
-                        setattr(newtask, kgofilevar, value.replace("{}", self.args[0]))
+                        setattr(
+                            newtask, kgofilevar,
+                            value.replace("{}", self.args[0]))
                     else:
                         setattr(newtask, kgofilevar, value)
                     newtask.numkgofiles += 1
@@ -329,10 +330,10 @@ class Analyse(object):
         for filename in files:
             directory = os.path.dirname(filename)
             if (not directory.endswith(USRCOMPARISON_DIRNAME) or
-                not filename.endswith(USRCOMPARISON_EXT)):
+                    not filename.endswith(USRCOMPARISON_EXT)):
                 continue
             comparison_name = os.path.basename(filename).rpartition(
-                                USRCOMPARISON_EXT)[0]
+                USRCOMPARISON_EXT)[0]
             sys.path.insert(0, os.path.abspath(directory))
             try:
                 modules.append(__import__(comparison_name))
@@ -348,8 +349,7 @@ class Analyse(object):
             contents = inspect.getmembers(module, inspect.isclass)
             for obj_name, obj in contents:
                 att_name = "run"
-                if (hasattr(obj, att_name) and
-                    callable(getattr(obj, att_name))):
+                if hasattr(obj, att_name) and callable(getattr(obj, att_name)):
                     doc_string = obj.__doc__
                     user_methods.append((comparison_name, obj_name, att_name,
                                         doc_string))
@@ -407,7 +407,7 @@ class AnalysisTask(object):
 
     def __init__(self):
 
-# Variables defined in config file
+        # Variables defined in config file
         self.name = None
         self.resultfile = None
         self.kgofile = None
@@ -416,7 +416,6 @@ class AnalysisTask(object):
         self.tolerance = None
         self.warnonfail = False
         self.numkgofiles = 0
-
 
 # Variables to save settings before environment variable expansion (for
 # writing back to config file, rerunning, etc)
@@ -478,4 +477,3 @@ def data_from_regexp(regexp, filename):
         if result:
             numbers.append(result.group(1))
     return numbers
-

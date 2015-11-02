@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,11 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Suite engine processor management."""
 
 from isodatetime.data import Duration
 from isodatetime.parsers import DurationParser, ISO8601SyntaxError
+from glob import glob
 import os
 import pwd
 import re
@@ -148,7 +149,7 @@ class OldFormatCycleOffset(BaseCycleOffset):
                 "M": ("minutes", 1)}
         date_time_unit, multiplier = KEYS[self.unit]
         amount = self.amount
-        if self.sign == self.SIGN_DEFAULT: # negative
+        if self.sign == self.SIGN_DEFAULT:  # negative
             amount = -amount
         return Duration(**{date_time_unit: multiplier * amount})
 
@@ -314,8 +315,8 @@ class SuiteEngineProcessor(object):
 
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
     SCHEME_HANDLER_MANAGER = None
-    SCHEME_DEFAULT = "cylc" # TODO: site configuration?
-    TIMEOUT = 5 # seconds
+    SCHEME_DEFAULT = "cylc"  # TODO: site configuration?
+    TIMEOUT = 5  # seconds
 
     @classmethod
     def get_processor(cls, key=None, event_handler=None, popen=None,
@@ -325,9 +326,9 @@ class SuiteEngineProcessor(object):
         if cls.SCHEME_HANDLER_MANAGER is None:
             p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
             cls.SCHEME_HANDLER_MANAGER = SchemeHandlersManager(
-                    [p], ns="rose.suite_engine_procs", attrs=["SCHEME"],
-                    can_handle=None, event_handler=event_handler, popen=popen,
-                    fs_util=fs_util, host_selector=host_selector)
+                [p], ns="rose.suite_engine_procs", attrs=["SCHEME"],
+                can_handle=None, event_handler=event_handler, popen=popen,
+                fs_util=fs_util, host_selector=host_selector)
         if key is None:
             key = cls.SCHEME_DEFAULT
         return cls.SCHEME_HANDLER_MANAGER.get_handler(key)
@@ -476,12 +477,10 @@ class SuiteEngineProcessor(object):
         suite_d = os.path.expanduser(suite_d)
         if not os.path.isdir(suite_d):
             raise NoSuiteLogError(user_name, suite_name)
-        rose_bush_status_f_name = os.path.expanduser(
-                    "~/.metomi/rose-bush.status")
         rose_bush_url = None
-        if os.path.isfile(rose_bush_status_f_name):
+        for f_name in glob(os.path.expanduser("~/.metomi/rose-bush*.status")):
             status = {}
-            for line in open(rose_bush_status_f_name):
+            for line in open(f_name):
                 k, v = line.strip().split("=", 1)
                 status[k] = v
             if status.get("host"):
@@ -489,6 +488,7 @@ class SuiteEngineProcessor(object):
                 if status.get("port"):
                     rose_bush_url += ":" + status["port"]
             rose_bush_url += "/"
+            break
         if not rose_bush_url:
             conf = ResourceLocator.default().get_conf()
             rose_bush_url = conf.get_value(["rose-suite-log", "rose-bush"])

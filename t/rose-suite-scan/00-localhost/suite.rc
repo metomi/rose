@@ -3,7 +3,7 @@
     UTC mode = True
     [[event hooks]]
         timeout handler = "rose suite-hook --shutdown"
-        timeout = 1
+        timeout = PT2M
 [scheduling]
     [[dependencies]]
         graph = """

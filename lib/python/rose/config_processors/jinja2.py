@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """Process a section in a rose.config.ConfigNode into a Jinja2 template."""
 
 import filecmp
@@ -39,8 +39,8 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
         """Process [jinja2:*] in "conf_tree.node"."""
         for s_key, s_node in sorted(conf_tree.node.value.items()):
             if (s_node.is_ignored() or
-                not s_key.startswith(self.PREFIX) or
-                not s_node.value):
+                    not s_key.startswith(self.PREFIX) or
+                    not s_node.value):
                 continue
             target = s_key[len(self.PREFIX):]
             source = os.path.join(conf_tree.files[target], target)
@@ -75,7 +75,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                 tmp_file.write(line)
             tmp_file.seek(0)
             if os.access(target, os.F_OK | os.R_OK):
-                if filecmp.cmp(target, tmp_file.name): # identical
+                if filecmp.cmp(target, tmp_file.name):  # identical
                     tmp_file.close()
                     continue
                 else:

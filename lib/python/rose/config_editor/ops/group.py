@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """This module handles grouped operations.
 
 These are supersets of section and variable operations, such as adding
@@ -151,24 +151,24 @@ class GroupOperations(object):
                     # Enable from user-ignored.
                     is_ignored = False
                 elif (rose.variable.IGNORED_BY_USER not in old_reason and
-                          rose.variable.IGNORED_BY_USER in reason):
+                        rose.variable.IGNORED_BY_USER in reason):
                     # User-ignore from enabled.
                     is_ignored = True
                 elif (triggers_ok and
-                          rose.variable.IGNORED_BY_SYSTEM not in old_reason
-                          and rose.variable.IGNORED_BY_SYSTEM in reason):
+                        rose.variable.IGNORED_BY_SYSTEM not in old_reason
+                        and rose.variable.IGNORED_BY_SYSTEM in reason):
                     # Trigger-ignore.
                     sect_data.error.setdefault(
-                              rose.config_editor.WARNING_TYPE_ENABLED,
-                              rose.config_editor.IGNORED_STATUS_MACRO)
+                        rose.config_editor.WARNING_TYPE_ENABLED,
+                        rose.config_editor.IGNORED_STATUS_MACRO)
                     is_ignored = True
                 elif (triggers_ok and
-                          rose.variable.IGNORED_BY_SYSTEM in old_reason and
-                          rose.variable.IGNORED_BY_SYSTEM not in reason):
+                        rose.variable.IGNORED_BY_SYSTEM in old_reason and
+                        rose.variable.IGNORED_BY_SYSTEM not in reason):
                     # Enabled from trigger-ignore.
                     sect_data.error.setdefault(
-                              rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED,
-                              rose.config_editor.IGNORED_STATUS_MACRO)
+                        rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED,
+                        rose.config_editor.IGNORED_STATUS_MACRO)
                     is_ignored = False
                 else:
                     ignored_changed = False
@@ -221,7 +221,7 @@ class GroupOperations(object):
             self.apply_diff,
             (config_name, reverse_diff, origin_name, triggers_ok,
              not is_reversed),
-            custom_name = origin_name
+            custom_name=origin_name
         )
         self.undo_stack.append(stack_item)
         del self.redo_stack[:]
@@ -248,7 +248,7 @@ class GroupOperations(object):
         self.sect_ops.add_section(config_name, new_section_name,
                                   skip_update=True)
         namespace = self.data.helper.get_default_namespace_for_section(
-                                         new_section_name, config_name)
+            new_section_name, config_name)
         config_data = self.data.config[config_name]
         if opt_map is None:
             opt_map = {}
@@ -261,9 +261,9 @@ class GroupOperations(object):
                 self.var_ops.add_var(var, skip_update=True)
         for opt_name, value in opt_map.items():
             var_id = self.util.get_id_from_section_option(
-                                           new_section_name, opt_name)
+                new_section_name, opt_name)
             metadata = self.data.helper.get_metadata_for_config_id(
-                                            var_id, config_name)
+                var_id, config_name)
             metadata['full_ns'] = namespace
             flags = self.data.load_option_flags(config_name,
                                                 new_section_name, opt_name)
@@ -300,12 +300,12 @@ class GroupOperations(object):
         self.sect_ops.add_section(config_name, new_section,
                                   skip_update=skip_update)
         new_namespace = self.data.helper.get_default_namespace_for_section(
-                                  new_section, config_name)
+            new_section, config_name)
         for var in clone_vars:
             var_id = self.util.get_id_from_section_option(
-                                           new_section, var.name)
+                new_section, var.name)
             metadata = self.data.helper.get_metadata_for_config_id(
-                                 var_id, config_name)
+                var_id, config_name)
             var.process_metadata(metadata)
             var.metadata['full_ns'] = new_namespace
         sorter = rose.config.sort_settings
@@ -329,7 +329,7 @@ class GroupOperations(object):
         nses = []
         for section in sections:
             ns = self.data.helper.get_default_namespace_for_section(
-                                              section, config_name)
+                section, config_name)
             if ns not in nses:
                 nses.append(ns)
             skipped_nses = self.sect_ops.ignore_section(config_name, section,
@@ -367,7 +367,7 @@ class GroupOperations(object):
         nses = []
         for section in sections:
             ns = self.data.helper.get_default_namespace_for_section(
-                                              section, config_name)
+                section, config_name)
             if ns not in nses:
                 nses.append(ns)
             self.remove_section(config_name, section, skip_update=True)
@@ -382,15 +382,15 @@ class GroupOperations(object):
             namespace = "/" + namespace
         config_name, subsp = self.util.split_full_ns(self.data, namespace)
         return SubDataOperations(
-                    config_name,
-                    self.add_section_with_options,
-                    self.copy_section,
-                    self.sect_ops.ignore_section,
-                    self.ignore_sections,
-                    self.remove_section,
-                    self.remove_sections,
-                    get_var_id_values_func=(
-                            self.data.helper.get_sub_data_var_id_value_map))
+            config_name,
+            self.add_section_with_options,
+            self.copy_section,
+            self.sect_ops.ignore_section,
+            self.ignore_sections,
+            self.remove_section,
+            self.remove_sections,
+            get_var_id_values_func=(
+                self.data.helper.get_sub_data_var_id_value_map))
 
 
 class SubDataOperations(object):
@@ -423,16 +423,16 @@ class SubDataOperations(object):
     def ignore_section(self, ignore_section_name, is_ignored):
         """User-ignore or enable a section."""
         return self._ignore_section_func(
-                            self.config_name,
-                            ignore_section_name,
-                            is_ignored)
+            self.config_name,
+            ignore_section_name,
+            is_ignored)
 
     def ignore_sections(self, ignore_sections_list, is_ignored):
         """User-ignore or enable a list of sections."""
         return self._ignore_sections_func(
-                            self.config_name,
-                            ignore_sections_list,
-                            is_ignored)
+            self.config_name,
+            ignore_sections_list,
+            is_ignored)
 
     def remove_section(self, remove_section_name):
         """Remove a section and all its options."""

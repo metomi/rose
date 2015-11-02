@@ -40,6 +40,7 @@
 . $(dirname $0)/../lib/bash/rose_init
 . $(dirname $0)/../lib/bash/rose_log
 rose_init
+mkdir -p ~/.metomi
 if [[ $ROSE_HOME != $(rose_readlink_canonicalize .) ]]; then
     info 1 cd "$ROSE_HOME"
     cd "$ROSE_HOME"

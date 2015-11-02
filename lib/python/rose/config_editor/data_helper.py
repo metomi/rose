@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import re
 
@@ -93,9 +93,9 @@ class ConfigDataHelper(object):
         """Return the matching variable or None."""
         sect, opt = self.util.get_section_option_from_id(var_id)
         return self.data.config[config_name].vars.get_var(
-                         sect, opt, save, skip_latent=not latent)
+            sect, opt, save, skip_latent=not latent)
 
-#------------------ Data model helper functions ------------------------------
+# ----------------- Data model helper functions ------------------------------
 
     def get_data_for_namespace(self, ns, from_saved=False):
         """Return a list of vars and a list of latent vars for this ns."""
@@ -122,7 +122,7 @@ class ConfigDataHelper(object):
         config_name = self.util.split_full_ns(self, ns)[0]
         config_data = self.data.config[config_name]
         ns_macros_text = self.data.namespace_meta_lookup.get(ns, {}).get(
-                                             rose.META_PROP_MACRO, "")
+            rose.META_PROP_MACRO, "")
         if not ns_macros_text:
             return {}
         ns_macros = rose.variable.array_split(ns_macros_text,
@@ -277,7 +277,7 @@ class ConfigDataHelper(object):
                     miss_sections.append(section)
             for section in self.data.config[config_name].vars.latent:
                 if (section not in real_sections and
-                    section not in miss_sections):
+                        section not in miss_sections):
                     miss_sections.append(section)
             full_sections += [config_name + ':' + s for s in miss_sections]
         sorter = rose.config.sort_settings
@@ -288,20 +288,22 @@ class ConfigDataHelper(object):
         """Return the default namespace for the section."""
         if config_name not in self.data._config_section_namespace_lookup:
             self.data._config_section_namespace_lookup.setdefault(
-                                                config_name, {})
+                config_name, {})
         section_ns = (
-                self.data._config_section_namespace_lookup[config_name].get(
-                                                                  section))
+            self.data._config_section_namespace_lookup[config_name].get(
+                section))
         if section_ns is None:
             config_data = self.data.config[config_name]
             meta_config = config_data.meta
-            node = meta_config.get([section, rose.META_PROP_NS], no_ignore=True)
+            node = meta_config.get(
+                [section, rose.META_PROP_NS], no_ignore=True)
             if node is not None:
                 subspace = node.value
             else:
                 match = REC_ELEMENT_SECTION.match(section)
                 if match:
-                    node = meta_config.get([match.groups()[0], rose.META_PROP_NS])
+                    node = meta_config.get(
+                        [match.groups()[0], rose.META_PROP_NS])
                     if node is None or node.is_ignored():
                         subspace = section.replace('(', '/')
                         subspace = subspace.replace(')', '')
@@ -317,7 +319,7 @@ class ConfigDataHelper(object):
             if not subspace:
                 section_ns = config_name
             self.data._config_section_namespace_lookup[config_name].update(
-                                                {section: section_ns})
+                {section: section_ns})
         return section_ns
 
     def get_format_sections(self, config_name):
@@ -325,7 +327,7 @@ class ConfigDataHelper(object):
         format_keys = []
         for section in self.data.config[config_name].sections.now:
             if (section not in format_keys and
-                ':' in section and not section.startswith('file:')):
+                    ':' in section and not section.startswith('file:')):
                 format_keys.append(section)
         format_keys.sort(rose.config.sort_settings)
         return format_keys
@@ -412,7 +414,7 @@ class ConfigDataHelper(object):
                     # Section ignored statuses need interpreting.
                     var_id = var.metadata["id"]
                     section, option = self.util.get_section_option_from_id(
-                                                                   var_id)
+                        var_id)
                     sect_data = config_data.sections.get_sect(section)
                     for key in sect_data.ignored_reason:
                         variable_statuses.setdefault(key, 0)
@@ -449,7 +451,7 @@ class ConfigDataHelper(object):
             if section in config_data.sections.now:
                 # It has a current section associated.
                 section_namespace = (
-                        config_data.sections.now[section].metadata["full_ns"])
+                    config_data.sections.now[section].metadata["full_ns"])
                 if section_namespace == namespace:
                     # This is a default page for an existing section.
                     return False

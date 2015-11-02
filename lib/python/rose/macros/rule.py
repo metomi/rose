@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import ast
 import os
@@ -30,29 +30,28 @@ import rose.macro
 import rose.variable
 
 
-
 REC_EXPR_IS_THIS_RULE = re.compile(
-             """(?:^.*[^\w:=]|^)   (?# Break or beginning)
-                 this              (?# 'this')
-                 (?:               (?# Followed by:)
-                   $               (?# the end)
-                  |                (?# or)
-                   \W              (?# break plus)
-                   .*              (?# anything)
-                   (               (?# Start operator)
-                     [+*%<>=-]    (?# Arithmetic)
-                    |              (?# or)
-                     in\s          (?# String)
-                    |              (?# or)
-                     not\s         (?# Logical not)
-                    |              (?# or)
-                     and\s         (?# Logical and)
-                    |              (?# or)
-                     or\s          (?# Logical or)
-                   )               (?# End operator)
-                   .*              (?# anything)
-                   $               (?# the end)
-                 )""", re.X)
+    """(?:^.*[^\w:=]|^)   (?# Break or beginning)
+        this              (?# 'this')
+        (?:               (?# Followed by:)
+          $               (?# the end)
+         |                (?# or)
+          \W              (?# break plus)
+          .*              (?# anything)
+          (               (?# Start operator)
+            [+*%<>=-]    (?# Arithmetic)
+           |              (?# or)
+            in\s          (?# String)
+           |              (?# or)
+            not\s         (?# Logical not)
+           |              (?# or)
+            and\s         (?# Logical and)
+           |              (?# or)
+            or\s          (?# Logical or)
+          )               (?# End operator)
+          .*              (?# anything)
+          $               (?# the end)
+        )""", re.X)
 
 
 class RuleValueError(Exception):
@@ -92,7 +91,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
             metadata = rose.macro.get_metadata_for_config_id(setting_id,
                                                              meta_config)
             for rule_opt in [self.RULE_ERROR_NAME, self.RULE_WARNING_NAME]:
-               if rule_opt in metadata:
+                if rule_opt in metadata:
                     rule = metadata.get(rule_opt)
                     id_rules = rule_data[rule_opt]
                     id_rules.setdefault(setting_id, [])
@@ -123,8 +122,8 @@ class FailureRuleChecker(rose.macro.MacroBase):
                     try:
                         test_failed = evaluator.evaluate_rule(
                             rule, setting_id, config, meta_config)
-                    except (ZeroDivisionError, TypeError, 
-                            ValueError,IndexError) as exc:
+                    except (ZeroDivisionError, TypeError,
+                            ValueError, IndexError) as exc:
                         test_failed = True
                         info = self.RULE_MSG_FAIL_FORMAT.format(
                             exc, f_type, rule)
@@ -193,7 +192,7 @@ class RuleEvaluator(rose.macro.MacroBase):
     def evaluate_rule(self, rule, setting_id, config, meta_config):
         """Evaluate the logic in the provided rule based on config values."""
         rule_template_str, rule_id_values = self._process_rule(
-                                   rule, setting_id, config, meta_config)
+            rule, setting_id, config, meta_config)
         template = jinja2.Template(rule_template_str)
         return_string = template.render(rule_id_values)
         return ast.literal_eval(return_string)
@@ -323,7 +322,7 @@ class RuleEvaluator(rose.macro.MacroBase):
             if option is None:
                 raise RuleValueError(variable_id)
             if (option.endswith(')') and '(' in option and
-                option.count('(') == 1):
+                    option.count('(') == 1):
                 option, element = option.rstrip(')').split('(')
                 opt_node = config.get([section, option])
                 if opt_node is not None:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-5 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import shlex
 
@@ -82,19 +82,21 @@ class PageTable(gtk.Table):
             if num_vars_above_this == 0:
                 row_above_new = -1
             else:
-                row_above_new = widget_coordinate_list[num_vars_above_this - 1][1]
+                row_above_new = widget_coordinate_list[
+                    num_vars_above_this - 1][1]
             for variable_widget, widget_row in widget_coordinate_list:
                 if widget_row > row_above_new:
                     for child in self.get_children():
                         if child.get_parent() == variable_widget:
                             self.remove(child)
-            new_variable_widget.insert_into(self, self.MAX_COLS, row_above_new + 1)
+            new_variable_widget.insert_into(
+                self, self.MAX_COLS, row_above_new + 1)
             self._show_and_hide_variable_widgets(new_variable_widget)
             r = row_above_new + 2
             for variable_widget, widget_row in widget_coordinate_list:
                 if (widget_row > row_above_new and
-                    variable_widget.variable.metadata.get('id') !=
-                    variable.metadata.get('id')):
+                        variable_widget.variable.metadata.get('id') !=
+                        variable.metadata.get('id')):
                     variable_widget.insert_into(self, self.MAX_COLS, r)
                     r += 1
         else:
@@ -112,10 +114,10 @@ class PageTable(gtk.Table):
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
         return rose.config_editor.variable.VariableWidget(
-                                                variable,
-                                                self.var_ops,
-                                                is_ghost=is_ghost,
-                                                show_modes=self.show_modes)
+            variable,
+            self.var_ops,
+            is_ghost=is_ghost,
+            show_modes=self.show_modes)
 
     def reload_variable_widget(self, variable):
         """Reload the widgets for the given variable."""
@@ -127,8 +129,8 @@ class PageTable(gtk.Table):
         for child in self.get_children():
             variable_widget = child.get_parent()
             if (variable_widget.variable.name == variable.name and
-                variable_widget.variable.metadata.get('id') ==
-                variable.metadata.get('id')):
+                    variable_widget.variable.metadata.get('id') ==
+                    variable.metadata.get('id')):
                 if "index" not in focus_dict:
                     focus_dict["index"] = variable_widget.get_focus_index()
                 if getattr(self, 'focus_child') == child:
@@ -155,7 +157,7 @@ class PageTable(gtk.Table):
             is_ghost = v in self.ghost_data
             sort_key_vars.append((sort_key, v, is_ghost))
         sort_key_vars.sort(
-               lambda x, y: rose.config_editor.util.null_cmp(x, y))
+            lambda x, y: rose.config_editor.util.null_cmp(x, y))
         sort_key_vars.sort(lambda x, y: cmp("=null" in x[1].metadata["id"],
                                             "=null" in y[1].metadata["id"]))
         return [(x[1], x[2]) for x in sort_key_vars]
@@ -231,18 +233,18 @@ class PageArrayTable(PageTable):
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
         if (rose.META_PROP_LENGTH in variable.metadata or
-            isinstance(variable.metadata.get(rose.META_PROP_TYPE), list)):
+                isinstance(variable.metadata.get(rose.META_PROP_TYPE), list)):
             return rose.config_editor.variable.RowVariableWidget(
-                                                variable,
-                                                self.var_ops,
-                                                is_ghost=is_ghost,
-                                                show_modes=self.show_modes,
-                                                length=self.array_length)
+                variable,
+                self.var_ops,
+                is_ghost=is_ghost,
+                show_modes=self.show_modes,
+                length=self.array_length)
         return rose.config_editor.variable.VariableWidget(
-                                                variable,
-                                                self.var_ops,
-                                                is_ghost=is_ghost,
-                                                show_modes=self.show_modes)
+            variable,
+            self.var_ops,
+            is_ghost=is_ghost,
+            show_modes=self.show_modes)
 
     def _set_length(self):
         max_meta_length = 0
@@ -278,17 +280,16 @@ class PageLatentTable(gtk.Table):
 
     def __init__(self, panel_data, ghost_data, var_ops, show_modes,
                  arg_str=None):
-        super(PageLatentTable, self).__init__(rows=self.MAX_ROWS,
-                                     columns=self.MAX_COLS,
-                                     homogeneous=False)
+        super(PageLatentTable, self).__init__(
+            rows=self.MAX_ROWS, columns=self.MAX_COLS, homogeneous=False)
         self.show()
         self.num_removes = 0
         self.panel_data = panel_data
         self.ghost_data = ghost_data
         self.var_ops = var_ops
         self.show_modes = show_modes
-        self.title_on = (not self.show_modes[
-                                  rose.config_editor.SHOW_MODE_NO_TITLE])
+        self.title_on = (
+            not self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE])
         self.alt_menu_class = rose.config_editor.menuwidget.CheckedMenuWidget
         r = 0
         v_sort_ids = []
@@ -296,8 +297,8 @@ class PageLatentTable(gtk.Table):
             v_sort_ids.append((v.metadata.get("sort-key", ""),
                                v.metadata["id"]))
         v_sort_ids.sort(
-               lambda x, y: rose.config.sort_settings(
-                                 x[0] + "~" + x[1], y[0] + "~" + y[1]))
+            lambda x, y: rose.config.sort_settings(
+                x[0] + "~" + x[1], y[0] + "~" + y[1]))
         v_sort_ids.sort(lambda x, y: cmp("=null" in x[1], "=null" in y[1]))
         for sort_key, var_id in v_sort_ids:
             is_ghost = False
@@ -318,10 +319,8 @@ class PageLatentTable(gtk.Table):
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
         return rose.config_editor.variable.VariableWidget(
-                                                variable,
-                                                self.var_ops,
-                                                is_ghost=is_ghost,
-                                                show_modes=self.show_modes)
+            variable, self.var_ops, is_ghost=is_ghost,
+            show_modes=self.show_modes)
 
     def reload_variable_widget(self, variable):
         """Reload the widgets for the given variable."""
@@ -333,8 +332,8 @@ class PageLatentTable(gtk.Table):
         for child in self.get_children():
             variable_widget = child.get_parent()
             if (variable_widget.variable.name == variable.name and
-                variable_widget.variable.metadata.get('id') ==
-                variable.metadata.get('id')):
+                    variable_widget.variable.metadata.get('id') ==
+                    variable.metadata.get('id')):
                 if "index" not in focus_dict:
                     focus_dict["index"] = variable_widget.get_focus_index()
                 if getattr(self, 'focus_child') == child:
