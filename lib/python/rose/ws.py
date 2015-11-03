@@ -25,6 +25,7 @@ ws_cli - Parse CLI. Start/Stop ad-hoc server.
 """
 
 import cherrypy
+from glob import glob
 import os
 import signal
 import sys
@@ -33,7 +34,7 @@ from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 
 
-LOG_ROOT_TMPL = "~/.metomi/%(ns)s-%(util)s-%(host)s-%(port)d"
+LOG_ROOT_TMPL = "~/.metomi/%(ns)s-%(util)s-%(host)s-%(port)s"
 
 
 def wsgi_app(service_cls, *args, **kwargs):
@@ -160,12 +161,17 @@ def _configure(service_cls):
 def _get_server_status(service_cls):
     """Return a dict containing Rose Bush quick server status."""
     ret = {}
-    try:
-        filename = os.path.expanduser(
-            LOG_ROOT_TMPL % (service_cls.NS, service_cls.UTIL)) + ".status"
-        for line in open(filename):
-            key, value = line.strip().split("=", 1)
-            ret[key] = value
-    except (IOError, ValueError):
-        pass
+    log_root_glob = os.path.expanduser(LOG_ROOT_TMPL % {
+        "ns": service_cls.NS,
+        "util": service_cls.UTIL,
+        "host": "*",
+        "port": "*"})
+    for filename in glob(log_root_glob):
+        try:
+            for line in open(filename):
+                key, value = line.strip().split("=", 1)
+                ret[key] = value
+            break
+        except (IOError, ValueError):
+            pass
     return ret

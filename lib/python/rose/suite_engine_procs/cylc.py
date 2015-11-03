@@ -79,6 +79,7 @@ class CylcProcessor(SuiteEngineProcessor):
     PGREP_CYLC_RUN = r"python.*cylc-(run|restart)( | .+ )%s( |$)"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
+    REC_BUNCH_LOG = re.compile(r"\A(bunch\.)(.+)(\.out|\.err)\Z")
     REC_CYCLE_TIME = re.compile(
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
@@ -393,68 +394,63 @@ class CylcProcessor(SuiteEngineProcessor):
             return (entries, of_n_entries)
 
         # Job logs DB
-        stmt = ("SELECT" +
-                " cycle, task AS name, submit_num," +
-                " key, path, path_in_tar, mtime, size" +
-                " FROM log_files")
-        where_exprs = []
-        where_args = []
-        if cycles:
-            cycle_where_exprs = []
-            for cycle in cycles:
-                if cycle.startswith("before "):
-                    where_args.append(cycle.split(None, 1)[-1])
-                    cycle_where_exprs.append("cycle <= ?")
-                elif cycle.startswith("after "):
-                    where_args.append(cycle.split(None, 1)[-1])
-                    cycle_where_exprs.append("cycle >= ?")
-                else:
-                    where_args.append(cycle)
-                    cycle_where_exprs.append("cycle GLOB ?")
-            where_exprs.append(" OR ".join(cycle_where_exprs))
-        if tasks:
-            where_exprs.append(" OR ".join(["name GLOB ?"] * len(tasks)))
-            where_args += tasks
-        if where_exprs:
-            stmt += " WHERE (" + ") AND (".join(where_exprs) + ")"
+        stmt = (
+            "SELECT cycle, name, submit_num, filename, location, mtime, size" +
+            " FROM task_job_logs")
 
         prefix = "~"
         if user_name:
             prefix += user_name
-        user_suite_dir = os.path.join(
-            os.path.expanduser(prefix), self.get_suite_dir_rel(suite_name))
-        for row in self._db_exec(
-                self.JOB_LOGS_DB, user_name, suite_name, stmt, where_args):
-            cycle, name, submit_num, key, path, path_in_tar, mtime, size = row
+        user_suite_dir = os.path.expanduser(os.path.join(
+            prefix, self.get_suite_dir_rel(suite_name)))
+        current_cycles = os.listdir(os.path.join(user_suite_dir, "log", "job"))
+        targzip_cycles = []
+        for name in glob(os.path.join(user_suite_dir, "log", "job-*.tar.gz")):
+            targzip_cycles.append(os.path.basename(name)[4:-7])
+        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
+            cycle, name, submit_num, filename, location, mtime, size = row
             try:
                 entry = entry_of[(cycle, name, int(submit_num))]
             except KeyError:
                 continue
-            abs_path = os.path.join(user_suite_dir, path)
-            entry["logs"][key] = {
+            if cycle in current_cycles:
+                path = os.path.join("log", "job", location)
+                path_in_tar = None
+                exists = True
+            elif cycle in targzip_cycles:
+                path = os.path.join("log", "job-%s.tar.gz" % (cycle))
+                path_in_tar = os.path.join("job", location)
+                exists = True
+            else:
+                path = os.path.join("log", "job", location)
+                path_in_tar = None
+                exists = False
+            entry["logs"][filename] = {
                 "path": path,
                 "path_in_tar": path_in_tar,
                 "mtime": mtime,
                 "size": size,
-                "exists": os.path.exists(abs_path),
+                "exists": exists,
                 "seq_key": None}
-            seq_log_match = self.REC_SEQ_LOG.match(key)
-            if seq_log_match:
-                head, index_str, tail = seq_log_match.groups()
-                if not tail:
-                    tail = ""
-                seq_key = head + "*" + tail
-                entry["logs"][key]["seq_key"] = seq_key
-                if seq_key not in entry["seq_logs_indexes"]:
-                    entry["seq_logs_indexes"][seq_key] = {}
-                entry["seq_logs_indexes"][seq_key][int(index_str)] = key
-        self._db_close(self.JOB_LOGS_DB, user_name, suite_name)
+            for seq_log_matcher in self.REC_SEQ_LOG, self.REC_BUNCH_LOG:
+                seq_log_match = seq_log_matcher.match(filename)
+                if seq_log_match:
+                    head, index_str, tail = seq_log_match.groups()
+                    if not tail:
+                        tail = ""
+                    seq_key = head + "*" + tail
+                    entry["logs"][filename]["seq_key"] = seq_key
+                    if seq_key not in entry["seq_logs_indexes"]:
+                        entry["seq_logs_indexes"][seq_key] = {}
+                    entry["seq_logs_indexes"][seq_key][index_str] = filename
+                    break
+        self._db_close(self.SUITE_DB, user_name, suite_name)
 
         for entry in entries:
             for seq_key, indexes in entry["seq_logs_indexes"].items():
                 if len(indexes) <= 1:
                     entry["seq_logs_indexes"].pop(seq_key)
-            for key, log_dict in entry["logs"].items():
+            for filename, log_dict in entry["logs"].items():
                 if log_dict["seq_key"] not in entry["seq_logs_indexes"]:
                     log_dict["seq_key"] = None
 
@@ -599,16 +595,17 @@ class CylcProcessor(SuiteEngineProcessor):
                                       "size": size,
                                       "exists": os.path.exists(abs_path),
                                       "seq_key": None}
-                seq_log_match = self.REC_SEQ_LOG.match(key)
-                if seq_log_match:
-                    head, index_str, tail = seq_log_match.groups()
-                    if not tail:
-                        tail = ""
-                    seq_key = head + "*" + tail
-                    entry["logs"][key]["seq_key"] = seq_key
-                    if seq_key not in entry["seq_logs_indexes"]:
-                        entry["seq_logs_indexes"][seq_key] = {}
-                    entry["seq_logs_indexes"][seq_key][int(index_str)] = key
+                for seq_log_match in [self.REC_SEQ_LOG.match(key),
+                                      self.REC_BUNCH_LOG.match(key)]:
+                    if seq_log_match:
+                        head, index_str, tail = seq_log_match.groups()
+                        if not tail:
+                            tail = ""
+                        seq_key = head + "*" + tail
+                        entry["logs"][key]["seq_key"] = seq_key
+                        if seq_key not in entry["seq_logs_indexes"]:
+                            entry["seq_logs_indexes"][seq_key] = {}
+                        entry["seq_logs_indexes"][seq_key][index_str] = key
 
             for seq_key, indexes in entry["seq_logs_indexes"].items():
                 if len(indexes) <= 1:
