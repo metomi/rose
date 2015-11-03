@@ -17,12 +17,16 @@
   <div class="navbar-inner">
     <a class="brand" href="{{script}}/">{{prefix}}: Rosie Suites Discovery
     <small>@ {{host}}</small></a>
+      <ul class="nav pull-right">
+        <li class="active search-button">
+          <a href="javascript: Rosie.show('search');">search</a>
+        </li>
+
+        <li class="query-button">
+          <a href="javascript: Rosie.show('query');">query</a>
+        </li>
+      </ul>
   </div>
-</div>
-<div id="interface-chooser" class="pull-right">
-  <a href="javascript: Rosie.show('search');">search</a>
-  |
-  <a href="javascript: Rosie.show('query');">query</a>
 </div>
 
 <div class="container-fluid">
@@ -46,7 +50,7 @@
               <input id="search-all" type="checkbox" name="all_revs" value="1" />
 {% endif %}
             </label>
-            <input class="btn" type="submit" value="search"/>
+            <input class="btn btn-primary" type="submit" value="search"/>
           </div>
         </form>
         <form class="form-horizontal" id="query" action="javascript:Rosie.query();">
@@ -132,7 +136,7 @@
                   </select>
                 </td>
 {%- if loop.first %}
-                <td><div><button class="btn" type="button" disabled="disabled"><i class="icon-minus"></button></div></td>
+                <td><div><button class="btn" type="button"><i class="icon-minus"></button></div></td>
 {%- else %}
                 <td><div><button class="btn" type="button"><i class="icon-minus"></i></button></div></td>
 {%- endif %}
@@ -156,11 +160,10 @@
               <input id="query-all" type="checkbox" name="all_revs" value="1" />
 {%- endif %}
             </label>
-            <label class="checkbox" for="show-groups">group controls
-              <input id="show-groups" type="checkbox" name="show_groups"
-              onclick="javascript: Rosie.query_groups_toggle();"/>
-            </label>
-            <input class="btn" type="submit" value="query" />
+            <input class="btn" id="show-groups" type="button" name="show_groups"
+            value="display group controls"
+            onclick="javascript: Rosie.query_groups_toggle();"/>
+            <input class="btn btn-primary" type="submit" value="query" />
             </div>
           </div>
         </form>
