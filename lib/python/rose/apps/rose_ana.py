@@ -26,10 +26,8 @@ import inspect
 import os
 import re
 import sys
-
-import sqlalchemy as al
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+import sqlite3
+import time
 
 # Rose modules
 import rose.config
@@ -51,49 +49,67 @@ OPTIONS = ["method_path"]
 USRCOMPARISON_DIRNAME = "comparisons"
 USRCOMPARISON_EXT = ".py"
 
-# Base for KGO comparison database entries
-Base = declarative_base()
 
-class _KGOLogTable(Base):
-    # The format for the log table entries
-    __tablename__ = "kgo_comparisons"
-    # Name of the task (will use rose_ana appname + comparison index)
-    app_task = al.Column(
-        "app_task", al.String, nullable=False, primary_key=True)
-    # Given path to the "KGO file" in the comparison
-    kgo_file = al.Column(
-        "kgo_file", al.String, nullable=False, unique=False)
-    # Given path to the "Suite file" in the comparison
-    suite_file = al.Column(
-        "suite_file", al.String, nullable=False, unique=False)
-    # Comparison status (OK / FAIL / WARN)
-    status = al.Column(
-        "status", al.String, nullable=False, unique=False)
-    # Some additional details of what comparison was performed
-    comparison = al.Column(
-        "comparison", al.String, nullable=False, unique=False)
+class KGODatabase(object):
+    """
+    KGO Database object, stores comparison information for rose_ana apps.
 
+    """
+    def __init__(self):
+        """Initialise the object"""
+        self.file_name = os.path.join(
+            os.getenv("ROSE_SUITE_DIR"), "kgo_update.db")
+        self.conn = None
+        self.create()
 
-def _create_kgo_db_session():
-    # Create a link to the database - if it already exists a connection to it
-    # will be made, otherwise it will be created
-    kgo_logfile=os.path.join(os.getenv("ROSE_SUITE_DIR"), "kgo_update.db")
-    engine = al.create_engine('sqlite:///' + kgo_logfile)
-    Base.metadata.create_all(engine)
-    Base.metadata.bind = engine
-    return sessionmaker(bind=engine)()
+    def get_conn(self):
+        """Return a connection to the database if it exists"""
+        if self.conn is None:
+            self.conn = sqlite3.connect(self.file_name, timeout=60.0)
+        return self.conn
 
+    def create(self):
+        """If the databaste doesn't exist, create it"""
+        self.wait_for_lock()
+        if not os.path.exists(self.file_name):
+            conn = self.get_conn()
+            conn.execute(
+                """
+                CREATE TABLE comparisons (
+                app_task TEXT,
+                kgo_file TEXT,
+                suite_file TEXT,
+                status TEXT,
+                comparison TEXT,
+                PRIMARY KEY(app_task))
+                """)
+            conn.commit()
+        self.unlock()
 
-def _add_kgo_db_entry(dbsession,
-                      app_task, kgo_file, suite_file, status, comparison):
-    # TODO: add retries here
-    new_entry = _KGOLogTable(app_task=app_task,
-                             status=status,
-                             suite_file=suite_file,
-                             kgo_file=kgo_file,
-                             comparison=comparison)
-    dbsession.merge(new_entry)
-    dbsession.commit()
+    def wait_for_lock(self):
+        """Use a lock-dir to control concurrent access to the database"""
+        retries = 0
+        while retries < 20:
+            try:
+                os.mkdir(self.file_name + ".lock")
+                return
+            except OSError:
+                time.sleep(5)
+        msg = "Waiting for lock to release timed-out after 20 retries"
+        raise IOError(msg)
+
+    def unlock(self):
+        """Unlock the database for access"""
+        os.rmdir(self.file_name + ".lock")
+
+    def insert_entry(self, app_task, kgo_file, suite_file, status, comparison):
+        """Insert a new entry to the database"""
+        # Use the file lock to protect access
+        conn = self.get_conn()
+        conn.execute(
+            "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)",
+            [app_task, kgo_file, suite_file, status, comparison])
+        conn.commit()
 
 
 class RoseAnaApp(BuiltinApp):
@@ -120,11 +136,11 @@ class RoseAnaApp(BuiltinApp):
                          reporter=app_runner.event_handler,
                          popen=app_runner.popen)
 
-        # Initialise a database session
-        dbsession = _create_kgo_db_session()
-
         # Run the analysis
         num_failed, tasks = engine.analyse()
+
+        # Initialise a database session
+        kgo_db = KGODatabase()
 
         # Update the database
         for itask, task in enumerate(tasks):
@@ -136,12 +152,8 @@ class RoseAnaApp(BuiltinApp):
             comparison = "{0} : {1} : {2}".format(task.comparison,
                                                   task.extract,
                                                   task.subextract)
-            _add_kgo_db_entry(dbsession,
-                              app_task,
-                              task.kgo1file,
-                              task.resultfile,
-                              task.userstatus,
-                              comparison)
+            kgo_db.insert_entry(app_task, task.kgo1file, task.resultfile,
+                                task.userstatus, comparison)
 
         if num_failed != 0:
             raise TestsFailedException(num_failed)
