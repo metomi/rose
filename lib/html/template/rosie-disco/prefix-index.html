@@ -180,7 +180,7 @@
       summary="List Result Table">
         <thead>
           <tr>
-            <th>?</th>
+            <th>detail</th>
             <th>id</th>
             <th>branch</th>
             <th>revision</th>
@@ -208,7 +208,7 @@
 {%- if loop.last %}
           <tr>
             <td><a class="infotip" href="#" data-html="true"
-            data-content="{{info}}" title="">?</a></td>
+            data-content="{{info}}" title=""><i class="icon-list"></i></a></td>
 {%- endif %}
 {%- endfor %}
             <td><a href="{{ item.href }}" class=tip>{{ item.idx }}</a></td>
