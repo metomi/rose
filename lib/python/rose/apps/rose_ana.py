@@ -27,6 +27,10 @@ import os
 import re
 import sys
 
+import sqlalchemy as al
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
 # Rose modules
 import rose.config
 from rose.env import env_var_process
@@ -46,6 +50,50 @@ OPTIONS = ["method_path"]
 
 USRCOMPARISON_DIRNAME = "comparisons"
 USRCOMPARISON_EXT = ".py"
+
+# Base for KGO comparison database entries
+Base = declarative_base()
+
+class _KGOLogTable(Base):
+    # The format for the log table entries
+    __tablename__ = "kgo_comparisons"
+    # Name of the task (will use rose_ana appname + comparison index)
+    app_task = al.Column(
+        "app_task", al.String, nullable=False, primary_key=True)
+    # Given path to the "KGO file" in the comparison
+    kgo_file = al.Column(
+        "kgo_file", al.String, nullable=False, unique=False)
+    # Given path to the "Suite file" in the comparison
+    suite_file = al.Column(
+        "suite_file", al.String, nullable=False, unique=False)
+    # Comparison status (OK / FAIL / WARN)
+    status = al.Column(
+        "status", al.String, nullable=False, unique=False)
+    # Some additional details of what comparison was performed
+    comparison = al.Column(
+        "comparison", al.String, nullable=False, unique=False)
+
+
+def _create_kgo_db_session():
+    # Create a link to the database - if it already exists a connection to it
+    # will be made, otherwise it will be created
+    kgo_logfile=os.path.join(os.getenv("ROSE_SUITE_DIR"), "kgo_update.db")
+    engine = al.create_engine('sqlite:///' + kgo_logfile)
+    Base.metadata.create_all(engine)
+    Base.metadata.bind = engine
+    return sessionmaker(bind=engine)()
+
+
+def _add_kgo_db_entry(dbsession,
+                      app_task, kgo_file, suite_file, status, comparison):
+    # TODO: add retries here
+    new_entry = _KGOLogTable(app_task=app_task,
+                             status=status,
+                             suite_file=suite_file,
+                             kgo_file=kgo_file,
+                             comparison=comparison)
+    dbsession.merge(new_entry)
+    dbsession.commit()
 
 
 class RoseAnaApp(BuiltinApp):
@@ -72,8 +120,29 @@ class RoseAnaApp(BuiltinApp):
                          reporter=app_runner.event_handler,
                          popen=app_runner.popen)
 
+        # Initialise a database session
+        dbsession = _create_kgo_db_session()
+
         # Run the analysis
         num_failed, tasks = engine.analyse()
+
+        # Update the database
+        for itask, task in enumerate(tasks):
+            # The primary key in the database is composed from both the
+            # rose_ana app name and the task index (to make it unique)
+            app_task = "{0} ({1})".format(os.getenv("ROSE_TASK_NAME"),
+                                          itask + 1)
+            # Include an indication of what extrac/comparison was performed
+            comparison = "{0} : {1} : {2}".format(task.comparison,
+                                                  task.extract,
+                                                  task.subextract)
+            _add_kgo_db_entry(dbsession,
+                              app_task,
+                              task.kgo1file,
+                              task.resultfile,
+                              task.userstatus,
+                              comparison)
+
         if num_failed != 0:
             raise TestsFailedException(num_failed)
 
@@ -410,9 +479,10 @@ class AnalysisTask(object):
         # Variables defined in config file
         self.name = None
         self.resultfile = None
-        self.kgofile = None
+        self.kgo1file = None
         self.comparison = None
         self.extract = None
+        self.subextract = None
         self.tolerance = None
         self.warnonfail = False
         self.numkgofiles = 0
@@ -420,7 +490,7 @@ class AnalysisTask(object):
 # Variables to save settings before environment variable expansion (for
 # writing back to config file, rerunning, etc)
         self.resultfileconfig = self.resultfile
-        self.kgofileconfig = self.kgofile
+        self.kgofileconfig = self.kgo1file
 
 # Data variables filled by extract methods
         self.resultdata = []

@@ -42,7 +42,7 @@ class Exact(object):
                 task.set_failure(
                     ExactComparisonFailure(task, val1, val2, location))
                 return task
-            task.set_pass(ExactComparisonSuccess(task))
+        task.set_pass(ExactComparisonSuccess(task))
         return task
 
 
