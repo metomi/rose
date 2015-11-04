@@ -34,6 +34,7 @@ fi
 tests 17
 #-------------------------------------------------------------------------------
 # Run the suite.
+export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')

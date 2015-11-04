@@ -34,6 +34,7 @@ else
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
+export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
