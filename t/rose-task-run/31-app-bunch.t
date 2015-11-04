@@ -113,8 +113,7 @@ APP=bunch_bigpop
 TEST_KEY_PREFIX=big-pop
 FILE=$LOG_DIR/$APP/01/job.out
 for INSTANCE in $(seq 0 14); do
-file_grep $TEST_KEY_PREFIX-ran-$INSTANCE \
-    "\[OK\] $INSTANCE" $FILE
+    file_grep $TEST_KEY_PREFIX-ran-$INSTANCE "\[OK\] $INSTANCE" $FILE
 done
 #-------------------------------------------------------------------------------
 # Testing names works ok
@@ -123,9 +122,8 @@ APP=bunch_names
 #-------------------------------------------------------------------------------
 TEST_KEY_PREFIX=names
 FILE=$LOG_DIR/$APP/01/job.out
-for NAME in foo bar baz qux; do
-file_grep $TEST_KEY_PREFIX-ran-$NAME \
-    "\[OK\] $NAME" $FILE
+for KEY in foo bar baz qux; do
+    file_grep $TEST_KEY_PREFIX-ran-$KEY "\[OK\] $KEY" $FILE
 done
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
