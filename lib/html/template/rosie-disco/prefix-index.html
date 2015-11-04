@@ -137,7 +137,7 @@
                   </select>
                 </td>
 {%- if loop.first %}
-                <td><div><button class="btn" type="button"><i class="icon-minus"></button></div></td>
+                <td><div><button class="btn" type="button"><i class="icon-minus"></i></button></div></td>
 {%- else %}
                 <td><div><button class="btn" type="button"><i class="icon-minus"></i></button></div></td>
 {%- endif %}
@@ -162,8 +162,7 @@
 {%- endif %}
             </label>
             <input class="btn" id="show-groups" type="button" name="show_groups"
-            value="display group controls"
-            onclick="javascript: Rosie.query_groups_toggle();"/>
+            data-toggle="button" value="display group controls"/>
             <input class="btn btn-primary" type="submit" value="query" />
             </div>
           </div>
