@@ -99,6 +99,7 @@ class KGODatabase(object):
         """Use a lock-dir to control concurrent access to the database"""
         retries = 0
         while retries < 20:
+            retries += 1
             try:
                 os.mkdir(self.file_name + ".lock")
                 return
