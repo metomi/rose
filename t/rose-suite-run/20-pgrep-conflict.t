@@ -34,6 +34,18 @@ NAME=$(basename "${SUITE_RUN_DIR}")
 #-------------------------------------------------------------------------------
 # Check that "rose suite-run" fails if a "python cylc-run SUITE" process is
 # running.
+
+# Recent version of "pgrep" has introduced a "-a" option, which does what "-l"
+# used to do. Unfortunately, "-l" no longer does what it used to, so the output
+# from our call to "pgrep -l" no longer looks the same. We should fix this in
+# our lib, but it is really hard, because we may be running "pgrep" via SSH,
+# and it does not even have a "--version" option. In the mean time, the easiest
+# thing to allow these tests to pass is to have different expectation for the
+# output depending on whether the "-a" option is available or not.
+IS_NEW_PGREP=false
+if pgrep -a 'bash' 1>'/dev/null' 2>&1; then
+    IS_NEW_PGREP=true
+fi
 for ARG in '' '--hold'; do
     TEST_KEY="${TEST_KEY_BASE}-self-check${ARG}"
     python "${TEST_DIR}/cylc-run" "${NAME}" ${ARG} 1>'/dev/null' 2>&1 &
@@ -44,12 +56,21 @@ for ARG in '' '--hold'; do
     if [[ -n "${ARG}" ]]; then
         ARG_STR=" ${ARG}"
     fi
-    file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+    if "${IS_NEW_PGREP}"; then
+        file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+[FAIL] Suite "${NAME}" may still be running.
+[FAIL] Host "localhost" has process:
+[FAIL]     ${FAKE_SUITE_PID} python
+[FAIL] Try "rose suite-shutdown --name=${NAME}" first?
+__ERR__
+    else
+        file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 [FAIL] Suite "${NAME}" may still be running.
 [FAIL] Host "localhost" has process:
 [FAIL]     ${FAKE_SUITE_PID} python ${TEST_DIR}/cylc-run ${NAME}${ARG_STR}
 [FAIL] Try "rose suite-shutdown --name=${NAME}" first?
 __ERR__
+    fi
     disown "${FAKE_SUITE_PID}" 2>'/dev/null'  # Don't report stuff on kill
     kill "${FAKE_SUITE_PID}" 2>'/dev/null' || true
 done
