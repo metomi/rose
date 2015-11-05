@@ -26,8 +26,10 @@ Classes:
 """
 
 import cherrypy
+from isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 import jinja2
 import simplejson
+from rose.host_select import HostSelector
 from rose.resource import ResourceLocator
 import rosie.db
 from rosie.suite_id import SuiteId
@@ -42,11 +44,16 @@ class RosieDiscoServiceRoot(object):
 
     def __init__(self, *args, **kwargs):
         self.exposed = True
-        res_loc = ResourceLocator.default()
-        template_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
-            ResourceLocator.default().get_util_home(
-                "lib", "html", "template", "rosie-disco")))
-        self.template_env = template_env
+        self.props = {}
+        self.props["host_name"] = HostSelector().get_local_host()
+        if self.props["host_name"] and "." in self.props["host_name"]:
+            self.props["host_name"] = (
+                self.props["host_name"].split(".", 1)[0])
+        self.props["rose_version"] = ResourceLocator.default().get_version()
+        self.props["template_env"] = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(
+                ResourceLocator.default().get_util_home(
+                    "lib", "html", "template", "rosie-disco")))
         db_url_map = {}
         rose_conf = ResourceLocator.default().get_conf()
         for key, node in rose_conf.get(["rosie-db"]).value.items():
@@ -56,16 +63,17 @@ class RosieDiscoServiceRoot(object):
         if not self.db_url_map:
             self.db_url_map = {}
         for key, db_url in self.db_url_map.items():
-            setattr(
-                self, key,
-                RosieDiscoService(self.template_env, key, db_url))
+            setattr(self, key, RosieDiscoService(self.props, key, db_url))
 
     @cherrypy.expose
     def index(self, *_):
         """Provide the root index page."""
-        template = self.template_env.get_template("index.html")
-        return template.render(script=cherrypy.request.script_name,
-                               keys=sorted(self.db_url_map.keys()))
+        tmpl = self.props["template_env"].get_template("index.html")
+        return tmpl.render(
+            host=self.props["host_name"],
+            rose_version=self.props["rose_version"],
+            script=cherrypy.request.script_name,
+            keys=sorted(self.db_url_map.keys()))
 
 
 class RosieDiscoService(object):
@@ -74,9 +82,9 @@ class RosieDiscoService(object):
 
     HELLO = "Hello %s\n"
 
-    def __init__(self, template_env, prefix, db_url):
+    def __init__(self, props, prefix, db_url):
         self.exposed = True
-        self.template_env = template_env
+        self.props = props
         self.prefix = prefix
         source_option = "prefix-web." + self.prefix
         source_url_node = ResourceLocator.default().get_conf().get(
@@ -86,10 +94,18 @@ class RosieDiscoService(object):
             self.source_url = source_url_node.value
         self.dao = rosie.db.DAO(db_url)
 
+    def __call__(self):
+        """Dummy."""
+        pass
+
     @cherrypy.expose
     def index(self, *_):
         """Provide the index page."""
-        return self._render()
+        try:
+            return self._render()
+        except:
+            import traceback
+            traceback.print_exc()
 
     @cherrypy.expose
     def hello(self, format=None):
@@ -149,8 +165,12 @@ class RosieDiscoService(object):
                 suite_id = SuiteId.from_idx_branch_revision(
                     item["idx"], item["branch"], item["revision"])
                 item["href"] = suite_id.to_web()
-        template = self.template_env.get_template("prefix-index.html")
-        return template.render(
+                item["date"] = str(get_timepoint_from_seconds_since_unix_epoch(
+                    item["date"]))
+        tmpl = self.props["template_env"].get_template("prefix-index.html")
+        return tmpl.render(
+            host=self.props["host_name"],
+            rose_version=self.props["rose_version"],
             script=cherrypy.request.script_name,
             prefix=self.prefix,
             prefix_source_url=self.source_url,
