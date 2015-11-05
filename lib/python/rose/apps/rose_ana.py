@@ -73,6 +73,7 @@ class KGODatabase(object):
         self.wait_for_lock()
         if not os.path.exists(self.file_name):
             conn = self.get_conn()
+            # This table stores the individual comparisons
             conn.execute(
                 """
                 CREATE TABLE comparisons (
@@ -82,6 +83,14 @@ class KGODatabase(object):
                 status TEXT,
                 comparison TEXT,
                 PRIMARY KEY(app_task))
+                """)
+            # And this one stores the completion status of the task
+            conn.execute(
+                """
+                CREATE TABLE tasks (
+                task_name TEXT,
+                completed INT,
+                PRIMARY KEY(task_name))
                 """)
             conn.commit()
         self.unlock()
@@ -102,15 +111,22 @@ class KGODatabase(object):
         """Unlock the database for access"""
         os.rmdir(self.file_name + ".lock")
 
-    def insert_entry(self, app_task, kgo_file, suite_file, status, comparison):
-        """Insert a new entry to the database"""
-        # Use the file lock to protect access
+    def enter_comparison(
+            self, app_task, kgo_file, suite_file, status, comparison):
+        """Insert a new comparison entry to the database"""
         conn = self.get_conn()
         conn.execute(
             "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)",
             [app_task, kgo_file, suite_file, status, comparison])
         conn.commit()
 
+    def enter_task(self, app_task, status):
+        conn = self.get_conn()
+        conn.execute(
+            "INSERT OR REPLACE INTO tasks VALUES (?, ?)",
+            [app_task, status])
+        conn.commit()        
+        
 
 class RoseAnaApp(BuiltinApp):
 
@@ -136,24 +152,30 @@ class RoseAnaApp(BuiltinApp):
                          reporter=app_runner.event_handler,
                          popen=app_runner.popen)
 
+        # Initialise a database session
+        rose_ana_task_name = os.getenv("ROSE_TASK_NAME")
+        kgo_db = KGODatabase()
+
+        # Add an entry for this task, with a non-zero status code
+        kgo_db.enter_task(rose_ana_task_name, 1)
+
         # Run the analysis
         num_failed, tasks = engine.analyse()
 
-        # Initialise a database session
-        kgo_db = KGODatabase()
+        # Update the database to indicate that the task succeeded
+        kgo_db.enter_task(rose_ana_task_name, 0)
 
         # Update the database
-        for itask, task in enumerate(tasks):
+        for task in tasks:
             # The primary key in the database is composed from both the
             # rose_ana app name and the task index (to make it unique)
-            app_task = "{0} ({1})".format(os.getenv("ROSE_TASK_NAME"),
-                                          itask + 1)
+            app_task = "{0} ({1})".format(rose_ana_task_name, task.name)
             # Include an indication of what extrac/comparison was performed
             comparison = "{0} : {1} : {2}".format(task.comparison,
                                                   task.extract,
                                                   task.subextract)
-            kgo_db.insert_entry(app_task, task.kgo1file, task.resultfile,
-                                task.userstatus, comparison)
+            kgo_db.enter_comparison(app_task, task.kgo1file, task.resultfile,
+                                    task.userstatus, comparison)
 
         if num_failed != 0:
             raise TestsFailedException(num_failed)
