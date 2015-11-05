@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>{% if path is defined %}{{path}} {% endif %}{{suite}}~{{user}}:
-Rose Bush @ {{host}} - {% block title_name %}{% endblock %}</title>
+{{title}} @ {{host}} - {% block title_name %}{% endblock %}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="{{script}}/favicon.ico" />
 <link rel="shortcut icon" href="{{script}}/favicon.ico" />
@@ -17,7 +17,7 @@ rel="stylesheet" media="screen" />
 <body>
 <div class="navbar navbar-static-top">
 <div class="navbar-inner">
-<a class="brand" href="{{script}}/">Rose Bush <small>@ {{host}}</small></a>
+<a class="brand" href="{{script}}/">{{title}} <small>@ {{host}}</small></a>
 <ul class="nav">
 <li><a href="{{script}}/suites/{{user}}">{{user}}</a></li>
 <li><a><strong>{{suite}}</strong></a></li>

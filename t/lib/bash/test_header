@@ -80,11 +80,40 @@
 #         a non-zero value.
 #     port_is_busy $PORT
 #         Return 0 if $PORT is busy or 1 if $PORT is not busy.
+#     rose_ws_init $NS $UTIL
+#         Start a Rose web service server. Test server OK. Write to these shell
+#         variables on success:
+#         * TEST_ROSE_WS_PID - PID of the service server
+#         * TEST_ROSE_WS_PORT - Port of the service server on localhost.
+#         * TEST_ROSE_WS_URL - URL of service server.
+#         E.g. rose_ws_init rose bush
+#     rose_ws_kill
+#         Kill a web service server started by "rose_ws_init" and remove
+#         generated log and status files.
+#     rose_ws_json_greps TEST_KEY JSON-FILE EXPECTED [EXPECTED ...]
+#         Load JSON content in argument 1
+#         Each remaining argument is an expected content in the JSON data in
+#         the form: [keys, value] where "keys" is a list containing keys or
+#         indexes to an expected item in the data structure, and the value is
+#         an expected value. A key in keys can be a simple dict key or an
+#         array index. It can also be a dict {attr_key: attr_value, ...}. In
+#         which case, the expected data item is under a list of dicts, where a
+#         unique dict in the list contains all elements attr_key: attr_value.
+#
+# VARIABLES
+#     TEST_DIR
+#         Tests will run in this temporary directory.
+#     TEST_KEY_BASE
+#         The base name without the "*.t" extension of the test file.
+#     TEST_NUMBER
+#         Number of tests already run.
+#     TEST_SOURCE_DIR
+#         The directory containing of the current test file.
 #-------------------------------------------------------------------------------
 set -eu
 
 SIGNALS="EXIT INT"
-function FINALLY() {
+FINALLY() {
     for S in $SIGNALS; do
         trap '' $S
     done
@@ -102,11 +131,11 @@ done
 
 TEST_NUMBER=0
 
-function tests() {
+tests() {
     echo "1..$1"
 }
 
-function skip() {
+skip() {
     local N_SKIPS=$1
     shift 1
     local I=0
@@ -115,20 +144,20 @@ function skip() {
     done
 }
 
-function skip_all() {
+skip_all() {
     echo "1..0 # SKIP $@"
     exit
 }
 
-function pass() {
+pass() {
     echo "ok $((++TEST_NUMBER)) - $@"
 }
 
-function fail() {
+fail() {
     echo "not ok $((++TEST_NUMBER)) - $@"
 }
 
-function run_pass() {
+run_pass() {
     local TEST_KEY=$1
     shift 1
     if ! "$@" 1>$TEST_KEY.out 2>$TEST_KEY.err; then
@@ -138,7 +167,7 @@ function run_pass() {
     pass $TEST_KEY
 }
 
-function run_fail() {
+run_fail() {
     local TEST_KEY=$1
     shift 1
     if "$@" 1>$TEST_KEY.out 2>$TEST_KEY.err; then
@@ -148,7 +177,7 @@ function run_fail() {
     pass $TEST_KEY
 }
 
-function file_cmp() {
+file_cmp() {
     local TEST_KEY=$1
     local FILE_ACTUAL=$2
     local FILE_EXPECT=${3:--}
@@ -159,7 +188,7 @@ function file_cmp() {
     fail $TEST_KEY
 }
 
-function file_cmp_any() {
+file_cmp_any() {
     local TEST_KEY=$1
     local FILE_ACTUAL=$2
     local FILE_EXPECT=${3:--}
@@ -178,7 +207,7 @@ function file_cmp_any() {
     fail $TEST_KEY
 }
 
-function file_test() {
+file_test() {
     local TEST_KEY=$1
     local FILE=$2
     local OPTION=${3:--e}
@@ -189,7 +218,7 @@ function file_test() {
     fi
 }
 
-function file_grep() {
+file_grep() {
     local TEST_KEY=$1
     local PATTERN=$2
     local FILE=$3
@@ -200,7 +229,7 @@ function file_grep() {
     fail $TEST_KEY
 }
 
-function file_grep_fail() {
+file_grep_fail() {
     local TEST_KEY=$1
     local PATTERN=$2
     local FILE=$3
@@ -211,7 +240,7 @@ function file_grep_fail() {
     pass $TEST_KEY
 }
 
-function bad_smtpd_init() {
+bad_smtpd_init() {
     local SMTPD_PORT=
     for SMTPD_PORT in 8026 8126 8226 8326 8426 8526 8626 8726 8826 8926; do
         local SMTPD_HOST=localhost:$SMTPD_PORT
@@ -249,7 +278,7 @@ __PYTHON__
     done
 }
 
-function bad_smtpd_kill() {
+bad_smtpd_kill() {
     if [[ -n ${TEST_SMTPD_PID:-} ]] && ps $TEST_SMTPD_PID >/dev/null 2>&1; then
         kill $TEST_SMTPD_PID
         wait $TEST_SMTPD_PID 2>/dev/null || true
@@ -257,7 +286,7 @@ function bad_smtpd_kill() {
     fi
 }
 
-function mock_smtpd_init() {
+mock_smtpd_init() {
     local SMTPD_PORT=
     for SMTPD_PORT in 8025 8125 8225 8325 8425 8525 8625 8725 8825 8925; do 
         local SMTPD_HOST=localhost:$SMTPD_PORT
@@ -283,7 +312,7 @@ function mock_smtpd_init() {
     done
 }
 
-function mock_smtpd_kill() {
+mock_smtpd_kill() {
     if [[ -n ${TEST_SMTPD_PID:-} ]] && ps $TEST_SMTPD_PID >/dev/null 2>&1; then
         kill $TEST_SMTPD_PID
         wait $TEST_SMTPD_PID 2>/dev/null || true
@@ -291,14 +320,14 @@ function mock_smtpd_kill() {
     fi
 }
 
-function poll() {
+poll() {
     local TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
     while (($(date +%s) < TIMEOUT)) && eval "$@"; do
         sleep 1
     done
 }
 
-function port_is_busy() {
+port_is_busy() {
     local PORT="${1}"
     if type -P netcat 1>/dev/null; then
         HOSTNAME="${HOSTNAME:-"$(hostname)"}"
@@ -306,6 +335,81 @@ function port_is_busy() {
         netcat -z "${HOSTNAME}" "${PORT}"
     else
         netstat -atun | grep -q "127.0.0.1:${PORT}"
+    fi
+}
+
+TEST_ROSE_WS_PID=
+TEST_ROSE_WS_PORT=
+TEST_ROSE_WS_URL=
+rose_ws_init() {
+    local NS="$1"
+    local UTIL="$2"
+    local PORT="$((${RANDOM} + 10000))"
+    while port_is_busy "${PORT}"; do
+        PORT="$((${RANDOM} + 10000))"
+    done
+
+    TEST_KEY="${TEST_KEY_BASE}-${NS}-${UTIL}"
+    "${NS}" "${UTIL}" 'start' "${PORT}" \
+        0<'/dev/null' 1>"${NS}-${UTIL}.out" 2>"${NS}-${UTIL}.err" &
+    TEST_ROSE_WS_PID="$!"
+    T_INIT="$(date '+%s')"
+    while ! port_is_busy "${PORT}" && (($(date '+%s') < ${T_INIT} + 60)); do
+        sleep 1
+    done
+    TEST_ROSE_WS_PORT="${PORT}"
+    if port_is_busy "${TEST_ROSE_WS_PORT}"; then
+        pass "${TEST_KEY}"
+        TEST_ROSE_WS_URL="http://${HOSTNAME}:${TEST_ROSE_WS_PORT}/"
+    else
+        fail "${TEST_KEY}"
+        rose_ws_kill
+    fi
+}
+
+rose_ws_kill() {
+    if [[ -n "${TEST_ROSE_WS_PID}" ]]; then
+        kill "${TEST_ROSE_WS_PID}" 2>'/dev/null'
+        wait 2>'/dev/null'
+    fi
+    if [[ -n "${TEST_ROSE_WS_PORT}" ]]; then
+        rm -fr "${HOME}/.metomi/"*"-0.0.0.0-${TEST_ROSE_WS_PORT}"* 2>'/dev/null'
+    fi
+    TEST_ROSE_WS_PID=
+    TEST_ROSE_WS_PORT=
+    TEST_ROSE_WS_URL=
+}
+
+rose_ws_json_greps() {
+    local TEST_KEY="$1"
+    shift 1
+    run_pass "${TEST_KEY}" python - "$@" <<'__PYTHON__'
+import ast
+import simplejson as json
+import sys
+
+data = json.load(open(sys.argv[1]))
+for item in sys.argv[2:]:
+    keys, value = ast.literal_eval(item)
+    datum = data
+    try:
+        for key in keys:
+            if isinstance(key, dict):
+                for datum_item in datum:
+                    if all([datum_item.get(k) == v for k, v in key.items()]):
+                        datum = datum_item
+                        break
+                else:
+                    raise KeyError
+            else:
+                datum = datum[key]
+        if datum != value:
+            raise ValueError(item)
+    except (IndexError, KeyError):
+        raise KeyError(item)
+__PYTHON__
+    if [[ -s "${TEST_KEY}.err" ]]; then
+        cat "${TEST_KEY}.err" >&2
     fi
 }
 

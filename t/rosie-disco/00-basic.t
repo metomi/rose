@@ -29,10 +29,6 @@ tests 21
 mkdir svn
 svnadmin create svn/foo
 SVN_URL=file://$PWD/svn/foo
-PORT="$((${RANDOM} + 10000))"
-while port_is_busy $PORT; do
-    PORT="$((${RANDOM} + 10000))"
-done
 cat >rose.conf <<__ROSE_CONF__
 [rosie-db]
 db.foo=sqlite:///$PWD/rosie/foo.db.sqlite
@@ -46,30 +42,17 @@ __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD
 $ROSE_HOME/sbin/rosa db-create -q
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-rosie-disco
-rosie disco 'start' "${PORT}" \
-    0<'/dev/null' 1>'rosie-disco.out' 2>'rosie-disco.err' &
-ROSIE_DISCO_PID=$!
-T_INIT=$(date +%s)
-while ! port_is_busy $PORT && (($(date +%s) < T_INIT + 60)); do
-    sleep 1
-done
-if port_is_busy $PORT; then
-    pass "$TEST_KEY"
-else
-    fail "$TEST_KEY"
-    kill "${ROSIE_DISCO_PID}" 2>'/dev/null'
-    wait 2>'/dev/null'
-    rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}* 2>'/dev/null'
+rose_ws_init 'rosie' 'disco'
+if [[ -z "${TEST_ROSE_WS_PORT}" ]]; then
     exit 1
 fi
-URL=http://$HOSTNAME:$PORT/
-URL_FOO=${URL}foo/
+
+URL_FOO="${TEST_ROSE_WS_URL}/foo/"
 URL_FOO_S=${URL_FOO}search?
 URL_FOO_Q=${URL_FOO}query?
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-root
-run_pass "$TEST_KEY" curl -I $URL
+run_pass "$TEST_KEY" curl -I "${TEST_ROSE_WS_URL}"
 file_grep "$TEST_KEY.out" 'HTTP/.* 200 OK' "$TEST_KEY.out"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo
@@ -224,7 +207,5 @@ sys.exit(len(d) != len(expected_d) or
          d[1]["revision"] != expected_d[1]["revision"])
 __PYTHON__
 #-------------------------------------------------------------------------------
-kill "${ROSIE_DISCO_PID}" 2>'/dev/null'
-wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}* 2>'/dev/null'
+rose_ws_kill
 exit 0

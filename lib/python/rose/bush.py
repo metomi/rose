@@ -49,6 +49,7 @@ class RoseBushService(object):
 
     NS = "rose"
     UTIL = "bush"
+    TITLE = "Rose Bush"
     CYCLES_PER_PAGE = 100
     JOBS_PER_PAGE = 15
     JOBS_PER_PAGE_MAX = 300
@@ -57,25 +58,33 @@ class RoseBushService(object):
     def __init__(self, *args, **kwargs):
         self.exposed = True
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
-        self.host_name = HostSelector().get_local_host()
-        if self.host_name and "." in self.host_name:
-            self.host_name = self.host_name.split(".", 1)[0]
+        rose_conf = ResourceLocator.default().get_conf()
+        self.title = rose_conf.get_value(["rose-bush", "title"], self.TITLE)
+        self.host_name = rose_conf.get_value(["rose-bush", "host"])
+        if self.host_name is None:
+            self.host_name = HostSelector().get_local_host()
+            if self.host_name and "." in self.host_name:
+                self.host_name = self.host_name.split(".", 1)[0]
         self.rose_version = ResourceLocator.default().get_version()
-        res_loc = ResourceLocator.default()
         template_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
             ResourceLocator.default().get_util_home(
                 "lib", "html", "template", "rose-bush")))
         self.template_env = template_env
 
     @cherrypy.expose
-    def index(self):
+    def index(self, form=None):
         """Display a page to input user ID and suite ID."""
         # TODO: some way to allow autocomplete of user field?
+        data = {
+            "title": self.title,
+            "host": self.host_name,
+            "rose_version": self.rose_version,
+            "script": cherrypy.request.script_name,
+        }
+        if form == "json":
+            return simplejson.dumps(data)
         try:
-            template = self.template_env.get_template("index.html")
-            return template.render(host=self.host_name,
-                                   rose_version=self.rose_version,
-                                   script=cherrypy.request.script_name)
+            return self.template_env.get_template("index.html").render(**data)
         except Exception as exc:
             traceback.print_exc(exc)
 
@@ -84,6 +93,7 @@ class RoseBushService(object):
         """List current broadcasts of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
         data = {
+            "title": self.title,
             "host": self.host_name,
             "user": user,
             "suite": suite,
@@ -111,6 +121,7 @@ class RoseBushService(object):
         """List broadcasts history of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
         data = {
+            "title": self.title,
             "host": self.host_name,
             "user": user,
             "suite": suite,
@@ -150,6 +161,7 @@ class RoseBushService(object):
         else:
             page = 1
         data = {
+            "title": self.title,
             "host": self.host_name,
             "user": user,
             "suite": suite,
@@ -239,6 +251,7 @@ class RoseBushService(object):
         if no_status and not isinstance(no_status, list):
             no_statuses = [no_status]
         data = {
+            "title": self.title,
             "host": self.host_name,
             "user": user,
             "suite": suite,
@@ -300,11 +313,13 @@ class RoseBushService(object):
 
         """
         user_suite_dir_root = self._get_user_suite_dir_root(user)
-        data = {"host": self.host_name,
-                "rose_version": self.rose_version,
-                "script": cherrypy.request.script_name,
-                "user": user,
-                "entries": []}
+        data = {
+            "title": self.title,
+            "host": self.host_name,
+            "rose_version": self.rose_version,
+            "script": cherrypy.request.script_name,
+            "user": user,
+            "entries": []}
         if os.path.isdir(user_suite_dir_root):
             for name in os.listdir(user_suite_dir_root):
                 suite_conf = os.path.join(user_suite_dir_root, name,
@@ -431,6 +446,7 @@ class RoseBushService(object):
             rose_version=self.rose_version,
             script=cherrypy.request.script_name,
             time=strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+            title=self.title,
             host=self.host_name,
             user=user,
             suite=suite,
