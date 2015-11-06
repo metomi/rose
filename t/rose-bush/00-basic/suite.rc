@@ -1,0 +1,20 @@
+#!Jinja2
+[cylc]
+    UTC mode = True
+    abort if any task fails = True
+[scheduling]
+    initial cycle point = 2000
+    final cycle point = 2000
+    [[dependencies]]
+        [[[P1Y]]]
+            graph = FOO
+[runtime]
+    [[FOO]]
+        script = """
+echo "Hello from ${CYLC_TASK_ID}.${CYLC_SUITE_NAME}"
+for I in $(seq -w 1 10); do
+    echo "[INFO] whatever stuff $I" >"$0.txt.$I"
+done
+"""
+    [[foo0, foo1]]
+        inherit = FOO

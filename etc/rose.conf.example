@@ -106,15 +106,23 @@
 #  user-tool=ldap
 [rosa-svn]
 
-# Configuration for Rose Bush server. (Examples are default values.)
+# Configuration for Rose Bush server. (Numeric examples are default values.)
 [rose-bush]
 #
 ## Cycles list view: default number of cycles per page
 #  cycles-per-page=100
+## An alternate host name. (Default is the server's host name.)
+#  host=NAME
+## E.g.:
+#  host=my-wonderful-host
 ## Job list view: default number of jobs per page
 #  jobs-per-page=15
 ## Job list view: maximum number of jobs per page
 #  jobs-per-page-max=300
+## An alternate service title (Default="Rose Bush")
+## title=TITLE
+## E.g.:
+#  title=Mulberry Bush
 ## File view: maximum viewable file size in bytes
 #  view-size-max=10485760
 [rose-bush]
@@ -297,6 +305,19 @@
 #  repos.foo=/srv/svn/foo
 [rosie-db]
 
+# Configuration related to the adhoc Rosie suite discovery service server
+[rosie-disco]
+#
+## An alternate host name. (Default is the server's host name.)
+#  host=NAME
+## E.g.:
+#  host=my-wonderful-host
+## An alternate service title (Default="Rosie Suites Discovery")
+## title=TITLE
+## E.g.:
+#  title=Mulberry Suites Discovery
+[rosie-disco]
+
 # Configuration related to "rosie go" GUI
 # See the $ROSE_HOME/lib/python/rosie/browser/__init__.py for detail.
 [rosie-go]
@@ -364,19 +385,6 @@
 ## E.g. to grant access to all users by default:
 #  access-list-default=*
 [rosie-vc]
-
-# Configuration related to the adhoc Rosie web service server
-[rosie-ws]
-#
-## Adhoc Rosie web server log directory
-#  log-dir=DIR
-## E.g.:
-#  log-dir=/var/log/rosie
-## Adhoc Rosie web server port
-#  port=PORT-NUMBER
-## E.g.:
-#  port=8080
-[rosie-ws]
 
 # Test Battery Configuration
 [t]

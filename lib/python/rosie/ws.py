@@ -41,21 +41,26 @@ class RosieDiscoServiceRoot(object):
 
     NS = "rosie"
     UTIL = "disco"
+    TITLE = "Rosie Suites Discovery"
 
     def __init__(self, *args, **kwargs):
         self.exposed = True
         self.props = {}
-        self.props["host_name"] = HostSelector().get_local_host()
-        if self.props["host_name"] and "." in self.props["host_name"]:
-            self.props["host_name"] = (
-                self.props["host_name"].split(".", 1)[0])
+        rose_conf = ResourceLocator.default().get_conf()
+        self.props["title"] = rose_conf.get_value(
+            ["rosie-disco", "title"], self.TITLE)
+        self.props["host_name"] = rose_conf.get_value(["rosie-disco", "host"])
+        if self.props["host_name"] is None:
+            self.props["host_name"] = HostSelector().get_local_host()
+            if self.props["host_name"] and "." in self.props["host_name"]:
+                self.props["host_name"] = (
+                    self.props["host_name"].split(".", 1)[0])
         self.props["rose_version"] = ResourceLocator.default().get_version()
         self.props["template_env"] = jinja2.Environment(
             loader=jinja2.FileSystemLoader(
                 ResourceLocator.default().get_util_home(
                     "lib", "html", "template", "rosie-disco")))
         db_url_map = {}
-        rose_conf = ResourceLocator.default().get_conf()
         for key, node in rose_conf.get(["rosie-db"]).value.items():
             if key.startswith("db.") and key[3:]:
                 db_url_map[key[3:]] = node.value
@@ -70,6 +75,7 @@ class RosieDiscoServiceRoot(object):
         """Provide the root index page."""
         tmpl = self.props["template_env"].get_template("index.html")
         return tmpl.render(
+            title=self.props["title"],
             host=self.props["host_name"],
             rose_version=self.props["rose_version"],
             script=cherrypy.request.script_name,
@@ -169,6 +175,7 @@ class RosieDiscoService(object):
                     item["date"]))
         tmpl = self.props["template_env"].get_template("prefix-index.html")
         return tmpl.render(
+            title=self.props["title"],
             host=self.props["host_name"],
             rose_version=self.props["rose_version"],
             script=cherrypy.request.script_name,
