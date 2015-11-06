@@ -58,7 +58,7 @@ class KGODatabase(object):
     def __init__(self):
         """Initialise the object"""
         self.file_name = os.path.join(
-            os.getenv("ROSE_SUITE_DIR"), "kgo_update.db")
+            os.getenv("ROSE_SUITE_DIR"), "rose-ana-comparisons.db")
         self.conn = None
         self.create()
 
