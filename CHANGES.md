@@ -5,18 +5,18 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2015-Q4?)
+## 2015.11.0 (2015-11-06)
 
-Rose release 32. This release will work best with
-[cylc-6.7.1](https://github.com/cylc/cylc/releases/tag/6.7.1) and
+Rose release 32. This release works best with
+[cylc-6.7.2](https://github.com/cylc/cylc/releases/tag/6.7.2) and
 [fcm-2015.10.0](https://github.com/metomi/fcm/releases/tag/2015.10.0).
 
 ### User Interface Changes
 
 [#1735](https://github.com/metomi/rose/pull/1735):
-rose suite-hook: will no longer retrieve remote job logs by default. This
-should be handled by cylc. If this functionality is still required for whatever
-reason, use the `--retrieve-job-logs` option to switch it back on.
+rose suite-hook: will no longer retrieve remote job logs by default, this can
+now be handled by cylc. If this functionality is still required for whatever
+reason, use the `--retrieve-job-logs` option.
 
 [#1729](https://github.com/metomi/rose/pull/1729):
 rose suite-scan: will now time out after 60s by default. This can be configured
@@ -32,8 +32,8 @@ single application configuration.
 ### Noteworthy Changes
 
 [#1750](https://github.com/metomi/rose/pull/1750):
-Rose Bush and Rosie Disco: can now be configured to use alternate strings for
-titles and host names.
+Rose Bush and Rosie Disco: can now be configured to display alternate titles
+and/or host names.
 
 [#1744](https://github.com/metomi/rose/pull/1744):
 rosie co: new alias of `rosie checkout`.
@@ -61,9 +61,9 @@ rose test-battery: now runs correctly in the absence of site/user configuration
 on recent Ubuntu distros.
 
 [#1727](https://github.com/metomi/rose/pull/1727):
-rosa svn-pre-commit: now checks `rose-suite.info` files of suites using site
-configuration metadata. A change that contains a `rose-suite.info` file that
-does not validate will be rejected.
+rosa svn-pre-commit: now validates `rose-suite.info` files of suites using site
+configuration metadata. The pre-commit hook will reject a changeset that
+contains a `rose-suite.info` file with invalidate entries.
 
 --------------------------------------------------------------------------------
 
