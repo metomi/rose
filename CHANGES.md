@@ -31,6 +31,10 @@ single application configuration.
 
 ### Noteworthy Changes
 
+[#1750](https://github.com/metomi/rose/pull/1750):
+Rose Bush and Rosie Disco: can now be configured to use alternate strings for
+titles and host names.
+
 [#1744](https://github.com/metomi/rose/pull/1744):
 rosie co: new alias of `rosie checkout`.
 
