@@ -106,7 +106,7 @@
 #  user-tool=ldap
 [rosa-svn]
 
-# Configuration for Rose Bush server. (Number examples are default values.)
+# Configuration for Rose Bush server. (Numeric examples are default values.)
 [rose-bush]
 #
 ## Cycles list view: default number of cycles per page
@@ -119,10 +119,10 @@
 #  jobs-per-page=15
 ## Job list view: maximum number of jobs per page
 #  jobs-per-page-max=300
-## An alternate service title (Default="Rosie Suites Discovery")
+## An alternate service title (Default="Rose Bush")
 ## title=TITLE
 ## E.g.:
-#  title=Mulberry Suites Discovery
+#  title=Mulberry Bush
 ## File view: maximum viewable file size in bytes
 #  view-size-max=10485760
 [rose-bush]
