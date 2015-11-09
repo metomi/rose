@@ -172,9 +172,8 @@ class RoseAnaApp(BuiltinApp):
             # rose_ana app name and the task index (to make it unique)
             app_task = "{0} ({1})".format(rose_ana_task_name, task.name)
             # Include an indication of what extrac/comparison was performed
-            comparison = "{0} : {1} : {2}".format(task.comparison,
-                                                  task.extract,
-                                                  task.subextract)
+            comparison = "{0} : {1} : {2}".format(
+                task.comparison, task.extract, getattr(task, "subextract", ""))
             kgo_db.enter_comparison(app_task, task.kgo1file, task.resultfile,
                                     task.userstatus, comparison)
 
@@ -517,7 +516,6 @@ class AnalysisTask(object):
         self.kgo1file = None
         self.comparison = None
         self.extract = None
-        self.subextract = None
         self.tolerance = None
         self.warnonfail = False
         self.numkgofiles = 0
