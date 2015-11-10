@@ -55,6 +55,11 @@ class KGODatabase(object):
     KGO Database object, stores comparison information for rose_ana apps.
 
     """
+    # Stores retries of database creation and the maximum allowed number
+    # of retries before an exception is raised
+    RETRIES = 0
+    MAX_RETRIES = 5
+
     def __init__(self):
         "Initialise the object."
         self.file_name = os.path.join(
@@ -70,43 +75,53 @@ class KGODatabase(object):
 
     def create(self):
         "If the databaste doesn't exist, create it."
-        self.wait_for_lock()
         if not os.path.exists(self.file_name):
-            conn = self.get_conn()
-            # This table stores the individual comparisons
-            conn.execute(
-                """
-                CREATE TABLE comparisons (
-                app_task TEXT,
-                kgo_file TEXT,
-                suite_file TEXT,
-                status TEXT,
-                comparison TEXT,
-                PRIMARY KEY(app_task))
-                """)
-            # And this one stores the completion status of the task
-            conn.execute(
-                """
-                CREATE TABLE tasks (
-                task_name TEXT,
-                completed INT,
-                PRIMARY KEY(task_name))
-                """)
-            conn.commit()
-        self.unlock()
-
-    def wait_for_lock(self):
-        "Use a lock-dir to control concurrent access to the database."
-        retries = 0
-        while retries < 20:
-            retries += 1
-            try:
-                os.mkdir(self.file_name + ".lock")
-                return
-            except OSError:
+            if self.acquire_lock():
+                # If the lock was acquired it is this task's job to
+                # create the database
+                conn = self.get_conn()
+                # This table stores the individual comparisons
+                conn.execute(
+                    """
+                    CREATE TABLE comparisons (
+                    app_task TEXT,
+                    kgo_file TEXT,
+                    suite_file TEXT,
+                    status TEXT,
+                    comparison TEXT,
+                    PRIMARY KEY(app_task))
+                    """)
+                # And this one stores the completion status of the task
+                conn.execute(
+                    """
+                    CREATE TABLE tasks (
+                    task_name TEXT,
+                    completed INT,
+                    PRIMARY KEY(task_name))
+                    """)
+                conn.commit()
+                # Unlock the database file again
+                self.unlock()
+            else:
+                # If the lock was not acquired this task should wait
+                # for the locking task to create the database and try
+                # again
                 time.sleep(5)
-        msg = "Waiting for lock to release timed-out after 20 retries"
-        raise IOError(msg)
+                # If this happens several times abort
+                self.RETRIES += 1
+                if self.RETRIES >= self.MAX_RETRIES:
+                    msg = ("Database failed to unlock, try manually removing "
+                           "{0} and re-triggering")
+                    raise IOError(msg.format(self.file_anme + ".lock"))
+                self.create()
+
+    def acquire_lock(self):
+        "Use a lock-dir to control concurrent access to the database."
+        try:
+            os.mkdir(self.file_name + ".lock")
+            return True
+        except OSError:
+            return False
 
     def unlock(self):
         "Unlock the database for access."
