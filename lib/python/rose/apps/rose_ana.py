@@ -56,20 +56,20 @@ class KGODatabase(object):
 
     """
     def __init__(self):
-        """Initialise the object"""
+        "Initialise the object."
         self.file_name = os.path.join(
             os.getenv("ROSE_SUITE_DIR"), "log", "rose-ana-comparisons.db")
         self.conn = None
         self.create()
 
     def get_conn(self):
-        """Return a connection to the database if it exists"""
+        "Return a connection to the database if it exists."
         if self.conn is None:
             self.conn = sqlite3.connect(self.file_name, timeout=60.0)
         return self.conn
 
     def create(self):
-        """If the databaste doesn't exist, create it"""
+        "If the databaste doesn't exist, create it."
         self.wait_for_lock()
         if not os.path.exists(self.file_name):
             conn = self.get_conn()
@@ -96,7 +96,7 @@ class KGODatabase(object):
         self.unlock()
 
     def wait_for_lock(self):
-        """Use a lock-dir to control concurrent access to the database"""
+        "Use a lock-dir to control concurrent access to the database."
         retries = 0
         while retries < 20:
             retries += 1
@@ -109,12 +109,12 @@ class KGODatabase(object):
         raise IOError(msg)
 
     def unlock(self):
-        """Unlock the database for access"""
+        "Unlock the database for access."
         os.rmdir(self.file_name + ".lock")
 
     def enter_comparison(
             self, app_task, kgo_file, suite_file, status, comparison):
-        """Insert a new comparison entry to the database"""
+        "Insert a new comparison entry to the database."
         conn = self.get_conn()
         conn.execute(
             "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)",
@@ -122,6 +122,7 @@ class KGODatabase(object):
         conn.commit()
 
     def enter_task(self, app_task, status):
+        "Insert a new task entry to the database."
         conn = self.get_conn()
         conn.execute(
             "INSERT OR REPLACE INTO tasks VALUES (?, ?)",
@@ -171,7 +172,7 @@ class RoseAnaApp(BuiltinApp):
             # The primary key in the database is composed from both the
             # rose_ana app name and the task index (to make it unique)
             app_task = "{0} ({1})".format(rose_ana_task_name, task.name)
-            # Include an indication of what extrac/comparison was performed
+            # Include an indication of what extract/comparison was performed
             comparison = "{0} : {1} : {2}".format(
                 task.comparison, task.extract, getattr(task, "subextract", ""))
             kgo_db.enter_comparison(app_task, task.kgo1file, task.resultfile,
