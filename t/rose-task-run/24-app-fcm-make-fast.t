@@ -31,7 +31,7 @@ if ! gfortran --version 1>/dev/null 2>&1; then
     skip_all '"gfortran" unavailable'
 fi
 #-------------------------------------------------------------------------------
-tests 4
+tests 5
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
 mkdir 'fast'
@@ -44,10 +44,18 @@ timeout 120 rose suite-run -q --debug \
     --no-gcontrol --host='localhost' -S "FAST_DEST_ROOT=\"${PWD}/fast\"" \
     -- --debug
 #-------------------------------------------------------------------------------
+# Permission modes of make directory should be the same as a normal directory
+mkdir "${SUITE_RUN_DIR}/share/hello-make-perm-mode-test"
+run_pass "${TEST_KEY_BASE}-perm-mode" test \
+    "$(stat -c'%a' "${SUITE_RUN_DIR}/share/hello-make-perm-mode-test")" = \
+    "$(stat -c'%a' "${SUITE_RUN_DIR}/share/hello-make")"
+rmdir "${SUITE_RUN_DIR}/share/hello-make-perm-mode-test"
+# Executable runs OK
 file_cmp "${TEST_KEY_BASE}" "${SUITE_RUN_DIR}/share/hello.txt" <<__TXT__
 ${SUITE_RUN_DIR}/share/hello-make/build/bin/hello
 Hello World!
 __TXT__
+# Logs
 HOST=$(hostname)
 file_grep "${TEST_KEY_BASE}.log" \
     "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make.1.${NAME}" \

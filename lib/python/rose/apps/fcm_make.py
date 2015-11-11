@@ -150,8 +150,10 @@ class FCMMakeApp(BuiltinApp):
             # "rsync" fast working directory to dests[0], if relevant
             if dest != dests[0] and os.path.isdir(dest):
                 app_runner.fs_util.makedirs(dests[0])
+                stat = os.stat(dests[0])
                 cmd = rsync_prefixes + [dest + os.sep, dests[0] + os.sep]
                 app_runner.popen.run_simple(*cmd)
+                os.chmod(dests[0], stat.st_mode)
                 app_runner.fs_util.delete(dest)
 
     def _run_orig(self, app_runner, conf_tree, opts, args, uuid, task,
