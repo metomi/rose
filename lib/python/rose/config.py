@@ -668,9 +668,9 @@ class ConfigLoader(object):
         if node is None:
             node = ConfigNode()
         handle, file_name = self._get_file_and_name(source)
-        keys = []
-        type_ = None
-        comments = None
+        keys = []  # Currently position under root node
+        type_ = None  # Type of current node, section or option?
+        comments = None  # Comments associated with next node
         line_num = 0
         # Note: "for line in handle:" hangs for sys.stdin
         while True:
@@ -700,12 +700,12 @@ class ConfigLoader(object):
             match = self.RE_SECTION.match(line)
             if match:
                 head, section, state = match.group("head", "section", "state")
-                for char in [CHAR_SECTION_OPEN, CHAR_SECTION_CLOSE]:
-                    index = section.find(char)
-                    if index >= 0:
-                        raise ConfigSyntaxError(
-                            ConfigSyntaxError.BAD_CHAR,
-                            file_name, line_num, len(head) + index, line)
+                bad_index = self._check_section_value(section)
+                if bad_index > -1:
+                    raise ConfigSyntaxError(
+                        ConfigSyntaxError.BAD_CHAR,
+                        file_name, line_num, len(head) + bad_index, line)
+                # Find position under root node
                 if type_ == self.TYPE_OPTION:
                     keys.pop()
                 if keys:
@@ -726,7 +726,7 @@ class ConfigLoader(object):
                         section_node.comments += comments
                 comments = []
                 continue
-            # Match the start of an option setting
+            # Match the start of an option setting?
             match = self.re_option.match(line)
             if not match:
                 raise ConfigSyntaxError(
@@ -742,6 +742,48 @@ class ConfigLoader(object):
         return node
 
     __call__ = load
+
+    @classmethod
+    def _check_section_value(cls, section):
+        """Check value of section title for bad braces."""
+        for char in CHAR_SECTION_OPEN, CHAR_SECTION_CLOSE:
+            bad_index = section.find(char)
+            if bad_index > -1:
+                return bad_index
+        scheme, _, path = section.partition(":")
+        if not path:
+            return -1
+        index_of = {}
+        for char in "{}()":
+            index_of[char] = -1
+            pos = 0
+            while pos < len(path):
+                index = path.find(char, pos)
+                if index > -1 and pos > 0:
+                    # 2nd occurrence of char
+                    return len(scheme) + index + 1
+                elif index > -1:
+                    index_of[char] = index
+                    pos = index + 1
+                else:
+                    break
+        for sym_open, sym_close in ["{}", "()"]:
+            if index_of[sym_close] == -1 and index_of[sym_open] == -1:
+                continue
+            elif index_of[sym_close] == -1:
+                # has open, but no close
+                return len(section)
+            elif (index_of[sym_open] == -1 or
+                    index_of[sym_close] < index_of[sym_open]):
+                # has close, but no open
+                # or close before open
+                return len(scheme) + index_of[sym_close] + 1
+        if index_of["("] > -1:
+            if index_of["{"] > index_of["("]:
+                return len(scheme) + index_of["{"] + 1
+            elif index_of["}"] > index_of["("]:
+                return len(scheme) + index_of["("] + 1
+        return -1
 
     @classmethod
     def _comment_strip(cls, line):
@@ -779,8 +821,8 @@ class ConfigSyntaxError(Exception):
     BAD_SYNTAX = "BAD_SYNTAX"
 
     MESSAGES = {
-        BAD_CHAR: """Unexpected character in name""",
-        BAD_SYNTAX: """Expecting "[SECTION]" or "KEY=VALUE\"""",
+        BAD_CHAR: """unexpected character or end of value""",
+        BAD_SYNTAX: '''expecting "[SECTION]" or "KEY=VALUE"''',
     }
 
     def __init__(self, code, file_name, line_num, col_num, line):
