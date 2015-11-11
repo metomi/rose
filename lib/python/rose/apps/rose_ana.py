@@ -27,7 +27,6 @@ import os
 import re
 import sys
 import sqlite3
-import time
 
 # Rose modules
 import rose.config
@@ -75,57 +74,27 @@ class KGODatabase(object):
 
     def create(self):
         "If the databaste doesn't exist, create it."
-        if not os.path.exists(self.file_name):
-            if self.acquire_lock():
-                # If the lock was acquired it is this task's job to
-                # create the database
-                conn = self.get_conn()
-                # This table stores the individual comparisons
-                conn.execute(
-                    """
-                    CREATE TABLE comparisons (
-                    app_task TEXT,
-                    kgo_file TEXT,
-                    suite_file TEXT,
-                    status TEXT,
-                    comparison TEXT,
-                    PRIMARY KEY(app_task))
-                    """)
-                # And this one stores the completion status of the task
-                conn.execute(
-                    """
-                    CREATE TABLE tasks (
-                    task_name TEXT,
-                    completed INT,
-                    PRIMARY KEY(task_name))
-                    """)
-                conn.commit()
-                # Unlock the database file again
-                self.unlock()
-            else:
-                # If the lock was not acquired this task should wait
-                # for the locking task to create the database and try
-                # again
-                time.sleep(5)
-                # If this happens several times abort
-                self.RETRIES += 1
-                if self.RETRIES >= self.MAX_RETRIES:
-                    msg = ("Database failed to unlock, try manually removing "
-                           "{0} and re-triggering")
-                    raise IOError(msg.format(self.file_anme + ".lock"))
-                self.create()
-
-    def acquire_lock(self):
-        "Use a lock-dir to control concurrent access to the database."
-        try:
-            os.mkdir(self.file_name + ".lock")
-            return True
-        except OSError:
-            return False
-
-    def unlock(self):
-        "Unlock the database for access."
-        os.rmdir(self.file_name + ".lock")
+        conn = self.get_conn()
+        # This table stores the individual comparisons
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS comparisons (
+            app_task TEXT,
+            kgo_file TEXT,
+            suite_file TEXT,
+            status TEXT,
+            comparison TEXT,
+            PRIMARY KEY(app_task))
+            """)
+        # And this one stores the completion status of the task
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS tasks (
+            task_name TEXT,
+            completed INT,
+            PRIMARY KEY(task_name))
+            """)
+        conn.commit()
 
     def enter_comparison(
             self, app_task, kgo_file, suite_file, status, comparison):
