@@ -134,6 +134,7 @@ class RoseArchApp(BuiltinApp):
             else:
                 target.status = target.ST_OLD
             targets.append(target)
+        targets.sort(key=lambda target: target.name)
 
         # Delete from database items that are no longer relevant
         dao.delete_all(filter_targets=targets)

@@ -746,13 +746,19 @@ class ConfigLoader(object):
     @classmethod
     def _check_section_value(cls, section):
         """Check value of section title for bad braces."""
+        # Square braces
         for char in CHAR_SECTION_OPEN, CHAR_SECTION_CLOSE:
             bad_index = section.find(char)
             if bad_index > -1:
                 return bad_index
+        # Don't check string with environment variable substitution syntax
+        if "${" in section:
+            return -1
+        # Check only section values with schemes
         scheme, _, path = section.partition(":")
         if not path:
             return -1
+        # Check brackets and curly braces
         index_of = {}
         for char in "{}()":
             index_of[char] = -1
@@ -778,6 +784,7 @@ class ConfigLoader(object):
                 # has close, but no open
                 # or close before open
                 return len(scheme) + index_of[sym_close] + 1
+        # Curly braces should be placed before brackets
         if index_of["("] > -1:
             if index_of["{"] > index_of["("]:
                 return len(scheme) + index_of["{"] + 1
