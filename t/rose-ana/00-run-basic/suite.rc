@@ -11,6 +11,7 @@ UTC mode=True
         graph="""
           rose_ana_t1 # basic
           rose_ana_t2_activated:fail => rose_ana_t2_deactivated
+          rose_ana_t1:fail & rose_ana_t2_deactivated => db_check
         """
 
 [runtime]
@@ -22,3 +23,6 @@ UTC mode=True
 
     [[rose_ana_t2_deactivated]]
         command scripting = rose task-run -v -v --debug --app-key=rose_ana_t2 --opt-conf-key=deactivate
+
+    [[db_check]]
+        command scripting = rose task-run -v -v --debug

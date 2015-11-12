@@ -26,6 +26,7 @@ import inspect
 import os
 import re
 import sys
+import sqlite3
 
 # Rose modules
 import rose.config
@@ -46,6 +47,71 @@ OPTIONS = ["method_path"]
 
 USRCOMPARISON_DIRNAME = "comparisons"
 USRCOMPARISON_EXT = ".py"
+
+
+class KGODatabase(object):
+    """
+    KGO Database object, stores comparison information for rose_ana apps.
+
+    """
+    # Stores retries of database creation and the maximum allowed number
+    # of retries before an exception is raised
+    RETRIES = 0
+    MAX_RETRIES = 5
+
+    def __init__(self):
+        "Initialise the object."
+        self.file_name = os.path.join(
+            os.getenv("ROSE_SUITE_DIR"), "log", "rose-ana-comparisons.db")
+        self.conn = None
+        self.create()
+
+    def get_conn(self):
+        "Return a connection to the database if it exists."
+        if self.conn is None:
+            self.conn = sqlite3.connect(self.file_name, timeout=60.0)
+        return self.conn
+
+    def create(self):
+        "If the databaste doesn't exist, create it."
+        conn = self.get_conn()
+        # This table stores the individual comparisons
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS comparisons (
+            app_task TEXT,
+            kgo_file TEXT,
+            suite_file TEXT,
+            status TEXT,
+            comparison TEXT,
+            PRIMARY KEY(app_task))
+            """)
+        # And this one stores the completion status of the task
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS tasks (
+            task_name TEXT,
+            completed INT,
+            PRIMARY KEY(task_name))
+            """)
+        conn.commit()
+
+    def enter_comparison(
+            self, app_task, kgo_file, suite_file, status, comparison):
+        "Insert a new comparison entry to the database."
+        conn = self.get_conn()
+        conn.execute(
+            "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)",
+            [app_task, kgo_file, suite_file, status, comparison])
+        conn.commit()
+
+    def enter_task(self, app_task, status):
+        "Insert a new task entry to the database."
+        conn = self.get_conn()
+        conn.execute(
+            "INSERT OR REPLACE INTO tasks VALUES (?, ?)",
+            [app_task, status])
+        conn.commit()
 
 
 class RoseAnaApp(BuiltinApp):
@@ -72,8 +138,30 @@ class RoseAnaApp(BuiltinApp):
                          reporter=app_runner.event_handler,
                          popen=app_runner.popen)
 
+        # Initialise a database session
+        rose_ana_task_name = os.getenv("ROSE_TASK_NAME")
+        kgo_db = KGODatabase()
+
+        # Add an entry for this task, with a non-zero status code
+        kgo_db.enter_task(rose_ana_task_name, 1)
+
         # Run the analysis
         num_failed, tasks = engine.analyse()
+
+        # Update the database to indicate that the task succeeded
+        kgo_db.enter_task(rose_ana_task_name, 0)
+
+        # Update the database
+        for task in tasks:
+            # The primary key in the database is composed from both the
+            # rose_ana app name and the task index (to make it unique)
+            app_task = "{0} ({1})".format(rose_ana_task_name, task.name)
+            # Include an indication of what extract/comparison was performed
+            comparison = "{0} : {1} : {2}".format(
+                task.comparison, task.extract, getattr(task, "subextract", ""))
+            kgo_db.enter_comparison(app_task, task.kgo1file, task.resultfile,
+                                    task.userstatus, comparison)
+
         if num_failed != 0:
             raise TestsFailedException(num_failed)
 
@@ -410,7 +498,7 @@ class AnalysisTask(object):
         # Variables defined in config file
         self.name = None
         self.resultfile = None
-        self.kgofile = None
+        self.kgo1file = None
         self.comparison = None
         self.extract = None
         self.tolerance = None
@@ -420,7 +508,7 @@ class AnalysisTask(object):
 # Variables to save settings before environment variable expansion (for
 # writing back to config file, rerunning, etc)
         self.resultfileconfig = self.resultfile
-        self.kgofileconfig = self.kgofile
+        self.kgofileconfig = self.kgo1file
 
 # Data variables filled by extract methods
         self.resultdata = []

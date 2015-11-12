@@ -327,6 +327,82 @@ rose stem --group=mygroup --group=myothergroup
       </div>
 
       <div class="slide">
+        <h2 id="rose-ana-db">The <samp>rose ana</samp> comparison database</h2>
+
+        <p>In addition to performing the comparisons each of the
+        <code>rose ana</code> tasks in the suite will append some key details
+        about the comparisons to an <code>sqlite</code> database kept in the
+        suite's <code>log</code> directory (at
+        <code>log/rose-ana-comparisons.db</code>).</p>
+
+        <p>This is intended to provide a quick means to interrogate the suite
+        for information about the status of any comparisons it has performed.
+        There are 2 tables present in the suite which contain the following:</p>
+
+      </div>
+
+      <div class="slide">
+        <h3 class="alwayshidden">rose ana db II</h3>
+
+        <ul>
+          <li><samp>tasks (TABLE)</samp> Contains an entry for each
+            <code>rose ana</code> task, using the following columns:
+            <ul>
+              <li><samp>task_name (TEXT)</samp> The exact name of the
+                <code>rose ana</code> task.</li>
+              <li><samp>completed (INT)</samp> Set to 1 when the task starts
+                performing its comparisons then updated to 0 when the task
+                has completed (Note: task success is not related to the
+                success/failed state of the comparisons).</li>
+            </ul>
+            The intention of this table is to detect if any
+            <code>rose ana</code> tasks have failed unexpectedly (or are still
+            running).</li>
+        </ul>
+
+      </div>
+
+      <div class="slide">
+        <h3 class="alwayshidden">rose ana db III</h3>
+
+        <ul>
+          <li><samp>comparisons</samp> Contains an entry for each individual
+            comparison from every <code>rose ana</code> task, using the
+            following columns:
+            <ul>
+              <li><samp>app_task (TEXT)</samp> A composite of the exact name
+                of the <code>rose ana</code> task and the comparison section
+                name from the app defintion (in brackets).</li>
+              <li><samp>kgo_file (TEXT)</samp> The full path to the file given
+                as <code>kgo1file</code> in the app definition.</li>
+              <li><samp>suite_file (TEXT)</samp> The full path to the file
+                given as <code>resultfile</code> in the app definition.</li>
+              <li><samp>status (TEXT)</samp> The status of the task, as
+                reported by <code>rose ana</code> (i.e. " OK ", "FAIL" or
+                "WARN").</li>
+              <li><samp>comparison (TEXT)</samp> Another composite, this time
+                it contains the <code>comparison</code> and <code>extract</code>
+                in the app definition, delimited by colons.</li>
+            </ul>
+            The intention of this table is to provide a record of which files
+            were compared by which tasks, how they were compared and what the
+            result of the comparison was.</li>
+        </ul>
+
+      </div>
+
+      <div class="slide">
+        <h3 class="alwayshidden">rose ana db IV</h3>
+        <p>Although this database is produced by a <code>rose stem</code> suite,
+        the system does not provide any direct methods for working with or
+        interrogating it - since there could be various reasons for doing so,
+        and there may be other suite-design factors to consider.  Users are
+        therefore expected to provide this functionality separately based on
+        their specific needs.</p>
+
+      </div>
+
+      <div class="slide">
         <h2 id="summary">Summary</h2>
 
         <p>From within a working copy, running <samp>rose stem</samp> is
