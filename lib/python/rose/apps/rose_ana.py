@@ -111,8 +111,8 @@ class KGODatabase(object):
         conn.execute(
             "INSERT OR REPLACE INTO tasks VALUES (?, ?)",
             [app_task, status])
-        conn.commit()        
-        
+        conn.commit()
+
 
 class RoseAnaApp(BuiltinApp):
 
