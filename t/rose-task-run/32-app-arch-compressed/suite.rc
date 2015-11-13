@@ -1,0 +1,25 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[event hooks]]
+        timeout=PT1M
+        abort on timeout=True
+[scheduling]
+    [[dependencies]]
+        graph=archive
+
+[runtime]
+    [[root]]
+        [[[events]]]
+            handlers=cylc stop '%(suite)s'
+            handler events=submission failed, failed
+    [[archive]]
+        script="""
+gzip -f - <<<'MMXVI' >'2016.txt.gz'
+mkdir 'whatever'
+echo "I don't care." >'whatever/idontcare.txt'
+echo "You may be right." >'whatever/youmayberight.txt'
+tar -czf 'whatever.tar.gz' 'whatever'
+rm -fr 'whatever'
+rose task-run --debug
+"""
