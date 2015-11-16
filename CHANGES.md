@@ -5,6 +5,21 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2015-Q4?)
+
+### Noteworthy Changes
+
+[#1752](https://github.com/metomi/rose/pull/1752):
+fcm_make built-in application: fix permission mode of destination when using a
+fast location. It was set to user-only read-write.
+
+[#1751](https://github.com/metomi/rose/pull/1751):
+rose_ana built-in application: now uses a database to store some key comparison
+information to simplify the process for building up an understanding of what
+files need updating.
+
+--------------------------------------------------------------------------------
+
 ## 2015.11.0 (2015-11-06)
 
 Rose release 32. This release works best with
