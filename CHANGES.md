@@ -5,9 +5,17 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2015-Q4?)
+## 2015.11.1 (2015-11-17)
+
+Rose release 33. This release works best with
+[cylc-6.7.3](https://github.com/cylc/cylc/releases/tag/6.7.3) and
+[fcm-2015.11.0](https://github.com/metomi/fcm/releases/tag/2015.11.0).
 
 ### Noteworthy Changes
+
+[#1753](https://github.com/metomi/rose/pull/1753):
+rose.config: on loading a configuration file, check that section values contain
+matching brackets and braces.
 
 [#1752](https://github.com/metomi/rose/pull/1752):
 fcm_make built-in application: fix permission mode of destination when using a
