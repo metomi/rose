@@ -89,7 +89,8 @@ class GnomekeyringStore(object):
             item_id = res[0]["item_id"]
             self.item_ids[(scheme, host, username)] = (ring_id, item_id)
             return res[0]["password"]
-        except (gnomekeyring.NoMatchError, gnomekeyring.NoKeyringDaemonError):
+        except (gnomekeyring.NoMatchError, gnomekeyring.NoKeyringDaemonError,
+                gnomekeyring.DeniedError):
             return
 
     def store_password(self, scheme, host, username, password):
