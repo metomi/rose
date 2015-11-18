@@ -33,6 +33,7 @@ import sys
 import time
 import traceback
 
+ERR_PREFIX_UNREACHABLE = "Cannot connect to prefix(es) {0}"
 ERR_SYNTAX = "Syntax error: {0}"
 
 PRINT_FORMAT_DEFAULT = "%local %suite %owner %project %title"
@@ -115,6 +116,10 @@ def list_local_suites(argv):
         report(UserSpecificRoses(alternative_roses_dir), prefix=None)
 
     ws_client = RosieWSClient(prefixes=opts.prefixes, event_handler=report)
+    if ws_client.unreachable_prefixes:
+        bad_prefix_string = " ".join(ws_client.unreachable_prefixes)
+        report(RosieWSClientError(
+                   ERR_PREFIX_UNREACHABLE.format(bad_prefix_string)))
     _display_maps(opts, ws_client, ws_client.query_local_copies(opts.user))
 
 

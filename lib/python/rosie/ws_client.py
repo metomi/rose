@@ -79,6 +79,7 @@ class RosieWSClient(object):
         self.popen = popen
         self.prompt_func = prompt_func
         self.prefixes = []
+        self.unreachable_prefixes = []
         self.auth_managers = {}
         conf = ResourceLocator.default().get_conf()
         conf_rosie_id = conf.get(["rosie-id"], no_ignore=True)
@@ -106,9 +107,20 @@ class RosieWSClient(object):
             if prefix in self.auth_managers:
                 continue
             self.auth_managers[prefix] = RosieWSClientAuthManager(
-                prefix, popen=self.popen, prompt_func=self.prompt_func)
+                prefix, popen=self.popen, prompt_func=self.prompt_func,
+                event_handler=self.event_handler)
+        # Remove uncontactable prefixes from the list.        
+        ok_prefixes = self.hello(return_ok_prefixes=True)
+        prefixes = []
+        self.unreachable_prefixes = []
+        for prefix in self.prefixes:
+            if prefix in ok_prefixes:
+                prefixes.append(prefix)
+            else:
+                self.unreachable_prefixes.append(prefix)
+        self.prefixes = prefixes
 
-    def _get(self, method, **kwargs):
+    def _get(self, method, return_ok_prefixes=False, **kwargs):
         """Send an HTTP GET request to the known servers.
 
         Return a list, each element is the result from a successful request to
@@ -127,16 +139,17 @@ class RosieWSClient(object):
                 auth_manager = self.auth_managers[prefix]
                 if url.startswith(auth_manager.root):
                     request_details[url] = self._create_request_detail(
-                        url, kwargs, auth_manager)
+                        url, prefix, kwargs, auth_manager)
                     break
             else:
-                request_details[url] = self._create_request_detail(url, kwargs)
+                request_details[url] = self._create_request_detail(
+                    url, prefix, kwargs)
         else:
             for prefix in self.prefixes:
                 auth_manager = self.auth_managers[prefix]
                 full_url = auth_manager.root + url
                 request_details[full_url] = self._create_request_detail(
-                    full_url, kwargs, auth_manager)
+                    full_url, prefix, kwargs, auth_manager)
         if not request_details:
             raise RosieWSClientError(method, kwargs)
 
@@ -201,7 +214,10 @@ class RosieWSClient(object):
             response_url = self._remove_params(response.url)
             try:
                 response_data = simplejson.loads(response.text)
-                ret.append((response_data, response_url))
+                if return_ok_prefixes:
+                    ret.append(request_detail["prefix"])
+                else:
+                    ret.append((response_data, response_url))
             except ValueError:
                 self.event_handler(
                     RosieWSClientError(url, kwargs), level=1)
@@ -219,12 +235,13 @@ class RosieWSClient(object):
         return url.replace("?&", "?").rstrip("?")
 
     @classmethod
-    def _create_request_detail(cls, url, params, auth_manager=None):
+    def _create_request_detail(cls, url, prefix, params, auth_manager=None):
         """Helper for "_get". Return a dict with request details.
 
         The dict will be populated like this:
         {
             "url": url,
+            "prefix": prefix,
             "auth_manager": auth_manager,
             "can_retry": False,
             "requests_kwargs": requests_kwargs,
@@ -234,14 +251,20 @@ class RosieWSClient(object):
         params = dict(params)
         params["format"] = "json"
         requests_kwargs = {"params": params}
+        can_retry = (auth_manager is not None)
         if auth_manager:
             requests_kwargs.update(auth_manager.requests_kwargs)
             requests_kwargs["auth"] = auth_manager.get_auth()
+            if requests_kwargs["auth"] is None:
+                # None implies a failure to get auth, unlike '()'.
+                can_retry = False
+                requests_kwargs.pop("auth")
         return {
             "auth_manager": auth_manager,
-            "can_retry": (auth_manager is not None),
+            "can_retry": can_retry,
             "requests_kwargs": requests_kwargs,
             "response": None,
+            "prefix": prefix,
             "url": url}
 
     def _get_keys(self, name):
@@ -265,9 +288,9 @@ class RosieWSClient(object):
         """Return the query operators."""
         return self._get_keys("get_query_operators")
 
-    def hello(self):
+    def hello(self, return_ok_prefixes=False):
         """Ask the server to say hello."""
-        return self._get("hello")
+        return self._get("hello", return_ok_prefixes=return_ok_prefixes)
 
     def query(self, q, **kwargs):
         """Query the Rosie database."""
