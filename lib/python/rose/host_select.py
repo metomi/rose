@@ -28,7 +28,7 @@ from rose.resource import ResourceLocator
 import shlex
 import signal
 import socket
-from socket import gethostbyname, gethostname, getfqdn
+from socket import getaddrinfo, gethostname, getfqdn
 import sys
 from time import sleep, time
 import traceback
@@ -147,15 +147,16 @@ class HostSelector(object):
                 except socket.error:
                     pass
             for item in items + ["localhost"]:
-                if item not in self.local_host_strs:
-                    self.local_host_strs.append(item)
-                    try:
-                        address = gethostbyname(item)
-                    except socket.error:
-                        pass
-                    else:
-                        if address not in self.local_host_strs:
-                            self.local_host_strs.append(address)
+                if item in self.local_host_strs:
+                    continue
+                self.local_host_strs.append(item)
+                try:
+                    for addrinfo_item in socket.getaddrinfo(item, None):
+                        if addrinfo_item[4][0] in self.local_host_strs:
+                            continue
+                        self.local_host_strs.append(addrinfo_item[4][0])
+                except (IndexError, socket.error):
+                    pass
         return self.local_host_strs
 
     def get_local_host(self):
