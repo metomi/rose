@@ -28,9 +28,8 @@
 {% if entry.cycle != "1" -%}
 <a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle|replace('+', '%2B')}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
 {% endif -%}
-<a href="{{script}}/jobs/{{user}}/{{suite}}?tasks={{entry.name}}">
-<span title="{{entry.name}}">{{entry.name|truncate(40, True)}}</span>
-</a>
+<a href="{{script}}/jobs/{{user}}/{{suite}}?tasks={{entry.name}}"
+title="{{entry.name}}">{{entry.name}}</a>
 {% if entry.submit_num_max == 1 -%}
 {% elif entry.submit_num == entry.submit_num_max -%}
 <span class="badge badge-inverse"
