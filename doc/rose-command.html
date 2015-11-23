@@ -193,7 +193,7 @@
 
       <dt><a href="#rose-test-battery">rose test-battery</a></dt>
 
-      <dd>Run the Rose test suite.</dd>
+      <dd>Run Rose self tests.</dd>
     </dl>
 
     <h3 id="rosie-cmds">Rosie Commands</h3>
@@ -2667,25 +2667,46 @@ environment scripting = "eval $(rose task-env)"
 
     <h3>DESCRIPTION</h3>
 
-    <p>Run the Rose test battery.</p>
+    <p>Run Rose self tests.</p>
 
-    <ol>
-      <li>Change to <var>$ROSE_HOME</var>.</li>
+    <p>Change directory to Rose source tree, and runs this shell command:</p>
 
-      <li>
-        <p>With arguments, exec <code>prove -r</code> with the specified
-        arguments.</p>
+    <pre class="shell">
+exec prove -j "$NPROC" -s -r "${@:-t}"
+</pre>
 
-        <p>With no arguments:</p>
+    <p>where <var>NPROC</var> is the number of processors on your computer (or
+    the setting <var>[t]prove-options</var> in the site/user configuration
+    file). If you do not want to run the full test suite, you can specify the
+    names of individual test files or their containing directories as extra
+    arguments.</p>
 
-        <ul>
-          <li>If <code>rose config t prove-options</code> returns 0, exec
-          <code>prove $(rose config t prove-options) -r t</code>.</li>
+    <h3>EXAMPLE</h3>
 
-          <li>Otherwise, exec <code>prove -j 9 -s -r t</code>.</li>
-        </ul>
-      </li>
-    </ol>
+    <p>Run the full test suite with the default options.</p>
+
+    <pre class="shell">
+rose test-battery
+</pre>
+
+    <p>Run the full test suite with 12 processes.</p>
+
+    <pre class="shell">
+rose test-battery -j 12
+</pre>
+
+    <p>Run only tests under "t/rose-app-run/" with 12 processes.</p>
+
+
+    <pre class="shell">
+rose test-battery -j 12 t/rose-app-run
+</pre>
+
+    <p>Run only "t/rose-app-run/07-opt.t" in verbose mode.</p>
+
+    <pre class="shell">
+rose test-battery -v t/rose-app-run/07-opt.t
+</pre>
 
     <h3>SEE ALSO</h3>
 
