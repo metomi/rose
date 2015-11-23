@@ -21,18 +21,31 @@
 #     rose-test-battery
 #
 # SYNOPSIS
-#     rose test-battery [PROVE-ARGS ...]
+#     rose test-battery
 #
 # DESCRIPTION
-#     Run the Rose test battery.
+#     Run Rose self tests.
 #
-#     1. Change to $ROSE_HOME.
-#     2. With arguments, exec "prove -r" with the specified arguments.
-#        With no arguments:
-#        * If "rose config t prove-options" returns 0,
-#          exec "prove $(rose config t prove-options) -r t".
-#        * Otherwise, exec "prove -j ${NPROC} -s -r t", where NPROC is an
-#          intelligent guess of the number of processors.
+#     Change directory to Rose source tree, and runs this shell command:
+#            exec prove -j "$NPROC" -s -r "${@:-t}"
+#     where NPROC is the number of processors on your computer (or the setting
+#     [t]prove-options in the site/user configuration file). If you do not want
+#     to run the full test suite, you can specify the names of individual test
+#     files or their containing directories as extra arguments.
+#
+# EXAMPLES
+#     Run the full test suite with the default options.
+#         rose test-battery
+#
+#     Run the full test suite with 12 processes.
+#         rose test-battery -j 12
+#
+#     Run only tests under "t/rose-app-run/" with 12 processes.
+#
+#         rose test-battery -j 12 t/rose-app-run
+#
+#     Run only "t/rose-app-run/07-opt.t" in verbose mode.
+#         rose test-battery -v t/rose-app-run/07-opt.t
 #
 # SEE ALSO
 #     prove(1)
