@@ -912,7 +912,7 @@ graph = """
                   <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = rose app-run --verbose
+        script = rose app-run --verbose
 </pre>
                 </td>
               </tr>
@@ -924,9 +924,6 @@ graph = """
                   <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 </pre>
                 </td>
               </tr>
@@ -946,7 +943,7 @@ graph = """
 
             <p class="answers C"><em><samp>[cylc]</samp> <samp>[[event
             hooks]]</samp>...</em> - this makes sure your suite does not become
-            a long-lived zombie. The <samp>command scripting</samp> answer
+            a long-lived zombie. The <samp>script</samp> answer
             would be reasonably standard if it was <code>rose task-run</code>,
             not <code>rose app-run</code></p>
           </div>

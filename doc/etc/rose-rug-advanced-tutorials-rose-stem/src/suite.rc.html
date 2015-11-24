@@ -44,18 +44,15 @@
     <pre class="prettyprint lang-cylc">
 #!jinja2
 [cylc]
-    # Timeout handlers
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = PT23H30M
+    UTC mode = True
 
 # This links a name specified on the command in rose-stem with a
 # set of cylc task dependencies
 {# name_graphs contains test_option-dependency key-value pairs -#}
 {%- set name_graphs = {
-    "command_spaceship" : "fcm_make_spaceship => spaceship => \
+    "command_spaceship" : "fcm_make_spaceship =&gt; spaceship =&gt; \
                            rose_ana_position",
-    "fire_lasers" : "fcm_make_weapons => fire => rose_ana_test_fire"
+    "fire_lasers" : "fcm_make_weapons =&gt; fire =&gt; rose_ana_test_fire"
                       }
 -%}
 # Define groups as lists of jobs and other groups
@@ -101,17 +98,13 @@
 export CYLC_VERSION={{CYLC_VERSION}}
 export ROSE_VERSION={{ROSE_VERSION}}
 """
-        command scripting = rose task-run --verbose
+        script = rose task-run --verbose
         environment scripting = eval $(rose task-env)
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
-            failed handler = rose suite-hook
-            retry handler = rose suite-hook --mail
-            submission failed handler = rose suite-hook --mail
+        [[[events]]]
+            mail events = submission retry, submission failed, submission timeout, \
+                          retry, failed, execution timeout
             submission timeout = PT12H
-            submission timeout handler = rose suite-hook --mail
             execution timeout = PT3H
-            execution timeout handler = rose suite-hook --mail
 
     [[fcm_make_spaceship]]
         [[[environment]]]

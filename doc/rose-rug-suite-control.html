@@ -408,20 +408,12 @@ rose slv
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode=True
-    [[event hooks]]
-        timeout handler=rose suite-hook --mail --shutdown
-        timeout=P3D
+    # abort if any task fails = True
+
 [runtime]
     [[root]]
-        [[[event hooks]]]
-           succeeded handler=rose suite-hook
-           failed handler=rose suite-hook --shutdown
-           retry handler=rose suite-hook --mail
-           submission failed handler=rose suite-hook --shutdown
-           submission timeout handler=rose suite-hook --mail
-           execution timeout handler=rose suite-hook --mail
-           submission timeout=P1D
-           execution timeout=PT3H
+        [[[events]]]
+            mail events = failed, retry, submission failed, submission timeout, execution timeout
 </pre>
 
     <p>See <a href="rose-command.html#rose-suite-hook">Rose Reference Guide:

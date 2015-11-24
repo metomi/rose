@@ -123,9 +123,6 @@
 #!jinja2
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     initial cycle point = <span id="cylc-time"></span>
     [[dependencies]]
@@ -134,12 +131,11 @@
 
 [runtime]
     [[root]]
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
-            failed handler = rose suite-hook --mail
+        [[[events]]]
+            mail events = failed
     [[bell]]
         environment scripting = eval $(rose task-env)
-        command scripting = yes 'bong' | head -n $(rose date -c --format=%H)
+        script = yes 'bong' | head -n $(rose date -c --format=%H)
 </pre>
     </div>
 
@@ -218,7 +214,7 @@ rose suite-run
       section by adding the following:</p>
       <pre class="prettyprint lang-cylc">
     [[quarter_past, half_past, quarter_to]]
-        command scripting = echo 'chimes'
+        script = echo 'chimes'
 </pre>
 
       <p>Similarly, modify the <var>[[scheduling]]</var> section as

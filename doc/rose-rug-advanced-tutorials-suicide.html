@@ -105,9 +105,6 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = """
@@ -144,22 +141,19 @@
       <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
 [runtime]
-    [[root]]
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
-            failed handler = rose suite-hook
     [[bake_cake]]
-        command scripting = """ sleep 10;
-                                if (($RANDOM % 2)); then
-                                    echo 'Success'; true;
-                                else
-                                    echo 'Burned the cake!'; false;
-                                fi
-                            """
+        script = """
+sleep 10;
+if (($RANDOM % 2)); then
+    echo 'Success'; true;
+else
+    echo 'Burned the cake!'; false;
+fi
+"""
     [[purchase_cake]]
-        command scripting = sleep 10; echo 'Off to the shops!'
+        script = sleep 10; echo 'Off to the shops!'
     [[eat_cake]]
-        command scripting = sleep 10; echo 'Mmm cake!'
+        script = sleep 10; echo 'Mmm cake!'
 </pre>
     </div>
 
@@ -299,9 +293,6 @@
 
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 
 [scheduling]
     [[dependencies]]
@@ -318,17 +309,13 @@
 
 [runtime]
     [[root]]
-        [[[event hooks]]]
-             succeeded handler          = rose suite-hook
-             failed handler             = rose suite-hook --mail
-             submission failed handler  = rose suite-hook --mail
-             submission timeout handler = rose suite-hook --mail
-             execution timeout handler  = rose suite-hook --mail
-             execution timeout          = PT3M
-             submission timeout         = PT24M
+        [[[events]]]
+            mail events = failed, submission failed, submission timeout, execution timeout
+            execution timeout = PT3M
+            submission timeout = PT24M
 
     [[check]]
-        command scripting = """
+        script = """
             sleep 10;
             echo ${CYLC_SUITE_LOG_DIR%suite}job/$CYLC_TASK_CYCLE_POINT/flaky_activity/NN/job.out
             grep -F 'Fail, but I can recover, try recovery.' ${CYLC_SUITE_LOG_DIR%suite}job/$CYLC_TASK_CYCLE_POINT/flaky_activity/NN/job.out
@@ -338,7 +325,7 @@
         """
 
     [[flaky_activity]]
-        command scripting = """ 
+        script = """ 
             sleep 10;
             if (($RANDOM % 2)); then
                 echo 'Success'; true;
@@ -352,12 +339,12 @@
         """
 
     [[housekeep]]
-        command scripting = """ sleep 10;
+        script = """ sleep 10;
             echo 'finishing, I always run as expected, usually a housekeeping task.'
         """
 
     [[recovery]]
-        command scripting = """
+        script = """
             sleep 10;
             if (($RANDOM % 2)); then
                 echo 'Success, I could be helped by the recovery task'; true;
@@ -367,7 +354,7 @@
        """
 
     [[start_install]]
-        command scripting = """ sleep 10;
+        script = """ sleep 10;
             echo 'starting up, I always run as expected, usually an install task.'
        """
 </pre>
@@ -401,9 +388,6 @@
 
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 
 [scheduling]
     [[dependencies]]
@@ -418,27 +402,23 @@
 
 [runtime]
     [[root]]
-        [[[event hooks]]]
-             succeeded handler          = rose suite-hook
-             failed handler             = rose suite-hook --mail
-             submission failed handler  = rose suite-hook --mail
-             submission timeout handler = rose suite-hook --mail
-             execution timeout handler  = rose suite-hook --mail
-             execution timeout          = PT3M
-             submission timeout         = PT24M
+        [[[events]]]
+            mail events = failed, submission failed, submission timeout, execution timeout
+            execution timeout          = PT3M
+            submission timeout         = PT24M
 
     [[FAMILY_PASS]]
-        command scripting = sleep 10;
+        script = sleep 10;
 
     [[SOME_DO_SOME_DONT]]
-        command scripting = sleep 5;
+        script = sleep 5;
 
     [[bar]]
         inherit = FAMILY_PASS
-        command scripting = echo 'bar always succeeds'
+        script = echo 'bar always succeeds'
 
     [[dependent_on_families]]
-       command scripting = """
+       script = """
            sleep 10;
            echo 'I can only run if all FAMILY_PASS succeed and 
                  SOME_DO_SOME_DONT finish'
@@ -446,11 +426,11 @@
 
     [[foo]]
         inherit = FAMILY_PASS
-        command scripting = echo 'foo always succeeds'
+        script = echo 'foo always succeeds'
                            
     [[flaky_member]]
         inherit = SOME_DO_SOME_DONT
-        command scripting = """
+        script = """
             echo 'flaky member is going to:'
             sleep 10;
             if (($RANDOM % 2)); then
@@ -461,12 +441,12 @@
         """
 
     [[housekeep]]
-        command scripting = """ sleep 10;
+        script = """ sleep 10;
             echo 'finishing, I always run as expected, usually a housekeeping task.'
         """
 
     [[sometimes_fail]]
-       command scripting = """
+       script = """
            sleep 10;
            if (($RANDOM % 2)); then
                echo 'Success'; true;
@@ -476,13 +456,13 @@
        """
 
     [[start_install]]
-        command scripting = """ sleep 10;
+        script = """ sleep 10;
             echo 'starting up, I always run as expected, usually an install task.'
         """
 
     [[stable_member]]
         inherit = SOME_DO_SOME_DONT
-        command scripting = echo 'stable member always succeeds'
+        script = echo 'stable member always succeeds'
 </pre>
     </div>
 
@@ -520,9 +500,6 @@
 
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 
 [scheduling]
     [[dependencies]]
@@ -539,17 +516,13 @@
 
 [runtime]
     [[root]]
-        [[[event hooks]]]
-             succeeded handler          = rose suite-hook
-             failed handler             = rose suite-hook --mail
-             submission failed handler  = rose suite-hook --mail
-             submission timeout handler = rose suite-hook --mail
-             execution timeout handler  = rose suite-hook --mail
-             execution timeout          = PT3M
-             submission timeout         = PT24M
+        [[[events]]]
+            mail events = failed, submission failed, submission timeout, execution timeout
+            execution timeout = PT3M
+            submission timeout = PT24M
 
     [[check_files_exist]]
-        command scripting = """
+        script = """
             echo 'Do the files exist?'
             sleep 10;
             if (($RANDOM % 2)); then
@@ -560,7 +533,7 @@
         """
 
     [[generate_plots]]
-        command scripting = """
+        script = """
             echo 'You could run a script to plot data, but did they finish?'
             sleep 10;
             if (($RANDOM % 2)); then
@@ -571,24 +544,24 @@
         """
 
     [[housekeep]]
-        command scripting = """ sleep 10;
+        script = """ sleep 10;
             echo 'finishing, I always run as expected, usually a housekeeping task.'
         """
 
     [[move_data]]
-        command scripting = """
+        script = """
             sleep 10;
             echo 'You could run a script to move data'
         """
 
     [[raise_alert]]
-        command scripting = """
+        script = """
             sleep 10;
             echo 'You need to raise an alert: ALERT!'
         """
 
     [[start_install]]
-        command scripting = """ sleep 10;
+        script = """ sleep 10;
             echo 'starting up, I always run as expected, usually an install task.'
         """
 </pre>

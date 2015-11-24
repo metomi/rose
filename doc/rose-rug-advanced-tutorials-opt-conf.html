@@ -104,20 +104,14 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = order_icecream =&gt; eat_icecream
 [runtime]
-    [[root]]
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
     [[order_icecream]]
-        command scripting = rose task-run
+        script = rose task-run
     [[eat_icecream]]
-        command scripting = echo Yummy
+        script = echo Yummy
 </pre>
     </div>
 
@@ -148,7 +142,7 @@ TOPPING=no topping
       predictable!</p>
 
       <p>We can override settings within apps by passing particular options or
-      to the <code>rose task-run</code> <samp>command scripting</samp>.</p>
+      to the <code>rose task-run</code> in <code>script</code>.</p>
     </div>
 
     <div class="slide">
@@ -168,10 +162,10 @@ TOPPING=no topping
     <div class="slide">
       <h3 class="alwayshidden">Suite Command Line</h3>
 
-      <p>Change the <samp>suite.rc</samp> <samp>command scripting</samp> for
+      <p>In <samp>suite.rc</samp>, modify <code>script</code> for
       <samp>order_icecream</samp> so that it reads:</p>
       <pre class="prettyprint lang-cylc">
-        command scripting = rose task-run --define='[env]FLAVOUR=chocolate' --define='[env]TOPPING=fudge'
+        script = rose task-run --define='[env]FLAVOUR=chocolate' --define='[env]TOPPING=fudge'
 </pre>
 
       <p>This will override the <samp>FLAVOUR</samp> and <samp>TOPPING</samp>
@@ -208,11 +202,11 @@ TOPPING=fudge
 </pre>
 
       <p>We can now reference this through an option to <code>rose
-      task-run</code> - alter the <samp>command scripting</samp> of the
+      task-run</code> - alter the <code>script</code> of the
       <samp>order_icecream</samp> task (in the <samp>suite.rc</samp> file) to
       read:</p>
       <pre class="prettyprint lang-cylc">
-        command scripting = rose task-run --opt-conf-key=chocofudge
+        script = rose task-run --opt-conf-key=chocofudge
 </pre>
     </div>
 
@@ -242,7 +236,7 @@ TOPPING=fudge
       configuration with:</p>
       <pre class="prettyprint lang-cylc">
     [[order_icecream]]
-        command scripting = rose task-run
+        script = rose task-run
         [[[environment]]]
             ROSE_APP_OPT_CONF_KEYS = chocofudge
 </pre>
@@ -274,7 +268,7 @@ opts=chocofudge
       like this:</p>
       <pre class="prettyprint lang-cylc">
     [[order_icecream]]
-        command scripting = rose task-run
+        script = rose task-run
 </pre>
     </div>
 

@@ -509,21 +509,13 @@ touch suite.rc
 #!jinja2
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
+    abort if any task fails = True
 [scheduling]
 [runtime]
     [[root]]
-        command scripting = rose task-run --verbose
-        [[[event hooks]]]
-           succeeded handler = rose suite-hook
-           failed handler = rose suite-hook --shutdown
-           submission failed handler = rose suite-hook --shutdown
-           submission timeout handler = rose suite-hook --mail
-           execution timeout handler = rose suite-hook --mail
-           submission timeout = P1D
-           execution timeout = PT3H
+        script = rose task-run --verbose
+        [[[events]]]
+            mail events = submission timeout, execution timeout
 </pre>
     </div>
 
@@ -697,9 +689,7 @@ touch suite.rc
       file:</p>
       <pre class="prettyprint lang-cylc">
     [[write_start_position]]
-        command scripting = """
-            echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position
-            """
+        script = echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position
 </pre>
 
       <p>This initialises our location for the <samp>navigate</samp> app via a
@@ -843,7 +833,7 @@ rose suite-log
       <h3 id="scripts">Adding a Script</h3>
 
       <p>It isn't necessary to put all scripting in an app or in the
-      <samp>command scripting</samp> in the <samp>suite.rc</samp> - you can put
+      <samp>script</samp> in the <samp>suite.rc</samp> - you can put
       scripts in the <samp>bin/</samp> directory of a suite, and they will be
       added to cylc's path.</p>
     </div>
@@ -900,7 +890,7 @@ chmod +x bin/sun_sight
       these lines to the file:</p>
       <pre class="prettyprint lang-cylc">
     [[take_sun_sight]]
-        command scripting = sun_sight $CYLC_SUITE_SHARE_PATH/position
+        script = sun_sight $CYLC_SUITE_SHARE_PATH/position
 </pre>
     </div>
 

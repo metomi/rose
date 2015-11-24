@@ -126,7 +126,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
+        abort on timeout = True
         timeout = PT1H
 [scheduling]
     [[dependencies]]
@@ -134,10 +134,7 @@
 [runtime]
     [[root]]
         environment scripting = eval $(rose task-env)
-        command scripting = rose task-run
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
-            failed handler = rose suite-hook
+        script = rose task-run
 </pre>
     </div>
 
@@ -145,7 +142,7 @@
      <h3 class="alwayshidden">Example suite.rc (2)</h3>
      <pre class="prettyprint lang-cylc">
     [[create_files]]
-        command scripting = """
+        script = """
             echo 'zip' &gt;&gt; $ROSE_DATAC/file_zip
             echo 'solo' &gt;&gt; $ROSE_DATAC/file_solo
             echo 'list1' &gt;&gt; $ROSE_DATA/file_list1

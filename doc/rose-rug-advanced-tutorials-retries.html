@@ -113,9 +113,6 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = start =&gt; roll_doubles =&gt; win
@@ -129,10 +126,6 @@
       section:</p>
       <pre class="prettyprint lang-cylc">
 [runtime]
-    [[root]]
-        [[[event hooks]]]
-            failed handler = rose suite-hook
-            succeeded handler = rose suite-hook
     [[start]]
     [[win]]
 </pre>
@@ -145,7 +138,7 @@
       your <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[roll_doubles]]
-        command scripting = """
+        script = """
 sleep 10
 RANDOM=$$  # Seed $RANDOM
 DIE_1=$((RANDOM%6 + 1))
@@ -231,7 +224,7 @@ rose suite-run
       <p>We can alter the behaviour of the task based on the number of retries,
       using <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
       <pre class="prettyprint lang-cylc">
-        command scripting = """
+        script = """
 sleep 10
 RANDOM=$$  # Seed $RANDOM
 DIE_1=$((RANDOM%6 + 1))

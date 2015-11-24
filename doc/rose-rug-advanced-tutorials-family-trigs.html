@@ -110,19 +110,12 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = visit_mine =&gt; MINERS
 [runtime]
-    [[root]]
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
-            failed handler = rose suite-hook
     [[visit_mine]]
-        command scripting = sleep 5; echo 'off to work we go'
+        script = sleep 5; echo 'off to work we go'
 </pre>
     </div>
 
@@ -130,13 +123,14 @@
       <h3 class="alwayshidden">Example (2)</h3>
       <pre class="prettyprint lang-cylc">
     [[MINERS]]
-        command scripting = """sleep 5;
-                                if (($RANDOM % 2)); then
-                                    echo 'Diamonds!'; true;
-                                else
-                                    echo 'Nothing...'; false;
-                                fi
-                            """
+        script = """
+sleep 5;
+if (($RANDOM % 2)); then
+    echo 'Diamonds!'; true;
+else
+    echo 'Nothing...'; false;
+fi
+"""
     [[doc, grumpy, sleepy, happy, bashful, sneezy, dopey]]
         inherit = MINERS
 </pre>
@@ -200,7 +194,7 @@
       section:</p>
       <pre class="prettyprint lang-cylc">
     [[sell_diamonds]]
-        command scripting = sleep 5
+        script = sleep 5
 </pre>
     </div>
 
@@ -249,7 +243,7 @@
       this:</p>
       <pre class="prettyprint lang-cylc">
     [[close_shafts, sell_diamonds]]
-        command scripting = sleep 5
+        script = sleep 5
 </pre>
     </div>
 
