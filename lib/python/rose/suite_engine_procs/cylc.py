@@ -313,7 +313,7 @@ class CylcProcessor(SuiteEngineProcessor):
             for no_status in no_statuses:
                 statuses = self.STATUSES.get(no_status, [])
                 where_exprs.append(
-                    " OR ".join(["status != ?"] * len(statuses)))
+                    " AND ".join(["status != ?"] * len(statuses)))
                 where_args += statuses
         if where_exprs:
             where_expr = " WHERE (" + ") AND (".join(where_exprs) + ")"
