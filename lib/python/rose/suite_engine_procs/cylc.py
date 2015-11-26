@@ -403,7 +403,11 @@ class CylcProcessor(SuiteEngineProcessor):
             prefix += user_name
         user_suite_dir = os.path.expanduser(os.path.join(
             prefix, self.get_suite_dir_rel(suite_name)))
-        current_cycles = os.listdir(os.path.join(user_suite_dir, "log", "job"))
+        try:
+            current_cycles = os.listdir(
+                os.path.join(user_suite_dir, "log", "job"))
+        except OSError:
+            current_cycles = []
         targzip_cycles = []
         for name in glob(os.path.join(user_suite_dir, "log", "job-*.tar.gz")):
             targzip_cycles.append(os.path.basename(name)[4:-7])
