@@ -89,6 +89,7 @@ for METHOD in 'cycles' 'jobs'; do
     file_grep "${TEST_KEY}.out" 'HTTP/.* 404 Not Found' "${TEST_KEY}.out"
 done
 
+TEST_KEY="${TEST_KEY_BASE}-200-curl-cycles"
 run_pass "${TEST_KEY}" \
     curl "${TEST_ROSE_WS_URL}/cycles/${USER}/${SUITE_NAME}?form=json"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
@@ -110,6 +111,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('of_n_entries',), 2]" \
     "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'success',), 2]"
 
+TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
 run_pass "${TEST_KEY}" \
     curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json"
 FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
@@ -162,7 +164,7 @@ SUITE_NAME2="$(basename "${SUITE_DIR2}")"
 cp -pr "${SUITE_DIR}/cylc-suite.db" "${SUITE_DIR2}/"
 run_pass "${TEST_KEY}-bare" \
     curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME2}?form=json"
-rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
+rose_ws_json_greps "${TEST_KEY}-bare.out" "${TEST_KEY}-bare.out" \
     "[('suite',), '${SUITE_NAME2}']"
 
 for FILE in \
