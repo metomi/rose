@@ -144,9 +144,11 @@
         script = sleep 5; echo 'writing a letter to Bob...'
     [[send_letter]]
         environment scripting = eval `rose task-env`
-        script = """sleep 5;
-                               echo 'Hello Bob' &gt; $ROSE_DATA/letter.txt;
-                               sleep 10"""
+        script = """
+sleep 5
+echo 'Hello Bob' &gt; $ROSE_DATA/letter.txt
+sleep 10
+"""
 </pre>
     </div>
 

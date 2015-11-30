@@ -3,8 +3,9 @@
     UTC mode = True # Ignore DST
     abort if any task fails = True
 [scheduling]
-    initial cycle point = 20130101T0000Z # 00:00 on Jan 1 2013
-    final cycle point = 20130102T0000Z # 00:00 on Jan 2 2013
+    # Cycle between 00:00 on Jan 1 2013 and 00:00 on Jan 2 2013 inclusive
+    initial cycle point = 20130101T0000Z
+    final cycle point = 20130102T0000Z
     [[dependencies]]
 
         [[[R1]]]

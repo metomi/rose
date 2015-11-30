@@ -650,6 +650,7 @@ type=boolean
 
       <pre class="prettyprint lang-cylc">
 [cylc]
+    UTC mode = True # Ignore DST
     # abort if any task fails = True
     [[event hooks]]
         # timeout handler = rose suite-hook --mail --shutdown
@@ -675,10 +676,9 @@ type=boolean
 [runtime]
     [[root]]
         [[[events]]]
-            mail events = submission retry, submission failed, submission timeout, \
-                          retry, failed, execution timeout
-            # submission timeout = PT3H
-            # execution timeout = P1D
+            mail events = submission retry, retry, \
+                          submission failed, failed, \
+                          submission timeout, execution timeout
 </pre>
 
       <p>The events should be adjusted if necessary - for example, increasing
@@ -726,16 +726,16 @@ type=boolean
 
         <li>background (default)</li>
 
-        <li>LoadLeveler</li>
+        <li>loadleveler</li>
 
-        <li>PBS (Portable Batch System)</li>
+        <li>pbs (Portable Batch System)</li>
 
-        <li>SGE (<del>Sun</del> Oracle Grid Engine)
+        <li>sge (<del>Sun</del> Oracle Grid Engine)
         </li>
 
-        <li>SLURM (not the fictional soft drink)</li>
+        <li>slurm (not the fictional soft drink)</li>
 
-        <li>LSF</li>
+        <li>lsf</li>
       </ul>
     </div>
 

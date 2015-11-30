@@ -408,12 +408,17 @@ rose slv
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode=True
-    # abort if any task fails = True
 
 [runtime]
     [[root]]
         [[[events]]]
-            mail events = failed, retry, submission failed, submission timeout, execution timeout
+            mail events = submission failed, failed, \
+                          submission retry, retry, \
+                          submission timeout, execution timeout
+            ## The following entries are useful if you want the suite to stop
+            ## as soon as a task fails.
+            #handler events = failed, submission failed
+            #handlers = cylc shutdown %(suite)s
 </pre>
 
     <p>See <a href="rose-command.html#rose-suite-hook">Rose Reference Guide:
