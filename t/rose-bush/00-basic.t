@@ -24,7 +24,7 @@ if ! python -c 'import cherrypy' 2>'/dev/null'; then
     skip_all '"cherrypy" not installed'
 fi
 
-tests 49
+tests 51
 
 ROSE_CONF_PATH= rose_ws_init 'rose' 'bush'
 if [[ -z "${TEST_ROSE_WS_PORT}" ]]; then
@@ -89,6 +89,7 @@ for METHOD in 'cycles' 'jobs'; do
     file_grep "${TEST_KEY}.out" 'HTTP/.* 404 Not Found' "${TEST_KEY}.out"
 done
 
+TEST_KEY="${TEST_KEY_BASE}-200-curl-cycles"
 run_pass "${TEST_KEY}" \
     curl "${TEST_ROSE_WS_URL}/cycles/${USER}/${SUITE_NAME}?form=json"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
@@ -110,6 +111,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('of_n_entries',), 2]" \
     "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'success',), 2]"
 
+TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
 run_pass "${TEST_KEY}" \
     curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json"
 FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
@@ -156,6 +158,15 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('entries', ${FOO1}, 'logs', 'job.txt.05', 'seq_key'), 'job.txt.*']" \
     "[('entries', ${FOO1}, 'logs', 'job.txt.10', 'seq_key'), 'job.txt.*']"
 
+# A suite run directory with only a "cylc-suite.db", and nothing else
+SUITE_DIR2="$(mktemp -d --tmpdir="${HOME}/cylc-run" "rtb-rose-bush-00-XXXXXXXX")"
+SUITE_NAME2="$(basename "${SUITE_DIR2}")"
+cp -pr "${SUITE_DIR}/cylc-suite.db" "${SUITE_DIR2}/"
+run_pass "${TEST_KEY}-bare" \
+    curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME2}?form=json"
+rose_ws_json_greps "${TEST_KEY}-bare.out" "${TEST_KEY}-bare.out" \
+    "[('suite',), '${SUITE_NAME2}']"
+
 for FILE in \
     'log/suite/log' \
     'log/job/20000101T0000Z/foo0/01/job' \
@@ -184,5 +195,6 @@ file_grep "${TEST_KEY}.out" 'HTTP/.* 404 Not Found' "${TEST_KEY}.out"
 # Tidy up
 rose_ws_kill
 cylc unregister "${SUITE_NAME}" 1>'/dev/null' 2>&1
-rm -fr "${SUITE_DIR}" "${HOME}/.cylc/ports/${SUITE_NAME}" 2>'/dev/null'
+rm -fr "${SUITE_DIR}" "${SUITE_DIR2}" "${HOME}/.cylc/ports/${SUITE_NAME}" \
+    2>'/dev/null'
 exit 0
