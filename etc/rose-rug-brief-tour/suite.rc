@@ -32,7 +32,7 @@
         [[[remote]]]
             host = {{ ROSE_ORIG_HOST }}
         # Begin Rose recommended event hook block
-        [[[event hooks]]]
+        [[[events]]]
             mail events = submission timeout, execution timeout
             submission timeout = P1D # 24 hours
             execution timeout = PT3H # 3 hours
