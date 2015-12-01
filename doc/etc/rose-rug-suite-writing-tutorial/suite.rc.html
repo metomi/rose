@@ -46,9 +46,7 @@
 #!jinja2
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
+    abort if any task fails = True
 [scheduling]
     initial cycle point = 20130601T00Z
     final cycle point = 20130603T00Z
@@ -62,13 +60,9 @@
             graph = navigate[-PT3H] =&gt; navigate
 [runtime]
     [[root]]
-        command scripting = rose task-run --verbose
-        [[[event hooks]]]
-           succeeded handler = rose suite-hook
-           failed handler = rose suite-hook --shutdown
-           submission failed handler = rose suite-hook --shutdown
-           submission timeout handler = rose suite-hook --mail
-           execution timeout handler = rose suite-hook --mail
+        script = rose task-run --verbose
+        [[[events]]]
+           mail events = submission timeout, execution timeout
            submission timeout = P1D
            execution timeout = PT3H
     [[fcm_make_navigate]]
@@ -77,7 +71,7 @@
             POS_FPATH = $CYLC_SUITE_SHARE_PATH/position
             TIME_INTERVAL_HRS = 3
     [[write_start_position]]
-        command scripting = """
+        script = """
             echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position
         """
 </pre>

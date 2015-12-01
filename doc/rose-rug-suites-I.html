@@ -239,7 +239,7 @@
         graph = hello_world
 [runtime]
     [[hello_world]]
-        command scripting = echo 'Hello World'
+        script = echo 'Hello World'
 </pre>
 
       <p>This will run a cylc task called <samp>hello_world</samp> that prints
@@ -259,7 +259,7 @@ cat &gt;$TMPDIR/simplesuite/suite.rc &lt;&lt;__SUITE_RC__
         graph = hello_world
 [runtime]
     [[hello_world]]
-        command scripting = echo 'Hello World'
+        script = echo 'Hello World'
 __SUITE_RC__
 rose suite-run -C $TMPDIR/simplesuite   # Run the suite!
 </pre>
@@ -300,7 +300,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[hello_world]]
-        command scripting = rose task-run
+        script = rose task-run
 </pre>
 
       <p><code>rose task-run</code> uses environment variables passed in by
@@ -313,12 +313,12 @@ default=echo 'Hello World'
       <h2 id="task-run">Hello World rose task-run</h2>
 
       <p><code>rose task-run</code> is reasonably generic, so we can put it as
-      the suite default (<samp>[[root]]</samp>)<samp>command scripting</samp>
+      the suite default (<samp>[[root]]</samp>)<samp>script</samp>
       by writing:</p>
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = rose task-run
+        script = rose task-run
     [[hello_world]]
 </pre>
 
@@ -357,7 +357,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = rose task-run
+        script = rose task-run
     [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false # Shared env variable
@@ -375,7 +375,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = rose task-run
+        script = rose task-run
     [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false  # Shared env variable
@@ -408,7 +408,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = rose task-run
+        script = rose task-run
     [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false  # Shared env variable
@@ -633,51 +633,57 @@ type=boolean
     </div>
 
     <div class="slide">
-      <h2 id="event-hooks">Event Hooks</h2>
+      <h2 id="utc-mode">UTC mode</h2>
 
-      <p>Suites also need some standard Rose <em>event hooks</em> to construct
-      the suite log viewer (more later) and report or shutdown on failure.</p>
-
-      <p><strong>The following should be in every Rose suite:</strong></p>
+      <p>We recommend running all suites in UTC mode. E.g.:</p>
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="event-hooks">Event Hooks</h2>
+
+      <p>Suites can have event handlers to report events or shutdown on
+      failure.</p>
+
+      <pre class="prettyprint lang-cylc">
+[cylc]
+    UTC mode = True # Ignore DST
+    # abort if any task fails = True
     [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
+        # timeout handler = rose suite-hook --mail --shutdown
+        # timeout = P3D
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Event Hooks Explained</h3>
 
-      <p>Here, when the time since the last task state change exceeds the value
-      of <kbd>timeout</kbd> the suite times out, the user will receive an email
-      (<kbd>--mail</kbd>) and the suite will shutdown
-      (<kbd>--shutdown</kbd>).</p>
+      <p>Normally, when a task fails, the suite will continue to run as much as
+      possible and wait for user input to fix (and perhaps retry) the failure so
+      it can continue. If <code>abort if any task fails = True</code> is not
+      commented out, the suite will abort as soon as a task fails.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Hello World Event Hooks (Continued)</h3>
 
-      <p>Suites should also have task event hooks, along these lines:</p>
+      <p>Suites can also be configured to email you on specific events. For
+      example:</p>
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        [[[event hooks]]]
-           succeeded handler = rose suite-hook
-           failed handler = rose suite-hook --shutdown
-           retry handler = rose suite-hook --mail
-           submission failed handler = rose suite-hook --shutdown
-           submission timeout handler = rose suite-hook --mail
-           execution timeout handler = rose suite-hook --mail
-           submission timeout = P1D
-           execution timeout = PT3H
+        [[[events]]]
+            mail events = submission retry, retry, \
+                          submission failed, failed, \
+                          submission timeout, execution timeout
 </pre>
 
-      <p>The <samp>[runtime]</samp> and <samp>[cylc]</samp> event hooks should
-      be adjusted if necessary - for example, increasing the timeout lengths or
-      altering the hook options like <samp>--shutdown</samp>.</p>
+      <p>The events should be adjusted if necessary - for example, increasing
+      the timeout lengths or altering the events that require email
+      notification.</p>
     </div>
 
     <div class="slide">
@@ -689,7 +695,7 @@ type=boolean
     [[hello_eris]]
 ...
         [[[job submission]]]
-            method = loadleveler
+            method = pbs
 </pre>
     </div>
 
@@ -702,21 +708,18 @@ type=boolean
     [[hello_eris]]
 ...
         [[[job submission]]]
-            method = loadleveler
+            method = pbs
         [[[directives]]]
-            class            = serial
-            job_type         = serial
-            notification     = error
-            resources        = ConsumableMemory(5000)
-            wall_clock_limit = 1260,1200
+            -l select = 1
+            -l walltime = 00:05:00
+            -q = normal
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Job Submission Methods</h3>
 
-      <p>cylc supports the following job submission methods (potentially more
-      later):</p>
+      <p>cylc supports the following job submission methods (and more):</p>
 
       <ul class="incremental">
         <li>at</li>
@@ -730,7 +733,9 @@ type=boolean
         <li>sge (<del>Sun</del> Oracle Grid Engine)
         </li>
 
-        <li>SLURM (not the fictional soft drink)</li>
+        <li>slurm (not the fictional soft drink)</li>
+
+        <li>lsf</li>
       </ul>
     </div>
 

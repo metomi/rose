@@ -105,20 +105,14 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = initialise =&gt; short &amp; medium &amp; long
 [runtime]
     [[root]]
-        command scripting = rose task-run
+        script = rose task-run
         [[[environment]]]
             ROSE_TASK_APP=calc_pi
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
-            failed handler = rose suite-hook
 </pre>
     </div>
 
@@ -126,7 +120,7 @@
       <h3 class="alwayshidden">Example suite.rc (2)</h3>
       <pre class="prettyprint lang-cylc">
     [[initialise]]
-        command scripting = "echo 'initialising...'; sleep 10"
+        script = "echo 'initialising...'; sleep 10"
     [[short]]
         [[[environment]]]
             NUM=50

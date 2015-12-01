@@ -87,7 +87,7 @@
       particular app.</p>
 
       <p>They work just like the default command for an app but have to be
-      explicitly called by the command scripting of a task.</p>
+      specified explicitly as an option of <code>rose task-run</code>.</p>
     </div>
 
     <div class="slide">
@@ -105,21 +105,15 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = gather_ingredients =&gt; breadmaker
 
 [runtime]
-    [[root]]
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
     [[gather_ingredients]]
-        command scripting = sleep 10; echo 'Done'
+        script = sleep 10; echo 'Done'
     [[breadmaker]]
-        command scripting = rose task-run
+        script = rose task-run
 </pre>
     </div>
 
@@ -186,7 +180,7 @@ timed_bread=sleep 15; echo 'fresh bread when you want it'
       the <samp>[[breadmaker]]</samp> task to look like this:</p>
       <pre class="prettyprint lang-cylc">
     [[breadmaker]]
-        command scripting=rose task-run --command-key=make_dough
+        script=rose task-run --command-key=make_dough
 </pre>
     </div>
 
@@ -196,9 +190,9 @@ timed_bread=sleep 15; echo 'fresh bread when you want it'
       <p>Save your changes and run the suite. If you inspect the output from
       the breadmaker task you should see the line "dough for later".</p>
 
-      <p>Edit the command scripting for the <samp>[[breadmaker]]</samp> task to
-      change the command key to <samp>'timed_bread'</samp>. Run the suite and
-      confirm the timed_bread command has been run.</p>
+      <p>Edit the <code>script</code> for the <samp>[[breadmaker]]</samp> task
+      to change the command key to <samp>'timed_bread'</samp>. Run the suite and
+      confirm the <samp>timed_bread</samp> command has been run.</p>
     </div>
 
     <div class="slide">

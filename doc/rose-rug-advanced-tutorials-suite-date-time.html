@@ -134,7 +134,7 @@
       <pre class="prettyprint lang-cylc">
     [[startup]]
         environment scripting = eval $(rose task-env --cycle-offset=T12H)
-        command scripting = """
+        script = """
             GATE="A"$((RANDOM%3))
             echo "GATE=$GATE" &gt; $ROSE_DATACT12H/flight_gate
             cylc task message "Starting gate: $GATE"
@@ -183,10 +183,10 @@
       <p>This exports an extra environment variable called
       <samp>$ROSE_DATACT12H</samp>.</p>
 
-      <p>We can now refer to this in boarding's <samp>command scripting</samp>
+      <p>We can now refer to this in boarding's <samp>script</samp>
       - add:</p>
       <pre class="prettyprint lang-cylc">
-        command scripting = """
+        script = """
             . $ROSE_DATACT12H/flight_gate
             cylc task message "Now boarding at Gate $GATE"
             sleep 5
@@ -211,10 +211,10 @@
     <div class="slide">
       <h3 class="alwayshidden">Using rose date</h3>
 
-      <p>Replace the boarding <samp>command scripting</samp> triple-quoted
+      <p>Replace the boarding <samp>script</samp> triple-quoted
       block with:</p>
       <pre class="prettyprint lang-cylc">
-        command scripting = """
+        script = """
             . $ROSE_DATACT12H/flight_gate
             FLIGHT_TIME=$(rose date --print-format="%H:%M" $CYLC_TASK_CYCLE_TIME)
             cylc task message "Flight $FLIGHT_TIME now boarding at Gate $GATE"
@@ -257,7 +257,7 @@
       <h3 class="alwayshidden">Example</h3>
       <pre class="prettyprint lang-cylc">
     [[departure]]
-        command scripting = """
+        script = """
             NOW=$(rose date --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
             ETA=$(rose date --offset=-P1D --offset=PT2H --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
             echo "Welcome to the aircraft. The current time and date is $NOW."

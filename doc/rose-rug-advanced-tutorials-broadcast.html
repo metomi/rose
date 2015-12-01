@@ -110,9 +110,6 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     initial cycle point = 20130101T00Z
     final cycle point = 20130105T00Z
@@ -139,11 +136,8 @@
       <p>It will need some runtime - add:</p>
       <pre class="prettyprint lang-cylc">
 [runtime]
-    [[root]]
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
     [[print_colour]]
-        command scripting = """
+        script = """
             sleep 4
             echo "Today's colour is &lt;span style='color:"$COLOUR"'&gt;"$COLOUR"&lt;/span&gt;"
         """
@@ -160,7 +154,7 @@
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[startup]]
-        command scripting = """
+        script = """
             cylc broadcast -t 20130102T0000Z -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
             cylc broadcast -t 20130104T0000Z -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
             cylc broadcast -d $CYLC_SUITE_REG_NAME
@@ -189,8 +183,8 @@ rose suite-run
       <h2 id="results-task">Results</h2>
 
       <p>Once the suite has run, you can see the results of the <code>cylc
-      broadcast</code> by looking at <samp>print_colour</samp>'s standard out
-      files (<samp>out</samp>) in the suite log viewer. Run:</p>
+      broadcast</code> by looking at <samp>print_colour</samp>'s standard output
+      file (<samp>job.out</samp>) in Rose Bush. Run:</p>
       <pre class="shell">
 rose suite-log
 </pre>
@@ -207,10 +201,9 @@ rose suite-log
       <p>You can also run <code>cylc broadcast</code> from the command
       line.</p>
 
-      <p>Remove the <samp>startup</samp> task command scripting. Get rid
-      of:</p>
+      <p>Remove the <samp>startup</samp> task script. Get rid of:</p>
       <pre class="prettyprint lang-cylc">
-        command scripting = """
+        script = """
             cylc broadcast -t 20130102T0000Z -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
             cylc broadcast -t 20130104T0000Z -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
             cylc broadcast -d $CYLC_SUITE_REG_NAME
@@ -261,7 +254,8 @@ cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=purple $SU
       <h2 id="results-cli">Results</h2>
 
       <p>You can see the results of your command line changes by looking at the
-      suite log viewer. Run:</p>
+      task's standard output in its <samp>job.out</samp> file with Rose Bush.
+      Run:</p>
       <pre class="shell">
 rose suite-log
 </pre>

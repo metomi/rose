@@ -117,9 +117,8 @@
       create a <samp>bin/</samp> subdirectory in your suite directory, and
       paste the script into a file called <samp>race</samp>. The
       <samp>bin/</samp> directory is added to the path by <code>cylc</code>,
-      which means you can just specify the name of this script in
-      <samp>command_scripting</samp> (e.g. <samp>command scripting =
-      "race"</samp>).</p>
+      which means you can just specify the command in <code>script</code> (e.g.
+      <samp>script = race</samp>).</p>
 
       <p>We need to make the file executable as well - you'll need to run:</p>
       <pre class="shell">
@@ -268,7 +267,7 @@ extended/overwritten by red_car
       <pre class="prettyprint lang-cylc">
     [[red_car]]
         # From COMPETITOR_VEHICLE:
-        command scripting = race
+        script = race
 
         [[[environment]]]
             # From ENGINE ELECTRIC:
@@ -314,11 +313,10 @@ extended/overwritten by red_car
 
       <p>Go ahead and run the suite with <code>rose suite-run</code>. The two
       vehicles will race over a quarter mile, and you should see the results in
-      both the <code>cylc gui</code> and in the web page that pops up. The
-      environment variables we set up will be printed in the standard output of
-      both tasks in the suite log viewer. If a web page didn't pop up, you can
-      access it through the suite log viewer by navigating to the standard out
-      of the <samp>output</samp> task and following the link.</p>
+      the <code>cylc gui</code>. The environment variables we set up will be
+      printed in the standard output of both tasks. You can view the output with
+      Rose Bush by following the link to the <samp>job.out</samp> file of the
+      <samp>output</samp> task.</p>
 
       <p>This is a successful implementation of multiple inheritance! The next
       thing to do is to make it slightly more tricky.</p>
@@ -343,8 +341,8 @@ extended/overwritten by red_car
       <samp>COMPETITOR_VEHICLE</samp> runtime to:</p>
       <pre class="prettyprint lang-cylc">
     [[COMPETITOR_VEHICLE]]
-        pre-command scripting = printenv | sort | grep ^COMP
-        command scripting = race
+        pre-script = printenv | sort | grep ^COMP
+        script = race
         [[[environment]]]
             COMP_MAX_POWER_KW = 130
             COMP_OUTPUT_DIR = $CYLC_SUITE_SHARE_PATH

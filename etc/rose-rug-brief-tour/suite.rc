@@ -1,14 +1,11 @@
 #!jinja2
 [cylc]
-    # Begin Rose required event hook block
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
-    # End Rose required event hook block
+    abort if any task fails = True
 [scheduling]
-    initial cycle point = 20130101T0000Z # The first cycle of the suite is at 00:00 on Jan 1 2013
-    final cycle point = 20130102T0000Z # The last cycle of the suite is at 00:00 on Jan 2 2013
+    # Cycle between 00:00 on Jan 1 2013 and 00:00 on Jan 2 2013 inclusive
+    initial cycle point = 20130101T0000Z
+    final cycle point = 20130102T0000Z
     [[dependencies]]
 
         [[[R1]]]
@@ -30,22 +27,18 @@
 
 [runtime]
     [[root]]
-        command scripting = rose task-run -v
-        pre-command scripting = {{SLEEP}}  # Slow down so we can see it run
+        script = rose task-run -v
+        pre-script = {{SLEEP}}  # Slow down so we can see it run
         [[[remote]]]
             host = {{ ROSE_ORIG_HOST }}
         # Begin Rose recommended event hook block
-        [[[event hooks]]]
-           succeeded handler = rose suite-hook
-           failed handler = rose suite-hook --shutdown
-           submission failed handler = rose suite-hook --shutdown
-           submission timeout handler = rose suite-hook --mail
-           execution timeout handler = rose suite-hook --mail
-           submission timeout = P1D # 24 hours
-           execution timeout = PT3H # 3 hours
+        [[[events]]]
+            mail events = submission timeout, execution timeout
+            submission timeout = P1D # 24 hours
+            execution timeout = PT3H # 3 hours
         # End Rose recommended event hook block
     [[locate_fred]]
-        command scripting = """
+        script = """
             echo 'fred is in '$(find /usr/share/zoneinfo/[A-Z]*/ -type f -printf "%f\n" | shuf -n 1 || echo 'the pub')
         """
     # Tasks need defining in runtime sections, even when identical to root.

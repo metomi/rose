@@ -106,9 +106,6 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = """compose_letter =&gt; send_letter
@@ -142,17 +139,16 @@
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting  = sleep 10
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
-            failed handler = rose suite-hook
+        script = sleep 10
     [[compose_letter]]
-        command scripting = sleep 5; echo 'writing a letter to Bob...'
+        script = sleep 5; echo 'writing a letter to Bob...'
     [[send_letter]]
         environment scripting = eval `rose task-env`
-        command scripting = """sleep 5;
-                               echo 'Hello Bob' &gt; $ROSE_DATA/letter.txt;
-                               sleep 10"""
+        script = """
+sleep 5
+echo 'Hello Bob' &gt; $ROSE_DATA/letter.txt
+sleep 10
+"""
 </pre>
     </div>
 
@@ -161,11 +157,11 @@
       <pre class="prettyprint lang-cylc">
 
     [[bob]]
-        command scripting = rose task-run
+        script = rose task-run
     [[read_letter]]
         environment scripting = eval `rose task-env`
-        command scripting = sleep 5; cat $ROSE_DATA/letter.txt
-        post-command scripting = rm $ROSE_DATA/letter.txt
+        script = sleep 5; cat $ROSE_DATA/letter.txt
+        post-script = rm $ROSE_DATA/letter.txt
 </pre>
     </div>
 

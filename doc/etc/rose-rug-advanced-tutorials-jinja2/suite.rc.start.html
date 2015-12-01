@@ -45,9 +45,6 @@
     <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = """
@@ -118,15 +115,12 @@
     [[root]]
         [[[remote]]]
             host = $ROSE_ORIG_HOST
-        [[[event hooks]]]
-            failed handler = rose suite-hook
-            succeeded handler = rose suite-hook
     [[DETONATE]]
-        command scripting = rose task-run
+        script = rose task-run
         [[[environment]]]
             ROSE_TASK_APP = detonate
     [[IGNITE]]
-        command scripting = sleep $((RANDOM % 2))
+        script = sleep $((RANDOM % 2))
     [[detonate_rocket_00]]
         inherit = DETONATE
         [[[environment]]]
@@ -339,7 +333,7 @@
         inherit = IGNITE
     [[start]]
     [[stop]]
-        command scripting = """
+        script = """
 sleep 2 &amp;&amp; printf '\033[2K' &gt; $(ls -drt -1 /dev/pts/* | tail -1)
         """
 </pre>

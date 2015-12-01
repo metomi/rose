@@ -47,9 +47,6 @@
 #!jinja2
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = """
@@ -58,16 +55,13 @@
         """
 [runtime]
     [[root]]
-        command scripting = sleep 5
-        [[[event hooks]]]
-            failed handler = rose suite-hook
-            succeeded handler = rose suite-hook
+        script = sleep 5
         [[[remote]]]
             # Run on the computer that invoked 'rose suite-run'
             host = {{ ROSE_ORIG_HOST }}
     [[get_ready]]
     [[output]]
-        command scripting = """
+        script = """
             cp $CYLC_SUITE_DEF_PATH/lib/output.html $CYLC_SUITE_SHARE_PATH/
             cp $CYLC_SUITE_DEF_PATH/lib/jquery.min.js $CYLC_SUITE_SHARE_PATH/
             echo 'See the output &lt;a href="file:///'$CYLC_SUITE_SHARE_PATH'/output.html"&gt;here&lt;/a&gt;'
@@ -75,8 +69,8 @@
             """
     # All competitors should inherit (directly or indirectly) from COMPETITOR_VEHICLE.
     [[COMPETITOR_VEHICLE]]
-        pre-command scripting = printenv | sort | grep ^COMP
-        command scripting = race
+        pre-script = printenv | sort | grep ^COMP
+        script = race
         [[[environment]]]
             COMP_OUTPUT_DIR = $CYLC_SUITE_SHARE_PATH
     # Families defining vehicle externals (body, wheels..)

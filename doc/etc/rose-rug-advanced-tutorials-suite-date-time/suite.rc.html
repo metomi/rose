@@ -47,9 +47,6 @@
 #!jinja2
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     initial cycle point = 20130601T08Z
     final cycle point = 20130603T20Z
@@ -64,14 +61,11 @@
             """
 [runtime]
     [[root]]
-        command scripting = sleep 5
-        [[[event hooks]]]
-            failed handler = rose suite-hook
-            succeeded handler = rose suite-hook
+        script = sleep 5
     [[arrival]]
     [[assign_gate]]
         environment scripting = eval $(rose task-env)
-        command scripting = """
+        script = """
              GATE="A"$((RANDOM%3))
              echo "GATE=$GATE" &gt; $ROSE_DATAC/flight_gate
              cylc task message "Cleared to land, go to Gate $GATE"
@@ -81,7 +75,7 @@
     [[departure]]
     [[startup]]
     [[wait_return]]
-        command scripting = """
+        script = """
             sleep $((10 + RANDOM%3))
             cylc task message "Plane requesting permission to land"
             sleep 5
