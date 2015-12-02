@@ -531,6 +531,11 @@ opt.jobs=8
     <kbd>[arch:TARGET]</kbd> section would override those in the global
     <kbd>[arch]</kbd> section for the given <var>TARGET</var>.</p>
 
+    <p>A target is considered compulsory, i.e. it must have at least one source,
+    unless it is specified with the syntax <kbd>[arch:(TARGET)]</kbd>. In which
+    case, <var>TARGET</var> is considered optional. The application will skip an
+    optional target that has no actual source.</p>
+
     <p>The application provides some useful functionalities:</p>
 
     <ul>
@@ -595,8 +600,8 @@ opt.jobs=8
       <kbd>source-prefix=PREFIX</kbd> is specified. If a name or glob is given
       in a pair of brackets, e.g. <code>(hello-world.*)</code>, the source is
       considered optional and will not cause a failure if it does not match any
-      source file names. However, a target that ends up with no matching source
-      file will be considered a failure.</dd>
+      source file names. However, a compulsory target that ends up with no
+      matching source file will be considered a failure.</dd>
 
       <dt><kbd>source-edit-format=FORMAT</kbd></dt>
 
@@ -668,6 +673,10 @@ source=hello/worlds/* greeting/worlds/* hi/worlds/*
 [arch:worlds/]
 source=hello/worlds/* (greeting/worlds/*) hi/worlds/*
 
+# Target is optional, sources may all be missing
+[arch:(black-box/)]
+source=(cats.txt) (dogs.txt)
+
 # Auto tar-gzip
 [arch:galaxies.tar.gz]
 source-prefix=hello/
@@ -694,6 +703,47 @@ source=stuffing-*.txt
 
 # ...
 </pre>
+
+    <p>On completion, <code>rose_arch</code> writes a status summary for each
+    target to the standard output, which looks like this:</p>
+
+    <pre>
+0 foo:///fred/my-su173/output0.tar.gz [compress=tar.gz]
++ foo:///fred/my-su173/output1.tar.gz [compress=tar.gz, t(init)=2012-12-02T20:02:20Z, dt(tran)=5s, dt(arch)=10s, ret-code=0]
++	output1/earth.txt (output1/human.txt)
++	output1/venus.txt (output1/woman.txt)
++	output1/mars.txt (output1/man.txt)
+= foo:///fred/my-su173/output2.tar.gz [compress=tar.gz]
+! foo:///fred/my-su173/output3.tar.gz [compress=tar.gz]
+</pre>
+
+    <p>The 1st column is a status symbol, where:</p>
+
+    <dl>
+      <dt>0</dt>
+      <dd>An optional target has no real source, and is skipped</dd>
+
+      <dt>+</dt>
+      <dd>A target is added or updated.</dd>
+
+      <dt>=</dt>
+      <dd>A target is not updated, as it was previously successfully updated
+      with the same sources.</dd>
+
+      <dt>!</dt>
+      <dd>Error updating this target.</dd>
+    </dl>
+
+    <p>If the 1st column and the 2nd column are separated by a space character,
+    the 2nd column is a target. If the 1st column and the 2nd column are
+    separated by a tab character, the 2nd column is a source in the target
+    above.</p>
+
+    <p>For a target line, the 3rd column contains the compress scheme, the
+    initial time, the duration taken to transform the sources, the duration
+    taken to run the archive command and the return code of the archive command.
+    For a source line, the 3rd column contains the original name of the
+    source.</p>
 
     <h2 id="rose-task-run.util.rose_bunch">Built-in Application:rose_bunch</h2>
 
