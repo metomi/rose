@@ -58,16 +58,18 @@ title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
 {{key}}
 {% else -%}
 <a
+{% if log.size == "?" -%}class="muted"{% endif -%}
 href="{{script}}/view/{{user}}/{{suite}}?path={{log.path|replace('+', '%2B')}}&amp;path_in_tar={{log.path_in_tar}}"
-title="{{log.size}} bytes">{{key}}</a>
+title="{{log.size}} bytes">{{key}}{% if log.size == "?" -%}?{% endif -%}</a>
 {% endif -%}
 {% else -%}
 {% if path is defined and path == log.path -%}
 {{key}}
 {% else -%}
 <a
+{% if log.size == "?" -%}class="muted"{% endif -%}
 href="{{script}}/view/{{user}}/{{suite}}?path={{log.path|replace('+', '%2B')}}"
-title="{{log.size}} bytes">{{key}}</a>
+title="{{log.size}} bytes">{{key}}{% if log.size == "?" -%}?{% endif -%}</a>
 {% endif -%}
 {% endif -%}
 {% elif log.exists -%}

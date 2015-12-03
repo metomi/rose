@@ -451,6 +451,32 @@ class CylcProcessor(SuiteEngineProcessor):
         self._db_close(self.SUITE_DB, user_name, suite_name)
 
         for entry in entries:
+            # job.out and job.err are expected for completed jobs
+            for filename in ["job.out", "job.err"]:
+                if (filename in entry["logs"] or
+                        entry["status"] not in ["success", "fail"]):
+                    continue
+                location = "%(cycle)s/%(name)s/%(submit_num)02d" % entry
+                if entry["cycle"] in current_cycles:
+                    path = os.path.join("log", "job", location, filename)
+                    path_in_tar = None
+                    exists = True
+                elif entry["cycle"] in targzip_cycles:
+                    path = os.path.join("log", "job-%(cycle)s.tar.gz" % entry)
+                    path_in_tar = os.path.join("job", location, filename)
+                    exists = True
+                else:
+                    path = os.path.join("log", "job", location, filename)
+                    path_in_tar = None
+                    exists = False
+                entry["logs"][filename] = {
+                    "path": path,
+                    "path_in_tar": path_in_tar,
+                    "mtime": "?",
+                    "size": "?",
+                    "exists": exists,
+                    "seq_key": None}
+            # Sequential logs
             for seq_key, indexes in entry["seq_logs_indexes"].items():
                 if len(indexes) <= 1:
                     entry["seq_logs_indexes"].pop(seq_key)
