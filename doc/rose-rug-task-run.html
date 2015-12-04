@@ -673,9 +673,9 @@ source=hello/worlds/* greeting/worlds/* hi/worlds/*
 [arch:worlds/]
 source=hello/worlds/* (greeting/worlds/*) hi/worlds/*
 
-# Target is optional, sources may all be missing
+# Target is optional, implied that sources may all be missing
 [arch:(black-box/)]
-source=(cats.txt) (dogs.txt)
+source=cats.txt dogs.txt
 
 # Auto tar-gzip
 [arch:galaxies.tar.gz]

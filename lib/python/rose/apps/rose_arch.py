@@ -205,7 +205,7 @@ class RoseArchApp(BuiltinApp):
             config, t_node, "source-prefix", default="")
         for source_glob in shlex.split(
                 self._get_conf(config, t_node, "source", compulsory=True)):
-            is_compulsory_source = True
+            is_compulsory_source = is_compulsory_target
             if source_glob.startswith("(") and source_glob.endswith(")"):
                 source_glob = source_glob[1:-1]
                 is_compulsory_source = False
