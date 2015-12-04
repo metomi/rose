@@ -309,7 +309,7 @@ cat >$PWD/roses/foo-aa001/app/hello/rose-app.conf <<'__ROSE_APP_CONF__'
 [command]
 default=echo Hello
 __ROSE_APP_CONF__
-echo $(($RANDOM % 10)) >$PWD/roses/foo-aa001/etc/number
+echo $((10 + $RANDOM % 10)) >$PWD/roses/foo-aa001/etc/number
 svn ci -q -m 't' $PWD/roses/foo-aa001
 svn up -q $PWD/roses/foo-aa001
 # Issue the copy command
