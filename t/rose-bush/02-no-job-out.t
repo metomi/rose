@@ -51,11 +51,13 @@ TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
 run_pass "${TEST_KEY}" \
     curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json"
 FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
-FOO0_JOB='log/job/20000101T0000Z/foo0/01/job'
+FOO0_OUT='log/job/20000101T0000Z/foo0/01/job.out'
+FOO0_OUT_MTIME=$(stat -c'%Y' "${SUITE_DIR}/${FOO0_OUT}")
+FOO0_OUT_SIZE=$(stat -c'%s' "${SUITE_DIR}/${FOO0_OUT}")
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
-    "[('entries', ${FOO0}, 'logs', 'job.out', 'path'), '${FOO0_JOB}.out']" \
-    "[('entries', ${FOO0}, 'logs', 'job.out', 'size'), '?']" \
-    "[('entries', ${FOO0}, 'logs', 'job.out', 'mtime'), '?']" \
+    "[('entries', ${FOO0}, 'logs', 'job.out', 'path'), '${FOO0_OUT}']" \
+    "[('entries', ${FOO0}, 'logs', 'job.out', 'size'), ${FOO0_OUT_SIZE}]" \
+    "[('entries', ${FOO0}, 'logs', 'job.out', 'mtime'), ${FOO0_OUT_MTIME}]" \
     "[('entries', ${FOO0}, 'logs', 'job.out', 'exists'), True]"
 
 #-------------------------------------------------------------------------------

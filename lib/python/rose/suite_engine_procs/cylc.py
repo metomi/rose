@@ -456,24 +456,32 @@ class CylcProcessor(SuiteEngineProcessor):
                 if (filename in entry["logs"] or
                         entry["status"] not in ["success", "fail"]):
                     continue
-                location = "%(cycle)s/%(name)s/%(submit_num)02d" % entry
+                path = os.path.join(
+                    "log", "job",
+                    "%(cycle)s/%(name)s/%(submit_num)02d" % entry,
+                    filename)
+                mtime = "?"
+                size = "?"
                 if entry["cycle"] in current_cycles:
-                    path = os.path.join("log", "job", location, filename)
+                    try:
+                        size, _, mtime = os.stat(
+                            os.path.join(user_suite_dir, path))[6:9]
+                    except (IndexError, OSError):
+                        continue
                     path_in_tar = None
                     exists = True
                 elif entry["cycle"] in targzip_cycles:
+                    path_in_tar = path
                     path = os.path.join("log", "job-%(cycle)s.tar.gz" % entry)
-                    path_in_tar = os.path.join("job", location, filename)
                     exists = True
                 else:
-                    path = os.path.join("log", "job", location, filename)
                     path_in_tar = None
                     exists = False
                 entry["logs"][filename] = {
                     "path": path,
                     "path_in_tar": path_in_tar,
-                    "mtime": "?",
-                    "size": "?",
+                    "mtime": mtime,
+                    "size": size,
                     "exists": exists,
                     "seq_key": None}
             # Sequential logs
