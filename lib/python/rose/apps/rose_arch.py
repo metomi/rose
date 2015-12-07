@@ -156,6 +156,10 @@ class RoseArchApp(BuiltinApp):
             s_key_tail = env_var_process(s_key_tail)
         except UnboundEnvironmentVariableError as exc:
             raise ConfigValueError([t_key, ""], "", exc)
+        is_compulsory_target = True
+        if s_key_tail.startswith("(") and s_key_tail.endswith(")"):
+            s_key_tail = s_key_tail[1:-1]
+            is_compulsory_target = False
         target = RoseArchTarget(target_prefix + s_key_tail)
         target.command_format = self._get_conf(
             config, t_node, "command-format", compulsory=True)
@@ -201,7 +205,7 @@ class RoseArchApp(BuiltinApp):
             config, t_node, "source-prefix", default="")
         for source_glob in shlex.split(
                 self._get_conf(config, t_node, "source", compulsory=True)):
-            is_compulsory_source = True
+            is_compulsory_source = is_compulsory_target
             if source_glob.startswith("(") and source_glob.endswith(")"):
                 source_glob = source_glob[1:-1]
                 is_compulsory_source = False
@@ -229,7 +233,10 @@ class RoseArchApp(BuiltinApp):
                         target.sources[checksum] = RoseArchSource(
                             checksum, name, path)
         if not target.sources:
-            target.status = target.ST_BAD
+            if is_compulsory_target:
+                target.status = target.ST_BAD
+            else:
+                target.status = target.ST_NULL
         target.compress_scheme = self._get_conf(config, t_node, "compress")
         if not target.compress_scheme:
             target_base = target.name
@@ -285,11 +292,13 @@ class RoseArchApp(BuiltinApp):
         if target.status == target.ST_OLD:
             app_runner.handle_event(RoseArchEvent(target))
             return
-        target.command_rc = 1
         dao.insert(target)
-        if target.status == target.ST_BAD:
+        if target.status in (target.ST_BAD, target.ST_NULL):
+            # boolean to int
+            target.command_rc = int(target.status == target.ST_BAD)
             app_runner.handle_event(RoseArchEvent(target))
             return
+        target.command_rc = 1
         work_dir = mkdtemp()
         times = [time()] * 3  # init, transformed, archived
         ret_code = None
@@ -369,6 +378,7 @@ class RoseArchTarget(object):
     ST_OLD = "="
     ST_NEW = "+"
     ST_BAD = "!"
+    ST_NULL = "0"
 
     def __init__(self, name):
         self.name = name
