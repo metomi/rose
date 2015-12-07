@@ -5,6 +5,37 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2016-Q1?)
+
+Rose release 34. This release will work best with
+[cylc-6.7.3](https://github.com/cylc/cylc/releases/tag/6.7.3) and
+[fcm-2015.11.0](https://github.com/metomi/fcm/releases/tag/2015.11.0)
+or their successors.
+
+### Noteworthy Changes
+
+[#1768](https://github.com/metomi/rose/pull/1768):
+rose_arch: an archive target can now be optional.
+
+[#1767](https://github.com/metomi/rose/pull/1767):
+Rose Bush: jobs list: display links to `job.out` and `job.err` as longer as
+they exist in the file system.
+
+[#1765](https://github.com/metomi/rose/pull/1765):
+Rose documentation: updated to reflect the changes in cylc. E.g.:
+* `command scripting` is now `script`.
+* Most functionality provided by `rose suite-hook` has been absorbed by cylc,
+  so we are no longer recommending usage of `rose suite-hook` for task events.
+
+[#1764](https://github.com/metomi/rose/pull/1764):
+Rose Bush: jobs list: no longer fails if the suite does not have a `log/job/`
+sub-directory.
+
+[#1762](https://github.com/metomi/rose/pull/1762):
+Rose Bush: jobs list: fix query logic for filtering jobs by status.
+
+--------------------------------------------------------------------------------
+
 ## 2015.11.1 (2015-11-17)
 
 Rose release 33. This release works best with
