@@ -32,8 +32,8 @@
 #
 #     1. Launch web browser to view suite log. If "rose bush" is not
 #        configured, the command will offer to start it.
-#     2. Update the suite's job logs by pulling them back from any remote hosts
-#        for specified cycle times or task names or IDs.
+#     2. Pull task job logs back from any remote hosts for specified cycle
+#        times or task names or IDs.
 #     3. Archive (tar-gzip) job logs at the specified cycle time.
 #
 #     If --name=SUITE-NAME is not specified, the name will be determined by
@@ -49,8 +49,7 @@
 #         Archive (tar-gzip) job logs at specified cycle times. Implies
 #         --update.
 #     --force, -f
-#         Force update the HTML display libraries. Implies "rose suite-log
-#         --update '*'".
+#         Same as "rose suite-log --update '*'".
 #     --name=SUITE-NAME, -n SUITE-NAME
 #         Specify the suite name, instead of using basename of $PWD.
 #     --prune-remote
