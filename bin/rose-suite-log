@@ -32,7 +32,7 @@
 #
 #     1. Launch web browser to view suite log. If "rose bush" is not
 #        configured, the command will offer to start it.
-#     2. Pull task job logs back from any remote hosts for specified cycle
+#     2. Pull back task job logs from any remote hosts for specified cycle
 #        times or task names or IDs.
 #     3. Archive (tar-gzip) job logs at the specified cycle time.
 #
