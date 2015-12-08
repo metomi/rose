@@ -1992,8 +1992,8 @@ launcher-preopts.mpiexec=-n $NPROC
       <li>Launch web browser to view suite log. If <dfn>rose bush</dfn> is not
       configured, the command will offer to start it.</li>
 
-      <li>Update the suite's job logs by pulling them back from any remote
-      hosts for specified cycle times or task names or IDs.</li>
+      <li>Pull back task's job logs back from any remote hosts for specified
+      cycle times or task names or IDs.</li>
 
       <li>Archive (tar-gzip) job logs at or older than the specified cycle
       time.</li>
@@ -2018,8 +2018,7 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>--force, -f</kbd></dt>
 
-      <dd>Force update the HTML display libraries. Implies <kbd>rose suite-log
-      --update '*'</kbd>.</dd>
+      <dd>Same as <kbd>rose suite-log --update '*'</kbd>.</dd>
 
       <dt><kbd>--name=SUITE-NAME</kbd>, <kbd>-n SUITE-NAME</kbd></dt>
 
