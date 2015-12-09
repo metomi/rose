@@ -34,6 +34,12 @@ sub-directory.
 [#1762](https://github.com/metomi/rose/pull/1762):
 Rose Bush: jobs list: fix query logic for filtering jobs by status.
 
+[#1757](https://github.com/metomi/rose/pull/1757):
+Rosie Discovery service clients: improve handling of situations when the user
+is unable to access a keyring. The new behaviour is to disable prefixes before
+use (and notify the user about it) if a hello call fails. This applies to other
+authentication failures as well.
+
 --------------------------------------------------------------------------------
 
 ## 2015.11.1 (2015-11-17)
