@@ -34,6 +34,7 @@ import webbrowser
 import pygtk
 pygtk.require("2.0")
 import gtk
+import gobject
 
 import rose.config_editor
 import rose.config_editor.main
@@ -93,6 +94,14 @@ class MainWindow(gtk.Window):
                 rosie.browser.LABEL_ERROR_PREFIX.format(prefix),
                 rosie.browser.TITLE_INVALID_PREFIX)
             sys.exit(1)
+        if self.ws_client.unreachable_prefixes:
+            bad_prefix_string = " ".join(self.ws_client.unreachable_prefixes)
+            rose.gtk.dialog.run_dialog(
+                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                rosie.browser.ERROR_PREFIX_UNREACHABLE.format(
+                    bad_prefix_string),
+                rosie.browser.TITLE_ERROR
+            )
         locator = ResourceLocator(paths=sys.path)
         splash_updater.update(rosie.browser.SPLASH_LOADING.format(
                               rosie.browser.PROGRAM_NAME,
@@ -791,6 +800,7 @@ class MainWindow(gtk.Window):
     def _handle_prefix_change(self, menuitem):
         """Handles changing the prefix."""
         prefixes = list(self.ws_client.prefixes)
+        old_prefixes = list(prefixes)
         if menuitem.get_active():
             if menuitem.prefix_text not in prefixes:
                 prefixes.append(menuitem.prefix_text)
@@ -798,7 +808,21 @@ class MainWindow(gtk.Window):
         else:
             if menuitem.prefix_text in prefixes:
                 prefixes.remove(menuitem.prefix_text)
+        if prefixes == old_prefixes:
+            # Happens on set_active call below, when there is a prefix problem.
+            return
         self.ws_client.set_prefixes(prefixes)
+        if self.ws_client.unreachable_prefixes:
+            # There are some bad prefixes.
+            bad_prefix_string = " ".join(self.ws_client.unreachable_prefixes)
+            rose.gtk.dialog.run_dialog(
+                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                rosie.browser.ERROR_PREFIX_UNREACHABLE.format(
+                    bad_prefix_string),
+                rosie.browser.TITLE_ERROR
+            )
+            gobject.idle_add(menuitem.set_active, not menuitem.get_active())
+            return
         if hasattr(self, "statusbar"):
             self.display_local_suites()
             self.statusbar.set_datasource(" ".join(prefixes))

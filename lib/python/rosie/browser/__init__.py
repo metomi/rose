@@ -121,6 +121,7 @@ ERROR_NO_NEXT_SEARCH = "No next search"
 ERROR_NO_PREVIOUS_SEARCH = "No previous search"
 ERROR_PERMISSIONS = ("Error: You do not have the required permissions to " +
                      "delete this suite")
+ERROR_PREFIX_UNREACHABLE = "Cannot connect to prefix(es) {0}"
 ERROR_UNRECOGNISED_LAST_SEARCH = "Unrecognised last search type"
 ERROR_UNRECOGNISED_NEXT_SEARCH = "Unrecognised next search type"
 ERROR_UNRECOGNISED_SEARCH = "Unrecognised search type"

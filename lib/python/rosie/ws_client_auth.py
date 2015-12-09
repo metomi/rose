@@ -32,6 +32,7 @@ import re
 import rose.config
 from rose.env import env_var_process
 from rose.popen import RosePopener
+from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 import shlex
 import socket
@@ -53,6 +54,17 @@ class GPGAgentStoreConnectionError(Exception):
 
     def __str__(self):
         return "Cannot connect to gpg-agent: %s" % self.args[0]
+
+
+class RosieStoreRetrievalError(Exception):
+
+    """Raised if a client cannot retrieve info from the password store."""
+
+    def __str__(self):
+        message = "Cannot retrieve username/password: %s" % self.args[0]
+        if self.args[1]:
+            message += ": %s" % self.args[1]
+        return message
 
 
 class GnomekeyringStore(object):
@@ -91,6 +103,10 @@ class GnomekeyringStore(object):
             return res[0]["password"]
         except (gnomekeyring.NoMatchError, gnomekeyring.NoKeyringDaemonError):
             return
+        except gnomekeyring.Error as exc:
+            exc_type = "gnomekeyring." + type(exc).__name__
+            exc_string = str(exc)
+            raise RosieStoreRetrievalError(exc_type, exc_string)
 
     def store_password(self, scheme, host, username, password):
         """Return the password of username@root."""
@@ -224,7 +240,8 @@ class RosieWSClientAuthManager(object):
     PROMPT_PASSWORD = "Password for %(username)s at %(prefix)r - %(root)r: "
     STR_CANCELLED = "cancelled by user"
 
-    def __init__(self, prefix, popen=None, prompt_func=None):
+    def __init__(self, prefix, popen=None, prompt_func=None,
+                 event_handler=None):
         self.prefix = prefix
         root = self._get_conf_value("ws")
         if root is None:
@@ -243,6 +260,10 @@ class RosieWSClientAuthManager(object):
             popen = RosePopener()
         self.popen = popen
         self.prompt_func = prompt_func
+        if event_handler is None:
+            self.event_handler = Reporter()
+        else:
+            self.event_handler = event_handler
         res_loc = ResourceLocator.default()
         password_stores_str = res_loc.default().get_conf().get_value(
             keys=["rosie-id", "prefix-password-store." + self.prefix],
@@ -284,7 +305,11 @@ class RosieWSClientAuthManager(object):
             self.username = self._get_conf_value("username")
             if self.username_orig is None:
                 self.username_orig = self.username
-        self._load_password()
+        try:
+            self._load_password()
+        except RosieStoreRetrievalError as exc:
+            self.event_handler(exc)
+            return None
         if (self.username and not self.password) or is_retry:
             self._prompt(is_retry)
         if self.username and self.password:
