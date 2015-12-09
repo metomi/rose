@@ -1448,6 +1448,10 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>(package) built-in Rose applications.</dd>
 
+      <dt><code>rose.bush</code></dt>
+
+      <dd>callable, Rose Bush services logic.</dd>
+
       <dt><code>rose.c3</code></dt>
 
       <dd>library, implements the C3 algorithm (e.g. to linearise multiple
@@ -1472,6 +1476,11 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>callable, implements the <kbd>rose config-dump</kbd> command.</dd>
 
+      <dt><code>rose.config_editor/*</code></dt>
+
+      <dd>(package) Rose configuration editor logic. See
+      <a href="#library:rose:config_edit">Rose Config Editor Modules</a>.</dd>
+
       <dt><code>rose.config_processor</code></dt>
 
       <dd>library, base class for rose configuration processing.</dd>
@@ -1479,6 +1488,10 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <dt><code>rose.config_processors</code></dt>
 
       <dd>(package) subclasses for rose configuration processing.</dd>
+
+      <dt><code>rose.config_tree</code></dt>
+
+      <dd>library, representation of a Rose configruation directory.</dd>
 
       <dt><code>rose.date</code></dt>
 
@@ -1526,10 +1539,19 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <dd>callable, runs internal and custom macros for an application or
       suite.</dd>
 
+      <dt><code>rose.macros</code></dt>
+
+      <dd>(package) Built-in macros. See
+      <a href="#library:rose:macros">Rose Build-in Macro Modules</a>.</dd>
+
       <dt><code>rose.meta_type</code></dt>
 
       <dd>library, classes for the various metadata <code>type</code>
       groups.</dd>
+
+      <dt><code>rose.meta_type</code></dt>
+
+      <dd>library, data types in a Rose configuration metadata.</dd>
 
       <dt><code>rose.metadata_check</code></dt>
 
@@ -1538,6 +1560,10 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <dt><code>rose.metadata_gen</code></dt>
 
       <dd>callable, generates template metadata for an application.</dd>
+
+      <dt><code>rose.metadata_graph</code></dt>
+
+      <dd>callable, implement the <code>rose metadata-graph</code> command.</dd>
 
       <dt><code>rose.namelist_dump</code></dt>
 
@@ -1559,6 +1585,15 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <dt><code>rose.run</code></dt>
 
       <dd>library, base class for application, suite and task runners.</dd>
+
+      <dt><code>rose.run_source_vc</code></dt>
+
+      <dd>library, functions to print out version control information for
+      <code>rose suite-run</code>.</dd>
+
+      <dt><code>rose.scheme_handler</code></dt>
+
+      <dd>library, logic to load python modules based on named schemes.</dd>
 
       <dt><code>rose.section</code></dt>
 
@@ -1592,9 +1627,13 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>callable, hooks to suite engine events.</dd>
 
-      <dt><code>rose.suite_log_view</code></dt>
+      <dt><code>rose.suite_log</code></dt>
 
-      <dd>callable, sets up suite log viewer.</dd>
+      <dd>callable, implements the <code>rose suite-log</code> command.</dd>
+
+      <dt><code>rose.suite_restart</code></dt>
+
+      <dd>callable, implements the <code>rose suite-restart</code> command.</dd>
 
       <dt><code>rose.suite_run</code></dt>
 
@@ -1620,6 +1659,10 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>library, utilities for processing metadata and a basic data structure
       used by the config editor to hold values and metadata for options.</dd>
+
+      <dt><code>rose.ws</code></dt>
+
+      <dd>library, logic for web services, e.g. Rose Bush and Rosie Disco.</dd>
     </dl>
 
     <h3 id="library:rose:config_edit">Rose Config Editor Modules</h3>
@@ -1763,24 +1806,55 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>Interface code to the suite database, called by the web server.</dd>
 
+      <dt><code>rosie.db_create</code></dt>
+
+      <dd>Callable, implements <code>rosa db-create</code> command.</dd>
+
+      <dt><code>rosie.graph</code></dt>
+
+      <dd>Callable, implements <code>rosie graph</code> command.</dd>
+
       <dt><code>rosie.suite_id</code></dt>
 
       <dd>Callable, implements the <code>rosie id</code> command to identify
       suites.</dd>
 
+      <dt><code>rosie.svn_post_commit</code></dt>
+
+      <dd>Callable, implements the <code>rosa svn-post-commit</code>
+      command.</dd>
+
+      <dt><code>rosie.svn_pre_commit</code></dt>
+
+      <dd>Callable, implements the <code>rosa svn-pre-commit</code>
+      command.</dd>
+
+      <dt><code>rosie.usertools.*</code></dt>
+
+      <dd>(package) logic shared by <code>rosa svn-post-commit</code> and
+      <code>rosa svn-pre-commit</code> for accessing user information, e.g. from
+      Unix password file or LDAP.</dd>
+
       <dt><code>rosie.vc</code></dt>
 
-      <dd>Interface code to version control.</dd>
+      <dd>Callable, implements wrappers to version control system.</dd>
 
       <dt><code>rosie.ws</code></dt>
 
-      <dd>Rosie web server code.</dd>
+      <dd>Callable, Rosie Discovery service (Rosie Disco).</dd>
 
       <dt><code>rosie.ws_client</code></dt>
 
-      <dd>Interface to the Rosie web server. Used by <code>rosie query</code>,
-      <code>rosie info</code>, <code>rosie search</code> and <code>rosie
-      browse</code>.</dd>
+      <dd>Library, Rosie Disco clients.</dd>
+
+      <dt><code>rosie.ws_client_auth</code></dt>
+
+      <dd>Library, Rosie Disco client authentication schemes and keyring
+      management.</dd>
+
+      <dt><code>rosie.ws_client_cli</code></dt>
+
+      <dd>Callable, Rosie Disco CLI clients.</dd>
     </dl>
 
     <h2 id="bash">Rose Bash Library</h2>
