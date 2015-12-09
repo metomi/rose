@@ -109,7 +109,7 @@ class RosieWSClient(object):
             self.auth_managers[prefix] = RosieWSClientAuthManager(
                 prefix, popen=self.popen, prompt_func=self.prompt_func,
                 event_handler=self.event_handler)
-        # Remove uncontactable prefixes from the list.        
+        # Remove uncontactable prefixes from the list.
         ok_prefixes = self.hello(return_ok_prefixes=True)
         prefixes = []
         self.unreachable_prefixes = []

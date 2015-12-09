@@ -118,8 +118,9 @@ def list_local_suites(argv):
     ws_client = RosieWSClient(prefixes=opts.prefixes, event_handler=report)
     if ws_client.unreachable_prefixes:
         bad_prefix_string = " ".join(ws_client.unreachable_prefixes)
-        report(RosieWSClientError(
-                   ERR_PREFIX_UNREACHABLE.format(bad_prefix_string)))
+        report(
+            RosieWSClientError(
+                ERR_PREFIX_UNREACHABLE.format(bad_prefix_string)))
     _display_maps(opts, ws_client, ws_client.query_local_copies(opts.user))
 
 
