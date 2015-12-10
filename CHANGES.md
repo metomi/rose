@@ -22,7 +22,7 @@ does not match anything.
 rose_arch: an archive target can now be optional.
 
 [#1767](https://github.com/metomi/rose/pull/1767):
-Rose Bush: jobs list: display links to `job.out` and `job.err` as longer as
+Rose Bush: jobs list: display links to `job.out` and `job.err` as long as
 they exist in the file system.
 
 [#1765](https://github.com/metomi/rose/pull/1765):
