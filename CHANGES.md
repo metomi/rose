@@ -14,6 +14,10 @@ or their successors.
 
 ### Noteworthy Changes
 
+[#1776](https://github.com/metomi/rose/pull/1776):
+rose_arch: include the source prefix in the exception message if a source glob
+does not match anything.
+
 [#1768](https://github.com/metomi/rose/pull/1768):
 rose_arch: an archive target can now be optional.
 
