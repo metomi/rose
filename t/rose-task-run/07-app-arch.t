@@ -106,8 +106,8 @@ file_cmp "$TEST_KEY.err" "${FILE_PREFIX}4/01/job.err" <<'__ERR__'
 [FAIL] [arch:$UNKNOWN_DARK_PLANETS.tar.gz]=: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNKNOWN_DARK_PLANETS
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-5"
-file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5/01/job.err" <<'__ERR__'
-[FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: 'hello/mercurry.txt'
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5/01/job.err" <<__ERR__
+[FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: '$SUITE_RUN_DIR/share/cycle/2013010112/hello/mercurry.txt'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}6/01/job.err" <<__ERR__
