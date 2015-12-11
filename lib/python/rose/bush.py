@@ -215,11 +215,17 @@ class RoseBushService(object):
                      The values in the list should be "active", "success" or
                      "fail".
         order -- Order search in a predetermined way. A valid value is one of
-                 "time_desc", "time_asc","cycle_desc_name_desc",
-                 "cycle_desc_name_asc", "cycle_asc_name_desc",
-                 "cycle_asc_name_asc", "name_asc_cycle_asc",
-                 "name_desc_cycle_asc", "name_asc_cycle_desc",
-                 "name_desc_cycle_desc".
+            "time_desc", "time_asc",
+            "cycle_desc_name_desc", "cycle_desc_name_asc",
+            "cycle_asc_name_desc", "cycle_asc_name_asc",
+            "name_asc_cycle_asc", "name_desc_cycle_asc",
+            "name_asc_cycle_desc", "name_desc_cycle_desc",
+            "time_submit_desc", "time_submit_asc",
+            "time_run_desc", "time_run_asc",
+            "time_run_exit_desc", "time_run_exit_asc",
+            "duration_queue_desc", "duration_queue_asc",
+            "duration_run_desc", "duration_run_asc",
+            "duration_queue_run_desc", "duration_queue_run_asc"
         per_page -- Number of entries to display per page (defualt=32)
         form -- Specify return format. If None, display HTML page. If "json",
                 return a JSON data structure.
