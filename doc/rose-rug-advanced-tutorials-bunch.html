@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Rose Bunch</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-5 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Rose Bunch</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through using the <a href=
+      "rose-rug-task-run.html#rose-task-run.util.rose_bunch">Rose Bunch</a>
+      built in app.</p>
+
+      <p>This allows multiple variants of a command to be run under a single
+      job.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="purpose">Purpose</h2>
+
+      <p>Often, we want to run many instances of a command that differ only
+      slightly from each other at the same time - an example would be where a
+      command is run repeatedly with only its arguments changing.</p>
+
+      <p>Rather than creating multiple apps or optional configs to change the
+      way a command is to be run, we can instead use the built-in <var>rose
+      bunch</var> application to run multiple command variants, in parallel,
+      under a single job as defined by an application configuration.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="purpose">Warning</h2>
+
+      <p>It is important to note that when running your <var>rose bunch</var>
+      app under load balancing systems such as PBS or Slurm, you will need to
+      set resource requests to reflect the resources required by running
+      multiple commands at once.</p>
+
+      <p>For example, if a single command would require 1GB memory and the app
+      is configured to run up to 4 commands at once then 4GB of memory should
+      be requested.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="example-task">Example</h2>
+
+      <p>In this example we are going to create a suite that simulates the
+      handling of landing planes at an airport. For a given plane the process
+      of landing and unloading is the same: land, taxi to the terminal, unload
+      passengers and get clear. We can refer to this as the "landing" routine.
+      What differs between landings is the plane type, number of passengers
+      carried and the resulting timings for each stage of the landing
+      process.</p>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory somewhere - e.g. in your homespace) containing a blank
+      <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
+      like this:</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc</h3>
+      <pre class="prettyprint lang-cylc">
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = rose suite-hook --mail --shutdown
+        timeout = P3D
+[scheduling]
+    [[dependencies]]
+        graph = lander
+[runtime]
+    [[root]]
+        command scripting = rose task-run
+    [[lander]]
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example App</h3>
+
+      <p>In the suite directory create an <samp>app/</samp> directory</p>
+      <pre class="shell">
+mkdir app
+</pre>
+
+      <p>In the <var>app</var> directory create a <var>lander/</var>
+      directory</p>
+      <pre class="shell">
+cd app
+mkdir lander
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example App (2)</h3>
+
+      <p>In the <var>app/lander/</var> directory create a
+      <samp>rose-app.conf</samp> file. Using your editor of choice, paste the
+      following lines into it:</p>
+      <pre class="prettyprint lang-cylc">
+mode=rose_bunch
+
+[bunch]
+command-format=land %(class)s %(passengers)s
+
+[bunch-args]
+class=airbus concorde airbus cessna
+passengers=40 20 30 2
+</pre>
+
+      <p>This configuration will run a <code>rose bunch</code> task that calls
+      multiple instances of the <code>land</code> command, supplying arguments
+      to each instance from the <var>class</var> and <var>passengers</var>
+      entries under <var>[bunch-args]</var>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example App (3)</h3>
+
+      <p>In the <var>app/lander/</var> directory create a <samp>bin/</samp>
+      directory. Using your editor of choice, create a file named "land" under
+      the bin directory and paste in <a href=
+      "etc/rose-rug-advanced-tutorials-rose-bunch/src/land.html">these</a>
+      lines. This script capures the landing routine and expects two arguments;
+      the plane type (its class) and the number of passengers it is
+      carrying.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example App (4)</h3>
+
+      <p>Finally, make the new <samp>land</samp> file executable by navigating
+      into the bin directory of the <samp>lander</samp> app and running:</p>
+      <pre class="shell">
+chmod +x land
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Run Example</h3>
+
+      <p>Navigate to the root directory of your suite and run <samp>rose
+      suite-run</samp>. Your suite should run, launch the cylc gui and
+      successfully run the lander app.</p>
+
+      <p>Once the suite has finished running and has shutdown, open <samp>rose
+      bush</samp> to view its output. You can quickly get to the relevent page
+      by running <samp>rose slv</samp> in the suite directory.</p>
+    </div>
+
+    <div class="slide">
+    <h3 class="alwayshidden">Examine output</h3>
+
+    <p>In the <samp>rose bush</samp> jobs page for your suite you should be
+    presented with a page containing a single row for the <samp>lander</samp>
+    task, from which you can access its output. In that row you should see
+    something like this:</p><img src="rose-bunch-rose-bush-view.png" width=
+    "100%" /></div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Examine output (2)</h3>
+
+      <p>In the <samp>rose bush</samp> entry you should see that the usual
+      links are present for the task such as for <var>job.out</var>,
+      <var>job.status</var> etc. with the addition of two drop down boxes: one
+      for <var>bunch.*.err</var> and one for <var>bunch.*.out</var>. Rather
+      than mixing the outputs from the multiple command invocations being run
+      at once, <samp>rose bunch</samp> directs their output to individual
+      output files. So, for example, the ouput from running the command with
+      the first set of parameters can be found in the <var>bunch.0.out</var>
+      file, the second set in the <var>bunch.1.out</var> file etc. Examine
+      these output files now to confirm that all four of the args combinations
+      have been run and produced output.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="naming-invocations">Naming invocations</h2>
+
+      <p>While the different invocations of the command have their own output
+      directed to indexed files, it can sometimes be difficult to quickly
+      identify which file to look in for output. To aid this, <code>rose
+      bunch</code> supports naming command instances via the
+      <code>[bunch]name=</code> option.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Naming invocations (2)</h3>
+
+      <p>Open your app config (under <var>app/lander/rose-app.conf</var>) and
+      add the following line under the <code>[bunch]</code> section:</p>
+      <pre class="prettyprint lang-cylc">
+names=BA123 Emirates345 BA007 PC456
+</pre>
+
+      <p>Re-run your suite and, once it has finished, open up <var>rose
+      bush</var> and examine the job listing. In the drop-down
+      <var>bunch.*.err</var> and <var>bunch.*.out</var> boxes you should now
+      see entries for the names you've configured rather than the
+      <var>bunch.0.out ... bunch.3.out</var> entries previously present.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="limits">Limiting concurrent invocations</h2>
+
+      <p>In some situations we may need to limit the number of concurrently
+      running command invocations - often as a result of resource limitations.
+      Rather than batching up jobs into sets of <var>N</var> simultaneously
+      running commands, <code>rose bunch</code> apps can be configured to run
+      as many commands as possible within some limit i.e. while <var>N</var>
+      commands are running, if one of them finishes, don't wait for the
+      remaining <var>N-1</var> jobs to finish before running the
+      <var>N+1</var>th one.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Limiting concurrent invocations (2)</h3>
+
+      <p>In the case of our simulated airport we will pretend we only have two
+      runways available at a time on which our planes can land. As such we need
+      to limit the number of planes being landed. We do this using the
+      <code>[bunch]pool-size=</code> configuration option of the <code>rose
+      bunch</code> app.</p>
+
+      <p>Open up your app config and add the following line to the
+      <code>[bunch]</code> section:</p>
+      <pre class="prettyprint lang-cylc">
+pool-size=2
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Limiting concurrent invocations (3)</h3>
+
+      <p>Run your suite again. Notice that this time round it takes longer for
+      the task to run as it has been limited in the number of tasks it can run
+      at once. You can see the individual commands being started by viewing the
+      task stdout in the cylc gui. For example, when the "BA007" invocation
+      starts running you should see the line:</p>
+      <pre class="prettyprint lang-cylc">
+[INFO] BA007: added to pool
+</pre>
+
+      <p>appear in the job output after a while whereas, when running without a
+      pool-size, the line will appear pretty quickly.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="summary">Summary</h2>
+
+      <p>In this tutorial we have learnt how to configure a <var>rose
+      bunch</var> app to run a set of command variants under one job. We have
+      learnt how to name the individual variants for convenience in examining
+      the logs and how to limit the number of concurrently running
+      commands.</p>
+
+      <p>Further options are listed in the <code>rose bunch</code> <a href=
+      "rose-rug-task-run.html#rose-task-run.util.rose_bunch">documentation</a>.
+      These include, configuring how to proceed following failure of an
+      individual command invocation - <code>[bunch]fail-mode=</code>),
+      automatically generating <var>N</var> <code>command-instances</code> and
+      enabling/disabling the app's incremental mode.</p>
+    </div>
+  </div>
+</body>
+</html>

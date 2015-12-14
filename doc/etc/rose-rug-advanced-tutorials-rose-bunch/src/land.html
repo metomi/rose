@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Rose Bunch Advanced Tutorial land script</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="../../../rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="../../../rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="../../../rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "../../../google-code-prettify/prettify.css" />
+  <script type="text/javascript" src="../../../jquery.min.js">
+</script>
+  <script type="text/javascript" src=
+  "../../../google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="../../../prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="../../../rose-doc.js">
+</script>
+  <script type="text/javascript" src="../../../rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-5 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="../../../rose-icon.png" alt="Rose" />
+
+    <p><a href="../../../">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h2>land script</h2>
+    <pre>
+#!/bin/bash
+
+CLASS=$1
+PASSENGERS=$2
+
+# Get settings
+case $CLASS in
+    airbus) LANDTIME=30; UNLOADRATE=8;;
+    cessna) LANDTIME=20; UNLOADRATE=2;;
+    concorde) LANDTIME=10; UNLOADRATE=4;;
+esac
+
+echo "[ $(rose date) ] $CLASS carrying $PASSENGERS passengers incoming"
+
+# Land plane
+echo "[ $(rose date) ] Approaching runway"
+sleep $LANDTIME
+echo "[ $(rose date) ] On the tarmac"
+
+# Unload passengers
+sleep $(($PASSENGERS / $UNLOADRATE))
+echo "[ $(rose date) ] Unloaded"
+
+# Clear terminal
+sleep 10
+echo "[ $(rose date) ] Clear of terminal"
+</pre>
+  </div>
+</body>
+</html>
