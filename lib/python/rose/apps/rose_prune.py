@@ -50,10 +50,11 @@ class RosePruneApp(BuiltinApp):
         # Tar-gzip job logs on suite host
         # Prune job logs on remote hosts and suite host
         prune_remote_logs_cycles = self._get_conf(
-            conf_tree, "prune-remote-logs-at")
+            app_runner, conf_tree, "prune-remote-logs-at")
         prune_server_logs_cycles = self._get_conf(
-            conf_tree, "prune-server-logs-at")
-        archive_logs_cycles = self._get_conf(conf_tree, "archive-logs-at")
+            app_runner, conf_tree, "prune-server-logs-at")
+        archive_logs_cycles = self._get_conf(
+            app_runner, conf_tree, "archive-logs-at")
         if (prune_remote_logs_cycles or
                 prune_server_logs_cycles or
                 archive_logs_cycles):
@@ -83,7 +84,7 @@ class RosePruneApp(BuiltinApp):
                     suite_name, archive_logs_cycles)
 
         # Prune other directories
-        globs = self._get_prune_globs(conf_tree)
+        globs = self._get_prune_globs(app_runner, conf_tree)
         suite_engine_proc = app_runner.suite_engine_proc
         hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
         suite_dir_rel = suite_engine_proc.get_suite_dir_rel(suite_name)
@@ -125,7 +126,7 @@ class RosePruneApp(BuiltinApp):
                     app_runner.fs_util.chdir(cwd)
         return
 
-    def _get_conf(self, conf_tree, key, max_args=0):
+    def _get_conf(self, app_runner, conf_tree, key, max_args=0):
         """Get a list of cycles from a configuration setting.
 
         key -- An option key in self.SECTION to locate the setting.
@@ -156,35 +157,36 @@ class RosePruneApp(BuiltinApp):
             raise ConfigValueError([self.SECTION, key], items_str, exc)
         items = []
         ref_point_str = os.getenv(
-            RoseDateTimeOperator.TASK_CYCLE_TIME_MODE_ENV)
+            RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
         try:
-            date_time_oper = None
-            ref_time_point = None
-            parse_format = None
+            ref_point = None
+            ref_fmt = None
             for item_str in shlex.split(items_str):
                 args = item_str.split(":", max_args)
                 when = args.pop(0)
                 cycle = when
-                if (ref_point_str and
-                        os.getenv("ROSE_CYCLING_MODE") == "integer"):
-                    # Integer cycling
-                    if "P" in when:  # "when" is an offset
-                        cycle = str(int(ref_point_str) +
-                                    int(when.replace("P", "")))
-                    else:  # "when" is a cycle point
-                        cycle = str(when)
-                elif ref_point_str:
-                    # Date-time cycling
-                    if date_time_oper is None:
-                        date_time_oper = RoseDateTimeOperator(
-                            ref_time_point=ref_point_str)
-                        ref_time_point, ref_fmt = date_time_oper.date_parse()
-                    try:
-                        time_point = date_time_oper.date_parse(when)[0]
-                    except ValueError:
-                        time_point = date_time_oper.date_shift(
-                            ref_time_point, when)
-                    cycle = date_time_oper.date_format(ref_fmt, time_point)
+                if ref_point_str is not None:
+                    if self._get_cycling_mode() == "integer":
+                        # Integer cycling
+                        if "P" in when:  # "when" is an offset
+                            cycle = str(int(ref_point_str) +
+                                        int(when.replace("P", "")))
+                        else:  # "when" is a cycle point
+                            cycle = str(when)
+                    else:
+                        # Date-time cycling
+                        if ref_fmt is None:
+                            ref_point, ref_fmt = (
+                                app_runner.date_time_oper.date_parse(
+                                    ref_point_str))
+                        try:
+                            time_point = app_runner.date_time_oper.date_parse(
+                                when)[0]
+                        except ValueError:
+                            time_point = app_runner.date_time_oper.date_shift(
+                                ref_point, when)
+                        cycle = app_runner.date_time_oper.date_format(
+                            ref_fmt, time_point)
                 if max_args:
                     items.append((cycle, args))
                 else:
@@ -193,12 +195,34 @@ class RosePruneApp(BuiltinApp):
             raise ConfigValueError([self.SECTION, key], items_str, exc)
         return items
 
-    def _get_prune_globs(self, conf_tree):
+    @classmethod
+    def _get_cycling_mode(cls):
+        """Return task cycling mode."""
+        return os.getenv("ROSE_CYCLING_MODE")
+
+    def _get_prune_globs(self, app_runner, conf_tree):
         """Return prune globs."""
         globs = []
         nodes = conf_tree.node.get_value([self.SECTION])
         if nodes is None:
             return []
+        cycle_formats = {}
+        for key, node in nodes.items():
+            if node.is_ignored():
+                continue
+            if key.startswith("cycle-format{") and key.endswith("}"):
+                fmt = key[len("cycle-format{"):-1]
+                try:
+                    cycle_formats[fmt] = env_var_process(node.value)
+                    # Check formats are valid
+                    if self._get_cycling_mode() == "integer":
+                        cycle_formats[fmt] % 0
+                    else:
+                        app_runner.date_time_oper.date_format(
+                            cycle_formats[fmt])
+                except (UnboundEnvironmentVariableError, ValueError) as exc:
+                    raise ConfigValueError(
+                        [self.SECTION, key], node.value, exc)
         for key, node in sorted(nodes.items()):
             if node.is_ignored():
                 continue
@@ -207,18 +231,27 @@ class RosePruneApp(BuiltinApp):
             elif key == "prune-work-at":  # backward compat
                 head = "work"
             elif key.startswith("prune{") and key.endswith("}"):
-                head = key[6:-1].strip()  # remove "prune{" and "}"
+                head = key[len("prune{"):-1].strip()  # remove "prune{" and "}"
             else:
                 continue
             for cycle, cycle_args in self._get_conf(
-                    conf_tree, key, max_args=1):
+                    app_runner, conf_tree, key, max_args=1):
                 if cycle_args:
+                    cycle_strs = {"cycle": cycle}
+                    for key, cycle_format in cycle_formats.items():
+                        if self._get_cycling_mode() == "integer":
+                            cycle_strs[key] = cycle_format % int(cycle)
+                        else:  # date time cycling
+                            cycle_point = (
+                                app_runner.date_time_oper.date_parse(cycle)[0])
+                            cycle_strs[key] = (
+                                app_runner.date_time_oper.date_format(
+                                    cycle_format, cycle_point))
                     for tail_glob in shlex.split(cycle_args.pop()):
-                        if "%(cycle)s" in tail_glob:
-                            globs.append(os.path.join(
-                                head, tail_glob % {"cycle": cycle}))
-                        else:
-                            globs.append(os.path.join(head, cycle, tail_glob))
+                        glob_ = tail_glob % cycle_strs
+                        if glob_ == tail_glob:  # no substitution
+                            glob_ = os.path.join(cycle, tail_glob)
+                        globs.append(os.path.join(head, glob_))
                 else:
                     globs.append(os.path.join(head, cycle))
         return globs
