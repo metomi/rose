@@ -896,6 +896,17 @@ arg2=foo bar baz qux
     <p>The following settings are accepted:</p>
 
     <dl>
+      <dt><kbd>cycle-format{key}=format</kbd></dt>
+
+      <dd>Specify a key to a format string for use in conjunction with a
+      <kbd>prune{item-root}=cycle:globs ...</kbd> setting. For example, we may
+      have something like <kbd>cycle-format{cycle_year}=CCYY</kbd> and
+      <kbd>prune{share}=-P1Y:xmas-present-%(cycle_year)s/</kbd>. The
+      <var>key</var> can be any string that can be used in a
+      <code>%(key)s</code> substitution, and <var>format</var> should be a
+      a valid <a href="rose-command.html#rose-date-print-format">rose date print
+      format</a>.</dd>
+
       <dt><kbd>prune-remote-logs-at=cycle ...</kbd></dt>
 
       <dd>Re-sync remote job logs at these cycles and remove them from remote
@@ -933,6 +944,11 @@ arg2=foo bar baz qux
         <kbd>prune{share}=-PT12H:hello-*-at-%(cycle)s.txt</kbd> will clear
         out all items matching
         <var>share/hello-*-at-20141225T0000Z.txt</var>.</p>
+
+        <p>A glob can also be specified as a formatting string containing a
+        substitution <code>%(key)s</code>, if a
+        <code>cycle-format{key}=format</code> setting is specified. See above
+        for detail.</p> 
       </dd>
 
       <dt><em>Deprecated</em> <kbd>prune-work-at=cycle[:globs] ...</kbd></dt>
@@ -950,11 +966,12 @@ meta=rose_prune
 mode=rose_prune
 
 [prune]
+cycle-format{cycle_year_month}=CCYYMM
 prune-remote-logs-at=-PT6H
 archive-logs-at=-P1D
 prune-server-logs-at=-P7D
 prune{work}=-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H
-prune{share}=-P1D:hello-*-at-%(cycle)s.txt
+prune{share}=-P1D:hello-*-at-%(cycle)s.txt -P3M:monthly/%(cycle_year_month)s/
 prune{share/cycle}=-PT6H:foo* -PT12H:'bar* *.baz*' -P1D
 </pre>
 
