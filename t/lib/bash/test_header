@@ -405,7 +405,9 @@ for item in sys.argv[2:]:
                 datum = datum[key]
         if datum != value:
             raise ValueError((item, datum))
-    except (IndexError, KeyError):
+    except IndexError:
+        raise IndexError(item)
+    except KeyError:
         raise KeyError(item)
 __PYTHON__
     if [[ -s "${TEST_KEY}.err" ]]; then

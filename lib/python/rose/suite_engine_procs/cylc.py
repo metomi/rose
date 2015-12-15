@@ -65,7 +65,7 @@ class CylcProcessor(SuiteEngineProcessor):
     EVENT_RANKS = {"submit-init": 0, "submit": 1, "fail(submit)": 1, "init": 2,
                    "success": 3, "fail": 3, "fail(%s)": 4}
     JOB_LOGS_DB = "log/rose-job-logs.db"
-    JOB_ORDERS = {
+    JOB_ORDERS_OLD = {
         "time_desc": "time DESC, submit_num DESC, name DESC, cycle DESC",
         "time_asc": "time ASC, submit_num ASC, name ASC, cycle ASC",
         "cycle_desc_name_asc": "cycle DESC, name ASC, submit_num DESC",
@@ -76,6 +76,45 @@ class CylcProcessor(SuiteEngineProcessor):
         "name_desc_cycle_asc": "name DESC, cycle ASC, submit_num DESC",
         "name_asc_cycle_desc": "name ASC, cycle DESC, submit_num DESC",
         "name_desc_cycle_desc": "name DESC, cycle DESC, submit_num DESC"}
+    JOB_ORDERS = dict(JOB_ORDERS_OLD)
+    JOB_ORDERS.update({
+        "time_submit_desc": (
+            "time_submit DESC, submit_num DESC, name DESC, cycle DESC"),
+        "time_submit_asc": (
+            "time_submit ASC, submit_num DESC, name DESC, cycle DESC"),
+        "time_run_desc": (
+            "time_run DESC, submit_num DESC, name DESC, cycle DESC"),
+        "time_run_asc": (
+            "time_run ASC, submit_num DESC, name DESC, cycle DESC"),
+        "time_run_exit_desc": (
+            "time_run_exit DESC, submit_num DESC, name DESC, cycle DESC"),
+        "time_run_exit_asc": (
+            "time_run_exit ASC, submit_num DESC, name DESC, cycle DESC"),
+        "duration_queue_desc": (
+            "(CAST(strftime('%s', time_run) AS NUMERIC) -" +
+            " CAST(strftime('%s', time_submit) AS NUMERIC)) DESC, " +
+            "submit_num DESC, name DESC, cycle DESC"),
+        "duration_queue_asc": (
+            "(CAST(strftime('%s', time_run) AS NUMERIC) -" +
+            " CAST(strftime('%s', time_submit) AS NUMERIC)) ASC, " +
+            "submit_num DESC, name DESC, cycle DESC"),
+        "duration_run_desc": (
+            "(CAST(strftime('%s', time_run_exit) AS NUMERIC) -" +
+            " CAST(strftime('%s', time_run) AS NUMERIC)) DESC, " +
+            "submit_num DESC, name DESC, cycle DESC"),
+        "duration_run_asc": (
+            "(CAST(strftime('%s', time_run_exit) AS NUMERIC) -" +
+            " CAST(strftime('%s', time_run) AS NUMERIC)) ASC, " +
+            "submit_num DESC, name DESC, cycle DESC"),
+        "duration_queue_run_desc": (
+            "(CAST(strftime('%s', time_run_exit) AS NUMERIC) -" +
+            " CAST(strftime('%s', time_submit) AS NUMERIC)) DESC, " +
+            "submit_num DESC, name DESC, cycle DESC"),
+        "duration_queue_run_asc": (
+            "(CAST(strftime('%s', time_run_exit) AS NUMERIC) -" +
+            " CAST(strftime('%s', time_submit) AS NUMERIC)) ASC, " +
+            "submit_num DESC, name DESC, cycle DESC"),
+    })
     PGREP_CYLC_RUN = r"python.*cylc-(run|restart)( | .+ )%s( |$)"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
@@ -543,19 +582,20 @@ class CylcProcessor(SuiteEngineProcessor):
             return ([], 0)
         # Execute query to get entries
         entries = []
-        stmt = ("SELECT" +
-                " cycle, name, task_events.submit_num AS submit_num," +
-                " group_concat(time), group_concat(event)," +
-                " group_concat(message) " +
-                " FROM" +
-                " task_events JOIN task_states USING (cycle,name)" +
-                " WHERE" +
-                " (event==? OR event==? OR event==? OR" +
-                "  event==? OR event==? OR event==? OR event==?)" +
-                where +
-                " GROUP BY cycle, name, task_events.submit_num" +
-                " ORDER BY " +
-                self.JOB_ORDERS.get(order, self.JOB_ORDERS["time_desc"]))
+        stmt = (
+            "SELECT" +
+            " cycle, name, task_events.submit_num AS submit_num," +
+            " group_concat(time), group_concat(event)," +
+            " group_concat(message) " +
+            " FROM" +
+            " task_events JOIN task_states USING (cycle,name)" +
+            " WHERE" +
+            " (event==? OR event==? OR event==? OR" +
+            "  event==? OR event==? OR event==? OR event==?)" +
+            where +
+            " GROUP BY cycle, name, task_events.submit_num" +
+            " ORDER BY " +
+            self.JOB_ORDERS_OLD.get(order, self.JOB_ORDERS_OLD["time_desc"]))
         stmt_args_head = [
             "submitting now", "incrementing submit number",
             "submission failed", "started", "succeeded", "failed", "signaled"]
