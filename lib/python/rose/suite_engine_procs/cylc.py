@@ -851,7 +851,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 " sum(" + fail_events_stmt + ") AS n_job_fail" +
                 " FROM task_events GROUP BY cycle")
         for cycle, n_job_fail in self._db_exec(
-                self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
+                self.SUITE_DB, user_name, suite_name, stmt):
             try:
                 entry_of[cycle]["n_states"]["job_fails"] = n_job_fail
             except KeyError:
