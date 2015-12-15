@@ -186,7 +186,11 @@ passengers=40 20 30 2
       <h3 class="alwayshidden">Example App (3)</h3>
 
       <p>In the <var>app/lander/</var> directory create a <samp>bin/</samp>
-      directory. Using your editor of choice, create a file named "land" under
+      directory:</p>
+      <pre class="shell">
+mkdir bin
+</pre>
+      <p>Using your editor of choice, create a file named "land" under
       the bin directory and paste in <a href=
       "etc/rose-rug-advanced-tutorials-rose-bunch/src/land.html">these</a>
       lines. This script capures the landing routine and expects two arguments;
@@ -207,13 +211,15 @@ chmod +x land
     <div class="slide">
       <h3 class="alwayshidden">Run Example</h3>
 
-      <p>Navigate to the root directory of your suite and run <samp>rose
-      suite-run</samp>. Your suite should run, launch the cylc gui and
-      successfully run the lander app.</p>
+      <p>Navigate to the top directory of your suite (where the
+      <samp>suite.rc</samp> and <samp>rose-suite.conf</samp> files can be
+      found) and run <samp>rose suite-run</samp>. Your suite should run, launch
+      the cylc gui and successfully run the lander app.</p>
 
       <p>Once the suite has finished running and has shutdown, open <samp>rose
-      bush</samp> to view its output. You can quickly get to the relevent page
-      by running <samp>rose slv</samp> in the suite directory.</p>
+      bush</samp> to view its output (note that you can close the cylc gui at
+      this point). You can quickly get to the relevent page by running 
+      <samp>rose slv</samp> from within the suite directory.</p>
     </div>
 
     <div class="slide">
@@ -289,8 +295,8 @@ names=BA123 Emirates345 BA007 PC456
       <code>[bunch]pool-size=</code> configuration option of the <code>rose
       bunch</code> app.</p>
 
-      <p>Open up your app config and add the following line to the
-      <code>[bunch]</code> section:</p>
+      <p>Open your app config (under <var>app/lander/rose-app.conf</var>) and
+      add the following line to the <code>[bunch]</code> section:</p>
       <pre class="prettyprint lang-cylc">
 pool-size=2
 </pre>
@@ -300,10 +306,11 @@ pool-size=2
       <h3 class="alwayshidden">Limiting concurrent invocations (3)</h3>
 
       <p>Run your suite again. Notice that this time round it takes longer for
-      the task to run as it has been limited in the number of tasks it can run
-      at once. You can see the individual commands being started by viewing the
-      task stdout in the cylc gui. For example, when the "BA007" invocation
-      starts running you should see the line:</p>
+      the task to run as it has been limited in the number of command variants
+      it can run simultaneously. You can see the individual commands being
+      started by viewing the task stdout in the cylc gui by right clicking on
+      the task and selecting "View" then "job stdout". As an example, when the
+      "BA007" invocation starts running you should see the line:</p>
       <pre class="prettyprint lang-cylc">
 [INFO] BA007: added to pool
 </pre>
