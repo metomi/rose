@@ -130,15 +130,12 @@
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
-    [[event hooks]]
-        timeout handler = rose suite-hook --mail --shutdown
-        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = lander
 [runtime]
     [[root]]
-        command scripting = rose task-run
+        script = rose task-run
     [[lander]]
 </pre>
     </div>
@@ -318,7 +315,7 @@ pool-size=2
 
       <p>appear in the job output after a while whereas, when running without a
       pool-size, the line will appear pretty quickly.</p>
-    </div>
+    </div>doc/rose-rug-advanced-tutorials-bunch.html 
 
     <div class="slide">
       <h2 id="summary">Summary</h2>
