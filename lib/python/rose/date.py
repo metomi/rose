@@ -64,7 +64,7 @@ class RoseDateTimeOperator(object):
     STR_NOW = "now"
     STR_REF = "ref"
 
-    TASK_CYCLE_TIME_MODE_ENV = "ROSE_TASK_CYCLE_TIME"
+    TASK_CYCLE_TIME_ENV = "ROSE_TASK_CYCLE_TIME"
 
     UNITS = {"w": "weeks",
              "d": "days",
@@ -73,7 +73,7 @@ class RoseDateTimeOperator(object):
              "s": "seconds"}
 
     def __init__(self, parse_format=None, utc_mode=False, calendar_mode=None,
-                 ref_time_point=None):
+                 ref_point_str=None):
         """Constructor.
 
         parse_format -- If specified, parse with the specified format.
@@ -86,8 +86,8 @@ class RoseDateTimeOperator(object):
 
         calendar_mode -- Set calendar mode, for isodatetime.data.Calendar.
 
-        ref_time_point -- Set the reference time point for operations.
-                          If not specified, operations use current date time.
+        ref_point_str -- Set the reference time point for operations.
+                         If not specified, operations use current date time.
 
         """
         self.parse_formats = self.PARSE_FORMATS
@@ -109,15 +109,17 @@ class RoseDateTimeOperator(object):
             assumed_time_zone=assumed_time_zone)
         self.duration_parser = DurationParser()
 
-        self.ref_time_point = ref_time_point
+        self.ref_point_str = ref_point_str
 
     def date_format(self, print_format, time_point=None):
         """Reformat time_point according to print_format.
 
         time_point -- The time point to format.
-                      Otherwise, use current date time.
+                      Otherwise, use ref date time.
 
         """
+        if time_point is None:
+            time_point = self.date_parse()[0]
         if print_format is None:
             return str(time_point)
         if "%" in print_format:
@@ -134,11 +136,11 @@ class RoseDateTimeOperator(object):
         format is the format that matches time_point_str.
 
         time_point_str -- The time point string to parse.
-                          Otherwise, use current time.
+                          Otherwise, use ref time.
 
         """
         if time_point_str is None or time_point_str == self.STR_REF:
-            time_point_str = self.ref_time_point
+            time_point_str = self.ref_point_str
         if time_point_str is None or time_point_str == self.STR_NOW:
             time_point = get_timepoint_for_now()
             time_point.set_time_zone_to_local()
@@ -306,13 +308,13 @@ def main():
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
-    ref_time_point = None
+    ref_point_str = None
     if opts.task_cycle_time_mode:
-        ref_time_point = os.getenv(
-            RoseDateTimeOperator.TASK_CYCLE_TIME_MODE_ENV)
-        if ref_time_point is None:
+        ref_point_str = os.getenv(
+            RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
+        if ref_point_str is None:
             exc = UnboundEnvironmentVariableError(
-                RoseDateTimeOperator.TASK_CYCLE_TIME_MODE_ENV)
+                RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
             report(exc)
             if opts.debug_mode:
                 raise exc
@@ -322,7 +324,7 @@ def main():
         parse_format=opts.parse_format,
         utc_mode=opts.utc_mode,
         calendar_mode=opts.calendar,
-        ref_time_point=ref_time_point)
+        ref_point_str=ref_point_str)
 
     try:
         if len(args) < 2:

@@ -29,6 +29,7 @@ import traceback
 from isodatetime.data import get_timepoint_for_now
 from isodatetime.parsers import DurationParser, ISO8601SyntaxError
 from rose.config import ConfigDumper
+from rose.date import RoseDateTimeOperator
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopenError
@@ -163,7 +164,7 @@ class AppRunner(Runner):
         path = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         self.builtins_manager = SchemeHandlersManager(
             [path], "rose.apps", ["run"], None, *args, **kwargs)
-        self.duration_parser = DurationParser()
+        self.date_time_oper = RoseDateTimeOperator()
 
     def run_impl(self, opts, args, uuid, work_files):
         """The actual logic for a run."""
@@ -235,7 +236,8 @@ class AppRunner(Runner):
                                                    poll_delays_value,
                                                    ConfigValueError.SYNTAX)
                     try:
-                        value = self.duration_parser.parse(value).get_seconds()
+                        value = self.date_time_oper.duration_parser.parse(
+                            value).get_seconds()
                         is_legacy = False
                     except ISO8601SyntaxError:
                         # Legacy mode: nnnU

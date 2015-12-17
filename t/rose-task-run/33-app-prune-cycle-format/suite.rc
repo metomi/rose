@@ -1,0 +1,27 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    abort if any task fails = True
+    [[event hooks]]
+        abort on timeout = True
+        timeout=PT1M
+[scheduling]
+    initial cycle point=1970
+    final cycle point=1990
+    [[dependencies]]
+        [[[P20Y]]]
+            graph="t1[-P20Y] & pruner[-P20Y] & t1 => pruner"
+
+[runtime]
+    [[t1]]
+        script="""
+eval $(rose task-env)
+cd "${CYLC_SUITE_RUN_DIR}/share"
+for NAME in 'earth' 'mars' 'venus'; do
+    echo "Greeting ${NAME}" >"hello-${NAME}-in-$(rose date -c -f 'CCYY').txt"
+done
+"""
+    [[pruner]]
+        script="""
+rose task-run -v -v --debug | tee -a "${CYLC_SUITE_RUN_DIR}/prune.log"
+"""
