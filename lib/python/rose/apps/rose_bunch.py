@@ -113,15 +113,15 @@ class RoseBunchApp(BuiltinApp):
         self.invocation_names = conf_tree.node.get_value([self.BUNCH_SECTION,
                                                          "names"])
         if self.invocation_names:
-            self.invocation_names = shlex.split(self.invocation_names)
+            self.invocation_names = shlex.split(
+                os.path.expandvars(self.invocation_names))
             if len(set(self.invocation_names)) != len(self.invocation_names):
                 raise ConfigValueError([self.BUNCH_SECTION, "names"],
                                        self.invocation_names,
                                        "names must be unique")
 
-        self.fail_mode = conf_tree.node.get_value([self.BUNCH_SECTION,
-                                                  "fail-mode"],
-                                                  self.TYPE_CONTINUE_ON_FAIL)
+        self.fail_mode = os.path.expandvars(conf_tree.node.get_value(
+            [self.BUNCH_SECTION, "fail-mode"], self.TYPE_CONTINUE_ON_FAIL))
 
         if self.fail_mode not in self.FAIL_MODE_TYPES:
             raise ConfigValueError([self.BUNCH_SECTION, "fail-mode"],
@@ -131,11 +131,15 @@ class RoseBunchApp(BuiltinApp):
         self.incremental = conf_tree.node.get_value([self.BUNCH_SECTION,
                                                     "incremental"],
                                                     "true")
+        if self.incremental:
+            self.incremental = os.path.expandvars(self.incremental)
 
         multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
+        for key, val in multi_args.items():
+            multi_args[key].value = os.path.expandvars(val.value)
 
-        self.command_format = conf_tree.node.get_value([self.BUNCH_SECTION,
-                                                       "command-format"])
+        self.command_format = os.path.expandvars(
+            conf_tree.node.get_value([self.BUNCH_SECTION, "command-format"]))
 
         if not self.command_format:
             raise CompulsoryConfigValueError([self.BUNCH_SECTION,
@@ -149,7 +153,7 @@ class RoseBunchApp(BuiltinApp):
 
         if instances:
             try:
-                instances = range(int(instances))
+                instances = range(int(os.path.expandvars(instances)))
             except ValueError:
                 raise ConfigValueError([self.BUNCH_SECTION,
                                         "command-instances"],
@@ -188,7 +192,7 @@ class RoseBunchApp(BuiltinApp):
         max_procs = conf_tree.node.get_value([self.BUNCH_SECTION, "pool-size"])
 
         if max_procs:
-            self.MAX_PROCS = int(max_procs)
+            self.MAX_PROCS = int(os.path.expandvars(max_procs))
         else:
             self.MAX_PROCS = arglength
 
