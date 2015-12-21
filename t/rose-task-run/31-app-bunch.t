@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 40
+tests 47
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -124,6 +124,31 @@ TEST_KEY_PREFIX=names
 FILE=$LOG_DIR/$APP/01/job.out
 for KEY in foo bar baz qux; do
     file_grep $TEST_KEY_PREFIX-ran-$KEY "\[OK\] $KEY" $FILE
+done
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Testing names works ok
+#-------------------------------------------------------------------------------
+APP=bunch_env_pass
+#-------------------------------------------------------------------------------
+TEST_KEY_PREFIX=env_vars
+FILE_PREFIX=$LOG_DIR/$APP/01/job
+#-------------------------------------------------------------------------------
+# First run files
+#-------------------------------------------------------------------------------
+file_grep $TEST_KEY_PREFIX-ran-0 "\[OK\] 0" $FILE_PREFIX.out
+file_grep $TEST_KEY_PREFIX-fail-1 "\[FAIL\] 1" $FILE_PREFIX.err
+file_grep $TEST_KEY_PREFIX-ran-2 "\[OK\] 2" $FILE_PREFIX.out
+#-------------------------------------------------------------------------------
+# Second run files
+#-------------------------------------------------------------------------------
+FILE=$LOG_DIR/$APP/02/job.err
+file_grep $TEST_KEY_PREFIX-fail-1 "\[FAIL\] 1" $FILE
+#-------------------------------------------------------------------------------
+FILE_DIR=$LOG_DIR/$APP/01/
+for KEY in $(seq 0 2); do
+    file_grep $TEST_KEY_PREFIX-cmd_eval_ran-$KEY \
+        "a comment" $FILE_DIR/bunch.$KEY.out
 done
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
