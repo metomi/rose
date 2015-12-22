@@ -123,7 +123,8 @@
 
       <p>Let's add some <samp>trigger</samp> information.</p>
 
-      <p>Under <samp>[namelist:pizza_order=pizza_type]</samp>, add:</p>
+      <p>In the <samp>rose-meta.conf</samp> file, under
+      <samp>[namelist:pizza_order=pizza_type]</samp>, add:</p>
       <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
@@ -147,7 +148,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
         namelist:side_order: this &gt;= 10;
 </pre>
 
-      <p>What we've done here is used a small subset of the Rose configuration
+      <p>What we've done here is use a small subset of the Rose configuration
       metadata logical syntax to specify a range of allowed values (the
       <samp>this &gt; 25</samp> part). Here, <samp>this</samp> is a placeholder
       for the value of <var>env=BUDGET</var>; the expression syntax is
@@ -186,15 +187,15 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
       in a couple of ways:</p>
 
       <ul>
-        <li>the toolbar button</li>
-
         <li>the <kbd>Metadata -&gt; Autofix all configurations</kbd> menu</li>
 
+        <li>the toolbar button</li>
+
         <li>the right click menu for the root page in the left hand tree
-        panel</li>
+        panel, in this case <samp>pizza_order</samp></li>
       </ul>
 
-      <p>Run "Autofix".</p>
+      <p>Run "Autofix" in one of the above ways.</p>
     </div>
 
     <div class="slide">
@@ -203,14 +204,14 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
       <p>If you accept the changes, the state of these settings will be
       corrected - if you go to the page, you'll see that they've vanished!
       They're actually just commented out, and viewable via the menu <kbd>View
-      -&gt; All Ignored Variables</kbd>.</p>
+      -&gt; View All Ignored Variables</kbd>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Results - Changing Settings</h3>
 
       <p>Try altering the values of <var>namelist:pizza_order=pizza_type</var>
-      and <var>env=BUDGET</var> - with <kbd>View -&gt; All Ignored
+      and <var>env=BUDGET</var> - with <kbd>View -&gt; View All Ignored
       Variables</kbd> on and off. This should enable and trigger-ignore
       different settings.</p>
 
