@@ -868,11 +868,14 @@ class CylcProcessor(SuiteEngineProcessor):
           the time of the latest activity in the suite
         * is_running is a boolean to indicate if the suite is running
         * is_failed: a boolean to indicate if any tasks (submit) failed
+        * server: host:port of server, if available
 
         """
-        ret = {"last_activity_time": None,
-               "is_running": False,
-               "is_failed": False}
+        ret = {
+            "last_activity_time": None,
+            "is_running": False,
+            "is_failed": False,
+            "server": None}
         dao = self._db_init(self.SUITE_DB, user_name, suite_name)
         if not os.access(dao.db_f_name, os.F_OK | os.R_OK):
             return ret
@@ -881,7 +884,16 @@ class CylcProcessor(SuiteEngineProcessor):
             ret["last_activity_time"] = row[0]
             break
 
-        ret["is_running"] = bool(self.is_suite_running(user_name, suite_name))
+        port_file_path = os.path.expanduser(
+            os.path.join("~" + user_name, ".cylc", "ports", suite_name))
+        try:
+            port_str, host = open(port_file_path).read().splitlines()
+        except (IOError, ValueError):
+            ret["is_running"] = bool(
+                self.is_suite_running(user_name, suite_name))
+        else:
+            ret["is_running"] = True
+            ret["server"] = host.split(".", 1)[0] + ":" + port_str
 
         stmt = "SELECT status FROM task_states WHERE status GLOB ? LIMIT 1"
         stmt_args = ["*failed"]

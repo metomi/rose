@@ -57,36 +57,45 @@
 
 {% include "pager.html" -%}
 
-{% for entry in entries -%}
-<div class="row-fluid entry">
-<div class="span2">
-<a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle|replace('+', '%2B')}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
-</div>
-{% for state, icon, label, title in [("active", "play", "info", "active tasks"), ("success", "ok", "success", "succeeded tasks"), ("fail", "warning-sign", "important", "failed tasks")] -%}
-{% set n_state = entry.n_states[state] -%}
-<div class="span2">
-{% if n_state -%}
-{% set state_url = script ~ "/jobs/" ~ user ~ "/" ~ suite ~ "?cycles=" ~ entry.cycle|replace('+', '%2B') -%}
-<a href="{{state_url}}{% for no_state in ["active", "success", "fail"] if no_state != state %}&amp;no_status={{no_state}}{% endfor %}">
-{% endif -%}
-<span class="label{% if n_state %} label-{{label}}{% endif %}">
-<i class="icon-{{icon}} icon-white" title="{{state}}"></i>
-</span>
-<span class="badge{% if n_state %}  badge-{{label}}{% endif %}" title="{{title}}">{{entry.n_states[state]}}</span>
-{% if n_state %}</a>{% endif %}
-{% if state=="fail" and entry.n_states["job_fails"] > 0 %}(<span class="badge  badge-{{label}}" title="job failures">{{entry.n_states["job_fails"]}}</span>){% endif %}
-</div>
-{% endfor -%}
-
-<div class="span4">
-<span class="label">
-<i class="icon-time icon-white" title="last active"></i>
-last active
-</span>
-<abbr class="livestamp" title="{{entry.max_time_updated}}">{{entry.max_time_updated}}</abbr>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      {% include "suite-state.html" -%}
+    </div>
+  </div>
 </div>
 
-</div>
-{% endfor -%}
+<div class="container-fluid"><!-- entries -->
+  {% for entry in entries -%}
+    <div class="row-fluid entry">
+      <div class="span2">
+        <a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle|replace('+', '%2B')}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
+      </div>
+      {% for state, icon, label, title in [("active", "play", "info", "active tasks"), ("success", "ok", "success", "succeeded tasks"), ("fail", "warning-sign", "important", "failed tasks")] -%}
+        {% set n_state = entry.n_states[state] -%}
+        <div class="span2">
+          {% if n_state -%}
+            {% set state_url = script ~ "/jobs/" ~ user ~ "/" ~ suite ~ "?cycles=" ~ entry.cycle|replace('+', '%2B') -%}
+            <a href="{{state_url}}{% for no_state in ["active", "success", "fail"] if no_state != state %}&amp;no_status={{no_state}}{% endfor %}">
+          {% endif -%}
+          <span class="label{% if n_state %} label-{{label}}{% endif %}">
+            <i class="icon-{{icon}} icon-white" title="{{state}}"></i>
+          </span>
+          <span class="badge{% if n_state %}  badge-{{label}}{% endif %}" title="{{title}}">{{entry.n_states[state]}}</span>
+          {% if n_state %}</a>{% endif %}
+          {% if state=="fail" and entry.n_states["job_fails"] > 0 %}(<span class="badge  badge-{{label}}" title="job failures">{{entry.n_states["job_fails"]}}</span>){% endif %}
+        </div>
+      {% endfor -%}
+
+      <div class="span4">
+        <span class="label">
+          <i class="icon-time icon-white" title="last active"></i>
+          last active
+        </span>
+        <abbr class="livestamp" title="{{entry.max_time_updated}}">{{entry.max_time_updated}}</abbr>
+      </div>
+
+    </div>
+  {% endfor -%}
 </div>
 {% endblock %}
