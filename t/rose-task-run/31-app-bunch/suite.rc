@@ -35,5 +35,15 @@
         inherit = BUNCH_TASKS
     [[bunch_names]]
         inherit = BUNCH_TASKS
+    [[bunch_env_pass]]
+        inherit = BUNCH_TASKS
+        retry delays = PT1S
+        [[[environment]]]
+            ARG1=true false true
+            COMMENT=a comment
+            FAIL_MODE=continue
+            INCREMENTAL=true
+            POOL_SIZE=1
+            
     [[dummy]]
         command scripting = true
