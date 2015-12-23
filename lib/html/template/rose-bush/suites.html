@@ -10,23 +10,96 @@ rel="stylesheet" media="screen" />
 <link type="text/css" href="{{script}}/css/rose-bush.css" rel="stylesheet" media="screen" />
 </head>
 <body>
+
 <div class="navbar navbar-static-top">
-<div class="navbar-inner">
-<a class="brand" href="{{script}}/">
-{% if logo -%}
-<img {{logo}} />
-{% endif -%}
-{{title}} <small>@ {{host}}</small>
-</a>
-<ul class="nav">
-<li class="active"><a><strong>{{user}}</strong></a></li>
-</ul>
+  <div class="navbar-inner">
+    <a class="brand" href="{{script}}/">
+      {% if logo -%}
+        <img {{logo}} />
+      {% endif -%}
+      {{title}} <small>@ {{host}}</small>
+    </a>
+    <ul class="nav">
+      <li class="active"><a><strong>{{user}}</strong></a></li>
+    </ul>
+    <ul class="nav pull-right">
+      <li>
+        {{entries|length}} installed suite(s)
+        <span class="label">
+          <abbr class="livestamp" title="{{time}}">{{time}}</abbr>
+        </span>
+      </li>
+    </ul>
+  </div>
 </div>
-</div>
+
 <div class="page-header">
-<p>User {{user}} has {{entries|length}} suite(s) installed.
-<span class="label"><abbr class="livestamp" title="{{time}}">{{time}}</abbr></span></p>
+  <div class="accordion" id="accordion-0">
+    <div class="accordion-group">
+      <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse"
+        data-parent="#accordion-0" href="#filter">
+          <i class="icon-wrench"></i>
+          Display Options
+        </a>
+      </div>
+      <div id="filter"
+      class="accordion-body collapse{% if not is_option_on %} in{% endif %}">
+        <div class="accordion-inner">
+          <form action="{{script}}/{{method}}">
+            <input type="hidden" name="user" value="{{user}}" />
+
+            <div class="input-append">
+              <label for="names">Names (Default=*)</label>
+              <input type="text" name="names" class="input-block-level"
+              title="Names (Default=*)"
+              placeholder="Names (Default=*)"
+              {% if names -%}value="{{names}}"{% endif -%}
+              />
+            </div>
+
+            <div class="input-append">
+              <label for="per_page">Entries/Page (Default=100)</label>
+              <input id="per_page" type="text" name="per_page"
+              title="Entries/Page, 0=unlimited"
+              placeholder="Entries/Page (Default={{per_page_default}})"
+              {% if per_page is defined and per_page != per_page_default -%}
+              value="{{per_page}}"
+              {% endif -%}
+              />
+            </div>
+
+            <div class="input-append">
+              <label for="order">Sort Order</label>
+              <select name="order" title="Sort Order">
+              {% for k, v in [
+                  ("time_desc", "new-&gt;old"),
+                  ("time_asc", "old-&gt;new"),
+                  ("name_asc", "a-z suite name"),
+                  ("name_desc", "z-a suite name"),
+              ] -%}
+                <option
+                {% if order and order == k -%}selected="selected"{% endif -%}
+                value="{{k}}">{{v}}</option>
+              {% endfor -%}
+              </select>
+            </div>
+
+            <div class="btn-group pull-right">
+              <input type="reset" class="btn" value="reset"
+              title="Reset Display Options"/>
+              <input type="submit" class="btn btn-primary" value="update"
+              title="Update Display Options"/>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+{% include "pager.html" -%}
+
 <div class="container-fluid">
 {% for entry in entries -%}
 <div class="row-fluid entry">

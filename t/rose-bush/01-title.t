@@ -42,7 +42,7 @@ fi
 #-------------------------------------------------------------------------------
 # Run a quick cylc suite
 mkdir -p "${HOME}/cylc-run"
-SUITE_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" "rtb-rose-bush-00-XXXXXXXX")"
+SUITE_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" "rtb-rose-bush-01-XXXXXXXX")"
 SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${SUITE_DIR}"
 export CYLC_CONF_PATH=
