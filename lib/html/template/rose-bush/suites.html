@@ -12,7 +12,12 @@ rel="stylesheet" media="screen" />
 <body>
 <div class="navbar navbar-static-top">
 <div class="navbar-inner">
-<a class="brand" href="{{script}}/">{{title}} <small>@ {{host}}</small></a>
+<a class="brand" href="{{script}}/">
+{% if logo -%}
+<img {{logo}} />
+{% endif -%}
+{{title}} <small>@ {{host}}</small>
+</a>
 <ul class="nav">
 <li class="active"><a><strong>{{user}}</strong></a></li>
 </ul>

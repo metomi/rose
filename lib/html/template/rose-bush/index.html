@@ -12,6 +12,9 @@ rel="stylesheet" media="screen" />
 <body>
 <div class="container-fluid">
 <div class="hero-unit">
+{% if logo -%}
+<img {{logo}} />
+{% endif -%}
 <h1>{{title}} <small>@ {{host}}</small></h1>
 <p>Browse User Suite-logs on HTTP</p>
 <p class="pull-right"><small>Rose {{rose_version}}</small></p>
