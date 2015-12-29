@@ -3,8 +3,8 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
-The most recent changes are listed in the [CHANGES.md](../CHANGES.md) at the
-top of the Rose project tree.
+See also:
+* [Changes (current)](../CHANGES.md)
 
 --------------------------------------------------------------------------------
 
