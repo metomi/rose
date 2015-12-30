@@ -119,6 +119,10 @@
 #  jobs-per-page=15
 ## Job list view: maximum number of jobs per page
 #  jobs-per-page-max=300
+## Image logo attributes, can be any HTML <img/> tag attributes
+## logo=HTML-IMG-ATTRIBUTE ...
+## E.g.:
+#  logo=src="http://server/my-rose-bush-logo.png" alt="My Rose Bush Logo"
 ## An alternate service title (Default="Rose Bush")
 ## title=TITLE
 ## E.g.:

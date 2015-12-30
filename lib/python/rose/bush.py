@@ -59,6 +59,7 @@ class RoseBushService(object):
         self.exposed = True
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
         rose_conf = ResourceLocator.default().get_conf()
+        self.logo = rose_conf.get_value(["rose-bush", "logo"])
         self.title = rose_conf.get_value(["rose-bush", "title"], self.TITLE)
         self.host_name = rose_conf.get_value(["rose-bush", "host"])
         if self.host_name is None:
@@ -76,6 +77,7 @@ class RoseBushService(object):
         """Display a page to input user ID and suite ID."""
         # TODO: some way to allow autocomplete of user field?
         data = {
+            "logo": self.logo,
             "title": self.title,
             "host": self.host_name,
             "rose_version": self.rose_version,
@@ -93,6 +95,7 @@ class RoseBushService(object):
         """List current broadcasts of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
         data = {
+            "logo": self.logo,
             "title": self.title,
             "host": self.host_name,
             "user": user,
@@ -121,6 +124,7 @@ class RoseBushService(object):
         """List broadcasts history of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
         data = {
+            "logo": self.logo,
             "title": self.title,
             "host": self.host_name,
             "user": user,
@@ -161,6 +165,7 @@ class RoseBushService(object):
         else:
             page = 1
         data = {
+            "logo": self.logo,
             "title": self.title,
             "host": self.host_name,
             "user": user,
@@ -257,6 +262,7 @@ class RoseBushService(object):
         if no_status and not isinstance(no_status, list):
             no_statuses = [no_status]
         data = {
+            "logo": self.logo,
             "title": self.title,
             "host": self.host_name,
             "user": user,
@@ -320,6 +326,7 @@ class RoseBushService(object):
         """
         user_suite_dir_root = self._get_user_suite_dir_root(user)
         data = {
+            "logo": self.logo,
             "title": self.title,
             "host": self.host_name,
             "rose_version": self.rose_version,
@@ -452,6 +459,7 @@ class RoseBushService(object):
             rose_version=self.rose_version,
             script=cherrypy.request.script_name,
             time=strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+            logo=self.logo,
             title=self.title,
             host=self.host_name,
             user=user,
