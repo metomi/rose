@@ -123,6 +123,8 @@
 ## logo=HTML-IMG-ATTRIBUTE ...
 ## E.g.:
 #  logo=src="http://server/my-rose-bush-logo.png" alt="My Rose Bush Logo"
+## Suites list view: default number of suites per page
+#  suites-per-page=100
 ## An alternate service title (Default="Rose Bush")
 ## title=TITLE
 ## E.g.:

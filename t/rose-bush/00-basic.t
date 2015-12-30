@@ -103,8 +103,6 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('page',), 1]" \
     "[('n_pages',), 1]" \
     "[('per_page',), 100]" \
-    "[('offset',), 0]" \
-    "[('cycles',), None]" \
     "[('order',), None]" \
     "[('states', 'is_running',), False]" \
     "[('states', 'is_failed',), False]" \
@@ -126,13 +124,12 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('suite',), '${SUITE_NAME}']" \
     "[('info', 'project',), 'survey']" \
     "[('info', 'title',), 'hms beagle']" \
-    "[('is_option_on',), None]" \
+    "[('is_option_on',), False]" \
     "[('page',), 1]" \
     "[('n_pages',), 1]" \
     "[('per_page',), 15]" \
     "[('per_page_default',), 15]" \
     "[('per_page_max',), 300]" \
-    "[('offset',), 0]" \
     "[('cycles',), None]" \
     "[('order',), None]" \
     "[('no_statuses',), None]" \
