@@ -14,6 +14,21 @@ or their successors.
 
 ### Noteworthy Changes
 
+[#1787](https://github.com/metomi/rose/pull/1787):
+rose bush: configurable logo.
+
+[#1786](https://github.com/metomi/rose/pull/1786):
+rose bush: improve paging and sorting:
+* suites list and cycles list: added *Display Option* box, like in a jobs list
+  page.
+* suites list and cycles list: entries per page can now be configured.
+* suites list: can now filter by suite name.
+* suites list: can now order by suite name, as well as activity time.
+
+[#1785](https://github.com/metomi/rose/pull/1785):
+rose bush: cycles list and jobs list: display suite's `host:port` where
+possible.
+
 [#1783](https://github.com/metomi/rose/pull/1783):
 rose_bunch: process environment variable substitution in configuration file.
 
