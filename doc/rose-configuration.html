@@ -983,7 +983,7 @@ delays=0,6*PT10S,60*PT1M,PT1H
             "rose-rug-task-run.html#rose-task-run.built-in-app.rose_ana">
             Running Tasks &gt; rose task-run &gt; Built-in
             Application: rose_ana</a> and <a href=
-            "rose-rug-stem.html#rose-ana">rose stem &gt; Comparing
+            "rose-rug-stem.html#rose-ana">rose stem &gt; Analysing
             output with rose_ana</a>.</p>
 
             <h3 id="app.conf-rose_arch">Application Configuration
@@ -1178,75 +1178,55 @@ source=http://host/svn-repos/path/to/bar.txt
             configuration format</h2>
 
             <p>The <code>rose-ana</code> builtin application reads
-            information about which comparisons to perform from the
-            <code>rose-app.conf</code> file for that task. The
-            first element is a human-readable name in square
-            brackets, followed by the following settings, one per
-            line:</p>
+            information about which analysis steps it should perform 
+            from the <code>rose-app.conf</code> file for that task. 
+            Each of the section names (in square brackets) which 
+            describe an analysis step must follow a particular format:</p>
 
             <ul>
-              <li>comparison - The class name which will be called
-              to compare the resulting data from the extract
-              command.</li>
-
-              <li>extract - Either the class name which should be
-              called to extract data from the files to be compared,
-              or a system command which will be called to extract
-              or compare the files. In the latter case, the tokens
-              <var>{resultfile}</var> and <var>{kgo1file}</var> map
-              to the values defined in the configuration file. The
-              token <var>{file}</var> will result in the command
-              being called twice, once on <var>{resultfile}</var>
-              and once on <var>{kgo1file}</var>. Some extraction
-              classes such as <kbd>OutputGrepper</kbd> require
-              additional information about how to extract the data,
-              such as a pattern to match. This should be placed
-              after the class name, separated from it by a
-              colon.</li>
-
-              <li>kgo1file - The path and name of the file
-              containing the known good output. Environment
-              variables and the wildcard character <var>*</var> are
-              accepted. <var>{}</var> is expanded with arguments
-              passed to the application.</li>
-
-              <li>resultfile - The path and name of the file
-              containing the output to be compared. Environment
-              variables and the wildcard character <kbd>*</kbd> are
-              accepted. <var>{}</var> is expanded with arguments
-              passed to the application.</li>
-
-              <li>tolerance - For inexact comparisons such as
-              <kbd>Within</kbd>, the tolerance should be specified
-              using this variable. Values with a percentage sign
-              are treated as percentages, otherwise values are
-              treated as a range either side of the known good
-              output value. This value is optional; some
-              comparisons such as <kbd>Exact</kbd> do not require
-              it.</li>
-
-              <li>warnonfail - If this is set to be <kbd>yes</kbd>
-              a failure of the test will result in a warning rather
-              than a failure. This value is always optional.</li>
+              <li>the name must begin with <code>ana:</code>. This is required
+                for <code>rose-ana</code> to recognise it as a valid section.</li>
+              <li>the next part gives the name of the class within one
+                of the analysis modules, including namespace information;
+                for example to use the built-in <code>FilePattern</code> class
+                from the <code>grepper</code> module you would provide the
+                name <code>grepper.FilePattern</code>.</li>
+              <li>finally an expression within parentheses which may contain 
+                any string; this should be used to make comparisons using the 
+                same class unique, but can otherwise simply act as a 
+                description or note.</li>
             </ul>
 
-            <p>For example:</p>
-            <pre class="prettyprint lang-rose_conf">
-[Compare initial norms]
-resultfile=$OUTPUT_DIR/fort6.pe0
-kgo1file=/path/to/kgo/fort6.pe0
-extract=OutputGrepper:um_initial_norms
-comparison=Within
-tolerance=5%
-</pre>
-            <pre class="prettyprint lang-rose_conf">
-[Compare Gradiant]
-comparison=Exact
-extract=OutputGrepper:' gradJ= \s*(\S+)'
-kgo1file=$SUITE_CONTROL_DIR/log/job/1/{}/NN/out
-resultfile=$ROSE_SUITE_DIR/log/job/1/{}/NN/out
-</pre>
-          </div>
+            <p>The content within each of these sections consists of a series 
+              of key-value option pairs; just like other standard Rose apps. 
+              However the availability of options for a given section is 
+              specified and controlled by the <i>class</i> rather than the 
+              meta-data.  This makes it easy to provide your own analysis
+              modules without requiring changes to Rose itself.
+            </p>
+
+            <p>Therefore you should consult the documentation or source code
+              of the analysis module you wish to use for details of which 
+              options it supports.  Additionally, some special treatment is 
+              applied to all options depending on what they contain:
+            </p>
+
+            <ul>
+              <li><b>Environment vars:</b> If the option contains any words
+                prefixed by <code>$</code> they will be substituted for the 
+                equivalent environment variable, if one is available.
+              </li>
+              <li><b>Lists:</b> If the option contains newlines it will 
+                be returned as a list of strings automatically.
+              </li>
+              <li><b>Argument substitution:</b> If the option contains one or
+                more pairs of empty curved-parentheses <code>{}</code> the 
+                option will be returned multiple times with the parentheses
+                substituted once for each argument passed to 
+                <code>rose task-run</code>
+              </li>
+            </ul>
+           </div>
 
           <div id="footer" class="panel-footer">
             <ul class="nav nav-pills" id="pagenav">

@@ -18,7 +18,7 @@ before_install:
 
 
 install: 
-    - sudo apt-get install at build-essential gfortran heirloom-mailx
+    - sudo apt-get install at build-essential gfortran heirloom-mailx pcregrep
     - sudo apt-get install -y libxml-parser-perl libconfig-inifiles-perl
     - sudo apt-get install -y libdbi-perl libdbd-sqlite3-perl
     - sudo apt-get install python-pip python-dev graphviz libgraphviz-dev python-jinja2 python-sqlalchemy

@@ -229,6 +229,17 @@ file_grep() {
     fail $TEST_KEY
 }
 
+file_pcregrep() {
+    local TEST_KEY=$1
+    local PATTERN=$2
+    local FILE=$3
+    if pcregrep -M "$PATTERN" $FILE; then
+        pass $TEST_KEY
+        return
+    fi
+    fail $TEST_KEY
+}
+
 file_grep_fail() {
     local TEST_KEY=$1
     local PATTERN=$2

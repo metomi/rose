@@ -625,24 +625,28 @@ opt.jobs=8
             Application: rose_ana</h2>
 
             <p>This built-in application runs
-            <code>rose-ana</code>, the Rose comparison engine. This
-            compares files against each other using a configurable
-            method and reports whether the files differ or not. It
-            also writes the details of any comparisons to its own
-            database in the suite's <code>log</code> directory (see
-            the guide linked below for more details).</p>
+            <code>rose-ana</code>, the Rose analysis engine. This
+            performs various configurable analysis steps; for example
+            a common usage is to compare 2 files and report whether 
+            they differ or not. It can writes the details of any comparisons 
+            it runs to a database in the suite's <code>log</code> directory 
+            to assist with any automated updating of control data 
+            (see the guide linked below for more details).</p>
 
             <p>In automatic selection mode, this built-in
             application will be invoked automatically if a task has
             a name that starts with <code>rose_ana*</code>.</p>
 
-            <p>The built-in application will search the
-            <code>comparisons</code> subdirectory of the Rose
-            installation for built-in comparisons, and further
-            directories to search can be specified in the
-            <code>rose.conf</code> file using the
+            <p>The built-in application will search for suitable analysis
+            modules to load firstly in the <code>ana</code> subdirectory
+            of the <code>rose-ana</code> app, then in the <code>ana</code>
+            subdirectory of the top-most suite directory.  Any additional
+            directories to search (for example a site-wide central directory)
+            may be specified in the <code>rose.conf</code> file using the
             <var>method-path</var> variable in the
-            <var>[rose-ana]</var> section.</p>
+            <var>[rose-ana]</var> section.  Finally the 
+            <code>ana_builtins</code> subdirectory of the Rose installation 
+            itself contains any built-in comparisons.</p>
 
             <p>See also <a href="rose-rug-stem.html#rose-ana">rose
             stem &gt; Comparing output with rose_ana</a>.</p>

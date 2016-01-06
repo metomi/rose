@@ -322,88 +322,189 @@ rose stem --group=mygroup --group=myothergroup
               app.</p>
 
               <p>A <samp>rose ana</samp> <code>rose-app.conf</code>
-              file contains a series of blocks which each contain
-              the names of two files to compare, a method of
-              extracting the data from the file, and a method to
-              compare the data. Each block is given a
-              human-readable description of the test.</p>
+              file contains a series of blocks; each one describing
+              a different analysis task to perform.  A common task
+              which <samp>rose ana</samp> is used for is to compare
+              output contained in different files (e.g. from a new test 
+              versus previous output from a control).  The analysis
+              modules which provide these tasks are flexible and able
+              to be provided by the user; however there is one built-in
+              module inside <samp>rose ana</samp> itself.</p>
             </div>
 
             <div class="slide">
               <h3 class="alwayshidden">rose ana II</h3>
 
-              <p>For example:</p>
-              <pre>
-  [Compare data from myfile]
-  comparison=Exact
-  extract=OutputGrepper:'data value:(\d+)'
-  kgo1file=/data/kgo/myfile
-  resultfile=../run.1/myfile
+              <p>An example based on the built-in <code>grepper</code> module:</p>
+              <pre class="prettyprint lang-rose_conf" >
+  [ana:grepper.FilePattern(Compare data from myfile)]
+  pattern='data value:(\d+)'
+  files=/data/kgo/myfile
+       =../run.1/myfile
 </pre>
-
-              <p>This tells <samp>rose ana</samp> to take the
+              <p>This tells <samp>rose ana</samp> to scan the
               contents of the file <code>../run.1/myfile</code>
               (which is relative to the <samp>rose ana</samp>
               task's <code>work</code> directory) and the contents
-              of <code>/data/kgo/myfile</code> and run the built-in
-              OutputGrepper method on each file. This particular
-              method runs an arbitrary regular expression on the
-              file, producing a list of items which match the first
-              group. In this case, the regular expression is
-              <code>data value:(\d+)</code>. The comparison method
-              is exact, so anything other than an exact match will
-              cause a failure.</p>
+              of <code>/data/kgo/myfile</code> for the specified regular
+              expression.  Since the pattern contains a group (in parentheses)
+              so it is the contents of this group which will be compared 
+              between the two files.  The <code>grepper.FilePattern</code>
+              analysis task can optionally be given a "tolerance" option for
+              matching numeric values, but without it the matching is expected
+              to be exact.  If the pattern or group contents do not match the
+              task will return a failure.</p>
             </div>
 
             <div class="slide">
               <h3 class="alwayshidden">rose ana III</h3>
 
-              <p>It is possible to add additional comparison and
-              extraction methods to <samp>rose ana</samp> by
-              setting the <code>method-path</code> variable in the
-              <code>rose ana</code> section of the
-              <code>rose.conf</code> file.</p>
-
-              <p>A list of available methods can be found by
-              listing the contents of the
-              <code>lib/python/rose/apps/comparisons</code>
-              subdirectory inside your <samp>Rose</samp>
-              installation. The default installation includes:</p>
+              <p>It is possible to add additional analysis modules to 
+              <samp>rose ana</samp> by placing an appropriately formatted
+              python file in one of the following places (in order of 
+              precedence):</p>
 
               <ul>
-                <li><samp>OutputGrepper</samp> - an extraction
-                method for running regular expressions on
-                files</li>
+                <li>The <code>ana</code> sub-directory of the 
+                  <code>rose ana</code> app</li>
+                <li>The <code>ana</code> sub-directory of the
+                  suite</li>
+                <li>Any other directory which is accessible to the process
+                  running <code>rose ana</code> and is specified in the
+                  <code>method-path</code> variable in the
+                  <code>rose ana</code> section of the
+                  <code>rose.conf</code> file.</li>
+              </ul>
 
-                <li><samp>Exact</samp> - a comparison method for
-                comparing two lists are identical</li>
+              <p>The only module provided with Rose can be found at
+              <code>lib/python/rose/apps/ana_builtin/grepper.py</code> and it
+              provides the following analysis tasks and options:</p>
 
-                <li><samp>Within</samp> - a comparison method for
-                comparing that the contents of one list are within
-                a certain percentage or range of the other. This
-                uses an additional <code>tolerance</code> value in
-                the <code>rose-app.conf</code> file</li>
+              <ul>
+                <li><b>SingleCommandStatus:</b> Runs a shell command, passing
+                  or failing depending on the exist status of that command.
+                  <ul>
+                    <li><i>files</i> - a newline-separated list of filenames
+                      (optional) which may appear in the command.</li>
+                    <li><i>command</i> - the command to run; if it contains
+                      Python style format specifiers these will be expanded
+                      using the list of files above (if provided).</li>
+                    <li><i>kgo_file</i> - if the list of files above was 
+                      provided indicates which file was the "kgo" or "control"
+                      file for use with the KGO database (if active).</li>
+                  </ul>
+                </li>
+                <li><b>SingleCommandPattern:</b> Runs a shell command, then
+                  passes or fails depending on the presence of a given regular
+                  expression in the command's stdout.
+                  <ul>
+                    <li><i>files</i> - a newline-separated list of filenames
+                      (optional) which may appear in the command.</li>
+                    <li><i>command</i> - the command to run; if it contains
+                      Python style format specifiers these will be expanded
+                      using the list of files above (if provided).</li>
+                    <li><i>kgo_file</i> - if the list of files above was 
+                      provided indicates which file was the "kgo" or "control"
+                      file for use with the KGO database (if active).</li>
+                    <li><i>pattern</i> - the regular expression to search for
+                      in the stdout from the command.</li>
+                  </ul>
+                </li>
+                <li><b>FilePattern:</b> Compares the contents of files using
+                  a regular expression.
+                  <ul>
+                    <li><i>files</i> - a newline-separated list of filenames
+                      to be compared.</li>
+                    <li><i>kgo_file</i> - if the list of files above was 
+                      provided indicates which file was the "kgo" or "control"
+                      file for use with the KGO database (if active).</li>
+                    <li><i>pattern</i> - the regular expression to search for
+                      in the files.  The expression should include one or more
+                      capture groups; each of these will be compared between
+                      the files any time the pattern occurs.</li>
+                    <li><i>tolerance</i> - by default the above comparisons
+                      will be compared exactly, but if this (optional) argument
+                      is specified they will be converted to float values and
+                      compared according to the given tolerance.  If this 
+                      tolerance ends in <code>%</code> it will be interpreted
+                      as a relative tolerance (otherwise absolute).</li>
+                  </ul>
+                </li>
+                <li><b>FileCommandPattern:</b> Uses a regular expression to 
+                  compares the contents of the stdout resulting from a given 
+                  command applied to two or more files.
+                  <ul>
+                    <li><i>files</i> - a newline-separated list of filenames
+                      to be substitued into the command.</li>
+                    <li><i>kgo_file</i> - if the list of files above was 
+                      provided indicates which file was the "kgo" or "control"
+                      file for use with the KGO database (if active).</li>
+                    <li><i>pattern</i> - the regular expression to search for
+                      in the stdout.  The expression should include one or more
+                      capture groups; each of these will be compared between
+                      the stdout any time the pattern occurs.</li>
+                    <li><i>tolerance</i> - by default the above comparisons
+                      will be compared exactly, but if this (optional) argument
+                      is specified they will be converted to float values and
+                      compared according to the given tolerance.  If this 
+                      tolerance ends in <code>%</code> it will be interpreted
+                      as a relative tolerance (otherwise absolute).</li>
+                    <li><i>command</i> - the command to run; it should contain
+                      a Python style format specifier to be expanded using the
+                      list of files above.</li>
+                  </ul>
+                </li>
               </ul>
             </div>
 
             <div class="slide">
               <h3 class="alwayshidden">rose ana IV</h3>
 
-              <p>There are two further comparison methods which use
-              the OutputGrepper extraction method to check whether
-              particular strings exist in a file or not. These
-              operate only the the <code>resultfile</code>
-              variable, no KGO file is needed. The methods are:</p>
+              <p>The format for analysis modules themselves is relatively
+              simple; the easiest route to understanding how they should be
+              arranged is likely to look at the built-in <code>grepper</code>
+              module.  But the key concepts are as follows.  To be recognised
+              as a valid analysis module, the Python file must contain at least 
+              one class which inherits and extends
+              <code>rose.apps.rose_ana.AnalysisTask</code> e.g:</p>
 
-              <ul>
-                <li><samp>Mandatory</samp> - will fail if the text
-                specified in OutputGrepper is not present in the
-                file.</li>
+            <pre class="prettyprint lang-python">
+from rose.apps.rose_ana import AnalysisTask
 
-                <li><samp>Prohibited</samp> - will fail if the text
-                specified in OutputGrepper is present in the
-                file.</li>
-              </ul>
+class CustomAnalysisTask(AnalysisTask):
+    """My new custom analysis task."""
+    def run_analysis(self):
+        print self.options
+        print self.parent
+</pre>
+
+              <p>Assuming the above was saved in a file called 
+              <code>custom.py</code> and placed into a folder suitable for
+              analysis modules this would allow a <code>rose ana</code> app
+              to specify:</p>
+
+            <pre class="prettyprint lang-rose_conf">
+[ana:custom.CustomAnalysisTask(Example rose-ana test)]
+option1 = 5
+option2 = test of rose ana
+option3 = .true.
+</pre>
+              <p>All options specified above will be processed by 
+              <code>rose ana</code> into a dictionary and attached to the 
+              running analysis class instance as the <code>options</code> 
+              attribute, and a reference to the parent <code>RoseAnaApp</code> 
+              instance will be attached as the <code>parent</code> attribute.
+              The result of the above examples would therefore print:</p>
+
+            <pre class="prettyprint lang-python">
+{'option2': 'test of rose ana', 'option3': '.true.', 'option1': '5'}
+&lt;class 'rose.apps.rose_ana.RoseAnaApp'&gt;
+</pre>
+            <p>Therefore from this point the <code>AnalysisTask</code> class
+              could access the options via their names.  Note however that
+              all options are treated as strings - it is up to the class to
+              apply any required checks or conversions.
+            </p>
             </div>
 
             <div class="slide">
@@ -411,8 +512,8 @@ rose stem --group=mygroup --group=myothergroup
               comparison database</h2>
 
               <p>In addition to performing the comparisons each of
-              the <code>rose ana</code> tasks in the suite will
-              append some key details about the comparisons to an
+              the <code>rose ana</code> tasks in the suite can be configured
+              to append some key details about any comparisons performed to an
               <code>sqlite</code> database kept in the suite's
               <code>log</code> directory (at
               <code>log/rose-ana-comparisons.db</code>).</p>
@@ -465,23 +566,19 @@ rose stem --group=mygroup --group=myothergroup
                     app defintion (in brackets).</li>
 
                     <li><samp>kgo_file (TEXT)</samp> The full path
-                    to the file given as <code>kgo1file</code> in
+                    to the file specified as the KGO file in
                     the app definition.</li>
 
                     <li><samp>suite_file (TEXT)</samp> The full
-                    path to the file given as
-                    <code>resultfile</code> in the app
-                    definition.</li>
+                    path to the file specified as the active test output
+                    in the app definition.</li>
 
                     <li><samp>status (TEXT)</samp> The status of
-                    the task, as reported by <code>rose ana</code>
-                    (i.e. " OK ", "FAIL" or "WARN").</li>
+                    the task (one of " OK ", "FAIL" or "WARN").</li>
 
-                    <li><samp>comparison (TEXT)</samp> Another
-                    composite, this time it contains the
-                    <code>comparison</code> and
-                    <code>extract</code> in the app definition,
-                    delimited by colons.</li>
+                    <li><samp>comparison (TEXT)</samp> Additional
+                    details which may be provided about the comparison</li>
+
                   </ul>The intention of this table is to provide a
                   record of which files were compared by which
                   tasks, how they were compared and what the result
@@ -493,9 +590,15 @@ rose stem --group=mygroup --group=myothergroup
             <div class="slide">
               <h3 class="alwayshidden">rose ana db IV</h3>
 
-              <p>Although this database is produced by a <code>rose
-              stem</code> suite, the system does not provide any
-              direct methods for working with or interrogating it -
+              <p>The database is entirely optional; by default is will
+                not be produced; if it is required it can be activated by
+                setting the <code>kgo-database</code> option in the 
+                <code>rose-ana</code> section of the Rose configuration
+                to <code>.true.</code>.
+              </p>
+
+              <p>Note that the system does not provide any
+              direct methods for working with or interrogating the database -
               since there could be various reasons for doing so,
               and there may be other suite-design factors to
               consider. Users are therefore expected to provide

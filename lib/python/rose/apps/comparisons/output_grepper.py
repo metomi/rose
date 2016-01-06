@@ -19,7 +19,7 @@
 # -----------------------------------------------------------------------------
 """Return a list of values matching a regular expression."""
 
-from rose.apps.rose_ana import DataLengthError, data_from_regexp
+from rose.apps.rose_ana_v1 import DataLengthError, data_from_regexp
 import re
 
 REGEXPS = {

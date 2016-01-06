@@ -69,12 +69,3 @@ Inclination/Axial Tilt:   27.60
 Inclination/Axial Tilt:   2.453
 
 
-
-Test of Multi Pattern Success
-
-Known planet races: Earthlings Martians Jovians Neptunians
-
-
-Test of Multi Pattern Fail
-
-Friendly planet races: Earthlings Martians Plutonians
