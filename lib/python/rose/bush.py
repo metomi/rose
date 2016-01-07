@@ -211,7 +211,8 @@ class RoseBushService(object):
 
     @cherrypy.expose
     def jobs(self, user, suite, page=1, cycles=None, tasks=None,
-             no_status=None, order=None, per_page=None, form=None):
+             no_status=None, order=None, per_page=None, no_fuzzy_time="0",
+             form=None):
         """List jobs of a running or completed suite.
 
         user -- A string containing a valid user ID
@@ -240,6 +241,7 @@ class RoseBushService(object):
             "duration_run_desc", "duration_run_asc",
             "duration_queue_run_desc", "duration_queue_run_asc"
         per_page -- Number of entries to display per page (defualt=32)
+        no_fuzzy_time -- Don't display fuzzy time if this is True.
         form -- Specify return format. If None, display HTML page. If "json",
                 return a JSON data structure.
 
@@ -270,24 +272,25 @@ class RoseBushService(object):
         if no_status and not isinstance(no_status, list):
             no_statuses = [no_status]
         data = {
-            "logo": self.logo,
-            "title": self.title,
-            "host": self.host_name,
-            "user": user,
-            "suite": suite,
             "cycles": cycles,
+            "host": self.host_name,
             "is_option_on": is_option_on,
-            "tasks": tasks,
+            "logo": self.logo,
+            "method": "jobs",
+            "no_fuzzy_time": no_fuzzy_time,
             "no_statuses": no_statuses,
             "order": order,
+            "page": page,
             "per_page": per_page,
             "per_page_default": per_page_default,
             "per_page_max": per_page_max,
-            "page": page,
             "rose_version": self.rose_version,
             "script": cherrypy.request.script_name,
-            "method": "jobs",
             "states": {},
+            "suite": suite,
+            "tasks": tasks,
+            "title": self.title,
+            "user": user,
         }
         # TODO: add paths to other suite files
         if cycles:

@@ -16,6 +16,7 @@ class="accordion-body collapse{% if not is_option_on %} in{% endif %}">
 <form action="{{script}}/{{method}}">
 <input type="hidden" name="user" value="{{user}}" />
 <input type="hidden" name="suite" value="{{suite}}" />
+<input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
 <fieldset class="container-fluid">
 <div class="row-fluid">
 <div class="span6">
@@ -124,14 +125,16 @@ value="{{k}}">{{v}}</option>
 {% include "pager.html" -%}
 
 <div class="container-fluid">
-<div class="row-fluid">
-<div class="span11">
-{% include "suite-state.html" -%}
-</div>
-<div class="span1 text-right">
-<small id="toggle-fuzzy-time"><a href="#">toggle &Delta;t</a></small>
-</div>
-</div>
+  <div class="row-fluid">
+    <div class="span11">
+      {% include "suite-state.html" -%}
+    </div>
+    <div class="span1 text-right">
+      <a id="toggle-fuzzy-time" data-no-fuzzy-time="{{no_fuzzy_time}}" href="#">
+        <small>toggle &Delta;t</small>
+      </a>
+    </div>
+  </div>
 </div>
 
 <div class="container-fluid"><!-- entries -->

@@ -136,6 +136,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('states', 'is_running',), False]" \
     "[('states', 'is_failed',), False]" \
     "[('of_n_entries',), 2]" \
+    "[('entries', ${FOO0}, 'task_status',), 'success']" \
     "[('entries', ${FOO0}, 'status',), 'success']" \
     "[('entries', ${FOO0}, 'host',), 'localhost']" \
     "[('entries', ${FOO0}, 'submit_method',), 'background']" \

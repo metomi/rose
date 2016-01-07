@@ -22,6 +22,9 @@
             {% if names -%}
               <input type="hidden" name="names" value="{{names}}" />
             {% endif -%}
+            {% if no_fuzzy_time -%}
+              <input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
+            {% endif -%}
             {% if suite -%}
               <input type="hidden" name="suite" value="{{suite}}" />
             {% endif -%}
