@@ -50,7 +50,7 @@ cp $TEST_SOURCE_DIR/00-run-basic/rose-suite.conf $WORKINGCOPY/rose-stem
 touch $WORKINGCOPY/rose-stem/rose-suite.conf
 #We should now have a valid rose-stem suite.
 #-------------------------------------------------------------------------------
-N_TESTS=32
+N_TESTS=41
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 #Test for successful execution
@@ -71,6 +71,32 @@ file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source-mirror
+file_grep $TEST_KEY "SOURCE_FOO_MIRROR=fcm:foo.xm/trunk@1\$" $OUTPUT
+#-------------------------------------------------------------------------------
+# Test using manual project override
+TEST_KEY=$TEST_KEY_BASE-project-override
+run_pass "$TEST_KEY" \
+   rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
+             --source=bar=$WORKINGCOPY --source=fcm:foo.x_tr@head \
+             --no-gcontrol --name $SUITENAME -- --debug
+#Test output
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
+TEST_KEY=$TEST_KEY_BASE-basic-groups-to-run
+file_grep $TEST_KEY "RUN_NAMES=\[earl_grey, milk, sugar, spoon, cup, milk\]" \
+          $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-source-foo
+file_grep $TEST_KEY "SOURCE_FOO=fcm:foo.x_tr@head" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-source-bar
+file_grep $TEST_KEY "SOURCE_BAR=$WORKINGCOPY" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-source-base-foo
+file_grep $TEST_KEY "SOURCE_FOO_BASE=fcm:foo.x_tr" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-source-base-bar
+file_grep $TEST_KEY "SOURCE_BAR_BASE=$WORKINGCOPY\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-source-rev-foo
+file_grep $TEST_KEY "SOURCE_FOO_REV=@1" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-source-rev-bar
+file_grep $TEST_KEY "SOURCE_BAR_REV=\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-source-mirror
 file_grep $TEST_KEY "SOURCE_FOO_MIRROR=fcm:foo.xm/trunk@1\$" $OUTPUT
 #-------------------------------------------------------------------------------
 # Second test, using suite redirection

@@ -218,6 +218,24 @@ rose stem --source=.
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Source IV</h3>
+
+      <p>The project to which a source tree belongs is normally automatically 
+      determined using FCM commands. However, in the case where the source
+      tree is not a valid FCM URL, or where you wish to assign it to another
+      project, you can specify this using the <code>--source</code> argument:
+      </p>
+      <pre>
+rose stem --source=foo=/path/to/source
+</pre>
+
+      <p>assigns the URL <code>/path/to/source</code> to the <samp>foo</samp>
+      project, so the variables <samp>SOURCE_FOO</samp> and 
+      <samp>SOURCE_FOO_BASE</samp> will be set to <code>/path/to/source</code>.
+      </p>
+    </div>
+
+    <div class="slide">
       <h2>The <code>--group</code> argument</h2>
 
       <p>The group argument is used to provide a Pythonic list of groups in the
