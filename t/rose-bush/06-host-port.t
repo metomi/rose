@@ -58,7 +58,7 @@ export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
 cylc run --debug "${SUITE_NAME}" 2>'/dev/null' &
 SUITE_PID="$!"
-poll '!' test -e "${HOME}/.cylc/ports/${SUITE_NAME}"
+poll '!' test -s "${HOME}/.cylc/ports/${SUITE_NAME}"
 PORT="$(sed -n '1p' "${HOME}/.cylc/ports/${SUITE_NAME}")"
 HOST="$(sed -n '2s/^\([^.]*\)..*$/\1/p' "${HOME}/.cylc/ports/${SUITE_NAME}")"
 
