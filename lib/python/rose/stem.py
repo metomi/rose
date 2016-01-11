@@ -262,17 +262,17 @@ class StemRunner(object):
         """
 
         project = None
-        if re.search(r'=', item):
-            elements = item.split('=')
-            project = elements[0]
-            item = elements[1]
+        try:
+            project, item = item.split("=", 1)
+        except ValueError:
+            pass
 
         if re.search(r'^\.', item):
             item = os.path.abspath(os.path.join(os.getcwd(), item))
 
         if project is not None:
-            print "[WARN] Forcing project for '{0}' to be '{1}'".format(item, 
-                                                             project)
+            print "[WARN] Forcing project for '{0}' to be '{1}'".format(
+                item, project)
             return project, item, item, '', ''
 
         source_dict = self._get_base_dir(item)
