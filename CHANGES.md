@@ -8,11 +8,14 @@ for a full listing of issues for each release.
 ## Next Release (2016-Q1?)
 
 Rose release 35. This release will work best with
-[cylc-6.7.4](https://github.com/cylc/cylc/releases/tag/6.7.4) and
+[cylc-6.8.0](https://github.com/cylc/cylc/releases/tag/6.8.0) and
 [fcm-2015.12.0](https://github.com/metomi/fcm/releases/tag/2015.12.0),
 or their successors.
 
 ### Noteworthy Changes
+
+[#1792](https://github.com/metomi/rose/pull/1792):
+rose stem: allow manual overriding of project.
 
 [#1787](https://github.com/metomi/rose/pull/1787):
 rose bush: configurable logo.
