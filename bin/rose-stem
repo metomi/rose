@@ -32,15 +32,20 @@
 # EXAMPLES
 #     rose stem --group=developer
 #     rose stem --source=/path/to/source --source=/other/source --group=mygroup
+#     rose stem --source=foo=/path/to/source --source=bar=fcm:bar_tr@head
 #
 # OPTIONS
 #     All options of "rose suite-run" are supported. Additional options are:
 #
-#     --source=SOURCE, -s SOURCE
+#     --source=SOURCE, -s SOURCE, --source=PROJECT=SOURCE, -s PROJECT=SOURCE
 #         Specify a source tree to include in a rose-stem suite. The first
 #         source tree must be a working copy as the location of the suite and
 #         fcm-make config files are taken from it. Further source trees can be
-#         added with additional --source arguments.
+#         added with additional --source arguments. The project which is 
+#         associated with a given source is normally automatically determined
+#         using FCM, however the project can be specified by putting the 
+#         project name as the first part of this argument separated by an
+#         equals sign as in the third example above.
 #         Defaults to '.' if not specified.
 #     --group=GROUP[,GROUP2[,...]], -g GROUP[,GROUP2[,...]]
 #         Specify a group name to run. Additional groups can be specified

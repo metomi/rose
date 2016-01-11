@@ -261,9 +261,19 @@ class StemRunner(object):
             * revision number
         """
 
-        project = ''
+        project = None
+        try:
+            project, item = item.split("=", 1)
+        except ValueError:
+            pass
+
         if re.search(r'^\.', item):
             item = os.path.abspath(os.path.join(os.getcwd(), item))
+
+        if project is not None:
+            print "[WARN] Forcing project for '{0}' to be '{1}'".format(
+                item, project)
+            return project, item, item, '', ''
 
         source_dict = self._get_base_dir(item)
         project = self._get_project_from_url(source_dict)

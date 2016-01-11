@@ -1746,6 +1746,7 @@ launcher-preopts.mpiexec=-n $NPROC
     <pre>
     rose stem --group=developer
     rose stem --source=/path/to/source --source=/other/source --group=mygroup
+    rose stem --source=foo=/path/to/source --source=bar=fcm:bar_tr@head
 </pre>
 
     <h3>OPTIONS</h3>All options of <a href="#rose-suite-run">rose suite-run</a>
@@ -1757,7 +1758,11 @@ launcher-preopts.mpiexec=-n $NPROC
       <dd>Specify a source tree to include in a rose-stem suite. The first
       source tree must be a working copy as the location of the suite and
       <kbd>fcm-make</kbd> config files are taken from it. Further source trees
-      can be added with additional --source arguments. Defaults to '.' if not
+      can be added with additional --source arguments.  The project which is 
+      associated with a given source is normally automatically determined
+      using FCM, however the project can be specified by putting the 
+      project name as the first part of this argument separated by an
+      equals sign as in the third example above. Defaults to '.' if not
       specified.</dd>
 
       <dt><kbd>--group=GROUP[,GROUP2[,...]], -g GROUP[,GROUP2[,...]]</kbd></dt>
