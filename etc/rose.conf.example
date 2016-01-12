@@ -422,6 +422,10 @@
 #  job-host-with-share-fast-dest-root=PATH
 ## E.g.:
 #  job-host-with-share-fast-dest-root=/var/run/$USER
+## 2 job hosts sharing a file system, but not with localhost
+#  job-hosts-sharing-fs=HOST1 HOST2
+## E.g.:
+#  job-hosts-sharing-fs=my-hpc01 my-hpc02
 #
 ## Options for "prove" when calling "rose test-battery" with no arguments.
 ## (default="-j9 -s")

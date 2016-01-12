@@ -698,18 +698,25 @@ class CylcProcessor(SuiteEngineProcessor):
                              task_name=None):
         """Return remote ["[user@]host", ...] for submitted jobs."""
         auths = []
-        stmt = "SELECT DISTINCT misc FROM task_events WHERE "
-        stmt_args = []
-        if cycle_time:
-            stmt += "cycle==? AND "
-            stmt_args.append(cycle_time)
-        if task_name:
-            stmt += "name==? AND "
-            stmt_args.append(task_name)
-        stmt += "(event==? OR event==? OR event==?)"
-        stmt_args += ["submission succeeded", "succeeded", "failed"]
-        for row in self._db_exec(self.SUITE_DB, None, suite_name, stmt,
-                                 stmt_args):
+        # Check if "task_jobs" table is available or not
+        for row in self._db_exec(
+                self.SUITE_DB, None, suite_name,
+                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
+            stmt = "SELECT DISTINCT user_at_host FROM task_jobs"
+            stmt_where_list = []
+            stmt_args = []
+        else:
+            stmt = "SELECT DISTINCT misc FROM task_events"
+            stmt_where_list = ["(event==? OR event==? OR event==?)"]
+            stmt_args = ["submission succeeded", "succeeded", "failed"]
+        for key, arg in [["cycle", cycle_time], ["name", task_name]]:
+            if arg:
+                stmt_where_list.append(key + "==?")
+                stmt_args.append(arg)
+        if stmt_where_list:
+            stmt += " WHERE " + " AND ".join(stmt_where_list)
+        for row in self._db_exec(
+                self.SUITE_DB, None, suite_name, stmt, stmt_args):
             if row and row[0]:
                 auth = self._parse_user_host(auth=row[0])
                 if auth:

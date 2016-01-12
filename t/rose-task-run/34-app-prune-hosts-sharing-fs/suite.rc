@@ -1,0 +1,32 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    abort if any task fails = True
+    [[event hooks]]
+        abort on timeout = True
+        timeout=PT1M
+[scheduling]
+    initial cycle point=1970
+    final cycle point=1990
+    [[dependencies]]
+        [[[P20Y]]]
+            graph="T[-P20Y]:succeed-all & pruner[-P20Y] & T:succeed-all => pruner"
+
+[runtime]
+    [[T]]
+        script="""
+eval $(rose task-env)
+echo "Whatever!" >"${ROSE_DATAC}/${ROSE_TASK_NAME}.txt"
+"""
+    [[t1]]
+        inherit = T
+        [[[remote]]]
+            host = {{JOB_HOST_1}}
+    [[t2]]
+        inherit = T
+        [[[remote]]]
+            host = {{JOB_HOST_2}}
+    [[pruner]]
+        script="""
+rose task-run -v -v --debug | tee -a "${CYLC_SUITE_RUN_DIR}/prune.log"
+"""
