@@ -20,6 +20,7 @@
 """Builtin application: rose_prune: suite housekeeping application."""
 
 import os
+from random import shuffle
 from rose.app_run import BuiltinApp, ConfigValueError
 from rose.date import RoseDateTimeOperator
 from rose.env import env_var_process, UnboundEnvironmentVariableError
@@ -87,6 +88,9 @@ class RosePruneApp(BuiltinApp):
         globs = self._get_prune_globs(app_runner, conf_tree)
         suite_engine_proc = app_runner.suite_engine_proc
         hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
+        # A shuffle here should allow the load for doing "rm -rf" to be shared
+        # between job hosts who share a file system.
+        shuffle(hosts)
         suite_dir_rel = suite_engine_proc.get_suite_dir_rel(suite_name)
         form_dict = {"d": suite_dir_rel, "g": " ".join(globs)}
         sh_cmd_head = r"set -e; cd %(d)s; " % form_dict
