@@ -3,14 +3,14 @@
     <!-- entry: cycle, name, submit_num, files -->
     <!-- entry: status -->
     {% if entry.status and "fail" in entry.status -%}
-    <span class="label label-important">
-      <i class="icon-warning-sign icon-white" title="{{entry.status}}"></i>
-    </span>
-    {% if entry.status != "fail" and entry.status != "fail(ERR)" -%}
       <span class="label label-important">
-        {{entry.status[5:-1]}}
+        <i class="icon-warning-sign icon-white" title="{{entry.status}}"></i>
       </span>
-    {% endif -%}
+      {% if entry.status != "fail" and entry.status != "fail(ERR)" -%}
+        <span class="label label-important">
+          {{entry.status[5:-1]}}
+        </span>
+      {% endif -%}
     {% elif entry.status == "success" -%}
       <span class="label label-success">
         <i class="icon-ok icon-white" title="{{entry.status}}"></i>
