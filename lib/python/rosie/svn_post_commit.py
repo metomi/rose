@@ -377,17 +377,22 @@ class RosieSvnPostCommitHook(object):
     def _update_info_db(self, dao, changeset_attribs, branch_attribs):
         """Update the suite info database for a suite branch."""
         idx = changeset_attribs["prefix"] + "-" + branch_attribs["sid"]
-        branch = branch_attribs["branch"]
-        revision = changeset_attribs["revision"]
+        vc_attrs = {
+            "idx": idx,
+            "branch": branch_attribs["branch"],
+            "revision": changeset_attribs["revision"]}
+        for key in vc_attrs:
+            vc_attrs[key] = vc_attrs[key].decode("utf-8")
         # Latest table
         try:
-            dao.delete(LATEST_TABLE_NAME, idx=idx, branch=branch)
+            dao.delete(
+                LATEST_TABLE_NAME,
+                idx=vc_attrs["idx"], branch=vc_attrs["branch"])
         except al.exc.IntegrityError:
             # idx and branch were just added: there is no previous record.
             pass
         if branch_attribs["status"] != self.ST_DELETED:
-            dao.insert(
-                LATEST_TABLE_NAME, idx=idx, branch=branch, revision=revision)
+            dao.insert(LATEST_TABLE_NAME, **vc_attrs)
         # N.B. deleted suite branch only has old info
         info_key = "info"
         if branch_attribs["status"] == self.ST_DELETED:
@@ -395,28 +400,32 @@ class RosieSvnPostCommitHook(object):
         if branch_attribs[info_key] is None:
             return
         # Main table
-        main_fields = {
+        cols = dict(vc_attrs)
+        cols.update({
             "author": changeset_attribs["author"],
-            "date": changeset_attribs["date"]}
+            "date": changeset_attribs["date"]})
         for name in ["owner", "project", "title"]:
-            main_fields[name] = branch_attribs[info_key].get_value([name])
-        if branch_attribs["from_path"] and branch == "trunk":
+            cols[name] = branch_attribs[info_key].get_value([name])
+        if branch_attribs["from_path"] and vc_attrs["branch"] == u"trunk":
             from_names = branch_attribs["from_path"].split("/")[:self.LEN_ID]
-            main_fields["from_idx"] = (
+            cols["from_idx"] = (
                 changeset_attribs["prefix"] + "-" + "".join(from_names))
-        main_fields["status"] = (
+        cols["status"] = (
             branch_attribs["status"] + branch_attribs["status_info_file"])
-        dao.insert(
-            MAIN_TABLE_NAME, idx=idx, branch=branch, revision=revision,
-            **main_fields)
+        for key in cols:
+            try:
+                cols[key] = cols[key].decode("utf-8")
+            except AttributeError:
+                pass
+        dao.insert(MAIN_TABLE_NAME, **cols)
         # Optional table
         for name in branch_attribs[info_key].value:
             if name in ["owner", "project", "title"]:
                 continue
-            value = branch_attribs[info_key].get_value([name])
-            dao.insert(
-                OPTIONAL_TABLE_NAME, idx=idx, branch=branch, revision=revision,
-                name=name, value=value)
+            value = branch_attribs[info_key].get_value([name]).decode("utf-8")
+            cols = dict(vc_attrs)
+            cols.update({"name": name.decode("utf-8"), "value": value})
+            dao.insert(OPTIONAL_TABLE_NAME, **cols)
 
     def _update_known_keys(self, dao, changeset_attribs):
         """Update the known_keys in the meta table."""
@@ -424,16 +433,14 @@ class RosieSvnPostCommitHook(object):
         revision = changeset_attribs["revision"]
         keys_str = self._svnlook(
             "cat", "-r", revision, repos, self.KNOWN_KEYS_FILE_PATH)
-        keys_str = " ".join(shlex.split(keys_str))
+        keys_str = " ".join(shlex.split(keys_str)).decode("utf-8")
         if keys_str:
             try:
-                dao.insert(
-                    META_TABLE_NAME,
-                    name="known_keys", value=keys_str)
+                dao.insert(META_TABLE_NAME, name=u"known_keys", value=keys_str)
             except al.exc.IntegrityError:
                 dao.update(
-                    META_TABLE_NAME,
-                    ("name",), name="known_keys", value=keys_str)
+                    META_TABLE_NAME, (u"name",),
+                    name=u"known_keys", value=keys_str)
 
 
 def main():
