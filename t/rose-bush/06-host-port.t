@@ -59,6 +59,7 @@ cylc register "${SUITE_NAME}" "${SUITE_DIR}"
 cylc run --debug "${SUITE_NAME}" 2>'/dev/null' &
 SUITE_PID="$!"
 poll '!' test -s "${HOME}/.cylc/ports/${SUITE_NAME}"
+sleep 1
 PORT="$(sed -n '1p' "${HOME}/.cylc/ports/${SUITE_NAME}")"
 HOST="$(sed -n '2s/^\([^.]*\)..*$/\1/p' "${HOME}/.cylc/ports/${SUITE_NAME}")"
 
@@ -75,7 +76,7 @@ else
 fi
 #-------------------------------------------------------------------------------
 # Tidy up
-cylc stop --now "${SUITE_NAME}"
+cylc stop "${SUITE_NAME}"
 wait "${SUITE_PID}"
 rose_ws_kill
 cylc unregister "${SUITE_NAME}" 1>'/dev/null' 2>&1
