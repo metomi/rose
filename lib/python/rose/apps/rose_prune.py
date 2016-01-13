@@ -86,6 +86,8 @@ class RosePruneApp(BuiltinApp):
 
         # Prune other directories
         globs = self._get_prune_globs(app_runner, conf_tree)
+        if not globs:
+            return
         suite_engine_proc = app_runner.suite_engine_proc
         hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
         # A shuffle here should allow the load for doing "rm -rf" to be shared

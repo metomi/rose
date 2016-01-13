@@ -25,6 +25,7 @@ from glob import glob
 import os
 import pwd
 import re
+from random import shuffle
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
@@ -1212,6 +1213,9 @@ class CylcProcessor(SuiteEngineProcessor):
             if "*" in items:
                 auths = self.get_suite_jobs_auths(suite_name)
                 if auths:
+                    # A shuffle here should allow the load for doing "rm -rf"
+                    # to be shared between job hosts who share a file system.
+                    shuffle(auths)
                     auths_filters.append((auths, [], []))
             else:
                 for item in items:
@@ -1229,6 +1233,10 @@ class CylcProcessor(SuiteEngineProcessor):
                         continue
                     auths = self.get_suite_jobs_auths(suite_name, cycle, name)
                     if auths:
+                        # A shuffle here should allow the load for doing "rm
+                        # -rf" to be shared between job hosts who share a file
+                        # system.
+                        shuffle(auths)
                         includes = []
                         excludes = []
                         if cycle is None and name is None:
