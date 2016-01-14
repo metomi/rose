@@ -381,6 +381,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 " cycle, name," +
                 " task_jobs.submit_num AS submit_num," +
                 " task_states.submit_num AS submit_num_max," +
+                " task_states.status AS task_status," +
                 " time_submit, submit_status," +
                 " time_run, time_run_exit, run_signal, run_status," +
                 " user_at_host, batch_sys_name, batch_sys_job_id" +
@@ -396,7 +397,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 self.SUITE_DB, user_name, suite_name, stmt,
                 where_args + limit_args):
             (
-                cycle, name, submit_num, submit_num_max,
+                cycle, name, submit_num, submit_num_max, task_status,
                 time_submit, submit_status,
                 time_run, time_run_exit, run_signal, run_status,
                 user_at_host, batch_sys_name, batch_sys_job_id
@@ -407,12 +408,17 @@ class CylcProcessor(SuiteEngineProcessor):
                 "submit_num": submit_num,
                 "submit_num_max": submit_num_max,
                 "events": [time_submit, time_run, time_run_exit],
+                "task_status": None,
                 "status": None,
                 "host": user_at_host,
                 "submit_method": batch_sys_name,
                 "submit_method_id": batch_sys_job_id,
                 "logs": {},
                 "seq_logs_indexes": {}}
+            try:
+                entry["task_status"] = self.state_of[task_status]
+            except KeyError:
+                pass
             if run_status and run_signal:
                 entry["status"] = "fail(%s)" % (run_signal)
             elif run_status:
