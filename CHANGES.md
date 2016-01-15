@@ -5,17 +5,33 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2016-Q1?)
+## 2016.01.0 (2016-01-15)
 
-Rose release 35. This release will work best with
+Rose release 35. This release works best with
 [cylc-6.8.0](https://github.com/cylc/cylc/releases/tag/6.8.0) and
-[fcm-2015.12.0](https://github.com/metomi/fcm/releases/tag/2015.12.0),
-or their successors.
+[fcm-2015.12.0](https://github.com/metomi/fcm/releases/tag/2015.12.0).
 
 ### Noteworthy Changes
 
+[#1799](https://github.com/metomi/rose/pull/1799),
+[#1795](https://github.com/metomi/rose/pull/1795):
+rose_prune: shuffle job hosts to allow job hosts with share file systems to
+share load on `rm -fr` commands.
+
+[#1797](https://github.com/metomi/rose/pull/1797):
+rosa svn-post-commit: ensure that all strings passed to the discovery database
+are UTF-8 strings.
+
 [#1792](https://github.com/metomi/rose/pull/1792):
 rose stem: allow manual overriding of project.
+
+[#1791](https://github.com/metomi/rose/pull/1791):
+rose bush: jobs list: improve hyperlinks and layout:
+* Fuzzy time toggle is now preserved when paging.
+* A submit number badge is now:
+  * a link to select all jobs of a given point/task.
+  * displaying the number of jobs in a given point/task.
+  * displaying the task status by colour of the point/task.
 
 [#1787](https://github.com/metomi/rose/pull/1787):
 rose bush: configurable logo.
@@ -29,8 +45,8 @@ rose bush: improve paging and sorting:
 * suites list: can now order by suite name, as well as activity time.
 
 [#1785](https://github.com/metomi/rose/pull/1785):
-rose bush: cycles list and jobs list: display suite's `host:port` where
-possible.
+rose bush: cycles list and jobs list: display suite's `host:port` for suites
+running cylc-6.8.0 or later.
 
 [#1783](https://github.com/metomi/rose/pull/1783):
 rose_bunch: process environment variable substitution in configuration file.
