@@ -376,14 +376,22 @@ class HostSelector(object):
                     out = proc.communicate()[0]
                     host_proc_dict.pop(host_name)
                     for threshold_conf in threshold_confs:
-                        if threshold_conf.check_threshold(out):
+                        try:
+                            is_bad = threshold_conf.check_threshold(out)
                             score = threshold_conf.command_out_parser(out)
+                        except ValueError:
+                            is_bad = True
+                            score = None
+                        if is_bad:
                             self.handle_event(HostThresholdNotMetEvent(
                                 host_name, threshold_conf, score))
                             break
                     else:
-                        score = rank_conf.command_out_parser(out)
-                        host_score_list.append((host_name, score))
+                        try:
+                            score = rank_conf.command_out_parser(out)
+                            host_score_list.append((host_name, score))
+                        except ValueError:
+                            score = None
                         self.handle_event(
                             HostSelectScoreEvent(host_name, score))
             if time() - time0 > ssh_cmd_timeout:
@@ -495,7 +503,7 @@ class MemoryScorer(RandomScorer):
     """Score host by amount of free memory"""
 
     KEY = "mem"
-    CMD = """echo mem=$(free -m | sed '3!d; s/^.* //')\n"""
+    CMD = """echo mem=$(free -m | sed '3!d; s/^.* \\<//')\n"""
     SIGN = -1  # Negative
 
     def command_out_parser(self, out, method_arg=None):
