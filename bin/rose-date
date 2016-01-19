@@ -49,6 +49,8 @@
 #     rose date -c 19700101T000000Z ref
 #     # 2.6 Between 2 specific date times
 #     rose date 19700101T000000Z 20380119T031407Z
+#     # 2.7 As its total number of a time increment (h, m, s)
+#     rose date --as-total=S PT1H
 #
 # DESCRIPTION
 #     Parse and print 1. a date time point or 2. a duration.
@@ -75,7 +77,7 @@
 #         Use the value of the ROSE_TASK_CYCLE_TIME environment variable as the
 #         reference time instead of the current time.
 #     --utc, -u
-#         Assume date time in UTC instead of local or other time zones.
+#         Assume date time in UTC instead of local or other time zones. 
 #
 # CALENDAR MODE
 #     The calendar mode is determined (in order) by:
