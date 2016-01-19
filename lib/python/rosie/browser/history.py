@@ -246,8 +246,8 @@ class HistoryItem():
 
     def __str__(self):
         """Define string format."""
-        return (self.h_type + "," + repr(self.details) + ","
-                + ("False", "True")[self.search_history])
+        return (self.h_type + "," + repr(self.details) + "," +
+                ("False", "True")[self.search_history])
 
     def get_out_string(self):
         """Return the output string."""

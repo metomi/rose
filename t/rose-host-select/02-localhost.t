@@ -29,7 +29,10 @@ export ROSE_CONF_PATH=
 LOCAL_HOSTS='localhost 127.0.0.1'
 for CMD in 'hostname -s' 'hostname' 'hostname --fqdn' 'hostname -I'; do
     if LOCAL_HOST=$(eval "$CMD"); then
-        LOCAL_HOSTS="${LOCAL_HOSTS} ${LOCAL_HOST}"
+        if ssh -n -q -oBatchMode=yes "${LOCAL_HOST}" true 1>'/dev/null' 2>&1
+        then
+            LOCAL_HOSTS="${LOCAL_HOSTS} ${LOCAL_HOST}"
+        fi
     fi
 done
 HOSTS="${LOCAL_HOSTS}"

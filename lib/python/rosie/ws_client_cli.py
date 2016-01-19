@@ -246,8 +246,9 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
         out = opts.print_format
         for key, value in dict_row.items():
             if "%" + key in out:
-                out = out.replace("%" + key, str(value), 1)
-        out = out.replace("%%", "%").expandtabs().rstrip()
+                out = unicode(out).replace(
+                    u"%" + unicode(key), unicode(value), 1)
+        out = unicode(out.replace("%%", "%").expandtabs().rstrip())
 
         report(SuiteEvent(out.expandtabs() + "\n"), prefix="",
                clip=terminal_cols)

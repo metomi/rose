@@ -163,8 +163,8 @@ class LogicalArrayValueWidget(gtk.HBox):
             focus = self.entries[-1]
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
-        if (focus is None and self.entry_table.is_focus()
-                and len(self.entries) > 0):
+        if (focus is None and self.entry_table.is_focus() and
+                len(self.entries) > 0):
             focus = self.entries[-1]
         num_fields = len(self.entries)
         num_rows_now = 1 + (num_fields - 1) / self.num_allowed_columns

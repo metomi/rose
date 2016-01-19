@@ -382,14 +382,14 @@ class VariableOperations(object):
             old_ignore = self.get_var_original_ignore(variable)
             if len(old_ignore) > len(variable.ignored_reason):
                 return rose.config_editor.KEY_TIP_ENABLED
-            if (rose.variable.IGNORED_BY_SYSTEM in variable.ignored_reason
-                    and rose.variable.IGNORED_BY_SYSTEM not in old_ignore):
+            if (rose.variable.IGNORED_BY_SYSTEM in variable.ignored_reason and
+                    rose.variable.IGNORED_BY_SYSTEM not in old_ignore):
                 return rose.config_editor.KEY_TIP_TRIGGER_IGNORED
-            if (rose.variable.IGNORED_BY_USER in variable.ignored_reason
-                    and rose.variable.IGNORED_BY_USER not in old_ignore):
+            if (rose.variable.IGNORED_BY_USER in variable.ignored_reason and
+                    rose.variable.IGNORED_BY_USER not in old_ignore):
                 return rose.config_editor.KEY_TIP_USER_IGNORED
-            if (rose.variable.IGNORED_BY_SECTION in variable.ignored_reason
-                    and rose.variable.IGNORED_BY_SECTION not in old_ignore):
+            if (rose.variable.IGNORED_BY_SECTION in variable.ignored_reason and
+                    rose.variable.IGNORED_BY_SECTION not in old_ignore):
                 return rose.config_editor.KEY_TIP_SECTION_IGNORED
             return rose.config_editor.KEY_TIP_ENABLED
         return ''

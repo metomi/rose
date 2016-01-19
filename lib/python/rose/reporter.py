@@ -138,9 +138,9 @@ class Reporter(object):
                 prefix = prefix(kind, level)
             if msg is None:
                 if callable(message):
-                    msg = str(message())
+                    msg = unicode(message())
                 else:
-                    msg = str(message)
+                    msg = unicode(message)
             if prefix:
                 for line in msg.splitlines():
                     msg_line = prefix + line
@@ -221,7 +221,7 @@ class ReporterContext(object):
 
     def write(self, message):
         """Write the message to the context's handle."""
-        return self.handle.write(message)
+        return self.handle.write(message.encode("utf-8"))
 
     def _tty_colour_err(self, s):
         try:

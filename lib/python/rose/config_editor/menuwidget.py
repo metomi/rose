@@ -67,7 +67,7 @@ class MenuWidget(gtk.HBox):
         actions = [('Options', 'rose-gtk-gnome-package-system', ''),
                    ('Info', gtk.STOCK_INFO,
                     rose.config_editor.VAR_MENU_INFO),
-                   ('Help',  gtk.STOCK_HELP,
+                   ('Help', gtk.STOCK_HELP,
                     rose.config_editor.VAR_MENU_HELP),
                    ('Web Help', gtk.STOCK_HOME,
                     rose.config_editor.VAR_MENU_URL),

@@ -167,10 +167,10 @@ class SectionOperations(object):
                           if e != rose.config_editor.WARNING_TYPE_ENABLED]
             my_errors = sect_data.error.keys()
             if (not override and
-                rose.variable.IGNORED_BY_SYSTEM in sect_data.ignored_reason
-                and all([e not in my_errors for e in ign_errors])
-                and self.check_cannot_enable_setting(config_name,
-                                                     section)):
+                    (rose.variable.IGNORED_BY_SYSTEM in
+                     sect_data.ignored_reason) and
+                    all([e not in my_errors for e in ign_errors]) and
+                    self.check_cannot_enable_setting(config_name, section)):
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     rose.config_editor.WARNING_CANNOT_ENABLE.format(section),

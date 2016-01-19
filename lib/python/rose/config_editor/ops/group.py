@@ -155,8 +155,8 @@ class GroupOperations(object):
                     # User-ignore from enabled.
                     is_ignored = True
                 elif (triggers_ok and
-                        rose.variable.IGNORED_BY_SYSTEM not in old_reason
-                        and rose.variable.IGNORED_BY_SYSTEM in reason):
+                        rose.variable.IGNORED_BY_SYSTEM not in old_reason and
+                        rose.variable.IGNORED_BY_SYSTEM in reason):
                     # Trigger-ignore.
                     sect_data.error.setdefault(
                         rose.config_editor.WARNING_TYPE_ENABLED,

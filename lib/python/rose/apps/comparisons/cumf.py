@@ -126,7 +126,7 @@ class CumfComparisonHeaderWarning(object):
 
     def __repr__(self):
         return OUTPUT_STRING % (HEADER, self.resultfile, self.kgo1file,
-                                self.cumfdir,  "")
+                                self.cumfdir, "")
 
     __str__ = __repr__
 

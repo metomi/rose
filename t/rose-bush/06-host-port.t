@@ -61,7 +61,7 @@ SUITE_PID="$!"
 poll '!' test -s "${HOME}/.cylc/ports/${SUITE_NAME}"
 sleep 1
 PORT="$(sed -n '1p' "${HOME}/.cylc/ports/${SUITE_NAME}")"
-HOST="$(sed -n '2s/^\([^.]*\)..*$/\1/p' "${HOME}/.cylc/ports/${SUITE_NAME}")"
+HOST="$(sed '2!d; s/^\([^.]*\)\..*$/\1/' "${HOME}/.cylc/ports/${SUITE_NAME}")"
 
 if [[ -n "${HOST}" && -n "${PORT}" ]]; then
     for METHOD in 'cycles' 'jobs'; do

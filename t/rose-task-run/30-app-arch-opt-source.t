@@ -53,12 +53,13 @@ __FIND__
 sed -n 's/^\[INFO\] \([+!=0] [^ ]*\) .*$/\1/p' \
     "${SUITE_RUN_DIR}/log/job/1/archive"*"/0"*"/job.out" \
     | sort >'job.out.sorted'
-file_cmp "${TEST_KEY}-job.out.sorted" 'job.out.sorted' <<__LOG__
+sort >'job.out.expected' <<__LOG__
 ! ${SUITE_RUN_DIR}/share/backup/archive2.d/
 + ${SUITE_RUN_DIR}/share/backup/archive1.d/
 + ${SUITE_RUN_DIR}/share/backup/archive2.d/
 0 ${SUITE_RUN_DIR}/share/backup/nobody.d/
 __LOG__
+file_cmp "${TEST_KEY}-job.out.sorted" 'job.out.sorted' 'job.out.expected'
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
 exit 0

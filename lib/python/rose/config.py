@@ -573,11 +573,9 @@ class ConfigLoader(object):
         self.char_assign = char_assign
         self.char_comment = char_comment
         self.re_option = re.compile(
-            r"^(?P<state>!?!?)(?P<option>[^\s"
-            + char_assign
-            + r"]+)\s*"
-            + char_assign
-            + r"\s*(?P<value>.*)$")
+            r"^(?P<state>!?!?)(?P<option>[^\s" +
+            char_assign + r"]+)\s*" +
+            char_assign + r"\s*(?P<value>.*)$")
 
     @staticmethod
     def can_miss_opt_conf_key(key):
