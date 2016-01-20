@@ -49,8 +49,11 @@
 #     rose date -c 19700101T000000Z ref
 #     # 2.6 Between 2 specific date times
 #     rose date 19700101T000000Z 20380119T031407Z
-#     # 2.7 As its total number of a time increment (h, m, s)
-#     rose date --as-total=S PT1H
+#
+#     # 3.  Convert ISO8601 duration
+#     # 3.1 Into the total number of hours (h), minutes (m) or seconds (s)
+#     #     it represents
+#     rose date --as-total=s PT1H
 #
 # DESCRIPTION
 #     Parse and print 1. a date time point or 2. a duration.
@@ -78,6 +81,9 @@
 #         reference time instead of the current time.
 #     --utc, -u
 #         Assume date time in UTC instead of local or other time zones. 
+#     --as-total=TIME_FORMAT
+#         Used to express an ISO8601 duration in the specified time format,
+#         hours h, minutes m or seconds s.
 #
 # CALENDAR MODE
 #     The calendar mode is determined (in order) by:

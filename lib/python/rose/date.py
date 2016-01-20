@@ -304,7 +304,6 @@ def main():
         "parse_format",
         "print_format",
         "task_cycle_time_mode",
-        "new_setting",
         "as_total",
         "utc_mode")
     opts, args = opt_parser.parse_args()
@@ -377,10 +376,9 @@ def _print_duration(date_time_oper, opts, args):
 
 
 def _convert_duration(date_time_oper, opts, args):
-    """ """
+    """Implement usage 3 of "rose date", convert ISO8601 duration."""
     time_in_8601 = date_time_oper.duration_parser.parse(args[0])
     time = time_in_8601.get_seconds()
-
     options = {'S': time, 'M': time/60, 'H': time/3600}
     if opts.duration_print_format.upper() in options:
         # supplied duration format is valid (upper removes case-sentisitivity)
@@ -389,6 +387,7 @@ def _convert_duration(date_time_oper, opts, args):
         # supplied duration format not valid
         print 'Invalid date/time format, please use one of h, m, s ' + \
             '(hours, minutes, seconds)'
+        sys.exit(1)
 
 
 if __name__ == "__main__":

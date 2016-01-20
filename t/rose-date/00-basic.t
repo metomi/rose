@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 98
+tests 102
 #-------------------------------------------------------------------------------
 # Produce the correct format for the current date/time.
 TEST_KEY=$TEST_KEY_BASE-current-format
@@ -299,5 +299,14 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] [UNDEFINED ENVIRONMENT VARIABLE] ROSE_TASK_CYCLE_TIME
 __ERR__
+#-------------------------------------------------------------------------------
+# Test ISO8601 duration convertion
+TEST_KEY=$TEST_KEY_BASE-duration
+run_pass "$TEST_KEY" rose date --as-total=s PT1M
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+60.0
+__OUT__
+run_fail "$TEST_KEY.fail" rose date --as-total=y PT1M
 #-------------------------------------------------------------------------------
 exit 0
