@@ -76,7 +76,10 @@ class KGODatabase(object):
     def create(self):
         "If the databaste doesn't exist, create it."
         conn = self.get_conn()
-        # This table stores the individual comparisons
+        # This SQL command ensures a "comparisons" table exists in the database
+        # and then populates it with a series of columns (which in this case
+        # are all storing strings/text). The primary key is the comparison name
+        # (as it must uniquely identify each row)
         sql_statement = """
             CREATE TABLE IF NOT EXISTS comparisons (
             app_task TEXT,
@@ -87,7 +90,10 @@ class KGODatabase(object):
             PRIMARY KEY(app_task))
             """
         self.execute_sql_retry(conn, (sql_statement,))
-        # And this one stores the completion status of the task
+        # This SQL command ensures a "tasks" table exists in the database
+        # and then populates it with a pair of columns (the task name and
+        # a completion status indicator). The primary key is the task name
+        # (as it must uniquely identify each row)
         sql_statement = """
             CREATE TABLE IF NOT EXISTS tasks (
             task_name TEXT,
@@ -110,13 +116,16 @@ class KGODatabase(object):
                 return
             except:
                 time.sleep(timeout)
+        # In the event that the retries are exceeded, re-raise the final
+        # exception for the calling application to handle
         raise
 
     def enter_comparison(
             self, app_task, kgo_file, suite_file, status, comparison):
         "Insert a new comparison entry to the database."
         conn = self.get_conn()
-
+        # This SQL command indicates that a single "row" is to be entered into
+        # the "comparisons" table
         sql_statement = (
             "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)")
         sql_args = [app_task, kgo_file, suite_file, status, comparison]
@@ -127,7 +136,8 @@ class KGODatabase(object):
     def enter_task(self, app_task, status):
         "Insert a new task entry to the database."
         conn = self.get_conn()
-
+        # This SQL command indicates that a single "row" is to be entered into
+        # the "tasks" table
         sql_statement = "INSERT OR REPLACE INTO tasks VALUES (?, ?)"
         sql_args = [app_task, status]
         self.execute_sql_retry(conn, (sql_statement, sql_args))
