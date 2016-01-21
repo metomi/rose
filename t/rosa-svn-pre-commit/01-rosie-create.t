@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 16
+tests 18
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo
@@ -102,6 +102,23 @@ A   a/a/0/0/1/
 A   a/a/0/0/1/trunk/
 U   a/a/0/0/1/trunk/rose-suite.info
 __CHANGED__
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-replace-trunk"
+mkdir -p 'wc'
+svn checkout -q --depth 'empty' "${SVN_URL}" 'wc/foo'
+svn update -q --parents 'wc/foo/a/a/0/0/1'
+svn rm -q 'wc/foo/a/a/0/0/1/trunk'
+svn cp -q "${SVN_URL}/a/a/0/0/0/trunk" 'wc/foo/a/a/0/0/1/trunk'
+cat >'wc/foo/a/a/0/0/1/trunk/rose-suite.info' <<__INFO__
+access-list=*
+owner=ivy
+project=hello
+title=greeting to a list of people
+__INFO__
+run_fail "${TEST_KEY}" \
+    svn ci --no-auth-cache -q -m'foo-aa001: override' --username 'ivy' 'wc/foo'
+file_grep "${TEST_KEY}.err" \
+    '\[FAIL\] SUITE MUST HAVE TRUNK: D   a/a/0/0/1/trunk/' "${TEST_KEY}.err"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-meta-empty
 cat >rose-suite.info <<__INFO__
