@@ -29,6 +29,14 @@ if [[ $TEST_KEY_BASE == *conf ]]; then
 else
     export ROSE_CONF_PATH=
 fi
+
+get_host_fqdn() {
+    python - "$@" <<'__PYTHON__'
+import socket
+import sys
+sys.stdout.write(socket.gethostbyname_ex(sys.argv[1])[0] + "\n")
+__PYTHON__
+}
 #-------------------------------------------------------------------------------
 N_TESTS=11
 tests $N_TESTS
@@ -43,9 +51,11 @@ HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
 poll ! test -e $SUITE_RUN_DIR/log/job/my_task_1.2013010100.1
 if [[ $HOST == 'localhost' ]]; then
     SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>")
+    HOST="$(hostname -f)"
 else
     CMD_PREFIX="ssh -oBatchMode=yes $HOST"
     SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run .*\\<$NAME\\>'")
+    HOST="$(get_host_fqdn "${HOST}")"
 fi
 SUITE_PROC=$(awk '{print "[FAIL]     " $0}' <<<"$SUITE_PROC")
 #-------------------------------------------------------------------------------
@@ -56,9 +66,7 @@ for OPTION in -i -l '' --restart; do
     run_fail "$TEST_KEY" rose suite-run $OPTION \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] Suite "$NAME" may still be running.
-[FAIL] Host "${HOST:-localhost}" has process:
-$SUITE_PROC
+[FAIL] Suite "$NAME" has running processes on: ${HOST:-localhost}
 [FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 done

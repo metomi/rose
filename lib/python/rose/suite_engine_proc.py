@@ -197,25 +197,37 @@ class SuiteStillRunningError(Exception):
 
     """An exception raised when a suite is still running."""
 
-    FMT_HEAD = "Suite \"%(suite_name)s\" may still be running.\n"
-    FMT_TAIL = "Try \"rose suite-shutdown --name=%(suite_name)s\" first?"
-    FMT_BODY1 = "Host \"%(host)s\" has %(reason_key)s:\n"
-    FMT_BODY2 = "    %(reason_value)s\n"
+    FMT_HEAD = "Suite \"%(suite_name)s\" has running processes on:"
+    FMT_BODY_1 = " %(host_name)s"
+    FMT_BODY_M = "\n    %(host_name)s"
+    FMT_TAIL = "\nTry \"rose suite-shutdown --name=%(suite_name)s\" first?"
 
     def __str__(self):
-        suite_name, reasons = self.args
+        suite_name, host_names = self.args
         ret = self.FMT_HEAD % {"suite_name": suite_name}
-        host = None
-        reason_key = None
-        for reason in reasons:
-            reason_dict = dict(reason)
-            if (reason_dict["host"] != host or
-                    reason_dict["reason_key"] != reason_key):
-                ret += self.FMT_BODY1 % reason_dict
-                host = reason_dict["host"]
-                reason_key = reason_dict["reason_key"]
-            ret += self.FMT_BODY2 % reason_dict
+        if len(host_names) == 1:
+            ret += self.FMT_BODY_1 % {"host_name": host_names[0]}
+        else:
+            for host_name in host_names:
+                ret += self.FMT_BODY_M % {"host_name": host_name}
         ret += self.FMT_TAIL % {"suite_name": suite_name}
+        return ret
+
+
+class SuiteHostConnectError(Exception):
+    """Cannot connect to the suite host."""
+
+    TMPL = "%s: cannot connect to some suite hosts, try again later?\n"
+    TMPL_HOST = "* %s\n"
+
+    def __str__(self):
+        suite_name, user_name, host_names = self.args
+        ret = self.TMPL % suite_name
+        for host_name in host_names:
+            auth = host_name
+            if user_name:
+                auth = user_name + "@" + host_name
+            ret += self.TMPL_HOST % auth
         return ret
 
 
@@ -357,10 +369,9 @@ class SuiteEngineProcessor(object):
 
     def check_suite_not_running(self, suite_name, hosts=None):
         """Raise SuiteStillRunningError if suite is still running."""
-        reasons = self.is_suite_running(
-            None, suite_name, self.get_suite_hosts(suite_name, hosts))
-        if reasons:
-            raise SuiteStillRunningError(suite_name, reasons)
+        host_names = self.get_suite_run_hosts(None, suite_name, hosts)
+        if host_names:
+            raise SuiteStillRunningError(suite_name, host_names)
 
     def clean_hook(self, suite_name=None):
         """Run suite engine dependent logic (at end of "rose suite-clean")."""
@@ -394,43 +405,9 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_suite_hosts(self, suite_name=None, hosts=None):
-        """Return names of potential suite hosts.
-
-        If "suite_name" is specified, return all possible hosts including what
-        is written in the "log/rose-suite-run.host" file.
-
-        If "suite_name" is not specified and if "[rose-suite-run]hosts" is
-        defined, split and return the setting.
-
-        Otherwise, return ["localhost"].
-
-        """
-        conf = ResourceLocator.default().get_conf()
-        hostnames = []
-        if hosts:
-            hostnames += hosts
-        if suite_name:
-            hostnames.append("localhost")
-            # Get host name from "log/rose-suite-run.host" file
-            host_file_path = self.get_suite_dir(
-                suite_name, "log", "rose-suite-run.host")
-            try:
-                for line in open(host_file_path):
-                    hostnames.append(line.strip())
-            except IOError:
-                pass
-            # Scan-able list
-            suite_hosts = conf.get_value(
-                ["rose-suite-run", "scan-hosts"], "").split()
-            if suite_hosts:
-                hostnames += self.host_selector.expand(suite_hosts)[0]
-        # Normal list
-        suite_hosts = conf.get_value(["rose-suite-run", "hosts"], "").split()
-        if suite_hosts:
-            hostnames += self.host_selector.expand(suite_hosts)[0]
-        hostnames = list(set(hostnames))
-        return hostnames
+    def get_suite_run_hosts(self, user_name, suite_name, host_names=None):
+        """Return host(s) where suite_name is running."""
+        raise NotImplementedError()
 
     def get_suite_job_events(self, user_name, suite_name, cycles, tasks,
                              no_statuses, order, limit, offset):
@@ -707,10 +684,6 @@ class SuiteEngineProcessor(object):
 
     def parse_job_log_rel_path(self, f_name):
         """Return (cycle, task, submit_num, ext) for a job log rel path."""
-        raise NotImplementedError()
-
-    def ping(self, suite_name, hosts=None, timeout=10):
-        """Return a list of host names where suite_name is running."""
         raise NotImplementedError()
 
     def run(self, suite_name, host=None, host_environ=None, restart_mode=False,

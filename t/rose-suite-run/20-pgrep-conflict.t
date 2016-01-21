@@ -58,16 +58,12 @@ for ARG in '' '--hold'; do
     fi
     if "${IS_NEW_PGREP}"; then
         file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
-[FAIL] Suite "${NAME}" may still be running.
-[FAIL] Host "localhost" has process:
-[FAIL]     ${FAKE_SUITE_PID} python
+[FAIL] Suite "${NAME}" has running processes on: localhost
 [FAIL] Try "rose suite-shutdown --name=${NAME}" first?
 __ERR__
     else
         file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
-[FAIL] Suite "${NAME}" may still be running.
-[FAIL] Host "localhost" has process:
-[FAIL]     ${FAKE_SUITE_PID} python ${TEST_DIR}/cylc-run ${NAME}${ARG_STR}
+[FAIL] Suite "${NAME}" has running processes on: localhost
 [FAIL] Try "rose suite-shutdown --name=${NAME}" first?
 __ERR__
     fi

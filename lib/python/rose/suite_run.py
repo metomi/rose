@@ -35,20 +35,14 @@ from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
 from rose.run_source_vc import write_source_vc_info
 from rose.suite_clean import SuiteRunCleaner
+from rose.suite_control import SuiteNotRunningError
+import shlex
 import socket
 import sys
 import tarfile
 from tempfile import TemporaryFile
 from time import sleep, strftime, time
 import traceback
-
-
-class NotRunningError(Exception):
-
-    """An exception raised when a suite is not running."""
-
-    def __str__(self):
-        return "%s: is not running" % (self.args)
 
 
 class VersionMismatchError(Exception):
@@ -183,9 +177,10 @@ class SuiteRunner(Runner):
         if opts.host:
             hosts.append(opts.host)
         if opts.run_mode == "reload":
-            suite_run_hosts = self.suite_engine_proc.ping(suite_name, hosts)
+            suite_run_hosts = self.suite_engine_proc.get_suite_run_hosts(
+                None, suite_name, hosts)
             if not suite_run_hosts:
-                raise NotRunningError(suite_name)
+                raise SuiteNotRunningError(suite_name)
             hosts = suite_run_hosts
         else:
             self.suite_engine_proc.check_suite_not_running(suite_name, hosts)
@@ -400,7 +395,10 @@ class SuiteRunner(Runner):
             if opts.host:
                 hosts = [opts.host]
             else:
-                hosts = self.suite_engine_proc.get_suite_hosts()
+                names = shlex.split(
+                    conf.get_value(["rose-suite-run", "hosts"], ""))
+                if names:
+                    hosts += self.host_selector.expand(names)[0]
 
         if (hosts and len(hosts) == 1 and
                 self.host_selector.is_local_host(hosts[0])):

@@ -33,12 +33,12 @@ rose suite-run --debug -q \
 TEST_KEY="${TEST_KEY_BASE}-name"
 run_fail "${TEST_KEY}" rose suite-restart --name="${NAME}"
 file_grep "${TEST_KEY}.err" \
-    "\[FAIL\] Suite \"${NAME}\" may still be running." "${TEST_KEY}.err"
+    "\[FAIL\] Suite \"${NAME}\" has running processes on:" "${TEST_KEY}.err"
 
 TEST_KEY="${TEST_KEY_BASE}-cwd"
 run_fail "${TEST_KEY}" bash -c "cd '${SUITE_RUN_DIR}'; rose suite-restart"
 file_grep "${TEST_KEY}.err" \
-    "\[FAIL\] Suite \"${NAME}\" may still be running." "${TEST_KEY}.err"
+    "\[FAIL\] Suite \"${NAME}\" has running processes on:" "${TEST_KEY}.err"
 #-------------------------------------------------------------------------------
 rm -f "${SUITE_RUN_DIR}/work/1/foo/file"
 timeout 60 \

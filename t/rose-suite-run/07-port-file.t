@@ -19,27 +19,34 @@
 #-------------------------------------------------------------------------------
 # Test "rose suite-run" when port file exists.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
+. "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
 tests 3
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/.cylc/ports
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
-touch $HOME/.cylc/ports/$NAME
-run_fail "$TEST_KEY" \
-    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] Suite "$NAME" may still be running.
-[FAIL] Host "localhost" has port-file:
-[FAIL]     ~$USER/.cylc/ports/$NAME
-[FAIL] Try "rose suite-shutdown --name=$NAME" first?
-__ERR__
+mkdir -p "${HOME}/.cylc/ports"
+SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rtb-suite-run-07.XXXXXX')"
+NAME="$(basename "${SUITE_RUN_DIR}")"
+
+PORT="$((${RANDOM} + 10000))"
+while port_is_busy "${PORT}"; do
+    PORT="$((${RANDOM} + 10000))"
+done
+
+HOST="$(hostname -f)"
+cat >"${HOME}/.cylc/ports/${NAME}" <<__PORT_FILE__
+${PORT}
+${HOST}
+__PORT_FILE__
+
+TEST_KEY="${TEST_KEY_BASE}"
+touch "${SUITE_RUN_DIR}/flag"
+run_pass "${TEST_KEY}" \
+    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+    --name="${NAME}" --no-gcontrol -- --debug
+file_grep "${TEST_KEY}.out" \
+    "delete: ${HOME}/.cylc/ports/${NAME}" "${TEST_KEY}.out"
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
 #-------------------------------------------------------------------------------
-rm $HOME/.cylc/ports/$NAME
-rose suite-clean -q -y $NAME
+rose suite-clean -q -y "${NAME}"
 exit 0
