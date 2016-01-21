@@ -284,8 +284,8 @@ class EntryArrayValueWidget(gtk.HBox):
             position = focus_widget.get_position()
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
-        if (focus_widget is None and self.entry_table.is_focus()
-                and len(self.entries) > 0):
+        if (focus_widget is None and self.entry_table.is_focus() and
+                len(self.entries) > 0):
             focus_widget = self.entries[-1]
             position = len(focus_widget.get_text())
         num_fields = len(self.entries + [self.button_box])

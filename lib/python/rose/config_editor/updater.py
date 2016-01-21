@@ -441,8 +441,8 @@ class Updater(object):
                 if (rose.variable.IGNORED_BY_USER in reason):
                     # User-ignored but trigger-enabled
                     if (meta_config.get(
-                            [section, rose.META_PROP_COMPULSORY]).value
-                            == rose.META_PROP_VALUE_TRUE):
+                            [section, rose.META_PROP_COMPULSORY]).value ==
+                            rose.META_PROP_VALUE_TRUE):
                         # Doc table: I_u -> E -> compulsory
                         sect_data.error.update(
                             {rose.config_editor.WARNING_TYPE_USER_IGNORED:

@@ -156,9 +156,9 @@ class SuiteId(object):
                 return
             state["stack"].append(name)
             state["try_text"] = (
-                state["stack"] == ["log", "logentry", "paths", "path"]
-                and attr_map.get("kind") == "dir"
-                and attr_map.get("action") == "A")
+                state["stack"] == ["log", "logentry", "paths", "path"] and
+                attr_map.get("kind") == "dir" and
+                attr_map.get("action") == "A")
 
         def _handle_tag1(state, _):
             """Handle XML end tag."""

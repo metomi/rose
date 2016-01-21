@@ -103,7 +103,7 @@ class SpacedListValueWidget(gtk.HBox):
         value_array_old = spaced_array_split(self.last_value)
         for i, val in enumerate(value_array):
             if i >= len(value_array_old):
-                self.entries[len(value_array)-1].grab_focus()
+                self.entries[len(value_array) - 1].grab_focus()
                 break
             if val != value_array_old[i]:
                 self.entries[i].grab_focus()
@@ -250,8 +250,8 @@ class SpacedListValueWidget(gtk.HBox):
             position = focus_widget.get_position()
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
-        if (focus_widget is None and self.entry_table.is_focus()
-                and len(self.entries) > 0):
+        if (focus_widget is None and self.entry_table.is_focus() and
+                len(self.entries) > 0):
             focus_widget = self.entries[-1]
             position = len(focus_widget.get_text())
         num_fields = len(self.entries + [self.button_box])

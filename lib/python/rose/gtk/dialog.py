@@ -241,7 +241,7 @@ class DialogProcess(object):
         """Scroll the parent scrolled window to the bottom."""
         vadj = text_view.get_parent().get_vadjustment()
         if vadj.upper > vadj.lower + vadj.page_size:
-            vadj.set_value(vadj.upper - 0.95*vadj.page_size)
+            vadj.set_value(vadj.upper - 0.95 * vadj.page_size)
 
 
 def _sep_process(*args):
@@ -685,8 +685,8 @@ def run_edit_dialog(text, finish_hook=None, title=None):
     start_size = dialog.size_request()
     scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     end_size = dialog.size_request()
-    my_size = (max([start_size[0], end_size[0], min_size[0]])+20,
-               max([start_size[1], end_size[1], min_size[1]])+20)
+    my_size = (max([start_size[0], end_size[0], min_size[0]]) + 20,
+               max([start_size[1], end_size[1], min_size[1]]) + 20)
     new_size = [-1, -1]
     for i in [0, 1]:
         new_size[i] = min([my_size[i], max_size[i]])

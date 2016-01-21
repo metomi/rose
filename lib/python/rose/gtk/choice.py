@@ -421,8 +421,8 @@ class ChoicesTreeView(gtk.TreeView):
         model = self.get_model()
         can_add = self._check_can_add(r_iter)
         should_add = False
-        if ((should_turn_off is None or should_turn_off)
-                and self._get_is_included(this_name, ok_values)):
+        if ((should_turn_off is None or should_turn_off) and
+                self._get_is_included(this_name, ok_values)):
             ok_values.remove(this_name)
         elif should_turn_off is None or not should_turn_off:
             if not can_add:

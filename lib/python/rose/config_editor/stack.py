@@ -122,7 +122,7 @@ class StackViewer(gtk.Window):
         text_scroller.set_shadow_type(gtk.SHADOW_IN)
         text_scroller.add(text_view)
         vadj = text_scroller.get_vadjustment()
-        vadj.set_value(vadj.upper - 0.9*vadj.page_size)
+        vadj.set_value(vadj.upper - 0.9 * vadj.page_size)
         text_scroller.show()
         vbox = gtk.VBox()
         label = gtk.Label()
@@ -194,7 +194,7 @@ class StackViewer(gtk.Window):
         """Scroll the parent scrolled window to the bottom."""
         vadj = tree_view.get_parent().get_vadjustment()
         if vadj.upper > vadj.lower + vadj.page_size:
-            vadj.set_value(vadj.upper - 0.95*vadj.page_size)
+            vadj.set_value(vadj.upper - 0.95 * vadj.page_size)
 
     def update(self):
         """Reload text views from the undo and redo stacks."""

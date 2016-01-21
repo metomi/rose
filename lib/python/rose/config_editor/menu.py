@@ -543,7 +543,7 @@ class MainMenuHandler(object):
                 is_valid = False
                 this_is_valid = False
             if not this_is_valid or new_val != optionals[k]:
-                lab = '<span foreground="blue">{0}</span>'.format(str(k)+":")
+                lab = '<span foreground="blue">{0}</span>'.format(str(k) + ":")
                 labels[k].set_markup(lab)
             else:
                 labels[k].set_text(str(k) + ":")
@@ -593,10 +593,10 @@ class MainMenuHandler(object):
                           dialog, entries)
             entries[k] = entry
             labels[k] = label
-            table.attach(entry, 1, 2, i, i+1)
+            table.attach(entry, 1, 2, i, i + 1)
             hbox = gtk.HBox()
             hbox.pack_start(label, expand=False)
-            table.attach(hbox, 0, 1, i, i+1)
+            table.attach(hbox, 0, 1, i, i + 1)
         dialog.show_all()
         response = dialog.run()
         if response == gtk.RESPONSE_CANCEL or response == gtk.RESPONSE_CLOSE:

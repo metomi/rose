@@ -428,7 +428,7 @@ class ConfigPage(gtk.VBox):
             width, height = help_label_window.size_request()
             if info == "Blank page - no data":
                 self.main_vpaned.set_position(
-                    rose.config_editor.SIZE_WINDOW[1]*100)
+                    rose.config_editor.SIZE_WINDOW[1] * 100)
             else:
                 height = min([rose.config_editor.SIZE_WINDOW[1] / 3,
                               help_label.size_request()[1]])
@@ -529,7 +529,7 @@ class ConfigPage(gtk.VBox):
         add_ui_start = """<ui> <popup name='Popup'>
                          <menu action="Add meta">"""
         add_ui_end = """</menu> </popup> </ui>"""
-        actions = [('Add meta',  gtk.STOCK_DIRECTORY,
+        actions = [('Add meta', gtk.STOCK_DIRECTORY,
                     rose.config_editor.ADD_MENU_META)]
         missing_variables = []
         section_choices = []
@@ -574,8 +574,8 @@ class ConfigPage(gtk.VBox):
             else:
                 blank_item.connect("activate", lambda b: self.add_row())
         for variable in ghost_list:
-            named_item = uimanager.get_widget('/Popup/Add meta/'
-                                              + variable.metadata['id'])
+            named_item = uimanager.get_widget(
+                '/Popup/Add meta/' + variable.metadata['id'])
             named_item.var_id = variable.metadata['id']
             tooltip_text = ""
             description = variable.metadata.get(rose.META_PROP_DESCRIPTION)

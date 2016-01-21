@@ -9,10 +9,11 @@
             graph = "loser:fail => rehab => done"
 [runtime]
     [[done]]
-        script = true
+        script = sleep 1
     [[loser]]
         script = false
     [[rehab]]
         script = """
 cylc reset --state='succeeded' "${CYLC_SUITE_NAME}" 'loser' "${CYLC_TASK_CYCLE_POINT}"
+sleep 1
 """

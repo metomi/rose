@@ -177,8 +177,9 @@ class PageTable(gtk.Table):
             ign_reason = variable.ignored_reason
             if variable.error:
                 variable_widget.show()
-            elif (len(variable.metadata.get(rose.META_PROP_VALUES, [])) == 1
-                  and not modes[rose.config_editor.SHOW_MODE_FIXED]):
+            elif (len(variable.metadata.get(
+                    rose.META_PROP_VALUES, [])) == 1 and
+                    not modes[rose.config_editor.SHOW_MODE_FIXED]):
                 variable_widget.hide()
             elif (variable_widget.is_ghost and
                   not modes[rose.config_editor.SHOW_MODE_LATENT]):
