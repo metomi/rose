@@ -77,8 +77,8 @@ class RoseOptionParser(OptionParser):
         "as_total": [
             ["--as-total"],
             {"action": "store",
-            "dest": "duration_print_format",
-            "help": "Express a duration string in the provided units."}],
+             "dest": "duration_print_format",
+             "help": "Express a duration string in the provided units."}],
         "calendar": [
             ["--calendar"],
             {"action": "store",
