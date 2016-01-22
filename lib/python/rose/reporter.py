@@ -26,6 +26,8 @@ import os
 import re
 import sys
 
+import datetime
+
 _DEFAULT_REPORTER = None
 
 
@@ -57,8 +59,7 @@ class Reporter(object):
 
     @classmethod
     def default(cls, verbosity=None, reset=False):
-        """Return the default reporter.
-        """
+        """Return the default reporter."""
         global _DEFAULT_REPORTER
         if _DEFAULT_REPORTER is None or reset:
             _DEFAULT_REPORTER = Reporter(verbosity)
@@ -77,6 +78,39 @@ class Reporter(object):
                                  ReporterContext(self.KIND_OUT, verbosity))
         self.event_handler = None
         self.raise_on_exc = raise_on_exc
+
+    def format_msg(self, msg, verbosity, prefix=None, clip=None):
+        """Format a message for reporting."""
+
+        msg_lines = []
+
+        if verbosity >= self.VV:
+            stamp = datetime.datetime.utcnow().strftime(
+                "%Y-%m-%dT%H:%M:%SZ : ")
+        else:
+            stamp = ""
+
+        if prefix:
+            for line in msg.splitlines():
+                msg_line = prefix + stamp + line
+                if clip is not None:
+                    msg_line = msg_line[:clip]
+                msg_line = msg_line + "\n"
+                msg_lines.append(msg_line)
+        else:
+            if clip is not None:
+                if msg.endswith("\n") and len(msg) > clip:
+                    insert_newline = True
+                    msg = msg[:-1]
+                msg_line = msg[:clip]
+            if insert_newline:
+                msg_line = msg_line + "\n"
+            else:
+                msg_line = msg
+            msg_line = stamp + msg_line
+            msg_lines.append(msg_line)
+
+        return msg_lines
 
     def report(self, message, kind=None, level=None, prefix=None, clip=None):
         """Report a message, if relevant for the reporter contexts.
@@ -141,22 +175,11 @@ class Reporter(object):
                     msg = unicode(message())
                 else:
                     msg = unicode(message)
-            if prefix:
-                for line in msg.splitlines():
-                    msg_line = prefix + line
-                    if clip is not None:
-                        msg_line = msg_line[:clip]
-                    context.write(msg_line + "\n")
-            else:
-                if clip is not None:
-                    if msg.endswith("\n") and len(msg) > clip:
-                        insert_newline = True
-                        msg = msg[:-1]
-                    msg_line = msg[:clip]
-                if insert_newline:
-                    context.write(msg_line + "\n")
-                else:
-                    context.write(msg)
+
+            msg_lines = self.format_msg(msg, context.verbosity, prefix, clip)
+            for line in msg_lines:
+                context.write(line)
+
         if isinstance(message, Exception) and self.raise_on_exc:
             raise message
 

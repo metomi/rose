@@ -102,9 +102,9 @@ class RoseBunchApp(BuiltinApp):
     TYPE_ABORT_ON_FAIL = "abort"
     TYPE_CONTINUE_ON_FAIL = "continue"
     FAIL_MODE_TYPES = [TYPE_CONTINUE_ON_FAIL, TYPE_ABORT_ON_FAIL]
-    PREFIX_OK = "[OK]"
-    PREFIX_PASS = "[PASS]"
-    PREFIX_NOTRUN = "[SKIP]"
+    PREFIX_OK = "[OK] "
+    PREFIX_PASS = "[PASS] "
+    PREFIX_NOTRUN = "[SKIP] "
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """ Run multiple instaces of a command using sets of specified args"""
