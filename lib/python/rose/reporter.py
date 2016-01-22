@@ -26,7 +26,7 @@ import os
 import re
 import sys
 
-import datetime
+import time
 
 _DEFAULT_REPORTER = None
 
@@ -85,10 +85,11 @@ class Reporter(object):
         msg_lines = []
 
         if verbosity >= self.VV:
-            stamp = datetime.datetime.utcnow().strftime(
-                "%Y-%m-%dT%H:%M:%SZ : ")
+            stamp = time.strftime("%Y-%m-%dT%H:%M:%SZ : ")
         else:
             stamp = ""
+
+        insert_newline = False
 
         if prefix:
             for line in msg.splitlines():
@@ -158,7 +159,6 @@ class Reporter(object):
             level = self.DEFAULT
         msg = None
         for key, context in self.contexts.items():
-            insert_newline = False
             if context.is_closed():
                 self.contexts.pop(key)  # remove contexts with closed handles
                 continue
