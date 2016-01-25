@@ -522,15 +522,16 @@ class RoseBushService(object):
 
         # convert url(s) to hyperlinks if in text mode
         if mode == None:
-            anchor = lambda url: '<a href="%s">%s</a>' % (url, url)
-            urlregex = '(http|https|ftp)://[^\s]+'
+            urlregex = re.compile('\\b(?:https?|ftp)://\S+\\b')
             for i in range(0, len(lines)):
                 line = lines[i]
-                match = re.search(urlregex, line)
+                match = urlregex.search(line)
                 if match:
                     begining, end = match.span()
-                    lines[i] = '%s'*3 % (line[:begining],
-                        anchor(match.group(0)), line[end:])
+                    lines[i] = '%s'*3 % (
+                        line[:begining],
+                        '<a href="{0}">{0}</a>'.format(match.group(0)),
+                        line[end:])
 
         data = {}
         data.update(self._get_suite_logs_info(user, suite))
