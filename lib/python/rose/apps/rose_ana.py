@@ -27,6 +27,7 @@ import os
 import re
 import sys
 import sqlite3
+import time
 
 # Rose modules
 import rose.config
@@ -75,9 +76,11 @@ class KGODatabase(object):
     def create(self):
         "If the databaste doesn't exist, create it."
         conn = self.get_conn()
-        # This table stores the individual comparisons
-        conn.execute(
-            """
+        # This SQL command ensures a "comparisons" table exists in the database
+        # and then populates it with a series of columns (which in this case
+        # are all storing strings/text). The primary key is the comparison name
+        # (as it must uniquely identify each row)
+        sql_statement = """
             CREATE TABLE IF NOT EXISTS comparisons (
             app_task TEXT,
             kgo_file TEXT,
@@ -85,32 +88,60 @@ class KGODatabase(object):
             status TEXT,
             comparison TEXT,
             PRIMARY KEY(app_task))
-            """)
-        # And this one stores the completion status of the task
-        conn.execute(
             """
+        self.execute_sql_retry(conn, (sql_statement,))
+        # This SQL command ensures a "tasks" table exists in the database
+        # and then populates it with a pair of columns (the task name and
+        # a completion status indicator). The primary key is the task name
+        # (as it must uniquely identify each row)
+        sql_statement = """
             CREATE TABLE IF NOT EXISTS tasks (
             task_name TEXT,
             completed INT,
             PRIMARY KEY(task_name))
-            """)
+            """
+        self.execute_sql_retry(conn, (sql_statement,))
         conn.commit()
+
+    def execute_sql_retry(self, conn, sql_args, retries=10, timeout=5.0):
+        """
+        Given a connection object and a tuple of the desired arguments;
+        calls sql execute and retries multiple times, to handle
+        concurrency issues
+
+        """
+        for retry in range(retries):
+            try:
+                conn.execute(*sql_args)
+                return
+            except:
+                time.sleep(timeout)
+        # In the event that the retries are exceeded, re-raise the final
+        # exception for the calling application to handle
+        raise
 
     def enter_comparison(
             self, app_task, kgo_file, suite_file, status, comparison):
         "Insert a new comparison entry to the database."
         conn = self.get_conn()
-        conn.execute(
-            "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)",
-            [app_task, kgo_file, suite_file, status, comparison])
+        # This SQL command indicates that a single "row" is to be entered into
+        # the "comparisons" table
+        sql_statement = (
+            "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)")
+        sql_args = [app_task, kgo_file, suite_file, status, comparison]
+        self.execute_sql_retry(conn, (sql_statement, sql_args))
+
         conn.commit()
 
     def enter_task(self, app_task, status):
         "Insert a new task entry to the database."
         conn = self.get_conn()
-        conn.execute(
-            "INSERT OR REPLACE INTO tasks VALUES (?, ?)",
-            [app_task, status])
+        # This SQL command indicates that a single "row" is to be entered into
+        # the "tasks" table
+        sql_statement = "INSERT OR REPLACE INTO tasks VALUES (?, ?)"
+        sql_args = [app_task, status]
+        self.execute_sql_retry(conn, (sql_statement, sql_args))
+
         conn.commit()
 
 
