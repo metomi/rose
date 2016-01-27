@@ -443,13 +443,11 @@ class ConfigDataHelper(object):
             cache[namespace] = status
             return rose.config.ConfigNode.STATE_NORMAL
         status = status_counts[0][0]
+        cache[namespace] = status
         if status == rose.variable.IGNORED_BY_USER:
-            cache[namespace] = status
             return rose.config.ConfigNode.STATE_USER_IGNORED
         if status == rose.variable.IGNORED_BY_SYSTEM:
-            cache[namespace] = status
             return rose.config.ConfigNode.STATE_SYST_IGNORED
-        cache[namespace] = status
         return rose.config.ConfigNode.STATE_NORMAL
 
     def get_ns_latent_status(self, namespace):
