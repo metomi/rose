@@ -99,16 +99,16 @@ class Reporter(object):
                 msg_line = msg_line + "\n"
                 msg_lines.append(msg_line)
         else:
+            msg_line = stamp
             if clip is not None:
                 if msg.endswith("\n") and len(msg) > clip:
                     insert_newline = True
                     msg = msg[:-1]
-                msg_line = msg[:clip]
+                msg_line = msg_line + msg[:clip]
             if insert_newline:
                 msg_line = msg_line + "\n"
             else:
                 msg_line = msg
-            msg_line = stamp + msg_line
             msg_lines.append(msg_line)
 
         return msg_lines
@@ -177,6 +177,7 @@ class Reporter(object):
                     msg = unicode(message)
 
             msg_lines = self.format_msg(msg, context.verbosity, prefix, clip)
+            #print msg_lines
             for line in msg_lines:
                 context.write(line)
 
