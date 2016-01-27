@@ -272,10 +272,6 @@ class RosieSvnPreCommitHook(object):
                         BadChange(status, path, BadChange.VALUE, reports_str))
                     continue
 
-            # New suite trunk: ignore the rest
-            if (self.ST_ADD, path_head + "trunk/") in changes:
-                continue
-
             # Can only remove trunk information file with suite
             if status == self.ST_DELETE and path_tail == self.TRUNK_INFO_FILE:
                 if (self.ST_DELETE, path_head) not in changes:
@@ -288,6 +284,10 @@ class RosieSvnPreCommitHook(object):
                 if (self.ST_DELETE, path_head) not in changes:
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_TRUNK))
+                continue
+
+            # New suite trunk: ignore the rest
+            if (self.ST_ADD, path_head + "trunk/") in changes:
                 continue
 
             # See whether author has permission to make changes
