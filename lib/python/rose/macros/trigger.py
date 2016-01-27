@@ -138,7 +138,6 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         skipped.
 
         """
-        has_ignored_parent = True
         config_sections = self._get_config_sections(config_data)
         config_sections_duplicate_map = self._get_duplicate_config_sections(
             config_data, config_sections=config_sections)
@@ -151,10 +150,11 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             start_ids = alt_ids
         id_stack = []
         for start_id in start_ids:
+            has_ignored_parent = True
             if (start_id in self.enabled_dict and
                     start_id not in self.ignored_dict):
                 has_ignored_parent = False
-            if not sum([start_id in v for v in
+            if not sum([var_id in v for v in
                         self.trigger_family_lookup.values()]):
                 has_ignored_parent = False
             section, option = self._get_section_option_from_id(start_id)
