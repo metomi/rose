@@ -291,10 +291,6 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def get_status_from_data(self, node_data):
         """Return markup corresponding to changes since the last save."""
-        if not hasattr(self, '_cached_data_statuses'):
-            self._cached_data_statuses = {}
-        if node_data in self._cached_data_statuses:
-            return self._cached_data_statuses[node_data]
         text = ""
         mod_markup = rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
         err_markup = rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP
@@ -329,7 +325,6 @@ class BaseSummaryDataPanel(gtk.VBox):
                 text += mod_markup
             if node_data.error:
                 text += err_markup
-        self._cached_data_statuses[node_data] = text
         return text
 
     def _refilter(self, widget=None):
