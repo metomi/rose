@@ -45,9 +45,11 @@ tests "$(($(wc -w <<<"${HOSTS}") + 2))"
 run_pass "${TEST_KEY_BASE}" rose 'host-select' -v -v ${HOSTS}
 
 # 1 bash command
-grep -F "[INFO] bash" "${TEST_KEY_BASE}.out" >"${TEST_KEY_BASE}.out.1"
+sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
+     "${TEST_KEY_BASE}.out" > stamp-removed.log
+grep -F "[INFO] YYYY-MM-DDTHHMMZ : bash" "stamp-removed.log" >"${TEST_KEY_BASE}.out.1"
 file_cmp "${TEST_KEY_BASE}.out.1" "${TEST_KEY_BASE}.out.1" <<'__OUT__'
-[INFO] bash <<'__STDIN__'
+[INFO] YYYY-MM-DDTHHMMZ : bash <<'__STDIN__'
 __OUT__
 
 # 0 ssh LOCAL_HOST command
@@ -59,11 +61,13 @@ done
 
 # 1 ssh MORE_HOST command
 if [[ -n ${MORE_HOST} ]]; then
-    grep -F "[INFO] ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST}" \
-        "${TEST_KEY_BASE}.out" >"${TEST_KEY_BASE}.out.${MORE_HOST}"
+    sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
+        "${TEST_KEY_BASE}.out" > stamp-removed.log
+    grep -F "[INFO] YYYY-MM-DDTHHMMZ : ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST}" \
+        "stamp-removed.log" >"${TEST_KEY_BASE}.out.${MORE_HOST}"
     file_cmp "${TEST_KEY_BASE}.out.${MORE_HOST}" \
         "${TEST_KEY_BASE}.out.${MORE_HOST}" <<__OUT__
-[INFO] ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST} bash <<'__STDIN__'
+[INFO] YYYY-MM-DDTHHMMZ : ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST} bash <<'__STDIN__'
 __OUT__
 fi
 
