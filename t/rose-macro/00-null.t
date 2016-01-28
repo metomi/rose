@@ -100,8 +100,10 @@ init_meta </dev/null
 TEST_KEY=$TEST_KEY_BASE-null-metadata-verbose
 setup
 run_pass "$TEST_KEY" rose macro -v -V -C ../config
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-[INFO] Configurations OK
+sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
+ $TEST_KEY.out > $TEST_KEY.out_mod
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out_mod" <<'__OUT__'
+[INFO] YYYY-MM-DDTHHMMZ : Configurations OK
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

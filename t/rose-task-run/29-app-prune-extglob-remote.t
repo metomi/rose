@@ -47,18 +47,21 @@ run_pass "${TEST_KEY}" \
     --no-gcontrol --host='localhost' ${JOB_HOST_OPT} -- --debug
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
-sed '/^\[INFO\] export ROSE_TASK_CYCLE_TIME=/p;/^\[INFO\] delete: /!d' \
-    "${SUITE_RUN_DIR}/prune.log" >'edited-prune.log'
+sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
+    "${SUITE_RUN_DIR}/prune.log" > stamp-removed.log
+sed '/^\[INFO\] YYYY-MM-DDTHHMMZ : export ROSE_TASK_CYCLE_TIME=/p;
+    /^\[INFO\] YYYY-MM-DDTHHMMZ : delete: /!d' \
+    "stamp-removed.log" >'edited-prune.log'
 file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
-[INFO] export ROSE_TASK_CYCLE_TIME=20150101T0000Z
-[INFO] export ROSE_TASK_CYCLE_TIME=20150102T0000Z
-[INFO] delete: ${JOB_HOST}:work/20150101T0000Z/creator/red_dwarf.nl
-[INFO] delete: ${JOB_HOST}:work/20150101T0000Z/creator/rose-app-run.conf
-[INFO] export ROSE_TASK_CYCLE_TIME=20150103T0000Z
-[INFO] delete: ${JOB_HOST}:work/20150101T0000Z
-[INFO] delete: ${JOB_HOST}:work/20150102T0000Z/creator/red_dwarf.nl
-[INFO] delete: ${JOB_HOST}:work/20150102T0000Z/creator/rose-app-run.conf
-[INFO] delete: work/20150101T0000Z
+[INFO] YYYY-MM-DDTHHMMZ : export ROSE_TASK_CYCLE_TIME=20150101T0000Z
+[INFO] YYYY-MM-DDTHHMMZ : export ROSE_TASK_CYCLE_TIME=20150102T0000Z
+[INFO] YYYY-MM-DDTHHMMZ : delete: ${JOB_HOST}:work/20150101T0000Z/creator/red_dwarf.nl
+[INFO] YYYY-MM-DDTHHMMZ : delete: ${JOB_HOST}:work/20150101T0000Z/creator/rose-app-run.conf
+[INFO] YYYY-MM-DDTHHMMZ : export ROSE_TASK_CYCLE_TIME=20150103T0000Z
+[INFO] YYYY-MM-DDTHHMMZ : delete: ${JOB_HOST}:work/20150101T0000Z
+[INFO] YYYY-MM-DDTHHMMZ : delete: ${JOB_HOST}:work/20150102T0000Z/creator/red_dwarf.nl
+[INFO] YYYY-MM-DDTHHMMZ : delete: ${JOB_HOST}:work/20150102T0000Z/creator/rose-app-run.conf
+[INFO] YYYY-MM-DDTHHMMZ : delete: work/20150101T0000Z
 __LOG__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
