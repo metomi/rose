@@ -2475,7 +2475,8 @@ launcher-preopts.mpiexec=-n $NPROC
 
         <ul>
           <li>A <var>__</var> (double underscore) prefix denotes a cycle time
-          in the future. Otherwise, it is a cycle time in the past.</li>
+          in the future (because a minus sign cannot be used in an environment
+          variable). Otherwise, it is a cycle time in the past.</li>
 
           <li>The rest should be either an <a href=
           "http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>
@@ -2551,13 +2552,18 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>--cycle-offset=TIME-DELTA, -T TIME-DELTA</kbd></dt>
 
-      <dd>Specify one or more the cycle offsets to determine what
+      <dd>Specify one or more cycle offsets to determine what
       <var>ROSE_DATAC????</var> environment variables to export. The
       <var>TIME-DELTA</var> argument uses the syntax explained above in the
       <var>ROSE_DATAC????</var> environment variable.<br />
       E.g. <kbd>--cycle-offset=PT3H --cycle-offset=PT6H</kbd> will tell
       <kbd>rose task-env</kbd> to export <var>ROSE_DATACPT3H</var> and
-      <var>ROSE_DATACPT6H</var>.</dd>
+      <var>ROSE_DATACPT6H</var>. Note: The main usage of this option is to
+      reference a cycle time in the past, so a positive offset is used to go
+      backward in time, and a negative offset is used to go forward in time.
+      E.g. <kbd>--cycle-offset=-PT3H</kbd> will tell <kbd>rose task-env</kbd>
+      to export <var>ROSE_DATAC__PT3H</var> for <var>ROSE_DATAC</var> of 3 hours
+      ahead of the current cycle time.</dd>
 
       <dt><kbd>--path=[NAME=]PATTERN, -P [NAME=]PATTERN</kbd></dt>
 
