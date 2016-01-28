@@ -53,7 +53,8 @@
 #         The path to the data directory of the cycle time with an offset
 #         relative to the current cycle time. ???? is a duration:
 #             * A "__" (double underscore) prefix denotes a cycle time in the
-#               future.  Otherwise, it is a cycle time in the past.
+#               future (because a minus sign cannot be used in an environment
+#               variable). Otherwise, it is a cycle time in the past.
 #             * The rest should be either an ISO 8601 duration, such as:
 #               * P2W - 2 weeks
 #               * PT12H - 12 hours
@@ -87,12 +88,18 @@
 #         CCYYMMDDhh (deprecated) date/time format, or a TIME-DELTA string
 #         described in the --cycle-offset=TIME-DELTA option.
 #     --cycle-offset=TIME-DELTA, -T TIME-DELTA
-#         Specify one or more the cycle offsets to determine what
+#         Specify one or more cycle offsets to determine what
 #         ROSE_DATAC???? environment variables to export. The TIME-DELTA
 #         argument uses the syntax explained above in the ROSE_DATAC????
-#         environment variable.
+#         environment variable. 
 #         E.g. --cycle-offset=PT3H --cycle-offset=PT6H will tell
 #         "rose task-env" to export ROSE_DATACPT3H and ROSE_DATACPT6H.
+#         Note:  The main usage of this option is to reference a cycle time in
+#         the past, so a positive offset is used to go backward in time, and a
+#         negative offset is used to go forward in time. E.g.
+#         --cycle-offset=-PT3H will tell "rose task-env" to export
+#         ROSE_DATAC__PT3H for ROSE_DATAC of 3 hours ahead of the current cycle
+#         time.
 #     --path=[NAME=]PATTERN, -P [NAME=]PATTERN
 #         Each of these specify a glob pattern for paths to prepend to an
 #         environment variable called NAME (or PATH if NAME is not specified).
