@@ -379,10 +379,11 @@ class RosieVCClient(object):
                 info_config.set(["title"], "")
 
         # Determine prefix
-        if from_id is not None:
-            prefix = from_id.prefix
-        elif prefix is None:
-            prefix = SuiteId.get_prefix_default()
+        if prefix is None:
+            if from_id is None:
+                prefix = SuiteId.get_prefix_default()
+            else:
+                prefix = from_id.prefix
 
         # Determine owner:
         # 1. From user configuration [rosie-id]prefix-username

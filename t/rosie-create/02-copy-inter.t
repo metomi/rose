@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
-tests 16
+tests 20
 #-------------------------------------------------------------------------------
 svnadmin create 'bar'
 svnadmin create 'foo'
@@ -40,7 +40,7 @@ export ROSE_CONF_PATH=$PWD
 #-------------------------------------------------------------------------------
 # Create some suites, add some contents
 cat >'rose-suite.info' <<__INFO__
-owner=$USER
+owner=bob
 project=bar
 title=barley
 __INFO__
@@ -58,7 +58,7 @@ svn add --parents -q "${PWD}/roses/bar-aa000/app/barley/rose-app.conf"
 svn commit -q -m 'whatever' "${PWD}/roses/bar-aa000"
 
 cat >'rose-suite.info' <<__INFO__
-owner=$USER
+owner=fred
 project=foo
 title=football
 __INFO__
@@ -84,6 +84,13 @@ run_pass "${TEST_KEY}" rosie copy -y 'foo-aa000'
 }>"${TEST_KEY}.out.1"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" "${TEST_KEY}.out.1"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
+file_cmp "${TEST_KEY}-rose-suite.info" \
+    "${PWD}/roses/foo-aa001/rose-suite.info" <<'__ROSE_SUITE_INFO__'
+description=Copy of foo-aa000/trunk@2
+owner=fred
+project=foo
+title=football
+__ROSE_SUITE_INFO__
 file_cmp "${TEST_KEY}-rose-suite.conf" \
     "${PWD}/roses/foo-aa000/rose-suite.conf" \
     "${PWD}/roses/foo-aa001/rose-suite.conf" \
@@ -100,6 +107,13 @@ run_pass "${TEST_KEY}" rosie copy -y 'bar-aa000'
 }>"${TEST_KEY}.out.1"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" "${TEST_KEY}.out.1"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
+file_cmp "${TEST_KEY}-rose-suite.info" \
+    "${PWD}/roses/bar-aa001/rose-suite.info" <<'__ROSE_SUITE_INFO__'
+description=Copy of bar-aa000/trunk@2
+owner=bob
+project=bar
+title=barley
+__ROSE_SUITE_INFO__
 file_cmp "${TEST_KEY}-rose-suite.conf" \
     "${PWD}/roses/bar-aa000/rose-suite.conf" \
     "${PWD}/roses/bar-aa001/rose-suite.conf" \
@@ -116,6 +130,13 @@ run_pass "${TEST_KEY}" rosie copy --prefix='bar' -y 'foo-aa000'
 }>"${TEST_KEY}.out.1"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" "${TEST_KEY}.out.1"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
+file_cmp "${TEST_KEY}-rose-suite.info" \
+    "${PWD}/roses/bar-aa002/rose-suite.info" <<'__ROSE_SUITE_INFO__'
+description=Copy of foo-aa000/trunk@2
+owner=bob
+project=foo
+title=football
+__ROSE_SUITE_INFO__
 file_cmp "${TEST_KEY}-rose-suite.conf" \
     "${PWD}/roses/foo-aa000/rose-suite.conf" \
     "${PWD}/roses/bar-aa002/rose-suite.conf" \
@@ -132,6 +153,13 @@ run_pass "${TEST_KEY}" rosie copy --prefix='foo' -y 'bar-aa000'
 }>"${TEST_KEY}.out.1"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" "${TEST_KEY}.out.1"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
+file_cmp "${TEST_KEY}-rose-suite.info" \
+    "${PWD}/roses/foo-aa002/rose-suite.info" <<'__ROSE_SUITE_INFO__'
+description=Copy of bar-aa000/trunk@2
+owner=fred
+project=bar
+title=barley
+__ROSE_SUITE_INFO__
 file_cmp "${TEST_KEY}-rose-suite.conf" \
     "${PWD}/roses/bar-aa000/rose-suite.conf" \
     "${PWD}/roses/foo-aa002/rose-suite.conf" \
