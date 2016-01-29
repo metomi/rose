@@ -479,31 +479,46 @@
     </div>
 
     <div class="slide">
-      <h2 id="gcontrol">cylc gui</h2>
+      <h2 id="cylc-gui">cylc gui</h2>
 
       <ul class="incremental">
-        <li>Usually launched by <code>rose suite-run</code> or using <code>rose
-        suite-gcontrol</code>.</li>
+        <li>Usually launched by <code>rose suite-run</code> or using the
+        commands <code>rose suite-gcontrol</code> (<code>rose sgc</code>) or
+        <code>cylc gui SUITE-NAME</code>.</li>
 
         <li>Three views - <a href="graph-view.png">graph</a>,
         <a href="dot-view.png">dot</a>
-        (square now!), <a href="text-view.png">tree</a></li>
+        (square now!), <a href="text-view.png">tree</a>.</li>
 
-        <li>Easy stop/start interface</li>
+        <li>Easy interface to start, pause (hold) and stop the suite.</li>
 
-        <li>Get task <var>STDOUT</var>, <var>STDERR</var>, state</li>
+        <li>View task states, and <samp>job.out</samp>, <samp>job.err</samp>,
+        etc files for task jobs.</li>
 
-        <li>Manual trigger/reset of tasks</li>
+        <li>Poll and kill submitted and running task jobs.</li>
+
+        <li>Manually trigger tasks and reset task states.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="cylc-gscan">cylc gscan</h2>
+
+      <ul class="incremental">
+        <li>Monitor all your running suites on a set of suite hosts from a
+        single GUI.</li>
+
+        <li>Launch <code>cylc gui</code> for individual suites.</li>
       </ul>
     </div>
 
     <div class="slide">
       <h2 id="suite-log">Rose Bush</h2>
 
-      <ul class="incremental">
-        <li>Browse suite logs via HTTP - view using <code>rose
-        suite-log</code>.</li>
-      </ul>
+      <p>Browse suite logs via HTTP.</p>
+      
+      <p>View suite status on your web browser. Can be launched using <code>rose
+      suite-log</code>.</p>
     </div>
 
     <div class="slide">
@@ -518,6 +533,9 @@
         <li><kbd>rose_arch</kbd> - archive output</li>
 
         <li><kbd>rose_prune</kbd> - housekeep a cycling suite</li>
+
+        <li><kbd>rose_bunch</kbd> - run multiple command variants in
+        parallel</li>
       </ul>
     </div>
 
@@ -528,26 +546,32 @@
         <li><kbd>rose date</kbd> - flexible way to manipulate date/time strings
         with or without an offset.</li>
 
-        <li><kbd>rose mpi-launch</kbd> - configurable MPI program launcher</li>
-
         <li><kbd>rose host-select</kbd> - configurable remote hosts
         selector</li>
       </ul>
     </div>
 
     <div class="slide">
-      <h2 id="disk">Tidying Up</h2>
+      <h2 id="rose-suite-clean">Tidying Up Runtime Directories</h2>
 
-      <p>You can delete a <var>~/roses/SUITE_NAME/</var> directory in the
-      normal way (<code>rm -rf</code>), or run <code>rosie delete --local-only
-      SUITE_NAME</code>.</p>
+      <p>Run <code>rose suite-clean SUITE_NAME [...]</code> to delete suite
+      output in the <var>~/cylc-run/SUITE_NAME/</var> directories. The command
+      removes the actual locations of <var>share/</var>, <var>share/cycle/</var>
+      and <var>work/</var> (which may be symbolic links), as well as the
+      <var>~/cylc-run/SUITE_NAME/</var> directory structure in each job host of
+      the latest run.</p>
+    </div>
 
-      <p>You can delete your suite output in <var>~/cylc-run/SUITE_NAME/</var>
-      in the normal way, or run <code>rose suite-clean SUITE_NAME</code>. The
-      latter removes the actual locations of <var>share/</var>,
-      <var>share/cycle/</var> and <var>work/</var> (which may be symbolic
-      links), as well as the <var>~/cylc-run/SUITE_NAME/</var> directory
-      structure in each job host of the latest run.</p>
+    <div class="slide">
+      <h2 id="rosie-delete">Tidying Up Rosie Suites</h2>
+
+      <p>Run <code>rosie delete SUITE_NAME</code> to delete
+      <var>SUITE_NAME</var> from the HEAD of its Rosie Subversion repository as
+      well as the <var>~/roses/SUITE_NAME/</var> directory.</p>
+      
+      <p>If you only want to remove the <var>~/roses/SUITE_NAME/</var>
+      directory, you can run <code>rm -rf ~/roses/SUITE_NAME</code> or
+      <code>rosie delete --local-only SUITE_NAME</code>.</p>
     </div>
 
     <div class="slide">
