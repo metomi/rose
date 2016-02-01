@@ -85,7 +85,7 @@ class Reporter(object):
         msg_lines = []
 
         if verbosity >= self.VV:
-            stamp = time.strftime("%Y-%m-%dT%H:%M:%S ")
+            stamp = time.strftime("%Y-%m-%dT%H:%M:%S%z ")
         else:
             stamp = ""
 

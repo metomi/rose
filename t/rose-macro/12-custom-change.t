@@ -52,7 +52,7 @@ init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro_change.py
 CONFIG_DIR=$(cd ../config && pwd -P)
 run_pass "$TEST_KEY" \
     rose macro -v --non-interactive --config=../config envswitch.LogicalTransformer
-sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
+sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\
     "$TEST_KEY.out" > edited.log
 file_cmp "$TEST_KEY.out" "edited.log" <<__CONTENT__
 [T] envswitch.LogicalTransformer: changes: 1

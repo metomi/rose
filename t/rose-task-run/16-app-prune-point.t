@@ -36,7 +36,7 @@ run_pass "${TEST_KEY}" \
 cat "${TEST_KEY}.err" >&2
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
-sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
+sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\
     "${SUITE_RUN_DIR}/prune.log" > stamp-removed.log
 
 sed '/^\[INFO\] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=/p;
