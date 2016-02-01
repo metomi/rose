@@ -46,7 +46,7 @@ FILE=$LOG_DIR/$APP/NN/job.out
 for ARGVALUE in 0 1 2 3; do
     TEST_KEY=$TEST_KEY_PREFIX-$ARGVALUE
     file_grep $TEST_KEY \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : $ARGVALUE: added to pool"\
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* $ARGVALUE: added to pool"\
      $FILE
 done
 #-------------------------------------------------------------------------------
@@ -66,12 +66,12 @@ APP=bunch_fail
 TEST_KEY_PREFIX=abort-on-fail
 FILE=$LOG_DIR/$APP/NN/job.out
 file_grep_fail $TEST_KEY_PREFIX-no-run \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : Adding command 2 to pool: banana" $FILE
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* Adding command 2 to pool: banana" $FILE
 file_grep $TEST_KEY_PREFIX-skip \
-    "\[SKIP\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z :  2: banana" $FILE
+    "\[SKIP\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*  2: banana" $FILE
 FILE=$LOG_DIR/$APP/NN/job.err
 file_grep $TEST_KEY_PREFIX-record-error \
-    "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 1 # return-code=1" $FILE
+    "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 1 # return-code=1" $FILE
 #-------------------------------------------------------------------------------
 # Testing incremental mode
 #-------------------------------------------------------------------------------
@@ -83,28 +83,28 @@ TEST_KEY_PREFIX=incremental
 #-------------------------------------------------------------------------------
 FILE=$LOG_DIR/$APP/01/job.err
 file_grep $TEST_KEY_PREFIX-record-error \
-    "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 1 # return-code=1" $FILE
+    "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 1 # return-code=1" $FILE
 FILE=$LOG_DIR/$APP/01/job.out
 file_grep $TEST_KEY_PREFIX-ran-0 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 0: added to pool" $FILE
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 0: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-ran-1 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 1: added to pool" $FILE
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 1: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-ran-2 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 2: added to pool" $FILE
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 2: added to pool" $FILE
 #-------------------------------------------------------------------------------
 # Second run files
 #-------------------------------------------------------------------------------
 FILE=$LOG_DIR/$APP/02/job.out
 file_grep_fail $TEST_KEY_PREFIX-not-ran-0 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 0: added to pool" $FILE
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 0: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-skip-0 \
-    "\[PASS\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z :  0" $FILE
+    "\[PASS\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*  0" $FILE
 file_grep $TEST_KEY_PREFIX-reran-1 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 1: added to pool" $FILE
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 1: added to pool" $FILE
 file_grep_fail $TEST_KEY_PREFIX-not-ran-2 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 2: added to pool" $FILE
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 2: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-skip-2 \
-    "\[PASS\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z :  2" $FILE
+    "\[PASS\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*  2" $FILE
 #-------------------------------------------------------------------------------
 # Testing works ok with double digit population size
 #-------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ APP=bunch_bigpop
 TEST_KEY_PREFIX=big-pop
 FILE=$LOG_DIR/$APP/01/job.out
 for INSTANCE in $(seq 0 14); do
-    file_grep $TEST_KEY_PREFIX-ran-$INSTANCE "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z :  $INSTANCE" $FILE
+    file_grep $TEST_KEY_PREFIX-ran-$INSTANCE "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*  $INSTANCE" $FILE
 done
 #-------------------------------------------------------------------------------
 # Testing names works ok
@@ -123,7 +123,7 @@ APP=bunch_names
 TEST_KEY_PREFIX=names
 FILE=$LOG_DIR/$APP/01/job.out
 for KEY in foo bar baz qux; do
-    file_grep $TEST_KEY_PREFIX-ran-$KEY "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z :  $KEY" $FILE
+    file_grep $TEST_KEY_PREFIX-ran-$KEY "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*  $KEY" $FILE
 done
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -136,14 +136,14 @@ FILE_PREFIX=$LOG_DIR/$APP/01/job
 #-------------------------------------------------------------------------------
 # First run files
 #-------------------------------------------------------------------------------
-file_grep $TEST_KEY_PREFIX-ran-0 "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z :  0" $FILE_PREFIX.out
-file_grep $TEST_KEY_PREFIX-fail-1 "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 1" $FILE_PREFIX.err
-file_grep $TEST_KEY_PREFIX-ran-2 "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z :  2" $FILE_PREFIX.out
+file_grep $TEST_KEY_PREFIX-ran-0 "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*  0" $FILE_PREFIX.out
+file_grep $TEST_KEY_PREFIX-fail-1 "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 1" $FILE_PREFIX.err
+file_grep $TEST_KEY_PREFIX-ran-2 "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*  2" $FILE_PREFIX.out
 #-------------------------------------------------------------------------------
 # Second run files
 #-------------------------------------------------------------------------------
 FILE=$LOG_DIR/$APP/02/job.err
-file_grep $TEST_KEY_PREFIX-fail-1 "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*Z : 1" $FILE
+file_grep $TEST_KEY_PREFIX-fail-1 "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]* 1" $FILE
 #-------------------------------------------------------------------------------
 FILE_DIR=$LOG_DIR/$APP/01/
 for KEY in $(seq 0 2); do

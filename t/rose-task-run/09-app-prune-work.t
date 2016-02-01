@@ -36,8 +36,8 @@ run_pass "$TEST_KEY" \
 TEST_KEY="$TEST_KEY_BASE-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
     "${SUITE_RUN_DIR}/prune.log" > stamp-removed.log
-sed '/^\[INFO\] YYYY-MM-DDTHHMMZ : export ROSE_TASK_CYCLE_TIME=/p;
-    /^\[INFO\] YYYY-MM-DDTHHMMZ : delete: /!d' \
+sed '/^\[INFO\] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=/p;
+    /^\[INFO\] YYYY-MM-DDTHHMM delete: /!d' \
     stamp-removed.log >edited-prune.log
 file_cmp "$TEST_KEY" "$TEST_SOURCE_DIR/$TEST_KEY_BASE.log" edited-prune.log
 #-------------------------------------------------------------------------------

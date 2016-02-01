@@ -85,11 +85,9 @@ class Reporter(object):
         msg_lines = []
 
         if verbosity >= self.VV:
-            stamp = time.strftime("%Y-%m-%dT%H:%M:%SZ : ")
+            stamp = time.strftime("%Y-%m-%dT%H:%M:%S ")
         else:
             stamp = ""
-
-        insert_newline = False
 
         if prefix:
             for line in msg.splitlines():
@@ -100,12 +98,13 @@ class Reporter(object):
                 msg_lines.append(msg_line)
         else:
             msg_line = stamp
+            should_insert_newline = False
             if clip is not None:
                 if msg.endswith("\n") and len(msg) > clip:
-                    insert_newline = True
+                    should_insert_newline = True
                     msg = msg[:-1]
                 msg_line = msg_line + msg[:clip]
-            if insert_newline:
+            if should_insert_newline:
                 msg_line = msg_line + "\n"
             else:
                 msg_line = msg
@@ -177,7 +176,7 @@ class Reporter(object):
                     msg = unicode(message)
 
             msg_lines = self.format_msg(msg, context.verbosity, prefix, clip)
-            #print msg_lines
+
             for line in msg_lines:
                 context.write(line)
 

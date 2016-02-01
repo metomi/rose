@@ -36,15 +36,15 @@ run_pass "${TEST_KEY}" \
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
     "${SUITE_RUN_DIR}/prune.log" > stamp-removed.log
-sed '/^\[INFO\] YYYY-MM-DDTHHMMZ : export ROSE_TASK_CYCLE_TIME=/p;
-    /^\[INFO\] YYYY-MM-DDTHHMMZ : delete: /!d' \
+sed '/^\[INFO\] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=/p;
+    /^\[INFO\] YYYY-MM-DDTHHMM delete: /!d' \
     "stamp-removed.log" >'edited-prune.log'
 file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
-[INFO] YYYY-MM-DDTHHMMZ : export ROSE_TASK_CYCLE_TIME=19700101T0000Z
-[INFO] YYYY-MM-DDTHHMMZ : export ROSE_TASK_CYCLE_TIME=19900101T0000Z
-[INFO] YYYY-MM-DDTHHMMZ : delete: share/hello-earth-in-1970.txt
-[INFO] YYYY-MM-DDTHHMMZ : delete: share/hello-mars-in-1970.txt
-[INFO] YYYY-MM-DDTHHMMZ : delete: share/hello-venus-in-1970.txt
+[INFO] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=19700101T0000Z
+[INFO] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=19900101T0000Z
+[INFO] YYYY-MM-DDTHHMM delete: share/hello-earth-in-1970.txt
+[INFO] YYYY-MM-DDTHHMM delete: share/hello-mars-in-1970.txt
+[INFO] YYYY-MM-DDTHHMM delete: share/hello-venus-in-1970.txt
 __LOG__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"

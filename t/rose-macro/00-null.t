@@ -103,7 +103,7 @@ run_pass "$TEST_KEY" rose macro -v -V -C ../config
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*/YYYY-MM-DDTHHMM/g'\
  $TEST_KEY.out > $TEST_KEY.out_mod
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out_mod" <<'__OUT__'
-[INFO] YYYY-MM-DDTHHMMZ : Configurations OK
+[INFO] YYYY-MM-DDTHHMM Configurations OK
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

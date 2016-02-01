@@ -58,7 +58,7 @@ file_cmp "$TEST_KEY.out" "edited.log" <<__CONTENT__
 [T] envswitch.LogicalTransformer: changes: 1
     env=TRANSFORM_SWITCH=false
         false -> true
-[INFO] YYYY-MM-DDTHHMMZ : M $CONFIG_DIR
+[INFO] YYYY-MM-DDTHHMM M $CONFIG_DIR
 __CONTENT__
 file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONFIG__'
 [env]
