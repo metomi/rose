@@ -520,19 +520,6 @@ class RoseBushService(object):
             file_content = self.suite_engine_proc.is_conf(path)
         template = self.template_env.get_template("view.html")
 
-        # convert url(s) to hyperlinks if in text mode
-        if mode == None:
-            urlregex = re.compile('\\b(?:https?|ftp)://\S+\\b')
-            for i in range(0, len(lines)):
-                line = lines[i]
-                match = urlregex.search(line)
-                if match:
-                    begining, end = match.span()
-                    lines[i] = '%s'*3 % (
-                        line[:begining],
-                        '<a href="{0}">{0}</a>'.format(match.group(0)),
-                        line[end:])
-
         data = {}
         data.update(self._get_suite_logs_info(user, suite))
         return template.render(
