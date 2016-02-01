@@ -27,6 +27,8 @@
     <!-- entry: status -->
     {% if no_fuzzy_time -%}
       {% set no_fuzzy_time_str = "&no_fuzzy_time=" + no_fuzzy_time -%}
+    {% else -%}
+      {% set no_fuzzy_time_str = "" -%}
     {% endif -%}
     {% set cycle_str = entry.cycle|replace('+', '%2B') -%}
     {% if entry.cycle != "1" -%}
