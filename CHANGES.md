@@ -5,6 +5,42 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2016-Q1?)
+
+Rose release 36. This release will work best with
+[cylc-6.8.0](https://github.com/cylc/cylc/releases/tag/6.8.0) and
+[fcm-2015.12.0](https://github.com/metomi/fcm/releases/tag/2015.12.0), or their
+successors.
+
+### Noteworthy Changes
+
+[#1822](https://github.com/metomi/rose/pull/1822):
+rose app-upgrade: fix trigger conflict with namelist prettification.
+
+[#1820](https://github.com/metomi/rose/pull/1820):
+rose bush: view: fix internal server error caused by missing items in the job
+entry associated with the log.
+
+[#1819](https://github.com/metomi/rose/pull/1819):
+rose CLI commands will now report information with a time stamp on `-v -v`
+verbosity.
+
+[#1811](https://github.com/metomi/rose/pull/1811):
+rosie copy: on suite copy between 2 repositories, ensure that the destination
+prefix is used to determine the value of owner, etc.
+
+[#1807](https://github.com/metomi/rose/pull/1807):
+rosa svn-pre-commit: should now stop trunk replace.
+
+[#1804](https://github.com/metomi/rose/pull/1804):
+rose_ana: extra retry database operations on failure.
+
+[#1802](https://github.com/metomi/rose/pull/1802):
+rose host-select: improve parser for ranking and threshold commands output, and
+in particular, the parser for the `free -m` command.
+
+--------------------------------------------------------------------------------
+
 ## 2016.01.0 (2016-01-15)
 
 Rose release 35. This release works best with
