@@ -1156,6 +1156,7 @@ def get_user_values(options):
 def dump_config(config, opt_conf_dir, opt_output_dir=None,
                 conf_key=None, name=rose.SUB_CONFIG_NAME):
     """Dump the config in a standard form."""
+    config = copy.deepcopy(config)
     pretty_format_config(config)
     if opt_output_dir is None:
         directory = opt_conf_dir
