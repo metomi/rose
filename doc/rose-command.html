@@ -940,7 +940,7 @@ rose date -c 19700101T000000Z ref
 rose date 19700101T000000Z 20380119T031407Z
 
 # 3.  Convert ISO8601 duration
-# 3.1 Into the total number of hours (h), minutes(m) or seconds (s)
+# 3.1 Into the total number of hours (H), minutes(M) or seconds (S)
 #     it represents
 rose date --as-total=s PT1H
 </pre>
@@ -959,6 +959,11 @@ rose date --as-total=s PT1H
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--as-total=TIME_FORMAT</kbd><dt>
+
+      <dd>Used to express an ISO 8601 duration in the specified time format,
+      hours H, minutes M or seconds S.</dd>
+
       <dt><kbd>--calendar=gregorian|360day|365day|366day</kbd></dt>
 
       <dd>Specify the calendar mode. See <a href=

@@ -51,7 +51,7 @@
 #     rose date 19700101T000000Z 20380119T031407Z
 #
 #     # 3.  Convert ISO8601 duration
-#     # 3.1 Into the total number of hours (h), minutes (m) or seconds (s)
+#     # 3.1 Into the total number of hours (H), minutes (M) or seconds (S)
 #     #     it represents
 #     rose date --as-total=s PT1H
 #
@@ -64,6 +64,9 @@
 #     2. With 2 arguments. Print the duration between the 2 arguments.
 #
 # OPTIONS
+#     --as-total=TIME_FORMAT
+#         Used to express an ISO8601 duration in the specified time format,
+#         hours H, minutes M or seconds S.
 #     --calendar=gregorian|360day|365day|366day
 #         Specify the calendar mode. See CALENDAR MODE below.
 #     --offset1=OFFSET, --offset=OFFSET, -s OFFSET, -1 OFFSET
@@ -81,9 +84,6 @@
 #         reference time instead of the current time.
 #     --utc, -u
 #         Assume date time in UTC instead of local or other time zones. 
-#     --as-total=TIME_FORMAT
-#         Used to express an ISO8601 duration in the specified time format,
-#         hours h, minutes m or seconds s.
 #
 # CALENDAR MODE
 #     The calendar mode is determined (in order) by:

@@ -381,7 +381,8 @@ def _convert_duration(date_time_oper, opts, args):
     time = time_in_8601.get_seconds()
     options = {'S': time, 'M': time/60, 'H': time/3600}
     if opts.duration_print_format.upper() in options:
-        # supplied duration format is valid (upper removes case-sentisitivity)
+        # supplied duration format is valid (upper removes
+        # case-sensitivity)
         print options[opts.duration_print_format.upper()]
     else:
         # supplied duration format not valid
