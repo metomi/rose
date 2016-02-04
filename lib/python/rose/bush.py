@@ -57,6 +57,7 @@ class RoseBushService(object):
     SUITES_PER_PAGE = 100
     VIEW_SIZE_MAX = 10 * 1024 * 1024  # 10MB
 
+
     def __init__(self, *args, **kwargs):
         self.exposed = True
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
@@ -72,6 +73,14 @@ class RoseBushService(object):
         template_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
             ResourceLocator.default().get_util_home(
                 "lib", "html", "template", "rose-bush")))
+
+        def urlise(text):
+            pattern = '((https?):\/\/[^\s\(\)&\[\]\{\}]+)'
+            replacement = '<a href="\g<1>">\g<1></a>'
+            text = re.sub(pattern, replacement, text)
+            return text
+
+        template_env.filters['urlise'] = urlise
         self.template_env = template_env
 
     @cherrypy.expose

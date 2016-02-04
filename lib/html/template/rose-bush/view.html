@@ -51,10 +51,10 @@
 {% if line|length > 7 and line[0:7] in PREFIXES -%}
 <span class="{{PREFIXES[line[0:7]]}}">{{line[0:7]}}</span>{{line[7:]}}
 {% else -%}
-{% if mode == "text" -%}
-{{line|urlize(40, true)}}
-{% else -%}
+{% if mode == "tags" -%}
 {{line}}
+{% else -%}
+{{line|urlise}}
 {% endif -%}
 {% endif -%}
 {% endfor -%}
