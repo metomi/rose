@@ -115,7 +115,7 @@ class ConfigNode(object):
         if isinstance(self.value, dict):
             for key in self.value.keys():
                 yield key
-        
+
     def __eq__(self, other):
         if self is other:
             return True
