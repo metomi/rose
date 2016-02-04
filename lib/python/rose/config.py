@@ -111,9 +111,11 @@ class ConfigNode(object):
     def __delitem__(self, key):
         return self.value.pop(key)
 
-    def __iter__(self, key):
-        return self.value.items()
-
+    def __iter__(self):
+        if isinstance(self.value, dict):
+            for key in self.value.keys():
+                yield key
+        
     def __eq__(self, other):
         if self is other:
             return True
