@@ -24,7 +24,7 @@ import unittest
 
 
 class TestConfigData(unittest.TestCase):
-    """Test usage of the rose.config.Config object."""
+    """Test usage of the rose.config.ConfigNode object."""
 
     def test_init(self):
         """Test empty Config object."""
@@ -77,6 +77,16 @@ class TestConfigData(unittest.TestCase):
         self.assertEqual((node.value, node.state), ("value", ""))
         conf.get(["rubbish"]).state = "!"
         self.assertTrue(conf.get(["rubbish", "item"], True) is None)
+
+    def test_iter(self):
+        """Test the iterator"""
+        conf = rose.config.ConfigNode()
+        conf.set(["", "food"], "glorious")
+        conf.set(["dinner", "starter"], "soup")
+        conf.set(["dinner", "dessert"], "custard")
+        self.assertEqual(list(iter(conf)), ["food", "dinner"])
+        end_node = conf.get(["", "food"])
+        self.assertEqual(list(iter(end_node)), [])
 
 
 class TestConfigDump(unittest.TestCase):
