@@ -389,6 +389,9 @@ class ConfigDataHelper(object):
 
     def get_ns_ignored_status(self, namespace):
         """Return the ignored status for a namespace's data."""
+        cache = self.data.namespace_cached_statuses['ignored']
+        if namespace in cache:
+            return cache[namespace]
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
         sections = self.get_sections_from_namespace(namespace)
@@ -401,6 +404,7 @@ class ConfigDataHelper(object):
                 continue
             if sect_data.metadata["full_ns"] == namespace:
                 if not sect_data.ignored_reason:
+                    cache[namespace] = status
                     return status
                 for key in sect_data.ignored_reason:
                     default_section_statuses.setdefault(key, 0)
@@ -408,6 +412,7 @@ class ConfigDataHelper(object):
         real_data, latent_data = self.get_data_for_namespace(namespace)
         for var in real_data + latent_data:
             if not var.ignored_reason:
+                cache[namespace] = status
                 return status
             for key in var.ignored_reason:
                 if key == rose.variable.IGNORED_BY_SECTION:
@@ -424,6 +429,7 @@ class ConfigDataHelper(object):
                     variable_statuses[key] += 1
         if not (variable_statuses or sections):
             # No data, so no ignored state.
+            cache[namespace] = status
             return status
         # Now return the most 'popular' ignored status.
         # Choose section statuses if any are default for this namespace.
@@ -434,8 +440,10 @@ class ConfigDataHelper(object):
         status_counts = object_statuses.items()
         status_counts.sort(lambda x, y: cmp(x[1], y[1]))
         if not status_counts:
+            cache[namespace] = status
             return rose.config.ConfigNode.STATE_NORMAL
         status = status_counts[0][0]
+        cache[namespace] = status
         if status == rose.variable.IGNORED_BY_USER:
             return rose.config.ConfigNode.STATE_USER_IGNORED
         if status == rose.variable.IGNORED_BY_SYSTEM:
@@ -444,6 +452,9 @@ class ConfigDataHelper(object):
 
     def get_ns_latent_status(self, namespace):
         """Return whether a page has no associated content."""
+        cache = self.data.namespace_cached_statuses['latent']
+        if namespace in cache:
+            return cache[namespace]
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
         sections = self.get_sections_from_namespace(namespace)
@@ -454,9 +465,19 @@ class ConfigDataHelper(object):
                     config_data.sections.now[section].metadata["full_ns"])
                 if section_namespace == namespace:
                     # This is a default page for an existing section.
+                    cache[namespace] = False
                     return False
                 for variable in config_data.vars.now.get(section, []):
                     if variable.metadata["full_ns"] == namespace:
                         # This contains an existing variable.
+                        cache[namespace] = False
                         return False
+        cache[namespace] = True
         return True
+
+    def clear_namespace_cached_statuses(self, namespace):
+        """Reset cached latent, ignored, modified statuses for namespace."""
+        if namespace in self.data.namespace_cached_statuses['ignored']:
+            self.data.namespace_cached_statuses['ignored'].pop(namespace)
+        if namespace in self.data.namespace_cached_statuses['latent']:
+            self.data.namespace_cached_statuses['latent'].pop(namespace)
