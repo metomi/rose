@@ -116,7 +116,7 @@ class _Test(object):
     def __init__(self):
         self.base_names_of = {}
         self.test_num = 0
-        self.test_plan = "1..9"
+        self.test_plan = "1..11"
 
     def get_base_names(self, name):
         return self.base_names_of[name]
@@ -165,6 +165,14 @@ class _Test(object):
         self.base_names_of["P"] = ["A1", "A2"]
         self.test("triangle", mro("P", self.get_base_names),
                   ["P", "A2", "A1", "O"])
+
+        self.base_names_of["P"] = ["A1", "O"]
+        self.test(
+            "triangle-2", mro("P", self.get_base_names), ["P", "A1", "O"])
+
+        self.base_names_of["P"] = ["O", "A1"]
+        self.test(
+            "triangle-3", mro("P", self.get_base_names), ["P", "A1", "O"])
 
         self.base_names_of["D1"] = ["O"]
         self.base_names_of["E1"] = ["O"]
