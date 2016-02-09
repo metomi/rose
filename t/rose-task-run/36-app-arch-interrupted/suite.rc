@@ -1,0 +1,24 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout = PT1M
+        abort on timeout = True
+[scheduling]
+    [[dependencies]]
+        graph = archive
+
+[runtime]
+    [[archive]]
+        script = """
+touch whatever
+if (( $CYLC_TASK_TRY_NUMBER == 1 )); then
+    rose task-run -v -v --debug &
+    TASK_RUN_PID=$!
+    sleep 5
+    kill $TASK_RUN_PID
+    exit 1
+fi
+rose task-run -v -v --debug
+"""
+        retry delays = PT5S
