@@ -14,6 +14,14 @@ successors.
 
 ### Noteworthy Changes
 
+[#1825](https://github.com/metomi/rose/pull/1825):
+rose_arch: fix incorrect behaviour on retry. If the previous attempt to archive
+was killed, a subsequent retry would do nothing, due to the premature insertion
+of the target in the rose_arch database. This is now fixed.
+
+[#1823](https://github.com/metomi/rose/pull/1823):
+rose.config.ConfigNode: fix incorrect behaviour of the `__iter__` method.
+
 [#1822](https://github.com/metomi/rose/pull/1822):
 rose app-upgrade: fix trigger conflict with namelist prettification.
 
@@ -29,6 +37,11 @@ verbosity.
 rosie copy: on suite copy between 2 repositories, ensure that the destination
 prefix is used to determine the value of owner, etc.
 
+[#1809](https://github.com/metomi/rose/pull/1809):
+Rose Bush: view: text mode is now the default, which means HTML tags will be
+escaped by default. Previously, it would render HTML tags in text files by
+default. You can continue to render HTML tags by using the tags mode.
+
 [#1807](https://github.com/metomi/rose/pull/1807):
 rosa svn-pre-commit: should now stop trunk replace.
 
@@ -38,6 +51,9 @@ rose_ana: extra retry database operations on failure.
 [#1802](https://github.com/metomi/rose/pull/1802):
 rose host-select: improve parser for ranking and threshold commands output, and
 in particular, the parser for the `free -m` command.
+
+[#1758](https://github.com/metomi/rose/pull/1758):
+rose config-edit: speed up adding/deleting sections.
 
 --------------------------------------------------------------------------------
 
