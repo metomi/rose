@@ -25,6 +25,7 @@ from glob import glob
 import jinja2
 import mimetypes
 import os
+import re
 import pwd
 import shlex
 import simplejson
@@ -56,6 +57,7 @@ class RoseBushService(object):
     SUITES_PER_PAGE = 100
     VIEW_SIZE_MAX = 10 * 1024 * 1024  # 10MB
 
+
     def __init__(self, *args, **kwargs):
         self.exposed = True
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
@@ -71,6 +73,14 @@ class RoseBushService(object):
         template_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
             ResourceLocator.default().get_util_home(
                 "lib", "html", "template", "rose-bush")))
+
+        def urlise(text):
+            pattern = '((https?):\/\/[^\s\(\)&\[\]\{\}]+)'
+            replacement = '<a href="\g<1>">\g<1></a>'
+            text = re.sub(pattern, replacement, text)
+            return text
+
+        template_env.filters['urlise'] = urlise
         self.template_env = template_env
 
     @cherrypy.expose
@@ -493,7 +503,7 @@ class RoseBushService(object):
                 cherrypy.response.headers["Content-Type"] = mime
                 return cherrypy.lib.static.serve_file(f_name, mime)
             s = open(f_name).read()
-        if mode == "text":
+        if mode == None:
             s = jinja2.escape(s)
         try:
             lines = [unicode(line) for line in s.splitlines()]
@@ -518,6 +528,7 @@ class RoseBushService(object):
         else:
             file_content = self.suite_engine_proc.is_conf(path)
         template = self.template_env.get_template("view.html")
+
         data = {}
         data.update(self._get_suite_logs_info(user, suite))
         return template.render(
