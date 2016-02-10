@@ -136,11 +136,15 @@
         <div class="span3">
           <small>
             <!-- entry: host, submit_method and submit_method_id -->
-            {% if entry.host and entry.submit_method and entry.submit_method_id -%}
+            {% if entry.host -%}
               <i class="icon-map-marker" title="Location"></i>
               {{entry.host}}:
-              {{entry.submit_method}}
-              {{entry.submit_method_id}}
+              {% if entry.submit_method -%}
+                {{entry.submit_method}}
+                {% if entry.submit_method_id -%}
+                  {{entry.submit_method_id}}
+                {% endif -%}
+              {% endif -%}
             {% endif -%}
           </small>
         </div>
