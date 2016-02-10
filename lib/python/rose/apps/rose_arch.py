@@ -292,13 +292,13 @@ class RoseArchApp(BuiltinApp):
         if target.status == target.ST_OLD:
             app_runner.handle_event(RoseArchEvent(target))
             return
-        dao.insert(target)
         if target.status in (target.ST_BAD, target.ST_NULL):
             # boolean to int
             target.command_rc = int(target.status == target.ST_BAD)
             app_runner.handle_event(RoseArchEvent(target))
             return
         target.command_rc = 1
+        dao.insert(target)
         work_dir = mkdtemp()
         times = [time()] * 3  # init, transformed, archived
         ret_code = None
