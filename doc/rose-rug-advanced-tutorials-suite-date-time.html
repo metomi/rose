@@ -133,10 +133,10 @@
       runtime section of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[startup]]
-        environment scripting = eval $(rose task-env --cycle-offset=T12H)
+        environment scripting = eval $(rose task-env --cycle-offset=PT12H)
         script = """
             GATE="A"$((RANDOM%3))
-            echo "GATE=$GATE" &gt; $ROSE_DATACT12H/flight_gate
+            echo "GATE=$GATE" &gt; $ROSE_DATACPT12H/flight_gate
             cylc task message "Starting gate: $GATE"
             sleep 5
          """
@@ -169,11 +169,11 @@
       directory, if we ask for it.</p>
 
       <p>We need to use the same <samp>environment scripting</samp> option, but
-      with a <samp>--cycle-offset=T12H</samp> option - add this to your
+      with a <samp>--cycle-offset=PT12H</samp> option - add this to your
       <samp>[[boarding]]</samp> runtime section:</p>
       <pre class="prettyprint lang-cylc">
     [[boarding]]
-        environment scripting = eval $(rose task-env --cycle-offset=T12H)
+        environment scripting = eval $(rose task-env --cycle-offset=PT12H)
 </pre>
     </div>
 
@@ -181,13 +181,13 @@
       <h3 class="alwayshidden">ROSE_DATAC???</h3>
 
       <p>This exports an extra environment variable called
-      <samp>$ROSE_DATACT12H</samp>.</p>
+      <samp>$ROSE_DATACPT12H</samp>.</p>
 
       <p>We can now refer to this in boarding's <samp>script</samp>
       - add:</p>
       <pre class="prettyprint lang-cylc">
         script = """
-            . $ROSE_DATACT12H/flight_gate
+            . $ROSE_DATACPT12H/flight_gate
             cylc task message "Now boarding at Gate $GATE"
             sleep 5
         """
@@ -215,7 +215,7 @@
       block with:</p>
       <pre class="prettyprint lang-cylc">
         script = """
-            . $ROSE_DATACT12H/flight_gate
+            . $ROSE_DATACPT12H/flight_gate
             FLIGHT_TIME=$(rose date --print-format="%H:%M" $CYLC_TASK_CYCLE_TIME)
             cylc task message "Flight $FLIGHT_TIME now boarding at Gate $GATE"
             sleep 5
