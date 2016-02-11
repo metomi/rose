@@ -57,7 +57,6 @@ class RoseBushService(object):
     SUITES_PER_PAGE = 100
     VIEW_SIZE_MAX = 10 * 1024 * 1024  # 10MB
 
-
     def __init__(self, *args, **kwargs):
         self.exposed = True
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
@@ -503,7 +502,7 @@ class RoseBushService(object):
                 cherrypy.response.headers["Content-Type"] = mime
                 return cherrypy.lib.static.serve_file(f_name, mime)
             s = open(f_name).read()
-        if mode == None:
+        if mode is None:
             s = jinja2.escape(s)
         try:
             lines = [unicode(line) for line in s.splitlines()]
