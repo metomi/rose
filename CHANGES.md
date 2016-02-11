@@ -5,12 +5,11 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2016-Q1?)
+## 2016.02.0 (2016-02-11)
 
-Rose release 36. This release will work best with
-[cylc-6.8.0](https://github.com/cylc/cylc/releases/tag/6.8.0) and
-[fcm-2015.12.0](https://github.com/metomi/fcm/releases/tag/2015.12.0), or their
-successors.
+Rose release 36. This release works best with
+[cylc-6.8.1](https://github.com/cylc/cylc/releases/tag/6.8.1) and
+[fcm-2016.02.0](https://github.com/metomi/fcm/releases/tag/2016.02.0).
 
 ### Noteworthy Changes
 
