@@ -24,7 +24,8 @@ set -eu
 #-------------------------------------------------------------------------------
 tests 20
 #-------------------------------------------------------------------------------
-cat >$TEST_DIR/cylc-run <<'__PYTHON__'
+mkdir "${TEST_DIR}/bin"
+cat >"${TEST_DIR}/bin/cylc-run" <<'__PYTHON__'
 #!/usr/bin/env python
 import time
 time.sleep(60)
@@ -48,7 +49,7 @@ if pgrep -a 'bash' 1>'/dev/null' 2>&1; then
 fi
 for ARG in '' '--hold'; do
     TEST_KEY="${TEST_KEY_BASE}-self-check${ARG}"
-    python "${TEST_DIR}/cylc-run" "${NAME}" ${ARG} 1>'/dev/null' 2>&1 &
+    python "${TEST_DIR}/bin/cylc-run" "${NAME}" ${ARG} 1>'/dev/null' 2>&1 &
     FAKE_SUITE_PID=$!
     run_fail "${TEST_KEY}" rose suite-run -q --no-gcontrol \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" -- --debug
@@ -85,7 +86,8 @@ for ALT_NAME in \
 do
     for ARG in '' '--hold'; do
         TEST_KEY="${TEST_KEY_BASE}-alt-name-${ALT_NAME}${ARG}"
-        python "${TEST_DIR}/cylc-run" "${ALT_NAME}" ${ARG} 1>'/dev/null' 2>&1 &
+        python "${TEST_DIR}/bin/cylc-run" "${ALT_NAME}" ${ARG} \
+            1>'/dev/null' 2>&1 &
         FAKE_SUITE_PID=$!
         run_pass "${TEST_KEY}" rose suite-run -q --no-gcontrol \
             -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" -- --debug

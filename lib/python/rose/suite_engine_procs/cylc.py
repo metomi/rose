@@ -119,7 +119,7 @@ class CylcProcessor(SuiteEngineProcessor):
             " CAST(strftime('%s', time_submit) AS NUMERIC)) ASC, " +
             "submit_num DESC, name DESC, cycle DESC"),
     })
-    PGREP_CYLC_RUN = r"python.*cylc-(run|restart)( | .+ )%s( |$)"
+    PGREP_CYLC_RUN = r"python.*/bin/cylc-(run|restart)( | .+ )%s( |$)"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
     REC_BUNCH_LOG = re.compile(r"\A(bunch\.)(.+)(\.out|\.err)\Z")
