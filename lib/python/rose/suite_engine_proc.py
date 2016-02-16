@@ -624,18 +624,6 @@ class SuiteEngineProcessor(object):
         """Return whether or not a suite is registered."""
         raise NotImplementedError()
 
-    def is_suite_running(self, user_name, suite_name, hosts=None):
-        """Return a list of reasons if it looks like suite is running.
-
-        Each reason should be a dict with the following keys:
-        * "host": the host name where the suite appears to be running on.
-        * "reason_key": a key, such as "process-id", "port-file", etc.
-        * "reason_value": the value of the reason, e.g. the process ID, the
-                          path to a port file, etc.
-
-        """
-        raise NotImplementedError()
-
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
 

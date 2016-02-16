@@ -912,15 +912,6 @@ class CylcProcessor(SuiteEngineProcessor):
                             suite_name, user_name, [host_name])
 
         # Look for suite on specified or configured suite hosts
-        if not host_names:
-            conf = ResourceLocator.default().get_conf()
-            host_names = ["localhost"]
-            for key in ["scan-hosts", "hosts"]:
-                names = shlex.split(
-                    conf.get_value(["rose-suite-run", key], ""))
-                if names:
-                    host_names += self.host_selector.expand(names)[0]
-
         yes_list, _, fail_list = self._suite_hosts_pgrep(
             user_name, suite_name, host_names)
         if yes_list:  # If suite running on any host, report them
@@ -944,7 +935,7 @@ class CylcProcessor(SuiteEngineProcessor):
             self.get_suite_dir_rel(suite_name, "log", "rose-suite-run.host"))
         return file_path, open(file_path).read().strip()
 
-    def _suite_hosts_pgrep(self, user_name, suite_name, host_names):
+    def _suite_hosts_pgrep(self, user_name, suite_name, host_names=None):
         """Helper for "self.get_suite_run_hosts".
 
         Return [yes_list, no_list, fail_list] where yes_list contains a list
@@ -952,6 +943,14 @@ class CylcProcessor(SuiteEngineProcessor):
         hosts with no processes running suite_name and fail_list contains a
         list of hosts that we are unable to connect to.
         """
+        if not host_names:
+            conf = ResourceLocator.default().get_conf()
+            host_names = ["localhost"]
+            for key in ["scan-hosts", "hosts"]:
+                names = shlex.split(
+                    conf.get_value(["rose-suite-run", key], ""))
+                if names:
+                    host_names += self.host_selector.expand(names)[0]
         pgrep = [
             "pgrep", "-f", "-u", user_name,
             self.PGREP_CYLC_RUN % (suite_name)]
@@ -1027,7 +1026,7 @@ class CylcProcessor(SuiteEngineProcessor):
             port_str, host = open(port_file_path).read().splitlines()
         except (IOError, ValueError):
             ret["is_running"] = bool(
-                self.is_suite_running(user_name, suite_name))
+                self._suite_hosts_pgrep(user_name, suite_name)[0])
         else:
             ret["is_running"] = True
             ret["server"] = host.split(".", 1)[0] + ":" + port_str
@@ -1140,97 +1139,6 @@ class CylcProcessor(SuiteEngineProcessor):
             Return False otherwise
         """
         return self.popen.run("cylc", "get-directory", suite_name)[0] == 0
-
-    def is_suite_running(self, user_name, suite_name, hosts=None):
-        """Return the reasons if it looks like suite is running.
-
-        return [
-            {
-                "host": host,
-                "reason_key": reason_key,
-                "reason_value": reason_value
-            },
-            # ...
-        ]
-
-        If not running, return an empty list.
-
-        """
-        if not hosts:
-            hosts = ["localhost"]
-
-        # localhost pgrep
-        if user_name is None:
-            user_name = pwd.getpwuid(os.getuid()).pw_name
-        pgrep = ["pgrep", "-f", "-l", "-u", user_name,
-                 self.PGREP_CYLC_RUN % (suite_name)]
-        ret_code, out, _ = self.popen.run(*pgrep)
-        if ret_code == 0:
-            proc_reasons = []
-            for line in out.splitlines():
-                proc_reasons.append({
-                    "host": "localhost",
-                    "reason_key": self.REASON_KEY_PROC,
-                    "reason_value": line})
-            if proc_reasons:
-                return proc_reasons
-
-        # remote hosts pgrep and ls port file
-        host_proc_dict = {}
-        prefix = "~"
-        if user_name:
-            prefix += user_name
-        port_file = os.path.join(prefix, ".cylc", "ports", suite_name)
-        opt_user = "-u `whoami`"
-        if user_name:
-            opt_user = "-u " + user_name
-        for host in sorted(hosts):
-            if self.host_selector.is_local_host(host):
-                continue
-            r_cmd_tmpl = (
-                r"pgrep -f -l %s '" + self.PGREP_CYLC_RUN + r"' || ls '%s'")
-            r_cmd = r_cmd_tmpl % (opt_user, suite_name, port_file)
-            cmd = self.popen.get_cmd("ssh", host, r_cmd)
-            host_proc_dict[host] = self.popen.run_bg(*cmd)
-        proc_reasons = []
-        file_reasons = []
-        while host_proc_dict:
-            for host, proc in host_proc_dict.items():
-                ret_code = proc.poll()
-                if ret_code is None:
-                    continue
-                host_proc_dict.pop(host)
-                if ret_code != 0:
-                    continue
-                out = proc.communicate()[0]
-                for line in out.splitlines():
-                    cols = line.split()
-                    if cols[0].isdigit():
-                        proc_reasons.append({
-                            "host": host,
-                            "reason_key": self.REASON_KEY_PROC,
-                            "reason_value": line})
-                    else:
-                        file_reasons.append({
-                            "host": host,
-                            "reason_key": self.REASON_KEY_FILE,
-                            "reason_value": line})
-            if host_proc_dict:
-                sleep(0.1)
-
-        if proc_reasons:
-            return proc_reasons
-
-        # localhost ls port file
-        # N.B. This logic means that on shared file systems, only the localhost
-        #      port file is reported.
-        if ("localhost" in hosts and
-                os.path.exists(os.path.expanduser(port_file))):
-            return [{"host": "localhost",
-                     "reason_key": self.REASON_KEY_FILE,
-                     "reason_value": port_file}]
-
-        return file_reasons
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
