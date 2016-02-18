@@ -38,7 +38,7 @@ atrig = 2
 btrig = 3
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 21
+tests 24
 #-------------------------------------------------------------------------------
 # Check trigger checking - this is nearly cyclic but should be fine.
 TEST_KEY=$TEST_KEY_BASE-ok
@@ -968,6 +968,42 @@ duplicate=true
 [namelist:bar=wibble]
 
 [namelist:bar=wobble]
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Check multiply-nested triggering inside a duplicate namelist's options.
+TEST_KEY=$TEST_KEY_BASE-dupl-namelist-within
+setup
+init <<'__CONFIG__'
+[namelist:baz(1)]
+a=1
+b=2
+c=4
+
+[namelist:baz(2)]
+a=0
+!!b=2
+!!c=4
+
+[namelist:baz(3)]
+a=1
+b=2
+c=4
+__CONFIG__
+init_meta <<__META_CONFIG__
+[namelist:baz]
+duplicate=true
+
+[namelist:baz=a]
+trigger=namelist:baz=b: 1;
+
+[namelist:baz=b]
+trigger=namelist:baz=c: 2;
+
+[namelist:baz=c]
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null

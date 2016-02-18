@@ -121,6 +121,8 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         """Update enabled and ignored ids starting with var_id.
 
         var_id - a setting id to start the triggering update at.
+        If an id has duplicates (e.g. is part of a duplicate section),
+        update all duplicate ids.
         config_data - a rose.config.ConfigNode or a dictionary that
         looks like this:
         {"sections":
@@ -133,12 +135,8 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             }
         }
         meta_config - a rose.config.ConfigNode.
-        only_these_sections (default None) - a list of sections to
-        examine. If specified, checking for other sections will be
-        skipped.
 
         """
-        has_ignored_parent = True
         config_sections = self._get_config_sections(config_data)
         config_sections_duplicate_map = self._get_duplicate_config_sections(
             config_data, config_sections=config_sections)
@@ -149,23 +147,31 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         )
         if alt_ids:
             start_ids = alt_ids
+        # For each id in our starting list, figure out if it itself is
+        # already effectively trigger-ignored.
         id_stack = []
         for start_id in start_ids:
+            is_ignored = True
             if (start_id in self.enabled_dict and
                     start_id not in self.ignored_dict):
-                has_ignored_parent = False
-            if not sum([start_id in v for v in
+                # Definitely enabled.
+                is_ignored = False
+            if not sum([var_id in v for v in
                         self.trigger_family_lookup.values()]):
-                has_ignored_parent = False
+                # Not triggered by anything, so must be enabled.
+                is_ignored = False
             section, option = self._get_section_option_from_id(start_id)
             is_node_present = self._get_config_has_id(config_data, start_id)
             if section in self.ignored_dict and option is not None:
-                has_ignored_parent = True
-            has_ignored_parent = has_ignored_parent or not is_node_present
-            id_stack.append((start_id, has_ignored_parent))
+                # Parent section of an option is ignored, so option is.
+                is_ignored = True
+            # If the id is missing, anything it triggers should be ignored.
+            is_ignored = is_ignored or not is_node_present
+            id_stack.append((start_id, is_ignored))
         update_id_list = []
         while id_stack:
             this_id, has_ignored_parent = id_stack[0]
+            # For each id, examine its duplicates (if any) and all children.
             alt_ids = self._get_id_duplicates(
                 this_id, config_data, meta_config,
                 config_sections_duplicate_map=config_sections_duplicate_map
