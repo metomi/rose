@@ -568,6 +568,7 @@ def load_meta_macro_modules(meta_files, module_prefix=None):
         if (not meta_dir.endswith(MACRO_DIRNAME) or
                 not meta_file.endswith(MACRO_EXT)):
             continue
+        sys.path.insert(0, meta_dir)
         macro_name = os.path.basename(meta_file).rpartition(MACRO_EXT)[0]
         if module_prefix is None:
             as_name = macro_name
@@ -578,6 +579,7 @@ def load_meta_macro_modules(meta_files, module_prefix=None):
         except Exception:
             rose.reporter.Reporter()(
                 MacroLoadError(meta_file, traceback.format_exc()))
+        sys.path.pop(0)
     modules.sort()
     return modules
 
