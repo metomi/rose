@@ -5,6 +5,23 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2016.02.1 (2016-02-25)
+
+Rose release 37. This release works best with
+[cylc-6.8.1](https://github.com/cylc/cylc/releases/tag/6.8.1) and
+[fcm-2016.02.0](https://github.com/metomi/fcm/releases/tag/2016.02.0).
+
+### Highlighted Changes
+
+[#1814](https://github.com/metomi/rose/pull/1814):
+rose macro: fix nested triggers for duplicate section options. The logic for
+triggering options in duplicate namelists was not right under certain circumstances.
+Some namelist:domain options in UM apps had incorrect trigger-ignored statuses.
+Some suites will have new, correct error statuses for these options when this version
+of Rose is used.
+
+--------------------------------------------------------------------------------
+
 ## 2016.02.0 (2016-02-11)
 
 Rose release 36. This release works best with
