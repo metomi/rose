@@ -17,7 +17,7 @@ Rose release 37. This release works best with
 rose macro: fix nested triggers for duplicate section options. The logic for
 triggering options in duplicate namelists was not right under certain circumstances.
 Some namelist:domain options in UM apps had incorrect trigger-ignored statuses.
-Some suites will have new, correct error statuses for these options when this version
+Some apps will have new, correct error statuses for these options when this version
 of Rose is used.
 
 --------------------------------------------------------------------------------
