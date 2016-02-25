@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 98
+tests 107
 #-------------------------------------------------------------------------------
 # Produce the correct format for the current date/time.
 TEST_KEY=$TEST_KEY_BASE-current-format
@@ -299,5 +299,35 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] [UNDEFINED ENVIRONMENT VARIABLE] ROSE_TASK_CYCLE_TIME
 __ERR__
+#-------------------------------------------------------------------------------
+# Test rose date --as-total runs without error
+TEST_KEY=$TEST_KEY_BASE-as-total
+run_pass "$TEST_KEY" rose date --as-total=s PT1M
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Test rose date --as-total=s P1DT1H1M1S
+TEST_KEY=$TEST_KEY_BASE-as-total-P1DT1H1M1S-s
+run_pass "$TEST_KEY" rose date --as-total=s P1DT1H1M1S
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+90061.0
+__OUT__
+#-------------------------------------------------------------------------------
+# Test rose date --as-total=m PT1S
+TEST_KEY=$TEST_KEY_BASE-as-total-PT1S-m
+run_pass "$TEST_KEY" rose date --as-total=m PT1S
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+0.0166666666667
+__OUT__
+#-------------------------------------------------------------------------------
+# Test rose date --as-total=h P832DT23H12M45S
+TEST_KEY=$TEST_KEY_BASE-as-total-P832DT23H12M45S-h
+run_pass "$TEST_KEY" rose date --as-total=h P832DT23H12M45S
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+19991.2125
+__OUT__
+#-------------------------------------------------------------------------------
+# Test rose date --as-total=FORMAT fails for invalid format
+TEST_KEY=$TEST_KEY_BASE-as-total-invalid-format
+run_fail "$TEST_KEY" rose date --as-total=y PT1M
 #-------------------------------------------------------------------------------
 exit 0

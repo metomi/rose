@@ -304,6 +304,7 @@ def main():
         "parse_format",
         "print_format",
         "task_cycle_time_mode",
+        "as_total",
         "utc_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
@@ -328,7 +329,10 @@ def main():
 
     try:
         if len(args) < 2:
-            _print_time_point(date_time_oper, opts, args)
+            if opts.duration_print_format:
+                _convert_duration(date_time_oper, opts, args)
+            else:
+                _print_time_point(date_time_oper, opts, args)
         else:
             _print_duration(date_time_oper, opts, args)
     except OffsetValueError as exc:
@@ -369,6 +373,22 @@ def _print_duration(date_time_oper, opts, args):
             time_point_2 = date_time_oper.date_shift(time_point_2, offset)
     duration, sign = date_time_oper.date_diff(time_point_1, time_point_2)
     print date_time_oper.date_diff_format(opts.print_format, duration, sign)
+
+
+def _convert_duration(date_time_oper, opts, args):
+    """Implement usage 3 of "rose date", convert ISO8601 duration."""
+    time_in_8601 = date_time_oper.duration_parser.parse(args[0])
+    time = time_in_8601.get_seconds()
+    options = {'S': time, 'M': time/60, 'H': time/3600}
+    if opts.duration_print_format.upper() in options:
+        # supplied duration format is valid (upper removes
+        # case-sensitivity)
+        print options[opts.duration_print_format.upper()]
+    else:
+        # supplied duration format not valid
+        print 'Invalid date/time format, please use one of H, M, S ' + \
+            '(hours, minutes, seconds)'
+        sys.exit(1)
 
 
 if __name__ == "__main__":
