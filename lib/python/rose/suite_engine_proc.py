@@ -217,7 +217,7 @@ class SuiteStillRunningError(Exception):
 class SuiteHostConnectError(Exception):
     """Cannot connect to the suite host."""
 
-    TMPL = "%s: cannot connect to some suite hosts, try again later?\n"
+    TMPL = "%s: cannot connect to some suite hosts, try again later.\n"
     TMPL_HOST = "* %s\n"
 
     def __str__(self):
