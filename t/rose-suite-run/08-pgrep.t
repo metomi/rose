@@ -69,9 +69,7 @@ run_fail "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     $OPT_HOST --no-gcontrol
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] Suite "$NAME" may still be running.
-[FAIL] Host "${HOST:-localhost}" has process:
-$SUITE_PROC
+[FAIL] Suite "$NAME" has running processes on: ${HOST:-localhost}
 [FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 run_pass "$TEST_KEY.NAME0" \

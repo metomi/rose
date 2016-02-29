@@ -37,13 +37,12 @@ ls -ld $HOME/cylc-run/$NAME 1>/dev/null
 poll ! test -e $SUITE_RUN_DIR/log/job/2013010100/my_task_1/01/job
 SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>" \
     | awk '{print "[FAIL]     " $0}')
+HOST=$(hostname -f)
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-running
 run_fail "$TEST_KEY" rose suite-clean -y $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] Suite "$NAME" may still be running.
-[FAIL] Host "localhost" has process:
-$SUITE_PROC
+[FAIL] Suite "$NAME" has running processes on: $HOST
 [FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 if [[ ! -d $HOME/cylc-run/$NAME ]]; then
@@ -53,9 +52,7 @@ fi
 TEST_KEY=$TEST_KEY_BASE-running-name
 run_fail "$TEST_KEY" rose suite-clean -y -n $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] Suite "$NAME" may still be running.
-[FAIL] Host "localhost" has process:
-$SUITE_PROC
+[FAIL] Suite "$NAME" has running processes on: $HOST
 [FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 if [[ ! -d $HOME/cylc-run/$NAME ]]; then
@@ -75,6 +72,7 @@ TEST_KEY=$TEST_KEY_BASE-stopped
 run_pass "$TEST_KEY" rose suite-clean -y $NAME
 sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
 [INFO] delete: $SUITE_RUN_DIR/
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null

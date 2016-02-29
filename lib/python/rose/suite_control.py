@@ -35,6 +35,14 @@ YES = "y"
 PROMPT = "Really %s %s at %s? [" + YES + " or n (default)] "
 
 
+class SuiteNotRunningError(Exception):
+
+    """An exception raised when a suite is not running."""
+
+    def __str__(self):
+        return "%s: does not appear to be running" % (self.args)
+
+
 class SuiteControl(object):
     """Launch suite engine's control commands from the correct suite host."""
 
@@ -71,9 +79,16 @@ class SuiteControl(object):
 
         """
         engine_version = self._get_engine_version(suite_name)
-        for host in self._get_hosts(suite_name, host):
+        if host:
+            host_names = [host]
+        else:
+            host_names = self.suite_engine_proc.get_suite_run_hosts(
+                None, suite_name)
+        if not host_names:
+            raise SuiteNotRunningError(suite_name)
+        for host_name in host_names:
             self.suite_engine_proc.gcontrol(
-                suite_name, host, engine_version, args)
+                suite_name, host_name, engine_version, args)
 
     def shutdown(self, suite_name, host=None, confirm=None, stderr=None,
                  stdout=None, *args):
@@ -91,29 +106,21 @@ class SuiteControl(object):
 
         """
         engine_version = self._get_engine_version(suite_name)
-        for host in self._get_hosts(suite_name, host):
-            if confirm is None or confirm("shutdown", suite_name, host):
-                self.suite_engine_proc.shutdown(
-                    suite_name, host, engine_version, args, stderr, stdout)
-
-    def _get_hosts(self, suite_name, host):
         if host:
-            hosts = [host]
+            host_names = [host]
         else:
-            hosts = self.suite_engine_proc.ping(suite_name)
-            if not hosts:
-                # Try the "rose-suite.host" file in the suite log directory
-                log = self.suite_engine_proc.get_suite_dir(suite_name, "log")
-                try:
-                    host_file = os.path.join(log, "rose-suite-run.host")
-                    hosts = [open(host_file).read().strip()]
-                except IOError:
-                    pass
-            if not hosts:
-                hosts = ["localhost"]
-        return hosts
+            host_names = self.suite_engine_proc.get_suite_run_hosts(
+                None, suite_name)
+        if not host_names:
+            raise SuiteNotRunningError(suite_name)
+        for host_name in host_names:
+            if confirm is None or confirm("shutdown", suite_name, host_name):
+                self.suite_engine_proc.shutdown(
+                    suite_name, host_name,
+                    engine_version, args, stderr, stdout)
 
     def _get_engine_version(self, suite_name):
+        """Return the suite engine version for starting the suite."""
         conf_path = self.suite_engine_proc.get_suite_dir(
             suite_name, "log", "rose-suite-run.conf")
         if os.access(conf_path, os.F_OK | os.R_OK):
