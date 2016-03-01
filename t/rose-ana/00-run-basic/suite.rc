@@ -11,6 +11,7 @@ UTC mode=True
         graph="""
           rose_ana_t1 # basic
           rose_ana_t2_activated:fail => rose_ana_t2_deactivated
+          rose_ana_t3_within_tolerance & rose_ana_t3_outside_tolerance:fail => \
           rose_ana_t1:fail & rose_ana_t2_deactivated => db_check
         """
 
@@ -23,6 +24,16 @@ UTC mode=True
 
     [[rose_ana_t2_deactivated]]
         command scripting = rose task-run -v -v --debug --app-key=rose_ana_t2 --opt-conf-key=deactivate
+
+    [[rose_ana_t3_within_tolerance]]
+        command scripting = rose task-run -v -v --debug --app-key=rose_ana_t3
+        [[[environment]]]
+            TOLERANCE=10%
+
+    [[rose_ana_t3_outside_tolerance]]
+        command scripting = rose task-run -v -v --debug --app-key=rose_ana_t3
+        [[[environment]]]
+            TOLERANCE=2%
 
     [[db_check]]
         command scripting = rose task-run -v -v --debug
