@@ -386,7 +386,8 @@ class Analyse(object):
                 newtask.subextract = ":".join(newtask.extract.split(":")[1:])
                 newtask.extract = newtask.extract.split(":")[0]
             newtask.comparison = self.config.get_value([task, "comparison"])
-            newtask.tolerance = self.config.get_value([task, "tolerance"])
+            newtask.tolerance = env_var_process(self.config.get_value(
+                                                [task, "tolerance"]))
             newtask.warnonfail = (
                 self.config.get_value([task, "warnonfail"]) in ["yes", "true"])
 
