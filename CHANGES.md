@@ -5,6 +5,27 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2016-Q1?)
+
+Rose release 38. This release will work best with
+[cylc-6.8.1](https://github.com/cylc/cylc/releases/tag/6.8.1) and
+[fcm-2016.02.0](https://github.com/metomi/fcm/releases/tag/2016.02.0),
+or their successors.
+
+### Noteworthy Changes
+
+[#1824](https://github.com/metomi/rose/pull/1824):
+rose suite- wrappers: make use of host information in cylc port files to detect
+whether suites are running or not. Delete a cylc port file and/or a rose suite
+host file if the system is able to detect that no process associated with the
+suite is running on the recorded host. This allows suite-run, suite-clean, etc
+to proceed if a suite is terminated with a left-over port file.
+
+[#1806](https://github.com/metomi/rose/pull/1806):
+rose date: new functionality to parse and convert ISO8601 durations.
+
+--------------------------------------------------------------------------------
+
 ## 2016.02.1 (2016-02-25)
 
 Rose release 37. This release works best with
@@ -15,10 +36,10 @@ Rose release 37. This release works best with
 
 [#1814](https://github.com/metomi/rose/pull/1814):
 rose macro: fix nested triggers for duplicate section options. The logic for
-triggering options in duplicate namelists was not right under certain circumstances.
-Some namelist:domain options in UM apps had incorrect trigger-ignored statuses.
-Some apps will have new, correct error statuses for these options when this version
-of Rose is used.
+triggering options in duplicate namelists was not right under certain
+circumstances. Some namelist:domain options in UM apps had incorrect
+trigger-ignored statuses. Some apps will have new, correct error statuses for
+these options when this version of Rose is used.
 
 --------------------------------------------------------------------------------
 
