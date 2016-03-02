@@ -523,7 +523,9 @@ DIALOG_LABEL_MACRO_WARN_ISSUES = ("warnings: {0}")
 DIALOG_LABEL_NULL_SECTION = "None"
 DIALOG_LABEL_PREFERENCES = ("Please edit your site and user " +
                             "configurations to make changes.")
-DIALOG_LABEL_UPGRADE_ALL = "Show all possible versions"
+DIALOG_LABEL_UPGRADE = (
+    "Click Upgrade Version cells to change target versions.")
+DIALOG_LABEL_UPGRADE_ALL = "Populate all possible versions"
 DIALOG_TIP_SUITE_RUN_HELP = "Read the help for rose suite-run"
 DIALOG_TEXT_MACRO_CHANGED = "changed"
 DIALOG_TEXT_MACRO_ERROR = "error"
