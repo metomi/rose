@@ -444,7 +444,9 @@ rose config rose-suite-run hosts
     <div class="slide">
       <h3 class="alwayshidden">rose config --file</h3>
 
-      <p>rose config also works for the other Rose formats. For example:</p>
+      <p>rose config also works for other Rose configuration files (and any
+      configuration files that have similar formats as a Rose configuration
+      file). For example:</p>
       <pre class="shell">
 rose config --file=/path/to/rose-app.conf env
 </pre>
@@ -522,17 +524,27 @@ rose config --meta env=SPAM_NUMBER help
       running:</p>
 
       <ul class="incremental">
-        <li><kbd>rose suite-scan</kbd>: list your running suites.</li>
+        <li><kbd>rose suite-scan</kbd> or <kbd>cylc scan</kbd>: list your
+        running suites.</li>
 
-        <li><kbd>rose suite-gcontrol</kbd>: launch the <code>cylc gui</code>
-        for the suite in <var>$PWD</var>.</li>
+        <li><kbd>cylc gscan</kbd>: GTK version of <kbd>cylc scan</kbd>.</li>
 
-        <li><kbd>rose suite-shutdown</kbd>: shutdown the suite in
-        <var>$PWD</var> at the next opportunity.</li>
+        <li><kbd>rose suite-gcontrol [--name=NAME]</kbd> or <kbd>cylc gui
+        NAME</kbd>: launch the <code>cylc gui</code> for a suite called
+        <var>NAME</var>. The rose wrapper uses the base name of <var>$PWD</var>
+        as <var>NAME</var> in the absence of the <kbd>--name=NAME</kbd>
+        option.</li>
 
-        <li><kbd>rose suite-clean</kbd>: remove items created by <code>rose
-        suite-run</code> for the suite in <var>$PWD</var> and those on remote
-        job hosts.</li>
+        <li><kbd>rose suite-shutdown [--name=NAME]</kbd> or <kbd>cylc stop
+        NAME</kbd>: stop a suite called <var>NAME</var> at the next opportunity.
+        The rose wrapper uses the base name of <var>$PWD</var> as
+        <var>NAME</var> in the absence of the <kbd>--name=NAME</kbd>
+        option.</li>
+
+        <li><kbd>rose suite-clean [NAME ...]</kbd>: remove items created by
+        <code>rose suite-run</code> (for suite and job hosts) for the suite in
+        each <var>NAME</var> argument. If no <var>NAME</var> is specified, use
+        the base name of <var>$PWD</var> as <var>NAME</var>.</li>
       </ul>
     </div>
 
