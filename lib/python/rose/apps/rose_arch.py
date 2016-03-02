@@ -295,7 +295,10 @@ class RoseArchApp(BuiltinApp):
         if target.status in (target.ST_BAD, target.ST_NULL):
             # boolean to int
             target.command_rc = int(target.status == target.ST_BAD)
-            level = int(target.status != target.ST_BAD)
+            if target.status == target.ST_BAD:
+                level = Event.FAIL
+            else:
+                level = Event.DEFAULT
             event = RoseArchEvent(target)
             app_runner.handle_event(event)
             app_runner.handle_event(event, kind=Event.KIND_ERR, level=level)
