@@ -22,7 +22,7 @@
 . "$(dirname "$0")/test_header"
 
 #-------------------------------------------------------------------------------
-tests 5
+tests 6
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export CYLC_CONF_PATH=
@@ -60,6 +60,13 @@ sort >'job.out.expected' <<__LOG__
 0 ${SUITE_RUN_DIR}/share/backup/nobody.d/
 __LOG__
 file_cmp "${TEST_KEY}-job.out.sorted" 'job.out.sorted' 'job.out.expected'
+sed -n 's/^\[FAIL\] \(! [^ ]*\) .*$/\1/p' \
+    "${SUITE_RUN_DIR}/log/job/1/archive"*"/0"*"/job.err" \
+    | sort >'job.err.sorted'
+sort >'job.err.expected' <<__LOG__
+! ${SUITE_RUN_DIR}/share/backup/archive2.d/
+__LOG__
+file_cmp "${TEST_KEY}-job.err.sorted" 'job.err.sorted' 'job.err.expected'
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
 exit 0

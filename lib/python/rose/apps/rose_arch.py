@@ -295,7 +295,10 @@ class RoseArchApp(BuiltinApp):
         if target.status in (target.ST_BAD, target.ST_NULL):
             # boolean to int
             target.command_rc = int(target.status == target.ST_BAD)
-            app_runner.handle_event(RoseArchEvent(target))
+            level = int(target.status != target.ST_BAD)
+            event = RoseArchEvent(target)
+            app_runner.handle_event(event)
+            app_runner.handle_event(event, kind=Event.KIND_ERR, level=level)
             return
         target.command_rc = 1
         dao.insert(target)
@@ -352,8 +355,11 @@ class RoseArchApp(BuiltinApp):
             dao.update_command_rc(target)
         finally:
             app_runner.fs_util.delete(work_dir)
-            app_runner.handle_event(
-                RoseArchEvent(target, times, ret_code))
+            event = RoseArchEvent(target, times, ret_code)
+            app_runner.handle_event(event)
+            if target.status in (target.ST_BAD, target.ST_NULL):
+                app_runner.handle_event(
+                    event, kind=Event.KIND_ERR, level=Event.FAIL)
 
     def _get_conf(self, r_node, t_node, key, compulsory=False, default=None):
         """Return the value of a configuration."""
