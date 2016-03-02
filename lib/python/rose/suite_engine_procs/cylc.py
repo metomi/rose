@@ -955,8 +955,11 @@ class CylcProcessor(SuiteEngineProcessor):
             "pgrep", "-f", "-u", user_name,
             self.PGREP_CYLC_RUN % (suite_name)]
         host_name_ctx_dict = {}
+        if self.user is None:
+            self.user = pwd.getpwuid(os.getuid()).pw_name
         for host_name in host_names:
-            if self.host_selector.is_local_host(host_name) and not user_name:
+            if (self.host_selector.is_local_host(host_name) and
+                    (not user_name or user_name == self.user)):
                 # localhost
                 host_name_ctx_dict[host_name] = (
                     self.popen.run_bg(*pgrep), True)  # is_local=True

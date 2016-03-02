@@ -379,7 +379,7 @@ def _convert_duration(date_time_oper, opts, args):
     """Implement usage 3 of "rose date", convert ISO8601 duration."""
     time_in_8601 = date_time_oper.duration_parser.parse(args[0])
     time = time_in_8601.get_seconds()
-    options = {'S': time, 'M': time/60, 'H': time/3600}
+    options = {'S': time, 'M': time / 60, 'H': time / 3600}
     if opts.duration_print_format.upper() in options:
         # supplied duration format is valid (upper removes
         # case-sensitivity)
