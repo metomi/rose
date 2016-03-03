@@ -14,6 +14,10 @@ or their successors.
 
 ### Noteworthy Changes
 
+[#1833](https://github.com/metomi/rose/pull/1833):
+rose_ana: value of `tolerance` setting can now contain environment variable
+substitution syntax.
+
 [#1824](https://github.com/metomi/rose/pull/1824):
 rose suite- wrappers: make use of host information in cylc port files to detect
 whether suites are running or not. Delete a cylc port file and/or a rose suite
