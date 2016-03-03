@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-N_TESTS=34
+N_TESTS=36
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
@@ -73,6 +73,16 @@ OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t2_deactivated/01/job.out
 TEST_KEY=$TEST_KEY_BASE-ignore-notpresent
 file_grep_fail $TEST_KEY "[FAIL].*Species" $OUTPUT
 #-------------------------------------------------------------------------------
+# Test tolerance as an environment variable
+# First, test that the basic task ran ok
+OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t3_within_tolerance/01/job.out
+TEST_KEY=$TEST_KEY_BASE-tolerance-env-var-pass
+file_grep $TEST_KEY "[PASS].*data" $OUTPUT
+OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t3_outside_tolerance/01/job.out
+TEST_KEY=$TEST_KEY_BASE-tolerance-env-var-fail
+file_grep $TEST_KEY "[FAIL].*data" $OUTPUT
+#-------------------------------------------------------------------------------
+
 # Test of comparison database
 #
 # Regexp for any number of digits (re-used a lot below)
