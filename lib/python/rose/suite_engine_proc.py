@@ -97,8 +97,12 @@ class BaseCycleOffset(object):
 
 class OldFormatCycleOffset(BaseCycleOffset):
 
-    """Represent a cycle time offset."""
+    """Represent a cycle time offset, back compat syntax."""
 
+    KEYS = {"W": ("days", 7),
+            "D": ("days", 1),
+            "H": ("hours", 1),
+            "M": ("minutes", 1)}
     REC_TEXT = re.compile(r"\A"
                           r"(?P<sign>__)?"
                           r"(?P<is_time>T)?"
@@ -121,6 +125,7 @@ class OldFormatCycleOffset(BaseCycleOffset):
           TnS denotes n seconds.
 
         """
+        BaseCycleOffset.__init__(self)
         match = self.REC_TEXT.match(offset_text.upper())
         if not match:
             raise CycleOffsetError(offset_text)
@@ -143,11 +148,7 @@ class OldFormatCycleOffset(BaseCycleOffset):
 
     def to_duration(self):
         """Convert to a Duration."""
-        KEYS = {"W": ("days", 7),
-                "D": ("days", 1),
-                "H": ("hours", 1),
-                "M": ("minutes", 1)}
-        date_time_unit, multiplier = KEYS[self.unit]
+        date_time_unit, multiplier = self.KEYS[self.unit]
         amount = self.amount
         if self.sign == self.SIGN_DEFAULT:  # negative
             amount = -amount
@@ -155,6 +156,8 @@ class OldFormatCycleOffset(BaseCycleOffset):
 
 
 class ISOCycleOffset(BaseCycleOffset):
+
+    """Represent a cycle time offset, ISO8601 syntax."""
 
     def __init__(self, offset_text):
         """Parse offset_text into a Duration-convertible form.
@@ -165,6 +168,7 @@ class ISOCycleOffset(BaseCycleOffset):
         * For the rest, use an ISO 8601 compatible duration.
 
         """
+        BaseCycleOffset.__init__(self)
         if offset_text.startswith("__"):
             self.sign_factor = 1
         else:
@@ -245,6 +249,13 @@ class CycleTimeError(ValueError):
         return self.args[0] + ": unrecognised cycle time format."
 
 
+class CyclingModeError(ValueError):
+    """Unrecognised cycling mode."""
+
+    def __str__(self):
+        return self.args[0] + ": unrecognised cycling mode."
+
+
 class TaskProps(object):
 
     """Task properties.
@@ -285,34 +296,35 @@ class TaskProps(object):
              "dir_etc": "ROSE_ETC"}
 
     def __init__(self, **kwargs):
-        for key, env_key in self.ATTRS.items():
-            if kwargs.get(key) is not None:
-                setattr(self, key, kwargs.get(key))
+        for attr_key, env_key in self.ATTRS.items():
+            if kwargs.get(attr_key) is not None:
+                setattr(self, attr_key, kwargs.get(attr_key))
             elif env_key.endswith("%s"):
-                setattr(self, key, {})
+                setattr(self, attr_key, {})
                 prefix = env_key.replace("%s", "")
-                for k, v in os.environ.items():
-                    if k == prefix or not k.startswith(prefix):
+                for key, value in os.environ.items():
+                    if key == prefix or not key.startswith(prefix):
                         continue
                     try:
-                        cycle_offset = get_cycle_offset(k.replace(prefix, ""))
-                    except ValueError as e:
+                        cycle_offset = get_cycle_offset(
+                            key.replace(prefix, ""))
+                    except ValueError:
                         continue
-                    getattr(self, key)[cycle_offset] = v
+                    getattr(self, attr_key)[cycle_offset] = value
             elif os.getenv(env_key) is not None:
-                setattr(self, key, os.getenv(env_key))
+                setattr(self, attr_key, os.getenv(env_key))
             else:
-                setattr(self, key, None)
+                setattr(self, attr_key, None)
 
     def __iter__(self):
-        for key, env_key in sorted(self.ATTRS.items()):
-            value = getattr(self, key)
-            if value is not None:
-                if isinstance(value, dict):
-                    for k, v in value.items():
-                        yield (env_key % k, str(v))
+        for attr_key, env_key in sorted(self.ATTRS.items()):
+            attr_value = getattr(self, attr_key)
+            if attr_value is not None:
+                if isinstance(attr_value, dict):
+                    for key, value in attr_value.items():
+                        yield (env_key % key, str(value))
                 else:
-                    yield (env_key, str(value))
+                    yield (env_key, str(attr_value))
 
     def __str__(self):
         ret = ""
@@ -326,6 +338,7 @@ class SuiteEngineProcessor(object):
     """An abstract suite engine processor."""
 
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
+    SCHEME = None
     SCHEME_HANDLER_MANAGER = None
     SCHEME_DEFAULT = "cylc"  # TODO: site configuration?
     TIMEOUT = 5  # seconds
@@ -336,9 +349,10 @@ class SuiteEngineProcessor(object):
         """Return a processor for the suite engine named by "key"."""
 
         if cls.SCHEME_HANDLER_MANAGER is None:
-            p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+            path = os.path.dirname(
+                os.path.dirname(sys.modules["rose"].__file__))
             cls.SCHEME_HANDLER_MANAGER = SchemeHandlersManager(
-                [p], ns="rose.suite_engine_procs", attrs=["SCHEME"],
+                [path], ns="rose.suite_engine_procs", attrs=["SCHEME"],
                 can_handle=None, event_handler=event_handler, popen=popen,
                 fs_util=fs_util, host_selector=host_selector)
         if key is None:
@@ -346,7 +360,7 @@ class SuiteEngineProcessor(object):
         return cls.SCHEME_HANDLER_MANAGER.get_handler(key)
 
     def __init__(self, event_handler=None, popen=None, fs_util=None,
-                 host_selector=None, **kwargs):
+                 host_selector=None, **_):
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -458,8 +472,8 @@ class SuiteEngineProcessor(object):
         for f_name in glob(os.path.expanduser("~/.metomi/rose-bush*.status")):
             status = {}
             for line in open(f_name):
-                k, v = line.strip().split("=", 1)
-                status[k] = v
+                key, value = line.strip().split("=", 1)
+                status[key] = value
             if status.get("host"):
                 rose_bush_url = "http://" + status["host"]
                 if status.get("port"):
@@ -511,49 +525,58 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def get_task_props(self, *args, **kwargs):
-        """Return a TaskProps object containing the attributes of a suite task.
-        """
+        """Return a TaskProps object containing suite task's attributes."""
+        calendar_mode = self.date_time_oper.get_calendar_mode()
+        try:
+            return self._get_task_props(*args, **kwargs)
+        finally:
+            # Restore calendar mode if changed
+            self.date_time_oper.set_calendar_mode(calendar_mode)
 
-        t = TaskProps()
+    def _get_task_props(self, *_, **kwargs):
+        """Helper for get_task_props."""
+        tprops = TaskProps()
         # If suite_name and task_id are defined, we can assume that the rest
         # are defined as well.
-        if t.suite_name is not None and t.task_id is not None:
-            return t
+        if tprops.suite_name is not None and tprops.task_id is not None:
+            return tprops
 
-        t = self.get_task_props_from_env()
+        tprops = self.get_task_props_from_env()
+        # Modify calendar mode, if possible
+        self.date_time_oper.set_calendar_mode(tprops.cycling_mode)
 
         if kwargs["cycle"] is not None:
 
             try:
                 cycle_offset = get_cycle_offset(kwargs["cycle"])
             except ISO8601SyntaxError:
-                t.task_cycle_time = kwargs["cycle"]
+                tprops.task_cycle_time = kwargs["cycle"]
             else:
-                if t.task_cycle_time:
-                    t.task_cycle_time = self._get_offset_cycle_time(
-                        t.task_cycle_time, cycle_offset)
+                if tprops.task_cycle_time:
+                    tprops.task_cycle_time = self._get_offset_cycle_time(
+                        tprops.task_cycle_time, cycle_offset)
                 else:
-                    t.task_cycle_time = kwargs["cycle"]
+                    tprops.task_cycle_time = kwargs["cycle"]
 
         # Etc directory
-        if os.path.exists(os.path.join(t.suite_dir, "etc")):
-            t.dir_etc = os.path.join(t.suite_dir, "etc")
+        if os.path.exists(os.path.join(tprops.suite_dir, "etc")):
+            tprops.dir_etc = os.path.join(tprops.suite_dir, "etc")
 
         # Data directory: generic, current cycle, and previous cycle
-        t.dir_data = os.path.join(t.suite_dir, "share", "data")
-        if t.task_cycle_time is not None:
-            task_cycle_time = t.task_cycle_time
-            t.dir_data_cycle = os.path.join(
-                t.suite_dir, "share", "cycle", str(task_cycle_time))
+        tprops.dir_data = os.path.join(tprops.suite_dir, "share", "data")
+        if tprops.task_cycle_time is not None:
+            task_cycle_time = tprops.task_cycle_time
+            tprops.dir_data_cycle = os.path.join(
+                tprops.suite_dir, "share", "cycle", str(task_cycle_time))
 
             # Offset cycles
             if kwargs.get("cycle_offsets"):
                 cycle_offset_strings = []
-                for v in kwargs.get("cycle_offsets"):
-                    cycle_offset_strings.extend(v.split(","))
-                for v in cycle_offset_strings:
-                    if t.cycling_mode == "integer":
-                        cycle_offset = v
+                for value in kwargs.get("cycle_offsets"):
+                    cycle_offset_strings.extend(value.split(","))
+                for value in cycle_offset_strings:
+                    if tprops.cycling_mode == "integer":
+                        cycle_offset = value
                         if cycle_offset.startswith("__"):
                             sign_factor = 1
                         else:
@@ -563,21 +586,23 @@ class SuiteEngineProcessor(object):
                             int(task_cycle_time) +
                             sign_factor * int(offset_val.replace("P", "")))
                     else:
-                        cycle_offset = get_cycle_offset(v)
+                        cycle_offset = get_cycle_offset(value)
                         cycle_time = self._get_offset_cycle_time(
                             task_cycle_time, cycle_offset)
-                    t.dir_data_cycle_offsets[str(cycle_offset)] = os.path.join(
-                        t.suite_dir, "share", "cycle", cycle_time)
+                    tprops.dir_data_cycle_offsets[str(cycle_offset)] = (
+                        os.path.join(
+                            tprops.suite_dir, "share", "cycle", cycle_time))
 
         # Create data directories if necessary
         # Note: should we create the offsets directories?
-        for d in ([t.dir_data, t.dir_data_cycle] +
-                  t.dir_data_cycle_offsets.values()):
-            if d is None:
+        for dir_ in (
+                [tprops.dir_data, tprops.dir_data_cycle] +
+                tprops.dir_data_cycle_offsets.values()):
+            if dir_ is None:
                 continue
-            if os.path.exists(d) and not os.path.isdir(d):
-                self.fs_util.delete(d)
-            self.fs_util.makedirs(d)
+            if os.path.exists(dir_) and not os.path.isdir(dir_):
+                self.fs_util.delete(dir_)
+            self.fs_util.makedirs(dir_)
 
         # Task prefix and suffix
         for key, split, index in [("prefix", str.split, 0),
@@ -585,11 +610,11 @@ class SuiteEngineProcessor(object):
             delim = self.TASK_NAME_DELIM[key]
             if kwargs.get(key + "_delim"):
                 delim = kwargs.get(key + "_delim")
-            if delim in t.task_name:
-                res = split(t.task_name, delim, 1)
-                setattr(t, "task_" + key, res[index])
+            if delim in tprops.task_name:
+                res = split(tprops.task_name, delim, 1)
+                setattr(tprops, "task_" + key, res[index])
 
-        return t
+        return tprops
 
     def get_task_props_from_env(self):
         """Return a TaskProps object.
@@ -665,9 +690,9 @@ class SuiteEngineProcessor(object):
 
         """
         url = self.get_suite_log_url(user_name, suite_name)
-        w = webbrowser.get()
-        w.open(url, new=True, autoraise=True)
-        self.handle_event(WebBrowserEvent(w.name, url))
+        browser = webbrowser.get()
+        browser.open(url, new=True, autoraise=True)
+        self.handle_event(WebBrowserEvent(browser.name, url))
         return url
 
     def parse_job_log_rel_path(self, f_name):
@@ -702,7 +727,7 @@ class SuiteEngineProcessor(object):
         cycle: a YYYYmmddHH or ISO 8601 date/time string.
         cycle_offset: an instance of BaseCycleOffset.
 
-        The returned date time would be an YYYYmmdd[HH[MM]] string.
+        Return date time in the same format as cycle.
 
         Note: It would be desirable to switch to a ISO 8601 format,
         but due to Cylc's YYYYmmddHH format, it would be too confusing to do so

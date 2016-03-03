@@ -98,11 +98,7 @@ class RoseDateTimeOperator(object):
         else:
             assumed_time_zone = None
 
-        if not calendar_mode:
-            calendar_mode = os.getenv("ROSE_CYCLING_MODE")
-
-        if calendar_mode and calendar_mode in Calendar.MODES:
-            Calendar.default().set_mode(calendar_mode)
+        self.set_calendar_mode(calendar_mode)
 
         self.time_point_dumper = TimePointDumper()
         self.time_point_parser = TimePointParser(
@@ -254,9 +250,27 @@ class RoseDateTimeOperator(object):
         else:
             return sign + str(duration)
 
+    @staticmethod
+    def get_calendar_mode():
+        """Get current calendar mode."""
+        return Calendar.default().mode
+
     def is_offset(self, offset):
         """Return True if the string offset can be parsed as an offset."""
         return (self.REC_OFFSET.match(offset) is not None)
+
+    @staticmethod
+    def set_calendar_mode(calendar_mode=None):
+        """Set calendar mode for subsequent operations.
+
+        Raise KeyError if calendar_mode is invalid.
+
+        """
+        if not calendar_mode:
+            calendar_mode = os.getenv("ROSE_CYCLING_MODE")
+
+        if calendar_mode and calendar_mode in Calendar.MODES:
+            Calendar.default().set_mode(calendar_mode)
 
     def strftime(self, time_point, print_format):
         """Use either the isodatetime or datetime strftime time formatting."""
@@ -379,7 +393,7 @@ def _convert_duration(date_time_oper, opts, args):
     """Implement usage 3 of "rose date", convert ISO8601 duration."""
     time_in_8601 = date_time_oper.duration_parser.parse(args[0])
     time = time_in_8601.get_seconds()
-    options = {'S': time, 'M': time/60, 'H': time/3600}
+    options = {'S': time, 'M': time / 60, 'H': time / 3600}
     if opts.duration_print_format.upper() in options:
         # supplied duration format is valid (upper removes
         # case-sensitivity)
