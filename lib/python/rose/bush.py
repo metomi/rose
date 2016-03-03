@@ -162,7 +162,8 @@ class RoseBushService(object):
 
     @cherrypy.expose
     def cycles(
-            self, user, suite, page=1, order=None, per_page=None, form=None):
+            self, user, suite, page=1, order=None, per_page=None,
+            no_fuzzy_time="0", form=None):
         """List cycles of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
         conf = ResourceLocator.default().get_conf()
@@ -191,6 +192,7 @@ class RoseBushService(object):
             "rose_version": self.rose_version,
             "script": cherrypy.request.script_name,
             "method": "cycles",
+            "no_fuzzy_time": no_fuzzy_time,
             "states": {},
             "per_page": per_page,
             "per_page_default": per_page_default,
@@ -337,7 +339,7 @@ class RoseBushService(object):
 
     @cherrypy.expose
     def suites(self, user, names=None, page=1, order=None, per_page=None,
-               form=None):
+               no_fuzzy_time="0", form=None):
         """List (installed) suites of a user.
 
         user -- A string containing a valid user ID
@@ -365,6 +367,7 @@ class RoseBushService(object):
             "rose_version": self.rose_version,
             "script": cherrypy.request.script_name,
             "method": "suites",
+            "no_fuzzy_time": no_fuzzy_time,
             "user": user,
             "is_option_on": (
                 names and shlex.split(str(names)) != ["*"] or

@@ -48,6 +48,7 @@ rel="stylesheet" media="screen" />
         <div class="accordion-inner">
           <form action="{{script}}/{{method}}">
             <input type="hidden" name="user" value="{{user}}" />
+            <input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
 
             <div class="input-append">
               <label for="names">Names (Default=*)</label>
@@ -99,6 +100,16 @@ rel="stylesheet" media="screen" />
 </div>
 
 {% include "pager.html" -%}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12 text-right">
+      <a id="toggle-fuzzy-time" data-no-fuzzy-time="{{no_fuzzy_time}}" href="#">
+        <small>toggle &Delta;t</small>
+      </a>
+    </div>
+  </div>
+</div>
 
 <div class="container-fluid">
 {% for entry in entries -%}

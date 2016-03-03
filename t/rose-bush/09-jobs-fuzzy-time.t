@@ -24,7 +24,7 @@ if ! python -c 'import cherrypy' 2>'/dev/null'; then
     skip_all '"cherrypy" not installed'
 fi
 
-tests 5
+tests 13
 
 ROSE_CONF_PATH= rose_ws_init 'rose' 'bush'
 if [[ -z "${TEST_ROSE_WS_PORT}" ]]; then
@@ -56,6 +56,30 @@ export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
 cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
 
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-200-curl-suites"
+run_pass "${TEST_KEY}" curl \
+    "${TEST_ROSE_WS_URL}/suites/${USER}?form=json"
+rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
+    "[('no_fuzzy_time',), '0']"
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-200-curl-suites-no-fuzzy-time"
+run_pass "${TEST_KEY}" curl \
+    "${TEST_ROSE_WS_URL}/suites/${USER}?form=json&no_fuzzy_time=1"
+rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
+    "[('no_fuzzy_time',), '1']"
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-200-curl-cycles"
+run_pass "${TEST_KEY}" curl \
+    "${TEST_ROSE_WS_URL}/cycles/${USER}/${SUITE_NAME}?form=json"
+rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
+    "[('no_fuzzy_time',), '0']"
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-200-curl-cycles-no-fuzzy-time"
+run_pass "${TEST_KEY}" curl \
+    "${TEST_ROSE_WS_URL}/cycles/${USER}/${SUITE_NAME}?form=json&no_fuzzy_time=1"
+rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
+    "[('no_fuzzy_time',), '1']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
 run_pass "${TEST_KEY}" curl \
