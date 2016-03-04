@@ -146,7 +146,7 @@ class SectionOperations(object):
                     rose.config_editor.WARNING_CANNOT_USER_IGNORE.format(
                         section),
                     rose.config_editor.WARNING_CANNOT_IGNORE_TITLE)
-                return []
+                return [], []
             for error in [rose.config_editor.WARNING_TYPE_USER_IGNORED,
                           rose.config_editor.WARNING_TYPE_ENABLED]:
                 if error in sect_data.error:
@@ -175,7 +175,7 @@ class SectionOperations(object):
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     rose.config_editor.WARNING_CANNOT_ENABLE.format(section),
                     rose.config_editor.WARNING_CANNOT_ENABLE_TITLE)
-                return []
+                return [], []
             sect_data.ignored_reason.clear()
             for error in ign_errors:
                 if error in my_errors:

@@ -332,9 +332,9 @@ class GroupOperations(object):
                 section, config_name)
             if ns not in nses:
                 nses.append(ns)
-            skipped_nses = self.sect_ops.ignore_section(config_name, section,
-                                                        is_ignored,
-                                                        skip_update=True)
+            skipped_nses, ids = self.sect_ops.ignore_section(
+                config_name, section,
+                is_ignored, skip_update=True)
             for ns in skipped_nses:
                 if ns not in nses:
                     nses.append(ns)
