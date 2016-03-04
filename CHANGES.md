@@ -14,9 +14,17 @@ or their successors.
 
 ### Noteworthy Changes
 
+[#1835](https://github.com/metomi/rose/pull/1835):
+rose config-edit: fix crash on ignore/remove/disable multiple sections.
+
 [#1833](https://github.com/metomi/rose/pull/1833):
 rose_ana: value of `tolerance` setting can now contain environment variable
 substitution syntax.
+
+[#1832](https://github.com/metomi/rose/pull/1832):
+rose bush: view text mode: fix internal server error when viewing files with
+Unicode characters. This fixes the problem by outputing the file in download
+mode.
 
 [#1824](https://github.com/metomi/rose/pull/1824):
 rose suite- wrappers: make use of host information in cylc port files to detect
