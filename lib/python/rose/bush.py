@@ -502,9 +502,9 @@ class RoseBushService(object):
                 cherrypy.response.headers["Content-Type"] = mime
                 return cherrypy.lib.static.serve_file(f_name, mime)
             s = open(f_name).read()
-        if mode is None:
-            s = jinja2.escape(s)
         try:
+            if mode in [None, "text"]:
+                s = jinja2.escape(s)
             lines = [unicode(line) for line in s.splitlines()]
         except UnicodeDecodeError:
             return cherrypy.lib.static.serve_file(f_name, MIME_TEXT_PLAIN)
