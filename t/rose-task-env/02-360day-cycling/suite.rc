@@ -1,0 +1,18 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        abort on timeout = True
+        timeout = PT1M
+[scheduling]
+    cycling mode = 360day
+    initial cycle point = 20200227
+    final cycle point = 20200302
+    [[dependencies]]
+        [[[P1D]]]
+            graph = foo[-P1D] => foo
+[runtime]
+    [[foo]]
+        env-script = eval $(rose task-env -T P1D -T -P1D)
+        script = rose task-run
+

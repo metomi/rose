@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose task-env" in non-cycling mode.
+# Test "rose task-env" in integer cycling mode.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 export ROSE_CONF_PATH=
