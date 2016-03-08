@@ -378,7 +378,7 @@ class Updater(object):
         for ns in update_nses:
             if ns != namespace:
                 # We don't need another update of namespace.
-                self.update_ns_tree_states(ns)
+                self.update_namespace(ns)
         for var_id in trig_id_val_dict.keys() + updated_ids:
             var = var_id_map.get(var_id)
             if var is None:
