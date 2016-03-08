@@ -12,7 +12,25 @@ Rose release 38. This release will work best with
 [fcm-2016.02.0](https://github.com/metomi/fcm/releases/tag/2016.02.0),
 or their successors.
 
+### Highlighted Changes
+
+[#1824](https://github.com/metomi/rose/pull/1824):
+rose suite- wrappers: make use of host information in cylc port files to detect
+whether suites are running or not. Delete a cylc port file and/or a rose suite
+host file if the system is able to detect that no process associated with the
+suite is running on the recorded host. This allows suite-run, suite-clean, etc
+to proceed if a suite is terminated with a left-over port file.
+
 ### Noteworthy Changes
+
+[#1847](https://github.com/metomi/rose/pull/1847):
+rose config-edit: fix other namespace state display on trigger. It could get a
+target namespace (page/panel) ignored state incorrect following triggering from
+another page. This fixes the issue.
+
+[#1845](https://github.com/metomi/rose/pull/1845):
+rose task-env: fix alternate calendar mode issue. It was not using the
+setting in `CYLC_CALENDAR_MODE`. This fixes the issue.
 
 [#1835](https://github.com/metomi/rose/pull/1835):
 rose config-edit: fix crash on ignore/remove/disable multiple sections.
@@ -25,13 +43,6 @@ substitution syntax.
 rose bush: view text mode: fix internal server error when viewing files with
 Unicode characters. This fixes the problem by outputing the file in download
 mode.
-
-[#1824](https://github.com/metomi/rose/pull/1824):
-rose suite- wrappers: make use of host information in cylc port files to detect
-whether suites are running or not. Delete a cylc port file and/or a rose suite
-host file if the system is able to detect that no process associated with the
-suite is running on the recorded host. This allows suite-run, suite-clean, etc
-to proceed if a suite is terminated with a left-over port file.
 
 [#1806](https://github.com/metomi/rose/pull/1806):
 rose date: new functionality to parse and convert ISO8601 durations.
