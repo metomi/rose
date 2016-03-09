@@ -131,7 +131,7 @@ class Updater(object):
                 self.update_ns_sub_data(only_this_namespace)
 
     def refresh_ids(self, config_name, setting_ids, is_loading=False,
-                    are_errors_done=False, skip_update=True):
+                    are_errors_done=False, skip_update=False):
         """Refresh and redraw settings if needed."""
         self.pagelist = self.get_pagelist_func()
         nses_to_do = []
@@ -158,7 +158,9 @@ class Updater(object):
                 nses_to_do.append(ns)
         if not skip_update:
             for ns in nses_to_do:
-                self.update_namespace(ns, is_loading=is_loading)
+                self.update_namespace(ns, is_loading=is_loading,
+                                      skip_sub_data_update=True)
+            self.update_ns_sub_data(nses_to_do)
 
     def update_all(self, only_this_config=None, is_loading=False,
                    skip_checking=False, skip_sub_data_update=False):
@@ -246,12 +248,17 @@ class Updater(object):
         if not skip_sub_data_update:
             self.update_ns_sub_data(page.namespace)
 
-    def update_ns_sub_data(self, namespace=None):
+    def update_ns_sub_data(self, namespaces=None):
         """Update any relevant summary data on another page."""
+        if type(namespaces) is not list:
+            namespaces = [namespaces]
         for page in self.pagelist:
-            if (namespace is not None and
-                    not namespace.startswith(page.namespace) and
-                    namespace != page.namespace):
+            for namespace in namespaces:
+                if (namespace is None or
+                        namespace.startswith(page.namespace)):
+                    break
+            else:
+                # No namespaces matched this page, skip
                 continue
             page.sub_data = self.data.helper.get_sub_data_for_namespace(
                 page.namespace)
