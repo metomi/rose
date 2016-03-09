@@ -110,6 +110,10 @@ class UpgradeController(object):
         self.window.vbox.pack_start(
             self.treewindow, expand=True, fill=True,
             padding=rose.config_editor.SPACING_PAGE)
+        label = gtk.Label(rose.config_editor.DIALOG_LABEL_UPGRADE)
+        label.show()
+        self.window.vbox.pack_start(
+            label, padding=rose.config_editor.SPACING_PAGE)
         button_hbox = gtk.HBox()
         button_hbox.show()
         all_versions_toggle_button = gtk.CheckButton(
@@ -223,6 +227,7 @@ class UpgradeController(object):
         for config_name in sorted(self.config_dict.keys()):
             self._update_treemodel_data(config_name)
         self.treeview.set_model(self.treemodel)
+        self._set_ok_to_upgrade()
 
     def _handle_toggle_upgrade(self, cell, path, col_index):
         iter_ = self.treemodel.get_iter(path)
