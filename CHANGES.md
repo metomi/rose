@@ -32,8 +32,22 @@ another page. This fixes the issue.
 rose task-env: fix alternate calendar mode issue. It was not using the
 setting in `CYLC_CALENDAR_MODE`. This fixes the issue.
 
+[#1841](https://github.com/metomi/rose/pull/1841):
+rose bush: suites list and cycles list: fix fuzzy time logic. Restored display
+of time using fuzzy time for suites list and cycles list, broken by
+[#1791](https://github.com/metomi/rose/pull/1791). A toogle delta time button
+will now be displayed in suites list and cycles list for users to toggle
+between fuzzy time and ISO8601 date-time stamp.
+
+[#1836](https://github.com/metomi/rose/pull/1836):
+rose_arch: status string for targets with bad statuses will now be printed to
+STDERR as well as STDOUT.
+
 [#1835](https://github.com/metomi/rose/pull/1835):
 rose config-edit: fix crash on ignore/remove/disable multiple sections.
+
+[#1834](https://github.com/metomi/rose/pull/1834):
+rose config-edit: fix upgrade button sensitivity and instructions.
 
 [#1833](https://github.com/metomi/rose/pull/1833):
 rose_ana: value of `tolerance` setting can now contain environment variable
