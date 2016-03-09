@@ -92,6 +92,16 @@ TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
 FILE_PREFIX="$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}1/01/job.err" <<'__ERR__'
 [FAIL] foo://2013010112/hello/worlds/planet-n.tar.gz: bad command-format: foo put %(target)s %(source)s: KeyError: 'source'
+[FAIL] ! foo://2013010112/hello/worlds/planet-n.tar.gz [compress=tar.gz]
+[FAIL] !	hello/planet-1.txt (hello/planet-1.txt)
+[FAIL] !	hello/planet-2.txt (hello/planet-2.txt)
+[FAIL] !	hello/planet-3.txt (hello/planet-3.txt)
+[FAIL] !	hello/planet-4.txt (hello/planet-4.txt)
+[FAIL] !	hello/planet-5.txt (hello/planet-5.txt)
+[FAIL] !	hello/planet-6.txt (hello/planet-6.txt)
+[FAIL] !	hello/planet-7.txt (hello/planet-7.txt)
+[FAIL] !	hello/planet-8.txt (hello/planet-8.txt)
+[FAIL] !	hello/planet-9.txt (hello/planet-9.txt)
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-2"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}2/01/job.err" <<'__ERR__'
@@ -108,11 +118,17 @@ __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-5"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5/01/job.err" <<__ERR__
 [FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: '$SUITE_RUN_DIR/share/cycle/2013010112/hello/mercurry.txt'
+[FAIL] ! foo://2013010112/hello/worlds/inner.tar.gz [compress=tar.gz]
+[FAIL] !	hello/venus.txt (hello/venus.txt)
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
-file_cmp "$TEST_KEY.err" "${FILE_PREFIX}6/01/job.err" <<__ERR__
+sed 's/ \[compress.*\]$//' "$TEST_KEY.err" \
+    "${FILE_PREFIX}6/01/job.err" >"$TEST_KEY.err"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/cycle/2013010112/hello/mars.txt # return-code=1, stderr=
 [FAIL] foo: push: unknown action
+[FAIL] ! foo://2013010112/hello/worlds/mars.txt.gz
+[FAIL] !	hello/mars.txt (hello/mars.txt)
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-7"
 file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_7/01/job.err" <<'__ERR__'
@@ -129,9 +145,39 @@ sed '/^\[INFO\] [=!+]/!d;
     "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.out" >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" \
     "$TEST_SOURCE_DIR/$TEST_KEY_BASE-bad-9.out" "$TEST_KEY.out"
-sed 's?\(hello/planet-5.txt\) .*\(/hello/planet-5.txt\)?\1 \2?' \
+sed -e 's?\(hello/planet-5.txt\) .*\(/hello/planet-5.txt\)?\1 \2?' \
+    -e 's/ \[compress.*]$//' \
     "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.err" >"$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] ! foo://2013010112/planet-n.tar.gz
+[FAIL] !	hello/dark-matter.txt (hello/dark-matter.txt)
+[FAIL] !	hello/earth.txt (hello/earth.txt)
+[FAIL] !	hello/jupiter-moon-1.txt (hello/jupiter-moon-1.txt)
+[FAIL] !	hello/jupiter.txt (hello/jupiter.txt)
+[FAIL] !	hello/mars.txt (hello/mars.txt)
+[FAIL] !	hello/mercury.txt (hello/mercury.txt)
+[FAIL] !	hello/neptune-1.txt (hello/neptune-1.txt)
+[FAIL] !	hello/planet-1.txt (hello/planet-1.txt)
+[FAIL] !	hello/planet-2.txt (hello/planet-2.txt)
+[FAIL] !	hello/planet-3.txt (hello/planet-3.txt)
+[FAIL] !	hello/planet-4.txt (hello/planet-4.txt)
+[FAIL] !	hello/planet-5.txt (hello/planet-5.txt)
+[FAIL] !	hello/planet-6.txt (hello/planet-6.txt)
+[FAIL] !	hello/planet-7.txt (hello/planet-7.txt)
+[FAIL] !	hello/planet-8.txt (hello/planet-8.txt)
+[FAIL] !	hello/planet-9.txt (hello/planet-9.txt)
+[FAIL] !	hello/saturn.txt (hello/saturn.txt)
+[FAIL] !	hello/spaceship-1.txt (hello/spaceship-1.txt)
+[FAIL] !	hello/spaceship-2.txt (hello/spaceship-2.txt)
+[FAIL] !	hello/spaceship-3.txt (hello/spaceship-3.txt)
+[FAIL] !	hello/spaceship-4.txt (hello/spaceship-4.txt)
+[FAIL] !	hello/spaceship-5.txt (hello/spaceship-5.txt)
+[FAIL] !	hello/spaceship-6.txt (hello/spaceship-6.txt)
+[FAIL] !	hello/spaceship-7.txt (hello/spaceship-7.txt)
+[FAIL] !	hello/spaceship-8.txt (hello/spaceship-8.txt)
+[FAIL] !	hello/spaceship-9.txt (hello/spaceship-9.txt)
+[FAIL] !	hello/uranus.txt (hello/uranus.txt)
+[FAIL] !	hello/venus.txt (hello/venus.txt)
 [FAIL] my-bad-command $SUITE_RUN_DIR/share/cycle/2013010112/hello/planet-5.txt /hello/planet-5.txt # return-code=1, stderr=
 [FAIL] [my-bad-command] $SUITE_RUN_DIR/share/cycle/2013010112/hello/planet-5.txt /hello/planet-5.txt
 __ERR__
