@@ -8,7 +8,7 @@ for a full listing of issues for each release.
 ## Next Release (2016-Q1?)
 
 Rose release 38. This release will work best with
-[cylc-6.8.1](https://github.com/cylc/cylc/releases/tag/6.8.1) and
+[cylc-6.9.0](https://github.com/cylc/cylc/releases/tag/6.9.0) and
 [fcm-2016.02.0](https://github.com/metomi/fcm/releases/tag/2016.02.0),
 or their successors.
 
@@ -31,6 +31,9 @@ another page. This fixes the issue.
 [#1845](https://github.com/metomi/rose/pull/1845):
 rose task-env: fix alternate calendar mode issue. It was not using the
 setting in `CYLC_CALENDAR_MODE`. This fixes the issue.
+
+[#1843](https://github.com/metomi/rose/pull/1843):
+rose config-edit: fix left hand tree panel error icons for macros.
 
 [#1841](https://github.com/metomi/rose/pull/1841):
 rose bush: suites list and cycles list: fix fuzzy time logic. Restored display
