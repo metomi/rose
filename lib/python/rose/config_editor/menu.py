@@ -696,11 +696,10 @@ class MainMenuHandler(object):
             try:
                 return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
-                message = 'Error in custom macro:\n\n%s' % (
-                    traceback.format_exc())
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                    message,
+                    'Error in custom macro:\n\n%s' % (
+                        traceback.format_exc()),
                     rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
                         macro_fullname))
                 continue
