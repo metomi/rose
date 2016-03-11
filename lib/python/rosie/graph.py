@@ -81,8 +81,12 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None,
         for property in properties:
             node_rosie_properties[idx].append(dict_row.get(property))
         from_idx = dict_row.get("from_idx")
+
         if from_idx is None:
             continue
+
+        print from_idx, idx, dict_row['owner'] # Parsing info from dict
+
         edges.append((from_idx, idx))
         forward_edges.setdefault(from_idx, [])
         forward_edges[from_idx].append(idx)
@@ -158,13 +162,20 @@ def output_graph(graph, filename=None, debug_mode=False):
                                      filename=filename)
 
 
+def dump_list(graph, filename=None):
+    """Dump list of graph entries to a file"""
+    for node in graph.nodes():
+        print node.attr['label'].replace("\\n", ", ")
+
+
 def main():
     """Provide the CLI interface."""
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("distance",
                               "output_file",
                               "prefix",
-                              "property")
+                              "property",
+                              "dump_list")
     opts, args = opt_parser.parse_args()
     filter_id = None
     if args:
@@ -181,7 +192,7 @@ def main():
     graph = make_graph(prefix, filter_id, opts.property,
                        max_distance=opts.distance)
     output_graph(graph, filename=opts.output_file, debug_mode=opts.debug_mode)
-
+    dump_list(graph, opts.dump_list)
 
 if __name__ == "__main__":
     main()

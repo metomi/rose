@@ -172,6 +172,12 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "downgrade",
              "help": "Downgrade instead of upgrade."}],
+        "dump_list": [
+            ["--dump-list"],
+            {"action": "store",
+             "dest": "dump_list",
+             "metavar": "FILE",
+             "help": "Specify file to dump list of suite ids and owners to."}],
         "env_var_process_mode": [
             ["--env-var-process", "-E"],
             {"action": "store_true",
