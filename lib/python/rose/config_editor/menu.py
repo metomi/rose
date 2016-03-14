@@ -695,7 +695,7 @@ class MainMenuHandler(object):
             os.chdir(config_data.directory)
             try:
                 return_value = macro_method(macro_config, meta_config, **res)
-            except Exception as e:
+            except Exception:
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     'Error in custom macro:\n\n%s' % (
