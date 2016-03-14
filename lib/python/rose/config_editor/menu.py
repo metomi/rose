@@ -24,6 +24,7 @@ import os
 import shlex
 import subprocess
 import sys
+import traceback
 
 import pygtk
 pygtk.require('2.0')
@@ -694,10 +695,11 @@ class MainMenuHandler(object):
             os.chdir(config_data.directory)
             try:
                 return_value = macro_method(macro_config, meta_config, **res)
-            except Exception as e:
+            except Exception:
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                    str(e),
+                    'Error in custom macro:\n\n%s' % (
+                        traceback.format_exc()),
                     rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
                         macro_fullname))
                 continue
