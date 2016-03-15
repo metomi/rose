@@ -72,6 +72,8 @@ ACCEL_BROWSER = "<Ctrl>B"
 ACCEL_SUITE_RUN = "<Ctrl>R"
 ACCEL_TERMINAL = "<Ctrl>T"
 ACCEL_HELP_GUI = "F1"
+ACCEL_REMOVE = "Delete"
+ACCEL_IGNORE = "<Ctrl>I"
 
 # Menu or panel strings
 ADD_MENU_BLANK = "Add blank variable"

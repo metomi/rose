@@ -68,13 +68,16 @@ class BaseSummaryDataPanel(gtk.VBox):
         self._prev_store = None
         self._prev_sort_model = None
         self._view = rose.gtk.util.TooltipTreeView(
-            get_tooltip_func=self.set_tree_tip)
+            get_tooltip_func=self.set_tree_tip,
+            multiple_selection=True)
         self._view.set_rules_hint(True)
         self.sort_util = rose.gtk.util.TreeModelSortUtil(
             lambda: self._view.get_model(), multi_sort_num=2)
         self._view.show()
         self._view.connect("button-release-event",
                            self._handle_button_press_event)
+        self._view.connect("key-press-event",
+                           self._handle_key_press_event)
         self._window = gtk.ScrolledWindow()
         self._window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.update()
@@ -371,8 +374,51 @@ class BaseSummaryDataPanel(gtk.VBox):
                 self._handle_activation(treeview, path, col)
         return False
 
+    def _get_selected_sections(self):
+        """ Returns a list of currently selected sections. """
+        ret = []
+        # get row, col values
+        col = self.get_section_column_index()
+        rows = [row[0] for row in
+                self._view.get_selection().get_selected_rows()[1]]
+        rows.sort()
+        # get iterator pointing at the first row
+        _iter = self._view.get_model().get_iter_first()
+        _iter_ind = 0
+        for row in rows:
+            # for each selected row
+            while _iter_ind < row:
+                # iterate untill we reach the current row
+                _iter = self._view.get_model().iter_next(_iter)
+                _iter_ind += 1
+                if not _iter:
+                    # incase we run out of iterator
+                    raise IndexError
+            ret.append(self._view.get_model().get_value(_iter, col))
+        return ret
+
+    def _handle_key_press_event(self, treeview, event):
+        if event.keyval == gtk.keysyms.Delete:
+            # `Delete` - remove section
+            _sections = self._get_selected_sections()
+            for _section in _sections:
+                self.remove_section(_section)
+            self._view.get_selection().unselect_all()
+
+        # detect key combination
+        elif 'GDK_CONTROL_MASK' in event.state.value_names:
+            # `Ctrl + ?`
+            if event.keyval == gtk.keysyms.i:
+                # `Ctrl + i` - ignore section
+                _sections = self._get_selected_sections()
+                for _section in _sections:
+                    ignored = (rose.variable.IGNORED_BY_USER not in
+                               self.sections[_section].ignored_reason)
+                    self.sub_ops.ignore_section(_section, ignored)
+
     def _popup_tree_menu(self, path, col, event):
         """Launch a menu for this main treeview row."""
+        shortcuts = []
         menu = gtk.Menu()
         menu.show()
         model = self._view.get_model()
@@ -425,6 +471,8 @@ class BaseSummaryDataPanel(gtk.VBox):
                     lambda i: self.sub_ops.ignore_section(this_section, False))
                 enab_menuitem.show()
                 menu.append(enab_menuitem)
+                shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                                  enab_menuitem))
             else:
                 ign_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
                 ign_menuitem.set_label(
@@ -434,6 +482,8 @@ class BaseSummaryDataPanel(gtk.VBox):
                     lambda i: self.sub_ops.ignore_section(this_section, True))
                 ign_menuitem.show()
                 menu.append(ign_menuitem)
+                shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                                  ign_menuitem))
             rem_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
             rem_menuitem.set_label(
                 rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
@@ -441,6 +491,20 @@ class BaseSummaryDataPanel(gtk.VBox):
                                  lambda i: self.remove_section(this_section))
             rem_menuitem.show()
             menu.append(rem_menuitem)
+            shortcuts.append((rose.config_editor.ACCEL_REMOVE, rem_menuitem))
+
+            # list shortcut keys
+            accel = gtk.AccelGroup()
+            for key_press, menuitem in shortcuts:
+                key, mod = gtk.accelerator_parse(key_press)
+                menuitem.add_accelerator(
+                    'activate',
+                    accel,
+                    key,
+                    mod,
+                    gtk.ACCEL_VISIBLE
+                )
+
         menu.popup(None, None, None, event.button, event.time)
         return False
 

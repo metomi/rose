@@ -470,13 +470,17 @@ class TooltipTreeView(gtk.TreeView):
 
     """
 
-    def __init__(self, model=None, get_tooltip_func=None):
+    def __init__(self, model=None, get_tooltip_func=None,
+                 multiple_selection=False):
         super(TooltipTreeView, self).__init__(model)
         self.get_tooltip = get_tooltip_func
         self.set_has_tooltip(True)
         self._last_tooltip_path = None
         self._last_tooltip_column = None
         self.connect('query-tooltip', self._handle_tooltip)
+        if multiple_selection:
+            self.set_rubber_banding(True)
+            self.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 
     def _handle_tooltip(self, view, x, y, kbd_ctx, tip):
         """Handle creating a tooltip for the treeview."""
