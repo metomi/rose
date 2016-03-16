@@ -215,9 +215,14 @@ class GPGAgentStore(object):
         for line in replylines:
             if line.startswith("D"):
                 return line.split(None, 1)[1]
-        if not no_ask and not any([
-                line.startswith("INQUIRE") for line in replylines]):
-            # Prompted for a password, didn't get one.
+        if not no_ask:
+            # We want gpg-agent to prompt for a password.
+            for line in replylines:
+                if (line.startswith("INQUIRE ") or
+                        "Operation cancelled" in line):
+                    # Prompt was launched, or a launched prompt was cancelled.
+                    return None
+            # Prompt couldn't be launched.
             raise RosieStoreRetrievalError(
                 "gpg-agent", reply.replace("OK\n", "").replace("\n", " "))
         return None
@@ -405,14 +410,17 @@ class RosieWSClientAuthManager(object):
                                              "root": self.root,
                                              "username": self.username}
             password = None
+            need_prompting = True
             if hasattr(self.password_store, "prompt_password"):
                 try:
                     password = self.password_store.prompt_password(
                         prompt, self.scheme, self.host, self.username)
                 except RosieStoreRetrievalError as exc:
                     self.event_handler(exc)
+                else:
+                    need_prompting = False
 
-            if not password:
+            if not password and need_prompting:
                 if self.popen.which("zenity") and os.getenv("DISPLAY"):
                     password = self.popen.run(
                         "zenity", "--entry", "--hide-text",
