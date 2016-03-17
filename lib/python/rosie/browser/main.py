@@ -798,19 +798,17 @@ class MainWindow(gtk.Window):
         self.display_toggle(menuitem.column)
 
     def _handle_prefix_change(self, menuitem):
-        """Handles changing the prefix."""
-        prefixes = list(self.ws_client.prefixes)
-        old_prefixes = list(prefixes)
-        if menuitem.get_active():
-            if menuitem.prefix_text not in prefixes:
-                prefixes.append(menuitem.prefix_text)
-                prefixes.sort()
-        else:
-            if menuitem.prefix_text in prefixes:
-                prefixes.remove(menuitem.prefix_text)
-        if prefixes == old_prefixes:
+        checkboxes = [child for child in menuitem.get_parent().get_children()
+                      if type(child) is gtk.CheckMenuItem]
+        prefixes = [checkbox.prefix_text for checkbox in checkboxes
+                    if checkbox.get_active()]
+        if not prefixes:
+            # do nothing, prefixes are left as before
+            return
+        if prefixes == list(self.ws_client.prefixes):
             # Happens on set_active call below, when there is a prefix problem.
             return
+
         self.ws_client.set_prefixes(prefixes)
         if self.ws_client.unreachable_prefixes:
             # There are some bad prefixes.
