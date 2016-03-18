@@ -211,9 +211,20 @@ class GPGAgentStore(object):
         gpg_socket.send("GET_PASSPHRASE --data %s rosie:%s:%s X X %s\n" % (
             no_ask_option, scheme, host, prompt))
         reply = self._socket_receive(gpg_socket, "^(?!OK)[^ ]+ .*\n")
-        for line in reply.splitlines():
+        replylines = reply.splitlines()
+        for line in replylines:
             if line.startswith("D"):
                 return line.split(None, 1)[1]
+        if not no_ask:
+            # We want gpg-agent to prompt for a password.
+            for line in replylines:
+                if (line.startswith("INQUIRE ") or
+                        "Operation cancelled" in line):
+                    # Prompt was launched, or a launched prompt was cancelled.
+                    return None
+            # Prompt couldn't be launched.
+            raise RosieStoreRetrievalError(
+                "gpg-agent", reply.replace("OK\n", "").replace("\n", " "))
         return None
 
     def prompt_password(self, prompt, scheme, host, username):
@@ -375,8 +386,6 @@ class RosieWSClientAuthManager(object):
         icon_path = ResourceLocator.default().locate("images/rosie-icon.png")
         if is_retry:
             username = ""
-            if self.username:
-                username = ""
 
             prompt = self.PROMPT_USERNAME % {
                 "prefix": self.prefix, "root": self.root}
@@ -400,17 +409,26 @@ class RosieWSClientAuthManager(object):
             prompt = self.PROMPT_PASSWORD % {"prefix": self.prefix,
                                              "root": self.root,
                                              "username": self.username}
+            password = None
+            need_prompting = True
             if hasattr(self.password_store, "prompt_password"):
-                password = self.password_store.prompt_password(
-                    prompt, self.scheme, self.host, self.username)
-            elif self.popen.which("zenity") and os.getenv("DISPLAY"):
-                password = self.popen.run(
-                    "zenity", "--entry", "--hide-text",
-                    "--title=Rosie",
-                    "--window-icon=" + icon_path,
-                    "--text=" + prompt)[1].strip()
-            else:
-                password = getpass(prompt)
+                try:
+                    password = self.password_store.prompt_password(
+                        prompt, self.scheme, self.host, self.username)
+                except RosieStoreRetrievalError as exc:
+                    self.event_handler(exc)
+                else:
+                    need_prompting = False
+
+            if not password and need_prompting:
+                if self.popen.which("zenity") and os.getenv("DISPLAY"):
+                    password = self.popen.run(
+                        "zenity", "--entry", "--hide-text",
+                        "--title=Rosie",
+                        "--window-icon=" + icon_path,
+                        "--text=" + prompt)[1].strip()
+                else:
+                    password = getpass(prompt)
             if not password:
                 raise KeyboardInterrupt(self.STR_CANCELLED)
             if password and password != self.password:
