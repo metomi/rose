@@ -1820,7 +1820,8 @@ class MainController(object):
 
 
 def spawn_window(config_directory_path=None, debug_mode=False,
-                 load_all_apps=False, load_no_apps=False, metadata_off=False):
+                 load_all_apps=False, load_no_apps=False, metadata_off=False,
+                 initial_namespaces=None):
     """Create a window and load the configuration into it. Run gtk."""
     if not debug_mode:
         warnings.filterwarnings('ignore')
@@ -1847,17 +1848,53 @@ def spawn_window(config_directory_path=None, debug_mode=False,
     splash_screen = rose.gtk.splash.SplashScreenProcess(logo, title,
                                                         number_of_events)
     try:
-        MainController(config_directory_path,
-                       load_updater=splash_screen,
-                       load_all_apps=load_all_apps,
-                       load_no_apps=load_no_apps,
-                       metadata_off=metadata_off)
+        ctrl = MainController(config_directory_path,
+                              load_updater=splash_screen,
+                              load_all_apps=load_all_apps,
+                              load_no_apps=load_no_apps,
+                              metadata_off=metadata_off)
+
     except BaseException as e:
         splash_screen.stop()
         if debug_mode and isinstance(e, Exception):
             # Write out origin information - this is otherwise lost.
             traceback.print_exc()
         raise e
+
+    # open up any initial_namespaces the user has provided us with
+    if initial_namespaces:
+        # if the namespace ends with a / remove it
+        for i in range(len(initial_namespaces)):
+            if (len(initial_namespaces[i]) > 1 and
+                    initial_namespaces[i][-1] == '/'):
+                initial_namespaces[i] = initial_namespaces[i][0:-1]
+
+        # for each partial namespace get the full namespace
+        full_namespaces = []
+        for namespace in initial_namespaces:
+            exp = re.compile('(.*%s?[^\/]+)' % (re.escape(namespace),))
+            for ns in sorted(sorted(ctrl.data.namespace_meta_lookup),
+                             key=len):
+                match = exp.search(ns)
+                if match:
+                    full_namespaces.append(match.groups()[0])
+                    break
+
+        # open each namespace in a new tab
+        for namespace in full_namespaces:
+            # if the namespace begins with a / remove it
+            if namespace[0] == '/':
+                namespace = namespace[1:]
+            # open namespace
+            try:
+                ctrl.view_page(namespace)
+            except Exception:
+                print >> sys.stderr, 'could not open ' + namespace
+            # expand namespace in nav_panel
+            path = ctrl.nav_panel.get_path_from_names(namespace.split('/'))
+            if path:
+                ctrl.nav_panel.tree.expand_to_path(path)
+
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
@@ -1912,9 +1949,6 @@ def main():
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode",
                               "load_no_apps", "load_all_apps", "no_metadata")
     opts, args = opt_parser.parse_args()
-    if args:
-        opt_parser.print_usage(sys.stderr)
-        sys.exit(2)
     rose.macro.add_meta_paths()
     rose.macro.add_opt_meta_paths(opts.meta_path)
     if opts.conf_dir:
@@ -1939,7 +1973,8 @@ def main():
         cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,
                                         load_all_apps=opts.load_all_apps,
                                         load_no_apps=opts.load_no_apps,
-                                        metadata_off=opts.no_metadata)""",
+                                        metadata_off=opts.no_metadata,
+                                        initial_namespaces=args)""",
                         globals(), locals(), f.name)
         p = pstats.Stats(f.name)
         p.strip_dirs().sort_stats("cumulative").print_stats()
@@ -1948,7 +1983,8 @@ def main():
         spawn_window(cwd, debug_mode=opts.debug_mode,
                      load_all_apps=opts.load_all_apps,
                      load_no_apps=opts.load_no_apps,
-                     metadata_off=opts.no_metadata)
+                     metadata_off=opts.no_metadata,
+                     initial_namespaces=args)
 
 
 if __name__ == '__main__':
