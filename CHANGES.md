@@ -5,6 +5,23 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2016-Q2?)
+
+Rose release 39. This release will work best with
+[cylc-6.9.1](https://github.com/cylc/cylc/releases/tag/6.9.1) and
+[fcm-2016.02.0](https://github.com/metomi/fcm/releases/tag/2016.02.0),
+or their successors.
+
+### Noteworthy Changes
+
+[#1858](https://github.com/metomi/rose/pull/1858):
+rosie go: better gpg-agent cache expiry handling.
+
+[#1855](https://github.com/metomi/rose/pull/1855):
+rose config-edit: show full traceback on macro crash.
+
+--------------------------------------------------------------------------------
+
 ## 2016.03.0 (2016-03-11)
 
 Rose release 38. This release works best with
