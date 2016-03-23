@@ -467,14 +467,15 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         meta_keys = ["rose-all"]
     else:
         key = opt_node.value
-        if "/" not in key:
-            key = key + "/" + rose.META_DEFAULT_VN_DIR
+        split_key = os.path.split(key)
+        if not split_key[0]:
+            key = os.path.join(key, rose.META_DEFAULT_VN_DIR)
         meta_keys = [key]
         if is_upgrade:
-            meta_keys = [key.split("/")[0]]
+            meta_keys = [os.path.split(key)[0]]
         else:
-            default_key = (key.rsplit("/", 1)[0] + "/" +
-                           rose.META_DEFAULT_VN_DIR)
+            default_key = os.path.join(os.path.split(key)[0],
+                                       rose.META_DEFAULT_VN_DIR)
             if default_key != key:
                 meta_keys.append(default_key)
     for i, meta_key in enumerate(meta_keys):
