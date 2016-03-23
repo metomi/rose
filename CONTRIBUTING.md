@@ -35,6 +35,7 @@ below:
 * Matt Pryor (Met Office, UK)
 * Oliver Sanders (Met Office, UK)
 * Jon Seddon (Met Office, UK)
+* Harry Shepherd (Met Office, UK)
 * Matt Shin (Met Office, UK)
 * Stuart Whitehouse (Met Office, UK)
 * Steve Wardle (Met Office, UK)
