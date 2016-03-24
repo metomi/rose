@@ -965,26 +965,26 @@ ${APP}/versions.py # i.e. the upgrade macros
     a collection of regularly-updated subdirectories from all of the relevant
     projects' <samp>rose-meta</samp> directories.</p>
 
-    <p>For example, for a system <code>COFFEE</code>, with the following
-    directory structure:</p>
-    <pre class="prettyprint lang-rose_conf">
-COFFEE/doc/
-...
-COFFEE/rose-meta/
-COFFEE/rose-meta/coffee-cappuccino/
-COFFEE/rose-meta/coffee-latte/
-COFFEE/rose-meta/coffee-mocha/
-</pre>
-
-    <p>and the system <code>CHOCOLATE</code>:</p>
+    <p>For example, a system <code>CHOCOLATE</code> may have a flat metadata
+    structure within the repository:</p>
     <pre class="prettyprint lang-rose_conf">
 CHOCOLATE/doc/
 ...
 CHOCOLATE/rose-meta/
 CHOCOLATE/rose-meta/choc-dark/
 CHOCOLATE/rose-meta/choc-milk/
+    </pre>
+    <p>and the system <code>CAFFINE</code> may have a hybrid structure, with
+    both flat and hierarchical components:</p>
+<pre class="prettyprint lang-rose_conf">
+CAFFINE/doc/
+...
+CAFFINE/rose-meta/caffine-guarana
+CAFFINE/rose-meta/caffine-coffee/cappuccino
+CAFFINE/rose-meta/caffine-coffee/latte
+CAFFINE/rose-meta/caffine-tea/yorkshire
+CAFFINE/rose-meta/caffine-tea/lapsang
 </pre>
-
     <p>and a site configuration with:</p>
     <pre class="prettyprint lang-rose_conf">
 meta-path=/path/to/rose-meta
@@ -993,12 +993,16 @@ meta-path=/path/to/rose-meta
     <p>We would expect the following directories in
     <samp>/path/to/rose-meta</samp>:</p>
     <pre class="prettyprint lang-rose_conf">
-/path/to/rose-meta/coffee-cappuccino/
-/path/to/rose-meta/coffee-latte/
-/path/to/rose-meta/coffee-mocha/
+/path/to/rose-meta/caffine-guarana/
+/path/to/rose-meta/caffine-coffee/
+/path/to/rose-meta/caffine-tea/
 /path/to/rose-meta/choc-dark/
 /path/to/rose-meta/choc-milk/
 </pre>
+    <p>with <code>caffine-coffee</code> containing subdirectories
+    <code>cappuccino</code> and <code>latte</code>, and
+    <code>caffine-tea</code> containing <code>yorkshire</code> and
+    <code>lapsang</code>
 
     <h2 id="appendix-upgrade">Appendix: Upgrade and Versions</h2>
 
