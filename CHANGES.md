@@ -14,6 +14,12 @@ or their successors.
 
 ### Noteworthy Changes
 
+[#1861](https://github.com/metomi/rose/pull/1861):
+rosie go: fix crash when all sources were unchecked.
+
+[#1859](https://github.com/metomi/rose/pull/1859):
+rose config-edit: keyboard shortcuts for multi section summary panel.
+
 [#1858](https://github.com/metomi/rose/pull/1858):
 rosie go: better gpg-agent cache expiry handling.
 
