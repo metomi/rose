@@ -170,6 +170,11 @@ DIALOG_TITLE_HISTORY_ERROR = "History Error"
 DIALOG_TITLE_INFO = "Suite Info"
 DIALOG_TITLE_UNCOMPLETED_FILTER = "Filter error"
 DIALOG_TITLE_UNREGISTERED_SUITE = "Suite not registered"
+DIALOG_MESSAGE_SOURCE_CHANGED = "Data source changed to {0}."
+DIALOG_TITLE_SOURCE_CHANGED = "Data Source Changed"
+
+# Dialog window size
+DIALOG_SIZE_SOURCE_CHANGED = (300, 75)
 
 # Tool-tip text
 
