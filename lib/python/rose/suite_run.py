@@ -293,7 +293,7 @@ class SuiteRunner(Runner):
         # Ask suite engine to parse suite configuration
         # and determine if it is up to date (unchanged)
         suite_conf_unchanged = self.suite_engine_proc.cmp_suite_conf(
-            suite_name, opts.strict_mode, opts.debug_mode)
+            suite_name, opts.run_mode, opts.strict_mode, opts.debug_mode)
 
         if opts.local_install_only_mode:
             return
