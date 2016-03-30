@@ -360,7 +360,7 @@ class AppRunner(Runner):
                 target_node = conf_tree.node.get([target_key])
             elif target_node.is_ignored():
                 continue
-            source_node = target_node.get("source")
+            source_node = target_node.get(["source"])
             if source_node is None:
                 target_node.set(["source"],
                                 os.path.join(conf_dir, "file", name))
