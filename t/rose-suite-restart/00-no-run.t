@@ -45,7 +45,7 @@ file_cmp "${TEST_KEY}.err.head" "${TEST_KEY}.err.head" <<__ERR__
 [FAIL] cylc restart ${NAME}  # return-code=1, stderr=
 __ERR__
 file_grep "${TEST_KEY}.err.grep" \
-    "'ERROR: Suite not found ${NAME}'" "${TEST_KEY}.err"
+    "ERROR: Suite not found ${NAME}" "${TEST_KEY}.err"
 rmdir "${HOME}/cylc-run/${NAME}"
 #-------------------------------------------------------------------------------
 exit
