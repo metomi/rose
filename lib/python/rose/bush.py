@@ -42,6 +42,8 @@ import urllib
 
 
 MIME_TEXT_PLAIN = "text/plain"
+SEARCH_MODE_TEXT = "TEXT"
+SEARCH_MODE_REGEX = "REGEX"
 
 
 class RoseBushService(object):
@@ -453,15 +455,14 @@ class RoseBushService(object):
     def summary(self, user, form=None):
         return self.suites(user, form)
 
-    @cherrypy.expose
-    def view(self, user, suite, path, path_in_tar=None, mode=None):
-        """View a text log file."""
+    def get_file(self, user, suite, path, path_in_tar=None, mode=None):
+        """Returns file information / content or a cherrypy response."""
         f_name = self._get_user_suite_dir(user, suite, path)
         conf = ResourceLocator.default().get_conf()
         view_size_max = int(conf.get_value(
             ["rose-bush", "view-size-max"], self.VIEW_SIZE_MAX))
         if path_in_tar:
-            tar_f = tarfile.open(f_name, 'r:gz')
+            tar_f = tarfile.open(f_name, "r:gz")
             try:
                 tar_info = tar_f.getmember(path_in_tar)
             except KeyError:
@@ -481,10 +482,10 @@ class RoseBushService(object):
                 t = NamedTemporaryFile()
                 f_bsize = os.fstatvfs(t.fileno()).f_bsize
                 while True:
-                    bytes = f.read(f_bsize)
-                    if not bytes:
+                    bytes_ = f.read(f_bsize)
+                    if not bytes_:
                         break
-                    t.write(bytes)
+                    t.write(bytes_)
                 cherrypy.response.headers["Content-Type"] = mime
                 try:
                     return cherrypy.lib.static.serve_file(t.name, mime)
@@ -498,6 +499,8 @@ class RoseBushService(object):
                 mime = MIME_TEXT_PLAIN
             else:
                 mime = mimetypes.guess_type(urllib.pathname2url(f_name))[0]
+            if not mime:
+                mime = MIME_TEXT_PLAIN
             if (mode == "download" or
                     f_size > view_size_max or
                     mime and
@@ -515,6 +518,7 @@ class RoseBushService(object):
         if path_in_tar:
             name = path_in_tar
         job_entry = None
+        entry = None
         if name.startswith("log/job/"):
             names = self.suite_engine_proc.parse_job_log_rel_path(name)
             if len(names) == 4:
@@ -529,6 +533,77 @@ class RoseBushService(object):
             file_content = "rose-conf"
         else:
             file_content = self.suite_engine_proc.is_conf(path)
+
+        return lines, job_entry, entry, file_content, f_name
+
+    @cherrypy.expose
+    def view_search(self, user, suite, path=None, path_in_tar=None, mode=None,
+                    search_string=None, search_mode=SEARCH_MODE_TEXT):
+        """Search a text log file."""
+        # get file or serve raw data
+        file_output = self.get_file(
+            user, suite, path, path_in_tar=path_in_tar, mode=mode)
+        if isinstance(file_output, tuple):
+            lines, job_entry, entry, file_content, f_name = self.get_file(
+                user, suite, path, path_in_tar=path_in_tar, mode=mode)
+        else:
+            return file_output
+
+        template = self.template_env.get_template("view-search.html")
+
+        if search_string:
+            results = []
+            line_numbers = []
+
+            # perform search
+            for i, line in enumerate(lines):
+                if search_mode == SEARCH_MODE_REGEX:
+                    match = re.search(search_string, line)
+                    if not match:
+                        continue
+                    start, end = match.span()
+                elif search_mode == SEARCH_MODE_TEXT:
+                    match = line.find(search_string)
+                    if match == -1:
+                        continue
+                    start = match
+                    end = start + len(search_string)
+                else:
+                    # ERROR: un-reccognised search_mode
+                    break
+                # if line matches search string include in results
+                results.append([line[:start], line[start:end],
+                                line[end:]])
+                if mode in [None, "text"]:
+                    line_numbers.append(i + 1)  # line numbers start from 1
+            lines = results
+        else:
+            # no search is being performed, client is requesting the whole
+            # page
+            if mode in [None, "text"]:
+                line_numbers = range(1, len(lines) + 1)
+            else:
+                line_numbers = []
+            lines = [[line] for line in lines]
+
+        return template.render(
+            lines=lines,
+            line_numbers=line_numbers,
+            file_content=file_content
+        )
+
+    @cherrypy.expose
+    def view(self, user, suite, path, path_in_tar=None, mode=None):
+        """View a text log file."""
+        # get file or serve raw data
+        file_output = self.get_file(
+            user, suite, path, path_in_tar=path_in_tar, mode=mode)
+        if isinstance(file_output, tuple):
+            lines, job_entry, entry, file_content, f_name = self.get_file(
+                user, suite, path, path_in_tar=path_in_tar, mode=mode)
+        else:
+            return file_output
+
         template = self.template_env.get_template("view.html")
 
         data = {}

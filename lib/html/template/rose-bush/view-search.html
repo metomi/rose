@@ -1,0 +1,42 @@
+{% if lines|length == 0 -%}
+<p>No results found.</p>
+{% else -%}
+<!-- File Line Numbers -->
+{% if line_numbers|length != 0 -%}
+<div class="span1 text-right">
+<pre id="filelinenumbers" class="prettyprint">
+{% for num in line_numbers -%}
+<span><a id="{{num}}" class="line-number">{{num}}</a></span>
+{% endfor -%}
+</pre>
+</div>
+{% endif -%}
+
+<!-- File Contents -->
+{% if line_numbers|length == 0 -%}
+<div class="span12">
+{% else -%}
+<div class="span11">
+{% endif -%}
+<pre id="filecode" {% if file_content %}class="prettyprint lang-{{file_content}}"{% endif -%}>
+{% set PREFIXES = {
+  "[DEBUG]": "muted",
+  "[FAIL] ": "text-error",
+  "[INFO] ": "text-info",
+  "[ OK ] ": "text-success",
+  "[WARN] ": "text-warning",
+} -%}
+{% for line in lines -%}
+{% for part in line -%}
+{% if loop.index == 1 and part|length > 7 and part[0:7] in PREFIXES
+-%}<span class="{{PREFIXES[part[0:7]]}}">{{part[0:7]}}</span>{{part[7:]}}{%
+else -%}
+{% if loop.index % 2 == 1 -%}{{part}}{% else 
+-%}<span class="highlight">{{part}}</span>{% endif -%}
+{% endif -%}
+{% endfor -%}
+{{ "" }} 
+{% endfor -%}
+</pre>
+</div>
+{% endif -%}

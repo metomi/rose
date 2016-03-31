@@ -24,7 +24,7 @@ if ! python -c 'import cherrypy' 2>'/dev/null'; then
     skip_all '"cherrypy" not installed'
 fi
 
-tests 51
+tests 55
 
 ROSE_CONF_PATH= rose_ws_init 'rose' 'bush'
 if [[ -z "${TEST_ROSE_WS_PORT}" ]]; then
@@ -188,6 +188,22 @@ run_pass "${TEST_KEY}" \
     curl -I \
     "${TEST_ROSE_WS_URL}/view/${USER}/${SUITE_NAME}?path=log/of/minus-one"
 file_grep "${TEST_KEY}.out" 'HTTP/.* 404 Not Found' "${TEST_KEY}.out"
+
+# test the file search feature
+TEST_KEY="${TEST_KEY_BASE}-200-curl-view-search"
+FILE='log/job/20000101T0000Z/foo1/01/job.out'
+MODE="&mode=text"
+URL="${TEST_ROSE_WS_URL}/view-search/${USER}/${SUITE_NAME}?path=${FILE}${MODE}\
+&search_mode=TEXT&search_string=Suite%20Name"
+
+run_pass "${TEST_KEY}" curl -I "${URL}"
+file_grep "${TEST_KEY}.out" 'HTTP/.* 200 OK' "${TEST_KEY}.out"
+
+TEST_KEY="${TEST_KEY_BASE}-200-curl-view-search-download"
+run_pass "${TEST_KEY}" \
+    curl "${URL}"
+file_grep "${TEST_KEY}.out" '<span class="highlight">Suite Name</span>' \
+    "${TEST_KEY}.out"
 
 #-------------------------------------------------------------------------------
 # Tidy up
