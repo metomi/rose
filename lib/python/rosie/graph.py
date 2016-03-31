@@ -76,7 +76,7 @@ class PrintSuiteDetails(rose.reporter.Event):
     def __str__(self):
         template = " - %s"
         argslist = [self.args[0]]
-        if self.args[1]:
+        if len(self.args) > 1:
             for arg in self.args[1]:
                 template += ", %s"
                 argslist.append(arg)
@@ -244,8 +244,11 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     reporter(PrintParentDetails(filter_id))
     parent_id = ancestry[filter_id]['parent']
 
-    reporter(PrintSuiteDetails(
-             parent_id, [ancestry[parent_id][p] for p in properties]))
+    if parent_id:
+        reporter(PrintSuiteDetails(
+                 parent_id, [ancestry[parent_id][p] for p in properties]))
+    else:
+        reporter(PrintSuiteDetails(None))
 
     children = ancestry[filter_id]['children']
     generation = 1
