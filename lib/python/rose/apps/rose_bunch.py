@@ -342,10 +342,15 @@ class RoseBunchDAO(object):
     def create_tables(self):
         """Create tables as appropriate"""
         existing = []
+        first_run = os.environ.get("CYLC_TASK_SUBMIT_NUMBER") == "1"
 
         for row in self.conn.execute("SELECT name FROM sqlite_master " +
                                      "WHERE type=='table'"):
             existing.append(row[0])
+
+        if first_run:
+            for tablename in existing:
+                self.conn.execute("""DELETE FROM """ + tablename)
 
         self.new_run = not existing
 
