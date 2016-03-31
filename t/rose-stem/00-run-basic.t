@@ -50,7 +50,7 @@ cp $TEST_SOURCE_DIR/00-run-basic/rose-suite.conf $WORKINGCOPY/rose-stem
 touch $WORKINGCOPY/rose-stem/rose-suite.conf
 #We should now have a valid rose-stem suite.
 #-------------------------------------------------------------------------------
-N_TESTS=41
+N_TESTS=42
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 #Test for successful execution
@@ -130,6 +130,9 @@ TEST_KEY=$TEST_KEY_BASE-subdirectory-source-base
 file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-subdirectory-source-mirror
+file_grep $TEST_KEY "SOURCE_FOO_MIRROR=fcm:foo.xm/trunk@1\$" $OUTPUT
+cp $OUTPUT ~
 #-------------------------------------------------------------------------------
 # Fourth test, checking relative path with -C is working
 TEST_KEY=$TEST_KEY_BASE-relative-path
