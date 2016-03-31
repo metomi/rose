@@ -48,21 +48,33 @@ class NoConnectionsEvent(rose.reporter.Event):
         return "%s: no copy relationships to other suites" % id
 
 
-def calculate_edges(graph, prefix, filter_id=None, properties=None,
-                    max_distance=None):
-    """Get all connected suites for a prefix, optionally filtered."""
+class DumpSuite(rose.reporter.Event):
+    """An event to print out suite details when dumping to CLI"""
+
+    KIND = rose.reporter.Reporter.KIND_OUT
+
+    def __str__(self):
+        id = self.args[0]
+        owner = self.args[1]
+        return "%s, %s" % (id, owner)
+
+
+def get_suite_data(prefix, properties=None):
+    """Retrieve a dictionary containing the contents of RosieWS
+
+    Adds in any extra requested properites
+
+    """
+
     if properties is None:
         properties = []
+
     ws_client = rosie.ws_client.RosieWSClient(
         prefixes=[prefix],
         event_handler=rose.reporter.Reporter()
     )
-    node_rosie_properties = {}
-    edges = []
-    forward_edges = {}
-    back_edges = {}
-    dict_rows = ws_client.search(prefix, all_revs=1)[0][0]
-    for dict_row in sorted(dict_rows, key=lambda _: _["revision"]):
+    suite_data = ws_client.search(prefix, all_revs=1)[0][0]
+    for dict_row in sorted(suite_data, key=lambda _: _["revision"]):
         suite_id = rosie.suite_id.SuiteId.from_idx_branch_revision(
             dict_row["idx"],
             dict_row["branch"],
@@ -76,6 +88,22 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None,
                 rosie.ws_client_cli.DATE_TIME_FORMAT,
                 time.gmtime(dict_row.get("date"))
             )
+
+    return suite_data
+
+
+def calculate_edges(graph, suite_data, filter_id=None, properties=None,
+                    max_distance=None):
+    """Get all connected suites for a prefix, optionally filtered."""
+    if properties is None:
+        properties = []
+
+    node_rosie_properties = {}
+    edges = []
+    forward_edges = {}
+    back_edges = {}
+
+    for dict_row in sorted(suite_data, key=lambda _: _["revision"]):
         idx = dict_row["idx"]
         node_rosie_properties[idx] = []
         for property in properties:
@@ -84,8 +112,6 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None,
 
         if from_idx is None:
             continue
-
-        print from_idx, idx, dict_row['owner'] # Parsing info from dict
 
         edges.append((from_idx, idx))
         forward_edges.setdefault(from_idx, [])
@@ -101,6 +127,8 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None,
             add_node(graph, node1, node_rosie_properties.get(node1))
             graph.add_edge(edge[0], edge[1])
     else:
+        reporter = rose.reporter.Reporter()
+
         # Only plot the connections involving filter_id.
         nodes = [n for edge in edges for n in edge]
         node_stack = []
@@ -121,7 +149,6 @@ def calculate_edges(graph, prefix, filter_id=None, properties=None,
 
         if len(ok_nodes) == 1:
             # There are no related suites.
-            reporter = rose.reporter.Reporter()
             reporter(NoConnectionsEvent(filter_id))
 
         for edge in sorted(edges):
@@ -143,7 +170,7 @@ def add_node(graph, node, node_label_properties, **kwargs):
     graph.add_node(node, **kwargs)
 
 
-def make_graph(prefix, filter_id, properties, max_distance=None):
+def make_graph(suite_data, filter_id, properties, max_distance=None):
     """Construct the pygraphviz graph."""
     graph = pygraphviz.AGraph(directed=True)
     graph.graph_attr["rankdir"] = "LR"
@@ -151,7 +178,7 @@ def make_graph(prefix, filter_id, properties, max_distance=None):
         graph.graph_attr["name"] = filter_id + " copy tree"
     else:
         graph.graph_attr["name"] = prefix + " copy tree"
-    calculate_edges(graph, prefix, filter_id, properties,
+    calculate_edges(graph, suite_data, filter_id, properties,
                     max_distance=max_distance)
     return graph
 
@@ -162,10 +189,63 @@ def output_graph(graph, filename=None, debug_mode=False):
                                      filename=filename)
 
 
-def dump_list(graph, filename=None):
-    """Dump list of graph entries to a file"""
-    for node in graph.nodes():
-        print node.attr['label'].replace("\\n", ", ")
+def dump_list(suite_data, filter_id, properties=None, max_distance=None):
+    """Dump out list of graph entries relating to a suite"""
+
+    if properties is None:
+        properties = []
+
+    ancestry = {}
+    # Process suite_data to get ancestry tree
+    for dict_row in sorted(suite_data, key=lambda _: _["revision"]):
+        idx = dict_row["idx"]
+        from_idx = dict_row.get("from_idx")
+
+        if not idx in ancestry:
+            ancestry[idx] = {'parent': None, 'children' : []}
+
+        if from_idx:
+            ancestry[idx]['parent'] = from_idx
+
+        for property in properties:
+            ancestry[idx][property] = dict_row.get(property)
+
+        if from_idx in ancestry:
+            ancestry[from_idx]['children'].append(idx)
+        else:
+            ancestry[from_idx] = {'parent': None, 'children' : [idx]}
+
+    # Print out info
+    print "parent suite"
+    print ancestry[filter_id]['parent']
+
+    children = ancestry[filter_id]['children']
+    level = 1
+    # Print out each generation of child suites
+    while children:
+        next_children = []
+        print "generation", level, "child suites (", len(children), " suites )"
+        for c in children:
+            output = [c]
+            for p in properties:
+                output.append(ancestry[c][p])
+            ",".join(output)
+            print ",".join(output)
+            if ancestry[c]['children']:
+                next_children += ancestry[c]['children']
+
+        if max_distance and level >= max_distance:
+            break
+        level += 1
+        children = next_children
+
+    levels = {}
+    # go down the tree
+    levels[0] = filter_id
+
+    # go up the tree
+    level = 0
+
 
 
 def main():
@@ -189,10 +269,18 @@ def main():
         prefix = rosie.suite_id.SuiteId.get_prefix_default()
     if opts.distance and not args:
         opt_parser.error("distance option requires an ID")
-    graph = make_graph(prefix, filter_id, opts.property,
+
+    suite_data = get_suite_data(prefix, opts.property)
+
+
+
+    graph = make_graph(suite_data, filter_id, opts.property,
                        max_distance=opts.distance)
+
     output_graph(graph, filename=opts.output_file, debug_mode=opts.debug_mode)
-    dump_list(graph, opts.dump_list)
+
+    dump_list(suite_data, filter_id, opts.property, max_distance=opts.distance)
+
 
 if __name__ == "__main__":
     main()
