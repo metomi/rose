@@ -172,12 +172,6 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "downgrade",
              "help": "Downgrade instead of upgrade."}],
-        "dump_list": [
-            ["--dump-list"],
-            {"action": "store",
-             "dest": "dump_list",
-             "metavar": "FILE",
-             "help": "Specify file to dump list of suite ids and owners to."}],
         "env_var_process_mode": [
             ["--env-var-process", "-E"],
             {"action": "store_true",
@@ -456,6 +450,11 @@ class RoseOptionParser(OptionParser):
             ["--print-format", "--format", "-f"],
             {"metavar": "FORMAT",
              "help": "Specify the format for printing results."}],
+        "print_graph": [
+            ["--print-graph"],
+            {"action": "store_true",
+             "dest": "print_graph",
+             "help": "Print graph in text format"}],
         "profile_mode": [
             ["--profile"],
             {"action": "store_true",

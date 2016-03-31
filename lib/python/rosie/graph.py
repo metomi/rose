@@ -48,15 +48,39 @@ class NoConnectionsEvent(rose.reporter.Event):
         return "%s: no copy relationships to other suites" % id
 
 
-class DumpSuite(rose.reporter.Event):
-    """An event to print out suite details when dumping to CLI"""
+class PrintChildGenerationDetails(rose.reporter.Event):
+    """An event to print out generation details when writing to CLI"""
 
     KIND = rose.reporter.Reporter.KIND_OUT
 
     def __str__(self):
-        id = self.args[0]
-        owner = self.args[1]
-        return "%s, %s" % (id, owner)
+        template = "Child generation %s (%s suites):"
+        return template % (self.args[0], self.args[1])
+
+
+class PrintParentDetails(rose.reporter.Event):
+    """An event to print out parent suite header when writing to CLI"""
+
+    KIND = rose.reporter.Reporter.KIND_OUT
+
+    def __str__(self):
+        template = "Parent suite of %s:"
+        return template % (self.args[0])
+
+
+class PrintSuiteDetails(rose.reporter.Event):
+    """An event to print out suite details when writing to CLI"""
+
+    KIND = rose.reporter.Reporter.KIND_OUT
+
+    def __str__(self):
+        template = " - %s"
+        argslist = [self.args[0]]
+        if self.args[1]:
+            for arg in self.args[1]:
+                template += ", %s"
+                argslist.append(arg)
+        return template % tuple(argslist)
 
 
 def get_suite_data(prefix, properties=None):
@@ -189,11 +213,12 @@ def output_graph(graph, filename=None, debug_mode=False):
                                      filename=filename)
 
 
-def dump_list(suite_data, filter_id, properties=None, max_distance=None):
+def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     """Dump out list of graph entries relating to a suite"""
-
     if properties is None:
         properties = []
+
+    reporter = rose.reporter.Reporter()
 
     ancestry = {}
     # Process suite_data to get ancestry tree
@@ -201,8 +226,8 @@ def dump_list(suite_data, filter_id, properties=None, max_distance=None):
         idx = dict_row["idx"]
         from_idx = dict_row.get("from_idx")
 
-        if not idx in ancestry:
-            ancestry[idx] = {'parent': None, 'children' : []}
+        if idx not in ancestry:
+            ancestry[idx] = {'parent': None, 'children': []}
 
         if from_idx:
             ancestry[idx]['parent'] = from_idx
@@ -213,39 +238,32 @@ def dump_list(suite_data, filter_id, properties=None, max_distance=None):
         if from_idx in ancestry:
             ancestry[from_idx]['children'].append(idx)
         else:
-            ancestry[from_idx] = {'parent': None, 'children' : [idx]}
+            ancestry[from_idx] = {'parent': None, 'children': [idx]}
 
     # Print out info
-    print "parent suite"
-    print ancestry[filter_id]['parent']
+    reporter(PrintParentDetails(filter_id))
+    parent_id = ancestry[filter_id]['parent']
+
+    reporter(PrintSuiteDetails(
+             parent_id, [ancestry[parent_id][p] for p in properties]))
 
     children = ancestry[filter_id]['children']
-    level = 1
+    generation = 1
     # Print out each generation of child suites
     while children:
         next_children = []
-        print "generation", level, "child suites (", len(children), " suites )"
+        reporter(PrintChildGenerationDetails(generation, len(children)))
         for c in children:
             output = [c]
-            for p in properties:
-                output.append(ancestry[c][p])
-            ",".join(output)
-            print ",".join(output)
+            reporter(PrintSuiteDetails(c,
+                     [ancestry[c][p] for p in properties]))
+            # If a child has children add to list of next generation children
             if ancestry[c]['children']:
                 next_children += ancestry[c]['children']
-
-        if max_distance and level >= max_distance:
+        if max_distance and generation >= max_distance:
             break
-        level += 1
+        generation += 1
         children = next_children
-
-    levels = {}
-    # go down the tree
-    levels[0] = filter_id
-
-    # go up the tree
-    level = 0
-
 
 
 def main():
@@ -255,7 +273,7 @@ def main():
                               "output_file",
                               "prefix",
                               "property",
-                              "dump_list")
+                              "print_graph")
     opts, args = opt_parser.parse_args()
     filter_id = None
     if args:
@@ -269,17 +287,19 @@ def main():
         prefix = rosie.suite_id.SuiteId.get_prefix_default()
     if opts.distance and not args:
         opt_parser.error("distance option requires an ID")
+    if opts.print_graph and not args:
+        opt_parser.error("print option requires an ID")
 
     suite_data = get_suite_data(prefix, opts.property)
 
-
-
-    graph = make_graph(suite_data, filter_id, opts.property,
-                       max_distance=opts.distance)
-
-    output_graph(graph, filename=opts.output_file, debug_mode=opts.debug_mode)
-
-    dump_list(suite_data, filter_id, opts.property, max_distance=opts.distance)
+    if opts.print_graph:
+        print_graph(suite_data, filter_id, opts.property,
+                    max_distance=opts.distance)
+    else:
+        graph = make_graph(suite_data, filter_id, opts.property,
+                           max_distance=opts.distance)
+        output_graph(graph, filename=opts.output_file,
+                     debug_mode=opts.debug_mode)
 
 
 if __name__ == "__main__":
