@@ -3077,6 +3077,22 @@ rose test-battery -v t/rose-app-run/07-opt.t
       <dd>Display suites from only the specified web services. This option can
       be used multiple times.</dd>
 
+      <dt><kbd>--print-graph</kbd></dt>
+
+      <dd>Print parent and child suites of a suite ID. For example, for a
+      suite "bar" you may get results like:
+<pre>
+[parent] foo
+[child1] baz
+[child1] qux
+[child2] quux
+[child3] corge
+</pre>
+      where "foo" is the parent of "bar", "baz" and "qux" its first generation
+      children, "quux" its second generation child and "corge" its third
+      generation child. Also supports use of the <kbd>--property</kbd> option.
+      Requires <var>ID</var> to be specified.</dd>
+
       <dt><kbd>--property=PROPERTY, -p PROPERTY</kbd></dt>
 
       <dd>Add a certain suite property to the node labels - e.g. owner or

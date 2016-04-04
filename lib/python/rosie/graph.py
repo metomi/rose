@@ -48,33 +48,13 @@ class NoConnectionsEvent(rose.reporter.Event):
         return "%s: no copy relationships to other suites" % id
 
 
-class PrintChildGenerationDetails(rose.reporter.Event):
-    """An event to print out generation details when writing to CLI"""
-
-    KIND = rose.reporter.Reporter.KIND_OUT
-
-    def __str__(self):
-        template = "Child generation %s (%s suites):"
-        return template % (self.args[0], self.args[1])
-
-
-class PrintParentDetails(rose.reporter.Event):
-    """An event to print out parent suite header when writing to CLI"""
-
-    KIND = rose.reporter.Reporter.KIND_OUT
-
-    def __str__(self):
-        template = "Parent suite of %s:"
-        return template % (self.args[0])
-
-
 class PrintSuiteDetails(rose.reporter.Event):
     """An event to print out suite details when writing to CLI"""
 
     KIND = rose.reporter.Reporter.KIND_OUT
 
     def __str__(self):
-        template = " - %s"
+        template = " %s"
         argslist = [self.args[0]]
         if len(self.args) > 1:
             for arg in self.args[1]:
@@ -194,7 +174,7 @@ def add_node(graph, node, node_label_properties, **kwargs):
     graph.add_node(node, **kwargs)
 
 
-def make_graph(suite_data, filter_id, properties, max_distance=None):
+def make_graph(suite_data, filter_id, properties, prefix, max_distance=None):
     """Construct the pygraphviz graph."""
     graph = pygraphviz.AGraph(directed=True)
     graph.graph_attr["rankdir"] = "LR"
@@ -215,6 +195,10 @@ def output_graph(graph, filename=None, debug_mode=False):
 
 def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     """Dump out list of graph entries relating to a suite"""
+
+    PREFIX_CHILD_GEN_TMPL="[child%s]"
+    PREFIX_PARENT="[parent]"
+
     if properties is None:
         properties = []
 
@@ -241,25 +225,25 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
             ancestry[from_idx] = {'parent': None, 'children': [idx]}
 
     # Print out info
-    reporter(PrintParentDetails(filter_id))
     parent_id = ancestry[filter_id]['parent']
 
     if parent_id:
         reporter(PrintSuiteDetails(
-                 parent_id, [ancestry[parent_id][p] for p in properties]))
+                 parent_id, [ancestry[parent_id][p] for p in properties]),
+                 prefix=PREFIX_PARENT)
     else:
-        reporter(PrintSuiteDetails(None))
+        reporter(PrintSuiteDetails(None), prefix=PREFIX_PARENT)
 
     children = ancestry[filter_id]['children']
     generation = 1
     # Print out each generation of child suites
     while children:
         next_children = []
-        reporter(PrintChildGenerationDetails(generation, len(children)))
         for c in children:
             output = [c]
             reporter(PrintSuiteDetails(c,
-                     [ancestry[c][p] for p in properties]))
+                     [ancestry[c][p] for p in properties]),
+                     prefix=PREFIX_CHILD_GEN_TMPL%generation)
             # If a child has children add to list of next generation children
             if ancestry[c]['children']:
                 next_children += ancestry[c]['children']
@@ -299,7 +283,7 @@ def main():
         print_graph(suite_data, filter_id, opts.property,
                     max_distance=opts.distance)
     else:
-        graph = make_graph(suite_data, filter_id, opts.property,
+        graph = make_graph(suite_data, filter_id, opts.property, prefix,
                            max_distance=opts.distance)
         output_graph(graph, filename=opts.output_file,
                      debug_mode=opts.debug_mode)
