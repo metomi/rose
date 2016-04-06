@@ -12,7 +12,18 @@ Rose release 39. This release will work best with
 [fcm-2016.02.0](https://github.com/metomi/fcm/releases/tag/2016.02.0),
 or their successors.
 
+### User Interface Changes
+
+[#1867](https://github.com/metomi/rose/pull/1867):
+rose app-run: fix file installation clash. Suppose we have both
+`file/whatever.txt` and `[file:whatever.txt]source=somewhere/whatever.txt`,
+the setting in the `rose-app.conf` should take precedence. A bug in the logic
+meant that this was not the case. This has now been fixed.
+
 ### Noteworthy Changes
+
+[#1865](https://github.com/metomi/rose/pull/1865):
+rose_bunch: remove any existing database entries on first submit.
 
 [#1861](https://github.com/metomi/rose/pull/1861):
 rosie go: fix crash when all sources were unchecked.
@@ -25,6 +36,9 @@ rosie go: better gpg-agent cache expiry handling.
 
 [#1855](https://github.com/metomi/rose/pull/1855):
 rose config-edit: show full traceback on macro crash.
+
+[#1808](https://github.com/metomi/rose/pull/1808):
+rose bush: view: new search functionality.
 
 --------------------------------------------------------------------------------
 
