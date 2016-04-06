@@ -843,7 +843,7 @@ ignore{foo}=namelist:bar,namelist:baz
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose config-edit [OPTIONS]</kbd></p>
+    <p><kbd>rose config-edit [OPTIONS]... [PAGE_PATH]...</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
@@ -892,6 +892,19 @@ ignore{foo}=namelist:bar,namelist:baz
       <dt><kbd>--no-metadata</kbd></dt>
 
       <dd>Launch with metadata switched off.</dd>
+    </dl>
+
+    <h3>ARGUMENTS</h3>
+
+    <dl>
+        <dt><kbd>PAGE_PATH</kbd></dt>
+
+        <dd>
+          One or more paths to open on load, pages may be full or partial
+          namespaces e.g. <var>'foo/bar/env'</var> or <var>'env'</var>.
+          <br/>
+          NOTE: Opens the shortest namespace that matches the provided string.
+        </dd>
     </dl>
 
     <h3>ENVIRONMENT VARIABLES</h3>
