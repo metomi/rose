@@ -15,6 +15,12 @@ pre {
     padding-left: 10px;
     padding-right: 10px;
 }
+.highlight {
+    background-color: yellow;
+}
+.line-number {
+    cursor: pointer;
+}
 
 
 @media screen {
