@@ -170,7 +170,8 @@ class CylcProcessor(SuiteEngineProcessor):
             if os.path.islink(path) and not os.path.exists(path):
                 self.fs_util.delete(path)
 
-    def cmp_suite_conf(self, suite_name, strict_mode=False, debug_mode=False):
+    def cmp_suite_conf(
+            self, suite_name, run_mode, strict_mode=False, debug_mode=False):
         """Parse and compare current "suite.rc" with that in the previous run.
 
         (Re-)register and validate the "suite.rc" file.
@@ -185,7 +186,8 @@ class CylcProcessor(SuiteEngineProcessor):
         if out:
             suite_dir_old = out.strip()
         suite_passphrase = os.path.join(suite_dir, "passphrase")
-        self.clean_hook(suite_name)
+        if run_mode != "reload":
+            self.clean_hook(suite_name)
         if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
             self.popen.run_simple("cylc", "unregister", suite_name)
             suite_dir_old = None
