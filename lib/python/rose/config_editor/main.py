@@ -118,7 +118,8 @@ class MainController(object):
                  config_obj_types=None,
                  pluggable=False,
                  load_updater=None,
-                 load_all_apps=False, load_no_apps=False, metadata_off=False):
+                 load_all_apps=False, load_no_apps=False, metadata_off=False,
+                 opt_meta_paths=None):
         if config_objs is None:
             config_objs = {}
         if pluggable:
@@ -133,6 +134,8 @@ class MainController(object):
         self.find_hist = {'regex': '', 'ids': []}
         self.util = rose.config_editor.util.Lookup()
         self.metadata_off = metadata_off
+        if opt_meta_paths is None:
+            opt_meta_paths = []
 
         # Set page variable 'verbosity' defaults.
         self.page_var_show_modes = {
@@ -186,7 +189,8 @@ class MainController(object):
             self.util,
             self.reporter,
             self.page_ns_show_modes,
-            self.reload_namespace_tree
+            self.reload_namespace_tree,
+            opt_meta_paths=opt_meta_paths
         )
 
         self.nav_controller = (
@@ -508,6 +512,8 @@ class MainController(object):
              lambda m: self.main_handle.handle_graph()),
             ('/TopMenuBar/Metadata/Reload metadata',
              lambda m: self._refresh_metadata_if_on()),
+            ('/TopMenuBar/Metadata/Load custom metadata',
+             lambda m: self.load_custom_metadata()),
             ('/TopMenuBar/Metadata/Switch off metadata',
              lambda m: self.refresh_metadata(m.get_active())),
             ('/TopMenuBar/Metadata/Upgrade',
@@ -1451,13 +1457,15 @@ class MainController(object):
             meta_config = config_data.meta
             if metadata_off:
                 meta_config_tree = self.data.load_meta_config_tree(
-                    config_type=config_data.config_type)
+                    config_type=config_data.config_type,
+                    opt_meta_paths=self.data.opt_meta_paths)
                 meta_config = meta_config_tree.node
                 meta_files = self.data.load_meta_files(meta_config_tree)
                 macros = []
             else:
                 meta_config_tree = self.data.load_meta_config_tree(
-                    config, directory, config_type=config_data.config_type)
+                    config, directory, config_type=config_data.config_type,
+                    opt_meta_paths=self.data.opt_meta_paths)
                 meta_config = meta_config_tree.node
                 meta_files = self.data.load_meta_files(meta_config_tree)
                 macro_module_prefix = (
@@ -1548,6 +1556,15 @@ class MainController(object):
             if config_name in configs:
                 if current_namespace in page_namespaces:
                     self.view_page(current_namespace, current_id)
+
+    def load_custom_metadata(self):
+        # open metadata dialog, use list() to pass by value
+        paths = self.mainwindow.launch_metadata_manager(
+            list(self.data.opt_meta_paths))
+        if paths is not None:
+            # if form submitted
+            self.data.opt_meta_paths = paths
+            self.refresh_metadata()
 
 # ----------------- Data-intensive menu functions / utilities ----------------
 
@@ -1821,8 +1838,10 @@ class MainController(object):
 
 def spawn_window(config_directory_path=None, debug_mode=False,
                  load_all_apps=False, load_no_apps=False, metadata_off=False,
-                 initial_namespaces=None):
+                 initial_namespaces=None, opt_meta_paths=None):
     """Create a window and load the configuration into it. Run gtk."""
+    if opt_meta_paths is None:
+        opt_meta_paths = []
     if not debug_mode:
         warnings.filterwarnings('ignore')
     RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
@@ -1852,8 +1871,8 @@ def spawn_window(config_directory_path=None, debug_mode=False,
                               load_updater=splash_screen,
                               load_all_apps=load_all_apps,
                               load_no_apps=load_no_apps,
-                              metadata_off=metadata_off)
-
+                              metadata_off=metadata_off,
+                              opt_meta_paths=opt_meta_paths)
     except BaseException as e:
         splash_screen.stop()
         if debug_mode and isinstance(e, Exception):
@@ -1895,6 +1914,7 @@ def spawn_window(config_directory_path=None, debug_mode=False,
             if path:
                 ctrl.nav_panel.tree.expand_to_path(path)
 
+    ctrl.refresh_metadata()
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
@@ -1950,7 +1970,14 @@ def main():
                               "load_no_apps", "load_all_apps", "no_metadata")
     opts, args = opt_parser.parse_args()
     rose.macro.add_meta_paths()
-    rose.macro.add_opt_meta_paths(opts.meta_path)
+    opt_meta_paths = []
+    if opts.meta_path:
+        for meta_path in opts.meta_path:
+            for path in meta_path.split(os.pathsep):
+                opt_meta_paths.append(
+                    os.path.abspath(
+                        os.path.expandvars(
+                            os.path.expanduser(path))))
     if opts.conf_dir:
         os.chdir(opts.conf_dir)
     path = os.getcwd()
@@ -1974,7 +2001,8 @@ def main():
                                         load_all_apps=opts.load_all_apps,
                                         load_no_apps=opts.load_no_apps,
                                         metadata_off=opts.no_metadata,
-                                        initial_namespaces=args)""",
+                                        initial_namespaces=args,
+                                        opt_meta_paths=opt_meta_paths)""",
                         globals(), locals(), f.name)
         p = pstats.Stats(f.name)
         p.strip_dirs().sort_stats("cumulative").print_stats()
@@ -1984,7 +2012,8 @@ def main():
                      load_all_apps=opts.load_all_apps,
                      load_no_apps=opts.load_no_apps,
                      metadata_off=opts.no_metadata,
-                     initial_namespaces=args)
+                     initial_namespaces=args,
+                     opt_meta_paths=opt_meta_paths)
 
 
 if __name__ == '__main__':
