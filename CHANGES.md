@@ -22,8 +22,14 @@ meant that this was not the case. This has now been fixed.
 
 ### Noteworthy Changes
 
+[#1866](https://github.com/metomi/rose/pull/1866):
+rose suite-run --reload: skip logic that invokes `cylc refresh`.
+
 [#1865](https://github.com/metomi/rose/pull/1865):
 rose_bunch: remove any existing database entries on first submit.
+
+[#1864](https://github.com/metomi/rose/pull/1864):
+rose config-edit: add ability to specify initial namespaces.
 
 [#1861](https://github.com/metomi/rose/pull/1861):
 rosie go: fix crash when all sources were unchecked.
