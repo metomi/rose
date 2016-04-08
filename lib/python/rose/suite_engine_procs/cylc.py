@@ -833,17 +833,18 @@ class CylcProcessor(SuiteEngineProcessor):
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
             cycle, max_time_updated, n_active, n_success, n_fail = row
-            entry_of[cycle] = {
-                "cycle": cycle,
-                "max_time_updated": max_time_updated,
-                "n_states": {
-                    "active": n_active,
-                    "success": n_success,
-                    "fail": n_fail,
-                    "job_fails": 0,
-                },
-            }
-            entries.append(entry_of[cycle])
+            if n_active or n_success or n_fail:
+                entry_of[cycle] = {
+                    "cycle": cycle,
+                    "max_time_updated": max_time_updated,
+                    "n_states": {
+                        "active": n_active,
+                        "success": n_success,
+                        "fail": n_fail,
+                        "job_fails": 0,
+                    },
+                }
+                entries.append(entry_of[cycle])
 
         # Check if "task_jobs" table is available or not
         can_use_task_jobs_table = False
