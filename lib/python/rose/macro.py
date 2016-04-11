@@ -435,7 +435,7 @@ def get_id_from_section_option(section, option):
 
 
 def load_meta_path(config=None, directory=None, is_upgrade=False,
-                   locator=None):
+                   locator=None, opt_meta_paths=None):
     """Retrieve the path to the configuration metadata directory.
 
     Arguments:
@@ -456,7 +456,11 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         if os.path.isfile(meta_file):
             return config_meta_dir, warning
     if locator is None:
-        locator = rose.resource.ResourceLocator(paths=sys.path)
+        if opt_meta_paths:
+            paths = opt_meta_paths + sys.path
+        else:
+            paths = sys.path
+        locator = rose.resource.ResourceLocator(paths=paths)
     opt_node = config.get([rose.CONFIG_SECT_TOP,
                            rose.CONFIG_OPT_META_TYPE], no_ignore=True)
     ignore_meta_error = opt_node is None
@@ -498,18 +502,24 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
 
 
 def load_meta_config_tree(config, directory=None, config_type=None,
-                          error_handler=None, ignore_meta_error=False):
+                          error_handler=None, ignore_meta_error=False,
+                          opt_meta_paths=None):
     """Return the metadata config tree for a configuration."""
+    if opt_meta_paths:
+        paths = opt_meta_paths + sys.path
+    else:
+        paths = sys.path
     if error_handler is None:
         error_handler = _report_error
     meta_list = ["rose-all/" + rose.META_CONFIG_NAME]
     if config_type is not None:
         default_meta_dir = config_type.replace(".", "-")
         meta_list.append(default_meta_dir + "/" + rose.META_CONFIG_NAME)
-    config_meta_path, warning = load_meta_path(config, directory)
+    config_meta_path, warning = load_meta_path(config, directory,
+                                               opt_meta_paths=opt_meta_paths)
     if warning is not None and not ignore_meta_error:
         error_handler(text=warning)
-    locator = rose.resource.ResourceLocator(paths=sys.path)
+    locator = rose.resource.ResourceLocator(paths=paths)
     opt_node = config.get([rose.CONFIG_SECT_TOP,
                            rose.CONFIG_OPT_META_TYPE], no_ignore=True)
     ignore_meta_error = ignore_meta_error or opt_node is None
@@ -526,7 +536,7 @@ def load_meta_config_tree(config, directory=None, config_type=None,
             meta_config_tree = rose.config_tree.ConfigTreeLoader().load(
                 os.path.dirname(meta_path),
                 rose.META_CONFIG_NAME,
-                conf_dir_paths=list(sys.path),
+                conf_dir_paths=list(paths),
                 conf_node=meta_config
             )
         except rose.config.ConfigSyntaxError as exc:
@@ -540,7 +550,7 @@ def load_meta_config_tree(config, directory=None, config_type=None,
         meta_config_tree = rose.config_tree.ConfigTreeLoader().load(
             config_meta_path,
             rose.META_CONFIG_NAME,
-            conf_dir_paths=list(sys.path),
+            conf_dir_paths=list(paths),
             conf_node=meta_config
         )
     except rose.resource.ResourceError:

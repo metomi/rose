@@ -90,6 +90,7 @@ class MenuBar(object):
       </menu>
       <menu action="Metadata">
         <menuitem action="Reload metadata"/>
+        <menuitem action="Load custom metadata"/>
         <menuitem action="Switch off metadata"/>
         <separator name="sep_view_generic"/>
         <menu action="Prefs">
@@ -187,6 +188,8 @@ class MenuBar(object):
         ('Reload metadata', gtk.STOCK_REFRESH,
          rose.config_editor.TOP_MENU_METADATA_REFRESH,
          rose.config_editor.ACCEL_METADATA_REFRESH),
+        ('Load custom metadata', gtk.STOCK_DIRECTORY,
+         rose.config_editor.TOP_MENU_METADATA_LOAD),
         ('Prefs', gtk.STOCK_PREFERENCES,
          rose.config_editor.TOP_MENU_METADATA_PREFERENCES),
         ('Upgrade', gtk.STOCK_GO_UP,
