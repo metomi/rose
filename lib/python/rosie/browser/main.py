@@ -49,7 +49,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopenError
 import rose.reporter
 from rose.resource import ResourceLocator, ResourceError
-from rose.suite_control import SuiteControl
+from rose.suite_control import SuiteControl, SuiteNotRunningError
 from rose.suite_engine_proc import (
     NoSuiteLogError, SuiteEngineProcessor, WebBrowserEvent)
 import rosie.browser.history
@@ -907,7 +907,15 @@ class MainWindow(gtk.Window):
         this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
 
         if SuiteControl().suite_engine_proc.is_suite_registered(this_id):
-            return SuiteControl().gcontrol(this_id)
+            try:
+                return SuiteControl().gcontrol(this_id)
+            except SuiteNotRunningError:
+                msg = rosie.browser.DIALOG_MESSAGE_SUITE_NOT_RUNNING.format(
+                    this_id)
+                return rose.gtk.dialog.run_dialog(
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    msg,
+                    rosie.browser.DIALOG_TITLE_SUITE_NOT_RUNNING)
         else:
             msg = rosie.browser.DIALOG_MESSAGE_UNREGISTERED_SUITE.format(
                 this_id)
