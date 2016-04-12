@@ -131,7 +131,8 @@ def main():
     """Implement the "rose config-diff" command."""
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("diff_tool", "graphical",
-                              "ignore", "meta_path", "properties")
+                              "ignore", "meta_path", "properties",
+                              "opt_conf_keys")
     my_sys_args = list(sys.argv)
 
     opts, args = opt_parser.parse_args(my_sys_args[1:])
@@ -181,7 +182,8 @@ def main():
             directory = None
         else:
             directory, filename = path.rsplit(os.sep, 1)
-        config = config_loader.load_with_opts(path)
+        config = config_loader.load_with_opts(path, mark_opt_confs=True,
+                                              more_keys=opts.opt_conf_keys)
         meta_config_tree = rose.macro.load_meta_config_tree(
             config, directory=directory, config_type=filename)
         if meta_config_tree is None:

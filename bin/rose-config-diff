@@ -52,6 +52,11 @@
 #     --meta-path=PATH, -M PATH
 #         Prepend PATH to the metadata search path (look here first).
 #         This option can be used repeatedly to load multiple paths.
+#     --opt-conf-key=KEY, -O KEY, --opt-conf-key='(KEY)', -O '(KEY)'
+#         Each of these switches on an optional configuration identified by KEY.
+#         The configurations are applied first-to-last. The '(KEY)' syntax
+#         denotes an optional configuration that can be missing. Otherwise, the
+#         optional configuration must exist.
 #     --properties=PROPERTIES, -p PROPERTIES
 #         Only display these metadata properties. This should be a comma
 #         separated list of metadata options, such as title,description,help.

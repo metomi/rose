@@ -701,6 +701,19 @@ rosie UTIL [OPTS] [ARG ...]
       <dd>Prepend <var>PATH</var> to the metadata search path (look here
       first). This option can be used repeatedly to load multiple paths.</dd>
 
+      <dt>
+        <kbd>
+          --opt-conf-key=KEY, -O KEY, --opt-conf-key='(KEY)', -O '(KEY)'
+        </kbd>
+      </dt>
+
+      <dd>
+        Each of these switches on an optional configuration identified by
+        <var>KEY</var>. The configurations are applied first-to-last. The
+        '(<var>KEY</var>)' syntax denotes an optional configuration that can be
+        missing. Otherwise, the optional configuration must exist.
+      </dd>
+
       <dt><kbd>--properties=PROPERTIES, -p PROPERTIES</kbd></dt>
 
       <dd>Only display these metadata properties. This should be a comma
