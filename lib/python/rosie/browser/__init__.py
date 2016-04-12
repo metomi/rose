@@ -160,8 +160,7 @@ DIALOG_MESSAGE_DELETE_CONFIRMATION = (
     "\"{0}\". This will permanently delete all branches, " +
     "trunk and any local copy." +
     "\n\nAre you sure you wish to proceed?")
-DIALOG_MESSAGE_SUITE_NOT_RUNNING = ("Cannot launch gcontrol: " +
-                                    "suite {0} does not appear to be running.")
+DIALOG_MESSAGE_SUITE_NOT_RUNNING = ("Cannot launch gcontrol: {0}")
 DIALOG_MESSAGE_UNCOMPLETED_FILTER = "Uncompleted filter"
 DIALOG_MESSAGE_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +
                                      "suite {0} is not registered.")

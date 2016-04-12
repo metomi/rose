@@ -909,9 +909,9 @@ class MainWindow(gtk.Window):
         if SuiteControl().suite_engine_proc.is_suite_registered(this_id):
             try:
                 return SuiteControl().gcontrol(this_id)
-            except SuiteNotRunningError:
+            except SuiteNotRunningError as err:
                 msg = rosie.browser.DIALOG_MESSAGE_SUITE_NOT_RUNNING.format(
-                    this_id)
+                    str(err))
                 return rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     msg,
