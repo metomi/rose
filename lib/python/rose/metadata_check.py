@@ -38,6 +38,7 @@ INVALID_IMPORT = "Could not import {0}: {1}"
 INCOMPATIBLE = "Incompatible with {0}"
 INVALID_OBJECT = "Not found: {0}"
 INVALID_RANGE_RULE_IDS = "Inter-variable comparison not allowed in range."
+INVALID_SETTING_FOR_NAMESPACE = "Invalid setting for namespace: {0}"
 INVALID_SYNTAX = "Invalid syntax: {0}"
 UNNECESSARY_VALUES_PROP = "Unnecessary property - 'values' overrides"
 UNKNOWN_TYPE = "Unknown type: {0}"
@@ -283,6 +284,15 @@ def metadata_check(meta_config, meta_dir=None,
                 info = UNKNOWN_PROP.format(option)
                 reports.append(rose.macro.MacroReport(section, option,
                                                       value, info))
+            if section.split('=')[0] == 'ns':
+                allowed = [rose.META_PROP_TITLE, rose.META_PROP_DESCRIPTION,
+                           rose.META_PROP_HELP, rose.META_PROP_SORT_KEY,
+                           rose.META_PROP_MACRO, rose.META_PROP_URL,
+                           rose.META_PROP_WIDGET]
+                if option not in allowed:
+                    info = INVALID_SETTING_FOR_NAMESPACE.format(option)
+                    reports.append(rose.macro.MacroReport(section, option,
+                                                          value, info))
             if option.startswith(rose.META_PROP_WIDGET):
                 check_func = lambda v: _check_widget(
                     v, module_files)
