@@ -78,6 +78,7 @@ class PreviousSuccessEvent(Event):
         name = self.args
         return " %s" % (name)
 
+
 class SummaryEvent(Event):
 
     """Event for reporting bunch counts at end of job"""
@@ -297,7 +298,8 @@ class RoseBunchApp(BuiltinApp):
             self.dao.close()
 
         # Report summary data in job.out file
-        app_runner.handle_event(SummaryEvent(run_ok,run_fail,run_skip,notrun))
+        app_runner.handle_event(SummaryEvent(
+                                run_ok, run_fail, run_skip, notrun))
 
         if failed:
             return 1
