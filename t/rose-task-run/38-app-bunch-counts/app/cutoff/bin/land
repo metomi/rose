@@ -1,0 +1,26 @@
+#!/bin/bash
+
+CLASS=$1
+PASSENGERS=$2
+
+# Get settings
+case $CLASS in
+    airbus) LANDTIME=30; UNLOADRATE=8;;
+    cessna) LANDTIME=20; UNLOADRATE=2;;
+    concorde) LANDTIME=10; UNLOADRATE=4;;
+esac
+
+echo "[ $(rose date) ] $CLASS carrying $PASSENGERS passengers incoming"
+
+# Land plane
+echo "[ $(rose date) ] Approaching runway"
+sleep $LANDTIME
+echo "[ $(rose date) ] On the tarmac"
+
+# Unload passengers
+sleep $(($PASSENGERS / $UNLOADRATE))
+echo "[ $(rose date) ] Unloaded"
+
+# Clear terminal
+sleep 10
+echo "[ $(rose date) ] Clear of terminal"
