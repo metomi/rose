@@ -1914,7 +1914,6 @@ def spawn_window(config_directory_path=None, debug_mode=False,
             if path:
                 ctrl.nav_panel.tree.expand_to_path(path)
 
-    ctrl.refresh_metadata()
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
