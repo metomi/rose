@@ -20,7 +20,27 @@ rose app-run: fix file installation clash. Suppose we have both
 the setting in the `rose-app.conf` should take precedence. A bug in the logic
 meant that this was not the case. This has now been fixed.
 
+### Highlighted Changes
+
+[#1808](https://github.com/metomi/rose/pull/1808):
+rose bush: view: new search functionality.
+
 ### Noteworthy Changes
+
+[#1877](https://github.com/metomi/rose/pull/1877):
+rose_bunch: bunch task counts at end of job.
+
+[#1875](https://github.com/metomi/rose/pull/1875):
+rosie go: cylc gui launcher: gracefully handle suites that are not running.
+
+[#1872](https://github.com/metomi/rose/pull/1872):
+rose bush: job entry: link 0-size file any way.
+
+[#1871](https://github.com/metomi/rose/pull/1871):
+rose bush: cycles: don't display cycles with no active or completed tasks.
+
+[#1869](https://github.com/metomi/rose/pull/1869):
+rose stem: fix incorrect mirror variable when run within subdirectory.
 
 [#1866](https://github.com/metomi/rose/pull/1866):
 rose suite-run --reload: skip logic that invokes `cylc refresh`.
@@ -40,11 +60,11 @@ rose config-edit: keyboard shortcuts for multi section summary panel.
 [#1858](https://github.com/metomi/rose/pull/1858):
 rosie go: better gpg-agent cache expiry handling.
 
+[#1856](https://github.com/metomi/rose/pull/1856):
+rose config-edit: add GUI dialog to manage metadata search path.
+
 [#1855](https://github.com/metomi/rose/pull/1855):
 rose config-edit: show full traceback on macro crash.
-
-[#1808](https://github.com/metomi/rose/pull/1808):
-rose bush: view: new search functionality.
 
 --------------------------------------------------------------------------------
 
