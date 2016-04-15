@@ -302,21 +302,21 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 __ERROR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-print-graph
-run_pass "$TEST_KEY" rosie graph --print-graph foo-aa003 -p owner
+run_pass "$TEST_KEY" rosie graph --text foo-aa003 -p owner
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 [parent] foo-aa002, aphids
 [child1] foo-aa004, bill
 __OUTPUT__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-print-graph-no-parent
-run_pass "$TEST_KEY" rosie graph --print-graph foo-aa000 -p owner -d 1
+run_pass "$TEST_KEY" rosie graph --text foo-aa000 -p owner -d 1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 [parent] None
 [child1] foo-aa001, roses
 __OUTPUT__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-print-graph-no-child
-run_pass "$TEST_KEY" rosie graph --print-graph foo-aa004 -p owner -d 1
+run_pass "$TEST_KEY" rosie graph --text foo-aa004 -p owner -d 1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
 [parent] foo-aa003, bill
 __OUTPUT__

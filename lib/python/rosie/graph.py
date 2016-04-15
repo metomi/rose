@@ -196,8 +196,8 @@ def output_graph(graph, filename=None, debug_mode=False):
 def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     """Dump out list of graph entries relating to a suite"""
 
-    PREFIX_CHILD_GEN_TMPL="[child%s]"
-    PREFIX_PARENT="[parent]"
+    PREFIX_CHILD_GEN_TMPL = "[child%s]"
+    PREFIX_PARENT = "[parent]"
 
     if properties is None:
         properties = []
@@ -243,7 +243,7 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
             output = [c]
             reporter(PrintSuiteDetails(c,
                      [ancestry[c][p] for p in properties]),
-                     prefix=PREFIX_CHILD_GEN_TMPL%generation)
+                     prefix=PREFIX_CHILD_GEN_TMPL % generation)
             # If a child has children add to list of next generation children
             if ancestry[c]['children']:
                 next_children += ancestry[c]['children']
@@ -260,7 +260,7 @@ def main():
                               "output_file",
                               "prefix",
                               "property",
-                              "print_graph")
+                              "text")
     opts, args = opt_parser.parse_args()
     filter_id = None
     if args:
@@ -274,12 +274,12 @@ def main():
         prefix = rosie.suite_id.SuiteId.get_prefix_default()
     if opts.distance and not args:
         opt_parser.error("distance option requires an ID")
-    if opts.print_graph and not args:
+    if opts.text and not args:
         opt_parser.error("print option requires an ID")
 
     suite_data = get_suite_data(prefix, opts.property)
 
-    if opts.print_graph:
+    if opts.text:
         print_graph(suite_data, filter_id, opts.property,
                     max_distance=opts.distance)
     else:

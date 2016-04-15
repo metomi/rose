@@ -450,11 +450,6 @@ class RoseOptionParser(OptionParser):
             ["--print-format", "--format", "-f"],
             {"metavar": "FORMAT",
              "help": "Specify the format for printing results."}],
-        "print_graph": [
-            ["--print-graph"],
-            {"action": "store_true",
-             "dest": "print_graph",
-             "help": "Print graph in text format"}],
         "profile_mode": [
             ["--profile"],
             {"action": "store_true",
@@ -572,6 +567,11 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "task_cycle_time_mode",
              "help": "Use ROSE_TASK_CYCLE_TIME."}],
+        "text": [
+            ["--text"],
+            {"action": "store_true",
+             "dest": "text",
+             "help": "Print graph in text format"}],
         "thresholds": [
             ["--threshold"],
             {"action": "append",

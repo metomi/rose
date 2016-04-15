@@ -40,7 +40,7 @@
 #     --prefix=PREFIX
 #         Display suites from only the specified web services.
 #         This option can be used multiple times.
-#     --print-graph
+#     --text
 #         Print parent and child suites of a suite ID. For example, for a
 #         suite "bar" you may get results like:
 #           [parent] foo
