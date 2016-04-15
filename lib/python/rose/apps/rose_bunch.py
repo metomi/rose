@@ -79,6 +79,21 @@ class PreviousSuccessEvent(Event):
         return " %s" % (name)
 
 
+class SummaryEvent(Event):
+
+    """Event for reporting bunch counts at end of job"""
+
+    KIND = Event.KIND_OUT
+
+    def __str__(self):
+        n_ok, n_fail, n_skip, n_notconsidered = self.args
+        total = n_ok + n_fail + n_skip + n_notconsidered
+        msg_template = ("BUNCH TASK TOTALS:\n" +
+                        "OK: %s\nFAIL: %s\nSKIP: %s\nNOT CONSIDERED: %s\n" +
+                        "TOTAL: %s")
+        return msg_template % (n_ok, n_fail, n_skip, n_notconsidered, total)
+
+
 class NotRunEvent(Event):
 
     """An event used to report commands that will not be run."""
@@ -108,6 +123,12 @@ class RoseBunchApp(BuiltinApp):
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """ Run multiple instaces of a command using sets of specified args"""
+
+        # Counts for reporting purposes
+        run_ok = 0
+        run_fail = 0
+        run_skip = 0
+        notrun = 0
 
         # Allow naming of individual calls
         self.invocation_names = conf_tree.node.get_value([self.BUNCH_SECTION,
@@ -225,6 +246,7 @@ class RoseBunchApp(BuiltinApp):
                     procs.pop(key)
                     if proc.returncode:
                         failed[key] = proc.returncode
+                        run_fail += 1
                         app_runner.handle_event(RosePopenError(str(key),
                                                 proc.returncode,
                                                 None, None))
@@ -234,6 +256,7 @@ class RoseBunchApp(BuiltinApp):
                             abort = True
                             app_runner.handle_event(AbortEvent())
                     else:
+                        run_ok += 1
                         app_runner.handle_event(SucceededEvent(key),
                                                 prefix=self.PREFIX_OK)
                         if self.dao:
@@ -249,6 +272,7 @@ class RoseBunchApp(BuiltinApp):
 
                 if self.dao:
                     if self.dao.check_has_succeeded(key):
+                        run_skip += 1
                         app_runner.handle_event(PreviousSuccessEvent(key),
                                                 prefix=self.PREFIX_PASS)
                         continue
@@ -265,12 +289,17 @@ class RoseBunchApp(BuiltinApp):
 
         if abort and commands:
             for key in self.invocation_names:
+                notrun += 1
                 cmd = commands.pop(key).get_command()
                 app_runner.handle_event(NotRunEvent(key, cmd),
                                         prefix=self.PREFIX_NOTRUN)
 
         if self.dao:
             self.dao.close()
+
+        # Report summary data in job.out file
+        app_runner.handle_event(SummaryEvent(
+                                run_ok, run_fail, run_skip, notrun))
 
         if failed:
             return 1
