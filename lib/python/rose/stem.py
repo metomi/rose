@@ -247,6 +247,10 @@ class StemRunner(object):
         # Generate mirror location
         mirror = re.sub(proj_root, mirror_repo, source_dict['url'])
 
+        # Remove any sub-tree
+        mirror = re.sub(source_dict['sub_tree'], r'', mirror)
+        mirror = re.sub(r'/@', r'@', mirror)
+
         # Add forwards slash after .xm if missing
         if '.xm/' not in mirror:
             mirror = re.sub(r'\.xm', r'.xm/', mirror)
