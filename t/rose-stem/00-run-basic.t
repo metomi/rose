@@ -132,7 +132,6 @@ TEST_KEY=$TEST_KEY_BASE-subdirectory-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source-mirror
 file_grep $TEST_KEY "SOURCE_FOO_MIRROR=fcm:foo.xm/trunk@1\$" $OUTPUT
-cp $OUTPUT ~
 #-------------------------------------------------------------------------------
 # Fourth test, checking relative path with -C is working
 TEST_KEY=$TEST_KEY_BASE-relative-path
