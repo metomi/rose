@@ -80,7 +80,6 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         state_map = {enabled: 'enabled     ',
                      trig_ignored: 'trig-ignored',
                      user_ignored: 'user-ignored'}
-        change_list = []
         id_list = []
         prev_ignoreds = {trig_ignored: [], user_ignored: []}
         for keylist, node in config.walk():
@@ -91,8 +90,14 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             id_list.append(n_id)
             if node.state in prev_ignoreds:
                 prev_ignoreds[node.state].append(n_id)
-        for var_id in self.trigger_family_lookup:
+
+        # Update in breadth-first order to get the ignored parent statuses
+        # correct and trickled down.
+        ranked_ids = self._get_ranked_trigger_ids()
+        for rank, var_id in sorted(ranked_ids):
             self.update(var_id, config, meta_config)
+
+        # Report any discrepancies in ignored status.
         for var_id in id_list:
             section, option = self._get_section_option_from_id(var_id)
             node = config.get([section, option])
@@ -261,6 +266,24 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                         id_stack.insert(1, (child_id, False))
             id_stack.pop(0)
         return update_id_list
+
+    def _get_ranked_trigger_ids(self):
+        """Return trigger ids with their maximum trigger chain depth."""
+        stack = [(id_, 0) for id_ in self.trigger_family_lookup]
+        id_ranks = dict(stack)
+        while stack:
+            parent_id, depth = stack.pop(0)
+            child_ids = self.trigger_family_lookup.get(parent_id, [])
+            for child_id in child_ids:
+                id_ranks.setdefault(child_id, depth + 1)
+                if depth + 1 > id_ranks[child_id]:
+                    id_ranks[child_id] = depth + 1
+                stack.append((child_id, depth + 1))
+        ranked_ids = []
+        for id_, rank in id_ranks.items():
+            ranked_ids.append((rank, id_))
+        ranked_ids.sort()
+        return ranked_ids
 
     def validate(self, config, meta_config=None):
         self.reports = []
