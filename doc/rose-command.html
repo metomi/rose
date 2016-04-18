@@ -703,11 +703,26 @@ rosie UTIL [OPTS] [ARG ...]
 
       <dt>
         <kbd>
-          --opt-conf-key=KEY, -O KEY, --opt-conf-key='(KEY)', -O '(KEY)'
+          --opt-conf-key-1=KEY, --opt-conf-key-1='(KEY)'
         </kbd>
       </dt>
 
       <dd>
+        opt-conf-key for the file in the first argument.
+        Each of these switches on an optional configuration identified by
+        <var>KEY</var>. The configurations are applied first-to-last. The
+        '(<var>KEY</var>)' syntax denotes an optional configuration that can be
+        missing. Otherwise, the optional configuration must exist.
+      </dd>
+
+      <dt>
+        <kbd>
+          --opt-conf-key-2=KEY, --opt-conf-key-2='(KEY)'
+        </kbd>
+      </dt>
+
+      <dd>
+        opt-conf-key for the file in the second argument.
         Each of these switches on an optional configuration identified by
         <var>KEY</var>. The configurations are applied first-to-last. The
         '(<var>KEY</var>)' syntax denotes an optional configuration that can be

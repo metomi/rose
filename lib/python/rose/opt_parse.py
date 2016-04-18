@@ -394,6 +394,22 @@ class RoseOptionParser(OptionParser):
              "metavar": "KEY",
              "help": ("Switch on an optional configuration " +
                       "file identified by KEY.")}],
+        "opt_conf_keys_1": [
+            ["--opt-conf-key-1"],
+            {"action": "append",
+             "dest": "opt_conf_keys_1",
+             "metavar": "KEY",
+             "help": ("Switch on an optional configuration " +
+                      "file identified by KEY for the first item " +
+                      "in a comparison.")}],
+        "opt_conf_keys_2": [
+            ["--opt-conf-key-2"],
+            {"action": "append",
+             "dest": "opt_conf_keys_2",
+             "metavar": "KEY",
+             "help": ("Switch on an optional configuration " +
+                      "file identified by KEY for the second item " +
+                      "in a comparison.")}],
         "output_dir": [
             ["--output", "-O"],
             {"action": "store",

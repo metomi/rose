@@ -132,7 +132,7 @@ def main():
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("diff_tool", "graphical",
                               "ignore", "meta_path", "properties",
-                              "opt_conf_keys")
+                              "opt_conf_keys_1", "opt_conf_keys_2")
     my_sys_args = list(sys.argv)
 
     opts, args = opt_parser.parse_args(my_sys_args[1:])
@@ -154,6 +154,7 @@ def main():
     ignore_regexes = expand_shorthand_in_ignore_regexes(
         opts.ignore_patterns)
 
+    # get file paths
     output_filenames = []
     config_type = rose.SUB_CONFIG_NAME
     file_paths = []
@@ -175,7 +176,16 @@ def main():
         else:
             config_type = os.path.basename(path)
             file_paths.append(path)
-    for path in file_paths:
+
+    # get opt_conf_keys for each file
+    opt_conf_list = [[]] * len(file_paths)
+    if opts.opt_conf_keys_1 is not None:
+        opt_conf_list[0] = opts.opt_conf_keys_1
+    if opts.opt_conf_keys_2 is not None:
+        opt_conf_list[1] = opts.opt_conf_keys_2
+
+    # get diffs
+    for path, opt_conf_keys in zip(file_paths, opt_conf_list):
         if path == "-":
             path = sys.stdin
             filename = config_type
@@ -183,7 +193,7 @@ def main():
         else:
             directory, filename = path.rsplit(os.sep, 1)
         config = config_loader.load_with_opts(path, mark_opt_confs=True,
-                                              more_keys=opts.opt_conf_keys)
+                                              more_keys=opt_conf_keys)
         meta_config_tree = rose.macro.load_meta_config_tree(
             config, directory=directory, config_type=filename)
         if meta_config_tree is None:

@@ -387,27 +387,28 @@ var=foo
 type=cheese
 __CHEESE_CONF__
 mkdir $OPT_DIR/opt
-cat >$OPT_DIR/opt/rose-chalk-bar.conf <<__CHALK_BAR_CONF__
+cat >$OPT_DIR/opt/rose-chalk-baz.conf <<__CHALK_BAR_CONF__
 [env]
-var=bar
+var=baz
 __CHALK_BAR_CONF__
 cat >$OPT_DIR/opt/rose-cheese-bar.conf <<__CHEESE_BAR_CONF__
 [env]
-var=baz
+var=bar
 __CHEESE_BAR_CONF__
 
-run_fail "$TEST_KEY" rose config-diff --opt-conf-key=bar $OPT_DIR/rose-chalk.conf $OPT_DIR/rose-cheese.conf
+run_fail "$TEST_KEY" rose config-diff --opt-conf-key-1=baz --opt-conf-key-2=bar $OPT_DIR/rose-chalk.conf $OPT_DIR/rose-cheese.conf
 sed -i "/rose-chalk.conf/d" "$TEST_KEY.out"
 sed -i "/rose-cheese.conf/d" "$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<DIFF
 @@ -1,4 +1,4 @@
  [env]
 -type=chalk
+-# setting from opt config "baz" (${PWD}/${OPT_DIR}/opt/rose-chalk-baz.conf)
+-var=baz
 +type=cheese
- # setting from opt config "bar"
--var=bar
-+var=baz
-__DIFF__
++# setting from opt config "bar" (${PWD}/${OPT_DIR}/opt/rose-cheese-bar.conf)
++var=bar
+DIFF
 
 teardown
 #-------------------------------------------------------------------------------

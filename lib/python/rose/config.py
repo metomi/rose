@@ -74,7 +74,7 @@ REC_SETTING_ELEMENT = re.compile(r"^(.+?)\(([^)]+)\)$")
 
 STATE_SECT_IGNORED = "^"
 
-OPT_CONFIG_SETTING_COMMENT = " setting from opt config \"%s\""
+OPT_CONFIG_SETTING_COMMENT = " setting from opt config \"%s\" (%s)"
 
 
 class ConfigNode(object):
@@ -648,7 +648,8 @@ class ConfigLoader(object):
             try:
                 if mark_opt_confs:
                     self.load(opt_conf_file_name, node, default_comments=[
-                        OPT_CONFIG_SETTING_COMMENT % (key,)])
+                        OPT_CONFIG_SETTING_COMMENT % (
+                            key, opt_conf_file_name,)])
                 else:
                     self.load(opt_conf_file_name, node)
             except IOError:
