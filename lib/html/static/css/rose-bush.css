@@ -21,6 +21,9 @@ pre {
 .line-number {
     cursor: pointer;
 }
+.badge-label {
+    border-radius: 1em;
+}
 
 
 @media screen {
@@ -28,6 +31,7 @@ pre {
         position: fixed;
         bottom: 0;
         background-color: lightgrey;
+        z-index: 10;
      }
     .next {
         background: white

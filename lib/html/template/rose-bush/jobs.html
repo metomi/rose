@@ -3,77 +3,84 @@
 {% block content %}
 <div class="page-header">
 
-<div class="accordion" id="accordion-0">
+<div class="panel-group" id="accordion-0">
 
-<div class="accordion-group">
-<div class="accordion-heading">
-<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-0"
-href="#filter"><i class="icon-wrench"></i> Display Options</a>
-</div>
-<div id="filter"
-class="accordion-body collapse{% if not is_option_on %} in{% endif %}">
-<div class="accordion-inner">
-<form action="{{script}}/{{method}}">
-<input type="hidden" name="user" value="{{user}}" />
-<input type="hidden" name="suite" value="{{suite}}" />
-<input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
-<fieldset class="container-fluid">
-<div class="row-fluid">
-<div class="span6">
-<input id="cycles" type="text" name="cycles" class="input-block-level"
-title="Cycle globs, &quot;before|after CYCLE&quot;"
-placeholder="Cycle globs, &quot;before|after CYCLE&quot;"
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-0"
+    href="#filter">
+      <i class="glyphicon glyphicon-wrench"></i>
+      Display Options
+    </a>
+  </div>
+  <div id="filter"
+  class="panel-collapse collapse{% if not is_option_on %} in{% endif %}">
+    <div class="panel-body">
+      <form action="{{script}}/{{method}}">
+        <input type="hidden" name="user" value="{{user}}" />
+        <input type="hidden" name="suite" value="{{suite}}" />
+        <input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
+        <fieldset class="container-fluid">
+          <div class="row">
+            <div class="col-md-6">
+              <input id="cycles" type="text" name="cycles" class="form-control"
+              title="Cycle globs, &quot;before|after CYCLE&quot;"
+              placeholder="Cycle globs, &quot;before|after CYCLE&quot;"
 {% if cycles -%}
-value="{{cycles|escape}}"
+              value="{{cycles|escape}}"
 {% endif -%}
-/>
-</div>
-<div class="span6">
-<input id="tasks" type="text" name="tasks" class="input-block-level"
-title="Task names globs"
-placeholder="Task names globs"
+              />
+            </div>
+            <div class="col-md-6">
+              <input id="tasks" type="text" name="tasks" class="form-control"
+              title="Task names globs"
+              placeholder="Task names globs"
 {% if tasks -%}
-value="{{tasks|escape}}"
+              value="{{tasks|escape}}"
 {% endif -%}
-/>
-</div>
-</div>
-<div class="row-fluid">
-<div class="span1">
-<label class="checkbox inline" for="per_page_max">
-<input id="per_page_max" type="checkbox" name="per_page"
-value="{{per_page_max}}"
-title="Display maximum {{per_page_max}} number of entries"
+              />
+            </div>
+          </div>
+          <br />
+          <div class="row">
+            <div class="col-md-1">
+              <label class="checkbox-inline" for="per_page_max">
+                <input id="per_page_max" type="checkbox" name="per_page"
+                value="{{per_page_max}}"
+                title="Display maximum {{per_page_max}} number of entries"
 {% if per_page_max <= per_page -%}
-checked="checked"
+                checked="checked"
 {% endif -%}
-/>
-Max
-</label>
-</div>
-<div class="span2">
-<input id="per_page" type="text" name="per_page" class="input-block-level"
-title="Entries/Page, 0=unlimited" placeholder="Entries/Page"
+                />
+                Max
+              </label>
+            </div>
+            <div class="col-md-2">
+              <input id="per_page" type="text" name="per_page"
+              class="form-control"
+              title="Entries/Page, 0=unlimited" placeholder="Entries/Page"
 {% if per_page_max <= per_page -%}
-disabled="disabled"
+              disabled="disabled"
 {% elif per_page is defined and per_page != per_page_default -%}
-value="{{per_page}}"
+              value="{{per_page}}"
 {% endif -%}
-/>
-</div>
-<div class="span3">
-{% for status, title in [["active", "active tasks"], ["success", "succeeded tasks"], ["fail", "failed tasks"]] -%}
-<label class="checkbox inline" for="no_status_{{status}}" title="Hide {{title}}">
-<input id="no_status_{{status}}" type="checkbox" name="no_status"
+              />
+            </div>
+            <div class="col-md-3">
+{% for status, title in [["active", "active tasks"], ["success",
+"succeeded tasks"], ["fail", "failed tasks"]] -%}
+              <label class="checkbox-inline" for="no_status_{{status}}"
+              title="Hide {{title}}">
+              <input id="no_status_{{status}}" type="checkbox" name="no_status"
 {% if no_statuses and status in no_statuses -%}
-checked="checked"
+              checked="checked"
 {% endif -%}
-value="{{status}}" />
-No {{status}}?</label>
+              value="{{status}}" />
+              No {{status}}?</label>
 {% endfor -%}
-</div>
-<div class="span4">
-<select name="order" title="Sort order">
+            </div>
+            <div class="col-md-4">
+              <select name="order" title="Sort order" class="form-control">
 {% for k, v in [
     ("time_desc", "new-&gt;old"),
     ("time_asc", "old-&gt;new"),
@@ -98,25 +105,28 @@ No {{status}}?</label>
     ("duration_queue_run_desc", "queue+run duration, long-&gt;short"),
     ("duration_queue_run_asc", "queue+run duration, short-&gt;long"),
 ] -%}
-<option
+                <option
 {% if order and order == k -%}
-selected="selected"
+                selected="selected"
 {% endif -%}
-value="{{k}}">{{v}}</option>
+                value="{{k}}">{{v}}
+              </option>
 {% endfor -%}
-</select>
-</div>
-<div class="span2 btn-toolbar">
-<div class="btn-group pull-right">
-<input type="reset" class="btn" value="reset" title="Reset Display Options"/>
-<input type="submit" class="btn btn-primary" value="update" title="Update Display Options"/>
-</div>
-</div>
-</div>
-</fieldset>
-</form>
-</div>
-</div>
+              </select>
+            </div>
+            <div class="col-md-2 btn-toolbar">
+              <div class="btn-group pull-right">
+                <input type="reset" class="btn btn-default" value="reset"
+                title="Reset Display Options"/>
+                <input type="submit" class="btn btn-primary" value="update"
+                title="Update Display Options"/>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
 </div>
 
 </div>
@@ -125,11 +135,11 @@ value="{{k}}">{{v}}</option>
 {% include "pager.html" -%}
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span11">
+  <div class="row">
+    <div class="col-md-11">
       {% include "suite-state.html" -%}
     </div>
-    <div class="span1 text-right">
+    <div class="col-md-1 text-right">
       <a id="toggle-fuzzy-time" data-no-fuzzy-time="{{no_fuzzy_time}}" href="#">
         <small>toggle &Delta;t</small>
       </a>

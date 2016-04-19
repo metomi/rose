@@ -3,7 +3,7 @@
 {% else -%}
 <!-- File Line Numbers -->
 {% if line_numbers|length != 0 -%}
-<div class="span1 text-right">
+<div class="col-md-1 text-right">
 <pre id="filelinenumbers" class="prettyprint">
 {% for num in line_numbers -%}
 <span><a id="{{num}}" class="line-number">{{num}}</a></span>
@@ -14,14 +14,14 @@
 
 <!-- File Contents -->
 {% if line_numbers|length == 0 -%}
-<div class="span12">
+<div class="col-md-12">
 {% else -%}
-<div class="span11">
+<div class="col-md-11">
 {% endif -%}
 <pre id="filecode" {% if file_content %}class="prettyprint lang-{{file_content}}"{% endif -%}>
 {% set PREFIXES = {
   "[DEBUG]": "muted",
-  "[FAIL] ": "text-error",
+  "[FAIL] ": "text-danger",
   "[INFO] ": "text-info",
   "[ OK ] ": "text-success",
   "[WARN] ": "text-warning",

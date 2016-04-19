@@ -15,80 +15,113 @@ rel="stylesheet" media="screen" />
 {% endif -%}
 </head>
 <body>
-<div class="navbar navbar-static-top">
-<div class="navbar-inner">
-<a class="brand" href="{{script}}/">
-{% if logo -%}
-<img {{logo}} />
-{% endif -%}
-{{title}} <small>@ {{host}}</small>
-</a>
-<ul class="nav">
-<li><a href="{{script}}/suites/{{user}}">{{user}}</a></li>
-<li><a><strong>{{suite}}</strong></a></li>
-{% for method, name, icon in [
-    ("cycles", "cycles list", "icon-tasks"),
-    ("jobs", "jobs list", "icon-th-list"),
-    ("broadcast_states", "broadcasts list", "icon-bullhorn")] %}
-{% if name == self.title_name() %}
-<li class="active"><a>
-<i class="icon {{icon}}" title="{{name}}"></i> {{name}}</a></li>
-{% else %}
-<li><a href="{{script}}/{{method}}/{{user}}/{{suite}}">
-<i class="icon {{icon}}" title="{{name}}"></i> {{name}}</a></li>
-{% endif %}
-{% endfor %}
-{% if files -%}
-{% for scheme, scheme_files in files|dictsort -%}
-{% if scheme_files -%}
-<li class="dropdown">
-<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-{{scheme}} files <b class="caret"></b>
-</a>
-<ul class="dropdown-menu">
-{% for key, log in scheme_files|dictsort -%}
-<li><a href="{{script}}/view/{{user}}/{{suite}}?path={{log.path}}"
-title="{{log.size}} bytes">{{key}}</a></li>
-{% endfor -%}
-</ul>
-</li>
-{% endif -%}
-{% endfor -%}
-{% endif -%}
-{% if info -%}
-<li>
-<a data-toggle="modal" role="button" href="#suite-info">rose-suite.info</a>
-<div id="suite-info" class="modal hide fade" tabindex="-1"
-role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
-<div class="modal-header">
-<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-<h3 id="suite-info-label">Suite Info</h3>
-</div>
-<div class="modal-body">
-<dl class="dl-horizontal">
-{% for key, value in info|dictsort -%}
-{% if info[key] -%}
-<dt>{{key}}</dt>
-<dd>{{info[key]}}</dd>
-{% endif -%}
-{% endfor -%}
-</dl>
-</div>
-</div>
-</li>
-{% endif -%}
-</ul>
+
+<!-- Static navbar -->
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed"
+      data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+      aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{script}}/">
+        {% if logo -%}
+        <img {{logo}} />
+        {% endif -%}
+        {{title}} <small>@ {{host}}</small>
+      </a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+
+        <li><a href="{{script}}/suites/{{user}}">{{user}}</a></li>
+        <li><a><strong>{{suite}}</strong></a></li>
+        {% for method, name, icon in [
+            ("cycles", "cycles list", "glyphicon-tasks"),
+            ("jobs", "jobs list", "glyphicon-th-list"),
+            ("broadcast_states", "broadcasts list", "glyphicon-bullhorn")] %}
+        {% if name == self.title_name() %}
+        <li class="active">
+          <a>
+            <i class="glyphicon {{icon}}" title="{{name}}"></i>
+            {{name}}
+          </a>
+        </li>
+        {% else %}
+        <li>
+          <a href="{{script}}/{{method}}/{{user}}/{{suite}}">
+            <i class="glyphicon {{icon}}" title="{{name}}"></i>
+            {{name}}
+          </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        {% if files -%}
+        {% for scheme, scheme_files in files|dictsort -%}
+        {% if scheme_files -%}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            {{scheme}} files <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+        {% for key, log in scheme_files|dictsort -%}
+            <li>
+              <a href="{{script}}/view/{{user}}/{{suite}}?path={{log.path}}"
+              title="{{log.size}} bytes">{{key}}</a></li>
+        {% endfor -%}
+          </ul>
+        </li>
+        {% endif -%}
+        {% endfor -%}
+        {% endif -%}
+        {% if info -%}
+        <li>
+          <a data-toggle="modal" href="#suite-info" role="button">
+              rose-suite.info
+          </a>
+
+          <div class="modal" id="suite-info">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"
+                  aria-hidden="true">×</button>
+                  <h4 class="modal-title">Suite Info</h4>
+                </div>
+                <div class="modal-body">
+                  <dl class="dl-horizontal">
+                  {% for key, value in info|dictsort -%}
+                  {% if info[key] -%}
+                    <dt>{{key}}</dt>
+                    <dd>{{info[key]}}</dd>
+                  {% endif -%}
+                  {% endfor -%}
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        {% endif -%}
+      </ul>
+
 {% if path is defined %}
 {% include "view-mode.html" %}
 {% endif %}
-</div>
-</div>
+    </div>
+  </div>
+</nav>
+
 
 {% block content %}{% endblock %}
 
 <div class="container-fluid">
-<div class="row-fluid">
-<div class="span12 text-right">
+<div class="row">
+<div class="col-md-12 text-right">
 <hr/>
 <address><small>Rose {{rose_version}}</small></address>
 </div>
@@ -104,8 +137,10 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 </script>
 <script type="text/javascript" src="{{script}}/js/rose-bush.js">
 </script>
+{% if path is defined and path -%}
 <script type="text/javascript" src="{{script}}/js/search.js">
 </script>
+{% endif -%}
 {% if file_content is defined and file_content -%}
 <script type="text/javascript" src="{{script}}/js/prettify.js">
 </script>

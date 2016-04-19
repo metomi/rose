@@ -10,14 +10,14 @@
 </h1>
 <div><small>
 <a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}">{{f_name}}</a>
-<span class="label">Content loaded
+<span class="label label-default">Content loaded
 <abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
 </small></div>
 {% else -%}
 <h1>{{path}}</h1>
 <div><small>
 {{f_name}}
-<span class="label">Content loaded
+<span class="label label-default">Content loaded
 <abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
 </small></div>
 {% endif -%}
@@ -31,20 +31,20 @@
 </div>
 
 <div class="container-fluid">
-<div class="row-fluid">
+<div class="row">
 <div id="file-container">
-<div class="span1 text-right">
+<div class="col-md-1 text-right">
 <pre class="prettyprint">
 {% for i in range(1, lines|length + 1) -%}
 <span><a id="{{i}}" class="line-number" href="#{{i}}">{{i}}</a></span>
 {% endfor -%}
 </pre>
 </div>
-<div class="span11">
+<div class="col-md-11">
 <pre{% if file_content %} class="prettyprint lang-{{file_content}}"{% endif %}>
 {%- set PREFIXES = {
     "[DEBUG]": "muted",
-    "[FAIL] ": "text-error",
+    "[FAIL] ": "text-danger",
     "[INFO] ": "text-info",
     "[ OK ] ": "text-success",
     "[WARN] ": "text-warning",
