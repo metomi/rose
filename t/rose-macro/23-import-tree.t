@@ -39,7 +39,7 @@ __CONFIG__
 # Set up main metadata.
 init_rose_meta dessert/baked-alaska vn1.0 HEAD
 init_rose_meta_content dessert/baked-alaska vn1.0 <<'__META_CONFIG__'
-import=rose-demo-baked-alaska-icecream/vn1.0 rose-demo-baked-alaska-sponge/vn1.0
+import=baked-alaska-icecream/vanilla/vn1.0 baked-alaska-sponge/vn1.0
 
 [env=MERINGUE_NICENESS]
 title=Meringue Niceness (version 1)
@@ -51,8 +51,8 @@ values=vanilla
 __META_CONFIG__
 
 # Set up imported metadata (1)
-init_rose_meta baked-alaska-icecream vn1.0 HEAD
-init_rose_meta_content baked-alaska-icecream vn1.0 <<'__META_CONFIG__'
+init_rose_meta baked-alaska-icecream/vanilla vn1.0 HEAD
+init_rose_meta_content baked-alaska-icecream/vanilla vn1.0 <<'__META_CONFIG__'
 [env=ICECREAM_TEMPERATURE]
 range=-20:0
 title=Icecream Temperature (celsius) (version 1)
