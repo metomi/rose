@@ -1052,11 +1052,16 @@ meta-path=/path/to/rose-meta
 #!cfg
 # Refer to the HEAD version
 # (typically you wouldn't do this since no upgrade process is possible)
+# For flat metadata
 meta=my-command
+# For hierarchical metadata
+meta=/path/to/metadata/my-command/HEAD
 
-# Refer to a named or tagged version
+# Refer to a named or tagged version in the flat metadata
 meta=my-command/8.3
 meta=my-command/t123
+# Refer to a named or tagged version in the hierarchical metadata
+meta=/path/to/metadata/my-command/8.3
 </pre>
 
     <p>If a version is defined then the Rose utilities will first look for the
@@ -1065,6 +1070,9 @@ meta=my-command/t123
     indicate that the configuration metadata being used requires upgrade macros
     to be run. If the version defined does not correspond to a tagged version
     then a warning will be given.</p>
+
+    <p> Please note that if a hierarchical structure for the metadata is being
+    used, the <code>HEAD</code> tag must be specified explictly.</p>
 
     <h3 id="appendix-upgrade:named">When to create named versions</h3>
 
