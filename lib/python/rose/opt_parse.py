@@ -567,6 +567,11 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "task_cycle_time_mode",
              "help": "Use ROSE_TASK_CYCLE_TIME."}],
+        "text": [
+            ["--text"],
+            {"action": "store_true",
+             "dest": "text",
+             "help": "Print graph in text format"}],
         "thresholds": [
             ["--threshold"],
             {"action": "append",

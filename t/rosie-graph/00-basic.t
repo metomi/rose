@@ -25,7 +25,7 @@
 if ! python -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all '"cherrypy" or "sqlalchemy" not installed'
 fi
-tests 27
+tests 33
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.
 export TZ='UTC'
@@ -149,6 +149,16 @@ rosie create -q -y --info-file=rose-suite.info || exit 1
 echo "2009-02-13T23:31:37.000000Z" >foo-date-8.txt
 svnadmin setrevprop $PWD/repos/foo -r 8 svn:date foo-date-8.txt
 
+# Setup repository - create another suite.
+cat >rose-suite.info <<'__ROSE_SUITE_INFO'
+owner=bill
+project=sonnet 54
+title=This is becoming something of a thorny issue
+__ROSE_SUITE_INFO
+rosie create -q -y --info-file=rose-suite.info foo-aa004 || exit 1
+echo "2009-02-13T23:31:38.000000Z" >foo-date-9.txt
+svnadmin setrevprop $PWD/repos/foo -r 8 svn:date foo-date-8.txt
+
 # Setup db.
 $ROSE_HOME/sbin/rosa db-create -q
 
@@ -185,7 +195,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
 "foo-aa002" [label="foo-aa002"
 "foo-aa003" -> "foo-aa004" [
 "foo-aa003" [label="foo-aa003"
+"foo-aa004" -> "foo-aa006" [
 "foo-aa004" [label="foo-aa004"
+"foo-aa006" [label="foo-aa006"
 graph [rankdir=LR
 node [label="\N"
 __OUTPUT__
@@ -199,7 +211,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
 "foo-aa002" [label="foo-aa002"
 "foo-aa003" -> "foo-aa004" [
 "foo-aa003" [label="foo-aa003", style=filled
+"foo-aa004" -> "foo-aa006" [
 "foo-aa004" [label="foo-aa004"
+"foo-aa006" [label="foo-aa006"
 graph [rankdir=LR
 node [label="\N"
 __OUTPUT__
@@ -211,7 +225,9 @@ filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
 "foo-aa003" -> "foo-aa004" [
 "foo-aa003" [label="foo-aa003"
+"foo-aa004" -> "foo-aa006" [
 "foo-aa004" [label="foo-aa004", style=filled
+"foo-aa006" [label="foo-aa006"
 graph [rankdir=LR
 node [label="\N"
 __OUTPUT__
@@ -249,7 +265,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
 "foo-aa002" [label="foo-aa002\naphids"
 "foo-aa003" -> "foo-aa004" [
 "foo-aa003" [label="foo-aa003\nbill"
+"foo-aa004" -> "foo-aa006" [
 "foo-aa004" [label="foo-aa004\nbill"
+"foo-aa006" [label="foo-aa006\nbill"
 graph [rankdir=LR
 node [label="\N"
 __OUTPUT__
@@ -266,7 +284,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
 "foo-aa002" [label="foo-aa002\naphids\neat roses"
 "foo-aa003" -> "foo-aa004" [
 "foo-aa003" [label="foo-aa003\nbill\nsonnet 54"
+"foo-aa004" -> "foo-aa006" [
 "foo-aa004" [label="foo-aa004\nbill\nsonnet 54"
+"foo-aa006" [label="foo-aa006\nbill\nsonnet 54"
 graph [rankdir=LR
 node [label="\N"
 __OUTPUT__
@@ -283,7 +303,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
 "foo-aa002" [label="foo-aa002\nEat all the roses!"
 "foo-aa003" -> "foo-aa004" [
 "foo-aa003" [label="foo-aa003\nThe rose looks fair..."
+"foo-aa004" -> "foo-aa006" [
 "foo-aa004" [label="foo-aa004\nThe rose looks fair but fairer we it deem for that sweet odour which\ndoth in it live."
+"foo-aa006" [label="foo-aa006\nThis is becoming something of a thorny issue"
 graph [rankdir=LR
 node [label="\N"
 __OUTPUT__
@@ -300,6 +322,28 @@ __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [WARN] foo-aa005: no copy relationships to other suites
 __ERROR__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-print-graph
+run_pass "$TEST_KEY" rosie graph --text foo-aa003 -p owner
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
+[parent] foo-aa002, aphids
+[child1] foo-aa004, bill
+[child2] foo-aa006, bill
+__OUTPUT__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-print-graph-no-parent
+run_pass "$TEST_KEY" rosie graph --text foo-aa000 -p owner -d 1
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
+[parent] None
+[child1] foo-aa001, roses
+__OUTPUT__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-print-graph-no-child
+run_pass "$TEST_KEY" rosie graph --text foo-aa006 -p owner -d 1
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
+[parent] foo-aa004, bill
+__OUTPUT__
+
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
