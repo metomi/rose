@@ -40,6 +40,59 @@ REC_SPLIT_MACRO_TEXT = re.compile(
     '})')
 
 
+class MetadataTable(object):
+    """
+    Creates a table from the provided list of paths appending it to the
+    provided parent.
+    The current state of the table can be obtained using '.paths'.
+    """
+    def __init__(self, paths, parent):
+        self.paths = paths
+        self.parent = parent
+        self.previous = None
+        self.draw_table()
+
+    def draw_table(self):
+        """ Draws the table. """
+        # destroy previous table if present
+        if self.previous:
+            self.previous.destroy()
+
+        # rows, cols
+        table = gtk.Table(len(self.paths), 2)
+
+        # table rows
+        for n, path in enumerate(self.paths):
+            label = gtk.Label(path)
+            label.set_alignment(xalign=0., yalign=0.5)
+            # component, col_from, col_to, row_from, row_to
+            table.attach(label, 0, 1, n, n + 1, xoptions=gtk.FILL, xpadding=15)
+            label.show()
+            button = gtk.Button('Remove')
+            button.data = path
+            # component, col_from, col_to, row_from, row_to
+            table.attach(button, 1, 2, n, n + 1)
+            button.connect('clicked', lambda b: self.remove_row(b))
+            button.show()
+
+        # append table
+        self.parent.pack_start(table)
+        self.parent.reorder_child(table, 2)
+        table.show()
+
+        self.previous = table
+
+    def remove_row(self, b):
+        """ To be called uppon 'remove' button press. """
+        self.paths.remove(b.data)
+        self.draw_table()
+
+    def add_row(self, path):
+        """ Creates a new table row from the provided path (as a string). """
+        self.paths.append(path)
+        self.draw_table()
+
+
 class MainWindow(object):
 
     """Generate the main window and dialog handling for this example."""
@@ -405,6 +458,71 @@ class MainWindow(object):
             return config_directory
         open_dialog.destroy()
         return None
+
+    def launch_load_metadata_dialog(self):
+        """ Launches a dialoge for selecting a metadata path. """
+        open_dialog = gtk.FileChooserDialog(
+            title=rose.config_editor.DIALOG_TITLE_LOAD_METADATA,
+            action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+            buttons=(gtk.STOCK_CLOSE,
+                     gtk.RESPONSE_CANCEL,
+                     gtk.STOCK_ADD,
+                     gtk.RESPONSE_OK))
+        open_dialog.set_transient_for(self.window)
+        open_dialog.set_icon(self.window.get_icon())
+        open_dialog.set_default_response(gtk.RESPONSE_OK)
+        response = open_dialog.run()
+        if response in [gtk.RESPONSE_OK, gtk.RESPONSE_ACCEPT,
+                        gtk.RESPONSE_YES]:
+            config_directory = open_dialog.get_filename()
+            open_dialog.destroy()
+            return config_directory
+        open_dialog.destroy()
+        return None
+
+    def launch_metadata_manager(self, paths):
+        """
+        Launches a dialogue where users may add or remove custom meta data
+        paths.
+        """
+        dialog = gtk.Dialog(
+            title=rose.config_editor.DIALOG_TITLE_MANAGE_METADATA,
+            buttons=(gtk.STOCK_CANCEL,
+                     gtk.RESPONSE_CANCEL,
+                     gtk.STOCK_OK,
+                     gtk.RESPONSE_OK)
+        )
+
+        # add description
+        label = gtk.Label('Specify metadata paths to override the default '
+                          'metadata.\n')
+        dialog.vbox.pack_start(label)
+        label.show()
+
+        # create table of paths
+        table = MetadataTable(paths, dialog.vbox)
+
+        # create add path button
+        button = gtk.Button('Add Path')
+
+        def add_path():
+            _path = self.launch_load_metadata_dialog()
+            if _path:
+                table.add_row(_path)
+        button.connect('clicked', lambda b: add_path())
+        dialog.vbox.pack_start(button)
+        button.show()
+
+        # open the dialogue
+        response = dialog.run()
+        if response in [gtk.RESPONSE_OK, gtk.RESPONSE_ACCEPT,
+                        gtk.RESPONSE_YES]:
+            # if user clicked 'ok'
+            dialog.destroy()
+            return table.paths
+        else:
+            dialog.destroy()
+            return None
 
     def launch_prefs(self, somewidget=None):
         """Launch a dialog explaining preferences."""

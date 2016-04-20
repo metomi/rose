@@ -170,7 +170,8 @@ class CylcProcessor(SuiteEngineProcessor):
             if os.path.islink(path) and not os.path.exists(path):
                 self.fs_util.delete(path)
 
-    def cmp_suite_conf(self, suite_name, strict_mode=False, debug_mode=False):
+    def cmp_suite_conf(
+            self, suite_name, run_mode, strict_mode=False, debug_mode=False):
         """Parse and compare current "suite.rc" with that in the previous run.
 
         (Re-)register and validate the "suite.rc" file.
@@ -185,7 +186,8 @@ class CylcProcessor(SuiteEngineProcessor):
         if out:
             suite_dir_old = out.strip()
         suite_passphrase = os.path.join(suite_dir, "passphrase")
-        self.clean_hook(suite_name)
+        if run_mode != "reload":
+            self.clean_hook(suite_name)
         if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
             self.popen.run_simple("cylc", "unregister", suite_name)
             suite_dir_old = None
@@ -831,17 +833,18 @@ class CylcProcessor(SuiteEngineProcessor):
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
             cycle, max_time_updated, n_active, n_success, n_fail = row
-            entry_of[cycle] = {
-                "cycle": cycle,
-                "max_time_updated": max_time_updated,
-                "n_states": {
-                    "active": n_active,
-                    "success": n_success,
-                    "fail": n_fail,
-                    "job_fails": 0,
-                },
-            }
-            entries.append(entry_of[cycle])
+            if n_active or n_success or n_fail:
+                entry_of[cycle] = {
+                    "cycle": cycle,
+                    "max_time_updated": max_time_updated,
+                    "n_states": {
+                        "active": n_active,
+                        "success": n_success,
+                        "fail": n_fail,
+                        "job_fails": 0,
+                    },
+                }
+                entries.append(entry_of[cycle])
 
         # Check if "task_jobs" table is available or not
         can_use_task_jobs_table = False

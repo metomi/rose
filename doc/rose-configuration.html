@@ -591,6 +591,20 @@ root-dir=hpc*=$WORKDIR
           <li>other configuration files that require more than
           section=key=value.</li>
         </ul>
+
+        <p>Files in this directory are copied to the working directory in run
+        time.</p>
+
+        <p>Note: If there is a clash between a <var>[file:*]</var> section and a
+        file under <var>file/</var>, the setting in the <var>[file:*]</var>
+        section takes precedence. E.g. Suppose we have a file
+        <samp>file/hello.txt</samp>. In the absence of
+        <samp>[file:hello.txt]</samp>, it will copy <samp>file/hello.txt</samp>
+        to <samp>$PWD/hello.txt</samp> in run time. However, if we have a
+        <samp>[file:hello.txt]</samp> section and a <var>source=SOURCE</var>
+        setting, then it will install the file from <var>SOURCE</var> instead.
+        If we have <samp>[!file:hello.txt]</samp>, then the file will not be
+        installed at all.</p>
       </li>
 
       <li><samp>bin/</samp> directory for e.g. scripts and executables used by

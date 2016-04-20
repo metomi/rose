@@ -21,7 +21,7 @@
 #     rose-config-edit
 #
 # SYNOPSIS
-#     rose-config-edit [OPTIONS]
+#     rose-config-edit [OPTIONS]... [PAGE_PATH]...
 #
 # DESCRIPTION
 #     Launch the GTK+ GUI to edit a suite or application configuration.
@@ -50,6 +50,12 @@
 #        Launch, ignoring any configuration.
 #     --no-metadata
 #        Launch with metadata switched off.
+#
+# ARGUMENTS
+#     PAGE_PATH
+#        One or more paths to open on load, pages may be full or partial
+#        namespaces e.g. 'foo/bar/env' or 'env'.
+#        NOTE: Opens the shortest namespace that matches the provided string.
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_META_PATH

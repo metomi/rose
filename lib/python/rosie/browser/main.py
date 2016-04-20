@@ -49,7 +49,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopenError
 import rose.reporter
 from rose.resource import ResourceLocator, ResourceError
-from rose.suite_control import SuiteControl
+from rose.suite_control import SuiteControl, SuiteNotRunningError
 from rose.suite_engine_proc import (
     NoSuiteLogError, SuiteEngineProcessor, WebBrowserEvent)
 import rosie.browser.history
@@ -798,19 +798,17 @@ class MainWindow(gtk.Window):
         self.display_toggle(menuitem.column)
 
     def _handle_prefix_change(self, menuitem):
-        """Handles changing the prefix."""
-        prefixes = list(self.ws_client.prefixes)
-        old_prefixes = list(prefixes)
-        if menuitem.get_active():
-            if menuitem.prefix_text not in prefixes:
-                prefixes.append(menuitem.prefix_text)
-                prefixes.sort()
-        else:
-            if menuitem.prefix_text in prefixes:
-                prefixes.remove(menuitem.prefix_text)
-        if prefixes == old_prefixes:
+        checkboxes = [child for child in menuitem.get_parent().get_children()
+                      if type(child) is gtk.CheckMenuItem]
+        prefixes = [checkbox.prefix_text for checkbox in checkboxes
+                    if checkbox.get_active()]
+        if not prefixes:
+            # do nothing, prefixes are left as before
+            return
+        if prefixes == list(self.ws_client.prefixes):
             # Happens on set_active call below, when there is a prefix problem.
             return
+
         self.ws_client.set_prefixes(prefixes)
         if self.ws_client.unreachable_prefixes:
             # There are some bad prefixes.
@@ -909,7 +907,15 @@ class MainWindow(gtk.Window):
         this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
 
         if SuiteControl().suite_engine_proc.is_suite_registered(this_id):
-            return SuiteControl().gcontrol(this_id)
+            try:
+                return SuiteControl().gcontrol(this_id)
+            except SuiteNotRunningError as err:
+                msg = rosie.browser.DIALOG_MESSAGE_SUITE_NOT_RUNNING.format(
+                    str(err))
+                return rose.gtk.dialog.run_dialog(
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    msg,
+                    rosie.browser.DIALOG_TITLE_SUITE_NOT_RUNNING)
         else:
             msg = rosie.browser.DIALOG_MESSAGE_UNREGISTERED_SUITE.format(
                 this_id)

@@ -174,7 +174,7 @@ class ConfigDataManager(object):
     """Loads the information from the various configurations."""
 
     def __init__(self, util, reporter, page_ns_show_modes,
-                 reload_ns_tree_func):
+                 reload_ns_tree_func, opt_meta_paths=None):
         """Load the root configuration and all its sub-configurations."""
         self.util = util
         self.helper = rose.config_editor.data_helper.ConfigDataHelper(
@@ -194,6 +194,10 @@ class ConfigDataManager(object):
             'latent': {}, 'ignored': {}}  # Caches ns statuses
         self._config_section_namespace_lookup = {}  # Store section namespaces
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
+        if opt_meta_paths is None:
+            self.opt_meta_paths = []
+        else:
+            self.opt_meta_paths = opt_meta_paths
 
     def load(self, top_level_directory, config_obj_dict,
              config_obj_type_dict=None, load_all_apps=False,
@@ -817,14 +821,15 @@ class ConfigDataManager(object):
             self._config_section_namespace_lookup.pop(config_name)
 
     def load_meta_config_tree(self, config=None, directory=None,
-                              config_type=None):
+                              config_type=None, opt_meta_paths=None):
         """Load the main metadata, and any specified in 'config'."""
         if config is None:
             config = rose.config.ConfigNode()
         error_handler = rose.config_editor.util.launch_error_dialog
         return rose.macro.load_meta_config_tree(config, directory,
                                                 config_type=config_type,
-                                                error_handler=error_handler)
+                                                error_handler=error_handler,
+                                                opt_meta_paths=opt_meta_paths)
 
     def load_meta_files(self, config_tree):
         """Load the file paths of files within the metadata directory."""

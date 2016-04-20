@@ -101,6 +101,7 @@ class RosieWSClient(object):
 
     def set_prefixes(self, prefixes):
         """Replace the default prefixes."""
+        prefixes.sort()
         if self.prefixes != prefixes:
             self.prefixes = prefixes
         for prefix in self.prefixes:

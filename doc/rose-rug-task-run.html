@@ -208,7 +208,19 @@ WORLDS=Mars Jupiter Saturn
       detail.</li>
 
       <li>Copy any regular files under the <var>file/</var> sub-directory of
-      the application configuration to the working directory.</li>
+      the application configuration to the working directory.
+
+        <p>Note: If there is a clash between a <var>[file:*]</var> section and a
+        file under <var>file/</var>, the setting in the <var>[file:*]</var>
+        section takes precedence. E.g. Suppose we have a file
+        <samp>file/hello.txt</samp>. In the absence of
+        <samp>[file:hello.txt]</samp>, it will copy <samp>file/hello.txt</samp>
+        to <samp>$PWD/hello.txt</samp> in run time. However, if we have a
+        <samp>[file:hello.txt]</samp> section and a <var>source=SOURCE</var>
+        setting, then it will install the file from <var>SOURCE</var> instead.
+        If we have <samp>[!file:hello.txt]</samp>, then the file will not be
+        installed at all.</p>
+      </li>
     </ul>
 
     <p>If the command for the application requires some pre-defined standard
