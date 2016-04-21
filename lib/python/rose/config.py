@@ -74,6 +74,8 @@ REC_SETTING_ELEMENT = re.compile(r"^(.+?)\(([^)]+)\)$")
 
 STATE_SECT_IGNORED = "^"
 
+OPT_CONFIG_SETTING_COMMENT = " setting from opt config \"%s\" (%s)"
+
 
 class ConfigNode(object):
 
@@ -588,7 +590,8 @@ class ConfigLoader(object):
             return
 
     def load_with_opts(self, source, node=None, more_keys=None,
-                       used_keys=None, return_config_map=False):
+                       used_keys=None, return_config_map=False,
+                       mark_opt_confs=False):
         """Read a source configuration file with optional configurations.
 
         Arguments:
@@ -604,6 +607,9 @@ class ConfigLoader(object):
                      that are specified in more_keys will not raise an error.
                      If not defined, any missing optional configuration will
                      trigger an OSError.
+        mark_opt_configs     (default False) if True, add comments above any
+                              settings which have been loaded from an optional
+                              config.
         return_config_map -- (default False) if True, construct and return a
                               dict (config_map) containing config names vs
                               their uncombined nodes. Optional configurations
@@ -640,7 +646,12 @@ class ConfigLoader(object):
             opt_conf_file_name = os.path.join(
                 source_dir, OPT_CONFIG_DIR, opt_conf_file_name_base)
             try:
-                self.load(opt_conf_file_name, node)
+                if mark_opt_confs:
+                    self.load(opt_conf_file_name, node, default_comments=[
+                        OPT_CONFIG_SETTING_COMMENT % (
+                            key, opt_conf_file_name,)])
+                else:
+                    self.load(opt_conf_file_name, node)
             except IOError:
                 if can_miss_opt_conf_key or (
                         used_keys is not None and opt_conf_key in more_keys):
@@ -655,7 +666,7 @@ class ConfigLoader(object):
             return node, config_map
         return node
 
-    def load(self, source, node=None):
+    def load(self, source, node=None, default_comments=None):
         """Read a source configuration file.
 
         Arguments:
@@ -737,6 +748,8 @@ class ConfigLoader(object):
             keys.append(option)
             type_ = self.TYPE_OPTION
             value = value.strip()
+            if comments is not None and default_comments is not None:
+                comments += default_comments
             node.set(keys[:], value.strip(), state, comments)
             comments = []
         return node

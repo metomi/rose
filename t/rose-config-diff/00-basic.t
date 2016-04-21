@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 43
+tests 45
 #-------------------------------------------------------------------------------
 setup
 init app 1 <<'__APP__'
@@ -370,6 +370,46 @@ GEARSTICK_DECORATION=golfball					GEARSTICK_DECORATION=golfball
 							      >	air_locking=.false.
 __DIFF__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# test --opt-conf-key option
+TEST_KEY=$TEST_KEY_BASE-opt-conf
+
+OPT_DIR=opt-conf
+mkdir $OPT_DIR
+cat >$OPT_DIR/rose-chalk.conf <<__CHALK_CONF__
+[env]
+var=foo
+type=chalk
+__CHALK_CONF__
+cat >$OPT_DIR/rose-cheese.conf <<__CHEESE_CONF__
+[env]
+var=foo
+type=cheese
+__CHEESE_CONF__
+mkdir $OPT_DIR/opt
+cat >$OPT_DIR/opt/rose-chalk-baz.conf <<__CHALK_BAR_CONF__
+[env]
+var=baz
+__CHALK_BAR_CONF__
+cat >$OPT_DIR/opt/rose-cheese-bar.conf <<__CHEESE_BAR_CONF__
+[env]
+var=bar
+__CHEESE_BAR_CONF__
+
+run_fail "$TEST_KEY" rose config-diff --opt-conf-key-1=baz --opt-conf-key-2=bar $OPT_DIR/rose-chalk.conf $OPT_DIR/rose-cheese.conf
+sed -i "/rose-chalk.conf/d" "$TEST_KEY.out"
+sed -i "/rose-cheese.conf/d" "$TEST_KEY.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<DIFF
+@@ -1,4 +1,4 @@
+ [env]
+-type=chalk
+-# setting from opt config "baz" (${PWD}/${OPT_DIR}/opt/rose-chalk-baz.conf)
+-var=baz
++type=cheese
++# setting from opt config "bar" (${PWD}/${OPT_DIR}/opt/rose-cheese-bar.conf)
++var=bar
+DIFF
+
 teardown
 #-------------------------------------------------------------------------------
 exit 0
