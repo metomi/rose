@@ -27,6 +27,17 @@ rose bush: view: new search functionality.
 
 ### Noteworthy Changes
 
+[#1882](https://github.com/metomi/rose/pull/1882):
+rose stem: improve handling of project not found error.
+
+[#1881](https://github.com/metomi/rose/pull/1881):
+rose macro: fix trigger transform order-sensitivity bug.
+
+[#1880](https://github.com/metomi/rose/pull/1880):
+rose metadata-check: now check for invalid namespace settings.
+
+[#1878](https://github.com/metomi/rose/pull/1878):
+
 [#1877](https://github.com/metomi/rose/pull/1877):
 rose_bunch: bunch task counts at end of job.
 
@@ -39,6 +50,9 @@ rose bush: job entry: link 0-size file any way.
 [#1871](https://github.com/metomi/rose/pull/1871):
 rose bush: cycles: don't display cycles with no active or completed tasks.
 
+[#1870](https://github.com/metomi/rose/pull/1870):
+rosie graph --text: new option print graph results as text.
+
 [#1869](https://github.com/metomi/rose/pull/1869):
 rose stem: fix incorrect mirror variable when run within subdirectory.
 
@@ -50,6 +64,9 @@ rose_bunch: remove any existing database entries on first submit.
 
 [#1864](https://github.com/metomi/rose/pull/1864):
 rose config-edit: add ability to specify initial namespaces.
+
+[#1863](https://github.com/metomi/rose/pull/1863):
+rose app-upgrade: allow multi depth value for `meta=value`.
 
 [#1861](https://github.com/metomi/rose/pull/1861):
 rosie go: fix crash when all sources were unchecked.
