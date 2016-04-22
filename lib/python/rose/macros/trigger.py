@@ -91,8 +91,6 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             if node.state in prev_ignoreds:
                 prev_ignoreds[node.state].append(n_id)
 
-        # Update in breadth-first order to get the ignored parent statuses
-        # correct and trickled down.
         ranked_ids = self._get_ranked_trigger_ids()
         for rank, var_id in sorted(ranked_ids):
             self.update(var_id, config, meta_config)
@@ -268,9 +266,21 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         return update_id_list
 
     def _get_ranked_trigger_ids(self):
-        """Return trigger ids with their maximum trigger chain depth."""
+        """Return trigger ids with their maximum trigger chain depth.
+
+        We need these to update in breadth-first order to get the ignored
+        parent statuses correct and trickled down.
+
+        """
+        # Starting stack has each starting point id with a default depth of 0.
+        # The depth will be overwritten with whatever is the maximum depth
+        # eventually found for that id.
         stack = [(id_, 0) for id_ in self.trigger_family_lookup]
+
+        # Create a dictionary to store the maximum depth (rank) for each id.
         id_ranks = dict(stack)
+
+        # Loop over the stack, going down all possible trigger chains.
         while stack:
             parent_id, depth = stack.pop(0)
             child_ids = self.trigger_family_lookup.get(parent_id, [])
