@@ -281,10 +281,10 @@ class StemRunner(object):
 
         source_dict = self._get_base_dir(item)
         project = self._get_project_from_url(source_dict)
-        mirror = self._deduce_mirror(source_dict, project)
-
         if not project:
             raise ProjectNotFoundException(item)
+
+        mirror = self._deduce_mirror(source_dict, project)
 
         if 'peg_rev' in source_dict and '@' in item:
             revision = '@' + source_dict['peg_rev']

@@ -50,7 +50,7 @@ cp $TEST_SOURCE_DIR/00-run-basic/rose-suite.conf $WORKINGCOPY/rose-stem
 touch $WORKINGCOPY/rose-stem/rose-suite.conf
 #We should now have a valid rose-stem suite.
 #-------------------------------------------------------------------------------
-N_TESTS=42
+N_TESTS=44
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 #Test for successful execution
@@ -206,6 +206,19 @@ run_fail "$TEST_KEY" \
 OUTPUT=$TEST_DIR/${TEST_KEY}.err
 TEST_KEY=$TEST_KEY_BASE-incompatible-versions-correct_error
 file_grep $TEST_KEY "Running rose-stem version 1 but suite is at version 0" $OUTPUT
+#-------------------------------------------------------------------------------
+# Eighth test - test error message when project not in keywords
+# Remove the keywords file and re-copy the original rose-suite.conf file
+unset FCM_CONF_PATH
+cp $TEST_SOURCE_DIR/00-run-basic/rose-suite.conf $WORKINGCOPY/rose-stem
+TEST_KEY=$TEST_KEY_BASE-project-not-in-keywords
+run_fail "$TEST_KEY" \
+   rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
+             --source=$WORKINGCOPY --source=fcm:foo.x_tr@head --no-gcontrol \
+             --name $SUITENAME -- --debug 
+OUTPUT=$TEST_DIR/${TEST_KEY}.err
+TEST_KEY=$TEST_KEY_BASE-project-not-in-keywords-correct_error
+file_grep $TEST_KEY "Cannot ascertain project for source tree" $OUTPUT
 #-------------------------------------------------------------------------------
 #Clean suite
 rose suite-clean -q -y $SUITENAME
