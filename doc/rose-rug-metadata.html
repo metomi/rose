@@ -113,6 +113,16 @@ meta=rose-demo-upgrade/27.1
       <samp>meta-path</samp> user/site config setting. The example above, for a
       <samp>meta-path</samp> of <samp>/project/rose-meta/</samp>, would be
       stored at <samp>/project/rose-meta/rose-demo-upgrade/27.1/</samp>.</p>
+
+      <p> We are not limited to a flat structure for our centrally-stored
+      metadata. For example, if we wanted to take our example above and
+      adopt a tree structure for all our <samp>rose-demo</samp> apps, the
+      <samp>meta</samp> tag may be:</p>
+<pre class="prettyprint lang-rose_conf">
+meta=rose-demo/upgrade/27.1
+</pre>
+      <p>and so the metadata would be stored at
+      <samp>/project/rose-meta/rose-demo/upgrade/27.1/</samp>.</p>
     </div>
 
     <div class="slide">

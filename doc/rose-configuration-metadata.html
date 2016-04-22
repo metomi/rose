@@ -965,26 +965,26 @@ ${APP}/versions.py # i.e. the upgrade macros
     a collection of regularly-updated subdirectories from all of the relevant
     projects' <samp>rose-meta</samp> directories.</p>
 
-    <p>For example, for a system <code>COFFEE</code>, with the following
-    directory structure:</p>
-    <pre class="prettyprint lang-rose_conf">
-COFFEE/doc/
-...
-COFFEE/rose-meta/
-COFFEE/rose-meta/coffee-cappuccino/
-COFFEE/rose-meta/coffee-latte/
-COFFEE/rose-meta/coffee-mocha/
-</pre>
-
-    <p>and the system <code>CHOCOLATE</code>:</p>
+    <p>For example, a system <code>CHOCOLATE</code> may have a flat metadata
+    structure within the repository:</p>
     <pre class="prettyprint lang-rose_conf">
 CHOCOLATE/doc/
 ...
 CHOCOLATE/rose-meta/
 CHOCOLATE/rose-meta/choc-dark/
 CHOCOLATE/rose-meta/choc-milk/
+    </pre>
+    <p>and the system <code>CAFFEINE</code> may have a hybrid structure, with
+    both flat and hierarchical components:</p>
+<pre class="prettyprint lang-rose_conf">
+CAFFEINE/doc/
+...
+CAFFEINE/rose-meta/caffeine-guarana/
+CAFFEINE/rose-meta/caffeine-coffee/cappuccino/
+CAFFEINE/rose-meta/caffeine-coffee/latte/
+CAFFEINE/rose-meta/caffeine-tea/yorkshire/
+CAFFEINE/rose-meta/caffeine-tea/lapsang/
 </pre>
-
     <p>and a site configuration with:</p>
     <pre class="prettyprint lang-rose_conf">
 meta-path=/path/to/rose-meta
@@ -993,12 +993,16 @@ meta-path=/path/to/rose-meta
     <p>We would expect the following directories in
     <samp>/path/to/rose-meta</samp>:</p>
     <pre class="prettyprint lang-rose_conf">
-/path/to/rose-meta/coffee-cappuccino/
-/path/to/rose-meta/coffee-latte/
-/path/to/rose-meta/coffee-mocha/
+/path/to/rose-meta/caffeine-guarana/
+/path/to/rose-meta/caffeine-coffee/
+/path/to/rose-meta/caffeine-tea/
 /path/to/rose-meta/choc-dark/
 /path/to/rose-meta/choc-milk/
 </pre>
+    <p>with <code>caffeine-coffee</code> containing subdirectories
+    <code>cappuccino</code> and <code>latte</code>, and
+    <code>caffeine-tea</code> containing <code>yorkshire</code> and
+    <code>lapsang</code>
 
     <h2 id="appendix-upgrade">Appendix: Upgrade and Versions</h2>
 
@@ -1048,11 +1052,16 @@ meta-path=/path/to/rose-meta
 #!cfg
 # Refer to the HEAD version
 # (typically you wouldn't do this since no upgrade process is possible)
+# For flat metadata
 meta=my-command
+# For hierarchical metadata
+meta=/path/to/metadata/my-command/HEAD
 
-# Refer to a named or tagged version
+# Refer to a named or tagged version in the flat metadata
 meta=my-command/8.3
 meta=my-command/t123
+# Refer to a named or tagged version in the hierarchical metadata
+meta=/path/to/metadata/my-command/8.3
 </pre>
 
     <p>If a version is defined then the Rose utilities will first look for the
@@ -1061,6 +1070,9 @@ meta=my-command/t123
     indicate that the configuration metadata being used requires upgrade macros
     to be run. If the version defined does not correspond to a tagged version
     then a warning will be given.</p>
+
+    <p> Please note that if a hierarchical structure for the metadata is being
+    used, the <code>HEAD</code> tag must be specified explictly.</p>
 
     <h3 id="appendix-upgrade:named">When to create named versions</h3>
 
