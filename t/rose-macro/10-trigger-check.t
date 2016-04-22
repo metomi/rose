@@ -38,7 +38,7 @@ atrig = 2
 btrig = 3
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 24
+tests 27
 #-------------------------------------------------------------------------------
 # Check trigger checking - this is nearly cyclic but should be fine.
 TEST_KEY=$TEST_KEY_BASE-ok
@@ -1004,6 +1004,64 @@ trigger=namelist:baz=b: 1;
 trigger=namelist:baz=c: 2;
 
 [namelist:baz=c]
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Check ignored mid-level trigger status handling.
+# Old bug behaviour was strongly dependent on exact ordering and naming.
+TEST_KEY=$TEST_KEY_BASE-dupl-namelist-within
+setup
+init <<'__CONFIG__'
+[namelist:rrr0]
+l_alternate=.true.
+
+[namelist:rrr]
+l_culmination_level=.false.
+!!l_mid_level=.true.
+!!lowest_level_opt=0
+
+[namelist:zzz0]
+l_alternate=.true.
+
+[namelist:zzz]
+l_culmination_level=.false.
+!!l_mid_level=.true.
+!!lowest_level_opt=0
+__CONFIG__
+init_meta <<__META_CONFIG__
+[namelist:rrr0=l_alternate]
+trigger=namelist:rrr=l_mid_level: .true.
+
+[namelist:rrr=l_culmination_level]
+trigger=namelist:rrr=l_mid_level: .true.
+
+[namelist:rrr=l_mid_level]
+trigger=namelist:rrr=lowest_level_opt: .true.
+
+[namelist:rrr=lowest_level_opt]
+
+[namelist:foo=bar]
+
+[namelist:foo=baz]
+trigger=namelist:foo=bar: .true.
+
+[namelist:xyz=bar]
+
+[namelist:xyz=baz]
+trigger=namelist:xyz=bar: this
+
+[namelist:zzz0=l_alternate]
+trigger=namelist:zzz=l_mid_level: .true.
+
+[namelist:zzz=l_culmination_level]
+trigger=namelist:zzz=l_mid_level: .true.
+
+[namelist:zzz=l_mid_level]
+trigger=namelist:zzz=lowest_level_opt: .true.
+
+[namelist:zzz=lowest_level_opt]
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
