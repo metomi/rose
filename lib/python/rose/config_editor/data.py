@@ -343,12 +343,14 @@ class ConfigDataManager(object):
             meta_config_tree = rose.config_tree.ConfigTree()
         elif metadata_off:
             meta_config_tree = self.load_meta_config_tree(
-                config_type=config_type)
+                config_type=config_type,
+                opt_meta_paths=self.opt_meta_paths)
         else:
             try:
                 meta_config_tree = self.load_meta_config_tree(
                     config, config_directory,
-                    config_type=config_type
+                    config_type=config_type,
+                    opt_meta_paths=self.opt_meta_paths
                 )
             except IOError as exc:
                 rose.gtk.dialog.run_exception_dialog(exc)
