@@ -286,7 +286,6 @@ class StemRunner(object):
 
         mirror = self._deduce_mirror(source_dict, project)
 
-
         if 'peg_rev' in source_dict and '@' in item:
             revision = '@' + source_dict['peg_rev']
             base = re.sub(r'@.*', r'', item)
