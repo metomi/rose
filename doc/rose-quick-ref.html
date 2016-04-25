@@ -1,130 +1,199 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+
   <title>Rose Reference Guide: CLI</title>
-  <meta id="author" content="Rose Team, Met Office, UK" />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <link rel="icon" href="rose-icon.png" type="image/png" />
-  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
-  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
-  <script type="text/javascript" src="jquery.min.js">
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content=
+  "text/html; charset=us-ascii" />
+  <link rel="icon" href="img/rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="img/rose-icon.png" type=
+  "image/png" />
+  <link rel="stylesheet" type="text/css" href=
+  "css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="css/rose-doc.css" />
+  <script type="text/javascript" src="js/jquery.min.js">
 </script>
-  <script type="text/javascript" src="rose-doc.js">
+  <script type="text/javascript" src="js/run_prettify.js">
 </script>
-  <script type="text/javascript" src="rose-version.js">
+  <script type="text/javascript" src="js/prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src=
+  "js/prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="js/bootstrap.min.js">
+</script>
+  <script type="text/javascript" src="js/rose-doc.js">
+</script>
+  <script type="text/javascript" src="js/rose-version.js">
 </script>
 </head>
 
 <body>
-  <div class="header-footer" id="body-header">
-    <address>
-      &copy; British Crown Copyright 2012-6 <a href=
-      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
-      "rose-terms-of-use.html">Terms of Use</a>.<br />
-      This document is released under the <a href=
-      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.<br />
-      <span id="rose-version"></span>
-    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="."><span class="logo">Rose
+        Documentation</span></a>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
 
-    <p><a href=".">Rose Documentation</a></p>
-  </div>
+      <div class="collapse navbar-collapse" id=
+      "bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="rose-single-page.html">Single Page
+          Version</a></li>
+        </ul>
 
-  <div id="body-main">
-    <h1>Rose Reference Guide: Quick Reference</h1>
+        <ul class="nav navbar-nav navbar-right">
+          <li><span class="navbar-text"><span class=
+          "compliance">&#169; British Crown Copyright 2012-6
+          <a href="http://www.metoffice.gov.uk">Met Office</a>. See
+          <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+          This document is released under the <a href=
+          "http://www.nationalarchives.gov.uk/doc/open-government-licence/"
+          rel="license">Open Government
+          Licence</a>.</span></span></li>
 
-    <h2 id="rose-cmds">Rose Commands</h2>
+          <li><span id="rose-version" class=
+          "navbar-text"></span></li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
 
-    <dl>
-      <dt>rose help</dt>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div id="panel-main" class="panel panel-default">
+          <div class="panel-heading">
+            <h1>Rose Reference Guide: Quick Reference</h1>
+          </div>
 
-      <dd>Show the rose help.</dd>
+          <div id="body-main" class="panel-body">
+            <h2 id="rose-cmds">Rose Commands</h2>
 
-      <dt>rose suite-run</dt>
+            <dl>
+              <dt>rose help</dt>
 
-      <dd>Run the suite in <var>$PWD</var>.</dd>
+              <dd>Show the rose help.</dd>
 
-      <dt>rose suite-run -- --mode=simulation</dt>
+              <dt>rose suite-run</dt>
 
-      <dd>Run the suite in <var>$PWD</var> in simulation mode, executing all
-      tasks/apps as 'sleep 10'. Useful for checking dependencies.</dd>
+              <dd>Run the suite in <var>$PWD</var>.</dd>
 
-      <dt>rose suite-run -C /path/to/suite/</dt>
+              <dt>rose suite-run -- --mode=simulation</dt>
 
-      <dd>Run a suite in a different directory than <var>$PWD</var>.</dd>
+              <dd>Run the suite in <var>$PWD</var> in simulation
+              mode, executing all tasks/apps as 'sleep 10'. Useful
+              for checking dependencies.</dd>
 
-      <dt>rose suite-run -v -v --debug</dt>
+              <dt>rose suite-run -C /path/to/suite/</dt>
 
-      <dd>Run in debug mode.</dd>
+              <dd>Run a suite in a different directory than
+              <var>$PWD</var>.</dd>
 
-      <dt>rose suite-run --restart</dt>
+              <dt>rose suite-run -v -v --debug</dt>
 
-      <dd>Reinstall and restart a shutdown suite from its last known state.</dd>
+              <dd>Run in debug mode.</dd>
 
-      <dt>rose suite-restart</dt>
+              <dt>rose suite-run --restart</dt>
 
-      <dd>Restart a shutdown suite from its last known state <em>without</em>
-      reinstalling it.</dd>
+              <dd>Reinstall and restart a shutdown suite from its
+              last known state.</dd>
 
-      <dt>rose suite-gcontrol</dt>
+              <dt>rose suite-restart</dt>
 
-      <dd>Launch the <code>cylc gui</code> for the suite in <var>$PWD</var>.
-      Short version: <samp>rose sgc</samp>.</dd>
+              <dd>Restart a shutdown suite from its last known
+              state <em>without</em> reinstalling it.</dd>
 
-      <dt>rose suite-log</dt>
+              <dt>rose suite-gcontrol</dt>
 
-      <dd>Launch a web browser to view suite logs on Rose Bush.</dd>
+              <dd>Launch the <code>cylc gui</code> for the suite in
+              <var>$PWD</var>. Short version: <samp>rose
+              sgc</samp>.</dd>
 
-      <dt>rose suite-scan</dt>
+              <dt>rose suite-log</dt>
 
-      <dd>Scan for running suites.</dd>
+              <dd>Launch a web browser to view suite logs on Rose
+              Bush.</dd>
 
-      <dt>rose suite-shutdown</dt>
+              <dt>rose suite-scan</dt>
 
-      <dd>Shutdown a running suite in <var>$PWD</var>.</dd>
+              <dd>Scan for running suites.</dd>
 
-      <dt>rose suite-clean</dt>
+              <dt>rose suite-shutdown</dt>
 
-      <dd>Remove items created by previous runs of the suite in
-      <var>$PWD</var>.</dd>
+              <dd>Shutdown a running suite in <var>$PWD</var>.</dd>
 
-      <dt>rose edit</dt>
+              <dt>rose suite-clean</dt>
 
-      <dd>Launch <samp>rose config-edit</samp> for the suite in
-      <var>$PWD</var>.</dd>
+              <dd>Remove items created by previous runs of the
+              suite in <var>$PWD</var>.</dd>
 
-      <dt>rose macro -V</dt>
+              <dt>rose edit</dt>
 
-      <dd>Error check the config in <var>$PWD</var>.</dd>
+              <dd>Launch <samp>rose config-edit</samp> for the
+              suite in <var>$PWD</var>.</dd>
 
-      <dt>rose host-select</dt>
+              <dt>rose macro -V</dt>
 
-      <dd>Select and print a host from a set of groups or names.</dd>
+              <dd>Error check the config in <var>$PWD</var>.</dd>
 
-    </dl>
+              <dt>rose host-select</dt>
 
-    <h2 id="rosie-cmds">Rosie Commands</h2>
+              <dd>Select and print a host from a set of groups or
+              names.</dd>
+            </dl>
 
-    <dl>
-      <dt>rosie go</dt>
+            <h2 id="rosie-cmds">Rosie Commands</h2>
 
-      <dd>Checkout local copies of suites.</dd>
+            <dl>
+              <dt>rosie go</dt>
 
-      <dt>rosie ls</dt>
+              <dd>Checkout local copies of suites.</dd>
 
-      <dd>List the suites checked out to your <var>roses</var> directory.</dd>
+              <dt>rosie ls</dt>
 
-      <dt>rosie lookup SEARCH</dt>
+              <dd>List the suites checked out to your
+              <var>roses</var> directory.</dd>
 
-      <dd>Run a search for suites containing <var>SEARCH</var> in their
-      <samp>suite.info</samp>.</dd>
+              <dt>rosie lookup SEARCH</dt>
 
-      <dt>rosie checkout SUITE</dt>
+              <dd>Run a search for suites containing
+              <var>SEARCH</var> in their
+              <samp>suite.info</samp>.</dd>
 
-      <dd>Checkout a copy of suite <var>SUITE</var>.</dd>
-    </dl>
+              <dt>rosie checkout SUITE</dt>
+
+              <dd>Checkout a copy of suite <var>SUITE</var>.</dd>
+            </dl>
+          </div>
+
+          <div class="panel-footer">
+            <ul class="nav nav-pills" id="pagenav">
+              <li><button id="back-button" class=
+              "btn btn-default">Previous</button></li>
+
+              <li><button id="next-button" class=
+              "btn btn-primary">Next</button></li>
+            </ul>
+
+            <ul class="nav nav-pills">
+              <li>
+                <div id="controls"></div>
+              </li>
+            </ul>
+
+            <ul class="nav nav-pills pull-right">
+              <li>
+                <div id="currentSlide"></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 </html>

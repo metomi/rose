@@ -151,7 +151,8 @@ class ResourceLocator(object):
         """Return ROSE_VERSION."""
         version = os.getenv("ROSE_VERSION")
         if version is None:
-            for line in open(self.get_util_home("doc", "rose-version.js")):
+            for line in open(self.get_util_home("doc", "js",
+                                                "rose-version.js")):
                 if line.startswith("ROSE_VERSION="):
                     value = line.replace("ROSE_VERSION=", "")
                     version = value.strip(string.whitespace + "\";")

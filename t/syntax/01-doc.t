@@ -23,9 +23,19 @@ if ! tidy -version 1>'/dev/null' 2>&1; then
     skip_all '"tidy" command not available'
 fi
 
-tests 2
+tests 1
 
-run_pass "${TEST_KEY_BASE}" tidy -q "${ROSE_HOME}/doc/"*".html"
+# IMPORTANT: this test has been written to work with a 2007 version of tidy
+# in order for html5 documents to pass tests warnings are removed from the stderr
+# file.
+
+# cannot use run-pass as tidy will fail for valid html
+touch "${TEST_KEY_BASE}.err"
+tidy --new-blocklevel-tags nav -q "${ROSE_HOME}/doc/"*".html" 2> "${TEST_KEY_BASE}.err" 1>/dev/null
+# ignore html5 <nav> element
+sed -i '/Warning: <nav> is not approved by W3C/d' "${TEST_KEY_BASE}.err"
+# ignore html5 doctype <!DOCTYPE html>
+sed -i '/Warning: discarding malformed <\!DOCTYPE>/d' "${TEST_KEY_BASE}.err"
 file_cmp "${TEST_KEY_BASE}.err" "${TEST_KEY_BASE}.err" <'/dev/null'
 
 exit

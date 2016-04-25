@@ -1,24 +1,29 @@
-@import url(../rose-doc.css);  /* stuff for Rose */
+/**********************************************************************
+ * (C) British crown copyright 2012-6 Met Office.
+ *
+ * This file is part of Rose, a framework for scientific suites.
+ *
+ * Rose is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Rose is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Rose. If not, see <http://www.gnu.org/licenses/>.
+ *
+ **********************************************************************/
 
-/* don't change this unless you want the layout stuff to show up in the outline view! */
+/* hide slideshow controls */
+#jumplist, #next, #prev, #currentSlide {
+    display: none;
+}
 
-.layout div, #footer *, #currentSlide, #controlForm * {display: none; visibility: hidden}
- #footer, #controls, #controlForm, #navLinks, #toggle {
-  display: inline; visibility: visible; margin: 0; padding: 0;}
- #footer {width: 0%; z-index: -100;}
-#toggle {float: left}
-.layout div {float: right}
-.doc-toggle {width: 50%}
-/*html>body>body-header #toggle {position: fixed; top: 0; right: 0;} */
-
-/* making the outline look pretty-ish */
-
-address {float: right; width: 40%;}
-.rose-link {float: left; width: 40%;}
-#controls {margin-left: 5%; margin-right: 5%;}
-/*
-#slide0 h1, #slide0 h2, #slide0 h3, #slide0 h4 {border: none; margin: 0;}
-#slide0 h1 {padding-top: 1.5em;}
-.slide h1 {margin: 1.5em 0 0; padding-top: 0.25em;
-  border-top: 1px solid #888; border-bottom: 1px solid #AAA;} */
-#currentSlide {visibility: hidden;}
+/* ensure that panel-main pops out of full-height mode */
+#panel-main > .panel-body {
+    height: auto!important;
+}
