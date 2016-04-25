@@ -23,7 +23,7 @@
 init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
-tests 33
+tests 38
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE-base
@@ -31,7 +31,7 @@ setup
 run_fail "$TEST_KEY" rose macro
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[FAIL] $PWD: not an application directory.
+[FAIL] $PWD: not an application or suite directory.
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ CONFIG_DIR=$(cd ../config && pwd -P)
 run_fail "$TEST_KEY" rose macro -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[FAIL] $CONFIG_DIR: not an application directory.
+[FAIL] $CONFIG_DIR: not an application or suite directory.
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -158,5 +158,69 @@ run_pass "$TEST_KEY" rose macro -V -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
+#-------------------------------------------------------------------------------
+# run from suite directory
+TEST_KEY=$TEST_KEY_BASE-suite
+TEST_SUITE=test-suite
+mkdir -p $TEST_DIR/$TEST_SUITE/meta
+cat >$TEST_DIR/$TEST_SUITE/rose-suite.conf <<'__SUITE_CONF__'
+[env]
+SUITE=sweet
+__SUITE_CONF__
+cat >$TEST_DIR/$TEST_SUITE/meta/rose-meta.conf <<'__META_CONF__'
+[env=SUITE]
+type=integer
+__META_CONF__
+run_fail "$TEST_KEY" rose macro -V -C $TEST_DIR/$TEST_SUITE
+#echo `rose macro -V -C $TEST_DIR/$TEST_SUITE`
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[V] rose.macros.DefaultValidators: issues: 1
+    env=SUITE=sweet
+        Not an integer: 'sweet'
+__ERR__
+
+# run from suite/app directory
+TEST_KEY=$TEST_KEY_BASE-suite-app-dir
+mkdir -p $TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros
+cat >$TEST_DIR/$TEST_SUITE/app/foo/rose-app.conf <<'__APP_CONF__'
+[env]
+FOO=baz
+__APP_CONF__
+cat >$TEST_DIR/$TEST_SUITE/app/foo/meta/rose-meta.conf <<'__META_CONF__'
+[env=FOO]
+macro=foo.FooChecker
+__META_CONF__
+touch $TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/__init__.py
+cat >$TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/foo.py <<'__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import rose.macro
+
+
+class FooChecker(rose.macro.MacroBase):
+    """Checks weather suite is sweet enough."""
+
+    def validate(self, config, meta_config=None):
+        node = config.get(['env', 'FOO'])
+        if node is not None or not node.is_ignored():
+            if node.value not in ['foo']:
+                self.add_report('env', 'FOO', node.value, 'Not foo enough')
+        return self.reports
+__MACRO__
+run_fail "$TEST_KEY" rose macro -V -C $TEST_DIR/$TEST_SUITE/app
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[INFO] app: foo
+[INFO] suite: test-suite
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[V] foo.FooChecker: issues: 1
+    env=FOO=baz
+        Not foo enough
+[V] rose.macros.DefaultValidators: issues: 1
+    env=SUITE=sweet
+        Not an integer: 'sweet'
+__ERR__
+rm -r $TEST_DIR/$TEST_SUITE
 #-------------------------------------------------------------------------------
 exit

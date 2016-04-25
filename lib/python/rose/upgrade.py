@@ -539,9 +539,44 @@ def get_meta_upgrade_module(meta_path):
     return version_module
 
 
+def parse_upgrade_args(argv=None):
+    """Parse options/arguments for rose macro and upgrade."""
+    opt_parser = rose.macro.RoseOptionParser()
+    options = ["conf_dir", "meta_path", "non_interactive", "output_dir",
+               "downgrade", "all_versions"]
+    opt_parser.add_my_options(*options)
+    if argv is None:
+        opts, args = opt_parser.parse_args()
+    else:
+        opts, args = opt_parser.parse_args(argv)
+    if len(args) > 1:
+        sys.stderr.write(opt_parser.get_usage())
+        return None
+    if opts.conf_dir is None:
+        opts.conf_dir = os.getcwd()
+    opts.conf_dir = os.path.abspath(opts.conf_dir)
+    if opts.output_dir is not None:
+        opts.output_dir = os.path.abspath(opts.output_dir)
+    sys.path.append(os.getenv("ROSE_HOME"))
+    rose.macro.add_opt_meta_paths(opts.meta_path)
+    config_name = os.path.basename(opts.conf_dir)
+    config_file_path = os.path.join(opts.conf_dir,
+                                    rose.SUB_CONFIG_NAME)
+    if (not os.path.exists(config_file_path) or
+            not os.path.isfile(config_file_path)):
+        rose.reporter.Reporter()(rose.macro.ERROR_LOAD_CONFIG_DIR.format(
+            opts.conf_dir),
+            kind=rose.reporter.Reporter.KIND_ERR,
+            level=rose.reporter.Reporter.FAIL)
+        return None
+
+    return (rose.macro.load_conf_from_file(opts, config_file_path, config_name,
+                                           mode="upgrade") + (args, opts,))
+
+
 def main():
     """Run rose upgrade."""
-    return_objects = rose.macro.parse_macro_mode_args("upgrade")
+    return_objects = parse_upgrade_args()
     if return_objects is None:
         sys.exit(1)
     app_config, config_map, meta_config, config_name, args, opts = (
