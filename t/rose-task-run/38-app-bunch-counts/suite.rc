@@ -1,16 +1,13 @@
 [cylc]
     UTC mode = True
+    abort if any task fails = True
     [[event hooks]]
-        timeout handler = rose suite-hook --shutdown
-        timeout         = PT1M
+        abort on timeout = True
+        timeout = PT1M
 [scheduling]
-[[dependencies]]
-    graph = cutoff
+    [[dependencies]]
+        graph = cutoff
 [runtime]
-[[root]]
-    command scripting = rose task-run
-    retry delays = 2*PT1S
-        [[[event hooks]]]
-            failed handler             = rose suite-hook --shutdown
-            submission failed handler  = rose suite-hook --shutdown
-[[cutoff]]
+    [[cutoff]]
+        script = rose task-run
+        retry delays = 2*PT1S

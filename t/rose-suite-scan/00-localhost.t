@@ -40,9 +40,9 @@ NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=$HOST
 if [[ $HOST == 'localhost' ]]; then
-    PORT=$(cat ~/.cylc/ports/$NAME)
+    PORT=$(head -1 ~/.cylc/ports/$NAME)
 else
-    PORT=$(ssh -oBatchMode=yes $HOST cat ~/.cylc/ports/$NAME)
+    PORT=$(ssh -oBatchMode=yes $HOST head -1 ~/.cylc/ports/$NAME)
 fi
 #-------------------------------------------------------------------------------
 # No argument
