@@ -36,6 +36,9 @@ rose macro: fix trigger transform order-sensitivity bug.
 [#1880](https://github.com/metomi/rose/pull/1880):
 rose metadata-check: now check for invalid namespace settings.
 
+[#1879](https://github.com/metomi/rose/pull/1879):
+rose config-diff: support optional configurations
+
 [#1877](https://github.com/metomi/rose/pull/1877):
 rose_bunch: bunch task counts at end of job.
 
