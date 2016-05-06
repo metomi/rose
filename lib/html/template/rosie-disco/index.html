@@ -9,16 +9,18 @@
   rel="stylesheet" media="screen" />
 </head>
 <body>
-<div class="hero-unit">
-  <h1>{{title}} <small>@ {{host}}</small></h1>
-  <p class="pull-right"><small>Rose {{rose_version}}</small></p>
+<div class="jumbotron">
+  <div class="container">
+    <h1>{{title}} <small>@ {{host}}</small></h1>
+    <p class="pull-right"><small>Rose {{rose_version}}</small></p>
+  </div>
 </div>
 <div class="container-fluid">
 {%- for row in keys|batch(12) %}
-  <div class="row-fluid">
+  <div class="row">
 {%- for key in row %}
-    <div class="span1">
-      <a class="btn btn-block btn-large btn-primary" href="{{key}}/">{{key}}</a>
+    <div class="col-md-1">
+      <a class="btn btn-block btn-lg btn-primary" href="{{key}}/">{{key}}</a>
     </div>
 {% endfor %}
   </div>

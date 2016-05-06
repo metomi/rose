@@ -11,87 +11,113 @@ rel="stylesheet" media="screen" />
 </head>
 <body>
 
-<div class="navbar navbar-static-top">
-  <div class="navbar-inner">
-    <a class="brand" href="{{script}}/">
-      {% if logo -%}
+<!-- Static navbar -->
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed"
+      data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+      aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{script}}/">
+        {% if logo -%}
         <img {{logo}} />
-      {% endif -%}
-      {{title}} <small>@ {{host}}</small>
-    </a>
-    <ul class="nav">
-      <li class="active"><a><strong>{{user}}</strong></a></li>
-    </ul>
-    <ul class="nav pull-right">
-      <li>
-        {{entries|length}} installed suite(s)
-        <span class="label">
-          <abbr class="livestamp" title="{{time}}">{{time}}</abbr>
-        </span>
-      </li>
-    </ul>
+        {% endif -%}
+        {{title}} <small>@ {{host}}</small>
+      </a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#"><strong>{{user}}</strong></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <span class="navbar-text">
+            {{entries|length}} installed suite(s)
+            <span class="label label-default">
+              <abbr class="livestamp" title="{{time}}">{{time}}</abbr>
+            </span>
+          </span>
+        </li>
+      </ul>
+    </div>
   </div>
-</div>
+</nav>
 
 <div class="page-header">
-  <div class="accordion" id="accordion-0">
-    <div class="accordion-group">
-      <div class="accordion-heading">
+  <div class="panel-group" id="accordion-0">
+    <div class="panel panel-default">
+      <div class="panel-heading">
         <a class="accordion-toggle" data-toggle="collapse"
         data-parent="#accordion-0" href="#filter">
-          <i class="icon-wrench"></i>
+          <i class="glyphicon glyphicon-wrench"></i>
           Display Options
         </a>
       </div>
       <div id="filter"
-      class="accordion-body collapse{% if not is_option_on %} in{% endif %}">
-        <div class="accordion-inner">
+      class="panel-collapse collapse{% if not is_option_on %} in{% endif %}">
+        <div class="panel-body">
           <form action="{{script}}/{{method}}">
             <input type="hidden" name="user" value="{{user}}" />
             <input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
+            <div class="row">
 
-            <div class="input-append">
-              <label for="names">Names (Default=*)</label>
-              <input type="text" name="names" class="input-block-level"
-              title="Names (Default=*)"
-              placeholder="Names (Default=*)"
-              {% if names -%}value="{{names}}"{% endif -%}
-              />
-            </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="names">Names (Default=*)</label>
+                  <input type="text" name="names" class="form-control"
+                  title="Names (Default=*)"
+                  placeholder="Names (Default=*)"
+                  {% if names -%}value="{{names}}"{% endif -%}
+                  />
+                </div>
+              </div>
 
-            <div class="input-append">
-              <label for="per_page">Entries/Page (Default=100)</label>
-              <input id="per_page" type="text" name="per_page"
-              title="Entries/Page, 0=unlimited"
-              placeholder="Entries/Page (Default={{per_page_default}})"
-              {% if per_page is defined and per_page != per_page_default -%}
-              value="{{per_page}}"
-              {% endif -%}
-              />
-            </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="per_page">Entries/Page (Default=100)</label>
+                  <input id="per_page" type="text" name="per_page"
+                  title="Entries/Page, 0=unlimited" class="form-control"
+                  placeholder="Entries/Page (Default={{per_page_default}})"
+                  {% if per_page is defined and per_page != per_page_default -%}
+                  value="{{per_page}}"
+                  {% endif -%}
+                  />
+                </div>
+              </div>
 
-            <div class="input-append">
-              <label for="order">Sort Order</label>
-              <select name="order" title="Sort Order">
-              {% for k, v in [
-                  ("time_desc", "new-&gt;old"),
-                  ("time_asc", "old-&gt;new"),
-                  ("name_asc", "a-z suite name"),
-                  ("name_desc", "z-a suite name"),
-              ] -%}
-                <option
-                {% if order and order == k -%}selected="selected"{% endif -%}
-                value="{{k}}">{{v}}</option>
-              {% endfor -%}
-              </select>
-            </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="order">Sort Order</label>
+                  <select name="order" title="Sort Order" class="form-control">
+                  {% for k, v in [
+                      ("time_desc", "new-&gt;old"),
+                      ("time_asc", "old-&gt;new"),
+                      ("name_asc", "a-z suite name"),
+                      ("name_desc", "z-a suite name"),
+                  ] -%}
+                    <option
+                    {% if order and order == k -%}selected="selected"{% endif -%}
+                    value="{{k}}">{{v}}</option>
+                  {% endfor -%}
+                  </select>
+                </div>
+              </div>
 
-            <div class="btn-group pull-right">
-              <input type="reset" class="btn" value="reset"
-              title="Reset Display Options"/>
-              <input type="submit" class="btn btn-primary" value="update"
-              title="Update Display Options"/>
-            </div>
+              <div class="col-md-3">
+                <div class="btn-group pull-right">
+                  <input type="reset" class="btn" value="reset"
+                  title="Reset Display Options"/>
+                  <input type="submit" class="btn btn-primary" value="update"
+                  title="Update Display Options"/>
+                </div>
+              </div>
+
+            </div> <!-- /row -->
           </form>
         </div>
       </div>
@@ -102,8 +128,8 @@ rel="stylesheet" media="screen" />
 {% include "pager.html" -%}
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12 text-right">
+  <div class="row">
+    <div class="col-md-12 text-right">
       <a id="toggle-fuzzy-time" data-no-fuzzy-time="{{no_fuzzy_time}}" href="#">
         <small>toggle &Delta;t</small>
       </a>
@@ -113,37 +139,43 @@ rel="stylesheet" media="screen" />
 
 <div class="container-fluid">
 {% for entry in entries -%}
-<div class="row-fluid entry">
+<div class="row entry">
 {% set maxlen=23 -%}
-<div class="span2">
+<div class="col-md-2">
 {% if entry.name|length > maxlen -%}
 <abbr title="{{entry.name}}">{{entry.name|truncate(maxlen,true)}}</abbr>
 {% else -%}
 {{entry.name}}
 {% endif -%}
 </div>
-<div class="span2">
-<a class="btn btn-mini" href="{{script}}/cycles/{{user}}/{{entry.name}}">
-<i class="icon icon-tasks" title="cycles list"></i>
-cycles list
-</a>
-<a class="btn btn-mini" href="{{script}}/jobs/{{user}}/{{entry.name}}">
-<i class="icon icon-th-list" title="jobs list"></i>
-jobs list
-</a>
+<div class="col-md-2">
+  <a href="{{script}}/cycles/{{user}}/{{entry.name}}">
+    <button type="button" class="btn btn-default btn-sm">
+      <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+      cycles list
+    </button>
+  </a>
+
+  <a href="{{script}}/jobs/{{user}}/{{entry.name}}">
+    <button type="button" class="btn btn-default btn-sm">
+      <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+      jobs list
+    </button>
+  </a>
 </div>
-<div class="span2">
+<div class="col-md-2">
 {% if entry.last_activity_time -%}
-<span class="text-info"><i class="icon-time" title="last active"></i>
-<abbr class="livestamp"
-title="{{entry.last_activity_time}}">{{entry.last_activity_time}}</abbr></span>
+  <span class="text-info"><i class="glyphicon glyphicon-time" title="last active"></i>
+    <abbr class="livestamp"
+      title="{{entry.last_activity_time}}">{{entry.last_activity_time}}</abbr>
+  </span>
 {% endif -%}{# entry.last_activity_time #}
 </div>
 {% for key, icon, span, maxlen in [("project", "tag", "2", 18), ("title", "comment", "4", 80)] -%}
-<div class="span{{span}}">
-<i class="icon-{{icon}}" title="{{key}}"></i>
+<div class="col-md-{{span}}">
+  <i class="glyphicon glyphicon-{{icon}}" title="{{key}}"></i>
 {% if entry.info[key]|length > maxlen -%}
-<abbr title="{{entry.info[key]}}">{{entry.info[key]|truncate(maxlen,true)}}</abbr>
+  <abbr title="{{entry.info[key]}}">{{entry.info[key]|truncate(maxlen,true)}}</abbr>
 {% else -%}
 {{entry.info[key]}}
 {% endif -%}
@@ -154,8 +186,8 @@ title="{{entry.last_activity_time}}">{{entry.last_activity_time}}</abbr></span>
 </div>
 
 <div class="container-fluid">
-<div class="row-fluid">
-<div class="span12 text-right">
+<div class="row">
+<div class="col-md-12 text-right">
 <hr/>
 <address><small>Rose {{rose_version}}</small></address>
 </div>

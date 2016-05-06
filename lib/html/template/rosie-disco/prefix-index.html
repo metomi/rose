@@ -14,11 +14,26 @@
 </head>
 
 <body>
-<div class="navbar navbar-static-top">
-  <div class="navbar-inner">
-    <a class="brand" href="{{script}}/">{{prefix}}: {{title}}
-    <small>@ {{host}}</small></a>
-      <ul class="nav pull-right">
+
+<!-- Static navbar -->
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed"
+      data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+      aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{script}}/">
+        {{prefix}}: {{title}}
+        <small>@ {{host}}</small>
+      </a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav pull-right">
         <li class="active search-button">
           <a href="javascript: Rosie.show('search');">search</a>
         </li>
@@ -27,34 +42,36 @@
           <a href="javascript: Rosie.show('query');">query</a>
         </li>
       </ul>
+    </div>
   </div>
-</div>
+</nav>
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12">
+  <div class="row">
+    <div class="col-md-12">
       <div id="body-query">
-        <form id="search" class="form-search form-inline" action="search">
+        <form id="search" class="form-inline" action="search">
           <div>
 {% if s %}
-            <input id="s" class="input-medium search-query" type="text" name="s"
+            <input id="s" class="search-query form-control"
+            type="text" name="s"
             placeholder="Search term ..." value="{{ s }}" />
 {% else %}
-            <input id="s" class="input-medium search-query" type="text" name="s"
+            <input id="s" class="search-query form-control"
+            type="text" name="s"
             placeholder="Search term ..." />
 {% endif %}
-            <label for="search-all" class="checkbox">all revisions
-{% if all_revs %}
-              <input id="search-all" type="checkbox" name="all_revs" value="1"
-              checked="checked" />
-{% else %}
-              <input id="search-all" type="checkbox" name="all_revs" value="1" />
-{% endif %}
-            </label>
+              <div class="checkbox">
+                <label>
+                  <input id="search-all" type="checkbox" name="all_revs"
+                  value="1"{% if all_revs %} checked="checked"{% endif %} />
+                    all revisions
+                </label>
+              </div>
             <input class="btn btn-primary" type="submit" value="search"/>
           </div>
         </form>
-        <form class="form-horizontal" id="query" action="javascript:Rosie.query();">
+        <form id="query" action="javascript:Rosie.query();">
           <table id="query-table" summary="Query Table">
             <tbody>
 {%- set group0_values = ["", "(", "((", "(((", "((((", "((((("] %}
@@ -67,10 +84,12 @@
               <tr id="q_{{ loop.index0 }}">
                 <td>
 {%- if loop.first %}
-                  <select class="q_conjunction" name="q_conjunction_{{ loop.index0 }}"
+                  <select class="q_conjunction form-control"
+                  name="q_conjunction_{{ loop.index0 }}"
                   disabled="disabled">
 {%- else %}
-                  <select class="q_conjunction" name="q_conjunction_{{ loop.index0 }}">
+                  <select class="q_conjunction form-control"
+                  name="q_conjunction_{{ loop.index0 }}">
 {%- endif %}
 {%- for conjunction in ["and", "or"] %}
 {%- if filter[i] == conjunction %}
@@ -83,7 +102,8 @@
                 </td>
 {%- set i = i + 1 %}
                 <td>
-                  <select class="q_group0" name="q_group0_{{ loop.index0 }}">
+                  <select class="q_group0 form-control"
+                  name="q_group0_{{ loop.index0 }}">
 {%- for group0 in group0_values %}
 {%- if filter[i] == group0 and filter|length > 4 %}
                     <option selected="selected">{{ group0 }}</option>
@@ -97,7 +117,8 @@
 {%- set i = i + 1 %}
 {%- endif %}
                 <td>
-                  <select class="q_key" name="q_key_{{ loop.index0 }}">
+                  <select class="q_key form-control"
+                  name="q_key_{{ loop.index0 }}">
 {%- for common_key in known_keys %}
 {%- if filter[i] == common_key %}
                     <option selected="selected">{{ common_key }}</option>
@@ -109,7 +130,8 @@
                 </td>
 {%- set i = i + 1 %}
                 <td>
-                  <select class="q_operator" name="q_operator_{{ loop.index0 }}">
+                  <select class="q_operator form-control"
+                  name="q_operator_{{ loop.index0 }}">
 {%- for query_operator in query_operators %}
 {%- if filter[i] == query_operator %}
                     <option selected="selected">{{ query_operator }}</option>
@@ -121,12 +143,14 @@
                 </td>
 {%- set i = i + 1 %}
                 <td>
-                  <input type="text" class="q_value" name="q_value_{{ loop.index0 }}"
+                  <input type="text" class="q_value form-control"
+                  name="q_value_{{ loop.index0 }}"
                   value="{{ filter[i] }}" />
                 </td>
 {%- set i = i + 1 %}
                 <td>
-                  <select class="q_group1" name="q_group1_{{ loop.index0 }}">
+                  <select class="q_group1 form-control"
+                  name="q_group1_{{ loop.index0 }}">
 {%- for group1 in group1_values %}
 {%- if filter[i] == group1 %}
                     <option selected="selected">{{ group1 }}</option>
@@ -137,45 +161,47 @@
                   </select>
                 </td>
 {%- if loop.first %}
-                <td><div><button class="btn" type="button"><i class="icon-minus"></i></button></div></td>
+                <td><div><button class="btn" type="button"><i class="glyphicon glyphicon-minus"></i></button></div></td>
 {%- else %}
-                <td><div><button class="btn" type="button"><i class="icon-minus"></i></button></div></td>
+                <td><div><button class="btn" type="button"><i class="glyphicon glyphicon-minus"></i></button></div></td>
 {%- endif %}
         </tr>
 {%- endfor %}{# filter #}
             </tbody>
           </table>
-          <div class="control-group">
+          <div class="form-group">
             <div id="controls">
               <button class="btn" type="button"
-              onclick="javascript: Rosie.query_add();"><i class="icon-plus"></i></button>
+              onclick="javascript: Rosie.query_add();"><i class="glyphicon glyphicon-plus"></i></button>
             </div>
           </div>
-          <div class="control-group">
-            <div id="controls">
-            <label class="checkbox" for="query-all">all revisions
+          <div class="form-group">
+            <div id="checkbox">
+              <label>
+                <input id="query-all" type="checkbox" name="all_revs" value="1"
 {%- if all_revs %}
-              <input id="query-all" type="checkbox" name="all_revs" value="1"
-              checked="checked" />
+                checked="checked" />
 {%- else %}
-              <input id="query-all" type="checkbox" name="all_revs" value="1" />
+                />
 {%- endif %}
-            </label>
+                all revisions
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
             <input class="btn" id="show-groups" type="button" name="show_groups"
             data-toggle="button" value="display group controls"/>
             <input class="btn btn-primary" type="submit" value="query" />
-            </div>
           </div>
         </form>
       </div>
-
     </div>
   </div>
 </div>
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12">
+  <div class="row">
+    <div class="col-md-12">
       <table id="list-result-table" class="table table-bordered"
       summary="List Result Table">
         <thead>
@@ -208,7 +234,9 @@
 {%- if loop.last %}
           <tr>
             <td><a class="infotip" href="#" data-html="true"
-            data-content="{{info}}" title=""><i class="icon-list"></i></a></td>
+            data-content="{{info}}" title="">
+              <i class="glyphicon glyphicon-list"></i>
+            </a></td>
 {%- endif %}
 {%- endfor %}
             <td><a href="{{ item.href }}" class=tip>{{ item.idx }}</a></td>
@@ -227,7 +255,7 @@
       </table>
     </div>
 
-    <div class="span12 text-right">
+    <div class="col-md-12 text-right">
       <hr/>
       <address><small>Rose {{rose_version}}</small></address>
     </div>

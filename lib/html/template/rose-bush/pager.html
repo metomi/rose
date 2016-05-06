@@ -1,21 +1,21 @@
 <div class="top_nav">
   <div class="container-fluid">
-    <div class="row-fluid">
+    <div class="row">
       {% if of_n_entries == 0 -%}
-        <div class="span12">
-          <span class="label">Result loaded
+        <div class="col-md-12">
+          <span class="label label-default">Result loaded
             <abbr class="livestamp" title="{{time}}">{{time}}</abbr>
           </span>
           <span class="text-info">No match</span>
         </div>
       {% elif per_page == 0 or per_page >= of_n_entries -%}
-        <div class="span12">
-        <span class="label">Result loaded
+        <div class="col-md-12">
+        <span class="label label-default">Result loaded
         <abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
         <span class="text-info">Page 1 of 1 Entries 1-{{of_n_entries}}</span>
         </div>
       {% else -%}
-        <div class="span12">
+        <div class="col-md-12">
           <form action="{{script}}/{{method}}" class="form-inline">
             <input type="hidden" name="per_page" value="{{per_page}}" />
             <input type="hidden" name="user" value="{{user}}" />
@@ -42,19 +42,19 @@
                 <input type="hidden" name="no_status" value="{{status}}" />
               {% endif -%}
             {% endfor -%}
-            <ul class="inline">
+            <ul class="list-inline">
               <li class="previous">
                 <button id="page-prev" title="previous"
                 {% if page == 1 -%}
-                class="btn btn-link disabled"
+                class="btn btn-default btn-link disabled"
                 disabled="disabled"
                 {% else %}
-                class="btn btn-link"
+                class="btn btn-default btn-link"
                 {% endif %}
                 >&laquo;</button>
               </li>
               <li class="page_entries">
-                <select id="page" name="page">
+                <select id="page" name="page" class="form-control">
                   {% for i_page in range(n_pages) -%}
                     <option
                     {% if i_page + 1 == page -%}
@@ -75,15 +75,15 @@
               <li class="next">
                 <button id="page-next" title="next"
                 {% if page == n_pages -%}
-                class="btn btn-link disabled"
+                class="btn btn-default btn-link disabled"
                 disabled="disabled"
                 {% else -%}
-                class="btn btn-link"
+                class="btn btn-default btn-link"
                 {% endif -%}
                 >&raquo;</button>
               </li>
               <li>
-                <span class="label">
+                <span class="label label-default">
                   Result loaded
                   <abbr class="livestamp" title="{{time}}">{{time}}</abbr>
                 </span>

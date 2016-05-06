@@ -3,52 +3,62 @@
 
 {% block content %}
 <div class="page-header">
-  <div class="accordion" id="accordion-0">
-    <div class="accordion-group">
-      <div class="accordion-heading">
+  <div class="panel-group" id="accordion-0">
+    <div class="panel panel-default">
+      <div class="panel-heading">
         <a class="accordion-toggle" data-toggle="collapse"
         data-parent="#accordion-0" href="#filter">
-          <i class="icon-wrench"></i>
+          <i class="glyphicon glyphicon-wrench"></i>
           Display Options
         </a>
       </div>
       <div id="filter"
-      class="accordion-body collapse{% if not is_option_on %} in{% endif %}">
-        <div class="accordion-inner">
+      class="panel-collapse collapse{% if not is_option_on %} in{% endif %}">
+        <div class="panel-body">
           <form action="{{script}}/{{method}}">
             <input type="hidden" name="user" value="{{user}}" />
             <input type="hidden" name="suite" value="{{suite}}" />
             <input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
 
-            <div class="input-append">
-              <label for="per_page">Entries/Page (Default=100)</label>
-              <input id="per_page" type="text" name="per_page"
-              title="Entries/Page, 0=unlimited"
-              placeholder="Entries/Page (Default={{per_page_default}})"
-              {% if per_page is defined and per_page != per_page_default -%}
-              value="{{per_page}}"
-              {% endif -%}
-              />
+            <div class="row">
+              <div class="col-md-3">
+                <div class="input-group">
+                  <label for="per_page">Entries/Page (Default=100)</label>
+                  <input id="per_page" type="text" name="per_page"
+                  title="Entries/Page, 0=unlimited" class="form-control"
+                  placeholder="Entries/Page (Default={{per_page_default}})"
+                  {% if per_page is defined and per_page != per_page_default -%}
+                  value="{{per_page}}"
+                  {% endif -%}
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="input-group">
+                  <label for="order">Sort Order</label>
+                  <select name="order" title="Sort Order" class="form-control">
+                  {% for k, v in [("time_desc", "new-&gt;old"),
+                                  ("time_asc", "old-&gt;new")] -%}
+                    <option
+                    {% if order and order == k -%}selected="selected"{% endif -%}
+                    value="{{k}}">{{v}}</option>
+                  {% endfor -%}
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-7">
+                <div class="btn-group pull-right">
+                  <input type="reset" class="btn btn-default" value="reset"
+                  title="Reset Display Options"/>
+                  <input type="submit" class="btn btn-primary" value="update"
+                  title="Update Display Options"/>
+                </div>
+              </div>
+
             </div>
 
-            <div class="input-append">
-              <label for="order">Sort Order</label>
-              <select name="order" title="Sort Order">
-              {% for k, v in [("time_desc", "new-&gt;old"),
-                              ("time_asc", "old-&gt;new")] -%}
-                <option
-                {% if order and order == k -%}selected="selected"{% endif -%}
-                value="{{k}}">{{v}}</option>
-              {% endfor -%}
-              </select>
-            </div>
-
-            <div class="btn-group pull-right">
-              <input type="reset" class="btn" value="reset"
-              title="Reset Display Options"/>
-              <input type="submit" class="btn btn-primary" value="update"
-              title="Update Display Options"/>
-            </div>
           </form>
         </div>
       </div>
@@ -59,11 +69,11 @@
 {% include "pager.html" -%}
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span11">
+  <div class="row">
+    <div class="col-md-11">
       {% include "suite-state.html" -%}
     </div>
-    <div class="span1 text-right">
+    <div class="col-md-1 text-right">
       <a id="toggle-fuzzy-time" data-no-fuzzy-time="{{no_fuzzy_time}}" href="#">
         <small>toggle &Delta;t</small>
       </a>
@@ -73,31 +83,26 @@
 
 <div class="container-fluid"><!-- entries -->
   {% for entry in entries -%}
-    <div class="row-fluid entry">
-      <div class="span2">
+    <div class="row entry">
+      <div class="col-md-2">
         <a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle|replace('+', '%2B')}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
       </div>
-      {% for state, icon, label, title in [("active", "play", "info", "active tasks"), ("success", "ok", "success", "succeeded tasks"), ("fail", "warning-sign", "important", "failed tasks")] -%}
+      {% for state, icon, label, title in [("active", "play", "info", "active tasks"), ("success", "ok", "success", "succeeded tasks"), ("fail", "warning-sign", "danger", "failed tasks")] -%}
         {% set n_state = entry.n_states[state] -%}
-        <div class="span2">
+        <div class="col-md-2">
           {% if n_state -%}
             {% set state_url = script ~ "/jobs/" ~ user ~ "/" ~ suite ~ "?cycles=" ~ entry.cycle|replace('+', '%2B') -%}
             <a href="{{state_url}}{% for no_state in ["active", "success", "fail"] if no_state != state %}&amp;no_status={{no_state}}{% endfor %}">
           {% endif -%}
-          <span class="label{% if n_state %} label-{{label}}{% endif %}">
-            <i class="icon-{{icon}} icon-white" title="{{state}}"></i>
-          </span>
-          <span class="badge{% if n_state %}  badge-{{label}}{% endif %}" title="{{title}}">{{entry.n_states[state]}}</span>
+          <span class="label{% if n_state %} label-{{label}}{% else %} label-default{% endif %}"><i class="glyphicon glyphicon-{{icon}}" title="{{state}}"></i></span>
+          <span class="label badge-label {% if n_state %}label-{{label}}{% else -%}label-default{% endif %}" title="{{title}}">{{entry.n_states[state]}}</span>
           {% if n_state %}</a>{% endif %}
           {% if state=="fail" and entry.n_states["job_fails"] > 0 %}(<span class="badge  badge-{{label}}" title="job failures">{{entry.n_states["job_fails"]}}</span>){% endif %}
-        </div>
+      </div>
       {% endfor -%}
 
-      <div class="span4">
-        <span class="label">
-          <i class="icon-time icon-white" title="last active"></i>
-          last active
-        </span>
+      <div class="col-md-4">
+        <span class="label label-default"><i class="glyphicon glyphicon-time" title="last active"></i> last active</span>
         <abbr class="livestamp" title="{{entry.max_time_updated}}">{{entry.max_time_updated}}</abbr>
       </div>
 
