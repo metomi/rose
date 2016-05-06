@@ -8,7 +8,7 @@ for a full listing of issues for each release.
 ## 2016.05.0 (2016-05-05)
 
 Rose release 39. This release works best with
-[cylc-6.10.1](https://github.com/cylc/cylc/releases/tag/6.10.1) and
+[cylc-6.10.0](https://github.com/cylc/cylc/releases/tag/6.10.0) and
 [fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0).
 
 ### User Interface Changes
