@@ -492,7 +492,6 @@ class RoseBushService(object):
                 finally:
                     t.close()
             s = f.read()
-            f.close()
         else:
             f_size = os.stat(f_name).st_size
             if open(f_name).read(2) == "#!":
@@ -513,7 +512,15 @@ class RoseBushService(object):
                 s = jinja2.escape(s)
             lines = [unicode(line) for line in s.splitlines()]
         except UnicodeDecodeError:
-            return cherrypy.lib.static.serve_file(f_name, MIME_TEXT_PLAIN)
+            if path_in_tar:
+                f.seek(0)
+                # file closed by cherrypy
+                return cherrypy.lib.static.serve_fileobj(f, MIME_TEXT_PLAIN)
+            else:
+                return cherrypy.lib.static.serve_file(f_name, MIME_TEXT_PLAIN)
+        else:
+            if path_in_tar:
+                f.close()
         name = path
         if path_in_tar:
             name = path_in_tar
