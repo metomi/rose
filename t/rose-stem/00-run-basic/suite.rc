@@ -12,7 +12,7 @@
 
 [runtime]
     [[root]]
-        command scripting = """
+        script = """
 echo RUN_NAMES={{RUN_NAMES}}
 echo SOURCE_FOO={{SOURCE_FOO}}
 echo SOURCE_FOO_BASE={{SOURCE_FOO_BASE}}

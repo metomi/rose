@@ -24,8 +24,8 @@ install => my_task_1
            submission timeout = PT1M
            execution timeout  = PT1M
     [[install]]
-        command scripting = """rose task-run"""
+        script = """rose task-run"""
     [[my_task_1]]
-        command scripting = """
+        script = """
 rose task-run --path= --path=etc/your-path
 """

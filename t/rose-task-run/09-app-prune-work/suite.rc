@@ -24,8 +24,8 @@ root[T-12]:finish-all => rose_prune
             submission timeout=1
             execution timeout=1
     [[t1,t2,t3]]
-        command scripting=rose task-run --app-key=hello
+        script=rose task-run --app-key=hello
     [[rose_prune]]
-        command scripting="""
+        script="""
 rose task-run -v -v --debug | tee -a $CYLC_SUITE_RUN_DIR/prune.log
 """

@@ -13,10 +13,10 @@
 
 [runtime]
     [[root]]
-        environment scripting = """
+        env-script = """
 eval $(rose task-env --cycle-offset=PT12H --path=MY_PATH='etc/my-path/*')
 """
-        command scripting = rose task-run --path=MY_PATH='etc/your-path'
+        script = rose task-run --path=MY_PATH='etc/your-path'
         [[[event hooks]]]
            succeeded handler = rose suite-hook
            failed handler = rose suite-hook --shutdown

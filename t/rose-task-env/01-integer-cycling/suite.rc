@@ -22,6 +22,6 @@
            submission timeout = PT10S
            execution timeout = PT30S
     [[foo]]
-        environment scripting = eval $(rose task-env -T P1 -T __P5)
-        command scripting = rose task-run -v
+        env-script = eval $(rose task-env -T P1 -T __P5)
+        script = rose task-run -v
 

@@ -23,7 +23,7 @@ archive[T-12] => archive
 
 [runtime]
     [[root]]
-        command scripting="""
+        script="""
 RC=0
 rose task-run --debug || RC=$?
 """
@@ -37,7 +37,7 @@ rose task-run --debug || RC=$?
             submission timeout=1
             execution timeout=1
     [[archive]]
-        post-command scripting="""
+        post-script="""
 {
 sqlite3 .rose-arch.db 'SELECT * FROM targets;' | sort
 sqlite3 .rose-arch.db 'SELECT * FROM sources;' | sort
@@ -45,7 +45,7 @@ sqlite3 .rose-arch.db 'SELECT * FROM sources;' | sort
 ((RC==0))
 """
     [[ARCHIVE_BAD]]
-        command scripting = """rose task-run || true; RC=$?"""
+        script = """rose task-run || true; RC=$?"""
         retry delays=0
 {% for bad_num in bad_nums %}
     [[archive_bad_{{bad_num}}]]

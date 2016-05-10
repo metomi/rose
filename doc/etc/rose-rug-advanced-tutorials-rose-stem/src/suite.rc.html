@@ -94,12 +94,12 @@
 [runtime]
 # Root, inherited by everything
     [[root]]
-        initial scripting = """
+        init-script = """
 export CYLC_VERSION={{CYLC_VERSION}}
 export ROSE_VERSION={{ROSE_VERSION}}
 """
         script = rose task-run --verbose
-        environment scripting = eval $(rose task-env)
+        env-script = eval $(rose task-env)
         [[[events]]]
             mail events = submission retry, submission failed, submission timeout, \
                           retry, failed, execution timeout

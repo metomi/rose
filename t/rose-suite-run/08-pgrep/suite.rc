@@ -10,5 +10,5 @@
 
 [runtime]
     [[root]]
-        command scripting=false
+        script=false
     [[my_task_1]]

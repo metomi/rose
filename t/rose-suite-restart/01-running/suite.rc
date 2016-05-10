@@ -3,7 +3,7 @@
         graph = foo
 [runtime]
     [[foo]]
-        command scripting = """
+        script = """
 touch 'file'
 timeout 60 bash -c 'while test -e "file"; do sleep 1; done'
 """

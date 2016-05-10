@@ -133,7 +133,7 @@
         graph = create_files =&gt; archive_files_rsync =&gt; archive_files_scp
 [runtime]
     [[root]]
-        environment scripting = eval $(rose task-env)
+        env-script = eval $(rose task-env)
         script = rose task-run
 </pre>
     </div>

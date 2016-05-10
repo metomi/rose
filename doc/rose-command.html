@@ -2648,10 +2648,10 @@ launcher-preopts.mpiexec=-n $NPROC
     <h3>USAGE IN SUITES</h3>
 
     <p><kbd>rose task-env</kbd> can be used to make environment variables
-    available to a suite by defining its suite.rc <var>environment
-    scripting</var> option as:</p>
+    available to a suite by defining its suite.rc <var>env-script</var>
+    option as:</p>
     <pre>
-environment scripting = "eval $(rose task-env)"
+env-script = "eval $(rose task-env)"
 </pre>
 
     <h2 id="rose-task-run">rose task-run</h2>

@@ -22,6 +22,6 @@ my_task_2
            submission timeout=1
            execution timeout=1
     [[my_task_1]]
-        command scripting=false
+        script=false
     [[my_task_2]]
-        command scripting=true
+        script=true

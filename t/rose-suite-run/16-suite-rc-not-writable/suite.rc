@@ -9,4 +9,4 @@
         graph=t1
 [runtime]
     [[t1]]
-        command scripting=true
+        script=true

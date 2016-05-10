@@ -21,6 +21,6 @@ my_task_1
            submission timeout = 1
            execution timeout  = 1
     [[my_task_1]]
-        command scripting = "echo 'Hello World' >$CYLC_TASK_LOG_ROOT.txt"
+        script = "echo 'Hello World' >$CYLC_TASK_LOG_ROOT.txt"
         [[[remote]]]
             host = "`rose host-select {{HOST}}`"

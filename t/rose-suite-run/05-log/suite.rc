@@ -13,4 +13,4 @@
 
 [runtime]
     [[my_task_1]]
-        command scripting = true
+        script = true

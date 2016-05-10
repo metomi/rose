@@ -16,7 +16,7 @@ my_task_2
 
 [runtime]
 [[root]]
-command scripting=true
+script=true
 [[my_task_1]]
 {% if JOB_HOST is defined %}
 [[my_task_2]]

@@ -9,4 +9,4 @@ timeout=2
 graph=t1
 [runtime]
 [[t1]]
-command scripting=false
+script=false

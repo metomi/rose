@@ -13,7 +13,7 @@
 
 [runtime]
     [[root]]
-        command scripting = """
+        script = """
 rose task-run --debug --cycle-offset=PT12H --path=MY_PATH='etc/my-path/*'
 """
         [[[event hooks]]]

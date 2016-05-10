@@ -1,8 +1,9 @@
 #!jinja2
 [cylc]
     UTC mode=True
+    abort if any task fails = True
     [[event hooks]]
-        timeout handler=rose suite-hook --shutdown
+        abort on timeout = True
         timeout=PT2M
 
 [scheduling]
@@ -14,9 +15,5 @@
 
 [runtime]
     [[root]]
-        command scripting=rose task-run
-        [[[event hooks]]]
-            succeeded handler=rose suite-hook
-            failed handler=rose suite-hook --shutdown
-            submission failed handler=rose suite-hook --shutdown
+        script=rose task-run
     [[hello]]
