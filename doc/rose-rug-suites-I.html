@@ -142,8 +142,8 @@
 
     <div class="slide">
     <h3>Background - ECOX</h3><img src=
-    "http://cylc.github.io/cylc/screenshots/ecox-1.png"
-    alt="ECOX" width="80%" /></div>
+    "http://cylc.github.io/cylc/screenshots/ecox-1.png" alt="ECOX" width=
+    "80%" /></div>
 
     <div class="slide">
       <h3>Background - Current</h3>
@@ -313,8 +313,8 @@ default=echo 'Hello World'
       <h2 id="task-run">Hello World rose task-run</h2>
 
       <p><code>rose task-run</code> is reasonably generic, so we can put it as
-      the suite default (<samp>[[root]]</samp>)<samp>script</samp>
-      by writing:</p>
+      the suite default (<samp>[[root]]</samp>)<samp>script</samp> by
+      writing:</p>
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
@@ -506,6 +506,11 @@ default=echo 'Hello World'
         [[[T00, T12]]]  # run each day at 00:00 and 12:00
             graph = hello_pluto =&gt; hello_eris
 </pre>
+
+      <p>N.B. cylc will not work with the various cycle points in real time
+      unless you ask it to. For details see the <a href=
+      "rose-rug-advanced-tutorials-clock-triggered.html">clock triggered
+      tasks</a> tutorial.</p>
     </div>
 
     <div class="slide">
@@ -647,7 +652,6 @@ type=boolean
 
       <p>Suites can have event handlers to report events or shutdown on
       failure.</p>
-
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
@@ -662,8 +666,8 @@ type=boolean
       <h3 class="alwayshidden">Event Hooks Explained</h3>
 
       <p>Normally, when a task fails, the suite will continue to run as much as
-      possible and wait for user input to fix (and perhaps retry) the failure so
-      it can continue. If <code>abort if any task fails = True</code> is not
+      possible and wait for user input to fix (and perhaps retry) the failure
+      so it can continue. If <code>abort if any task fails = True</code> is not
       commented out, the suite will abort as soon as a task fails.</p>
     </div>
 
