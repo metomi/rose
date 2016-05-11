@@ -24,7 +24,7 @@ if ! python -c 'import cherrypy' 2>'/dev/null'; then
     skip_all '"cherrypy" not installed'
 fi
 
-tests 5
+tests 7
 
 ROSE_CONF_PATH= rose_ws_init 'rose' 'bush'
 if [[ -z "${TEST_ROSE_WS_PORT}" ]]; then
@@ -37,7 +37,7 @@ cat >'suite.rc' <<'__SUITE_RC__'
     UTC mode = True
     abort if any task fails = True
 [scheduling]
-    initial cycle point = 2000
+    initial cycle point = 1999
     final cycle point = 2000
     [[dependencies]]
         [[[P1Y]]]
@@ -73,6 +73,14 @@ file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<'€'
 TEST_KEY="${TEST_KEY_BASE}-200-curl-view-text"
 run_pass "${TEST_KEY}" curl \
     "${TEST_ROSE_WS_URL}/view/${USER}/${SUITE_NAME}?path=${LOG_FILE}&mode=text"
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<'€'
+#-------------------------------------------------------------------------------
+# Tar
+TEST_KEY="${TEST_KEY_BASE}-200-curl-view-default-tar"
+TAR_FILE='job-19990101T0000Z.tar.gz'
+(cd "${SUITE_DIR}/log" && tar -czf "${TAR_FILE}" 'job/19990101T0000Z')
+run_pass "${TEST_KEY}" curl \
+    "${TEST_ROSE_WS_URL}/view/${USER}/${SUITE_NAME}?path=log/${TAR_FILE}&path_in_tar=job/19990101T0000Z/echo-euro/01/job.txt&mode=text"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<'€'
 #-------------------------------------------------------------------------------
 # Tidy up
