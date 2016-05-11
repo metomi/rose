@@ -120,7 +120,7 @@
       <p><samp>assign_gate</samp> gets a random gate number and writes it to a
       file (<samp>flight_gates</samp>). It uses the Rose environment variable
       <samp>ROSE_DATAC</samp> provided by <code>rose task-env</code> in the
-      <samp>environment scripting</samp> runtime section. This points to a data
+      <samp>env-script</samp> runtime section. This points to a data
       directory for this particular cycle time, where the file will be
       written.</p>
     </div>
@@ -133,7 +133,7 @@
       runtime section of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[startup]]
-        environment scripting = eval $(rose task-env --cycle-offset=PT12H)
+        env-script = eval $(rose task-env --cycle-offset=PT12H)
         script = """
             GATE="A"$((RANDOM%3))
             echo "GATE=$GATE" &gt; $ROSE_DATACPT12H/flight_gate
@@ -168,12 +168,12 @@
       <p>Rose will give us the environment variable for the last cycle's data
       directory, if we ask for it.</p>
 
-      <p>We need to use the same <samp>environment scripting</samp> option, but
+      <p>We need to use the same <samp>env-script</samp> option, but
       with a <samp>--cycle-offset=PT12H</samp> option - add this to your
       <samp>[[boarding]]</samp> runtime section:</p>
       <pre class="prettyprint lang-cylc">
     [[boarding]]
-        environment scripting = eval $(rose task-env --cycle-offset=PT12H)
+        env-script = eval $(rose task-env --cycle-offset=PT12H)
 </pre>
     </div>
 

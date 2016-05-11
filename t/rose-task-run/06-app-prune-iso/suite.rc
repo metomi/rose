@@ -19,7 +19,7 @@ WARM[-PT12H]:finish-all => rose_prune
 
 [runtime]
     [[root]]
-        command scripting = rose task-run
+        script = rose task-run
         [[[event hooks]]]
             succeeded handler = rose suite-hook
             failed handler = rose suite-hook
@@ -29,7 +29,7 @@ WARM[-PT12H]:finish-all => rose_prune
             submission timeout = PT1M
             execution timeout  = PT1M
     [[cold]]
-        command scripting = true
+        script = true
     [[WARM]]
     [[my_task_1]]
         inherit = WARM
@@ -41,6 +41,6 @@ WARM[-PT12H]:finish-all => rose_prune
 {% endif %}
     [[rose_prune]]
         inherit = WARM
-        command scripting = """
+        script = """
 rose task-run --debug | tee -a $CYLC_SUITE_RUN_DIR/prune.log
 """

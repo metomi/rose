@@ -14,7 +14,7 @@
 
 [runtime]
     [[root]]
-        command scripting=rose task-run -v -v --debug
+        script=rose task-run -v -v --debug
         [[[event hooks]]]
             succeeded handler          = rose suite-hook
             failed handler             = rose suite-hook
@@ -46,4 +46,4 @@
             POOL_SIZE=1
             
     [[dummy]]
-        command scripting = true
+        script = true

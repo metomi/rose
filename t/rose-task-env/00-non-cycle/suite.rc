@@ -9,8 +9,8 @@
         graph = t1
 [runtime]
     [[t1]]
-        environment scripting = eval $(rose task-env)
-        command scripting = rose task-run -v
+        env-script = eval $(rose task-env)
+        script = rose task-run -v
         [[[event hooks]]]
            succeeded handler = rose suite-hook
            failed handler = rose suite-hook --shutdown

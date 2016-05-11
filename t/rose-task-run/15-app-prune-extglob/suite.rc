@@ -24,12 +24,12 @@ creator[-P1D] => pruner => creator
             submission timeout=PT1M
             execution timeout=PT1M
     [[creator]]
-        command scripting=rose task-run
+        script=rose task-run
 {% if JOB_HOST is defined %}
         [[[remote]]]
             host = {{JOB_HOST}}
 {% endif %}
     [[pruner]]
-        command scripting="""
+        script="""
 rose task-run -v -v --debug | tee -a "${CYLC_SUITE_RUN_DIR}/prune.log"
 """

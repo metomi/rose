@@ -121,9 +121,9 @@
 #
 # USAGE IN SUITES
 #     rose task-env can be used to make environment variables available to a
-#     suite by defining its suite.rc environment scripting option as:
+#     suite by defining its suite.rc env-script option as:
 #
-#     environment scripting = "eval $(rose task-env)"
+#     env-script = "eval $(rose task-env)"
 #
 #-------------------------------------------------------------------------------
 exec python -m rose.task_env "$@"

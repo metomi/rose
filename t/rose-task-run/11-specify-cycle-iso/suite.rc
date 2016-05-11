@@ -13,7 +13,7 @@
 
 [runtime]
     [[t1]]
-        command scripting=rose task-run --cycle=PT12H
+        script=rose task-run --cycle=PT12H
         [[[event hooks]]]
            succeeded handler=rose suite-hook
            failed handler=rose suite-hook --shutdown

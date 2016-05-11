@@ -64,7 +64,7 @@
         script = sleep 5
     [[arrival]]
     [[assign_gate]]
-        environment scripting = eval $(rose task-env)
+        env-script = eval $(rose task-env)
         script = """
              GATE="A"$((RANDOM%3))
              echo "GATE=$GATE" &gt; $ROSE_DATAC/flight_gate

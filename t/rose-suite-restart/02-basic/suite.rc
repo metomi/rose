@@ -3,6 +3,6 @@
         graph = "t1 => t2"
 [runtime]
     [[t1]]
-        command scripting = cylc stop "${CYLC_SUITE_NAME}"
+        script = cylc stop "${CYLC_SUITE_NAME}"
     [[t2]]
-        command scripting = true
+        script = true

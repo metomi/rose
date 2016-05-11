@@ -28,12 +28,12 @@ t1[1970] & t1[1980] => pruner
             submission timeout=PT1M
             execution timeout=PT1M
     [[t1]]
-        command scripting="""
+        script="""
 mkdir -p "${CYLC_SUITE_RUN_DIR}/var/${CYLC_TASK_CYCLE_POINT}"
 cd "${CYLC_SUITE_RUN_DIR}/var/${CYLC_TASK_CYCLE_POINT}"
 echo 'garbage' | tee 'a.file' 'b.file' 'c.file' >'/dev/null'
 """
     [[pruner]]
-        command scripting="""
+        script="""
 rose task-run -v -v --debug | tee -a "${CYLC_SUITE_RUN_DIR}/prune.log"
 """

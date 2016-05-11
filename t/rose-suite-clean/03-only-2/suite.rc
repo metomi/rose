@@ -15,8 +15,8 @@ my_task_2
 
 [runtime]
     [[root]]
-        environment scripting = eval $(rose task-env)
-        command scripting = """
+        env-script = eval $(rose task-env)
+        script = """
 mkdir -p "$ROSE_SUITE_DIR/etc" || true
 mkdir -p "$ROSE_SUITE_DIR/etc/$ROSE_TASK_CYCLE_TIME" || true
 for ITEM in 'hello-world.out:Hello World' 'greet-earth.out:Greet Earth'; do

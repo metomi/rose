@@ -28,13 +28,13 @@ t1[1970] => pruner
             submission timeout=PT1M
             execution timeout=PT1M
     [[t1]]
-        command scripting="""
+        script="""
 cd "${CYLC_SUITE_RUN_DIR}/share"
 for NAME in 'earth' 'mars' 'venus'; do
     echo 'garbage' >"hello-${NAME}-at-${CYLC_TASK_CYCLE_POINT}.txt"
 done
 """
     [[pruner]]
-        command scripting="""
+        script="""
 rose task-run -v -v --debug | tee -a "${CYLC_SUITE_RUN_DIR}/prune.log"
 """

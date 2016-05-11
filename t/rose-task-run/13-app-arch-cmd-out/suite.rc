@@ -10,7 +10,7 @@
 
 [runtime]
     [[archive]]
-        command scripting=rose task-run --debug
+        script=rose task-run --debug
         [[[event hooks]]]
             succeeded handler=rose suite-hook
             failed handler=rose suite-hook --shutdown

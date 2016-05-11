@@ -1008,6 +1008,7 @@ __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
 #-------------------------------------------------------------------------------
 # Check ignored mid-level trigger status handling.
 # Old bug behaviour was strongly dependent on exact ordering and naming.

@@ -17,23 +17,23 @@ UTC mode=True
 
 [runtime]
     [[rose_ana_t1]]
-        command scripting = rose task-run -v -v --debug
+        script = rose task-run -v -v --debug
 
     [[rose_ana_t2_activated]]
-        command scripting = rose task-run -v -v --debug --app-key=rose_ana_t2
+        script = rose task-run -v -v --debug --app-key=rose_ana_t2
 
     [[rose_ana_t2_deactivated]]
-        command scripting = rose task-run -v -v --debug --app-key=rose_ana_t2 --opt-conf-key=deactivate
+        script = rose task-run -v -v --debug --app-key=rose_ana_t2 --opt-conf-key=deactivate
 
     [[rose_ana_t3_within_tolerance]]
-        command scripting = rose task-run -v -v --debug --app-key=rose_ana_t3
+        script = rose task-run -v -v --debug --app-key=rose_ana_t3
         [[[environment]]]
             TOLERANCE=10%
 
     [[rose_ana_t3_outside_tolerance]]
-        command scripting = rose task-run -v -v --debug --app-key=rose_ana_t3
+        script = rose task-run -v -v --debug --app-key=rose_ana_t3
         [[[environment]]]
             TOLERANCE=2%
 
     [[db_check]]
-        command scripting = rose task-run -v -v --debug
+        script = rose task-run -v -v --debug

@@ -17,7 +17,7 @@ hello_{{world}}
 
 [runtime]
     [[root]]
-        command scripting=rose task-run --debug --app-key=hello
+        script=rose task-run --debug --app-key=hello
         [[[environment]]]
             HELLO={{hello|default("hello")}}
         [[[event hooks]]]
