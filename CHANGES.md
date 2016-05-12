@@ -5,6 +5,32 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2016-Q2?)
+
+Rose release 40. This release will work best with
+[cylc-6.10.0](https://github.com/cylc/cylc/releases/tag/6.10.0) and
+[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0),
+or their successors.
+
+### Highlighted Changes
+
+[#1884](https://github.com/metomi/rose/pull/1884):
+rose macro: can now be used on the whole suite. Previously, it only worked at
+the level of an application configuration.
+
+### Noteworthy Changes
+
+[#1887](https://github.com/metomi/rose/pull/1887):
+rose bush: view: can now serve a file in a tar-gzip archive that contains
+Unicode character. Previously, it would incorrectly serve the whole tar
+archive.
+
+[#1883](https://github.com/metomi/rose/pull/1883):
+rose bush and rosie disco: web pages have been upgraded from Bootstrap 2.X to
+Bootstrap 3.3.6.
+
+--------------------------------------------------------------------------------
+
 ## 2016.05.0 (2016-05-05)
 
 Rose release 39. This release works best with
