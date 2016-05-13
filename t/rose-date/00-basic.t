@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 111
+tests 113
 #-------------------------------------------------------------------------------
 # Produce the correct format for the current date/time.
 TEST_KEY=$TEST_KEY_BASE-current-format
@@ -329,6 +329,13 @@ __OUT__
 # Test rose date --as-total=FORMAT fails for invalid format
 TEST_KEY=$TEST_KEY_BASE-as-total-invalid-format
 run_fail "$TEST_KEY" rose date --as-total=y PT1M
+#-------------------------------------------------------------------------------
+# Test rose date --as-total=FORMAT for negative durations
+TEST_KEY=$TEST_KEY_BASE-as-total-negative
+run_pass "$TEST_KEY" rose date --as-total=S \\-PT1M1S
+file_cmp "TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+-61.0
+__OUT__
 #-------------------------------------------------------------------------------
 # Test rose date --as-total=FORMAT for use case 2
 TEST_KEY=$TEST_KEY_BASE-as-total-between-dates

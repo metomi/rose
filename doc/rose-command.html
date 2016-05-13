@@ -982,7 +982,8 @@ rose date 19700101T000000Z 20380119T031407Z
 
 # 3.  Convert ISO8601 duration
 # 3.1 Into the total number of hours (H), minutes(M) or seconds (S)
-#     it represents
+#     it represents, preceed negative durations with a double backslash
+#     (e.g. \\-PT1H)
 rose date --as-total=s PT1H
 </pre>
 
