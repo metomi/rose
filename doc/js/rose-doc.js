@@ -115,7 +115,7 @@ $(function () {
                 href = d_href + href;
             }
             stack[0].append($("<li/>").append(
-                $("<a/>", {"href": href}).html($(this).text())
+                $("<a/>", {"href": href}).html($.trim($(this).text()))
             ));
 
             // Add a section link as well
