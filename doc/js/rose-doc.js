@@ -70,7 +70,7 @@ $(function () {
                                 img.css("opacity", 0);
                             }
                         },
-                        "xml"
+                        "html"
                     ).error(function () {
                         anchor.unbind("click");
                         img.css("opacity", 0);
