@@ -423,9 +423,7 @@ function createControls() {
                 })
             ),
             $('<div />', {
-                'id': 'navList',
-                'onmouseover': 'showHide("s");',
-                'onmouseout': 'showHide("h");',
+                'id': 'navList'
             }).append(
                 $('<select />', {
                     'class': 'form-control',
@@ -435,13 +433,6 @@ function createControls() {
             )
         )
     ).appendTo($('#controls'));
-
-    if (controlVis == 'hidden') {
-        var hidden = document.getElementById('navLinks');
-    } else {
-        var hidden = document.getElementById('jumplist');
-    }
-    addClass(hidden,'hideme');
 }
 
 function fontScale() {  // causes layout problems in FireFox that get fixed if browser's Reload is used; same may be true of other Gecko-based browsers
