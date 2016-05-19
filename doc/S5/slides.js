@@ -205,7 +205,7 @@ function toggle() {
             slide.style.visibility = 'hidden';
         }
         slideColl[snum].style.visibility = 'visible';
-        mainPanelResize();
+        slideResize();
         $('#navList').mouseout();
     }
 }
@@ -597,18 +597,71 @@ function startup() {
     }
 }
 
-function mainPanelResize() {
+function slideResize() {
     if (s5mode) {
-        var panelHeight = $('#panel-main').outerHeight();
-        var headerHeight = $($('#panel-main .panel-heading')[0])
-            .outerHeight();
-        var footerHeight = $($('#panel-main .panel-footer')[0])
-            .outerHeight();
+        var panel_main = $('#panel-main');
+        var panel_body = panel_main.find('.panel-body:first');
+        var panel_foot = panel_main.find('.panel-footer:first');
+        var panel_head = panel_main.find('.panel-heading:first');
+
+        // resize the panel body to fill the avaliable height
+        var panelHeight = panel_main.outerHeight();
+        var headerHeight = panel_head.outerHeight();
+        var footerHeight = panel_foot.outerHeight();
         var bodyHeight = panelHeight - (headerHeight + footerHeight);
-        $('#panel-main .panel-body').outerHeight(bodyHeight);
+        panel_body.outerHeight(bodyHeight);
+
+        // resize `<?>.img-full` images to ensure they fit within the slide
+        var imgs = $('.img-full');
+        if (imgs.length == 0) {
+            return;
+        }
+        var i;
+        var pan_top;
+        var img_top;
+        var img_wid;
+        var img_hei;
+        var pan_wid;
+        for (i = 0; i < imgs.length; i += 1) {
+            var img = $(imgs[i]);
+            // set image size to fill avaliable height
+            pan_top = panel_body.offset().top;
+            img_top = img.offset().top + parseInt(img.css('margin-top'));
+            img_hei = bodyHeight - (img_top - pan_top);
+            if (img.context.tagName == "IMG") {
+                img.outerHeight(img_hei);
+                img.css({
+                    'max-height': img_hei,
+                    'height': '100%!important',
+                    'width': 'auto',
+                    'max-width': 'none'
+                });
+            } else if (img.context.tagName == "PRE") {
+                img.css({'max-height': img_hei - parseFloat(
+                                        panel_body.css('padding-bottom'))});
+                // do not adjust width for pre elements
+                continue;
+            }
+
+            // check that image is not too wide
+            img_wid = img.outerWidth();
+            pan_wid = panel_body.innerWidth()
+                    - parseInt(panel_body.css('padding-left'))
+                    - parseInt($('.slide:first').css('padding-right'))
+            if (img_wid > pan_wid) {
+                // image is too wide, set image size to fill avaliable width
+                img.outerWidth(pan_wid);
+                img.css({
+                    'max-height': 'none',
+                    'height': 'auto',
+                    'max-width': pan_wid,
+                    'width': '100%!important'
+                });
+            }
+        }
     }
 }
 
 window.onload = startup;
-window.onresize = function(){setTimeout('fontScale()', 50); mainPanelResize();}
+window.onresize = function(){setTimeout('fontScale()', 50); slideResize();}
 

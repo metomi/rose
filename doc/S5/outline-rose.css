@@ -27,3 +27,19 @@
 #panel-main > .panel-body {
     height: auto!important;
 }
+
+/* force .img-full images back to their entended size */
+img.img-full {
+    /* also update in css/rose-doc.css */
+    max-width: 80%!important;
+    max-height: 30em!important;
+    width: auto!important;
+    height: auto!important;
+}
+
+pre.img-full {
+    max-width: none;
+    max-height: none;
+    //width: 100%!important;
+    //height: auto!important;
+}

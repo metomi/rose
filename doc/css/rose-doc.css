@@ -22,6 +22,22 @@
     display: none;
 }
 
+img.img-full {
+    /* also update in S5/slides.css */
+    max-width: 80%;
+    max-height: 30em;
+    width: auto;
+    height: auto;
+}
+
+body {
+    background-color: rgb(252,252,252)!important;
+}
+
+body {
+    background-color: rgb(252,252,252)!important;
+}
+
 #main-content li, #content li {
     list-style-type: none;
 }

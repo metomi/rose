@@ -24,12 +24,18 @@
 .slide {
     width:100%;
     position: absolute;
-    padding-right: 1em; // should be 2 * #panel-main > .panel-body : padding
+    padding-right: 2em; // should be 2 * #panel-main > .panel-body:padding-left
+}
+
+.centre-slide {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* enforce a known padding for slide positioning */
 #panel-main > .panel-body {
-    padding: 0.5em;
+    padding: 0.5em 0em 0.5em 1em;
 }
 
 /* Fix footer margin */
