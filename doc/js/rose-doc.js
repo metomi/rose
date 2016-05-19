@@ -225,15 +225,9 @@ $(function () {
 
     // collapse non-active sub-sections of #sidenav
     function collapseSidenav() {
-        var sub = $("#sidenav ul li ul");
-        var i;
-        for (i = 0; i < sub.length; i += 1) {
-            if (!$($(sub[i]).parent()).hasClass("active")) {
-                $($(sub[i]).find("li")).hide();
-            } else {
-                $($(sub[i]).find("li")).show();
-            }
-        }
+        $("#sidenav li.active ul").show();
+        $("#sidenav li:not(.active) ul").hide();
+        $("#sidenav li ul li:not(.active) ul").hide();
     }
 
     // scroll the sidenav if the currently selected element is offscreen
