@@ -23,6 +23,11 @@
     display: none;
 }
 
+/* hide slide title in slideshow mode */
+div.slide-title {
+    display: none;
+}
+
 /* ensure that panel-main pops out of full-height mode */
 #panel-main > .panel-body {
     height: auto!important;
