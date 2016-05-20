@@ -21,6 +21,7 @@
 
 import os
 import re
+import socket
 import sys
 
 import rose.config
@@ -359,6 +360,18 @@ class StemRunner(object):
         if not suite_rose_stem_version == ROSE_STEM_VERSION:
             raise RoseStemVersionException(suite_rose_stem_version)
 
+    def _get_localhost(self):
+        """Return the local host on which the rose-stem command was invoked."""
+        return socket.gethostname()
+
+    def _prepend_localhost(self, url):
+        """Prepend the local hostname to urls which do not point to repository
+        locations."""
+        if ('svn:' not in url and 'fcm:' not in url and 'http:' not in url
+                and 'https:' not in url and 'svn+ssh:' not in url):
+            url = self._get_localhost() + ':' + url
+        return url
+
     def process(self):
         """Process STEM options into 'rose suite-run' options."""
 
@@ -372,6 +385,10 @@ class StemRunner(object):
             project, url, base, rev, mirror = self._ascertain_project(url)
             self.opts.source[i] = url
             self.opts.project.append(project)
+
+            url = self._prepend_localhost(url)
+            base = self._prepend_localhost(base)
+
             if project in repos:
                 repos[project].append(url)
             else:
