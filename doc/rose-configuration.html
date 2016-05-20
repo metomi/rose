@@ -595,8 +595,8 @@ root-dir=hpc*=$WORKDIR
         <p>Files in this directory are copied to the working directory in run
         time.</p>
 
-        <p>Note: If there is a clash between a <var>[file:*]</var> section and a
-        file under <var>file/</var>, the setting in the <var>[file:*]</var>
+        <p>Note: If there is a clash between a <var>[file:*]</var> section and
+        a file under <var>file/</var>, the setting in the <var>[file:*]</var>
         section takes precedence. E.g. Suppose we have a file
         <samp>file/hello.txt</samp>. In the absence of
         <samp>[file:hello.txt]</samp>, it will copy <samp>file/hello.txt</samp>
@@ -774,22 +774,24 @@ file-test=test -e {} &amp;&amp; grep -q 'hello' {}
         be performed a number of times with delays between them. If the
         prerequisites are still not met after the number of delays, the
         application runner will fail with a time out. The list is a
-        comma-separated list. The syntax looks like <var>[R*]T[U]</var>, where
-        <var>U</var> is a unit (<kbd>s</kbd> for seconds (default),
-        <kbd>m</kbd> for minutes and <kbd>h</kbd> for hours), <var>T</var> is
-        the number of units. E.g.:</p>
+        comma-separated list. The syntax looks like <var>[n*][DURATION]</var>,
+        where <var>DURATION</var> is an <a href=
+        "https://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601
+        duration</a> such as <kbd>PT5S</kbd> (5 seconds) or <kbd>PT10M</kbd>
+        (10 minutes), and <var>n</var> is an optional number of times to repeat
+        it. E.g.:</p>
         <pre class="prettyprint lang-rose_conf">
 # Default
 delays=0
 
 # Poll 1 minute after the runner begins, repeat every minute 10 times
-delays=10*1m
+delays=10*PT1M
 
 # Poll when runner begins,
 # repeat every 10 seconds 6 times,
 # repeat every minute 60 times,
 # repeat once after 1 hour
-delays=0,6*10s,60*1m,1h
+delays=0,6*PT10S,60*PT1M,PT1H
 </pre>
       </dd>
     </dl>
