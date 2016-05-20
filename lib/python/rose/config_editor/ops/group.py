@@ -360,6 +360,17 @@ class GroupOperations(object):
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
 
+    def rename_section(self, config_name, section, target_section,
+                       skip_update=False):
+        """Implement a rename of a section and its options."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_RENAME + "-" + str(time.time())
+        self.copy_section(config_name, section, target_section,
+                          skip_update=skip_update)
+        self.remove_section(config_name, section, skip_update=skip_update)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+
     def remove_sections(self, config_name, sections, skip_update=False):
         """Implement a mass removal of sections."""
         start_stack_index = len(self.undo_stack)

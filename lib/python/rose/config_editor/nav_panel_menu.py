@@ -270,6 +270,33 @@ class NavPanelHandler(object):
             for stack_item in self.undo_stack[start_stack_index:]:
                 stack_item.group = group
 
+    def rename_dialog(self, base_ns):
+        """Handle a rename section dialog and request."""
+        config_names = self.data.config.keys()
+        if base_ns is not None and '/' in base_ns:
+            config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+            prefer_name_sections = {
+                config_name:
+                self.data.helper.get_sections_from_namespace(base_ns)}
+        else:
+            prefer_name_sections = {}
+        config_sect_dict = {}
+        sorter = rose.config.sort_settings
+        for config_name in config_names:
+            config_data = self.data.config[config_name]
+            config_sect_dict[config_name] = config_data.sections.now.keys()
+            config_sect_dict[config_name].sort(rose.config.sort_settings)
+            if config_name in prefer_name_sections:
+                prefer_name_sections[config_name].sort(
+                    rose.config.sort_settings)
+        config_name, source_section, target_section = (
+                self.mainwindow.launch_rename_dialog(
+                    config_sect_dict, prefer_name_sections))
+        if (config_name in self.data.config and
+                source_section is not None and target_section):
+            self.group_ops.rename_section(
+                config_name, source_section, target_section)
+
     def search_request(self, namespace, setting_id):
         """Handle a search for an id (hyperlink)."""
         config_name, subsp = self.util.split_full_ns(self.data, namespace)
@@ -287,8 +314,6 @@ class NavPanelHandler(object):
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),
                    ('Add', gtk.STOCK_ADD,
                     rose.config_editor.TREE_PANEL_ADD_GENERIC),
-                   ('Add section', gtk.STOCK_ADD,
-                    rose.config_editor.TREE_PANEL_ADD_SECTION),
                    ('Autofix', gtk.STOCK_CONVERT,
                     rose.config_editor.TREE_PANEL_AUTOFIX_CONFIG),
                    ('Clone', gtk.STOCK_COPY,
@@ -297,14 +322,10 @@ class NavPanelHandler(object):
                     rose.config_editor.TREE_PANEL_EDIT_SECTION),
                    ('Enable', gtk.STOCK_YES,
                     rose.config_editor.TREE_PANEL_ENABLE_GENERIC),
-                   ('Enable section', gtk.STOCK_YES,
-                    rose.config_editor.TREE_PANEL_ENABLE_SECTION),
                    ('Graph', gtk.STOCK_SORT_ASCENDING,
                     rose.config_editor.TREE_PANEL_GRAPH_SECTION),
                    ('Ignore', gtk.STOCK_NO,
                     rose.config_editor.TREE_PANEL_IGNORE_GENERIC),
-                   ('Ignore section', gtk.STOCK_NO,
-                    rose.config_editor.TREE_PANEL_IGNORE_SECTION),
                    ('Info', gtk.STOCK_INFO,
                     rose.config_editor.TREE_PANEL_INFO_SECTION),
                    ('Help', gtk.STOCK_HELP,
@@ -313,8 +334,8 @@ class NavPanelHandler(object):
                     rose.config_editor.TREE_PANEL_URL_SECTION),
                    ('Remove', gtk.STOCK_DELETE,
                     rose.config_editor.TREE_PANEL_REMOVE_GENERIC),
-                   ('Remove section', gtk.STOCK_DELETE,
-                    rose.config_editor.TREE_PANEL_REMOVE_SECTION)]
+                   ('Rename', gtk.STOCK_COPY,
+                    rose.config_editor.TREE_PANEL_RENAME_GENERIC)]
         url = None
         help = None
         is_empty = (not self.data.config)
@@ -349,6 +370,9 @@ class NavPanelHandler(object):
             if cloneable:
                 ui_config_string += '<separator name="clonesep"/>'
                 ui_config_string += '<menuitem action="Clone"/>'
+            if not is_empty:
+                ui_config_string += '<separator name="renamesep"/>'
+                ui_config_string += '<menuitem action="Rename"/>'
             ui_config_string += '<separator name="ignoresep"/>'
             ui_config_string += '<menuitem action="Enable"/>'
             ui_config_string += '<menuitem action="Ignore"/>'
@@ -449,6 +473,9 @@ class NavPanelHandler(object):
             remove_section_item = uimanager.get_widget('/Popup/Remove')
             remove_section_item.connect(
                 "activate", lambda b: self.remove_request(namespace))
+            rename_section_item = uimanager.get_widget('/Popup/Rename')
+            rename_section_item.connect(
+                "activate", lambda b: self.rename_dialog(namespace))
         menu = uimanager.get_widget('/Popup')
         menu.popup(None, None, None, event.button, event.time)
         return False

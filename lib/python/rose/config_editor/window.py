@@ -296,7 +296,8 @@ class MainWindow(object):
     def _launch_config_section_chooser_dialog(self, name_section_dict, prefs,
                                               dialog_title, config_title,
                                               section_title,
-                                              null_section_choice=False):
+                                              null_section_choice=False,
+                                              do_target_section=False):
         chooser_dialog = gtk.Dialog(
             title=dialog_title,
             parent=self.window,
@@ -330,7 +331,7 @@ class MainWindow(object):
             null_section_checkbutton.show()
             null_section_checkbutton.set_active(True)
         index = config_name_box.get_active()
-        self._reload_section_choices(
+        section_combo = self._reload_section_choices(
             section_box,
             name_section_dict[name_keys[index]],
             prefs.get(name_keys[index], []))
@@ -346,6 +347,22 @@ class MainWindow(object):
         vbox.pack_start(section_label, expand=False, fill=False)
         vbox.pack_start(null_section_checkbutton, expand=False, fill=False)
         vbox.pack_start(section_box, expand=False, fill=False)
+        if do_target_section:
+            target_section_entry = gtk.Entry()
+            self._reload_target_section_entry(
+                section_combo, target_section_entry,
+                name_keys[config_name_box.get_active()], name_section_dict
+            )
+            section_combo.connect(
+                "changed",
+                lambda combo: self._reload_target_section_entry(
+                    combo, target_section_entry,
+                    name_keys[config_name_box.get_active()],
+                    name_section_dict
+                    )
+            )
+            target_section_entry.show()
+            vbox.pack_start(target_section_entry, expand=False, fill=False)
         vbox.show()
         hbox = gtk.HBox()
         hbox.pack_start(vbox, expand=True, fill=True,
@@ -360,15 +377,25 @@ class MainWindow(object):
             config_name_entered = name_keys[config_name_box.get_active()]
             if null_section_checkbutton.get_active():
                 chooser_dialog.destroy()
+                if do_target_section:
+                    return config_name_entered, None, None
                 return config_name_entered, None
+
             for widget in section_box.get_children():
                 if hasattr(widget, 'get_active'):
                     index = widget.get_active()
                     sections = name_section_dict[config_name_entered]
                     section_name = sections[index]
+                    if do_target_section:
+                        target_section_name = target_section_entry.get_text()
                     chooser_dialog.destroy()
+                    if do_target_section:
+                        return (config_name_entered, section_name,
+                                target_section_name)
                     return config_name_entered, section_name
         chooser_dialog.destroy()
+        if do_target_section:
+            return None, None, None
         return None, None
 
     def _reload_section_choices(self, vbox, sections, prefs):
@@ -384,7 +411,14 @@ class MainWindow(object):
             section_chooser.set_active(0)
         section_chooser.show()
         vbox.pack_start(section_chooser, expand=False, fill=False)
-        return vbox
+        return section_chooser
+
+    def _reload_target_section_entry(self, section_combo_box, target_entry,
+                                     config_name_entered, name_section_dict):
+        index = section_combo_box.get_active()
+        sections = name_section_dict[config_name_entered]
+        section_name = sections[index]
+        target_entry.set_text(section_name)
 
     def launch_macro_changes_dialog(
             self, config_name, macro_name, changes_list, mode="transform",
@@ -545,6 +579,22 @@ class MainWindow(object):
             rose.config_editor.DIALOG_TITLE_REMOVE,
             rose.config_editor.DIALOG_BODY_REMOVE_CONFIG,
             rose.config_editor.DIALOG_BODY_REMOVE_SECTION
+        )
+
+    def launch_rename_dialog(self, name_section_dict, prefs):
+        """Launch a dialog asking for a section name to rename.
+
+        name_section_dict is a dictionary containing config names
+        as keys, and lists of available sections as values.
+        prefs is in the same format, but indicates preferred values.
+
+        """
+        return self._launch_config_section_chooser_dialog(
+            name_section_dict, prefs,
+            rose.config_editor.DIALOG_TITLE_RENAME,
+            rose.config_editor.DIALOG_BODY_RENAME_CONFIG,
+            rose.config_editor.DIALOG_BODY_RENAME_SECTION,
+            do_target_section=True
         )
 
     def launch_view_stack(self, undo_stack, redo_stack, undo_func):
