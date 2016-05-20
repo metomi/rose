@@ -34,7 +34,7 @@ from rose.suite_run import SuiteRunner
 
 DEFAULT_TEST_DIR = 'rose-stem'
 OPTIONS = ['group', 'source', 'task', ]
-ROSE_STEM_VERSION = 1
+ROSE_STEM_VERSION = 2
 SUITE_RC_PREFIX = '[jinja2:suite.rc]'
 
 
