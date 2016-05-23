@@ -135,7 +135,7 @@ class MenuWidget(gtk.HBox):
             option_ui_middle = ("<menuitem action='Add'/>" +
                                 "<separator name='sepAdd'/>" +
                                 option_ui_middle)
-        if 'url' in variable.metadata:
+        if rose.META_PROP_URL in variable.metadata:
             url_ui = "<separator name='sepWeb'/><menuitem action='Web Help'/>"
             option_ui_middle += url_ui
         option_ui = option_ui_start + option_ui_middle + option_ui_end
@@ -287,7 +287,7 @@ class MenuWidget(gtk.HBox):
         if url_item is not None and 'url' in self.my_variable.metadata:
             url_item.connect(
                 "activate",
-                lambda b: self.launch_help(self.my_variable.metadata['url']))
+                lambda b: self.launch_help(url_mode=True))
         if self.is_ghost:
             add_item = uimanager.get_widget('/Options/Add')
             add_item.connect("activate", lambda b: self._perform_add())

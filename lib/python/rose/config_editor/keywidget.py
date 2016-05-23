@@ -132,7 +132,8 @@ class KeyWidget(gtk.VBox):
     def handle_launch_help(self, widget, event):
         """Handle launching help."""
         if event.type == gtk.gdk.BUTTON_PRESS and event.button != 3:
-            self.launch_help()
+            url_mode = (rose.META_PROP_HELP not in self.meta)
+            self.launch_help(url_mode=url_mode)
 
     def launch_edit_comments(self, *args):
         """Launch an edit comments dialog."""

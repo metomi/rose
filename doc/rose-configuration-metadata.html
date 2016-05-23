@@ -306,7 +306,7 @@ sort-key=do-not-like-00
           <dd>
             <p><dfn>example option:</dfn> <samp>ENABLE_THINGS=True</samp></p>
 
-            <p><dfn>description:</dfn> Python boolean type - either 
+            <p><dfn>description:</dfn> Python boolean type - either
             <samp>True</samp> or <samp>False</samp></p>
 
             <p><dfn>usage:</dfn> Python boolean types</p>
@@ -842,19 +842,21 @@ main             beef      spaghetti   coq au vin       lamb
 petits_fours    .false.     .true.       .false.       .true.
 </pre>
       </dd>
-      <dt id="meta.conf.behaviour.copy-mode">copy-mode (metadata usage with
-      the rose-suite.info file)</dt>
+
+      <dt id="meta.conf.behaviour.copy-mode">copy-mode (metadata usage with the
+      rose-suite.info file)</dt>
 
       <dd>
-        <p>Setting copy-mode in the metadata allows for the field to be
-           either <code>never</code> copied or copied with any value associated 
-           to be <code>clear</code>.</p>
+        <p>Setting copy-mode in the metadata allows for the field to be either
+        <code>never</code> copied or copied with any value associated to be
+        <code>clear</code>.</p>
 
         <p>For example: in a rose-suite.info file</p>
         <pre class="prettyprint lang-rose_conf">
 [ensemble members]
 copy-mode=never
 </pre>
+
         <p>Setting the <var>ensemble members</var> field to include
         <var>copy-mode=never</var> means that the ensemble members field would
         never be copied.</p>
@@ -862,10 +864,10 @@ copy-mode=never
 [additional info]
 copy-mode=clear
 </pre>
-        <p>Setting the <var>additional info</var> field to include
-        <var>copy-mode=never</var> means that the additional info field
-        would be copied, but any value associated with it would be cleared.</p>
 
+        <p>Setting the <var>additional info</var> field to include
+        <var>copy-mode=never</var> means that the additional info field would
+        be copied, but any value associated with it would be cleared.</p>
       </dd>
     </dl>
 
@@ -879,11 +881,13 @@ copy-mode=clear
       <dd>
         <p>A web URL containing help for the setting. For example:</p>
         <pre class="prettyprint lang-rose_conf">
-url=http://www-nwp/~frve/VER/view/dev/doc/GTDP5.html
+url=http://www.something.com/FOO/view/dev/doc/FOO.html
 </pre>
 
         <p>For example, the config editor will trigger a web browser to display
-        this when a variable name is clicked.</p>
+        this when a variable name is clicked. A partial URL can be used for
+        variables (e.g. <kbd>url=#foobar</kbd> if the variable's section or
+        namespace has a relevant parent url property to use as a prefix.</p>
       </dd>
 
       <dt id="meta.conf.help.help">help</dt>
@@ -939,8 +943,8 @@ help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
       <li>The content of the <var>ROSE_META_PATH</var> environment
       variable.</li>
 
-      <li>The <samp>meta-path</samp> setting in
-      <a href="rose-configuration.html#site">site/user</a> configurations.</li>
+      <li>The <samp>meta-path</samp> setting in <a href=
+      "rose-configuration.html#site">site/user</a> configurations.</li>
     </ul>
 
     <p>Each of the above settings can be a colon-separated list of paths.</p>
@@ -973,10 +977,12 @@ CHOCOLATE/doc/
 CHOCOLATE/rose-meta/
 CHOCOLATE/rose-meta/choc-dark/
 CHOCOLATE/rose-meta/choc-milk/
-    </pre>
+    
+</pre>
+
     <p>and the system <code>CAFFEINE</code> may have a hybrid structure, with
     both flat and hierarchical components:</p>
-<pre class="prettyprint lang-rose_conf">
+    <pre class="prettyprint lang-rose_conf">
 CAFFEINE/doc/
 ...
 CAFFEINE/rose-meta/caffeine-guarana/
@@ -985,6 +991,7 @@ CAFFEINE/rose-meta/caffeine-coffee/latte/
 CAFFEINE/rose-meta/caffeine-tea/yorkshire/
 CAFFEINE/rose-meta/caffeine-tea/lapsang/
 </pre>
+
     <p>and a site configuration with:</p>
     <pre class="prettyprint lang-rose_conf">
 meta-path=/path/to/rose-meta
@@ -999,10 +1006,11 @@ meta-path=/path/to/rose-meta
 /path/to/rose-meta/choc-dark/
 /path/to/rose-meta/choc-milk/
 </pre>
+
     <p>with <code>caffeine-coffee</code> containing subdirectories
     <code>cappuccino</code> and <code>latte</code>, and
     <code>caffeine-tea</code> containing <code>yorkshire</code> and
-    <code>lapsang</code>
+    <code>lapsang</code></p>
 
     <h2 id="appendix-upgrade">Appendix: Upgrade and Versions</h2>
 
@@ -1071,7 +1079,7 @@ meta=/path/to/metadata/my-command/8.3
     to be run. If the version defined does not correspond to a tagged version
     then a warning will be given.</p>
 
-    <p> Please note that if a hierarchical structure for the metadata is being
+    <p>Please note that if a hierarchical structure for the metadata is being
     used, the <code>HEAD</code> tag must be specified explictly.</p>
 
     <h3 id="appendix-upgrade:named">When to create named versions</h3>

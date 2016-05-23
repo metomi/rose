@@ -41,7 +41,7 @@ REC_RANGE_RANGE = re.compile(
     "(" + RE_REAL + "?)" + "\s*:\s*" +
     "(" + RE_REAL + "?)" +
     "(?<!^:)$")  # Expression can't just be a colon.
-
+REC_FULL_URL = re.compile("^(\w+://|www\.)")
 
 # Ignored types used in rose.variable.ignored_reason,
 # used by macros and user switches.
