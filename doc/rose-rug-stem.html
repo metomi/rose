@@ -180,24 +180,30 @@ rose stem --source=/path/to/workingcopy --source=fcm:other_project_tr@head
       is the project name. This contains a space-separated list of all source
       trees belonging to that project, which can then be given to an
       appropriate build task in the suite so it builds those source trees.</p>
+      
+      <p>Similarly, a <code>HOST_SOURCE_FOO</code> variable is also provided.
+      This is identical to <code>SOURCE_FOO</code> except any working copies
+      have the local hostname prepended. This is to assist building on remote
+      machines.</p>
 
       <p>The first source specified must be a working copy which contains the
       <samp>rose stem</samp> suite. The suite is expected to be in a
       subdirectory named <code>rose-stem</code> off the top of the working
-      copy. This source is used to generate two additional variables:</p>
+      copy. This source is used to generate three additional variables:</p>
 
       <ul>
         <li><code>SOURCE_FOO_BASE</code> - the base directory of the
         project</li>
+
+        <li><code>HOST_SOURCE_FOO_BASE</code> - the base directory of the
+        project with the hostname prepended if it is a working copy</li>
 
         <li><code>SOURCE_FOO_REV</code> - the revision of the project (if
         any)</li>
       </ul>
 
       <p>These settings <b>override</b> the variables in the
-      <code>rose-suite.conf</code> file. Note that if the source tree is
-      a working copy, the local hostname is prepended to it to facilitate
-      building on remote machines.</p>
+      <code>rose-suite.conf</code> file.</p>
     </div>
 
     <div class="slide">
@@ -206,7 +212,7 @@ rose stem --source=/path/to/workingcopy --source=fcm:other_project_tr@head
       <p>These should allow the use of configuration files which control the
       build process inside the working copy, e.g. you can refer to:</p>
       <pre>
-      {{SOURCE_FOO_BASE}}/fcm-make/configs/machine.cfg{{SOURCE_FOO_REV}}
+      {{HOST_SOURCE_FOO_BASE}}/fcm-make/configs/machine.cfg{{SOURCE_FOO_REV}}
 </pre>
 
       <p>If you omit the source argument, <samp>rose stem</samp> defaults to

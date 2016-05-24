@@ -34,7 +34,7 @@ from rose.suite_run import SuiteRunner
 
 DEFAULT_TEST_DIR = 'rose-stem'
 OPTIONS = ['group', 'source', 'task', ]
-ROSE_STEM_VERSION = 2
+ROSE_STEM_VERSION = 1
 SUITE_RC_PREFIX = '[jinja2:suite.rc]'
 
 
@@ -377,6 +377,7 @@ class StemRunner(object):
 
         # Generate options for source trees
         repos = {}
+        repos_with_hosts = {}
         if not self.opts.source:
             self.opts.source = ['.']
         self.opts.project = list()
@@ -386,17 +387,22 @@ class StemRunner(object):
             self.opts.source[i] = url
             self.opts.project.append(project)
 
-            url = self._prepend_localhost(url)
-            base = self._prepend_localhost(base)
+            # Versions of variables with hostname prepended for working copies
+            url_host = self._prepend_localhost(url)
+            base_host = self._prepend_localhost(base)
 
             if project in repos:
                 repos[project].append(url)
+                repos_with_hosts[project].append(url_host)
             else:
                 repos[project] = [url]
+                repos_with_hosts[project] = [url_host]
                 self._add_define_option('SOURCE_' + project.upper() + '_REV',
                                         '"' + rev + '"')
                 self._add_define_option('SOURCE_' + project.upper() + '_BASE',
                                         '"' + base + '"')
+                self._add_define_option('HOST_SOURCE_' + project.upper()
+                                        + '_BASE', '"' + base_host + '"')
                 self._add_define_option('SOURCE_' + project.upper() +
                                         '_MIRROR', '"' + mirror + '"')
             self.reporter(SourceTreeAddedAsBranchEvent(url))
@@ -404,6 +410,10 @@ class StemRunner(object):
             var = 'SOURCE_' + project.upper()
             branchstring = RosePopener.list_to_shell_str(branches)
             self._add_define_option(var, '"' + branchstring + '"')
+        for project, branches in repos_with_hosts.iteritems():
+            var_host = 'HOST_SOURCE_' + project.upper()
+            branchstring = RosePopener.list_to_shell_str(branches)
+            self._add_define_option(var_host, '"' + branchstring + '"')
 
         # Generate the variable containing tasks to run
         if self.opts.group:

@@ -50,7 +50,7 @@ cp $TEST_SOURCE_DIR/00-run-basic/rose-suite.conf $WORKINGCOPY/rose-stem
 touch $WORKINGCOPY/rose-stem/rose-suite.conf
 #We should now have a valid rose-stem suite.
 #-------------------------------------------------------------------------------
-N_TESTS=44
+N_TESTS=56
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 #Test for successful execution
@@ -65,8 +65,12 @@ TEST_KEY=$TEST_KEY_BASE-basic-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[earl_grey, milk, sugar, spoon, cup, milk\]" \
           $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source
-file_grep $TEST_KEY "SOURCE_FOO=$HOSTNAME:$WORKINGCOPY fcm:foo.x_tr@head" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY fcm:foo.x_tr@head" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-basic-host-source
+file_grep $TEST_KEY "HOST_SOURCE_FOO=$HOSTNAME:$WORKINGCOPY fcm:foo.x_tr@head" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source-base
+file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-basic-host-source-base
 file_grep $TEST_KEY "SOURCE_FOO_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
@@ -86,12 +90,20 @@ file_grep $TEST_KEY "RUN_NAMES=\[earl_grey, milk, sugar, spoon, cup, milk\]" \
           $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-project-override-source-foo
 file_grep $TEST_KEY "SOURCE_FOO=fcm:foo.x_tr@head" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-host-source-foo
+file_grep $TEST_KEY "HOST_SOURCE_FOO=fcm:foo.x_tr@head" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-project-override-source-bar
-file_grep $TEST_KEY "SOURCE_BAR=$HOSTNAME:$WORKINGCOPY" $OUTPUT
+file_grep $TEST_KEY "SOURCE_BAR=$WORKINGCOPY" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-host-source-bar
+file_grep $TEST_KEY "HOST_SOURCE_BAR=$HOSTNAME:$WORKINGCOPY" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-project-override-source-base-foo
 file_grep $TEST_KEY "SOURCE_FOO_BASE=fcm:foo.x_tr" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-host-source-base-foo
+file_grep $TEST_KEY "HOST_SOURCE_FOO_BASE=fcm:foo.x_tr" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-project-override-source-base-bar
-file_grep $TEST_KEY "SOURCE_BAR_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
+file_grep $TEST_KEY "SOURCE_BAR_BASE=$WORKINGCOPY\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-project-override-source-base-bar
+file_grep $TEST_KEY "HOST_SOURCE_BAR_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-project-override-source-rev-foo
 file_grep $TEST_KEY "SOURCE_FOO_REV=@1" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-project-override-source-rev-bar
@@ -125,9 +137,13 @@ OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-subdirectory-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[assam\]" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source
-file_grep $TEST_KEY "SOURCE_FOO=$HOSTNAME:$WORKINGCOPY" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-subdirectory-host-source
+file_grep $TEST_KEY "HOST_SOURCE_FOO=$HOSTNAME:$WORKINGCOPY" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source-base
-file_grep $TEST_KEY "SOURCE_FOO_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-subdirectory-host-source-base
+file_grep $TEST_KEY "HOST_SOURCE_FOO_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source-mirror
@@ -144,9 +160,13 @@ OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-relative-path-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[ceylon\]" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-relative-path-source
-file_grep $TEST_KEY "SOURCE_FOO=$HOSTNAME:$WORKINGCOPY" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-relative-path-host-source
+file_grep $TEST_KEY "HOST_SOURCE_FOO=$HOSTNAME:$WORKINGCOPY" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-relative-path-source-base
-file_grep $TEST_KEY "SOURCE_FOO_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-relative-path-host-source-base
+file_grep $TEST_KEY "HOST_SOURCE_FOO_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-relative-path-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 #-------------------------------------------------------------------------------
@@ -171,9 +191,13 @@ TEST_KEY=$TEST_KEY_BASE-check-with-config-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[earl_grey, milk, sugar, spoon, cup, milk\]" \
           $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-check-with-config-source
-file_grep $TEST_KEY "SOURCE_FOO=$HOSTNAME:$WORKINGCOPY fcm:foo.x_tr@head" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY fcm:foo.x_tr@head" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-check-with-config-host-source
+file_grep $TEST_KEY "HOST_SOURCE_FOO=$HOSTNAME:$WORKINGCOPY fcm:foo.x_tr@head" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-check-with-config-source-base
-file_grep $TEST_KEY "SOURCE_FOO_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-check-with-config-host-source-base
+file_grep $TEST_KEY "HOST_SOURCE_FOO_BASE=$HOSTNAME:$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-check-with-config-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-check-with-config-single-auto-option
