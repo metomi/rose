@@ -395,7 +395,7 @@ function createControls() {
     }).append(
         $('<div />', {'id': 'navLinks'}).append(
             $('<a />', {
-                'class': 'btn btn-default',
+                'class': 'btn btn-primary',
                 'id': 'toggle',
                 'accesskey': 't',
                 'href': 'javascript:toggle();'
@@ -654,5 +654,5 @@ function slideResize() {
 }
 
 window.onload = startup;
-window.onresize = function(){setTimeout('fontScale()', 50); slideResize();}
+window.onresize = function(){setTimeout('fontScale(); slideResize()', 50);}
 

@@ -23,8 +23,8 @@
     display: none;
 }
 
-/* hide slide title in slideshow mode */
-div.slide-title {
+/* hide content we don't want in outline mode */
+div.slide-title, .slides-only {
     display: none;
 }
 
@@ -47,4 +47,9 @@ pre.img-full {
     max-height: none;
     //width: 100%!important;
     //height: auto!important;
+}
+
+/* "S5 Slideshow" sits on the right in outline mode */
+#control-nav {
+    float: right;
 }

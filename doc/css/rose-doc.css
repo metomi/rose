@@ -28,6 +28,9 @@ img.img-full {
     max-height: 30em;
     width: auto;
     height: auto;
+
+body {
+    background-color: rgb(252,252,252)!important;
 }
 
 body {
