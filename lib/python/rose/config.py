@@ -309,7 +309,14 @@ class ConfigNode(object):
             self.unset(keys=removed_key)
 
     def __add__(self, config_diff):
-        """Return a new node by applying a config node diff object to self."""
+        """Return a new node by applying a config node diff object to self.
+        Alternatively a config node can be provided, the diff will then be
+        applied to self to return a new node."""
+        if type(config_diff) is ConfigNode:
+            config_node = config_diff
+            config_diff = ConfigNodeDiff()
+            config_diff.set_from_configs(self, config_node)
+            config_diff.delete_removed()  # Don't delete anything.
         new_node = copy.deepcopy(self)
         new_node.add(config_diff)
         return new_node
@@ -431,6 +438,10 @@ class ConfigNodeDiff(object):
         for keys, data in self.get_added():
             rev_diff.set_removed_setting(keys, data)
         return rev_diff
+
+    def delete_removed(self):
+        """Deletes all 'removed' keys from this diff."""
+        self._data[self.KEY_REMOVED] = {}
 
 
 class ConfigDumper(object):

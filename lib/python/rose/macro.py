@@ -553,14 +553,16 @@ def load_meta_config_tree(config, directory=None, config_type=None,
         meta_config_tree = rose.config_tree.ConfigTreeLoader().load(
             config_meta_path,
             rose.META_CONFIG_NAME,
-            conf_dir_paths=list(paths),
-            conf_node=meta_config
+            conf_dir_paths=list(paths)
         )
     except rose.resource.ResourceError:
         if not ignore_meta_error:
             error_handler(text=ERROR_LOAD_META_PATH.format(meta_key))
     except rose.config.ConfigSyntaxError as exc:
         error_handler(text=str(exc))
+
+    meta_config += meta_config_tree.node
+    meta_config_tree.node = meta_config
     return meta_config_tree
 
 
