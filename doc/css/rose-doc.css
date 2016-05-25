@@ -119,6 +119,15 @@ samp {
     box-shadow: none;
 }
 
+var {
+    font-family: monospace;
+    border-radius: 0.2em;
+    padding: 0 0.2em 0 0.2em;
+    background-color: rgb(240,240,240);
+    color: rgb(120, 50, 120);
+    box-shadow: none;
+}
+
 .shell-prompt {
     background: none;
     border: none;

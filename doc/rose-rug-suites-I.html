@@ -519,26 +519,26 @@ default=echo 'Hello World'
             WORLD = neptune
 </pre>
 
-                <div class="slide">
-                  <h2 id="remote-hosts">Remote Hosts</h2>
+              </div>
+              <div class="slide">
+                <h2 id="remote-hosts">Remote Hosts</h2>
 
-                  <p>So far, the example tasks run on the localhost
-                  - it is usually better to farm off tasks to a
-                  remote host like a compute server or a
-                  cluster/supercomputer.</p>
+                <p>So far, the example tasks run on the localhost
+                - it is usually better to farm off tasks to a
+                remote host like a compute server or a
+                cluster/supercomputer.</p>
 
-                  <p>We could set <samp>hello_eris</samp> to run on
-                  a given host by setting <samp>[[[remote]]]</samp>
-                  section settings:</p>
-                  <pre class="prettyprint lang-cylc">
-    [[hello_eris]]
-        inherit = HELLO_FAMILY
-        [[[environment]]]
-            WORLD = eris
-        [[[remote]]]
-            host = voyager_1
+                <p>We could set <samp>hello_eris</samp> to run on
+                a given host by setting <samp>[[[remote]]]</samp>
+                section settings:</p>
+                <pre class="prettyprint lang-cylc">
+  [[hello_eris]]
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = eris
+      [[[remote]]]
+          host = voyager_1
 </pre>
-                </div>
 
                 <p>The order in which they are combined is
                 essentially last to first - e.g.
@@ -557,10 +557,10 @@ default=echo 'Hello World'
                 succeed before <samp>hello_eris</samp>. We can put
                 this in our <samp>suite.rc</samp>:</p>
                 <pre class="prettyprint lang-cylc">
-[scheduling]
+  [scheduling]
     [[dependencies]]
         graph = hello_pluto =&gt; hello_eris
-</pre>
+  </pre>
               </div>
 
               <div class="slide">
@@ -570,13 +570,13 @@ default=echo 'Hello World'
                 <p>We can make this run as a cycling suite,
                 repeating every 12 hours:</p>
                 <pre class="prettyprint lang-cylc">
-[scheduling]
+  [scheduling]
     initial cycle point = 20130105T00Z  # 00:00, 5/1/2013
     final cycle point = 20130106T00Z    # 00:00, 6/1/2013
     [[dependencies]]
         [[[T00, T12]]]  # run each day at 00:00 and 12:00
             graph = hello_pluto =&gt; hello_eris
-</pre>
+  </pre>
 
                 <p>N.B. cylc will not work with the various cycle
                 points in real time unless you ask it to. For
@@ -606,13 +606,13 @@ default=echo 'Hello World'
                 context. You can use <code>if</code> and
                 <code>for</code> blocks, amongst other things:</p>
                 <pre class="prettyprint lang-cylc">
-{%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
+  {%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
     [[hello_{{ WORLD }}]]
         inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = {{ WORLD }}
-{%- endfor %}
-</pre>
+  {%- endfor %}
+  </pre>
               </div>
 
               <div class="slide">
@@ -637,7 +637,7 @@ default=echo 'Hello World'
         inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = haumea
-</pre>
+  </pre>
               </div>
 
               <div class="slide">
@@ -648,22 +648,22 @@ default=echo 'Hello World'
                 settings. Rose supports storing these in the
                 <samp>rose-suite.conf</samp> file - e.g.</p>
                 <pre class="prettyprint lang-rose_conf">
-[jinja2:suite.rc]
-HELLO_WORLDS = ["eris", "pluto", "makemake", "haumea"]
-</pre>
+  [jinja2:suite.rc]
+  HELLO_WORLDS = ["eris", "pluto", "makemake", "haumea"]
+  </pre>
 
                 <p>Rose passes variables in this section into the
                 Jinja2 template at runtime. This means that we can
                 have a <samp>suite.rc</samp> snippet that looks
                 like this:</p>
                 <pre class="prettyprint lang-cylc">
-{%- for WORLD in HELLO_WORLDS %}
+  {%- for WORLD in HELLO_WORLDS %}
     [[hello_{{ WORLD }}]]
         inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = {{ WORLD }}
-{%- endfor %}
-</pre>
+  {%- endfor %}
+  </pre>
               </div>
 
               <div class="slide">
@@ -689,14 +689,14 @@ HELLO_WORLDS = ["eris", "pluto", "makemake", "haumea"]
                 <pre class="prettyprint lang-cylc">
         [[[environment]]]
             INCLUDE_MOONS = {{ HELLO_TO_MOONS }}
-</pre>
+  </pre>
 
                 <p>We could have a <samp>rose-suite.conf</samp>
                 file that looked like this:</p>
                 <pre class="prettyprint lang-rose_conf">
-[jinja2:suite.rc]
-HELLO_TO_MOONS=false
-</pre>
+  [jinja2:suite.rc]
+  HELLO_TO_MOONS=false
+  </pre>
               </div>
 
               <div class="slide">
@@ -707,8 +707,8 @@ HELLO_TO_MOONS=false
                 to app metadata) for the
                 <samp>rose-suite.conf</samp> file, such as:</p>
                 <pre class="prettyprint lang-rose_conf">
-[jinja2:suite.rc=HELLO_TO_MOONS]
-help=Decide whether to say hello to the moons of the world
+  [jinja2:suite.rc=HELLO_TO_MOONS]
+  help=Decide whether to say hello to the moons of the world
     =(if any).
     =
     =If true, include moons like
@@ -716,9 +716,9 @@ help=Decide whether to say hello to the moons of the world
     =If false, ignore them.
     =
     =Moons of moons are not supported.
-title=Include Moons when saying hello?
-type=boolean
-</pre>
+  title=Include Moons when saying hello?
+  type=boolean
+  </pre>
               </div>
 
               <div class="slide">
@@ -727,9 +727,9 @@ type=boolean
                 <p>We recommend running all suites in UTC mode.
                 E.g.:</p>
                 <pre class="prettyprint lang-cylc">
-[cylc]
+  [cylc]
     UTC mode = True # Ignore DST
-</pre>
+  </pre>
               </div>
 
               <div class="slide">
@@ -738,13 +738,13 @@ type=boolean
                 <p>Suites can have event handlers to report events
                 or shutdown on failure.</p>
                 <pre class="prettyprint lang-cylc">
-[cylc]
+  [cylc]
     UTC mode = True # Ignore DST
     # abort if any task fails = True
     [[event hooks]]
         # timeout handler = rose suite-hook --mail --shutdown
         # timeout = P3D
-</pre>
+  </pre>
               </div>
 
               <div class="slide">
@@ -765,13 +765,13 @@ type=boolean
                 <p>Suites can also be configured to email you on
                 specific events. For example:</p>
                 <pre class="prettyprint lang-cylc">
-[runtime]
+  [runtime]
     [[root]]
         [[[events]]]
             mail events = submission retry, retry, \
                           submission failed, failed, \
                           submission timeout, execution timeout
-</pre>
+  </pre>
 
                 <p>The events should be adjusted if necessary - for
                 example, increasing the timeout lengths or altering
@@ -785,10 +785,10 @@ type=boolean
                 method, such as using <code>PBS</code>:</p>
                 <pre class="prettyprint lang-cylc">
     [[hello_eris]]
-...
+  ...
         [[[job submission]]]
             method = pbs
-</pre>
+  </pre>
               </div>
 
               <div class="slide">
@@ -798,14 +798,14 @@ type=boolean
                 via <code>directives</code>:</p>
                 <pre class="prettyprint lang-cylc">
     [[hello_eris]]
-...
+  ...
         [[[job submission]]]
             method = pbs
         [[[directives]]]
             -l select = 1
             -l walltime = 00:05:00
             -q = normal
-</pre>
+  </pre>
               </div>
 
               <div class="slide">

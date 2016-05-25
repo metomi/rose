@@ -362,6 +362,9 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
               <samp>trigger-ignored</samp>.</p>
             </div>
 
+            <div class="slide">
+              <h3 class="alwayshidden">Cascading Triggering
+              Continued</h3>
             <p>We need to add <var>no_mushrooms</var> to the
             <var>[namelist:pizza_order=pizza_type]</var> section so
             that it is <samp>trigger-ignored</samp> when no pizza
@@ -373,10 +376,6 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
         namelist:pizza_order=no_mushrooms;
 </pre>
-
-            <div class="slide">
-              <h3 class="alwayshidden">Cascading Triggering
-              Continued</h3>
 
               <p>Save, reload, and try changing
               <var>env=BUDGET</var> below <samp>5</samp> to see
@@ -498,6 +497,5 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         </div>
       </div>
     </div>
-  </div>
 </body>
 </html>

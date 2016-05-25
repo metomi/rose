@@ -1649,22 +1649,36 @@ all(namelist:foo=bar == 'e')
             be:</p>
 
             <dl>
-              <dt class="trigger-ignored">I<sub>T</sub> -
-              <var>!!</var></dt>
+              <dt class="trigger-ignored">
+                <span class="label label-success">I<sub>T</sub></span>
+                - <var>!!</var>
+              </dt>
 
               <dd>trigger ignored</dd>
 
-              <dt class="user-ignored">I<sub>U</sub> -
-              <var>!</var></dt>
+              <dt class="user-ignored">
+                <span class="label label-warning">I<sub>U</sub></span> -
+                <var>!</var>
+              </dt>
 
               <dd>user ignored</dd>
 
-              <dt>E - (normal)</dt>
+              <dt><span class="label label-default">E</span> - (normal)</dt>
 
               <dd>enabled</dd>
             </dl>
 
-            <table summary=
+            <style type="text/css">
+            table {
+
+            }
+            td, th {
+              text-align: center;
+            }
+            </style>
+
+            <table class="table table-striped table-condensed table-bordered"
+            summary=
             "A subset of possible ignored/enabled states, errors and fixes">
             <caption>
                 A subset of possible ignored/enabled states, errors
@@ -1686,9 +1700,15 @@ all(namelist:foo=bar == 'e')
               </tr>
 
               <tr>
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
                 <td>compulsory</td>
 
@@ -1700,9 +1720,16 @@ all(namelist:foo=bar == 'e')
               </tr>
 
               <tr class="odd">
-                <td class="trigger-ignored">I<sub>T</sub></td>
 
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
+
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
                 <td>optional</td>
 
@@ -1714,66 +1741,88 @@ all(namelist:foo=bar == 'e')
               </tr>
 
               <tr>
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>compulsory</td>
 
                 <td class="fail">error</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr class="odd">
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>optional</td>
 
                 <td class="fail">error</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr>
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
-                <td class="not-trigger">not trigger</td>
+                <td class="not-trigger">
+                  &nbsp;<span class="label label-info">not trigger</span>&nbsp;
+                </td>
 
                 <td>compulsory</td>
 
                 <td class="fail">error</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr class="odd">
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
-                <td class="not-trigger">not trigger</td>
+                <td class="not-trigger">
+                  &nbsp;<span class="label label-info">not trigger</span>&nbsp;
+                </td>
 
                 <td>optional</td>
 
                 <td class="warn">overlook</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>overlooking mainly in order to de-clutter the
                 <kbd>No Metadata</kbd> view.</td>
               </tr>
 
               <tr>
-                <td class="user-ignored">I<sub>U</sub></td>
+                <td class="user-ignored">
+                  &nbsp;<span class="label label-warning"
+                    >I<sub>U</sub></span>&nbsp;
+                </td>
 
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
                 <td>compulsory</td>
 
@@ -1786,9 +1835,15 @@ all(namelist:foo=bar == 'e')
               </tr>
 
               <tr class="odd">
-                <td class="user-ignored">I<sub>U</sub></td>
+                <td class="user-ignored">
+                  &nbsp;<span class="label label-warning"
+                    >I<sub>U</sub></span>&nbsp;
+                </td>
 
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
                 <td>optional</td>
 
@@ -1800,93 +1855,121 @@ all(namelist:foo=bar == 'e')
               </tr>
 
               <tr>
-                <td class="user-ignored">I<sub>U</sub></td>
+                <td class="user-ignored">
+                  &nbsp;<span class="label label-warning"
+                    >I<sub>U</sub></span>&nbsp;
+                </td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>compulsory</td>
 
                 <td class="fail">error</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr class="odd">
-                <td class="user-ignored">I<sub>U</sub></td>
+                <td class="user-ignored">
+                  &nbsp;<span class="label label-warning"
+                    >I<sub>U</sub></span>&nbsp;
+                </td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>optional</td>
 
                 <td>no</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr>
-                <td class="user-ignored">I<sub>U</sub></td>
+                <td class="user-ignored">
+                  &nbsp;<span class="label label-warning"
+                    >i<sub>u</sub></span>&nbsp;
+                </td>
 
-                <td class="not-trigger">not trigger</td>
+                <td class="not-trigger">
+                  &nbsp;<span class="label label-info">not trigger</span>&nbsp;
+                </td>
 
                 <td>compulsory</td>
 
                 <td class="fail">error</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr class="odd">
-                <td class="user-ignored">I<sub>U</sub></td>
+                <td class="user-ignored">
+                  &nbsp;<span class="label label-warning"
+                    >i<sub>u</sub></span>&nbsp;
+                </td>
 
-                <td class="not-trigger">not trigger</td>
+                <td class="not-trigger">
+                  &nbsp;<span class="label label-info">not trigger</span>&nbsp;
+                </td>
 
                 <td>optional</td>
 
                 <td>no</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr>
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
                 <td>compulsory</td>
 
                 <td class="fail">error</td>
 
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr class="odd">
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
                 <td>optional</td>
 
                 <td class="fail">error</td>
 
-                <td class="trigger-ignored">I<sub>T</sub></td>
+                <td class="trigger-ignored">
+                  &nbsp;<span class="label label-success"
+                    >I<sub>T</sub></span>&nbsp;
+                </td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr>
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>compulsory</td>
 
@@ -1898,23 +1981,28 @@ all(namelist:foo=bar == 'e')
               </tr>
 
               <tr class="odd">
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
                 <td>optional</td>
 
                 <td>no</td>
 
-                <td class="user-ignored">I<sub>U</sub></td>
+                <td class="user-ignored">
+                  &nbsp;<span class="label label-warning"
+                    >I<sub>U</sub></span>&nbsp;
+                </td>
 
                 <td>&nbsp;</td>
               </tr>
 
               <tr>
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
-                <td class="not-trigger">not trigger</td>
+                <td class="not-trigger">
+                  &nbsp;<span class="label label-info">not trigger</span>&nbsp;
+                </td>
 
                 <td>compulsory</td>
 
@@ -1926,15 +2014,20 @@ all(namelist:foo=bar == 'e')
               </tr>
 
               <tr class="odd">
-                <td>E</td>
+                <td>&nbsp;<span class="label label-default">E</span>&nbsp;</td>
 
-                <td class="not-trigger">not trigger</td>
+                <td class="not-trigger">
+                  &nbsp;<span class="label label-info">not trigger</span>&nbsp;
+                </td>
 
                 <td>optional</td>
 
                 <td>no</td>
 
-                <td class="user-ignored">I<sub>U</sub></td>
+                <td class="user-ignored">
+                  &nbsp;<span class="label label-warning"
+                    >I<sub>U</sub></span>&nbsp;
+                </td>
 
                 <td>&nbsp;</td>
               </tr>
