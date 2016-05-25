@@ -335,7 +335,7 @@ fi
             <div class="slide">
               <h3 class="alwayshidden">Advanced example 1
               suite.rc</h3>
-              <pre class="prettyprint lang-cylc">
+              <pre class="prettyprint lang-cylc img-full">
 # Check the failure of `flaky_activity` and if it meets the criteria in the 
 # `check` task then try a recovery task, `recovery`. If `recovery` succeeds 
 # then the suite carrys on else if it fails then the suite stops as it cannot 
@@ -438,7 +438,7 @@ fi
             <div class="slide">
               <h3 class="alwayshidden">Advanced example 2
               suite-.rc</h3>
-              <pre class="prettyprint lang-cylc">
+              <pre class="prettyprint lang-cylc img-full">
 # If a member of family `SOME_DO_SOME_DONT` fails then carry on regardless.
 # If then the `sometimes_fail` task fails go to the end of that cycle and 
 # remove the failed task from the task pool.
@@ -556,7 +556,7 @@ fi
             <div class="slide">
               <h3 class="alwayshidden">Advanced example 3
               suite.rc</h3>
-              <pre class="prettyprint lang-cylc">
+              <pre class="prettyprint lang-cylc img-full">
 # If the `check_files_exist` task fails go to the end of the cycle and only do
 # the `housekeep` task, or if `generate_plots` task fails go to the second 
 # from last task, `raise_alert` and then to the end of that cycle and do the 
