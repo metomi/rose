@@ -203,8 +203,8 @@ class MacroUpgrade(rose.macro.MacroBase):
         node = config.get([section, option])
         if node is None:
             if forced:
-                return self.add_setting(config, keys, value, node.state,
-                                        comments, info)
+                return self.add_setting(config, keys, value=value,
+                                        comments=comments, info=info)
             return False
         if node.value == value:
             return False
