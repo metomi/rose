@@ -232,6 +232,9 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
         self.change_setting_value(config, ["namelist:change_opt",
                                            "trig_ignore_opt_has_changed"],
                                   ".true.")
+        self.change_setting_value(config, ["namelist:change_opt",
+                                           "opt_force_added_change"],
+                                  ".true.", forced=True)
 
         # Remove settings.
         self.remove_setting(config, ["namelist:missing_sect"])
@@ -303,7 +306,7 @@ TEST_KEY=$TEST_KEY_BASE-upgrade
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade_apple-fig: changes: 50
+[U] Upgrade_apple-fig: changes: 51
     namelist:add_sect=new_opt=.true.
         Added with value '.true.'
     namelist:add_sect_only=None=None
@@ -340,6 +343,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Value: '.false.' -> '.true.'
     namelist:change_opt=trig_ignore_opt_has_changed=.true.
         Value: '.false.' -> '.true.'
+    namelist:change_opt=opt_force_added_change=.true.
+        Added with value '.true.'
     namelist:remove_sect_empty=None=None
         Removed
     namelist:remove_sect_full=opt_with_content=None
@@ -443,6 +448,7 @@ new_opt=.true.
 
 [namelist:change_opt]
 !ignore_opt_has_changed=.true.
+opt_force_added_change=.true.
 opt_has_changed=.true.
 trig_ignore_opt_has_changed=.true.
 
@@ -736,6 +742,9 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
         self.change_setting_value(config, ["namelist:change_opt",
                                            "trig_ignore_opt_has_changed"],
                                   ".true.", info="good")
+        self.change_setting_value(config, ["namelist:change_opt",
+                                           "opt_force_added_change"],
+                                  ".true.", forced=True, info="good")
         self.remove_setting(config, ["namelist:missing_sect"], info="bad")
         self.remove_setting(config, ["namelist:missing_sect", "missing_opt"],
                             info="bad")
@@ -798,7 +807,7 @@ TEST_KEY=$TEST_KEY_BASE-upgrade-info
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade_apple-fig: changes: 33
+[U] Upgrade_apple-fig: changes: 34
     namelist:add_sect=new_opt=.true.
         good
     namelist:add_sect_only=None=None
@@ -834,6 +843,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
     namelist:change_opt=ignore_opt_has_changed=.true.
         good
     namelist:change_opt=trig_ignore_opt_has_changed=.true.
+        good
+    namelist:change_opt=opt_force_added_change=.true.
         good
     namelist:remove_sect_empty=None=None
         good
@@ -904,6 +915,7 @@ new_opt=.true.
 
 [namelist:change_opt]
 !ignore_opt_has_changed=.true.
+opt_force_added_change=.true.
 opt_has_changed=.true.
 trig_ignore_opt_has_changed=.true.
 
