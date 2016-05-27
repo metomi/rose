@@ -290,8 +290,9 @@ class NavPanelHandler(object):
                 prefer_name_sections[config_name].sort(
                     rose.config.sort_settings)
         config_name, source_section, target_section = (
-                self.mainwindow.launch_rename_dialog(
-                    config_sect_dict, prefer_name_sections))
+            self.mainwindow.launch_rename_dialog(
+                config_sect_dict, prefer_name_sections)
+        )
         if (config_name in self.data.config and
                 source_section is not None and target_section):
             self.group_ops.rename_section(

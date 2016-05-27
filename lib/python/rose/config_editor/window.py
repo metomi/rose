@@ -359,7 +359,7 @@ class MainWindow(object):
                     combo, target_section_entry,
                     name_keys[config_name_box.get_active()],
                     name_section_dict
-                    )
+                )
             )
             target_section_entry.show()
             vbox.pack_start(target_section_entry, expand=False, fill=False)
