@@ -886,8 +886,15 @@ url=http://www.something.com/FOO/view/dev/doc/FOO.html
 
         <p>For example, the config editor will trigger a web browser to display
         this when a variable name is clicked. A partial URL can be used for
-        variables (e.g. <kbd>url=#foobar</kbd> if the variable's section or
-        namespace has a relevant parent url property to use as a prefix.</p>
+        variables if the variable's section or namespace has a relevant parent
+        url property to use as a prefix. For example:</p>
+        <pre class="prettyprint lang-rose_conf">
+[namelist:foo]
+url=https://www.google.com/search
+
+[namelist:foo=bar]
+url=?q=nearest+bar
+</pre>
       </dd>
 
       <dt id="meta.conf.help.help">help</dt>
