@@ -368,11 +368,11 @@ class ConfigNodeDiff(object):
 
         """
         node = ConfigNode()
-        for keys, info in self.get_added():
-            value, state, comments = info
-            node.set(keys, value=value, state=state, comments=comments)
         for keys, old_and_new_info in self.get_modified():
             old_info, info = old_and_new_info
+            value, state, comments = info
+            node.set(keys, value=value, state=state, comments=comments)
+        for keys, info in self.get_added():
             value, state, comments = info
             node.set(keys, value=value, state=state, comments=comments)
         for keys, info in self.get_removed():
