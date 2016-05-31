@@ -557,10 +557,10 @@ default=echo 'Hello World'
                 succeed before <samp>hello_eris</samp>. We can put
                 this in our <samp>suite.rc</samp>:</p>
                 <pre class="prettyprint lang-cylc">
-  [scheduling]
-    [[dependencies]]
-        graph = hello_pluto =&gt; hello_eris
-  </pre>
+[scheduling]
+  [[dependencies]]
+      graph = hello_pluto =&gt; hello_eris
+</pre>
               </div>
 
               <div class="slide">
@@ -570,13 +570,13 @@ default=echo 'Hello World'
                 <p>We can make this run as a cycling suite,
                 repeating every 12 hours:</p>
                 <pre class="prettyprint lang-cylc">
-  [scheduling]
-    initial cycle point = 20130105T00Z  # 00:00, 5/1/2013
-    final cycle point = 20130106T00Z    # 00:00, 6/1/2013
-    [[dependencies]]
-        [[[T00, T12]]]  # run each day at 00:00 and 12:00
-            graph = hello_pluto =&gt; hello_eris
-  </pre>
+[scheduling]
+  initial cycle point = 20130105T00Z  # 00:00, 5/1/2013
+  final cycle point = 20130106T00Z    # 00:00, 6/1/2013
+  [[dependencies]]
+      [[[T00, T12]]]  # run each day at 00:00 and 12:00
+          graph = hello_pluto =&gt; hello_eris
+</pre>
 
                 <p>N.B. cylc will not work with the various cycle
                 points in real time unless you ask it to. For
@@ -606,13 +606,13 @@ default=echo 'Hello World'
                 context. You can use <code>if</code> and
                 <code>for</code> blocks, amongst other things:</p>
                 <pre class="prettyprint lang-cylc">
-  {%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
-    [[hello_{{ WORLD }}]]
-        inherit = HELLO_FAMILY
-        [[[environment]]]
-            WORLD = {{ WORLD }}
-  {%- endfor %}
-  </pre>
+{%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
+  [[hello_{{ WORLD }}]]
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = {{ WORLD }}
+{%- endfor %}
+</pre>
               </div>
 
               <div class="slide">
@@ -621,23 +621,23 @@ default=echo 'Hello World'
                 <p>This gets processed at runtime, so the file as
                 read in by cylc looks like:</p>
                 <pre class="prettyprint lang-cylc">
-    [[hello_eris]]
-        inherit = HELLO_FAMILY
-        [[[environment]]]
-            WORLD = eris
-    [[hello_pluto]]
-        inherit = HELLO_FAMILY
-        [[[environment]]]
-            WORLD = pluto
-    [[hello_makemake]]
-        inherit = HELLO_FAMILY
-        [[[environment]]]
-            WORLD = makemake
-    [[hello_haumea]]
-        inherit = HELLO_FAMILY
-        [[[environment]]]
-            WORLD = haumea
-  </pre>
+  [[hello_eris]]
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = eris
+  [[hello_pluto]]
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = pluto
+  [[hello_makemake]]
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = makemake
+  [[hello_haumea]]
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = haumea
+</pre>
               </div>
 
               <div class="slide">
@@ -648,22 +648,22 @@ default=echo 'Hello World'
                 settings. Rose supports storing these in the
                 <samp>rose-suite.conf</samp> file - e.g.</p>
                 <pre class="prettyprint lang-rose_conf">
-  [jinja2:suite.rc]
-  HELLO_WORLDS = ["eris", "pluto", "makemake", "haumea"]
-  </pre>
+[jinja2:suite.rc]
+HELLO_WORLDS = ["eris", "pluto", "makemake", "haumea"]
+</pre>
 
                 <p>Rose passes variables in this section into the
                 Jinja2 template at runtime. This means that we can
                 have a <samp>suite.rc</samp> snippet that looks
                 like this:</p>
                 <pre class="prettyprint lang-cylc">
-  {%- for WORLD in HELLO_WORLDS %}
-    [[hello_{{ WORLD }}]]
-        inherit = HELLO_FAMILY
-        [[[environment]]]
-            WORLD = {{ WORLD }}
-  {%- endfor %}
-  </pre>
+{%- for WORLD in HELLO_WORLDS %}
+  [[hello_{{ WORLD }}]]
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = {{ WORLD }}
+{%- endfor %}
+</pre>
               </div>
 
               <div class="slide">
@@ -687,16 +687,16 @@ default=echo 'Hello World'
                 <p>For example, if we had a <samp>suite.rc</samp>
                 setting that looked like this:</p>
                 <pre class="prettyprint lang-cylc">
-        [[[environment]]]
-            INCLUDE_MOONS = {{ HELLO_TO_MOONS }}
-  </pre>
+      [[[environment]]]
+          INCLUDE_MOONS = {{ HELLO_TO_MOONS }}
+</pre>
 
                 <p>We could have a <samp>rose-suite.conf</samp>
                 file that looked like this:</p>
                 <pre class="prettyprint lang-rose_conf">
-  [jinja2:suite.rc]
-  HELLO_TO_MOONS=false
-  </pre>
+[jinja2:suite.rc]
+HELLO_TO_MOONS=false
+</pre>
               </div>
 
               <div class="slide">
@@ -707,18 +707,18 @@ default=echo 'Hello World'
                 to app metadata) for the
                 <samp>rose-suite.conf</samp> file, such as:</p>
                 <pre class="prettyprint lang-rose_conf">
-  [jinja2:suite.rc=HELLO_TO_MOONS]
-  help=Decide whether to say hello to the moons of the world
-    =(if any).
-    =
-    =If true, include moons like
-    =http://en.wikipedia.org/wiki/Dysnomia_%28moon%29
-    =If false, ignore them.
-    =
-    =Moons of moons are not supported.
-  title=Include Moons when saying hello?
-  type=boolean
-  </pre>
+[jinja2:suite.rc=HELLO_TO_MOONS]
+help=Decide whether to say hello to the moons of the world
+  =(if any).
+  =
+  =If true, include moons like
+  =http://en.wikipedia.org/wiki/Dysnomia_%28moon%29
+  =If false, ignore them.
+  =
+  =Moons of moons are not supported.
+title=Include Moons when saying hello?
+type=boolean
+</pre>
               </div>
 
               <div class="slide">
@@ -727,9 +727,9 @@ default=echo 'Hello World'
                 <p>We recommend running all suites in UTC mode.
                 E.g.:</p>
                 <pre class="prettyprint lang-cylc">
-  [cylc]
-    UTC mode = True # Ignore DST
-  </pre>
+[cylc]
+  UTC mode = True # Ignore DST
+</pre>
               </div>
 
               <div class="slide">
@@ -738,13 +738,13 @@ default=echo 'Hello World'
                 <p>Suites can have event handlers to report events
                 or shutdown on failure.</p>
                 <pre class="prettyprint lang-cylc">
-  [cylc]
-    UTC mode = True # Ignore DST
-    # abort if any task fails = True
-    [[event hooks]]
-        # timeout handler = rose suite-hook --mail --shutdown
-        # timeout = P3D
-  </pre>
+[cylc]
+  UTC mode = True # Ignore DST
+  # abort if any task fails = True
+  [[event hooks]]
+      # timeout handler = rose suite-hook --mail --shutdown
+      # timeout = P3D
+</pre>
               </div>
 
               <div class="slide">
@@ -765,13 +765,13 @@ default=echo 'Hello World'
                 <p>Suites can also be configured to email you on
                 specific events. For example:</p>
                 <pre class="prettyprint lang-cylc">
-  [runtime]
-    [[root]]
-        [[[events]]]
-            mail events = submission retry, retry, \
-                          submission failed, failed, \
-                          submission timeout, execution timeout
-  </pre>
+[runtime]
+  [[root]]
+      [[[events]]]
+          mail events = submission retry, retry, \
+                        submission failed, failed, \
+                        submission timeout, execution timeout
+</pre>
 
                 <p>The events should be adjusted if necessary - for
                 example, increasing the timeout lengths or altering
@@ -784,11 +784,11 @@ default=echo 'Hello World'
                 <p>We may want to configure a job submission
                 method, such as using <code>PBS</code>:</p>
                 <pre class="prettyprint lang-cylc">
-    [[hello_eris]]
-  ...
-        [[[job submission]]]
-            method = pbs
-  </pre>
+  [[hello_eris]]
+...
+      [[[job submission]]]
+          method = pbs
+</pre>
               </div>
 
               <div class="slide">
@@ -797,15 +797,15 @@ default=echo 'Hello World'
                 <p>The job submission method may need configuration
                 via <code>directives</code>:</p>
                 <pre class="prettyprint lang-cylc">
-    [[hello_eris]]
-  ...
-        [[[job submission]]]
-            method = pbs
-        [[[directives]]]
-            -l select = 1
-            -l walltime = 00:05:00
-            -q = normal
-  </pre>
+  [[hello_eris]]
+...
+      [[[job submission]]]
+          method = pbs
+      [[[directives]]]
+          -l select = 1
+          -l walltime = 00:05:00
+          -q = normal
+</pre>
               </div>
 
               <div class="slide">
