@@ -21,11 +21,11 @@
 
 import os
 import re
-import socket
 import sys
 
 import rose.config
 from rose.fs_util import FileSystemUtil
+from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
@@ -362,13 +362,15 @@ class StemRunner(object):
 
     def _get_localhost(self):
         """Return the local host on which the rose-stem command was invoked."""
-        return socket.gethostname()
+        return HostSelector().get_local_host()
 
     def _prepend_localhost(self, url):
         """Prepend the local hostname to urls which do not point to repository
         locations."""
-        if ('svn:' not in url and 'fcm:' not in url and 'http:' not in url
-                and 'https:' not in url and 'svn+ssh:' not in url):
+        if ':' in url and url.split(':', 1)[0] not in ['svn', 'fcm', 'http',
+                                                       'https', 'svn+ssh']:
+            url = self._get_localhost() + ':' + url
+        elif ':' not in url:
             url = self._get_localhost() + ':' + url
         return url
 
