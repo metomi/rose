@@ -271,7 +271,8 @@ $(function () {
     // removes characters from a string which are not permitted in an html id
     // and replaces space(s) with a single hyphon for readability
     function safeID(id) {
-        return id.replace(/[\s]+/g, "-").replace(/[^\w_.\-]+/g, "");
+        //return id.replace(/[\s]+/g, "-").replace(/[^\w_.\-]+/g, "");
+        return id.replace(/[\s]+/g, "-").replace(/[^\w_\-]+/g, "");
     }
 
     // ajaxes in content and returns a sidebar nav
@@ -362,7 +363,7 @@ $(function () {
                 var k;
                 var headingID;
                 for (k = 0; k < headings.length; k += 1) {
-                    headingID = $(headings[k]).attr("id");
+                    headingID = safeID($(headings[k]).attr("id"));
                     if (headingID !== null) {
                         // namespace the heading
                         $(headings[k]).attr({"id": pathStr + "_" + headingID});
