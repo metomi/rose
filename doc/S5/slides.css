@@ -87,6 +87,11 @@ nav {
     display: none;
 }
 
+/* ensure slides-only content is visible */
+.slides-only {
+    display: block;
+}
+
 /* hide the previous and next buttons at the bottom of #panel-main */
 #back-button, #next-button, #pagenav {
     display: none;
