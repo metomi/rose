@@ -367,10 +367,8 @@ class StemRunner(object):
     def _prepend_localhost(self, url):
         """Prepend the local hostname to urls which do not point to repository
         locations."""
-        if ':' in url and url.split(':', 1)[0] not in ['svn', 'fcm', 'http',
-                                                       'https', 'svn+ssh']:
-            url = self._get_localhost() + ':' + url
-        elif ':' not in url:
+        if ':' not in url or url.split(':', 1)[0] not in ['svn', 'fcm', 'http',
+                                                          'https', 'svn+ssh']:
             url = self._get_localhost() + ':' + url
         return url
 
