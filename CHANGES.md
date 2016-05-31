@@ -5,6 +5,30 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2016-Q2?)
+
+Rose release 41. This release will work best with
+[cylc-6.10.1](https://github.com/cylc/cylc/releases/tag/6.10.1) and
+[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0) or
+their successors.
+
+### Noteworthy Changes
+
+[#1905](https://github.com/metomi/rose/pull/1905):
+rose macro, app-upgrade: fix section comment removal of options bug
+
+[#1903](https://github.com/metomi/rose/pull/1903):
+rose app-upgrade: fix `change_setting_value` with `forced=True`.
+
+[#1902](https://github.com/metomi/rose/pull/1902):
+rose-meta.conf: url: add section or ns root
+
+[#1895](https://github.com/metomi/rose/pull/1895):
+rose bush: view: fixed search failure if service is not served under the root
+of a server.
+
+--------------------------------------------------------------------------------
+
 ## 2016.05.1 (2016-05-19)
 
 Rose release 40. This release works best with
