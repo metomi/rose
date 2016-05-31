@@ -182,6 +182,8 @@ class StemRunner(object):
             self.fs_util = FileSystemUtil(event_handler=self.reporter)
         else:
             self.fs_util = fs_util
+        self.host_selector = HostSelector(event_handler=self.reporter,
+                                          popen=self.popen)
 
     def _add_define_option(self, var, val):
         """Add a define option passed to the SuiteRunner."""
@@ -360,16 +362,12 @@ class StemRunner(object):
         if not suite_rose_stem_version == ROSE_STEM_VERSION:
             raise RoseStemVersionException(suite_rose_stem_version)
 
-    def _get_localhost(self):
-        """Return the local host on which the rose-stem command was invoked."""
-        return HostSelector().get_local_host()
-
     def _prepend_localhost(self, url):
         """Prepend the local hostname to urls which do not point to repository
         locations."""
         if ':' not in url or url.split(':', 1)[0] not in ['svn', 'fcm', 'http',
                                                           'https', 'svn+ssh']:
-            url = self._get_localhost() + ':' + url
+            url = self.host_selector.get_local_host() + ':' + url
         return url
 
     def process(self):
