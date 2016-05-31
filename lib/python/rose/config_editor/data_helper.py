@@ -212,6 +212,22 @@ class ConfigDataHelper(object):
             var = config_data.vars.get_var(sect, opt, save=True)
         return var  # May be None.
 
+    def get_ns_url_for_variable(self, variable):
+        """Return the parent (ns or section) URL property, if any."""
+        config_name = self.util.split_full_ns(
+            self.data, variable.metadata["full_ns"])[0]
+        ns_metadata = self.data.namespace_meta_lookup.get(
+            variable.metadata["full_ns"], {})
+        ns_url = ns_metadata.get(rose.META_PROP_URL)
+        if ns_url:
+            return ns_url
+        section = self.util.get_section_option_from_id(
+            variable.metadata["id"])[0]
+        section_object = self.data.config[config_name].sections.get_sect(
+            section)
+        section_url = section_object.metadata.get(rose.META_PROP_URL)
+        return section_url
+
     def get_sections_from_namespace(self, namespace):
         """Return all sections contributing to a namespace."""
         # FIXME: What about files?

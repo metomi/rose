@@ -26,7 +26,9 @@ etc). There are also some utility methods.
 """
 import copy
 import time
+import webbrowser
 
+import rose.variable
 import rose.config_editor
 import rose.config_editor.stack
 
@@ -393,6 +395,27 @@ class VariableOperations(object):
                 return rose.config_editor.KEY_TIP_SECTION_IGNORED
             return rose.config_editor.KEY_TIP_ENABLED
         return ''
+
+    def launch_url(self, variable):
+        """Determine and launch the variable help URL in a web browser."""
+        if rose.META_PROP_URL not in variable.metadata:
+            return
+        url = variable.metadata[rose.META_PROP_URL]
+        if rose.variable.REC_FULL_URL.match(url):
+            # It is a proper URL by itself - launch it.
+            return self._launch_url(url)
+        # Must be a partial URL (e.g. '#foo') - try to prefix a parent URL.
+        ns_url = self.__data.helper.get_ns_url_for_variable(variable)
+        if ns_url:
+            return self._launch_url(ns_url + url)
+        return self._launch_url(url)
+
+    def _launch_url(self, url):
+        """Actually launch a URL."""
+        try:
+            webbrowser.open(url)
+        except webbrowser.error as exc:
+            rose.gtk.dialog.run_exception_dialog(exc)
 
     def search_for_var(self, config_name_or_namespace, setting_id):
         """Launch a search for a setting or variable id."""

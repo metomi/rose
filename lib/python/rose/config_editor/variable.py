@@ -24,7 +24,6 @@ import inspect
 import os
 import re
 import sys
-import webbrowser
 
 import pango
 import pygtk
@@ -427,33 +426,30 @@ class VariableWidget(object):
             return None
         return indicies[-1]
 
-    def launch_help(self, text_or_url=None):
-        if text_or_url is None:
-            if rose.META_PROP_HELP in self.meta:
-                text_or_url = None
-                if self.show_modes.get(
-                        rose.config_editor.SHOW_MODE_CUSTOM_HELP):
-                    format_string = rose.config_editor.CUSTOM_FORMAT_HELP
-                    text_or_url = rose.variable.expand_format_string(
-                        format_string, self.variable)
-                if text_or_url is None:
-                    text_or_url = self.meta[rose.META_PROP_HELP]
-            elif 'url' in self.meta:
-                text_or_url = self.meta[rose.META_PROP_URL]
-            else:
-                return
-        if text_or_url.startswith('http://') or text_or_url.startswith('www.'):
-            webbrowser.open(text_or_url)
-        else:
-            self._launch_help_dialog(text_or_url)
+    def launch_help(self, url_mode=False):
+        """Launch a help dialog or a URL in a web browser."""
+        if url_mode:
+            return self.var_ops.launch_url(self.variable)
+        if rose.META_PROP_HELP not in self.meta:
+            return
+        help_text = None
+        if self.show_modes.get(
+                rose.config_editor.SHOW_MODE_CUSTOM_HELP):
+            format_string = rose.config_editor.CUSTOM_FORMAT_HELP
+            help_text = rose.variable.expand_format_string(
+                format_string, self.variable)
+        if help_text is None:
+            help_text = self.meta[rose.META_PROP_HELP]
+        self._launch_help_dialog(help_text)
 
-    def _launch_help_dialog(self, text, url=None):
+    def _launch_help_dialog(self, help_text):
+        """Launch a scrollable dialog for this variable's help text."""
         title = rose.config_editor.DIALOG_HELP_TITLE.format(
-            self.variable.metadata['id'])
+            self.variable.metadata["id"])
         ns = self.variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
-        rose.gtk.dialog.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO,
-                                             text, title, search_function)
+        rose.gtk.dialog.run_hyperlink_dialog(
+            gtk.STOCK_DIALOG_INFO, help_text, title, search_function)
         return False
 
     def _set_inconsistent(self, valuewidget, variable):
