@@ -25,6 +25,7 @@ import sys
 
 import rose.config
 from rose.fs_util import FileSystemUtil
+from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
@@ -181,6 +182,8 @@ class StemRunner(object):
             self.fs_util = FileSystemUtil(event_handler=self.reporter)
         else:
             self.fs_util = fs_util
+        self.host_selector = HostSelector(event_handler=self.reporter,
+                                          popen=self.popen)
 
     def _add_define_option(self, var, val):
         """Add a define option passed to the SuiteRunner."""
@@ -359,11 +362,20 @@ class StemRunner(object):
         if not suite_rose_stem_version == ROSE_STEM_VERSION:
             raise RoseStemVersionException(suite_rose_stem_version)
 
+    def _prepend_localhost(self, url):
+        """Prepend the local hostname to urls which do not point to repository
+        locations."""
+        if ':' not in url or url.split(':', 1)[0] not in ['svn', 'fcm', 'http',
+                                                          'https', 'svn+ssh']:
+            url = self.host_selector.get_local_host() + ':' + url
+        return url
+
     def process(self):
         """Process STEM options into 'rose suite-run' options."""
 
         # Generate options for source trees
         repos = {}
+        repos_with_hosts = {}
         if not self.opts.source:
             self.opts.source = ['.']
         self.opts.project = list()
@@ -372,14 +384,23 @@ class StemRunner(object):
             project, url, base, rev, mirror = self._ascertain_project(url)
             self.opts.source[i] = url
             self.opts.project.append(project)
+
+            # Versions of variables with hostname prepended for working copies
+            url_host = self._prepend_localhost(url)
+            base_host = self._prepend_localhost(base)
+
             if project in repos:
                 repos[project].append(url)
+                repos_with_hosts[project].append(url_host)
             else:
                 repos[project] = [url]
+                repos_with_hosts[project] = [url_host]
                 self._add_define_option('SOURCE_' + project.upper() + '_REV',
                                         '"' + rev + '"')
                 self._add_define_option('SOURCE_' + project.upper() + '_BASE',
                                         '"' + base + '"')
+                self._add_define_option('HOST_SOURCE_' + project.upper()
+                                        + '_BASE', '"' + base_host + '"')
                 self._add_define_option('SOURCE_' + project.upper() +
                                         '_MIRROR', '"' + mirror + '"')
             self.reporter(SourceTreeAddedAsBranchEvent(url))
@@ -387,6 +408,10 @@ class StemRunner(object):
             var = 'SOURCE_' + project.upper()
             branchstring = RosePopener.list_to_shell_str(branches)
             self._add_define_option(var, '"' + branchstring + '"')
+        for project, branches in repos_with_hosts.iteritems():
+            var_host = 'HOST_SOURCE_' + project.upper()
+            branchstring = RosePopener.list_to_shell_str(branches)
+            self._add_define_option(var_host, '"' + branchstring + '"')
 
         # Generate the variable containing tasks to run
         if self.opts.group:
