@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 20
+tests 25
 #-------------------------------------------------------------------------------
 setup
 #-------------------------------------------------------------------------------
@@ -252,6 +252,44 @@ paint_job=sparkly
 [!garage]
 door_paint_job=boring
 __CONFIG__
-teardown
 #-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-comment-in-section-bug
+init <<'__CONFIG__'
+[car]
+budget=1000
+paint_job=standard
+wheels=4
+
+[garage]
+__CONFIG__
+init_opt colour <<'__OPT_CONFIG__'
+[car]
+paint_job=sparkly
+
+# Garages are for boats, not cars.
+[garage]
+door_paint_job=boring
+__OPT_CONFIG__
+run_pass "$TEST_KEY" rose macro -y --config=../config modify.InvisibleCarPaint
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[T] modify.InvisibleCarPaint: changes: 1
+    car=paint_job=invisible
+        Where did I park?
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.config" ../config/rose-app.conf <<'__CONFIG__'
+[car]
+budget=1000
+paint_job=invisible
+wheels=4
+
+[garage]
+__CONFIG__
+file_cmp "$TEST_KEY.opt-config" ../config/opt/rose-app-colour.conf <<'__CONFIG__'
+# Garages are for boats, not cars.
+[garage]
+door_paint_job=boring
+__CONFIG__
+#-------------------------------------------------------------------------------
+teardown
 exit
