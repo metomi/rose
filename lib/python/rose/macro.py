@@ -48,7 +48,10 @@ ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate",
 ERROR_LOAD_CONFIG_DIR = "{0}: not an application or suite directory.\n"
 ERROR_LOAD_MACRO = "Could not load macro {0}: {1}"
 ERROR_LOAD_METADATA = "Could not load metadata {0}\n"
-ERROR_LOAD_CHOSEN_META_PATH = "Could not find metadata for {0}, using {1}\n"
+ERROR_LOAD_CHOSEN_META_PATH = (
+    "Could not find metadata for {0}, using {1}\n"
+    "To suppress these warnings run 'rose edit %s'\n" % (
+        RoseOptionParser.OPTIONS['no_warn_version'][0][0]))
 ERROR_LOAD_META_PATH = "Could not find metadata for {0}"
 ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
 ERROR_MACRO_CASE_MISMATCH = ("Error: case mismatch; \n {0} does not match {1},"
@@ -437,7 +440,7 @@ def get_id_from_section_option(section, option):
 
 
 def load_meta_path(config=None, directory=None, is_upgrade=False,
-                   locator=None, opt_meta_paths=None):
+                   locator=None, opt_meta_paths=None, no_warn_version=False):
     """Retrieve the path to the configuration metadata directory.
 
     Arguments:
@@ -493,7 +496,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         except rose.resource.ResourceError:
             continue
         else:
-            if not ignore_meta_error and i > 0:
+            if not (ignore_meta_error or no_warn_version) and i > 0:
                 warning = ERROR_LOAD_CHOSEN_META_PATH.format(meta_keys[0],
                                                              meta_keys[i])
             if is_upgrade:
@@ -506,7 +509,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
 
 def load_meta_config_tree(config, directory=None, config_type=None,
                           error_handler=None, ignore_meta_error=False,
-                          opt_meta_paths=None):
+                          opt_meta_paths=None, no_warn_version=False):
     """Return the metadata config tree for a configuration."""
     if opt_meta_paths:
         paths = opt_meta_paths + sys.path
@@ -518,8 +521,9 @@ def load_meta_config_tree(config, directory=None, config_type=None,
     if config_type is not None:
         default_meta_dir = config_type.replace(".", "-")
         meta_list.append(default_meta_dir + "/" + rose.META_CONFIG_NAME)
-    config_meta_path, warning = load_meta_path(config, directory,
-                                               opt_meta_paths=opt_meta_paths)
+    config_meta_path, warning = load_meta_path(
+        config, directory, opt_meta_paths=opt_meta_paths,
+        no_warn_version=no_warn_version)
     if warning is not None and not ignore_meta_error:
         error_handler(text=warning)
     locator = rose.resource.ResourceLocator(paths=paths)

@@ -336,6 +336,12 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "no_headers",
              "help": "Suppress headers."}],
+        "no_warn_version": [
+            ["--no-warn-version"],
+            {"action": "store_true",
+             "default": False,
+             "help": "Suppress \"could not find metadata for app/version, " +
+                     "using app/HEAD\" warnings."}],
         "next": [
             ["--next"],
             {"action": "store_true",

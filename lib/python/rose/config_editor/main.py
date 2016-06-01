@@ -115,11 +115,9 @@ class MainController(object):
     RE_ARRAY_ELEMENT = re.compile('\([\d:, ]+\)$')
 
     def __init__(self, config_directory=None, config_objs=None,
-                 config_obj_types=None,
-                 pluggable=False,
-                 load_updater=None,
+                 config_obj_types=None, pluggable=False, load_updater=None,
                  load_all_apps=False, load_no_apps=False, metadata_off=False,
-                 opt_meta_paths=None):
+                 opt_meta_paths=None, no_warn_version=False):
         if config_objs is None:
             config_objs = {}
         if pluggable:
@@ -190,7 +188,8 @@ class MainController(object):
             self.reporter,
             self.page_ns_show_modes,
             self.reload_namespace_tree,
-            opt_meta_paths=opt_meta_paths
+            opt_meta_paths=opt_meta_paths,
+            no_warn_version=no_warn_version
         )
 
         self.nav_controller = (
@@ -1838,7 +1837,8 @@ class MainController(object):
 
 def spawn_window(config_directory_path=None, debug_mode=False,
                  load_all_apps=False, load_no_apps=False, metadata_off=False,
-                 initial_namespaces=None, opt_meta_paths=None):
+                 initial_namespaces=None, opt_meta_paths=None,
+                 no_warn_version=False):
     """Create a window and load the configuration into it. Run gtk."""
     if opt_meta_paths is None:
         opt_meta_paths = []
@@ -1872,7 +1872,8 @@ def spawn_window(config_directory_path=None, debug_mode=False,
                               load_all_apps=load_all_apps,
                               load_no_apps=load_no_apps,
                               metadata_off=metadata_off,
-                              opt_meta_paths=opt_meta_paths)
+                              opt_meta_paths=opt_meta_paths,
+                              no_warn_version=no_warn_version)
     except BaseException as e:
         splash_screen.stop()
         if debug_mode and isinstance(e, Exception):
@@ -1966,7 +1967,8 @@ def main():
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode",
-                              "load_no_apps", "load_all_apps", "no_metadata")
+                              "load_no_apps", "load_all_apps", "no_metadata",
+                              "no_warn_version")
     opts, args = opt_parser.parse_args()
     rose.macro.add_meta_paths()
     opt_meta_paths = []
@@ -2001,8 +2003,9 @@ def main():
                                         load_no_apps=opts.load_no_apps,
                                         metadata_off=opts.no_metadata,
                                         initial_namespaces=args,
-                                        opt_meta_paths=opt_meta_paths)""",
-                        globals(), locals(), f.name)
+                                        opt_meta_paths=opt_meta_paths,
+                                        no_warn_version=opts.no_warn_version)
+                        """, globals(), locals(), f.name)
         p = pstats.Stats(f.name)
         p.strip_dirs().sort_stats("cumulative").print_stats()
         f.close()
@@ -2012,7 +2015,8 @@ def main():
                      load_no_apps=opts.load_no_apps,
                      metadata_off=opts.no_metadata,
                      initial_namespaces=args,
-                     opt_meta_paths=opt_meta_paths)
+                     opt_meta_paths=opt_meta_paths,
+                     no_warn_version=opts.no_warn_version)
 
 
 if __name__ == '__main__':
