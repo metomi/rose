@@ -1061,10 +1061,9 @@ ignore{foo}=namelist:bar,namelist:baz
 
               <dd>Launch with metadata switched off.</dd>
 
-              <dt><kbd>--no-warn-version</kbd></dt>
+              <dt><kbd>--no-warn=WARNING-TYPE</kbd></dt>
 
-              <dd>Suppress "could not find metadata for app/version, using
-              app/HEAD" warnings.</dd>
+              <dd>Suppress warnings of the provided type.</dd>
             </dl>
 
             <h3>ARGUMENTS</h3>
@@ -1077,6 +1076,21 @@ ignore{foo}=namelist:bar,namelist:baz
               <var>'foo/bar/env'</var> or <var>'env'</var>.<br />
               NOTE: Opens the shortest namespace that matches the
               provided string.</dd>
+            </dl>
+
+            <h3>OPTIONS</h3>
+
+            <dl>
+                <dt><kbd>--no-warn WARNING_TYPE</kbd></dt>
+
+                <dd>Suppress warnings of type <var>WARNING_TYPE</var>.
+                  <var>WARNING_TYPE</var> may be:
+                  <ul>
+                    <li><var>version</var>: 'could not find metadata for
+                    app/version, using app/HEAD' warnings.</li>
+                  </ul>
+                </dd>
+
             </dl>
 
             <h3>ENVIRONMENT VARIABLES</h3>

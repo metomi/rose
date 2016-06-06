@@ -336,12 +336,6 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "no_headers",
              "help": "Suppress headers."}],
-        "no_warn_version": [
-            ["--no-warn-version"],
-            {"action": "store_true",
-             "default": False,
-             "help": "Suppress \"could not find metadata for app/version, " +
-                     "using app/HEAD\" warnings."}],
         "next": [
             ["--next"],
             {"action": "store_true",
@@ -381,6 +375,13 @@ class RoseOptionParser(OptionParser):
              "default": False,
              "dest": "no_pretty_mode",
              "help": "Switch off format-specific prettyprinting."}],
+        "no_warn": [
+            ["--no-warn"],
+            {"action": "append",
+             "metavar": "WARNING_TYPE",
+             "choices": ["version"],
+             "dest": "no_warn",
+             "help": "Warnings to disable."}],
         "offsets1": [
             ["--offset1", "--offset", "-s", "-1"],
             {"action": "append",

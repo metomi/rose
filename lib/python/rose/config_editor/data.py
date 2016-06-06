@@ -175,7 +175,7 @@ class ConfigDataManager(object):
 
     def __init__(self, util, reporter, page_ns_show_modes,
                  reload_ns_tree_func, opt_meta_paths=None,
-                 no_warn_version=False):
+                 no_warn=None):
         """Load the root configuration and all its sub-configurations."""
         self.util = util
         self.helper = rose.config_editor.data_helper.ConfigDataHelper(
@@ -199,7 +199,7 @@ class ConfigDataManager(object):
             self.opt_meta_paths = []
         else:
             self.opt_meta_paths = opt_meta_paths
-        self.no_warn_version = no_warn_version
+        self.no_warn = no_warn
 
     def load(self, top_level_directory, config_obj_dict,
              config_obj_type_dict=None, load_all_apps=False,
@@ -836,7 +836,7 @@ class ConfigDataManager(object):
             config_type=config_type,
             error_handler=error_handler,
             opt_meta_paths=opt_meta_paths,
-            no_warn_version=self.no_warn_version
+            no_warn=self.no_warn
         )
 
     def load_meta_files(self, config_tree):
