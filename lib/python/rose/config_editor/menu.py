@@ -943,7 +943,15 @@ class MainMenuHandler(object):
         this_id = self.data.top_level_name
         scontrol = rose.suite_control.SuiteControl()
         if scontrol.suite_engine_proc.is_suite_registered(this_id):
-            return scontrol.gcontrol(this_id)
+            try:
+                return scontrol.gcontrol(this_id)
+            except rose.suite_control.SuiteNotRunningError as err:
+                msg = rose.config_editor.DIALOG_TEXT_SUITE_NOT_RUNNING.format(
+                    str(err))
+                return rose.gtk.dialog.run_dialog(
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    msg,
+                    rose.config_editor.DIALOG_TITLE_SUITE_NOT_RUNNING)
         else:
             msg = rose.config_editor.DIALOG_TEXT_UNREGISTERED_SUITE.format(
                 this_id)
