@@ -129,7 +129,7 @@ def launch_node_info_dialog(node, changes, search_function):
     maxlen = rose.config_editor.DIALOG_NODE_INFO_MAX_LEN
     for i, (att_name, att_val) in enumerate(att_list):
         if (att_name == 'metadata' or att_name.startswith("_") or
-                callable(att_val)):
+                callable(att_val) or att_name == 'old_value'):
             continue
         if i == metadata_start_index:
             text += "\n" + rose.config_editor.DIALOG_NODE_INFO_METADATA
