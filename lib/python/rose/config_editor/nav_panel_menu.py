@@ -272,7 +272,6 @@ class NavPanelHandler(object):
 
     def rename_dialog(self, base_ns):
         """Handle a rename section dialog and request."""
-        config_names = self.data.config.keys()
         if base_ns is not None and '/' in base_ns:
             config_name, subsp = self.util.split_full_ns(self.data, base_ns)
             prefer_name_sections = {
@@ -281,8 +280,7 @@ class NavPanelHandler(object):
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
-        sorter = rose.config.sort_settings
-        for config_name in config_names:
+        for config_name in self.data.config:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = config_data.sections.now.keys()
             config_sect_dict[config_name].sort(rose.config.sort_settings)
