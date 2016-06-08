@@ -114,14 +114,20 @@ pre.shell-prompt, pre.shell {width:auto;}
  * necessary) */
 div.slide-title > span {font-size:2.0em;}
 h1 {font-size:1.6em;}
-h2 {font-size:1.4em;}
-h3 {font-size:1.2em;}
-h4 {font-size:1.0em;}
-p, ul, code {font-size: 0.8em;}
+h2 {font-size:1.4em; font-weight: bold;}
+h3 {font-size:1.2em; font-weight: bold;}
+h4 {font-size:1.1em; font-weight: bold;}
+p, ul, code {font-size: 1.0em;}
 pre {font-size: 0.6em;}
 
 /* reduce default line for pre elements so we can get more code in */
 pre {line-height:1.2;}
+
+/* indent lists */
+ul {margin-left: 1em;}
+
+/* smaller font for nested lists */
+ul li ul {font-size: 0.8em;}
 
 /* increase the gap between li elements for presentation */
 ul li {margin-top: 0.65em; margin-bottom: 0.65em;}
