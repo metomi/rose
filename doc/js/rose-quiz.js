@@ -69,16 +69,18 @@ $(function() {
                 correct_answers[input_name].join("")) {
                 $("#" + input_name + " .answers").prepend(
                     $("<span/>",
-                      {"class": "answer-status succeed"}
-                     ).text("Correct: ")
+                      {"class": "label label-success"}
+                     ).text("Correct:"),
+                    " "
                 );
                 good_answers += 1;
             }
             else {
                 $("#" + input_name + " .answers").prepend(
                     $("<span/>",
-                      {"class": "answer-status fail"}
-                     ).text("Answer: ")
+                      {"class": "label label-danger"}
+                     ).text("Answer:"),
+                    " "
                 );
                 bad_answers += 1;
             }
