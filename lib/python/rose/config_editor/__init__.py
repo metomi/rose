@@ -537,6 +537,7 @@ DIALOG_TIP_SUITE_RUN_HELP = "Read the help for rose suite-run"
 DIALOG_TEXT_MACRO_CHANGED = "changed"
 DIALOG_TEXT_MACRO_ERROR = "error"
 DIALOG_TEXT_MACRO_WARNING = "warning"
+DIALOG_TEXT_SUITE_NOT_RUNNING = ("Cannot launch gcontrol: {0}")
 DIALOG_TEXT_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +
                                   "suite {0} is not registered.")
 DIALOG_TITLE_MACRO_TRANSFORM = "{0} - Changes for {1}"
@@ -564,6 +565,7 @@ DIALOG_TITLE_PREFERENCES = "Configure preferences"
 DIALOG_TITLE_REMOVE = "Remove section"
 DIALOG_TITLE_RENAME = "Rename section"
 DIALOG_TITLE_SAVE_CHANGES = "Save changes?"
+DIALOG_TITLE_SUITE_NOT_RUNNING = "Suite not running"
 DIALOG_TITLE_UNREGISTERED_SUITE = "Suite not registered"
 DIALOG_TITLE_UPGRADE = "Upgrade configurations"
 DIALOG_TITLE_WARNING = "Warning"
