@@ -297,10 +297,11 @@ class GroupOperations(object):
             while new_section in existing_sections:
                 i += 1
                 new_section = section_base + "(" + str(i) + ")"
-        self.sect_ops.add_section(config_name, new_section,
-                                  skip_update=skip_update)
-        new_namespace = self.data.helper.get_default_namespace_for_section(
-            new_section, config_name)
+        new_namespace = self.sect_ops.add_section(config_name, new_section,
+                                                  skip_update=skip_update)
+        if new_namespace is None:
+            # Add failed (section already exists).
+            return
         for var in clone_vars:
             var_id = self.util.get_id_from_section_option(
                 new_section, var.name)
@@ -357,6 +358,21 @@ class GroupOperations(object):
             self.var_ops.remove_var(variable, skip_update=True)
         self.sect_ops.remove_section(config_name, section,
                                      skip_update=skip_update)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+
+    def rename_section(self, config_name, section, target_section,
+                       skip_update=False):
+        """Implement a rename of a section and its options."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_RENAME + "-" + str(time.time())
+        added_section = self.copy_section(config_name, section,
+                                          target_section,
+                                          skip_update=skip_update)
+        if added_section is None:
+            # Couldn't add the target section.
+            return
+        self.remove_section(config_name, section, skip_update=skip_update)
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
 
