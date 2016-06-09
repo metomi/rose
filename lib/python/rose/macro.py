@@ -628,12 +628,13 @@ def get_macro_class_methods(macro_modules):
 def get_macros_for_config(app_config=None,
                           config_directory=None,
                           return_modules=False,
-                          include_system=False):
+                          include_system=False,
+                          no_warn=False):
     """Driver function to return macro names for a config object."""
     if app_config is None:
         app_config = rose.config.ConfigNode()
     meta_config_tree = load_meta_config_tree(
-        app_config, directory=config_directory)
+        app_config, directory=config_directory, no_warn=no_warn)
     if meta_config_tree is None:
         return []
     meta_filepaths = [
@@ -853,7 +854,8 @@ def get_metadata_for_config_id(setting_id, meta_config):
 def run_macros(config_map, meta_config, config_name, macro_names,
                opt_conf_dir=None, opt_fix=False,
                opt_non_interactive=False, opt_output_dir=None,
-               opt_validate_all=False, verbosity=None):
+               opt_validate_all=False, verbosity=None,
+               no_warn=False):
     """Run standard or custom macros for a configuration."""
 
     reporter = rose.reporter.Reporter(verbosity)
@@ -861,7 +863,8 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     macro_tuples, modules = get_macros_for_config(
         config_map[None], opt_conf_dir,
         return_modules=True,
-        include_system=True
+        include_system=True,
+        no_warn=no_warn
     )
     # Add all validator macros to the run list if specified.
     if opt_validate_all:
@@ -1239,7 +1242,7 @@ def parse_macro_args(argv=None):
     """Parse options/arguments for rose macro and upgrade."""
     opt_parser = RoseOptionParser()
     options = ["conf_dir", "meta_path", "non_interactive", "output_dir",
-               "fix", "validate_all"]
+               "fix", "validate_all", "no_warn"]
     opt_parser.add_my_options(*options)
     if argv is None:
         opts, args = opt_parser.parse_args()
@@ -1371,7 +1374,7 @@ def main():
         ret.append(run_macros(
             config_map, meta_config, config_name, list(args), opts.conf_dir,
             opts.fix, opts.non_interactive, opts.output_dir,
-            opts.validate_all, verbosity
+            opts.validate_all, verbosity, no_warn=opts.no_warn
         ))
     # return 0 if all macros return True else 1
     return_code = 0 if reduce(lambda x, y: x and y, ret) is True else 1
