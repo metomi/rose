@@ -70,9 +70,9 @@ MACRO_OUTPUT_VALIDATE_ISSUES = "{0}: issues: {1}\n"
 MACRO_OUTPUT_WARNING_ISSUES = "{0}: warnings: {1}\n"
 OPT_CONFIG_REPORT = "(opts={0})"
 REC_MODIFIER = re.compile(r"\{.+\}")
-REC_ID_STRIP_DUPL = re.compile(r"\([:, \w]+\)")
-REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([:, \w]+\))?$')
-REC_ID_ELEMENT = re.compile(r"\(([:, \w]+)\)$")
+REC_ID_STRIP_DUPL = re.compile(r"\([^()]+\)")
+REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([^()]+\))?$')
+REC_ID_ELEMENT = re.compile(r"\(([^()]+)\)$")
 REC_ID_SINGLE_ELEMENT = re.compile(r"\((\d+)\)$")
 ID_ELEMENT_FORMAT = "{0}({1})"
 PROBLEM_ENTRY = "    {0}{1}={2}={3}\n        {4}\n"

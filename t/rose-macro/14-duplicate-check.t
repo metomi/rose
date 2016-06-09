@@ -35,7 +35,9 @@ my_var5(1) = .true.
 my_var6(2) = .true.
 my_var7 = .true.
 
-
+[namelist:nl5(`!"%^&sd_-3)]
+my_var6(3) = .true.
+my_var7 = .true.
 __CONFIG__
 #-------------------------------------------------------------------------------
 tests 6
@@ -59,6 +61,9 @@ duplicate = true
 
 [namelist:nl4{modifier}]
 duplicate = true
+
+[namelist:nl5]
+duplicate = true
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
@@ -75,17 +80,21 @@ duplicate = true
 [namelist:nl2]
 
 [namelist:nl3=foo]
+
+[namelist:nl5]
 __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 3
+[V] rose.macros.DefaultValidators: issues: 4
     namelist:nl1=None=None
         incorrect "duplicate=true" metadata
     namelist:nl2(1)=None=None
         namelist:nl2 requires "duplicate=true" metadata
     namelist:nl3{modifier}=None=None
         namelist:nl3 requires "duplicate=true" metadata
+    namelist:nl5(`!"%^&sd_-3)=None=None
+        namelist:nl5 requires "duplicate=true" metadata
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
