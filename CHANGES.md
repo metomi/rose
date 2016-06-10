@@ -7,10 +7,9 @@ for a full listing of issues for each release.
 
 ## 2016.06.0 (2016-06-10)
 
-Rose release 41. This release will work best with
+Rose release 41. This release works best with
 [cylc-6.10.2](https://github.com/cylc/cylc/releases/tag/6.10.2) and
-[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0) or
-their successors.
+[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0).
 
 ### Highlighted Changes
 
