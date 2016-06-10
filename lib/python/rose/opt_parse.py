@@ -375,6 +375,13 @@ class RoseOptionParser(OptionParser):
              "default": False,
              "dest": "no_pretty_mode",
              "help": "Switch off format-specific prettyprinting."}],
+        "no_warn": [
+            ["--no-warn"],
+            {"action": "append",
+             "metavar": "WARNING_TYPE",
+             "choices": ["version"],
+             "dest": "no_warn",
+             "help": "Warnings to disable."}],
         "offsets1": [
             ["--offset1", "--offset", "-s", "-1"],
             {"action": "append",

@@ -178,3 +178,7 @@ h2 {
 .alwayshidden {
     display: none;
 }
+
+#configuration-metadata-table td, th{
+    text-align: center;
+}

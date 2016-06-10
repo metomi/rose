@@ -727,75 +727,42 @@ root-dir=hpc*=$WORKDIR
 
                   <li>other configuration files that require more
                   than section=key=value.</li>
+
                 </ul>
 
-                <p>Files in this directory are copied to the
-                working directory in run time.</p>
+                <p>Files in this directory are copied to the working directory
+                in run time.</p>
 
-                <p>Note: If there is a clash between a
-                <var>[file:*]</var> section and a file under
-                <var>file/</var>, the setting in the
-                <var>[file:*]</var> section takes precedence. E.g.
-                Suppose we have a file <samp>file/hello.txt</samp>.
-                In the absence of <samp>[file:hello.txt]</samp>, it
-                will copy <samp>file/hello.txt</samp> to
-                <samp>$PWD/hello.txt</samp> in run time. However,
-                if we have a <samp>[file:hello.txt]</samp> section
-                and a <var>source=SOURCE</var> setting, then it
-                will install the file from <var>SOURCE</var>
-                instead. If we have <samp>[!file:hello.txt]</samp>,
-                then the file will not be installed at all.</p>
+                <p>Note: If there is a clash between a <var>[file:*]</var>
+                section and a file under <var>file/</var>, the setting in the
+                <var>[file:*]</var>
+                section takes precedence. E.g. Suppose we have a file
+                <samp>file/hello.txt</samp>. In the absence of
+                <samp>[file:hello.txt]</samp>, it will copy
+                <samp>file/hello.txt</samp> to <samp>$PWD/hello.txt</samp>
+                in run time. However, if we have a
+                <samp>[file:hello.txt]</samp> section and a
+                <var>source=SOURCE</var> setting, then it will install
+                the file from <var>SOURCE</var> instead. If we have
+                <samp>[!file:hello.txt]</samp>, then the file will not
+                be installed at all.</p>
               </li>
 
               <li><samp>bin/</samp> directory for e.g. scripts and
               executables used by the application at run time. If a
-              <samp>bin/</samp> exists in the application
-              configuration, it will prepended to the
-              <var>PATH</var> environment variable at run
-              time.</li>
+              <samp>bin/</samp> exists in the application configuration,
+              it will prepended to the <var>PATH</var> environment
+              variable at run time.</li>
 
-              <li><samp>meta/</samp> directory for the metadata of
-              the application.</li>
+              <li><samp>meta/</samp> directory for the metadata of the
+              application.</li>
 
               <li><samp>opt/</samp> directory. For detail, see
               <a href="#opts">Optional Configuration</a>.</li>
             </ul>
 
-              <li>other configuration files that require more than
-              section=key=value.</li>
-            </ul>
-
-            <p>Files in this directory are copied to the working directory in
-            run time.</p>
-
-            <p>Note: If there is a clash between a <var>[file:*]</var> section
-            and a file under <var>file/</var>, the setting in the
-            <var>[file:*]</var>
-            section takes precedence. E.g. Suppose we have a file
-            <samp>file/hello.txt</samp>. In the absence of
-            <samp>[file:hello.txt]</samp>, it will copy
-            <samp>file/hello.txt</samp>
-            to <samp>$PWD/hello.txt</samp> in run time. However, if we have a
-            <samp>[file:hello.txt]</samp> section and a <var>source=SOURCE</var>
-            setting, then it will install the file from <var>SOURCE</var>
-            instead. If we have <samp>[!file:hello.txt]</samp>, then the file
-            will not be installed at all.</p>
-          </li>
-
-          <li><samp>bin/</samp> directory for e.g. scripts and executables used
-          by the application at run time. If a <samp>bin/</samp> exists in the
-          application configuration, it will prepended to the <var>PATH</var>
-          environment variable at run time.</li>
-
-          <li><samp>meta/</samp> directory for the metadata of the
-          application.</li>
-
-          <li><samp>opt/</samp> directory. For detail, see
-          <a href="#opts">Optional Configuration</a>.</li>
-        </ul>
-
-        <p>E.g. The application configuration directory may look like:</p>
-        <pre>
+            <p>E.g. The application configuration directory may look like:</p>
+            <pre>
 ./bin/
 ./rose-app.conf
 ./file/file1
