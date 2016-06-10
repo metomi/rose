@@ -14,6 +14,14 @@ their successors.
 
 ### Highlighted Changes
 
+[#1905](https://github.com/metomi/rose/pull/1905):
+rose macro, app-upgrade: fix section comment removal of options bug. This
+meant that on upgrade or macro change, some optional configurations could
+lose options from their sections. This happened only if the sections were
+also present in the main configuration and if they had a differing comment
+or ignored state in the optional configuration. Please check if you think
+this may have happened to you.
+
 [#1891](https://github.com/metomi/rose/pull/1891):
 rose documentation: restyled with Bootstrap 3.
 User guide is now available in a single page as well as in multiple pages.
@@ -36,9 +44,6 @@ rose config-edit: don't show `old_value` in info dialog.
 [#1906](https://github.com/metomi/rose/pull/1906):
 rose config-edit and rose macro: new `--no-warn=version` option to suppress
 default version to HEAD warnings.
-
-[#1905](https://github.com/metomi/rose/pull/1905):
-rose macro, app-upgrade: fix section comment removal of options bug
 
 [#1903](https://github.com/metomi/rose/pull/1903):
 rose app-upgrade: fix `change_setting_value` with `forced=True`.
