@@ -1,108 +1,127 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+
   <title>Rose Advanced Tutorial: suicide triggers</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
-  <meta name="controlVis" content="visible" />
-  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
-  "projection" id="slideProj" />
-  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
-  "screen" id="outlineStyle" />
-  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
-  id="operaFix" />
+  <meta http-equiv="Content-Type" content=
+  "text/html; charset=us-ascii" />
+  <link rel="icon" href="img/rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="img/rose-icon.png" type=
+  "image/png" />
   <link rel="stylesheet" type="text/css" href=
-  "google-code-prettify/prettify.css" />
-  <link rel="icon" href="rose-icon.png" type="image/png" />
-  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
-  <script src="S5/slides.js" type="text/javascript">
+  "css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="css/rose-doc.css" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css"
+  media="projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css"
+  media="screen" id="outlineStyle" />
+  <script type="text/javascript" src="js/jquery.min.js">
 </script>
-  <script type="text/javascript" src="jquery.min.js">
+  <script type="text/javascript" src="js/run_prettify.js">
 </script>
-  <script type="text/javascript" src="google-code-prettify/prettify.js">
+  <script type="text/javascript" src="js/prettify-rose-conf.js">
 </script>
-  <script type="text/javascript" src="prettify-rose-conf.js">
+  <script type="text/javascript" src=
+  "js/prettify-cylc-suite-rc.js">
 </script>
-  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+  <script type="text/javascript" src="js/bootstrap.min.js">
 </script>
-  <script type="text/javascript" src="rose-doc.js">
+  <script type="text/javascript" src="js/rose-doc.js">
 </script>
-  <script type="text/javascript" src="rose-version.js">
+  <script type="text/javascript" src="js/rose-version.js">
+</script>
+  <script type="text/javascript" src="S5/slides.js">
 </script>
 </head>
 
 <body>
-  <div class="header-footer" id="body-header">
-    <address>
-      &copy; British Crown Copyright 2012-6 <a href=
-      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
-      "rose-terms-of-use.html">Terms of Use</a>.<br />
-      This document is released under the <a href=
-      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.<br />
-      <span id="rose-version"></span>
-    </address>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="."><span class="logo">Rose
+        Documentation</span></a>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
 
-    <div class="rose-link">
-      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+      <div class="collapse navbar-collapse" id=
+      "bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="rose-single-page.html">Single
+          Page Version</a></li>
+          <li><a href="javascript:toggle()">S5 Slideshow</a></li>
+        </ul>
 
-      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-      Documentation</a></p>
-    </div>
+        <ul class="nav navbar-nav navbar-right">
+          <li><span class="navbar-text"><span class=
+          "compliance">&#169; British Crown Copyright 2012-6
+          <a href="http://www.metoffice.gov.uk">Met Office</a>. See
+          <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+          This document is released under the <a href=
+          "http://www.nationalarchives.gov.uk/doc/open-government-licence/"
+          rel="license">Open Government
+          Licence</a>.</span></span></li>
 
-    <div id="currentSlide">
-      <!-- DO NOT EDIT -->
-    </div>
+          <li><span id="rose-version" class=
+          "navbar-text"></span></li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
 
-    <div id="controls">
-      <!-- DO NOT EDIT -->
-    </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div id="panel-main" class="panel panel-default">
+          <div class="panel-heading">
+            <h1 class="slides-only logo logo-large">Suicide Triggers</h1>
+            <h1 class="outline-only">Rose Advanced Tutorial: suicide triggers
+            </h1>
+          </div>
 
-    <div class="header-footer" id="footer"></div>
-  </div>
+          <div id="body-main" class="panel-body presentation">
+            <div class="handout" id="content"></div>
 
-  <div id="body-main" class="presentation">
-    <div class="slide">
-      <h1>Rose Advanced Tutorial: suicide triggers</h1>
-    </div>
+            <div class="slide slide-title">
+              <span>Suicide Triggers</span>
+            </div>
 
-    <div class="handout" id="content"></div>
+            <div class="slide">
+              <h2 id="intro">Introduction</h2>
 
-    <div class="slide">
-      <h2 id="intro">Introduction</h2>
+              <p>This tutorial walks you through using suicide
+              triggers.</p>
 
-      <p>This tutorial walks you through using suicide triggers.</p>
+              <p>Suicide triggers allow you to remove tasks from
+              the suite during runtime.</p>
+            </div>
 
-      <p>Suicide triggers allow you to remove tasks from the suite during
-      runtime.</p>
-    </div>
+            <div class="slide">
+              <h2 id="purpose">Purpose</h2>
 
-    <div class="slide">
-      <h2 id="purpose">Purpose</h2>
+              <p>Suicide triggers can be used to remove any task
+              from a suite while it is running.</p>
 
-      <p>Suicide triggers can be used to remove any task from a suite while it
-      is running.</p>
+              <p>They work much like any other type of trigger in a
+              suite, except that rather than running a particular
+              task once the triggering condition is met, the task
+              is instead removed from the suite.</p>
+            </div>
 
-      <p>They work much like any other type of trigger in a suite, except that
-      rather than running a particular task once the triggering condition is
-      met, the task is instead removed from the suite.</p>
-    </div>
+            <div class="slide">
+              <h2 id="example-task">Example</h2>
 
-    <div class="slide">
-      <h2 id="example-task">Example</h2>
+              <p>Create a <a href="rose-rug-brief-tour#cli">new
+              suite</a> (or just a new directory somewhere - e.g.
+              in your homespace) containing a blank
+              <samp>rose-suite.conf</samp> and a
+              <samp>suite.rc</samp> file that looks like this:</p>
+            </div>
 
-      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
-      new directory somewhere - e.g. in your homespace) containing a blank
-      <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
-      like this:</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Example suite.rc</h3>
-      <pre class="prettyprint lang-cylc">
+            <div class="slide">
+              <h3 class="alwayshidden">Example suite.rc</h3>
+              <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
 [scheduling]
@@ -112,34 +131,38 @@
             bake_cake | purchase_cake =&gt; eat_cake
             """
 </pre>
-    </div>
+            </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Description</h3>
+            <div class="slide">
+              <h3 class="alwayshidden">Description</h3>
 
-      <p>This sets up a simple suite which consists of the following:</p>
+              <p>This sets up a simple suite which consists of the
+              following:</p>
 
-      <ul>
-        <li>a <samp>bake_cake</samp> task which either succeeds or fails</li>
+              <ul>
+                <li>a <samp>bake_cake</samp> task which either
+                succeeds or fails</li>
 
-        <li>a <samp>purchase_cake</samp> "recovery" task which is run if
-        <samp>bake_cake</samp> fails</li>
+                <li>a <samp>purchase_cake</samp> "recovery" task
+                which is run if <samp>bake_cake</samp> fails</li>
 
-        <li>an <samp>eat_cake</samp> task which runs once cake has been
-        obtained i.e. once <samp>bake_cake</samp> or <samp>purchase_cake</samp>
-        has succeeded</li>
-      </ul>
+                <li>an <samp>eat_cake</samp> task which runs once
+                cake has been obtained i.e. once
+                <samp>bake_cake</samp> or
+                <samp>purchase_cake</samp> has succeeded</li>
+              </ul>
 
-      <p>For purposes of this tutorial <samp>purchase_cake</samp> will always
-      succeed as cake should be available to buy somewhere.</p>
-    </div>
+              <p>For purposes of this tutorial
+              <samp>purchase_cake</samp> will always succeed as
+              cake should be available to buy somewhere.</p>
+            </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Runtime</h3>
+            <div class="slide">
+              <h3 class="alwayshidden">Runtime</h3>
 
-      <p>It will need some runtime. Add the following to your
-      <samp>suite.rc</samp> file:</p>
-      <pre class="prettyprint lang-cylc">
+              <p>It will need some runtime. Add the following to
+              your <samp>suite.rc</samp> file:</p>
+              <pre class="prettyprint lang-cylc">
 [runtime]
     [[bake_cake]]
         script = """
@@ -155,50 +178,57 @@ fi
     [[eat_cake]]
         script = sleep 10; echo 'Mmm cake!'
 </pre>
-    </div>
+            </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Run the suite</h3>
+            <div class="slide">
+              <h3 class="alwayshidden">Run the suite</h3>
 
-      <p>Save your changes and run the suite using <samp>rose
-      suite-run</samp></p>
+              <p>Save your changes and run the suite using
+              <samp>rose suite-run</samp></p>
 
-      <p>The suite should now run. If <samp>bake_cake</samp> fails,
-      <samp>purchase_cake</samp> is triggered which triggers
-      <samp>eat_cake</samp>. Otherwise, <samp>bake_cake</samp> triggers
-      <samp>eat_cake</samp>.</p>
+              <p>The suite should now run. If
+              <samp>bake_cake</samp> fails,
+              <samp>purchase_cake</samp> is triggered which
+              triggers <samp>eat_cake</samp>. Otherwise,
+              <samp>bake_cake</samp> triggers
+              <samp>eat_cake</samp>.</p>
 
-      <p>Notice that at once <samp>eat_cake</samp> has completed the suite does
-      not shut down. This is because either <samp>bake_cake</samp> is in the
-      failed state or <samp>purchase_cake</samp> is waiting to be triggered.
-      Shut down the suite by pressing the stop button in the <code>cylc
-      gui</code>.</p>
+              <p>Notice that at once <samp>eat_cake</samp> has
+              completed the suite does not shut down. This is
+              because either <samp>bake_cake</samp> is in the
+              failed state or <samp>purchase_cake</samp> is waiting
+              to be triggered. Shut down the suite by pressing the
+              stop button in the <code>cylc gui</code>.</p>
 
-      <p>You may want to run the suite again to see both situations.</p>
-    </div>
+              <p>You may want to run the suite again to see both
+              situations.</p>
+            </div>
 
-    <div class="slide">
-      <h2 id="example-trigger">Adding suicide triggers</h2>
+            <div class="slide">
+              <h2 id="example-trigger">Adding suicide triggers</h2>
 
-      <p>Since <samp>purchase_cake</samp> has corrected for the failure of
-      <samp>bake_cake</samp> we don't need the suite to keep running - we would
-      like the suite to be able to shutdown once the final cycle has
-      completed.</p>
+              <p>Since <samp>purchase_cake</samp> has corrected for
+              the failure of <samp>bake_cake</samp> we don't need
+              the suite to keep running - we would like the suite
+              to be able to shutdown once the final cycle has
+              completed.</p>
 
-      <p>We can make use of a suicide trigger to remove the failed
-      <samp>bake_cake</samp> task.</p>
-    </div>
+              <p>We can make use of a suicide trigger to remove the
+              failed <samp>bake_cake</samp> task.</p>
+            </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Adding suicide triggers (2)</h3>
+            <div class="slide">
+              <h3 class="alwayshidden">Adding suicide triggers
+              (2)</h3>
 
-      <p>Once <samp>purchase_cake</samp> has succeeded we no longer need
-      <samp>bake_cake</samp> so we can use a suicide trigger to remove
-      <samp>bake_cake</samp> from the suite.</p>
+              <p>Once <samp>purchase_cake</samp> has succeeded we
+              no longer need <samp>bake_cake</samp> so we can use a
+              suicide trigger to remove <samp>bake_cake</samp> from
+              the suite.</p>
 
-      <p>Modify the <samp>[scheduling]</samp> section to look like the
-      following:</p>
-      <pre class="prettyprint lang-cylc">
+              <p>Modify the <samp>[scheduling]</samp> section to
+              look like the following:</p>
+              <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = """
@@ -207,85 +237,105 @@ fi
             purchase_cake =&gt; !bake_cake
             """
 </pre>
-    </div>
+            </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Adding suicide triggers (3)</h3>
+            <div class="slide">
+              <h3 class="alwayshidden">Adding suicide triggers
+              (3)</h3>
 
-      <p>The line <samp>purchase_cake =&gt; !bake_cake</samp> is the suicide
-      trigger. When <samp>purchase_cake</samp> succeeds, <samp>bake_cake</samp>
-      is removed from the suite.</p>
-    </div>
+              <p>The line <samp>purchase_cake =&gt;
+              !bake_cake</samp> is the suicide trigger. When
+              <samp>purchase_cake</samp> succeeds,
+              <samp>bake_cake</samp> is removed from the suite.</p>
+            </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Adding suicide triggers (4)</h3>
+            <div class="slide">
+              <h3 class="alwayshidden">Adding suicide triggers
+              (4)</h3>
 
-      <p>We also need to remove the <samp>purchase_cake</samp> from the suite
-      if it is not needed i.e. when <samp>bake_cake</samp> succeeds.</p>
+              <p>We also need to remove the
+              <samp>purchase_cake</samp> from the suite if it is
+              not needed i.e. when <samp>bake_cake</samp>
+              succeeds.</p>
 
-      <p>Add the line <samp>bake_cake =&gt; !purchase_cake</samp> to the
-      dependencies graph.</p>
+              <p>Add the line <samp>bake_cake =&gt;
+              !purchase_cake</samp> to the dependencies graph.</p>
 
-      <p>Save your changes and run your suite. You should now be able to
-      <samp>eat_cake</samp> and not worry about previous tasks keeping the
-      suite from shutting down.</p>
-    </div>
+              <p>Save your changes and run your suite. You should
+              now be able to <samp>eat_cake</samp> and not worry
+              about previous tasks keeping the suite from shutting
+              down.</p>
+            </div>
 
-    <div class="slide">
-      <h2 id="notes">Note on suicide triggers</h2>
+            <div class="slide">
+              <h2 id="notes">Note on suicide triggers</h2>
 
-      <p>While it is possible to have a task suicide triggering itself this is
-      not recommended and may lead to difficulties if manual interaction with
-      the suite is required to correct the problem (the task has been removed
-      from the suite).</p>
-    </div>
+              <p>While it is possible to have a task suicide
+              triggering itself this is not recommended and may
+              lead to difficulties if manual interaction with the
+              suite is required to correct the problem (the task
+              has been removed from the suite).</p>
+            </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Note on suicide triggers (2)</h3>
+            <div class="slide">
+              <h3 class="alwayshidden">Note on suicide triggers
+              (2)</h3>
 
-      <p>Depending on your needs, possible places to put the suicide trigger
-      are:</p>
+              <p>Depending on your needs, possible places to put
+              the suicide trigger are:</p>
 
-      <ul>
-        <li>triggering off the success of a recovery task</li>
+              <ul>
+                <li>triggering off the success of a recovery
+                task</li>
 
-        <li>triggering off the final task in a cycle</li>
+                <li>triggering off the final task in a cycle</li>
 
-        <li>triggering off a cleanup task in the suite</li>
-      </ul>
-    </div>
+                <li>triggering off a cleanup task in the suite</li>
+              </ul>
+            </div>
 
-    <div class="slide">
-          <h2 id="advanced-example">Advanced suicide triggers example</h2>
+            <div class="slide">
+              <h2 id="advanced-example">Advanced suicide triggers
+              example</h2>
+            </div>
 
-    <div class="slide">
-        <h3 id="example-task2">Advanced Example 1</h3>
+            <div class="slide">
+              <h3 id="example-task2">Advanced Example 1</h3>
 
-      <p>The first example checks the failure of an unreliable task, if it 
-      meets the criteria in the checking task then it tries a recovery task.
-      If the recovery task succeeds then the suite carries on, else if it fails 
-      then the suite stops as it cannot be recovered.</p>
+              <p>The first example checks the failure of an
+              unreliable task, if it meets the criteria in the
+              checking task then it tries a recovery task. If the
+              recovery task succeeds then the suite carries on,
+              else if it fails then the suite stops as it cannot be
+              recovered.</p>
 
-      <p>Possible Outcomes:</p>
-      <p>If <samp>flaky_activity</samp> fails then run <samp>check</samp>, the
-      <samp>check</samp> checks to see if the suite is recoverable, if it is
-      then <samp>recovery</samp> succeeds and the suite can continue. 
-      If it is not recoverable, i.e., <samp>check</samp> fails then don't run 
-      housekeep as the suite cannnot carry on and needs human interaction to 
-      fix.</p>
+              <p>Possible Outcomes:</p>
 
-      <p>If <samp>flaky_activity</samp> succeeds the suite carries on as 
-      normal, i.e., going straight to <samp>housekeep</samp> and not running 
-      either of the <samp>check</samp> or <samp>recovery</samp> tasks.</p>
+              <p>If <samp>flaky_activity</samp> fails then run
+              <samp>check</samp>, the <samp>check</samp> checks to
+              see if the suite is recoverable, if it is then
+              <samp>recovery</samp> succeeds and the suite can
+              continue. If it is not recoverable, i.e.,
+              <samp>check</samp> fails then don't run housekeep as
+              the suite cannnot carry on and needs human
+              interaction to fix.</p>
 
-      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
-      new directory somewhere - e.g. in your homespace) containing a
-      <samp>suite.rc</samp> file that looks like this:</p>
-    </div>
+              <p>If <samp>flaky_activity</samp> succeeds the suite
+              carries on as normal, i.e., going straight to
+              <samp>housekeep</samp> and not running either of the
+              <samp>check</samp> or <samp>recovery</samp>
+              tasks.</p>
 
-    <div class="slide">
-          <h3 class="alwayshidden">Advanced example 1 suite.rc</h3>
-<pre class="prettyprint lang-cylc">
+              <p>Create a <a href="rose-rug-brief-tour#cli">new
+              suite</a> (or just a new directory somewhere - e.g.
+              in your homespace) containing a <samp>suite.rc</samp>
+              file that looks like this:</p>
+            </div>
+
+            <div class="slide">
+              <h3 class="alwayshidden">Advanced example 1
+              suite.rc</h3>
+              <pre class="prettyprint lang-cylc img-full">
 # Check the failure of `flaky_activity` and if it meets the criteria in the 
 # `check` task then try a recovery task, `recovery`. If `recovery` succeeds 
 # then the suite carrys on else if it fails then the suite stops as it cannot 
@@ -358,30 +408,37 @@ fi
             echo 'starting up, I always run as expected, usually an install task.'
        """
 </pre>
-    </div>
+            </div>
 
-    <div class="slide">
-            <h3 id="example-task3">Advanced Example 2</h3>
+            <div class="slide">
+              <h3 id="example-task3">Advanced Example 2</h3>
 
-      <p>In this example if a member of a specific family fails carry on.
-      If a task important to that cycle fails go to the end of that cycle and 
-      remove the failed task from the task pool.</p>
+              <p>In this example if a member of a specific family
+              fails carry on. If a task important to that cycle
+              fails go to the end of that cycle and remove the
+              failed task from the task pool.</p>
 
-      <p>Possible Outcomes:</p>
-      <p>If <samp>sometimes_fail</samp> fails then go to the 
-      <samp>housekeep</samp> task.</p>
-      <p>If  <samp>sometimes_fail</samp> succeeds and <samp>FAMILY_PASS</samp>
-      all succeed and <samp>SOME_DO_SOME_DONT</samp> all finish no matter if 
-      they succeed or fail then then go to the <samp>housekeep</samp> task.</p>
+              <p>Possible Outcomes:</p>
 
-      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
-      new directory somewhere - e.g. in your homespace) containing a
-      <samp>suite.rc</samp> file that looks like this:</p>
-    </div>
+              <p>If <samp>sometimes_fail</samp> fails then go to
+              the <samp>housekeep</samp> task.</p>
 
-    <div class="slide">
-        <h3 class="alwayshidden">Advanced example 2 suite-.rc</h3>
-<pre class="prettyprint lang-cylc">
+              <p>If <samp>sometimes_fail</samp> succeeds and
+              <samp>FAMILY_PASS</samp> all succeed and
+              <samp>SOME_DO_SOME_DONT</samp> all finish no matter
+              if they succeed or fail then then go to the
+              <samp>housekeep</samp> task.</p>
+
+              <p>Create a <a href="rose-rug-brief-tour#cli">new
+              suite</a> (or just a new directory somewhere - e.g.
+              in your homespace) containing a <samp>suite.rc</samp>
+              file that looks like this:</p>
+            </div>
+
+            <div class="slide">
+              <h3 class="alwayshidden">Advanced example 2
+              suite-.rc</h3>
+              <pre class="prettyprint lang-cylc img-full">
 # If a member of family `SOME_DO_SOME_DONT` fails then carry on regardless.
 # If then the `sometimes_fail` task fails go to the end of that cycle and 
 # remove the failed task from the task pool.
@@ -464,35 +521,42 @@ fi
         inherit = SOME_DO_SOME_DONT
         script = echo 'stable member always succeeds'
 </pre>
-    </div>
+            </div>
 
-    <div class="slide">
-        <h3 id="example-task4">Advanced Example 3</h3>
+            <div class="slide">
+              <h3 id="example-task4">Advanced Example 3</h3>
 
-      <p>For the third example if a specified task fails go to the end of the 
-      cycle. 
-      If the next task fails go to the second from last task and then to the
-      end of that cycle.</p>
+              <p>For the third example if a specified task fails go
+              to the end of the cycle. If the next task fails go to
+              the second from last task and then to the end of that
+              cycle.</p>
 
-      <p>Possible Outcomes:</p>
-      <p>If <samp>check_files_exist</samp> fails then go to the 
-      <samp>housekeep</samp> task.</p>
-      <p>If <samp>check_files_exist</samp> succeeds but 
-      <samp>generate_plots</samp> fails go to <samp>move_data</samp> then go 
-      to the<samp>housekeep</samp>.</p>
-      <p>If <samp>check_files_exist</samp> succeeds go to 
-      <samp>generate_plots</samp> if that succeeds go to 
-      <samp>raise_alert</samp> if that succeeds go to <samp>move_data</samp> 
-      then go to the<samp>housekeep</samp> task.</p>
+              <p>Possible Outcomes:</p>
 
-      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
-      new directory somewhere - e.g. in your homespace) containing a
-      <samp>suite.rc</samp> file that looks like this:</p>
-    </div>
+              <p>If <samp>check_files_exist</samp> fails then go to
+              the <samp>housekeep</samp> task.</p>
 
-    <div class="slide">
-        <h3 class="alwayshidden">Advanced example 3 suite.rc</h3>
-<pre class="prettyprint lang-cylc">
+              <p>If <samp>check_files_exist</samp> succeeds but
+              <samp>generate_plots</samp> fails go to
+              <samp>move_data</samp> then go to
+              the<samp>housekeep</samp>.</p>
+
+              <p>If <samp>check_files_exist</samp> succeeds go to
+              <samp>generate_plots</samp> if that succeeds go to
+              <samp>raise_alert</samp> if that succeeds go to
+              <samp>move_data</samp> then go to
+              the<samp>housekeep</samp> task.</p>
+
+              <p>Create a <a href="rose-rug-brief-tour#cli">new
+              suite</a> (or just a new directory somewhere - e.g.
+              in your homespace) containing a <samp>suite.rc</samp>
+              file that looks like this:</p>
+            </div>
+
+            <div class="slide">
+              <h3 class="alwayshidden">Advanced example 3
+              suite.rc</h3>
+              <pre class="prettyprint lang-cylc img-full">
 # If the `check_files_exist` task fails go to the end of the cycle and only do
 # the `housekeep` task, or if `generate_plots` task fails go to the second 
 # from last task, `raise_alert` and then to the end of that cycle and do the 
@@ -565,11 +629,33 @@ fi
             echo 'starting up, I always run as expected, usually an install task.'
         """
 </pre>
+            </div>
+          </div>
+
+          <div id="footer" class="panel-footer">
+            <ul class="nav nav-pills" id="pagenav">
+              <li><button id="back-button" class=
+              "btn btn-default">Previous</button></li>
+
+              <li><button id="next-button" class=
+              "btn btn-primary">Next</button></li>
+            </ul>
+
+            <ul class="nav nav-pills" id="control-nav">
+              <li>
+                <div id="controls"></div>
+              </li>
+            </ul>
+
+            <ul class="nav nav-pills pull-right">
+              <li>
+                <div id="currentSlide"></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
-
-
-
-   </div>
   </div>
 </body>
 </html>
