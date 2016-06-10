@@ -5,14 +5,26 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2016-Q2?)
+## 2016.06.0 (2016-06-10)
 
 Rose release 41. This release will work best with
 [cylc-6.10.2](https://github.com/cylc/cylc/releases/tag/6.10.2) and
 [fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0) or
 their successors.
 
+### Highlighted Changes
+
+[#1891](https://github.com/metomi/rose/pull/1891):
+rose documentation: restyled with Bootstrap 3.
+User guide is now available in a single page as well as in multiple pages.
+
 ### Noteworthy Changes
+
+[#1913](https://github.com/metomi/rose/pull/1913):
+rose configuration: allows a greater range of characters in the indices for
+duplicate settings. This is prompted by the move towards including profile
+names in the indices for UM STASH namelists - many of these have characters
+like `+`, etc.
 
 [#1911](https://github.com/metomi/rose/pull/1911):
 rose config-edit: cylc gui launcher: gracefully handle suites that are not
@@ -20,6 +32,10 @@ running.
 
 [#1909](https://github.com/metomi/rose/pull/1909):
 rose config-edit: don't show `old_value` in info dialog.
+
+[#1906](https://github.com/metomi/rose/pull/1906):
+rose config-edit and rose macro: new `--no-warn=version` option to suppress
+default version to HEAD warnings.
 
 [#1905](https://github.com/metomi/rose/pull/1905):
 rose macro, app-upgrade: fix section comment removal of options bug
