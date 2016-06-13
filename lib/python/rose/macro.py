@@ -691,8 +691,11 @@ def check_config_integrity(app_config):
 
 
 def validate_config(app_config, meta_config, run_macro_list, modules,
-                    macro_info_tuples, opt_non_interactive=False):
+                    macro_info_tuples, opt_non_interactive=False,
+                    optional_config_name=None, optional_values=None):
     """Run validator custom macros on the config and return problems."""
+    if optional_values is None:
+        optional_values = {}
     macro_problem_map = {}
     for module_name, class_name, method, help in macro_info_tuples:
         macro_name = ".".join([module_name, class_name])
@@ -715,7 +718,19 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                     else:
                         break
                 if optionals:
-                    res = get_user_values(optionals)
+                    res = {}
+                    if "optional_config_name" in optionals:
+                        res["optional_config_name"] = optional_config_name
+                    for key in [key for key in optionals if key in
+                                optional_values]:
+                        res[key] = optional_values[key]
+                    res.update(
+                        get_user_values(
+                            dict(((key, value) for key, value in
+                                  optionals.iteritems() if key not in res))))
+                    optional_values.update(res)
+                    if "optional_config_name" in optional_values:
+                        del optional_values["optional_config_name"]
             problem_list = macro_meth(app_config, meta_config, **res)
             if not isinstance(problem_list, list):
                 raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
@@ -725,9 +740,11 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
 
 
 def transform_config(config, meta_config, transformer_macro, modules,
-                     macro_info_tuples, opt_non_interactive=False):
+                     macro_info_tuples, opt_non_interactive=False,
+                     optional_config_name=None, optional_values=None):
     """Run transformer custom macros on the config and return problems."""
-    macro_change_dict = {}
+    if optional_values is None:
+        optional_values = {}
     for module_name, class_name, method, help in macro_info_tuples:
         if method != TRANSFORM_METHOD:
             continue
@@ -752,7 +769,19 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 else:
                     break
             if optionals:
-                res = get_user_values(optionals)
+                res = {}
+                if "optional_config_name" in optionals:
+                    res["optional_config_name"] = optional_config_name
+                for key in [key for key in optionals if key in
+                            optional_values]:
+                    res[key] = optional_values[key]
+                res.update(
+                    get_user_values(
+                        dict(((key, value) for key, value in
+                              optionals.iteritems() if key not in res))))
+                optional_values.update(res)
+                if "optional_config_name" in optional_values:
+                    del optional_values["optional_config_name"]
         return macro_method(config, meta_config, **res)
     return config, []
 
@@ -921,10 +950,13 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     if VALIDATE_METHOD in macros_by_type:
         new_combined_config_map = combine_opt_config_map(config_map)
         macro_config_problems_map = {}
+        optional_values = {}
         for conf_key, config in new_combined_config_map.items():
+
             config_problems_map = validate_config(
                 config, meta_config, macros_by_type[VALIDATE_METHOD], modules,
-                macro_tuples, opt_non_interactive
+                macro_tuples, opt_non_interactive,
+                optional_config_name=conf_key, optional_values=optional_values
             )
             if config_problems_map:
                 rc = 1
@@ -1088,11 +1120,14 @@ def _run_transform_macros(macros, config_name, config_map, meta_config,
                           reporter=None):
     no_changes = True
     combined_config_map = combine_opt_config_map(config_map)
+    optional_values = {}
     for transformer_macro in macros:
         macro_function = (
-            lambda conf, meta: transform_config(conf, meta, transformer_macro,
-                                                modules, macro_tuples,
-                                                opt_non_interactive))
+            lambda conf, meta, opt: transform_config(
+                conf, meta, transformer_macro, modules, macro_tuples,
+                opt_non_interactive, optional_config_name=opt,
+                optional_values=optional_values)
+        )
         new_config_map, changes_map = apply_macro_to_config_map(
             combined_config_map, meta_config, macro_function,
             macro_name=transformer_macro
@@ -1117,7 +1152,7 @@ def apply_macro_to_config_map(config_map, meta_config, macro_function,
     for conf_key in conf_keys:
         config = config_map[conf_key]
         macro_config = copy.deepcopy(config)
-        return_value = macro_function(macro_config, meta_config)
+        return_value = macro_function(macro_config, meta_config, conf_key)
         err_bad_return_value = ERROR_RETURN_VALUE.format(macro_name)
         if (not isinstance(return_value, tuple) or
                 len(return_value) != 2):
