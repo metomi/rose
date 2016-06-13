@@ -626,7 +626,7 @@ def main():
     macro_config = copy.deepcopy(app_config)
     combined_config_map = rose.macro.combine_opt_config_map(config_map)
     macro_function = (
-        lambda conf, meta: upgrade_manager.transform(
+        lambda conf, meta, conf_key: upgrade_manager.transform(
             conf, meta, opts.non_interactive)
     )
     method_id = UPGRADE_METHOD.upper()[0]
@@ -650,7 +650,7 @@ def main():
     config_map = new_config_map
     combined_config_map = rose.macro.combine_opt_config_map(config_map)
     macro_function = (
-        lambda conf, meta:
+        lambda conf, meta, conf_key:
         rose.macros.trigger.TriggerMacro().transform(conf, meta)
     )
     new_config_map, changes_map = rose.macro.apply_macro_to_config_map(
