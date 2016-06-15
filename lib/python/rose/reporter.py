@@ -171,9 +171,19 @@ class Reporter(object):
                 prefix = prefix(kind, level)
             if msg is None:
                 if callable(message):
-                    msg = unicode(message())
+                    msg = message()
                 else:
-                    msg = unicode(message)
+                    msg = message
+
+                try:
+                    msg = unicode(msg)
+                except UnicodeDecodeError:
+                    try:
+                        msg = unicode(msg, 'utf-8')
+                    except TypeError:
+                        msg = str(msg)
+                    except UnicodeEncodeError:
+                        pass
 
             msg_lines = self.format_msg(msg, context.verbosity, prefix, clip)
 
@@ -244,7 +254,10 @@ class ReporterContext(object):
 
     def write(self, message):
         """Write the message to the context's handle."""
-        return self.handle.write(message.encode("utf-8"))
+        try:
+            return self.handle.write(message.encode("utf-8"))
+        except UnicodeDecodeError:
+            return self.handle.write(message)
 
     def _tty_colour_err(self, s):
         try:

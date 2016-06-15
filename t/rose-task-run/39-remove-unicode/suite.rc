@@ -1,0 +1,18 @@
+[cylc]
+    UTC mode = True
+    abort if any task fails = True
+    [[event hooks]]
+        abort on timeout = True
+        timeout = PT1M
+[scheduling]
+    [[dependencies]]
+        graph = test_handle_unicode_filename
+[runtime]
+    [[test_handle_unicode_filename]]
+        script = """
+            # Create a file with unicode (slice of pizza) in the filename.
+            # cylc validate currently gets upset about unicode, so script it.
+            make_flower_unicode_file
+            # rose task-run --new should be able to remove it without failing.
+            rose task-run --new -v -v --debug
+        """
