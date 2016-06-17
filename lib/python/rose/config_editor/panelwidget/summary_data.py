@@ -495,6 +495,7 @@ class BaseSummaryDataPanel(gtk.VBox):
 
             # list shortcut keys
             accel = gtk.AccelGroup()
+            menu.set_accel_group(accel)
             for key_press, menuitem in shortcuts:
                 key, mod = gtk.accelerator_parse(key_press)
                 menuitem.add_accelerator(
