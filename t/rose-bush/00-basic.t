@@ -190,16 +190,16 @@ run_pass "${TEST_KEY}" \
 file_grep "${TEST_KEY}.out" 'HTTP/.* 404 Not Found' "${TEST_KEY}.out"
 
 # test the file search feature
-TEST_KEY="${TEST_KEY_BASE}-200-curl-view-search"
+TEST_KEY="${TEST_KEY_BASE}-200-curl-viewsearch"
 FILE='log/job/20000101T0000Z/foo1/01/job.out'
 MODE="&mode=text"
-URL="${TEST_ROSE_WS_URL}/view-search/${USER}/${SUITE_NAME}?path=${FILE}${MODE}\
+URL="${TEST_ROSE_WS_URL}/viewsearch/${USER}/${SUITE_NAME}?path=${FILE}${MODE}\
 &search_mode=TEXT&search_string=Suite%20Name"
 
 run_pass "${TEST_KEY}" curl -I "${URL}"
 file_grep "${TEST_KEY}.out" 'HTTP/.* 200 OK' "${TEST_KEY}.out"
 
-TEST_KEY="${TEST_KEY_BASE}-200-curl-view-search-download"
+TEST_KEY="${TEST_KEY_BASE}-200-curl-viewsearch-download"
 run_pass "${TEST_KEY}" \
     curl "${URL}"
 file_grep "${TEST_KEY}.out" '<span class="highlight">Suite Name</span>' \
