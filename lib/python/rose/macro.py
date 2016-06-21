@@ -723,10 +723,7 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                         res["optional_config_name"] = optional_config_name
                     for key in set(optionals) & set(optional_values):
                         res[key] = optional_values[key]
-                    res.update(
-                        get_user_values(
-                            dict(((key, value) for key, value in
-                                  optionals.iteritems() if key not in res))))
+                    res.update(get_user_values(optionals, res.keys()))
                     optional_values.update(res)
                     if "optional_config_name" in optional_values:
                         del optional_values["optional_config_name"]
@@ -771,13 +768,10 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 res = {}
                 if "optional_config_name" in optionals:
                     res["optional_config_name"] = optional_config_name
-                for key in [key for key in optionals if key in
-                            optional_values]:
-                    res[key] = optional_values[key]
-                res.update(
-                    get_user_values(
-                        dict(((key, value) for key, value in
-                              optionals.iteritems() if key not in res))))
+                for key in optionals:
+                    if key in optional_values:
+                        res[key] = optional_values[key]
+                res.update(get_user_values(optionals, res.keys()))
                 optional_values.update(res)
                 if "optional_config_name" in optional_values:
                     del optional_values["optional_config_name"]
@@ -1185,19 +1179,23 @@ def _get_user_accept():
     return user_allowed_changes
 
 
-def get_user_values(options):
-    for k, v in options.items():
+def get_user_values(options, ignore=None):
+    if ignore is None:
+        ignore = []
+    for key, val in options.items():
+        if key in ignore:
+            continue
         entered = False
         while not entered:
             try:
-                user_input = raw_input("Value for " + str(k) + " (default " +
-                                       str(v) + "): ")
+                user_input = raw_input("Value for " + str(key) + " (default " +
+                                       str(val) + "): ")
             except EOFError:
                 user_input = ""
                 entered = True
             if len(user_input) > 0:
                 try:
-                    options[k] = ast.literal_eval(user_input)
+                    options[key] = ast.literal_eval(user_input)
                     entered = True
                 except ValueError:
                     rose.reporter.Reporter()(
