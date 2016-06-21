@@ -544,8 +544,8 @@ class RoseBushService(object):
         return lines, job_entry, entry, file_content, f_name
 
     @cherrypy.expose
-    def view_search(self, user, suite, path=None, path_in_tar=None, mode=None,
-                    search_string=None, search_mode=SEARCH_MODE_TEXT):
+    def viewsearch(self, user, suite, path=None, path_in_tar=None, mode=None,
+                   search_string=None, search_mode=SEARCH_MODE_TEXT):
         """Search a text log file."""
         # get file or serve raw data
         file_output = self.get_file(
