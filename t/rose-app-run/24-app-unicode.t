@@ -17,21 +17,22 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test rose_bunch built-in application.
+# Test dealing with Unicode configuration values.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 1
+tests 2
 #-------------------------------------------------------------------------------
-# Run the suite, and wait for it to complete
-export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost -- --debug
+test_setup
+test_init </dev/null
+cp "$TEST_SOURCE_DIR/$TEST_KEY_BASE"/rose-app.conf "$TEST_DIR/config/"
+TEST_KEY="$TEST_KEY_BASE"
+run_pass "$TEST_KEY" rose app-run --config="$TEST_DIR/config"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] export FLOWER=⚘
+[INFO] export PATH=$PATH
+[INFO] command: true
+__OUT__
+test_teardown
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
 exit 0
