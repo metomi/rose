@@ -515,7 +515,11 @@ class RoseBushService(object):
             if path_in_tar:
                 f.seek(0)
                 # file closed by cherrypy
-                return cherrypy.lib.static.serve_fileobj(f, MIME_TEXT_PLAIN)
+                # cherrypy 3.2 +
+                # return cherrypy.lib.static.serve_fileobj(f, MIME_TEXT_PLAIN)
+                # cherrypy < 3.2
+                return self.get_file(user, suite, path, path_in_tar,
+                                     'download')
             else:
                 return cherrypy.lib.static.serve_file(f_name, MIME_TEXT_PLAIN)
         else:
