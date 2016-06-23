@@ -5,6 +5,32 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2016.06.1 (2016-06-23)
+
+Rose release 42. This release works best with
+[cylc-6.10.2](https://github.com/cylc/cylc/releases/tag/6.10.2) and
+[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0).
+
+### Noteworthy Changes
+
+[#1925](https://github.com/metomi/rose/pull/1925):
+rose web services: document new requirement on cherrypy 3.2.2.
+
+[#1921](https://github.com/metomi/rose/pull/1921):
+Rose Bush: view search: fix incorrect URL that causes server to return 500.
+
+[#1920](https://github.com/metomi/rose/pull/1920):
+rose.reporter: better unicode handling.
+
+[#1918](https://github.com/metomi/rose/pull/1918):
+rose config-edit: fix right click menu segfault in summary panel.
+
+[#1917](https://github.com/metomi/rose/pull/1917):
+rose documentation: fix oddity with the scroll spy widget when viewing the
+documentation as a single page.
+
+--------------------------------------------------------------------------------
+
 ## 2016.06.0 (2016-06-10)
 
 Rose release 41. This release works best with
