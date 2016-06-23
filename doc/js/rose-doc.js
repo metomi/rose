@@ -271,7 +271,6 @@ $(function () {
     // removes characters from a string which are not permitted in an html id
     // and replaces space(s) with a single hyphon for readability
     function safeID(id) {
-        //return id.replace(/[\s]+/g, "-").replace(/[^\w_.\-]+/g, "");
         return id.replace(/[\s]+/g, "-").replace(/[^\w_\-]+/g, "");
     }
 
@@ -345,6 +344,15 @@ $(function () {
             // create a holder for this article and a menu for its subsections
             // (h2 tags) in the nav
             var div = $("<div />", {"id": pathStr});
+            // add a loading label which gets over-written by ajax data as a
+            // placeholder to help scrollspy
+            div.append(
+                $("<h3 />").append(
+                    $("<span />", {"class": "label label-info"}).append(
+                        "Loading..."
+                    )
+                )
+            );
             ul = $("<ul />");
             // ajax in the content
             div.load(contents.url + " #panel-main", function () {
@@ -363,6 +371,9 @@ $(function () {
                 var k;
                 var headingID;
                 for (k = 0; k < headings.length; k += 1) {
+                    if (!$(headings[k]).attr("id")) {
+                        continue;
+                    }
                     headingID = safeID($(headings[k]).attr("id"));
                     if (headingID !== null) {
                         // namespace the heading
@@ -432,7 +443,10 @@ $(function () {
                 $("#sidenav").append(loadFromContentsTree(contents, true));
 
                 // setup scroll spy to follow us as we scroll down the page
-                $('body').scrollspy({"target": '#sidenav'});
+                $('body').scrollspy({"target": "#sidenav", "offset": 100});
+                $('[data-spy="scroll"]').each(function () {
+                  var $spy = $(this).scrollspy('refresh')
+                })
             }
         });
     }
