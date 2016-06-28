@@ -77,3 +77,15 @@ function teardown() {
     rm -rf $TEST_DIR/run
     rm -rf $TEST_DIR/config/meta
 }
+
+function grep_count_ok() {
+    local TEST_KEY=$1
+    local PATTERN=$2
+    local FILE=$3
+    local COUNT=$4
+    if (( $(grep "$PATTERN" "$FILE" -c) == $COUNT )); then
+        pass "$TEST_KEY"
+        return
+    fi
+    fail "$TEST_KEY"
+}
