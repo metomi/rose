@@ -467,7 +467,7 @@ class Updater(object):
                         if ns not in triggered_ns_list:
                             triggered_ns_list.append(ns)
                         var.ignored_reason.pop(
-                            rose.variable.IGNORED_BY_SECTION)
+                            rose.variable.IGNORED_BY_SECTION, None)
             elif section in trigger.ignored_dict:
                 # Trigger-ignored sections
                 parents = trigger.ignored_dict.get(section, {})
