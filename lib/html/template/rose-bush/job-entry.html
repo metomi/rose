@@ -40,7 +40,7 @@
       {% if entry.task_status == "success" -%}
         {% set badge_class = "label-success" %}
       {% elif entry.task_status == "fail" -%}
-        {% set badge_class = "label-important" %}
+        {% set badge_class = "label-danger" %}
       {% else -%}
         {% set badge_class = "label-default" %}
       {% endif -%}
