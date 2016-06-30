@@ -960,10 +960,10 @@ source=stuffing-*.txt
               Insert placeholders <var>%(argname)s</var> for
               substitution of the arguments specified under
               <kbd>[bunch-args]</kbd> to the invoked command. The
-              placeholder <var>%(instances)s</var> is reserved for
+              placeholder <var>%(command-instances)s</var> is reserved for
               inserting an automatically generated index for the
               command invocation when using the
-              <kbd>instances</kbd> setting.</dd>
+              <kbd>command-instances</kbd> setting.</dd>
 
               <dt><kbd>command-instances=N</kbd></dt>
 
@@ -1043,9 +1043,9 @@ source=stuffing-*.txt
               Multiple named sets of arguments can be defined. Each
               <var>argname</var> can be referenced in the using
               <var>%(argname)s</var>. The only disallowed name is
-              <var>instances</var>, which is reserved for the
+              <var>command-instances</var>, which is reserved for the
               auto-generated list of instances when the
-              <kbd>[bunch]instances=N</kbd> option is used.</dd>
+              <kbd>[bunch]command-instances=N</kbd> option is used.</dd>
             </dl>
 
             <p>E.g.:</p>
@@ -1055,9 +1055,9 @@ mode=rose_bunch
 
 [bunch]
 command-format=echo arg1: %(arg1)s, arg2: %(arg2)s, command-instance: %(command-instances)s
+command-instances = 4
 fail-handle = abort
 incremental = True
-instances = 4
 names = foo1 bar2 baz3 qux4
 pool-size=2
 
