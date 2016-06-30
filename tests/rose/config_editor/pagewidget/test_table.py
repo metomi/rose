@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 from __future__ import print_function
-
-ROSE_NS="namespace"
-ROSE_UTIL="UTIL"
 from rose.config_editor.pagewidget.table import PageTable, PageArrayTable, PageLatentTable
 from rose.config_editor.ops.variable import VariableOperations
 from rose.variable import Variable
