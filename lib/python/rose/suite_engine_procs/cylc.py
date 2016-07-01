@@ -40,7 +40,7 @@ import socket
 import sqlite3
 import tarfile
 from tempfile import mkstemp
-from time import sleep, time
+from time import sleep, time, gmtime, strftime
 from uuid import uuid4
 
 
@@ -1021,10 +1021,10 @@ class CylcProcessor(SuiteEngineProcessor):
         dao = self._db_init(self.SUITE_DB, user_name, suite_name)
         if not os.access(dao.db_f_name, os.F_OK | os.R_OK):
             return ret
-        stmt = "SELECT time FROM task_events ORDER BY time DESC LIMIT 1"
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
-            ret["last_activity_time"] = row[0]
-            break
+
+        ret["last_activity_time"] = strftime("%Y-%m-%dT%H:%M:%S+0000",
+                                             gmtime(os.stat(
+                                                    dao.db_f_name).st_mtime))
 
         port_file_path = os.path.expanduser(
             os.path.join("~" + user_name, ".cylc", "ports", suite_name))
