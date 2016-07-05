@@ -116,7 +116,7 @@ class RoseBushService(object):
             "script": cherrypy.request.script_name,
             "method": "broadcast_states",
             "states": {},
-            "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+            "time": strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()),
         }
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
@@ -150,7 +150,7 @@ class RoseBushService(object):
             "script": cherrypy.request.script_name,
             "method": "broadcast_events",
             "states": {},
-            "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+            "time": strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         }
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
@@ -220,7 +220,7 @@ class RoseBushService(object):
             user_suite_dir, self.suite_engine_proc.SUITE_DB)
         data["states"]["last_activity_time"] = \
             self.get_last_activity_time(suite_db)
-        data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
             return simplejson.dumps(data)
         try:
@@ -336,7 +336,7 @@ class RoseBushService(object):
                 data["n_pages"] += 1
         else:
             data["n_pages"] = 1
-        data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
             return simplejson.dumps(data)
         try:
@@ -455,7 +455,7 @@ class RoseBushService(object):
                     entry["info"][key] = node.value
             except (IOError, rose.config.ConfigSyntaxError):
                 pass
-        data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
             return simplejson.dumps(data)
         template = self.template_env.get_template("suites.html")
@@ -635,7 +635,7 @@ class RoseBushService(object):
             rose_version=self.rose_version,
             script=cherrypy.request.script_name,
             method="view",
-            time=strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+            time=strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()),
             logo=self.logo,
             title=self.title,
             host=self.host_name,
