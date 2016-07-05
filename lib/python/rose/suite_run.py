@@ -39,7 +39,6 @@ from rose.suite_control import SuiteNotRunningError
 import shlex
 import socket
 import sys
-import tarfile
 from tempfile import TemporaryFile
 from time import sleep, strftime, time
 import traceback
@@ -532,20 +531,18 @@ class SuiteRunner(Runner):
             for log in list(logs):
                 if os.path.isfile(log):
                     continue
-                log_tar = log + ".tar"
-                f_bsize = os.statvfs(log).f_bsize
-                tar_f = open(log_tar, "w")
-                tar_handle = tarfile.open(mode="w", fileobj=tar_f,
-                                          bufsize=f_bsize)
-                tar_handle.add(log)
-                tar_handle.close()
-                tar_f.flush()
-                os.fsync(tar_f.fileno())
-                tar_f.close()
-                # N.B. Python's gzip is slow
-                self.popen.run_simple("gzip", "-f", log_tar)
-                self.handle_event(SuiteLogArchiveEvent(log_tar + ".gz", log))
-                self.fs_util.delete(log)
+                log_tar_gz = log + ".tar.gz"
+                try:
+                    self.popen.run_simple("tar", "-czf", log_tar_gz, log)
+                except RosePopenError:
+                    try:
+                        self.fs_util.delete(log_tar_gz)
+                    except OSError:
+                        pass
+                    raise
+                else:
+                    self.handle_event(SuiteLogArchiveEvent(log_tar_gz, log))
+                    self.fs_util.delete(log)
 
     def _run_init_dir_work(self, opts, suite_name, name, conf_tree=None,
                            r_opts=None, locs_conf=None):
