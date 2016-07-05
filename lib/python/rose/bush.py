@@ -120,6 +120,10 @@ class RoseBushService(object):
         }
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
+        suite_db = os.path.join(
+            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+        data["states"]["last_activity_time"] = \
+            self.get_last_activity_time(suite_db)
         data.update(self._get_suite_logs_info(user, suite))
         data["broadcast_states"] = (
             self.suite_engine_proc.get_suite_broadcast_states(user, suite))
@@ -212,6 +216,10 @@ class RoseBushService(object):
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
+        suite_db = os.path.join(
+            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+        data["states"]["last_activity_time"] = \
+            self.get_last_activity_time(suite_db)
         data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
         if form == "json":
             return simplejson.dumps(data)
@@ -313,6 +321,10 @@ class RoseBushService(object):
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
+        suite_db = os.path.join(
+            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+        data["states"]["last_activity_time"] = \
+            self.get_last_activity_time(suite_db)
         entries, of_n_entries = self.suite_engine_proc.get_suite_job_events(
             user, suite, cycles, tasks, no_statuses, order, per_page,
             (page - 1) * per_page)
@@ -405,9 +417,7 @@ class RoseBushService(object):
             suite_db = os.path.join(
                 user_suite_dir, self.suite_engine_proc.SUITE_DB)
             try:
-                last_activity_time = strftime(
-                    "%Y-%m-%dT%H:%M:%S+0000",
-                    gmtime(os.stat(suite_db).st_mtime))
+                last_activity_time = self.get_last_activity_time(suite_db)
             except OSError:
                 last_activity_time = None
             data["entries"].append({
@@ -542,6 +552,12 @@ class RoseBushService(object):
             file_content = self.suite_engine_proc.is_conf(path)
 
         return lines, job_entry, entry, file_content, f_name
+
+    def get_last_activity_time(self, suite_db):
+        """Returns last activity time for a suite based on database stat"""
+        last_activity_time = strftime("%Y-%m-%dT%H:%M:%SZ",
+                                      gmtime(os.stat(suite_db).st_mtime))
+        return last_activity_time
 
     @cherrypy.expose
     def viewsearch(self, user, suite, path=None, path_in_tar=None, mode=None,
