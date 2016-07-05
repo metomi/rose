@@ -33,7 +33,7 @@ if (($? != 0)); then
     exit 0
 fi
 #-------------------------------------------------------------------------------
-tests 44
+tests 46
 #-------------------------------------------------------------------------------
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost -- --debug
@@ -82,6 +82,18 @@ for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
     file_grep "$TEST_KEY-ROSE_TASK_SUFFIX" "ROSE_TASK_SUFFIX=1" $FILE
     file_grep "$TEST_KEY-MY_PATH" "MY_PATH=$MY_PATH" $FILE
     PREV_CYCLE=$CYCLE
+done
+# Test ROSE_DATAC__???? (offset to a future cycle)
+NEXT_CYCLE=
+for CYCLE in 20130102T0000Z 20130101T1200Z 20130101T0000Z; do
+    if [[ -n "${NEXT_CYCLE}" ]]; then
+        TEST_KEY="${TEST_KEY_BASE}-file-${CYCLE}"
+        FILE="${HOME}/cylc-run/${NAME}/log/job/${CYCLE}/my_task_1/01/job.txt"
+        file_grep "${TEST_KEY}-ROSE_DATAC__PT12H" \
+            "ROSE_DATAC__PT12H=${SUITE_RUN_DIR}/share/cycle/${NEXT_CYCLE}" \
+            "${FILE}"
+    fi
+    NEXT_CYCLE="${CYCLE}"
 done
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
