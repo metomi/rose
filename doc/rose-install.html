@@ -78,10 +78,13 @@
 
               <p>The main utilities of Rose are intended to run on
               a Unix/Linux system. They are known to work on
-              RHEL-6. A limited set of the Rose utilities are known
-              to work on AIX-7.1. Web based Rose utilities require
-              a web browser compliant to XHTML 1.0, JavaScript 1.8
-              and CSS 2.1.</p>
+              RHEL6, and a number of systems including the ones
+              documented under <a href=
+              "https://github.com/metomi/metomi-vms">metomi-vms</a>
+              Web based Rose utilities require a web browser
+              compliant to Bootstrap 3. See <a href=
+              "http://getbootstrap.com/getting-started/">Bootstrap
+              Getting Started</a> for detail.</p>
 
               <p>The source code for Rose is available via <a href=
               "https://github.com/metomi/rose">github</a>. You can
@@ -109,13 +112,13 @@
                 </dd>
 
                 <dt><a href=
-                "http://www.python.org/">Python</a></dt>
+                "http://www.python.org/">Python 2</a></dt>
 
                 <dd>
                   <p><dfn>used by:</dfn> <code>rose</code>.</p>
 
                   <p><dfn>tested with version:</dfn> 2.6.6 and
-                  2.7.2.</p>
+                  2.7.X.</p>
                 </dd>
 
                 <dt>Python: <a href=
@@ -220,8 +223,8 @@
                   Rose Changes</a> for compatible cylc versions for
                   this release of Rose.</p>
 
-                  <p><dfn>additional requirements:</dfn> Pyro 3,
-                  Pygraphviz (for details see the <a href=
+                  <p><dfn>additional requirements:</dfn> Pygraphviz
+                  (for details see the <a href=
                   "http://cylc.github.io/cylc/#requirements">cylc
                   documentation</a>).</p>
                 </dd>
@@ -281,29 +284,14 @@
 
               <p>Whilst you can install and use Rose &amp; cylc on
               a single host (i.e. machine), most installations are
-              likely to be more complex. There are actually four
+              likely to be more complex. There are actually five
               sets of hosts to consider when installing Rose &amp;
-              cylc. Each host has slightly different requirements
+              cylc. You may not need all of these on your site.
+              Each host has slightly different requirements
               as follows:</p>
 
               <dl>
-                <dt>1. Hosts for Rosie Subversion repositories and
-                the Rosie web services.</dt>
-
-                <dd>
-                  <p>Typically you will only need a single host but
-                  you can have multiple repositories on different
-                  hosts if you require this.</p>
-
-                  <p><dfn>Installation requirements:</dfn></p>
-
-                  <ul>
-                    <li>Rose, Bash, Python, cherrypy, jinja2,
-                    simplejson, sqlalchemy, Subversion.</li>
-                  </ul>
-                </dd>
-
-                <dt>2. Hosts for running cylc suites.</dt>
+                <dt>1. Hosts for running cylc suites.</dt>
 
                 <dd>
                   <p>Each user can just run their suites on the
@@ -320,8 +308,7 @@
                   <p><dfn>Installation requirements:</dfn></p>
 
                   <ul>
-                    <li>Rose, cylc, Bash, Python, cherrypy, jinja2,
-                    simplejson, Pyro.</li>
+                    <li>Rose, cylc, Bash, Python, jinja2.</li>
 
                     <li>Subversion &amp; FCM (only if you want rose
                     suite-run to install files from Subversion
@@ -334,14 +321,10 @@
                     <li>Must be able to submit tasks to the hosts
                     which run the suite tasks, either directly or
                     via SSH access to another host.</li>
-
-                    <li>Must be able to run Rose Bush web server,
-                    which must have read access to all user suite
-                    logs.</li>
                   </ul>
                 </dd>
 
-                <dt>3. Hosts for running tasks in suites.</dt>
+                <dt>2. Hosts for running tasks in suites.</dt>
 
                 <dd>
                   <p><dfn>Installation requirements:</dfn></p>
@@ -352,9 +335,6 @@
                     <li>Subversion &amp; FCM (only if you want to
                     use the Rose install utility to install files
                     from Subversion using FCM keywords).</li>
-
-                    <li>Pyro (unless you configure cylc to use SSH
-                    for task communication).</li>
                   </ul>
 
                   <p><dfn>Connectivity requirements:</dfn></p>
@@ -366,7 +346,7 @@
                   </ul>
                 </dd>
 
-                <dt>4. Hosts for running user interactive
+                <dt>3. Hosts for running user interactive
                 tools.</dt>
 
                 <dd>
@@ -374,7 +354,7 @@
 
                   <ul>
                     <li>Rose, cylc, Bash, Python, requests,
-                    simplejson, Subversion, FCM, Pyro, Pygraphviz
+                    simplejson, Subversion, FCM, Pygraphviz
                     (+ graphviz), PyGTK (+ GTK).</li>
                   </ul>
 
@@ -393,6 +373,41 @@
                     <li>Must share user accounts and $HOME
                     directories with the hosts running the cylc
                     suites.</li>
+                  </ul>
+                </dd>
+
+                <dt>4. Hosts for running Rose Bush.</dt>
+
+                <dd>
+                  <p><dfn>Installation requirements:</dfn></p>
+
+                  <ul>
+                    <li>Rose, Bash, Python, cherrypy, jinja2,
+                    simplejson.</li>
+                  </ul>
+
+                  <p><dfn>Connectivity requirements:</dfn></p>
+
+                  <ul>
+                    <li>Must be able to access the home
+                    directories of users' cylc run
+                    directories.</li>
+                  </ul>
+                </dd>
+
+                <dt>5. Hosts for Rosie Subversion repositories and
+                the Rosie web services.</dt>
+
+                <dd>
+                  <p>Typically you will only need a single host but
+                  you can have multiple repositories on different
+                  hosts if you require this.</p>
+
+                  <p><dfn>Installation requirements:</dfn></p>
+
+                  <ul>
+                    <li>Rose, Bash, Python, cherrypy, jinja2,
+                    simplejson, sqlalchemy, Subversion.</li>
                   </ul>
                 </dd>
               </dl>
