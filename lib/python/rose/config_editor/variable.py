@@ -160,7 +160,7 @@ class VariableWidget(object):
                                                     metadata,
                                                     set_value,
                                                     hook_object,
-                                                    custom_arg)
+                                                    arg_str=custom_arg)
         elif (rose.config_editor.META_PROP_WIDGET in self.meta and
                 not override_custom):
             w_val = self.meta[rose.config_editor.META_PROP_WIDGET]
