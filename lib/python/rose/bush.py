@@ -116,10 +116,14 @@ class RoseBushService(object):
             "script": cherrypy.request.script_name,
             "method": "broadcast_states",
             "states": {},
-            "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+            "time": strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()),
         }
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
+        suite_db = os.path.join(
+            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+        data["states"]["last_activity_time"] = \
+            self.get_last_activity_time(suite_db)
         data.update(self._get_suite_logs_info(user, suite))
         data["broadcast_states"] = (
             self.suite_engine_proc.get_suite_broadcast_states(user, suite))
@@ -146,7 +150,7 @@ class RoseBushService(object):
             "script": cherrypy.request.script_name,
             "method": "broadcast_events",
             "states": {},
-            "time": strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+            "time": strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         }
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
@@ -212,7 +216,11 @@ class RoseBushService(object):
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
-        data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        suite_db = os.path.join(
+            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+        data["states"]["last_activity_time"] = \
+            self.get_last_activity_time(suite_db)
+        data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
             return simplejson.dumps(data)
         try:
@@ -313,6 +321,10 @@ class RoseBushService(object):
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
             self.suite_engine_proc.get_suite_state_summary(user, suite))
+        suite_db = os.path.join(
+            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+        data["states"]["last_activity_time"] = \
+            self.get_last_activity_time(suite_db)
         entries, of_n_entries = self.suite_engine_proc.get_suite_job_events(
             user, suite, cycles, tasks, no_statuses, order, per_page,
             (page - 1) * per_page)
@@ -324,7 +336,7 @@ class RoseBushService(object):
                 data["n_pages"] += 1
         else:
             data["n_pages"] = 1
-        data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
             return simplejson.dumps(data)
         try:
@@ -405,9 +417,7 @@ class RoseBushService(object):
             suite_db = os.path.join(
                 user_suite_dir, self.suite_engine_proc.SUITE_DB)
             try:
-                last_activity_time = strftime(
-                    "%Y-%m-%dT%H:%M:%S+0000",
-                    gmtime(os.stat(suite_db).st_mtime))
+                last_activity_time = self.get_last_activity_time(suite_db)
             except OSError:
                 last_activity_time = None
             data["entries"].append({
@@ -445,7 +455,7 @@ class RoseBushService(object):
                     entry["info"][key] = node.value
             except (IOError, rose.config.ConfigSyntaxError):
                 pass
-        data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
             return simplejson.dumps(data)
         template = self.template_env.get_template("suites.html")
@@ -543,6 +553,12 @@ class RoseBushService(object):
 
         return lines, job_entry, entry, file_content, f_name
 
+    def get_last_activity_time(self, suite_db):
+        """Returns last activity time for a suite based on database stat"""
+        last_activity_time = strftime("%Y-%m-%dT%H:%M:%SZ",
+                                      gmtime(os.stat(suite_db).st_mtime))
+        return last_activity_time
+
     @cherrypy.expose
     def viewsearch(self, user, suite, path=None, path_in_tar=None, mode=None,
                    search_string=None, search_mode=SEARCH_MODE_TEXT):
@@ -619,7 +635,7 @@ class RoseBushService(object):
             rose_version=self.rose_version,
             script=cherrypy.request.script_name,
             method="view",
-            time=strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+            time=strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()),
             logo=self.logo,
             title=self.title,
             host=self.host_name,

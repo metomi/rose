@@ -40,7 +40,7 @@ import socket
 import sqlite3
 import tarfile
 from tempfile import mkstemp
-from time import sleep, time
+from time import sleep, time, gmtime, strftime
 from uuid import uuid4
 
 
@@ -1004,27 +1004,20 @@ class CylcProcessor(SuiteEngineProcessor):
     def get_suite_state_summary(self, user_name, suite_name):
         """Return a the state summary of a user's suite.
 
-        Return {"last_activity_time": s, "is_running": b, "is_failed": b}
+        Return {"is_running": b, "is_failed": b, "server": s}
         where:
-        * last_activity_time is a string in %Y-%m-%dT%H:%M:%S format,
-          the time of the latest activity in the suite
         * is_running is a boolean to indicate if the suite is running
         * is_failed: a boolean to indicate if any tasks (submit) failed
         * server: host:port of server, if available
 
         """
         ret = {
-            "last_activity_time": None,
             "is_running": False,
             "is_failed": False,
             "server": None}
         dao = self._db_init(self.SUITE_DB, user_name, suite_name)
         if not os.access(dao.db_f_name, os.F_OK | os.R_OK):
             return ret
-        stmt = "SELECT time FROM task_events ORDER BY time DESC LIMIT 1"
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
-            ret["last_activity_time"] = row[0]
-            break
 
         port_file_path = os.path.expanduser(
             os.path.join("~" + user_name, ".cylc", "ports", suite_name))
