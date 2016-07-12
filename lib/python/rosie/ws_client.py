@@ -176,18 +176,21 @@ class RosieWSClient(object):
                 # Retry request once, if it fails with a 401
                 if (response.status_code == requests.codes["unauthorized"] and
                         request_detail["can_retry"]):
-                    request_detail["can_retry"] = False
                     requests_kwargs = request_detail["requests_kwargs"]
                     auth_manager = request_detail["auth_manager"]
+                    prev_auth = requests_kwargs["auth"]
                     try:
                         requests_kwargs["auth"] = auth_manager.get_auth(
                             is_retry=True)
                     except KeyboardInterrupt as exc:
                         error = RosieWSClientError(url, kwargs, exc)
                         self.event_handler(error, level=1)
+                        request_detail["can_retry"] = False
                     else:
                         results[url] = pool.apply_async(
                             requests.get, [url], requests_kwargs)
+                        request_detail["can_retry"] = (
+                            prev_auth != requests_kwargs["auth"])
                     continue
                 request_detail["response"] = response
             if results:

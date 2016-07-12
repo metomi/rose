@@ -361,15 +361,14 @@ class RosieWSClientAuthManager(object):
             value = env_var_process(value)
         return value
 
-    def _load_password(self):
+    def _load_password(self, is_retry=False):
         """Load password from store, if possible."""
         if (self.password_store is not None and
-                self.username and self.password is None):
-            if self.password_store is not None:
-                self.password = self.password_store.find_password(
-                    self.scheme, self.host, self.username)
-                if self.password_orig is None:
-                    self.password_orig = self.password
+                self.username and (self.password is None or is_retry)):
+            self.password = self.password_store.find_password(
+                self.scheme, self.host, self.username)
+            if self.password_orig is None:
+                self.password_orig = self.password
 
     def _prompt(self, is_retry=False):
         """Prompt for the username and password, where necessary.
@@ -401,7 +400,7 @@ class RosieWSClientAuthManager(object):
                 raise KeyboardInterrupt(self.STR_CANCELLED)
             if username and username != self.username:
                 self.username = username
-                self._load_password()
+                self._load_password(is_retry)
                 if self.password:
                     return
 
