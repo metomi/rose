@@ -27,6 +27,9 @@ tests 6
 TEST_KEY=$TEST_KEY_BASE-ok
 setup
 init <<'__CONFIG__'
+top_level_model='foo'
+top_level_model_subset_fail='ofo_001'
+
 [simple:scalar_test]
 test_var_div_zero_fail=0
 test_var_odd_even = 3
@@ -101,6 +104,11 @@ test_var_1 = -1
 test_var_2 = 2
 __CONFIG__
 init_meta <<__META_CONFIG__
+[=top_level_model]
+
+[=top_level_model_subset_fail]
+fail-if= =top_level_model == "'foo'" and 'foo' not in this
+
 [complex:array_test]
 
 [complex:array_test=control_array_all_ne]
@@ -371,7 +379,9 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 21
+[V] rose.macros.DefaultValidators: issues: 22
+    =top_level_model_subset_fail='ofo_001'
+        failed because: =top_level_model == "'foo'" and 'foo' not in this
     complex:array_test=test_array_len_fail=0, 1, 2
         failed because: len(this) > len(complex:array_test=control_len_array) or len(this) < len(complex:array_test=control_len_array)
     complex:array_test=test_var_all_ne_fail=6
