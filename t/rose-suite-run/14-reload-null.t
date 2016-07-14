@@ -31,8 +31,7 @@ poll ! test -e "$SUITE_RUN_DIR/log/job/2013010100/t1/01/job.status"
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-0"
 run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
-sed '1,/export ROSE_VERSION=/d; /^\[INFO\] delete: .*\/.cylc\//d' \
-    "$TEST_KEY.out" >"$TEST_KEY.out.tail"
+sed -n '/reload complete/p' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] $NAME: reload complete. "suite.rc" unchanged
 __OUT__
@@ -45,8 +44,7 @@ hello world
 hello earth
 __TXT__
 run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
-sed '1,/export ROSE_VERSION=/d; /\/.cylc\//d' "$TEST_KEY.out" \
-    >"$TEST_KEY.out.tail"
+sed -n '/hello\.txt/p; /reload complete/p' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] install: hello.txt
 [INFO]     source: $PWD/src/hello.txt
