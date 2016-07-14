@@ -368,26 +368,37 @@ $(function () {
                 // namespace all section ids and add h2 elements to the nav
                 pathStr = $(this).attr("id");
                 var headings = $(this).find("h2, h3, h4, h5, h6");
-                var k;
+                var hed;
+                var anc;
                 var headingID;
-                for (k = 0; k < headings.length; k += 1) {
-                    if (!$(headings[k]).attr("id")) {
+                var origID;
+                for (hed = 0; hed < headings.length; hed += 1) {
+                    if (!$(headings[hed]).attr("id")) {
                         continue;
                     }
-                    headingID = safeID($(headings[k]).attr("id"));
+                    origID = $(headings[hed]).attr('id');
+                    headingID = safeID(origID);
                     if (headingID !== null) {
                         // namespace the heading
-                        $(headings[k]).attr({"id": pathStr + "_" + headingID});
-                        if (headings[k].tagName === "H2") {
+                        $(headings[hed]).attr({"id": pathStr + "_" + headingID});
+                        if (headings[hed].tagName === "H2") {
                             // if heading is an h2 element add to the sidebar
                             // nav
                             ul.append(
                                 $("<li />").append(
                                     $("<a />", {
                                         "href": "#" + pathStr + "_" + headingID
-                                    }).append($(headings[k]).html())
+                                    }).append($(headings[hed]).html())
                                 )
                             );
+
+                            // update anything that was referencing this header
+                            var anchors = $(this)
+                                .find('a[href="#' + origID + '"]');
+                            for (anc = 0; anc < anchors.length; anc += 1) {
+                                $(anchors[anc]).attr(
+                                    'href', '#' + pathStr + "_" + headingID);
+                            }
                         }
                     }
                 }
