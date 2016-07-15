@@ -164,7 +164,7 @@ class RuleEvaluator(rose.macro.MacroBase):
     REC_CONFIG_ID = re.compile(r"""
                       (?:\W|^)        (?# Break or beginning)
                       (               (?# Begin ID capture)
-                       [\w:.]+         (?# 1st part of section, including :)
+                       [\w:.]*         (?# 1st part of section, including :)
                        (?:\{.*?\})?   (?# Optional modifier for the section)
                        (?:\([^)]*\))? (?# Optional element for the section)
                        =              (?# Section-option delimiter)
@@ -216,10 +216,14 @@ class RuleEvaluator(rose.macro.MacroBase):
             )
         if not (rule.startswith('{%') or rule.startswith('{-%')):
             rule = "{% if " + rule + " %}True{% else %}False{% endif %}"
+
+        # Start processing out our additional syntax.
         local_map = {"this": get_value_from_id(
             setting_id, config, meta_config, setting_id)}
         value_id_count = -1
         sci_num_count = -1
+
+        # any/all processing.
         for array_func_key, rec_regex in self.REC_ARRAY.items():
             for search_result in rec_regex.findall(rule):
                 start, var_id, operator, value, end = search_result
@@ -236,6 +240,8 @@ class RuleEvaluator(rose.macro.MacroBase):
                         new_string += self.ARRAY_FUNC_LOGIC[array_func_key]
                 new_string += ")" + end
                 rule = rec_regex.sub(new_string, rule, count=1)
+
+        # len(...) processing.
         for search_result in self.REC_LEN_FUNC.findall(rule):
             start, var_id, end = search_result
             if var_id == "this":
@@ -245,11 +251,15 @@ class RuleEvaluator(rose.macro.MacroBase):
             array_value = rose.variable.array_split(str(setting_value))
             new_string = start + str(len(array_value)) + end
             rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
+
+        # Number-like-strings into numbers.
         for search_result in self.REC_SCI_NUM.findall(rule):
             sci_num_count += 1
             key = self.INTERNAL_ID_SCI_NUM.format(sci_num_count)
             local_map[key] = self._evaluate(search_result)
             rule = rule.replace(search_result, key, 1)
+
+        # Strings into proper string variables.
         for search_result in self.REC_VALUE.findall(rule):
             value_string = search_result.strip('"')
             for key, value in local_map.items():
@@ -260,6 +270,8 @@ class RuleEvaluator(rose.macro.MacroBase):
                 key = self.INTERNAL_ID_VALUE.format(value_id_count)
                 local_map[key] = value_string
             rule = rule.replace(search_result, key, 1)
+
+        # Replace 'this' id with the cast value.
         for search_result in self.REC_THIS_ELEMENT_ID.findall(rule):
             proper_id = search_result.replace("this", setting_id)
             value_string = get_value_from_id(
@@ -272,6 +284,8 @@ class RuleEvaluator(rose.macro.MacroBase):
                 key = self.INTERNAL_ID_THIS_SETTING.format(x_id_num_str)
                 local_map[key] = value_string
             rule = rule.replace(search_result, key, 1)
+
+        # Replace ids (namelist:foo=bar) with their cast values.
         config_id_count = -1
         for search_result in self.REC_CONFIG_ID.findall(rule):
             value_string = get_value_from_id(
@@ -284,6 +298,8 @@ class RuleEvaluator(rose.macro.MacroBase):
                 key = self.INTERNAL_ID_SETTING.format(config_id_count)
                 local_map[key] = value_string
             rule = rule.replace(search_result, key, 1)
+
+        # Return the now valid Jinja2 template with a map of variables.
         return rule, local_map
 
     def _log_id_usage(self, variable_id, config, meta_config, parent_id,
