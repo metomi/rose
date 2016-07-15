@@ -5,6 +5,53 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2016-Q3?)
+
+Rose release 43. This release will work best with
+[cylc-6.10.2](https://github.com/cylc/cylc/releases/tag/6.10.2) and
+[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0),
+or their successors.
+
+### Noteworthy Changes
+
+[#1939](https://github.com/metomi/rose/pull/1939):
+Rosie discovery service clients: on authentication failure, the clients will
+now keep retrying as long as the user enters entering different credentials
+from the previous attempt.
+
+[#1933](https://github.com/metomi/rose/pull/1933):
+rose suite-run: `log-*.tar.gz`: is now created by a single `tar` command. For
+reference, the original inefficient logic was required because we had to
+support running Rose on old Unix systems that do not have access to a modern
+`tar` command that has the `-z` option. The old logic used Python's `tarfile`
+module to TAR up the log directory and then used the `gzip` command to compress
+the resulting TAR file (to avoid inefficient when using Python's built-in
+`gzip` logic with the `tarfile` module).  It is now highly unlikely that we had
+to support running Rose systems that do not have access to a modern `tar`
+command.
+
+[#1932](https://github.com/metomi/rose/pull/1932):
+Rose Bush: use `os.stat` to get `last_activity_time` in all Rose Bush pages,
+instead of performing an expensive query.
+
+[#1931](https://github.com/metomi/rose/pull/1931):
+Rose Bush: remove a remaining Bootstrap 2 class from template.
+
+[#1929](https://github.com/metomi/rose/pull/1929):
+rose config-edit: fix an error in the `PageArrayTable` widget, which fails when
+it attempts to display an array variable (i.e. a variable with the length
+metadata set).
+
+[#1928](https://github.com/metomi/rose/pull/1928):
+rose config-edit: fix trigger latent section traceback.
+
+[#1915](https://github.com/metomi/rose/pull/1915):
+rose macro: removed un-necessary prompting with optional configuration.
+* No longer prompts for `optional_config_name`.
+* Now only prompts once for unknown values when using optional configurations.
+
+--------------------------------------------------------------------------------
+
 ## 2016.06.1 (2016-06-23)
 
 Rose release 42. This release works best with
