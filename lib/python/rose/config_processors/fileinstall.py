@@ -126,7 +126,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             if targets[name].mode and targets[name].mode not in Loc.MODES:
                 raise ConfigProcessError([key, "mode"], targets[name].mode)
             target_sources = []
-            for k in ["content", "source"]:
+            for k in ["content", "source"]:  # "content" for back compat
                 source_str = node.get_value([k])
                 if source_str is None:
                     continue
@@ -255,7 +255,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                             break
             if target.is_out_of_date:
                 target.paths = None
-                loc_dao.delete(target)
+                loc_dao.delete_locs.append(target)
 
         # Set up jobs for rebuilding all out-of-date targets.
         jobs = {}
@@ -265,12 +265,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 continue
             if target.mode == target.MODE_SYMLINK:
                 self.manager.fs_util.symlink(target.real_name, target.name)
-                loc_dao.update(target)
+                loc_dao.update_locs.append(target)
             elif target.mode == target.MODE_MKDIR:
                 if os.path.islink(target.name):
                     self.manager.fs_util.delete(target.name)
                 self.manager.fs_util.makedirs(target.name)
-                loc_dao.update(target)
+                loc_dao.update_locs.append(target)
                 target.loc_type = target.TYPE_TREE
                 target.add_path(target.BLOB, None, None)
             elif target.dep_locs:
@@ -294,8 +294,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 target.loc_type = target.TYPE_BLOB
                 for path, checksum, access_mode in get_checksum(target.name):
                     target.add_path(path, checksum, access_mode)
-                loc_dao.update(target)
+                loc_dao.update_locs.append(target)
+        loc_dao.execute_queued_items()
 
+        # If relevant, use job runner to get sources and build targets
         if jobs:
             work_dir = mkdtemp()
             try:
@@ -316,6 +318,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         raise ConfigProcessError(keys, source.name)
                 raise exc
             finally:
+                loc_dao.execute_queued_items()
                 rmtree(work_dir)
 
         # Target checksum compare and report
@@ -349,7 +352,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     @classmethod
     def post_process_job(cls, job, conf_tree, loc_dao, work_dir):
         """Post-process a successful job, helper for "process"."""
-        loc_dao.update(job.context)
+        loc_dao.update_locs.append(job.context)
 
     def set_event_handler(self, event_handler):
         """Sets the event handler, used by pool workers to capture events."""
@@ -580,6 +583,8 @@ class LocDAO(object):
     def __init__(self):
         self.file_name = os.path.abspath(self.FILE_NAME)
         self.conn = None
+        self.delete_locs = []
+        self.update_locs = []
 
     def get_conn(self):
         """Return a Connection object to the database."""
@@ -602,13 +607,57 @@ class LocDAO(object):
                 conn.execute("CREATE TABLE " + name + "(" + schema + ")")
         conn.commit()
 
-    def delete(self, loc):
-        """Remove settings related to loc from the database."""
-        conn = self.get_conn()
-        conn.execute("""DELETE FROM locs WHERE name=?""", [loc.name])
-        conn.execute("""DELETE FROM dep_names WHERE name=?""", [loc.name])
-        conn.execute("""DELETE FROM paths WHERE name=?""", [loc.name])
-        conn.commit()
+    def execute_queued_items(self):
+        """Execute queued delete_locs and updates."""
+        if not self.delete_locs and not self.update_locs:
+            return
+        try:
+            conn = self.get_conn()
+            # Locations to delete
+            if self.delete_locs:
+                for table in ["locs", "dep_names", "paths"]:
+                    conn.executemany(
+                        (r"DELETE FROM %s WHERE name=?" % table),
+                        [[loc.name] for loc in self.delete_locs])
+            # Locations to update
+            if self.update_locs:
+                data = {
+                    "locs": {"n_args": 6, "args_list": []},
+                    "paths": {"n_args": 3, "args_list": []},
+                    "dep_names": {"n_args": 2, "args_list": []}}
+                for loc in self.update_locs:
+                    data["locs"]["args_list"].append([
+                        loc.name, loc.real_name, loc.scheme, loc.mode,
+                        loc.loc_type, loc.key])
+                    if loc.paths:
+                        for path in loc.paths:
+                            if path.checksum and path.access_mode:
+                                checksum_str = ":".join(
+                                    [path.checksum, str(path.access_mode)])
+                            else:
+                                checksum_str = None
+                            data["paths"]["args_list"].append(
+                                [loc.name, path.name, checksum_str])
+                    if loc.dep_locs:
+                        for dep_loc in loc.dep_locs:
+                            data["dep_names"]["args_list"].append(
+                                [loc.name, dep_loc.name])
+                for table, datum in data.items():
+                    if datum["args_list"]:
+                        conn.executemany(
+                            ("INSERT OR REPLACE INTO %s VALUES(%s)" %
+                                (table, ",".join("?" * datum["n_args"]))),
+                            datum["args_list"])
+            conn.commit()
+        except sqlite3.Error:
+            try:
+                self.conn.rollback()
+            except sqlite3.Error:
+                pass
+            raise
+        else:
+            del self.delete_locs[:]
+            del self.update_locs[:]
 
     def select(self, name):
         """Query database for settings matching name.
@@ -648,36 +697,6 @@ class LocDAO(object):
             loc.dep_locs.append(self.select(dep_name))
 
         return loc
-
-    def update(self, loc):
-        """Insert or update settings related to loc to the database."""
-        conn = self.get_conn()
-        conn.execute(
-            """INSERT OR REPLACE INTO locs VALUES(?,?,?,?,?,?)""",
-            [
-                loc.name,
-                loc.real_name,
-                loc.scheme,
-                loc.mode,
-                loc.loc_type,
-                loc.key
-            ])
-        if loc.paths:
-            for path in loc.paths:
-                if path.checksum and path.access_mode:
-                    checksum_str = ":".join(
-                        [path.checksum, str(path.access_mode)])
-                else:
-                    checksum_str = None
-                conn.execute(
-                    """INSERT OR REPLACE INTO paths VALUES(?,?,?)""",
-                    [loc.name, path.name, checksum_str])
-        if loc.dep_locs:
-            for dep_loc in loc.dep_locs:
-                conn.execute(
-                    """INSERT OR REPLACE INTO dep_names VALUES(?,?)""",
-                    [loc.name, dep_loc.name])
-        conn.commit()
 
 
 class PullableLocHandlersManager(SchemeHandlersManager):
