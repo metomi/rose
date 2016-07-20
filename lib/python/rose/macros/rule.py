@@ -168,7 +168,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                        (?:\{.*?\})?   (?# Optional modifier for the section)
                        (?:\([^)]*\))? (?# Optional element for the section)
                        =              (?# Section-option delimiter)
-                       [\w-]+         (?# Option name )
+                       [a-zA-Z][\w-]+ (?# Option name )
                        (?:\(\d+\))?   (?# Optional element for the option )
                       )               (?# End ID capture )
                       (?:\W|$)        (?# Break or end)""", re.X)
