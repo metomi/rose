@@ -48,6 +48,8 @@ control_mult_1 = 2
 control_mult_2 = 3
 test_substring_pass = "ABCCEFG"
 test_substring_fail = "ABCDEFG"
+test_var_no_spaces_fail = 1
+test_var_no_spaces_pass = 0
 
 [simple:array_test]
 test_array_pass = '0A', '0A', '0A', '0A'
@@ -360,6 +362,14 @@ type=real
 fail-if=this != simple:scalar_test=control_sum_1 + simple:scalar_test=control_sum_2 + simple:scalar_test=control_sum_3
 type=real
 
+[simple:scalar_test=test_var_no_spaces_fail]
+fail-if=this!=0
+type=real
+
+[simple:scalar_test=test_var_no_spaces_pass]
+fail-if=this!=0
+type=real
+
 [simple:warn_test]
 
 [simple:warn_test=test_var_1]
@@ -379,7 +389,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 22
+[V] rose.macros.DefaultValidators: issues: 23
     =top_level_model_subset_fail='ofo_001'
         failed because: =top_level_model == "'foo'" and 'foo' not in this
     complex:array_test=test_array_len_fail=0, 1, 2
@@ -422,6 +432,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         failed because: this < simple:scalar_test=control_lt
     simple:scalar_test=test_var_mult_fail=5
         failed because: this != simple:scalar_test=control_mult_1 * simple:scalar_test=control_mult_2
+    simple:scalar_test=test_var_no_spaces_fail=1
+        failed because: this!=0
     simple:scalar_test=test_var_sum_fail=6.00
         failed because: this != simple:scalar_test=control_sum_1 + simple:scalar_test=control_sum_2 + simple:scalar_test=control_sum_3
 [V] rose.macros.DefaultValidators: warnings: 3
