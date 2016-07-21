@@ -14,6 +14,16 @@ or their successors.
 
 ### Noteworthy Changes
 
+[#1947](https://github.com/metomi/rose/pull/1947):
+rose app-run, task-run, suite-run, etc: file install: reduce commits to sqlite
+database that is used to store the state of file install sources and targets.
+If you are installing a large number of files, this change should offer
+significant improvement to the elasped time of the command.
+
+[#1943](https://github.com/metomi/rose/pull/1943):
+rose metadata: fix referring to top-level-option ids in the fail-if and warn-if
+rules.
+
 [#1939](https://github.com/metomi/rose/pull/1939):
 Rosie discovery service clients: on authentication failure, the clients will
 now keep retrying as long as the user enters entering different credentials
