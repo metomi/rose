@@ -57,7 +57,8 @@ rose config-edit: fix trigger latent section traceback.
 
 [#1915](https://github.com/metomi/rose/pull/1915):
 rose macro: removed un-necessary prompting with optional configuration.
-* No longer prompts for `optional_config_name`.
+* Allow macros to have a keyword argument `optional_config_name` which will be
+  set to the name of the optional configuration used, if any.
 * Now only prompts once for unknown values when using optional configurations.
 
 --------------------------------------------------------------------------------
