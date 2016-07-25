@@ -59,6 +59,10 @@ class Variable(object):
 
     """
 
+    __slots__ = ["name", "value", "metadata", "old_value",
+                 "flags", "ignored_reason", "error", "warning",
+                 "comments"]
+
     def __init__(self, name, value, metadata=None, ignored_reason=None,
                  error=None, warning=None, flags=None, comments=None):
         self.name = name
