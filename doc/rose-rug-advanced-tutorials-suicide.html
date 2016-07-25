@@ -359,9 +359,10 @@ fi
 
 [runtime]
     [[root]]
+        [[[job]]]
+            execution time limit = PT3M
         [[[events]]]
             mail events = failed, submission failed, submission timeout, execution timeout
-            execution timeout = PT3M
             submission timeout = PT24M
 
     [[check]]
@@ -459,10 +460,11 @@ fi
 
 [runtime]
     [[root]]
+        [[[job]]]
+            execution time limit = PT3M
         [[[events]]]
             mail events = failed, submission failed, submission timeout, execution timeout
-            execution timeout          = PT3M
-            submission timeout         = PT24M
+            submission timeout = PT24M
 
     [[FAMILY_PASS]]
         script = sleep 10;
@@ -580,9 +582,10 @@ fi
 
 [runtime]
     [[root]]
+        [[[job]]]
+            execution time limit = PT3M
         [[[events]]]
             mail events = failed, submission failed, submission timeout, execution timeout
-            execution timeout = PT3M
             submission timeout = PT24M
 
     [[check_files_exist]]

@@ -32,6 +32,6 @@ NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost -- --debug
 #-------------------------------------------------------------------------------
-file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/file" <<<'2012123112'
+file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/file" <<<'20121231T1200Z'
 rose suite-clean -q -y $NAME
 exit 0

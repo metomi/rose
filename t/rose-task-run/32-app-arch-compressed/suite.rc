@@ -1,7 +1,8 @@
 #!jinja2
 [cylc]
     UTC mode=True
-    [[event hooks]]
+    abort if any task fails = True
+    [[events]]
         timeout=PT1M
         abort on timeout=True
 [scheduling]
@@ -9,10 +10,6 @@
         graph=archive
 
 [runtime]
-    [[root]]
-        [[[events]]]
-            handlers=cylc stop '%(suite)s'
-            handler events=submission failed, failed
     [[archive]]
         script="""
 gzip -f - <<<'MMXVI' >'2016.txt.gz'

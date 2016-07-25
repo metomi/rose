@@ -48,7 +48,7 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
 HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
-poll ! test -e $SUITE_RUN_DIR/log/job/my_task_1.2013010100.1
+poll ! test -e "$SUITE_RUN_DIR/log/job/20130101T0000Z/my_task_1/01"
 if [[ $HOST == 'localhost' ]]; then
     SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>")
     HOST="$(hostname -f)"
@@ -74,7 +74,7 @@ done
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 while (($(date +%s) < TIMEOUT)) && ! (
     cd $SUITE_RUN_DIR/log/job/
-    test -f 2013010100/my_task_1/01/job.out && test -f 2013010112/my_task_1/01/job.out
+    test -f "20130101T0000Z/my_task_1/01/job.out" && test -f "20130101T1200Z/my_task_1/01/job.out"
 )
 do
     sleep 1

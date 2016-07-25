@@ -1,8 +1,9 @@
 #!jinja2
 [cylc]
     UTC mode=True
-    [[event hooks]]
-        timeout handler=rose suite-hook --shutdown
+    abort if any task fails=True
+    [[events]]
+        abort on timeout=True
         timeout=PT1M
 [scheduling]
     initial cycle point=1970
@@ -19,14 +20,8 @@ t1[1970] => pruner
 
 [runtime]
     [[root]]
-        [[[event hooks]]]
-            succeeded handler=rose suite-hook
-            failed handler=rose suite-hook
-            submission failed handler=rose suite-hook --shutdown
-            submission timeout handler=rose suite-hook
-            execution timeout handler=rose suite-hook
-            submission timeout=PT1M
-            execution timeout=PT1M
+        [[[job]]]
+            execution time limit=PT1M
     [[t1]]
         script="""
 cd "${CYLC_SUITE_RUN_DIR}/share"

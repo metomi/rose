@@ -1,9 +1,9 @@
 #!jinja2
 [cylc]
     UTC mode=True
-    abort if any task fails = True
-    [[event hooks]]
-        abort on timeout = True
+    abort if any task fails=True
+    [[events]]
+        abort on timeout=True
         timeout=PT1M
 [scheduling]
     initial cycle point=1970
@@ -18,11 +18,11 @@
     [[t1]]
         inherit = T
         [[[remote]]]
-            host = {{JOB_HOST_1}}
+            host={{JOB_HOST_1}}
     [[t2]]
         inherit = T
         [[[remote]]]
-            host = {{JOB_HOST_2}}
+            host={{JOB_HOST_2}}
     [[pruner]]
         script="""
 rose task-run -v -v --debug | tee -a "${CYLC_SUITE_RUN_DIR}/prune.log"

@@ -4,4 +4,4 @@
         graph = foo
 [runtime]
     [[foo]]
-        script = "sleep 100"
+        script = sleep 100

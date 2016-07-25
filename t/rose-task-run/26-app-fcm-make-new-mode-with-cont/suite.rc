@@ -1,14 +1,12 @@
 #!jinja2
 [cylc]
     UTC mode = True
+    abort if any task fails = True
 [scheduling]
     [[dependencies]]
         graph = """hello-make => hello-make-bin => hello-run"""
 
 [runtime]
-    [[root]]
-        [[[event hooks]]]
-            failed handler = rose suite-hook --shutdown
     [[hello-make]]
         script = rose task-run --app-key=make --new
     [[hello-make-bin]]

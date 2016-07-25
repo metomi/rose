@@ -1,13 +1,13 @@
 #!jinja2
 [cylc]
 UTC mode=True
-[[event hooks]]
-timeout handler=rose suite-hook --shutdown
-timeout=1
+    [[events]]
+        abort on timeout = True
+        timeout=PT1M
 
 [scheduling]
-[[dependencies]]
-graph="""
+    [[dependencies]]
+        graph="""
 my_task_1
 {% if JOB_HOST is defined %}
 my_task_2
@@ -15,11 +15,11 @@ my_task_2
 """
 
 [runtime]
-[[root]]
-script=true
-[[my_task_1]]
+    [[root]]
+        script=true
+    [[my_task_1]]
 {% if JOB_HOST is defined %}
-[[my_task_2]]
-[[[remote]]]
-host={{JOB_HOST}}
+    [[my_task_2]]
+        [[[remote]]]
+            host={{JOB_HOST}}
 {% endif %}

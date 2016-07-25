@@ -1,24 +1,19 @@
 #!jinja2
 [cylc]
     UTC mode=True
-    [[event hooks]]
-        timeout handler=rose suite-hook --shutdown
+    abort if any task fails=True
+    [[events]]
+        abort on timeout=True
         timeout=PT1M
 [scheduling]
     initial cycle point=20130101T0000Z
     final cycle point=20130101T0000Z
     [[dependencies]]
-        [[[ T00 ]]]
+        [[[T00]]]
             graph=t1
 
 [runtime]
     [[t1]]
         script=rose task-run --cycle=PT12H
-        [[[event hooks]]]
-           succeeded handler=rose suite-hook
-           failed handler=rose suite-hook --shutdown
-           submission failed handler=rose suite-hook --shutdown
-           submission timeout handler=rose suite-hook
-           execution timeout handler=rose suite-hook
-           submission timeout=PT1M
-           execution timeout=PT1M
+        [[[job]]]
+           execution time limit=PT1M

@@ -1,8 +1,9 @@
 #!jinja2
 [cylc]
     UTC mode = True
-    [[event hooks]]
-        timeout handler = rose suite-hook --shutdown
+    abort if any task fails = True
+    [[events]]
+        abort on timeout = True
         timeout = PT2M
 [scheduling]
     [[dependencies]]

@@ -162,7 +162,7 @@
     [[compose_letter]]
         script = sleep 5; echo 'writing a letter to Bob...'
     [[send_letter]]
-        environment scripting = eval `rose task-env`
+        env-script = eval `rose task-env`
         script = """
 sleep 5
 echo 'Hello Bob' &gt; $ROSE_DATA/letter.txt
@@ -177,7 +177,7 @@ sleep 10
     [[bob]]
         script = rose task-run
     [[read_letter]]
-        environment scripting = eval `rose task-env`
+        env-script = eval `rose task-env`
         script = sleep 5; cat $ROSE_DATA/letter.txt
         post-script = rm $ROSE_DATA/letter.txt
 </pre>

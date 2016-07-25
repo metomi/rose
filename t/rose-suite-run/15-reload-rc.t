@@ -28,7 +28,7 @@ mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -n $NAME --no-gcontrol -C src
-poll ! test -e "$SUITE_RUN_DIR/log/job/2013010100/t1/01/job.status"
+poll ! test -e "$SUITE_RUN_DIR/log/job/20130101T0000Z/t1/01/job.status"
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE"
 cat >src/rose-suite.conf <<'__CONF__'
@@ -45,8 +45,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" /dev/null
 poll ! grep -q \
-    -e 'RELOADING.TASK.DEFINITION.FOR.t1\.2013010100' \
-    -e 'RELOADING.TASK.DEFINITION.FOR.t1\.2013010112' \
+    -e 'RELOADING.TASK.DEFINITION.FOR.t1\.20130101T0000Z' \
+    -e 'RELOADING.TASK.DEFINITION.FOR.t1\.20130101T1200Z' \
     "$SUITE_RUN_DIR/log/suite/log"
 # Add file that allows the jobs to proceed
 cat >"$SUITE_RUN_DIR/hello.txt" <<'__TXT__'
@@ -57,8 +57,8 @@ __TXT__
 poll test -e "$HOME/.cylc/ports/$NAME"
 grep '^hello ' $SUITE_RUN_DIR/log/job/*/t1/01/job.out >"$TEST_KEY.job.out"
 file_cmp "$TEST_KEY.job.out" "$TEST_KEY.job.out" <<__OUT__
-$SUITE_RUN_DIR/log/job/2013010100/t1/01/job.out:hello world
-$SUITE_RUN_DIR/log/job/2013010112/t1/01/job.out:hello earth
+$SUITE_RUN_DIR/log/job/20130101T0000Z/t1/01/job.out:hello world
+$SUITE_RUN_DIR/log/job/20130101T1200Z/t1/01/job.out:hello earth
 __OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

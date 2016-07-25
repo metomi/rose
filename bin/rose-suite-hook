@@ -26,6 +26,8 @@
 #     rose task-hook [OPTIONS] EVENT SUITE TASK_ID MSG
 #
 # DESCRIPTION
+#     Deprecated. Use cylc built-in event handlers instead.
+#
 #     Provide a common event hook for cylc suites and tasks.
 #     * (Task event only) Retrieve remote task logs back to server host.
 #     * Email user if --mail specified.

@@ -41,7 +41,7 @@ cat >"${SUITE_DIR}/suite.rc" <<'__SUITE_RC__'
 #!Jinja2
 [cylc]
     UTC mode = True
-    [[event hooks]]
+    [[events]]
         timeout = PT2M
         abort on timeout = True
 [scheduling]

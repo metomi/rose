@@ -1,7 +1,8 @@
 #!jinja2
 [cylc]
     UTC mode=True
-    [[event hooks]]
+    abort if any task fails = True
+    [[events]]
         timeout=PT1M
         abort on timeout=True
 [scheduling]
@@ -13,14 +14,8 @@ archive2
 
 [runtime]
     [[root]]
-        [[[event hooks]]]
-            succeeded handler=rose suite-hook
-            failed handler=rose suite-hook --shutdown
-            submission failed handler=rose suite-hook --shutdown
-            submission timeout handler=rose suite-hook
-            execution timeout handler=rose suite-hook
-            submission timeout=PT1M
-            execution timeout=PT1M
+        [[[job]]]
+            execution time limit=PT1M
     [[archive1]]
         script="""
 echo 'MMXIV' >'2014.txt'
