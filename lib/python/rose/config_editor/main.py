@@ -1874,12 +1874,9 @@ def spawn_window(config_directory_path=None, debug_mode=False,
                               metadata_off=metadata_off,
                               opt_meta_paths=opt_meta_paths,
                               no_warn=no_warn)
-    except BaseException as e:
+    except BaseException:
         splash_screen.stop()
-        if debug_mode and isinstance(e, Exception):
-            # Write out origin information - this is otherwise lost.
-            traceback.print_exc()
-        raise e
+        raise
 
     # open up any initial_namespaces the user has provided us with
     if initial_namespaces:
