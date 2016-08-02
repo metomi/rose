@@ -752,13 +752,41 @@ class CylcProcessor(SuiteEngineProcessor):
             prefix += user_name
         d_rel = self.get_suite_dir_rel(suite_name)
         dir_ = os.path.expanduser(os.path.join(prefix, d_rel))
-        for key in ["cylc-suite-env",
-                    "log/suite/err", "log/suite/log", "log/suite/out",
-                    "suite.rc", "suite.rc.processed"]:
+        # Get cylc files.
+        cylc_files = ["cylc-suite-env", "suite.rc", "suite.rc.processed"]
+        for key in cylc_files:
             f_name = os.path.join(dir_, key)
             if os.path.isfile(f_name):
                 f_stat = os.stat(f_name)
                 logs_info[key] = {"path": key,
+                                  "mtime": f_stat.st_mtime,
+                                  "size": f_stat.st_size}
+        # Get cylc suite log files.
+        log_files = ["log/suite/err", "log/suite/log", "log/suite/out"]
+        for key in log_files:
+            f_name = os.path.join(dir_, key)
+            if os.path.isfile(f_name):
+                try:
+                    link_path = os.readlink(f_name)
+                except OSError:
+                    link_path = f_name
+                old_logs = []  # Old log naming system.
+                new_logs = []  # New log naming system.
+                # TODO: Post migration to cylc this logic can be replaced by:
+                # `from cylc.suite_logging import get_logs` (superior)
+                for log in glob(f_name + '.*'):
+                    log_name = os.path.basename(log)
+                    if log_name == link_path:
+                        continue
+                    if len(log_name.split('.')[1]) > 3:
+                        new_logs.append(os.path.join("log", "suite", log_name))
+                    else:
+                        old_logs.append(os.path.join("log", "suite", log_name))
+                new_logs.sort(reverse=True)
+                old_logs.sort()
+                f_stat = os.stat(f_name)
+                logs_info[key] = {"path": key,
+                                  "paths": [key] + new_logs + old_logs,
                                   "mtime": f_stat.st_mtime,
                                   "size": f_stat.st_size}
         return ("cylc", logs_info)

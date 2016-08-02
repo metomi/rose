@@ -66,6 +66,11 @@ lib/html/static/js/bootstrap.min.js:
   released under the Apache 2.0 license.
   See <http://getbootstrap.com/>.
 
+lib/html/static/css/rose-bush.css
+* Contains modified code from Twitter Bootstrap v2.3.1 released
+  under the Apache 2.0 licence.
+  See <http://getbootstrap.com/2.3.2/>.
+
 lib/html/static/css/jquery.dataTables.???:
 lib/html/static/images/sort_???:
 lib/html/static/js/jquery.dataTables.???:
