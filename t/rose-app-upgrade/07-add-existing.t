@@ -68,6 +68,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Added with value 'electric,electric'
     =meta=park/dinosaurs
         Upgraded from no-dinosaurs to dinosaurs
+[U] Upgrade_no-dinosaurs-dinosaurs: warnings: 1
+    env=DINOSAURS=compy,t-rex
+        Warning: cannot add env=DINOSAURS: clash with env=DINOSAURS(1)
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.file" ../config/rose-app.conf <<'__CONFIG__'
