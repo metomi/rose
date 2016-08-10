@@ -54,6 +54,7 @@ text, remembering to add the [rose-config-edit] section.
 
 import ast
 import os
+import sys
 
 from rose.resource import ResourceLocator
 
@@ -720,14 +721,11 @@ UNTITLED_NAME = "Untitled"
 VAR_ID_IN_CONFIG = "Variable id {0} from the configuration {1}"
 
 
-class OverrideValueError(Exception):
+_OVERRIDE_WARNING_PRIVATE = (
+    "Cannot override: {0}={1} ({2}): not permitted.\n")
+_OVERRIDE_WARNING_TYPE = (
+    "Cannot override: {0}={1}={2}: site/user conf: was {3}, supplied {4}\n")
 
-    """An error raised on failure to override a particular constant above."""
-
-    OVERRIDE_WARNING = "{0}={1}={2}: site/user conf: was {3}, supplied {4}"
-
-    def __str__(self):
-        return self.OVERRIDE_WARNING.format(*self.args)
 
 
 def false_function(*args, **kwargs):
@@ -753,8 +751,16 @@ def load_override_config(sections, my_globals=None):
             orig_value = my_globals[name]
             if (type(orig_value) is not type(cast_value) and
                     orig_value is not None):
-                raise OverrideValueError(section, key, cast_value,
-                                         type(orig_value), type(cast_value))
+                sys.stderr.write(_OVERRIDE_WARNING_TYPE.format(
+                    section, key, cast_value,
+                    type(orig_value), type(cast_value))
+                )
+                continue
+            if name.startswith("_"):
+                sys.stderr.write(_OVERRIDE_WARNING_PRIVATE.format(
+                    section, key, name)
+                )
+                continue
             my_globals[name] = cast_value
 
 
