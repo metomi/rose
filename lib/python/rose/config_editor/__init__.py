@@ -727,7 +727,6 @@ _OVERRIDE_WARNING_TYPE = (
     "Cannot override: {0}={1}={2}: site/user conf: was {3}, supplied {4}\n")
 
 
-
 def false_function(*args, **kwargs):
     """Return False, no matter what the arguments are."""
     return False
