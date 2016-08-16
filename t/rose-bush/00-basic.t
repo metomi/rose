@@ -159,7 +159,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 # A suite run directory with only a "cylc-suite.db", and nothing else
 SUITE_DIR2="$(mktemp -d --tmpdir="${HOME}/cylc-run" "rtb-rose-bush-00-XXXXXXXX")"
 SUITE_NAME2="$(basename "${SUITE_DIR2}")"
-cp -pr "${SUITE_DIR}/cylc-suite.db" "${SUITE_DIR2}/"
+cp "${SUITE_DIR}/cylc-suite.db" "${SUITE_DIR2}/"
 run_pass "${TEST_KEY}-bare" \
     curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME2}?form=json"
 rose_ws_json_greps "${TEST_KEY}-bare.out" "${TEST_KEY}-bare.out" \
