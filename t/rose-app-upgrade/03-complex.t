@@ -124,6 +124,8 @@ rename_opt_alt_sect=.true.
 [namelist:rename_opt_dest_exists]
 rename_this_opt=.true.
 rename_this_opt_dest=.true.
+rename_this_opt_index=.true.
+rename_this_opt_index_dest(1)=.true.
 
 [namelist:rename_sect]
 rename_this_opt_via_sect=.true.
@@ -133,6 +135,12 @@ rename_this_opt_via_sect=.true.
 
 [namelist:rename_sect_dest_exists_dest]
 remove_this_opt_via_rename=.true.
+
+[namelist:rename_sect_dest_index_exists]
+rename_this_opt=.true.
+
+[namelist:rename_sect_dest_index_exists_dest(1)]
+rename_this_opt_dest=.true.
 
 [namelist:change_opt_if_value]
 change_opt_if_true=.true.
@@ -271,10 +279,18 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
                              "rename_this_opt"],
                             ["namelist:rename_opt_dest_exists",
                              "rename_this_opt_dest"])
+        self.rename_setting(config,
+                            ["namelist:rename_opt_dest_exists",
+                             "rename_this_opt_index"],
+                            ["namelist:rename_opt_dest_exists",
+                             "rename_this_opt_index_dest"])
         self.rename_setting(config, ["namelist:rename_sect"],
                             ["namelist:rename_sect_dest"])
         self.rename_setting(config, ["namelist:rename_sect_dest_exists"],
                             ["namelist:rename_sect_dest_exists_dest"])
+        self.rename_setting(config, ["namelist:rename_sect_dest_index_exists"],
+                            ["namelist:rename_sect_dest_index_exists_dest"])
+
 
         # Get setting values.
         if self.get_setting_value(config,
@@ -306,7 +322,7 @@ TEST_KEY=$TEST_KEY_BASE-upgrade
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade_apple-fig: changes: 51
+[U] Upgrade_apple-fig: changes: 54
     namelist:add_sect=new_opt=.true.
         Added with value '.true.'
     namelist:add_sect_only=None=None
@@ -383,6 +399,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Removed
     namelist:rename_opt_dest_exists=rename_this_opt=None
         Removed
+    namelist:rename_opt_dest_exists=rename_this_opt_index=None
+        Removed
     namelist:rename_sect_dest=None=None
         Renamed namelist:rename_sect -> namelist:rename_sect_dest
     namelist:rename_sect_dest=rename_this_opt_via_sect=.true.
@@ -403,12 +421,23 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Removed
     namelist:rename_sect_dest_exists=None=None
         Removed
+    namelist:rename_sect_dest_index_exists=rename_this_opt=None
+        Removed
+    namelist:rename_sect_dest_index_exists=None=None
+        Removed
     namelist:change_opt_if_value=change_opt_if_true=.false.
         Value: '.true.' -> '.false.'
     namelist:change_ign_opt_if_value=change_opt_if_true=.false.
         Value: '.true.' -> '.false.'
     =meta=test-app-upgrade/fig
         Upgraded from apple to fig
+[U] Upgrade_apple-fig: warnings: 3
+    namelist:rename_opt_dest_exists=rename_this_opt_index_dest=.true.
+        Warning: cannot add namelist:rename_opt_dest_exists=rename_this_opt_index_dest: clash with namelist:rename_opt_dest_exists=rename_this_opt_index_dest(1)
+    namelist:rename_sect_dest_index_exists_dest=None=None
+        Warning: cannot add namelist:rename_sect_dest_index_exists_dest: clash with namelist:rename_sect_dest_index_exists_dest(1)
+    namelist:rename_sect_dest_index_exists_dest=rename_this_opt=.true.
+        Warning: cannot add namelist:rename_sect_dest_index_exists_dest=rename_this_opt: clash with namelist:rename_sect_dest_index_exists_dest(1)
 [T] UpgradeTriggerFixing: changes: 7
     namelist:change_opt=trig_ignore_opt_has_changed=.true.
         trig-ignored -> enabled     
@@ -504,12 +533,16 @@ rename_opt_alt_sect_dest=.true.
 
 [namelist:rename_opt_dest_exists]
 rename_this_opt_dest=.true.
+rename_this_opt_index_dest(1)=.true.
 
 [namelist:rename_sect_dest]
 rename_this_opt_via_sect=.true.
 
 [namelist:rename_sect_dest_exists_dest]
 rename_this_opt_via_sect=.true.
+
+[namelist:rename_sect_dest_index_exists_dest(1)]
+rename_this_opt_dest=.true.
 
 [namelist:standard_sect]
 standard_opt=.true.

@@ -83,6 +83,7 @@ class MacroUpgrade(rose.macro.MacroBase):
     INFO_REMOVED = "Removed"
     INFO_RENAMED_SECT = "Renamed {0} -> {1}"
     INFO_RENAMED_VAR = "Renamed {0}={1} -> {2}={3}"
+    WARNING_ADD_CLASH = "Warning: cannot add {0}: clash with {1}"
     UPGRADE_RESOURCE_DIR = MACRO_UPGRADE_RESOURCE_DIR
 
     def act_from_files(self, config, downgrade=False):
@@ -146,41 +147,60 @@ class MacroUpgrade(rose.macro.MacroBase):
                 info = self.INFO_ADDED_VAR.format(repr(value))
 
         # Search for existing conflicting settings.
+        conflict_id = None
         found_setting = False
         if config.get([section, option]) is None:
             strip_dupl = rose.macro.REC_ID_STRIP
-            for keys, node in config.walk():
-                existing_section = keys[0]
+            for key in config.get_value():
+                existing_section = key
+                if not existing_section.startswith(section):
+                    continue
                 existing_base_section = (
                     rose.macro.REC_ID_STRIP.sub("", existing_section))
-                if len(keys) == 1:
-                    existing_option = None
-                    existing_base_option = None
-                else:
-                    existing_option = keys[1]
-                    existing_base_option = (
-                        rose.macro.REC_ID_STRIP_DUPL.sub("", existing_option))
                 if option is None:
                     # For section 'foo', look for 'foo', 'foo{bar}', 'foo(1)'.
-                    if (existing_section == section or
-                            existing_base_section == section):
-                        found_setting = True
-                        break
-                # For option 'foo', look for 'foo', 'foo(1)'.
-                elif (existing_section == section and
-                        (existing_option == option or
-                         existing_base_option == option)):
-                    found_setting = True
+                    found_setting = (existing_section == section or
+                                     existing_base_section == section)
+                else:
+                    # For 'foo=bar', don't allow sections 'foo(1)', 'foo{bar}'.
+                    found_setting = (existing_section != section and
+                                     existing_base_section == section)
+                if found_setting:
+                    conflict_id = existing_section
                     break
+                if option is not None:
+                    for keys, node in config.walk([existing_section]):
+                        existing_option = keys[1]
+                        existing_base_option = (
+                            rose.macro.REC_ID_STRIP_DUPL.sub(
+                                "", existing_option)
+                        )
+                        # For option 'foo', look for 'foo', 'foo(1)'.
+                        if (existing_section == section and
+                                (existing_option == option or
+                                 existing_base_option == option)):
+                            found_setting = True
+                            conflict_id = self._get_id_from_section_option(
+                                existing_section, existing_option)
+                            break
+                    if found_setting:
+                        break
         else:
             found_setting = True
+            conflict_id = None
 
         # If already added, quit, unless "forced".
         if found_setting:
-            if forced:
-                # If forced, override the existing properties.
+            if forced and (conflict_id is None or id_ == conflict_id):
+                # If forced, override settings for an identical id.
                 return self.change_setting_value(
                     config, keys, value, state, comments, info)
+            if conflict_id:
+                self.add_report(
+                    section, option, value,
+                    self.WARNING_ADD_CLASH.format(id_, conflict_id),
+                    is_warning=True
+                )
             return False
 
         # Add parent section if missing.
@@ -665,6 +685,7 @@ def main():
                                     changes_map, trig_macro_id,
                                     opts.conf_dir, opts.output_dir,
                                     opts.non_interactive, reporter)
+
 
 if __name__ == "__main__":
     rose.macro.add_meta_paths()
