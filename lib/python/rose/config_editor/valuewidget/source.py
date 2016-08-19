@@ -36,18 +36,18 @@ class SourceValueWidget(gtk.HBox):
     """This class generates a special widget for the file source variable.
 
     It cheats by passing in a special VariableOperations instance as
-    custom_arg. This is used for search and getting and updating the
+    arg_str. This is used for search and getting and updating the
     available sections.
 
     """
 
-    def __init__(self, value, metadata, set_value, hook, custom_arg=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(SourceValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.var_ops = custom_arg
+        self.var_ops = arg_str
         formats = [f for f in rose.formats.__dict__ if not f.startswith('__')]
         self.formats = formats
         self.formats_ok = None
