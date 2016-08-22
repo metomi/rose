@@ -717,6 +717,7 @@ class CylcProcessor(SuiteEngineProcessor):
             stmt = "SELECT DISTINCT user_at_host FROM task_jobs"
             stmt_where_list = []
             stmt_args = []
+            break
         else:
             stmt = "SELECT DISTINCT misc FROM task_events"
             stmt_where_list = ["(event==? OR event==? OR event==?)"]
