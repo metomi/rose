@@ -81,6 +81,9 @@ class ConfigNode(object):
 
     """Represent a node in a configuration file."""
 
+    __slots__ = ["STATE_NORMAL", "STATE_USER_IGNORED",
+                 "STATE_SYST_IGNORED", "value", "state", "comments"]
+
     STATE_NORMAL = ""
     STATE_USER_IGNORED = "!"
     STATE_SYST_IGNORED = "!!"
@@ -326,6 +329,22 @@ class ConfigNode(object):
         diff = ConfigNodeDiff()
         diff.set_from_configs(other_config_node, self)
         return diff
+
+    def __getstate__(self):
+        """Avoid pickling the STATE constants within a deepcopy.
+
+        This avoids a read-only error and allows __slots__ compatibility.
+
+        """
+        return {"state": self.state,
+                "value": self.value,
+                "comments": self.comments}
+
+    def __setstate__(self, state):
+        """Read in the results of __getstate__."""
+        self.state = state["state"]
+        self.value = state["value"]
+        self.comments = state["comments"]
 
 
 class ConfigNodeDiff(object):
