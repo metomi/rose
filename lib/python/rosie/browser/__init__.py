@@ -53,6 +53,7 @@ text, remembering to add the [rosie-go] section.
 import ast
 import os
 
+from rose.config_editor import load_override_config
 from rose.resource import ResourceLocator
 
 # Accelerators
@@ -272,21 +273,4 @@ SPLASH_SEARCH_MANAGER = "search manager"
 SPLASH_SETUP_WINDOW = "main window"
 
 
-def load_override_config():
-    """Load any overrides of the above settings."""
-    conf = ResourceLocator.default().get_conf()
-    for s in ["rosie-browse", "rosie-go"]:
-        node = conf.get([s], no_ignore=True)
-        if node is None:
-            continue
-        for key, node in node.value.items():
-            if node.is_ignored():
-                continue
-            try:
-                cast_value = ast.literal_eval(node.value)
-            except Exception:
-                cast_value = node.value
-            globals()[key.replace("-", "_").upper()] = cast_value
-
-
-load_override_config()
+load_override_config(["rosie-browse", "rosie-go"], my_globals=globals())
