@@ -5,12 +5,40 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2016-Q3?)
+
+Rose release 44. This release will work best with
+[cylc-6.10.2](https://github.com/cylc/cylc/releases/tag/6.10.2) and
+[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0),
+or their successors.
+
+### Noteworthy Changes
+
+[#1962](https://github.com/metomi/rose/pull/1962):
+rose config-edit: fix source file page widget traceback.
+
+[#1959](https://github.com/metomi/rose/pull/1959):
+rosie go, rosie ls: handle corrupt working copy edge case.
+
+[#1956](https://github.com/metomi/rose/pull/1956):
+rose app-upgrade: speed up adding or renaming for large configurations.
+
+[#1955](https://github.com/metomi/rose/pull/1955):
+rose bush: add rotated log files to the `cylc files` menu.
+
+[#1951](https://github.com/metomi/rose/pull/1951):
+rose config-edit, rosie go: handle site/user incorrect value types.
+
+[#1950](https://github.com/metomi/rose/pull/1950):
+rose config-edit: clearer exception handling on startup.
+
+--------------------------------------------------------------------------------
+
 ## 2016.07.0 (2016-07-22)
 
 Rose release 43. This release works best with
 [cylc-6.10.2](https://github.com/cylc/cylc/releases/tag/6.10.2) and
-[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0),
-or their successors.
+[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0).
 
 ### Noteworthy Changes
 
