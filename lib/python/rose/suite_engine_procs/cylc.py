@@ -239,12 +239,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
         # Check if "broadcast_states" table is available or not
-        for row in self._db_exec(
-                self.SUITE_DB, user_name, suite_name,
-                "SELECT name FROM sqlite_master WHERE name==?",
-                ["broadcast_states"]):
-            break
-        else:
+        if not self._db_has_table(
+                self.SUITE_DB, user_name, suite_name, "broadcast_states"):
             return
 
         broadcast_states = []
@@ -263,12 +259,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
         # Check if "broadcast_events" table is available or not
-        for row in self._db_exec(
-                self.SUITE_DB, user_name, suite_name,
-                "SELECT name FROM sqlite_master WHERE name==?",
-                ["broadcast_events"]):
-            break
-        else:
+        if not self._db_has_table(
+                self.SUITE_DB, user_name, suite_name, "broadcast_events"):
             return {}
 
         broadcast_events = []
@@ -326,11 +318,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
         # Check if "task_jobs" table is available or not
-        for row in self._db_exec(
-                self.SUITE_DB, user_name, suite_name,
-                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
-            break
-        else:
+        if not self._db_has_table(
+                self.SUITE_DB, user_name, suite_name, "task_jobs"):
             return self._get_suite_job_events_old(
                 user_name, suite_name, cycles, tasks, no_statuses, order,
                 limit, offset)
@@ -711,13 +700,10 @@ class CylcProcessor(SuiteEngineProcessor):
         """Return remote ["[user@]host", ...] for submitted jobs."""
         auths = []
         # Check if "task_jobs" table is available or not
-        for row in self._db_exec(
-                self.SUITE_DB, None, suite_name,
-                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
+        if self._db_has_table(self.SUITE_DB, None, suite_name, "task_jobs"):
             stmt = "SELECT DISTINCT user_at_host FROM task_jobs"
             stmt_where_list = []
             stmt_args = []
-            break
         else:
             stmt = "SELECT DISTINCT misc FROM task_events"
             stmt_where_list = ["(event==? OR event==? OR event==?)"]
@@ -875,19 +861,13 @@ class CylcProcessor(SuiteEngineProcessor):
                 }
                 entries.append(entry_of[cycle])
 
-        # Check if "task_jobs" table is available or not
-        can_use_task_jobs_table = False
-        for row in self._db_exec(
-                self.SUITE_DB, user_name, suite_name,
-                "SELECT name FROM sqlite_master WHERE name==?", ["task_jobs"]):
-            can_use_task_jobs_table = True
-            break
-
+        # Check if "task_jobs" table is available or not.
         # Note: A single query with a JOIN is probably a more elegant solution.
         # However, timing tests suggest that it is cheaper with 2 queries.
         # This 2nd query may return more results than is necessary, but should
         # be a very cheap query as it does not have to do a lot of work.
-        if can_use_task_jobs_table:
+        if self._db_has_table(
+                self.SUITE_DB, user_name, suite_name, "task_jobs"):
             stmt = (
                 "SELECT cycle," +
                 " sum(submit_status==1 OR run_status==1) AS n_job_fail" +
@@ -1610,6 +1590,13 @@ class CylcProcessor(SuiteEngineProcessor):
         """Execute a query on a named database connection."""
         dao = self._db_init(db_name, user_name, suite_name)
         return dao.execute(stmt, stmt_args, commit)
+
+    def _db_has_table(self, db_name, user_name, suite_name, table_name):
+        """Return True if table_name exists in the suite database."""
+        cursor = self._db_exec(
+            db_name, user_name, suite_name,
+            "SELECT name FROM sqlite_master WHERE name==?", [table_name])
+        return cursor.fetchone() is not None
 
     def _db_init(self, db_name, user_name, suite_name):
         """Initialise a named database connection."""
