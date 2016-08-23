@@ -38,7 +38,7 @@ run_pass "$TEST_KEY" \
 TEST_KEY="$TEST_KEY_BASE-find-foo"
 (cd $SUITE_RUN_DIR; find foo -type f | LANG=C sort) >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_SOURCE_DIR/$TEST_KEY.out" "$TEST_KEY.out"
-for CYCLE in 2013010100 2013010112 2013010200; do
+for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
     TEST_KEY="$TEST_KEY_BASE-$CYCLE.out"
     sed '/^\[INFO\] [=!+]/!d;
          s/\(t(init)=\)[^Z]*Z/\1YYYY-mm-DDTHH:MM:SSZ/;
@@ -87,13 +87,13 @@ __TXT__
 done
 #-------------------------------------------------------------------------------
 # Results, bad ones
-CYCLE=2013010112
+CYCLE=20130101T1200Z
 TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
 FILE_PREFIX="$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_"
 sed '/^\[FAIL\] /!d' "${FILE_PREFIX}1/01/job.err" >"${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
-[FAIL] foo://2013010112/hello/worlds/planet-n.tar.gz: bad command-format: foo put %(target)s %(source)s: KeyError: 'source'
-[FAIL] ! foo://2013010112/hello/worlds/planet-n.tar.gz [compress=tar.gz]
+[FAIL] foo://20130101T1200Z/hello/worlds/planet-n.tar.gz: bad command-format: foo put %(target)s %(source)s: KeyError: 'source'
+[FAIL] ! foo://20130101T1200Z/hello/worlds/planet-n.tar.gz [compress=tar.gz]
 [FAIL] !	hello/planet-1.txt (hello/planet-1.txt)
 [FAIL] !	hello/planet-2.txt (hello/planet-2.txt)
 [FAIL] !	hello/planet-3.txt (hello/planet-3.txt)
@@ -122,28 +122,28 @@ __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-5"
 sed '/^\[FAIL\] /!d' "${FILE_PREFIX}5/01/job.err" >"${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
-[FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: '${SUITE_RUN_DIR}/share/cycle/2013010112/hello/mercurry.txt'
-[FAIL] ! foo://2013010112/hello/worlds/inner.tar.gz [compress=tar.gz]
+[FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: '${SUITE_RUN_DIR}/share/cycle/20130101T1200Z/hello/mercurry.txt'
+[FAIL] ! foo://20130101T1200Z/hello/worlds/inner.tar.gz [compress=tar.gz]
 [FAIL] !	hello/venus.txt (hello/venus.txt)
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
 sed '/^\[FAIL\] /!d; s/ \[compress.*\]$//' "$TEST_KEY.err" \
     "${FILE_PREFIX}6/01/job.err" >"$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/cycle/2013010112/hello/mars.txt # return-code=1, stderr=
+[FAIL] foo push foo://20130101T1200Z/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/cycle/20130101T1200Z/hello/mars.txt # return-code=1, stderr=
 [FAIL] foo: push: unknown action
-[FAIL] ! foo://2013010112/hello/worlds/mars.txt.gz
+[FAIL] ! foo://20130101T1200Z/hello/worlds/mars.txt.gz
 [FAIL] !	hello/mars.txt (hello/mars.txt)
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-7"
 sed '/^\[FAIL\] /!d' "${FILE_PREFIX}7/01/job.err" >"${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
-[FAIL] foo://2013010112/planet-n.tar.gz: bad rename-format: %(planet?maybedwarfplanet???)s: KeyError: 'planet?maybedwarfplanet???'
+[FAIL] foo://20130101T1200Z/planet-n.tar.gz: bad rename-format: %(planet?maybedwarfplanet???)s: KeyError: 'planet?maybedwarfplanet???'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-8"
 sed '/^\[FAIL\] /!d' "${FILE_PREFIX}8/01/job.err" >"${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
-[FAIL] foo://2013010112/planet-n.tar.gz: bad rename-parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
+[FAIL] foo://20130101T1200Z/planet-n.tar.gz: bad rename-parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-9"
 sed '/^\[INFO\] [=!+]/!d;
@@ -153,11 +153,12 @@ sed '/^\[INFO\] [=!+]/!d;
 file_cmp "$TEST_KEY.out" \
     "$TEST_SOURCE_DIR/$TEST_KEY_BASE-bad-9.out" "$TEST_KEY.out"
 sed -e '/^\[FAIL\] /!d' \
-    -e 's?\(hello/planet-5.txt\) .*\(/hello/planet-5.txt\)?\1 \2?' \
+    -e 's/^\(\[FAIL\] my-bad-command\) .*\( # return-code=1, stderr=\)$/\1\2/' \
+    -e '/^\[FAIL\] \[my-bad-command\]/d' \
     -e 's/ \[compress.*]$//' \
     "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.err" >"$TEST_KEY.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
-[FAIL] ! foo://2013010112/planet-n.tar.gz
+[FAIL] ! foo://20130101T1200Z/planet-n.tar.gz
 [FAIL] !	hello/dark-matter.txt (hello/dark-matter.txt)
 [FAIL] !	hello/earth.txt (hello/earth.txt)
 [FAIL] !	hello/jupiter-moon-1.txt (hello/jupiter-moon-1.txt)
@@ -186,8 +187,7 @@ file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 [FAIL] !	hello/spaceship-9.txt (hello/spaceship-9.txt)
 [FAIL] !	hello/uranus.txt (hello/uranus.txt)
 [FAIL] !	hello/venus.txt (hello/venus.txt)
-[FAIL] my-bad-command ${SUITE_RUN_DIR}/share/cycle/2013010112/hello/planet-5.txt /hello/planet-5.txt # return-code=1, stderr=
-[FAIL] [my-bad-command] ${SUITE_RUN_DIR}/share/cycle/2013010112/hello/planet-5.txt /hello/planet-5.txt
+[FAIL] my-bad-command # return-code=1, stderr=
 __ERR__
 
 #-------------------------------------------------------------------------------

@@ -1,10 +1,10 @@
 #!jinja2
 [cylc]
 UTC mode=True
-    [[event hooks]]
-        timeout handler=rose suite-hook --shutdown
+    [[events]]
+        stalled handler = cylc stop "%(suite)s"
+        timeout handler = cylc stop "%(suite)s"
         timeout=PT30S
-        abort on timeout=False
 
 [scheduling]
     [[dependencies]]

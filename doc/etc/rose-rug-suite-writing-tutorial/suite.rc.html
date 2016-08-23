@@ -89,10 +89,11 @@
 [runtime]
     [[root]]
         script = rose task-run --verbose
+        [[[job]]]
+            execution time limit = PT3H
         [[[events]]]
-           mail events = submission timeout, execution timeout
-           submission timeout = P1D
-           execution timeout = PT3H
+            mail events = submission timeout, execution timeout
+            submission timeout = P1D
     [[fcm_make_navigate]]
     [[navigate]]
         [[[environment]]]

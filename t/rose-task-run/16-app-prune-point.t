@@ -33,7 +33,6 @@ TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
     rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host='localhost' --debug -- --debug
-cat "${TEST_KEY}.err" >&2
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\

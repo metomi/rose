@@ -205,8 +205,8 @@
               <dt><a href="#rose-suite-hook">rose
               suite-hook</a></dt>
 
-              <dd>Provide a common event hook for cylc suites and
-              tasks.</dd>
+              <dd>Deprecated. Use cylc built-in event handlers
+              instead.</dd>
 
               <dt><a href="#rose-suite-log">rose suite-log</a></dt>
 
@@ -2273,6 +2273,9 @@ launcher-preopts.mpiexec=-n $NPROC
 
             <h3>DESCRIPTION</h3>
 
+            <p>Deprecated. Use cylc built-in event handlers
+            instead.</p>
+
             <p>Provide a common event hook for cylc suites and
             tasks.</p>
 
@@ -3029,10 +3032,10 @@ launcher-preopts.mpiexec=-n $NPROC
 
             <p><kbd>rose task-env</kbd> can be used to make
             environment variables available to a suite by defining
-            its suite.rc <var>environment scripting</var> option
+            its suite.rc <var>env-script</var> option
             as:</p>
             <pre>
-environment scripting = "eval $(rose task-env)"
+env-script = "eval $(rose task-env)"
 </pre>
 
             <h2 id="rose-task-run">rose task-run</h2>

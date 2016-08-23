@@ -64,18 +64,18 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,path_in_tar,key FROM log_files ORDER BY path,path_in_tar ASC;' \
     >"$TEST_KEY-db-1.out"
 file_cmp "$TEST_KEY-db-1.out" "$TEST_KEY-db-1.out" <<'__OUT__'
-log/job/2013010100/my_task_1/01/job||job
-log/job/2013010100/my_task_1/01/job-activity.log||job-activity.log
-log/job/2013010100/my_task_1/01/job.err||job.err
-log/job/2013010100/my_task_1/01/job.out||job.out
-log/job/2013010112/my_task_1/01/job||job
-log/job/2013010112/my_task_1/01/job-activity.log||job-activity.log
-log/job/2013010112/my_task_1/01/job.err||job.err
-log/job/2013010112/my_task_1/01/job.out||job.out
-log/job/2013010200/my_task_1/01/job||job
-log/job/2013010200/my_task_1/01/job-activity.log||job-activity.log
-log/job/2013010200/my_task_1/01/job.err||job.err
-log/job/2013010200/my_task_1/01/job.out||job.out
+log/job/20130101T0000Z/my_task_1/01/job||job
+log/job/20130101T0000Z/my_task_1/01/job-activity.log||job-activity.log
+log/job/20130101T0000Z/my_task_1/01/job.err||job.err
+log/job/20130101T0000Z/my_task_1/01/job.out||job.out
+log/job/20130101T1200Z/my_task_1/01/job||job
+log/job/20130101T1200Z/my_task_1/01/job-activity.log||job-activity.log
+log/job/20130101T1200Z/my_task_1/01/job.err||job.err
+log/job/20130101T1200Z/my_task_1/01/job.out||job.out
+log/job/20130102T0000Z/my_task_1/01/job||job
+log/job/20130102T0000Z/my_task_1/01/job-activity.log||job-activity.log
+log/job/20130102T0000Z/my_task_1/01/job.err||job.err
+log/job/20130102T0000Z/my_task_1/01/job.out||job.out
 __OUT__
 N_JOB_LOGS=$(wc -l "$TEST_KEY-list-job-logs-before.out" | cut -d' ' -f1)
 (cd $SUITE_RUN_DIR/log && ls job/*) | LANG=C sort >foo
@@ -90,7 +90,7 @@ else
     pass "$TEST_KEY-job-log.out-after-jobhost"
 fi
 ALL_JOB_LOGS_ARCH=
-for CYCLE in 2013010100 2013010112 2013010200; do
+for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
     file_test "$TEST_KEY-$CYCLE-tar-exist" $SUITE_RUN_DIR/log/job-$CYCLE.tar.gz
     JOB_LOGS_ARCH=$(tar -tzf $SUITE_RUN_DIR/log/job-$CYCLE.tar.gz)
     if [[ -n $ALL_JOB_LOGS_ARCH ]]; then
@@ -114,30 +114,30 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,path_in_tar,key FROM log_files ORDER BY path,path_in_tar ASC;' \
     >"$TEST_KEY-db-2.out"
 file_cmp "$TEST_KEY-db-2.out" "$TEST_KEY-db-2.out" <<'__OUT__'
-log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job|job
-log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job-activity.log|job-activity.log
-log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job.err|job.err
-log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job.out|job.out
-log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job|job
-log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job-activity.log|job-activity.log
-log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job.err|job.err
-log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job.out|job.out
-log/job-2013010112.tar.gz|job/2013010112/my_task_1/01/job|job
-log/job-2013010112.tar.gz|job/2013010112/my_task_1/01/job-activity.log|job-activity.log
-log/job-2013010112.tar.gz|job/2013010112/my_task_1/01/job.err|job.err
-log/job-2013010112.tar.gz|job/2013010112/my_task_1/01/job.out|job.out
-log/job-2013010112.tar.gz|job/2013010112/my_task_2/01/job|job
-log/job-2013010112.tar.gz|job/2013010112/my_task_2/01/job-activity.log|job-activity.log
-log/job-2013010112.tar.gz|job/2013010112/my_task_2/01/job.err|job.err
-log/job-2013010112.tar.gz|job/2013010112/my_task_2/01/job.out|job.out
-log/job-2013010200.tar.gz|job/2013010200/my_task_1/01/job|job
-log/job-2013010200.tar.gz|job/2013010200/my_task_1/01/job-activity.log|job-activity.log
-log/job-2013010200.tar.gz|job/2013010200/my_task_1/01/job.err|job.err
-log/job-2013010200.tar.gz|job/2013010200/my_task_1/01/job.out|job.out
-log/job-2013010200.tar.gz|job/2013010200/my_task_2/01/job|job
-log/job-2013010200.tar.gz|job/2013010200/my_task_2/01/job-activity.log|job-activity.log
-log/job-2013010200.tar.gz|job/2013010200/my_task_2/01/job.err|job.err
-log/job-2013010200.tar.gz|job/2013010200/my_task_2/01/job.out|job.out
+log/job-20130101T0000Z.tar.gz|job/20130101T0000Z/my_task_1/01/job|job
+log/job-20130101T0000Z.tar.gz|job/20130101T0000Z/my_task_1/01/job-activity.log|job-activity.log
+log/job-20130101T0000Z.tar.gz|job/20130101T0000Z/my_task_1/01/job.err|job.err
+log/job-20130101T0000Z.tar.gz|job/20130101T0000Z/my_task_1/01/job.out|job.out
+log/job-20130101T0000Z.tar.gz|job/20130101T0000Z/my_task_2/01/job|job
+log/job-20130101T0000Z.tar.gz|job/20130101T0000Z/my_task_2/01/job-activity.log|job-activity.log
+log/job-20130101T0000Z.tar.gz|job/20130101T0000Z/my_task_2/01/job.err|job.err
+log/job-20130101T0000Z.tar.gz|job/20130101T0000Z/my_task_2/01/job.out|job.out
+log/job-20130101T1200Z.tar.gz|job/20130101T1200Z/my_task_1/01/job|job
+log/job-20130101T1200Z.tar.gz|job/20130101T1200Z/my_task_1/01/job-activity.log|job-activity.log
+log/job-20130101T1200Z.tar.gz|job/20130101T1200Z/my_task_1/01/job.err|job.err
+log/job-20130101T1200Z.tar.gz|job/20130101T1200Z/my_task_1/01/job.out|job.out
+log/job-20130101T1200Z.tar.gz|job/20130101T1200Z/my_task_2/01/job|job
+log/job-20130101T1200Z.tar.gz|job/20130101T1200Z/my_task_2/01/job-activity.log|job-activity.log
+log/job-20130101T1200Z.tar.gz|job/20130101T1200Z/my_task_2/01/job.err|job.err
+log/job-20130101T1200Z.tar.gz|job/20130101T1200Z/my_task_2/01/job.out|job.out
+log/job-20130102T0000Z.tar.gz|job/20130102T0000Z/my_task_1/01/job|job
+log/job-20130102T0000Z.tar.gz|job/20130102T0000Z/my_task_1/01/job-activity.log|job-activity.log
+log/job-20130102T0000Z.tar.gz|job/20130102T0000Z/my_task_1/01/job.err|job.err
+log/job-20130102T0000Z.tar.gz|job/20130102T0000Z/my_task_1/01/job.out|job.out
+log/job-20130102T0000Z.tar.gz|job/20130102T0000Z/my_task_2/01/job|job
+log/job-20130102T0000Z.tar.gz|job/20130102T0000Z/my_task_2/01/job-activity.log|job-activity.log
+log/job-20130102T0000Z.tar.gz|job/20130102T0000Z/my_task_2/01/job.err|job.err
+log/job-20130102T0000Z.tar.gz|job/20130102T0000Z/my_task_2/01/job.out|job.out
 __OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

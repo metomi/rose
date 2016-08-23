@@ -1,8 +1,8 @@
 #!jinja2
 [cylc]
     UTC mode = True
-    [[event hooks]]
-        timeout handler = "rose suite-hook --shutdown"
+    [[events]]
+        abort on timeout = True
         timeout = PT2M
 [scheduling]
     [[dependencies]]
@@ -18,3 +18,5 @@ while [[ ! -e $CYLC_SUITE_RUN_DIR/flag ]]; do
     sleep 1
 done
 """
+        [[[job]]]
+            execution time limit = PT1M

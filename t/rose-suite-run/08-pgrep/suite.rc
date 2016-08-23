@@ -1,7 +1,7 @@
 #!jinja2
 [cylc]
     UTC mode=True
-    [[event hooks]]
+    [[events]]
         timeout handler=rose suite-hook --shutdown
         timeout=2
 [scheduling]

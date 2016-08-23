@@ -69,12 +69,12 @@ fi
 TEST_KEY="$TEST_KEY_BASE-suite-run-my-hello.log"
 LANG=C sort $SUITE_RUN_DIR/my-hello.log >"$TEST_KEY"
 file_cmp "$TEST_KEY" "$TEST_KEY" <<'__LOG__'
-[2013010100] Hello Earth
-[2013010100] Hello Moon
-[2013010112] Hello Earth
-[2013010112] Hello Moon
-[2013010200] Hello Earth
-[2013010200] Hello Moon
+[20130101T0000Z] Hello Earth
+[20130101T0000Z] Hello Moon
+[20130101T1200Z] Hello Earth
+[20130101T1200Z] Hello Moon
+[20130102T0000Z] Hello Earth
+[20130102T0000Z] Hello Moon
 __LOG__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

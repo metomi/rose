@@ -128,11 +128,12 @@ export ROSE_VERSION={{ROSE_VERSION}}
 """
         script = rose task-run --verbose
         env-script = eval $(rose task-env)
+        [[[job]]]
+            execution time limit = PT3H
         [[[events]]]
             mail events = submission retry, submission failed, submission timeout, \
                           retry, failed, execution timeout
             submission timeout = PT12H
-            execution timeout = PT3H
 
     [[fcm_make_spaceship]]
         [[[environment]]]

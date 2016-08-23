@@ -1,4 +1,4 @@
-[INFO] ! foo://2013010112/planet-n.tar.gz [compress=tar.gz, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] ! foo://20130101T1200Z/planet-n.tar.gz [compress=tar.gz, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
 [INFO] !	hello/dark-matter.txt (hello/dark-matter.txt)
 [INFO] !	hello/earth.txt (hello/earth.txt)
 [INFO] !	hello/jupiter-moon-1.txt (hello/jupiter-moon-1.txt)

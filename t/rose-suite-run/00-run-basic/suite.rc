@@ -1,18 +1,19 @@
 #!jinja2
 [cylc]
     UTC mode=True
-    [[event hooks]]
-        timeout handler=rose suite-hook --shutdown
-        timeout=2
+    abort if any task fails = True
+    [[events]]
+        abort on timeout = True
+        timeout=PT2M
 [scheduling]
-    initial cycle point=2013010100
-    final cycle point=2013010212
+    initial cycle point=20130101T00Z
+    final cycle point=20130102T12Z
     [[dependencies]]
-        [[[ 0, 12 ]]]
+        [[[T00, T12]]]
             graph=my_task_1
 
 [runtime]
-    [[root]]
+    [[my_task_1]]
         script = """
 I=0
 OLD_I=
@@ -27,12 +28,5 @@ while [[ ! -e $CYLC_SUITE_RUN_DIR/flag ]]; do
 done
 echo
 """
-        [[[event hooks]]]
-           succeeded handler=rose suite-hook
-           failed handler=rose suite-hook --shutdown
-           submission failed handler=rose suite-hook --shutdown
-           submission timeout handler=rose suite-hook
-           execution timeout handler=rose suite-hook
-           submission timeout=1
-           execution timeout=1
-    [[my_task_1]]
+        [[[job]]]
+            execution time limit = PT1M

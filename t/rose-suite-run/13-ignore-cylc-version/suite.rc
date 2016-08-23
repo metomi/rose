@@ -1,12 +1,12 @@
 #!jinja2
 [cylc]
-UTC mode=True
-[[event hooks]]
-timeout handler=rose suite-hook --shutdown
-timeout=2
+    UTC mode=True
+    [[events]]
+        abort on timeout=True
+        timeout=PT2M
 [scheduling]
-[[dependencies]]
-graph=t1
+    [[dependencies]]
+        graph=t1
 [runtime]
-[[t1]]
-script=false
+    [[t1]]
+        script=false

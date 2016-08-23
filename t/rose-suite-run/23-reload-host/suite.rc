@@ -1,8 +1,8 @@
 #!jinja2
 [cylc]
     UTC mode = True
-    [[event hooks]]
-        timeout handler = rose suite-hook --shutdown
+    [[events]]
+        abort on timeout = True
         timeout = PT1M
 [scheduling]
     initial cycle point = 2020

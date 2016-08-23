@@ -31,12 +31,10 @@
         pre-script = {{SLEEP}}  # Slow down so we can see it run
         [[[remote]]]
             host = {{ ROSE_ORIG_HOST }}
-        # Begin Rose recommended event hook block
+        # Begin recommended events block
         [[[events]]]
             mail events = submission timeout, execution timeout
-            submission timeout = P1D # 24 hours
-            execution timeout = PT3H # 3 hours
-        # End Rose recommended event hook block
+        # End recommended events block
     [[locate_fred]]
         script = """
             echo 'fred is in '$(find /usr/share/zoneinfo/[A-Z]*/ -type f -printf "%f\n" | shuf -n 1 || echo 'the pub')

@@ -2,23 +2,24 @@
 {% set bad_nums=["1", "2", "3", "4", "5", "6", "7", "8", "9"] %}
 [cylc]
     UTC mode=True
-    [[event hooks]]
-        timeout handler=rose suite-hook --shutdown
-        timeout=1
+    abort if any task fails=True
+    [[events]]
+        abort on timeout=True
+        timeout=PT1M
 [scheduling]
-    initial cycle point=2013010100
-    final cycle point=2013010200
+    initial cycle point=20130101
+    final cycle point=20130102
     [[dependencies]]
-        [[[ 12 ]]]
+        [[[T12]]]
             graph="""
 {% for bad_num in bad_nums %}
 install => archive_bad_{{bad_num}}
 {% endfor %}
 """
-        [[[ 0, 12 ]]]
+        [[[T00, T12]]]
             graph="""
 install => archive
-archive[T-12] => archive
+archive[-PT12H] => archive
 """
 
 [runtime]
@@ -27,15 +28,9 @@ archive[T-12] => archive
 RC=0
 rose task-run --debug || RC=$?
 """
-        retry delays=0.01 # minutes
-        [[[event hooks]]]
-            succeeded handler=rose suite-hook
-            failed handler=rose suite-hook
-            submission failed handler=rose suite-hook --shutdown
-            submission timeout handler=rose suite-hook
-            execution timeout handler=rose suite-hook
-            submission timeout=1
-            execution timeout=1
+        retry delays=PT1S
+        [[[job]]]
+            execution time limit=PT1M
     [[archive]]
         post-script="""
 {
@@ -46,7 +41,7 @@ sqlite3 .rose-arch.db 'SELECT * FROM sources;' | sort
 """
     [[ARCHIVE_BAD]]
         script = """rose task-run || true; RC=$?"""
-        retry delays=0
+        retry delays=P0Y
 {% for bad_num in bad_nums %}
     [[archive_bad_{{bad_num}}]]
         inherit=ARCHIVE_BAD
