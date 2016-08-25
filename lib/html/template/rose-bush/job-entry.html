@@ -72,7 +72,7 @@
                   {{key}}
                 {% else -%}
                   <a
-                  {% if log.size == "?" -%}class="text-muted"{% endif -%}
+                  {% if log.size == "?" or not log.size -%}class="text-muted"{% endif -%}
                   href="{{script}}/view/{{user}}/{{suite}}?path={{log.path|replace('+', '%2B')}}&amp;path_in_tar={{log.path_in_tar}}"
                   title="{{log.size}} bytes">{{key}}{% if log.size == "?" -%}?{% endif -%}</a>
                 {% endif -%}
@@ -81,7 +81,7 @@
                   {{key}}
                 {% else -%}
                   <a
-                  {% if log.size == "?" -%}class="text-muted"{% endif -%}
+                  {% if log.size == "?" or not log.size -%}class="text-muted"{% endif -%}
                   href="{{script}}/view/{{user}}/{{suite}}?path={{log.path|replace('+', '%2B')}}"
                   title="{{log.size}} bytes">{{key}}{% if log.size == "?" -%}?{% endif -%}</a>
                 {% endif -%}
