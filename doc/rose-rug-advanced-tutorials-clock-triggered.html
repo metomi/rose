@@ -158,7 +158,7 @@
             mail events = failed
     [[bell]]
         env-script = eval $(rose task-env)
-        script = yes 'bong' | head -n $(rose date -c --format=%H)
+        script = printf 'bong%.0s\n' $(seq 1 $(rose date -c --format=%H))
 </pre>
             </div>
 
