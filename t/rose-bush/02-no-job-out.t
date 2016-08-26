@@ -43,7 +43,7 @@ cylc run --debug "${SUITE_NAME}"
 
 # Remove the "job.out" entry from the suite's public database.
 sqlite3 "${SUITE_DIR}/cylc-suite.db" \
-    'DELETE FROM task_job_logs WHERE filename=="job.out";'
+    'DELETE FROM task_job_logs WHERE filename=="job.out";' 2>'/dev/null' || true
 
 #-------------------------------------------------------------------------------
 

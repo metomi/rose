@@ -433,97 +433,87 @@ class CylcProcessor(SuiteEngineProcessor):
         if not entries:
             return (entries, of_n_entries)
 
-        # Job logs DB
-        stmt = (
-            "SELECT cycle, name, submit_num, filename, location, mtime, size" +
-            " FROM task_job_logs")
-
+        # Job logs
+        # Recent job logs are likely to be in the file system, so we can get a
+        # listing of the relevant "log/job/CYCLE/NAME/SUBMI_NUM/" directory.
+        # Older job logs may be archived in "log/job-CYCLE.tar.gz", we should
+        # only open each relevant TAR file once to obtain a listing for all
+        # relevant entries of that cycle.
         prefix = "~"
         if user_name:
             prefix += user_name
         user_suite_dir = os.path.expanduser(os.path.join(
             prefix, self.get_suite_dir_rel(suite_name)))
         try:
-            current_cycles = os.listdir(
+            fs_log_cycles = os.listdir(
                 os.path.join(user_suite_dir, "log", "job"))
         except OSError:
-            current_cycles = []
-        targzip_cycles = []
+            fs_log_cycles = []
+        targzip_log_cycles = []
         for name in glob(os.path.join(user_suite_dir, "log", "job-*.tar.gz")):
-            targzip_cycles.append(os.path.basename(name)[4:-7])
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
-            cycle, name, submit_num, filename, location, mtime, size = row
-            try:
-                entry = entry_of[(cycle, name, int(submit_num))]
-            except KeyError:
-                continue
-            if cycle in current_cycles:
-                path = os.path.join("log", "job", location)
-                path_in_tar = None
-                exists = True
-            elif cycle in targzip_cycles:
-                path = os.path.join("log", "job-%s.tar.gz" % (cycle))
-                path_in_tar = os.path.join("job", location)
-                exists = True
-            else:
-                path = os.path.join("log", "job", location)
-                path_in_tar = None
-                exists = False
-            entry["logs"][filename] = {
-                "path": path,
-                "path_in_tar": path_in_tar,
-                "mtime": mtime,
-                "size": size,
-                "exists": exists,
-                "seq_key": None}
-            for seq_log_matcher in self.REC_SEQ_LOG, self.REC_BUNCH_LOG:
-                seq_log_match = seq_log_matcher.match(filename)
-                if seq_log_match:
+            targzip_log_cycles.append(os.path.basename(name)[4:-7])
+
+        relevant_targzip_log_cycles = []
+        for entry in entries:
+            if entry["cycle"] in fs_log_cycles:
+                pathd = "log/job/%(cycle)s/%(name)s/%(submit_num)02d" % entry
+                try:
+                    filenames = os.listdir(os.path.join(user_suite_dir, pathd))
+                except OSError:
+                    pass
+                for filename in filenames:
+                    try:
+                        stat = os.stat(
+                            os.path.join(user_suite_dir, pathd, filename))
+                    except OSError:
+                        pass
+                    entry["logs"][filename] = {
+                        "path": "/".join([pathd, filename]),
+                        "path_in_tar": None,
+                        "mtime": int(stat.st_mtime),  # too precise otherwise
+                        "size": stat.st_size,
+                        "exists": True,
+                        "seq_key": None}
+            elif entry["cycle"] in targzip_log_cycles:
+                if entry["cycle"] not in relevant_targzip_log_cycles:
+                    relevant_targzip_log_cycles.append(entry["cycle"])
+
+        for cycle in relevant_targzip_log_cycles:
+            path = os.path.join("log", "job-%s.tar.gz" % cycle)
+            tar = tarfile.open(os.path.join(user_suite_dir, path), "r:gz")
+            for member in tar.getmembers():
+                # member.name expected to be "job/cycle/task/submit_num/*"
+                if not member.isfile():
+                    continue
+                try:
+                    cycle_str, name, submit_num_str = (
+                        member.name.split("/", 4)[1:4])
+                    entry = entry_of[(cycle_str, name, int(submit_num_str))]
+                except (KeyError, ValueError):
+                    pass
+                entry["logs"][os.path.basename(member.name)] = {
+                    "path": path,
+                    "path_in_tar": member.name,
+                    "mtime": int(member.mtime),  # too precise otherwise
+                    "size": member.size,
+                    "exists": True,
+                    "seq_key": None}
+
+        for entry in entries:
+            for filename, filename_items in entry["logs"].items():
+                for seq_log_matcher in self.REC_SEQ_LOG, self.REC_BUNCH_LOG:
+                    seq_log_match = seq_log_matcher.match(filename)
+                    if not seq_log_match:
+                        continue
                     head, index_str, tail = seq_log_match.groups()
                     if not tail:
                         tail = ""
                     seq_key = head + "*" + tail
-                    entry["logs"][filename]["seq_key"] = seq_key
+                    filename_items["seq_key"] = seq_key
                     if seq_key not in entry["seq_logs_indexes"]:
                         entry["seq_logs_indexes"][seq_key] = {}
                     entry["seq_logs_indexes"][seq_key][index_str] = filename
                     break
-        self._db_close(self.SUITE_DB, user_name, suite_name)
-
-        for entry in entries:
-            # job.out and job.err are expected for completed jobs
-            for filename in ["job.out", "job.err"]:
-                if (filename in entry["logs"] or
-                        entry["status"] not in ["success", "fail"]):
-                    continue
-                path = os.path.join(
-                    "log", "job",
-                    "%(cycle)s/%(name)s/%(submit_num)02d" % entry,
-                    filename)
-                mtime = "?"
-                size = "?"
-                if entry["cycle"] in current_cycles:
-                    try:
-                        size, _, mtime = os.stat(
-                            os.path.join(user_suite_dir, path))[6:9]
-                    except (IndexError, OSError):
-                        continue
-                    path_in_tar = None
-                    exists = True
-                elif entry["cycle"] in targzip_cycles:
-                    path_in_tar = path
-                    path = os.path.join("log", "job-%(cycle)s.tar.gz" % entry)
-                    exists = True
-                else:
-                    path_in_tar = None
-                    exists = False
-                entry["logs"][filename] = {
-                    "path": path,
-                    "path_in_tar": path_in_tar,
-                    "mtime": mtime,
-                    "size": size,
-                    "exists": exists,
-                    "seq_key": None}
             # Sequential logs
             for seq_key, indexes in entry["seq_logs_indexes"].items():
                 if len(indexes) <= 1:

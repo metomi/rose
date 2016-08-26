@@ -533,10 +533,10 @@ class RoseBushService(object):
                 f.close()
         name = path
         if path_in_tar:
-            name = path_in_tar
+            name = "log/" + path_in_tar
         job_entry = None
         entry = None
-        if name.startswith("log/job/"):
+        if name.startswith("log/job"):
             names = self.suite_engine_proc.parse_job_log_rel_path(name)
             if len(names) == 4:
                 cycle, task, submit_num, ext = names
