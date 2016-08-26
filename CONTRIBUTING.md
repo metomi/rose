@@ -25,6 +25,7 @@ below:
 
 * Andrew Clark (Met Office, UK)
 * Kerry Day (Met Office, UK)
+* Martin Dix (CSIRO, Australia)
 * Ben Fitzpatrick (Met Office, UK)
 * Craig MacLachlan (Met Office, UK)
 * Joseph Mancell (Met Office, UK)
