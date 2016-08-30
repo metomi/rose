@@ -450,10 +450,10 @@ class SuiteId(object):
             if self.branch != location_suite_id.branch:
                 self.statuses[user] = self.STATUS_SW
             elif (location_suite_id.revision and
-                      int(self.revision) > int(location_suite_id.revision)):
+                    int(self.revision) > int(location_suite_id.revision)):
                 self.statuses[user] = self.STATUS_UP
             elif (location_suite_id.revision and
-                      int(self.revision) < int(location_suite_id.revision)):
+                    int(self.revision) < int(location_suite_id.revision)):
                 self.statuses[user] = self.STATUS_DO
             else:
                 try:
