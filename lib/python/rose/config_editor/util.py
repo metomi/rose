@@ -117,7 +117,11 @@ def launch_node_info_dialog(node, changes, search_function):
         text += (rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(changes) +
                  "\n")
     text += rose.config_editor.DIALOG_NODE_INFO_DATA
-    att_list = vars(node).items()
+    try:
+        att_list = vars(node).items()
+    except TypeError:
+        # vars will fail when __slots__ are used.
+        att_list = node.getattrs()
     att_list.sort()
     att_list.sort(lambda x, y: (y[0] in ['name', 'value']) -
                                (x[0] in ['name', 'value']))

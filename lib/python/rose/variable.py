@@ -127,6 +127,13 @@ class Variable(object):
         new_variable.old_value = self.old_value
         return new_variable
 
+    def getattrs(self):
+        """Return a list of attributes and values."""
+        attrs = []
+        for name in self.__slots__:
+            attrs.append((name, getattr(self, name)))
+        return attrs
+
     def __repr__(self):
         text = '<rose.variable :- name: ' + self.name + ', value: '
         text += (
