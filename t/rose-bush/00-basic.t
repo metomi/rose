@@ -116,6 +116,7 @@ FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
 FOO0_JOB='log/job/20000101T0000Z/foo0/01/job'
 FOO1="{'cycle': '20000101T0000Z', 'name': 'foo1', 'submit_num': 1}"
 FOO1_JOB='log/job/20000101T0000Z/foo1/01/job'
+cat "${TEST_KEY}.out" >~/foo
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('rose_version',), '$(rose version | cut -d' ' -f 2)']" \
     "[('title',), 'Rose Bush']" \
@@ -143,18 +144,48 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('entries', ${FOO0}, 'logs', 'job', 'path'), '${FOO0_JOB}']" \
     "[('entries', ${FOO0}, 'logs', 'job.err', 'path'), '${FOO0_JOB}.err']" \
     "[('entries', ${FOO0}, 'logs', 'job.out', 'path'), '${FOO0_JOB}.out']" \
-    "[('entries', ${FOO0}, 'logs', 'job.txt.01', 'seq_key'), 'job.txt.*']" \
-    "[('entries', ${FOO0}, 'logs', 'job.txt.05', 'seq_key'), 'job.txt.*']" \
-    "[('entries', ${FOO0}, 'logs', 'job.txt.10', 'seq_key'), 'job.txt.*']" \
+    "[('entries', ${FOO0}, 'logs', 'job.01.txt', 'seq_key'), 'job.*.txt']" \
+    "[('entries', ${FOO0}, 'logs', 'job.05.txt', 'seq_key'), 'job.*.txt']" \
+    "[('entries', ${FOO0}, 'logs', 'job.10.txt', 'seq_key'), 'job.*.txt']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.*.txt', '1'), 'job.01.txt']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.*.txt', '5'), 'job.05.txt']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.*.txt', '10'), 'job.10.txt']" \
+    "[('entries', ${FOO0}, 'logs', 'bunch.holly.out', 'seq_key'), 'bunch.*.out']" \
+    "[('entries', ${FOO0}, 'logs', 'bunch.iris.out', 'seq_key'), 'bunch.*.out']" \
+    "[('entries', ${FOO0}, 'logs', 'bunch.daisy.out', 'seq_key'), 'bunch.*.out']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'bunch.*.out', 'holly'), 'bunch.holly.out']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'bunch.*.out', 'iris'), 'bunch.iris.out']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'bunch.*.out', 'daisy'), 'bunch.daisy.out']" \
+    "[('entries', ${FOO0}, 'logs', 'job.trace.2.html', 'seq_key'), 'job.trace.*.html']" \
+    "[('entries', ${FOO0}, 'logs', 'job.trace.32.html', 'seq_key'), 'job.trace.*.html']" \
+    "[('entries', ${FOO0}, 'logs', 'job.trace.256.html', 'seq_key'), 'job.trace.*.html']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.trace.*.html', '2'), 'job.trace.2.html']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.trace.*.html', '32'), 'job.trace.32.html']" \
+    "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.trace.*.html', '256'), 'job.trace.256.html']" \
     "[('entries', ${FOO1}, 'status',), 'success']" \
     "[('entries', ${FOO1}, 'host',), 'localhost']" \
     "[('entries', ${FOO1}, 'submit_method',), 'background']" \
     "[('entries', ${FOO1}, 'logs', 'job', 'path'), '${FOO1_JOB}']" \
     "[('entries', ${FOO1}, 'logs', 'job.err', 'path'), '${FOO1_JOB}.err']" \
     "[('entries', ${FOO1}, 'logs', 'job.out', 'path'), '${FOO1_JOB}.out']" \
-    "[('entries', ${FOO1}, 'logs', 'job.txt.01', 'seq_key'), 'job.txt.*']" \
-    "[('entries', ${FOO1}, 'logs', 'job.txt.05', 'seq_key'), 'job.txt.*']" \
-    "[('entries', ${FOO1}, 'logs', 'job.txt.10', 'seq_key'), 'job.txt.*']"
+    "[('entries', ${FOO1}, 'logs', 'job.01.txt', 'seq_key'), 'job.*.txt']" \
+    "[('entries', ${FOO1}, 'logs', 'job.05.txt', 'seq_key'), 'job.*.txt']" \
+    "[('entries', ${FOO1}, 'logs', 'job.10.txt', 'seq_key'), 'job.*.txt']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'job.*.txt', '1'), 'job.01.txt']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'job.*.txt', '5'), 'job.05.txt']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'job.*.txt', '10'), 'job.10.txt']" \
+    "[('entries', ${FOO1}, 'logs', 'bunch.holly.out', 'seq_key'), 'bunch.*.out']" \
+    "[('entries', ${FOO1}, 'logs', 'bunch.iris.out', 'seq_key'), 'bunch.*.out']" \
+    "[('entries', ${FOO1}, 'logs', 'bunch.daisy.out', 'seq_key'), 'bunch.*.out']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'bunch.*.out', 'holly'), 'bunch.holly.out']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'bunch.*.out', 'iris'), 'bunch.iris.out']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'bunch.*.out', 'daisy'), 'bunch.daisy.out']" \
+    "[('entries', ${FOO1}, 'logs', 'job.trace.2.html', 'seq_key'), 'job.trace.*.html']" \
+    "[('entries', ${FOO1}, 'logs', 'job.trace.32.html', 'seq_key'), 'job.trace.*.html']" \
+    "[('entries', ${FOO1}, 'logs', 'job.trace.256.html', 'seq_key'), 'job.trace.*.html']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'job.trace.*.html', '2'), 'job.trace.2.html']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'job.trace.*.html', '32'), 'job.trace.32.html']" \
+    "[('entries', ${FOO1}, 'seq_logs_indexes', 'job.trace.*.html', '256'), 'job.trace.256.html']"
 
 # A suite run directory with only a "cylc-suite.db", and nothing else
 SUITE_DIR2="$(mktemp -d --tmpdir="${HOME}/cylc-run" "rtb-rose-bush-00-XXXXXXXX")"
