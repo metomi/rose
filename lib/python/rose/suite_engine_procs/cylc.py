@@ -806,9 +806,10 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
         of_n_entries = 0
+        stmt = ("SELECT COUNT(DISTINCT cycle) FROM task_states where " +
+                "status is not 'waiting'")
         for row in self._db_exec(
-                self.SUITE_DB, user_name, suite_name,
-                "SELECT COUNT(DISTINCT cycle) FROM task_states"):
+                self.SUITE_DB, user_name, suite_name, stmt):
             of_n_entries = row[0]
             break
         if not of_n_entries:
