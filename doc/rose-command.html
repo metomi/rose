@@ -2114,6 +2114,19 @@ launcher-preopts.mpiexec=-n $NPROC
             upper case.
 
             <dl>
+              <dt><kbd>HOST_SOURCE_project</kbd></dt>
+              
+              <dd>The complete list of source trees for a given
+              project. Working copies in this list have their
+              hostname prefixed, e.g. host:/path/wc.</dd>
+
+              <dt><kbd>HOST_SOURCE_project_BASE</kbd></dt>
+              
+              <dd>The base of the project specified on the command
+              line. This is intended to specify the location of 
+              <kbd>fcm-make</kbd> config files. Working copies in
+              this list have their hostname prefixed.</dd>
+
               <dt><kbd>RUN_NAMES</kbd></dt>
 
               <dd>A list of groups to run in the rose-stem
@@ -2122,13 +2135,17 @@ launcher-preopts.mpiexec=-n $NPROC
               <dt><kbd>SOURCE_project</kbd></dt>
 
               <dd>The complete list of source trees for a given
-              project.</dd>
+              project.Unlike the HOST_ variable of similar name, 
+              paths to working copies do NOT include the host 
+              name.</dd>
 
               <dt><kbd>SOURCE_project_BASE</kbd></dt>
 
               <dd>The base of the project specified on the command
               line. This is intended to specify the location of
-              <kbd>fcm-make</kbd> config files.</dd>
+              <kbd>fcm-make</kbd> config files. Unlike the HOST_ 
+              variable of similar name, paths to working copies 
+              do NOT include the host name.</dd>
 
               <dt><kbd>SOURCE_project_REV</kbd></dt>
 
