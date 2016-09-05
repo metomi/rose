@@ -129,10 +129,9 @@ file_cmp "$TEST_KEY-sub0.txt" "sub0.txt" </dev/null
 file_cmp "$TEST_KEY-sub1.txt" "sub1.txt" <<'__TXT__'
 I can see the periscope.
 __TXT__
-ls -l hello*.nl foo*.txt sub*.txt | LANG=C sort >"$TEST_KEY-ls-l-before"
-run_pass "$TEST_KEY" rose app-run --config=../config -q
-ls -l hello*.nl foo*.txt sub*.txt | LANG=C sort >"$TEST_KEY-ls-l-after"
-file_cmp "$TEST_KEY-ls-l" "$TEST_KEY-ls-l-before" "$TEST_KEY-ls-l-after"
+sha1sum hello*.nl foo*.txt sub*.txt >"${TEST_KEY}.sha1sum"
+run_pass "${TEST_KEY}" rose app-run --config='../config' -q
+run_pass "${TEST_KEY}.sha1sum" sha1sum -c "${TEST_KEY}.sha1sum"
 test_teardown
 #-------------------------------------------------------------------------------
 exit
