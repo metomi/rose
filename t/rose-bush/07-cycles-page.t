@@ -67,27 +67,27 @@ done
 rose_ws_json_greps "${TEST_KEY_PREFIX}1.out" "${TEST_KEY_PREFIX}1.out" \
     "[('page',), 1]" \
     "[('per_page',), 3]" \
-    "[('of_n_entries',), 11]" \
+    "[('of_n_entries',), 10]" \
     "[('entries', 0, 'cycle'), '20090101T0000Z']" \
     "[('entries', 1, 'cycle'), '20080101T0000Z']"
 rose_ws_json_greps "${TEST_KEY_PREFIX}2.out" "${TEST_KEY_PREFIX}2.out" \
     "[('page',), 2]" \
     "[('per_page',), 3]" \
-    "[('of_n_entries',), 11]" \
+    "[('of_n_entries',), 10]" \
     "[('entries', 0, 'cycle'), '20070101T0000Z']" \
     "[('entries', 1, 'cycle'), '20060101T0000Z']" \
     "[('entries', 2, 'cycle'), '20050101T0000Z']"
 rose_ws_json_greps "${TEST_KEY_PREFIX}3.out" "${TEST_KEY_PREFIX}3.out" \
     "[('page',), 3]" \
     "[('per_page',), 3]" \
-    "[('of_n_entries',), 11]" \
+    "[('of_n_entries',), 10]" \
     "[('entries', 0, 'cycle'), '20040101T0000Z']" \
     "[('entries', 1, 'cycle'), '20030101T0000Z']" \
     "[('entries', 2, 'cycle'), '20020101T0000Z']"
 rose_ws_json_greps "${TEST_KEY_PREFIX}4.out" "${TEST_KEY_PREFIX}4.out" \
     "[('page',), 4]" \
     "[('per_page',), 3]" \
-    "[('of_n_entries',), 11]" \
+    "[('of_n_entries',), 10]" \
     "[('entries', 0, 'cycle'), '20010101T0000Z']" \
     "[('entries', 1, 'cycle'), '20000101T0000Z']"
 #-------------------------------------------------------------------------------
@@ -103,28 +103,28 @@ done
 rose_ws_json_greps "${TEST_KEY_PREFIX}1.out" "${TEST_KEY_PREFIX}1.out" \
     "[('page',), 1]" \
     "[('per_page',), 3]" \
-    "[('of_n_entries',), 11]" \
+    "[('of_n_entries',), 10]" \
     "[('entries', 0, 'cycle'), '20000101T0000Z']" \
     "[('entries', 1, 'cycle'), '20010101T0000Z']" \
     "[('entries', 2, 'cycle'), '20020101T0000Z']"
 rose_ws_json_greps "${TEST_KEY_PREFIX}2.out" "${TEST_KEY_PREFIX}2.out" \
     "[('page',), 2]" \
     "[('per_page',), 3]" \
-    "[('of_n_entries',), 11]" \
+    "[('of_n_entries',), 10]" \
     "[('entries', 0, 'cycle'), '20030101T0000Z']" \
     "[('entries', 1, 'cycle'), '20040101T0000Z']" \
     "[('entries', 2, 'cycle'), '20050101T0000Z']"
 rose_ws_json_greps "${TEST_KEY_PREFIX}3.out" "${TEST_KEY_PREFIX}3.out" \
     "[('page',), 3]" \
     "[('per_page',), 3]" \
-    "[('of_n_entries',), 11]" \
+    "[('of_n_entries',), 10]" \
     "[('entries', 0, 'cycle'), '20060101T0000Z']" \
     "[('entries', 1, 'cycle'), '20070101T0000Z']" \
     "[('entries', 2, 'cycle'), '20080101T0000Z']"
 rose_ws_json_greps "${TEST_KEY_PREFIX}4.out" "${TEST_KEY_PREFIX}4.out" \
     "[('page',), 4]" \
     "[('per_page',), 3]" \
-    "[('of_n_entries',), 11]" \
+    "[('of_n_entries',), 10]" \
     "[('entries', 0, 'cycle'), '20090101T0000Z']"
 #-------------------------------------------------------------------------------
 # Tidy up
