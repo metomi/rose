@@ -106,7 +106,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('order',), None]" \
     "[('states', 'is_running',), False]" \
     "[('states', 'is_failed',), False]" \
-    "[('of_n_entries',), 2]" \
+    "[('of_n_entries',), 1]" \
     "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'success',), 2]"
 
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
