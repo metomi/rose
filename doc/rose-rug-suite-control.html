@@ -433,14 +433,20 @@ root-dir=hpc*=$WORKDIR
             directory will launch Rose Bush on your web
             browser.</p>
 
-            <p>You can also use Rose Bush to:</p>
+            <p>You can use Rose Bush to:</p>
 
             <ul>
               <li>View the list of suites in your
               <var>$HOME/cylc-run/</var> directory.</li>
 
-              <li>View log files, including those in Tar-Gzip
-              archives.</li>
+              <li>List the cycles in a suite.</li>
+
+              <li>List the jobs in a suite.</li>
+
+              <li>View suite log files.</li>
+
+              <li>View job log files, including those in cycle
+              Tar-Gzip archives.</li>
 
               <li>View suite logs of other users (if the Rose Bush
               server has read access to their
@@ -455,18 +461,34 @@ root-dir=hpc*=$WORKDIR
             the <var>$HOME/cylc-run/</var> directory of a user. It
             also provides an aesthetically pleasing and user
             friendly web view of the suites files including:
-            <var>rose files</var> for example
-            <var>log/rose-suite-run.conf/log/version</var> and
-            <var>cylc files</var>, <var>.log</var>,
-            <var>.err</var>, <var>.out</var> and <var>.stats</var>
-            of tasks, etc. It allows you to filter the <var>Display
+
+            <ul>
+              <li>rose suite run logs, such as 
+              <var>log/rose-suite-run.conf</var>,
+              <var>log/rose-suite-run.version</var>.</li>
+
+              <li>cylc suite logs, such as
+              <var>log/suite/err</var>,
+              <var>log/suite/log</var>,
+              <var>log/suite/out</var>.</li>
+              
+              <li>cylc task job logs, such as
+              <var>log/job/CYCLE/TASK/NN/*</var> (where
+              <var>CYCLE</var>, <var>TASK</var>,
+              <var>NN</var> are cycle points, task names and
+              submit numbers). Files with a sequential pattern
+              <var>*.NNN.*</var> (where <var>NNN</var> can be a
+              string or numeric index) will be grouped together for
+              easier navigation.</li>
+            </ul>
+            
+            <p>It allows you to filter the <var>Display
             Options</var> using the tool provided in a drop down
             section for example by <var>Task names globs</var>,
             <var>Cycle globs</var>, etc or by <var>cycles
             list</var> or <var>jobs list</var>.</p>
 
-            <p>To invoke Rose Bush, the suite log viewer using the
-            command line, in the suite directory: E.g.:</p>
+            <p>To invoke Rose Bush in the suite directory: E.g.:</p>
             <pre class="shell">
 rose suite-log
 </pre>

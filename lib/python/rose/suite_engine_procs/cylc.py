@@ -122,10 +122,9 @@ class CylcProcessor(SuiteEngineProcessor):
     PGREP_CYLC_RUN = r"python.*/bin/cylc-(run|restart)( | .+ )%s( |$)"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
-    REC_BUNCH_LOG = re.compile(r"\A(bunch\.)(.+)(\.out|\.err)\Z")
     REC_CYCLE_TIME = re.compile(
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
-    REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
+    REC_SEQ_LOG = re.compile(r"\A(.+\.)([^\.]+)(\.[^\.]+)\Z")
     REC_SIGNALLED = re.compile(r"Task\sjob\sscript\sreceived\ssignal\s(\S+)")
     SCHEME = "cylc"
     STATUSES = {"active": ["ready", "queued", "submitting", "submitted",
@@ -499,26 +498,33 @@ class CylcProcessor(SuiteEngineProcessor):
                     "exists": True,
                     "seq_key": None}
 
+        # Sequential logs
         for entry in entries:
             for filename, filename_items in entry["logs"].items():
-                for seq_log_matcher in self.REC_SEQ_LOG, self.REC_BUNCH_LOG:
-                    seq_log_match = seq_log_matcher.match(filename)
-                    if not seq_log_match:
-                        continue
-                    head, index_str, tail = seq_log_match.groups()
-                    if not tail:
-                        tail = ""
-                    seq_key = head + "*" + tail
-                    filename_items["seq_key"] = seq_key
-                    if seq_key not in entry["seq_logs_indexes"]:
-                        entry["seq_logs_indexes"][seq_key] = {}
-                    entry["seq_logs_indexes"][seq_key][index_str] = filename
-                    break
-            # Sequential logs
+                seq_log_match = self.REC_SEQ_LOG.match(filename)
+                if not seq_log_match:
+                    continue
+                head, index_str, tail = seq_log_match.groups()
+                seq_key = head + "*" + tail
+                filename_items["seq_key"] = seq_key
+                if seq_key not in entry["seq_logs_indexes"]:
+                    entry["seq_logs_indexes"][seq_key] = {}
+                entry["seq_logs_indexes"][seq_key][index_str] = filename
             for seq_key, indexes in entry["seq_logs_indexes"].items():
+                # Only one item, not a sequence
                 if len(indexes) <= 1:
                     entry["seq_logs_indexes"].pop(seq_key)
+                # All index_str are numbers, convert key to integer so
+                # the template can sort them as numbers
+                try:
+                    int_indexes = {}
+                    for index_str, filename in indexes.items():
+                        int_indexes[int(index_str)] = filename
+                    entry["seq_logs_indexes"][seq_key] = int_indexes
+                except ValueError:
+                    pass
             for filename, log_dict in entry["logs"].items():
+                # Unset seq_key for singular items
                 if log_dict["seq_key"] not in entry["seq_logs_indexes"]:
                     log_dict["seq_key"] = None
 
@@ -664,17 +670,19 @@ class CylcProcessor(SuiteEngineProcessor):
                                       "size": size,
                                       "exists": os.path.exists(abs_path),
                                       "seq_key": None}
-                for seq_log_match in [self.REC_SEQ_LOG.match(key),
-                                      self.REC_BUNCH_LOG.match(key)]:
-                    if seq_log_match:
-                        head, index_str, tail = seq_log_match.groups()
-                        if not tail:
-                            tail = ""
-                        seq_key = head + "*" + tail
-                        entry["logs"][key]["seq_key"] = seq_key
-                        if seq_key not in entry["seq_logs_indexes"]:
-                            entry["seq_logs_indexes"][seq_key] = {}
-                        entry["seq_logs_indexes"][seq_key][index_str] = key
+                seq_log_match = self.REC_SEQ_LOG.match(key)
+                if not seq_log_match:
+                    continue
+                head, index_str, tail = seq_log_match.groups()
+                if not tail and not index_str.isdigit():
+                    continue
+                if not tail:
+                    tail = ""
+                seq_key = head + "*" + tail
+                entry["logs"][key]["seq_key"] = seq_key
+                if seq_key not in entry["seq_logs_indexes"]:
+                    entry["seq_logs_indexes"][seq_key] = {}
+                entry["seq_logs_indexes"][seq_key][index_str] = key
 
             for seq_key, indexes in entry["seq_logs_indexes"].items():
                 if len(indexes) <= 1:
