@@ -1117,7 +1117,7 @@ class CylcProcessor(SuiteEngineProcessor):
             task_cycle_time = None
         task_log_root = os.environ["CYLC_TASK_LOG_ROOT"]
         task_is_cold_start = "false"
-        if os.environ["CYLC_TASK_IS_COLDSTART"] == "True":
+        if os.environ.get("CYLC_TASK_IS_COLDSTART", "True") == "True":
             task_is_cold_start = "true"
 
         return TaskProps(suite_name=suite_name,

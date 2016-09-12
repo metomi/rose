@@ -33,13 +33,13 @@ rose suite-run --debug -q \
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
     rose suite-restart --debug --name="${NAME}" --no-gcontrol -- --debug
-file_grep "${TEST_KEY}.out.1" \
+file_grep "${TEST_KEY}.out" \
     "\\[INFO\\] ${NAME}: will restart on localhost" \
     "${TEST_KEY}.out"
 # N.B. This relies on output from "cylc restart"
-file_grep "${TEST_KEY}.out.2" \
-    "\\[INFO\\] cylc jobs-submit --debug -- ${SUITE_RUN_DIR}/log/job 1/t2/01" \
-    "${TEST_KEY}.out"
+file_grep "${TEST_KEY}.log" \
+    "\\[jobs-submit cmd\\] cylc jobs-submit --debug -- ${SUITE_RUN_DIR}/log/job 1/t2/01" \
+    "${SUITE_RUN_DIR}/log/suite/log"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" '/dev/null'
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
