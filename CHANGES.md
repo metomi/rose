@@ -14,11 +14,34 @@ or their successors.
 
 ### Noteworthy Changes
 
+[#1976](https://github.com/metomi/rose/pull/1976):
+Rose Bush: job logs listing: now accepts log files with names in these patterns
+`*.NNN.*`, `*.KEY.*` as sequetial files.
+
+[#1972](https://github.com/metomi/rose/pull/1972):
+Rose Bush: cycles list: only count cycles with non-waiting tasks.
+
+[#1970](https://github.com/metomi/rose/pull/1970):
+rose config-edit: fix info dialog for variables.
+
+[#1968](https://github.com/metomi/rose/pull/1968):
+Rose Bush: use file system listing for job logs listing - no longer rely on the
+`task_job_logs` table in the cylc runtime database.
+
+[#1965](https://github.com/metomi/rose/pull/1965):
+rose metadata-check: add index entry.
+
+[#1963](https://github.com/metomi/rose/pull/1963):
+Rose Bush: jobs list: use muted text style for zero size file links.
+
 [#1962](https://github.com/metomi/rose/pull/1962):
 rose config-edit: fix source file page widget traceback.
 
 [#1959](https://github.com/metomi/rose/pull/1959):
 rosie go, rosie ls: handle corrupt working copy edge case.
+
+[#1957](https://github.com/metomi/rose/pull/1957):
+rose config, rose config-edit: reduce memory usage.
 
 [#1956](https://github.com/metomi/rose/pull/1956):
 rose app-upgrade: speed up adding or renaming for large configurations.
