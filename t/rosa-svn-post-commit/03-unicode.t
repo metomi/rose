@@ -64,6 +64,7 @@ owner=ivy
 project=euro
 title=The euro symbol € requires unicode
 more-title=We may lose € if we can't handle unicode
+!whatever=
 __ROSE_SUITE_INFO
 rosie create -q -y --info-file='rose-suite.info'
 file_cmp "${TEST_KEY}-hook.out" "${PWD}/rosa-svn-post-commit.out" <'/dev/null'
@@ -90,6 +91,7 @@ owner=ivy
 project=euro
 title=Euro symbol € requires unicode
 more-title=We will lose € if we can't handle unicode
+!whatever=
 __ROSE_SUITE_INFO
 set -e
 svn commit -q -m 't' "${PWD}/roses/foo-aa000"

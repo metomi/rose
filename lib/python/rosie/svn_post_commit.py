@@ -422,9 +422,12 @@ class RosieSvnPostCommitHook(object):
         for name in branch_attribs[info_key].value:
             if name in ["owner", "project", "title"]:
                 continue
-            value = branch_attribs[info_key].get_value([name]).decode("utf-8")
+            value = branch_attribs[info_key].get_value([name])
+            if value is None:  # setting may have ignore flag (!)
+                continue
             cols = dict(vc_attrs)
-            cols.update({"name": name.decode("utf-8"), "value": value})
+            cols.update({
+                "name": name.decode("utf-8"), "value": value.decode("utf-8")})
             dao.insert(OPTIONAL_TABLE_NAME, **cols)
 
     def _update_known_keys(self, dao, changeset_attribs):
