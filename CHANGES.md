@@ -5,14 +5,18 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2016-Q3?)
+## 2016.09.0 (2016-09-14)
 
-Rose release 44. This release will work best with
-[cylc-6.10.2](https://github.com/cylc/cylc/releases/tag/6.10.2) and
-[fcm-2016.05.0](https://github.com/metomi/fcm/releases/tag/2016.05.0),
+Rose release 44. This release works best with
+[cylc-6.11.0](https://github.com/cylc/cylc/releases/tag/6.11.0) and
+[fcm-2016.05.1](https://github.com/metomi/fcm/releases/tag/2016.05.1),
 or their successors.
 
 ### Noteworthy Changes
+
+[#1982](https://github.com/metomi/rose/pull/1982):
+rosa svn-post-commit: fix handling of settings with `!` ignored flags in
+`rose-suite.info`.
 
 [#1976](https://github.com/metomi/rose/pull/1976):
 Rose Bush: job logs listing: now accepts log files with names in these patterns
