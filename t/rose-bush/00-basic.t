@@ -116,7 +116,6 @@ FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
 FOO0_JOB='log/job/20000101T0000Z/foo0/01/job'
 FOO1="{'cycle': '20000101T0000Z', 'name': 'foo1', 'submit_num': 1}"
 FOO1_JOB='log/job/20000101T0000Z/foo1/01/job'
-cat "${TEST_KEY}.out" >~/foo
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('rose_version',), '$(rose version | cut -d' ' -f 2)']" \
     "[('title',), 'Rose Bush']" \
