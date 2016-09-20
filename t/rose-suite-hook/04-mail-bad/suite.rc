@@ -1,7 +1,0 @@
-[cylc]
-[scheduling]
-    [[dependencies]]
-        graph = foo
-[runtime]
-    [[foo]]
-        script = sleep 100

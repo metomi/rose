@@ -20,7 +20,7 @@
 # Test "rose suite-run", import.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-tests 6
+tests 5
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
@@ -51,20 +51,7 @@ __FIND__
 TEST_KEY="$TEST_KEY_BASE-suite-run"
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/hello_earth \
-    -n $NAME --no-gcontrol
-#-------------------------------------------------------------------------------
-# Wait for the "hello_earth" suite to complete
-TEST_KEY="$TEST_KEY_BASE-suite-run-wait"
-TIMEOUT=$(($(date +%s) + 120)) # wait 2 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
-fi
+    -n $NAME --no-gcontrol -- --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-suite-run-my-hello.log"
 LANG=C sort $SUITE_RUN_DIR/my-hello.log >"$TEST_KEY"
