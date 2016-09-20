@@ -399,8 +399,8 @@ class StemRunner(object):
                                         '"' + rev + '"')
                 self._add_define_option('SOURCE_' + project.upper() + '_BASE',
                                         '"' + base + '"')
-                self._add_define_option('HOST_SOURCE_' + project.upper()
-                                        + '_BASE', '"' + base_host + '"')
+                self._add_define_option('HOST_SOURCE_' + project.upper() +
+                                        '_BASE', '"' + base_host + '"')
                 self._add_define_option('SOURCE_' + project.upper() +
                                         '_MIRROR', '"' + mirror + '"')
             self.reporter(SourceTreeAddedAsBranchEvent(url))

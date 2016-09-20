@@ -43,6 +43,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] install: suite.rc
 [INFO] $NAME: will reload on localhost
 __OUT__
+sed -i '/no HTTPS support/d' "${TEST_KEY}.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" /dev/null
 poll ! grep -q \
     -e 'RELOADING.TASK.DEFINITION.FOR.t1\.20130101T0000Z' \
