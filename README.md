@@ -1,5 +1,7 @@
 # Rose
 
+[![Build Status](https://travis-ci.org/metomi/rose.svg?branch=master)](https://travis-ci.org/metomi/rose)
+
 Rose: a framework for managing and running meteorological suites.
 
 [Installation](http://metomi.github.io/rose/doc/rose-install.html) |
