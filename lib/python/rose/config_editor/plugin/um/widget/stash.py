@@ -737,13 +737,14 @@ class BaseStashSummaryDataPanelv1(
         # Add a package of new requests, and profiles if needed.
         sections_for_adding = []
         for sect_type, values in self._package_lookup[package].items():
-            if sect_type == "namelist:streq":
+            if sect_type == self.STREQ_NL_BASE:
                 sections_for_adding.extend(values)
             else:
                 for profile_name in values:
                     sect = self._package_profile_lookup[sect_type].get(
                         profile_name)
                     sections_for_adding.append(sect)
+        sections_for_adding = sorted(set(sections_for_adding))
         for section in sections_for_adding:
             opt_name_values = {}
             node = self.package_config.get([section], no_ignore=True)
