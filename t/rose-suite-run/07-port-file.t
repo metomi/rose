@@ -46,6 +46,7 @@ run_pass "${TEST_KEY}" \
     --name="${NAME}" --no-gcontrol -- --debug
 file_grep "${TEST_KEY}.out" \
     "delete: ${HOME}/.cylc/ports/${NAME}" "${TEST_KEY}.out"
+sed -i '/no HTTPS support/d' "${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"

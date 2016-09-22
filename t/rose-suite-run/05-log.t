@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 31
+tests 23
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 mkdir -p $HOME/cylc-run
@@ -44,25 +44,14 @@ for I in $(seq 0 $N_RUNS); do
     # Run the suite
     TEST_KEY=$TEST_KEY_BASE-$I
     if ((I == I_KEEP)); then
-        run_pass "$TEST_KEY-keep" $ROSE_SUITE_RUN --log-name=keep
+        run_pass "$TEST_KEY-keep" $ROSE_SUITE_RUN --log-name=keep -- --debug
     elif ((I == I_NO_LOG_ARCHIVE)); then
-        run_pass "$TEST_KEY-no-log-archive" $ROSE_SUITE_RUN --no-log-archive
+        run_pass "$TEST_KEY-no-log-archive" \
+            $ROSE_SUITE_RUN --no-log-archive -- --debug
     else
-        run_pass "$TEST_KEY" $ROSE_SUITE_RUN
+        run_pass "$TEST_KEY" $ROSE_SUITE_RUN -- --debug
     fi
 
-    # Wait for the suite to complete
-    TEST_KEY=$TEST_KEY_BASE-$I-wait
-    TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-    while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-        sleep 1
-    done
-    if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-        fail "$TEST_KEY"
-        exit 1
-    else
-        pass "$TEST_KEY"
-    fi
     TEST_KEY=$TEST_KEY_BASE-$I-log
     file_test "$TEST_KEY" $SUITE_RUN_DIR/log -L
     if ((I == I_KEEP)); then
@@ -78,20 +67,7 @@ for I in $(seq 0 $N_RUNS); do
 done
 
 TEST_KEY=$TEST_KEY_BASE-log-keep-0
-run_pass "$TEST_KEY" $ROSE_SUITE_RUN --log-keep=0
-
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-log-keep-0-wait
-TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
-fi
+run_pass "$TEST_KEY" $ROSE_SUITE_RUN --log-keep=0 -- --debug
 
 TEST_KEY=$TEST_KEY_BASE-log-keep-0-ls
 ls -d $SUITE_RUN_DIR/log* >$TEST_KEY.out

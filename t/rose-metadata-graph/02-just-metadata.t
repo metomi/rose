@@ -36,7 +36,8 @@ init_meta < $TEST_SOURCE_DIR/lib/rose-meta.conf
 META_CONFIG_PATH=$(cd ../config/meta && pwd -P)
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config/meta
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-file_cmp "$TEST_KEY.filtered.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL" -> "env=CONTROL=None" [color=grey
 "env=CONTROL" -> "env=CONTROL=bar" [color=grey
 "env=CONTROL" -> "env=CONTROL=baz" [color=grey
@@ -90,6 +91,8 @@ env [shape=octagon
 graph [label="$META_CONFIG_PATH", rankdir=LR
 node [label="\N"
 __OUTPUT__
+file_cmp "$TEST_KEY.out" \
+    "$TEST_KEY.filtered.out.sorted" "$TEST_KEY.filtered.out.expected"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 exit

@@ -32,8 +32,8 @@ SUITE_RUN_DIR=$(readlink -f $SUITE_RUN_DIR)
 NAME=$(basename $SUITE_RUN_DIR)
 # Install suite, and prove that directories are created
 rose suite-run --debug -q \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-ls -ld $HOME/cylc-run/$NAME 1>/dev/null
+    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol -- --debug &
+ROSE_SUITE_RUN_PID=$!
 poll ! test -e $SUITE_RUN_DIR/log/job/2013010100/my_task_1/01/job
 SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>" \
     | awk '{print "[FAIL]     " $0}')
@@ -68,6 +68,7 @@ done
 if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     exit 1
 fi
+wait "${ROSE_SUITE_RUN_PID}"
 TEST_KEY=$TEST_KEY_BASE-stopped
 run_pass "$TEST_KEY" rose suite-clean -y $NAME
 sed -i '/\/\.cylc\//d' "$TEST_KEY.out"

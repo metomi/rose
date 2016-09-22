@@ -35,7 +35,8 @@ init_meta < $TEST_SOURCE_DIR/lib/rose-meta.conf
 CONFIG_PATH=$(cd ../config && pwd -P)
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 "env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
 "env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
@@ -89,13 +90,16 @@ env [color=green, shape=octagon
 graph [label="$CONFIG_PATH", rankdir=LR
 node [label="\N"
 __OUTPUT__
+file_cmp "$TEST_KEY.out" \
+    "$TEST_KEY.filtered.out.sorted" "$TEST_KEY.filtered.out.expected"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Check specific section graphing.
 TEST_KEY=$TEST_KEY_BASE-ok-sub-section
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config namelist:qux
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
 "env=CONTROL_NAMELIST_QUX" [color=green, shape=rectangle
 "env=CONTROL_NAMELIST_QUX=bar" -> "namelist:qux" [color=red
@@ -109,6 +113,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
 graph [label="$CONFIG_PATH: namelist:qux", rankdir=LR
 node [label="\N"
 __OUTPUT__
+file_cmp "$TEST_KEY.out" \
+    "$TEST_KEY.filtered.out.sorted" "$TEST_KEY.filtered.out.expected"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Check specific property graphing.
@@ -116,7 +122,8 @@ TEST_KEY=$TEST_KEY_BASE-ok-property
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config \
     --property=trigger
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 "env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
 "env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
@@ -170,6 +177,8 @@ env [color=green, shape=octagon
 graph [label="$CONFIG_PATH (trigger)", rankdir=LR
 node [label="\N"
 __OUTPUT__
+file_cmp "$TEST_KEY.out" \
+    "$TEST_KEY.filtered.out.sorted" "$TEST_KEY.filtered.out.expected"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Check specific section and specific property graphing.
@@ -177,7 +186,8 @@ TEST_KEY=$TEST_KEY_BASE-ok-property-sub-section
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config \
     --property=trigger env
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.filtered.out" <<__OUTPUT__
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 "env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
 "env=CONTROL" -> "env=CONTROL=baz" [color=red, label=foo
@@ -222,6 +232,8 @@ env [color=green, shape=octagon
 graph [label="$CONFIG_PATH: env (trigger)", rankdir=LR
 node [label="\N"
 __OUTPUT__
+file_cmp "$TEST_KEY.out" \
+    "$TEST_KEY.filtered.out.sorted" "$TEST_KEY.filtered.out.expected"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 exit

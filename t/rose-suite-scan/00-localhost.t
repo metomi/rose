@@ -39,6 +39,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=$HOST
+sleep 5
 if [[ $HOST == 'localhost' ]]; then
     PORT=$(head -1 ~/.cylc/ports/$NAME)
 else

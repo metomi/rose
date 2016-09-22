@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 9
+tests 6
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 cat </dev/null >tests
@@ -39,34 +39,24 @@ while read OPT_KEY SUITE_RUN_DIR; do
     if [[ $OPT_KEY != 'world' ]]; then
         ROSE_SUITE_RUN="$ROSE_SUITE_RUN -O $OPT_KEY"
     fi
+    ROSE_SUITE_RUN="$ROSE_SUITE_RUN -- --debug"
     TEST_KEY=$TEST_KEY_BASE-$OPT_KEY
     run_pass "$TEST_KEY" $ROSE_SUITE_RUN
 done <tests
 
 # Wait for the suites to complete
-TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 while read OPT_KEY SUITE_RUN_DIR; do
     TEST_KEY=$TEST_KEY_BASE-$OPT_KEY
-    NAME=$(basename $SUITE_RUN_DIR)
-    while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-        sleep 1
-    done
-    if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-        fail "$TEST_KEY"
-        fail "$TEST_KEY_BASE-$OPT_KEY-txt"
+    if [[ $OPT_KEY == 'world' ]]; then
+        CONF=$TEST_SOURCE_DIR/$TEST_KEY_BASE/rose-suite.conf
     else
-        pass "$TEST_KEY"
-        if [[ $OPT_KEY == 'world' ]]; then
-            CONF=$TEST_SOURCE_DIR/$TEST_KEY_BASE/rose-suite.conf
-        else
-            CONF=$TEST_SOURCE_DIR/$TEST_KEY_BASE/opt/rose-suite-$OPT_KEY.conf
-        fi
-        VALUE=$(rose config -f $CONF 'jinja2:suite.rc' 'WORLD')
-        TEST_KEY=$TEST_KEY_BASE-$OPT_KEY-txt
-        file_cmp "$TEST_KEY" $SUITE_RUN_DIR/log/job/1/my_task_1/01/job.txt <<__OUT__
+        CONF=$TEST_SOURCE_DIR/$TEST_KEY_BASE/opt/rose-suite-$OPT_KEY.conf
+    fi
+    VALUE=$(rose config -f $CONF 'jinja2:suite.rc' 'WORLD')
+    TEST_KEY=$TEST_KEY_BASE-$OPT_KEY-txt
+    file_cmp "$TEST_KEY" $SUITE_RUN_DIR/log/job/1/my_task_1/01/job.txt <<__OUT__
 Hello $VALUE
 __OUT__
-    fi
 done <tests
 
 #-------------------------------------------------------------------------------
