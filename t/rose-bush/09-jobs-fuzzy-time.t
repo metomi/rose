@@ -54,7 +54,8 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -p 'suite.rc' "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    || cat "${SUITE_DIR}/log/suite/err" >&2
 
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-200-curl-suites"
@@ -83,13 +84,13 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
 run_pass "${TEST_KEY}" curl \
-    "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json"
+    "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('no_fuzzy_time',), '0']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs-no-fuzzy-time"
 run_pass "${TEST_KEY}" curl \
-    "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json&no_fuzzy_time=1"
+    "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json&no_fuzzy_time=1"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('no_fuzzy_time',), '1']"
 #-------------------------------------------------------------------------------

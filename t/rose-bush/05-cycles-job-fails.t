@@ -39,7 +39,8 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    || cat "${SUITE_DIR}/log/suite/err" >&2
 
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-200-curl-cycles"
@@ -47,7 +48,9 @@ run_pass "${TEST_KEY}" curl \
     "${TEST_ROSE_WS_URL}/cycles/${USER}/${SUITE_NAME}?form=json"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'success',), 3]" \
-    "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'job_fails',), 1]"
+    "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'job_success',), 2]" \
+    "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'fail',), 0]" \
+    "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'job_fail',), 1]"
 #-------------------------------------------------------------------------------
 # Tidy up
 rose_ws_kill

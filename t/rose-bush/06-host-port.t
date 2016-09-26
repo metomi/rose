@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test for "rose bush", cycles/jobs list, suite server host:port.
+# Test for "rose bush", cycles/taskjobs list, suite server host:port.
 # Require a version of cylc with cylc/cylc#1705 merged in.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
@@ -77,7 +77,7 @@ fi
 #-------------------------------------------------------------------------------
 # Tidy up
 cylc stop "${SUITE_NAME}"
-wait "${SUITE_PID}"
+wait "${SUITE_PID}" || cat "${SUITE_DIR}/log/suite/err" >&2
 rose_ws_kill
 cylc unregister "${SUITE_NAME}" 1>'/dev/null' 2>&1
 rm -fr "${SUITE_DIR}" "${HOME}/.cylc/ports/${SUITE_NAME}" 2>'/dev/null'

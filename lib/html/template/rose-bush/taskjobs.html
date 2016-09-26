@@ -22,65 +22,84 @@
         <input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
         <fieldset class="container-fluid">
           <div class="row">
-            <div class="col-md-6">
-              <input id="cycles" type="text" name="cycles" class="form-control"
-              title="Cycle globs, &quot;before|after CYCLE&quot;"
-              placeholder="Cycle globs, &quot;before|after CYCLE&quot;"
-{% if cycles -%}
-              value="{{cycles|escape}}"
+{% for key, name, value in [
+    ("cycles", "Cycles: &gt;CYCLE|&lt;CYCLE|CYCLE-GLOB ...", cycles),
+    ("tasks", "Task Name Globs", tasks),
+] -%}
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="{{key}}">{{name}}</label>
+              <input id="{{key}}" type="text" name="{{key}}" class="form-control"
+              title="{{name}}" placeholder="{{name}}"
+{% if value -%}
+              value="{{value|escape}}"
 {% endif -%}
               />
             </div>
-            <div class="col-md-6">
-              <input id="tasks" type="text" name="tasks" class="form-control"
-              title="Task names globs"
-              placeholder="Task names globs"
-{% if tasks -%}
-              value="{{tasks|escape}}"
-{% endif -%}
-              />
-            </div>
+{% endfor -%}
           </div>
-          <br />
           <div class="row">
-            <div class="col-md-1">
-              <label class="checkbox-inline" for="per_page_max">
-                <input id="per_page_max" type="checkbox" name="per_page"
-                value="{{per_page_max}}"
-                title="Display maximum {{per_page_max}} number of entries"
-{% if per_page_max <= per_page -%}
+            <div class="col-sm-12 col-md-12">
+              <label class="checkbox-inline" for="all_task_statuses">
+                <input id="all_task_statuses" type="checkbox"
+                name="task_status"
+                value=""
+                title="Display jobs of all tasks"
+{% if all_task_statuses -%}
                 checked="checked"
 {% endif -%}
                 />
-                Max
+                <strong>Select by Any Task Status</strong>
               </label>
             </div>
-            <div class="col-md-2">
-              <input id="per_page" type="text" name="per_page"
-              class="form-control"
-              title="Entries/Page, 0=unlimited" placeholder="Entries/Page"
-{% if per_page_max <= per_page -%}
-              disabled="disabled"
-{% elif per_page is defined and per_page != per_page_default -%}
-              value="{{per_page}}"
+          </div>
+          <div class="form-group row">
+{% for key, value in task_statuses -%}
+            <div class="col-sm-6 col-md-2">
+              <label class="checkbox-inline" for="task_status_{{key}}">
+                <input class="task_status" type="checkbox"
+                name="task_status"
+                value="{{key}}"
+                title="Display jobs of {{key}} tasks"
+{% if value == "1" -%}
+                checked="checked"
 {% endif -%}
-              />
+                />
+                {{key}}
+              </label>
             </div>
-            <div class="col-md-3">
-{% for status, title in [["active", "active tasks"], ["success",
-"succeeded tasks"], ["fail", "failed tasks"]] -%}
-              <label class="checkbox-inline" for="no_status_{{status}}"
-              title="Hide {{title}}">
-              <input id="no_status_{{status}}" type="checkbox" name="no_status"
-{% if no_statuses and status in no_statuses -%}
-              checked="checked"
-{% endif -%}
-              value="{{status}}" />
-              No {{status}}?</label>
 {% endfor -%}
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="job_status">Select by Job Status</label>
+              <select id="job_status" name="job_status"
+              title="Select by Job Status" class="form-control">
+{% for key in [
+    "all",
+    "submitted",
+    "submitted,running",
+    "submission-failed",
+    "submission-failed,failed",
+    "running",
+    "running,succeeded,failed",
+    "succeeded",
+    "succeeded,failed",
+    "failed",
+]
+ -%}
+                <option
+{% if job_status and key == job_status -%}
+                selected="selected"
+{% endif -%}
+                value="{% if key != "all" -%}{{key}}{% endif -%}">{{key}}
+                </option>
+{% endfor -%}
+              </select>
             </div>
-            <div class="col-md-4">
-              <select name="order" title="Sort order" class="form-control">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="order">Sort Order</label>
+              <select id="order" name="order" title="Sort Order"
+              class="form-control">
 {% for k, v in [
     ("time_desc", "new-&gt;old"),
     ("time_asc", "old-&gt;new"),
@@ -114,7 +133,35 @@
 {% endfor -%}
               </select>
             </div>
-            <div class="col-md-2 btn-toolbar">
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-12 col-md-12">
+              <label for="per_page">Entries/Page, max=300</label>
+            </div>
+            <div class="col-sm-6 col-md-2">
+              <input id="per_page" type="text" name="per_page"
+              class="form-control"
+              title="Entries/Page, 0=unlimited" placeholder="Entries/Page"
+{% if per_page_max <= per_page -%}
+              disabled="disabled"
+{% elif per_page is defined and per_page != per_page_default -%}
+              value="{{per_page}}"
+{% endif -%}
+              />
+            </div>
+            <div class="col-sm-2 col-md-8">
+              <label class="checkbox-inline" for="per_page_max">
+                <input id="per_page_max" type="checkbox" name="per_page"
+                value="{{per_page_max}}"
+                title="Display maximum {{per_page_max}} number of entries"
+{% if per_page_max <= per_page -%}
+                checked="checked"
+{% endif -%}
+                />
+                Max
+              </label>
+            </div>
+            <div class="form-group col-sm-4 col-md-2 btn-toolbar">
               <div class="btn-group pull-right">
                 <input type="reset" class="btn btn-default" value="reset"
                 title="Reset Display Options"/>

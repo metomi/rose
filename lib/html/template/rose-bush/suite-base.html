@@ -42,7 +42,7 @@ rel="stylesheet" media="screen" />
         <li><a><strong>{{suite}}</strong></a></li>
         {% for method, name, icon in [
             ("cycles", "cycles list", "glyphicon-tasks"),
-            ("jobs", "jobs list", "glyphicon-th-list"),
+            ("taskjobs", "task jobs list", "glyphicon-th-list"),
             ("broadcast_states", "broadcasts list", "glyphicon-bullhorn")] %}
         {% if name == self.title_name() %}
         <li class="active">

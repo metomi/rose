@@ -39,7 +39,8 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}"
+cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    || cat "${SUITE_DIR}/log/suite/err" >&2
 
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-curl-root"
@@ -107,11 +108,12 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('states', 'is_running',), False]" \
     "[('states', 'is_failed',), False]" \
     "[('of_n_entries',), 1]" \
-    "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'success',), 2]"
+    "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'success',), 2]" \
+    "[('entries', {'cycle': '20000101T0000Z'}, 'n_states', 'job_success',), 2]"
 
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
 run_pass "${TEST_KEY}" \
-    curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json"
+    curl "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json"
 FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
 FOO0_JOB='log/job/20000101T0000Z/foo0/01/job'
 FOO1="{'cycle': '20000101T0000Z', 'name': 'foo1', 'submit_num': 1}"
@@ -132,12 +134,10 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('per_page_max',), 300]" \
     "[('cycles',), None]" \
     "[('order',), None]" \
-    "[('no_statuses',), None]" \
     "[('states', 'is_running',), False]" \
     "[('states', 'is_failed',), False]" \
     "[('of_n_entries',), 2]" \
-    "[('entries', ${FOO0}, 'task_status',), 'success']" \
-    "[('entries', ${FOO0}, 'status',), 'success']" \
+    "[('entries', ${FOO0}, 'task_status',), 'succeeded']" \
     "[('entries', ${FOO0}, 'host',), 'localhost']" \
     "[('entries', ${FOO0}, 'submit_method',), 'background']" \
     "[('entries', ${FOO0}, 'logs', 'job', 'path'), '${FOO0_JOB}']" \
@@ -161,7 +161,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.trace.*.html', '2'), 'job.trace.2.html']" \
     "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.trace.*.html', '32'), 'job.trace.32.html']" \
     "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.trace.*.html', '256'), 'job.trace.256.html']" \
-    "[('entries', ${FOO1}, 'status',), 'success']" \
+    "[('entries', ${FOO1}, 'task_status',), 'succeeded']" \
     "[('entries', ${FOO1}, 'host',), 'localhost']" \
     "[('entries', ${FOO1}, 'submit_method',), 'background']" \
     "[('entries', ${FOO1}, 'logs', 'job', 'path'), '${FOO1_JOB}']" \
@@ -191,7 +191,7 @@ SUITE_DIR2="$(mktemp -d --tmpdir="${HOME}/cylc-run" "rtb-rose-bush-00-XXXXXXXX")
 SUITE_NAME2="$(basename "${SUITE_DIR2}")"
 cp "${SUITE_DIR}/cylc-suite.db" "${SUITE_DIR2}/"
 run_pass "${TEST_KEY}-bare" \
-    curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME2}?form=json"
+    curl "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME2}?form=json"
 rose_ws_json_greps "${TEST_KEY}-bare.out" "${TEST_KEY}-bare.out" \
     "[('suite',), '${SUITE_NAME2}']"
 

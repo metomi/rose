@@ -57,7 +57,8 @@ for SUFFIX in 'b' 'a' 'c'; do
     mkdir -p "${SUITE_DIR}"
     cp -p 'suite.rc' "${SUITE_DIR}/suite.rc"
     cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-    cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+    cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+        || cat "${SUITE_DIR}/log/suite/err" >&2
 done
 
 # Run another set of suites, for glob and paging tests
@@ -68,7 +69,8 @@ for SUFFIX in $(seq -w 1 10); do
     mkdir -p "${SUITE_DIR}"
     cp -p 'suite.rc' "${SUITE_DIR}/suite.rc"
     cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-    cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+    cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+        || cat "${SUITE_DIR}/log/suite/err" >&2
 done
 #-------------------------------------------------------------------------------
 # Batch 1, sort by time_desc

@@ -249,9 +249,6 @@ class SuiteRunner(Runner):
             self.event_handler.contexts[uuid].handle = log_file
             temp_log_file.close()
 
-        # Create the suite log view
-        self.suite_engine_proc.job_logs_db_create(suite_name, close=True)
-
         # Install share/work directories (local)
         for name in ["share", "share/cycle", "work"]:
             self._run_init_dir_work(

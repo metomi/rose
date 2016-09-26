@@ -39,7 +39,8 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}"
+cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    || cat "${SUITE_DIR}/log/suite/err" >&2
 
 # Remove the "job.out" entry from the suite's public database.
 sqlite3 "${SUITE_DIR}/cylc-suite.db" \
@@ -49,7 +50,7 @@ sqlite3 "${SUITE_DIR}/cylc-suite.db" \
 
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
 run_pass "${TEST_KEY}" \
-    curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json"
+    curl "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json"
 FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
 FOO0_OUT='log/job/20000101T0000Z/foo0/01/job.out'
 FOO0_OUT_MTIME=$(stat -c'%Y' "${SUITE_DIR}/${FOO0_OUT}")

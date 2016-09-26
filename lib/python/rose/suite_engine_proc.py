@@ -424,42 +424,6 @@ class SuiteEngineProcessor(object):
         """Return host(s) where suite_name is running."""
         raise NotImplementedError()
 
-    def get_suite_job_events(self, user_name, suite_name, cycles, tasks,
-                             no_statuses, order, limit, offset):
-        """Return suite job events.
-
-        user -- A string containing a valid user ID
-        suite -- A string containing a valid suite ID
-        cycles -- Display only task jobs matching these cycles. A value in the
-                  list can be a cycle, the string "before|after CYCLE", or a
-                  glob to match cycles.
-        tasks -- Display only jobs for task names matching these names. Values
-                 can be a valid task name or a glob like pattern for matching
-                 valid task names.
-        no_statues -- Do not display jobs with these statuses. Valid values are
-                      the keys of CylcProcessor.STATUSES.
-        order -- Order search in a predetermined way. A valid value is one of
-                 the keys in CylcProcessor.ORDERS.
-        limit -- Limit number of returned entries
-        offset -- Offset entry number
-
-        Return (entries, of_n_entries) where:
-        entries -- A list of matching entries
-        of_n_entries -- Total number of entries matching query
-
-        Each entry is a dict:
-            {"cycle": cycle, "name": name, "submit_num": submit_num,
-             "events": [time_submit, time_init, time_exit],
-             "status": None|"submit|fail(submit)|init|success|fail|fail(%s)",
-             "logs": {"script": {"path": path, "path_in_tar", path_in_tar,
-                                 "size": size, "mtime": mtime},
-                      "out": {...},
-                      "err": {...},
-                      ...}}
-
-        """
-        raise NotImplementedError()
-
     def get_suite_log_url(self, user_name, suite_name):
         """Return the "rose bush" URL for a user's suite."""
         prefix = "~"
@@ -490,32 +454,7 @@ class SuiteEngineProcessor(object):
             rose_bush_url += "/"
         if not user_name:
             user_name = pwd.getpwuid(os.getuid()).pw_name
-        return rose_bush_url + "/".join(["list", user_name, suite_name])
-
-    def get_suite_logs_info(self, user_name, suite_name):
-        """Return the information of the suite logs.
-
-        Return a tuple that looks like:
-            ("cylc-run",
-             {"err": {"path": "log/suite/err", "mtime": mtime, "size": size},
-              "log": {"path": "log/suite/log", "mtime": mtime, "size": size},
-              "out": {"path": "log/suite/out", "mtime": mtime, "size": size}})
-
-        """
-        raise NotImplementedError()
-
-    def get_suite_state_summary(self, user_name, suite_name):
-        """Return a the state summary of a user's suite.
-
-        Return {"last_activity_time": s, "is_running": b, "is_failed": b}
-        where:
-        * last_activity_time is a string in %Y-%m-%dT%H:%M:%S format,
-          the time of the latest activity in the suite
-        * is_running is a boolean to indicate if the suite is running
-        * is_failed: a boolean to indicate if any tasks (submit) failed
-
-        """
-        raise NotImplementedError()
+        return rose_bush_url + "/".join(["taskjobs", user_name, suite_name])
 
     def get_task_auth(self, suite_name, task_name):
         """Return [user@]host for a remote task in a suite."""
@@ -642,10 +581,6 @@ class SuiteEngineProcessor(object):
         """Launch control GUI for a suite_name running at a host."""
         raise NotImplementedError()
 
-    def is_conf(self, path):
-        """Return the file type if path is a config of this suite engine."""
-        raise NotImplementedError()
-
     def is_suite_registered(self, suite_name):
         """Return whether or not a suite is registered."""
         raise NotImplementedError()
@@ -657,10 +592,6 @@ class SuiteEngineProcessor(object):
         items -- A list of relevant items.
 
         """
-        raise NotImplementedError()
-
-    def job_logs_db_create(self, suite_name, close=False):
-        """Create the job logs database."""
         raise NotImplementedError()
 
     def job_logs_pull_remote(self, suite_name, items,

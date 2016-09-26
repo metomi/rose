@@ -31,7 +31,7 @@ if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose host-select -q $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
-tests 17
+tests 15
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
@@ -56,10 +56,6 @@ for CYCLE in $CYCLES; do
     run_fail "$TEST_KEY" \
         test -f "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json"
 done
-TEST_KEY="$TEST_KEY_BASE-db-before"
-sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
-    'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 TEST_KEY="$TEST_KEY_BASE-command"
 run_pass "$TEST_KEY" rose suite-log -n $NAME -f --debug
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -70,35 +66,6 @@ for CYCLE in $CYCLES; do
     file_test "$TEST_KEY-after-log-2.out" \
         $SUITE_RUN_DIR/log/job/$CYCLE/my_task_2/01/job.out
 done
-TEST_KEY="$TEST_KEY_BASE-db-after"
-sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
-    'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-log/job/20130101T0000Z/my_task_1/01/job|job
-log/job/20130101T0000Z/my_task_1/01/job-activity.log|job-activity.log
-log/job/20130101T0000Z/my_task_1/01/job.err|job.err
-log/job/20130101T0000Z/my_task_1/01/job.out|job.out
-log/job/20130101T0000Z/my_task_2/01/job|job
-log/job/20130101T0000Z/my_task_2/01/job-activity.log|job-activity.log
-log/job/20130101T0000Z/my_task_2/01/job.err|job.err
-log/job/20130101T0000Z/my_task_2/01/job.out|job.out
-log/job/20130101T1200Z/my_task_1/01/job|job
-log/job/20130101T1200Z/my_task_1/01/job-activity.log|job-activity.log
-log/job/20130101T1200Z/my_task_1/01/job.err|job.err
-log/job/20130101T1200Z/my_task_1/01/job.out|job.out
-log/job/20130101T1200Z/my_task_2/01/job|job
-log/job/20130101T1200Z/my_task_2/01/job-activity.log|job-activity.log
-log/job/20130101T1200Z/my_task_2/01/job.err|job.err
-log/job/20130101T1200Z/my_task_2/01/job.out|job.out
-log/job/20130102T0000Z/my_task_1/01/job|job
-log/job/20130102T0000Z/my_task_1/01/job-activity.log|job-activity.log
-log/job/20130102T0000Z/my_task_1/01/job.err|job.err
-log/job/20130102T0000Z/my_task_1/01/job.out|job.out
-log/job/20130102T0000Z/my_task_2/01/job|job
-log/job/20130102T0000Z/my_task_2/01/job-activity.log|job-activity.log
-log/job/20130102T0000Z/my_task_2/01/job.err|job.err
-log/job/20130102T0000Z/my_task_2/01/job.out|job.out
-__OUT__
 #-------------------------------------------------------------------------------
 # Test --prune-remote.
 TEST_KEY="$TEST_KEY_BASE-prune-remote"

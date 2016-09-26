@@ -29,11 +29,10 @@ import re
 import pwd
 import shlex
 import simplejson
-import socket
 import rose.config
 from rose.host_select import HostSelector
 from rose.resource import ResourceLocator
-from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.bush_dao import RoseBushDAO
 import tarfile
 from tempfile import NamedTemporaryFile
 from time import gmtime, strftime
@@ -41,27 +40,27 @@ import traceback
 import urllib
 
 
-MIME_TEXT_PLAIN = "text/plain"
-SEARCH_MODE_TEXT = "TEXT"
-SEARCH_MODE_REGEX = "REGEX"
-
-
 class RoseBushService(object):
 
-    """Serves the index page."""
+    """Rose Bush Service."""
 
     NS = "rose"
     UTIL = "bush"
     TITLE = "Rose Bush"
+
     CYCLES_PER_PAGE = 100
     JOBS_PER_PAGE = 15
     JOBS_PER_PAGE_MAX = 300
+    MIME_TEXT_PLAIN = "text/plain"
+    REC_URL = re.compile(r"((https?):\/\/[^\s\(\)&\[\]\{\}]+)")
+    SEARCH_MODE_REGEX = "REGEX"
+    SEARCH_MODE_TEXT = "TEXT"
     SUITES_PER_PAGE = 100
     VIEW_SIZE_MAX = 10 * 1024 * 1024  # 10MB
 
     def __init__(self, *args, **kwargs):
         self.exposed = True
-        self.suite_engine_proc = SuiteEngineProcessor.get_processor()
+        self.bush_dao = RoseBushDAO()
         rose_conf = ResourceLocator.default().get_conf()
         self.logo = rose_conf.get_value(["rose-bush", "logo"])
         self.title = rose_conf.get_value(["rose-bush", "title"], self.TITLE)
@@ -74,20 +73,17 @@ class RoseBushService(object):
         template_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
             ResourceLocator.default().get_util_home(
                 "lib", "html", "template", "rose-bush")))
-
-        def urlise(text):
-            pattern = '((https?):\/\/[^\s\(\)&\[\]\{\}]+)'
-            replacement = '<a href="\g<1>">\g<1></a>'
-            text = re.sub(pattern, replacement, text)
-            return text
-
-        template_env.filters['urlise'] = urlise
+        template_env.filters['urlise'] = self.url2hyperlink
         self.template_env = template_env
+
+    @classmethod
+    def url2hyperlink(cls, text):
+        """Turn http or https link into a hyperlink."""
+        return cls.REC_URL.sub(r'<a href="\g<1>">\g<1></a>', text)
 
     @cherrypy.expose
     def index(self, form=None):
         """Display a page to input user ID and suite ID."""
-        # TODO: some way to allow autocomplete of user field?
         data = {
             "logo": self.logo,
             "title": self.title,
@@ -99,8 +95,8 @@ class RoseBushService(object):
             return simplejson.dumps(data)
         try:
             return self.template_env.get_template("index.html").render(**data)
-        except Exception as exc:
-            traceback.print_exc(exc)
+        except jinja2.TemplateError:
+            traceback.print_exc()
 
     @cherrypy.expose
     def broadcast_states(self, user, suite, form=None):
@@ -119,27 +115,26 @@ class RoseBushService(object):
             "time": strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()),
         }
         data["states"].update(
-            self.suite_engine_proc.get_suite_state_summary(user, suite))
+            self.bush_dao.get_suite_state_summary(user, suite))
         suite_db = os.path.join(
-            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+            user_suite_dir, self.bush_dao.SUITE_DB)
         data["states"]["last_activity_time"] = \
             self.get_last_activity_time(suite_db)
         data.update(self._get_suite_logs_info(user, suite))
         data["broadcast_states"] = (
-            self.suite_engine_proc.get_suite_broadcast_states(user, suite))
+            self.bush_dao.get_suite_broadcast_states(user, suite))
         if form == "json":
             return simplejson.dumps(data)
         try:
-            template = self.template_env.get_template("broadcast-states.html")
-            return template.render(**data)
-        except Exception as exc:
-            traceback.print_exc(exc)
+            return self.template_env.get_template(
+                "broadcast-states.html").render(**data)
+        except jinja2.TemplateError:
+            traceback.print_exc()
         return simplejson.dumps(data)
 
     @cherrypy.expose
     def broadcast_events(self, user, suite, form=None):
         """List broadcasts history of a running or completed suite."""
-        user_suite_dir = self._get_user_suite_dir(user, suite)
         data = {
             "logo": self.logo,
             "title": self.title,
@@ -153,17 +148,17 @@ class RoseBushService(object):
             "time": strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         }
         data["states"].update(
-            self.suite_engine_proc.get_suite_state_summary(user, suite))
+            self.bush_dao.get_suite_state_summary(user, suite))
         data.update(self._get_suite_logs_info(user, suite))
         data["broadcast_events"] = (
-            self.suite_engine_proc.get_suite_broadcast_events(user, suite))
+            self.bush_dao.get_suite_broadcast_events(user, suite))
         if form == "json":
             return simplejson.dumps(data)
         try:
-            template = self.template_env.get_template("broadcast-events.html")
-            return template.render(**data)
-        except Exception as exc:
-            traceback.print_exc(exc)
+            return self.template_env.get_template(
+                "broadcast-events.html").render(**data)
+        except jinja2.TemplateError:
+            traceback.print_exc()
         return simplejson.dumps(data)
 
     @cherrypy.expose
@@ -203,9 +198,10 @@ class RoseBushService(object):
             "per_page": per_page,
             "per_page_default": per_page_default,
             "page": page,
+            "task_status_groups": self.bush_dao.TASK_STATUS_GROUPS,
         }
         data["entries"], data["of_n_entries"] = (
-            self.suite_engine_proc.get_suite_cycles_summary(
+            self.bush_dao.get_suite_cycles_summary(
                 user, suite, order, per_page, (page - 1) * per_page))
         if per_page:
             data["n_pages"] = data["of_n_entries"] / per_page
@@ -215,26 +211,26 @@ class RoseBushService(object):
             data["n_pages"] = 1
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
-            self.suite_engine_proc.get_suite_state_summary(user, suite))
+            self.bush_dao.get_suite_state_summary(user, suite))
         suite_db = os.path.join(
-            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+            user_suite_dir, self.bush_dao.SUITE_DB)
         data["states"]["last_activity_time"] = \
             self.get_last_activity_time(suite_db)
         data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
             return simplejson.dumps(data)
         try:
-            template = self.template_env.get_template("cycles.html")
-            return template.render(**data)
-        except Exception as exc:
-            traceback.print_exc(exc)
+            return self.template_env.get_template("cycles.html").render(**data)
+        except jinja2.TemplateError:
+            traceback.print_exc()
         return simplejson.dumps(data)
 
     @cherrypy.expose
-    def jobs(self, user, suite, page=1, cycles=None, tasks=None,
-             no_status=None, order=None, per_page=None, no_fuzzy_time="0",
-             form=None):
-        """List jobs of a running or completed suite.
+    def taskjobs(
+            self, user, suite, page=1, cycles=None, tasks=None,
+            task_status=None, job_status=None,
+            order=None, per_page=None, no_fuzzy_time="0", form=None):
+        """List task jobs.
 
         user -- A string containing a valid user ID
         suite -- A string containing a valid suite ID
@@ -246,9 +242,9 @@ class RoseBushService(object):
                  The list should be specified as a string which will be
                  shlex.split by this method. Values can be a valid task name or
                  a glob like pattern for matching valid task names.
-        no_status -- Do not display jobs of tasks matching these statuses.
-                     The values in the list should be "active", "success" or
-                     "fail".
+        task_status -- Select by task statuses.
+        job_status -- Select by job status. See RoseBushDAO.JOB_STATUS_COMBOS
+                      for detail.
         order -- Order search in a predetermined way. A valid value is one of
             "time_desc", "time_asc",
             "cycle_desc_name_desc", "cycle_desc_name_asc",
@@ -273,33 +269,44 @@ class RoseBushService(object):
             ["rose-bush", "jobs-per-page"], self.JOBS_PER_PAGE))
         per_page_max = int(conf.get_value(
             ["rose-bush", "jobs-per-page-max"], self.JOBS_PER_PAGE_MAX))
-        is_option_on = (
-            cycles or
-            tasks or
-            no_status is not None or
-            order is not None and order != "time_desc" or
-            per_page is not None and per_page != per_page_default
-        )
         if not isinstance(per_page, int):
             if per_page:
                 per_page = int(per_page)
             else:
                 per_page = per_page_default
+        is_option_on = (
+            cycles or
+            tasks or
+            task_status or
+            job_status or
+            order is not None and order != "time_desc" or
+            per_page != per_page_default
+        )
         if page and per_page:
             page = int(page)
         else:
             page = 1
-        no_statuses = no_status
-        if no_status and not isinstance(no_status, list):
-            no_statuses = [no_status]
+        task_statuses = (
+            [[item, ""] for item in self.bush_dao.TASK_STATUSES])
+        if task_status:
+            if not isinstance(task_status, list):
+                task_status = [task_status]
+        for item in task_statuses:
+            if not task_status or item[0] in task_status:
+                item[1] = "1"
+        all_task_statuses = all([status[1] == "1" for status in task_statuses])
+        if all_task_statuses:
+            task_status = []
         data = {
             "cycles": cycles,
             "host": self.host_name,
             "is_option_on": is_option_on,
             "logo": self.logo,
-            "method": "jobs",
+            "method": "taskjobs",
             "no_fuzzy_time": no_fuzzy_time,
-            "no_statuses": no_statuses,
+            "all_task_statuses": all_task_statuses,
+            "task_statuses": task_statuses,
+            "job_status": job_status,
             "order": order,
             "page": page,
             "per_page": per_page,
@@ -313,21 +320,20 @@ class RoseBushService(object):
             "title": self.title,
             "user": user,
         }
-        # TODO: add paths to other suite files
         if cycles:
             cycles = shlex.split(str(cycles))
         if tasks:
             tasks = shlex.split(str(tasks))
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
-            self.suite_engine_proc.get_suite_state_summary(user, suite))
+            self.bush_dao.get_suite_state_summary(user, suite))
         suite_db = os.path.join(
-            user_suite_dir, self.suite_engine_proc.SUITE_DB)
+            user_suite_dir, self.bush_dao.SUITE_DB)
         data["states"]["last_activity_time"] = \
             self.get_last_activity_time(suite_db)
-        entries, of_n_entries = self.suite_engine_proc.get_suite_job_events(
-            user, suite, cycles, tasks, no_statuses, order, per_page,
-            (page - 1) * per_page)
+        entries, of_n_entries = self.bush_dao.get_suite_job_entries(
+            user, suite, cycles, tasks, task_status, job_status, order,
+            per_page, (page - 1) * per_page)
         data["entries"] = entries
         data["of_n_entries"] = of_n_entries
         if per_page:
@@ -340,16 +346,30 @@ class RoseBushService(object):
         if form == "json":
             return simplejson.dumps(data)
         try:
-            template = self.template_env.get_template("jobs.html")
-            return template.render(**data)
-        except Exception as exc:
-            traceback.print_exc(exc)
+            return self.template_env.get_template("taskjobs.html").render(
+                **data)
+        except jinja2.TemplateError:
+            traceback.print_exc()
 
     @cherrypy.expose
-    def list(self, user, suite, page=1, cycles=None, tasks=None,
-             no_status=None, order=None, per_page=None, form=None):
-        return self.jobs(user, suite, page, cycles, tasks, no_status, order,
-                         per_page, form)
+    def jobs(self, user, suite, page=1, cycles=None, tasks=None,
+             no_status=None, order=None, per_page=None, no_fuzzy_time="0",
+             form=None):
+        """(Deprecated) Redirect to self.taskjobs.
+
+        Convert "no_status" to "task_status" argument of self.taskjobs.
+        """
+        task_status = None
+        if no_status:
+            task_status = []
+            if not isinstance(no_status, list):
+                no_status = [no_status]
+            for key, values in self.bush_dao.TASK_STATUS_GROUPS.items():
+                if key not in no_status:
+                    task_status += values
+        return self.taskjobs(
+            user, suite, page, cycles, tasks, task_status,
+            None, order, per_page, no_fuzzy_time, form)
 
     @cherrypy.expose
     def suites(self, user, names=None, page=1, order=None, per_page=None,
@@ -407,15 +427,9 @@ class RoseBushService(object):
             if not any([fnmatch(item, glob_) for glob_ in name_globs]):
                 continue
             user_suite_dir = os.path.join(user_suite_dir_root, item)
-            suite_conf = os.path.join(
-                user_suite_dir, self.suite_engine_proc.SUITE_CONF)
-            job_logs_db = os.path.join(
-                user_suite_dir, self.suite_engine_proc.JOB_LOGS_DB)
-            if (not os.path.exists(job_logs_db) and
-                    not os.path.exists(suite_conf)):
+            suite_db = os.path.join(user_suite_dir, self.bush_dao.SUITE_DB)
+            if not os.path.exists(suite_db):
                 continue
-            suite_db = os.path.join(
-                user_suite_dir, self.suite_engine_proc.SUITE_DB)
             try:
                 last_activity_time = self.get_last_activity_time(suite_db)
             except OSError:
@@ -461,10 +475,6 @@ class RoseBushService(object):
         template = self.template_env.get_template("suites.html")
         return template.render(**data)
 
-    @cherrypy.expose
-    def summary(self, user, form=None):
-        return self.suites(user, form)
-
     def get_file(self, user, suite, path, path_in_tar=None, mode=None):
         """Returns file information / content or a cherrypy response."""
         f_name = self._get_user_suite_dir(user, suite, path)
@@ -478,70 +488,72 @@ class RoseBushService(object):
             except KeyError:
                 raise cherrypy.HTTPError(404)
             f_size = tar_info.size
-            f = tar_f.extractfile(path_in_tar)
-            if f.read(2) == "#!":
-                mime = MIME_TEXT_PLAIN
+            handle = tar_f.extractfile(path_in_tar)
+            if handle.read(2) == "#!":
+                mime = self.MIME_TEXT_PLAIN
             else:
                 mime = mimetypes.guess_type(
                     urllib.pathname2url(path_in_tar))[0]
-            f.seek(0)
+            handle.seek(0)
             if (mode == "download" or
                     f_size > view_size_max or
                     mime and
                     (not mime.startswith("text/") or mime.endswith("html"))):
-                t = NamedTemporaryFile()
-                f_bsize = os.fstatvfs(t.fileno()).f_bsize
+                temp_f = NamedTemporaryFile()
+                f_bsize = os.fstatvfs(temp_f.fileno()).f_bsize
                 while True:
-                    bytes_ = f.read(f_bsize)
+                    bytes_ = handle.read(f_bsize)
                     if not bytes_:
                         break
-                    t.write(bytes_)
+                    temp_f.write(bytes_)
                 cherrypy.response.headers["Content-Type"] = mime
                 try:
-                    return cherrypy.lib.static.serve_file(t.name, mime)
+                    return cherrypy.lib.static.serve_file(temp_f.name, mime)
                 finally:
-                    t.close()
-            s = f.read()
+                    temp_f.close()
+            text = handle.read()
         else:
             f_size = os.stat(f_name).st_size
             if open(f_name).read(2) == "#!":
-                mime = MIME_TEXT_PLAIN
+                mime = self.MIME_TEXT_PLAIN
             else:
                 mime = mimetypes.guess_type(urllib.pathname2url(f_name))[0]
             if not mime:
-                mime = MIME_TEXT_PLAIN
+                mime = self.MIME_TEXT_PLAIN
             if (mode == "download" or
                     f_size > view_size_max or
                     mime and
                     (not mime.startswith("text/") or mime.endswith("html"))):
                 cherrypy.response.headers["Content-Type"] = mime
                 return cherrypy.lib.static.serve_file(f_name, mime)
-            s = open(f_name).read()
+            text = open(f_name).read()
         try:
             if mode in [None, "text"]:
-                s = jinja2.escape(s)
-            lines = [unicode(line) for line in s.splitlines()]
+                text = jinja2.escape(text)
+            lines = [unicode(line) for line in text.splitlines()]
         except UnicodeDecodeError:
             if path_in_tar:
-                f.seek(0)
+                handle.seek(0)
                 # file closed by cherrypy
-                return cherrypy.lib.static.serve_fileobj(f, MIME_TEXT_PLAIN)
+                return cherrypy.lib.static.serve_fileobj(
+                    handle, self.MIME_TEXT_PLAIN)
             else:
-                return cherrypy.lib.static.serve_file(f_name, MIME_TEXT_PLAIN)
+                return cherrypy.lib.static.serve_file(
+                    f_name, self.MIME_TEXT_PLAIN)
         else:
             if path_in_tar:
-                f.close()
+                handle.close()
         name = path
         if path_in_tar:
             name = "log/" + path_in_tar
         job_entry = None
-        entry = None
         if name.startswith("log/job"):
-            names = self.suite_engine_proc.parse_job_log_rel_path(name)
+            names = self.bush_dao.parse_job_log_rel_path(name)
             if len(names) == 4:
-                cycle, task, submit_num, ext = names
-                entries = self.suite_engine_proc.get_suite_job_events(
-                    user, suite, [cycle], [task], None, None, None, None)[0]
+                cycle, task, submit_num, _ = names
+                entries = self.bush_dao.get_suite_job_entries(
+                    user, suite, [cycle], [task],
+                    None, None, None, None, None)[0]
                 for entry in entries:
                     if entry["submit_num"] == int(submit_num):
                         job_entry = entry
@@ -549,25 +561,25 @@ class RoseBushService(object):
         if fnmatch(os.path.basename(path), "rose*.conf"):
             file_content = "rose-conf"
         else:
-            file_content = self.suite_engine_proc.is_conf(path)
+            file_content = self.bush_dao.is_conf(path)
 
-        return lines, job_entry, entry, file_content, f_name
+        return lines, job_entry, file_content, f_name
 
-    def get_last_activity_time(self, suite_db):
+    @staticmethod
+    def get_last_activity_time(suite_db):
         """Returns last activity time for a suite based on database stat"""
-        last_activity_time = strftime("%Y-%m-%dT%H:%M:%SZ",
-                                      gmtime(os.stat(suite_db).st_mtime))
-        return last_activity_time
+        return strftime(
+            "%Y-%m-%dT%H:%M:%SZ", gmtime(os.stat(suite_db).st_mtime))
 
     @cherrypy.expose
     def viewsearch(self, user, suite, path=None, path_in_tar=None, mode=None,
-                   search_string=None, search_mode=SEARCH_MODE_TEXT):
+                   search_string=None, search_mode=None):
         """Search a text log file."""
         # get file or serve raw data
         file_output = self.get_file(
             user, suite, path, path_in_tar=path_in_tar, mode=mode)
         if isinstance(file_output, tuple):
-            lines, job_entry, entry, file_content, f_name = self.get_file(
+            lines, _, file_content, _ = self.get_file(
                 user, suite, path, path_in_tar=path_in_tar, mode=mode)
         else:
             return file_output
@@ -580,17 +592,17 @@ class RoseBushService(object):
 
             # perform search
             for i, line in enumerate(lines):
-                if search_mode == SEARCH_MODE_REGEX:
-                    match = re.search(search_string, line)
-                    if not match:
-                        continue
-                    start, end = match.span()
-                elif search_mode == SEARCH_MODE_TEXT:
+                if search_mode is None or search_mode == self.SEARCH_MODE_TEXT:
                     match = line.find(search_string)
                     if match == -1:
                         continue
                     start = match
                     end = start + len(search_string)
+                elif search_mode == self.SEARCH_MODE_REGEX:
+                    match = re.search(search_string, line)
+                    if not match:
+                        continue
+                    start, end = match.span()
                 else:
                     # ERROR: un-reccognised search_mode
                     break
@@ -622,7 +634,7 @@ class RoseBushService(object):
         file_output = self.get_file(
             user, suite, path, path_in_tar=path_in_tar, mode=mode)
         if isinstance(file_output, tuple):
-            lines, job_entry, entry, file_content, f_name = self.get_file(
+            lines, job_entry, file_content, f_name = self.get_file(
                 user, suite, path, path_in_tar=path_in_tar, mode=mode)
         else:
             return file_output
@@ -651,6 +663,7 @@ class RoseBushService(object):
             **data)
 
     def _get_suite_logs_info(self, user, suite):
+        """Return a dict with suite logs and Rosie suite info."""
         data = {"info": {}, "files": {}}
         user_suite_dir = self._get_user_suite_dir(user, suite)
 
@@ -663,7 +676,7 @@ class RoseBushService(object):
                     if node.is_ignored() or not isinstance(node.value, str):
                         continue
                     data["info"][key] = node.value
-            except rose.config.ConfigSyntaxError as err:
+            except rose.config.ConfigSyntaxError:
                 pass
 
         # rose-suite-run.conf, rose-suite-run.log, rose-suite-run.version
@@ -671,24 +684,24 @@ class RoseBushService(object):
         for key in ["conf", "log", "version"]:
             f_name = os.path.join(user_suite_dir, "log/rose-suite-run." + key)
             if os.path.isfile(f_name):
-                s = os.stat(f_name)
+                stat = os.stat(f_name)
                 data["files"]["rose"]["log/rose-suite-run." + key] = {
                     "path": "log/rose-suite-run." + key,
-                    "mtime": s.st_mtime,
-                    "size": s.st_size}
+                    "mtime": stat.st_mtime,
+                    "size": stat.st_size}
 
         # Other version files
         for f_name in glob(os.path.join(user_suite_dir, "log/*.version")):
             if os.path.basename(f_name).startswith("rose-"):
                 continue
             name = os.path.join("log", os.path.basename(f_name))
-            s = os.stat(f_name)
+            stat = os.stat(f_name)
             data["files"]["rose"]["other:" + name] = {
                 "path": name,
-                "mtime": s.st_mtime,
-                "size": s.st_size}
+                "mtime": stat.st_mtime,
+                "size": stat.st_size}
 
-        k, logs_info = self.suite_engine_proc.get_suite_logs_info(user, suite)
+        k, logs_info = self.bush_dao.get_suite_logs_info(user, suite)
         data["files"][k] = logs_info
 
         return data
@@ -708,7 +721,8 @@ class RoseBushService(object):
             raise cherrypy.HTTPError(403)
         return path
 
-    def _get_user_home(self, user):
+    @staticmethod
+    def _get_user_home(user):
         """Return, e.g. ~/cylc-run/ for a cylc suite.
 
         N.B. os.path.expanduser does not fail if ~user is invalid.
@@ -723,20 +737,22 @@ class RoseBushService(object):
         """Return, e.g. ~user/cylc-run/ for a cylc suite."""
         return self._check_dir_access(os.path.join(
             self._get_user_home(user),
-            self.suite_engine_proc.SUITE_DIR_REL_ROOT))
+            self.bush_dao.SUITE_DIR_REL_ROOT))
 
     def _get_user_suite_dir(self, user, suite, *paths):
         """Return, e.g. ~user/cylc-run/suite/... for a cylc suite."""
         return self._check_dir_access(os.path.join(
             self._get_user_home(user),
-            self.suite_engine_proc.SUITE_DIR_REL_ROOT,
+            self.bush_dao.SUITE_DIR_REL_ROOT,
             suite,
             *paths))
 
-    def _sort_summary_entries(self, a, b):
-        return (cmp(b.get("last_activity_time"),
-                    a.get("last_activity_time")) or
-                cmp(a["name"], b["name"]))
+    @staticmethod
+    def _sort_summary_entries(suite1, suite2):
+        """Sort suites by last_activity_time."""
+        return (cmp(suite2.get("last_activity_time"),
+                    suite1.get("last_activity_time")) or
+                cmp(suite1["name"], suite2["name"]))
 
 
 if __name__ == "__main__":

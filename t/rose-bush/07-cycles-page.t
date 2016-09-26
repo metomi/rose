@@ -52,7 +52,8 @@ cat >"${SUITE_DIR}/suite.rc" <<'__SUITE_RC__'
 __SUITE_RC__
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    || cat "${SUITE_DIR}/log/suite/err" >&2
 
 #-------------------------------------------------------------------------------
 # Sort by time_desc
