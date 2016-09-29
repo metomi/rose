@@ -799,11 +799,11 @@ type=boolean
                 <pre class="prettyprint lang-cylc">
   [[hello_eris]]
 ...
-      [[[job submission]]]
-          method = pbs
+      [[[job]]]
+          batch system = pbs
+          execution time limit = PT5M # generates directives walltime value
       [[[directives]]]
           -l select = 1
-          -l walltime = 00:05:00
           -q = normal
 </pre>
               </div>
