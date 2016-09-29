@@ -207,7 +207,7 @@ class RoseBunchApp(BuiltinApp):
 
         if instances and arglength != len(instances):
             raise ConfigValueError([self.BUNCH_SECTION, "command-instances"],
-                                   instances, "inconsitent arg lengths")
+                                   instances, "inconsistent arg lengths")
 
         # Set max number of processes to run at once
         max_procs = conf_tree.node.get_value([self.BUNCH_SECTION, "pool-size"])
