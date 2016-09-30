@@ -498,65 +498,16 @@ rose suite-log
 rose slv
 </pre>
 
-            <h2 id="rose-suite-hook">rose suite-hook</h2>
-
-            <p>This command provide a common way to handle the
-            suite and task events of a cylc suite. The command is
-            normally called as a handler in the events section
-            of a cylc suite's <var>suite.rc</var> file. For a task
-            event of a remote task, it will attempt to
-            <code>rsync</code> the task logs back from the remote
-            host running the task. For all other events, it will
-            update the database for Rose Bush.</p>
-
-            <p>If the <code>--mail</code> option is specified on
-            the command line, the command will email you with the
-            message of the event. This may be useful for monitoring
-            failures or timeouts. If the <code>--shutdown</code>
-            option is specified, the command will attempt to
-            shutdown the suite immediately. This may be useful, for
-            example, if you want the suite to shutdown immediately
-            on any failures or following a suite timeout.</p>
-
-            <p>As discussed in the <a href=
-            "rose-rug-suites-I.html">Rose User Guide: Suites I</a>
-            chapter, we recommend adding the following to
-            <em>all</em> your suites, (but adjust the timeout and
-            remove <code>--shutdown</code> options to suit your
-            situations):</p>
-            <pre class="prettyprint lang-cylc">
-[cylc]
-    UTC mode=True
-
-[runtime]
-    [[root]]
-        [[[events]]]
-            mail events = submission failed, failed, \
-                          submission retry, retry, \
-                          submission timeout, execution timeout
-            ## The following entries are useful if you want the suite to stop
-            ## as soon as a task fails.
-            #handler events = failed, submission failed
-            #handlers = cylc shutdown %(suite)s
-</pre>
-
-            <p>See <a href="rose-command.html#rose-suite-hook">Rose
-            Reference Guide: CLI &gt; rose suite-hook</a> for more
-            information.</p>
-
             <h2 id="rose-suite-log">rose suite-log</h2>
 
-            <p>There are 2 usages of this command.</p>
+            <p>Invoking this command launches a web browser to display
+            the logs of a running or stopped suite in Rose Bush.</p>
 
-            <p>In normal or view mode, this command launches a web
-            browser to display the logs of a running or stopped
-            suite in Rose Bush.</p>
-
-            <p>In update mode, this command updates the logs and/or
-            the Rose Bush databse of a suite. This mode is useful
-            in the situations when <a href="#rose-suite-hook">rose
-            suite-hook</a> did not manage to update the logs and/or
-            the Rose Bush database successfully.</p>
+            <p>If run with the <var>--update</var> option this
+            synchronises logs between the various filesystems that the
+            suite has run jobs on and the suite host. This is useful
+            if cylc has been unable to retrieve a log on job
+            completion.</p>
 
             <p>See <a href="rose-command.html#rose-suite-log">Rose
             Reference Guide: CLI &gt; rose suite-log</a> for more

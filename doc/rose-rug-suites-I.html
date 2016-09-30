@@ -742,7 +742,8 @@ type=boolean
   UTC mode = True # Ignore DST
   # abort if any task fails = True
   [[events]]
-      # timeout handler = rose suite-hook --mail --shutdown
+      # abort on timeout = True
+      # mail events = timeout
       # timeout = P3D
 </pre>
               </div>
