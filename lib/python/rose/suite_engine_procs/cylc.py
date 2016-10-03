@@ -489,7 +489,7 @@ class CylcProcessor(SuiteEngineProcessor):
                         member.name.split("/", 4)[1:4])
                     entry = entry_of[(cycle_str, name, int(submit_num_str))]
                 except (KeyError, ValueError):
-                    pass
+                    continue
                 entry["logs"][os.path.basename(member.name)] = {
                     "path": path,
                     "path_in_tar": member.name,
