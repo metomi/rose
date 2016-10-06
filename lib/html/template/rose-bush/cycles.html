@@ -81,24 +81,82 @@
   </div>
 </div>
 
-<div class="container-fluid"><!-- entries -->
+<table summary="cycles entries"
+class="table table-bordered table-condensed table-striped">
+  <thead>
+    <tr>
+      <th>cycle point</th>
+
+      <th>last active time</th>
+
+      <th>
+        <span class="pull-right"># tasks</span>
+        <span class="label label-info">
+          <i class="glyphicon glyphicon-play" title="# active tasks"></i>
+        </span>
+      </th>
+
+      <th>
+        <span class="pull-right"># jobs</span>
+        <span class="label label-info">
+          <i class="glyphicon glyphicon-play-circle" title="# active jobs"></i>
+        </span>
+      </th>
+
+      <th>
+        <span class="pull-right"># tasks</span>
+        <span class="label label-success">
+          <i class="glyphicon glyphicon-ok" title="# succeeded tasks"></i>
+        </span>
+      </th>
+
+      <th>
+        <span class="pull-right"># jobs</span>
+        <span class="label label-success">
+          <i class="glyphicon glyphicon-ok-circle" title="# succeeded jobs"></i>
+        </span>
+      </th>
+
+      <th>
+        <span class="pull-right"># tasks</span>
+        <span class="label label-danger">
+          <i class="glyphicon glyphicon-remove" title="# failed tasks"></i>
+        </span>
+      </th>
+
+      <th>
+        <span class="pull-right"># jobs</span>
+        <span class="label label-danger">
+          <i class="glyphicon glyphicon-remove-circle"
+          title="# failed jobs"></i>
+        </span>
+      </th>
+
+      <th><i class="glyphicon glyphicon-download"
+      title="download job logs archive"></i> log/job-CYCLE.tar.gz</th>
+    </tr>
+  </thead>
+  <tbody>
 {% for entry in entries -%}
   {% set cycle_in_url = entry.cycle|replace('+', '%2B') -%}
   {% set task_jobs_url = (
       script ~ "/taskjobs/" ~ user ~ "/" ~ suite ~ "?cycles=" ~ cycle_in_url
   ) -%}
-  <div class="row entry">
+    <tr class="entry">
 
-    <div class="col-xs-6 col-md-3">
-      <a href="{{task_jobs_url}}"
-      class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
-    </div>
+      <td>
+        <small>
+          <a href="{{task_jobs_url}}"
+          class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
+        </small>
+      </td>
 
-    <div class="col-xs-6 col-md-3">
-      last active
-      <abbr class="livestamp"
-      title="{{entry.max_time_updated}}">{{entry.max_time_updated}}</abbr>
-    </div>
+      <td>
+        <small>
+          <abbr class="livestamp"
+          title="{{entry.max_time_updated}}">{{entry.max_time_updated}}</abbr>
+        </small>
+      </td>
 
   {# task and jobs states -#}
   {% for state, icon, label, title_, unit1, unit2, url_arg in [
@@ -129,42 +187,40 @@
       {% set more_label = "label-default" -%}
     {% endif -%}
 
-    <div class="col-xs-2 col-md-1">
     {% if n_state -%}
+    <td class="{{label}}">
       <a href="{{task_jobs_url}}{{url_arg}}">
-        <span class="label {{more_label}}"
-        title="{{n_state}} {{title_}} {{unit}}">
+        <span class="label {{more_label}}">
           <i class="glyphicon glyphicon-{{icon}}"></i>
-          {{n_state}}
         </span>
+        <small class="pull-right">{{n_state}}</small>
       </a>
+    </td>
     {% else -%}
-      <span class="label {{more_label}}"
-      title="{{n_state}} {{title_}} {{unit}}">
-        <i class="glyphicon glyphicon-{{icon}}"></i>
-        {{n_state}}
-      </span>
+    <td><small class="pull-right">{{n_state}}</span></small></td>
     {% endif -%}
-    </div>
 
-  {% endfor -%}{# task and jobs states -#}
+  {% endfor -%}{# end task and jobs states -#}
 
+    <td>
   {% if entry.has_log_job_tar_gz -%}
-    {% set download_text = "path=log/job-" ~ entry.cycle ~ ".tar.gz" -%}
     {% set download = (
         script ~ "/view/" ~ user ~ "/" ~ suite ~ "?path=log/job-" ~
         cycle_in_url ~ ".tar.gz&amp;mode=download"
     ) -%}
-    <div class="col-xs-12 col-md-12">
-      <small>
-        <a href="{{download}}"
-        download="{{user}}-{{suite}}-log-job-{{entry.cycle}}.tar.gz">download
-        {{download_text}}</a>
-      </small>
-    </div>
+      <a href="{{download}}"
+      download="{{user}}-{{suite}}-log-job-{{entry.cycle}}.tar.gz">
+        <i class="glyphicon glyphicon-download"
+        title="download log/job-{{entry.cycle}}.tar.gz"></i>
+        <small>
+          log/job-{{entry.cycle}}.tar.gz
+        </small>
+      </a>
   {% endif -%}
+    </td>
 
-  </div>
-{% endfor -%}{# for entry in entries -#}
-</div>
+    </tr><!-- end table row for entry -->
+{% endfor -%}{# end for entry in entries -#}
+  </tbody><!-- end cycles entries -->
+</table>
 {% endblock %}

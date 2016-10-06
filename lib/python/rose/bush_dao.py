@@ -341,7 +341,7 @@ class RoseBushDAO(object):
                 try:
                     filenames = os.listdir(os.path.join(user_suite_dir, pathd))
                 except OSError:
-                    pass
+                    continue
                 for filename in filenames:
                     try:
                         stat = os.stat(

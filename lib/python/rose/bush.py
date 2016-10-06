@@ -317,6 +317,7 @@ class RoseBushService(object):
             "states": {},
             "suite": suite,
             "tasks": tasks,
+            "task_status_groups": self.bush_dao.TASK_STATUS_GROUPS,
             "title": self.title,
             "user": user,
         }
@@ -628,7 +629,8 @@ class RoseBushService(object):
         )
 
     @cherrypy.expose
-    def view(self, user, suite, path, path_in_tar=None, mode=None):
+    def view(self, user, suite, path, path_in_tar=None, mode=None,
+             no_fuzzy_time="0"):
         """View a text log file."""
         # get file or serve raw data
         file_output = self.get_file(
@@ -657,9 +659,11 @@ class RoseBushService(object):
             path_in_tar=path_in_tar,
             f_name=f_name,
             mode=mode,
+            no_fuzzy_time=no_fuzzy_time,
             file_content=file_content,
             lines=lines,
             entry=job_entry,
+            task_status_groups=self.bush_dao.TASK_STATUS_GROUPS,
             **data)
 
     def _get_suite_logs_info(self, user, suite):

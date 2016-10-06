@@ -1,5 +1,5 @@
 {% extends "suite-base.html" %}
-{% block title_name %}jobs list{% endblock %}
+{% block title_name %}task jobs list{% endblock %}
 {% block content %}
 <div class="page-header">
 
@@ -23,7 +23,8 @@
         <fieldset class="container-fluid">
           <div class="row">
 {% for key, name, value in [
-    ("cycles", "Cycles: &gt;CYCLE|&lt;CYCLE|CYCLE-GLOB ...", cycles),
+    ("cycles",
+     "Cycles (before, after or patterns): &gt;CYCLE | &lt;CYCLE | GLOB ...", cycles),
     ("tasks", "Task Name Globs", tasks),
 ] -%}
             <div class="form-group col-sm-12 col-md-6">
@@ -194,9 +195,14 @@
   </div>
 </div>
 
-<div class="container-fluid"><!-- entries -->
+<!-- entries -->
+<table summary="task job entries"
+class="table table-bordered table-condensed table-striped">
+  {% include "job-entry-head.html" %}
+  <tbody>
 {% for entry in entries -%}
-{% include "job-entry.html" %}
+  {% include "job-entry.html" %}
 {% endfor -%}
-</div><!-- entries -->
+  </tbody>
+</table><!-- entries -->
 {% endblock %}

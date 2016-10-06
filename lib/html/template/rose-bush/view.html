@@ -4,29 +4,48 @@
 {% block content %}
 <div class="page-header">
 {% include "search-form.html" -%}
+
 {% if path_in_tar -%}
-<h1>{{path_in_tar}}
-<small>&lt; {{path}}</small>
-</h1>
-<div><small>
-<a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}">{{f_name}}</a>
-<span class="label label-default">Content loaded
-<abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
-</small></div>
+  <h1>{{path_in_tar}}
+    <small>&lt; {{path}}</small>
+  </h1>
+  <div class="pull-right">
+    <a id="toggle-fuzzy-time" data-no-fuzzy-time="{{no_fuzzy_time}}" href="#">
+      <small>toggle &Delta;t</small>
+    </a>
+  </div>
+  <div>
+    <small>
+      <a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}">{{f_name}}</a>
+      <span class="label label-default">Content loaded
+      <abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
+    </small>
+  </div>
 {% else -%}
-<h1>{{path}}</h1>
-<div><small>
-{{f_name}}
-<span class="label label-default">Content loaded
-<abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
-</small></div>
+  <h1>{{path}}</h1>
+  <div class="pull-right">
+    <a id="toggle-fuzzy-time" data-no-fuzzy-time="{{no_fuzzy_time}}" href="#">
+      <small>toggle &Delta;t</small>
+    </a>
+  </div>
+  <div>
+    <small>
+      {{f_name}}
+      <span class="label label-default">Content loaded
+      <abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
+    </small>
+  </div>
 {% endif -%}
 
 {% if entry -%}
-<hr />
-<div class="container-fluid">
-{% include "job-entry.html" %}
-</div>
+  <hr />
+  <table summary="task job entry"
+  class="table table-bordered table-condensed table-striped">
+  {% include "job-entry-head.html" %}
+    <tbody>
+  {% include "job-entry.html" %}
+    </tbody>
+  </table>
 {% endif -%}
 </div>
 

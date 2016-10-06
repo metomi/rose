@@ -137,63 +137,67 @@ rel="stylesheet" media="screen" />
   </div>
 </div>
 
-<div class="container-fluid">
-{% for entry in entries -%}
-<div class="row entry">
-{% set maxlen=23 -%}
-<div class="col-md-2">
-{% if entry.name|length > maxlen -%}
-<abbr title="{{entry.name}}">{{entry.name|truncate(maxlen,true)}}</abbr>
-{% else -%}
-{{entry.name}}
-{% endif -%}
-</div>
-<div class="col-md-1">
-  <a href="{{script}}/cycles/{{user}}/{{entry.name}}">
-    <button type="button" class="btn btn-default btn-sm">
-      <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
-      cycles list
-    </button>
-  </a>
-</div>
-<div class="col-md-1">
-  <a href="{{script}}/taskjobs/{{user}}/{{entry.name}}">
-    <button type="button" class="btn btn-default btn-sm">
-      <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-      jobs list
-    </button>
-  </a>
-</div>
-<div class="col-md-2">
-{% if entry.last_activity_time -%}
-  <span class="text-info"><i class="glyphicon glyphicon-time" title="last active"></i>
-    <abbr class="livestamp"
-      title="{{entry.last_activity_time}}">{{entry.last_activity_time}}</abbr>
-  </span>
-{% endif -%}{# entry.last_activity_time #}
-</div>
-{% for key, icon, span, maxlen in [("project", "tag", "2", 18), ("title", "comment", "4", 80)] -%}
-<div class="col-md-{{span}}">
-  <i class="glyphicon glyphicon-{{icon}}" title="{{key}}"></i>
-{% if entry.info[key]|length > maxlen -%}
-  <abbr title="{{entry.info[key]}}">{{entry.info[key]|truncate(maxlen,true)}}</abbr>
-{% else -%}
-{{entry.info[key]}}
-{% endif -%}
-</div>
-{% endfor -%}
-</div>
-{% endfor -%}{# entry in entries #}
-</div>
+<table summary="suites entries"
+class="table table-bordered table-condensed table-striped">
+  <thead>
+    <tr>
+      <th>suite name</th>
 
-<div class="container-fluid">
-<div class="row">
-<div class="col-md-12 text-right">
+      <th>
+        cycles list
+      </th>
+
+      <th>
+        task jobs list
+      </th>
+
+      <th>
+        last active time
+      </th>
+
+      <th>
+        project
+      </th>
+
+      <th>
+        title
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+{% for entry in entries -%}
+    <tr>
+      <td><small>{{entry.name}}</small></td>
+      <td>
+        <small>
+          <a href="{{script}}/cycles/{{user}}/{{entry.name}}">cycles list</a>
+        </small>
+      </td>
+
+      <td>
+        <small>
+          <a href="{{script}}/taskjobs/{{user}}/{{entry.name}}">task jobs list</a>
+        </small>
+      </td>
+
+      <td>
+        <small>
+          <abbr class="livestamp"
+          title="{{entry.last_activity_time}}">{{entry.last_activity_time}}</abbr>
+        </small>
+      </td>
+
+      <td><small>{{entry.info["project"]}}</small></td>
+
+      <td><small>{{entry.info["title"]}}</small></td>
+
+    </tr>
+{% endfor -%}{# entry in entries #}
+  </tbody>
+</table>
+
 <hr/>
-<address><small>Rose {{rose_version}}</small></address>
-</div>
-</div>
-</div>
+<address text-right><small>Rose {{rose_version}}</small></address>
 
 <script type="text/javascript" src="{{script}}/js/jquery.min.js"></script>
 <script type="text/javascript" src="{{script}}/js/bootstrap.min.js">
