@@ -556,6 +556,12 @@ class RoseOptionParser(OptionParser):
              "const": "search",
              "dest": "lookup_mode",
              "help": "Shorthand for --lookup-mode=search."}],
+        "service_root_mode": [
+            ["--service-root", "-R"],
+            {"action": "store_true",
+             "default": False,
+             "dest": "service_root_mode",
+             "help": "Include web service name under root of URL."}],
         "shutdown": [
             ["--shutdown"],
             {"action": "store_true",

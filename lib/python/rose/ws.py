@@ -64,16 +64,16 @@ def ws_cli(service_cls, *args, **kwargs):
                   passed to its constructor.
     """
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("non_interactive")
+    opt_parser.add_my_options("non_interactive", "service_root_mode")
     opts, args = opt_parser.parse_args()
     arg = None
-    if sys.argv[1:]:
-        arg = sys.argv[1]
+    if args:
+        arg = args[0]
     if arg == "start":
         port = None
-        if sys.argv[2:]:
-            port = sys.argv[2]
-        _ws_init(service_cls, port, *args, **kwargs)
+        if args[1:]:
+            port = args[1]
+        _ws_init(service_cls, port, opts.service_root_mode, *args, **kwargs)
     else:
         report = Reporter(opts.verbosity - opts.quietness)
         status = _get_server_status(service_cls)
@@ -89,7 +89,7 @@ def ws_cli(service_cls, *args, **kwargs):
             # TODO: should check whether it is killed or not
 
 
-def _ws_init(service_cls, port, *args, **kwargs):
+def _ws_init(service_cls, port, service_root_mode, *args, **kwargs):
     """Start quick web service."""
     config = _configure(service_cls)
 
@@ -115,7 +115,10 @@ def _ws_init(service_cls, port, *args, **kwargs):
     cherrypy.config["log.error_file"] = log_root + "-error.log"
     open(cherrypy.config["log.error_file"], "w").close()
 
-    cherrypy.tree.mount(service_cls(*args, **kwargs), "/", config)
+    root = "/"
+    if service_root_mode:
+        root = "/%s-%s/" % (service_cls.NS, service_cls.UTIL)
+    cherrypy.tree.mount(service_cls(*args, **kwargs), root, config)
     try:
         cherrypy.engine.start()
         cherrypy.engine.block()

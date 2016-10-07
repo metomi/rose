@@ -350,7 +350,7 @@ rose_ws_init() {
     done
 
     TEST_KEY="${TEST_KEY_BASE}-${NS}-${UTIL}"
-    "${NS}" "${UTIL}" 'start' "${PORT}" \
+    "${NS}" "${UTIL}" '-R' 'start' "${PORT}" \
         0<'/dev/null' 1>"${NS}-${UTIL}.out" 2>"${NS}-${UTIL}.err" &
     TEST_ROSE_WS_PID="$!"
     T_INIT="$(date '+%s')"
@@ -360,7 +360,7 @@ rose_ws_init() {
     TEST_ROSE_WS_PORT="${PORT}"
     if port_is_busy "${TEST_ROSE_WS_PORT}"; then
         pass "${TEST_KEY}"
-        TEST_ROSE_WS_URL="http://${HOSTNAME}:${TEST_ROSE_WS_PORT}/"
+        TEST_ROSE_WS_URL="http://${HOSTNAME}:${TEST_ROSE_WS_PORT}/${NS}-${UTIL}/"
     else
         fail "${TEST_KEY}"
         rose_ws_kill
