@@ -21,13 +21,21 @@
 #     rosie disco
 #
 # SYNOPSIS
-#     rosie disco
 #     rosie disco start [PORT] # start ad-hoc web service server (on PORT)
 #     rosie disco stop         # stop ad-hoc web service server
+#     rosie disco stop -y      # stop ad-hoc web service server w/o prompting
+#     rosie disco              # print status of ad-hoc web service server
 #
 # DESCRIPTION
 #     Start/stop ad-hoc Rosie suite discovery web service server.
 #
 #     For "rosie disco start", if PORT is not specified, use port 8080.
+#
+# OPTIONS
+#     --non-interactive, --yes, -y
+#         (For stop only.) Switch off interactive prompting (=answer yes to
+#         everything)
+#     --service-root, -R
+#         (For start only.) Include web service name under root of URL.
 #-------------------------------------------------------------------------------
 exec python -m rosie.ws "$@"

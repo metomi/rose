@@ -593,6 +593,10 @@ rosie UTIL [OPTS] [ARG ...]
 
               <dd>Stop ad-hoc web service server</dd>
 
+              <dt><kbd>rose bush stop -y</kbd></dt>
+
+              <dd>Stop ad-hoc web service server without prompting</dd>
+
               <dt><kbd>rose bush</kbd></dt>
 
               <dd>Print status of ad-hoc web service server</dd>
@@ -607,6 +611,20 @@ rosie UTIL [OPTS] [ARG ...]
 
             <p>Rose Bush is a web service for browsing users' Rose
             suite logs via an HTTP interface.</p>
+
+            <h3>OPTIONS</h3>
+
+            <dl>
+              <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
+
+              <dd>(For stop only.) Switch off interactive prompting (=answer yes
+              to everything).</dd>
+
+              <dt><kbd>--service-root, -R</kbd></dt>
+
+              <dd>(For start only.) Include web service name under root of
+              URL.</dd>
+            </dl>
 
             <h2 id="rose-config">rose config</h2>
 
@@ -3434,6 +3452,10 @@ rose test-battery -v t/rose-app-run/07-opt.t
 
               <dd>Stop ad-hoc web service server</dd>
 
+              <dt><kbd>rosie disco stop -y</kbd></dt>
+
+              <dd>Stop ad-hoc web service server without prompting</dd>
+
               <dt><kbd>rosie disco</kbd></dt>
 
               <dd>Print status of ad-hoc web service server</dd>
@@ -3446,6 +3468,20 @@ rose test-battery -v t/rose-app-run/07-opt.t
 
             <p>For <code>rosie disco start</code>, if
             <var>PORT</var> is not specified, use port 8080.</p>
+
+            <h3>OPTIONS</h3>
+
+            <dl>
+              <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
+
+              <dd>(For stop only.) Switch off interactive prompting (=answer yes
+              to everything).</dd>
+
+              <dt><kbd>--service-root, -R</kbd></dt>
+
+              <dd>(For start only.) Include web service name under root of
+              URL.</dd>
+            </dl>
 
             <h2 id="rosie-go">rosie go</h2>
 

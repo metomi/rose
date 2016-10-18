@@ -23,6 +23,7 @@
 # SYNOPSIS
 #     rose bush start [PORT] # start ad-hoc web service server (on PORT)
 #     rose bush stop         # stop ad-hoc web service server
+#     rose bush stop -y      # stop ad-hoc web service server w/o prompting
 #     rose bush              # print status of ad-hoc web service server
 #
 # DESCRIPTION
@@ -32,5 +33,12 @@
 #
 #     Rose Bush is a web service for browsing users' Rose suite logs via an
 #     HTTP interface.
+#
+# OPTIONS
+#     --non-interactive, --yes, -y
+#         (For stop only.) Switch off interactive prompting (=answer yes to
+#         everything)
+#     --service-root, -R
+#         (For start only.) Include web service name under root of URL.
 #-------------------------------------------------------------------------------
 exec python -m rose.bush "$@"
