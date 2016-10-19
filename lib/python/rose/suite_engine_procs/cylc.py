@@ -1595,7 +1595,7 @@ class CylcProcessor(SuiteEngineProcessor):
         cursor = self._db_exec(
             db_name, user_name, suite_name,
             "SELECT name FROM sqlite_master WHERE name==?", [table_name])
-        return cursor.fetchone() is not None
+        return (cursor and cursor.fetchone() is not None)
 
     def _db_init(self, db_name, user_name, suite_name):
         """Initialise a named database connection."""
