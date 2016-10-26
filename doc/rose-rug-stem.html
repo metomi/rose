@@ -390,8 +390,9 @@ rose stem --group=mygroup --group=myothergroup
                       Python style format specifiers these will be expanded
                       using the list of files above (if provided).</li>
                     <li><i>kgo_file</i> - if the list of files above was 
-                      provided indicates which file was the "kgo" or "control"
-                      file for use with the KGO database (if active).</li>
+                      provided gives the (0-based) index of the file holding
+                      the "kgo" or "control" output for use with the comparisons
+                      database (if active).</li>
                   </ul>
                 </li>
                 <li><b>SingleCommandPattern:</b> Runs a shell command, then
@@ -403,9 +404,10 @@ rose stem --group=mygroup --group=myothergroup
                     <li><i>command</i> - the command to run; if it contains
                       Python style format specifiers these will be expanded
                       using the list of files above (if provided).</li>
-                    <li><i>kgo_file</i> - if the list of files above was 
-                      provided indicates which file was the "kgo" or "control"
-                      file for use with the KGO database (if active).</li>
+                   <li><i>kgo_file</i> - if the list of files above was 
+                      provided gives the (0-based) index of the file holding
+                      the "kgo" or "control" output for use with the comparisons
+                      database (if active).</li>
                     <li><i>pattern</i> - the regular expression to search for
                       in the stdout from the command.</li>
                   </ul>
@@ -415,9 +417,10 @@ rose stem --group=mygroup --group=myothergroup
                   <ul>
                     <li><i>files</i> - a newline-separated list of filenames
                       to be compared.</li>
-                    <li><i>kgo_file</i> - if the list of files above was 
-                      provided indicates which file was the "kgo" or "control"
-                      file for use with the KGO database (if active).</li>
+                   <li><i>kgo_file</i> - if the list of files above was 
+                      provided gives the (0-based) index of the file holding
+                      the "kgo" or "control" output for use with the comparisons
+                      database (if active).</li>
                     <li><i>pattern</i> - the regular expression to search for
                       in the files.  The expression should include one or more
                       capture groups; each of these will be compared between
@@ -436,9 +439,10 @@ rose stem --group=mygroup --group=myothergroup
                   <ul>
                     <li><i>files</i> - a newline-separated list of filenames
                       to be substitued into the command.</li>
-                    <li><i>kgo_file</i> - if the list of files above was 
-                      provided indicates which file was the "kgo" or "control"
-                      file for use with the KGO database (if active).</li>
+                   <li><i>kgo_file</i> - if the list of files above was 
+                      provided gives the (0-based) index of the file holding
+                      the "kgo" or "control" output for use with the comparisons
+                      database (if active).</li>
                     <li><i>pattern</i> - the regular expression to search for
                       in the stdout.  The expression should include one or more
                       capture groups; each of these will be compared between
