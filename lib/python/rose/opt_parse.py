@@ -586,6 +586,12 @@ class RoseOptionParser(OptionParser):
             ["--suffix-delim"],
             {"metavar": "DELIMITER",
              "help": "Specify the suffix delimiter."}],
+        "suite_only": [
+            ["--suite-only"],
+            {"action": "store_true",
+             "dest": "suite_only",
+             "default": False,
+             "help": "Run only for suite level macros."}],
         "task": [
             ["--task", "-t"],
             {"action": "append",

@@ -23,7 +23,7 @@
 init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
-tests 38
+tests 40
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE-base
@@ -221,6 +221,18 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
     env=SUITE=sweet
         Not an integer: 'sweet'
 __ERR__
+
+# run with --suite-only option
+TEST_KEY=$TEST_KEY_BASE-suite-only
+run_pass "$TEST_KEY" rose macro -C $TEST_DIR/$TEST_SUITE/app --suite-only
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[INFO] suite: test-suite
+[V] rose.macros.DefaultValidators
+    # Runs all the default checks, such as compulsory checking.
+[T] rose.macros.DefaultTransforms
+    # Runs all the default fixers, such as trigger fixing.
+__OUT__
+
 rm -r $TEST_DIR/$TEST_SUITE
 #-------------------------------------------------------------------------------
 exit
