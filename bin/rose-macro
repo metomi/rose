@@ -48,6 +48,8 @@
 #         there is at least one transformer in the argument list.
 #     --quiet, -q
 #         Reduce verbosity.
+#     --suite-only
+#         Run only for suite level macros.
 #     --validate, -V
 #         Prepend all validators to the argument list.
 #

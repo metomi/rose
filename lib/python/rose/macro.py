@@ -1273,7 +1273,7 @@ def parse_macro_args(argv=None):
     """Parse options/arguments for rose macro and upgrade."""
     opt_parser = RoseOptionParser()
     options = ["conf_dir", "meta_path", "non_interactive", "output_dir",
-               "fix", "validate_all", "no_warn"]
+               "fix", "validate_all", "no_warn", "suite_only"]
     opt_parser.add_my_options(*options)
     if argv is None:
         opts, args = opt_parser.parse_args()
@@ -1335,7 +1335,7 @@ def _report_error(exception=None, text=""):
     )
 
 
-def scan_rose_directory(conf_dir):
+def scan_rose_directory(conf_dir, suite_only=False):
     """Scans up the directory tree until it encounters a config file returning
     the type of file it encountered (i.e. TOP_CONFIG_NAME, SUB_CONFIG_NAME)
     along with a list of app directories.
@@ -1349,14 +1349,19 @@ def scan_rose_directory(conf_dir):
         lstdir = set(os.listdir(path))
         # does this dir contain a top level config file ?
         if lstdir & set([rose.TOP_CONFIG_NAME]):
-            apps = [conf.replace('/' + rose.SUB_CONFIG_NAME, '') for conf in
-                    glob.glob(os.path.join(path, rose.SUB_CONFIGS_DIR, '*',
-                                           rose.SUB_CONFIG_NAME))]
-            apps.sort()
+            if suite_only:
+                apps = []
+            else:
+                apps = [conf.replace('/' + rose.SUB_CONFIG_NAME, '')
+                        for conf in glob.glob(os.path.join(
+                            path,
+                            rose.SUB_CONFIGS_DIR, '*',
+                            rose.SUB_CONFIG_NAME))]
+                apps.sort()
             apps.append(path)  # add the suite dir to the list of apps
             return rose.TOP_CONFIG_NAME, apps
         # does this dir contain an app level config file ?
-        elif lstdir & set([rose.SUB_CONFIG_NAME]):
+        elif not suite_only and lstdir & set([rose.SUB_CONFIG_NAME]):
             return rose.SUB_CONFIG_NAME, [path]
         path = os.path.dirname(path)
         if path == os.path.dirname(path):
@@ -1372,7 +1377,7 @@ def main():
     opts, args = parse_macro_args()
 
     # get list of apps to evaluate
-    conf_type, apps = scan_rose_directory(opts.conf_dir)
+    conf_type, apps = scan_rose_directory(opts.conf_dir, opts.suite_only)
     if conf_type != rose.SUB_CONFIG_NAME and opts.output_dir is not None:
         reporter(ERROR_OUT_DIR_MULTIPLE_APPS,
                  kind=rose.reporter.Reporter.KIND_ERR,
