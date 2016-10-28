@@ -888,25 +888,26 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         include_system=True,
         no_warn=no_warn
     )
-    # Add all validator macros to the run list if specified.
+
+    # Add all macros to the run list as specified.
+    methods = []
     if opt_validate_all:
+        methods.append(VALIDATE_METHOD)
+    if opt_fix:
+        methods.append(TRANSFORM_METHOD)
+    macros_by_type = {}
+    for macro_method in methods:
+        macros_by_type[macro_method] = []
         for module_name, class_name, method, help in macro_tuples:
-            if method == VALIDATE_METHOD:
+            if method == macro_method:
                 macro_name = ".".join([module_name, class_name])
-                macro_names.insert(0, macro_name)
-        if not macro_names:
+                macros_by_type[macro_method].append(macro_name)
+        if not macros_by_type[macro_method]:
             return True
-    elif opt_fix:
-        for module_name, class_name, method, help in macro_tuples:
-            if module_name != rose.macros.__name__:
-                continue
-            if method == TRANSFORM_METHOD:
-                macro_name = ".".join([module_name, class_name])
-                macro_names.insert(0, macro_name)
-        if not macro_names:
-            return True
+
     # List all macros if none are given.
-    if not macro_names:
+    if not macro_names and not [macros_by_type[method] for method in
+                                macros_by_type]:
         for module_name, class_name, method, help in macro_tuples:
             macro_name = ".".join([module_name, class_name])
             macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], macro_name)
@@ -917,7 +918,6 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         return True
 
     # Categorise macros given as arguments.
-    macros_by_type = {}
     macros_not_found = [m for m in macro_names]
     for module_name, class_name, method, help in macro_tuples:
         this_macro_name = ".".join([module_name, class_name])
