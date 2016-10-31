@@ -369,10 +369,7 @@ class EntryArrayValueWidget(gtk.HBox):
             text = self.entries[-1].get_text()
             entry = self.entries.pop()
         self.populate_table()
-        if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
-                rose.META_PROP_VALUE_TRUE or text):
-            # Optional, or compulsory but not blank.
-            self.setter(entry)
+        self.setter(entry)
 
     def setter(self, widget):
         """Reconstruct the new variable value from the entry array."""
