@@ -20,6 +20,7 @@
 
 import ast
 import re
+import shlex
 import sys
 
 import pygtk
@@ -424,7 +425,7 @@ def spaced_array_join(values):
 def spaced_array_split(value):
     """Split the value into elements with appropriate string values."""
     try:
-        value_array = value.split(" ")
+        value_array = shlex.split(value)
     except (SyntaxError, ValueError):
         value_array = rose.variable.array_split(value)
     return value_array
