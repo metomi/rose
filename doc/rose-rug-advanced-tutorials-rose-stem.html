@@ -351,23 +351,20 @@ SOURCE_SPACESHIP='fcm:spaceship_tr@head'
             <div class="slide">
               <h2 class="alwayshidden">rose ana config</h2>
               <pre class="prettyprint lang-rose_conf">
-[Check X position at each timestep]
-comparison=Exact
-extract=OutputGrepper:'^\s*Position:\s*(.*?)\s*,'
-kgo1file=/home/user/spaceship/kgo.txt
-resultfile=../spaceship/output.txt
+[ana:grepper.FilePattern(Check X position at each timestep)]
+pattern='^\s*Position:\s*(.*?)\s*,'
+files=/home/user/spaceship/kgo.txt
+     =../spaceship/output.txt
 
-[Check Y position at each timestep]
-comparison=Exact
-extract=OutputGrepper:'^\s*Position:.*?,\s*(.*?)\s*,'
-kgo1file=/home/user/spaceship/kgo.txt
-resultfile=../spaceship/output.txt
+[ana:grepper.FilePattern(Check Y position at each timestep)]
+pattern='^\s*Position:.*?,\s*(.*?)\s*,'
+files=/home/user/spaceship/kgo.txt
+     =../spaceship/output.txt
 
-[Check Z position at each timestep]
-comparison=Exact
-extract=OutputGrepper:'^\s*Position:.*,\s*(.*)\s*$'
-kgo1file=/home/user/spaceship/kgo.txt
-resultfile=../spaceship/output.txt
+[ana:grepper.FilePattern(Check Z position at each timestep)]
+pattern='^\s*Position:.*,\s*(.*)\s*$'
+files=/home/user/spaceship/kgo.txt
+     =../spaceship/output.txt
 </pre>
 
               <p>This will check that the positions reported by the
@@ -383,7 +380,7 @@ resultfile=../spaceship/output.txt
               "etc/rose-rug-advanced-tutorials-rose-stem/src/kgo.txt.html">
               these contents</a>. Replace the
               <code>/home/user/spaceship</code> path in the
-              <code>kgo1file</code> variable with the path to this
+              <code>files</code> variable list with the path to this
               file.</p>
 
               <p>The <em>known good output</em> should be the

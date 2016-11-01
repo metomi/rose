@@ -24,30 +24,20 @@
 import glob
 import inspect
 import os
+import abc
 import re
 import sys
 import sqlite3
 import time
+import traceback
+import fcntl
+from contextlib import contextmanager
 
 # Rose modules
-import rose.config
-from rose.env import env_var_process
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
-from rose.reporter import Reporter, Event
+from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.app_run import BuiltinApp
-
-WARN = -1
-PASS = 0
-FAIL = 1
-
-MAX_KGO_FILES = 100
-
-OPTIONS = ["method_path"]
-
-USRCOMPARISON_DIRNAME = "comparisons"
-USRCOMPARISON_EXT = ".py"
+from rose.env import env_var_process
 
 
 class KGODatabase(object):
@@ -55,94 +45,97 @@ class KGODatabase(object):
     KGO Database object, stores comparison information for rose_ana apps.
 
     """
-    # Stores retries of database creation and the maximum allowed number
-    # of retries before an exception is raised
-    RETRIES = 0
-    MAX_RETRIES = 5
+    # This SQL command ensures a "comparisons" table exists in the database
+    # and then populates it with a series of columns (which in this case
+    # are all storing strings/text). The primary key is the comparison name
+    # (as it must uniquely identify each row)
+    CREATE_COMPARISON_TABLE = """
+        CREATE TABLE IF NOT EXISTS comparisons (
+        app_task TEXT,
+        kgo_file TEXT,
+        suite_file TEXT,
+        status TEXT,
+        comparison TEXT,
+        PRIMARY KEY(app_task))
+        """
+    # This SQL command ensures a "tasks" table exists in the database
+    # and then populates it with a pair of columns (the task name and
+    # a completion status indicator). The primary key is the task name
+    # (as it must uniquely identify each row)
+    CREATE_TASKS_TABLE = """
+        CREATE TABLE IF NOT EXISTS tasks (
+        task_name TEXT,
+        completed INT,
+        PRIMARY KEY(task_name))
+        """
 
     def __init__(self):
         "Initialise the object."
-        self.file_name = os.path.join(
-            os.getenv("ROSE_SUITE_DIR"), "log", "rose-ana-comparisons.db")
-        self.conn = None
-        self.create()
-
-    def get_conn(self):
-        "Return a connection to the database if it exists."
-        if self.conn is None:
-            self.conn = sqlite3.connect(self.file_name, timeout=60.0)
-        return self.conn
-
-    def create(self):
-        "If the databaste doesn't exist, create it."
-        conn = self.get_conn()
-        # This SQL command ensures a "comparisons" table exists in the database
-        # and then populates it with a series of columns (which in this case
-        # are all storing strings/text). The primary key is the comparison name
-        # (as it must uniquely identify each row)
-        sql_statement = """
-            CREATE TABLE IF NOT EXISTS comparisons (
-            app_task TEXT,
-            kgo_file TEXT,
-            suite_file TEXT,
-            status TEXT,
-            comparison TEXT,
-            PRIMARY KEY(app_task))
-            """
-        self.execute_sql_retry(conn, (sql_statement,))
-        # This SQL command ensures a "tasks" table exists in the database
-        # and then populates it with a pair of columns (the task name and
-        # a completion status indicator). The primary key is the task name
-        # (as it must uniquely identify each row)
-        sql_statement = """
-            CREATE TABLE IF NOT EXISTS tasks (
-            task_name TEXT,
-            completed INT,
-            PRIMARY KEY(task_name))
-            """
-        self.execute_sql_retry(conn, (sql_statement,))
-        conn.commit()
-
-    def execute_sql_retry(self, conn, sql_args, retries=10, timeout=5.0):
-        """
-        Given a connection object and a tuple of the desired arguments;
-        calls sql execute and retries multiple times, to handle
-        concurrency issues
-
-        """
-        for retry in range(retries):
-            try:
-                conn.execute(*sql_args)
-                return
-            except:
-                time.sleep(timeout)
-        # In the event that the retries are exceeded, re-raise the final
-        # exception for the calling application to handle
-        raise
+        self.statement_buffer = []
 
     def enter_comparison(
             self, app_task, kgo_file, suite_file, status, comparison):
-        "Insert a new comparison entry to the database."
-        conn = self.get_conn()
+        """Add a command to insert a new comparison entry to the database."""
         # This SQL command indicates that a single "row" is to be entered into
         # the "comparisons" table
         sql_statement = (
             "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)")
         sql_args = [app_task, kgo_file, suite_file, status, comparison]
-        self.execute_sql_retry(conn, (sql_statement, sql_args))
-
-        conn.commit()
+        # Add the command and arguments to the buffer
+        self.statement_buffer.append((sql_statement, sql_args))
 
     def enter_task(self, app_task, status):
-        "Insert a new task entry to the database."
-        conn = self.get_conn()
+        """Add a command to insert a new task entry to the database."""
         # This SQL command indicates that a single "row" is to be entered into
         # the "tasks" table
         sql_statement = "INSERT OR REPLACE INTO tasks VALUES (?, ?)"
         sql_args = [app_task, status]
-        self.execute_sql_retry(conn, (sql_statement, sql_args))
+        # Add the command and arguments to the buffer
+        self.statement_buffer.append((sql_statement, sql_args))
 
-        conn.commit()
+    @contextmanager
+    def database_lock(self, lockfile, reporter=None):
+        """Context manager which obtains an exclusive file-based lock."""
+        lock = open(lockfile, "w")
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if reporter is not None:
+            reporter("Acquired DB lock at: " + time.asctime())
+        lock.write("{0}".format(os.getpid()))
+        reporter("Writing results to KGO Database...")
+        yield
+        fcntl.flock(lock, fcntl.LOCK_UN)
+        if reporter is not None:
+            reporter("Released DB lock at: " + time.asctime())
+        lock.close()
+
+    def buffer_to_db(self, reporter=None):
+        """Flush the buffer; executing all the commands in one transaction."""
+        # If the buffer is empty, there isn't anything to do
+        if len(self.statement_buffer) == 0:
+            return
+        # Otherwise locate the database
+        file_name = os.path.join(
+            os.getenv("ROSE_SUITE_DIR"), "log", "rose-ana-comparisons.db")
+        lock_name = file_name + ".lock"
+
+        if reporter is not None:
+            for statement in self.statement_buffer:
+                reporter(str(statement), level=reporter.V)
+
+        # Acquire a file lock to ensure exclusive access, then connect to the
+        # database and commit each command from the buffer
+        with self.database_lock(lock_name, reporter):
+            conn = sqlite3.connect(file_name, timeout=60.0)
+            # Ensure that the tables exist
+            conn.execute(self.CREATE_COMPARISON_TABLE)
+            conn.execute(self.CREATE_TASKS_TABLE)
+            # Apply each command from the buffer
+            for statement, args in self.statement_buffer:
+                conn.execute(statement, args)
+            # Finalise the database
+            conn.commit()
+        # Empty the buffer in case it gets re-used
+        self.statement_buffer = []
 
 
 class RoseAnaApp(BuiltinApp):
@@ -150,83 +143,382 @@ class RoseAnaApp(BuiltinApp):
     """Run rosa ana as an application."""
 
     SCHEME = "rose_ana"
+    _prefix_pass = "[ OK ] "
+    _prefix_fail = "[FAIL] "
+    _printbar_width = 80
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Implement the "rose ana" command"""
+        # Initialise properties which will be needed later.
+        self._task = app_runner.suite_engine_proc.get_task_props()
+        self.task_name = self._task.task_name
+        self.opts = opts
+        self.args = args
+        self.config = conf_tree.node
+        self.app_runner = app_runner
 
-        # Get config file option for user-specified method paths
-        method_paths = [os.path.join(os.path.dirname(__file__),
-                        USRCOMPARISON_DIRNAME)]
-        conf = ResourceLocator.default().get_conf()
+        # Attach to the main rose config (for retrieving settings from things
+        # like the user's ~/.metomi/rose.conf)
+        self.rose_conf = ResourceLocator.default().get_conf()
 
-        my_conf = conf.get_value(["rose-ana", "method-path"])
-        if my_conf:
-            for item in my_conf.split():
-                method_paths.append(item)
+        # Attach to a reporter instance for sending messages.
+        self._init_reporter(app_runner.event_handler)
 
-        # Initialise the analysis engine
-        engine = Analyse(conf_tree.node, opts, args, method_paths,
-                         reporter=app_runner.event_handler,
-                         popen=app_runner.popen)
+        # As part of the introduction of a re-written rose_ana, backwards
+        # compatibility is maintained here by detecting the lack of the
+        # newer syntax in the app config and falling back to the old version
+        # of the rose_ana app (renamed to rose_ana_v1)
+        # **Once the old behaviour is removed the below block can be too**.
+        new_style_app = False
+        for keys, node in self.config.walk(no_ignore=True):
+            task = keys[0]
+            if task.startswith("ana:"):
+                new_style_app = True
+                break
+        if not new_style_app:
+            # Use the previous app by instantiating and calling it explicitly
+            self.reporter("!!WARNING!! - Detected old style rose_ana app; "
+                          "Using previous rose_ana version...")
+            from rose.apps.rose_ana_v1 import RoseAnaV1App
+            old_app = RoseAnaV1App(manager=self.manager)
+            return old_app.run(
+                app_runner, conf_tree, opts, args, uuid, work_files)
 
-        # Initialise a database session
-        rose_ana_task_name = os.getenv("ROSE_TASK_NAME")
-        kgo_db = KGODatabase()
+        # If the user's config indicates that it should be used - attach
+        # to the KGO database instance in case it is needed later.
+        use_kgo = self.rose_conf.get_value(["rose-ana", "kgo-database"])
+        self.kgo_db = None
+        if use_kgo is not None and use_kgo == ".true.":
+            self.kgo_db = KGODatabase()
 
-        # Add an entry for this task, with a non-zero status code
-        kgo_db.enter_task(rose_ana_task_name, 1)
+        self.titlebar("Launching rose_ana")
 
-        # Run the analysis
-        num_failed, tasks = engine.analyse()
+        # Load available methods for analysis and the tasks in the app.
+        self._load_analysis_modules()
+        self._load_analysis_methods()
+        self._load_tasks()
 
-        # Update the database to indicate that the task succeeded
-        kgo_db.enter_task(rose_ana_task_name, 0)
+        number_of_failures = 0
+        task_error = False
+        summary_status = []
+        for itask, task in enumerate(self.analysis_tasks):
+            # Report the name of the task and a banner line to aid readability.
+            self.titlebar("Running task #{0}".format(itask + 1))
+            self.reporter("Method: {0}".format(task.options["full_task_name"]))
 
-        # Update the database
-        for task in tasks:
-            # The primary key in the database is composed from both the
-            # rose_ana app name and the task index (to make it unique)
-            app_task = "{0} ({1})".format(rose_ana_task_name, task.name)
-            # Include an indication of what extract/comparison was performed
-            comparison = "{0} : {1} : {2}".format(
-                task.comparison, task.extract, getattr(task, "subextract", ""))
-            kgo_db.enter_comparison(app_task, task.kgo1file, task.resultfile,
-                                    task.userstatus, comparison)
+            # Since the run_analysis method is out of rose's control in many
+            # cases the safest thing to do is a blanket try/except; since we
+            # have no way of knowing what exceptions might be raised.
+            try:
+                task.run_analysis()
+                # In the case that the task didn't raise any exception,
+                # we can now check whether it passed or failed.
+                if task.passed:
+                    msg = "Task #{0} passed".format(itask + 1)
+                    summary_status.append(("{0} ({1})".format(
+                        msg, task.options["full_task_name"]),
+                        self._prefix_pass))
+                    self.reporter(msg, prefix=self._prefix_pass)
+                else:
+                    number_of_failures += 1
+                    msg = "Task #{0} did not pass".format(itask + 1)
+                    summary_status.append(("{0} ({1})".format(
+                        msg, task.options["full_task_name"]),
+                        self._prefix_fail))
+                    self.reporter(msg, prefix=self._prefix_fail)
 
-        if num_failed != 0:
-            raise TestsFailedException(num_failed)
+            except Exception as err:
+                # If an exception was raised, print a traceback and treat it
+                # as a failure.
+                task_error = True
+                number_of_failures += 1
+                msg = "Task #{0} encountered an error".format(itask + 1)
+                summary_status.append(("{0} ({1})".format(
+                    msg, task.options["full_task_name"]),
+                    self._prefix_fail))
+                self.reporter(msg + " (see stderr)", prefix=self._prefix_fail)
+                exception = traceback.format_exc()
+                self.reporter(msg, prefix=self._prefix_fail,
+                              kind=self.reporter.KIND_ERR)
+                self.reporter(exception, prefix=self._prefix_fail,
+                              kind=self.reporter.KIND_ERR)
+
+        # The KGO database (if needed by the task) also stores its status - to
+        # indicate whether there was some unexpected exception above.  If there
+        # were no such exceptions only output the task status to the database
+        # if there were other other commands added by the tasks.
+        if self.kgo_db is not None:
+            if task_error:
+                self._kgo_db_task_status(1)
+            elif len(self.kgo_db.statement_buffer) != 0:
+                self._kgo_db_task_status(0)
+
+            if len(self.kgo_db.statement_buffer) != 0:
+                self.titlebar("Updating KGO database")
+
+            self.kgo_db.buffer_to_db(self.reporter)
+
+        # Summarise the results of the tasks
+        self.titlebar("Summary")
+        for line, prefix in summary_status:
+            self.reporter(line, prefix=prefix)
+
+        if number_of_failures > 0:
+            msg = "{0}/{1} Tasks did not pass"
+            self.reporter(msg.format(number_of_failures, len(summary_status)),
+                          prefix=self._prefix_fail)
+        else:
+            self.reporter("All Tasks passed", prefix=self._prefix_pass)
+
+        self.titlebar("Completed rose_ana")
+
+        # Finally if there were legitimate test failures raise an exception
+        # so that the task is caught by cylc as failed.
+        if number_of_failures > 0:
+            raise TestsFailedException(number_of_failures)
+
+    def titlebar(self, title):
+        sidebarlen = (self._printbar_width - len(title) + 1) / 2 - 1
+        self.reporter("{0} {1} {0}".format("*" * sidebarlen, title))
+
+    def _init_reporter(self, reporter=None):
+        """Attach a reporter instance to the class."""
+        if reporter is None:
+            self.reporter = Reporter(self.opts.verbosity - self.opts.quietness)
+        else:
+            self.reporter = reporter
+
+    def _kgo_db_add_file_pair(self, name, user_info, status,
+                              suite_file, kgo_file):
+        """
+        Add information about a pair of compared files to the KGO database,
+        which some analysis (comparison) tasks may wish to make use of.
+
+        Args:
+            * name:
+                The name of the analysis (comparison) task.
+            * user_info:
+                Additional user-supplied details describing the task.
+            * status:
+                Numeric task status indicator.
+            * suite_file:
+                Full path to the file in the suite.
+            * kgo_file:
+                Full path to the file containing the KGO.
+
+        """
+        # The primary key in the database is composed from both the
+        # rose_ana app name and the task index (to make it unique)
+        app_task = "{0} ({1})".format(self.task_name, name)
+        self.kgo_db.enter_comparison(app_task, kgo_file, suite_file,
+                                     status, user_info)
+
+    def _kgo_db_task_status(self, status):
+        """
+        Update the entry for this task in the KGO database to indicate that
+        it has either finished processing analysis tasks or gone wrong.
+
+        """
+        self.kgo_db.enter_task(self.task_name, status)
+
+    def _load_analysis_modules(self):
+        """Populate the list of modules containing analysis methods."""
+        # Find the possible paths that could contain modules
+        method_paths = self._get_method_paths()
+
+        # Report the paths that were found
+        self.reporter("Method module search-paths:")
+        for path in method_paths:
+            self.reporter(" * {0}".format(path))
+
+        self.modules = set([])
+        for path in method_paths:
+            # Add the method path to the start of the sys.path
+            sys.path.insert(0, os.path.abspath(path))
+            for filename in glob.glob(os.path.join(path, "*.py")):
+                # Find python files and attempt to import them; if a module
+                # fails to import report it but don't crash (the module may
+                # not actually be needed by this task)
+                module_name = os.path.splitext(
+                    os.path.basename(filename))[0]
+                try:
+                    self.modules.add(__import__(module_name))
+                except Exception as err:
+                    msg = "Failed to import module: {0} ".format(module_name)
+                    self.reporter(msg, prefix="[FAIL] ",
+                                  kind=self.reporter.KIND_ERR)
+                    exception = traceback.format_exc().split("\n")
+                    for line in exception:
+                        self.reporter(line, prefix="[FAIL]   ",
+                                      kind=self.reporter.KIND_ERR)
+
+            # Remove the method path from the sys.path
+            sys.path.pop(0)
+        self.modules = list(self.modules)
+        self.modules.sort()
+
+        # Report the modules which were loaded
+        self.reporter("Method modules loaded:")
+        for module in self.modules:
+            self.reporter(" * {0}".format(module))
+
+    def _load_analysis_methods(self):
+        """Populate the list of analysis methods."""
+        self.methods = {}
+        for module in self.modules:
+            module_name = module.__name__
+            method_classes = inspect.getmembers(module, inspect.isclass)
+            for method_class_name, method_class in method_classes:
+                if hasattr(method_class, "run_analysis"):
+                    name = ".".join([module_name, method_class_name])
+                    self.methods[name] = method_class
+
+        # Report the methods which were loaded
+        self.reporter("Methods available:")
+        for method in sorted(self.methods):
+            self.reporter(" * {0}".format(method))
+
+    def _load_tasks(self):
+        """Populate the list of analysis tasks from the app config."""
+        # Fill a dictionary of tasks and extract their options and values
+        # - skipping any which are user/trigger-ignored
+        _tasks = {}
+        for keys, node in self.config.walk(no_ignore=True):
+            task = keys[0]
+            if task.startswith("ana:"):
+                # Capture the options only and save them to the tasks dict
+                task = task.split(":", 1)[1]
+                if len(keys) == 2:
+                    _tasks.setdefault(task, {})
+                    # If the value contains newlines, split it into a list
+                    # and either way remove any quotation marks and process
+                    # any environment variables
+                    value = env_var_process(node.value)
+                    values = value.split("\n")
+                    for ival, value in enumerate(values):
+                        values[ival] = (
+                            re.sub(r"^((?:'|\")*)(.*)(\1)$", r"\2", value))
+
+                    # If the user passed a blank curled-braces expression
+                    # it should be expanded to contain each of the arguments
+                    # passed to rose_ana
+                    new_values = []
+                    for value in values:
+                        if "{}" in value:
+                            if self.args is not None and len(self.args) > 0:
+                                for arg in self.args:
+                                    new_values.append(value.replace("{}", arg))
+                            else:
+                                new_values.append(value)
+                        else:
+                            new_values.append(value)
+                    values = new_values
+
+                    if len(values) == 1:
+                        values = values[0]
+                    _tasks[task][keys[1]] = values
+
+        # Can now populate the output task list with analysis objects
+        self.analysis_tasks = []
+        for name in sorted(_tasks.keys()):
+            options = _tasks[name]
+            options["full_task_name"] = name
+            # Create an analysis object for each task, passing through
+            # all options given to the section in the app, the given name
+            # starts with the comparison type and then optionally a
+            # name/description, extract this here
+            match = re.match(r"(?P<atype>[\w\.]+)(?:\((?P<descr>.*)\)|)", name)
+            if match:
+                options["description"] = match.group("descr")
+                atype = match.group("atype")
+
+            # Assuming this analysis task has been loaded by the app, create
+            # an instance of the task, passing the options to it
+            if atype in self.methods:
+                self.analysis_tasks.append(self.methods[atype](self, options))
+            else:
+                msg = "Unrecognised analysis type: {0}"
+                raise ValueError(msg.format(atype))
+
+    def _get_method_paths(self):
+        """Create a listing of paths for analysis methods."""
+        # Setup the return list - the order of preference is earliest-first,
+        # allowing methods to be overridden if sharing the same namespace
+        method_paths = []
+
+        # The app may defines an "ana" directory specific to the app
+        app_dir_var = "ROSE_TASK_APP"
+        suite_dir = os.environ["ROSE_SUITE_DIR"]
+        if app_dir_var not in os.environ:
+            app_dir_var = "ROSE_TASK_NAME"
+        app_dir = os.path.join(
+            suite_dir, "app", os.environ[app_dir_var], "ana")
+        if os.path.exists(app_dir):
+            method_paths.append(app_dir)
+
+        # The suite can have an "ana" directory which the apps may use
+        ana_dir = os.path.join(suite_dir, "ana")
+        if os.path.exists(ana_dir):
+            method_paths.append(ana_dir)
+
+        # The rose config can specify a directory for site-specific methods
+        config_paths = self.rose_conf.get_value(["rose-ana", "method-path"])
+        if config_paths:
+            for config_dir in config_paths.split():
+                if os.path.exists(config_dir):
+                    method_paths.append(config_dir)
+
+        # Finally there are some built-in methods within Rose itself
+        method_paths.append(
+            os.path.join(os.path.dirname(__file__), "ana_builtin"))
+
+        return method_paths
 
 
-class DataLengthError(Exception):
+class AnalysisTask(object):
+    """
+    Base class for an analysis task; all custom user tasks should inherit
+    from this class and override the "run_analysis" method to perform
+    whatever analysis is required.
 
-    """An exception if KGO and result data are of different lengths."""
+    """
+    __metaclass__ = abc.ABCMeta
 
-    def __init__(self, task):
-        self.resultlen = len(task.resultdata)
-        self.kgolen = len(task.kgo1data)
-        self.taskname = task.name
+    def __init__(self, parent_app, task_options):
+        """
+        Initialise the analysis task, storing the user specified options
+        dictionary and a reference to the parent app.
 
-    def __repr__(self):
-        return "Mismatch in data lengths in %s (%s and %s)" % (
-            self.taskname, self.resultlen, self.kgolen)
+        """
+        self.parent = parent_app
+        self.options = task_options
 
-    __str__ = __repr__
+        self.passed = False
 
+    @abc.abstractmethod
+    def run_analysis(self):
+        """
+        Will be called to start the analysis code; this method should be
+        overidden by the user's class to perform the desired analysis.
 
-class TaskCompletionEvent(Event):
+        """
+        msg = "Abstract analysis task class should never be called directly"
+        raise ValueError(msg)
 
-    """Event for completing a comparison from AnalysisTask."""
+    def process_opt_unhandled(self):
+        """
+        Options should be removed from the options dictionary as they are
+        processed; this method may then be called to catch and unknown options
 
-    def __init__(self, task):
-        self.message = task.message
-        self.userstatus = task.userstatus
-        self.level = Event.DEFAULT
-        self.kind = Event.KIND_OUT
-
-    def __repr__(self):
-        return " %s" % (self.message)
-
-    __str__ = __repr__
+        """
+        unhandled = []
+        for option in self.options:
+            if option not in ["full_task_name", "description"]:
+                unhandled.append(option)
+        if len(unhandled) > 0:
+            msg = ("Options provided but not understood for this "
+                   "analysis type: {0}")
+            raise ValueError(msg.format(unhandled))
 
 
 class TestsFailedException(Exception):
@@ -234,366 +526,11 @@ class TestsFailedException(Exception):
     """Exception raised if any rose-ana comparisons fail."""
 
     def __init__(self, num_failed):
-        self.rc = num_failed
+        self.failed = num_failed
 
     def __repr__(self):
-        return "%s tests did not pass" % (self.rc)
+        msg = "{0} test{1} did not pass".format(
+            self.failed, {1: ""}.get(self.failed, "s"))
+        return msg
 
     __str__ = __repr__
-
-
-class Analyse(object):
-
-    """A comparison engine for Rose."""
-
-    def __init__(self, config, opts, args, method_paths, reporter=None,
-                 popen=None):
-        if reporter is None:
-            self.reporter = Reporter(opts.verbosity - opts.quietness)
-        else:
-            self.reporter = reporter
-        if popen is None:
-            self.popen = RosePopener(event_handler=self.reporter)
-        else:
-            self.popen = popen
-        self.opts = opts
-        self.args = args
-        self.config = config
-        self.load_tasks()
-        modules = []
-        for path in method_paths:
-            for filename in glob.glob(path + "/*.py"):
-                modules.append(filename)
-        self.load_user_comparison_modules(modules)
-
-    def analyse(self):
-        """Perform comparisons given a list of tasks."""
-        rc = 0
-        for task in self.tasks:
-
-            if self.check_extract(task):
-                # Internal AnalysisEngine extract+comparison test
-
-                # Extract data from results and from kgoX
-                task = self.do_extract(task, "result")
-
-                for i in range(task.numkgofiles):
-                    var = "kgo" + str(i + 1)
-                    task = self.do_extract(task, var)
-
-                task = self.do_comparison(task)
-            else:
-                # External program(s) doing test
-
-                # Command to run
-                command = task.extract
-
-                result = re.search(r"\$file", command)
-                # If the command contains $file, it is run separately for both
-                # the KGO and the result files
-                if result:
-                    # Replace $file token with resultfile or kgofile
-                    resultcommand = self._expand_tokens(command, task,
-                                                        "result")
-                    kgocommand = self._expand_tokens(command, task, "kgo1")
-
-                    # Run the command on the resultfile
-                    task.resultdata = self._run_command(resultcommand)
-
-                    # Run the command on the KGO file
-                    task.kgo1data = self._run_command(kgocommand)
-                else:
-                    # The command works on both files at the same time
-                    # Replace tokens $kgofile and $resultfile for actual values
-                    command = self._expand_tokens(command, task)
-
-                    # Run the command
-                    task.resultdata = self._run_command(command)
-
-                # Run the comparison
-                task = self.do_comparison(task)
-
-            self.reporter(TaskCompletionEvent(task),
-                          prefix="[%s]" % (task.userstatus))
-            if task.numericstatus != PASS:
-                rc += 1
-        return rc, self.tasks
-
-    def check_extract(self, task):
-        """Check if an extract name is present in a user method."""
-        for module_name, class_name, method, help in self.user_methods:
-            if task.extract == class_name:
-                return True
-        return False
-
-    def do_comparison(self, task):
-        """Run the comparison."""
-        for module_name, class_name, method, help in self.user_methods:
-            comparison_name = ".".join([module_name, class_name])
-            if task.comparison == class_name:
-                for module in self.modules:
-                    if module.__name__ == module_name:
-                        comparison_inst = getattr(module, class_name)()
-                        comparison_meth = getattr(comparison_inst, "run")(task)
-        return task
-
-    def do_extract(self, task, var):
-        """Extract the specified data."""
-        for module_name, class_name, method, help in self.user_methods:
-            extract_name = ".".join([module_name, class_name])
-            if task.extract == class_name:
-                for module in self.modules:
-                    if module.__name__ == module_name:
-                        extract_inst = getattr(module, class_name)()
-                        extract_meth = getattr(extract_inst, "run")(task, var)
-        return task
-
-    def _run_command(self, command):
-        """Run an external command using rose.popen."""
-        output, stderr = self.popen.run_ok(command, shell=True)
-        output = "".join(output).splitlines()
-        return output
-
-    def _expand_tokens(self, inputstring, task, var=None):
-        """Expands tokens $resultfile, $file and $kgoXfile."""
-        filename = ''
-        if var:
-            filename = getattr(task, var + "file")
-        expansions = {'resultfile': task.resultfile, 'file': filename}
-        for i in range(1, task.numkgofiles + 1):
-            key = "kgo" + str(i) + "file"
-            value = getattr(task, key)
-            expansions[key] = value
-        inputstring = inputstring.format(**expansions)
-        return inputstring
-
-    def _find_file(self, var, task):
-        """Finds a file given a variable name containing the filename.
-
-        Given a variable name and task object, this returns the filename it
-        points to, including expanding any * characters with glob.
-        """
-
-        filevar = var + "file"
-        if hasattr(task, filevar):
-            configvar = var + "fileconfig"
-            setattr(task, configvar, getattr(task, filevar))
-            filenames = glob.glob(env_var_process(getattr(task, filevar)))
-            if len(filenames) > 0:
-                setattr(task, filevar, os.path.abspath(filenames[0]))
-        return task
-
-    def load_tasks(self):
-        """Loads AnalysisTasks from files.
-
-        Given a list of files, return AnalysisTasks generated from those files.
-        This also expands environment variables in filenames, but saves the
-        original contents for use when writing out config files
-        """
-
-        tasks = []
-        for task in self.config.value.keys():
-            if task is "env":
-                continue
-            if task.startswith("file:"):
-                continue
-            newtask = AnalysisTask()
-            newtask.name = task
-            value = self.config.get_value([task, "resultfile"])
-
-            # If the task is ignored, this will be None, so continue
-            # on to the next task
-            if value is None:
-                continue
-
-            if "{}" in value:
-                newtask.resultfile = value.replace("{}", self.args[0])
-            else:
-                newtask.resultfile = value
-            newtask = self._find_file("result", newtask)
-            newtask.extract = self.config.get_value([task, "extract"])
-            result = re.search(r":", newtask.extract)
-            if result:
-                newtask.subextract = ":".join(newtask.extract.split(":")[1:])
-                newtask.extract = newtask.extract.split(":")[0]
-            newtask.comparison = self.config.get_value([task, "comparison"])
-            newtask.tolerance = env_var_process(self.config.get_value(
-                                                [task, "tolerance"]))
-            newtask.warnonfail = (
-                self.config.get_value([task, "warnonfail"]) in ["yes", "true"])
-
-            # Allow for multiple KGO, e.g. kgo1file, kgo2file, for
-            # statistical comparisons of results
-            newtask.numkgofiles = 0
-            for i in range(1, MAX_KGO_FILES):
-                kgovar = "kgo" + str(i)
-                kgofilevar = kgovar + "file"
-                if self.config.get([task, kgofilevar]):
-                    value = self.config.get([task, kgofilevar])[:]
-                    if "{}" in value:
-                        setattr(
-                            newtask, kgofilevar,
-                            value.replace("{}", self.args[0]))
-                    else:
-                        setattr(newtask, kgofilevar, value)
-                    newtask.numkgofiles += 1
-                    newtask = self._find_file(kgovar, newtask)
-                else:
-                    break
-            tasks.append(newtask)
-        self.tasks = tasks
-        return tasks
-
-    def load_user_comparison_modules(self, files):
-        """Import comparison modules and store them."""
-        modules = []
-        for filename in files:
-            directory = os.path.dirname(filename)
-            if (not directory.endswith(USRCOMPARISON_DIRNAME) or
-                    not filename.endswith(USRCOMPARISON_EXT)):
-                continue
-            comparison_name = os.path.basename(filename).rpartition(
-                USRCOMPARISON_EXT)[0]
-            sys.path.insert(0, os.path.abspath(directory))
-            try:
-                modules.append(__import__(comparison_name))
-            except ImportError as e:
-                self.reporter(e)
-            sys.path.pop(0)
-        modules.sort()
-        self.modules = modules
-
-        user_methods = []
-        for module in modules:
-            comparison_name = module.__name__
-            contents = inspect.getmembers(module, inspect.isclass)
-            for obj_name, obj in contents:
-                att_name = "run"
-                if hasattr(obj, att_name) and callable(getattr(obj, att_name)):
-                    doc_string = obj.__doc__
-                    user_methods.append((comparison_name, obj_name, att_name,
-                                        doc_string))
-        self.user_methods = user_methods
-        return user_methods
-
-    def write_config(self, filename, tasks):
-        """Write an analysis config file based on a list of tasks provided"""
-        config = rose.config.ConfigNode()
-
-        for task in tasks:
-            sectionname = task.name
-            if task.resultfileconfig:
-                config.set([sectionname, "resultfile"], task.resultfileconfig)
-            for i in range(1, task.numkgofiles + 1):
-                origvar = "kgo" + str(i) + "fileconfig"
-                valvar = "kgo" + str(i) + "file"
-                if hasattr(task, origvar):
-                    config.set([sectionname, valvar], getattr(task, origvar))
-            if task.extract:
-                config.set([sectionname, "extract"], task.extract)
-            if task.subextract:
-                config.set([sectionname, "extract"],
-                           task.extract + ":" + task.subextract)
-            if task.comparison:
-                config.set([sectionname, "comparison"], task.comparison)
-            if task.tolerance:
-                config.set([sectionname, "tolerance"], task.tolerance)
-            if task.warnonfail:
-                config.set([sectionname, "warnonfail"], "true")
-        rose.config.dump(config, filename)
-
-
-class AnalysisTask(object):
-
-    """Class to completely describe an analysis task.
-
-    Attributes:
-        name                    # Short description of test for the user
-        resultfile              # File generated by suite
-        kgo1file                # Known Good output file
-        comparison              # Comparison type
-        extract                 # Extract method
-        subextract              # Extract sub-type (if any)
-        tolerance               # Tolerance (optional in file)
-        warnonfail              # True if failure is just a warning
-        numkgofiles             # Number of KGO files
-        resultdata              # Data from result file
-        kgo1data                # Data from KGO file
-        ok                      # True if test didn"t fail
-        message                 # User message
-        userstatus              # User status
-        numericstatus           # Numeric status
-    """
-
-    def __init__(self):
-
-        # Variables defined in config file
-        self.name = None
-        self.resultfile = None
-        self.kgo1file = None
-        self.comparison = None
-        self.extract = None
-        self.tolerance = None
-        self.warnonfail = False
-        self.numkgofiles = 0
-
-# Variables to save settings before environment variable expansion (for
-# writing back to config file, rerunning, etc)
-        self.resultfileconfig = self.resultfile
-        self.kgofileconfig = self.kgo1file
-
-# Data variables filled by extract methods
-        self.resultdata = []
-        self.kgo1data = []
-
-# Variables set by comparison methods
-        self.ok = False
-
-        self.message = None
-        self.userstatus = "UNTESTED"
-        self.numericstatus = WARN
-
-# Methods for setting pass/fail/warn; all take an object of one of the
-# success/ failure/warning classes as an argument, which all have a sensible
-# user message as the string representation of them.
-    def set_failure(self, message):
-        """Sets the status of the task to "FAIL"."""
-
-        if self.warnonfail:
-            self.set_warning(message)
-        else:
-            self.ok = False
-            self.message = message
-            self.userstatus = "FAIL"
-            self.numericstatus = FAIL
-
-    def set_pass(self, message):
-        """Sets the status of the task to " OK "."""
-
-        self.ok = True
-        self.message = message
-        self.userstatus = " OK "
-        self.numericstatus = PASS
-
-    def set_warning(self, message):
-        """Sets the status of the task to "WARN"."""
-
-        self.ok = True
-        self.message = message
-        self.userstatus = "WARN"
-        self.numericstatus = WARN
-
-    def __repr__(self):
-        return "%s: %s" % (self.name, self.userstatus)
-
-    __str__ = __repr__
-
-
-def data_from_regexp(regexp, filename):
-    """Returns a list of text matching a regexp from a given file."""
-    numbers = []
-    for line in open(filename):
-        result = re.search(regexp, line)
-        if result:
-            numbers.append(result.group(1))
-    return numbers
