@@ -58,7 +58,7 @@ class IntSpinButtonValueWidget(gtk.HBox):
 
         if acceptable:
             entry = self.make_spinner(int_value)
-            signal = 'value-changed'
+            signal = 'changed'
         else:
             entry = gtk.Entry()
             entry.set_text(self.value)
