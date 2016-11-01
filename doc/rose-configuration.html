@@ -1055,8 +1055,8 @@ delays=0,6*PT10S,60*PT1M,PT1H
 
               <dt><code>mode</code></dt>
 
-              <dd><kbd>auto</kbd> (default), <kbd>mkdir</kbd> or
-              <kbd>symlink</kbd>. See below.</dd>
+              <dd><kbd>auto</kbd> (default), <kbd>mkdir</kbd>,
+              <kbd>symlink</kbd> or <kbd>symlink+</kbd>. See below.</dd>
             </dl>
 
             <p>The following is a list of all the supported
@@ -1085,7 +1085,17 @@ delays=0,6*PT10S,60*PT1M,PT1H
 
               <dd>Target is created as a symlink of an FS
               <var>SOURCE</var>. N.B. In this mode,
-              <var>SOURCE</var> must be a single source.</dd>
+              <var>SOURCE</var> must be a single source.
+              <var>SOURCE</var> does not have to exist when the
+              symbolic link is created.</dd>
+
+              <dt><code>mode=symlink+,source=SOURCE</code></dt>
+
+              <dd>Target is created as a symlink of an FS
+              <var>SOURCE</var>. N.B. In this mode,
+              <var>SOURCE</var> must be a single source.
+              <var>SOURCE</var> must exist when the symbolic
+              link is created.</dd>
             </dl>
 
             <p>The root level <code>schemes</code> setting: While

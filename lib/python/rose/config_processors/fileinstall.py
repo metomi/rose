@@ -153,7 +153,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         source_name = raw_source_name[1:-1]
                     if source_name.startswith("~"):
                         source_name = os.path.expanduser(source_name)
-                    if targets[name].mode == targets[name].MODE_SYMLINK:
+                    if targets[name].mode in [
+                            targets[name].MODE_SYMLINK,
+                            targets[name].MODE_SYMLINK_PLUS]:
                         if targets[name].real_name:
                             # Symlink mode can only have 1 source
                             raise ConfigProcessError([key, k], source_str)
@@ -166,8 +168,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         sources[source_name].used_by_names.append(name)
                         target_sources.append(sources[source_name])
             targets[name].dep_locs = target_sources
-            if (targets[name].mode == targets[name].MODE_SYMLINK and
-                    not targets[name].real_name):
+            if not targets[name].real_name and targets[name].mode in [
+                    targets[name].MODE_SYMLINK,
+                    targets[name].MODE_SYMLINK_PLUS]:
                 raise ConfigProcessError([key, "source"], None)
 
         # Determine the scheme of the location from configuration.
@@ -263,7 +266,14 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             if not target.is_out_of_date:
                 self.handle_event(FileUnchangedEvent(target, level=Event.V))
                 continue
-            if target.mode == target.MODE_SYMLINK:
+            if target.mode in [target.MODE_SYMLINK, target.MODE_SYMLINK_PLUS]:
+                if target.mode == target.MODE_SYMLINK_PLUS:
+                    try:
+                        os.stat(target.real_name)
+                    except OSError as exc:
+                        raise ConfigProcessError(
+                            [self.PREFIX + target.name, "source"],
+                            target.real_name, exc)
                 self.manager.fs_util.symlink(target.real_name, target.name)
                 loc_dao.update_locs.append(target)
             elif target.mode == target.MODE_MKDIR:
@@ -479,7 +489,8 @@ class Loc(object):
     MODE_AUTO = "auto"
     MODE_MKDIR = "mkdir"
     MODE_SYMLINK = "symlink"
-    MODES = (MODE_AUTO, MODE_MKDIR, MODE_SYMLINK)
+    MODE_SYMLINK_PLUS = "symlink+"
+    MODES = (MODE_AUTO, MODE_MKDIR, MODE_SYMLINK, MODE_SYMLINK_PLUS)
     TYPE_TREE = "tree"
     TYPE_BLOB = "blob"
 
