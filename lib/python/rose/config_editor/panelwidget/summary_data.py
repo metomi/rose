@@ -34,14 +34,14 @@ class BaseSummaryDataPanel(gtk.VBox):
     """A base class for summarising data across many namespaces.
 
     Subclasses should provide the following methods:
-    def add_cell_renderer_for_value(self, column, column_title):
-    def get_model_data(self):
-    def get_section_column_index(self):
-    def set_tree_cell_status(self, column, cell, model, row_iter):
-    def set_tree_tip(self, treeview, row_iter, col_index, tip):
+    - def add_cell_renderer_for_value(self, column, column_title):
+    - def get_model_data(self):
+    - def get_section_column_index(self):
+    - def set_tree_cell_status(self, column, cell, model, row_iter):
+    - def set_tree_tip(self, treeview, row_iter, col_index, tip):
 
     Subclasses may provide the following methods:
-    def _get_custom_menu_items(self, path, column, event):
+    - def _get_custom_menu_items(self, path, column, event):
 
     These are described below in their placeholder methods.
 
@@ -74,7 +74,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.sort_util = rose.gtk.util.TreeModelSortUtil(
             lambda: self._view.get_model(), multi_sort_num=2)
         self._view.show()
-        self._view.connect("button-release-event",
+        self._view.connect("button-press-event",
                            self._handle_button_press_event)
         self._view.connect("key-press-event",
                            self._handle_key_press_event)
@@ -189,8 +189,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             col_types = [str] * len(data_rows[0])
         else:
             col_types = []
-        need_new_store = (should_redraw or
-                          any(rows_are_descendants))
+        need_new_store = (should_redraw or self.group_index)
         if need_new_store:
             # We need to construct a new TreeModel.
             if self._prev_sort_model is not None:
@@ -369,55 +368,102 @@ class BaseSummaryDataPanel(gtk.VBox):
         if pathinfo is not None:
             path, col, cell_x, cell_y = pathinfo
             if event.button == 3:
-                self._popup_tree_menu(path, col, event)
+                model, rows = self._view.get_selection().get_selected_rows()
+                if len(rows) > 1:
+                    # Multiple selection.
+                    self._popup_tree_multi_menu(event)
+                else:
+                    # Single selection.
+                    self._popup_tree_menu(path, col, event)
+                return True
             elif event.button == 2:
                 self._handle_activation(treeview, path, col)
         return False
 
     def _get_selected_sections(self):
-        """ Returns a list of currently selected sections. """
-        ret = []
-        # get row, col values
+        """Return a set of the names of any sections that are currently being
+        selected by the user."""
+        ret = set([])
         col = self.get_section_column_index()
-        rows = [row[0] for row in
-                self._view.get_selection().get_selected_rows()[1]]
-        rows.sort()
-        # get iterator pointing at the first row
-        _iter = self._view.get_model().get_iter_first()
-        _iter_ind = 0
+        model, rows = self._view.get_selection().get_selected_rows()
         for row in rows:
-            # for each selected row
-            while _iter_ind < row:
-                # iterate untill we reach the current row
-                _iter = self._view.get_model().iter_next(_iter)
-                _iter_ind += 1
-                if not _iter:
-                    # incase we run out of iterator
-                    raise IndexError
-            ret.append(self._view.get_model().get_value(_iter, col))
+            iter_ = model.get_iter(row)
+            section = model.get_value(iter_, col)
+            if section:
+                # This row is a section.
+                ret.add(section)
+            else:
+                # This may be the parent of some sections.
+                ret.update(self._get_child_row_sections(model, iter_, col))
         return ret
 
-    def _handle_key_press_event(self, treeview, event):
-        if event.keyval == gtk.keysyms.Delete:
-            # `Delete` - remove section
-            _sections = self._get_selected_sections()
-            for _section in _sections:
-                self.remove_section(_section)
-            self._view.get_selection().unselect_all()
+    def _get_child_row_sections(self, model, iter_, col):
+        """Return a set of any sub-sections contained within the section
+        represented by the provided iter_. Method is recursive so will iterate
+        down the tree."""
+        ret = set([])
+        for child_no in range(model.iter_n_children(iter_)):
+            child_iter = model.iter_nth_child(iter_, child_no)
+            if not child_iter:
+                continue
+            section = model.get_value(child_iter, col)
+            if not section:
+                # Recursively acquire sub-sections if present.
+                ret.update(self._get_child_rows(child_iter))
+            ret.add(section)
+        return ret
 
-        # detect key combination
-        elif 'GDK_CONTROL_MASK' in event.state.value_names:
-            # `Ctrl + ?`
-            if event.keyval == gtk.keysyms.i:
-                # `Ctrl + i` - ignore section
-                _sections = self._get_selected_sections()
-                for _section in _sections:
-                    ignored = (rose.variable.IGNORED_BY_USER not in
-                               self.sections[_section].ignored_reason)
-                    self.sub_ops.ignore_section(_section, ignored)
+    def _popup_tree_multi_menu(self, event):
+        """Launch a menu for these main treeview rows (multi-selection)."""
+        menu = gtk.Menu()
+        menu.show()
+        shortcuts = []
+
+        # Ignore all.
+        ign_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
+        ign_menuitem.set_label(
+            rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE_MULTI)
+        ign_menuitem.connect("activate", self._ignore_selected_sections, True)
+        ign_menuitem.show()
+        menu.append(ign_menuitem)
+        shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                          ign_menuitem))
+        # Enable all.
+        ign_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
+        ign_menuitem.set_label(
+            rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE_MULTI)
+        ign_menuitem.connect("activate", self._ignore_selected_sections, False)
+        ign_menuitem.show()
+        menu.append(ign_menuitem)
+        shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                          ign_menuitem))
+        # Remove all.
+        rem_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
+        rem_menuitem.set_label(
+            rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE_MULTI)
+        rem_menuitem.connect("activate", self._remove_selected_sections)
+        rem_menuitem.show()
+        menu.append(rem_menuitem)
+        shortcuts.append((rose.config_editor.ACCEL_REMOVE, rem_menuitem))
+
+        # list shortcut keys
+        accel = gtk.AccelGroup()
+        menu.set_accel_group(accel)
+        for key_press, menuitem in shortcuts:
+            key, mod = gtk.accelerator_parse(key_press)
+            menuitem.add_accelerator(
+                'activate',
+                accel,
+                key,
+                mod,
+                gtk.ACCEL_VISIBLE
+            )
+
+        menu.popup(None, None, None, event.button, event.time)
+        return False
 
     def _popup_tree_menu(self, path, col, event):
-        """Launch a menu for this main treeview row."""
+        """Launch a menu for this main treeview row (single selection)."""
         shortcuts = []
         menu = gtk.Menu()
         menu.show()
@@ -426,6 +472,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         sect_index = self.get_section_column_index()
         this_section = model.get_value(row_iter, sect_index)
         if this_section is not None:
+            # Jump to section.
             menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_JUMP_TO)
             label = rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
                 this_section.replace("_", "__"))
@@ -446,52 +493,95 @@ class BaseSummaryDataPanel(gtk.VBox):
                 sep = gtk.SeparatorMenuItem()
                 sep.show()
                 menu.append(sep)
-        if self.is_duplicate and this_section is not None:
-            add_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
-            add_menuitem.set_label(
-                rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
-            add_menuitem.connect("activate",
-                                 lambda i: self.add_section())
-            add_menuitem.show()
-            menu.append(add_menuitem)
-            copy_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_COPY)
-            copy_menuitem.set_label(
-                rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
-            copy_menuitem.connect("activate",
-                                  lambda i: self.copy_section(this_section))
-            copy_menuitem.show()
-            menu.append(copy_menuitem)
-            if (rose.variable.IGNORED_BY_USER in
-                    self.sections[this_section].ignored_reason):
-                enab_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
-                enab_menuitem.set_label(
-                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
-                enab_menuitem.connect(
-                    "activate",
-                    lambda i: self.sub_ops.ignore_section(this_section, False))
-                enab_menuitem.show()
-                menu.append(enab_menuitem)
-                shortcuts.append((rose.config_editor.ACCEL_IGNORE,
-                                  enab_menuitem))
-            else:
+        if self.is_duplicate:
+            # A section is currently selected
+            if this_section is not None:
+                # Add section.
+                add_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
+                add_menuitem.set_label(
+                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
+                add_menuitem.connect("activate",
+                                     lambda i: self.add_section())
+                add_menuitem.show()
+                menu.append(add_menuitem)
+                # Copy section.
+                copy_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_COPY)
+                copy_menuitem.set_label(
+                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
+                copy_menuitem.connect(
+                    "activate", lambda i: self.copy_section(this_section))
+                copy_menuitem.show()
+                menu.append(copy_menuitem)
+                if (rose.variable.IGNORED_BY_USER in
+                        self.sections[this_section].ignored_reason):
+                    # Enable section.
+                    enab_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
+                    enab_menuitem.set_label(
+                        rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                    enab_menuitem.connect(
+                        "activate",
+                        lambda i: self.sub_ops.ignore_section(this_section,
+                                                              False))
+                    enab_menuitem.show()
+                    menu.append(enab_menuitem)
+                    shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                                      enab_menuitem))
+                else:
+                    # Ignore section.
+                    ign_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
+                    ign_menuitem.set_label(
+                        rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                    ign_menuitem.connect(
+                        "activate",
+                        lambda i: self.sub_ops.ignore_section(this_section,
+                                                              True))
+                    ign_menuitem.show()
+                    menu.append(ign_menuitem)
+                    shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                                      ign_menuitem))
+                # Remove section.
+                rem_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
+                rem_menuitem.set_label(
+                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rem_menuitem.connect(
+                    "activate", lambda i: self.remove_section(this_section))
+                rem_menuitem.show()
+                menu.append(rem_menuitem)
+                shortcuts.append((rose.config_editor.ACCEL_REMOVE,
+                                  rem_menuitem))
+            else:  # A group is currently selected.
+                # Ignore all
                 ign_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
                 ign_menuitem.set_label(
                     rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
-                ign_menuitem.connect(
-                    "activate",
-                    lambda i: self.sub_ops.ignore_section(this_section, True))
+                ign_menuitem.connect("activate",
+                                     self._ignore_selected_sections,
+                                     True)
                 ign_menuitem.show()
                 menu.append(ign_menuitem)
                 shortcuts.append((rose.config_editor.ACCEL_IGNORE,
                                   ign_menuitem))
-            rem_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
-            rem_menuitem.set_label(
-                rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
-            rem_menuitem.connect("activate",
-                                 lambda i: self.remove_section(this_section))
-            rem_menuitem.show()
-            menu.append(rem_menuitem)
-            shortcuts.append((rose.config_editor.ACCEL_REMOVE, rem_menuitem))
+                # Enable all
+                ign_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
+                ign_menuitem.set_label(
+                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                ign_menuitem.connect("activate",
+                                     self._ignore_selected_sections,
+                                     False)
+                ign_menuitem.show()
+                menu.append(ign_menuitem)
+                shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                                  ign_menuitem))
+                # Delete all.
+                rem_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
+                rem_menuitem.set_label(
+                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rem_menuitem.connect(
+                    "activate", self._remove_selected_sections)
+                rem_menuitem.show()
+                menu.append(rem_menuitem)
+                shortcuts.append((rose.config_editor.ACCEL_REMOVE,
+                                  rem_menuitem))
 
             # list shortcut keys
             accel = gtk.AccelGroup()
@@ -535,6 +625,44 @@ class BaseSummaryDataPanel(gtk.VBox):
         """Copy a section and its content into a new section name."""
         new_section = self.sub_ops.clone_section(section)
         self.scroll_to_section(new_section)
+
+    def _handle_key_press_event(self, treeview, event):
+        if event.keyval == gtk.keysyms.Delete:
+            # `Delete` - remove section(s)
+            self._remove_selected_sections()
+        # detect key combination
+        elif 'GDK_CONTROL_MASK' in event.state.value_names:
+            # `Ctrl + ?`
+            if event.keyval == gtk.keysyms.i:
+                # `Ctrl + i` - ignore section(s)
+                self._ignore_selected_sections(None)
+
+    def _remove_selected_sections(self, *args):
+        """Remove any sections currently selected by the user."""
+        sections = self._get_selected_sections()
+        self.sub_ops.remove_sections(sections)
+        self._view.get_selection().unselect_all()
+
+    def _ignore_selected_sections(self, _, ignore=None):
+        """Ignores any sections currently selected by the user. Ignore mode is
+        set by the 'ignore' kwarg:
+            True:  Ignore all sections (if not already ignored)
+            False: Enable all sections (if not already enabled)
+            None:  Ignore all sections, if sections are all already ignored
+                   then enable all sections inserted.
+        """
+        sections_ = self._get_selected_sections()
+        ignored = [rose.variable.IGNORED_BY_USER in
+                   self.sections[section_].ignored_reason for
+                   section_ in sections_]
+        # If ignore mode is not specified decide whether to ignore or enable.
+        if ignore is None:
+            ignore = not all(ignored)
+        # Filter out sections that are already ignored/enabled.
+        sections_ = [section_ for section_, ignored in zip(sections_, ignored)
+                     if ignored != ignore]
+        self.sub_ops.ignore_sections(
+            sections_, ignore, skip_sub_data_update=False)
 
     def remove_section(self, section):
         """Remove a section."""
