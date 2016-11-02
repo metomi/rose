@@ -348,14 +348,16 @@ class RoseBushDAO(object):
                             os.path.join(user_suite_dir, pathd, filename))
                     except OSError:
                         pass
-                    entry["logs"][filename] = {
-                        "path": "/".join([pathd, filename]),
-                        "path_in_tar": None,
-                        "mtime": int(stat.st_mtime),  # too precise otherwise
-                        "size": stat.st_size,
-                        "exists": True,
-                        "seq_key": None}
-            elif entry["cycle"] in targzip_log_cycles:
+                    else:
+                        entry["logs"][filename] = {
+                            "path": "/".join([pathd, filename]),
+                            "path_in_tar": None,
+                            "mtime": int(stat.st_mtime),  # int precise enough
+                            "size": stat.st_size,
+                            "exists": True,
+                            "seq_key": None}
+                        continue
+            if entry["cycle"] in targzip_log_cycles:
                 if entry["cycle"] not in relevant_targzip_log_cycles:
                     relevant_targzip_log_cycles.append(entry["cycle"])
 
