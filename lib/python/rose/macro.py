@@ -718,21 +718,26 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                     else:
                         break
                 if optionals:
-                    res = {}
-                    if "optional_config_name" in optionals:
-                        res["optional_config_name"] = optional_config_name
-                    for key in set(optionals) & set(optional_values):
-                        res[key] = optional_values[key]
-                    res.update(get_user_values(optionals, res.keys()))
-                    optional_values.update(res)
-                    if "optional_config_name" in optional_values:
-                        del optional_values["optional_config_name"]
+                    update_optional_values(res, optionals, optional_values,
+                                           optional_config_name)
             problem_list = macro_meth(app_config, meta_config, **res)
             if not isinstance(problem_list, list):
                 raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
             if problem_list:
                 macro_problem_map.update({macro_name: problem_list})
     return macro_problem_map
+
+
+def update_optional_values(res, optionals, optional_values,
+                           optional_config_name):
+    """Copy any relevant parameters into the 'res' dict."""
+    if "optional_config_name" in optionals:
+        res["optional_config_name"] = optional_config_name
+        del optionals["optional_config_name"]
+    for key in set(optionals) & set(optional_values):
+        res[key] = optional_values[key]
+    res.update(get_user_values(optionals, res.keys()))
+    optional_values.update(res)
 
 
 def transform_config(config, meta_config, transformer_macro, modules,
@@ -765,16 +770,8 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 else:
                     break
             if optionals:
-                res = {}
-                if "optional_config_name" in optionals:
-                    res["optional_config_name"] = optional_config_name
-                for key in optionals:
-                    if key in optional_values:
-                        res[key] = optional_values[key]
-                res.update(get_user_values(optionals, res.keys()))
-                optional_values.update(res)
-                if "optional_config_name" in optional_values:
-                    del optional_values["optional_config_name"]
+                update_optional_values(res, optionals, optional_values,
+                                       optional_config_name)
         return macro_method(config, meta_config, **res)
     return config, []
 

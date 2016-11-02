@@ -21,9 +21,10 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 2
+tests 4
 #-------------------------------------------------------------------------------
-# Test that only relevant prompts are provided
+# Test that optional_config_name is not prompted for and that a custom
+# parameter is only prompted for once.
 init <<'__CONFIG__'
 [env]
 ANSWER=42
@@ -45,7 +46,11 @@ TEST_KEY="$TEST_KEY_BASE"
 rose macro --config='../config' -V <<<'' >>'temp'
 grep_count_ok "$TEST_KEY"-1 'Value for answer (default 42)' 'temp' 1
 grep_count_ok "$TEST_KEY"-2 'Value for optional_config_name' 'temp' 0
-
+#-------------------------------------------------------------------------------
+# Test that the optional_config_name keyword is being set correctly.
+TEST_KEY="$TEST_KEY_BASE-optional_config_name"
+file_grep "$TEST_KEY"-3 'optional_config_name None 42' 'temp'
+file_grep "$TEST_KEY"-3 'optional_config_name baseeight 52' 'temp'
 rm temp
 teardown
 #-------------------------------------------------------------------------------
