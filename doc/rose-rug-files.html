@@ -427,11 +427,21 @@ source=/data/stuff/pi_to_a_million_places
 
                 <p>If this file is a bit large to copy over, you
                 could consider asking for a symbolic link instead
-                of a copy:</p>
+                of a copy. Use <code>mode=symlink+</code> to
+                ensure that the target of the symbolic link exists.
+                Use <code>mode=symlink</code> if the target of the
+                symbolic link is not guaranteed to exist at the
+                time the symbolic link is created. (E.g. the
+                target may be a file only available in a alternate
+                compute node.)</p>
                 <pre class="prettyprint lang-rose_conf">
 [file:constants/pi]
-mode=symlink
+mode=symlink+
 source=/data/stuff/pi_to_a_trillion_places
+
+[file:matter/dark]
+mode=symlink
+source=/data/matter/dark
 </pre>
               </div>
 
