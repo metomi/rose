@@ -40,13 +40,14 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    || cat "${SUITE_DIR}/log/suite/err" >&2
 
 #-------------------------------------------------------------------------------
 ORDER='time_submit'
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs-${ORDER}"
 run_pass "${TEST_KEY}" curl \
-    "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
+    "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
 # Note: only qux submit time order is reliable, the others are submitted at the
 # same time, in any order.
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
@@ -57,7 +58,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 ORDER='time_run_desc'
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs-${ORDER}"
 run_pass "${TEST_KEY}" curl \
-    "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
+    "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('order',), '${ORDER}']" \
     "[('entries', 0, 'name'), 'qux']" \
@@ -69,7 +70,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 ORDER='time_run_exit_desc'
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs-${ORDER}"
 run_pass "${TEST_KEY}" curl \
-    "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
+    "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('order',), '${ORDER}']" \
     "[('entries', 0, 'name'), 'qux']" \
@@ -81,7 +82,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 ORDER='duration_queue_desc'
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs-${ORDER}"
 run_pass "${TEST_KEY}" curl \
-    "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
+    "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('order',), '${ORDER}']" \
     "[('entries', 0, 'name'), 'bar']" \
@@ -93,7 +94,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 ORDER='duration_run_desc'
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs-${ORDER}"
 run_pass "${TEST_KEY}" curl \
-    "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
+    "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('order',), '${ORDER}']" \
     "[('entries', 0, 'name'), 'baz']" \
@@ -105,7 +106,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 ORDER='duration_queue_run_desc'
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs-${ORDER}"
 run_pass "${TEST_KEY}" curl \
-    "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
+    "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json&order=${ORDER}"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('order',), '${ORDER}']" \
     "[('entries', 0, 'name'), 'baz']" \

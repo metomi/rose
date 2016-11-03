@@ -47,7 +47,8 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}"
+cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    || cat "${SUITE_DIR}/log/suite/err" >&2
 
 #-------------------------------------------------------------------------------
 
@@ -75,7 +76,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs-json"
 run_pass "${TEST_KEY}" \
-    curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json"
+    curl "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('logo',), 'src=\"rose-favicon.png\" alt=\"Rose Logo\"']" \
     "[('title',), 'Humpty Dumpty']" \

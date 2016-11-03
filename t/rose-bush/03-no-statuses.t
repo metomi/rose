@@ -48,9 +48,8 @@ run_pass "${TEST_KEY}" \
     curl "${TEST_ROSE_WS_URL}/jobs/${USER}/${SUITE_NAME}?form=json${FILTERS}"
 FOO="{'cycle': '20000101T0000Z', 'name': 'foo', 'submit_num': 1}"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
-    "[('no_statuses',), ['active', 'fail']]" \
     "[('of_n_entries',), 1]" \
-    "[('entries', ${FOO}, 'status'), 'success']"
+    "[('entries', ${FOO}, 'task_status'), 'succeeded']"
 
 #-------------------------------------------------------------------------------
 # Tidy up

@@ -29,7 +29,7 @@ if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose host-select -q $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
-tests 6
+tests 4
 #-------------------------------------------------------------------------------
 # Run the suite.
 export CYLC_CONF_PATH=
@@ -46,15 +46,6 @@ else
         --no-gcontrol --host=localhost -- --debug
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY="$TEST_KEY_BASE-db-before"
-sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
-    'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-log/job/1/my_task_1/01/job|job
-log/job/1/my_task_1/01/job-activity.log|job-activity.log
-log/job/1/my_task_1/01/job.err|job.err
-log/job/1/my_task_1/01/job.out|job.out
-__OUT__
 TEST_KEY=$TEST_KEY_BASE-before-log.out
 if [[ -n ${JOB_HOST:-} ]]; then
     run_fail "$TEST_KEY-log.out" \
@@ -66,19 +57,6 @@ TEST_KEY=$TEST_KEY_BASE-command
 run_pass "$TEST_KEY" rose suite-log -n $NAME -U 'my_task_2' --debug
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_test "$TEST_KEY-log.out" $SUITE_RUN_DIR/log/job/1/my_task_2/01/job.out
-TEST_KEY="$TEST_KEY_BASE-db-after"
-sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
-    'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-log/job/1/my_task_1/01/job|job
-log/job/1/my_task_1/01/job-activity.log|job-activity.log
-log/job/1/my_task_1/01/job.err|job.err
-log/job/1/my_task_1/01/job.out|job.out
-log/job/1/my_task_2/01/job|job
-log/job/1/my_task_2/01/job-activity.log|job-activity.log
-log/job/1/my_task_2/01/job.err|job.err
-log/job/1/my_task_2/01/job.out|job.out
-__OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0

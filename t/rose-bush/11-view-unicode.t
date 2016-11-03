@@ -61,7 +61,8 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -pr 'bin' 'suite.rc' "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    || cat "${SUITE_DIR}/log/suite/err" >&2
 #-------------------------------------------------------------------------------
 LOG_FILE='log/job/20000101T0000Z/echo-euro/01/job.txt'
 

@@ -105,3 +105,12 @@ pre {
      -moz-border-radius: 6px 0 6px 6px;
           border-radius: 6px 0 6px 6px;
 }
+
+@-moz-document url-prefix() {
+  fieldset { display: table-cell; }
+}
+
+th,
+.livestamp {
+  white-space: nowrap;
+}
