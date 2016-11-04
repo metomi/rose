@@ -589,6 +589,21 @@ macro=planet.PlanetChecker, planet.PlanetChanger
             </div>
 
             <div class="slide">
+              <h2 id="reporter-macros">Reporter Macros</h2>
+              <p>There are also reporter macros which can be used
+              where you need to output some information about a
+              configuration. A reporter macro takes the same form
+              as validator and transform macros but does not require
+              a return value.</p>
+
+              <pre class="prettyprint">
+    def report(self, config, meta_config=None):
+        with open('report/file', 'r') as report_file:
+            report_file.write(str(config.get(["namelist:snowflakes"])))
+</pre>
+            </div>
+
+            <div class="slide">
               <h2>Further Reading</h2>
 
               <p>For more information, see the <a href=
