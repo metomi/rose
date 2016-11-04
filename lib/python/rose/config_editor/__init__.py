@@ -374,7 +374,7 @@ SHOULD_SHOW_FLAG_OPTIONAL_VARS = False
 # Control showing all comment text.
 SHOULD_SHOW_ALL_COMMENTS = False
 # Control showing fixed variables on a page.
-SHOULD_SHOW_FIXED_VARS = False
+SHOULD_SHOW_FIXED_VARS = True
 # Control showing ! or !! ignored pages.
 SHOULD_SHOW_IGNORED_PAGES = False
 # Control showing ! or !! ignored variables on a page.
