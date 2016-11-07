@@ -323,7 +323,7 @@ class GroupOperations(object):
         return new_section
 
     def ignore_sections(self, config_name, sections, is_ignored,
-                        skip_update=False):
+                        skip_update=False, skip_sub_data_update=True):
         """Implement a mass user-ignore or enable of sections."""
         start_stack_index = len(self.undo_stack)
         group = rose.config_editor.STACK_GROUP_IGNORE + "-" + str(time.time())
@@ -343,7 +343,8 @@ class GroupOperations(object):
             stack_item.group = group
         if not skip_update:
             for ns in nses:
-                self.sect_ops.trigger_update(ns, skip_sub_data_update=True)
+                self.sect_ops.trigger_update(
+                    ns, skip_sub_data_update=skip_sub_data_update)
                 self.sect_ops.trigger_info_update(ns)
             self.sect_ops.trigger_update(config_name)
             self.update_ns_sub_data_func(config_name)
@@ -443,12 +444,15 @@ class SubDataOperations(object):
             ignore_section_name,
             is_ignored)
 
-    def ignore_sections(self, ignore_sections_list, is_ignored):
+    def ignore_sections(self, ignore_sections_list, is_ignored,
+                        skip_sub_data_update=True):
         """User-ignore or enable a list of sections."""
         return self._ignore_sections_func(
             self.config_name,
             ignore_sections_list,
-            is_ignored)
+            is_ignored,
+            skip_sub_data_update=skip_sub_data_update
+        )
 
     def remove_section(self, remove_section_name):
         """Remove a section and all its options."""

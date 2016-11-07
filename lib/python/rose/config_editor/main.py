@@ -1825,9 +1825,11 @@ class MainController(object):
         if is_group:
             group_name = do_list[0].group.split("-")[0]
             self.reporter.report(event_text.format(group_name))
+        namespace = None
         for namespace in set(stack_info):
             self.reload_namespace_tree(namespace)
-            # Use the last node_id for a sub page focus (if any).
+        # Use the last node_id for a sub page focus (if any).
+        if namespace:
             focus_id = namespace_id_map[namespace][-1]
             self.updater.focus_sub_page_if_open(namespace, focus_id)
         return True
