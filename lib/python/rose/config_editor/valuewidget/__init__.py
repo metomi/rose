@@ -65,8 +65,6 @@ class ValueWidgetHook(object):
 
 def chooser(value, metadata, error):
     """Select an appropriate widget class based on the arguments."""
-    if rose.env.contains_env_var(value):
-        return text.RawValueWidget
     m_type = metadata.get(rose.META_PROP_TYPE)
     m_values = metadata.get(rose.META_PROP_VALUES)
     m_length = metadata.get(rose.META_PROP_LENGTH)
