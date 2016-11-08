@@ -508,6 +508,32 @@ rose edit
             </div>
 
             <div class="slide">
+              <h2>Reporter macro</h2>
+              <p>Along with validator and transformer macros there are also
+              reporter macros. These are used when you want to output
+              information about a configuration but do not want to make any
+              changes to it.</p>
+              <p>Next we will write a reporter macro which produces a
+              horoscope entry based on the value of <var>env=WORLD</var>.</p>
+            </div>
+
+            <div class="slide">
+              <h3 class="alwayshidden">Running the reporter macro</h3>
+              <p>Open <code>planet.py</code> and paste in this <a
+                href="etc/rose-rug-advanced-tutorials-macro/planet.py.report.html">text</a>.</p>
+              <p>You will need to add the following line with the other imports
+              at the top of the file.</p>
+              <pre class="prettyprint">
+import random
+</pre>
+
+              <p>Next run this macro from the command line by invoking:</p>
+
+              <pre class="shell">
+rose macro planet.PlanetReporter</pre>
+            </div>
+
+            <div class="slide">
               <h2 id="macro-args">Macro Arguments</h2>
 
               <p>From time to time, we may want to change some
@@ -586,21 +612,6 @@ macro=planet.PlanetChecker, planet.PlanetChanger
               <var>env</var> page should now contain a dropdown
               menu at the top of the page for launching the two
               macros.</p>
-            </div>
-
-            <div class="slide">
-              <h2 id="reporter-macros">Reporter Macros</h2>
-              <p>There are also reporter macros which can be used
-              where you need to output some information about a
-              configuration. A reporter macro takes the same form
-              as validator and transform macros but does not require
-              a return value.</p>
-
-              <pre class="prettyprint">
-    def report(self, config, meta_config=None):
-        with open('report/file', 'r') as report_file:
-            report_file.write(str(config.get(["namelist:snowflakes"])))
-</pre>
             </div>
 
             <div class="slide">
