@@ -508,6 +508,32 @@ rose edit
             </div>
 
             <div class="slide">
+              <h2>Reporter macro</h2>
+              <p>Along with validator and transformer macros there are also
+              reporter macros. These are used when you want to output
+              information about a configuration but do not want to make any
+              changes to it.</p>
+              <p>Next we will write a reporter macro which produces a
+              horoscope entry based on the value of <var>env=WORLD</var>.</p>
+            </div>
+
+            <div class="slide">
+              <h3 class="alwayshidden">Running the reporter macro</h3>
+              <p>Open <code>planet.py</code> and paste in this <a
+                href="etc/rose-rug-advanced-tutorials-macro/planet.py.report.html">text</a>.</p>
+              <p>You will need to add the following line with the other imports
+              at the top of the file.</p>
+              <pre class="prettyprint">
+import random
+</pre>
+
+              <p>Next run this macro from the command line by invoking:</p>
+
+              <pre class="shell">
+rose macro planet.PlanetReporter</pre>
+            </div>
+
+            <div class="slide">
               <h2 id="macro-args">Macro Arguments</h2>
 
               <p>From time to time, we may want to change some

@@ -43,8 +43,8 @@ import rose.resource
 import rose.variable
 
 
-ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate",
-                               "downgrade", "upgrade"]
+ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate", "downgrade", "upgrade",
+                               "report"]
 ERROR_LOAD_CONFIG_DIR = "{0}: not an application or suite directory.\n"
 ERROR_LOAD_MACRO = "Could not load macro {0}: {1}"
 ERROR_LOAD_METADATA = "Could not load metadata {0}\n"
@@ -83,6 +83,7 @@ PROMPT_OK = "y"
 SETTING_ID = "    {0}={1}={2}\n        {3}"
 TRANSFORM_METHOD = "transform"
 VALIDATE_METHOD = "validate"
+REPORT_METHOD = "report"
 VERBOSE_LIST = "{0} - ({1}) - {2}"
 
 
@@ -690,16 +691,22 @@ def check_config_integrity(app_config):
                         key, "key", type(key), "basestring"))
 
 
-def validate_config(app_config, meta_config, run_macro_list, modules,
-                    macro_info_tuples, opt_non_interactive=False,
-                    optional_config_name=None, optional_values=None):
-    """Run validator custom macros on the config and return problems."""
+def report_config(app_config, meta_config, run_macro_list, modules,
+                  macro_info_tuples, opt_non_interactive=False,
+                  optional_config_name=None, optional_values=None,
+                  validate_mode=True):
+    """Run report/validator custom macros on the config and return problems
+    (in the case of validator macros)."""
     if optional_values is None:
         optional_values = {}
     macro_problem_map = {}
+    if validate_mode:
+        macro_method = VALIDATE_METHOD
+    else:
+        macro_method = REPORT_METHOD
     for module_name, class_name, method, help in macro_info_tuples:
         macro_name = ".".join([module_name, class_name])
-        if macro_name in run_macro_list and method == VALIDATE_METHOD:
+        if macro_name in run_macro_list and method == macro_method:
             for module in modules:
                 if module.__name__ == module_name:
                     macro_inst = getattr(module, class_name)()
@@ -720,12 +727,16 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                 if optionals:
                     update_optional_values(res, optionals, optional_values,
                                            optional_config_name)
-            problem_list = macro_meth(app_config, meta_config, **res)
-            if not isinstance(problem_list, list):
-                raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
-            if problem_list:
-                macro_problem_map.update({macro_name: problem_list})
-    return macro_problem_map
+            if validate_mode:
+                problem_list = macro_meth(app_config, meta_config, **res)
+                if not isinstance(problem_list, list):
+                    raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
+                if problem_list:
+                    macro_problem_map.update({macro_name: problem_list})
+            else:
+                macro_meth(app_config, meta_config, **res)
+    if validate_mode:
+        return macro_problem_map
 
 
 def update_optional_values(res, optionals, optional_values,
@@ -942,10 +953,11 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         macro_config_problems_map = {}
         optional_values = {}
         for conf_key, config in new_combined_config_map.items():
-            config_problems_map = validate_config(
+            config_problems_map = report_config(
                 config, meta_config, macros_by_type[VALIDATE_METHOD], modules,
                 macro_tuples, opt_non_interactive,
-                optional_config_name=conf_key, optional_values=optional_values
+                optional_config_name=conf_key, optional_values=optional_values,
+                validate_mode=True
             )
             if config_problems_map:
                 rc = 1
@@ -965,9 +977,20 @@ def run_macros(config_map, meta_config, config_name, macro_names,
                 level=reporter.V, kind=reporter.KIND_ERR, prefix=""
             )
 
-    no_changes = True
+    # Run any report macros.
+    if REPORT_METHOD in macros_by_type:
+        new_combined_config_map = combine_opt_config_map(config_map)
+        optional_values = {}
+        for conf_key, config in new_combined_config_map.items():
+            report_config(
+                config, meta_config, macros_by_type[REPORT_METHOD], modules,
+                macro_tuples, opt_non_interactive,
+                optional_config_name=conf_key, optional_values=optional_values,
+                validate_mode=False
+            )
 
     # Run any transform macros.
+    no_changes = True
     if TRANSFORM_METHOD in macros_by_type:
         no_changes = no_changes and _run_transform_macros(
             macros_by_type[TRANSFORM_METHOD],
@@ -977,6 +1000,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
             opt_conf_dir=opt_conf_dir,
             opt_output_dir=opt_output_dir,
             reporter=reporter)
+
     if not rc and no_changes:
         reporter(MacroFinishNothingEvent())
     return rc == 0

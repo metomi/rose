@@ -23,7 +23,7 @@
 init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
-tests 33
+tests 36
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE-base
@@ -155,6 +155,28 @@ init </dev/null
 TEST_KEY=$TEST_KEY_BASE-default-metadata
 setup
 run_pass "$TEST_KEY" rose macro -V -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Check reporter macros run ok.
+init </dev/null
+init_meta <<'__META_CONFIG__'
+[env=ANSWER]
+macro=report.Test
+__META_CONFIG__
+init_macro report.py <<'__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import rose.macro
+class Test(rose.macro.MacroBase):
+    """Test reporter macro."""
+    def report(self, config, meta_config=None):
+        return True
+__MACRO__
+setup
+TEST_KEY=$TEST_KEY_BASE-validator-macro
+run_pass "$TEST_KEY" rose macro report.Test -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
