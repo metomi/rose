@@ -93,11 +93,12 @@ class PlanetReporter(rose.macro.MacroBase):
         else:
             print (
                 '{planet} is currently passing through {constellation}.\n'
-                'You should {tosh} today.'
+                'You should {generic_message} today.'
             ).format(
                 planet = planet,
                 constellation = constellation,
-                tosh = random.choice(self.GENERIC_HOROSCOPE_STATEMENTS)
+                generic_message = random.choice(
+                  self.GENERIC_HOROSCOPE_STATEMENTS)
             )
 
     def get_planet_info(self, planet_name):
