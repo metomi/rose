@@ -35,6 +35,9 @@ rose config-edit: better behaviour for enviroment variables in `values`
 metadata. Always display such settings as a radio/combobox (do not try to
 change to a textbox).
 
+[#2009](https://github.com/metomi/rose/pull/2009):
+rose macro: add reporter macros. Adds a new Reporter macro type.
+
 [#2008](https://github.com/metomi/rose/pull/2008):
 rose config-edit: fix macro optional_config_name kwarg (broken since
 2016.07.0).
