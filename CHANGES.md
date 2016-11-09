@@ -5,6 +5,89 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2016.11.0 (2016-11-09)
+
+Rose release 45. This release works best with
+[cylc-6.11.2](https://github.com/cylc/cylc/releases/tag/6.11.2) and
+[fcm-2016.10.0](https://github.com/metomi/fcm/releases/tag/2016.10.0),
+or their successors.
+
+### Highlighted Changes
+
+[#1996](https://github.com/metomi/rose/pull/1996):
+rose_ana: new version.
+
+[#1994](https://github.com/metomi/rose/pull/1994):
+rose bush: improve tasks and jobs filtering:
+* Cycles list now displays number of tasks and jobs.
+* Cycles list now provides download links to those cycles with a
+  `log/job-CYCLE.tar.gz`.
+* Jobs list can now be filtered by job status combinations and individual
+  cylc task statuses.
+* Job list cycles filter can now use syntax such as
+  `<CYCLE` (currently `before CYCLE`), `>CYCLE` (currently `after CYCLE`).
+* Improve display for screens with smaller width.
+
+### Noteworthy Changes
+
+[#2010](https://github.com/metomi/rose/pull/2010):
+rose config-edit: better behaviour for enviroment variables in `values`
+metadata. Always display such settings as a radio/combobox (do not try to
+change to a textbox).
+
+[#2008](https://github.com/metomi/rose/pull/2008):
+rose config-edit: fix macro optional_config_name kwarg (broken since
+2016.07.0).
+
+[#2007](https://github.com/metomi/rose/pull/2007):
+rose config-edit: change default to show fixed variables.
+
+[#2006](https://github.com/metomi/rose/pull/2006):
+rose config-edit: extended multiple selection to groups. Stash entries can now
+be ignored/deleted for a tree of entries (i.e. in group view). If a parent
+section is ignored/deleted then this action will apply (recursively) to all
+child sections.
+
+[#2005](https://github.com/metomi/rose/pull/2005):
+rose file install: new `symlink+` mode that checks for existence of the link
+target.
+
+[#2004](https://github.com/metomi/rose/pull/2004):
+rose config-edit: fixed integer widget updating.
+
+[#2003](https://github.com/metomi/rose/pull/2003):
+rose config-edit: allow removal of empty elements in compulsory arrays.
+
+[#2002](https://github.com/metomi/rose/pull/2002):
+rose config-edit: allow newline separators in space-separated list.
+
+[#2001](https://github.com/metomi/rose/pull/2001):
+rose macro: don't run transform macros in validate mode.
+
+[#2000](https://github.com/metomi/rose/pull/2000):
+rose macro: new `--suite-only` option.
+
+[#1998](https://github.com/metomi/rose/pull/1998):
+rose_prune: fix bad fail message on non-suite host.
+
+[#1995](https://github.com/metomi/rose/pull/1995):
+rose bush and rosie disco: ad hoc server can now have service name in URL.
+
+[#1990](https://github.com/metomi/rose/pull/1990),
+[#1993](https://github.com/metomi/rose/pull/1993):
+User guide and tutorial updated to latest cylc usage.
+
+[#1988](https://github.com/metomi/rose/pull/1988):
+rose bush: jobs list: fix paths in tar links. Previously a link to a log in a
+tar archive may take users to a random path.
+
+[#1987](https://github.com/metomi/rose/pull/1987):
+rose config-edit: fixes an inflexibility in the third-party UM STASH widget
+when importing packages from metadata (a demo piece of functionality). It also
+fixes a problem with duplicated attempts at adding sections.
+
+--------------------------------------------------------------------------------
+
 ## 2016.09.0 (2016-09-14)
 
 Rose release 44. This release works best with
