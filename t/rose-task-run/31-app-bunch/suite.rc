@@ -39,6 +39,8 @@
             FAIL_MODE=continue
             INCREMENTAL=true
             POOL_SIZE=1
-            
+    [[bunch_print_envar]]
+        inherit = BUNCH_TASKS
+
     [[dummy]]
         script = true
