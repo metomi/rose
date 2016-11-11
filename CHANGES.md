@@ -41,7 +41,7 @@ rose bush: improve tasks and jobs filtering:
 ### Noteworthy Changes
 
 [#2010](https://github.com/metomi/rose/pull/2010):
-rose config-edit: better behaviour for enviroment variables in `values`
+rose config-edit: better behaviour for environment variables in `values`
 metadata. Always display such settings as a radio/combobox (do not try to
 change to a textbox).
 
