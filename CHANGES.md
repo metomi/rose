@@ -5,12 +5,11 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## 2016.11.0 (2016-11-09)
+## 2016.11.0 (2016-11-11)
 
 Rose release 45. This release works best with
 [cylc-6.11.2](https://github.com/cylc/cylc/releases/tag/6.11.2) and
-[fcm-2016.10.0](https://github.com/metomi/fcm/releases/tag/2016.10.0),
-or their successors.
+[fcm-2016.10.0](https://github.com/metomi/fcm/releases/tag/2016.10.0).
 
 ### Highlighted Changes
 
@@ -18,14 +17,15 @@ or their successors.
 rose_ana: new version.
 * Analysis logic is now specified via external modules, which in general are
   expected to be written or supplied by the user.
-* One such method is built into Rose (`grepper.py`), it handles comparisons
-  of text contents between different files or the output from simple commands.
+* One such method is built into Rose (`rose.apps.ana_builtin.grepper`),
+  it handles comparisons of text contents between different files or the output
+  from simple commands.
 * Change in formatting of `rose_ana` app files (though apps in old format 
   will fall-back to the deprecated behaviour; to be retired in a future release).
 * Failure of a single analysis sub-task no longer forces a fatal error in the 
   main task.
 * Hopeful resolution of database locking issues (KGO database functionality is
-  now "opt-in", and the locking mechanism has been changed).
+  now *opt-in*, and the locking mechanism has been changed).
 
 [#1994](https://github.com/metomi/rose/pull/1994):
 rose bush: improve tasks and jobs filtering:
