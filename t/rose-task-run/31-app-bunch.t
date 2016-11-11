@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 47
+tests 51
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -149,6 +149,18 @@ FILE_DIR=$LOG_DIR/$APP/01/
 for KEY in $(seq 0 2); do
     file_grep $TEST_KEY_PREFIX-cmd_eval_ran-$KEY \
         "a comment" $FILE_DIR/bunch.$KEY.out
+done
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Testing ROSE_BUNCH_LOG_PREFIX is correctly set
+#-------------------------------------------------------------------------------
+APP=bunch_print_envar
+#-------------------------------------------------------------------------------
+TEST_KEY_PREFIX=log_prefix
+FILE_DIR=$LOG_DIR/$APP/01/
+for KEY in $(seq 0 3); do
+    file_grep $TEST_KEY_PREFIX-ok-$KEY \
+        "ROSE_BUNCH_LOG_PREFIX: $KEY" $FILE_DIR/bunch.$KEY.out
 done
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
