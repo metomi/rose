@@ -269,6 +269,9 @@ class RoseBunchApp(BuiltinApp):
                 cmd = command.get_command()
                 cmd_stdout = log_format % command.get_out_file()
                 cmd_stderr = log_format % command.get_err_file()
+                prefix = command.get_log_prefix()
+                bunch_environ = os.environ
+                bunch_environ['ROSE_BUNCH_LOG_PREFIX'] = prefix
 
                 if self.dao:
                     if self.dao.check_has_succeeded(key):
@@ -284,7 +287,8 @@ class RoseBunchApp(BuiltinApp):
                     app_runner.popen.run_bg(cmd,
                                             shell=True,
                                             stdout=open(cmd_stdout, 'w'),
-                                            stderr=open(cmd_stderr, 'w'))
+                                            stderr=open(cmd_stderr, 'w'),
+                                            env=bunch_environ)
             sleep(self.SLEEP_DURATION)
 
         if abort and commands:
@@ -316,7 +320,7 @@ class RoseBunchCmd(object):
     def __init__(self, name, command, index):
         self.command_format = command
         self.argsdict = {}
-        self.name = name
+        self.name = str(name)
         self.index = index
 
     def get_command(self):
@@ -333,6 +337,11 @@ class RoseBunchCmd(object):
         """Return error file name"""
 
         return self.OUTPUT_TEMPLATE % (self.name, "err")
+
+    def get_log_prefix(self):
+        """Return log prefix"""
+
+        return self.name
 
 
 class RoseBunchDAO(object):
