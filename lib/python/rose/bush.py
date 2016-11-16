@@ -101,7 +101,6 @@ class RoseBushService(object):
     @cherrypy.expose
     def broadcast_states(self, user, suite, form=None):
         """List current broadcasts of a running or completed suite."""
-        user_suite_dir = self._get_user_suite_dir(user, suite)
         data = {
             "logo": self.logo,
             "title": self.title,
@@ -116,10 +115,8 @@ class RoseBushService(object):
         }
         data["states"].update(
             self.bush_dao.get_suite_state_summary(user, suite))
-        suite_db = os.path.join(
-            user_suite_dir, self.bush_dao.SUITE_DB)
-        data["states"]["last_activity_time"] = \
-            self.get_last_activity_time(suite_db)
+        data["states"]["last_activity_time"] = (
+            self.get_last_activity_time(user, suite))
         data.update(self._get_suite_logs_info(user, suite))
         data["broadcast_states"] = (
             self.bush_dao.get_suite_broadcast_states(user, suite))
@@ -166,7 +163,6 @@ class RoseBushService(object):
             self, user, suite, page=1, order=None, per_page=None,
             no_fuzzy_time="0", form=None):
         """List cycles of a running or completed suite."""
-        user_suite_dir = self._get_user_suite_dir(user, suite)
         conf = ResourceLocator.default().get_conf()
         per_page_default = int(conf.get_value(
             ["rose-bush", "cycles-per-page"], self.CYCLES_PER_PAGE))
@@ -212,10 +208,8 @@ class RoseBushService(object):
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
             self.bush_dao.get_suite_state_summary(user, suite))
-        suite_db = os.path.join(
-            user_suite_dir, self.bush_dao.SUITE_DB)
-        data["states"]["last_activity_time"] = \
-            self.get_last_activity_time(suite_db)
+        data["states"]["last_activity_time"] = (
+            self.get_last_activity_time(user, suite))
         data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
             return simplejson.dumps(data)
@@ -263,7 +257,6 @@ class RoseBushService(object):
                 return a JSON data structure.
 
         """
-        user_suite_dir = self._get_user_suite_dir(user, suite)
         conf = ResourceLocator.default().get_conf()
         per_page_default = int(conf.get_value(
             ["rose-bush", "jobs-per-page"], self.JOBS_PER_PAGE))
@@ -328,10 +321,8 @@ class RoseBushService(object):
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
             self.bush_dao.get_suite_state_summary(user, suite))
-        suite_db = os.path.join(
-            user_suite_dir, self.bush_dao.SUITE_DB)
-        data["states"]["last_activity_time"] = \
-            self.get_last_activity_time(suite_db)
+        data["states"]["last_activity_time"] = (
+            self.get_last_activity_time(user, suite))
         entries, of_n_entries = self.bush_dao.get_suite_job_entries(
             user, suite, cycles, tasks, task_status, job_status, order,
             per_page, (page - 1) * per_page)
@@ -420,25 +411,24 @@ class RoseBushService(object):
         if names:
             name_globs = shlex.split(str(names))
         # Get entries
-        try:
-            items = os.listdir(user_suite_dir_root)
-        except OSError:
-            items = []
-        for item in items:
+        sub_names = [
+            ".service", "log", "share", "work", self.bush_dao.SUITE_CONF]
+        for dirpath, dnames, fnames in os.walk(user_suite_dir_root):
+            if any([name in dnames or name in fnames for name in sub_names]):
+                dnames[:] = []
+            else:
+                continue
+            item = os.path.relpath(dirpath, user_suite_dir_root)
             if not any([fnmatch(item, glob_) for glob_ in name_globs]):
                 continue
-            user_suite_dir = os.path.join(user_suite_dir_root, item)
-            suite_db = os.path.join(user_suite_dir, self.bush_dao.SUITE_DB)
-            if not os.path.exists(suite_db):
-                continue
             try:
-                last_activity_time = self.get_last_activity_time(suite_db)
+                data["entries"].append({
+                    "name": item,
+                    "info": {},
+                    "last_activity_time": (
+                        self.get_last_activity_time(user, item))})
             except OSError:
-                last_activity_time = None
-            data["entries"].append({
-                "name": item,
-                "info": {},
-                "last_activity_time": last_activity_time})
+                continue
 
         if order == "name_asc":
             data["entries"].sort(key=lambda entry: entry["name"])
@@ -566,11 +556,15 @@ class RoseBushService(object):
 
         return lines, job_entry, file_content, f_name
 
-    @staticmethod
-    def get_last_activity_time(suite_db):
+    def get_last_activity_time(self, user, suite):
         """Returns last activity time for a suite based on database stat"""
-        return strftime(
-            "%Y-%m-%dT%H:%M:%SZ", gmtime(os.stat(suite_db).st_mtime))
+        for name in [os.path.join("log", "db"), "cylc-suite.db"]:
+            fname = os.path.join(self._get_user_suite_dir(user, suite), name)
+            try:
+                return strftime(
+                    "%Y-%m-%dT%H:%M:%SZ", gmtime(os.stat(fname).st_mtime))
+            except OSError:
+                continue
 
     @cherrypy.expose
     def viewsearch(self, user, suite, path=None, path_in_tar=None, mode=None,

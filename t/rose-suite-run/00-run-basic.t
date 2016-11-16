@@ -81,17 +81,19 @@ do
 done
 TEST_KEY=$TEST_KEY_BASE-running-reload
 run_pass "$TEST_KEY" rose suite-run --reload \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
+    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol --debug
 sleep 1
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
 touch $SUITE_RUN_DIR/flag # allow the task to die
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
+CONTACT="${HOME}/cylc-run/${NAME}/.service/contact"
+while [[ -e "${CONTACT}" ]] && (($(date +%s) < TIMEOUT))
+do
     sleep 1
 done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
+if [[ -e "${CONTACT}" ]]; then
     fail "$TEST_KEY"
     exit 1
 else

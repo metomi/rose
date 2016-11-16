@@ -33,7 +33,7 @@ run_suite() {
             -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" --name="$NAME" \
             --no-gcontrol -- --debug
     fi
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
+    ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e
 }
 
@@ -56,7 +56,6 @@ run_suite
 TEST_KEY="$TEST_KEY_BASE-share-tens"
 run_pass "$TEST_KEY" \
     rose suite-clean -y -n "$NAME" --only=share/cycle/20?00101T0000Z
-sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 LANG=C sort "$TEST_KEY.out" >"$TEST_KEY.sorted.out"
 if [[ -n "$JOB_HOST" ]]; then
     # We do not know the relative sort order of $SUITE_RUN_DIR and $JOB_HOST.
@@ -83,7 +82,6 @@ run_pass "$TEST_KEY" \
     rose suite-clean -y -n "$NAME" \
     --only=share/cycle/*/hello-world.out \
     --only=etc/*/greet-earth.out
-sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 if [[ -n "$JOB_HOST" ]]; then
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] delete: $SUITE_RUN_DIR/etc/20000101T0000Z/greet-earth.out

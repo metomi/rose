@@ -57,7 +57,7 @@ while ! $CMD_PREFIX "$GREP" 2>/dev/null; do
     fi
     sleep 1
 done
-$CMD_PREFIX "mv ~/.cylc/ports/$NAME $NAME.port"
+$CMD_PREFIX "mv ~/cylc-run/${NAME}/.service/contact ${NAME}.contact"
 ERR_HOST=${HOST:-localhost}
 if [[ -n $HOST ]]; then
     SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run .*\\<$NAME\\>'")
@@ -84,10 +84,10 @@ run_pass "$TEST_KEY.SHORTNAME" \
 #-------------------------------------------------------------------------------
 set +e
 sleep 1
-$CMD_PREFIX "mv $NAME.port ~/.cylc/ports/$NAME"
+$CMD_PREFIX "mv ${NAME}.contact ~/cylc-run/${NAME}/.service/contact"
 SHUTDOWN_OPTS='--kill --max-polls=24 --interval=5'
 for N in $NAME ${NAME0} ${NAME}1 ${NAME%?}; do
-    if $CMD_PREFIX test -f ~/.cylc/ports/$N; then
+    if $CMD_PREFIX test -f ~/cylc-run/$N/.service/contact; then
         rose suite-shutdown --debug -q -y -n $N \
             -- $SHUTDOWN_OPTS 1>/dev/null 2>&1
     fi

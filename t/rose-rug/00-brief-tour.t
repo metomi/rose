@@ -40,7 +40,7 @@ run_pass "$TEST_KEY" \
 #-------------------------------------------------------------------------------
 # Check that the suite runs to success
 TEST_KEY=$TEST_KEY_BASE-db
-sqlite3 $SUITE_RUN_DIR/cylc-suite.db \
+sqlite3 $SUITE_RUN_DIR/log/db \
     'SELECT cycle,name FROM task_events
      WHERE event=="succeeded" ORDER BY cycle,name ASC;' \
     >"$TEST_KEY.out"

@@ -237,7 +237,7 @@
               <h3>rose date</h3>
 
               <p>We can also process the cylc environment variable
-              <samp>$CYLC_TASK_CYCLE_TIME</samp> in our tasks,
+              <samp>$CYLC_TASK_CYCLE_POINT</samp> in our tasks,
               using the date manipulation utility <a href=
               "rose-command.html#rose-date">rose date</a>.</p>
 
@@ -253,7 +253,7 @@
               <pre class="prettyprint lang-cylc">
         script = """
             . $ROSE_DATACPT12H/flight_gate
-            FLIGHT_TIME=$(rose date --print-format="%H:%M" $CYLC_TASK_CYCLE_TIME)
+            FLIGHT_TIME=$(rose date --print-format="%H:%M" $CYLC_TASK_CYCLE_POINT)
             cylc task message "Flight $FLIGHT_TIME now boarding at Gate $GATE"
             sleep 5
             cylc task message "Last call for Flight $FLIGHT_TIME at Gate $GATE"
@@ -300,8 +300,8 @@
               <pre class="prettyprint lang-cylc">
     [[departure]]
         script = """
-            NOW=$(rose date --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
-            ETA=$(rose date --offset=-P1D --offset=PT2H --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
+            NOW=$(rose date --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_POINT)
+            ETA=$(rose date --offset=-P1D --offset=PT2H --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_POINT)
             echo "Welcome to the aircraft. The current time and date is $NOW."
             echo "Since we're crossing the International Date Line, our ETA is $ETA."
         """

@@ -43,7 +43,7 @@ cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
     || cat "${SUITE_DIR}/log/suite/err" >&2
 
 # Remove the "job.out" entry from the suite's public database.
-sqlite3 "${SUITE_DIR}/cylc-suite.db" \
+sqlite3 "${SUITE_DIR}/log/db" \
     'DELETE FROM task_job_logs WHERE filename=="job.out";' 2>'/dev/null' || true
 
 #-------------------------------------------------------------------------------
@@ -64,6 +64,5 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 #-------------------------------------------------------------------------------
 # Tidy up
 rose_ws_kill
-cylc unregister "${SUITE_NAME}" 1>'/dev/null' 2>&1
-rm -fr "${SUITE_DIR}" "${HOME}/.cylc/ports/${SUITE_NAME}" 2>'/dev/null'
+rm -fr "${SUITE_DIR}" 2>'/dev/null'
 exit 0

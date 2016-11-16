@@ -96,7 +96,6 @@ class RoseBushDAO(object):
     REC_CYCLE_QUERY_OP = re.compile(r"\A(before |after |[<>]=?)(.+)\Z")
     REC_SEQ_LOG = re.compile(r"\A(.+\.)([^\.]+)(\.[^\.]+)\Z")
     SUITE_CONF = CylcProcessor.SUITE_CONF
-    SUITE_DB = CylcProcessor.SUITE_DB
     SUITE_DIR_REL_ROOT = CylcProcessor.SUITE_DIR_REL_ROOT
     TASK_STATUS_GROUPS = {
         "active": [
@@ -624,14 +623,24 @@ class RoseBushDAO(object):
             return ret
 
         port_file_path = os.path.expanduser(
-            os.path.join("~" + user_name, ".cylc", "ports", suite_name))
+            os.path.join(
+                "~" + user_name, "cylc-run", suite_name, ".service",
+                "contact"))
         try:
-            port_str, host = open(port_file_path).read().splitlines()
+            host = None
+            port_str = None
+            for line in open(port_file_path):
+                key, value = [item.strip() for item in line.split("=", 1)]
+                if key == "CYLC_SUITE_HOST":
+                    host = value
+                elif key == "CYLC_SUITE_PORT":
+                    port_str = value
         except (IOError, ValueError):
             pass
         else:
-            ret["is_running"] = True
-            ret["server"] = host.split(".", 1)[0] + ":" + port_str
+            if host and port_str:
+                ret["is_running"] = True
+                ret["server"] = host.split(".", 1)[0] + ":" + port_str
 
         stmt = "SELECT status FROM task_states WHERE status GLOB ? LIMIT 1"
         stmt_args = ["*failed"]
@@ -678,8 +687,10 @@ class RoseBushDAO(object):
             prefix = "~"
             if user_name:
                 prefix += user_name
-            db_f_name = os.path.expanduser(os.path.join(
-                prefix,
-                self.get_suite_dir_rel(suite_name, CylcProcessor.SUITE_DB)))
-            self.daos[key] = CylcSuiteDAO(db_f_name)
+            for name in [os.path.join("log", "db"), "cylc-suite.db"]:
+                db_f_name = os.path.expanduser(os.path.join(
+                    prefix, self.get_suite_dir_rel(suite_name, name)))
+                self.daos[key] = CylcSuiteDAO(db_f_name)
+                if os.path.exists(db_f_name):
+                    break
         return self.daos[key]
