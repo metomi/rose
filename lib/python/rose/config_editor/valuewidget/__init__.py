@@ -69,6 +69,9 @@ def chooser(value, metadata, error):
     m_values = metadata.get(rose.META_PROP_VALUES)
     m_length = metadata.get(rose.META_PROP_LENGTH)
     m_hint = metadata.get(rose.META_PROP_VALUE_HINTS)
+    if not (m_values is not None and m_length is None):
+        if rose.env.contains_env_var(value):
+            return text.RawValueWidget
     if (m_type is None and m_values is None and m_length is None and
        m_hint is None):
         return text.RawValueWidget
@@ -76,6 +79,8 @@ def chooser(value, metadata, error):
        m_type in ['logical', 'boolean', 'python_boolean']):
         return booltoggle.BoolToggleValueWidget
     if m_length is None:
+        if rose.env.contains_env_var(value) and value not in m_values:
+            return text.RawValueWidget
         if m_values is not None and len(m_values) <= 4:
             return radiobuttons.RadioButtonsValueWidget
         if m_values is not None and len(m_values) > 4:
