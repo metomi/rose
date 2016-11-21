@@ -201,7 +201,8 @@ TIP_REMOVE_FILTER_GROUP = "Remove bracket"
 TIP_SEARCH_ADVANCED = "Query by logical expressions"
 TIP_SEARCH_BUTTON = "Search database"
 TIP_SEARCH_SIMPLE = "Search for text"
-TIP_SEARCH_SIMPLE_ENTRY = "Enter text to search for"
+TIP_SEARCH_SIMPLE_ENTRY = (
+    "Enter text to search for (may contain SQL wildcard characters)")
 TIP_SHOW_HIDE_BUTTON = "Show/hide the advanced search pane"
 TIP_STATUSBAR_SOURCE = "Data source"
 TIP_TOOLBAR_CHECKOUT = "Checkout"

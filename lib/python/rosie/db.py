@@ -344,7 +344,7 @@ class DAO(object):
             from_obj, cols = self._get_join_and_columns()
         where = None
         if not isinstance(s, list):
-            s = s.split()
+            s = [s]
         where = None
         for word in s:
             expr = None

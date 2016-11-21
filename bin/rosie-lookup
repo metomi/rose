@@ -47,6 +47,10 @@
 #     "M" means that the suite is checked out and modified.
 #     "X" means that the suite is checked out but is corrupted.
 #
+#     Search strings may contain SQL wildcard characters. E.g.
+#     % (percent) is a substitute for zero or more characters.
+#     _ (underscore) is a substitute for a single character.
+#
 # OPTIONS
 #     --address-mode, --url, -A, -U
 #         Shorthand for "--lookup-mode=address".
