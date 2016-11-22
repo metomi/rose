@@ -36,8 +36,10 @@
 # OPTIONS
 #     --config=DIR, -C DIR
 #         Use configuration in DIR instead of $PWD.
+#     --default-only
+#         Run only Rose default macros.
 #     --fix, -F
-#         Run Rose internal transformer (fixer) macros.
+#         Run transformer (fixer) macros.
 #     --meta-path=PATH, -M PATH
 #         Prepend PATH to the metadata search path (look here first).
 #         This option can be used repeatedly to load multiple paths.

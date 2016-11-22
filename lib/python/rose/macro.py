@@ -630,6 +630,7 @@ def get_macros_for_config(app_config=None,
                           config_directory=None,
                           return_modules=False,
                           include_system=False,
+                          include_user=True,
                           no_warn=False):
     """Driver function to return macro names for a config object."""
     if app_config is None:
@@ -640,7 +641,9 @@ def get_macros_for_config(app_config=None,
         return []
     meta_filepaths = [
         os.path.join(v, k) for k, v in meta_config_tree.files.items()]
-    modules = load_meta_macro_modules(meta_filepaths)
+    modules = []
+    if include_user:
+        modules.extend(load_meta_macro_modules(meta_filepaths))
     if include_system:
         import rose.macros  # Done to avoid cyclic top-level imports.
         modules.append(rose.macros)
@@ -885,7 +888,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
                opt_conf_dir=None, opt_fix=False,
                opt_non_interactive=False, opt_output_dir=None,
                opt_validate_all=False, verbosity=None,
-               no_warn=False):
+               no_warn=False, default_only=False):
     """Run standard or custom macros for a configuration."""
 
     reporter = rose.reporter.Reporter(verbosity)
@@ -894,6 +897,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         config_map[None], opt_conf_dir,
         return_modules=True,
         include_system=True,
+        include_user=not default_only,
         no_warn=no_warn
     )
 
@@ -1294,7 +1298,7 @@ def parse_macro_args(argv=None):
     """Parse options/arguments for rose macro and upgrade."""
     opt_parser = RoseOptionParser()
     options = ["conf_dir", "meta_path", "non_interactive", "output_dir",
-               "fix", "validate_all", "no_warn", "suite_only"]
+               "fix", "validate_all", "no_warn", "suite_only", "default_only"]
     opt_parser.add_my_options(*options)
     if argv is None:
         opts, args = opt_parser.parse_args()
@@ -1431,7 +1435,8 @@ def main():
         ret.append(run_macros(
             config_map, meta_config, config_name, list(args), opts.conf_dir,
             opts.fix, opts.non_interactive, opts.output_dir,
-            opts.validate_all, verbosity, no_warn=opts.no_warn
+            opts.validate_all, verbosity, no_warn=opts.no_warn,
+            default_only=opts.default_only
         ))
     # return 0 if all macros return True else 1
     return_code = 0 if reduce(lambda x, y: x and y, ret) is True else 1

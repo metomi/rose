@@ -23,10 +23,9 @@
 init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
-tests 7
+tests 12
 #-------------------------------------------------------------------------------
-# run from suite directory
-TEST_KEY=$TEST_KEY_BASE-suite
+# Setup.
 TEST_SUITE=test-suite
 mkdir -p $TEST_DIR/$TEST_SUITE/meta
 cat >$TEST_DIR/$TEST_SUITE/rose-suite.conf <<'__SUITE_CONF__'
@@ -37,15 +36,6 @@ cat >$TEST_DIR/$TEST_SUITE/meta/rose-meta.conf <<'__META_CONF__'
 [env=SUITE]
 type=integer
 __META_CONF__
-run_fail "$TEST_KEY" rose macro -V -C $TEST_DIR/$TEST_SUITE
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 1
-    env=SUITE=sweet
-        Not an integer: 'sweet'
-__ERR__
-#-------------------------------------------------------------------------------
-# run from suite/app directory
-TEST_KEY=$TEST_KEY_BASE-suite-app-dir
 mkdir -p $TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros
 cat >$TEST_DIR/$TEST_SUITE/app/foo/rose-app.conf <<'__APP_CONF__'
 [env]
@@ -54,6 +44,7 @@ __APP_CONF__
 cat >$TEST_DIR/$TEST_SUITE/app/foo/meta/rose-meta.conf <<'__META_CONF__'
 [env=FOO]
 macro=foo.FooChecker
+type=integer
 __META_CONF__
 touch $TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/__init__.py
 cat >$TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/foo.py <<'__MACRO__'
@@ -78,24 +69,20 @@ class FooChecker(rose.macro.MacroBase):
         # option.
         return config, self.reports
 __MACRO__
-run_fail "$TEST_KEY" rose macro -V -C $TEST_DIR/$TEST_SUITE/app
+#-------------------------------------------------------------------------------
+# List all macros.
+TEST_KEY=$TEST_KEY_BASE-all
+run_pass "$TEST_KEY" rose macro -C $TEST_DIR/$TEST_SUITE
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [INFO] app: foo
-[INFO] suite: test-suite
-__OUT__
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[V] foo.FooChecker: issues: 1
-    env=FOO=baz
-        Not foo enough
-[V] rose.macros.DefaultValidators: issues: 1
-    env=SUITE=sweet
-        Not an integer: 'sweet'
-__ERR__
-#-------------------------------------------------------------------------------
-# run with --suite-only option
-TEST_KEY=$TEST_KEY_BASE-suite-only
-run_pass "$TEST_KEY" rose macro -C $TEST_DIR/$TEST_SUITE/app --suite-only
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[V] foo.FooChecker
+    # Checks weather suite is sweet enough.
+[V] rose.macros.DefaultValidators
+    # Runs all the default checks, such as compulsory checking.
+[T] foo.FooChecker
+    # Checks weather suite is sweet enough.
+[T] rose.macros.DefaultTransforms
+    # Runs all the default fixers, such as trigger fixing.
 [INFO] suite: test-suite
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
@@ -103,6 +90,69 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
     # Runs all the default fixers, such as trigger fixing.
 __OUT__
 #-------------------------------------------------------------------------------
-
+# List only default macros.
+TEST_KEY=$TEST_KEY_BASE-default-only
+run_pass "$TEST_KEY" rose macro -C $TEST_DIR/$TEST_SUITE --default-only
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[INFO] app: foo
+[V] rose.macros.DefaultValidators
+    # Runs all the default checks, such as compulsory checking.
+[T] rose.macros.DefaultTransforms
+    # Runs all the default fixers, such as trigger fixing.
+[INFO] suite: test-suite
+[V] rose.macros.DefaultValidators
+    # Runs all the default checks, such as compulsory checking.
+[T] rose.macros.DefaultTransforms
+    # Runs all the default fixers, such as trigger fixing.
+__OUT__
+#-------------------------------------------------------------------------------
+# Run all validate macros.
+TEST_KEY=$TEST_KEY_BASE-validate
+run_fail "$TEST_KEY" rose macro -C $TEST_DIR/$TEST_SUITE -V
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__OUT__'
+[V] foo.FooChecker: issues: 1
+    env=FOO=baz
+        Not foo enough
+[V] rose.macros.DefaultValidators: issues: 1
+    env=FOO=baz
+        Not an integer: 'baz'
+[V] rose.macros.DefaultValidators: issues: 1
+    env=SUITE=sweet
+        Not an integer: 'sweet'
+__OUT__
+#-------------------------------------------------------------------------------
+# Run only default validate macros.
+TEST_KEY=$TEST_KEY_BASE-validate-default-only
+run_fail "$TEST_KEY" rose macro -C $TEST_DIR/$TEST_SUITE -V --default-only
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__OUT__'
+[V] rose.macros.DefaultValidators: issues: 1
+    env=FOO=baz
+        Not an integer: 'baz'
+[V] rose.macros.DefaultValidators: issues: 1
+    env=SUITE=sweet
+        Not an integer: 'sweet'
+__OUT__
+#-------------------------------------------------------------------------------
+# Run all fixer macros.
+TEST_KEY=$TEST_KEY_BASE-fixer
+run_pass "$TEST_KEY" rose macro -C $TEST_DIR/$TEST_SUITE -F
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[INFO] app: foo
+[T] foo.FooChecker: changes: 0
+[T] rose.macros.DefaultTransforms: changes: 0
+[INFO] suite: test-suite
+[T] rose.macros.DefaultTransforms: changes: 0
+__OUT__
+#-------------------------------------------------------------------------------
+# Run only default fixer macros.
+TEST_KEY=$TEST_KEY_BASE-fixer-default-only
+run_pass "$TEST_KEY" rose macro -C $TEST_DIR/$TEST_SUITE -F --default-only
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[INFO] app: foo
+[T] rose.macros.DefaultTransforms: changes: 0
+[INFO] suite: test-suite
+[T] rose.macros.DefaultTransforms: changes: 0
+__OUT__
+#-------------------------------------------------------------------------------
 rm -r $TEST_DIR/$TEST_SUITE
 exit

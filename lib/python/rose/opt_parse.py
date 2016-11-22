@@ -136,6 +136,11 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "debug_mode",
              "help": "Report trace back."}],
+        "default_only": [
+            ["--default-only"],
+            {"action": "store_true",
+             "default": False,
+             "help": "Run only Rose default macros."}],
         "defines": [
             ["--define", "-D"],
             {"action": "append",
@@ -187,7 +192,7 @@ class RoseOptionParser(OptionParser):
             ["--fix", "-F"],
             {"action": "store_true",
              "dest": "fix",
-             "help": "Fix the configuration."}],
+             "help": "Run transformer (fixer) macros."}],
         "force_mode": [
             ["--force", "-f"],
             {"action": "store_true",
