@@ -20,8 +20,8 @@
 """Implement "rosie go"."""
 
 import ast
-import functools
 import os
+import pwd
 import subprocess
 import sys
 import threading
@@ -111,7 +111,8 @@ class MainWindow(gtk.Window):
         self.usernames = {}
         for prefix in self.ws_client.auth_managers.keys():
             self.usernames[prefix] = self.config.get_value(
-                ["rosie-id", "prefix-username." + prefix]) or os.getlogin()
+                ["rosie-id", "prefix-username." + prefix],
+                default=pwd.getpwuid(os.getuid()).pw_name)
 
         self.set_icon(rose.gtk.util.get_icon(system="rosie"))
         if rosie.browser.ICON_PATH_SCHEDULER is None:
