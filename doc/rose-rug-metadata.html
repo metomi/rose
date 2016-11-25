@@ -521,7 +521,11 @@ fail-if=any(namelist:test=ctrl_array % this == 0)
 
                 <ul>
                   <li><code>rose macro --fix</code> - runs all
-                  transformer macros.</li>
+                  internal transformer (fixer) macros.</li>
+                  <li><code>rose macro --transform</code> - runs
+                  all transformer macros.</li>
+                  <li><code>rose macro --validate</code> - runs
+                  all validator macros.</li>
                   <li><code>rose macro MY_MACRO</code> - runs
                   a macro called <code>MY_MACRO</code>.</li>
                 </ul>
