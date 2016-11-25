@@ -2,8 +2,8 @@
 [cylc]
     UTC mode=True
     [[events]]
-        timeout handler=rose suite-hook --shutdown
-        timeout=2
+        abort on timeout=True
+        timeout=PT2M
 [scheduling]
     [[dependencies]]
         graph=my_task_1
