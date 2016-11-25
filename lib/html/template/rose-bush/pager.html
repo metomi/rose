@@ -37,11 +37,17 @@
             {% if order -%}
               <input type="hidden" name="order" value="{{order}}" />
             {% endif -%}
-            {% for status in ["active", "success", "fail"] -%}
-              {% if no_statuses and status in no_statuses -%}
-                <input type="hidden" name="no_status" value="{{status}}" />
+            {% for key, value in task_statuses -%}
+              {% if value == "1" -%}
+              <input type="hidden" name="task_status" value="{{key}}" />
               {% endif -%}
             {% endfor -%}
+            {% if all_task_statuses -%}
+              <input type="hidden" name="task_status" value="" />
+            {% endif -%}
+            {% if job_status -%}
+              <input type="hidden" name="job_status" value="{{job_status}}" />
+            {% endif -%}
             <ul class="list-inline">
               <li class="previous">
                 <button id="page-prev" title="previous"
