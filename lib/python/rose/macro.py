@@ -1417,7 +1417,6 @@ def main():
 
     verbosity = 1 + opts.verbosity - opts.quietness
 
-
     # run macros for each app
     ret = [True]
     dir_types = {rose.TOP_CONFIG_NAME: 'suite', rose.SUB_CONFIG_NAME: 'app'}
