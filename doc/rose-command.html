@@ -2137,15 +2137,15 @@ launcher-preopts.mpiexec=-n $NPROC
 
             <dl>
               <dt><kbd>HOST_SOURCE_project</kbd></dt>
-              
+
               <dd>The complete list of source trees for a given
               project. Working copies in this list have their
               hostname prefixed, e.g. host:/path/wc.</dd>
 
               <dt><kbd>HOST_SOURCE_project_BASE</kbd></dt>
-              
+
               <dd>The base of the project specified on the command
-              line. This is intended to specify the location of 
+              line. This is intended to specify the location of
               <kbd>fcm-make</kbd> config files. Working copies in
               this list have their hostname prefixed.</dd>
 
@@ -2157,16 +2157,16 @@ launcher-preopts.mpiexec=-n $NPROC
               <dt><kbd>SOURCE_project</kbd></dt>
 
               <dd>The complete list of source trees for a given
-              project.Unlike the HOST_ variable of similar name, 
-              paths to working copies do NOT include the host 
+              project.Unlike the HOST_ variable of similar name,
+              paths to working copies do NOT include the host
               name.</dd>
 
               <dt><kbd>SOURCE_project_BASE</kbd></dt>
 
               <dd>The base of the project specified on the command
               line. This is intended to specify the location of
-              <kbd>fcm-make</kbd> config files. Unlike the HOST_ 
-              variable of similar name, paths to working copies 
+              <kbd>fcm-make</kbd> config files. Unlike the HOST_
+              variable of similar name, paths to working copies
               do NOT include the host name.</dd>
 
               <dt><kbd>SOURCE_project_REV</kbd></dt>
@@ -3520,6 +3520,12 @@ rose test-battery -v t/rose-app-run/07-opt.t
             <p>An address URL may contain shell meta characters, so
             remember to put it in quotes.</p>
 
+            <p>Search strings may contain <a href=
+            "http://www.w3schools.com/sql/sql_wildcards.asp">SQL
+            wildcard characters</a>. E.g. A percent sign <kbd>%</kbd>
+            is a substitute for zero or more characters.  An underscore sign
+            <kbd>_</kbd> is a substitute for a single character.</p>
+
             <p>If no argument is specified, <code>rosie go</code>
             will display a list of all your locally checked out
             suites.</p>
@@ -3814,6 +3820,12 @@ its third generation child. Also supports use of the <kbd>
             newer revision.<br />
             "S" means that the suite is checked out but on a
             different branch.<br /></p>
+
+            <p>Search strings may contain <a href=
+            "http://www.w3schools.com/sql/sql_wildcards.asp">SQL
+            wildcard characters</a>. E.g. A percent sign <kbd>%</kbd>
+            is a substitute for zero or more characters.  An underscore sign
+            <kbd>_</kbd> is a substitute for a single character.</p>
 
             <h3>OPTIONS</h3>
 

@@ -26,7 +26,7 @@
 if ! python -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all '"cherrypy" or "sqlalchemy" not installed'
 fi
-tests 66
+tests 75
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.
 export TZ='UTC'
@@ -195,6 +195,35 @@ local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
 =     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
 url: http://$HOSTNAME:$PORT/foo/search?s=a
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-search-results-general-2
+run_pass "$TEST_KEY" rosie lookup 'a%'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+local suite             owner  project   title
+=     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
+=     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
+=     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
+url: http://$HOSTNAME:$PORT/foo/search?s=a%25
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-search-results-general-3
+run_pass "$TEST_KEY" rosie lookup 't a'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+local suite             owner  project   title
+=     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
+url: http://$HOSTNAME:$PORT/foo/search?s=t+a
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-search-results-general-4
+run_pass "$TEST_KEY" rosie lookup 't a_l the'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+local suite             owner  project   title
+=     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
+url: http://$HOSTNAME:$PORT/foo/search?s=t+a_l+the
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

@@ -38,6 +38,10 @@
 #     An address URL may contain shell meta characters, so remember to put it
 #     in quotes.
 #
+#     Search strings may contain SQL wildcard characters. E.g.
+#     % (percent) is a substitute for zero or more characters.
+#     _ (underscore) is a substitute for a single character.
+#
 #     If no argument is specified, rosie go will display a list of all your
 #     locally checked out suites.
 #

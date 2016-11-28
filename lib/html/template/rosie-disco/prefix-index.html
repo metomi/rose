@@ -52,22 +52,20 @@
       <div id="body-query">
         <form id="search" class="form-inline" action="search">
           <div>
+            <input id="s" class="search-query form-control"
+            type="text" name="s" placeholder="Search term ..."
+            title="Search term ... (may contain SQL wildcard characters)"
 {% if s %}
-            <input id="s" class="search-query form-control"
-            type="text" name="s"
-            placeholder="Search term ..." value="{{ s }}" />
-{% else %}
-            <input id="s" class="search-query form-control"
-            type="text" name="s"
-            placeholder="Search term ..." />
+            value="{{ s }}"
 {% endif %}
-              <div class="checkbox">
-                <label>
-                  <input id="search-all" type="checkbox" name="all_revs"
-                  value="1"{% if all_revs %} checked="checked"{% endif %} />
-                    all revisions
-                </label>
-              </div>
+            />
+            <div class="checkbox">
+              <label>
+                <input id="search-all" type="checkbox" name="all_revs"
+                value="1"{% if all_revs %} checked="checked"{% endif %} />
+                  all revisions
+              </label>
+            </div>
             <input class="btn btn-primary" type="submit" value="search"/>
           </div>
         </form>
