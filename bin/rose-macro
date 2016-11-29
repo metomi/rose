@@ -37,7 +37,8 @@
 #     --config=DIR, -C DIR
 #         Use configuration in DIR instead of $PWD.
 #     --fix, -F
-#         Run Rose internal transformer (fixer) macros.
+#         Prepend all internal transformer (fixer) macros to the argument
+#         list.
 #     --meta-path=PATH, -M PATH
 #         Prepend PATH to the metadata search path (look here first).
 #         This option can be used repeatedly to load multiple paths.
@@ -50,8 +51,10 @@
 #         Reduce verbosity.
 #     --suite-only
 #         Run only for suite level macros.
+#     --transform, -T
+#         Prepend all transformer macros to the argument list.
 #     --validate, -V
-#         Prepend all validators to the argument list.
+#         Prepend all validator macros to the argument list.
 #
 # ARGUMENTS
 #     MACRO_NAME ...

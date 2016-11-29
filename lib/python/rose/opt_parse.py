@@ -186,8 +186,10 @@ class RoseOptionParser(OptionParser):
         "fix": [
             ["--fix", "-F"],
             {"action": "store_true",
+             "default": False,
              "dest": "fix",
-             "help": "Fix the configuration."}],
+             "help": ("Prepend all internal transformer (fixer) macros to"
+                      "the argument list.")}],
         "force_mode": [
             ["--force", "-f"],
             {"action": "store_true",
@@ -633,6 +635,12 @@ class RoseOptionParser(OptionParser):
             ["--to-web"],
             {"action": "store_true",
              "help": "Convert ID to the web source URL"}],
+        "transform_all": [
+            ["-T", "--transform"],
+            {"action": "store_true",
+             "dest": "transform_all",
+             "default": False,
+             "help": "Prepend all transformer macros to the argument list."}],
         "unbound": [
             ["--unbound", "--undef"],
             {"metavar": "STRING",
@@ -666,7 +674,7 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "validate_all",
              "default": False,
-             "help": "Switch on all validators."}],
+             "help": "Prepend all validator macros to the argument list."}],
         "verbosity": [
             ["--verbose", "-v"],
             {"action": "count",

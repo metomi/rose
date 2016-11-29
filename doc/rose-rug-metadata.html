@@ -504,26 +504,33 @@ fail-if=any(namelist:test=ctrl_array % this == 0)
                 editor) of the config editor. It applies Rose
                 built-in macros to applications, plus any custom
                 macros defined in the metadata.</p>
+
+                <p>When run from an application directory <code>
+                rose macro</code> will run on the contained
+                rose-app.conf file. When run from elsewhere
+                within the suite's directory <code>rose macro</code>
+                will run on all rose-app.conf files as well as the
+                rose-suite.conf file.</p>
+
               </div>
 
               <div class="slide">
                 <h3 class="alwayshidden">rose macro Examples</h3>
+                <p>The macros to be run can be specified in the
+                following ways:</p>
 
-                <p>Running <code>rose macro --validate</code> in an
-                application directory will check against all
-                built-in and custom <em>validator</em> macros.</p>
+                <ul>
+                  <li><code>rose macro --fix</code> - runs all
+                  internal transformer (fixer) macros.</li>
+                  <li><code>rose macro --transform</code> - runs
+                  all transformer macros.</li>
+                  <li><code>rose macro --validate</code> - runs
+                  all validator macros.</li>
+                  <li><code>rose macro MY_MACRO</code> - runs
+                  a macro called <code>MY_MACRO</code>.</li>
+                </ul>
 
-                <p>Running <code>rose macro --fix</code> will make
-                Rose run the built-in transformer macros to fix
-                your application.</p>
-              </div>
-
-              <div class="slide">
-                <h3 class="alwayshidden">rose macro Examples
-                (Continued)</h3>
-
-                <p>Running <code>rose macro MY_MACRO</code> will
-                run a macro called <code>MY_MACRO</code>. In an
+                <p> In an
                 example app in the rose distribution:</p>
                 <pre class="shell">
 rose macro fib.FibonnaciChecker

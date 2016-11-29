@@ -884,7 +884,7 @@ def get_metadata_for_config_id(setting_id, meta_config):
 def run_macros(config_map, meta_config, config_name, macro_names,
                opt_conf_dir=None, opt_fix=False,
                opt_non_interactive=False, opt_output_dir=None,
-               opt_validate_all=False, verbosity=None,
+               opt_validate_all=False, opt_transform_all=False, verbosity=None,
                no_warn=False):
     """Run standard or custom macros for a configuration."""
 
@@ -901,12 +901,17 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     methods = []
     if opt_validate_all:
         methods.append(VALIDATE_METHOD)
-    if opt_fix:
+    if opt_transform_all or opt_fix:
         methods.append(TRANSFORM_METHOD)
     macros_by_type = {}
     for macro_method in methods:
         macros_by_type[macro_method] = []
         for module_name, class_name, method, help in macro_tuples:
+            if opt_fix and not opt_transform_all:
+                # Only include internal transformer macros for
+                # rose macro --fix.
+                if module_name != rose.macros.__name__:
+                    continue
             if method == macro_method:
                 macro_name = ".".join([module_name, class_name])
                 macros_by_type[macro_method].append(macro_name)
@@ -1294,7 +1299,7 @@ def parse_macro_args(argv=None):
     """Parse options/arguments for rose macro and upgrade."""
     opt_parser = RoseOptionParser()
     options = ["conf_dir", "meta_path", "non_interactive", "output_dir",
-               "fix", "validate_all", "no_warn", "suite_only"]
+               "fix", "validate_all", "no_warn", "suite_only", "transform_all"]
     opt_parser.add_my_options(*options)
     if argv is None:
         opts, args = opt_parser.parse_args()
@@ -1431,7 +1436,8 @@ def main():
         ret.append(run_macros(
             config_map, meta_config, config_name, list(args), opts.conf_dir,
             opts.fix, opts.non_interactive, opts.output_dir,
-            opts.validate_all, verbosity, no_warn=opts.no_warn
+            opts.validate_all, opts.transform_all, verbosity,
+            no_warn=opts.no_warn
         ))
     # return 0 if all macros return True else 1
     return_code = 0 if reduce(lambda x, y: x and y, ret) is True else 1
