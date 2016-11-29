@@ -640,7 +640,7 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "transform_all",
              "default": False,
-             "help": "Prepend all transformers to the argument list."}],
+             "help": "Prepend all transformer macros to the argument list."}],
         "unbound": [
             ["--unbound", "--undef"],
             {"metavar": "STRING",
@@ -674,7 +674,7 @@ class RoseOptionParser(OptionParser):
             {"action": "store_true",
              "dest": "validate_all",
              "default": False,
-             "help": "Prepend all validators to the argument list."}],
+             "help": "Prepend all validator macros to the argument list."}],
         "verbosity": [
             ["--verbose", "-v"],
             {"action": "count",

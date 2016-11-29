@@ -52,9 +52,9 @@
 #     --suite-only
 #         Run only for suite level macros.
 #     --transform, -T
-#         Prepend all transformers to the argument list.
+#         Prepend all transformer macros to the argument list.
 #     --validate, -V
-#         Prepend all validators to the argument list.
+#         Prepend all validator macros to the argument list.
 #
 # ARGUMENTS
 #     MACRO_NAME ...
