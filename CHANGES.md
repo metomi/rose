@@ -5,6 +5,36 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2016.11.1 (2016-11-29)
+
+Rose release 46. This release works best with
+[cylc-6.11.2](https://github.com/cylc/cylc/releases/tag/6.11.2) and
+[fcm-2016.10.0](https://github.com/metomi/fcm/releases/tag/2016.10.0).
+
+### Noteworthy Changes
+
+[#2020](https://github.com/metomi/rose/pull/2020):
+Rose Bush: fix task/job status filter for the pager widget.
+
+[#2018](https://github.com/metomi/rose/pull/2018):
+rose macro: new `--transform` option to prepend all transformer macros to the
+argument list. The existing `--fix` option will now prepend all internal
+transformer (fixer) macros to the argument list.
+
+[#2014](https://github.com/metomi/rose/pull/2014):
+Rosie Disco: now respect space characters in individual search terms.
+
+[#2013](https://github.com/metomi/rose/pull/2013):
+rose config-edit: improve spin button widget behaviour when value is an
+environment variable syntax.
+
+[#2011](https://github.com/metomi/rose/pull/2011):
+rose_bunch: now provide an environment variable `ROSE_BUNCH_LOG_PREFIX` for
+each bunch instance at runtime to identify the log prefix that will be used for
+output.
+
+--------------------------------------------------------------------------------
+
 ## 2016.11.0 (2016-11-11)
 
 Rose release 45. This release works best with
