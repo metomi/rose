@@ -18,7 +18,7 @@ Rose Bush: fix task/job status filter for the pager widget.
 
 [#2018](https://github.com/metomi/rose/pull/2018):
 rose macro: new `--transform` option to prepend all transformer macros to the
-argument list. The existing `--fix` option will now prepend all internal
+argument list. The existing `--fix` option will still prepend all internal
 transformer (fixer) macros to the argument list.
 
 [#2014](https://github.com/metomi/rose/pull/2014):
