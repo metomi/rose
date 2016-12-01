@@ -586,40 +586,63 @@ default=echo 'Hello World'
               </div>
 
               <div class="slide">
-                <h2 id="jinja2">Jinja2</h2>
+                <h2 id="parameterization">Parameterization</h2>
 
-                <p>cylc uses a templating language called Jinja2
-                that you can use to collapse duplicated portions of
-                configuration or insert settings.</p>
+                <p>cylc provides an inbuilt templating language that you can
+                use to generate repeated graphing and runtime entries by
+                working through a list of parameter values.</p>
 
-                <p>This means that you can embed special
-                instruction code in the <samp>suite.rc</samp> file
-                to generate or insert text that will be expanded at
-                runtime.</p>
+                <p>This allows you to reduce down sections of the
+                <samp>suite.rc</samp> file into special instruction code that
+                will be expanded by cylc at runtime.</p>
               </div>
 
               <div class="slide">
-                <h3 class="alwayshidden">Jinja2 Loop</h3>
+                <h3 id="parameterized-graphing">Parameterized graphing</h3>
 
-                <p>This can be especially useful when you have a
-                lot of repetition - for example, in an ensemble
-                context. You can use <code>if</code> and
-                <code>for</code> blocks, amongst other things:</p>
+                <p>This can be particularly useful when you have large amounts
+                of repetition - for example, in an ensemble context.</p>
+
+                <p>Sets of parameters are configured in the
+                <samp>[cylc][[parameters]]</samp> section. For example:</p>
                 <pre class="prettyprint lang-cylc">
-{%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
-  [[hello_{{ WORLD }}]]
-      inherit = HELLO_FAMILY
-      [[[environment]]]
-          WORLD = {{ WORLD }}
-{%- endfor %}
+[cylc]
+   [[parameters]]
+         world = eris, pluto, makemake, haumea
+</pre>
+                <p>You can then get cylc to work through a set of parameters
+                using <var>&lt;parameter&gt;</var> tags.
+                <pre class="prettyprint lang-cylc">
+[scheduling]
+   [[dependencies]]
+         graph = hello_&lt;world&gt;
 </pre>
               </div>
 
               <div class="slide">
-                <h3 class="alwayshidden">Jinja2 Result</h3>
+                <h3 id="parameterized-runtime">Parameterized runtime</h3>
+                <p>Similarly, you can work with parameterized items in the
+                runtime section too, further helping you reduce down your
+                <samp>suite.rc</samp>:</p>
+                <pre class="prettyprint lang-cylc">
+  [[hello_&lt;world&gt;]]
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = $CYLC_TASK_PARAM_world
+</pre>
+                <p>Notice that the task name uses <samp>&lt;world&gt;</samp>
+                to access the parameter value, telling cylc that it is a
+                repeated item, while access to its value at runtime is provided
+                by a <samp>$CYLC_TASK_PARAM_</samp> variable with a suffix of
+                the parameter name (in this case <samp>world</samp>).</p>
+              </div>
 
-                <p>This gets processed at runtime, so the file as
-                read in by cylc looks like:</p>
+              <div class="slide">
+                <h3 class="alwayshidden">Parameterization Result</h3>
+
+                <p>This gets processed internally by the running suite process,
+                so cylc sees it in the same way as if you had explicitly
+                written:</p>
                 <pre class="prettyprint lang-cylc">
   [[hello_eris]]
       inherit = HELLO_FAMILY
@@ -641,41 +664,116 @@ default=echo 'Hello World'
               </div>
 
               <div class="slide">
-                <h3 class="alwayshidden">Jinja2
-                rose-suite.conf</h3>
+                <h3 class="alwayshidden">Parameterization and Specific Tasks</h3>
+
+                <p>If, for a particular task that is being parameterized, you
+                want to provide a slight variant then you can do so as:</p>
+                <pre class="prettyprint lang-cylc">
+  [[hello_&lt;world&gt;]] # General case
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = $CYLC_TASK_PARAM_world
+  [[hello_&lt;world=pluto&gt;]] # Specific case
+      inherit = HELLO_FAMILY
+      [[[environment]]]
+          WORLD = $CYLC_TASK_PARAM_world
+          MOON = True
+</pre>
+                <p>Make sure that any specific cases follow the generic one as
+                the last config entry in the <samp>suite.rc</samp> will
+                override any earlier ones.</p>
+              </div>
+
+              <div class="slide">
+                <h3 class="alwayshidden">Further Parameterization</h3>
+
+                <p>Beyond the examples given, Parameterization can be used to
+                automatically generate more complex graphing sections between
+                several sets of parameters. For more details see the 
+                <a href=
+                "http://cylc.github.io/cylc/html/single/cug-html.html">Cylc
+                User Guide.</a></p>
+              </div>
+
+              <div class="slide">
+                <h2 id="jinja2">Jinja2</h2>
+
+                <p>cylc uses a templating language called Jinja2
+                that you can use to embed special
+                instruction code in the <samp>suite.rc</samp> file
+                to generate or insert text that will be expanded at
+                runtime.</p>
+              </div>
+
+              <div class="slide">
+                <h3 class="alwayshidden">Jinja2 Switch</h3>
+
+                <p>This can be especially useful when you have a
+                some task or graphing that you want to be able to easily
+                swap between two modes - for example, for turning on or off
+                an archiving task. You can use <code>if</code> and
+                <code>for</code> blocks, amongst other things:</p>
+                <pre class="prettyprint lang-cylc">
+{% set ARCHIVE_RESULTS=true %}
+[scheduling]
+  [[runtime]]
+    [[[dependencies]]]
+        graph = """
+                HELLO_FAMILY
+{%- if ARCHIVE_RESULTS %}
+                HELLO_FAMILY:succeed-all => archive_results
+{%- endfor %}
+                """
+</pre>
+              </div>
+
+              <div class="slide">
+                <h3 class="alwayshidden">Jinja2 Result</h3>
+
+                <p>This gets processed at suite install time. So, if 
+                <samp>ARCHIVE_RESULTS</samp> is set then the file as
+                read in by cylc looks like:</p>
+                <pre class="prettyprint lang-cylc">
+[scheduling]
+  [[runtime]]
+    [[[dependencies]]]
+        graph = """
+                HELLO_FAMILY
+                HELLO_FAMILY:succeed-all => archive_results
+                """
+</pre>
+              </div>
+
+              <div class="slide">
+                <h3 class="alwayshidden">Jinja2 Result (2)</h3>
+
+                <p>Conversely, if <samp>ARCHIVE_RESULTS</samp> is not set then
+                the file as read in by cylc will look like:</p>
+                <pre class="prettyprint lang-cylc">
+[scheduling]
+  [[runtime]]
+    [[[dependencies]]]
+        graph = """
+                HELLO_FAMILY
+                """
+</pre>
+              </div>
+
+              <div class="slide">
+                <h3 class="alwayshidden">Jinja2 rose-suite.conf</h3>
 
                 <p>You can use Jinja2 to centralise commonly-used
                 settings. Rose supports storing these in the
                 <samp>rose-suite.conf</samp> file - e.g.</p>
                 <pre class="prettyprint lang-rose_conf">
 [jinja2:suite.rc]
-HELLO_WORLDS = ["eris", "pluto", "makemake", "haumea"]
+ARCHIVE_RESULTS=true
 </pre>
-
                 <p>Rose passes variables in this section into the
-                Jinja2 template at runtime. This means that we can
-                have a <samp>suite.rc</samp> snippet that looks
-                like this:</p>
-                <pre class="prettyprint lang-cylc">
-{%- for WORLD in HELLO_WORLDS %}
-  [[hello_{{ WORLD }}]]
-      inherit = HELLO_FAMILY
-      [[[environment]]]
-          WORLD = {{ WORLD }}
-{%- endfor %}
-</pre>
-              </div>
+                Jinja2 template at runtime so your user doesn't have to look
+                for the line to change in the <samp>suite.rc</samp> file.
 
-              <div class="slide">
-                <h3 class="alwayshidden">Jinja2 rose-suite.conf
-                Advantages</h3>
-
-                <p>It's useful to keep commonly-changed variables
-                in the <samp>rose-suite.conf</samp> file, so users
-                don't have to modify the <samp>suite.rc</samp>
-                itself.</p>
-
-                <p>You can also add proper metadata for them such
+              <p>Furthermore, you can also add proper metadata for them such
                 as help, so they have a nice interface in the
                 config editor.</p>
               </div>
