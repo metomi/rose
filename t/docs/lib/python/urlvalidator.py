@@ -197,7 +197,6 @@ def main(root):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print ('Usage: Please supply root directory to validate the contents '
-               'of.')
-        sys.exit(1)
+        sys.exit('Usage: Please supply root directory to validate the '
+                 'contents of.')
     main(sys.argv[1])
