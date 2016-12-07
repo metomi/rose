@@ -79,10 +79,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 raise SuiteEngineGlobalConfCompatError(
                     self.SCHEME, key, lines[0])
 
-    def clean_hook(self, suite_name=None):
-        """Pass."""
-        pass
-
     def cmp_suite_conf(
             self, suite_name, run_mode, strict_mode=False, debug_mode=False):
         """Parse and compare current "suite.rc" with that in the previous run.

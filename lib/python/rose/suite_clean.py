@@ -63,7 +63,6 @@ class SuiteRunCleaner(object):
         os.chdir(os.path.expanduser('~'))
         self.suite_engine_proc.check_suite_not_running(suite_name)
         self._clean(suite_name, only_items)
-        self.suite_engine_proc.clean_hook(suite_name)
 
     def _clean(self, suite_name, only_items=None):
         """Perform the cleaning operations."""
