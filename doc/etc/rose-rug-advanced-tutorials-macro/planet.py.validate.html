@@ -104,7 +104,7 @@ class PlanetChecker(rose.macro.MacroBase):
         p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
         text = p.communicate()[0]
         planets = re.findall("(\w+)&lt;/td&gt;",
-                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
+                             re.sub(r'(?s)^.*(&lt;thead.*?ascension).*$',
                                     r"\1", text))
         distances = re.findall("([\d.]+)&lt;/td&gt;",
                                re.sub('(?s)^.*(Range.*?Brightness).*$',
