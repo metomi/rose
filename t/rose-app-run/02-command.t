@@ -27,6 +27,7 @@ default = true
 false = false
 hello-world = hello
 hello-user = hello $USER
+hello-from-env = hello run by env
 __CONFIG__
 mkdir $PWD/config/bin
 cat > $PWD/config/bin/hello <<'__SCRIPT__'
@@ -35,7 +36,7 @@ echo "Hello ${@:-world}!"
 __SCRIPT__
 chmod +x $PWD/config/bin/hello
 #-------------------------------------------------------------------------------
-tests 12
+tests 15
 #-------------------------------------------------------------------------------
 # Normal mode, command=true.
 TEST_KEY=$TEST_KEY_BASE-true
@@ -71,6 +72,18 @@ test_setup
 run_pass "$TEST_KEY" rose app-run -C ../config -q --command-key=hello-user
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 Hello $USER!
+__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+test_teardown
+#-------------------------------------------------------------------------------
+# Normal mode, command key provided via ROSE_APP_COMMAND_KEY, 
+# command-key=hello-user.
+TEST_KEY=$TEST_KEY_BASE-hello-from-env
+test_setup
+ROSE_APP_COMMAND_KEY="hello-from-env" run_pass "$TEST_KEY" \
+    rose app-run -C ../config -q
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
+Hello run by env!
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 test_teardown

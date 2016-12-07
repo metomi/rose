@@ -392,6 +392,11 @@ rosie UTIL [OPTS] [ARG ...]
               <li>If <var>COMMAND</var> is specified, invoke the
               command.</li>
 
+              <li>If the <var>ROSE_APP_COMMAND_KEY</var> environment variable
+              is set, the command specified in the <var>[command]KEY</var>
+              setting in the application configuration whose KEY matches it
+              is used.</li>
+
               <li>If the <kbd>--command-key=KEY</kbd> option is
               defined, invoke the command specified in
               <var>[command]KEY</var>.</li>
@@ -472,6 +477,11 @@ rosie UTIL [OPTS] [ARG ...]
             <h3>ENVIRONMENT VARIABLES</h3>
 
             <dl>
+              <dt><kbd>optional ROSE_APP_COMMAND_KEY</kbd></dt>
+
+              <dd>Switch to a particular command specified in 
+              <var>[command]KEY</var></dd>
+
               <dt><kbd>optional ROSE_APP_OPT_CONF_KEYS</kbd></dt>
 
               <dd>Each KEY in this space delimited list switches on

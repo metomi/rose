@@ -317,6 +317,11 @@ WORLDS=Mars Jupiter Saturn
               task-run</code>, the arguments are run as a shell
               command.</li>
 
+              <li>If the <code>ROSE_APP_COMMAND_KEY</code> environment variable
+              is set, the command specified in the <var>[command]KEY</var>
+              setting in the application configuration whose KEY matches it
+              is used.</li>
+
               <li>If the <code>--command-key=KEY</code> option is
               specified, the command specified in the
               <var>[command]KEY</var> setting in the application
