@@ -38,14 +38,15 @@ __ERR__
 TEST_KEY="${TEST_KEY_BASE}-name-uuid-installed"
 NAME="$(uuidgen)"
 mkdir -p "${HOME}/cylc-run/${NAME}"
-ROSE_CONF_PATH= run_fail "${TEST_KEY}" rose suite-restart -n "${NAME}"
+ROSE_CONF_PATH= run_fail "${TEST_KEY}" rose suite-restart -n "${NAME}" -- --debug
 # N.B. This relies on output of "cylc restart"
 head -1 "${TEST_KEY}.err" >"${TEST_KEY}.err.head"
 file_cmp "${TEST_KEY}.err.head" "${TEST_KEY}.err.head" <<__ERR__
-[FAIL] cylc restart ${NAME}  # return-code=1, stderr=
+[FAIL] cylc restart ${NAME} --debug # return-code=1, stderr=
 __ERR__
 file_grep "${TEST_KEY}.err.grep" \
-    "ERROR: Suite not found ${NAME}" "${TEST_KEY}.err"
-rmdir "${HOME}/cylc-run/${NAME}"
+    "No such file or directory: '${HOME}/cylc-run/${NAME}/suite.rc'" \
+    "${TEST_KEY}.err"
+rm -fr "${HOME}/cylc-run/${NAME}"
 #-------------------------------------------------------------------------------
 exit

@@ -32,7 +32,7 @@ install_suite() {
         rose suite-run --new -q \
             -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol
     fi
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
+    ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e
 }
 #-------------------------------------------------------------------------------
@@ -73,8 +73,7 @@ fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ans-y
 run_pass "$TEST_KEY" rose suite-clean -v -v $NAME <<<'y'
-run_fail "$TEST_KEY.locahost.ls" \
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME}
+run_fail "$TEST_KEY.locahost.ls" ls -d $HOME/cylc-run/$NAME
 if [[ -n "$JOB_HOST" ]]; then
     run_fail "$TEST_KEY.job-host.ls" ssh "$JOB_HOST" "ls -d cylc-run/$NAME"
 fi
@@ -82,8 +81,7 @@ fi
 TEST_KEY=$TEST_KEY_BASE--name-ans-y
 install_suite
 run_pass "$TEST_KEY" rose suite-clean -v -v -n $NAME <<<'y'
-run_fail "$TEST_KEY.locahost.ls" \
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME}
+run_fail "$TEST_KEY.locahost.ls" ls -d $HOME/cylc-run/$NAME
 if [[ -n "$JOB_HOST" ]]; then
     run_fail "$TEST_KEY.job-host.ls" ssh "$JOB_HOST" "ls -d cylc-run/$NAME"
 fi

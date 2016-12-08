@@ -90,7 +90,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 # Wait for the suite to complete
 touch $SUITE_RUN_DIR/flag
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
+while [[ -e "$HOME/cylc-run/$NAME/.service/contact" ]] && (($(date +%s) < TIMEOUT))
+do
     sleep 1
 done
 rose suite-clean -q -y $NAME || exit 1

@@ -62,10 +62,11 @@ fi
 touch $SUITE_RUN_DIR/flag # let the suite stop
 # Wait for the suite to complete
 TIMEOUT=$(($(date +%s) + 120)) # wait 2 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
+while [[ -e "$HOME/cylc-run/$NAME/.service/contact" ]] && (($(date +%s) < TIMEOUT))
+do
     sleep 1
 done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
+if [[ -e "$HOME/cylc-run/$NAME/.service/contact" ]]; then
     exit 1
 fi
 wait "${ROSE_SUITE_RUN_PID}"

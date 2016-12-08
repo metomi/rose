@@ -42,6 +42,6 @@ file_grep "${TEST_KEY}.err" \
 #-------------------------------------------------------------------------------
 rm -f "${SUITE_RUN_DIR}/work/1/foo/file"
 timeout 60 \
-    bash -c "while test -e '${HOME}/.cylc/ports/${NAME}'; do sleep 1; done"
+    bash -c "while test -e '${HOME}/cylc-run/${NAME}/.service/contact'; do sleep 1; done"
 rose suite-clean -q -y "${NAME}"
 exit

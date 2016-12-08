@@ -5,10 +5,10 @@
 {% endif -%}
 {% set cycle_str = entry.cycle|replace('+', '%2B') -%}
 {% set taskjobs_link = (
-    script ~ "/taskjobs/" ~ user ~ "/" ~ suite ~ "?" ~ no_fuzzy_time_str
+    script ~ "/taskjobs/" ~ user ~ "?&amp;suite=" ~ suite|replace('+', '%2F') ~ no_fuzzy_time_str
 ) -%}
 {% set view_link = (
-    script ~ "/view/" ~ user ~ "/" ~ suite ~ "?" ~ no_fuzzy_time_str
+    script ~ "/view/" ~ user ~ "?&amp;suite=" ~ suite|replace('+', '%2F') ~ no_fuzzy_time_str
 ) -%}
 <tr class="entry"><!-- entry row -->
   <td>
@@ -47,7 +47,7 @@
     <!-- entry: submit_status, run_status -->
     <small>
     {% set link = (
-        script ~ "/taskjobs/" ~ user ~ "/" ~ suite ~ "?" ~
+        script ~ "/taskjobs/" ~ user ~ "?&amp;suite=" ~ suite|replace('+', '%2F') ~
         no_fuzzy_time_str
     ) -%}
     {% if entry.run_status == 0 -%}
@@ -197,7 +197,7 @@
             <li>
               <form action="{{script}}/view" class="form-inline">
                 <input type="hidden" name="user" value="{{user}}"/>
-                <input type="hidden" name="suite" value="{{suite}}"/>
+                <input type="hidden" name="suite" value="{{suite|replace("/", "%2F")}}"/>
                 <input type="hidden" name="no_fuzzy_time"
                 value="{{no_fuzzy_time}}"/>
                 {% if entry.logs[indexes.values()|first].path_in_tar -%}

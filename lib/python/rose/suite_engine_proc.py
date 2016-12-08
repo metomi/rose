@@ -387,10 +387,6 @@ class SuiteEngineProcessor(object):
         if host_names:
             raise SuiteStillRunningError(suite_name, host_names)
 
-    def clean_hook(self, suite_name=None):
-        """Run suite engine dependent logic (at end of "rose suite-clean")."""
-        raise NotImplementedError()
-
     def cmp_suite_conf(
             self, suite_name, run_mode, strict_mode=False, debug_mode=False):
         """Compare current suite configuration with that in the previous run.
