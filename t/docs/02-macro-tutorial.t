@@ -17,13 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose date".
+# Test that the rose macro tutorials still work.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 tests 2
 #-------------------------------------------------------------------------------
-# Validate URLs in the rose docs (see test 01-validate-validator.t for defailt.
 run_pass ${TEST_KEY_BASE} python $TEST_SOURCE_DIR/lib/python/heavens_above.py
 file_cmp "${TEST_KEY_BASE}.err" "${TEST_KEY_BASE}.err" <'/dev/null'
 

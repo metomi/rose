@@ -17,13 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose date".
+# Test the URL validator used in t/docs/00-urls.t.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 tests 10
 #-------------------------------------------------------------------------------
-# Test the URL validator script for correct functioning.
 run_fail ${TEST_KEY_BASE} python $TEST_SOURCE_DIR/lib/python/urlvalidator.py \
   "$TEST_SOURCE_DIR"
 file_grep $TEST_KEY_BASE-link "some-file\.css" "${TEST_KEY_BASE}.err"
