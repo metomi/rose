@@ -51,7 +51,7 @@ else
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-status"
-sqlite3 $SUITE_RUN_DIR/cylc-suite.db \
+sqlite3 $SUITE_RUN_DIR/log/db \
     'SELECT name,status FROM task_states ORDER BY name;' \
     >"$TEST_KEY"
 if [[ -n $JOB_HOST ]]; then

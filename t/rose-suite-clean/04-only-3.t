@@ -26,7 +26,7 @@ run_suite() {
     rose suite-run --new -q \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" --name="$NAME" \
         --no-gcontrol -- --debug
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
+    ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e
 }
 
@@ -50,7 +50,6 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_suite
 TEST_KEY="$TEST_KEY_BASE-work"
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work
-sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 LANG=C sort >"$TEST_KEY.out.expected" <<__OUT__
 [INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
 [INFO] delete: $SUITE_RUN_DIR/work

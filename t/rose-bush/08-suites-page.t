@@ -167,12 +167,8 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
 #-------------------------------------------------------------------------------
 # Tidy up
 rose_ws_kill
-cylc unregister "${SUITE_NAME_1_PREFIX}[abc]" 1>'/dev/null' 2>&1
-cylc unregister "${SUITE_NAME_2_PREFIX}.." 1>'/dev/null' 2>&1
 rm -fr \
     "${HOME}/cylc-run/${SUITE_NAME_1_PREFIX}"[abc] \
-    "${HOME}/.cylc/ports/${SUITE_NAME_1_PREFIX}"[abc] \
     "${HOME}/cylc-run/${SUITE_NAME_2_PREFIX}"?? \
-    "${HOME}/.cylc/ports/${SUITE_NAME_2_PREFIX}"?? \
     2>'/dev/null'
 exit 0

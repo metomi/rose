@@ -58,10 +58,12 @@ export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
 cylc run --debug "${SUITE_NAME}" 2>'/dev/null' &
 SUITE_PID="$!"
-poll '!' test -s "${HOME}/.cylc/ports/${SUITE_NAME}"
+CONTACT="${HOME}/cylc-run/${SUITE_NAME}/.service/contact"
+poll '!' test -s "${CONTACT}"
 sleep 1
-PORT="$(sed -n '1p' "${HOME}/.cylc/ports/${SUITE_NAME}")"
-HOST="$(sed '2!d; s/^\([^.]*\)\..*$/\1/' "${HOME}/.cylc/ports/${SUITE_NAME}")"
+PORT="$(awk -F= '$1 ~ /CYLC_SUITE_PORT/ {print $2}' "${CONTACT}")"
+HOST="$(awk -F= '$1 ~ /CYLC_SUITE_HOST/ {print $2}' "${CONTACT}")"
+HOST=${HOST%%.*}  # strip domain
 
 if [[ -n "${HOST}" && -n "${PORT}" ]]; then
     for METHOD in 'cycles' 'jobs'; do
@@ -79,6 +81,5 @@ fi
 cylc stop "${SUITE_NAME}"
 wait "${SUITE_PID}" || cat "${SUITE_DIR}/log/suite/err" >&2
 rose_ws_kill
-cylc unregister "${SUITE_NAME}" 1>'/dev/null' 2>&1
-rm -fr "${SUITE_DIR}" "${HOME}/.cylc/ports/${SUITE_NAME}" 2>'/dev/null'
+rm -fr "${SUITE_DIR}" 2>'/dev/null'
 exit 0

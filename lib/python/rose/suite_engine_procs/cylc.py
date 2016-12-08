@@ -56,7 +56,6 @@ class CylcProcessor(SuiteEngineProcessor):
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
-    SUITE_DB = "cylc-suite.db"
     SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
 
@@ -80,15 +79,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 raise SuiteEngineGlobalConfCompatError(
                     self.SCHEME, key, lines[0])
 
-    def clean_hook(self, suite_name=None):
-        """Run "cylc refresh --unregister" (at end of "rose suite-clean")."""
-        self.popen.run("cylc", "refresh", "--unregister")
-        passphrase_dir_root = os.path.expanduser(os.path.join("~", ".cylc"))
-        for name in os.listdir(passphrase_dir_root):
-            path = os.path.join(passphrase_dir_root, name)
-            if os.path.islink(path) and not os.path.exists(path):
-                self.fs_util.delete(path)
-
     def cmp_suite_conf(
             self, suite_name, run_mode, strict_mode=False, debug_mode=False):
         """Parse and compare current "suite.rc" with that in the previous run.
@@ -100,42 +90,24 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
         suite_dir = self.get_suite_dir(suite_name)
-        out = self.popen.run("cylc", "get-directory", suite_name)[1]
-        suite_dir_old = None
-        if out:
-            suite_dir_old = out.strip()
-        suite_passphrase = os.path.join(suite_dir, "passphrase")
-        if run_mode != "reload":
-            self.clean_hook(suite_name)
-        if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
-            self.popen.run_simple("cylc", "unregister", suite_name)
-            suite_dir_old = None
-        if suite_dir_old is None:
+        if run_mode == "run":
             self.popen.run_simple("cylc", "register", suite_name, suite_dir)
-        passphrase_dir = os.path.join("~", ".cylc", suite_name)
-        passphrase_dir = os.path.expanduser(passphrase_dir)
-        self.fs_util.symlink(suite_dir, passphrase_dir)
-        command = ["cylc", "validate", "-v"]
+        f_desc, new_suite_rc_processed = mkstemp()
+        os.close(f_desc)
+        command = ["cylc", "validate", "-v", "-o", new_suite_rc_processed]
         if debug_mode:
             command.append("--debug")
         if strict_mode:
             command.append("--strict")
         command.append(suite_name)
-        suite_rc_processed = os.path.join(suite_dir, "suite.rc.processed")
-        old_suite_rc_processed = None
-        if os.path.exists(suite_rc_processed):
-            f_desc, old_suite_rc_processed = mkstemp(
-                dir=suite_dir,
-                prefix="suite.rc.processed.")
-            os.close(f_desc)
-            os.rename(suite_rc_processed, old_suite_rc_processed)
+        old_suite_rc_processed = os.path.join(suite_dir, "suite.rc.processed")
         try:
             self.popen.run_simple(*command, stdout_level=Event.V)
-            return (old_suite_rc_processed and
-                    filecmp.cmp(old_suite_rc_processed, suite_rc_processed))
+            return (
+                os.path.exists(old_suite_rc_processed) and
+                filecmp.cmp(old_suite_rc_processed, new_suite_rc_processed))
         finally:
-            if old_suite_rc_processed:
-                os.unlink(old_suite_rc_processed)
+            os.unlink(new_suite_rc_processed)
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
@@ -198,12 +170,12 @@ class CylcProcessor(SuiteEngineProcessor):
                 return []
 
         # Get suite host name from:
-        # * ~USERID/.cylc/ports/SUITE
+        # * ~USERID/cylc-run/SUITE/.service/contact
         # * ~USERID/cylc-run/SUITE/log/rose-suite-run.host
-        for func in [self._host_from_port_file, self._host_from_rose_log]:
+        for func in [self._host_from_contact_file, self._host_from_rose_log]:
             try:
                 file_path, host_name = func(user_name, suite_name)
-            except (IOError, IndexError):
+            except (IOError, IndexError, TypeError):
                 # Not running on localhost?
                 # Running on usual hosts with no share FS?
                 # (port file) Suite started with version before cylc-6.8.0?
@@ -233,11 +205,18 @@ class CylcProcessor(SuiteEngineProcessor):
             return []
 
     @classmethod
-    def _host_from_port_file(cls, user_name, suite_name):
+    def _host_from_contact_file(cls, user_name, suite_name):
         """Get host from port file line 2, require cylc-6.8.0+."""
         file_path = os.path.join(
-            os.path.expanduser("~" + user_name), ".cylc", "ports", suite_name)
-        return file_path, open(file_path).read().splitlines()[1]
+            os.path.expanduser("~" + user_name),
+            cls.get_suite_dir_rel(suite_name, ".service", "contact"))
+        try:
+            for line in open(file_path):
+                key, value = [item.strip() for item in line.split("=", 1)]
+                if key == "CYLC_SUITE_HOST":
+                    return file_path, value
+        except IOError, ValueError:
+            return
 
     def _host_from_rose_log(self, user_name, suite_name):
         """Get host from rose-suite-run.host file."""
@@ -368,12 +347,12 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
 
-        suite_name = os.environ["CYLC_SUITE_REG_NAME"]
+        suite_name = os.environ["CYLC_SUITE_NAME"]
         suite_dir_rel = self.get_suite_dir_rel(suite_name)
         suite_dir = self.get_suite_dir(suite_name)
         task_id = os.environ["CYLC_TASK_ID"]
         task_name = os.environ["CYLC_TASK_NAME"]
-        task_cycle_time = os.environ["CYLC_TASK_CYCLE_TIME"]
+        task_cycle_time = os.environ["CYLC_TASK_CYCLE_POINT"]
         cycling_mode = os.environ.get("CYLC_CYCLING_MODE", "gregorian")
         if task_cycle_time == "1" and not cycling_mode == "integer":
             task_cycle_time = None
@@ -680,63 +659,28 @@ class CylcProcessor(SuiteEngineProcessor):
         if timeout is None:
             timeout = self.TIMEOUT
         cmd = ["cylc", "scan", "--pyro-timeout=%s" % timeout] + list(hosts)
-        procs = {}
-        procs[(_PORT_SCAN, None, tuple(cmd))] = self.popen.run_bg(*cmd)
-        for host in sorted(hosts):
-            sh_cmd = "whoami && cd ~/.cylc/ports/ && ls || true"
-            if self.host_selector.is_local_host(host):
-                cmd = ["bash", "-c", sh_cmd]
-            else:
-                cmd = self.popen.get_cmd("ssh", "-n", host, sh_cmd)
-            procs[(_PORT_FILE, host, tuple(cmd))] = self.popen.run_bg(
-                *cmd, preexec_fn=os.setpgrp)
+        proc = self.popen.run_bg(*cmd)
         results = {}
         exceptions = []
         end_time = time() + timeout
-        while procs and time() < end_time:
-            for keys, proc in procs.items():
-                ret_code = proc.poll()
-                if ret_code is None:
-                    continue
-                procs.pop(keys)
-                key, host, cmd = keys
-                if ret_code == 0:
-                    if key == _PORT_SCAN:
-                        for line in proc.communicate()[0].splitlines():
-                            try:
-                                # Releases after cylc 6.5.0
-                                name, location = line.split()
-                                host = location.split("@")[1].split(":")[0]
-                                results[(name, host, key)] = SuiteScanResult(
-                                    name, location)
-                            except ValueError:
-                                # Backward compat cylc 6.5.0 or before
-                                name, user, host, port = line.split()
-                                results[(name, host, key)] = SuiteScanResult(
-                                    name, "%s@%s:%s" % (user, host, port))
-                            # N.B. Trust port-scan over port-file
-                            for i_host in hosts:
-                                try:
-                                    results.pop((name, i_host, _PORT_FILE))
-                                except KeyError:
-                                    pass
-                    else:  # if key == _PORT_FILE:
-                        lines = proc.communicate()[0].splitlines()
-                        user = lines.pop(0)
-                        for name in lines:
-                            # N.B. Trust port-scan over port-file
-                            if (name, host, _PORT_SCAN) in results:
-                                continue
-                            results[(name, host, key)] = SuiteScanResult(
-                                name, "%s@%s:%s" % (
-                                    user, host, "~/.cylc/ports/" + name))
-                else:
-                    out, err = proc.communicate()
-                    exceptions.append(RosePopenError(cmd, ret_code, out, err))
-            if procs:
-                sleep(0.1)
+        while time() < end_time:
+            sleep(0.1)
+            ret_code = proc.poll()
+            if ret_code is None:
+                continue
+            if ret_code == 0:
+                for line in proc.communicate()[0].splitlines():
+                    name, location = line.split()
+                    host = location.split("@")[1].split(":")[0]
+                    results[(name, host, _PORT_SCAN)] = SuiteScanResult(
+                        name, location)
+            else:
+                out, err = proc.communicate()
+                exceptions.append(RosePopenError(cmd, ret_code, out, err))
+            proc = None
+            break
         # Timed out, kill remaining processes
-        for key, proc in procs.items():
+        if proc is not None:
             try:
                 os.killpg(proc.pid, signal.SIGTERM)
             except OSError:
@@ -792,7 +736,7 @@ class CylcProcessor(SuiteEngineProcessor):
         if suite_name not in self.daos:
             prefix = "~"
             db_f_name = os.path.expanduser(os.path.join(
-                prefix, self.get_suite_dir_rel(suite_name, self.SUITE_DB)))
+                prefix, self.get_suite_dir_rel(suite_name, "log", "db")))
             self.daos[suite_name] = CylcSuiteDAO(db_f_name)
         return self.daos[suite_name]
 

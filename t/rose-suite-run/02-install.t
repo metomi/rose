@@ -59,7 +59,7 @@ else
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-port-file"
-run_fail "${TEST_KEY}" test -e "${HOME}/.cylc/ports/${NAME}"
+run_fail "${TEST_KEY}" test -e "${HOME}/cylc-run/${NAME}/.service/contact"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-items"
 run_pass "${TEST_KEY}" find "${SUITE_RUN_DIR}/"{app,colon:is:ok,etc} -type f

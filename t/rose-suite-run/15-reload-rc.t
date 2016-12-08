@@ -55,7 +55,7 @@ hello world
 hello earth
 __TXT__
 # Wait for the suite to complete
-poll test -e "$HOME/.cylc/ports/$NAME"
+poll test -e "$HOME/cylc-run/$NAME/.service/contact"
 grep '^hello ' $SUITE_RUN_DIR/log/job/*/t1/01/job.out >"$TEST_KEY.job.out"
 file_cmp "$TEST_KEY.job.out" "$TEST_KEY.job.out" <<__OUT__
 $SUITE_RUN_DIR/log/job/20130101T0000Z/t1/01/job.out:hello world

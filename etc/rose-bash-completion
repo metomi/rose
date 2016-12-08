@@ -261,7 +261,7 @@ _rose_stem__task() {
 
 _rose_suite_gcontrol__name() {
     local names
-    names=$(ls ~/.cylc/ports/ 2>/dev/null)
+    names=$(cylc print -xy 2>/dev/null)
     COMPREPLY=( $(compgen -W "$names" -- $1) )
 }
 
@@ -285,7 +285,7 @@ _rose_suite_hook__mail_cc() {
 
 _rose_suite_log__name() {
     local names
-    names=$(ls ~/cylc-run/)
+    names=$(cylc print -xy 2>/dev/null)
     COMPREPLY=( $(compgen -W "$names" -- $1) )
 }
 
@@ -327,7 +327,7 @@ _rose_suite_shutdown__host() {
 
 _rose_suite_shutdown__name() {
     local names
-    names=$(ls ~/.cylc/ports/)
+    names=$(cylc print -xy 2>/dev/null)
     COMPREPLY=( $(compgen -W "$names" -- $1) )
 }
 

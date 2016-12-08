@@ -33,7 +33,7 @@ run_suite() {
             -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" -i --name=$NAME \
             --no-gcontrol -- --debug
     fi
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
+    ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e
 }
 
@@ -55,7 +55,6 @@ NAME=$(basename $SUITE_RUN_DIR)
 TEST_KEY="$TEST_KEY_BASE-share"
 run_suite
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=share
-sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 if [[ -n "$JOB_HOST" ]]; then
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] delete: $SUITE_RUN_DIR/share/
@@ -70,7 +69,6 @@ fi
 TEST_KEY="$TEST_KEY_BASE-work"
 run_suite
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work
-sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 if [[ -n "$JOB_HOST" ]]; then
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] delete: $SUITE_RUN_DIR/work/
@@ -85,7 +83,6 @@ fi
 TEST_KEY="$TEST_KEY_BASE-both"
 run_suite
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=share --only=work
-sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 if [[ -n "$JOB_HOST" ]]; then
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] delete: $SUITE_RUN_DIR/share/

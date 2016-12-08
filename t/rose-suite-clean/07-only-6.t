@@ -27,7 +27,7 @@ run_suite() {
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" --name="$NAME" \
         --no-gcontrol -S "HOST=\"$JOB_HOST\"" -- --debug
     ssh "$JOB_HOST" "ls -d cylc-run/$NAME 1>/dev/null"
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
+    ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e
 }
 JOB_HOST=$(rose config --default= 't' 'job-host')
@@ -55,7 +55,6 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_suite
 TEST_KEY="$TEST_KEY_BASE-work"
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work/20?00101T0000Z
-sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 file_cmp  "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] delete: ${HOME}/cylc-run/${NAME}/log/rose-suite-run.host
 [INFO] delete: $SUITE_RUN_DIR/work/20000101T0000Z/

@@ -17,14 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-run" when port file exists.
+# Test "rose suite-run" when contact file exists.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
 tests 3
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
-mkdir -p "${HOME}/.cylc/ports"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rtb-suite-run-07.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 
@@ -34,9 +33,10 @@ while port_is_busy "${PORT}"; do
 done
 
 HOST="$(hostname -f)"
-cat >"${HOME}/.cylc/ports/${NAME}" <<__PORT_FILE__
-${PORT}
-${HOST}
+mkdir -p "${HOME}/cylc-run/${NAME}/.service"
+cat >"${HOME}/cylc-run/${NAME}/.service/contact" <<__PORT_FILE__
+CYLC_SUITE_HOST=${HOST}
+CYLC_SUITE_PORT=${PORT}
 __PORT_FILE__
 
 TEST_KEY="${TEST_KEY_BASE}"
@@ -45,8 +45,8 @@ run_pass "${TEST_KEY}" \
     rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
     --name="${NAME}" --no-gcontrol -- --debug
 file_grep "${TEST_KEY}.out" \
-    "delete: ${HOME}/.cylc/ports/${NAME}" "${TEST_KEY}.out"
-sed -i '/no HTTPS support/d' "${TEST_KEY}.err"
+    "delete: ${HOME}/cylc-run/${NAME}/.service/contact" "${TEST_KEY}.out"
+sed -i '/no HTTPS.* support/d' "${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"

@@ -31,7 +31,7 @@ NAME=$(basename "${SUITE_RUN_DIR}")
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host=localhost -- --debug
 
-sqlite3 "${SUITE_RUN_DIR}/cylc-suite.db" \
+sqlite3 "${SUITE_RUN_DIR}/log/db" \
     'select distinct status from task_states;' >"$TEST_KEY_BASE-db.out"
 file_cmp "$TEST_KEY_BASE-db.out" "$TEST_KEY_BASE-db.out" <<<'succeeded'
 #-------------------------------------------------------------------------------

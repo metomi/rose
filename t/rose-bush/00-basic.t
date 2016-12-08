@@ -186,10 +186,10 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('entries', ${FOO1}, 'seq_logs_indexes', 'job.trace.*.html', '32'), 'job.trace.32.html']" \
     "[('entries', ${FOO1}, 'seq_logs_indexes', 'job.trace.*.html', '256'), 'job.trace.256.html']"
 
-# A suite run directory with only a "cylc-suite.db", and nothing else
+# A suite run directory with only a "log/db", and nothing else
 SUITE_DIR2="$(mktemp -d --tmpdir="${HOME}/cylc-run" "rtb-rose-bush-00-XXXXXXXX")"
 SUITE_NAME2="$(basename "${SUITE_DIR2}")"
-cp "${SUITE_DIR}/cylc-suite.db" "${SUITE_DIR2}/"
+cp "${SUITE_DIR}/log/db" "${SUITE_DIR2}/"
 run_pass "${TEST_KEY}-bare" \
     curl "${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME2}?form=json"
 rose_ws_json_greps "${TEST_KEY}-bare.out" "${TEST_KEY}-bare.out" \
@@ -238,7 +238,5 @@ file_grep "${TEST_KEY}.out" '<span class="highlight">Suite Name</span>' \
 #-------------------------------------------------------------------------------
 # Tidy up
 rose_ws_kill
-cylc unregister "${SUITE_NAME}" 1>'/dev/null' 2>&1
-rm -fr "${SUITE_DIR}" "${SUITE_DIR2}" "${HOME}/.cylc/ports/${SUITE_NAME}" \
-    2>'/dev/null'
+rm -fr "${SUITE_DIR}" "${SUITE_DIR2}" 2>'/dev/null'
 exit 0

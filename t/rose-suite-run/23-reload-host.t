@@ -38,7 +38,7 @@ rose suite-run --debug --name="${NAME}" --no-gcontrol \
 ROSE_SUITE_RUN_PID=$!
 
 timeout 60 bash -c \
-    "while ! test -e '${HOME}/.cylc/ports/${NAME}'; do sleep 1; done"
+    "while ! test -e '${HOME}/cylc-run/${NAME}/.service/contact'; do sleep 1; done"
 sed -i "s/host = localhost/host = ${JOB_HOST}/" 'suite.rc'
 
 run_pass "${TEST_KEY_BASE}" \

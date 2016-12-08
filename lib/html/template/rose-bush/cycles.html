@@ -17,7 +17,7 @@
         <div class="panel-body">
           <form action="{{script}}/{{method}}">
             <input type="hidden" name="user" value="{{user}}" />
-            <input type="hidden" name="suite" value="{{suite}}" />
+            <input type="hidden" name="suite" value="{{suite|replace("/", "%2F")}}" />
             <input type="hidden" name="no_fuzzy_time" value="{{no_fuzzy_time}}" />
 
             <div class="row">
@@ -140,7 +140,8 @@ class="table table-bordered table-condensed table-striped">
 {% for entry in entries -%}
   {% set cycle_in_url = entry.cycle|replace('+', '%2B') -%}
   {% set task_jobs_url = (
-      script ~ "/taskjobs/" ~ user ~ "/" ~ suite ~ "?cycles=" ~ cycle_in_url
+      script ~ "/taskjobs/" ~ user ~ "?&amp;suite=" ~
+      suite|replace('+', '%2F') ~ "&amp;cycles=" ~ cycle_in_url
   ) -%}
     <tr class="entry">
 
@@ -205,11 +206,11 @@ class="table table-bordered table-condensed table-striped">
     <td>
   {% if entry.has_log_job_tar_gz -%}
     {% set download = (
-        script ~ "/view/" ~ user ~ "/" ~ suite ~ "?path=log/job-" ~
-        cycle_in_url ~ ".tar.gz&amp;mode=download"
+        script ~ "/view/" ~ user ~ "?&amp;suite=" ~ suite|replace('+', '%2F') ~
+        "&amp;path=log/job-" ~ cycle_in_url ~ ".tar.gz&amp;mode=download"
     ) -%}
       <a href="{{download}}"
-      download="{{user}}-{{suite}}-log-job-{{entry.cycle}}.tar.gz">
+      download="{{user}}-{{suite|replace("/", "%2F")}}-log-job-{{entry.cycle}}.tar.gz">
         <i class="glyphicon glyphicon-download"
         title="download log/job-{{entry.cycle}}.tar.gz"></i>
         <small>
