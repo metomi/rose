@@ -432,7 +432,7 @@ class AppRunner(Runner):
 
         command = self.popen.list_to_shell_str(args)
         if not command:
-            names = [os.getenv("ROSE_APP_COMMAND_KEY"), opts.command_key,
+            names = [opts.command_key, os.getenv("ROSE_APP_COMMAND_KEY"),
                      os.getenv("ROSE_TASK_NAME"), "default"]
             for name in names:
                 if not name:
