@@ -328,6 +328,8 @@ class MainController(object):
 
         self.update_bar_widgets()
 
+        self.performing_undo = False
+
 # ----------------- Setting up main component functions ----------------------
 
     def generate_toolbar(self):
@@ -1719,6 +1721,11 @@ class MainController(object):
             stack = self.undo_stack
         if not stack:
             return False
+        if self.performing_undo:
+            # Prevent multiple calls from existing concurrently.
+            return False
+        else:
+            self.performing_undo = True
         self._get_pagelist()
         do_list = [stack[-1]]
         # We should undo/redo all same-grouped items together.
@@ -1832,6 +1839,7 @@ class MainController(object):
         if namespace:
             focus_id = namespace_id_map[namespace][-1]
             self.updater.focus_sub_page_if_open(namespace, focus_id)
+        self.performing_undo = False
         return True
 
 # ----------------------- System functions -----------------------------------
