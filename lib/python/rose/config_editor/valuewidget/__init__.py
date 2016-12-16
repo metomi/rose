@@ -73,7 +73,9 @@ def chooser(value, metadata, error):
         if rose.env.contains_env_var(value):
             return text.RawValueWidget
     if (m_type is None and m_values is None and m_length is None and
-       m_hint is None):
+            m_hint is None):
+        if value and "\n" in value:
+            return text.TextMultilineValueWidget
         return text.RawValueWidget
     if (m_values is None and m_length is None and m_hint is None and
        m_type in ['logical', 'boolean', 'python_boolean']):

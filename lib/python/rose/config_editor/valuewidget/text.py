@@ -102,11 +102,6 @@ class TextMultilineValueWidget(gtk.HBox):
         self.set_value = set_value
         self.hook = hook
 
-        self.entry_scroller = gtk.ScrolledWindow()
-        self.entry_scroller.set_shadow_type(gtk.SHADOW_IN)
-        self.entry_scroller.set_policy(gtk.POLICY_AUTOMATIC,
-                                       gtk.POLICY_NEVER)
-        self.entry_scroller.show()
         self.entrybuffer = gtk.TextBuffer()
         self.entrybuffer.set_text(self.value)
         self.entry = gtk.TextView(self.entrybuffer)
@@ -115,10 +110,14 @@ class TextMultilineValueWidget(gtk.HBox):
         self.entry.set_right_margin(rose.config_editor.SPACING_SUB_PAGE)
         self.entry.connect('focus-in-event', self.hook.trigger_scroll)
         self.entry.show()
-        self.entry_scroller.add(self.entry)
+
+        viewport = gtk.Viewport()
+        viewport.add(self.entry)
+        viewport.show()
+
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
         self.entrybuffer.connect('changed', self.setter)
-        self.pack_start(self.entry_scroller, expand=True, fill=True)
+        self.pack_start(viewport, expand=True, fill=True)
 
     def get_focus_index(self):
         """Return the cursor position within the variable value."""
