@@ -7,11 +7,9 @@ for a full listing of issues for each release.
 
 ## 2016.12.0 (2016-12-22)
 
-Rose release 47. This release works best with
+Rose release 47. **This release is expected to be used with
 [cylc-7.0.0](https://github.com/cylc/cylc/releases/tag/7.0.0) and
-[fcm-2016.12.0](https://github.com/metomi/fcm/releases/tag/2016.12.0).
-
-**This version of Rose is expected to be used with cylc 7.0.0.**
+[fcm-2016.12.0](https://github.com/metomi/fcm/releases/tag/2016.12.0).**
 
 ### Noteworthy Changes
 
