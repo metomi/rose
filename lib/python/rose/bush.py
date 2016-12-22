@@ -413,7 +413,8 @@ class RoseBushService(object):
         # Get entries
         sub_names = [
             ".service", "log", "share", "work", self.bush_dao.SUITE_CONF]
-        for dirpath, dnames, fnames in os.walk(user_suite_dir_root):
+        for dirpath, dnames, fnames in os.walk(
+                user_suite_dir_root, followlinks=True):
             if any([name in dnames or name in fnames for name in sub_names]):
                 dnames[:] = []
             else:

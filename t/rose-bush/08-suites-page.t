@@ -54,7 +54,13 @@ SUITE_NAME_1_PREFIX="rtb-rose-bush-08-$(uuidgen)-"
 for SUFFIX in 'b' 'a' 'c'; do
     SUITE_NAME="${SUITE_NAME_1_PREFIX}${SUFFIX}"
     SUITE_DIR="${HOME}/cylc-run/${SUITE_NAME}"
-    mkdir -p "${SUITE_DIR}"
+    # Make one of these a symlink
+    if [[ "${SUFFIX}" == 'a' ]]; then
+        mkdir "${SUITE_NAME}"
+        ln -s "${PWD}/${SUITE_NAME}" "${SUITE_DIR}"
+    else
+        mkdir -p "${SUITE_DIR}"
+    fi
     cp -p 'suite.rc' "${SUITE_DIR}/suite.rc"
     cylc register "${SUITE_NAME}" "${SUITE_DIR}"
     cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
