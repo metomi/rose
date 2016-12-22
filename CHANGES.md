@@ -20,13 +20,13 @@ rose config-edit: use multi-line text widget for multi-line values.
 rose app-run/task-run: new environment variable `ROSE_APP_COMMAND_KEY`,
 equivalent to the `--command-key` option.
 
+[#2023](https://github.com/metomi/rose/pull/2023)
+Rose training course docs: update to parameterization for simple cases.
+
 [#2021](https://github.com/metomi/rose/pull/2021):
 Rose Bush and rose suite-* utilities: modify to work best with cylc 7,
 following the change in the location of service files in cylc 7 suites.
 (See [cylc/cylc#2067](https://github.com/cylc/cylc/pull/2067).)
-
-[#2023](https://github.com/metomi/rose/pull/2023)
-Rose training course: update to replace simple Jinja2 cases with parameterization.
 
 --------------------------------------------------------------------------------
 
