@@ -5,6 +5,30 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2016.12.0 (2016-12-22)
+
+Rose release 47. This release works best with
+[cylc-7.0.0](https://github.com/cylc/cylc/releases/tag/7.0.0) and
+[fcm-2016.12.0](https://github.com/metomi/fcm/releases/tag/2016.12.0).
+
+**This version of Rose is expected to be used with cylc 7.0.0.**
+
+### Noteworthy Changes
+
+[#2027](https://github.com/metomi/rose/pull/2027):
+rose config-edit: use multi-line text widget for multi-line values.
+
+[#2025](https://github.com/metomi/rose/pull/2025):
+rose app-run/task-run: new environment variable `ROSE_APP_COMMAND_KEY`,
+equivalent to the `--command-key` option.
+
+[#2021](https://github.com/metomi/rose/pull/2021):
+Rose Bush and rose suite-* utilities: modify to work best with cylc 7,
+following the change in the location of service files in cylc 7 suites.
+(See [cylc/cylc#2067](https://github.com/cylc/cylc/pull/2067).)
+
+--------------------------------------------------------------------------------
+
 ## 2016.11.1 (2016-11-29)
 
 Rose release 46. This release works best with
