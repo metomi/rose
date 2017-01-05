@@ -41,8 +41,8 @@ run_pass "$TEST_KEY" \
 # Check that the suite runs to success
 TEST_KEY=$TEST_KEY_BASE-db
 sqlite3 $SUITE_RUN_DIR/log/db \
-    'SELECT cycle,name FROM task_events
-     WHERE event=="succeeded" ORDER BY cycle,name ASC;' \
+    'SELECT cycle,name FROM task_jobs
+     WHERE run_status==0 ORDER BY cycle,name ASC;' \
     >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 20130101T0000Z|fcm_make

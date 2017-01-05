@@ -422,6 +422,10 @@
 #  job-host-with-share-fast-dest-root=PATH
 ## E.g.:
 #  job-host-with-share-fast-dest-root=/var/run/$USER
+## 2 non-local job hosts with or without sharing a file system
+#  job-hosts=HOST1 HOST2
+## E.g.:
+#  job-hosts=my-host1 my-host2
 ## 2 job hosts sharing a file system, but not with localhost
 #  job-hosts-sharing-fs=HOST1 HOST2
 ## E.g.:
