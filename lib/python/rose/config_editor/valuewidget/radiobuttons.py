@@ -42,7 +42,7 @@ class RadioButtonsValueWidget(gtk.HBox):
 
         if var_titles:
             vbox = gtk.VBox()
-            self.pack_start(vbox)
+            self.pack_start(vbox, expand=False)
             vbox.show()
 
         for k, item in enumerate(var_values):
