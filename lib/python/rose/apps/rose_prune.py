@@ -85,11 +85,12 @@ class RosePruneApp(BuiltinApp):
                     suite_name, archive_logs_cycles)
 
         # Prune other directories
-        globs = self._get_prune_globs(app_runner, conf_tree)
+        globs, cycle_set = self._get_prune_globs(app_runner, conf_tree)
         if not globs:
             return
         suite_engine_proc = app_runner.suite_engine_proc
-        hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
+        hosts = suite_engine_proc.get_suite_jobs_auths(
+            suite_name, [(cycle, None) for cycle in cycle_set])
         # A shuffle here should allow the load for doing "rm -rf" to be shared
         # between job hosts who share a file system.
         shuffle(hosts)
@@ -207,11 +208,16 @@ class RosePruneApp(BuiltinApp):
         return os.getenv("ROSE_CYCLING_MODE")
 
     def _get_prune_globs(self, app_runner, conf_tree):
-        """Return prune globs."""
+        """Return (globs, cycles).
+
+        where:
+        * globs is for matching items to prune.
+        * cycles is a set of relevant cycles.
+        """
         globs = []
         nodes = conf_tree.node.get_value([self.SECTION])
         if nodes is None:
-            return []
+            return [], set()
         cycle_formats = {}
         for key, node in nodes.items():
             if node.is_ignored():
@@ -229,6 +235,7 @@ class RosePruneApp(BuiltinApp):
                 except (UnboundEnvironmentVariableError, ValueError) as exc:
                     raise ConfigValueError(
                         [self.SECTION, key], node.value, exc)
+        cycle_set = set()
         for key, node in sorted(nodes.items()):
             if node.is_ignored():
                 continue
@@ -242,6 +249,7 @@ class RosePruneApp(BuiltinApp):
                 continue
             for cycle, cycle_args in self._get_conf(
                     app_runner, conf_tree, key, max_args=1):
+                cycle_set.add(cycle)
                 if cycle_args:
                     cycle_strs = {"cycle": cycle}
                     for key, cycle_format in cycle_formats.items():
@@ -260,4 +268,4 @@ class RosePruneApp(BuiltinApp):
                         globs.append(os.path.join(head, glob_))
                 else:
                     globs.append(os.path.join(head, cycle))
-        return globs
+        return globs, cycle_set

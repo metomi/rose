@@ -132,25 +132,24 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(cls.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
-    def get_suite_jobs_auths(self, suite_name, cycle_time=None,
-                             task_name=None):
+    def get_suite_jobs_auths(self, suite_name, cycle_name_tuples=None):
         """Return remote ["[user@]host", ...] for submitted jobs."""
         auths = []
-        # Check if "task_jobs" table is available or not
-        if self._db_has_table(suite_name, "task_jobs"):
-            stmt = "SELECT DISTINCT user_at_host FROM task_jobs"
-            stmt_where_list = []
-            stmt_args = []
-        else:
-            stmt = "SELECT DISTINCT misc FROM task_events"
-            stmt_where_list = ["(event==? OR event==? OR event==?)"]
-            stmt_args = ["submission succeeded", "succeeded", "failed"]
-        for key, arg in [["cycle", cycle_time], ["name", task_name]]:
-            if arg:
-                stmt_where_list.append(key + "==?")
-                stmt_args.append(arg)
+        stmt = "SELECT DISTINCT user_at_host FROM task_jobs"
+        stmt_where_list = []
+        stmt_args = []
+        if cycle_name_tuples:
+            for cycle, name in cycle_name_tuples:
+                stmt_fragments = []
+                if cycle is not None:
+                    stmt_fragments.append("cycle==?")
+                    stmt_args.append(cycle)
+                if name is not None:
+                    stmt_fragments.append("name==?")
+                    stmt_args.append(name)
+                stmt_where_list.append(" AND ".join(stmt_fragments))
         if stmt_where_list:
-            stmt += " WHERE " + " AND ".join(stmt_where_list)
+            stmt += " WHERE (" + ") OR (".join(stmt_where_list) + ")"
         for row in self._db_exec(suite_name, stmt, stmt_args):
             if row and row[0]:
                 auth = self._parse_user_host(auth=row[0])
@@ -392,7 +391,7 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         cycles = []
         if "*" in items:
-            stmt = "SELECT DISTINCT cycle FROM task_events"
+            stmt = "SELECT DISTINCT cycle FROM task_jobs"
             for row in self._db_exec(suite_name, stmt):
                 cycles.append(row[0])
             self._db_close(suite_name)
@@ -475,7 +474,8 @@ class CylcProcessor(SuiteEngineProcessor):
                             os.path.exists(os.path.join(
                                 log_dir, str(cycle), name, "NN", "job.out"))):
                         continue
-                    auths = self.get_suite_jobs_auths(suite_name, cycle, name)
+                    auths = self.get_suite_jobs_auths(
+                        suite_name, [(cycle, name)])
                     if auths:
                         # A shuffle here should allow the load for doing "rm
                         # -rf" to be shared between job hosts who share a file
@@ -551,7 +551,7 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         cycles = []
         if "*" in items:
-            stmt = "SELECT DISTINCT cycle FROM task_events"
+            stmt = "SELECT DISTINCT cycle FROM task_jobs"
             for row in self._db_exec(suite_name, stmt):
                 cycles.append(row[0])
             self._db_close(suite_name)
