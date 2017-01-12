@@ -50,11 +50,13 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_suite
 TEST_KEY="$TEST_KEY_BASE-work"
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work
-LANG=C sort >"$TEST_KEY.out.expected" <<__OUT__
-[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
-[INFO] delete: $SUITE_RUN_DIR/work
+{
+    echo "[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host"
+    LANG=C sort -r <<__OUT__
 [INFO] delete: $ROOT_DIR_WORK/cylc-run/$NAME/work/
+[INFO] delete: $SUITE_RUN_DIR/work
 __OUT__
+} >"$TEST_KEY.out.expected"
 file_cmp  "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.expected"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y --name="$NAME"

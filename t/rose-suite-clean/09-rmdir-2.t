@@ -17,15 +17,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-clean", normal mode.
+# Test "rose suite-clean", clean up parent directories.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 
 mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
-NAME="$(basename "${SUITE_RUN_DIR}")"
+SUITE_RUN_DIR0="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
+NAME0="$(basename "${SUITE_RUN_DIR0}")"
+SUITE_RUN_DIR="${SUITE_RUN_DIR0}/foo/bar"
+mkdir -p "${SUITE_RUN_DIR}"
+NAME="${NAME0}/foo/bar"
 
-cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" "${NAME}"
+cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" 'source'
 
 JOB_HOST="$(rose config 't' 'job-host')"
 JOB_HOST_RUN_ROOT="$(rose config 't' 'job-host-run-root')"
@@ -33,7 +36,7 @@ JOB_HOST_OPT=
 if [[ -n "${JOB_HOST}" && -n "${JOB_HOST_RUN_ROOT}" ]]; then
     export JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
     export JOB_HOST_RUN_ROOT
-    cat >>"${NAME}/rose-suite.conf" <<__CONF__
+    cat >>'source/rose-suite.conf' <<__CONF__
 root-dir{share/cycle}=${JOB_HOST}=${JOB_HOST_RUN_ROOT}
                      =*=\${ROSE_TEST_ROOT_DIR}
 root-dir{work}=${JOB_HOST}=${JOB_HOST_RUN_ROOT}
@@ -42,16 +45,17 @@ root-dir{work}=${JOB_HOST}=${JOB_HOST_RUN_ROOT}
 [jinja2:suite.rc]
 JOB_HOST="${JOB_HOST}"
 __CONF__
-    tests 5
+    tests 9
 else
-    tests 3
+    tests 5
 fi
 
 # Run suite, create lots of directories
 export ROSE_CONF_PATH=
 export ROSE_TEST_ROOT_DIR="${PWD}/root.d"
 set -e
-rose suite-run -q -C "${PWD}/${NAME}" --no-gcontrol --host='localhost' -- --debug
+rose suite-run --name="${NAME}" -q -C "${PWD}/source" --no-gcontrol \
+    --host='localhost' -- --debug
 # Prove that the directories exist before clean
 test -d "${HOME}/cylc-run/${NAME}"
 test -d "${PWD}/root.d/cylc-run/${NAME}"
@@ -65,12 +69,18 @@ set +e
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" rose suite-clean -y -v -v --debug "${NAME}"
 run_fail "${TEST_KEY}-test-d-cylc-run" test -d "${HOME}/cylc-run/${NAME}"
+run_fail "${TEST_KEY}-test-d-cylc-run-0" test -d "${HOME}/cylc-run/${NAME0}"
 run_fail "${TEST_KEY}-test-d-root-x" test -d "${PWD}/root.d/cylc-run/${NAME}"
+run_fail "${TEST_KEY}-test-d-root-x-0" test -d "${PWD}/root.d/cylc-run/${NAME0}"
 if [[ -n "${JOB_HOST}" && -n "${JOB_HOST_RUN_ROOT}" ]]; then
-    run_pass "${TEST_KEY}-test-d-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
+    run_pass "${TEST_KEY}-test-d-cylc-run-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
         "bash -l -c '! test -d cylc-run/${NAME}'"
-    run_pass "${TEST_KEY}-test-d-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
+    run_pass "${TEST_KEY}-test-d-cylc-run0-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
+        "bash -l -c '! test -d cylc-run/${NAME0}'"
+    run_pass "${TEST_KEY}-test-d-root-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
         "bash -l -c '! test -d ${JOB_HOST_RUN_ROOT}/cylc-run/${NAME}'"
+    run_pass "${TEST_KEY}-test-d-root0-at-${JOB_HOST}" ${SSH} "${JOB_HOST}" \
+        "bash -l -c '! test -d ${JOB_HOST_RUN_ROOT}/cylc-run/${NAME0}'"
 fi
 #-------------------------------------------------------------------------------
 exit 0

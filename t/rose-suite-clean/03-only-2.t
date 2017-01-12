@@ -61,12 +61,12 @@ if [[ -n "$JOB_HOST" ]]; then
     # We do not know the relative sort order of $SUITE_RUN_DIR and $JOB_HOST.
     LANG=C sort >"$TEST_KEY.expected.out" <<__OUT__
 [INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
-[INFO] delete: $SUITE_RUN_DIR/share/cycle/20000101T0000Z/
-[INFO] delete: $SUITE_RUN_DIR/share/cycle/20100101T0000Z/
 [INFO] delete: $SUITE_RUN_DIR/share/cycle/20200101T0000Z/
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20000101T0000Z
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20100101T0000Z
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20100101T0000Z/
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20000101T0000Z/
 [INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20200101T0000Z
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20100101T0000Z
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20000101T0000Z
 __OUT__
 else
     cat >"$TEST_KEY.expected.out" <<__OUT__
@@ -84,30 +84,30 @@ run_pass "$TEST_KEY" \
     --only=etc/*/greet-earth.out
 if [[ -n "$JOB_HOST" ]]; then
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[INFO] delete: $SUITE_RUN_DIR/etc/20000101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/etc/20050101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/etc/20100101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/etc/20150101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/etc/20200101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/share/cycle/20050101T0000Z/hello-world.out
 [INFO] delete: $SUITE_RUN_DIR/share/cycle/20150101T0000Z/hello-world.out
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20000101T0000Z/greet-earth.out
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20050101T0000Z/greet-earth.out
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20100101T0000Z/greet-earth.out
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20150101T0000Z/greet-earth.out
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20200101T0000Z/greet-earth.out
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20050101T0000Z/hello-world.out
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20050101T0000Z/hello-world.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20200101T0000Z/greet-earth.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20150101T0000Z/greet-earth.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20100101T0000Z/greet-earth.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20050101T0000Z/greet-earth.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20000101T0000Z/greet-earth.out
 [INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20150101T0000Z/hello-world.out
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share/cycle/20050101T0000Z/hello-world.out
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20200101T0000Z/greet-earth.out
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20150101T0000Z/greet-earth.out
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20100101T0000Z/greet-earth.out
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20050101T0000Z/greet-earth.out
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/etc/20000101T0000Z/greet-earth.out
 __OUT__
 else
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[INFO] delete: $SUITE_RUN_DIR/etc/20000101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/etc/20050101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/etc/20100101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/etc/20150101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/etc/20200101T0000Z/greet-earth.out
-[INFO] delete: $SUITE_RUN_DIR/share/cycle/20050101T0000Z/hello-world.out
 [INFO] delete: $SUITE_RUN_DIR/share/cycle/20150101T0000Z/hello-world.out
+[INFO] delete: $SUITE_RUN_DIR/share/cycle/20050101T0000Z/hello-world.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20200101T0000Z/greet-earth.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20150101T0000Z/greet-earth.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20100101T0000Z/greet-earth.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20050101T0000Z/greet-earth.out
+[INFO] delete: $SUITE_RUN_DIR/etc/20000101T0000Z/greet-earth.out
 __OUT__
 fi
 #-------------------------------------------------------------------------------

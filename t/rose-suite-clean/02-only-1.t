@@ -85,15 +85,15 @@ run_suite
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=share --only=work
 if [[ -n "$JOB_HOST" ]]; then
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[INFO] delete: $SUITE_RUN_DIR/share/
 [INFO] delete: $SUITE_RUN_DIR/work/
-[INFO] delete: $JOB_HOST:cylc-run/$NAME/share
+[INFO] delete: $SUITE_RUN_DIR/share/
 [INFO] delete: $JOB_HOST:cylc-run/$NAME/work
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share
 __OUT__
 else
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[INFO] delete: $SUITE_RUN_DIR/share/
 [INFO] delete: $SUITE_RUN_DIR/work/
+[INFO] delete: $SUITE_RUN_DIR/share/
 __OUT__
 fi
 #-------------------------------------------------------------------------------
