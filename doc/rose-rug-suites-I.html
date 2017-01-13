@@ -720,9 +720,9 @@ default=echo 'Hello World'
     [[[dependencies]]]
         graph = """
                 HELLO_FAMILY
-{%- if ARCHIVE_RESULTS %}
+{% if ARCHIVE_RESULTS %}
                 HELLO_FAMILY:succeed-all => archive_results
-{%- endfor %}
+{% endif %}
                 """
 </pre>
               </div>
