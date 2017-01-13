@@ -1222,7 +1222,7 @@ class ConfigDataManager(object):
                                                                   config_name)
                 for key, value in metadata.items():
                     if (ns_section not in default_ns_sections.get(ns, []) and
-                        key in [rose.META_PROP_TITLE,
+                        key in [rose.META_PROP_TITLE, rose.META_PROP_SORT_KEY,
                                 rose.META_PROP_DESCRIPTION]):
                         # ns created from variables, not a section - no title.
                         continue
