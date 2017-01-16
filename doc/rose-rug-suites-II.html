@@ -284,7 +284,7 @@
                   <li>clock-triggered tasks - tasks triggered at
                   certain wallclock times</li>
 
-                  <li>runahead limit - prevent too many cycles
+                  <li>max active cycle points - prevent too many cycles
                   being active at any one time</li>
 
                   <li>message triggers - triggers based on task
@@ -377,12 +377,10 @@
                 <h3 class="alwayshidden">Environment (3)</h3>
 
                 <ul class="incremental">
-                  <li><var>ROSE_TASK_LOG_ROOT</var>, the name of
-                  the task including the cycle time - if you prefix
-                  a filename with <samp>$ROSE_TASK_LOG_ROOT</samp>
-                  in the <samp>log/job/</samp> directory, it will
-                  be associated with the task in the suite log
-                  viewer.</li>
+                  <li><var>ROSE_TASK_LOG_ROOT</var>, the path where
+                  log files for a task are stored - if you create
+                  a file in this direcotry it will be associated
+                  with the task in the suite log viewer.</li>
                 </ul>
               </div>
 
@@ -476,7 +474,7 @@
                 <h2 id="design">Suite Design</h2>
 
                 <p>See <a href=
-                "http://cylc.github.io/cylc/html/single/cug-html.html#x1-19700015">
+                "http://cylc.github.io/cylc/html/single/cug-html.html#x1-22000016">
                 cylc suite design principles</a>.</p>
               </div>
 
