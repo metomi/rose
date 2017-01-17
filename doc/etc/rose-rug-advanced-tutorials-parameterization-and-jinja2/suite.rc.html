@@ -77,11 +77,11 @@
         world = eris, pluto, makemake, haumea
 [scheduling]
     [[dependencies]]
-        graph = hello<world>
+        graph = hello&lt;world&gt;
 [runtime]
     [[HELLO_FAMILY]]
         script = sleep 5; echo hello $WORLD
-    [[hello<world>]]
+    [[hello&lt;world&gt;]]
         inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = $CYLC_TASK_PARAM_world
