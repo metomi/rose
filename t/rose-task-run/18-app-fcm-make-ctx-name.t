@@ -53,7 +53,7 @@ NAME="$(basename "${SUITE_RUN_DIR}")"
 timeout 120 rose suite-run -v -v --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host='localhost' \
-    -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --debug
+    -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --debug 1>'/dev/null' 2>&1
 #-------------------------------------------------------------------------------
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
     cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'

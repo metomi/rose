@@ -319,7 +319,7 @@ run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [D] Downgrade_0.2-0.1: changes: 2
-    env=Z=None
+    env=Z=1
         removed Z
     =meta=test-app-upgrade/0.1
         Downgraded from 0.2 to 0.1
@@ -363,7 +363,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         enabled -> user-ignored
     env=A=4
         user-ignored -> enabled
-    env=Z=None
+    env=Z=1
         removed Z
     =meta=test-app-upgrade/0.1
         Downgraded from 1.0 to 0.1
@@ -512,7 +512,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [D] Downgrade_0.3-0.1: changes: 3
     env=A=4
         user-ignored -> enabled
-    env=Z=None
+    env=Z=1
         no more Zs
     =meta=test-app-upgrade/0.1
         Downgraded from 0.3 to 0.1
@@ -633,9 +633,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Added with value 'bar'
     namelist:qwerty=None=None
         Added
-    env=B=None
+    env=B=5
         Removed
-    namelist:new=spam=None
+    namelist:new=spam=eggs
         Removed
     =meta=test-app-upgrade/0.1
         Downgraded from 0.2 to 0.1

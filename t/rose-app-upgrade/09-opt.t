@@ -67,15 +67,17 @@ TEST_KEY=$TEST_KEY_BASE-upgrade-add
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade_0.1-0.2: changes: 4
+[U] Upgrade_0.1-0.2: changes: 5
     env=Z=1
         only one Z
-    env=A=None
+    env=A=4
         Removed
     =meta=test-app-upgrade/0.2
         Upgraded from 0.1 to 0.2
     (opts=foo)env=D=56
         Value: '2' -> '56'
+    (opts=foo)env=A=1
+        Removed
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.file" ../config/rose-app.conf <<'__CONFIG__'
