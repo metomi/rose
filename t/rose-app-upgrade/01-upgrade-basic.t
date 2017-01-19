@@ -273,7 +273,7 @@ run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.5
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade_0.4-0.5: changes: 2
-    env=A=None
+    env=A=4
         Removed
     =meta=test-app-upgrade/0.5
         Upgraded from 0.4 to 0.5
@@ -440,7 +440,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         enabled -> user-ignored
     env=A=4
         user-ignored -> enabled
-    env=A=None
+    env=A=4
         Removed
     env=C=8
         Added with value '8'
@@ -669,7 +669,7 @@ run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.5
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade_0.4-0.5: changes: 2
-    env=A=None
+    env=A=4
         Removed
     =meta=test-app-upgrade/0.5
         Upgraded from 0.4 to 0.5
@@ -747,13 +747,13 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Added
     namelist:new=spam=eggs
         Added with value 'eggs'
-    env=A=None
+    env=A=4
         Removed
-    namelist:something=foo=None
+    namelist:something=foo=bar
         Removed
-    namelist:qwerty=uiop=None
+    namelist:qwerty=uiop=asdf
         Removed
-    namelist:qwerty=None=None
+    namelist:qwerty=None=
         Removed
     =meta=test-app-upgrade/0.2
         Upgraded from 0.1 to 0.2

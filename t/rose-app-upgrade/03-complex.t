@@ -361,69 +361,69 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Value: '.false.' -> '.true.'
     namelist:change_opt=opt_force_added_change=.true.
         Added with value '.true.'
-    namelist:remove_sect_empty=None=None
+    namelist:remove_sect_empty=None=
         Removed
-    namelist:remove_sect_full=opt_with_content=None
+    namelist:remove_sect_full=opt_with_content=.true.
         Removed
-    namelist:remove_sect_full=None=None
+    namelist:remove_sect_full=None=
         Removed
-    namelist:remove_opt=remove_this_opt=None
+    namelist:remove_opt=remove_this_opt=.true.
         Removed
-    namelist:remove_ignore_sect_empty=None=None
+    namelist:remove_ignore_sect_empty=None=
         Removed
-    namelist:remove_ignore_sect_full=opt_with_content=None
+    namelist:remove_ignore_sect_full=opt_with_content=.true.
         Removed
-    namelist:remove_ignore_sect_full=None=None
+    namelist:remove_ignore_sect_full=None=
         Removed
-    namelist:remove_ignore_opt=remove_this_ignore_opt=None
+    namelist:remove_ignore_opt=remove_this_ignore_opt=.true.
         Removed
-    namelist:remove_trig_ignore_sect_empty=None=None
+    namelist:remove_trig_ignore_sect_empty=None=
         Removed
-    namelist:remove_trig_ignore_sect_full=opt_with_content=None
+    namelist:remove_trig_ignore_sect_full=opt_with_content=.true.
         Removed
-    namelist:remove_trig_ignore_sect_full=None=None
+    namelist:remove_trig_ignore_sect_full=None=
         Removed
-    namelist:remove_trig_ignore_opt=remove_this_trig_ignore_opt=None
+    namelist:remove_trig_ignore_opt=remove_this_trig_ignore_opt=.true.
         Removed
     namelist:rename_opt=rename_dest=.true.
         Renamed namelist:rename_opt=rename_this_opt -> namelist:rename_opt=rename_dest
-    namelist:rename_opt=rename_this_opt=None
+    namelist:rename_opt=rename_this_opt=.true.
         Removed
     namelist:rename_opt=rename_ignored_dest=.true.
         Renamed namelist:rename_opt=rename_this_ignored_opt -> namelist:rename_opt=rename_ignored_dest
-    namelist:rename_opt=rename_this_ignored_opt=None
+    namelist:rename_opt=rename_this_ignored_opt=.true.
         Removed
     namelist:rename_opt_dest=rename_opt_alt_sect_dest=.true.
         Renamed namelist:rename_opt=rename_opt_alt_sect -> namelist:rename_opt_dest=rename_opt_alt_sect_dest
-    namelist:rename_opt=rename_opt_alt_sect=None
+    namelist:rename_opt=rename_opt_alt_sect=.true.
         Removed
-    namelist:rename_opt_dest_exists=rename_this_opt=None
+    namelist:rename_opt_dest_exists=rename_this_opt=.true.
         Removed
-    namelist:rename_opt_dest_exists=rename_this_opt_index=None
+    namelist:rename_opt_dest_exists=rename_this_opt_index=.true.
         Removed
     namelist:rename_sect_dest=None=None
         Renamed namelist:rename_sect -> namelist:rename_sect_dest
     namelist:rename_sect_dest=rename_this_opt_via_sect=.true.
         Renamed namelist:rename_sect -> namelist:rename_sect_dest
-    namelist:rename_sect=rename_this_opt_via_sect=None
+    namelist:rename_sect=rename_this_opt_via_sect=.true.
         Removed
-    namelist:rename_sect=None=None
+    namelist:rename_sect=None=
         Removed
-    namelist:rename_sect_dest_exists_dest=remove_this_opt_via_rename=None
+    namelist:rename_sect_dest_exists_dest=remove_this_opt_via_rename=.true.
         Removed
-    namelist:rename_sect_dest_exists_dest=None=None
+    namelist:rename_sect_dest_exists_dest=None=
         Removed
     namelist:rename_sect_dest_exists_dest=None=None
         Renamed namelist:rename_sect_dest_exists -> namelist:rename_sect_dest_exists_dest
     namelist:rename_sect_dest_exists_dest=rename_this_opt_via_sect=.true.
         Renamed namelist:rename_sect_dest_exists -> namelist:rename_sect_dest_exists_dest
-    namelist:rename_sect_dest_exists=rename_this_opt_via_sect=None
+    namelist:rename_sect_dest_exists=rename_this_opt_via_sect=.true.
         Removed
-    namelist:rename_sect_dest_exists=None=None
+    namelist:rename_sect_dest_exists=None=
         Removed
-    namelist:rename_sect_dest_index_exists=rename_this_opt=None
+    namelist:rename_sect_dest_index_exists=rename_this_opt=.true.
         Removed
-    namelist:rename_sect_dest_index_exists=None=None
+    namelist:rename_sect_dest_index_exists=None=
         Removed
     namelist:change_opt_if_value=change_opt_if_true=.false.
         Value: '.true.' -> '.false.'
@@ -879,29 +879,29 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         good
     namelist:change_opt=opt_force_added_change=.true.
         good
-    namelist:remove_sect_empty=None=None
+    namelist:remove_sect_empty=None=
         good
-    namelist:remove_sect_full=opt_with_content=None
+    namelist:remove_sect_full=opt_with_content=.true.
         good
-    namelist:remove_sect_full=None=None
+    namelist:remove_sect_full=None=
         good
-    namelist:remove_opt=remove_this_opt=None
+    namelist:remove_opt=remove_this_opt=.true.
         good
-    namelist:remove_ignore_sect_empty=None=None
+    namelist:remove_ignore_sect_empty=None=
         good
-    namelist:remove_ignore_sect_full=opt_with_content=None
+    namelist:remove_ignore_sect_full=opt_with_content=.true.
         good
-    namelist:remove_ignore_sect_full=None=None
+    namelist:remove_ignore_sect_full=None=
         good
-    namelist:remove_ignore_opt=remove_this_ignore_opt=None
+    namelist:remove_ignore_opt=remove_this_ignore_opt=.true.
         good
-    namelist:remove_trig_ignore_sect_empty=None=None
+    namelist:remove_trig_ignore_sect_empty=None=
         good
-    namelist:remove_trig_ignore_sect_full=opt_with_content=None
+    namelist:remove_trig_ignore_sect_full=opt_with_content=.true.
         good
-    namelist:remove_trig_ignore_sect_full=None=None
+    namelist:remove_trig_ignore_sect_full=None=
         good
-    namelist:remove_trig_ignore_opt=remove_this_trig_ignore_opt=None
+    namelist:remove_trig_ignore_opt=remove_this_trig_ignore_opt=.true.
         good
     namelist:change_opt_if_value=change_opt_if_true=.false.
         good

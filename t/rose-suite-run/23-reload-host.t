@@ -34,7 +34,7 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename ${SUITE_RUN_DIR})"
 rose suite-run --debug --name="${NAME}" --no-gcontrol \
-    -S "HOST=\"${JOB_HOST}\"" -- --debug --hold &
+    -S "HOST=\"${JOB_HOST}\"" -- --debug --hold 1>'/dev/null' 2>&1 &
 ROSE_SUITE_RUN_PID=$!
 
 timeout 60 bash -c \

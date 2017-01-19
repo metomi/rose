@@ -338,8 +338,11 @@ class MacroUpgrade(rose.macro.MacroBase):
             return False
         if info is None:
             info = self.INFO_REMOVED
-        config.unset([section, option])
-        self.add_report(section, option, None, info)
+        node = config.unset([section, option])
+        value = ""
+        if node.value:
+            value = node.value
+        self.add_report(section, option, value, info)
 
     def _get_section_option_from_keys(self, keys):
         return (keys + [None])[:2]
