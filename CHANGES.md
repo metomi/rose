@@ -13,6 +13,12 @@ Rose release 48. **This release is expected to be used with
 
 ### Noteworthy Changes
 
+[#2039](https://github.com/metomi/rose/pull/2039):
+rose app-upgrade: improve diagnostics on removal of settings.
+
+[#2036](https://github.com/metomi/rose/pull/2036):
+rose config-edit: fix namespaces stealing sort-keys from option sections.
+
 [#2034](https://github.com/metomi/rose/pull/2034):
 rose config-edit: prevent radio buttons from filling full page width.
 
