@@ -593,8 +593,11 @@ def parse_upgrade_args(argv=None):
             level=rose.reporter.Reporter.FAIL)
         return None
 
-    return (rose.macro.load_conf_from_file(opts, config_file_path, config_name,
-                                           mode="upgrade") + (args, opts,))
+    return (
+        rose.macro.load_conf_from_file(
+            opts.conf_dir, config_file_path, mode="upgrade") +
+        (config_name, args, opts,)
+    )
 
 
 def main():
