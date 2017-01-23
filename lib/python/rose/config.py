@@ -19,39 +19,74 @@
 # -----------------------------------------------------------------------------
 """Simple INI-style configuration data model, loader and dumper.
 
-Synopsis:
+.. testsetup:: *
 
-    import rose.config
+    import os
+    from rose.config import *
+
+.. testcleanup:: rose.config
+
     try:
-        config = rose.config.load(file)
-    except rose.config.ConfigSyntaxError:
-        # ... do something to handle exception
-    value = config.get([section, option])
-    # ...
+        os.remove('config.conf')
+    except OSError:
+        pass
 
-    config.set([section, option], value)
-    # ...
-    rose.config.dump(config, file)
+Synopsis:
+    >>> # Create a config file.
+    >>> with open('config.conf', 'w+') as config_file:
+    ...     config_file.write('''
+    ... [foo]
+    ... bar=Bar
+    ... !baz=Baz
+    ...      ''')
+
+    >>> # Load in a config file.
+    >>> try:
+    ...     config_node = load('config.conf')
+    ... except ConfigSyntaxError:
+    ...     # Handle exception.
+    ...     pass
+
+    >>> # Retrieve config settings.
+    >>> config_node.get(['foo', 'bar'])
+    {'state': '', 'comments': [], 'value': 'Bar'}
+
+    >>> # Set new config settings.
+    >>> _ = config_node.set(['foo', 'new'], 'New')
+
+    >>> # Overwrite existing config settings.
+    >>> _ = config_node.set(['foo', 'baz'], state=ConfigNode.STATE_NORMAL,
+    ...                     value='NewBaz')
+
+    >>> # Write out config to a file.
+    >>> dump(config_node, sys.stdout)
+    [foo]
+    bar=Bar
+    baz=NewBaz
+    new=New
+
 
 Classes:
-    ConfigNode - represents an individual node (setting or section).
-    ConfigNodeDiff - represent differences between ConfigNode instances.
-    ConfigDumper - dumps a configuration to stdout or a file.
-    ConfigLoader - loads a configuration into a Config instance.
+    .. autosummary::
+        rose.config.ConfigNode
+        rose.config.ConfigNodeDiff
+        rose.config.ConfigDumper
+        rose.config.ConfigLoader
 
 Functions:
-    dump - shorthand for ConfigDumper().dump
-    load - shorthand for ConfigLoader().load
+    .. autosummary::
+       rose.config.load
+       rose.config.dump
 
 Limitations:
- * The loader does not handle trailing comments.
+    - The loader does not handle trailing comments.
 
 What about the standard library ConfigParser? Well, it is problematic:
- * The comment character and style is hard-coded.
- * The assignment character is hard-coded.
- * A duplicated section header causes an exception to be raised.
- * Option keys are transformed to lower case by default.
- * It is far too complicated and confusing.
+    - The comment character and style is hard-coded.
+    - The assignment character is hard-coded.
+    - A duplicated section header causes an exception to be raised.
+    - Option keys are transformed to lower case by default.
+    - It is far too complicated and confusing.
 
 """
 
@@ -79,14 +114,67 @@ OPT_CONFIG_SETTING_COMMENT = " setting from opt config \"%s\" (%s)"
 
 class ConfigNode(object):
 
-    """Represent a node in a configuration file."""
+    """Represent a node in a configuration file.
+
+    Nodes are stored hierarchically, for instance the following config
+        [foo]
+        bar = Bar
+
+    When loaded by ConfigNode.load(file) would result in three levels of
+    ConfigNodes, the first representing "root" (i.e. the top level of the
+    config), one representing the config section "foo" and one representing the
+    setting "bar".
+
+    Examples:
+        >>> # Create a new ConfigNode.
+        >>> config_node = ConfigNode()
+
+        >>> # Add sub-nodes.
+        >>> _ = config_node.set(keys=['foo', 'bar'], value='Bar')
+        >>> _ = config_node.set(keys=['foo', 'baz'], value='Baz')
+        >>> config_node # doctest: +NORMALIZE_WHITESPACE
+        {'state': '', 'comments': [],
+         'value': {'foo': {'state': '', 'comments': [],
+                           'value': {'baz': {'state': '', 'comments': [],
+                                             'value': 'Baz'},
+                                     'bar': {'state': '', 'comments': [],
+                                             'value': 'Bar'}}}}}
+
+        >>> # Set the state of a node.
+        >>> _ = config_node.set(keys=['foo', 'bar'],
+        ...                     state=ConfigNode.STATE_USER_IGNORED)
+
+        >>> # Get the value of the node at a position.
+        >>> config_node.get_value(keys=['foo', 'baz'])
+        'Baz'
+
+        >>> # Walk over the hierarchical structure of a node.
+        >>> [keys for keys, sub_node in config_node.walk()]
+        [['foo'], ['foo', 'bar'], ['foo', 'baz']]
+
+        >>> # Walk over the config skipping ignored sections.
+        >>> [keys for keys, sub_node in config_node.walk(no_ignore=True)]
+        [['foo'], ['foo', 'baz']]
+
+        >>> # Add two ConfigNode instances to create a new "merged" node.
+        >>> another_config_node = ConfigNode()
+        >>> _ = another_config_node.set(keys=['new'], value='New')
+        >>> new_config_node = config_node + another_config_node
+        >>> [keys for keys, sub_node in new_config_node.walk()]
+        [['foo'], ['foo', 'baz'], ['foo', 'bar'], ['', 'new']]
+
+    """
 
     __slots__ = ["STATE_NORMAL", "STATE_USER_IGNORED",
                  "STATE_SYST_IGNORED", "value", "state", "comments"]
 
     STATE_NORMAL = ""
+    """The default state of a ConfigNode."""
     STATE_USER_IGNORED = "!"
+    """ConfigNode state if it has been specifically ignored in the config."""
     STATE_SYST_IGNORED = "!!"
+    """ConfigNode state if a metadata opperation has logically ignored the
+    config."""
 
     def __init__(self, value=None, state=STATE_NORMAL, comments=None):
         if value is None:
@@ -143,19 +231,48 @@ class ConfigNode(object):
         return not self.__eq__(other)
 
     def is_ignored(self):
-        """Return true if current node is in the "ignored" state."""
+        """Return True if current node is in the "ignored" state."""
         return self.state != self.STATE_NORMAL
 
     def walk(self, keys=None, no_ignore=False):
         """Return all keylist - sub-node pairs below keys.
 
-        keys is a list defining a hierarchy of node.value
-        'keys'. If an entry in keys is the null string,
-        it is skipped.
+        Args:
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                If an entry in keys is the null string, it is skipped.
+            no_ignore (bool): If True any ignored nodes will be skipped.
 
-        If a sub-node is at the top level, and does not
-        contain any node children, a null string will be
-        prepended to the returned keylist.
+        Yields:
+            tuple - (keys, sub_node)
+                - keys (list) - A list defining a hierarchy of node.value
+                     'keys'. If a sub-node is at the top level, and does not
+                     contain any node children, a null string will be
+                     prepended to the returned keylist.
+                - sub_node (ConfigNode) - The config node at the position of
+                     keys.
+
+        Examples:
+            >>> config_node = ConfigNode()
+            >>> _ = config_node.set(['foo', 'bar'], 'Bar')
+            >>> _ = config_node.set(['foo', 'baz'], 'Baz',
+            ...                     state=ConfigNode.STATE_USER_IGNORED)
+
+            >>> # Walk over the full hierarchy.
+            >>> [keys for keys, sub_node in config_node.walk()]
+            [['foo'], ['foo', 'bar'], ['foo', 'baz']]
+
+            >>> # Walk over one branch of the hierarchy
+            >>> [keys for keys, sub_node in config_node.walk(keys=['foo'])]
+            [['foo', 'bar'], ['foo', 'baz']]
+
+            >>> # Skip over ignored nodes.
+            >>> [keys for keys, sub_node in config_node.walk(no_ignore=True)]
+            [['foo'], ['foo', 'bar']]
+
+            >>> # Invalid/non-existent keys.
+            >>> [keys for keys, sub_node in config_node.walk(
+            ...     keys=['elephant'])]
+            []
 
         """
         if keys is None:
@@ -183,13 +300,37 @@ class ConfigNode(object):
     def get(self, keys=None, no_ignore=False):
         """Return a node at the position of keys, if any.
 
-        keys is a list defining a hierarchy of node.value
-        'keys'. If an entry in keys is the null string,
-        it is skipped.
+        Args:
+            keys (list, optional): A list defining a hierarchy of
+                node.value 'keys'. If an entry in keys is the null
+                string, it is skipped.
+            no_ignore (bool, optional): If True any ignored nodes will
+                not be returned.
 
-        no_ignore switches on filtering nodes by their
-        ignored status. If True, ignored nodes will not be
-        returned. If False, ignored nodes will be returned.
+        Returns:
+            ConfigNode: The config node located at the position of keys or
+            None.
+
+        Examples:
+            >>> # Create ConfigNode.
+            >>> config_node = ConfigNode()
+            >>> _ = config_node.set(['foo', 'bar'], 'Bar')
+            >>> _ = config_node.set(['foo', 'baz'], 'Baz',
+            ...     state=ConfigNode.STATE_USER_IGNORED)
+
+            >>> # A ConfigNode containing sub-nodes.
+            >>> config_node.get(keys=['foo']) # doctest: +NORMALIZE_WHITESPACE
+            {'state': '', 'comments': [],
+             'value': {'baz': {'state': '!', 'comments': [], 'value': 'Baz'},
+                       'bar': {'state': '', 'comments': [], 'value': 'Bar'}}}
+
+            >>> # A bottom level sub-node.
+            >>> config_node.get(keys=['foo', 'bar'])
+            {'state': '', 'comments': [], 'value': 'Bar'}
+
+            >>> # Skip ignored nodes.
+            >>> print config_node.get(keys=['foo', 'baz'], no_ignore=True)
+            None
 
         """
         if not keys:
@@ -207,9 +348,29 @@ class ConfigNode(object):
         return node
 
     def get_filter(self, no_ignore):
-        """Return None if no_ignore and node is in ignored state.
+        """Return this ConfigNode unless no_ignore and node is ignored.
 
-        Return self otherwise.
+        Args:
+            no_ignore (bool): If True only return this node if it is not
+                ignored.
+
+        Returns:
+            ConfigNode: This ConfigNode unless no_ignore and node is ignored.
+
+        Examples:
+            >>> config_node = ConfigNode(value=42)
+            >>> config_node.get_filter(False)
+            {'state': '', 'comments': [], 'value': 42}
+            >>> config_node.get_filter(True)
+            {'state': '', 'comments': [], 'value': 42}
+
+            >>> config_node = ConfigNode(value=42,
+            ...                      state=ConfigNode.STATE_USER_IGNORED)
+            >>> config_node.get_filter(False)
+            {'state': '!', 'comments': [], 'value': 42}
+            >>> print config_node.get_filter(True)
+            None
+
 
         """
         if no_ignore and self.state:
@@ -221,25 +382,85 @@ class ConfigNode(object):
 
         If the node does not exist or is ignored, return None.
 
+        Args:
+            keys (list, optional): A list defining a hierarchy of node.value
+                'keys'. If an entry in keys is the null string, it is skipped.
+            default (obj, optional): Return default if the value is not set.
+
+        Returns:
+            obj: The value of this ConfigNode at the position of keys or
+            default if not set.
+
+        Examples:
+            >>> # Create ConfigNode.
+            >>> config_node = ConfigNode(value=42)
+            >>> _ = config_node.set(['foo'], 'foo')
+            >>> _ = config_node.set(['foo', 'bar'], 'Bar')
+
+            >>> # Get value without specifying keys returns the value of the
+            >>> # root ConfigNode (which in this case is a dict of its
+            >>> # sub-nodes).
+            >>> config_node.get_value() # doctest: +NORMALIZE_WHITESPACE
+            {'foo': {'state': '', 'comments': [],
+                     'value': {'bar': {'state': '', 'comments': [],
+                                       'value': 'Bar'}}}}
+
+            >>> # Intermediate level ConfigNode.
+            >>> config_node.get_value(keys=['foo'])
+            {'bar': {'state': '', 'comments': [], 'value': 'Bar'}}
+
+            >>> # Bottom level ConfigNode.
+            >>> config_node.get_value(keys=['foo', 'bar'])
+            'Bar'
+
+            >>> # If there is no node located at the position of keys or if
+            >>> # that node is unset then the default value is returned.
+            >>> config_node.get_value(keys=['foo', 'bar', 'baz'],
+            ...                       default=True)
+            True
         """
         return getattr(self.get(keys, no_ignore=True), "value", default)
 
     def set(self, keys=None, value=None, state=None, comments=None):
+        # TODO: Are keys=[''] really skipped?
+        # TODO: Should comments be a list?
         """Set node properties at the position of keys, if any.
 
-        keys is a list defining a hierarchy of node.value
-        'keys'. If an entry in keys is the null string,
-        it is skipped.
+        Arguments:
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                If an entry in keys is the null string, it is skipped.
+            value (obj): The node.value property to set at this position.
+            state (str): The node.state property to set at this position.
+                If None, the node.state property is unchanged.
+            comments (str): The node.comments property to set at this position.
+                If None, the node.comments property is unchanged.
 
-        value defines the node.value property at this position.
+        Returns:
+            ConfigNode: This config node.
 
-        state defines the node.state property at this position.
+        Examples:
+            >>> # Create ConfigNode.
+            >>> config_node = ConfigNode()
+            >>> config_node
+            {'state': '', 'comments': [], 'value': {}}
 
-        comments defines the node.comments property at this position.
+            >>> # Add a sub-node at the position 'foo' with the comment 'Info'.
+            >>> config_node.set(keys=['foo'], comments='Info')
+            ... # doctest: +NORMALIZE_WHITESPACE
+            {'state': '', 'comments': [],
+             'value': {'foo': {'state': '', 'comments': 'Info', 'value': {}}}}
 
-        If state is None, the node.state property is unchanged.
+            >>> # Set the value for the sub-node at the position
+            >>> # 'foo' to 'Foo'.
+            >>> config_node.set(keys=['foo'], value='Foo')
+            ... # doctest: +NORMALIZE_WHITESPACE
+            {'state': '', 'comments': [], 'value': {'foo': {'state': '',
+             'comments': 'Info', 'value': 'Foo'}}}
 
-        If comments is None, the node.comments property is unchanged.
+            >>> # Set the value of the ConfigNode to True, this overwrites all
+            >>> # sub-nodes!
+            >>> config_node.set(keys=[''], value=True)
+            {'state': '', 'comments': [], 'value': True}
 
         """
         if keys is None:
@@ -268,11 +489,34 @@ class ConfigNode(object):
         return self
 
     def unset(self, keys=None):
-        """Remove a node at this (keys) position, if any.
+        """Remove a node at the position of keys, if any.
 
-        keys is a list defining a hierarchy of node.value
-        'keys'. If an entry in keys is the null string,
-        it is skipped.
+        Args:
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                If an entry in keys is the null string, it is skipped.
+
+        Returns:
+            ConfigNode: The ConfigNode instance that was removed, else None.
+
+        Examples:
+            >>> # Create ConfigNode.
+            >>> config_node = ConfigNode()
+            >>> _ = config_node.set(keys=['foo'], value='Foo')
+
+            >>> # Unset without providing any keys does nothing.
+            >>> print config_node.unset()
+            None
+
+            >>> # Unset with invalid keys does nothing.
+            >>> print config_node.unset(keys=['bar'])
+            None
+
+            >>> # Unset with valid keys removes the node from the node.
+            >>> config_node.unset(keys=['foo'])
+            {'state': '', 'comments': [], 'value': 'Foo'}
+
+            >>> config_node
+            {'state': '', 'comments': [], 'value': {}}
 
         """
         if keys is None:
@@ -287,7 +531,28 @@ class ConfigNode(object):
             return None
 
     def add(self, config_diff):
-        """Apply a config node diff object to self."""
+        """Apply a ConfigNodeDiff object to self.
+
+        Args:
+            config_diff (ConfigNodeDiff): A diff to apply to this ConfigNode.
+
+        Examples:
+            >>> # Create ConfigNode
+            >>> config_node = ConfigNode()
+            >>> _ = config_node.set(keys=['foo', 'bar'], value='Bar')
+            >>> [keys for keys, sub_node in config_node.walk()]
+            [['foo'], ['foo', 'bar']]
+
+            >>> # Create ConfigNodeDiff
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_added_setting(keys=['foo', 'baz'],
+            ...                                    data='Baz')
+
+            >>> # Apply ConfigNodeDiff to ConfigNode
+            >>> config_node.add(config_node_diff)
+            >>> [keys for keys, sub_node in config_node.walk()]
+            [['foo'], ['foo', 'bar'], ['foo', 'baz']]
+        """
         for added_key, added_data in config_diff.get_added():
             value, state, comments = added_data
             self.set(keys=added_key, value=value, state=state,
@@ -312,9 +577,35 @@ class ConfigNode(object):
             self.unset(keys=removed_key)
 
     def __add__(self, config_diff):
-        """Return a new node by applying a config node diff object to self.
-        Alternatively a config node can be provided, the diff will then be
-        applied to self to return a new node."""
+        """Return a new node by applying a ConfigNodeDiff or ConfigNode to self.
+
+        Create a new node by applying either a ConfigNodeDiff or ConfigNode
+        instance to this ConfigNode.
+
+        Arguments:
+            config_diff - Either a ConfigNodeDiff or a ConfigNode.
+
+        Returns:
+            node - The new ConfigNode.
+
+        Examples:
+            >>> # Add one ConfigNode to another ConfigNode
+            >>> config_node_1 = ConfigNode()
+            >>> config_node_1.set(keys=['foo'], value='Foo')
+            >>> config_node_2 = ConfigNode()
+            >>> config_node_2.set(keys=['bar'], value='Bar')
+            >>> new_config_node = config_node_1 + config_node_2
+            >>> [keys for keys, sub_node in new_config_node.walk()]
+            [['', 'bar'], ['', 'foo']]
+
+            >>> # Add a ConfigNodeDiff to a ConfigNode
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_added_setting(keys=['baz'], data='Baz')
+            >>> new_config_node = config_node_1 + config_node_diff
+            >>> [keys for keys, sub_node in new_config_node.walk()]
+            [['', 'baz'], ['', 'foo']]
+
+        """
         if type(config_diff) is ConfigNode:
             config_node = config_diff
             config_diff = ConfigNodeDiff()
@@ -325,7 +616,30 @@ class ConfigNode(object):
         return new_node
 
     def __sub__(self, other_config_node):
-        """Produce a diff from another node."""
+        """Produce a ConfigNodeDiff from another ConfigNode.
+
+        Arguments:
+            other_config_node - The ConfigNode to be applied to this ConfigNode
+                to produce the ConfigNodeDiff.
+
+        Returns:
+            config_diff - A ConfigNodeDiff instance.
+
+        Examples:
+            >>> # Create a ConfigNodeDiff from two ConfigNodes
+            >>> config_node_1 = ConfigNode()
+            >>> config_node_1.set(keys=['foo'], value='Foo')
+            >>> config_node_2 = ConfigNode()
+            >>> config_node_2.set(keys=['bar'], value='Bar')
+            >>> config_node_diff = config_node_1 - config_node_2
+
+            >>> config_node_diff.get_added()
+            [(('', 'foo'), ('Foo', '', []))]
+
+            >>> config_node_diff.get_removed()
+            [(('', 'bar'), ('Bar', '', []))]
+
+        """
         diff = ConfigNodeDiff()
         diff.set_from_configs(other_config_node, self)
         return diff
@@ -349,7 +663,44 @@ class ConfigNode(object):
 
 class ConfigNodeDiff(object):
 
-    """Represent differences between two ConfigNode instances."""
+    """Represent differences between two ConfigNode instances.
+
+        Examples:
+            >>> # Create a new ConfigNodeDiff.
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_added_setting(keys=['bar'],
+            ...                                    data=('Bar', None, None,))
+
+            >>> # Create a new ConfigNode.
+            >>> config_node = ConfigNode()
+            >>> _ = config_node.set(keys=['baz'], value='Baz')
+
+            >>> # Apply the diff to the node.
+            >>> config_node.add(config_node_diff)
+            >>> [(keys, sub_node.get_value()) for keys, sub_node in
+            ...  config_node.walk()]
+            [(['', 'baz'], 'Baz'), (['', 'bar'], 'Bar')]
+
+            >>> # Create a ConfigNodeDiff by comparing two ConfigNodes.
+            >>> another_config_node = ConfigNode()
+            >>> _ = another_config_node.set(keys=['bar'], value='NewBar')
+            >>> _ = another_config_node.set(keys=['new'], value='New')
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_from_configs(config_node,
+            ...                                   another_config_node)
+            >>> config_node_diff.get_added()
+            [(('', 'new'), ('New', '', []))]
+            >>> config_node_diff.get_removed()
+            [(('', 'baz'), ('Baz', '', []))]
+            >>> config_node_diff.get_modified()
+            [(('', 'bar'), (('Bar', '', []), ('NewBar', '', [])))]
+
+            >>> # Inverse a ConfigNodeDiff.
+            >>> reversed_diff = config_node_diff.get_reversed()
+            >>> reversed_diff.get_added()
+            [(('', 'baz'), ('Baz', '', []))]
+
+    """
 
     KEY_ADDED = "added"
     KEY_MODIFIED = "modified"
@@ -360,7 +711,30 @@ class ConfigNodeDiff(object):
                       self.KEY_MODIFIED: {}}
 
     def set_from_configs(self, config_node_1, config_node_2):
-        """Create diff data from two ConfigNode instances."""
+        """Create diff data from two ConfigNode instances.
+
+        Args:
+            config_node_1 (ConfigNode): The node for which to base the diff
+                off of.
+            config_node_2 (ConfigNode): The "new" node the changes of which
+                this diff will "apply".
+
+        Example:
+            >>> # Create two ConfigNode instances to compare.
+            >>> config_node_1 = ConfigNode()
+            >>> _ = config_node_1.set(keys=['foo'])
+            >>> config_node_2 = ConfigNode()
+            >>> _ = config_node_2.set(keys=['bar'])
+
+            >>> # Create a ConfigNodeDiff instance.
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_from_configs(config_node_1, config_node_2)
+            >>> config_node_diff.get_added()
+            [(('bar',), (None, '', []))]
+            >>> config_node_diff.get_removed()
+            [(('foo',), (None, '', []))]
+
+        """
         settings_1 = {}
         settings_2 = {}
         for config_node, settings in [(config_node_1, settings_1),
@@ -385,6 +759,20 @@ class ConfigNodeDiff(object):
         Add all the added settings, add all the modified settings,
         add all the removed settings as user-ignored.
 
+        Returns:
+            ConfigNode: A new ConfigNode instance.
+
+        Example:
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_added_setting(['foo'],
+            ...                                    ('Foo', None, None,))
+            >>> config_node_diff.set_removed_setting(['bar'],
+            ...                                      ('Bar', None, None,))
+            >>> config_node = config_node_diff.get_as_opt_config()
+            >>> list(config_node.walk()) # doctest: +NORMALIZE_WHITESPACE
+            [(['', 'bar'], {'state': '!', 'comments': [], 'value': 'Bar'}),
+             (['', 'foo'], {'state': '', 'comments': [], 'value': 'Foo'})]
+
         """
         node = ConfigNode()
         for keys, old_and_new_info in self.get_modified():
@@ -402,15 +790,92 @@ class ConfigNodeDiff(object):
         return node
 
     def set_added_setting(self, keys, data):
-        """Set a setting to be "added"."""
+        # TODO: type(comments) == str ?
+        """Set a config setting to be "added" in this ConfigNodeDiff.
+
+        Args:
+            keys (list/tuple): The position of the setting to add.
+            data (obj, str, str): A tuple (value, state, comments) for the
+                setting to add.
+
+        Examples:
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_added_setting(['foo'],
+            ...                                    ('Foo', None, None,))
+            >>> config_node_diff.set_added_setting(
+            ...     ['bar'],
+            ...     ('Bar', ConfigNode.STATE_USER_IGNORED, 'Some Info',))
+
+            >>> config_node = ConfigNode()
+            >>> config_node.add(config_node_diff)
+
+            >>> list(config_node.walk()) # doctest: +NORMALIZE_WHITESPACE
+            [(['', 'bar'], {'state': '!', 'comments': 'Some Info',
+                            'value': 'Bar'}),
+             (['', 'foo'], {'state': '', 'comments': [], 'value': 'Foo'})]
+
+        """
+        keys = tuple(keys)
         self._data[self.KEY_ADDED][keys] = data
 
     def set_modified_setting(self, keys, old_data, data):
-        """Set a setting to be "modified"."""
+        # TODO: Really?
+        """Set a config setting to be "modified" in this ConfigNodeDiff.
+
+        If a property in both the old_data and data (new data) are both set to
+        None then no change will be made to any pre-existing value.
+
+        Args:
+            keys (list/tuple): The position of the setting to add.
+            old_data (obj, str, str): A tuple (value, state, comments) for
+                the "current" properties of the setting to modify.
+            data (obj, str, str): A tuple (value, state, comments) for "new"
+                properties to change this setting to.
+
+        Examples:
+            >>> # Create a ConfigNodeDiff.
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_modified_setting(
+            ...     ['foo'], ('Foo', None, None), ('New Foo', None, None))
+
+            >>> # Create a ConfigNode.
+            >>> config_node = ConfigNode()
+            >>> _ = config_node.set(keys=['foo'], value='Foo',
+            ...                     comments='Some Info')
+
+            >>> # Apply the ConfigNodeDiff to the ConfigNode
+            >>> config_node.add(config_node_diff)
+            >>> config_node.get(keys=['foo'])
+            {'state': '', 'comments': 'Some Info', 'value': 'New Foo'}
+        """
+        keys = tuple(keys)
         self._data[self.KEY_MODIFIED][keys] = (old_data, data)
 
     def set_removed_setting(self, keys, data):
-        """Set a setting to be "removed"."""
+        """Set a config setting to be "removed" in this ConfigNodeDiff.
+
+        Arguments:
+            keys (list): The position of the setting to add.
+            data (obj, str, str): A tuple (value, state, comments) of the
+                properties for the setting to remove.
+
+        Example:
+            >>> # Create a ConfigNodeDiff.
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_removed_setting(['foo'], ('X', 'Y', 'Z'))
+
+            >>> # Create a ConfigNode.
+            >>> config_node = ConfigNode()
+            >>> _ = config_node.set(keys=['foo'], value='Foo',
+            ...                     comments='Some Info')
+
+            >>> # Apply the ConfigNodeDiff to the ConfigNode
+            >>> config_node.add(config_node_diff)
+            >>> print config_node.get(keys=['foo'])
+            None
+
+        """
+        keys = tuple(keys)
         self._data[self.KEY_REMOVED][keys] = data
 
     def get_added(self):
@@ -418,6 +883,19 @@ class ConfigNodeDiff(object):
 
         The data is a tuple of value, state, comments, where value is
         set to None for sections.
+
+        Returns:
+            list: A list of the form [(keys, data), ...]
+                - keys - The position of an added setting.
+                - data - Tuple of the form (value, state, comments) of the
+                  properties of the added setting.
+
+        Examples:
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_added_setting(['foo'],
+            ...                                    ('Foo', None, None))
+            >>> config_node_diff.get_added()
+            [(('foo',), ('Foo', None, None))]
 
         """
         return sorted(self._data[self.KEY_ADDED].items())
@@ -428,6 +906,21 @@ class ConfigNodeDiff(object):
         The data is a list of two tuples (before and after) of value,
         state, comments, where value is set to None for sections.
 
+        Returns:
+            list: A list of the form [(keys, data), ...]:
+                - keys - The position of an added setting.
+                - data - Tuple of the form (value, state, comments) for the
+                  properties of the setting before the modification.
+                - old_data - The same tuple as data but representing the
+                  properties of the setting after the modification.
+
+        Examples:
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_modified_setting(
+            ...     ['foo'], ('Foo', None, None), ('New Foo', None, None))
+            >>> config_node_diff.get_modified()
+            [(('foo',), (('Foo', None, None), ('New Foo', None, None)))]
+
         """
         return sorted(self._data[self.KEY_MODIFIED].items())
 
@@ -437,18 +930,62 @@ class ConfigNodeDiff(object):
         The data is a tuple of value, state, comments, where value is
         set to None for sections.
 
+        Returns:
+            list - A list of the form [(keys, data), ...]:
+                - keys - The position of an added setting.
+                - data - Tuple of the form (value, state, comments) of the
+                  properties of the removed setting.
+
+        Examples:
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_removed_setting(keys=['foo'],
+            ...                                      data=('foo', None, None))
+            >>> config_node_diff.get_removed()
+            [(('foo',), ('foo', None, None))]
+
         """
         return sorted(self._data[self.KEY_REMOVED].items())
 
     def get_all_keys(self):
-        """Return all changed keys."""
+        """Return all keys affected by this ConfigNodeDiff.
+
+        Returns:
+            list: A list containing any keys affected by this diff as tuples,
+            e.g. ('foo', 'bar').
+
+        Examples:
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_added_setting(['foo'],('foo', None, None))
+            >>> config_node_diff.set_removed_setting(['bar'],
+            ...                                      ('bar', None, None))
+            >>> config_node_diff.get_all_keys()
+            [('bar',), ('foo',)]
+        """
         return sorted(
             set(self._data[self.KEY_ADDED]) |
             set(self._data[self.KEY_MODIFIED]) |
             set(self._data[self.KEY_REMOVED]))
 
     def get_reversed(self):
-        """Return an inverse (add->remove, etc) copy of this diff."""
+        """Return an inverse (add->remove, etc) copy of this ConfigNodeDiff.
+
+        Returns:
+            ConfigNodeDiff: A new ConfigNodeDiff instance.
+
+        Examples:
+            >>> # Create ConfigNodeDiff instance.
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_added_setting(['foo'],('foo', None, None))
+            >>> config_node_diff.set_removed_setting(['bar'],
+            ...                                      ('bar', None, None))
+
+            >>> # Generate reversed diff.
+            >>> reversed_diff = config_node_diff.get_reversed()
+            >>> reversed_diff.get_added()
+            [(('bar',), ('bar', None, None))]
+            >>> reversed_diff.get_removed()
+            [(('foo',), ('foo', None, None))]
+        """
         rev_diff = ConfigNodeDiff()
         for keys, data in self.get_removed():
             rev_diff.set_added_setting(keys, data)
@@ -459,13 +996,36 @@ class ConfigNodeDiff(object):
         return rev_diff
 
     def delete_removed(self):
-        """Deletes all 'removed' keys from this diff."""
+        """Deletes all 'removed' keys from this ConfigNodeDiff..
+
+        Examples:
+            >>> config_node_diff = ConfigNodeDiff()
+            >>> config_node_diff.set_removed_setting(['foo'],
+            ...                                      ('foo', None, None))
+            >>> config_node_diff.delete_removed()
+            >>> config_node_diff.get_removed()
+            []
+        """
         self._data[self.KEY_REMOVED] = {}
 
 
 class ConfigDumper(object):
 
-    """Dumper of a ConfigNode object in Rose INI format."""
+    """Dumper of a ConfigNode object in Rose INI format.
+
+    Examples:
+        >>> config_node = ConfigNode()
+        >>> _ = config_node.set(keys=['foo', 'bar'], value='Bar')
+        >>> _ = config_node.set(keys=['foo', 'baz'], value='Baz',
+        ...                     comments=['Currently ignored!'],
+        ...                     state=ConfigNode.STATE_USER_IGNORED)
+        >>> dumper = ConfigDumper()
+        >>> dumper(config_node, sys.stdout)
+        [foo]
+        bar=Bar
+        #Currently ignored!
+        !baz=Baz
+    """
 
     def __init__(self, char_assign=CHAR_ASSIGN):
         """Initialise the configuration dumper utility.
@@ -480,20 +1040,20 @@ class ConfigDumper(object):
              sort_option_items=None, env_escape_ok=False, concat_mode=False):
         """Format a ConfigNode object and write result to target.
 
-        Arguments:
-        root -- the root node, a ConfigNode object.
-        target -- an open file handle or a string containing a
-        file path. If not specified, the result is written to
-        sys.stdout.
-        sort_sections -- an optional argument that should be a function
-        for sorting a list of section keys.
-        sort_option_items -- an optional argument that should be a
-        function for sorting a list of option (key, value) tuples.
-        in string values.
-        env_escape_ok -- an optional argument to indicate that $NAME
-        and ${NAME} syntax in values should be escaped.
-        concat_mode -- switch on concatenation mode. If True, add []
-        before root level options.
+        Args:
+            root (ConfigNode): The root config node.
+            target (str/file): An open file handle or a string containing a
+                file path. If not specified, the result is written to
+                sys.stdout.
+            sort_sections (fcn - optional): An optional argument that should be
+                a function for sorting a list of section keys.
+            sort_option_items (fcn - optional): An optional argument that
+                should be a function for sorting a list of option (key, value)
+                tuples in string values.
+            env_escape_ok (bool - optional): An optional argument to indicate
+                that $NAME and ${NAME} syntax in values should be escaped.
+            concat_mode (bool - optional): Switch on concatenation mode. If
+                True, add [] before root level options.
 
         """
         if sort_sections is None:
@@ -586,7 +1146,23 @@ class ConfigDumper(object):
 
 class ConfigLoader(object):
 
-    """Loader of an INI format configuration into a Config object."""
+    """Loader of an INI format configuration into a ConfigNode object.
+
+    Example:
+        >>> with open('config.conf', 'w+') as config_file:
+        ...     config_file.write('''
+        ... [foo]
+        ... !bar=Bar
+        ... baz=Baz
+        ...     ''')
+        >>> loader = ConfigLoader()
+        >>> try:
+        ...     config_node = loader.load('config.conf')
+        ... except ConfigSyntaxError:
+        ...     raise  # Handle exception.
+        >>> config_node.get(keys=['foo', 'bar'])
+        {'state': '!', 'comments': [], 'value': 'Bar'}
+    """
 
     RE_SECTION = re.compile(
         r"^(?P<head>\s*\[(?P<state>!?!?))(?P<section>.*)\]\s*$")
@@ -625,32 +1201,73 @@ class ConfigLoader(object):
         """Read a source configuration file with optional configurations.
 
         Arguments:
-        source -- A string for a file path.
-        node --- A ConfigNode object if specified, otherwise created.
-        more_keys -- A list of additional optional configuration names. If
-                     source is "rose-${TYPE}.conf", the file of each name
-                     should be "opt/rose-${TYPE}-${NAME}.conf".
-        used_keys -- If defined, it should be a list for this method to append
-                     to. The key of each successfully loaded optional
-                     configuration will be appended to the list (unless the key
-                     is already in the list). Missing optional configurations
-                     that are specified in more_keys will not raise an error.
-                     If not defined, any missing optional configuration will
-                     trigger an OSError.
-        mark_opt_configs     (default False) if True, add comments above any
-                              settings which have been loaded from an optional
-                              config.
-        return_config_map -- (default False) if True, construct and return a
-                              dict (config_map) containing config names vs
-                              their uncombined nodes. Optional configurations
-                              use their opt keys as keys, and the main
-                              configuration uses 'None'.
+            source (str): A file path.
+            node (ConfigNode - optional): A ConfigNode object if specified,
+                otherwise one is created.
+            more_keys (list - optional): A list of additional optional
+                configuration names. If source is "rose-${TYPE}.conf", the
+                file of each name should be "opt/rose-${TYPE}-${NAME}.conf".
+            used_keys (list - optional): If defined, it should be a list for
+                this method to  append to. The key of each successfully loaded
+                optional configuration will be appended to the list (unless the
+                key is already in the list). Missing optional configurations
+                that are specified in more_keys will not raise an error.
+                If not defined, any missing optional configuration will
+                trigger an OSError.
+            mark_opt_configs (bool - optional): if True, add comments above any
+                settings which have been loaded from an optional config.
+            return_config_map (bool - optional): If True, construct and return
+                a dict (config_map) containing config names vs their uncombined
+                nodes. Optional configurations use their opt keys as keys, and
+                the main configuration uses 'None'.
 
-        Return node if return_config_map is False (default).
-        Return node, config_map if return_config_map is True.
+        Returns:
+            tuple: node or (node, config_map):
+                - node - The loaded configuration as a ConfigNode.
+                - config_map - A dictionary containing opt_conf_key: ConfigNode
+                  pairs. Only returned if return_config_map is True.
+
+        Examples:
+            .. testcleanup:: rose.config.ConfigLoader.load_with_opts
+
+                try:
+                    os.remove('config.conf')
+                    os.remove('opt/config-foo.conf')
+                    os.rmdir('opt')
+                except OSError:
+                    pass
+
+            >>> # Write config file.
+            >>> with open('config.conf', 'w+') as config_file:
+            ...     config_file.write('''
+            ... [foo]
+            ... bar=Bar
+            ...     ''')
+            >>> # Write optional config file (foo).
+            >>> os.mkdir('opt')
+            >>> with open('opt/config-foo.conf', 'w+') as opt_config_file:
+            ...     opt_config_file.write('''
+            ... [foo]
+            ... bar=Baz
+            ...     ''')
+
+            >>> loader = ConfigLoader()
+            >>> config_node, config_map = loader.load_with_opts(
+            ...     'config.conf', more_keys=['foo'], return_config_map=True)
+            >>> config_node.get_value(keys=['foo', 'bar'])
+            'Baz'
+
+            >>> original_config_node = config_map[None]
+            >>> original_config_node.get_value(keys=['foo', 'bar'])
+            'Bar'
+
+            >>> optional_config_node = config_map['foo']
+            >>> optional_config_node.get_value(keys=['foo', 'bar'])
+            'Baz'
 
         """
-        node = self.load(source, node)
+        if not node:
+            node = self.load(source, node)
         if return_config_map:
             config_map = {None: copy.deepcopy(node)}
         opt_conf_keys_node = node.unset(["opts"])
@@ -700,10 +1317,30 @@ class ConfigLoader(object):
         """Read a source configuration file.
 
         Arguments:
-        source -- an open file handle or a string for a file path.
-        node --- a ConfigNode object if specified, otherwise created.
+            source (str): An open file handle or a string for a file path.
+            node (ConfigNode): A ConfigNode object if specified, otherwise
+                created.
 
-        Return node.
+        Returns:
+            ConfigNode: A new ConfigNode object.
+
+        Examples:
+            >>> # Create example config file.
+            >>> with open('config.conf', 'w+') as config_file:
+            ...     config_file.write('''
+            ... [foo]
+            ... # Some comment
+            ... !bar=Bar
+            ...     ''')
+
+            >>> # Load config file.
+            >>> loader = ConfigLoader()
+            >>> try:
+            ...     config_node = loader.load('config.conf')
+            ... except ConfigSyntaxError:
+            ...     raise  # Handle exception.
+            >>> config_node.get(keys=['foo', 'bar'])
+            {'state': '!', 'comments': [' Some comment'], 'value': 'Bar'}
 
         """
         if node is None:
@@ -857,14 +1494,26 @@ class ConfigSyntaxError(Exception):
 
     """Exception raised for syntax error loading a configuration file.
 
-    It has the following attributes:
-        exc.code -- Error code. Can be one of:
+    Attributes:
+        exc.code: Error code. Can be one of:
             ConfigSyntaxError.BAD_CHAR (bad characters in a name)
             ConfigSyntaxError.BAD_SYNTAX (general syntax error)
-        exc.file_name -- The name of the file that triggers the error.
-        exc.line_num -- The line number (from 1) in the file with the error.
-        exc.col_num -- The column number (from 0) in the line with the error.
-        exc.line -- The content of the line that contains the error.
+        exc.file_name: The name of the file that triggers the error.
+        exc.line_num: The line number (from 1) in the file with the error.
+        exc.col_num: The column number (from 0) in the line with the error.
+        exc.line: The content of the line that contains the error.
+
+    Examples:
+        >>> with open('config.conf', 'w+') as config_file:
+        ...     config_file.write('[foo][foo]')
+        >>> loader = ConfigLoader()
+        >>> try:
+        ...     loader.load('config.conf')
+        ... except ConfigSyntaxError as exc:
+        ...     print 'Error (%s) in file "%s" at %s:%s' % (
+        ...         exc.code, exc.file_name, exc.line_num, exc.col_num)
+        Error (BAD_CHAR) in file "..." at 1:5
+
     """
 
     BAD_CHAR = "BAD_CHAR"

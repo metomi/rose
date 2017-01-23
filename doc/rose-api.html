@@ -785,7 +785,8 @@ widget[rose-config-edit:sub-ns] = modulename.ClassName arg1 arg2 arg3 ...
               e.g. adding/removing options.</li>
 
               <li>Upgraders - these are special transformer macros
-              for upgrading and downgrading configurations.</li>
+              for upgrading and downgrading configurations. (covered in the
+              <a href="#upgrade">next section</a>)</li>
 
               <li>Reporters - output information about a
               configuration.</li>
@@ -839,24 +840,30 @@ widget[rose-config-edit:sub-ns] = modulename.ClassName arg1 arg2 arg3 ...
             "rose-rug-advanced-tutorials-macro.html">Advanced
             Tutorial</a>.</p>
 
+            <h4 id="macro:code:api:docs">API Documentation</h4>
+            <p>The <code>rose.macro.MacroBase</code> class (subclassed by all
+            rose macros) is documented <a
+              href="sphinx/_build/html/macro.html">here</a>.
+
             <h4 id="macro:code:api">API Reference</h4>
 
-            <p>Macros should subclass from
-            <code>rose.macro.MacroBase</code>. There are two types
-            of macro - checkers (validators) which do not alter a
-            configuration but provide error messages, and changers
-            (transformers) which return an altered configuration. A
-            macro class can contain one or both of these
-            behaviours.</p>
+            <p>Validator, transformer and reporter macros are
+            python classes which subclass from
+            <code>rose.macro.MacroBase</code> (<a
+              href="sphinx/_build/html/macro.html">api docs</a>).
 
-            <p>Your macro should provide a method called
-            <code>validate</code> (for <em>checking</em>) and/or a
-            method called <code>transform</code> (for
-            <em>changing</em>). These methods should accept two
-            <code>rose.config.ConfigNode</code> instances as
-            arguments - one is the configuration, and one is the
-            metadata configuration that provides information about
-            the configuration items.</p>
+            <p>These macros implement their behaviours by providing a
+            <code>validate</code>, <code>transform</code> or
+            <code>report</code> method. A macro can contain any
+            combination of these methods so, for example, a macro
+            might be both a validator and a transformer.</p>
+
+            <p>These methods should accept two
+            <code>rose.config.ConfigNode</code> (<a
+              href="sphinx/_build/html/config.html">api docs</a>)
+            instances as arguments - one is the configuration, and
+            one is the metadata configuration that provides
+            information about the configuration items.</p>
 
             <p>A validator macro should look like:</p>
             <pre class="prettyprint">
@@ -963,6 +970,8 @@ class SomeTransformer(rose.macro.MacroBase):
 
             <pre class="prettyprint">
     def report(self, config, meta_config=None):
+        """ Write some information about the configuration to a report file."""
+        # Note: report methods do not have a return value.
         with open('report/file', 'r') as report_file:
             report_file.write(str(config.get(["namelist:snowflakes"])))
 </pre>
