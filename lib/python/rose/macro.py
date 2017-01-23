@@ -633,7 +633,7 @@ def get_macros_for_config(config=None,
                           include_custom=True,
                           no_warn=False):
     """Driver function to return macro names for a config object.
-    
+
     kwargs:
         config - The config to retrieve macros for as a rose.config.ConfigNode
         config_directory - The directory that the config file is located in.
