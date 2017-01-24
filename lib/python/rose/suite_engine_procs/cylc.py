@@ -658,7 +658,7 @@ class CylcProcessor(SuiteEngineProcessor):
             hosts = ["localhost"]
         if timeout is None:
             timeout = self.TIMEOUT
-        cmd = ["cylc", "scan", "--pyro-timeout=%s" % timeout] + list(hosts)
+        cmd = ["cylc", "scan", "--comms-timeout=%s" % timeout] + list(hosts)
         proc = self.popen.run_bg(*cmd)
         results = {}
         exceptions = []
