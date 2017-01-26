@@ -5,13 +5,16 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2017-Q1)
+## 2017.01.0 (2017-01-26)
 
 Rose release 48. **This release is expected to be used with
-[cylc-7.0.0](https://github.com/cylc/cylc/releases/tag/7.0.0) and
+[cylc-7.1.0](https://github.com/cylc/cylc/releases/tag/7.1.0) and
 [fcm-2016.12.0](https://github.com/metomi/fcm/releases/tag/2016.12.0).**
 
 ### Noteworthy Changes
+
+[#2043](https://github.com/metomi/rose/pull/2043):
+rose macro: default macros will now apply to `rose-suite.info` as well.
 
 [#2039](https://github.com/metomi/rose/pull/2039):
 rose app-upgrade: improve diagnostics on removal of settings.
