@@ -626,22 +626,34 @@ def get_macro_class_methods(macro_modules):
     return macro_methods
 
 
-def get_macros_for_config(app_config=None,
+def get_macros_for_config(config=None,
                           config_directory=None,
                           return_modules=False,
                           include_system=False,
+                          include_custom=True,
                           no_warn=False):
-    """Driver function to return macro names for a config object."""
-    if app_config is None:
-        app_config = rose.config.ConfigNode()
+    """Driver function to return macro names for a config object.
+
+    kwargs:
+        config - The config to retrieve macros for as a rose.config.ConfigNode
+        config_directory - The directory that the config file is located in.
+        return_modules - If true then a list of macro modules is also returned.
+        include_system - Include default rose macros?
+        include_custom - Include non-default rose macros?
+        no_warn - Output metadata warnings?
+    """
+    if config is None:
+        config = rose.config.ConfigNode()
     meta_config_tree = load_meta_config_tree(
-        app_config, directory=config_directory, no_warn=no_warn)
+        config, directory=config_directory, no_warn=no_warn)
     if meta_config_tree is None:
         return []
-    meta_filepaths = [
-        os.path.join(v, k) for k, v in meta_config_tree.files.items()]
-    modules = load_meta_macro_modules(meta_filepaths)
-    if include_system:
+    modules = []
+    if include_custom:  # Suite specified macros.
+        meta_filepaths = [
+            os.path.join(v, k) for k, v in meta_config_tree.files.items()]
+        modules.extend(load_meta_macro_modules(meta_filepaths))
+    if include_system:  # Default macros.
         import rose.macros  # Done to avoid cyclic top-level imports.
         modules.append(rose.macros)
     if return_modules:
@@ -885,7 +897,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
                opt_conf_dir=None, opt_fix=False,
                opt_non_interactive=False, opt_output_dir=None,
                opt_validate_all=False, opt_transform_all=False, verbosity=None,
-               no_warn=False):
+               no_warn=False, default_only=False):
     """Run standard or custom macros for a configuration."""
 
     reporter = rose.reporter.Reporter(verbosity)
@@ -894,6 +906,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         config_map[None], opt_conf_dir,
         return_modules=True,
         include_system=True,
+        include_custom=not default_only,
         no_warn=no_warn
     )
 
@@ -1253,10 +1266,10 @@ def dump_config(config, opt_conf_dir, opt_output_dir=None,
     rose.config.dump(config, target_path)
 
 
-def load_conf_from_file(opts, config_file_path, config_name, mode="macro"):
+def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
     """Loads config data from the file config_file_path."""
     optional_keys = []
-    optional_dir = os.path.join(opts.conf_dir, rose.config.OPT_CONFIG_DIR)
+    optional_dir = os.path.join(conf_dir, rose.config.OPT_CONFIG_DIR)
     optional_glob = os.path.join(optional_dir, rose.GLOB_OPT_CONFIG_FILE)
     for path in glob.glob(optional_glob):
         filename = os.path.basename(path)
@@ -1272,12 +1285,12 @@ def load_conf_from_file(opts, config_file_path, config_name, mode="macro"):
         config_file_path, more_keys=optional_keys,
         return_config_map=True)
     standard_format_config(app_config)
-    for conf_key, config in config_map.items():
+    for _, config in config_map.items():
         standard_format_config(config)
 
     # Load meta config if it exists.
     meta_config = rose.config.ConfigNode()
-    meta_path, warning = load_meta_path(app_config, opts.conf_dir)
+    meta_path, warning = load_meta_path(app_config, conf_dir)
     if meta_path is None:
         if mode == "macro":
             text = ERROR_LOAD_METADATA.format("")
@@ -1289,10 +1302,11 @@ def load_conf_from_file(opts, config_file_path, config_name, mode="macro"):
             return None
     else:
         meta_config = load_meta_config(app_config,
-                                       directory=opts.conf_dir,
-                                       config_type=rose.SUB_CONFIG_NAME,
+                                       directory=conf_dir,
+                                       config_type=os.path.basename(
+                                           config_file_path),
                                        ignore_meta_error=True)
-    return app_config, config_map, meta_config, config_name
+    return app_config, config_map, meta_config
 
 
 def parse_macro_args(argv=None):
@@ -1317,37 +1331,6 @@ def parse_macro_args(argv=None):
     return opts, args
 
 
-def get_data_from_opts(opts):
-    """Returns config data for an app or suite provided as opts.conf_dir."""
-    sys.path.append(os.getenv("ROSE_HOME"))
-    add_opt_meta_paths(opts.meta_path)
-    config_name = os.path.basename(opts.conf_dir)
-    config_file_path = os.path.join(opts.conf_dir,
-                                    rose.SUB_CONFIG_NAME)
-    dir_type = None
-    if (os.path.exists(config_file_path) or
-            os.path.isfile(config_file_path)):
-        dir_type = rose.SUB_CONFIG_NAME
-    else:
-        config_file_path = os.path.join(opts.conf_dir, rose.TOP_CONFIG_NAME)
-        if (os.path.exists(config_file_path) or
-                os.path.isfile(config_file_path)):
-            dir_type = rose.TOP_CONFIG_NAME
-        else:
-            rose.reporter.Reporter()(
-                ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir),
-                kind=rose.reporter.Reporter.KIND_ERR,
-                level=rose.reporter.Reporter.FAIL)
-            return None
-
-    conf_data = load_conf_from_file(opts, config_file_path, config_name,
-                                    mode="macro")
-    if conf_data is not None:
-        return conf_data + (dir_type,)
-    else:
-        return None
-
-
 def _report_error(exception=None, text=""):
     """Report an error via rose.reporter utilities."""
     if text:
@@ -1362,38 +1345,44 @@ def _report_error(exception=None, text=""):
 
 
 def scan_rose_directory(conf_dir, suite_only=False):
-    """Scans up the directory tree until it encounters a config file returning
-    the type of file it encountered (i.e. TOP_CONFIG_NAME, SUB_CONFIG_NAME)
-    along with a list of app directories.
-    In the case that the config file is TOP_CONFIG_NAME the app list will
-        contain all apps located suite/app/* + the suite directory.
-    In the case that the config file is SUB_CONFIG_NAME the app list will
-        contain only the directory in which the config file was found."""
-    # scan upwards looking for rose-app/suite.conf
+    """Returns a list of rose config files found within the given conf_dir.
+
+    * If the conf_dir is an application directory then return only the
+      application configuration file
+    * If the conf_dir is within the suite directory but above any application
+      directory then return all application configs along with the suite and
+      info configs.
+    * Return None otherwise.
+
+    Arguments:
+        conf_dir - The directory to scan.
+        suite_only - If True only return suite and info config files.
+    """
     path = conf_dir
     while True:
         lstdir = set(os.listdir(path))
-        # does this dir contain a top level config file ?
-        if lstdir & set([rose.TOP_CONFIG_NAME]):
-            if suite_only:
-                apps = []
-            else:
-                apps = [conf.replace('/' + rose.SUB_CONFIG_NAME, '')
-                        for conf in glob.glob(os.path.join(
-                            path,
-                            rose.SUB_CONFIGS_DIR, '*',
-                            rose.SUB_CONFIG_NAME))]
-                apps.sort()
-            apps.append(path)  # add the suite dir to the list of apps
-            return rose.TOP_CONFIG_NAME, apps
-        # does this dir contain an app level config file ?
-        elif not suite_only and lstdir & set([rose.SUB_CONFIG_NAME]):
-            return rose.SUB_CONFIG_NAME, [path]
+        if rose.TOP_CONFIG_NAME in lstdir:
+            # We are in the suite directory.
+            confs = []
+            if not suite_only:
+                # Add app/*/rose-app.conf files.
+                confs = sorted(glob.glob(os.path.join(
+                    path, rose.SUB_CONFIGS_DIR, '*', rose.SUB_CONFIG_NAME)))
+            # Add rose-suite.conf file.
+            confs.append(os.path.join(path, rose.TOP_CONFIG_NAME))
+            # Add rose-suite.info file.
+            if rose.INFO_CONFIG_NAME in lstdir:
+                confs.append(os.path.join(path, rose.INFO_CONFIG_NAME))
+            return confs
+        elif not suite_only and rose.SUB_CONFIG_NAME in lstdir:
+            # We are in an app directory. Return only that app.
+            return [os.path.join(path, rose.SUB_CONFIG_NAME)]
+        # Go up a directory.
         path = os.path.dirname(path)
         if path == os.path.dirname(path):
             # We don't support suites located at the root!
             break
-    return None, None
+    return None
 
 
 def main():
@@ -1402,46 +1391,64 @@ def main():
     add_meta_paths()
     opts, args = parse_macro_args()
 
-    # get list of apps to evaluate
-    conf_type, apps = scan_rose_directory(opts.conf_dir, opts.suite_only)
-    if conf_type != rose.SUB_CONFIG_NAME and opts.output_dir is not None:
-        reporter(ERROR_OUT_DIR_MULTIPLE_APPS,
-                 kind=rose.reporter.Reporter.KIND_ERR,
-                 level=rose.reporter.Reporter.FAIL)
-        sys.exit(1)
-    if conf_type is None or apps is None:
+    # Get list of apps to evaluate.
+    confs = scan_rose_directory(opts.conf_dir, suite_only=opts.suite_only)
+
+    # Fail if no config files could be found.
+    if not confs:
         reporter(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir),
                  kind=rose.reporter.Reporter.KIND_ERR,
                  level=rose.reporter.Reporter.FAIL)
         sys.exit(1)
 
-    verbosity = 1 + opts.verbosity - opts.quietness
+    # Fail if --output-dir specified and multiple config files found.
+    if len(confs) > 1 and opts.output_dir:
+        reporter(ERROR_OUT_DIR_MULTIPLE_APPS,
+                 kind=rose.reporter.Reporter.KIND_ERR,
+                 level=rose.reporter.Reporter.FAIL)
+        sys.exit(1)
 
-    # run macros for each app
+    # Path manipulation.
+    sys.path.append(os.getenv("ROSE_HOME"))
+    add_opt_meta_paths(opts.meta_path)
+
+    # Run macros for each config.
+    verbosity = 1 + opts.verbosity - opts.quietness
     ret = [True]
-    dir_types = {rose.TOP_CONFIG_NAME: 'suite', rose.SUB_CONFIG_NAME: 'app'}
-    for app in apps:
-        opts.conf_dir = app
-        return_objects = get_data_from_opts(opts)
-        if return_objects is None:
+    for config_file_path in confs:
+        # Macro info.
+        conf_dir = os.path.dirname(config_file_path)
+        cur_conf_type = os.path.basename(config_file_path)
+        config_name = os.path.basename(conf_dir)
+        os.chdir(conf_dir)
+
+        # Load config.
+        try:
+            _, config_map, meta_config = load_conf_from_file(
+                conf_dir, config_file_path)
+        except TypeError:
             sys.exit(1)
-        app_config, config_map, meta_config, config_name, cur_conf_type = (
-            return_objects)
-        if conf_type in [rose.TOP_CONFIG_NAME]:
-            reporter(dir_types[cur_conf_type] + ': ' + config_name)
+
+        # Report which config we are currently working on.
+        if len(confs) > 1:
+            if cur_conf_type == rose.SUB_CONFIG_NAME:
+                reporter(os.path.join(
+                    rose.SUB_CONFIGS_DIR, config_name, cur_conf_type))
+            else:
+                reporter(cur_conf_type)
             sys.stdout.flush()
-        if opts.conf_dir is not None:
-            os.chdir(opts.conf_dir)
-        opts.conf_dir = os.getcwd()
+
+        # Run macros.
         ret.append(run_macros(
-            config_map, meta_config, config_name, list(args), opts.conf_dir,
+            config_map, meta_config, config_name, list(args), conf_dir,
             opts.fix, opts.non_interactive, opts.output_dir,
             opts.validate_all, opts.transform_all, verbosity,
-            no_warn=opts.no_warn
+            no_warn=opts.no_warn,
+            default_only=cur_conf_type == rose.INFO_CONFIG_NAME
         ))
-    # return 0 if all macros return True else 1
-    return_code = 0 if reduce(lambda x, y: x and y, ret) is True else 1
-    sys.exit(return_code)
+
+    # Fail if any macro failed.
+    sys.exit(0 if all(ret) else 1)
 
 
 if __name__ == "__main__":

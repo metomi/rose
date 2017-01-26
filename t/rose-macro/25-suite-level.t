@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose macro" in the absence of a rose configuration.
+# Test "rose macro" by running in different directories within a suite.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 init </dev/null
@@ -34,9 +34,16 @@ cat >$TEST_DIR/$TEST_SUITE/rose-suite.conf <<'__SUITE_CONF__'
 [env]
 ANSWER=quarante deux
 __SUITE_CONF__
+cat >$TEST_DIR/$TEST_SUITE/rose-suite.info <<'__SUITE_INFO__'
+title=incorrect-title
+__SUITE_INFO__
 cat >$TEST_DIR/$TEST_SUITE/meta/rose-meta.conf <<'__META_CONF__'
 [env=ANSWER]
 type=integer
+macro=suite.SuiteChecker
+
+[=title]
+values=valid-title
 __META_CONF__
 touch $TEST_DIR/$TEST_SUITE/meta/lib/python/macros/__init__.py
 cat >$TEST_DIR/$TEST_SUITE/meta/lib/python/macros/suite.py <<'__MACRO__'
@@ -51,7 +58,7 @@ class SuiteChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config=None):
         node = config.get(['env', 'ANSWER'])
-        if node is not None or not node.is_ignored():
+        if node is not None and not node.is_ignored():
             if node.value != 42:
                 self.add_report('env', 'ANSWER', node.value, 'Incorrect'
                     'answer')
@@ -89,7 +96,7 @@ class FooChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config=None):
         node = config.get(['env', 'FOO'])
-        if node is not None or not node.is_ignored():
+        if node is not None and not node.is_ignored():
             if node.value not in ['foo']:
                 self.add_report('env', 'FOO', node.value, 'Not foo enough')
         return self.reports
@@ -125,7 +132,7 @@ class BarChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config=None):
         node = config.get(['env', 'BAR'])
-        if node is not None or not node.is_ignored():
+        if node is not None and not node.is_ignored():
             if node.value not in ['pub']:
                 self.add_report('env', 'BAR', node.value, 'bar < pub')
         return self.reports
@@ -142,7 +149,7 @@ __MACRO__
 TEST_KEY=$TEST_KEY_BASE-list-all-suite
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[INFO] app: bar
+[INFO] app/bar/rose-app.conf
 [V] bar.BarChecker
     # Bar checker macro.
 [V] rose.macros.DefaultValidators
@@ -153,7 +160,7 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Runs all the default fixers, such as trigger fixing.
 [R] bar.BarChecker
     # Bar checker macro.
-[INFO] app: foo
+[INFO] app/foo/rose-app.conf
 [V] foo.FooChecker
     # Foo checker macro.
 [V] rose.macros.DefaultValidators
@@ -164,7 +171,7 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Runs all the default fixers, such as trigger fixing.
 [R] foo.FooChecker
     # Foo checker macro.
-[INFO] suite: test-suite
+[INFO] rose-suite.conf
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] suite.SuiteChecker
@@ -175,13 +182,18 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Suite checker macro.
 [R] suite.SuiteChecker
     # Suite checker macro.
+[INFO] rose-suite.info
+[V] rose.macros.DefaultValidators
+    # Runs all the default checks, such as compulsory checking.
+[T] rose.macros.DefaultTransforms
+    # Runs all the default fixers, such as trigger fixing.
 __OUT__
 #-------------------------------------------------------------------------------
 # List all macros from the suite/app directory.
 TEST_KEY=$TEST_KEY_BASE-list-all-app
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[INFO] app: bar
+[INFO] app/bar/rose-app.conf
 [V] bar.BarChecker
     # Bar checker macro.
 [V] rose.macros.DefaultValidators
@@ -192,7 +204,7 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Runs all the default fixers, such as trigger fixing.
 [R] bar.BarChecker
     # Bar checker macro.
-[INFO] app: foo
+[INFO] app/foo/rose-app.conf
 [V] foo.FooChecker
     # Foo checker macro.
 [V] rose.macros.DefaultValidators
@@ -203,7 +215,7 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Runs all the default fixers, such as trigger fixing.
 [R] foo.FooChecker
     # Foo checker macro.
-[INFO] suite: test-suite
+[INFO] rose-suite.conf
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] suite.SuiteChecker
@@ -214,6 +226,11 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Suite checker macro.
 [R] suite.SuiteChecker
     # Suite checker macro.
+[INFO] rose-suite.info
+[V] rose.macros.DefaultValidators
+    # Runs all the default checks, such as compulsory checking.
+[T] rose.macros.DefaultTransforms
+    # Runs all the default fixers, such as trigger fixing.
 __OUT__
 #-------------------------------------------------------------------------------
 # List all macros from the app/foo directory.
@@ -252,7 +269,7 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-list-all-suite-subdir
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/meta
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[INFO] app: bar
+[INFO] app/bar/rose-app.conf
 [V] bar.BarChecker
     # Bar checker macro.
 [V] rose.macros.DefaultValidators
@@ -263,7 +280,7 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Runs all the default fixers, such as trigger fixing.
 [R] bar.BarChecker
     # Bar checker macro.
-[INFO] app: foo
+[INFO] app/foo/rose-app.conf
 [V] foo.FooChecker
     # Foo checker macro.
 [V] rose.macros.DefaultValidators
@@ -274,7 +291,7 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Runs all the default fixers, such as trigger fixing.
 [R] foo.FooChecker
     # Foo checker macro.
-[INFO] suite: test-suite
+[INFO] rose-suite.conf
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] suite.SuiteChecker
@@ -285,6 +302,11 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
     # Suite checker macro.
 [R] suite.SuiteChecker
     # Suite checker macro.
+[INFO] rose-suite.info
+[V] rose.macros.DefaultValidators
+    # Runs all the default checks, such as compulsory checking.
+[T] rose.macros.DefaultTransforms
+    # Runs all the default fixers, such as trigger fixing.
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all validator macros from the suite directory.
@@ -309,38 +331,58 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
 [V] suite.SuiteChecker: issues: 1
     env=ANSWER=quarante deux
         Incorrectanswer
+[V] rose.macros.DefaultValidators: issues: 3
+    =owner=None
+        Variable set as compulsory, but not in configuration.
+    =project=None
+        Variable set as compulsory, but not in configuration.
+    =title=incorrect-title
+        Value incorrect-title should be valid-title
 __ERR__
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[INFO] app: bar
-[INFO] app: foo
-[INFO] suite: test-suite
+[INFO] app/bar/rose-app.conf
+[INFO] app/foo/rose-app.conf
+[INFO] rose-suite.conf
+[INFO] rose-suite.info
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all transformer macros from the suite directory.
 TEST_KEY=$TEST_KEY_BASE-transform-all-suite
-run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE -T
+run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE -T -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[INFO] app: bar
+[INFO] app/bar/rose-app.conf
 [T] bar.BarChecker: changes: 0
 [T] rose.macros.DefaultTransforms: changes: 0
-[INFO] app: foo
+[INFO] app/foo/rose-app.conf
 [T] foo.FooChecker: changes: 0
 [T] rose.macros.DefaultTransforms: changes: 0
-[INFO] suite: test-suite
+[INFO] rose-suite.conf
 [T] rose.macros.DefaultTransforms: changes: 0
 [T] suite.SuiteChecker: changes: 0
+[INFO] rose-suite.info
+[T] rose.macros.DefaultTransforms: changes: 2
+    =owner=
+        Added compulsory option
+    =project=
+        Added compulsory option
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all fixer macros from the suite directory.
 TEST_KEY=$TEST_KEY_BASE-fix-all-suite
-run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE -F
+run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE -F -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[INFO] app: bar
+[INFO] app/bar/rose-app.conf
 [T] rose.macros.DefaultTransforms: changes: 0
-[INFO] app: foo
+[INFO] app/foo/rose-app.conf
 [T] rose.macros.DefaultTransforms: changes: 0
-[INFO] suite: test-suite
+[INFO] rose-suite.conf
 [T] rose.macros.DefaultTransforms: changes: 0
+[INFO] rose-suite.info
+[T] rose.macros.DefaultTransforms: changes: 2
+    =owner=
+        Added compulsory option
+    =project=
+        Added compulsory option
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all validator macros for the suite only.
@@ -353,9 +395,17 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
 [V] suite.SuiteChecker: issues: 1
     env=ANSWER=quarante deux
         Incorrectanswer
+[V] rose.macros.DefaultValidators: issues: 3
+    =owner=None
+        Variable set as compulsory, but not in configuration.
+    =project=None
+        Variable set as compulsory, but not in configuration.
+    =title=incorrect-title
+        Value incorrect-title should be valid-title
 __ERR__
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[INFO] suite: test-suite
+[INFO] rose-suite.conf
+[INFO] rose-suite.info
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all validator macros for the suite only from an app directory.
@@ -368,9 +418,17 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
 [V] suite.SuiteChecker: issues: 1
     env=ANSWER=quarante deux
         Incorrectanswer
+[V] rose.macros.DefaultValidators: issues: 3
+    =owner=None
+        Variable set as compulsory, but not in configuration.
+    =project=None
+        Variable set as compulsory, but not in configuration.
+    =title=incorrect-title
+        Value incorrect-title should be valid-title
 __ERR__
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[INFO] suite: test-suite
+[INFO] rose-suite.conf
+[INFO] rose-suite.info
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all validator macros from an app directory.
@@ -388,20 +446,19 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all transformer macros from an app directory.
-TEST_KEY=$TEST_KEY_BASE-transform-all-suite
-run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -T
+TEST_KEY=$TEST_KEY_BASE-transform-all-suite-app-foo
+run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -T -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [T] foo.FooChecker: changes: 0
 [T] rose.macros.DefaultTransforms: changes: 0
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all fixer macros from an app directory.
-TEST_KEY=$TEST_KEY_BASE-fix-all-suite
-run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -F
+TEST_KEY=$TEST_KEY_BASE-fix-all-suite-app-foo
+run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -F -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [T] rose.macros.DefaultTransforms: changes: 0
 __OUT__
-
 #-------------------------------------------------------------------------------
 rm -r $TEST_DIR/$TEST_SUITE
 exit
