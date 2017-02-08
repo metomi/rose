@@ -51,12 +51,12 @@ class KGODatabase(object):
     # (as it must uniquely identify each row)
     CREATE_COMPARISON_TABLE = """
         CREATE TABLE IF NOT EXISTS comparisons (
-        app_task TEXT,
+        comp_task TEXT,
         kgo_file TEXT,
         suite_file TEXT,
         status TEXT,
         comparison TEXT,
-        PRIMARY KEY(app_task))
+        PRIMARY KEY(comp_task))
         """
     # This SQL command ensures a "tasks" table exists in the database
     # and then populates it with a pair of columns (the task name and
@@ -79,7 +79,7 @@ class KGODatabase(object):
         self.task_name = "task_name not set"
 
     def enter_comparison(
-            self, app_task, kgo_file, suite_file, status, comparison):
+            self, comp_task, kgo_file, suite_file, status, comparison):
         """Add a command to insert a new comparison entry to the database."""
         # This SQL command indicates that a single "row" is to be entered into
         # the "comparisons" table
@@ -88,21 +88,21 @@ class KGODatabase(object):
         # Prepend the task_name onto each entry, to try and ensure it is
         # unique (the individual comparison names may not be, but the rose
         # task name + the comparison task name should)
-        sql_args = [self.task_name + " - " + app_task,
+        sql_args = [self.task_name + " - " + comp_task,
                     kgo_file, suite_file, status, comparison]
         # Add the command and arguments to the buffer
         self.statement_buffer.append((sql_statement, sql_args))
 
-    def enter_task(self, app_task, status):
+    def enter_task(self, task_name, status):
         """Add a command to insert a new task entry to the database."""
         # This SQL command indicates that a single "row" is to be entered into
         # the "tasks" table
         sql_statement = "INSERT OR REPLACE INTO tasks VALUES (?, ?)"
-        sql_args = [app_task, status]
+        sql_args = [task_name, status]
         # Add the command and arguments to the buffer
         self.statement_buffer.append((sql_statement, sql_args))
         # Save the name for use in any comparisons later
-        self.task_name = app_task
+        self.task_name = task_name
 
     @contextmanager
     def database_lock(self, lockfile, reporter=None):
