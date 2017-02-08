@@ -113,7 +113,7 @@ class KGODatabase(object):
             reporter("Acquired DB lock at: " + time.asctime())
         lock.write("{0}".format(os.getpid()))
         if reporter is not None:
-            reporter("Writing results to KGO Database...")
+            reporter("Writing to KGO Database...")
         yield
         fcntl.flock(lock, fcntl.LOCK_UN)
         if reporter is not None:
