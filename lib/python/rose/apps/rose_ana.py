@@ -51,12 +51,12 @@ class KGODatabase(object):
     # (as it must uniquely identify each row)
     CREATE_COMPARISON_TABLE = """
         CREATE TABLE IF NOT EXISTS comparisons (
-        app_task TEXT,
+        comp_task TEXT,
         kgo_file TEXT,
         suite_file TEXT,
         status TEXT,
         comparison TEXT,
-        PRIMARY KEY(app_task))
+        PRIMARY KEY(comp_task))
         """
     # This SQL command ensures a "tasks" table exists in the database
     # and then populates it with a pair of columns (the task name and
@@ -69,29 +69,40 @@ class KGODatabase(object):
         PRIMARY KEY(task_name))
         """
 
+    # Task statuses
+    TASK_STATUS_RUNNING = 1
+    TASK_STATUS_SUCCEEDED = 0
+
     def __init__(self):
         "Initialise the object."
         self.statement_buffer = []
+        self.task_name = "task_name not set"
 
     def enter_comparison(
-            self, app_task, kgo_file, suite_file, status, comparison):
+            self, comp_task, kgo_file, suite_file, status, comparison):
         """Add a command to insert a new comparison entry to the database."""
         # This SQL command indicates that a single "row" is to be entered into
         # the "comparisons" table
         sql_statement = (
             "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)")
-        sql_args = [app_task, kgo_file, suite_file, status, comparison]
+        # Prepend the task_name onto each entry, to try and ensure it is
+        # unique (the individual comparison names may not be, but the rose
+        # task name + the comparison task name should)
+        sql_args = [self.task_name + " - " + comp_task,
+                    kgo_file, suite_file, status, comparison]
         # Add the command and arguments to the buffer
         self.statement_buffer.append((sql_statement, sql_args))
 
-    def enter_task(self, app_task, status):
+    def enter_task(self, task_name, status):
         """Add a command to insert a new task entry to the database."""
         # This SQL command indicates that a single "row" is to be entered into
         # the "tasks" table
         sql_statement = "INSERT OR REPLACE INTO tasks VALUES (?, ?)"
-        sql_args = [app_task, status]
+        sql_args = [task_name, status]
         # Add the command and arguments to the buffer
         self.statement_buffer.append((sql_statement, sql_args))
+        # Save the name for use in any comparisons later
+        self.task_name = task_name
 
     @contextmanager
     def database_lock(self, lockfile, reporter=None):
@@ -101,7 +112,8 @@ class KGODatabase(object):
         if reporter is not None:
             reporter("Acquired DB lock at: " + time.asctime())
         lock.write("{0}".format(os.getpid()))
-        reporter("Writing results to KGO Database...")
+        if reporter is not None:
+            reporter("Writing to KGO Database...")
         yield
         fcntl.flock(lock, fcntl.LOCK_UN)
         if reporter is not None:
@@ -190,6 +202,10 @@ class RoseAnaApp(BuiltinApp):
         self.kgo_db = None
         if use_kgo is not None and use_kgo == ".true.":
             self.kgo_db = KGODatabase()
+            self.kgo_db.enter_task(self.task_name,
+                                   self.kgo_db.TASK_STATUS_RUNNING)
+            self.titlebar("Initialising KGO database")
+            self.kgo_db.buffer_to_db(self.reporter)
 
         self.titlebar("Launching rose_ana")
 
@@ -244,18 +260,11 @@ class RoseAnaApp(BuiltinApp):
                               kind=self.reporter.KIND_ERR)
 
         # The KGO database (if needed by the task) also stores its status - to
-        # indicate whether there was some unexpected exception above.  If there
-        # were no such exceptions only output the task status to the database
-        # if there were other other commands added by the tasks.
-        if self.kgo_db is not None:
-            if task_error:
-                self._kgo_db_task_status(1)
-            elif len(self.kgo_db.statement_buffer) != 0:
-                self._kgo_db_task_status(0)
-
-            if len(self.kgo_db.statement_buffer) != 0:
-                self.titlebar("Updating KGO database")
-
+        # indicate whether there was some unexpected exception above.
+        if self.kgo_db is not None and not task_error:
+            self.kgo_db.enter_task(self.task_name,
+                                   self.kgo_db.TASK_STATUS_SUCCEEDED)
+            self.titlebar("Updating KGO database")
             self.kgo_db.buffer_to_db(self.reporter)
 
         # Summarise the results of the tasks
@@ -287,39 +296,6 @@ class RoseAnaApp(BuiltinApp):
             self.reporter = Reporter(self.opts.verbosity - self.opts.quietness)
         else:
             self.reporter = reporter
-
-    def _kgo_db_add_file_pair(self, name, user_info, status,
-                              suite_file, kgo_file):
-        """
-        Add information about a pair of compared files to the KGO database,
-        which some analysis (comparison) tasks may wish to make use of.
-
-        Args:
-            * name:
-                The name of the analysis (comparison) task.
-            * user_info:
-                Additional user-supplied details describing the task.
-            * status:
-                Numeric task status indicator.
-            * suite_file:
-                Full path to the file in the suite.
-            * kgo_file:
-                Full path to the file containing the KGO.
-
-        """
-        # The primary key in the database is composed from both the
-        # rose_ana app name and the task index (to make it unique)
-        app_task = "{0} ({1})".format(self.task_name, name)
-        self.kgo_db.enter_comparison(app_task, kgo_file, suite_file,
-                                     status, user_info)
-
-    def _kgo_db_task_status(self, status):
-        """
-        Update the entry for this task in the KGO database to indicate that
-        it has either finished processing analysis tasks or gone wrong.
-
-        """
-        self.kgo_db.enter_task(self.task_name, status)
 
     def _load_analysis_modules(self):
         """Populate the list of modules containing analysis methods."""

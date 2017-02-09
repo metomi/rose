@@ -139,86 +139,86 @@ done
 COMP_FILES=".*\(\w*\)/kgo.txt | .*\1/results.txt"
 
 # Comparison tasks for the rose_ana_t1 task
-TASK_NAME="grepper.FilePattern(Test of Exact Numeric Match Success)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Exact Numeric Match Success)"
 TASK_STATUS=" OK "
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_exact_numeric_success
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Exact Numeric Match Fail)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Exact Numeric Match Fail)"
 TASK_STATUS="FAIL"
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_exact_numeric_fail
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Exact Text Match Success)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Exact Text Match Success)"
 TASK_STATUS=" OK "
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_exact_text_success
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Exact Text Match Fail)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Exact Text Match Fail)"
 TASK_STATUS="FAIL"
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_exact_text_fail
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Within Match Percentage Success)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Within Match Percentage Success)"
 TASK_STATUS=" OK "
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_percentage_success
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Within Match Percentage Fail)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Within Match Percentage Fail)"
 TASK_STATUS="FAIL"
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_percentage_fail
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Within Match Absolute Success)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Within Match Absolute Success)"
 TASK_STATUS=" OK "
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_absolute_success
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Within Match Absolute Fail)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Within Match Absolute Fail)"
 TASK_STATUS="FAIL"
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_absolute_fail
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Exact List Match Success)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Exact List Match Success)"
 TASK_STATUS=" OK "
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_exact_list_success
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Exact List Match Fail)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Exact List Match Fail)"
 TASK_STATUS="FAIL"
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_exact_list_fail
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Within List Match Success)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Within List Match Success)"
 TASK_STATUS=" OK "
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_within_list_success
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Test of Within List Match Fail)"
+TASK_NAME="rose_ana_t1 - grepper.FilePattern(Test of Within List Match Fail)"
 TASK_STATUS="FAIL"
 TEST_KEY=$TEST_KEY_BASE-db_check_t1_within_list_fail
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
 # Comparison tasks for the rose_ana_t2 task(s)
-TASK_NAME="grepper.FilePattern(First Test)"
+TASK_NAME="rose_ana_t2_activated - grepper.FilePattern(First Test)"
 TASK_STATUS="FAIL"
 TEST_KEY=$TEST_KEY_BASE-db_check_t2_ignore_basic_1
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-TASK_NAME="grepper.FilePattern(Second Test)"
+TASK_NAME="rose_ana_t2_deactivated - grepper.FilePattern(Second Test)"
 TASK_STATUS=" OK "
 TEST_KEY=$TEST_KEY_BASE-db_check_t2_ignore_basic_2
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
