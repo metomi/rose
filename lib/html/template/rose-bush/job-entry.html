@@ -210,6 +210,7 @@
                     {% for index, key in indexes|dictsort -%}
                       {% set log = entry.logs[key] -%}
                       <option title="{{log.size}} bytes"
+                      {% if log.size == 0 -%}disabled="disabled"{% endif -%}
                       value="{{log.path_in_tar}}">{{key}}</option>
                     {% endfor -%}
                   </select>
@@ -220,6 +221,7 @@
                     {% for index, key in indexes|dictsort -%}
                       {% set log = entry.logs[key] -%}
                       <option title="{{log.size}} bytes"
+                      {% if log.size == 0 -%}disabled="disabled"{% endif -%}
                       value="{{log.path}}">{{key}}</option>
                     {% endfor -%}
                   </select>
