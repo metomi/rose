@@ -103,93 +103,49 @@ class SuiteRunCleaner(object):
                     locs.append(os.path.join(item_root, loc_rel))
                     roots.add(item_root)
             locs.reverse()
+            # Invoke bash as a login shell. The root location of a path may be
+            # in $DIR syntax, which can only be expanded correctly in a login
+            # shell. However, profile scripts invoked on login shell may print
+            # lots of junks. Hence we use a UUID here as a delimiter. Only
+            # output after the UUID lines are desirable lines.
+            command = ["bash", "-l", "-O", "extglob", "-c"]
+            sh_command = "cd; echo '%s'" % (uuid_str,)
+            if not self.host_selector.is_local_host(auth):
+                command = engine.popen.get_cmd("ssh", auth) + command
+            sh_command += "; ls -d -r %(locs)s; rm -fr %(locs)s" % {
+                "locs": engine.popen.list_to_shell_str(locs)}
+            if not only_items:
+                # Clean empty directories
+                # Change directory to root level to avoid cleaning them as
+                # well For cylc suites, e.g. it can clean up to an empty
+                # "cylc-run/" directory.
+                for root in roots:
+                    names = []
+                    # Reverse sort to ensure that e.g. "share/cycle/" is
+                    # cleaned before "share/"
+                    for name in sorted(self.CLEANABLE_PATHS, reverse=True):
+                        names.append(os.path.join(suite_dir_rel, name))
+                    if os.sep in suite_dir_rel:
+                        names.append(os.path.dirname(suite_dir_rel))
+                    sh_command += (
+                        "; " +
+                        "(cd %(root)s; " +
+                        "rmdir -p %(names)s 2>/dev/null || true)"
+                    ) % {
+                        "root": root,
+                        "names": engine.popen.list_to_shell_str(names),
+                    }
             if self.host_selector.is_local_host(auth):
-                # Clean relevant items
-                for loc in locs:
-                    loc = os.path.abspath(env_var_process(loc))
-                    for name in sorted(glob(loc), reverse=True):
-                        engine.fs_util.delete(name)
-                if not only_items:
-                    # Clean empty directories
-                    # Change directory to root level to avoid cleaning them as
-                    # well For cylc suites, e.g. it can clean up to an empty
-                    # "cylc-run/" directory.
-                    for root in sorted(roots):
-                        old_cwd = os.getcwd()
-                        cwd = old_cwd
-                        if root:
-                            try:
-                                os.chdir(env_var_process(root))
-                                cwd = os.getcwd()
-                            except OSError:
-                                continue
-                        # Reverse sort to ensure that e.g. "share/cycle/" is
-                        # cleaned before "share/"
-                        for name in sorted(self.CLEANABLE_PATHS, reverse=True):
-                            try:
-                                os.removedirs(
-                                    os.path.join(suite_dir_rel, name))
-                            except OSError:
-                                pass
-                            else:
-                                engine.handle_event(FileSystemEvent(
-                                    FileSystemEvent.DELETE,
-                                    os.path.join(cwd, suite_dir_rel, name)))
-                        if os.sep in suite_dir_rel:
-                            dir_rel = os.path.dirname(suite_dir_rel)
-                            try:
-                                os.removedirs(dir_rel)
-                            except OSError:
-                                pass
-                            else:
-                                engine.handle_event(FileSystemEvent(
-                                    FileSystemEvent.DELETE,
-                                    os.path.join(cwd, dir_rel)))
-                        if root:
-                            os.chdir(old_cwd)
+                command.append(sh_command)
             else:
-                # Invoke bash as a login shell. The root location of a path may
-                # be in $DIR syntax, which can only be expanded correctly in a
-                # login shell. However, profile scripts invoked on login to the
-                # remote host may print lots of junks. Hence we use a UUID here
-                # as a delimiter. Only output after the UUID lines are
-                # desirable lines.
-                command = engine.popen.get_cmd("ssh", auth, "bash", "-l", "-c")
-                sh_command = (
-                    "echo %(uuid)s; ls -d -r %(locs)s; rm -fr %(locs)s"
-                ) % {
-                    "locs": engine.popen.list_to_shell_str(locs),
-                    "uuid": uuid_str,
-                }
-                if not only_items:
-                    # Clean empty directories
-                    # Change directory to root level to avoid cleaning them as
-                    # well For cylc suites, e.g. it can clean up to an empty
-                    # "cylc-run/" directory.
-                    for root in roots:
-                        names = []
-                        # Reverse sort to ensure that e.g. "share/cycle/" is
-                        # cleaned before "share/"
-                        for name in sorted(self.CLEANABLE_PATHS, reverse=True):
-                            names.append(os.path.join(suite_dir_rel, name))
-                        if os.sep in suite_dir_rel:
-                            names.append(os.path.dirname(suite_dir_rel))
-                        sh_command += (
-                            "; " +
-                            "(cd %(root)s; " +
-                            "rmdir -p %(names)s 2>/dev/null || true)"
-                        ) % {
-                            "root": root,
-                            "names": engine.popen.list_to_shell_str(names),
-                        }
                 command.append(quote(sh_command))
-                is_after_uuid_str = False
-                for line in engine.popen(*command)[0].splitlines():
-                    if is_after_uuid_str:
-                        engine.handle_event(FileSystemEvent(
-                            FileSystemEvent.DELETE, auth + ":" + line.strip()))
-                    elif line == uuid_str:
-                        is_after_uuid_str = True
+            is_after_uuid_str = False
+            for line in engine.popen(*command)[0].splitlines():
+                if is_after_uuid_str:
+                    engine.handle_event(FileSystemEvent(
+                        FileSystemEvent.DELETE, auth + ":" + line.strip()))
+                elif line == uuid_str:
+                    is_after_uuid_str = True
 
     __call__ = clean
 

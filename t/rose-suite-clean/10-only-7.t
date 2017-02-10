@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-clean", --only= glob and a localhost root-dir{*} setting.
+# Test "rose suite-clean", --only=extglob and a localhost root-dir{*} setting.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
@@ -49,11 +49,13 @@ NAME=$(basename $SUITE_RUN_DIR)
 #-------------------------------------------------------------------------------
 run_suite
 TEST_KEY="$TEST_KEY_BASE-work"
-run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work/20?00101T0000Z
+run_pass "$TEST_KEY" \
+    rose suite-clean -y -n "${NAME}" --only='work/!(20100101T0000Z)'
 file_cmp  "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
 [INFO] delete: localhost:cylc-run/${NAME}/work/20200101T0000Z
-[INFO] delete: localhost:cylc-run/${NAME}/work/20100101T0000Z
+[INFO] delete: localhost:cylc-run/${NAME}/work/20150101T0000Z
+[INFO] delete: localhost:cylc-run/${NAME}/work/20050101T0000Z
 [INFO] delete: localhost:cylc-run/${NAME}/work/20000101T0000Z
 __OUT__
 #-------------------------------------------------------------------------------

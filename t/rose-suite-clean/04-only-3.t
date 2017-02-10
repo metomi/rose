@@ -53,8 +53,8 @@ run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work
 {
     echo "[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host"
     LANG=C sort -r <<__OUT__
-[INFO] delete: $ROOT_DIR_WORK/cylc-run/$NAME/work/
-[INFO] delete: $SUITE_RUN_DIR/work
+[INFO] delete: localhost:$ROOT_DIR_WORK/cylc-run/$NAME/work
+[INFO] delete: localhost:cylc-run/${NAME}/work
 __OUT__
 } >"$TEST_KEY.out.expected"
 file_cmp  "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.expected"
