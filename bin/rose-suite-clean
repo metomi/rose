@@ -39,8 +39,8 @@
 #     --only=ITEM
 #         If one or more --only=ITEM option is specified, only files and/or
 #         directories matching an ITEM will be removed. An ITEM should be a
-#         glob pattern for matching a relative path in the run directory of the
-#         suite(s). 
+#         glob pattern (bash extglob) for matching a relative path in the run
+#         directory of the suite(s). 
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v

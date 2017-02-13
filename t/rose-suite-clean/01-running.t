@@ -75,10 +75,10 @@ run_pass "$TEST_KEY" rose suite-clean -y $NAME
 sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
-[INFO] delete: $SUITE_RUN_DIR/work/
-[INFO] delete: $SUITE_RUN_DIR/share/cycle/
-[INFO] delete: $SUITE_RUN_DIR/share/
-[INFO] delete: $SUITE_RUN_DIR/
+[INFO] delete: localhost:cylc-run/${NAME}/work
+[INFO] delete: localhost:cylc-run/${NAME}/share/cycle
+[INFO] delete: localhost:cylc-run/${NAME}/share
+[INFO] delete: localhost:cylc-run/${NAME}
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
