@@ -224,7 +224,7 @@ TEST_KEY="${TEST_KEY_BASE}-200-curl-viewsearch"
 FILE='log/job/20000101T0000Z/foo1/01/job.out'
 MODE="&mode=text"
 URL="${TEST_ROSE_WS_URL}/viewsearch/${USER}/${SUITE_NAME}?path=${FILE}${MODE}\
-&search_mode=TEXT&search_string=Suite%20Name"
+&search_mode=TEXT&search_string=Hello%20from"
 
 run_pass "${TEST_KEY}" curl -I "${URL}"
 file_grep "${TEST_KEY}.out" 'HTTP/.* 200 OK' "${TEST_KEY}.out"
@@ -232,7 +232,7 @@ file_grep "${TEST_KEY}.out" 'HTTP/.* 200 OK' "${TEST_KEY}.out"
 TEST_KEY="${TEST_KEY_BASE}-200-curl-viewsearch-download"
 run_pass "${TEST_KEY}" \
     curl "${URL}"
-file_grep "${TEST_KEY}.out" '<span class="highlight">Suite Name</span>' \
+file_grep "${TEST_KEY}.out" '<span class="highlight">Hello from</span>' \
     "${TEST_KEY}.out"
 
 #-------------------------------------------------------------------------------
