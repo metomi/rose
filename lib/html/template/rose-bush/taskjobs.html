@@ -40,6 +40,8 @@
           </div>
           <div class="row">
             <div class="col-sm-12 col-md-12">
+              <strong>Select by Task Statuses</strong>
+              <br/>
               <label class="checkbox-inline" for="all_task_statuses">
                 <input id="all_task_statuses" type="checkbox"
                 name="task_status"
@@ -49,8 +51,10 @@
                 checked="checked"
 {% endif -%}
                 />
-                <strong>Select by Any Task Status</strong>
+                select all
               </label>
+              <button id="uncheck_task_statuses" type="button"
+              class="btn btn-default btn-xs">uncheck all</button>
             </div>
           </div>
           <div class="form-group row">
