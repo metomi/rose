@@ -28,15 +28,27 @@ tests 30
 # Setup.
 TEST_SUITE=test-suite
 
-# suite
-mkdir -p $TEST_DIR/$TEST_SUITE/meta/lib/python/macros
+# rose-suite.conf
+mkdir $TEST_DIR/$TEST_SUITE -p
 cat >$TEST_DIR/$TEST_SUITE/rose-suite.conf <<'__SUITE_CONF__'
 [env]
 ANSWER=quarante deux
 __SUITE_CONF__
+
+# rose-suite.info
 cat >$TEST_DIR/$TEST_SUITE/rose-suite.info <<'__SUITE_INFO__'
 title=incorrect-title
 __SUITE_INFO__
+
+# opt/
+mkdir $TEST_DIR/$TEST_SUITE/opt
+cat >$TEST_DIR/$TEST_SUITE/opt/rose-suite-optional.conf <<'__OPT_SUITE_CONF__'
+[env]
+ANSWER=caurenta y dos
+__OPT_SUITE_CONF__
+
+# meta/
+mkdir -p $TEST_DIR/$TEST_SUITE/meta/lib/python/macros
 cat >$TEST_DIR/$TEST_SUITE/meta/rose-meta.conf <<'__META_CONF__'
 [env=ANSWER]
 type=integer
@@ -325,11 +337,15 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
 [V] rose.macros.DefaultValidators: issues: 1
     env=FOO=baz
         Not an integer: 'baz'
-[V] rose.macros.DefaultValidators: issues: 1
+[V] rose.macros.DefaultValidators: issues: 2
     env=ANSWER=quarante deux
         Not an integer: 'quarante deux'
-[V] suite.SuiteChecker: issues: 1
+    (opts=optional)env=ANSWER=caurenta y dos
+        Not an integer: 'caurenta y dos'
+[V] suite.SuiteChecker: issues: 2
     env=ANSWER=quarante deux
+        Incorrectanswer
+    (opts=optional)env=ANSWER=caurenta y dos
         Incorrectanswer
 [V] rose.macros.DefaultValidators: issues: 3
     =owner=None
@@ -389,11 +405,15 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-validate-all-suite-only-suite
 run_fail $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE -V --suite-only
 file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 1
+[V] rose.macros.DefaultValidators: issues: 2
     env=ANSWER=quarante deux
         Not an integer: 'quarante deux'
-[V] suite.SuiteChecker: issues: 1
+    (opts=optional)env=ANSWER=caurenta y dos
+        Not an integer: 'caurenta y dos'
+[V] suite.SuiteChecker: issues: 2
     env=ANSWER=quarante deux
+        Incorrectanswer
+    (opts=optional)env=ANSWER=caurenta y dos
         Incorrectanswer
 [V] rose.macros.DefaultValidators: issues: 3
     =owner=None
@@ -412,11 +432,15 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-validate-all-suite-only-app-foo
 run_fail $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -V --suite-only
 file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 1
+[V] rose.macros.DefaultValidators: issues: 2
     env=ANSWER=quarante deux
         Not an integer: 'quarante deux'
-[V] suite.SuiteChecker: issues: 1
+    (opts=optional)env=ANSWER=caurenta y dos
+        Not an integer: 'caurenta y dos'
+[V] suite.SuiteChecker: issues: 2
     env=ANSWER=quarante deux
+        Incorrectanswer
+    (opts=optional)env=ANSWER=caurenta y dos
         Incorrectanswer
 [V] rose.macros.DefaultValidators: issues: 3
     =owner=None

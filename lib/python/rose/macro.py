@@ -1268,6 +1268,8 @@ def dump_config(config, opt_conf_dir, opt_output_dir=None,
 
 def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
     """Loads config data from the file config_file_path."""
+    is_info_config = (os.path.basename(config_file_path) ==
+                      rose.INFO_CONFIG_NAME)
     optional_keys = []
     optional_dir = os.path.join(conf_dir, rose.config.OPT_CONFIG_DIR)
     optional_glob = os.path.join(optional_dir, rose.GLOB_OPT_CONFIG_FILE)
@@ -1281,6 +1283,8 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
 
     # Load the configuration and the metadata macros.
     config_loader = rose.config.ConfigLoader()
+    if is_info_config:
+        optional_keys = None
     app_config, config_map = config_loader.load_with_opts(
         config_file_path, more_keys=optional_keys,
         return_config_map=True)
@@ -1291,7 +1295,8 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
     # Load meta config if it exists.
     meta_config = rose.config.ConfigNode()
     meta_path, warning = load_meta_path(app_config, conf_dir)
-    if meta_path is None:
+
+    if meta_path is None and not is_info_config:
         if mode == "macro":
             text = ERROR_LOAD_METADATA.format("")
             if warning:
