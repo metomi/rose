@@ -5,6 +5,37 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2017-Q1?)
+
+Rose release 49. **This release is expected to be used with
+[cylc-7.1.0](https://github.com/cylc/cylc/releases/tag/7.1.0) and
+[fcm-2016.12.0](https://github.com/metomi/fcm/releases/tag/2016.12.0) or
+later.**
+
+### Noteworthy Changes
+
+[#2057](https://github.com/metomi/rose/pull/2057):
+isodatetime: bundled library updated to 2017.02.1 release.
+
+[#2052](https://github.com/metomi/rose/pull/2052):
+rose macro: fix issue when applying macros to `rose-suite.info` in the presence
+of optional configurations intended for `rose-suite.conf`.
+
+[#2050](https://github.com/metomi/rose/pull/2050):
+rose suite-clean: `--only=` now supports Bash extended globs (extglob).
+
+[#2049](https://github.com/metomi/rose/pull/2049):
+rose bush: job entry: disable links to any zero-size files in the drop down box
+for sequence job logs.
+
+[#2048](https://github.com/metomi/rose/pull/2048):
+rose bush: taskjobs: added a button for unchecking all task status filters.
+
+[#2047](https://github.com/metomi/rose/pull/2047):
+rose_ana: fix some issues with writing to the KGO database.
+
+--------------------------------------------------------------------------------
+
 ## 2017.01.0 (2017-01-26)
 
 Rose release 48. **This release is expected to be used with
