@@ -8,7 +8,7 @@ for a full listing of issues for each release.
 ## 2017.02.0 (2017-02-28)
 
 Rose release 49. **This release is expected to be used with
-[cylc-7.1.0](https://github.com/cylc/cylc/releases/tag/7.1.0) and
+[cylc-7.2.0](https://github.com/cylc/cylc/releases/tag/7.2.0) and
 [fcm-2017.02.0](https://github.com/metomi/fcm/releases/tag/2017.02.0) or
 compatible.**
 
