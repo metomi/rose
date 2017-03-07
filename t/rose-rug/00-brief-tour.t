@@ -49,6 +49,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 20130101T0000Z|fred_hello_world
 20130101T0000Z|locate_fred
 20130101T0000Z|my_hello_mars
+20130101T0000Z|my_hello_saturn
 20130101T0000Z|my_hello_world
 20130101T0600Z|fred_hello_world
 20130101T0600Z|locate_fred
