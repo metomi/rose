@@ -13,6 +13,7 @@
                 fcm_make => my_hello_world
                 fcm_make => locate_fred
                 fcm_make => my_hello_mars
+                fcm_make => my_hello_saturn
             """
         [[[PT6H]]] # Each day at 00:00, 06:00, 12:00, 18:00:
             graph = """
@@ -44,3 +45,4 @@
     [[my_hello_world]]
     [[fred_hello_world]]
     [[my_hello_mars]]
+    [[my_hello_saturn]]
