@@ -51,13 +51,14 @@ run_suite
 TEST_KEY="$TEST_KEY_BASE-work"
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work
 {
-    echo "[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host"
-    LANG=C sort -r <<__OUT__
-[INFO] delete: localhost:$ROOT_DIR_WORK/cylc-run/$NAME/work
+    LANG=C sort <<__OUT__
+[INFO] delete: ${HOME}/cylc-run/${NAME}/log/rose-suite-run.host
+[INFO] delete: localhost:${ROOT_DIR_WORK}/cylc-run/${NAME}/work
 [INFO] delete: localhost:cylc-run/${NAME}/work
 __OUT__
-} >"$TEST_KEY.out.expected"
-file_cmp  "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.expected"
+} >"${TEST_KEY}.out.expected"
+LANG=C sort "${TEST_KEY}.out" >"${TEST_KEY}.out.sorted"
+file_cmp  "${TEST_KEY}.out" "${TEST_KEY}.out.sorted" "${TEST_KEY}.out.expected"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y --name="$NAME"
 exit 0
