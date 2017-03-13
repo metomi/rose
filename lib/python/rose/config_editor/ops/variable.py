@@ -118,6 +118,7 @@ class VariableOperations(object):
     def remove_var(self, variable, skip_update=False, skip_undo=False):
         """Remove the variable entry from the internal lists."""
         variable = self._get_proper_variable(variable)
+        variable.error = {}  # Kill any metadata errors before removing.
         namespace = variable.metadata.get('full_ns')
         var_id = variable.metadata['id']
         sect, opt = self.__util.get_section_option_from_id(var_id)
