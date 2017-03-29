@@ -38,7 +38,7 @@ file_grep "${TEST_KEY}-archive1-01" \
     'CYLC_JOB_EXIT=SUCCEEDED' \
     "${SUITE_RUN_DIR}/log/job/1/archive1/01/job.status"
 file_grep "${TEST_KEY}-archive2-01" \
-    'CYLC_JOB_EXIT=ERR' \
+    'CYLC_JOB_EXIT=EXIT' \
     "${SUITE_RUN_DIR}/log/job/1/archive2/01/job.status"
 file_grep "${TEST_KEY}-archive2-02" \
     'CYLC_JOB_EXIT=SUCCEEDED' \

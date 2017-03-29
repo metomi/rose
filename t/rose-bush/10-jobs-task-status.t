@@ -91,21 +91,21 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('job_status',), None]" \
     "[('entries', ${FOO1}, 'task_status',), 'succeeded']" \
     "[('entries', ${FOO1}, 'run_status',), 1]" \
-    "[('entries', ${FOO1}, 'run_signal',), 'ERR']" \
+    "[('entries', ${FOO1}, 'run_signal',), 'EXIT']" \
     "[('entries', ${FOO2}, 'task_status',), 'succeeded']" \
     "[('entries', ${FOO2}, 'run_status',), 1]" \
-    "[('entries', ${FOO2}, 'run_signal',), 'ERR']" \
+    "[('entries', ${FOO2}, 'run_signal',), 'EXIT']" \
     "[('entries', ${FOO3}, 'task_status',), 'succeeded']" \
     "[('entries', ${FOO3}, 'run_status',), 0]" \
     "[('entries', ${BAR1}, 'task_status',), 'failed']" \
     "[('entries', ${BAR1}, 'run_status',), 1]" \
-    "[('entries', ${BAR1}, 'run_signal',), 'ERR']" \
+    "[('entries', ${BAR1}, 'run_signal',), 'EXIT']" \
     "[('entries', ${BAR2}, 'task_status',), 'failed']" \
     "[('entries', ${BAR2}, 'run_status',), 1]" \
-    "[('entries', ${BAR2}, 'run_signal',), 'ERR']" \
+    "[('entries', ${BAR2}, 'run_signal',), 'EXIT']" \
     "[('entries', ${BAR3}, 'task_status',), 'failed']" \
     "[('entries', ${BAR3}, 'run_status',), 1]" \
-    "[('entries', ${BAR3}, 'run_signal',), 'ERR']" \
+    "[('entries', ${BAR3}, 'run_signal',), 'EXIT']" \
     "[('entries', ${BAZ1}, 'task_status',), 'succeeded']" \
     "[('entries', ${BAZ1}, 'submit_status',), 1]" \
     "[('entries', ${BAZ1}, 'run_status',), None]" \

@@ -59,7 +59,7 @@
       <a href="{{taskjobs_link}}&amp;job_status=failed"
       class="label label-danger">
         <i class="glyphicon glyphicon-remove-circle" title="failed"></i>
-        {% if entry.run_signal and entry.run_signal != "ERR" -%}
+        {% if entry.run_signal and entry.run_signal not in ["ERR", "EXIT"] -%}
           {{entry.run_signal}}
         {% endif -%}
       </a>
