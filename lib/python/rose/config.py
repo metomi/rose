@@ -1266,8 +1266,7 @@ class ConfigLoader(object):
             'Baz'
 
         """
-        if not node:
-            node = self.load(source, node)
+        node = self.load(source, node)
         if return_config_map:
             config_map = {None: copy.deepcopy(node)}
         opt_conf_keys_node = node.unset(["opts"])
