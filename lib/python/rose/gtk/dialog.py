@@ -399,14 +399,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     if title is not None:
         dialog.set_title(title)
 
-    # ensure the dialog size does not exceed the maximum allowed
-    max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
-    my_size = dialog.size_request()
-    new_size = [-1, -1]
-    for i in [0, 1]:
-        new_size[i] = min([my_size[i], max_size[i]])
-    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    dialog.set_default_size(*new_size)
+    _configure_scroll(dialog, scrolled_window)
     ok_button.grab_focus()
     if modal or cancel:
         dialog.show()
@@ -479,14 +472,7 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     if "\n" in text:
         label.set_line_wrap(False)
     dialog.set_resizable(True)
-    # make sure the dialog size doesn't exceed the maximum - if so change it
-    max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
-    my_size = dialog.size_request()
-    new_size = [-1, -1]
-    for i in [0, 1]:
-        new_size[i] = min([my_size[i], max_size[i]])
-    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    dialog.set_default_size(*new_size)
+    _configure_scroll(dialog, scrolled_window)
     dialog.show()
     label.set_selectable(True)
     button.grab_focus()
@@ -735,6 +721,23 @@ def set_exception_hook_dialog(keep_alive=False):
     sys.excepthook = (lambda c, i, t:
                       _run_exception_dialog(c, i, t, prev_hook,
                                             keep_alive))
+
+
+def _configure_scroll(dialog, scrolled_window):
+    """Set scroll window size and scroll policy."""
+    # make sure the dialog size doesn't exceed the maximum - if so change it
+    max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
+    my_size = dialog.size_request()
+    new_size = [-1, -1]
+    for i, scrollbar_cls in [(0, gtk.VScrollbar), (1, gtk.HScrollbar)]:
+        new_size[i] = min([my_size[i], max_size[i]])
+        if new_size[i] < max_size[i]:
+            # Factor in existence of a scrollbar in the other dimension.
+            # For horizontal dimension, add width of vertical scroll bar + 2
+            # For vertical dimension, add height of horizontal scroll bar + 2
+            new_size[i] += scrollbar_cls().size_request()[i] + 2
+    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    dialog.set_default_size(*new_size)
 
 
 def _run_exception_dialog(exc_class, exc_inst, tback, hook, keep_alive):
