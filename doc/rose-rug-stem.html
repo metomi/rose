@@ -358,6 +358,37 @@ rose stem --group=mygroup --group=myothergroup
 
             <div class="slide">
               <h3 class="alwayshidden">rose ana III</h3>
+              <p>As well as sections defining analysis tasks, <samp>rose_ana</samp>
+              apps allow for one additional section for storing global 
+              configuration settings for the app.  Just like the tasks themselves
+              these options and their effects are dependent on which analysis 
+              tasks are used by the app.</p>
+
+              <p>Therefore we will here present an example using the built-in
+              <code>grepper</code> class.  An app may begin with a section like
+              this:</p>
+
+              <pre class="prettyprint lang-rose_conf" >
+  [ana:config]
+  grepper-report-limit=5
+  skip-if-all-files-missing=.true.
+</pre>
+             <p>Each of these modifies the behaviour of <code>grepper</code>. 
+             The first option suppresses printed output for each analysis task
+             one the specified number of lines have been printed (in this case
+             5 lines).  The second option causes <samp>rose_ana</samp> to skip
+             any <code>grepper</code> tasks which compare files in the case that
+             <i>both</i> files do not exist.</p>
+
+             <p>Note that any options given to this section may instead be 
+             specified in the <code>rose-ana</code> section of the user or site 
+             configuration.  In the case that the same configuration option
+             appears in both locations the one contained in the app file will
+             take precedence.</p>
+            </div>
+
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana IV</h3>
 
               <p>It is possible to add additional analysis modules to 
               <samp>rose ana</samp> by placing an appropriately formatted
@@ -459,10 +490,33 @@ rose stem --group=mygroup --group=myothergroup
                   </ul>
                 </li>
               </ul>
+
+              <p>The <code>grepper</code> analysis module also supports some
+              configuration options (specified in the <code>[ana:config]</code> 
+              section of the app or in the <code>[rose-ana]</code> section of 
+              the Rose site/user configuration:</p>
+
+              <ul>
+                <li><b>grepper-report-limit:</b> A numerical value giving the
+                  maximum number of informational output lines to print for 
+                  each comparison.  This is intended for cases where for example
+                  a pattern-matching comparison is expected to match many 
+                  thousands of occurences in the given files; it may not be 
+                  desirable to print the results of every comparison.  After
+                  the given number of lines are printed a special message 
+                  indicating that the rest of the output is truncated will be
+                  produced.</li>
+                <li><b>skip-if-all-files-missing:</b> Can be set to 
+                  <code>.true.</code> or <code>.false.</code>; if active, any
+                  comparison done on files by <code>grepper</code> will be 
+                  skipped if <i>all</i> of those files are non-existent.  In 
+                  this case the task will return as "skipped" rather than 
+                  passed/failed.</li>
+              </ul>
             </div>
 
             <div class="slide">
-              <h3 class="alwayshidden">rose ana IV</h3>
+              <h3 class="alwayshidden">rose ana V</h3>
 
               <p>The format for analysis modules themselves is relatively
               simple; the easiest route to understanding how they should be

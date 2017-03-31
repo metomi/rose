@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-N_TESTS=50
+N_TESTS=52
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 
@@ -225,7 +225,16 @@ REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
 #-------------------------------------------------------------------------------
+# Test of a few config options
+
+OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t4/01/job.out
+TEST_KEY=$TEST_KEY_BASE-report_limit_working
+file_pcregrep $TEST_KEY "Running task #([0-9]+).*\n.*Check report limit is active.*(\n.*)*Some output omitted due to limit.*(\n.*)*Task #\1 passed" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-missing_skip_working
+file_pcregrep $TEST_KEY "Running task #([0-9]+).*\n.*Check non-existent files are skipped.*(\n.*)*All file arguments are missing, skipping task.*(\n.*)*Task #\1 skipped by method" $OUTPUT
+
+#-------------------------------------------------------------------------------
 #Clean suite
-rose suite-clean -q -y $NAME
+#rose suite-clean -q -y $NAME
 #-------------------------------------------------------------------------------
 exit 0

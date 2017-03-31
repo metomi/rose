@@ -156,6 +156,7 @@ class RoseAnaApp(BuiltinApp):
 
     SCHEME = "rose_ana"
     _prefix_pass = "[ OK ] "
+    _prefix_skip = "[SKIP] "
     _prefix_fail = "[FAIL] "
     _printbar_width = 80
 
@@ -196,11 +197,15 @@ class RoseAnaApp(BuiltinApp):
             return old_app.run(
                 app_runner, conf_tree, opts, args, uuid, work_files)
 
+        # Load any rose_ana specific configuration settings either from the
+        # site defaults or the user's personal config
+        self._get_global_ana_config()
+
         # If the user's config indicates that it should be used - attach
         # to the KGO database instance in case it is needed later.
-        use_kgo = self.rose_conf.get_value(["rose-ana", "kgo-database"])
+        use_kgo = self.ana_config.get("kgo-database", ".false.")
         self.kgo_db = None
-        if use_kgo is not None and use_kgo == ".true.":
+        if use_kgo == ".true.":
             self.kgo_db = KGODatabase()
             self.kgo_db.enter_task(self.task_name,
                                    self.kgo_db.TASK_STATUS_RUNNING)
@@ -215,6 +220,7 @@ class RoseAnaApp(BuiltinApp):
         self._load_tasks()
 
         number_of_failures = 0
+        number_of_skips = 0
         task_error = False
         summary_status = []
         for itask, task in enumerate(self.analysis_tasks):
@@ -235,6 +241,13 @@ class RoseAnaApp(BuiltinApp):
                         msg, task.options["full_task_name"]),
                         self._prefix_pass))
                     self.reporter(msg, prefix=self._prefix_pass)
+                elif task.skipped:
+                    number_of_skips += 1
+                    msg = "Task #{0} skipped by method".format(itask + 1)
+                    summary_status.append(("{0} ({1})".format(
+                        msg, task.options["full_task_name"]),
+                        self._prefix_skip))
+                    self.reporter(msg, prefix=self._prefix_skip)
                 else:
                     number_of_failures += 1
                     msg = "Task #{0} did not pass".format(itask + 1)
@@ -272,23 +285,49 @@ class RoseAnaApp(BuiltinApp):
         for line, prefix in summary_status:
             self.reporter(line, prefix=prefix)
 
+        # And a final 1-line summary
+        total = len(summary_status)
+        plural = {1: ""}
+
+        prefix = self._prefix_pass
+        passed = total - number_of_failures - number_of_skips
+        msg = "{0} Task{1} Passed".format(passed, plural.get(passed, "s"))
+
         if number_of_failures > 0:
-            msg = "{0}/{1} Tasks did not pass"
-            self.reporter(msg.format(number_of_failures, len(summary_status)),
-                          prefix=self._prefix_fail)
-        else:
-            self.reporter("All Tasks passed", prefix=self._prefix_pass)
+            msg += ", {0} Task{1} Failed".format(
+                number_of_failures, plural.get(number_of_failures, "s"))
+            prefix = self._prefix_fail
+
+        if number_of_skips > 0:
+            msg += ", {0} Task{1} Skipped".format(
+                number_of_skips, plural.get(number_of_skips, "s"))
+
+        msg += " (of {0} processed)".format(total)
+        self.titlebar("Final status")
+        self.reporter(msg, prefix=prefix)
 
         self.titlebar("Completed rose_ana")
 
         # Finally if there were legitimate test failures raise an exception
-        # so that the task is caught by cylc as failed.
-        if number_of_failures > 0:
+        # so that the task is caught by cylc as failed.  Also fail if it looks
+        # like every single task has been skipped
+        if number_of_failures > 0 or number_of_skips == total:
             raise TestsFailedException(number_of_failures)
 
     def titlebar(self, title):
         sidebarlen = (self._printbar_width - len(title) + 1) / 2 - 1
         self.reporter("{0} {1} {0}".format("*" * sidebarlen, title))
+
+    def _get_global_ana_config(self):
+        """Retrieves all rose_ana config options; these could be from the
+        site's settings or the user's personal settings."""
+        self.ana_config = {}
+        user_config = (
+            self.rose_conf.get_value(["rose-ana"]))
+        if user_config is not None:
+            for name, obj in user_config.items():
+                if obj.state == "":
+                    self.ana_config[name] = obj.value
 
     def _init_reporter(self, reporter=None):
         """Attach a reporter instance to the class."""
@@ -365,6 +404,15 @@ class RoseAnaApp(BuiltinApp):
                 # Capture the options only and save them to the tasks dict
                 task = task.split(":", 1)[1]
                 if len(keys) == 2:
+
+                    # The app may define a section containing rose_ana config
+                    # settings; add these to the config dictionary (if any of
+                    # the names match existing config options from the global
+                    # config it will be overwritten)
+                    if task == "config":
+                        self.ana_config[keys[1]] = node.value
+                        continue
+
                     _tasks.setdefault(task, {})
                     # If the value contains newlines, split it into a list
                     # and either way remove any quotation marks and process
@@ -463,13 +511,25 @@ class AnalysisTask(object):
     def __init__(self, parent_app, task_options):
         """
         Initialise the analysis task, storing the user specified options
-        dictionary and a reference to the parent app.
+        dictionary and a few references to useful objects from the parent app.
 
         """
-        self.parent = parent_app
         self.options = task_options
 
+        # This attribute gives access to the parent task; but it is only
+        # included for backwards compatibility and will be remove in the
+        # future (please instead use the other attributes below!)
+        self.parent = parent_app
+
+        # Attributes to access some helpful/relevant parts of the parent
+        # task environment for printing, running tasks, etc.
+        self.config = parent_app.ana_config
+        self.reporter = parent_app.reporter
+        self.kgo_db = parent_app.kgo_db
+        self.popen = parent_app.app_runner.popen
+
         self.passed = False
+        self.skipped = False
 
     @abc.abstractmethod
     def run_analysis(self):

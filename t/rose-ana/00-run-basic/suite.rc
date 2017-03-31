@@ -13,6 +13,7 @@ UTC mode=True
           rose_ana_t2_activated:fail => rose_ana_t2_deactivated
           rose_ana_t3_within_tolerance & rose_ana_t3_outside_tolerance:fail => \
           rose_ana_t1:fail & rose_ana_t2_deactivated => db_check
+          rose_ana_t4
         """
 
 [runtime]
@@ -34,6 +35,9 @@ UTC mode=True
         script = rose task-run -v -v --debug --app-key=rose_ana_t3
         [[[environment]]]
             TOLERANCE=2%
+
+    [[rose_ana_t4]]
+        script = rose task-run -v -v --debug
 
     [[db_check]]
         script = rose task-run -v -v --debug

@@ -31,6 +31,10 @@ class SingleCommandStatus(AnalysisTask):
         self.process_opt_command()
         self.process_opt_unhandled()
         self.get_config_opts()
+
+        if self.check_for_skip():
+            return
+
         self.run_command_and_check()
         self.update_kgo()
 
@@ -41,19 +45,33 @@ class SingleCommandStatus(AnalysisTask):
         self.command = self.command.format(*self.files)
         returncode, stdout, stderr = self.run_command(self.command)
         if returncode == 0:
-            self.parent.reporter(stdout, prefix="[INFO] ")
+            self.reporter(stdout, prefix="[INFO] ")
             self.passed = True
         else:
-            self.parent.reporter(stderr, prefix="[FAIL] ")
+            self.reporter(stderr, prefix="[FAIL] ")
+
+    def check_for_skip(self):
+        # If the users config options specified that the task should be
+        # ignored if all of its files were missing, set skipped attribute here
+        if self.skip_if_missing and len(self.files) > 0:
+            if all([not os.path.exists(fname) for fname in self.files]):
+                self.skipped = True
+                self.reporter(
+                    "All file arguments are missing, skipping task since "
+                    "'skip-if-all-files-missing' is '.true.'")
+        return self.skipped
 
     def get_config_opts(self):
-        # Check the rose config for any relevant options
-        report_limit = (
-            self.parent.rose_conf.get_value(["rose-ana",
-                                             "grepper-report-limit"]))
+        """Process any configuration options."""
+        report_limit = self.config.get("grepper-report-limit", None)
         self.max_report_lines = None
         if report_limit is not None and report_limit.isdigit():
             self.max_report_lines = int(report_limit)
+
+        skip_missing = self.config.get("skip-if-all-files-missing", None)
+        self.skip_if_missing = False
+        if skip_missing is not None and skip_missing == ".true.":
+            self.skip_if_missing = True
 
     def process_opt_files(self):
         """Process the files option; a list of one or more filenames."""
@@ -66,7 +84,7 @@ class SingleCommandStatus(AnalysisTask):
             files = [files]
         # Report the filenames (with paths)
         for ifile, fname in enumerate(files):
-            self.parent.reporter(
+            self.reporter(
                 "File {0}: {1}".format(ifile + 1,
                                        os.path.realpath(files[ifile])))
         self.files = files
@@ -93,9 +111,9 @@ class SingleCommandStatus(AnalysisTask):
                 msg = "KGO index not recognised; must be a digit or blank"
                 raise ValueError(msg)
         if kgo is not None:
-            self.parent.reporter("KGO is file {0}".format(kgo + 1))
+            self.reporter("KGO is file {0}".format(kgo + 1))
         else:
-            self.parent.reporter("No KGO files are present")
+            self.reporter("No KGO files are present")
         self.kgo = kgo
 
     def process_opt_command(self):
@@ -107,15 +125,14 @@ class SingleCommandStatus(AnalysisTask):
         # Get the command from the options
         self.command = self.options.pop("command", None)
         if self.command is not None:
-            self.parent.reporter("Command: {0}".format(self.command))
+            self.reporter("Command: {0}".format(self.command))
         else:
             msg = "Command not specified"
             raise ValueError(msg)
 
     def run_command(self, command):
         """Simple command runner; returns output error and return code."""
-        popen = self.parent.app_runner.popen
-        retcode, stdout, stderr = popen.run(command, shell=True)
+        retcode, stdout, stderr = self.popen.run(command, shell=True)
         return retcode, stdout, stderr
 
     def read_file(self, filename):
@@ -130,7 +147,7 @@ class SingleCommandStatus(AnalysisTask):
         kgo_file option (i.e. whether they have passed/failed the test.
 
         """
-        if self.kgo is not None and self.parent.kgo_db is not None:
+        if self.kgo is not None and self.kgo_db is not None:
             # Identify the KGO file from its index
             kgo_file = self.files[self.kgo]
             # Now find the other file/s (this is presently designed to expect
@@ -138,7 +155,7 @@ class SingleCommandStatus(AnalysisTask):
             for ifile, suite_file in enumerate(self.files):
                 if ifile == self.kgo:
                     continue
-                self.parent.kgo_db.enter_comparison(
+                self.kgo_db.enter_comparison(
                     self.options["full_task_name"],
                     os.path.realpath(kgo_file),
                     os.path.realpath(suite_file),
@@ -167,7 +184,7 @@ class SingleCommandPattern(SingleCommandStatus):
         # Get the pattern from the options dictionary
         self.pattern = self.options.pop("pattern", None)
         if self.pattern is not None:
-            self.parent.reporter("Pattern: {0}".format(self.pattern))
+            self.reporter("Pattern: {0}".format(self.pattern))
         else:
             msg = "Must specify a pattern"
             raise ValueError(msg)
@@ -202,6 +219,9 @@ class FilePattern(SingleCommandPattern):
         self.process_opt_tolerance()
         self.process_opt_unhandled()
         self.get_config_opts()
+
+        if self.check_for_skip():
+            return
 
         # Generate the groupings - the pattern can match multiple times
         matched_groups = self.search_for_matches()
@@ -262,41 +282,41 @@ class FilePattern(SingleCommandPattern):
                         msg = ("Mismatch in group {0} of pattern for "
                                "occurence {1} in files")
                         prefix = "[FAIL] "
-                        self.parent.reporter(
+                        self.reporter(
                             msg.format(imatch + 1, igroup + 1), prefix=prefix)
                         msg = "File {0}: {1}"
-                        self.parent.reporter(msg.format(1, match1),
-                                             prefix=prefix)
-                        self.parent.reporter(msg.format(ifile + 2, match2),
-                                             prefix=prefix)
+                        self.reporter(msg.format(1, match1),
+                                      prefix=prefix)
+                        self.reporter(msg.format(ifile + 2, match2),
+                                      prefix=prefix)
 
                     else:
                         msg = ("Group {0} of pattern for occurence {1} in "
                                "files matches")
-                        self.parent.reporter(
+                        self.reporter(
                             msg.format(imatch + 1, igroup + 1),
-                            level=self.parent.reporter.V)
+                            level=self.reporter.V)
                         if self.tolerance is None:
                             msg = "Value: {0}"
-                            self.parent.reporter(msg.format(match1),
-                                                 level=self.parent.reporter.V)
+                            self.reporter(msg.format(match1),
+                                          level=self.reporter.V)
                         else:
                             msg = "File {0}: {1}"
-                            self.parent.reporter(msg.format(1, match1),
-                                                 level=self.parent.reporter.V)
-                            self.parent.reporter(msg.format(ifile + 2, match2),
-                                                 level=self.parent.reporter.V)
+                            self.reporter(msg.format(1, match1),
+                                          level=self.reporter.V)
+                            self.reporter(msg.format(ifile + 2, match2),
+                                          level=self.reporter.V)
 
         # If not all comparisons were printed, note it here
         if (self.max_report_lines is not None and
                 comparison_total > self.max_report_lines):
-            self.parent.reporter("... Some output omitted due to limit ...")
+            self.reporter("... Some output omitted due to limit ...")
 
         msg = "Performed {0} comparison{1}, with {2} failure{3}"
-        self.parent.reporter(msg.format(comparison_total,
-                                        {1: ""}.get(comparison_total, "s"),
-                                        failure_total,
-                                        {1: ""}.get(failure_total, "s")))
+        self.reporter(msg.format(comparison_total,
+                                 {1: ""}.get(comparison_total, "s"),
+                                 failure_total,
+                                 {1: ""}.get(failure_total, "s")))
 
         # If everything passed - the task did too
         self.passed = all(passed)
@@ -317,11 +337,11 @@ class FilePattern(SingleCommandPattern):
             if tolerance.endswith("%"):
                 self.relative_tol = True
                 tolerance = float(tolerance.strip("%"))
-                self.parent.reporter(
+                self.reporter(
                     "Relative (%) tolerance: {0}".format(tolerance))
             else:
                 tolerance = float(tolerance)
-                self.parent.reporter(
+                self.reporter(
                     "Absolute tolerance: {0}".format(tolerance))
         self.tolerance = tolerance
 
