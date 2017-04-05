@@ -1164,7 +1164,11 @@ source=http://host/svn-repos/path/to/bar.txt
               <dd>This scheme is useful for pulling a file or
               directory from a remote host using <code>rsync</code>
               via <code>ssh</code>. A URI should have the form
-              <var>[USER@]HOST:PATH</var>.</dd>
+              <var>HOST:PATH</var>. (Note: If required, you can use the
+              <a href="http://man.openbsd.org/ssh_config#User">User</a>
+              setting in <var>~/.ssh/config</var> to specify the user
+              ID for logging into <var>HOST</var>.)</dd>
+              </dd>
             </dl>
 
             <p>The application launcher will use the following
