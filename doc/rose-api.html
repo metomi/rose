@@ -786,7 +786,7 @@ widget[rose-config-edit:sub-ns] = modulename.ClassName arg1 arg2 arg3 ...
 
               <li>Upgraders - these are special transformer macros
               for upgrading and downgrading configurations. (covered in the
-              <a href="#upgrade">next section</a>)</li>
+              <a href="#upgrade">Upgrade Macro API</a>)</li>
 
               <li>Reporters - output information about a
               configuration.</li>
@@ -970,8 +970,11 @@ class SomeTransformer(rose.macro.MacroBase):
 
             <pre class="prettyprint">
     def report(self, config, meta_config=None):
-        """ Write some information about the configuration to a report file."""
-        # Note: report methods do not have a return value.
+        """ Write some information about the configuration to a report file.
+
+        Note: report methods do not have a return value.
+
+        """
         with open('report/file', 'r') as report_file:
             report_file.write(str(config.get(["namelist:snowflakes"])))
 </pre>

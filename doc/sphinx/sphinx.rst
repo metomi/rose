@@ -62,7 +62,7 @@ Some quick examples:
 
         """  # Blank line.
 
-        def __init(self, param1, param2, kwarg=None):
+        def __init__(self, param1, param2, kwarg=None):
             pass
 
         def some_generator(self, param1, param2):

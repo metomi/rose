@@ -996,7 +996,7 @@ class ConfigNodeDiff(object):
         return rev_diff
 
     def delete_removed(self):
-        """Deletes all 'removed' keys from this ConfigNodeDiff..
+        """Deletes all 'removed' keys from this ConfigNodeDiff.
 
         Examples:
             >>> config_node_diff = ConfigNodeDiff()
