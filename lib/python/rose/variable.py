@@ -95,6 +95,10 @@ class Variable(object):
                 not isinstance(self.metadata['type'], list)):
             self.metadata['type'] = parse_type_expression(
                 self.metadata['type'])
+        if ('element-titles' in self.metadata and
+                not isinstance(self.metadata['element-titles'], list)):
+            self.metadata['element-titles'] = parse_type_expression(
+                self.metadata['element-titles'])
         # Replace this kind of thing with a proper metadata handler later.
         for key, delim in [
                 ("values", ","),
