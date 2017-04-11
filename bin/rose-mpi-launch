@@ -131,7 +131,7 @@ while (($# > 0)); do
                       err "ROSE_LAUNCHER_ULIMIT_OPTS=$ROSE_LAUNCHER_ULIMIT_OPTS"
                       :;;
                     *)
-                      ulimit -$OPT $OPTARG || err \
+                      ulimit -$OPT ${OPTARG:-} || err \
                           "ROSE_LAUNCHER_ULIMIT_OPTS=$ROSE_LAUNCHER_ULIMIT_OPTS"
                       :;;
                 esac
