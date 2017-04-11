@@ -34,15 +34,18 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Use ROSE_LAUNCHER_ULIMIT_OPTS.
 TEST_KEY=$TEST_KEY_BASE-ulimit-good
-ULIMIT_STACK=$(ulimit -s)
-if [[ $ULIMIT_STACK == 'unlimited' ]]; then
-    ULIMIT_STACK_NEW=$ULIMIT_STACK
+ULIMIT_FILE_SIZE=$(ulimit -f)
+if [[ $ULIMIT_FILE_SIZE == 'unlimited' ]]; then
+    ULIMIT_FILE_SIZE_NEW=100000
 else
-    ULIMIT_STACK_NEW=$(($(ulimit -s) / 2))
+    ULIMIT_FILE_SIZE_NEW=$(($(ulimit -f) / 2))
 fi
-ROSE_LAUNCHER_ULIMIT_OPTS="-s $ULIMIT_STACK_NEW" \
-    run_pass "$TEST_KEY" rose mpi-launch --inner bash -c 'ulimit -s'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<$ULIMIT_STACK_NEW
+ROSE_LAUNCHER_ULIMIT_OPTS="-f $ULIMIT_FILE_SIZE_NEW -H" \
+    run_pass "$TEST_KEY" rose mpi-launch --inner bash -c 'ulimit -f'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+$ULIMIT_FILE_SIZE_NEW
+$ULIMIT_FILE_SIZE_NEW
+__OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Use bad ROSE_LAUNCHER_ULIMIT_OPTS.
