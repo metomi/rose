@@ -18,6 +18,21 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 """
+.. testsetup:: *
+
+    import os
+    from rose.macro import *
+
+    def test_cleanup(stuff_to_remove):
+        for item in stuff_to_remove:
+            try:
+                os.remove(item)
+            except OSError:
+                try:
+                    os.rmdir(item)
+                except OSError:
+                    pass
+
 Module to list or run available custom macros for a configuration.
 
 It also stores macro base classes and macro library functions.
@@ -56,6 +71,7 @@ ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
 ERROR_MACRO_CASE_MISMATCH = ("Error: case mismatch; \n {0} does not match {1},"
                              " please only use lowercase.")
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
+ERROR_NO_MACRO_HELP = "No help docstring provided, macro \"{0}\"."
 ERROR_NO_MACROS = "Please specify a macro name.\n"
 ERROR_RETURN_TYPE = "{0}: {1}: invalid returned type: {2}, expect {3}"
 ERROR_RETURN_VALUE = "{0}: incorrect return value"
@@ -157,7 +173,33 @@ class MetaConfigFlagMissingError(Exception):
 
 class MacroBase(object):
 
-    """Base class for macros for validating or transforming configurations."""
+    """Base class for macros for validating or transforming configurations.
+
+    Synopsis:
+        >>> import rose.macro
+        ...
+        >>> class SomeValidator(rose.macro.MacroBase):
+        ...
+        ...    '''Important: Add a docstring for your macro like this.
+        ...
+        ...    A macro class should implement one of the following methods:
+        ...
+        ...    '''
+        ...
+        ...    def validate(self, config, meta_config=None):
+        ...        # Some check on config appends to self.reports using
+        ...        # self.add_report.
+        ...        return self.reports
+        ...
+        ...    def transform(self, config, meta_config=None):
+        ...        # Some operation on config which calls self.add_report
+        ...        # for each change.
+        ...        return config, self.reports
+        ...
+        ...    def report(self, config, meta_config=None):
+        ...        # Perform some analysis of the config but return nothing.
+        ...        pass
+    """
 
     def __init__(self):
         self.reports = []  # MacroReport instances for errors or changes
@@ -186,6 +228,42 @@ class MacroBase(object):
         return load_meta_config(config, directory, config_type=config_type)
 
     def get_metadata_for_config_id(self, setting_id, meta_config):
+        """Return a dict of metadata properties and values for a setting id.
+
+        Args:
+            setting_id (str): The name of the setting to extract metadata for.
+            meta_config (rose.config.ConfigNode): Config node containing the
+                metadata to extract from.
+
+        Return:
+            dict: A dictionary containing metadata options.
+
+        Example:
+            >>> # Create a rose app.
+            >>> with open('rose-app.conf', 'w+') as app_config:
+            ...     app_config.write('''
+            ... [foo]
+            ... bar=2
+            ...     ''')
+            >>> os.mkdir('meta')
+            >>> with open('meta/rose-meta.conf', 'w+') as meta_config:
+            ...     meta_config.write('''
+            ... [foo=bar]
+            ... values = 1,2,3
+            ...     ''')
+            ...
+            >>> # Load config.
+            >>> app_conf, config_map, meta_config = load_conf_from_file(
+            ...     '.', 'rose-app.conf')
+            ...
+            >>> # Extract metadata for foo=bar.
+            >>> get_metadata_for_config_id('foo=bar', meta_config)
+            {'values': '1,2,3', 'id': 'foo=bar'}
+
+        .. testcleanup:: rose.macro.MacroBase.get_metadata_for_config_id
+
+            test_cleanup(['rose-app.conf', 'meta/rose-meta.conf', 'meta'])
+        """
         return get_metadata_for_config_id(setting_id, meta_config)
 
     def get_resource_path(self, filename=''):
@@ -196,7 +274,14 @@ class MacroBase(object):
 
         If the calling macro is lib/python/macro/levels.py,
         and the filename is 'rules.json', the returned path will be
-        etc/macro/levels/rules.json .
+        etc/macro/levels/rules.json.
+
+        Args:
+            filename (str): The filename of the resource to request the path
+                to.
+
+        Return:
+            str: The path to the requested resource.
 
         """
         last_frame = inspect.getouterframes(inspect.currentframe())[1]
@@ -213,14 +298,44 @@ class MacroBase(object):
         return resource_path
 
     def pretty_format_config(self, config):
-        """Pretty-format the configuration values."""
+        """Standardise the keys and values of a config node.
+
+        Args:
+            config (rose.config.ConfigNode): The config node to convert.
+
+        """
         pretty_format_config(config)
 
     def standard_format_config(self, config):
-        """Standardise configuration syntax."""
+        """Standardise any degenerate representations e.g. namelist repeats.
+
+        Args:
+            config (rose.config.ConfigNode): The config node to convert.
+
+        """
         standard_format_config(config)
 
     def add_report(self, *args, **kwargs):
+        """Add a rose.macro.MacroReport.
+
+        See :class:`rose.macro.MacroReport` for details of arguments.
+
+        Examples:
+            >>> # An example validator macro which adds a report to the setting
+            >>> # env=MY_FAVOURITE_STREAM_EDITOR.
+            >>> class My_Macro(MacroBase):
+            ...     def validate(self, config, meta_config=None):
+            ...         editor_value = config.get(
+            ...             ['env', 'MY_FAVOURITE_STREAM_EDITOR']).value
+            ...         if editor_value != 'sed':
+            ...             self.add_report(
+            ...                 'env',                         # Section
+            ...                 'MY_FAVOURITE_STREAM_EDITOR',  # Option
+            ...                 editor_value,                  # Value
+            ...                 'Should be "sed"!')            # Message
+            ...         return self.reports
+
+        """
         self.reports.append(MacroReport(*args, **kwargs))
 
 
@@ -362,7 +477,23 @@ class MacroTransformerCollection(MacroBase):
 
 class MacroReport(object):
 
-    """Class to hold information about a macro issue."""
+    """Class to hold information about a macro issue.
+
+    Arguments:
+        section (str): The name of the section to attach this report to.
+        option (str): The name of the option (within the section) to
+            attach this report to.
+        value (obj): The value of the configuration associated with this
+            report.
+        info (str): Text information describing the nature of the report.
+        is_warning (bool): If True then this report will be logged as a
+            warning.
+
+    Example:
+        >>> report = MacroReport('env', 'WORLD', 'Earth',
+        ...                      'World changed to Earth', True)
+
+    """
 
     def __init__(self, section=None, option=None, value=None,
                  info=None, is_warning=False):
@@ -800,7 +931,12 @@ def transform_config(config, meta_config, transformer_macro, modules,
 
 
 def pretty_format_config(config, ignore_error=False):
-    """Improve configuration prettiness."""
+    """Standardise the keys and values of a config node.
+
+    Args:
+        config (rose.config.ConfigNode): The Config node to convert.
+
+    """
     for s_key, s_node in config.value.items():
         scheme = s_key
         if ":" in scheme:
@@ -812,7 +948,7 @@ def pretty_format_config(config, ignore_error=False):
         except AttributeError:
             continue
         for keylist, node in list(s_node.walk()):
-            # FIXME: Surely, only the scheme know how to splits its array?
+            # FIXME: Surely, only the scheme knows how to split its array?
             values = rose.variable.array_split(node.value, ",")
             node.value = pretty_format_value(values)
             new_keylist = pretty_format_keys(keylist)
@@ -826,7 +962,12 @@ def pretty_format_config(config, ignore_error=False):
 
 
 def standard_format_config(config):
-    """Standardise any degenerate representations e.g. namelist repeats."""
+    """Standardise any degenerate representations e.g. namelist repeats.
+
+        Args:
+            config (rose.config.ConfigNode): The config node to convert.
+
+    """
     for keylist, node in config.walk():
         if len(keylist) == 2:
             scheme, option = keylist
@@ -842,7 +983,43 @@ def standard_format_config(config):
 
 
 def get_metadata_for_config_id(setting_id, meta_config):
-    """Return a dict of metadata properties and values for a setting id."""
+    """Return a dict of metadata properties and values for a setting id.
+
+    Args:
+        setting_id (str): The name of the setting to extract metadata for.
+        meta_config (rose.config.ConfigNode): Config node containing the
+            metadata to extract from.
+
+    Return:
+        dict: A dictionary containing metadata options.
+
+    Example:
+        >>> # Create a rose app.
+        >>> with open('rose-app.conf', 'w+') as app_config:
+        ...     app_config.write('''
+        ... [foo]
+        ... bar=2
+        ...     ''')
+        >>> os.mkdir('meta')
+        >>> with open('meta/rose-meta.conf', 'w+') as meta_config:
+        ...     meta_config.write('''
+        ... [foo=bar]
+        ... values = 1,2,3
+        ...     ''')
+        ...
+        >>> # Load config.
+        >>> app_conf, config_map, meta_config = load_conf_from_file(
+        ...     '.', 'rose-app.conf')
+        ...
+        >>> # Extract metadata for foo=bar.
+        >>> get_metadata_for_config_id('foo=bar', meta_config)
+        {'values': '1,2,3', 'id': 'foo=bar'}
+
+        .. testcleanup:: rose.macro.get_metadata_for_config_id
+
+            test_cleanup(['rose-app.conf', 'meta/rose-meta.conf', 'meta'])
+
+    """
     metadata = {}
     if rose.CONFIG_DELIMITER in setting_id:
         section, option = setting_id.split(rose.CONFIG_DELIMITER, 1)
@@ -937,10 +1114,16 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         for module_name, class_name, method, help in macro_tuples:
             macro_name = ".".join([module_name, class_name])
             macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], macro_name)
-            reporter(macro_id + "\n", prefix="")
-            for help_line in help.split("\n"):
-                reporter(MACRO_OUTPUT_HELP.format(help_line),
-                         level=reporter.V, prefix="")
+            if help:
+                reporter(macro_id + "\n", prefix="")
+                for help_line in help.split("\n"):
+                    reporter(MACRO_OUTPUT_HELP.format(help_line),
+                             level=reporter.V, prefix="")
+            else:
+                # No "help" docstring provided in macro.
+                reporter(ERROR_NO_MACRO_HELP.format(macro_name),
+                         level=reporter.FAIL, prefix=reporter.PREFIX_FAIL)
+                return False
         return True
 
     # Categorise macros given as arguments.
