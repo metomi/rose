@@ -323,10 +323,10 @@ rose stem --group=mygroup --group=myothergroup
 
               <p>A <samp>rose ana</samp> <code>rose-app.conf</code>
               file contains a series of blocks; each one describing
-              a different analysis task to perform.  A common task
+              a different analysis task to perform. A common task
               which <samp>rose ana</samp> is used for is to compare
               output contained in different files (e.g. from a new test 
-              versus previous output from a control).  The analysis
+              versus previous output from a control). The analysis
               modules which provide these tasks are flexible and able
               to be provided by the user; however there is one built-in
               module inside <samp>rose ana</samp> itself.</p>
@@ -347,12 +347,12 @@ rose stem --group=mygroup --group=myothergroup
               (which is relative to the <samp>rose ana</samp>
               task's <code>work</code> directory) and the contents
               of <code>/data/kgo/myfile</code> for the specified regular
-              expression.  Since the pattern contains a group (in parentheses)
+              expression. Since the pattern contains a group (in parentheses)
               so it is the contents of this group which will be compared 
-              between the two files.  The <code>grepper.FilePattern</code>
+              between the two files. The <code>grepper.FilePattern</code>
               analysis task can optionally be given a "tolerance" option for
               matching numeric values, but without it the matching is expected
-              to be exact.  If the pattern or group contents do not match the
+              to be exact. If the pattern or group contents do not match the
               task will return a failure.</p>
             </div>
 
@@ -360,12 +360,12 @@ rose stem --group=mygroup --group=myothergroup
               <h3 class="alwayshidden">rose ana III</h3>
               <p>As well as sections defining analysis tasks, <samp>rose_ana</samp>
               apps allow for one additional section for storing global 
-              configuration settings for the app.  Just like the tasks themselves
+              configuration settings for the app. Just like the tasks themselves
               these options and their effects are dependent on which analysis 
               tasks are used by the app.</p>
 
               <p>Therefore we will here present an example using the built-in
-              <code>grepper</code> class.  An app may begin with a section like
+              <code>grepper</code> class. An app may begin with a section like
               this:</p>
 
               <pre class="prettyprint lang-rose_conf" >
@@ -373,22 +373,27 @@ rose stem --group=mygroup --group=myothergroup
   grepper-report-limit=5
   skip-if-all-files-missing=.true.
 </pre>
+
+            </div>
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana IV</h3>
+
              <p>Each of these modifies the behaviour of <code>grepper</code>. 
              The first option suppresses printed output for each analysis task
-             one the specified number of lines have been printed (in this case
-             5 lines).  The second option causes <samp>rose_ana</samp> to skip
+             once the specified number of lines have been printed (in this case
+             5 lines). The second option causes <samp>rose_ana</samp> to skip
              any <code>grepper</code> tasks which compare files in the case that
              <i>both</i> files do not exist.</p>
 
              <p>Note that any options given to this section may instead be 
              specified in the <code>rose-ana</code> section of the user or site 
-             configuration.  In the case that the same configuration option
+             configuration. In the case that the same configuration option
              appears in both locations the one contained in the app file will
              take precedence.</p>
             </div>
 
             <div class="slide">
-              <h3 class="alwayshidden">rose ana IV</h3>
+              <h3 class="alwayshidden">rose ana V</h3>
 
               <p>It is possible to add additional analysis modules to 
               <samp>rose ana</samp> by placing an appropriately formatted
@@ -410,10 +415,13 @@ rose stem --group=mygroup --group=myothergroup
               <p>The only module provided with Rose can be found at
               <code>lib/python/rose/apps/ana_builtin/grepper.py</code> and it
               provides the following analysis tasks and options:</p>
-
+              
+            </div>
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana VI</h3>
               <ul>
                 <li><b>SingleCommandStatus:</b> Runs a shell command, passing
-                  or failing depending on the exist status of that command.
+                  or failing depending on the exit status of that command.
                   <ul>
                     <li><i>files</i> - a newline-separated list of filenames
                       (optional) which may appear in the command.</li>
@@ -426,71 +434,66 @@ rose stem --group=mygroup --group=myothergroup
                       database (if active).</li>
                   </ul>
                 </li>
+              </ul>
+            </div>
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana VII</h3>
+              <ul>
                 <li><b>SingleCommandPattern:</b> Runs a shell command, then
                   passes or fails depending on the presence of a given regular
                   expression in the command's stdout.
                   <ul>
-                    <li><i>files</i> - a newline-separated list of filenames
-                      (optional) which may appear in the command.</li>
-                    <li><i>command</i> - the command to run; if it contains
-                      Python style format specifiers these will be expanded
-                      using the list of files above (if provided).</li>
-                   <li><i>kgo_file</i> - if the list of files above was 
-                      provided gives the (0-based) index of the file holding
-                      the "kgo" or "control" output for use with the comparisons
-                      database (if active).</li>
+                    <li><i>files</i> - (optional) same as previous task.</li>
+                    <li><i>command</i> - same as previous task.</li>
+                    <li><i>kgo_file</i> - same as previous task.</li>
                     <li><i>pattern</i> - the regular expression to search for
                       in the stdout from the command.</li>
                   </ul>
                 </li>
+              </ul>
+            </div>
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana VIII</h3>
+              <ul>
                 <li><b>FilePattern:</b> Compares the contents of files using
                   a regular expression.
                   <ul>
-                    <li><i>files</i> - a newline-separated list of filenames
-                      to be compared.</li>
-                   <li><i>kgo_file</i> - if the list of files above was 
-                      provided gives the (0-based) index of the file holding
-                      the "kgo" or "control" output for use with the comparisons
-                      database (if active).</li>
+                   <li><i>files</i> - (optional) same as previous tasks.</li>
+                   <li><i>kgo_file</i> - same as previous tasks.</li>
                     <li><i>pattern</i> - the regular expression to search for
-                      in the files.  The expression should include one or more
+                      in the files. The expression should include one or more
                       capture groups; each of these will be compared between
                       the files any time the pattern occurs.</li>
                     <li><i>tolerance</i> - by default the above comparisons
                       will be compared exactly, but if this (optional) argument
                       is specified they will be converted to float values and
-                      compared according to the given tolerance.  If this 
+                      compared according to the given tolerance. If this 
                       tolerance ends in <code>%</code> it will be interpreted
                       as a relative tolerance (otherwise absolute).</li>
                   </ul>
                 </li>
+              </ul>
+            </div>
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana IX</h3>
+              <ul>
                 <li><b>FileCommandPattern:</b> Uses a regular expression to 
                   compares the contents of the stdout resulting from a given 
                   command applied to two or more files.
                   <ul>
-                    <li><i>files</i> - a newline-separated list of filenames
-                      to be substitued into the command.</li>
-                   <li><i>kgo_file</i> - if the list of files above was 
-                      provided gives the (0-based) index of the file holding
-                      the "kgo" or "control" output for use with the comparisons
-                      database (if active).</li>
-                    <li><i>pattern</i> - the regular expression to search for
-                      in the stdout.  The expression should include one or more
-                      capture groups; each of these will be compared between
-                      the stdout any time the pattern occurs.</li>
-                    <li><i>tolerance</i> - by default the above comparisons
-                      will be compared exactly, but if this (optional) argument
-                      is specified they will be converted to float values and
-                      compared according to the given tolerance.  If this 
-                      tolerance ends in <code>%</code> it will be interpreted
-                      as a relative tolerance (otherwise absolute).</li>
-                    <li><i>command</i> - the command to run; it should contain
-                      a Python style format specifier to be expanded using the
-                      list of files above.</li>
+                   <li><i>files</i> - (optional) same as previous tasks.</li>
+                   <li><i>kgo_file</i> - same as previous tasks.</li>
+                   <li><i>pattern</i> - same as previous tasks.</li>
+                   <li><i>tolerance</i> - (optional) same as previous tasks.</li>
+                   <li><i>command</i> - the command to run; it should contain
+                     a Python style format specifier to be expanded using the
+                     list of files above.</li>
                   </ul>
                 </li>
               </ul>
-
+            </div>
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana X</h3>
               <p>The <code>grepper</code> analysis module also supports some
               configuration options (specified in the <code>[ana:config]</code> 
               section of the app or in the <code>[rose-ana]</code> section of 
@@ -499,32 +502,33 @@ rose stem --group=mygroup --group=myothergroup
               <ul>
                 <li><b>grepper-report-limit:</b> A numerical value giving the
                   maximum number of informational output lines to print for 
-                  each comparison.  This is intended for cases where for example
+                  each comparison. This is intended for cases where for example
                   a pattern-matching comparison is expected to match many 
                   thousands of occurences in the given files; it may not be 
-                  desirable to print the results of every comparison.  After
+                  desirable to print the results of every comparison. After
                   the given number of lines are printed a special message 
                   indicating that the rest of the output is truncated will be
                   produced.</li>
                 <li><b>skip-if-all-files-missing:</b> Can be set to 
                   <code>.true.</code> or <code>.false.</code>; if active, any
                   comparison done on files by <code>grepper</code> will be 
-                  skipped if <i>all</i> of those files are non-existent.  In 
+                  skipped if <i>all</i> of those files are non-existent. In 
                   this case the task will return as "skipped" rather than 
                   passed/failed.</li>
               </ul>
             </div>
 
             <div class="slide">
-              <h3 class="alwayshidden">rose ana V</h3>
+              <h3 class="alwayshidden">rose ana XI</h3>
 
               <p>The format for analysis modules themselves is relatively
               simple; the easiest route to understanding how they should be
               arranged is likely to look at the built-in <code>grepper</code>
-              module.  But the key concepts are as follows.  To be recognised
+              module. But the key concepts are as follows. To be recognised
               as a valid analysis module, the Python file must contain at least 
               one class which inherits and extends
-              <code>rose.apps.rose_ana.AnalysisTask</code> e.g:</p>
+              <code>rose.apps.rose_ana.AnalysisTask</code>, which will 
+              automatically populate itself with certain attributes; e.g:</p>
 
             <pre class="prettyprint lang-python">
 from rose.apps.rose_ana import AnalysisTask
@@ -532,10 +536,14 @@ from rose.apps.rose_ana import AnalysisTask
 class CustomAnalysisTask(AnalysisTask):
     """My new custom analysis task."""
     def run_analysis(self):
-        print self.options
-        print self.parent
+        print self.options  # Dictionary of options (see next slide)
+        if self.options["option1"] == "5":
+            self.passed = True
 </pre>
+            </div>
 
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana XII</h3>
               <p>Assuming the above was saved in a file called 
               <code>custom.py</code> and placed into a folder suitable for
               analysis modules this would allow a <code>rose ana</code> app
@@ -547,22 +555,49 @@ option1 = 5
 option2 = test of rose ana
 option3 = .true.
 </pre>
-              <p>All options specified above will be processed by 
+              <p>Note that the <code>custom</code> part of the filename appears
+              at the start of the <code>ana</code> entry, followed by the name
+              of the desired class (in the style of Python's own namespacing). 
+              All options specified by the app-task will be processed by 
               <code>rose ana</code> into a dictionary and attached to the 
               running analysis class instance as the <code>options</code> 
-              attribute, and a reference to the parent <code>RoseAnaApp</code> 
-              instance will be attached as the <code>parent</code> attribute.
-              The result of the above examples would therefore print:</p>
+              attribute.  Hopefully you can see that in this case the task would
+              <i>pass</i> because <code>option1</code> is set to <code>5</code>
+              as required by the class.</p>
 
-            <pre class="prettyprint lang-python">
-{'option2': 'test of rose ana', 'option3': '.true.', 'option1': '5'}
-&lt;class 'rose.apps.rose_ana.RoseAnaApp'&gt;
-</pre>
-            <p>Therefore from this point the <code>AnalysisTask</code> class
-              could access the options via their names.  Note however that
-              all options are treated as strings - it is up to the class to
-              apply any required checks or conversions.
-            </p>
+            </div>
+
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana XIII</h3>
+
+              <p>The parent <code>AnalysisTask</code> class will also set 
+              several other attributes which may be of use when designing a 
+              new method:</p>
+              <ul>
+                <li><b>self.config</b> - a dictionary containing any 
+                <samp>rose ana</samp> configuration options</li>
+                <li><b>self.reporter</b> - a reference to the 
+                <code>rose.reporter.Reporter</code> instance used by the parent 
+                app (for printing to stderr/stdout)</li>
+                <li><b>self.kgo_db</b> - a reference to the KGO database 
+                object created by the parent app (for adding entries to the
+                database - see next section)</li>
+                <li><b>self.popen</b> - a reference to the 
+                <code>rose.popen.RosePopener</code> instance used by the parent
+                app (for spawning subprocesses)</li>
+              </ul>
+            </div>
+
+            <div class="slide">
+              <h3 class="alwayshidden">rose ana XIV</h3>
+
+              <p>The parent class also provides the <b>self.passed</b> and 
+              <b>self.skipped</b> methods, which will default to 
+              <code>False</code> but should be set to <code>True</code> by the 
+              task to indicate how <samp>rose ana</samp> should proceed.  (Note 
+              that the <b>skipped</b> state is only checked if the <b>passed</b>
+              state is <code>False</code>.</p>
+
             </div>
 
             <div class="slide">
@@ -618,10 +653,10 @@ option3 = .true.
                   ana</code> task, using the following columns:
 
                   <ul>
-                    <li><samp>app_task (TEXT)</samp> A composite of
-                    the exact name of the <code>rose ana</code>
-                    task and the comparison section name from the
-                    app defintion (in brackets).</li>
+                    <li><samp>comp_task (TEXT)</samp> The comparison
+                    task name - by convention this is usually the comparison 
+                    section name from the app defintion (including the part 
+                    inside the brackets).</li>
 
                     <li><samp>kgo_file (TEXT)</samp> The full path
                     to the file specified as the KGO file in

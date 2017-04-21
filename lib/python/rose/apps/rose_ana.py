@@ -34,6 +34,7 @@ import fcntl
 from contextlib import contextmanager
 
 # Rose modules
+from rose import TYPE_LOGICAL_VALUE_TRUE
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.app_run import BuiltinApp
@@ -205,7 +206,7 @@ class RoseAnaApp(BuiltinApp):
         # to the KGO database instance in case it is needed later.
         use_kgo = self.ana_config.get("kgo-database", ".false.")
         self.kgo_db = None
-        if use_kgo == ".true.":
+        if use_kgo == TYPE_LOGICAL_VALUE_TRUE:
             self.kgo_db = KGODatabase()
             self.kgo_db.enter_task(self.task_name,
                                    self.kgo_db.TASK_STATUS_RUNNING)

@@ -19,6 +19,7 @@
 # -----------------------------------------------------------------------------
 import os
 import re
+from rose import TYPE_LOGICAL_VALUE_TRUE
 from rose.apps.rose_ana import AnalysisTask
 
 
@@ -51,14 +52,16 @@ class SingleCommandStatus(AnalysisTask):
             self.reporter(stderr, prefix="[FAIL] ")
 
     def check_for_skip(self):
-        # If the users config options specified that the task should be
-        # ignored if all of its files were missing, set skipped attribute here
-        if self.skip_if_missing and len(self.files) > 0:
-            if all([not os.path.exists(fname) for fname in self.files]):
+        """If the user's config options specified that the task should be
+        ignored if all of its files were missing, set skipped attribute here.
+        """
+        if self.skip_if_missing and self.files:
+            if not any(os.path.exists(fname) for fname in self.files):
                 self.skipped = True
                 self.reporter(
                     "All file arguments are missing, skipping task since "
-                    "'skip-if-all-files-missing' is '.true.'")
+                    "'skip-if-all-files-missing' is '{0}'"
+                    .format(TYPE_LOGICAL_VALUE_TRUE))
         return self.skipped
 
     def get_config_opts(self):
@@ -70,7 +73,8 @@ class SingleCommandStatus(AnalysisTask):
 
         skip_missing = self.config.get("skip-if-all-files-missing", None)
         self.skip_if_missing = False
-        if skip_missing is not None and skip_missing == ".true.":
+        if (skip_missing is not None and
+                skip_missing == TYPE_LOGICAL_VALUE_TRUE):
             self.skip_if_missing = True
 
     def process_opt_files(self):
