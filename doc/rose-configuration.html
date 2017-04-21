@@ -1214,13 +1214,13 @@ source=http://host/svn-repos/path/to/bar.txt
               of key-value option pairs; just like other standard Rose apps. 
               However the availability of options for a given section is 
               specified and controlled by the <i>class</i> rather than the 
-              meta-data.  This makes it easy to provide your own analysis
+              meta-data. This makes it easy to provide your own analysis
               modules without requiring changes to Rose itself.
             </p>
 
             <p>Therefore you should consult the documentation or source code
               of the analysis module you wish to use for details of which 
-              options it supports.  Additionally, some special treatment is 
+              options it supports. Additionally, some special treatment is 
               applied to all options depending on what they contain:
             </p>
 
@@ -1239,6 +1239,16 @@ source=http://host/svn-repos/path/to/bar.txt
                 <code>rose task-run</code>
               </li>
             </ul>
+
+            <p>The app may also define a configuration section; 
+              <code>[ana:config]</code>, whose key-value pairs define app-wide
+              settings that are passed through to the analysis classes. In 
+              the same way that the task options are dependent on the class
+              definition; interpretation of the <code>config</code> options is
+              done by the class(es), so their documentation or source code 
+              should be consulted for details.
+            </p>
+
            </div>
 
           <div id="footer" class="panel-footer">
