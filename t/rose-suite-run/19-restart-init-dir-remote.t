@@ -42,12 +42,13 @@ __PYTHON__
 T_HOST_ROSE_HOME=$(ssh_mkdtemp $T_HOST)
 rsync -a --exclude=*.pyc $ROSE_HOME/* $T_HOST:$T_HOST_ROSE_HOME/
 
-mkdir -p conf
-cat >conf/rose.conf <<__CONF__
-[rose-home-at]
-$T_HOST=$T_HOST_ROSE_HOME
+mkdir -p 'conf'
+cat >'conf/rose.conf' <<__CONF__
+[rose-suite-run]
+remote-no-login-shell=${T_HOST}=true
+remote-host-bin=${T_HOST}=${T_HOST_ROSE_HOME}/bin/rose
 __CONF__
-export ROSE_CONF_PATH=$PWD/conf
+export ROSE_CONF_PATH="${PWD}/conf"
 
 tests 3
 

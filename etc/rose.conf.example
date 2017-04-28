@@ -252,6 +252,19 @@
 #  scan-hosts=HOST-GROUP|HOST ...
 ## E.g.:
 #  scan-hosts=localhost rose-vm
+## Don't use login shell to invoke "rose suite-run --remote"? (default=false)
+#  remote-no-login-shell=HOST-GLOB=true|false
+## where HOST-GLOB is a glob for matching host names.
+## E.g.:
+#  remote-no-login-shell=myhpc*=true
+#                        mycluster*=true
+## Path to "rose" executable on remote hosts (default=rose)
+#  remote-rose-bin=HOST-GLOB=ROSE-BIN-PATH
+## where HOST-GLOB is a glob for matching host names.
+##       ROSE-BIN-PATH is the path to the "rose" executable
+## E.g.:
+#  remote-rose-bin=myhpc*=/opt/rose/bin/rose
+#                  mycluster*=/usr/local/bin/rose
 ## Root location of a suite run directory (default=$HOME)
 #  root-dir=HOST-GLOB=$HOST-DIR
 #          =...
@@ -281,15 +294,6 @@
 ## Items to prepend to the a PATH-like environment variable, e.g. PYTHONPATH
 #  path-prepend.PYTHONPATH=
 [rose-task-run]
-
-# Calling "rose" on a remote host.
-[rose-home-at]
-#
-## Alternate path to "rose" for all hosts
-#  * =/opt/rose
-## Alternate path to "rose" for a specific host
-#  hostname=/opt/site/rose
-[rose-home-at]
 
 # Configuration related to the built-in "rose_ana" application.
 [rose-ana]
