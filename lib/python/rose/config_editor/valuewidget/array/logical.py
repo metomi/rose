@@ -185,16 +185,16 @@ class LogicalArrayValueWidget(gtk.HBox):
         else:
             self.del_button.show()
         if self.has_titles:
-            for c, label in enumerate(self.metadata['element-titles']):
-                if c >= len(table_widgets):
+            for col, label in enumerate(self.metadata['element-titles']):
+                if col >= len(table_widgets):
                     break
                 widget = gtk.HBox()
-                label = gtk.Label(self.metadata['element-titles'][c])
+                label = gtk.Label(self.metadata['element-titles'][col])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True)
                 widget.show()
                 self.entry_table.attach(widget,
-                                        c, c + 1,
+                                        col, col + 1,
                                         0, 1,
                                         xoptions=gtk.FILL,
                                         yoptions=gtk.SHRINK)
