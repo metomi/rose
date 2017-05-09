@@ -76,6 +76,11 @@ class LogicalArrayValueWidget(gtk.HBox):
         for value_item in value_array:
             entry = self.get_entry(value_item)
             self.entries.append(entry)
+
+        self.has_titles = False
+        if "element-titles" in metadata:
+            self.has_titles = True
+
         self.generate_buttons()
         self.populate_table()
         self.pack_start(self.button_box, expand=False, fill=False)
@@ -179,8 +184,25 @@ class LogicalArrayValueWidget(gtk.HBox):
             self.del_button.hide()
         else:
             self.del_button.show()
+        if self.has_titles:
+            for col, label in enumerate(self.metadata['element-titles']):
+                if col >= len(table_widgets):
+                    break
+                widget = gtk.HBox()
+                label = gtk.Label(self.metadata['element-titles'][col])
+                label.show()
+                widget.pack_start(label, expand=True, fill=True)
+                widget.show()
+                self.entry_table.attach(widget,
+                                        col, col + 1,
+                                        0, 1,
+                                        xoptions=gtk.FILL,
+                                        yoptions=gtk.SHRINK)
+
         for i, widget in enumerate(table_widgets):
             row = i // self.num_allowed_columns
+            if self.has_titles:
+                row += 1
             column = i % self.num_allowed_columns
             self.entry_table.attach(widget,
                                     column, column + 1,

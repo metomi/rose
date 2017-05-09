@@ -85,6 +85,11 @@ class EntryArrayValueWidget(gtk.HBox):
         self.entry_table.show()
 
         self.entries = []
+
+        self.has_titles = False
+        if "element-titles" in metadata:
+            self.has_titles = True
+
         self.generate_entries(value_array)
         self.generate_buttons()
         self.populate_table()
@@ -312,6 +317,22 @@ class EntryArrayValueWidget(gtk.HBox):
                 self.set_arrow_sensitive(True, False)
         if len(self.entries) < 2:
             self.set_arrow_sensitive(False, False)
+
+        if self.has_titles:
+            for col, label in enumerate(self.metadata['element-titles']):
+                if col >= len(table_widgets) - 1:
+                    break
+                widget = gtk.HBox()
+                label = gtk.Label(self.metadata['element-titles'][col])
+                label.show()
+                widget.pack_start(label, expand=True, fill=True)
+                widget.show()
+                self.entry_table.attach(widget,
+                                        col, col + 1,
+                                        0, 1,
+                                        xoptions=gtk.FILL,
+                                        yoptions=gtk.SHRINK)
+
         for i, widget in enumerate(table_widgets):
             if isinstance(widget, gtk.Entry):
                 if self.is_char_array or self.is_quoted_array:
@@ -321,6 +342,8 @@ class EntryArrayValueWidget(gtk.HBox):
                 else:
                     widget.set_tooltip_text(self.TIP_ELEMENT.format((i + 1)))
             row = i // self.num_allowed_columns
+            if self.has_titles:
+                row += 1
             column = i % self.num_allowed_columns
             self.entry_table.attach(widget,
                                     column, column + 1,
