@@ -314,9 +314,9 @@ class SuiteRunner(Runner):
             shcommand = "env ROSE_VERSION=%s %s=%s" % (
                 my_rose_version, suite_engine_key, suite_engine_version)
             # Use login shell?
-            no_login_hell = self._run_conf(
+            no_login_shell = self._run_conf(
                 "remote-no-login-shell", host=host, conf_tree=conf_tree)
-            if not no_login_hell or no_login_hell.lower() != "true":
+            if not no_login_shell or no_login_shell.lower() != "true":
                 shcommand += r""" bash -l -c '"$0" "$@"'"""
             # Path to "rose" command, if applicable
             rose_bin = self._run_conf(
