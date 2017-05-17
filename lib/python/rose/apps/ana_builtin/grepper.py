@@ -41,6 +41,16 @@ class SingleCommandStatus(AnalysisTask):
 
     def run_command_and_check(self):
         """Run the command and return based on the output."""
+        # If the user has specified a KGO file, but it is missing, exit early
+        if self.kgo is not None:
+            kgo_file = self.files[self.kgo]
+            if not os.path.exists(kgo_file):
+                self.reporter(
+                    "KGO File (file {0}) appears to be missing"
+                    .format(self.kgo + 1), prefix="[FAIL] ")
+                # Note that by exiting early this task counts as failed
+                return
+
         # The command may contain format subsitution characters, which will
         # receive any filenames passed to the app.
         self.command = self.command.format(*self.files)
@@ -199,6 +209,16 @@ class SingleCommandPattern(SingleCommandStatus):
         standard output.
 
         """
+        # If the user has specified a KGO file, but it is missing, exit early
+        if self.kgo is not None:
+            kgo_file = self.files[self.kgo]
+            if not os.path.exists(kgo_file):
+                self.reporter(
+                    "KGO File (file {0}) appears to be missing"
+                    .format(self.kgo + 1), prefix="[FAIL] ")
+                # Note that by exiting early this task counts as failed
+                return
+
         # The command may contain format subsitution characters, which will
         # receive any filenames passed to the app.
         self.command = self.command.format(*self.files)
@@ -226,6 +246,16 @@ class FilePattern(SingleCommandPattern):
 
         if self.check_for_skip():
             return
+
+        # If the user has specified a KGO file, but it is missing, exit early
+        if self.kgo is not None:
+            kgo_file = self.files[self.kgo]
+            if not os.path.exists(kgo_file):
+                self.reporter(
+                    "KGO File (file {0}) appears to be missing"
+                    .format(self.kgo + 1), prefix="[FAIL] ")
+                # Note that by exiting early this task counts as failed
+                return
 
         # Generate the groupings - the pattern can match multiple times
         matched_groups = self.search_for_matches()
