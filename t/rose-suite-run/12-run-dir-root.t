@@ -75,7 +75,7 @@ else
 fi
 if [[ -n $JOB_HOST_OPT ]]; then
     RUN_ROOT=$(ssh $JOB_HOST "bash -l -c echo\\ \\$JOB_HOST_RUN_ROOT" | tail -1)
-    RUN_DIR=$(ssh $JOB_HOST "bash -l -c readlink\\ ~/cylc-run/$NAME" | tail -1)
+    RUN_DIR=$(ssh $JOB_HOST "readlink ~/cylc-run/$NAME" | tail -1)
     if [[ $RUN_DIR == $RUN_ROOT/cylc-run/$NAME ]]; then
         pass "$TEST_KEY.$JOB_HOST"
     else

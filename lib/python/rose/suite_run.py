@@ -303,58 +303,64 @@ class SuiteRunner(Runner):
         # Install items to user@host
         conf = ResourceLocator.default().get_conf()
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
-        queue = []  # [[pipe, command, "ssh"|"rsync", auth], ...]
+        proc_queue = []  # [[proc, command, "ssh"|"rsync", auth], ...]
         for auth in sorted(auths):
             host = auth
             if "@" in auth:
                 host = auth.split("@", 1)[1]
-            command = self.popen.get_cmd("ssh", auth, "bash", "--login", "-c")
-            rose_bin = "rose"
-            for name in [host, "*"]:
-                rose_home_node = conf.get(["rose-home-at", name],
-                                          no_ignore=True)
-                if rose_home_node is not None:
-                    rose_bin = "%s/bin/rose" % (rose_home_node.value)
-                    break
+            # Remote shell
+            command = self.popen.get_cmd("ssh", "-n", auth)
+            # Provide ROSE_VERSION and CYLC_VERSION in the environment
+            shcommand = "env ROSE_VERSION=%s %s=%s" % (
+                my_rose_version, suite_engine_key, suite_engine_version)
+            # Use login shell?
+            no_login_shell = self._run_conf(
+                "remote-no-login-shell", host=host, conf_tree=conf_tree)
+            if not no_login_shell or no_login_shell.lower() != "true":
+                shcommand += r""" bash -l -c '"$0" "$@"'"""
+            # Path to "rose" command, if applicable
+            rose_bin = self._run_conf(
+                "remote-rose-bin", host=host, conf_tree=conf_tree,
+                default="rose")
             # Build remote "rose suite-run" command
-            rose_sr = "ROSE_VERSION=%s %s" % (my_rose_version, rose_bin)
-            rose_sr += " suite-run -v -v --name=%s" % suite_name
+            shcommand += " %s suite-run -vv -n %s" % (rose_bin, suite_name)
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:
-                    rose_sr += " --" + key
+                    shcommand += " --%s" % key
             if opts.log_keep:
-                rose_sr += " --log-keep=" + opts.log_keep
+                shcommand += " --log-keep=%s" % opts.log_keep
             if opts.log_name:
-                rose_sr += " --log-name=" + opts.log_name
+                shcommand += " --log-name=%s" % opts.log_name
             if not opts.log_archive_mode:
-                rose_sr += " --no-log-archive"
-            rose_sr += " --run=" + opts.run_mode
+                shcommand += " --no-log-archive"
+            shcommand += " --run=%s" % opts.run_mode
+            # Build --remote= option
+            shcommand += " --remote=uuid=%s" % uuid
             host_confs = [
                 "root-dir",
                 "root-dir{share}",
                 "root-dir{share/cycle}",
                 "root-dir{work}"]
-            rose_sr += " --remote=uuid=" + uuid
             locs_conf.set([auth])
             for key in host_confs:
                 value = self._run_conf(key, host=host, conf_tree=conf_tree)
                 if value is not None:
                     val = self.popen.list_to_shell_str([str(value)])
-                    rose_sr += "," + key + "=" + val
+                    shcommand += ",%s=%s" % (key, val)
                     locs_conf.set([auth, key], value)
-            command += ["'" + rose_sr + "'"]
-            pipe = self.popen.run_bg(*command)
-            queue.append([pipe, command, "ssh", auth])
+            command.append(shcommand)
+            proc = self.popen.run_bg(*command)
+            proc_queue.append([proc, command, "ssh", auth])
 
-        while queue:
+        while proc_queue:
             sleep(self.SLEEP_PIPE)
-            pipe, command, command_name, auth = queue.pop(0)
-            if pipe.poll() is None:
-                queue.append([pipe, command, command_name, auth])  # put back
+            proc, command, command_name, auth = proc_queue.pop(0)
+            if proc.poll() is None:  # put it back in proc_queue
+                proc_queue.append([proc, command, command_name, auth])
                 continue
-            ret_code = pipe.wait()
-            out, err = pipe.communicate()
+            ret_code = proc.wait()
+            out, err = proc.communicate()
             if ret_code:
                 raise RosePopenError(command, ret_code, out, err)
             if command_name == "rsync":
@@ -372,7 +378,8 @@ class SuiteRunner(Runner):
                     filters["excludes"].append(name + uuid)
                 target = auth + ":" + suite_dir_rel
                 cmd = self._get_cmd_rsync(target, **filters)
-                queue.append([self.popen.run_bg(*cmd), cmd, "rsync", auth])
+                proc_queue.append(
+                    [self.popen.run_bg(*cmd), cmd, "rsync", auth])
 
         # Install ends
         ConfigDumper()(locs_conf, os.path.join("log", "rose-suite-run.locs"))
