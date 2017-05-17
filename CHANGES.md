@@ -5,6 +5,54 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2017.05.0 (2017-05-17)
+
+Rose release 50. This release is expected to be used with:
+* [cylc-7.3.0](https://github.com/cylc/cylc/releases/tag/7.3.0) or
+  [cylc-7.4.0](https://github.com/cylc/cylc/releases/tag/7.4.0), and
+* [fcm-2017.02.0](https://github.com/metomi/fcm/releases/tag/2017.02.0).
+
+### Noteworthy Changes
+
+[#2071](https://github.com/metomi/rose/pull/2071):
+rose config-edit: support new `element-titles` metadata setting to allow users
+to put headings above columns in arrays.
+
+[#2070](https://github.com/metomi/rose/pull/2070):
+rose suite-run: when installing a suite on a remote job host, it can now call
+itself on the remote host without invoking a login shell.
+* New `[rose-suite-run]remote-no-login-shell` setting in the site/user
+  `rose.conf` to switch off/on usage of a remote login shell.
+* The old `[rose-home-at]` section in the site/user `rose.conf` file has been
+  replaced by the new `[rose-suite-run]remote-rose-bin` setting. The new
+  setting can be used to specify the path to the `rose` executable on different
+  hosts.
+* See `${ROSE_HOME}/etc/rose.conf.example` in your distribution for detail.
+
+[#2067](https://github.com/metomi/rose/pull/2067):
+rose mpi-launch: fix usage of `ROSE_LAUNCHER_ULIMIT_OPTS=-a`.
+
+[#2064](https://github.com/metomi/rose/pull/2064):
+rose_ana improvements:
+* `AnalysisTask` object now has a skipped attribute rather than just passed -
+  if skipped is `True`, rose_ana will report on it differently as well as not
+  considering it a failure overall
+* Overall summary line right at the end of the output which gives total counts
+  of passed, failed and skipped tests.
+
+[#2063](https://github.com/metomi/rose/pull/2063):
+rose config-edit: fix display of unnecessary scrollbars in dialogs.
+
+[#2061](https://github.com/metomi/rose/pull/2061):
+rose config-edit: remove errors associated with a variable before removing the
+variable itself. This fixes the previously incorrect behaviour where the panel
+would continue to show an error after removing the variable.
+
+[#2046](https://github.com/metomi/rose/pull/2046):
+New API docs for `rose.config` and `rose.macro`.
+
+--------------------------------------------------------------------------------
+
 ## 2017.02.0 (2017-02-28)
 
 Rose release 49. **This release is expected to be used with
