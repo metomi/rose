@@ -14,6 +14,9 @@ Rose release 50. This release is expected to be used with:
 
 ### Noteworthy Changes
 
+[#2073](https://github.com/metomi/rose/pull/2073):
+rose_ana: allow grepper classes to treat missing KGO files as failed tasks.
+
 [#2071](https://github.com/metomi/rose/pull/2071):
 rose config-edit: support new `element-titles` metadata setting to allow users
 to put headings above columns in arrays.
