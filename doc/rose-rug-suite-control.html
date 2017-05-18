@@ -379,17 +379,31 @@ rose suite-run -- --mode=simulation
             physical location for hosting the suite runtime files,
             (perhaps the disk does not have enough space or has
             poor performance), it is possible to configure the root
-            of an alternate physical location using the setting
-            <var>root-dir=LIST</var> in the suite's
+            of an alternate physical location using the top level
+            setting <var>root-dir=LIST</var> in the suite's
             <var>rose-suite.conf</var> or the same setting under
-            the <var>[rose-suite-run</var> section of the Rose
+            the <var>[rose-suite-run]</var> section of the Rose
             site/user configuration. The <var>LIST</var> should be
             a newline delimited list of <var>PATTERN=DIR</var>
             pairs. The <var>PATTERN</var> should be a glob-like
             pattern for matching a host name. The <var>DIR</var>
             should be the root directory to install a suite run
             directory to. E.g.:</p>
+
+            <p>In a <var>rose-suite.conf</var> file,
+            it is a top level setting:</p>
+
             <pre class="prettyprint lang-rose_conf">
+[]
+root-dir=hpc*=$WORKDIR
+        =*=$DATADIR
+</pre>
+
+            <p>In a site/user configuration file,
+            it is under <var>[rose-suite-run]</var>:</p>
+
+            <pre class="prettyprint lang-rose_conf">
+[rose-suite-run]
 root-dir=hpc*=$WORKDIR
         =*=$DATADIR
 </pre>
