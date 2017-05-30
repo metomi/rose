@@ -3314,6 +3314,14 @@ rose test-battery -v t/rose-app-run/07-opt.t
             <var>FROM-ID</var> is in the same repository of the new
             suite.</p>
 
+            <p>The syntax of the <var>FROM-ID</var> is
+            <var>PREFIX-xxNNN[/BRANCH][@REV]</var> (e.g. my-su173,
+            my-su173/trunk, my-su173/trunk@HEAD).
+            If <var>REV</var> is not specified,
+            the last changed revision of the branch is used.
+            If <var>BRANCH</var> is not specified,
+            <samp>trunk</samp> is used.</p>
+
             <h3>OPTIONS</h3>
 
             <dl>
