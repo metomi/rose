@@ -1,0 +1,220 @@
+from pygments.lexer import RegexLexer, bygroups, include, words
+from pygments.token import *
+
+
+class CylcLexer(RegexLexer):
+    """Pygments lexer for the cylc suite.rc language."""
+
+    # Pygments tokens for cylc suite.rc elements which have no direct
+    # translation.
+    HEADING_TOKEN = Name.Tag
+    SETTING_TOKEN = Name.Variable
+    GRAPH_TASK_TOKEN = Keyword.Declaration
+    PARAMETERISED_TASK_TOKEN = Name.Builtin
+    INTERCYCLE_OFFSET_TOKEN = Name.Builtin
+
+    # Pygments values.
+    name = 'Cylc'
+    aliases = ['cylc', 'suiterc']
+    filenames = ['suite.rc']
+    #mimetypes = ['text/x-ini', 'text/inf']
+
+    # Patterns, rules and tokens.
+    tokens = {
+        'root': [
+            # Jinja2 opening braces:  {{  {%  {#
+            include('jinja2-openers'),
+
+            # Jinja2 shebang:  #!Jinja2
+            (r'#![Jj]inja2', Comment.Hashbang),
+
+            # Cylc comments:  # ...
+            include('comment'),
+
+            # Leading whitespace.
+            (r'^[\s\t]+', Text),
+
+            # Cylc headings:  [<heading>]
+            (r'([\[]+)', HEADING_TOKEN, 'heading'),
+
+            # Multi-line graph sections:  graph = """ ...
+            (r'(graph)(\s+)?(=)([\s+])?(\"\"\")',
+                bygroups(SETTING_TOKEN,
+                         Text,
+                         Operator,
+                         Text,
+                         String.Double), 'multiline-graph'),
+
+            # Inline graph sections:  graph = ...
+            (r'(graph)(\s+)?(=)',
+                bygroups(SETTING_TOKEN,
+                         String,
+                         Operator), 'inline-graph'),
+
+            # Multi-line settings:  key = """ ...
+            (r'(.*)(\s+)?(=)([\s+])?(\"\"\")',
+                bygroups(SETTING_TOKEN,
+                         Text,
+                         Operator,
+                         Text,
+                         String.Double), 'multiline-setting'),
+
+            # Inline settings:  key = ...
+            (r'(.*)(\s+)?(=)',
+                bygroups(SETTING_TOKEN,
+                         Text,
+                         Operator), 'setting')
+        ],
+
+        'heading': [
+            (r'[\]]+', HEADING_TOKEN, '#pop'),
+            include('jinja2-openers'),
+            include('parameterisation'),
+            (r'.', HEADING_TOKEN),
+        ],
+
+        # Cylc comments.
+        'comment': [
+            # Allow whitespace so this will work for comments following
+            # headings.
+            (r'(\s+)?(#.*)', bygroups(Text, Comment.Single))
+        ],
+
+        # The value in a key = value pair.
+        'setting': [
+
+            include('comment'),
+            include('jinja2-openers'),
+            (r'\\\n', String),
+            (r'.', String),
+
+        ],
+
+        # The value in a key = """value""" pair.
+        'multiline-setting': [
+            (r'\"\"\"', String.Double, '#pop'),
+            include('comment'),
+            include('jinja2-openers'),
+            (r'(\n|.)', String.Double)
+        ],
+
+        # Graph strings:  foo => bar & baz
+        'graph': [
+            include('jinja2-openers'),
+            include('comment'),
+            include('parameterisation'),
+            (r'\w+', GRAPH_TASK_TOKEN),
+            (r'\s', Text),
+            (r'=>', Operator),
+            (r'[\&\|]', Operator),
+            (r'[\(\)]', Punctuation),
+            (r'\[', Text, 'intercycle-offset'),
+            (r'.', Comment)
+        ],
+
+        # Parameterised syntax:  <foo=1>
+        'parameterisation': [
+            (r'(\<)(\s?\w+\s?(?:[+-=]\s?\d+)?\s?'
+             r'(?:(?:\s?,\s?\w+\s?(?:[+-=]\s?\d+)?\s?)+)?'
+             r')(\>)',
+             bygroups(Text, PARAMETERISED_TASK_TOKEN, Text)),
+            (r'(\<)(.*)(\>)', bygroups(Text, Error, Text))
+        ],
+
+        # Task inter-cycle offset for graphing:  foo[-P1DT1M]
+        'intercycle-offset': [
+            include('integer-duration'),
+            include('iso8601-duration'),
+            (r'[\^\$]', INTERCYCLE_OFFSET_TOKEN),
+            (r'\]', Text, '#pop')
+        ],
+
+        # An integer duration:  +P1
+        'integer-duration': [
+            (r'[+-]P\d+(?![\w-])', INTERCYCLE_OFFSET_TOKEN)
+        ],
+
+        # An ISO8601 duration:  +P1DT1H
+        'iso8601-duration': [
+            # Basic format.
+            (r'([+-])?P'
+             r'(?![\]\s])'  # Require something to follow.
+             r'('
+
+             # Weekly format (ISO8601-1:4.4.4.5):
+             r'\d{1,2}W'
+
+             r'|'  # OR
+
+             # Extended Format (ISO8601-1:4.4.4.4):
+             r'('
+             r'\d{8}T\d{6}'
+             r'|'
+             r'\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}'
+             r')'
+
+             r'|'  # OR
+
+             # Basic format (ISO8601-1:4.4.4.4):
+             # ..Year
+             r'(\d{1,4}Y)?'
+             # ..Month
+             r'(\d{1,2}M)?'
+             # ..Day
+             r'(\d{1,2}D)?'
+             r'(T'
+             # ..Hours.
+             r'(\d{1,2}H)?'
+             # ..Minutes.
+             r'(\d{1,2}M)?'
+             # ..Secconds.
+             r'(\d{1,2}S)?'
+             r')?'
+
+             r')'
+            , INTERCYCLE_OFFSET_TOKEN),
+        ],
+
+        # Wrapper for multi-line graph strings.
+        'multiline-graph': [
+            (r'\"\"\"', String.Double, '#pop'),
+            include('graph'),
+        ],
+
+        # Wrapper for inline graph strings.
+        'inline-graph': [
+            (r'\n', Text, '#pop'),
+            include('graph')
+        ],
+
+        # Provides entry points for the other Jinja2 sections.
+        'jinja2-openers': [
+            (r'\{\{', Comment.Preproc, 'jinja2-inline'),
+            (r'\{#', Comment.Multi, 'jinja2-comment'),
+            (r'\{\%', Comment.Preproc, 'jinja2-block'),
+        ],
+
+        #  {# ... #}
+        'jinja2-comment': [
+            (r'#\}', Comment.Multi, '#pop'),
+            (r'(.|\n)', Comment.Multi)
+        ],
+
+        #  {% ... %}
+        'jinja2-block': [
+            (r'\%\}', Comment.Preproc, '#pop'),
+            (r'(.|\n)', Comment.Preproc)
+        ],
+
+        #  {{ ... }}
+        'jinja2-inline': [
+            (r'\}\}', Comment.Preproc, '#pop'),
+            (r'(.|\n)', Comment.Preproc)
+        ]
+
+    }
+
+
+def setup(app):
+    """Sphinx plugin setup function."""
+    app.add_lexer('cylc', CylcLexer())
