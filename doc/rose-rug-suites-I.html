@@ -519,7 +519,12 @@ default=echo 'Hello World'
             WORLD = neptune
 </pre>
 
+                <p>The order in which they are combined is
+                essentially last to first - e.g.
+                <samp>HELLO_FAMILY</samp> will override any shared
+                setting in <samp>GAS_GIANT_FAMILY</samp>.</p>
               </div>
+
               <div class="slide">
                 <h2 id="remote-hosts">Remote Hosts</h2>
 
@@ -539,11 +544,6 @@ default=echo 'Hello World'
       [[[remote]]]
           host = voyager_1
 </pre>
-
-                <p>The order in which they are combined is
-                essentially last to first - e.g.
-                <samp>HELLO_FAMILY</samp> will override any shared
-                setting in <samp>GAS_GIANT_FAMILY</samp>.</p>
               </div>
 
               <div class="slide">
