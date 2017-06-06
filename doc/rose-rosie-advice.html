@@ -93,13 +93,20 @@ rosie create
 
             <h3>Description</h3>
 
-            <p>Copies an existing suite using its
-            <var>$SUITE_ID</var> from the roses repository to a new
-            suite id which is provided by the rosie repository.
-            E.g.:</p>
+            <p>Copies an existing suite from a roses repository to a
+            new suite id. E.g.:</p>
             <pre class="shell">
-rosie copy $SUITE_ID
+# rosie copy FROM-ID, e.g.:
+rosie copy my-su173
 </pre>
+
+            <p>The syntax of the <var>FROM-ID</var> is
+            <var>PREFIX-xxNNN[/BRANCH][@REV]</var> (e.g. my-su173,
+            my-su173/trunk, my-su173/trunk@HEAD).
+            If <var>REV</var> is not specified,
+            the last changed revision of the branch is used.
+            If <var>BRANCH</var> is not specified,
+            <samp>trunk</samp> is used.</p>
 
             <p>The suite is assigned to the user invoking rosie
             copy, making them the owner unless they change this in

@@ -41,6 +41,11 @@
 #     copied items can only be preserved if FROM-ID is in the same repository
 #     of the new suite.
 #
+#     The syntax of the FROM-ID is PREFIX-xxNNN[/BRANCH][@REV] (e.g. my-su173,
+#     my-su173/trunk, my-su173/trunk@HEAD). If REV is not specified, the last
+#     changed revision of the branch is used. If BRANCH is not specified,
+#     "trunk" is used.
+#
 # OPTIONS
 #     --info-file=FILE
 #         Specify a FILE containing the discovery information for the
