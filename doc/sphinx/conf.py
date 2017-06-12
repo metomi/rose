@@ -37,7 +37,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.graphviz',
     'minicylc',
-    'cylc-lang'
+    'cylc-lang',
+    'practical'
 ]
 
 #graphviz_output_format = 'svg'
