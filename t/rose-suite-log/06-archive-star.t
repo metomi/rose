@@ -51,7 +51,7 @@ fi
 TEST_KEY="$TEST_KEY_BASE"
 
 set -e
-(cd $SUITE_RUN_DIR/log/job; ls */*/01/{job,job-activity.log,job.err,job.out}) \
+(cd $SUITE_RUN_DIR/log/job; ls */*/01/{job,job-activity.log,job.err,job.out,job.xtrace}) \
     >"$TEST_KEY-list-job-logs-before.out"
 if [[ -n ${JOB_HOST:-} ]]; then
     ssh -oBatchMode=yes $JOB_HOST \
@@ -64,7 +64,7 @@ N_JOB_LOGS=$(wc -l "$TEST_KEY-list-job-logs-before.out" | cut -d' ' -f1)
 run_pass "$TEST_KEY-command" rose suite-log -n $NAME --archive '*' --debug
 run_fail "$TEST_KEY-list-job-logs-after" ls $SUITE_RUN_DIR/log/job/*
 if [[ -n ${JOB_HOST:-} ]]; then
-    ((N_JOB_LOGS += 3)) # job, job.activity.log, job.out and job.err files
+    ((N_JOB_LOGS += 4)) # job, job.activity.log, job.out, job.err, job.xtrace files
     run_fail "$TEST_KEY-job-log.out-after-jobhost" \
         ssh -oBatchMode=yes $JOB_HOST \
         test -f cylc-run/$NAME/log/job/*/my_task_2/01/job.out
