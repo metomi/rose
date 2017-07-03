@@ -271,8 +271,8 @@ build.target{task} = link
             <div class="slide">
               <h3 class="alwayshidden">suite.rc II</h3>
 
-              <p>The <code>suite.rc</code> file starts off with the
-              timeout event hooks, which you should already be
+              <p>The <code>suite.rc</code> file starts off with
+              <samp>UTC mode = True</samp>, which you should already be
               familiar with. The next part is a Jinja2 block which
               links the group names the user can specific with the
               dependency graph for that group. In this case, the
@@ -324,7 +324,7 @@ fcm_make_spaceship =&gt; spaceship =&gt; rose_ana_position
               into your <code>rose-suite.conf</code> file:</p>
               <pre>
 ROSE_STEM_VERSION=1
-        
+
 [jinja2:suite.rc]
 RUN_NAMES=[]
 SOURCE_SPACESHIP='fcm:spaceship_tr@head'
