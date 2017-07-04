@@ -414,7 +414,7 @@ class EntryArrayValueWidget(gtk.HBox):
             for i, val in enumerate(val_array):
                 val_array[i] = (
                     rose.config_editor.util.text_from_quoted_widget(val))
-        entries_have_commas = any(["," in v for v in val_array])
+        entries_have_commas = any("," in v for v in val_array)
         new_value = rose.variable.array_join(val_array)
         if new_value != self.value:
             self.value = new_value

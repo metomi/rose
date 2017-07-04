@@ -104,7 +104,7 @@ def type_gen(value):
                 val_meta_type = meta_type
                 break
         types.append(val_meta_type)
-    if not any([t != "raw" for t in types]):
+    if not any(t != "raw" for t in types):
         length = 1
         return None, str(length)
     if all([t == types[0] for t in types]):

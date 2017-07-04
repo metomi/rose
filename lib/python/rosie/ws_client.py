@@ -395,7 +395,7 @@ class RosieWSClient(object):
             level -= len(arg) if all([c == ")" for c in arg]) else 0
         if (
             len(q_item) > 1 or level != 0 or
-            any([len(q_item) > 6 or len(q_item) < 4 for q_item in q_list])
+            any(len(q_item) not in [4, 5, 6] for q_item in q_list)
         ):
             raise RosieWSClientQuerySplitError(args)
         return q_list

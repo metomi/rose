@@ -725,7 +725,7 @@ class BaseStashSummaryDataPanelv1(
         for id_, value in self.sub_ops.get_var_id_values().items():
             section, option = self.util.get_section_option_from_id(id_)
             if (option in ok_var_names and
-                    any([section.startswith(n) for n in ok_sect_names])):
+                    any(section.startswith(n) for n in ok_sect_names)):
                 self._profile_location_map.setdefault(option, {})
                 self._profile_location_map[option].update({value: id_})
                 self._available_profile_map.setdefault(option, [])
@@ -787,7 +787,7 @@ class BaseStashSummaryDataPanelv1(
             ignore_menuitem.connect(
                 "button-release-event",
                 lambda m, e: self._packages_enable(*m._connect_args))
-            ignore_menuitem.set_sensitive(any([not i for i in ignored_list]))
+            ignore_menuitem.set_sensitive(any(not i for i in ignored_list))
             ignore_menuitem.show()
             package_menu.append(ignore_menuitem)
             remove_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)

@@ -189,7 +189,7 @@ class RosieSvnPreCommitHook(object):
         ignores = shlex.split(ignores_str)
 
         for status, path in sorted(changes):
-            if any([fnmatch(path, ignore) for ignore in ignores]):
+            if any(fnmatch(path, ignore) for ignore in ignores):
                 continue
 
             names = path.split("/", self.LEN_ID + 1)

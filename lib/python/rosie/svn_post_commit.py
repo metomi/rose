@@ -192,8 +192,8 @@ class RosieSvnPostCommitHook(object):
             names = path.split("/", self.LEN_ID + 1)
             if (len(names) < self.LEN_ID + 1 or (
                     "".join(names[0:self.LEN_ID]) != "ROSIE" and
-                    any([name not in id_chars for name, id_chars in
-                        zip(names, self.ID_CHARS_LIST)]))):
+                    any(name not in id_chars for name, id_chars in
+                        zip(names, self.ID_CHARS_LIST)))):
                 continue
             sid = "".join(names[0:self.LEN_ID])
             branch = names[self.LEN_ID]

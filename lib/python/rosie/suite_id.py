@@ -462,7 +462,7 @@ class SuiteId(object):
                     # Corrupt working copy.
                     self.statuses[user] = self.STATUS_CR
                 else:
-                    if any([line[:7].strip() for line in out.splitlines()]):
+                    if any(line[:7].strip() for line in out.splitlines()):
                         self.statuses[user] = self.STATUS_MO
                     else:
                         self.statuses[user] = self.STATUS_OK

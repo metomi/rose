@@ -261,8 +261,8 @@ class SuiteRunner(Runner):
         cwd = os.getcwd()
         for rel_path, conf_dir in conf_tree.files.items():
             if (conf_dir == cwd or
-                    any([fnmatchcase(os.sep + rel_path, exclude)
-                         for exclude in self.SYNC_EXCLUDES]) or
+                    any(fnmatchcase(os.sep + rel_path, exclude)
+                        for exclude in self.SYNC_EXCLUDES) or
                     conf_tree.node.get(["jinja2:" + rel_path]) is not None):
                 continue
             # No sub-directories, very slow otherwise

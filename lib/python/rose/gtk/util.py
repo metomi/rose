@@ -666,7 +666,7 @@ def extract_link(label, search_function):
             break
         upper_bound += 1
     link = text[lower_bound: upper_bound]
-    if any([c.isspace() for c in link]):
+    if any(c.isspace() for c in link):
         return None
     handle_link(link, search_function, handle_web=True)
 

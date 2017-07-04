@@ -405,13 +405,13 @@ class MainController(object):
 
         self.toolbar.set_widget_sensitive(
             rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-            any([c.config_type == rose.TOP_CONFIG_NAME
-                 for c in self.data.config.values()]))
+            any(c.config_type == rose.TOP_CONFIG_NAME
+                for c in self.data.config.values()))
 
         self.toolbar.set_widget_sensitive(
             rose.config_editor.TOOLBAR_VIEW_OUTPUT,
-            any([c.config_type == rose.TOP_CONFIG_NAME
-                 for c in self.data.config.values()]))
+            any(c.config_type == rose.TOP_CONFIG_NAME
+                for c in self.data.config.values()))
 
     def generate_menubar(self):
         """Link in the menu functionality and accelerators."""
@@ -607,8 +607,8 @@ class MainController(object):
                 add_menuitem
             ))
         self.main_handle.load_macro_menu(self.menubar)
-        if not any([c.config_type == rose.TOP_CONFIG_NAME
-                    for c in self.data.config.values()]):
+        if not any(c.config_type == rose.TOP_CONFIG_NAME
+                   for c in self.data.config.values()):
             self.menubar.uimanager.get_widget(
                 "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
         self.update_bar_widgets()

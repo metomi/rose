@@ -79,7 +79,7 @@ def mro(target_name, get_base_names, *args, **kwargs):
                     cand_name = None
                     for seq in seqs:
                         cand_name = seq[0]
-                        if not any([cand_name in s[1:] for s in seqs]):
+                        if not any(cand_name in s[1:] for s in seqs):
                             results[name].append(cand_name)
                             break
                         cand_name = None
