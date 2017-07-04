@@ -177,8 +177,8 @@
 [runtime]
     [[startup]]
         script = """
-            cylc broadcast -t 20130102T0000Z -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_NAME
-            cylc broadcast -t 20130104T0000Z -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_NAME
+            cylc broadcast -p 20130102T0000Z -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_NAME
+            cylc broadcast -p 20130104T0000Z -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_NAME
             cylc broadcast -d $CYLC_SUITE_NAME
         """
 </pre>
@@ -233,8 +233,8 @@ rose suite-log
               rid of:</p>
               <pre class="prettyprint lang-cylc">
         script = """
-            cylc broadcast -t 20130102T0000Z -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_NAME
-            cylc broadcast -t 20130104T0000Z -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_NAME
+            cylc broadcast -p 20130102T0000Z -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_NAME
+            cylc broadcast -p 20130104T0000Z -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_NAME
             cylc broadcast -d $CYLC_SUITE_NAME
         """
 </pre>
