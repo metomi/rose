@@ -913,8 +913,8 @@ class ConfigPage(gtk.VBox):
             else:
                 if hasattr(target, 'is_ignored') and target.is_ignored:
                     self._set_widget_ignored(target, '', enabled=True)
-            if (any([e in target.errors for e in relevant_errs]) or
-                    any([e in target.variable.error for e in relevant_errs])):
+            if (any(e in target.errors for e in relevant_errs) or
+                    any(e in target.variable.error for e in relevant_errs)):
                 if ([e in target.errors for e in relevant_errs] !=
                         [e in target.variable.error for e in relevant_errs]):
                     refresh_list.append(target.variable.metadata['id'])

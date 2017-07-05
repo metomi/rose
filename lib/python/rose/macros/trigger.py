@@ -102,7 +102,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             old, new = None, None
             if var_id in self.ignored_dict:
                 node.state = trig_ignored
-                if not any([var_id in v for k, v in prev_ignoreds.items()]):
+                if not any(var_id in v for v in prev_ignoreds.values()):
                     old, new = state_map[enabled], state_map[trig_ignored]
             elif var_id in prev_ignoreds[trig_ignored]:
                 node.state = enabled

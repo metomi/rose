@@ -74,7 +74,7 @@ def annotate_config_with_metadata(config, meta_config, ignore_regexes=None,
         if len(keylist) > 1:
             option = keylist[1]
         id_ = rose.macro.get_id_from_section_option(section, option)
-        if any([_.search(id_) for _ in ignore_recs]):
+        if any(_.search(id_) for _ in ignore_recs):
             unset_keys.append(keylist)
             continue
         metadata = rose.macro.get_metadata_for_config_id(id_, meta_config)

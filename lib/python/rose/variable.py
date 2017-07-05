@@ -337,7 +337,7 @@ def parse_range_expression(expr):
     truth_funcs = []
     for items, token in _scan_range_string(expr):
         truth_funcs.append(RangeSubFunction(token, items))
-    return lambda n: any([t.check(n) for t in truth_funcs])
+    return lambda n: any(t.check(n) for t in truth_funcs)
 
 
 def parse_trigger_expression(expr):

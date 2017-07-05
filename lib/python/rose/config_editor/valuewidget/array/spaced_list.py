@@ -371,7 +371,7 @@ class SpacedListValueWidget(gtk.HBox):
                 widget.set_position(len(widget.get_text()))
                 widget.select_region(widget.get_position(),
                                      widget.get_position())
-        entries_have_spaces = any([" " in v for v in val_array])
+        entries_have_spaces = any(" " in v for v in val_array)
         new_value = spaced_array_join(val_array)
         if new_value != self.value:
             self.last_value = self.value
