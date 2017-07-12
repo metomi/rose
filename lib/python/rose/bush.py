@@ -417,7 +417,7 @@ class RoseBushService(object):
                 user_suite_dir_root, followlinks=True):
             if dirpath != user_suite_dir_root and (
                     any(name in dnames or name in fnames
-                            for name in sub_names)):
+                        for name in sub_names)):
                 dnames[:] = []
             else:
                 continue
