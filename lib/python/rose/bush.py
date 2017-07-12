@@ -415,7 +415,9 @@ class RoseBushService(object):
             ".service", "log", "share", "work", self.bush_dao.SUITE_CONF]
         for dirpath, dnames, fnames in os.walk(
                 user_suite_dir_root, followlinks=True):
-            if any(name in dnames or name in fnames for name in sub_names):
+            if dirpath != user_suite_dir_root and (
+                    any(name in dnames or name in fnames
+                            for name in sub_names)):
                 dnames[:] = []
             else:
                 continue
