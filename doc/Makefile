@@ -44,7 +44,6 @@ sphinx-install:
 	virtualenv --python=python2.7 "$(env-path)"
 	$(venv) pip install sphinx
 	$(venv) pip install sphinx_rtd_theme
-	$(venv) pip install https://github.com/mapio/GraphvizAnim/archive/0.2-alpha.zip
 
 sphinx-activate:
 
