@@ -334,20 +334,24 @@ opts=ketchup (mayonnaise)
             <a href="rose-command.html#rose-task-run">rose
             task-run</a>, <a href=
             "rose-command.html#rose-app-run">rose app-run</a>, etc)
-            allows optional configuration to be selected at run
+            allow optional configurations to be selected at run
             time using:</p>
 
             <ol>
-              <li>Environment variables. (See reference of
-              individual commands for detail.)</li>
+              <li>The ROSE_APP_OPT_CONF_KEYS Environment variables.</li>
 
-              <li>The command line option
-              <code>--opt-conf-key=KEY</code> or <code>-O
-              KEY</code> for optional configurations that must
-              exist, and <code>--opt-conf-key='(KEY)'</code> or
-              <code>-O '(KEY)'</code> for optional configurations
-              that can be missing.</li>
+              <li>The command line options
+              <code>--opt-conf-key=KEY</code> or <code>-O KEY</code>.
+              </li>
             </ol>
+
+            <p>See reference of individual commands for detail.</p>
+
+            <p>Note that by default optional configurations must exist
+            else an error will be raised. To specify an optional
+            configuration which may be missing write the name of the
+            configuration inside parenthesis (e.g. <code>(foo)</code>).
+            </p>
 
             <h3 id="opts-meta">Optional Configurations and
             Metadata</h3>
