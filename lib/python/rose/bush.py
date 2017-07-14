@@ -691,16 +691,17 @@ class RoseBushService(object):
                     "mtime": stat.st_mtime,
                     "size": stat.st_size}
 
-        # Other version files
-        for f_name in glob(os.path.join(user_suite_dir, "log/*.version")):
-            if os.path.basename(f_name).startswith("rose-"):
-                continue
-            name = os.path.join("log", os.path.basename(f_name))
-            stat = os.stat(f_name)
-            data["files"]["rose"]["other:" + name] = {
-                "path": name,
-                "mtime": stat.st_mtime,
-                "size": stat.st_size}
+        # Other recognised formats
+        for key in ["html", "txt", "version"]:
+            for f_name in glob(os.path.join(user_suite_dir, "log/*." + key)):
+                if os.path.basename(f_name).startswith("rose-"):
+                    continue
+                name = os.path.join("log", os.path.basename(f_name))
+                stat = os.stat(f_name)
+                data["files"]["rose"]["other:" + name] = {
+                    "path": name,
+                    "mtime": stat.st_mtime,
+                    "size": stat.st_size}
 
         k, logs_info = self.bush_dao.get_suite_logs_info(user, suite)
         data["files"][k] = logs_info
