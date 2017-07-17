@@ -1419,9 +1419,11 @@ def get_user_values(options, ignore=None):
                 try:
                     options[key] = ast.literal_eval(user_input)
                     entered = True
-                except ValueError:
+                except (SyntaxError, ValueError):
                     rose.reporter.Reporter()(
-                        "Invalid entry, please try again\n",
+                        "Invalid entry: Input should be a valid python "
+                        "value.\nNote that strings should be quoted. "
+                        "Please try again:\n",
                         kind=rose.reporter.Reporter.KIND_ERR,
                         level=rose.reporter.Reporter.FAIL
                     )
