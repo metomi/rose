@@ -38,6 +38,7 @@ extensions = [
     'sphinx.ext.graphviz',
     'minicylc',
     'cylc-lang',
+    'rose-lang',
     'practical'
 ]
 
