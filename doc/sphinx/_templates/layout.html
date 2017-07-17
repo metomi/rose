@@ -1,0 +1,7 @@
+{# This file serves to correct the behaviour of the read the docs theme which
+greedily overides sphinx's `pygments_style` option by placing its own syntax in
+the stylesheet - https://github.com/rtfd/sphinx_rtd_theme/issues/166 #}
+
+{% extends "!layout.html" %}
+
+{% set css_files = css_files + ['_static/css/reset-syntax.css', '_static/pygments.css'] %}
