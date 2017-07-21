@@ -203,8 +203,10 @@ class SuiteRunner(Runner):
             os.chdir(suite_dir)
 
         # Housekeep log files
+        now_str = None
         if not opts.install_only_mode and not opts.local_install_only_mode:
-            self._run_init_dir_log(opts)
+            now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+            self._run_init_dir_log(opts, now_str)
         self.fs_util.makedirs("log/suite")
 
         # Rose configuration and version logs
@@ -337,6 +339,8 @@ class SuiteRunner(Runner):
             shcommand += " --run=%s" % opts.run_mode
             # Build --remote= option
             shcommand += " --remote=uuid=%s" % uuid
+            if now_str is not None:
+                shcommand += ",now-str=%s" % now_str
             host_confs = [
                 "root-dir",
                 "root-dir{share}",
@@ -482,14 +486,15 @@ class SuiteRunner(Runner):
         else:
             self.fs_util.makedirs(suite_dir_home)
 
-    def _run_init_dir_log(self, opts):
+    def _run_init_dir_log(self, opts, now_str=None):
         """Create the suite's log/ directory. Housekeep, archive old ones."""
         # Do nothing in log append mode if log directory already exists
         if opts.run_mode in ["reload", "restart"] and os.path.isdir("log"):
             return
 
         # Log directory of this run
-        now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        if now_str is None:
+            now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
         now_log = "log." + now_str
         self.fs_util.makedirs(now_log)
         self.fs_util.symlink(now_log, "log")
@@ -616,7 +621,7 @@ class SuiteRunner(Runner):
             if os.path.exists(uuid_file):
                 self.handle_event("log/" + r_opts["uuid"] + "\n", level=0)
             else:
-                self._run_init_dir_log(opts)
+                self._run_init_dir_log(opts, r_opts.get("now-str"))
         self.fs_util.makedirs("log/suite")
 
     def _get_cmd_rsync(self, target, excludes=None, includes=None):
