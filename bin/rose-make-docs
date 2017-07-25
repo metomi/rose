@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+# NAME
+#     rose make-docs
+#
+# SYNOPSIS
+#     rose make-docs [OPTIONS] [BUILD...]
+#
+# DESCRIPTION
+#     Build the rose documentation in the requested `BUILD` format(s).
+#
+# OPTIONS
+#     --venv
+#         Build virtualenv for temporarilly installing python dependencies
+#         if necessary.
+#     --dev
+#         Development mode, don't remove virtualenv after build.
+#
+# ENVIRONMENT VARIABLES
+#     SPHINX_DEV_MODE
+#         Set to `true` in order to make the `rose test-battery` command use
+#         development mode.
+#
+# BUILD
+#     The format(s) to build the documentation in - default html.
+#     Avaliable formats are listed in the sphinx documentation
+#     (http://www.sphinx-doc.org/en/stable/builders.html).
+#     The most commonly used formats are:
+#
+#     `html`
+#         For building standalone HTML files.
+#     `singlehtml`
+#         For building a single page HTML document.
+#     `latexpdf`
+#         For building PDF documentation.
+#
+# DEVELOPMENT BUILDS
+#     For development purposes use the following BUILDs:
+#
+#     `doctest`
+#         Runs any doctest examples present in documented python modules.
+#     `strict`
+#         Runs sphinx-build in a "strict" mode where cashing is turned off and
+#         warnings are turned into errors.
+#     `linkcheck`
+#         Checks external links.
+#
+#-----------------------------------------------------------------------------
+
+# Move into rose directory
+cd $(dirname $0)/../
+
+VENV_PATH='venv'  # Path for virtualenv.
+VENV=false  # Set to `true` when the virtualenv is being used.
+SPHINX_PATH=sphinx  # Path to the sphinx directory.
+
+function venv-activate () {
+    VENV=true
+    . "${VENV_PATH}/bin/activate"
+}
+
+function venv-install () {
+    venv-destroy
+    virtualenv --python=python2.7 "${VENV_PATH}"
+    venv-activate
+    pip install sphinx
+    pip install sphinx_rtd_theme
+}
+
+function venv-deactivate () {
+    deactivate >/dev/null 2>&1
+}
+
+function venv-destroy () {
+    venv-deactivate
+    rm -rf "${VENV_PATH}"
+}
+
+# Parse command line args.
+YES=false
+DEV_MODE=${SPHINX_DEV_MODE:=false}
+BUILDS=''
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --venv)
+            YES=true
+            shift
+            ;;
+        --dev)
+            DEV_MODE=true
+            shift
+            ;;
+        *)
+            BUILDS="$BUILDS $1"
+            shift
+            ;;
+    esac
+done
+if [[ ${BUILDS} == '' ]]; then
+    BUILDS='html'
+fi
+
+# Use virtualenv if present and requested or if we are in development mode.
+if [[ ${DEV_MODE} || ${YES} ]]; then
+    if [ -d "${VENV_PATH}" ]; then
+        venv-activate
+    fi
+fi
+
+# Check optional builders.
+for build in ${BUILDS}; do
+    if ! rose-check-software-docs ${build} >/dev/null; then
+        echo "Software dependencies for a ${build} build are missing."
+        echo "run `rose software-check-docs ${build}` for details."
+        exit 1
+    fi
+done
+
+# Check core (sphinx) builder.
+if ! rose-check-software-docs core >/dev/null; then
+    if ${YES}; then
+        venv-install
+    else
+        echo 'Software required by the rose documentation builder is not'
+        echo 'present (run `rose software-check-docs` for details).'
+        echo
+        echo 'The documentation can still be built by installing dedencies'
+        echo 'in a python virtual enironment (virtualenv). This environment'
+        echo "will be created in rose/${VENV_PATH} and will be removed after"
+        echo 'use. To keep the virtualenv for future builds run this command'
+        echo 'with the "--dev" option.'
+        echo
+        while true; do
+            read -p 'Proceed using a virtualenv (y/n)? ' in
+            case $in in
+                [Yy])
+                    venv-install
+                    break
+                    ;;
+                [Nn])
+                    echo
+                    echo 'Unable to build documentation.'
+                    exit 1
+                    ;;
+            esac
+        done
+    fi
+fi
+
+# Run sphinx make.
+make -C "${SPHINX_PATH}" ${BUILDS}
+
+# Remove virtualenv if used and if we are not in development mode.
+if ${VENV}; then
+    if ! ${DEV_MODE}; then
+        venv-destroy
+    fi 
+fi

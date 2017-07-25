@@ -1,0 +1,200 @@
+#!/usr/bin/env python
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+"""NAME
+    rose check-software-docs
+
+SYNOPSIS
+    rose check-software-docs
+    rose check-software-docs --builder BUILDER
+
+DESCRIPTION
+    Check software dependencies for the rose documentation builder.
+
+BUILDER
+    Check the dependencies for a particular builder or core for sphinx
+    itself. For details of avaliable builders see the sphinx documentation
+    (http://www.sphinx-doc.org/en/stable/builders.html).
+"""
+
+import re
+import sys
+from subprocess import check_call, CalledProcessError, PIPE
+
+
+ENTRY_LENGTH = 45
+
+
+def parse_version(version):
+    return tuple(int(x) for x in version.split('.'))
+
+
+def string_version(version_tuple):
+    return '.'.join(str(x) for x in version_tuple)
+
+
+def check_python_version(min_version, max_version=None):
+    """Check if a minimum versiojn of python is installed.
+
+    Args:
+        min_version (tuple): Tuple of the minimum acceptible version.
+        max_version (tuple - optional): Tuple of the close-ended top end of the
+            range.
+
+    Return:
+        bool
+
+    """
+    if max_version:
+        msg = 'python (%s+, <%s)' % (string_version(min_version),
+                                     string_version(max_version))
+    else:
+        msg = 'python (%s+)' % string_version(min_version)
+    sys.stdout.write(msg + '.' * (ENTRY_LENGTH - len(msg)))
+    version = sys.version_info
+    ret = True
+    if version >= min_version:
+        if max_version and not version < max_version:
+            ret = False
+    else:
+        ret = False
+    sys.stdout.write('%s (%s)\n' % ('PASS' if ret else 'FAIL -',
+                                      string_version(version)))
+    return ret
+
+
+def check_python_module_version(module, min_version):
+    """Check if a minimum version of a python module is installed.
+
+    Args:
+        module (str): The name of the module - note module must be in the
+            python path.
+        min_version (tuple): Tuple of the version number.
+
+    Return:
+        bool
+
+    """
+    msg = 'python:%s (%s+)' % (module, string_version(min_version))
+    sys.stdout.write(msg + '.' * (ENTRY_LENGTH - len(msg)))
+    try:
+        imported_module = __import__(module)
+    except ImportError:
+        sys.stdout.write('FAIL - Module not installed.\n')
+        return False
+    try:
+        module_version = imported_module.__version__
+    except AttributeError:
+        sys.stdout.write('FAIL - Could not determine module version\n')
+        return False
+    if parse_version(module_version) >= min_version:
+        sys.stdout.write('PASS (%s)\n' % module_version)
+        return True
+    else:
+        sys.stdout.write('FAIL - (%s)\n' % module_version)
+        return False
+
+
+def check_shell_command_present(command):
+    """Check that a shell command is avaliable.
+
+    Runs which <command>
+
+    Args:
+        command (str): The command to be tested.
+
+    Raises:
+        Exception: In the event that the command is scripted / invalid.
+
+    """
+    if not re.match('^[\w-]+$', command):
+        raise Exception('Invalid command "%s"' % command)
+    sys.stdout.write(command + '.' * (ENTRY_LENGTH - len(command)))
+    try:
+        check_call(['which', command], stdout=PIPE, stderr=PIPE)
+    except CalledProcessError:
+        sys.stdout.write('Fail - Command not found\n')
+        return False
+    else:
+        sys.stdout.write('PASS\n')
+        return True
+
+
+def check_core_deps():
+    """Check software dependencies for the sphinx documentation builder"""
+    sys.stdout.write(check_core_deps.__doc__ + ':\n')
+    ret = [
+        check_python_version((2, 7), (3,)),
+        check_python_module_version('sphinx', (1, 5, 3)),
+        check_python_module_version('sphinx_rtd_theme', (0, 2, 4))
+    ]
+    if all(ret):
+        sys.stdout.write('*PASS*\n')
+    else:
+        sys.stdout.write('*FAIL*\n')
+    return all(ret)
+
+
+def check_latex_deps():
+    """Check software dependencies for the latex builder."""
+    sys.stdout.write(check_latex_deps.__doc__ + ':\n')
+    latex = [
+        check_shell_command_present('latexmk'),
+        check_shell_command_present('pdflatex')
+    ]
+    if all(latex):
+        sys.stdout.write('*PASS*\n')
+    else:
+        sys.stdout.write('*FAIL*\n')
+    return all(latex)
+
+
+BUILDER_CHECKS = {
+    'core': check_core_deps,
+    'latex': check_latex_deps,
+    'latexpdf': check_latex_deps,
+    'latexpdfja': check_latex_deps
+}
+
+
+def main(builders):
+    # Test only dependencies for the sphinx builder by default.
+    if not builders:
+        builders = ['core']
+
+    # Run requested builders
+    ret = []
+    for builder in builders:
+        try:
+            ret.append(BUILDER_CHECKS[builder]())
+        except KeyError:
+            pass
+
+    # Exit code
+    if all(ret):
+        sys.exit(0)
+    else:
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    if 'help' in sys.argv or '--help' in sys.argv:
+        print __doc__
+    else:
+        main(sys.argv[1:])
