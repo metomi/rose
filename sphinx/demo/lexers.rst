@@ -5,9 +5,11 @@ Lexers
 rose-app.conf / rose-suite.conf
 -------------------------------
 
-More complex example: `mi-ai111_rose`_
+.. only:: builder_html
 
-.. _mi-ai111_rose: ../_static/snippets/mi-ai111-gl-um-fcst-rose-app.conf
+    More complex example: `mi-ai111_rose`_
+
+    .. _mi-ai111_rose: ../_static/snippets/mi-ai111-gl-um-fcst-rose-app.conf
 
 .. code-block:: rose
 
@@ -57,9 +59,11 @@ More complex example: `mi-ai111_rose`_
 suite.rc
 --------
 
-More complex example: `mi-ai111_cylc`_
+.. only:: builder_html
 
-.. _mi-ai111_cylc: ../_static/snippets/mi-ai111-suite-rc.html
+   More complex example: `mi-ai111_cylc`_
+
+   .. _mi-ai111_cylc: ../_static/snippets/mi-ai111-suite-rc.html
 
 .. code-block:: cylc
 
