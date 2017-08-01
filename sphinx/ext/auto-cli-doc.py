@@ -37,7 +37,7 @@ ROSE_COMMAND_REGEX = re.compile(r'={%d}\n(.*)\n={%d}\n(((?!====).*\n)+)' %
                                 (50, 50))
 # Splits command documentation into sections and content.
 ROSE_HELP_SECTION_REGEX = re.compile(r'(^(?:\w+\s?)+$)((?:\n(?!^\w).*)+)',
-                                re.MULTILINE)
+                                     re.MULTILINE)
 
 
 # --- Rose specific help section formatting. ---
@@ -49,7 +49,7 @@ ROSE_CODE_SECTIONS = {  # SECTION_NAME: SYNTAX_HIGHLIGHTING
 # Documentation sections which contain lists of options (along with one or more
 # un-formatted description lines at the start of the block).
 ROSE_OPTION_SECTIONS = ['OPTIONS', 'ARGUMENTS', 'ENVIRONMENT VARIABLES',
-                   'JINJA2 VARIABLES', 'CONFIGURATION']
+                        'JINJA2 VARIABLES', 'CONFIGURATION']
 
 
 def get_indentation(lines):
@@ -85,7 +85,7 @@ def get_indentation(lines):
 
 def line_strip(lines):
     """Remove leading and trailing empty lines from a line list
-    
+
     Example:
         >>> line_strip([
         ...     ''
@@ -111,7 +111,7 @@ def line_strip(lines):
 
 def format_literals(text, references_to_match=None, ref_template='%s'):
     """Replace single back-quotes with double ones.
-    
+
     Optionally replace certain strings with references to other sections in
     this document.
 
@@ -160,7 +160,7 @@ def format_literals(text, references_to_match=None, ref_template='%s'):
 def write_rst_heading(write, text, heading_level, label_section=False,
                       label_template='%s'):
     """Write a rst heading element.
-    
+
     Args:
         write (function): A writer function which will be called with each line
             to be written.
@@ -183,15 +183,15 @@ def write_rst_heading(write, text, heading_level, label_section=False,
 
 def write_rst_section(write, text, indent_level=0):
     """Write out text with indentation striped.
-    
+
     Optionally apply rst indentation as required.
-    
+
     Args:
         write (function): A writer function which will be called with each line
             to be written.
         text (str): The text to write out.
         indent_level (int): The desired indentation level for the output text.
-    
+
     """
     lines = line_strip(text.split('\n'))
     indentation = get_indentation(lines)
@@ -202,7 +202,7 @@ def write_rst_section(write, text, indent_level=0):
 
 def write_rose_command_reference(write, command_name):
     """Generate help text for a rose command.
-    
+
     Args:
         write (function): A writer function which will be called with each line
             to be written.
@@ -237,7 +237,7 @@ def write_rose_command_reference(write, command_name):
         # Split the help-text into sections.
         sections = OrderedDict(
             (a.strip(), b) for a, b in
-             ROSE_HELP_SECTION_REGEX.findall(help_text))
+            ROSE_HELP_SECTION_REGEX.findall(help_text))
 
         # The NAME section is not used.
         del sections['NAME']
@@ -316,7 +316,7 @@ def write_rose_command_reference(write, command_name):
                 write('')
 
         # Write section divide.
-        if num != len(commands) -1:
+        if num != len(commands) - 1:
             write('')
             write('----')
 
