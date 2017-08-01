@@ -20,7 +20,7 @@ class RoseLexer(RegexLexer):
     name = 'Rose'
     aliases = ['rose']
     filenames = ['rose-app.conf', 'rose-suite.conf']
-    #mimetypes = ['text/x-ini', 'text/inf']
+    # mimetypes = ['text/x-ini', 'text/inf']
 
     # Patterns, rules and tokens.
     tokens = {
@@ -106,7 +106,8 @@ class RoseLexer(RegexLexer):
 
         # [!foo]!!bar=baz.
         'trigger-ignored-setting-in-user-ignored-section': [
-            (ROSE_SETTING_VALUE_PATTERN.format('\!\!'), ROSE_USER_IGNORED_TOKEN)
+            (ROSE_SETTING_VALUE_PATTERN.format('\!\!'),
+             ROSE_USER_IGNORED_TOKEN)
         ],
 
         # [...].
