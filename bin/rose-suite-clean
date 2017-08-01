@@ -26,19 +26,19 @@
 # DESCRIPTION
 #     Remove items created by "rose suite-run".
 #
-#     If no argument is specified, use the base-name of $PWD as suite name.
+#     If no argument is specified, use the base-name of `$PWD` as suite name.
 #
-#     Correctly remove runtime directories created by "rose suite-run"
+#     Correctly remove runtime directories created by `rose suite-run`
 #     including those on remote job hosts.
 #
 # OPTIONS
 #     --name=NAME, -n NAME
-#         Append NAME to the argument list.
+#         Append `NAME` to the argument list.
 #     --non-interactive, --yes, -y
 #         Switch off interactive prompting (=answer yes to everything)
 #     --only=ITEM
-#         If one or more --only=ITEM option is specified, only files and/or
-#         directories matching an ITEM will be removed. An ITEM should be a
+#         If one or more `--only=ITEM` option is specified, only files and/or
+#         directories matching an `ITEM` will be removed. An `ITEM` should be a
 #         glob pattern (bash extglob) for matching a relative path in the run
 #         directory of the suite(s). 
 #     --quiet, -q

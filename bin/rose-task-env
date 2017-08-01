@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-task-env
+#     rose task-env
 #
 # SYNOPSIS
 #     rose task-env [OPTIONS]
@@ -28,102 +28,116 @@
 # DESCRIPTION
 #     Provide an environment for cycling suite task.
 #
-#     Print KEY=VALUE of the following to the STDOUT:
+#     Print `KEY=VALUE` of the following to the STDOUT:
 #
-#     ROSE_SUITE_DIR
+#     `ROSE_SUITE_DIR`
 #         The path to the root directory of the running suite.
-#     ROSE_SUITE_DIR_REL
-#         The path to the root directory of the running suite relative to $HOME.
-#     ROSE_SUITE_NAME
+#     `ROSE_SUITE_DIR_REL`
+#         The path to the root directory of the running suite relative to
+#         `$HOME`.
+#     `ROSE_SUITE_NAME`
 #         The name of the running suite.
-#     ROSE_TASK_NAME
+#     `ROSE_TASK_NAME`
 #         The name of the suite task.
-#     ROSE_TASK_CYCLE_TIME
+#     `ROSE_TASK_CYCLE_TIME`
 #         The cycle time of the suite task, if there is one.
-#     ROSE_CYCLING_MODE
+#     `ROSE_CYCLING_MODE`
 #         The cycling mode of the running suite.
-#     ROSE_TASK_LOG_ROOT
+#     `ROSE_TASK_LOG_ROOT`
 #         The root path for log files of the suite task.
-#     ROSE_DATA
+#     `ROSE_DATA`
 #         The path to the data directory of the running suite.
-#     ROSE_DATAC
+#     `ROSE_DATAC`
 #         The path to the data directory of this cycle
 #         time in the running suite.
-#     ROSE_DATAC????
+#     `ROSE_DATAC????`
 #         The path to the data directory of the cycle time with an offset
-#         relative to the current cycle time. ???? is a duration:
-#             * A "__" (double underscore) prefix denotes a cycle time in the
-#               future (because a minus sign cannot be used in an environment
-#               variable). Otherwise, it is a cycle time in the past.
-#             * The rest should be either an ISO 8601 duration, such as:
-#               * P2W - 2 weeks
-#               * PT12H - 12 hours
-#               * P1DT6H - 1 day, 6 hours
-#               * P4M - 4 months
-#               * PT5M - 5 minutes
-#               Or, for the case of integer cycling suites:
-#               * P1 - 1 cycle before the current cycle
-#               * P5 - 5 cycles before the current cycle
-#             Deprecated syntax:
-#             * nW denotes n weeks.
-#               n or nD denotes n days.
-#               Tn or TnH denotes n hours.
-#               TnM denotes n minutes.
-#               TnS denotes s seconds.
-#         E.g. ROSE_DATACPT6H is the data directory of 6 hours before the
-#              current cycle time.
-#         E.g. ROSE_DATACP1D and ROSE_DATACPT24H are both the data directory
-#              of 1 day before the current cycle time.
-#     ROSE_ETC
+#         relative to the current cycle time. `????` is a duration:
+#
+#         A `__` (double underscore) prefix denotes a cycle time in the
+#         future (because a minus sign cannot be used in an environment
+#         variable). Otherwise, it is a cycle time in the past.
+#
+#         The rest should be either an ISO 8601 duration, such as:
+#
+#         * `P2W` - 2 weeks
+#         * `PT12H` - 12 hours
+#         * `P1DT6H` - 1 day, 6 hours
+#         * `P4M` - 4 months
+#         * `PT5M` - 5 minutes
+#
+#         Or, for the case of integer cycling suites:
+#
+#         * `P1` - 1 cycle before the current cycle
+#         * `P5` - 5 cycles before the current cycle
+#
+#         Deprecated syntax:
+#
+#         * `nW` denotes `n` weeks.
+#         * `n` or `nD` denotes `n` days.
+#         * `Tn` or `TnH` denotes `n` hours.
+#         * `TnM` denotes `n` minutes.
+#         * `TnS` denotes `s` seconds.
+#
+#         E.g. `ROSE_DATACPT6H` is the data directory of 6 hours before the
+#         current cycle time.
+#
+#         E.g. `ROSE_DATACP1D` and `ROSE_DATACPT24H` are both the data
+#         directory of 1 day before the current cycle time.
+#     `ROSE_ETC`
 #         The path to the etc directory of the running suite.
-#     ROSE_TASK_PREFIX
+#     `ROSE_TASK_PREFIX`
 #         The prefix in the task name.
-#     ROSE_TASK_SUFFIX
+#     `ROSE_TASK_SUFFIX`
 #         The suffix in the task name.
 #
 # OPTIONS
 #     --cycle=TIME, -t TIME
 #         Specify the cycle time. If not defined, use the cycle time provided
-#         by the suite environment. TIME can be in an ISO date/time format,
-#         CCYYMMDDhh (deprecated) date/time format, or a TIME-DELTA string
-#         described in the --cycle-offset=TIME-DELTA option.
+#         by the suite environment. `TIME` can be in an ISO date/time format,
+#         `CCYYMMDDhh` (deprecated) date/time format, or a `TIME-DELTA` string
+#         described in the `--cycle-offset=TIME-DELTA` option.
 #     --cycle-offset=TIME-DELTA, -T TIME-DELTA
 #         Specify one or more cycle offsets to determine what
-#         ROSE_DATAC???? environment variables to export. The TIME-DELTA
-#         argument uses the syntax explained above in the ROSE_DATAC????
-#         environment variable. 
-#         E.g. --cycle-offset=PT3H --cycle-offset=PT6H will tell
-#         "rose task-env" to export ROSE_DATACPT3H and ROSE_DATACPT6H.
+#         `ROSE_DATAC????` environment variables to export. The `TIME-DELTA`
+#         argument uses the syntax explained above in the `ROSE_DATAC????`
+#         environment variable.
+#
+#         E.g. `--cycle-offset=PT3H --cycle-offset=PT6H` will tell
+#         `rose task-env` to export `ROSE_DATACPT3H` and `ROSE_DATACPT6H`.
+#
 #         Note:  The main usage of this option is to reference a cycle time in
 #         the past, so a positive offset is used to go backward in time, and a
-#         negative offset is used to go forward in time. E.g.
-#         --cycle-offset=-PT3H will tell "rose task-env" to export
-#         ROSE_DATAC__PT3H for ROSE_DATAC of 3 hours ahead of the current cycle
-#         time.
+#         negative offset is used to go forward in time.
+#
+#         E.g. `--cycle-offset=-PT3H` will tell `rose task-env` to export
+#         `ROSE_DATAC__PT3H` for `ROSE_DATAC` of 3 hours ahead of the current
+#         cycle time.
+#
 #     --path=[NAME=]PATTERN, -P [NAME=]PATTERN
 #         Each of these specify a glob pattern for paths to prepend to an
-#         environment variable called NAME (or PATH if NAME is not specified).
-#         If a relative path is given, it is relative to $ROSE_SUITE_DIR. An
-#         empty value resets the default and any previous --path=PATTERN
+#         environment variable called `NAME` (or `PATH` if `NAME` is not
+#         specified).
+#         If a relative path is given, it is relative to `$ROSE_SUITE_DIR`. An
+#         empty value resets the default and any previous `--path=PATTERN`
 #         settings.
-#         (Default for PATH is "share/fcm[_-]make*/*/bin" and
-#         "work/fcm[_-]make*/*/bin")
+#         (Default for `PATH` is `"share/fcm[_-]make*/*/bin"` and
+#         `"work/fcm[_-]make*/*/bin"`)
 #     --prefix-delim=DELIMITER
 #         Specify the delimiter used to determine the task name prefix.
-#         (Default="_")
+#         (Default=`_`)
 #     --suffix-delim=DELIMITER
 #         Specify the delimiter used to determine the task name suffix.
-#         (Default="_")
+#         (Default=`_`)
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v
 #         Increment verbosity.
 #
 # USAGE IN SUITES
-#     rose task-env can be used to make environment variables available to a
-#     suite by defining its suite.rc env-script option as:
-#
-#     env-script = "eval $(rose task-env)"
+#     rose `task-env` can be used to make environment variables available to a
+#     suite by defining its `suite.rc` `env-script` option as
+#     `env-script = eval $(rose task-env)`.
 #
 #-------------------------------------------------------------------------------
 exec python -m rose.task_env "$@"

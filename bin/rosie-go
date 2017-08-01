@@ -28,10 +28,11 @@
 #
 #     If arguments are specified, rosie go will perform an initial lookup based
 #     on the arguments, which can be an address, a query, or search words. See
-#     "rosie lookup" for detail.
+#     `rosie lookup` for detail.
 #
 #     Unless an option is used to specify the initial search type the argument
 #     is interpreted as follows:
+#
 #     * A string beginning with "http": an address
 #     * A string not beginning with "http": search words
 #
@@ -39,31 +40,32 @@
 #     in quotes.
 #
 #     Search strings may contain SQL wildcard characters. E.g.
-#     % (percent) is a substitute for zero or more characters.
-#     _ (underscore) is a substitute for a single character.
+#
+#     * `%` (percent) is a substitute for zero or more characters.
+#     * `_` (underscore) is a substitute for a single character.
 #
 #     If no argument is specified, rosie go will display a list of all your
 #     locally checked out suites.
 #
 # OPTIONS
 #     --address-mode, --url, -A, -U
-#         Shorthand for "--lookup-mode=address".
+#         Shorthand for `--lookup-mode=address`.
 #     --all-revs
 #         Specify whether to search deleted suites and superceded suites.
 #     --lookup-mode=MODE
-#         Specify the initial lookup mode. MODE can be "address", "query" or
-#         "search".
+#         Specify the initial lookup mode. `MODE` can be `address`, `query` or
+#         `search`.
 #     --prefix=PREFIX
 #         Specify the name of a Rosie web service to use. This option can be
 #         used multiple times.
 #     --query, -Q
-#         Shorthand for "--lookup-mode=query".
+#         Shorthand for `--lookup-mode=query`.
 #     --search, -S
-#         Shorthand for "--lookup-mode=search".
+#         Shorthand for `--lookup-mode=search`.
 #
 # SEE ALSO
-#     rosie lookup
-#     rosie ls
+#     * `rosie lookup`
+#     * `rosie ls`
 #-------------------------------------------------------------------------------
 exec python -m rosie.browser.main "$@"
 

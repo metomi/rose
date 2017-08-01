@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-suite-hook
+#     rose suite-hook
 #
 # SYNOPSIS
 #     # Cylc interface
@@ -29,15 +29,16 @@
 #     Deprecated. Use cylc built-in event handlers instead.
 #
 #     Provide a common event hook for cylc suites and tasks.
+#
 #     * (Task event only) Retrieve remote task logs back to server host.
-#     * Email user if --mail specified.
-#     * Shutdown suite if --shutdown specified.
+#     * Email user if `--mail` specified.
+#     * Shutdown suite if `--shutdown` specified.
 #
 # OPTIONS
 #     --debug
 #         Switch on debug mode.
 #     --mail-cc=LIST
-#         Only useful if the --mail option is specified. Specify a
+#         Only useful if the `--mail` option is specified. Specify a
 #         comma separated list of additional addresses to email.
 #     --mail
 #         Trigger an email notification to the user.

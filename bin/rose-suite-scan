@@ -26,8 +26,8 @@
 # DESCRIPTION
 #     Scan for running suites.
 #
-#     If no HOST specified, use "[rose-suite-run] hosts" setting in site / user
-#     configuration. If no configuration defined, use "localhost".
+#     If no HOST specified, use `[rose-suite-run] hosts` setting in site / user
+#     configuration. If no configuration defined, use `localhost`.
 #
 # OPTIONS
 #     --quiet, -q

@@ -39,20 +39,20 @@
 #     Restart a shutdown suite from its last known state without reinstalling
 #     it.
 #
-#     If re-installation is required, use "rose suite-run --restart".
+#     If re-installation is required, use `rose suite-run --restart`.
 #
 # ARGUMENTS
-#    Arguments (and options after --) are passed to "cylc restart".
+#    Arguments (and options after `--`) are passed to `cylc restart`.
 #
 # OPTIONS
 #     --host=HOST
 #         Specify a host for restarting the suite.
 #     --name=NAME, -n NAME
-#         Specify the suite NAME in cylc, instead of using the basename of the
-#         current working directory.
+#         Specify the suite `NAME` in cylc, instead of using the basename of
+#         the current working directory.
 #     --no-gcontrol
-#         Do not run "cylc gui". Default is to run "cylc gui" if the suite is
-#         running and the DISPLAY environment variable is defined.
+#         Do not run `cylc gui`. Default is to run `cylc gui` if the suite is
+#         running and the `DISPLAY` environment variable is defined.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v

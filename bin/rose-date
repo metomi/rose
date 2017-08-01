@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-date
+#     rose date
 #
 # SYNOPSIS
 #     # 1. Print date time point
@@ -67,29 +67,30 @@
 # OPTIONS
 #     --as-total=TIME_FORMAT
 #         Used to express an ISO8601 duration in the specified time format,
-#         hours H, minutes M or seconds S.
+#         hours `H`, minutes `M` or seconds `S`.
 #     --calendar=gregorian|360day|365day|366day
-#         Specify the calendar mode. See CALENDAR MODE below.
+#         Specify the calendar mode. See `CALENDAR MODE` below.
 #     --offset1=OFFSET, --offset=OFFSET, -s OFFSET, -1 OFFSET
 #         Specify 1 or more offsets to add to argument 1 or the current time.
-#         See OFFSET FORMAT below.
+#         See `OFFSET FORMAT` below.
 #     --offset2=OFFSET, -2 OFFSET
 #         Specify 1 or more offsets to add to argument 2.
-#         See OFFSET FORMAT below.
+#         See `OFFSET FORMAT` below.
 #     --parse-format=FORMAT, -p FORMAT
-#         Specify a format for parsing DATE-TIME. See PARSE FORMAT below.
+#         Specify a format for parsing `DATE-TIME`. See `PARSE FORMAT` below.
 #     --print-format=FORMAT, --format=FORMAT, -f FORMAT
-#         Specify a format for printing the result. See PRINT FORMAT below.
+#         Specify a format for printing the result. See `PRINT FORMAT` below.
 #     --use-task-cycle-time, -c
-#         Use the value of the ROSE_TASK_CYCLE_TIME environment variable as the
-#         reference time instead of the current time.
+#         Use the value of the `ROSE_TASK_CYCLE_TIME` environment variable as
+#         the reference time instead of the current time.
 #     --utc, -u
 #         Assume date time in UTC instead of local or other time zones. 
 #
 # CALENDAR MODE
 #     The calendar mode is determined (in order) by:
-#     1. The --calendar=MODE option.
-#     2. The ROSE_CYCLING_MODE environment variable.
+#
+#     1. The `--calendar=MODE` option.
+#     2. The `ROSE_CYCLING_MODE` environment variable.
 #     3. Default to "gregorian".
 #
 # ENVIRONMENT VARIABLES
@@ -97,45 +98,48 @@
 #         Specify the calendar mode. 
 #     ROSE_TASK_CYCLE_TIME
 #         Specify the current cycle time of a task in a suite. If the
-#         --use-task-cycle-time option is set, the value of this environment
+#         `--use-task-cycle-time` option is set, the value of this environment
 #         variable is used by the command as the reference time instead of the
 #         current time.
 #
 # OFFSET FORMAT
-#     OFFSET must follow the ISO 8601 duration representations such as
-#     PnW or PnYnMnDTnHnMnS - P followed by a series of nU where U is the
-#     unit (Y, M, D, H, M, S) and n is a positive integer, where T
-#     delimits the date series from the time series if any time units are
-#     used. n may also have a decimal (e.g. PT5.5M) part for a unit
+#     `OFFSET` must follow the ISO 8601 duration representations such as
+#     `PnW` or `PnYnMnDTnHnMnS - P` followed by a series of `nU` where `U` is
+#     the unit (`Y`, `M`, `D`, `H`, `M`, `S`) and `n` is a positive integer,
+#     where `T` delimits the date series from the time series if any time units
+#     are used. `n` may also have a decimal (e.g. `PT5.5M`) part for a unit
 #     provided no smaller units are supplied. It is not necessary to
-#     specify zero values for units. If OFFSET is negative, prefix a "-".
+#     specify zero values for units. If `OFFSET` is negative, prefix a `-`.
 #     For example:
-#         P6D - 6 day offset
-#         PT6H - 6 hour offset
-#         PT1M - 1 minute offset
-#         -PT1M - (negative) 1 minute offset
-#         P3M - 3 month offset
-#         P2W - 2 week offset (note no other units may be combined with weeks)
-#         P2DT5.5H - 2 day, 5.5 hour offset
-#         -P2YT4S - (negative) 2 year, 4 second offset
+#
+#     * `P6D` - 6 day offset
+#     * `PT6H` - 6 hour offset
+#     * `PT1M` - 1 minute offset
+#     * `-PT1M` - (negative) 1 minute offset
+#     * `P3M` - 3 month offset
+#     * `P2W` - 2 week offset (note no other units may be combined with weeks)
+#     * `P2DT5.5H` - 2 day, 5.5 hour offset
+#     * `-P2YT4S` - (negative) 2 year, 4 second offset
 #
 #     The following deprecated syntax is supported:
-#     OFFSET in the form nU where U is the unit (w for weeks, d for days,
-#     h for hours, m for minutes and s for seconds) and n is a positive or
-#     negative integer.
+#     `OFFSET` in the form `nU` where `U` is the unit (`w` for weeks, `d` for
+#     days, `h` for hours, `m` for minutes and `s` for seconds) and `n` is a
+#     positive or negative integer.
 #
 # PARSE FORMAT
 #     The format for parsing a date time point should be compatible with the
 #     POSIX strptime template format (see the strptime command help), with the
 #     following subset supported across all date/time ranges:
-#         %F, %H, %M, %S, %Y, %d, %j, %m, %s, %z
 #
-#     If not specified, the system will attempt to parse DATE-TIME using
+#     `%F`, `%H`, `%M`, `%S`, `%Y`, `%d`, `%j`, `%m`, `%s`, `%z`
+#
+#     If not specified, the system will attempt to parse `DATE-TIME` using
 #     the following formats:
-#         ctime: "%a %b %d %H:%M:%S %Y"
-#         Unix date: "%a %b %d %H:%M:%S %Z %Y"
-#         Basic ISO8601: "%Y-%m-%dT%H:%M:%S", "%Y%m%dT%H%M%S"
-#         Cylc: "%Y%m%d%H"
+#
+#     * ctime: `%a %b %d %H:%M:%S %Y`
+#     * Unix date: `%a %b %d %H:%M:%S %Z %Y`
+#     * Basic ISO8601: `%Y-%m-%dT%H:%M:%S`, `%Y%m%dT%H%M%S`
+#     * Cylc: `%Y%m%d%H`
 #
 #     If none of these match, the date time point will be parsed according to
 #     the full ISO 8601 date/time standard.
@@ -145,28 +149,30 @@
 #     format as the parse format. Also supports the isodatetime library dump
 #     syntax for these operations which follows ISO 8601 example syntax - for
 #     example:
-#         'CCYY-MM-DDThh:mm:ss' -> '1955-11-05T09:28:00',
-#         'CCYY' -> '1955',
-#         'CCYY-DDD' -> '1955-309',
-#         'CCYY-Www-D' -> '1955-W44-6'.
+#
+#     * `CCYY-MM-DDThh:mm:ss` -> `1955-11-05T09:28:00`,
+#     * `CCYY` -> `1955`,
+#     * `CCYY-DDD` -> `1955-309`,
+#     * `CCYY-Www-D` -> `1955-W44-6`.
 #
 #     Usage of this ISO 8601-like syntax should be as ISO 8601-compliant
 #     as possible.
 #
 #     Note that specifying an explicit timezone in this format (e.g.
-#     'CCYY-MM-DDThh:mm:ss+0100' or 'CCYYDDDThhmmZ' will automatically
+#     `CCYY-MM-DDThh:mm:ss+0100` or `CCYYDDDThhmmZ` will automatically
 #     adapt the date/time to that timezone i.e. apply the correct
 #     hour/minute UTC offset.
 #
 #     For printing a duration, the following can be used in format
 #     statements:
-#         y: years
-#         m: months
-#         d: days
-#         h: hours
-#         M: minutes
-#         s: seconds
-#     For example, for a duration P57DT12H:
-#         'y,m,d,h' -> '0,0,57,12'
+#
+#     * `y`: years
+#     * `m`: months
+#     * `d`: days
+#     * `h`: hours
+#     * `M`: minutes
+#     * `s`: seconds
+#
+#     For example, for a duration `P57DT12H` - `y,m,d,h` -> `0,0,57,12`
 #-------------------------------------------------------------------------------
 exec python -m rose.date "$@"

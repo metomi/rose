@@ -41,7 +41,8 @@ extensions = [
     'minicylc',
     'cylc-lang',
     'rose-lang',
-    'practical'
+    'practical',
+    'auto-cli-doc'
 ]
 
 graphviz_output_format = 'svg'

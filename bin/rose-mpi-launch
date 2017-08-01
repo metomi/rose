@@ -19,7 +19,7 @@
 #     Refer to COPYRIGHT.txt of this distribution for details.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-mpi-launch
+#     rose mpi-launch
 #
 # SYNOPSIS
 #     1. rose mpi-launch -f FILE
@@ -29,12 +29,13 @@
 # DESCRIPTION
 #     Provide a portable way to launch an MPI command.
 #
-#     1. If --command-file=FILE (or -f FILE) is specified, FILE is assumed to
-#        be the command file to be submitted to the MPI launcher command.
-#     2. Alternatively, if $PWD/rose-mpi-launch.rc exists and
-#        --command-file=FILE (or -f FILE) is not specified, it is assumed to be
-#        the command file to be submitted to the MPI launcher command.
-#     3. In the final form, it will attempt to submit COMMAND with the MPI
+#     1. If `--command-file=FILE` (or `-f FILE`) is specified, `FILE` is
+#        assumed to be the command file to be submitted to the MPI launcher
+#        command.
+#     2. Alternatively, if `$PWD/rose-mpi-launch.rc` exists and
+#        `--command-file=FILE` (or `-f FILE`) is not specified, it is assumed
+#        to be the command file to be submitted to the MPI launcher command.
+#     3. In the final form, it will attempt to submit `COMMAND` with the MPI
 #        launcher command.
 #
 #     In all cases, the remaining arguments will be appended to the command
@@ -44,56 +45,66 @@
 #     --command-file=FILE, -f FILE
 #         Specify a command file for the MPI launcher.
 #     --debug
-#         Switch on xtrace, i.e. "set -x".
+#         Switch on xtrace, i.e. `set -x`.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v
-#         Increment verbosity. Print command on "-v" mode. Run "printenv", "ldd"
-#         on a binary executable, and "ulimit -a" on "-v -v" mode.
+#         Increment verbosity. Print command on `-v` mode. Run `printenv`,
+#         `ldd` on a binary executable, and `ulimit -a` on `-v -v` mode.
 #
 # CONFIGURATION
-#     The command reads from the [rose-mpi-launch] section in
-#     "$ROSE_HOME/etc/rose.conf" and "$HOME/.metomi/rose.conf".
+#     The command reads from the `[rose-mpi-launch]` section in
+#     `$ROSE_HOME/etc/rose.conf` and `$HOME/.metomi/rose.conf`.
 #     Valid settings are:
 #
 #     launcher-list=LIST
-#         Specify a list of launcher commands. E.g.:
-#             launcher-list=poe mpiexec
+#         Specify a list of launcher commands.
+#
+#         E.g:
+#
+#         * `launcher-list=poe mpiexec`
+#
 #     launcher-fileopts.LAUNCHER=OPTION-TEMPLATE
-#         Specify the options to a LAUNCHER for launching with a command file.
-#         The template string should contain "$ROSE_COMMAND_FILE" (or
-#         "${ROSE_COMMAND_FILE}"), which will be expanded to the path to the
-#         command file. E.g.:
-#             launcher-fileopts.mpiexec=-f $ROSE_COMMAND_FILE
-#             launcher-fileopts.poe=-cmdfile $ROSE_COMMAND_FILE
-#     launcher-preopts.LAUNCHER=OPTION-TEMPLATE
-#     launcher-postopts.LAUNCHER=OPTION-TEMPLATE
-#         Specify the options to a LAUNCHER for launching with a command.
-#         "preopts" are options placed after the launcher command but before
-#         COMMAND. "postopts" are options placed after COMMAND but before the
-#         remaining arguments. E.g.:
-#             launcher-preopts.mpiexec=-n $PROC
+#         Specify the options to a `LAUNCHER` for launching with a command file.
+#         The template string should contain `$ROSE_COMMAND_FILE` (or
+#         `${ROSE_COMMAND_FILE}`), which will be expanded to the path to the
+#         command file.
+#
+#         E.g.:
+#
+#         * `launcher-fileopts.mpiexec=-f $ROSE_COMMAND_FILE`
+#         * `launcher-fileopts.poe=-cmdfile $ROSE_COMMAND_FILE`
+#
+#     launcher-(pre|post)opts.LAUNCHER=OPTION-TEMPLATE
+#         Specify the options to a `LAUNCHER` for launching with a command.
+#         `preopts` are options placed after the launcher command but before
+#         `COMMAND`. `postopts` are options placed after `COMMAND` but before
+#         the remaining arguments.
+#
+#         E.g.:
+#
+#         * `launcher-preopts.mpiexec=-n $PROC`
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_LAUNCHER
 #         Specify the launcher program.
 #     optional ROSE_LAUNCHER_LIST
-#         Override "launcher-list" setting in configuration.
+#         Override `launcher-list` setting in configuration.
 #     optional ROSE_LAUNCHER_FILEOPTS
-#         Override "launcher-fileopts.LAUNCHER" setting for the selected
-#         LAUNCHER.
+#         Override `launcher-fileopts.LAUNCHER` setting for the selected
+#         `LAUNCHER`.
 #     optional ROSE_LAUNCHER_PREOPTS
-#         Override "launcher-preopts.LAUNCHER" setting for the selected
-#         LAUNCHER.
+#         Override `launcher-preopts.LAUNCHER` setting for the selected
+#         `LAUNCHER`.
 #     optional ROSE_LAUNCHER_POSTOPTS
-#         Override "launcher-postopts.LAUNCHER" setting for the selected
-#         LAUNCHER.
+#         Override `launcher-postopts.LAUNCHER` setting for the selected
+#         `LAUNCHER`.
 #     optional ROSE_LAUNCHER_ULIMIT_OPTS
 #         Only relevant when launching with a command. Tell launcher to run
-#         "rose mpi-launch --inner $@". Specify the arguments to ulimit.
-#         E.g. Setting this variable to "-a -s unlimited -d unlimited -a"
-#         results in "ulimit -a; ulimit -s unlimited; ulimit -d unlimited;
-#         ulimit -a".
+#         `rose mpi-launch --inner $@`. Specify the arguments to `ulimit`.
+#         E.g. Setting this variable to `-a -s unlimited -d unlimited -a`
+#         results in `ulimit -a; ulimit -s unlimited; ulimit -d unlimited;
+#         ulimit -a`.
 #     optional NPROC
 #         Specify the number of processors to run on. Default is 1.
 #

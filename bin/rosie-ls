@@ -28,15 +28,16 @@
 #
 #     Search for locally checked out suites and print their details.
 #
-#     The default format includes a local working copy status field (%local)
+#     The default format includes a local working copy status field (`%local`)
 #     in the first column.
 #     A blank field means there is no related suite checked out.
-#     "=" means that the suite is checked out at this branch and revision.
-#     "<" means that the suite is checked out but at an older revision.
-#     ">" means that the suite is checked out but at a newer revision.
-#     "S" means that the suite is checked out but on a different branch.
-#     "M" means that the suite is checked out and modified.
-#     "X" means that the suite is checked out but is corrupted.
+#
+#     * `=` means that the suite is checked out at this branch and revision.
+#     * `<` means that the suite is checked out but at an older revision.
+#     * `>` means that the suite is checked out but at a newer revision.
+#     * `S` means that the suite is checked out but on a different branch.
+#     * `M` means that the suite is checked out and modified.
+#     * `X` means that the suite is checked out but is corrupted.
 #
 # OPTIONS
 #     --prefix=PREFIX
@@ -46,18 +47,18 @@
 #         Do not print column headers.
 #     --print-format=FORMAT, --format=FORMAT, -f FORMAT
 #         Control the output format of the results using a string
-#         containing column names or properties preceded by %.
-#         For example: rosie ls --format="%idx from %owner"
-#         might give: abc01 from daisy
+#         containing column names or properties preceded by `%`.
+#         For example: `rosie ls --format="%idx from %owner"`
+#         might give: `abc01 from daisy`
 #     --quiet, -q
-#         Shorthand for --format="%idx".
+#         Shorthand for `--format="%idx"`.
 #     --reverse, -r
 #         Reverse sort order.
 #     --sort=FIELD, -s FIELD
-#         Sort results by the field FIELD instead of revision.
+#         Sort results by the field `FIELD` instead of revision.
 #     --user=~USERNAME, -u ~USERNAME
 #         Specify another user whose roses directory you want to list
-#         e.g. --user=~bob
+#         e.g. `--user=~bob`
 #     --verbose, -v
 #         Display full info for each returned suite.
 #-------------------------------------------------------------------------------

@@ -45,63 +45,73 @@
 #     --graphical, -g
 #         Use a graphical diff tool.
 #     --ignore=PATTERN, -i PATTERN
-#         Ignore settings that contain the regular expression PATTERN in their
-#         id. Can be specified more than once. PATTERN may also be a key used
-#         in site or user configuration which expands to a list of patterns.
-#         See CONFIGURATION below.
+#         Ignore settings that contain the regular expression `PATTERN` in
+#         their id. Can be specified more than once. `PATTERN` may also be a
+#         key used in site or user configuration which expands to a list of
+#         patterns. See `CONFIGURATION` below.
 #     --meta-path=PATH, -M PATH
-#         Prepend PATH to the metadata search path (look here first).
+#         Prepend `PATH` to the metadata search path (look here first).
 #         This option can be used repeatedly to load multiple paths.
 #     --opt-conf-key-1=KEY, --opt-conf-key-1='(KEY)'
 #         opt-conf-key for the file in the first argument.
-#         Each of these switches on an optional configuration identified by KEY.
-#         The configurations are applied first-to-last. The '(KEY)' syntax
-#         denotes an optional configuration that can be missing. Otherwise, the
-#         optional configuration must exist.
+#         Each of these switches on an optional configuration identified by
+#         `KEY`. The configurations are applied first-to-last. The `(KEY)`
+#         syntax denotes an optional configuration that can be missing.
+#         Otherwise, the optional configuration must exist.
 #     --opt-conf-key-2=KEY, --opt-conf-key-2='(KEY)'
-#         opt-conf-key for the file in the second argument.
-#         Each of these switches on an optional configuration identified by KEY.
-#         The configurations are applied first-to-last. The '(KEY)' syntax
-#         denotes an optional configuration that can be missing. Otherwise, the
-#         optional configuration must exist.
+#         `opt-conf-key` for the file in the second argument.
+#         Each of these switches on an optional configuration identified by
+#         `KEY`. The configurations are applied first-to-last. The `(KEY)`
+#         syntax denotes an optional configuration that can be missing.
+#         Otherwise, the optional configuration must exist.
 #     --properties=PROPERTIES, -p PROPERTIES
 #         Only display these metadata properties. This should be a comma
 #         separated list of metadata options, such as title,description,help.
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_META_PATH
-#         Prepend $ROSE_META_PATH to the metadata search path.
+#         Prepend `$ROSE_META_PATH` to the metadata search path.
 #
 # ARGUMENTS
 #     PATH1, PATH2
 #         Two Rose configuration files or directories to compare.
 #         If the path is a directory, look underneath for a Rose configuration
-#         file.
-#         '-' for PATH1 or PATH2 denotes read in from standard input.
+#         file. '-' for `PATH1` or `PATH2` denotes read in from standard input.
 #     --
-#         Options and arguments after a -- token are passed directly to the
+#         Options and arguments after a `--` token are passed directly to the
 #         diff tool.
 #
 # CONFIGURATION
 #     [external]diff-tool, [external]gdiff-tool
-#         You can override the default non-graphical and graphical diff tools
-#         by setting e.g.:
-#         [external]
-#         diff-tool=diff3
-#         gdiff-tool=kompare
-#         in your site or user Rose configuration (rose.conf).
+#        You can override the default non-graphical and graphical diff tools
+#        by setting e.g::
+#
+#           [external]
+#           diff-tool=diff3
+#           gdiff-tool=kompare
+#
+#        in your site or user Rose configuration (`rose.conf`).
+#
 #     [rose-config-diff]properties, [rose-config-diff]ignore{...}
-#         You can override the default metadata properties to display by
-#         setting e.g.:
-#         [rose-config-diff]
-#         properties=title,ns,description,help
-#         in your site or user Rose configuration (rose.conf).
-#         You can also set shorthand ignore patterns by setting e.g.:
-#         [rose-config-diff]
-#         ignore{foo}=namelist:bar,namelist:baz
-#         in the same location. This will allow you to run:
-#         rose config-diff --ignore=foo ...
-#         instead of:
-#         rose config-diff --ignore=namelist:bar --ignore=namelist:baz ...
+#        You can override the default metadata properties to display by
+#        setting e.g::
+#
+#           [rose-config-diff]
+#           properties=title,ns,description,help
+#
+#        in your site or user Rose configuration (`rose.conf`).
+#        You can also set shorthand ignore patterns by setting e.g.::
+#
+#          [rose-config-diff]
+#          ignore{foo}=namelist:bar,namelist:baz
+#
+#        in the same location. This will allow you to run::
+#
+#           rose config-diff --ignore=foo ...
+#
+#        instead of::
+#
+#           rose config-diff --ignore=namelist:bar --ignore=namelist:baz ...
+#
 #-------------------------------------------------------------------------------
 exec python -m rose.config_diff "$@"

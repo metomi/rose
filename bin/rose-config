@@ -71,17 +71,17 @@
 #         a string value.)
 #     --file=FILE, -f FILE
 #         Each of these specifies a configuration file. If none specified, read
-#         from $THIS/../etc/rose.conf and $HOME/.metomi/rose.conf (where $THIS
-#         is the location of this command).
+#         from `$THIS/../etc/rose.conf` and `$HOME/.metomi/rose.conf` (where
+#         `$THIS` is the location of this command).
 #     --keys, -k
-#         If specified, only print the SECTION keys in the configuration file or
-#         the OPTION keys in a SECTION.
+#         If specified, only print the `SECTION` keys in the configuration file
+#         or the `OPTION` keys in a `SECTION`.
 #     --meta
 #         If specified, operate on the metadata associated with the
-#         configuration FILE.
+#         configuration `FILE`.
 #     --meta-key=KEY
-#         If specified, prints the value of a specified metadata flag KEY.
-#         Cannot be used in conjunction with --file=FILE.
+#         If specified, prints the value of a specified metadata flag `KEY`.
+#         Cannot be used in conjunction with `--file=FILE`.
 #     --no-opts
 #         Do not load optional configurations.
 #     --print-conf
@@ -89,14 +89,14 @@
 #         This allows the output to be concatenated into another Rose
 #         configuration file.
 #     --print-ignored, -i
-#         If specified, the program will print ignored !OPTION=VALUE where
+#         If specified, the program will print ignored `!OPTION=VALUE` where
 #         relevant.
 #     --quiet, -q
-#         Exit with 0 if the specified SECTION and/or OPTION exist in the
+#         Exit with 0 if the specified `SECTION` and/or `OPTION` exist in the
 #         configuration, or 1 otherwise.
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_META_PATH
-#         Prepend $ROSE_META_PATH to the metadata search path.
+#         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
 exec python -m rose.config_cli "$@"

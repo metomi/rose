@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-macro
+#     rose macro
 #
 # SYNOPSIS
 #     rose macro [OPTIONS] [MACRO_NAME ...]
@@ -26,29 +26,31 @@
 # DESCRIPTION
 #     List or run macros associated with a suite or application.
 #
-#     Macros are listed/run according to the config dir ($PWD unless
-#     --config=DIR is set):
-#       * If the config dir is an app directory (or is within an app directory)
-#         macros will be listed/run for the rose-app.conf file of that app.
-#       * Otherwise macros will be listed/run for the rose-suite.conf,
-#         rose-suite.info and (unless --suite-only is set) all rose-app.conf
-#         files.
+#     Macros are listed/run according to the config dir (`$PWD` unless
+#     `--config=DIR` is set):
+#
+#     * If the config dir is an app directory (or is within an app directory)
+#       macros will be listed/run for the `rose-app.conf` file of that app.
+#     * Otherwise macros will be listed/run for the `rose-suite.conf`,
+#       `rose-suite.info` and (unless `--suite-only` is set) all
+#       `rose-app.conf` files.
 #
 #     If a configuration contains optional configurations:
-#       * For validator macros, validate the main configuration, then
-#         validate each main + optional configuration in turn.
-#       * For transform macros, transform the main configuration, then
-#         transform each main + optional configuration, recreating each
-#         optional configuration as the diff vs the transformed main.
+#
+#     * For validator macros, validate the main configuration, then
+#       validate each main + optional configuration in turn.
+#     * For transform macros, transform the main configuration, then
+#       transform each main + optional configuration, recreating each
+#       optional configuration as the diff vs the transformed main.
 #
 # OPTIONS
 #     --config=DIR, -C DIR
-#         Use configuration in DIR instead of $PWD.
+#         Use configuration in `DIR` instead of `$PWD`.
 #     --fix, -F
 #         Prepend all internal transformer (fixer) macros to the argument
 #         list.
 #     --meta-path=PATH, -M PATH
-#         Prepend PATH to the metadata search path (look here first).
+#         Prepend `PATH` to the metadata search path (look here first).
 #         This option can be used repeatedly to load multiple paths.
 #     --non-interactive, --yes, -y
 #         Switch off interactive prompting (=answer yes to everything).
@@ -67,11 +69,11 @@
 # ARGUMENTS
 #     MACRO_NAME ...
 #         A list of macro names to run. If no macro names are specified and
-#         --fix, --validate are not used, list all available macros.
+#         `--fix`, `--validate` are not used, list all available macros.
 #         Otherwise, run the specified macro names.
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_META_PATH
-#         Prepend $ROSE_META_PATH to the metadata search path.
+#         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
 exec python -m rose.macro "$@"

@@ -39,47 +39,48 @@
 # DESCRIPTION
 #     Install and run a Cylc suite.
 #
-#     Install a suite (in $PWD), register it in Cylc using the basename of the
-#     configuration directory or the option specified in --name=NAME. Invoke
-#     "cylc run" on it. Arguments (and options after --) are passed to "cylc
-#     run".
+#     Install a suite (in `$PWD`), register it in Cylc using the basename of
+#     the configuration directory or the option specified in `--name=NAME`.
+#     Invoke `cylc run` on it. Arguments (and options after `--`) are passed
+#     to `cylc run`.
 #
 # OPTIONS
 #     --config=DIR, -C DIR
-#         Specify the configuration directory of the suite. (default=$PWD)
+#         Specify the configuration directory of the suite. (default=`$PWD`)
 #     --define=[SECTION]KEY=VALUE, -D [SECTION]KEY=VALUE
-#         Each of these overrides the [SECTION]KEY setting with a given VALUE.
-#         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
-#         or even --define=[!SECTION]. See also --define-suite.
+#         Each of these overrides the `[SECTION]KEY` setting with a given
+#         `VALUE`. Can be used to disable a setting using the syntax
+#         `--define=[SECTION]!KEY` or even `--define=[!SECTION]`.
+#         See also `--define-suite`.
 #     --define-suite=KEY=VALUE, -S KEY=VALUE
-#         As --define, but with an implicit [SECTION] for suite variables.
+#         As `--define`, but with an implicit `[SECTION]` for suite variables.
 #     --host=HOST
 #         Specify a host for running the suite.
 #     --install-only, -i
-#         Install the suite. Do not run it. Implies --no-gcontrol.
+#         Install the suite. Do not run it. Implies `--no-gcontrol`.
 #     --local-install-only, -l
 #         Install the suite locally. Do not install to job hosts. Do not run
-#         it. Implies --no-gcontrol.
+#         it. Implies `--no-gcontrol`.
 #     --log-keep=DAYS
 #         Specify the number of days to keep log directories/archives.
 #         Do not housekeep if not specified. Named log directories (created by
-#         --log-name=NAME in previous runs) will not be housekept.
+#         `--log-name=NAME` in previous runs) will not be housekept.
 #     --log-name=NAME
 #         Specify a name for the log directory of the current run. If
-#         specified, it will create a symbolic link log.NAME to point to the
+#         specified, it will create a symbolic link `log.NAME` to point to the
 #         log directory of the current run. Named log directories will not be
-#         automatically archived or housekept. Only works with --run=run.
+#         automatically archived or housekept. Only works with `--run=run`.
 #     --name=NAME, -n NAME
-#         Specify the suite NAME in Cylc, instead of using the basename of the
-#         configuration directory.
+#         Specify the suite `NAME` in Cylc, instead of using the basename of
+#         the configuration directory.
 #     --new, -N
 #         (Re-)create suite runtime locations. This option is equivalent to
-#         running "rose suite-clean -y && rose suite-run" and will remove
+#         running `rose suite-clean -y && rose suite-run` and will remove
 #         previous runs. Users may want to take extra care when using this
 #         option.
 #     --no-gcontrol
-#         Do not run "cylc gui". Default is to run "cylc gui" if the suite is
-#         running and the DISPLAY environment variable is defined.
+#         Do not run `cylc gui`. Default is to run `cylc gui` if the suite is
+#         running and the `DISPLAY` environment variable is defined.
 #     --no-log-archive
 #         Do not archive (tar-gzip) old log directories.
 #     --no-overwrite
@@ -87,40 +88,40 @@
 #     --no-strict
 #         Do not validate (suite engine configuration) in strict mode.
 #     --opt-conf-key=KEY, -O KEY, --opt-conf-key='(KEY)', -O '(KEY)'
-#         Each of these switches on an optional configuration identified by KEY.
-#         The configurations are applied first-to-last. The '(KEY)' syntax
-#         denotes an optional configuration that can be missing. Otherwise, the
-#         optional configuration must exist.
+#         Each of these switches on an optional configuration identified by
+#         `KEY`. The configurations are applied first-to-last. The `(KEY)`
+#         syntax denotes an optional configuration that can be missing.
+#         Otherwise, the optional configuration must exist.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --reload
-#         Shorthand for --run=reload.
+#         Shorthand for `--run=reload`.
 #     --restart
-#         Shorthand for --run=restart.
+#         Shorthand for `--run=restart`.
 #     --run=reload|restart|run
-#         Invoke "cylc reload|restart|run" according to this option.
-#         (default="run")
+#         Invoke `cylc reload|restart|run` according to this option.
+#         (default=`run`)
 #     --verbose, -v
 #         Increment verbosity.
 #
 # ENVIRONMENT VARIABLES
-#     "rose suite-run" provides the following environment variables to the suite.
+#     `rose suite-run` provides the following environment variables to the suite.
 #
 #     ROSE_ORIG_HOST
-#         The name of the host where the "rose suite-run" command was invoked.
+#         The name of the host where the `rose suite-run` command was invoked.
 #     optional ROSE_SUITE_OPT_CONF_KEYS
-#         Each KEY in this space delimited list switches on an optional
+#         Each `KEY` in this space delimited list switches on an optional
 #         configuration. The configurations are applied first-to-last.
 #
 # JINJA2 VARIABLES
-#     "rose suite-run" provides the following Jinja2 variables to the suite.
+#     `rose suite-run` provides the following Jinja2 variables to the suite.
 #
 #     ROSE_ORIG_HOST
-#         The name of the host where the "rose suite-run" command was invoked.
+#         The name of the host where the `rose suite-run` command was invoked.
 #
 # SEE ALSO
-#     "cylc help gui"
-#     "cylc help register"
-#     "cylc help run"
+#     * `cylc help gui`
+#     * `cylc help register`
+#     * `cylc help run`
 #-------------------------------------------------------------------------------
 exec python -m rose.suite_run "$@"

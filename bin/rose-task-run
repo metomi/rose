@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-task-run
+#     rose task-run
 #
 # SYNOPSIS
 #     rose task-run [OPTIONS] [--] [APP-COMMAND ...]
@@ -26,34 +26,32 @@
 # DESCRIPTION
 #     Provide an environment to run a suite task.
 #
-#     Provides environment variables documented in "rose task-env". It is worth
-#     noting that if the environment variables are already provided by "rose
-#     task-env", this command will not override them.
+#     Provides environment variables documented in `rose task-env`. It is worth
+#     noting that if the environment variables are already provided by
+#     `rose task-env`, this command will not override them.
 #
 #     Normally, the suite task will select a Rose application configuration
 #     that has the same name as the task. This can be overridden by the
-#     --app-key=KEY option or the ROSE_TASK_APP environment variable.
+#     `--app-key=KEY` option or the `ROSE_TASK_APP` environment variable.
 #
 # OPTIONS
-#     All options of "rose app-run" and "rose task-env" are supported.
+#     All options of `rose app-run` and `rose task-env` are supported.
 #     Additional options are:
+#
 #     --app-key=KEY
 #         Specify a named application configuration.
 #
 # ENVIRONMENT VARIABLES
-#     All environment variables of "rose app-run" and "rose task-env" are
-#     supported.
-#
-#     The following environment variables are used by "rose task-run":
+#     All environment variables of `rose app-run` and `rose task-env` are
+#     supported. All environment variables documented in `rose task-env` are
+#     passed to the application `rose task-run` runs.
+#     The following environment variables are used by `rose task-run`:
 #
 #     ROSE_TASK_APP
 #         Specify a named application configuration.
 #
-#     All environment variables documented in "rose task-env" are passed to the
-#     application "rose task-run" runs.
-#
 # SEE ALSO
-#     rose app-run
-#     rose task-env
+#     * `rose app-run`
+#     * `rose task-env`
 #-------------------------------------------------------------------------------
 exec python -m rose.task_run "$@"
