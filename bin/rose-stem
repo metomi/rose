@@ -27,7 +27,7 @@
 #     Run a suitable suite with a specified set of source tree(s).
 #
 #     Default values of some of these settings are suite-dependent, specified
-#     in the rose-suite.conf file.
+#     in the `rose-suite.conf` file.
 #
 # EXAMPLES
 #     rose stem --group=developer
@@ -35,51 +35,51 @@
 #     rose stem --source=foo=/path/to/source --source=bar=fcm:bar_tr@head
 #
 # OPTIONS
-#     All options of "rose suite-run" are supported. Additional options are:
+#     All options of `rose suite-run` are supported. Additional options are:
 #
 #     --source=SOURCE, -s SOURCE, --source=PROJECT=SOURCE, -s PROJECT=SOURCE
 #         Specify a source tree to include in a rose-stem suite. The first
 #         source tree must be a working copy as the location of the suite and
 #         fcm-make config files are taken from it. Further source trees can be
-#         added with additional --source arguments. The project which is 
+#         added with additional `--source` arguments. The project which is 
 #         associated with a given source is normally automatically determined
 #         using FCM, however the project can be specified by putting the 
 #         project name as the first part of this argument separated by an
 #         equals sign as in the third example above.
-#         Defaults to '.' if not specified.
+#         Defaults to `.` if not specified.
 #     --group=GROUP[,GROUP2[,...]], -g GROUP[,GROUP2[,...]]
 #         Specify a group name to run. Additional groups can be specified
-#         with further --group arguments. The suite will then convert the groups
-#         into a series of tasks to run..
+#         with further `--group` arguments. The suite will then convert the
+#         groups into a series of tasks to run..
 #     --task=TASK[,TASK2[,...]], -t TASK[,TASK2[,...]]
-#         Synonym for --group.
+#         Synonym for `--group`.
 #
 # JINJA2 VARIABLES
 #
-#     Note that <project> refers to the FCM keyword name of the repository in
+#     Note that `<project>` refers to the FCM keyword name of the repository in
 #     upper case.
 #
 #     HOST_SOURCE_<project>
 #         The complete list of source trees for a given project. Working copies
-#         in this list have their hostname prefixed, e.g. host:/path/wc.
+#         in this list have their hostname prefixed, e.g. `host:/path/wc`.
 #     HOST_SOURCE_<project>_BASE
 #         The base of the project specified on the command line. This is
-#         intended to specify the location of 'fcm-make' config files. Working 
+#         intended to specify the location of `fcm-make` config files. Working 
 #         copies in this list have their hostname prefixed.
 #     RUN_NAMES
 #         A list of groups to run in the rose-stem suite.
 #     SOURCE_<project>
 #         The complete list of source trees for a given project. Unlike the 
-#         HOST_ variable of similar name, paths to working copies do NOT 
+#         `HOST_` variable of similar name, paths to working copies do NOT 
 #         include the host name.
 #     SOURCE_<project>_BASE
 #         The base of the project specified on the command line. This is
-#         intended to specify the location of 'fcm-make' config files.Unlike 
-#         the  HOST_ variable of similar name, paths to working copies do NOT
+#         intended to specify the location of `fcm-make` config files. Unlike 
+#         the `HOST_` variable of similar name, paths to working copies do NOT
 #         include the host name.
 #     SOURCE_<project>_REV
 #         The revision of the project specified on the command line. This
-#         is intended to specify the revision of 'fcm-make' config files.
+#         is intended to specify the revision of `fcm-make` config files.
 #
 #-------------------------------------------------------------------------------
 exec python -m rose.stem "$@"

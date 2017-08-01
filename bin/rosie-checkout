@@ -26,13 +26,13 @@
 # DESCRIPTION
 #     Checkout local copies of suites.
 #
-#     For each ID in the argument list, checkout a working copy of the suite
-#     identified by ID to the standard location.
+#     For each `ID` in the argument list, checkout a working copy of the suite
+#     identified by `ID` to the standard location.
 #
 # OPTIONS
 #     --force, -f
-#         If working copy for suite identified by ID already exists, remove it.
-#         Continue to the next ID if checkout of a suite fails.
+#         If working copy for suite identified by `ID` already exists, remove
+#         it. Continue to the next `ID` if checkout of a suite fails.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v

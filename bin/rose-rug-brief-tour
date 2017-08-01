@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-rug-brief-tour
+#     rose rug-brief-tour
 #
 # SYNOPSIS
 #     rose rug-brief-tour [DEST]
@@ -27,7 +27,8 @@
 #     Populate the destination directory for Rose User Guide: A Brief Tour.
 #
 # ARGUMENTS
-#     DEST - Destination directory. (default=$PWD)
+#     DEST
+#         Destination directory. (`default=$PWD`)
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/../lib/bash/rose_init"
 echo -n 'rose rug-brief-tour: copying brief tour files to current directory...'

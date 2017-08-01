@@ -31,15 +31,15 @@
 #         The directory containing either the configuration or
 #         the configuration metadata. If the configuration is
 #         given, the metadata will be looked up in the normal
-#         way (see also --meta-path, ROSE_META_PATH). If the
+#         way (see also `--meta-path`, `ROSE_META_PATH`). If the
 #         configuration metadata is given, there will be no
 #         configuration data used in the graphing.
 #         If not specified, the current directory will be used.
 #     --meta-path=PATH, -M PATH
-#         Prepend PATH to the metadata search path (look here first).
+#         Prepend `PATH` to the metadata search path (look here first).
 #         This option can be used repeatedly to load multiple paths.
 #     --property=PROPERTY, -p PROPERTY
-#         Graph a certain property e.g. trigger. If specified,
+#         Graph a certain property e.g. `trigger`. If specified,
 #         only this property will be graphed.
 # ARGUMENTS
 #     SECTION
@@ -48,6 +48,6 @@
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_META_PATH
-#         Prepend $ROSE_META_PATH to the metadata search path.
+#         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
 exec python -m rose.metadata_graph "$@"

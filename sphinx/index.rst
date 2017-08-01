@@ -13,6 +13,7 @@
    demo/lexers
    demo/admonitions
    demo/minicylc
+   command-reference
 
 Indices and tables
 ==================

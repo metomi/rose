@@ -27,37 +27,45 @@
 #     Select a host from a set of groups or names by load, by free memory
 #     or by random.
 #
-#     Use settings in $ROSE_HOME/etc/rose.conf and $HOME/.metomi/rose.conf to
-#     determine the ranking method.
+#     Use settings in `$ROSE_HOME/etc/rose.conf` and `$HOME/.metomi/rose.conf`
+#     to determine the ranking method.
 #
 #     Print the selected host name.
 #
 # OPTIONS
 #     --choice=N
-#         Choose from any of the top N hosts.
+#         Choose from any of the top `N` hosts.
 #     --debug
 #         Print stack trace on error.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --rank-method=METHOD[:METHOD-ARG]
 #         Specify the method for ranking a list of hosts. The method can be:
-#             "load" (by average load as reported by "uptime" divided by number
-#                     of virtual processors):
-#                 If METHOD-ARG is specified, it must be "1", "5" or "15". The
-#                 default is to use the 15 minute load.
-#             "fs" (by % usage of a file system as reported by df):
-#                 METHOD-ARG must be a valid file system in all the given hosts
-#                 and host groups. The default is to use the "~" directory.
-#             "mem" (by largest amount of free memory:
-#                 Uses free -m to return memory in Mb
-#             "random"
+#
+#         `load`
+#             Rank by average load as reported by `uptime` divided by number of
+#             virtual processors.
+#
+#             If `METHOD-ARG` is specified, it must be `1`, `5` or `15`. The
+#             default is to use the 15 minute load.
+#         `fs`
+#             Rank by % usage of a file system as reported by `df`.
+#
+#             `METHOD-ARG` must be a valid file system in all the given hosts
+#             and host groups. The default is to use the `~` directory.
+#         `mem`
+#             Rank by largest amount of free memory. Uses `free -m` to return
+#             memory in Mb
+#         `random`
+#             No ranking is used.
+#
 #     --threshold=[METHOD[:METHOD-ARG]:]VALUE
 #         Each of these option specifies a numeric value of a threshold of which
 #         the hosts must either not exceed or must be greater than depending on
-#         the specified method . Accepts the same METHOD and METHOD-ARG
-#         (and the same defaults) as the --rank-method=METHOD[:METHOD-ARG]
-#         option. (Obviously, the "random" method does not make sense in this
-#         case.) "load" and "fs" must not exceed threshold while "mem"
+#         the specified method . Accepts the same `METHOD` and `METHOD-ARG`
+#         (and the same defaults) as the `--rank-method=METHOD[:METHOD-ARG]`
+#         option. (Obviously, the `random` method does not make sense in this
+#         case.) `load` and `fs` must not exceed threshold while `mem`
 #         must be greater than threshold. A host not meeting a threshold
 #         condition will be excluded from the ranking list.
 #     --timeout=FLOAT
@@ -66,21 +74,21 @@
 #         Increment verbosity.
 #
 # CONFIGURATION
-#     The command reads its settings from the [rose-host-select] section in
-#     $ROSE_HOME/etc/rose.conf and $HOME/.metomi/rose.conf. All settings are
-#     optional. Valid settings are:
-#         default = GROUP/HOST ...
-#             The default arguments to use for this command.
-#         group{NAME} = GROUP/HOST ...
-#             Declare a named group of hosts.
-#         method{NAME} = METHOD[:METHOD-ARG]
-#             Declare the default ranking method for a group of hosts.
-#         thresholds{NAME} = [METHOD[:METHOD-ARG]:]VALUE ...
-#             Declare the default threshold(s) for a group of hosts.
-#         timeout = FLOAT
-#             Set the timeout in seconds of SSH commands to hosts.
-#             (default=10.0)
+#     The command reads its settings from the `[rose-host-select]` section in
+#     `$ROSE_HOME/etc/rose.conf` and `$HOME/.metomi/rose.conf`. All settings
+#     are optional. Type `rose config rose-host-select` to print settings.
+#     Valid settings are:
 #
-#     Type "rose config rose-host-select" to print settings.
+#     default = GROUP/HOST ...
+#        The default arguments to use for this command.
+#     group{NAME} = GROUP/HOST ...
+#        Declare a named group of hosts.
+#     method{NAME} = METHOD[:METHOD-ARG]
+#        Declare the default ranking method for a group of hosts.
+#     thresholds{NAME} = [METHOD[:METHOD-ARG]:]VALUE ...
+#        Declare the default threshold(s) for a group of hosts.
+#     timeout = FLOAT
+#        Set the timeout in seconds of SSH commands to hosts.
+#        (default=10.0)
 #-------------------------------------------------------------------------------
 exec python -m rose.host_select "$@"

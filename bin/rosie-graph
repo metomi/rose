@@ -28,10 +28,10 @@
 #
 # OPTIONS
 #     --distance=DISTANCE, -d DISTANCE
-#         The maximum distance (graph depth) for suites related to ID
+#         The maximum distance (graph depth) for suites related to `ID`
 #         to be plotted. For example, if the distance is 1, only the
-#         parents and children (but not siblings) of ID will be plotted.
-#         If not given, this is unlimited. Requires ID to be specified.
+#         parents and children (but not siblings) of `ID` will be plotted.
+#         If not given, this is unlimited. Requires `ID` to be specified.
 #     --output=FILE, -o FILE
 #         The name of the file for dumping the output. Otherwise,
 #         the output will go to a temporary file which will get
@@ -41,17 +41,19 @@
 #         Display suites from only the specified web services.
 #         This option can be used multiple times.
 #     --text
-#         Print parent and child suites of a suite ID. For example, for a
+#         Print parent and child suites of a suite `ID`. For example, for a
 #         suite "bar" you may get results like:
-#           [parent] foo
-#           [child1] baz
-#           [child1] qux
-#           [child2] quux
-#           [child3] corge
+#
+#         * `[parent] foo`
+#         * `[child1] baz`
+#         * `[child1] qux`
+#         * `[child2] quux`
+#         * `[child3] corge`
+#
 #         where "foo" is the parent of "bar", "baz" and "qux" its first
 #         generation children, "quux" its second generation child and "corge"
-#         its third generation child. Also supports use of the --property
-#         option for producing output. Requires ID to be specified.
+#         its third generation child. Also supports use of the `--property`
+#         option for producing output. Requires `ID` to be specified.
 #     --property=PROPERTY, -p PROPERTY
 #         Add a certain suite property to the node labels - e.g.
 #         owner or title. This option can be used multiple times.

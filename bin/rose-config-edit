@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 # NAME
-#     rose-config-edit
+#     rose config-edit
 #
 # SYNOPSIS
 #     rose-config-edit [OPTIONS]... [PAGE_PATH]...
@@ -31,42 +31,43 @@
 #
 # OPTIONS
 #     --config=DIR, -C DIR
-#        A path to either
-#        1) a directory containing a suite with a file named
-#           'suite.rc' and a directory called 'app' containing
-#           subdirectories with files named 'rose-app.conf',
+#        A path to either:
+#
+#        1. a directory containing a suite with a file named
+#           `suite.rc` and a directory called `app` containing
+#           subdirectories with files named `rose-app.conf`,
 #           in the format specified in the Rose pages.
-#        2) a directory containing a single 'application' - a file named
-#           'rose-app.conf' and an optional subdirectory called 'file'
+#        2. a directory containing a single 'application' - a file named
+#           `rose-app.conf` and an optional subdirectory called `file`
 #           with other application files.
+#
 #     --load-all-apps
 #        Force loading of all applications on startup.
 #     --load-no-apps
 #        Load applications in the suite on demand.
 #     --meta-path=PATH, -M PATH
-#        Prepend PATH to the search path for metadata (look here first).
+#        Prepend `PATH` to the search path for metadata (look here first).
 #        This option can be used repeatedly to load multiple paths.
 #     --new
 #        Launch, ignoring any configuration.
 #     --no-metadata
 #        Launch with metadata switched off.
 #     --no-warn=WARNING-TYPE
-#        Suppress warnings of the provided type.
+#        Suppress warnings of the provided type. `WARNING-TYPE` may be:
+#
+#        `version`
+#            Suppress "Could not find metadata for app/version, using app/HEAD"
+#            warnings.
 #
 # ARGUMENTS
 #     PAGE_PATH
 #        One or more paths to open on load, pages may be full or partial
-#        namespaces e.g. 'foo/bar/env' or 'env'.
-#        NOTE: Opens the shortest namespace that matches the provided string.
+#        namespaces e.g. `foo/bar/env` or `env`.
 #
-# OPTIONS
-#     no-warn
-#        Suppress warnings of type WARNING_TYPE. WARNING_TYPE may be:
-#            "version" 'Could not find metadata for app/version, using
-#                      app/HEAD' warnings.
+#        NOTE: Opens the shortest namespace that matches the provided string.
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_META_PATH
-#         Prepend $ROSE_META_PATH to the metadata search path.
+#         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
 exec python -m rose.config_editor.main "$@"

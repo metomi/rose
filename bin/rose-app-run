@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-app-run
+#     rose app-run
 #
 # SYNOPSIS
 #     rose app-run [OPTIONS] [--] [COMMAND ...]
@@ -26,43 +26,48 @@
 # DESCRIPTION
 #     Run an application according to its configuration.
 #
-#     May run a builtin application (if the "mode" setting in the configuration
+#     May run a builtin application (if the `mode` setting in the configuration
 #     specifies the name of a builtin application) or a command.
 #
 #     Determine the command to run in this order:
-#     1. If COMMAND is specified, invoke the command.
-#     2. If the --command-key=KEY option is defined, invoke the command
-#        specified in [command]KEY.
-#     3. If the ROSE_APP_COMMAND_KEY environment variable is set, the command
-#        specified in the [command]KEY setting in the application configuration
-#        whose KEY matches it is used.
-#     4. If the environment variable ROSE_TASK_NAME is defined and a setting in
-#        the [command] section has a key matching the value of the environment
-#        variable, then the value of the setting is used as the command.
-#     5. Invoke the command specified in [command]default.
+#
+#     1. If `COMMAND` is specified, invoke the command.
+#     2. If the `--command-key=KEY` option is defined, invoke the command
+#        specified in `[command]KEY`.
+#     3. If the `ROSE_APP_COMMAND_KEY` environment variable is set, the command
+#        specified in the `[command]KEY` setting in the application
+#        configuration whose `KEY` matches it is used.
+#     4. If the environment variable `ROSE_TASK_NAME` is defined and a setting
+#        in the `[command]` section has a key matching the value of the
+#        environment variable, then the value of the setting is used as the
+#        command.
+#     5. Invoke the command specified in `[command]default`.
 #
 # OPTIONS
 #     --app-mode=MODE
-#         Run a builtin application identified by MODE. The default MODE is
-#         "command".
+#         Run a builtin application identified by `MODE`. The default `MODE` is
+#         `command`.
 #     --config=DIR, -C DIR
-#         Specify the configuration directory of the application. (default=$PWD)
+#         Specify the configuration directory of the application.
+#         (default=`$PWD`)
 #     --command-key=KEY, -c KEY
-#         Invoke the command specified in [command]KEY.
+#         Invoke the command specified in `[command]KEY`.
 #     --define=[SECTION]KEY=VALUE, -D [SECTION]KEY=VALUE
-#         Each of these overrides the [SECTION]KEY setting with a given VALUE.
-#         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
-#         or even --define=[!SECTION].
+#         Each of these overrides the `[SECTION]KEY` setting with a given
+#         `VALUE`.
+#         Can be used to disable a setting using the syntax
+#         `--define=[SECTION]!KEY` or even `--define=[!SECTION]`.
 #     --install-only, -i
 #         Install files only. Do not invoke the run.
 #     --new, -N
-#         Remove all items in $PWD before doing anything. This option only
-#         works with the --config=DIR option and if $PWD is not DIR.
+#         Remove all items in `$PWD` before doing anything. This option only
+#         works with the `--config=DIR` option and if `$PWD` is not `DIR`.
 #     --no-overwrite
 #         Do not overwrite existing files.
 #     --opt-conf-key=KEY, -O KEY, --opt-conf-key='(KEY)', -O '(KEY)'
-#         Each of these switches on an optional configuration identified by KEY.
-#         The configurations are applied first-to-last. The '(KEY)' syntax
+#         Each of these switches on an optional configuration identified by
+#         `KEY`.
+#         The configurations are applied first-to-last. The `(KEY)` syntax
 #         denotes an optional configuration that can be missing. Otherwise, the
 #         optional configuration must exist.
 #     --quiet, -q
@@ -72,9 +77,9 @@
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_APP_COMMAND_KEY
-#         Switch to a particular command specified in [command]KEY
+#         Switch to a particular command specified in `[command]KEY`.
 #     optional ROSE_APP_OPT_CONF_KEYS
-#         Each KEY in this space delimited list switches on an optional
+#         Each `KEY` in this space delimited list switches on an optional
 #         configuration. The configurations are applied first-to-last.
 #     optional ROSE_FILE_INSTALL_ROOT
 #         If specified, change to the specified directory to install files.
