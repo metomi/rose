@@ -215,6 +215,18 @@ class CylcLexer(RegexLexer):
     }
 
 
+class CylcGraphLexer(CylcLexer):
+    """Pygments lexer for cylc graph strings."""
+
+    tokens = dict(CylcLexer.tokens)
+    tokens['root'] = list(tokens['graph'])
+
+    name = 'Cylc Graph'
+    aliases = ['cylc-graph']
+    filenames = []
+
+
 def setup(app):
     """Sphinx plugin setup function."""
     app.add_lexer('cylc', CylcLexer())
+    app.add_lexer('cylc-graph', CylcGraphLexer())

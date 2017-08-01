@@ -186,7 +186,7 @@ class MiniCylcDirective(GraphvizSimple):
         # Generate cylc code snippet if requested.
         if 'snippet' in self.options:
             ret.extend(CodeBlock(self.name,
-                                 ['bash'],  # Args. (TODO)
+                                 ['cylc-graph'],
                                  {},  # Opts.
                                  self.content,
                                  self.lineno,
