@@ -36,7 +36,7 @@ class MiniCylc(graphviz):
                 # Skip builtins.
                 continue
             attr = getattr(graphviz_node, item)
-            if type(attr) == types.MethodType:
+            if isinstance(attr, types.MethodType):
                 # Skip methods.
                 continue
             setattr(new_node, item, attr)
@@ -168,7 +168,7 @@ class MiniCylcDirective(GraphvizSimple):
             if not line:
                 continue
             temp = line.strip()
-            if temp[-1] in ['|', '&'] or temp [-2:] == '=>':
+            if temp[-1] in ['|', '&'] or temp[-2:] == '=>':
                 buff.append(line)
             elif buff:
                 lines.append(' '.join(buff))

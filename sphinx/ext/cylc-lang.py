@@ -17,7 +17,7 @@ class CylcLexer(RegexLexer):
     name = 'Cylc'
     aliases = ['cylc', 'suiterc']
     filenames = ['suite.rc']
-    #mimetypes = ['text/x-ini', 'text/inf']
+    # mimetypes = ['text/x-ini', 'text/inf']
 
     # Patterns, rules and tokens.
     tokens = {
@@ -171,8 +171,8 @@ class CylcLexer(RegexLexer):
              r'(\d{1,2}S)?'
              r')?'
 
-             r')'
-            , INTERCYCLE_OFFSET_TOKEN),
+             r')',
+             INTERCYCLE_OFFSET_TOKEN),
         ],
 
         # Wrapper for multi-line graph strings.
