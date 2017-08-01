@@ -27,28 +27,26 @@
 #     Run Rose self tests.
 #
 #     Change directory to Rose source tree, and runs this shell command:
-#            exec prove -j "$NPROC" -s -r "${@:-t}"
-#     where NPROC is the number of processors on your computer (or the setting
-#     [t]prove-options in the site/user configuration file). If you do not want
-#     to run the full test suite, you can specify the names of individual test
-#     files or their containing directories as extra arguments.
+#
+#     `exec prove -j "$NPROC" -s -r "${@:-t}"`
+#
+#     where `NPROC` is the number of processors on your computer (or the
+#     setting `[t]prove-options` in the site/user configuration file). If you
+#     do not want to run the full test suite, you can specify the names of
+#     individual test files or their containing directories as extra arguments.
 #
 # EXAMPLES
-#     Run the full test suite with the default options.
-#         rose test-battery
-#
-#     Run the full test suite with 12 processes.
-#         rose test-battery -j 12
-#
-#     Run only tests under "t/rose-app-run/" with 12 processes.
-#
-#         rose test-battery -j 12 t/rose-app-run
-#
-#     Run only "t/rose-app-run/07-opt.t" in verbose mode.
-#         rose test-battery -v t/rose-app-run/07-opt.t
+#     # Run the full test suite with the default options.
+#     rose test-battery
+#     # Run the full test suite with 12 processes.
+#     rose test-battery -j 12
+#     # Run only tests under "t/rose-app-run/" with 12 processes.
+#     rose test-battery -j 12 t/rose-app-run
+#     # Run only "t/rose-app-run/07-opt.t" in verbose mode.
+#     rose test-battery -v t/rose-app-run/07-opt.t
 #
 # SEE ALSO
-#     prove(1)
+#     * `prove(1)`
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
 . $(dirname $0)/../lib/bash/rose_log

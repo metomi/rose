@@ -27,19 +27,19 @@
 #     Delete suites.
 #
 #     Check the standard working copy location for a checked out suite
-#     matching ID and remove it if there is no uncommitted change (or if
-#     --force is specified).
+#     matching `ID` and remove it if there is no uncommitted change (or if
+#     `--force` is specified).
 #
 #     Delete the suite directory structure from the HEAD of the central
-#     repository matching the ID.
+#     repository matching the `ID`.
 #
-#     If no ID is specified and $PWD is a working copy of a suite, use the ID
-#     of the suite in the working copy.
+#     If no `ID` is specified and `$PWD` is a working copy of a suite, use the
+#     `ID` of the suite in the working copy.
 #
 # OPTIONS
 #     --force, -f
 #         Remove working copies even if there are uncommitted changes.
-#         Continue with the next ID if delete of a suite fails.
+#         Continue with the next `ID` if delete of a suite fails.
 #     --local-only
 #         Remove only the working copy of a suite.
 #     --non-interactive, --yes, -y

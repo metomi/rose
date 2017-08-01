@@ -24,9 +24,10 @@
 #     rose metadata-gen [OPTIONS] [PROPERTY=VALUE ...]
 #
 # DESCRIPTION
-#    Automatically generate metadata from an application or suite
-#    configuration. An aid for metadata development.
-#    WARNING - May Contain Thorns.
+#     Automatically generate metadata from an application or suite
+#     configuration. An aid for metadata development.
+#
+#     WARNING: May Contain Thorns.
 #
 # OPTIONS
 #     --auto-type
@@ -41,8 +42,8 @@
 #
 # ARGUMENTS
 #     PROPERTY[=VALUE] ...
-#        One or more key=value pairs of properties to specify for
-#        every setting e.g. "compulsory=true". If =VALUE is missing,
+#        One or more `key=value` pairs of properties to specify for
+#        every setting e.g. `compulsory=true`. If `=VALUE` is missing,
 #        the property will be set to a null string in each setting.
 #-------------------------------------------------------------------------------
 exec python -m rose.metadata_gen "$@"

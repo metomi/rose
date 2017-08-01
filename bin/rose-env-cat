@@ -26,26 +26,26 @@
 # DESCRIPTION
 #     Substitute environment variables in input files and print.
 #
-#     If no argument is specified, read from STDIN. One FILE argument may be
-#     "-", which means read from STDIN.
+#     If no argument is specified, read from STDIN. One `FILE` argument may be
+#     `-`, which means read from STDIN.
 #
-#     In "match-mode=default", the command will look for $NAME or ${NAME}
+#     In `match-mode=default`, the command will look for `$NAME` or `${NAME}`
 #     syntax and substitute them with the value of the environment variable
-#     NAME. A backslash in front of the syntax, e.g. \$NAME or \${NAME} will
-#     escape the substitution.
+#     `NAME`. A backslash in front of the syntax, e.g. `\$NAME` or `\${NAME}`
+#     will escape the substitution.
 #
-#     In "match-mode=brace", the command will look for ${NAME} syntax only.
+#     In `match-mode=brace`, the command will look for `${NAME}` syntax only.
 #
 # OPTIONS
 #     --match-mode=MODE, -m MODE
-#         Specify the match mode, which can be "brace" or "default".
+#         Specify the match mode, which can be `brace` or `default`.
 #     --output=FILE, -o FILE
-#         Specify an output file. If no output file is specified or if FILE is
-#         "-", write output to STDOUT.
+#         Specify an output file. If no output file is specified or if `FILE`
+#         is `-`, write output to STDOUT.
 #     --unbound=STRING, --undef=STRING
 #         The command will normally fail on unbound (or undefined) variables.
 #         If this option is specified, the command will substitute an unbound
-#         variable with the value of STRING, (which can be an empty string),
+#         variable with the value of `STRING`, (which can be an empty string),
 #         instead of failing.
 #-------------------------------------------------------------------------------
 exec python -m rose.env_cat "$@"

@@ -26,13 +26,13 @@
 # DESCRIPTION
 #     Launch suite engine's suite control GUI for a suite.
 #
-#     If --name=SUITE-NAME is not specified, the name will be determined by
-#     locating a rose-suite.conf file in $PWD or its nearest parent
+#     If `--name=SUITE-NAME` is not specified, the name will be determined by
+#     locating a `rose-suite.conf` file in `$PWD` or its nearest parent
 #     directories. In a normal suite, the basename of the (nearest parent)
-#     directory containing the rose-suite.conf file is assumed to be the suite
-#     name. In a project containing a rose stem suite, the basename of the
-#     (nearest parent) directory containing the rose-stem/rose-suite.conf file
-#     is assumed to be the suite name.
+#     directory containing the `rose-suite.conf` file is assumed to be the
+#     suite name. In a project containing a rose stem suite, the basename of
+#     the (nearest parent) directory containing the `rose-stem/rose-suite.conf`
+#     file is assumed to be the suite name.
 #
 #     This wrapper is to deal with the use case where a suite may be running on
 #     dedicated servers at a site. The wrapper will make an attempt to detect

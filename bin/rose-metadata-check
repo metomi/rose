@@ -29,7 +29,7 @@
 # OPTIONS
 #     --config=DIR, -C DIR
 #        The directory containing the configuration metadata i.e.
-#        containing the rose-meta.conf file, amongst other things.
+#        containing the `rose-meta.conf` file, amongst other things.
 #        If not specified, the current directory will be used.
 #     --property=PROPERTY, -p PROPERTY
 #        Only check a certain property e.g. trigger. This can be
@@ -37,7 +37,7 @@
 # ARGUMENTS
 #     ID
 #        One or more sections (configuration IDs) to check in the
-#        metadata e.g.env=FOO or namelist:bar. If specified, only
+#        metadata e.g.`env=FOO` or `namelist:bar`. If specified, only
 #        this section will be checked.
 #-------------------------------------------------------------------------------
 exec python -m rose.metadata_check "$@"

@@ -151,6 +151,33 @@ version|--version|-V)
     print_version
     exit
     :;;
+doc)
+    PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
+    PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
+    ROSE_UTIL=$UTIL
+    export PATH PYTHONPATH ROSE_UTIL
+    let ns_len=${#ROSE_NS}+2
+    for U in $(cd $ROSE_HOME_BIN && ls $ROSE_NS-*); do
+        NAME=$(sed "s/^$ROSE_NS-\\(.*\\)\$/\1/" <<<$U)
+        ALIAS=$(get_alias $NAME)
+        if [[ -n $ALIAS ]]; then
+            echo '=================================================='
+            echo "${ROSE_NS} ${NAME} -> ${ROSE_NS} ${ALIAS}"
+            echo '=================================================='
+            echo
+        else
+
+            echo '=================================================='
+            echo "$ROSE_NS $NAME"
+            echo '=================================================='
+            echo
+            PAGER=cat
+            help_util $(echo $U | cut -c ${ns_len}-)
+            echo
+        fi
+    done
+    exit 0
+    :;;
 esac
 
 COMMAND=$(dirname $0)/$ROSE_NS-$UTIL
