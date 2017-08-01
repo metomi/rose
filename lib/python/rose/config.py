@@ -422,8 +422,6 @@ class ConfigNode(object):
         return getattr(self.get(keys, no_ignore=True), "value", default)
 
     def set(self, keys=None, value=None, state=None, comments=None):
-        # TODO: Are keys=[''] really skipped?
-        # TODO: Should comments be a list?
         """Set node properties at the position of keys, if any.
 
         Arguments:
@@ -789,7 +787,6 @@ class ConfigNodeDiff(object):
         return node
 
     def set_added_setting(self, keys, data):
-        # TODO: type(comments) == str ?
         """Set a config setting to be "added" in this ConfigNodeDiff.
 
         Args:
@@ -818,7 +815,6 @@ class ConfigNodeDiff(object):
         self._data[self.KEY_ADDED][keys] = data
 
     def set_modified_setting(self, keys, old_data, data):
-        # TODO: Really?
         """Set a config setting to be "modified" in this ConfigNodeDiff.
 
         If a property in both the old_data and data (new data) are both set to
