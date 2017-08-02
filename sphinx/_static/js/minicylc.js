@@ -1,5 +1,5 @@
 // Default cylc colour theme.
-minicylc_default_theme = {
+var minicylc_default_theme = {
     'waiting_fill': 'none',
     'waiting_stroke': '#88c6ff',
     'running_fill': '#00c410',
@@ -9,7 +9,7 @@ minicylc_default_theme = {
 }
 
 // Demo colour theme for demmonstrating workflow logic.
-minicylc_demo_theme = {
+var minicylc_demo_theme = {
     'succeed_fill': '#aabbff',
     'succeed_stroke': 'black'
 }
@@ -69,7 +69,7 @@ class MiniCylc {
          */
         var nodes = {};
         var edges = {};
-        $(svg).find('.graph g').each(function(index) {
+        $(svg).find('.graph g').each(function() {
             var node = $(this)[0];
             var node_class = $(node).attr('class');
             if (node_class == 'node') {
@@ -112,8 +112,8 @@ class MiniCylc {
          * @param deps A list of dependencies in the form [[left, right], ...].
          */
         var condition;
-        var conditional_regex = /[\(\)\&]/;
-        var conditional_regex2 = /([\(\)\&\|])/;
+        var conditional_regex = /[()&]/;
+        var conditional_regex2 = /([()&|])/;
         var conditional_chars = ['(', ')', '|', '&'];
         this.dependencies = {};
         for (let dep of deps) {
