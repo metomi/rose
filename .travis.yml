@@ -29,6 +29,7 @@ install:
     - sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- | sudo apt-key add -
     - sudo apt-get update
     - sudo apt-get install -y subversion
+    - npm install -g eslint
 
 script: 
     - rose test-battery --state=save -j 5 || (echo -e "\n\nRerunning Failed Tests...\n\n"; rose test-battery --state=save,failed -j 5)
