@@ -20,7 +20,7 @@
 # Test "rose suite-run", reload "suite.rc".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-tests 4
+tests 3
 export ROSE_CONF_PATH=
 mkdir -p src
 cp -r $TEST_SOURCE_DIR/$TEST_KEY_BASE/* src
@@ -43,8 +43,6 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] install: suite.rc
 [INFO] $NAME: will reload on localhost
 __OUT__
-sed -i '/no HTTPS support/d' "${TEST_KEY}.err"
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" /dev/null
 poll ! grep -q \
     -e 'RELOADING.TASK.DEFINITION.FOR.t1\.20130101T0000Z' \
     -e 'RELOADING.TASK.DEFINITION.FOR.t1\.20130101T1200Z' \
