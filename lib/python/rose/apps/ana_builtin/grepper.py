@@ -59,6 +59,9 @@ class SingleCommandStatus(AnalysisTask):
             self.reporter(stdout, prefix="[INFO] ")
             self.passed = True
         else:
+            self.reporter("STDOUT:", prefix="[FAIL] ")
+            self.reporter(stdout, prefix="[FAIL] ")
+            self.reporter("STDERR:", prefix="[FAIL] ")
             self.reporter(stderr, prefix="[FAIL] ")
 
     def check_for_skip(self):
