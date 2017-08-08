@@ -46,7 +46,7 @@ mkdir -p 'conf'
 cat >'conf/rose.conf' <<__CONF__
 [rose-suite-run]
 remote-no-login-shell=${T_HOST}=true
-remote-host-bin=${T_HOST}=${T_HOST_ROSE_HOME}/bin/rose
+remote-rose-bin=${T_HOST}=${T_HOST_ROSE_HOME}/bin/rose
 __CONF__
 export ROSE_CONF_PATH="${PWD}/conf"
 
