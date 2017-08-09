@@ -13,8 +13,8 @@
 #
 #     Alternatively, show the available upgrade/downgrade versions:
 #
-#     * "=" indicates the current version.
-#     * "*" indicates the default version to change to.
+#     * `=` indicates the current version.
+#     * `*` indicates the default version to change to.
 #
 #     If an application contains optional configurations, loop through
 #     each one, combine with the main, upgrade it, and re-create it as
