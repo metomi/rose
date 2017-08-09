@@ -1,12 +1,35 @@
+# -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+"""An extension providing a pygments lexer for rose configuration files."""
+
 from pygments.lexer import RegexLexer, bygroups, include, words
-from pygments.token import *
+from pygments.token import (Comment, Name, Text, Operator, String)
 
 
 class RoseLexer(RegexLexer):
     """Pygments lexer for the rose rose-app.conf language."""
 
-    # Rose - re-used patterns.
+    # Pattern for a rose setting with capture groups.
     ROSE_SETTING_PATTERN = r'^([\s\t]+)?([\w\{\}-]+)(\s+)?(=)(\s+)?'
+
+    # Pattern for a rose (ignored|trigger-ignored|regular) setting.
     ROSE_SETTING_VALUE_PATTERN = ('{0}'  # '', '!', '!!'.
                                   r'[\w{{}}-]+(\s+)?=(\s+)?'
                                   r'[^\n]+((\n[\s\t]+=[^\n]+)+)?')
@@ -49,9 +72,9 @@ class RoseLexer(RegexLexer):
             (r'\[.*\]', Name.Tag, 'section'),
         ],
 
-        # Rose comments - single and inline w/ or w/o/ leading whitespace.
+        # Rose comments - w/ or w/o/ leading whitespace.
         'comment': [
-            (r'([\s\t]+)?(#[^\n]+)', Comment.Single)
+            (r'^([\s\t]+)?(#[^\n]+)$', Comment.Single)
         ],
 
         # Rose settings broken down by constituent parts, values handled
