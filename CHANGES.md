@@ -5,6 +5,34 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2017-Q3?)
+
+Rose release 51. This release is expected to be used with:
+* [cylc-7.4.0](https://github.com/cylc/cylc/releases/tag/7.4.0) or
+  the upcoming cylc release, and
+* [fcm-2017.02.0](https://github.com/metomi/fcm/releases/tag/2017.02.0).
+
+### Noteworthy Changes
+
+[#2099](https://github.com/metomi/rose/pull/2099):
+rose_ana: grepper now prints to STDOUT on failure.
+
+[#2096](https://github.com/metomi/rose/pull/2096):
+rose suite-run: timestamp for log directory on a remote job host should now
+match that of the suite host.
+
+[#2094](https://github.com/metomi/rose/pull/2094):
+rose macro: improve feedbad for invalid input.
+
+[#2090](https://github.com/metomi/rose/pull/2090):
+Rose Bush: improve suite search logic - always drill down at least a level from
+the root at `~/cylc-run/`.
+
+[#2089](https://github.com/metomi/rose/pull/2089):
+Rose Bush: add links to `.txt` and `.html` files in suite's `log/` directory.
+
+--------------------------------------------------------------------------------
+
 ## 2017.05.0 (2017-05-17)
 
 Rose release 50. This release is expected to be used with:
