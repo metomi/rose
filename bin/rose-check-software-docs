@@ -39,6 +39,8 @@ from subprocess import check_call, CalledProcessError, PIPE
 
 
 ENTRY_LENGTH = 45
+PASS = 'ok'
+FAIL = 'not ok'
 
 
 def parse_version(version):
@@ -50,7 +52,7 @@ def string_version(version_tuple):
 
 
 def check_python_version(min_version, max_version=None):
-    """Check if a minimum versiojn of python is installed.
+    """Check if a minimum version of python is installed.
 
     Args:
         min_version (tuple): Tuple of the minimum acceptible version.
@@ -68,13 +70,9 @@ def check_python_version(min_version, max_version=None):
         msg = 'python (%s+)' % string_version(min_version)
     sys.stdout.write(msg + '.' * (ENTRY_LENGTH - len(msg)))
     version = sys.version_info
-    ret = True
-    if version >= min_version:
-        if max_version and not version < max_version:
-            ret = False
-    else:
-        ret = False
-    sys.stdout.write('%s (%s)\n' % ('PASS' if ret else 'FAIL -',
+    ret = (version >= min_version and
+           (not max_version or version < max_version))
+    sys.stdout.write('%s (%s)\n' % (PASS if ret else FAIL + ' -',
                                       string_version(version)))
     return ret
 
@@ -96,18 +94,18 @@ def check_python_module_version(module, min_version):
     try:
         imported_module = __import__(module)
     except ImportError:
-        sys.stdout.write('FAIL - Module not installed.\n')
+        sys.stdout.write('%s - Module not installed.\n' % FAIL)
         return False
     try:
         module_version = imported_module.__version__
     except AttributeError:
-        sys.stdout.write('FAIL - Could not determine module version\n')
+        sys.stdout.write('%s - Could not determine module version\n' % FAIL)
         return False
     if parse_version(module_version) >= min_version:
-        sys.stdout.write('PASS (%s)\n' % module_version)
+        sys.stdout.write('%s (%s)\n' % (PASS, module_version))
         return True
     else:
-        sys.stdout.write('FAIL - (%s)\n' % module_version)
+        sys.stdout.write('%s - (%s)\n' % (FAIL, module_version))
         return False
 
 
@@ -132,7 +130,7 @@ def check_shell_command_present(command):
         sys.stdout.write('Fail - Command not found\n')
         return False
     else:
-        sys.stdout.write('PASS\n')
+        sys.stdout.write('%s\n' % PASS)
         return True
 
 
@@ -144,10 +142,7 @@ def check_core_deps():
         check_python_module_version('sphinx', (1, 5, 3)),
         check_python_module_version('sphinx_rtd_theme', (0, 2, 4))
     ]
-    if all(ret):
-        sys.stdout.write('*PASS*\n')
-    else:
-        sys.stdout.write('*FAIL*\n')
+    sys.stdout.write('*%s*\n' % (PASS if all(ret) else FAIL))
     return all(ret)
 
 
@@ -159,9 +154,9 @@ def check_latex_deps():
         check_shell_command_present('pdflatex')
     ]
     if all(latex):
-        sys.stdout.write('*PASS*\n')
+        sys.stdout.write('*%s*\n' % PASS)
     else:
-        sys.stdout.write('*FAIL*\n')
+        sys.stdout.write('*%s*\n' % FAIL)
     return all(latex)
 
 
@@ -187,10 +182,7 @@ def main(builders):
             pass
 
     # Exit code
-    if all(ret):
-        sys.exit(0)
-    else:
-        sys.exit(1)
+    sys.exit(not all(ret))
 
 
 if __name__ == '__main__':

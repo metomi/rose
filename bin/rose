@@ -172,7 +172,7 @@ doc)
             echo '=================================================='
             echo
             PAGER=cat
-            help_util $(echo $U | cut -c ${ns_len}-)
+            help_util $(cut -c "${ns_len}-" <<<"${U}")
             echo
         fi
     done

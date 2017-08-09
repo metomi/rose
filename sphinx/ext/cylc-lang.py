@@ -1,5 +1,28 @@
+# -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+"""An extension providing pygments lexers for suite.rc files and cylc graph
+strings."""
+
 from pygments.lexer import RegexLexer, bygroups, include, words
-from pygments.token import *
+from pygments.token import (Name, Comment, Text, Operator, String,
+                            Punctuation, Error, Keyword)
 
 
 class CylcLexer(RegexLexer):
@@ -114,9 +137,16 @@ class CylcLexer(RegexLexer):
 
         # Parameterised syntax:  <foo=1>
         'parameterisation': [
-            (r'(\<)(\s?\w+\s?(?:[+-=]\s?\d+)?\s?'
-             r'(?:(?:\s?,\s?\w+\s?(?:[+-=]\s?\d+)?\s?)+)?'
-             r')(\>)',
+            (r'(\<)'  # Opening greater-than bracket.
+             r'(\s?\w+\s?'  # Parameter name (permit whitespace).
+             r'(?:[+-=]\s?\w+)?'  # [+-=] for selecting parameters.
+             r'\s?'  # Permit whitespace.
+             r'(?:'  # BEGIN optional extra parameter groups...
+             r'(?:\s?,\s?\w+\s?'  # Comma seperated parameters.
+             r'(?:[+-=]\s?\w+)?'  # [+-=] for selecting parameters.
+             r'\s?)'  # Permit whitespace.
+             r'+)?'  # ...END optional extra parameter groups.
+             r')(\>)',  # Closing lesser-than bracket.
              bygroups(Text, PARAMETERISED_TASK_TOKEN, Text)),
             (r'(\<)(.*)(\>)', bygroups(Text, Error, Text))
         ],

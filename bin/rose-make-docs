@@ -50,6 +50,9 @@
 #         For building a single page HTML document.
 #     `latexpdf`
 #         For building PDF documentation.
+#     `clean`
+#         Removes all builds (rose make-docs clean <build> will force a
+#         complete re-build).
 #
 # DEVELOPMENT BUILDS
 #     For development purposes use the following BUILDs:
@@ -63,20 +66,22 @@
 #         Checks external links.
 #
 #-----------------------------------------------------------------------------
+set -e
+set -o pipefail
 
 # Move into rose directory
-cd $(dirname $0)/../
+cd "$(dirname $0)/../"
 
 VENV_PATH='venv'  # Path for virtualenv.
-VENV=false  # Set to `true` when the virtualenv is being used.
+USING_VENV=false  # Set to `true` when the virtualenv is being used.
 SPHINX_PATH=sphinx  # Path to the sphinx directory.
 
-function venv-activate () {
-    VENV=true
+venv-activate () {
+    USING_VENV=true
     . "${VENV_PATH}/bin/activate"
 }
 
-function venv-install () {
+venv-install () {
     venv-destroy
     virtualenv --python=python2.7 "${VENV_PATH}"
     venv-activate
@@ -84,23 +89,23 @@ function venv-install () {
     pip install sphinx_rtd_theme
 }
 
-function venv-deactivate () {
-    deactivate >/dev/null 2>&1
+venv-deactivate () {
+    deactivate >/dev/null 2>&1 || true
 }
 
-function venv-destroy () {
+venv-destroy () {
     venv-deactivate
     rm -rf "${VENV_PATH}"
 }
 
 # Parse command line args.
-YES=false
+VENV_MODE=false
 DEV_MODE=${SPHINX_DEV_MODE:=false}
 BUILDS=''
 while [[ $# -gt 0 ]]; do
     case $1 in
         --venv)
-            YES=true
+            VENV_MODE=true
             shift
             ;;
         --dev)
@@ -108,17 +113,17 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            BUILDS="$BUILDS $1"
+            BUILDS="${BUILDS} $1"
             shift
             ;;
     esac
 done
-if [[ ${BUILDS} == '' ]]; then
+if [[ -z "${BUILDS}" ]]; then
     BUILDS='html'
 fi
 
 # Use virtualenv if present and requested or if we are in development mode.
-if [[ ${DEV_MODE} || ${YES} ]]; then
+if [[ "${DEV_MODE:-false}" || "${VENV_MODE:-false}" ]]; then
     if [ -d "${VENV_PATH}" ]; then
         venv-activate
     fi
@@ -128,28 +133,27 @@ fi
 for build in ${BUILDS}; do
     if ! rose-check-software-docs ${build} >/dev/null; then
         echo "Software dependencies for a ${build} build are missing."
-        echo "run `rose software-check-docs ${build}` for details."
+        echo "run `rose check-software-docs ${build}` for details."
         exit 1
     fi
 done
 
 # Check core (sphinx) builder.
 if ! rose-check-software-docs core >/dev/null; then
-    if ${YES}; then
+    if ${VENV_MODE}; then
         venv-install
     else
         echo 'Software required by the rose documentation builder is not'
-        echo 'present (run `rose software-check-docs` for details).'
+        echo 'present (run `rose check-software-docs` for details).'
         echo
-        echo 'The documentation can still be built by installing dedencies'
+        echo 'The documentation can still be built by installing dependencies'
         echo 'in a python virtual enironment (virtualenv). This environment'
         echo "will be created in rose/${VENV_PATH} and will be removed after"
         echo 'use. To keep the virtualenv for future builds run this command'
         echo 'with the "--dev" option.'
         echo
-        while true; do
-            read -p 'Proceed using a virtualenv (y/n)? ' in
-            case $in in
+        while read -p 'Proceed using a virtualenv (y/n)? ' usr; do
+            case ${usr} in
                 [Yy])
                     venv-install
                     break
@@ -168,7 +172,7 @@ fi
 make -C "${SPHINX_PATH}" ${BUILDS}
 
 # Remove virtualenv if used and if we are not in development mode.
-if ${VENV}; then
+if ${USING_VENV}; then
     if ! ${DEV_MODE}; then
         venv-destroy
     fi 
