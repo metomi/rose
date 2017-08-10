@@ -405,7 +405,7 @@ class SuiteRunner(Runner):
                 names = shlex.split(
                     conf.get_value(["rose-suite-run", "hosts"], ""))
                 if names:
-                    hosts += self.host_selector.expand(names)[0]
+                    hosts += names
 
         if (hosts and len(hosts) == 1 and
                 self.host_selector.is_local_host(hosts[0])):

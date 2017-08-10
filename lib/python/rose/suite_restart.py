@@ -84,8 +84,7 @@ class SuiteRestarter(object):
             hosts = []
             val = ResourceLocator.default().get_conf().get_value(
                 ["rose-suite-run", "hosts"], "localhost")
-            known_hosts = self.host_selector.expand(val.split())[0]
-            for known_host in known_hosts:
+            for known_host in val.split():
                 if known_host not in hosts:
                     hosts.append(known_host)
 
