@@ -60,7 +60,6 @@ LANG=C sort "$TEST_KEY.out" >"$TEST_KEY.sorted.out"
 if [[ -n "$JOB_HOST" ]]; then
     # We do not know the relative sort order of $SUITE_RUN_DIR and $JOB_HOST.
     LANG=C sort >"$TEST_KEY.expected.out" <<__OUT__
-[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
 [INFO] delete: localhost:cylc-run/${NAME}/share/cycle/20200101T0000Z
 [INFO] delete: localhost:cylc-run/${NAME}/share/cycle/20100101T0000Z
 [INFO] delete: localhost:cylc-run/${NAME}/share/cycle/20000101T0000Z
@@ -70,7 +69,6 @@ if [[ -n "$JOB_HOST" ]]; then
 __OUT__
 else
     cat >"$TEST_KEY.expected.out" <<__OUT__
-[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
 [INFO] delete: localhost:cylc-run/${NAME}/share/cycle/20000101T0000Z
 [INFO] delete: localhost:cylc-run/${NAME}/share/cycle/20100101T0000Z
 [INFO] delete: localhost:cylc-run/${NAME}/share/cycle/20200101T0000Z

@@ -24,7 +24,6 @@ from datetime import datetime
 from fnmatch import fnmatchcase
 from glob import glob
 import os
-import re
 from rose.config import ConfigDumper, ConfigLoader, ConfigNode
 from rose.env import env_var_process
 from rose.host_select import HostSelector
@@ -37,7 +36,6 @@ from rose.run_source_vc import write_source_vc_info
 from rose.suite_clean import SuiteRunCleaner
 from rose.suite_control import SuiteNotRunningError
 import shlex
-import socket
 import sys
 from tempfile import TemporaryFile
 from time import sleep, strftime, time
@@ -177,12 +175,12 @@ class SuiteRunner(Runner):
             hosts.append(opts.host)
         if opts.run_mode == "reload":
             suite_run_hosts = self.suite_engine_proc.get_suite_run_hosts(
-                None, suite_name, hosts)
+                None, suite_name)
             if not suite_run_hosts:
                 raise SuiteNotRunningError(suite_name)
             hosts = suite_run_hosts
         else:
-            self.suite_engine_proc.check_suite_not_running(suite_name, hosts)
+            self.suite_engine_proc.check_suite_not_running(suite_name)
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
@@ -418,7 +416,6 @@ class SuiteRunner(Runner):
         # FIXME: values in environ were expanded in the localhost
         self.suite_engine_proc.run(
             suite_name, host, environ, opts.run_mode, args)
-        open("rose-suite-run.host", "w").write(host + "\n")
 
         # Disconnect log file handle, so monitoring tool command will no longer
         # be associated with the log file.

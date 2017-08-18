@@ -22,18 +22,15 @@
 import filecmp
 from glob import glob
 import os
-from pipes import quote
 import pwd
 import re
 from random import shuffle
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
-from rose.resource import ResourceLocator
 from rose.suite_engine_proc import (
-    SuiteEngineProcessor, SuiteHostConnectError, SuiteScanResult,
+    SuiteEngineProcessor, SuiteScanResult,
     SuiteEngineGlobalConfCompatError, TaskProps)
-import shlex
 import signal
 import socket
 import sqlite3
@@ -43,7 +40,6 @@ from time import sleep, time
 from uuid import uuid4
 
 
-_PORT_FILE = "port-file"
 _PORT_SCAN = "port-scan"
 
 
@@ -158,7 +154,7 @@ class CylcProcessor(SuiteEngineProcessor):
         self._db_close(suite_name)
         return auths
 
-    def get_suite_run_hosts(self, user_name, suite_name, host_names=None):
+    def get_suite_run_hosts(self, user_name, suite_name):
         """Return a list of host(s) where suite_name has running processes."""
         if user_name is None:
             user_name = pwd.getpwuid(os.getuid()).pw_name
@@ -170,122 +166,17 @@ class CylcProcessor(SuiteEngineProcessor):
 
         # Get suite host name from:
         # * ~USERID/cylc-run/SUITE/.service/contact
-        # * ~USERID/cylc-run/SUITE/log/rose-suite-run.host
-        for func in [self._host_from_contact_file, self._host_from_rose_log]:
-            try:
-                file_path, host_name = func(user_name, suite_name)
-            except (IOError, IndexError, TypeError):
-                # Not running on localhost?
-                # Running on usual hosts with no share FS?
-                # (port file) Suite started with version before cylc-6.8.0?
-                pass
-            else:
-                if host_name:
-                    yes_list, no_list, fail_list = self._suite_hosts_pgrep(
-                        user_name, suite_name, [host_name])
-                    if yes_list:
-                        return [host_name]
-                    elif no_list:
-                        if file_path:
-                            self.fs_util.delete(file_path)
-                        return []
-                    else:  # fail_list
-                        raise SuiteHostConnectError(
-                            suite_name, user_name, [host_name])
-
-        # Look for suite on specified or configured suite hosts
-        yes_list, _, fail_list = self._suite_hosts_pgrep(
-            user_name, suite_name, host_names)
-        if yes_list:  # If suite running on any host, report them
-            return yes_list
-        elif fail_list:  # Suite may still be running on unconnected hosts
-            raise SuiteHostConnectError(suite_name, user_name, fail_list)
-        else:  # We can be quite sure that suite is not running
-            return []
-
-    @classmethod
-    def _host_from_contact_file(cls, user_name, suite_name):
-        """Get host from port file line 2, require cylc-6.8.0+."""
         file_path = os.path.join(
             os.path.expanduser("~" + user_name),
-            cls.get_suite_dir_rel(suite_name, ".service", "contact"))
+            self.get_suite_dir_rel(suite_name, ".service", "contact"))
         try:
             for line in open(file_path):
                 key, value = [item.strip() for item in line.split("=", 1)]
                 if key == "CYLC_SUITE_HOST":
-                    return file_path, value
-        except IOError, ValueError:
-            return
-
-    def _host_from_rose_log(self, user_name, suite_name):
-        """Get host from rose-suite-run.host file."""
-        file_path = os.path.join(
-            os.path.expanduser("~" + user_name),
-            self.get_suite_dir_rel(suite_name, "log", "rose-suite-run.host"))
-        return file_path, open(file_path).read().strip()
-
-    def _suite_hosts_pgrep(self, user_name, suite_name, host_names=None):
-        """Helper for "self.get_suite_run_hosts".
-
-        Return [yes_list, no_list, fail_list] where yes_list contains a list
-        of hosts with processes running suite_name, no_list contains a list of
-        hosts with no processes running suite_name and fail_list contains a
-        list of hosts that we are unable to connect to.
-        """
-        if not host_names:
-            conf = ResourceLocator.default().get_conf()
-            host_names = ["localhost"]
-            for key in ["scan-hosts", "hosts"]:
-                names = shlex.split(
-                    conf.get_value(["rose-suite-run", key], ""))
-                if names:
-                    host_names += self.host_selector.expand(names)[0]
-        pgrep = [
-            "pgrep", "-f", "-u", user_name,
-            self.PGREP_CYLC_RUN % (suite_name)]
-        host_name_ctx_dict = {}
-        if self.user is None:
-            self.user = pwd.getpwuid(os.getuid()).pw_name
-        for host_name in host_names:
-            if (self.host_selector.is_local_host(host_name) and
-                    (not user_name or user_name == self.user)):
-                # localhost
-                host_name_ctx_dict[host_name] = (
-                    self.popen.run_bg(*pgrep), True)  # is_local=True
-            else:
-                # alternate host and/or alternate user
-                auth = host_name
-                if user_name:
-                    auth = user_name + "@" + host_name
-                command = self.popen.get_cmd("ssh", "-n", auth, (
-                    " ".join([quote(item) for item in pgrep]) + " || true"))
-                host_name_ctx_dict[host_name] = (
-                    self.popen.run_bg(*command), False)  # is_local=False
-        yes_list = []
-        no_list = []
-        fail_list = []
-        while host_name_ctx_dict:
-            for host_name, ctx in host_name_ctx_dict.items():
-                proc, is_local = ctx
-                ret_code = proc.poll()
-                if ret_code is None:
-                    continue
-                host_name_ctx_dict.pop(host_name)
-                out = proc.communicate()[0]
-                ret_code = proc.wait()
-                if out and out.splitlines()[0].isdigit():
-                    # pgrep has returned some entries
-                    # suite running on host
-                    yes_list.append(host_name)
-                elif is_local or ret_code == 0:
-                    # pgrep has no entry, local or ssh did not fail
-                    # suite not running on host
-                    no_list.append(host_name)
-                else:
-                    # ssh failed
-                    # can't tell if suite running on host or not
-                    fail_list.append(host_name)
-        return yes_list, no_list, fail_list
+                    return [value]
+        except (IOError, ValueError):
+            pass
+        return []
 
     def get_task_auth(self, suite_name, task_name):
         """
@@ -688,7 +579,7 @@ class CylcProcessor(SuiteEngineProcessor):
             else:
                 ret_code = proc.wait()
                 out, err = proc.communicate()
-                exceptions.append(RosePopenError(key[2], ret_code, out, err))
+                exceptions.append(RosePopenError(cmd, ret_code, out, err))
         return (sorted(results.values()), exceptions)
 
     def shutdown(self, suite_name, host=None, engine_version=None, args=None,

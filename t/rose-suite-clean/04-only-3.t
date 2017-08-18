@@ -52,7 +52,6 @@ TEST_KEY="$TEST_KEY_BASE-work"
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work
 {
     LANG=C sort <<__OUT__
-[INFO] delete: ${HOME}/cylc-run/${NAME}/log/rose-suite-run.host
 [INFO] delete: localhost:${ROOT_DIR_WORK}/cylc-run/${NAME}/work
 [INFO] delete: localhost:cylc-run/${NAME}/work
 __OUT__

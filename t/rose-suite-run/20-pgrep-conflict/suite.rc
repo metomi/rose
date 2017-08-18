@@ -1,6 +1,0 @@
-[scheduling]
-    [[dependencies]]
-        graph = foo
-[runtime]
-    [[foo]]
-        script = true
