@@ -32,8 +32,7 @@
 #     --non-interactive, --yes, -y
 #         Switch off interactive prompting.
 #     --output=DIR, -O DIR
-#         The location of the output directory. Only meaningful if
-#         there is at least one transformer in the argument list.
+#         The location of the output directory.
 #     --quiet, -q
 #         Reduce verbosity.
 #
