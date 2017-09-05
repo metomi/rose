@@ -146,7 +146,7 @@ class RoseBunchApp(BuiltinApp):
 
         if self.fail_mode not in self.FAIL_MODE_TYPES:
             raise ConfigValueError([self.BUNCH_SECTION, "fail-mode"],
-                                   fail_mode,
+                                   self.fail_mode,
                                    "not a valid setting")
 
         self.incremental = conf_tree.node.get_value([self.BUNCH_SECTION,
