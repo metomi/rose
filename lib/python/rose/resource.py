@@ -140,9 +140,9 @@ class ResourceLocator(object):
         util = self.util
         try:
             if namespace is None:
-                namespace = os.getenv("ROSE_NS")
+                namespace = os.environ["ROSE_NS"]
             if util is None:
-                util = os.getenv("ROSE_UTIL")
+                util = os.environ["ROSE_UTIL"]
             return namespace + separator + util
         except KeyError:
             return os.path.basename(sys.argv[0])
