@@ -68,4 +68,3 @@ def setup(app):
     app.add_directive('practical', Practical)
     app.add_directive('spoiler', Spoiler)
     app.add_javascript('js/spoiler.js')  # self-hiding node.
-    app.add_stylesheet('css/rtd-theme-fix.css')

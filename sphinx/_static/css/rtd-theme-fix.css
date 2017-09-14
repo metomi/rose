@@ -18,3 +18,43 @@
 .rst-content .attention .admonition-title {
     background: orange
 }
+
+/* Enable theme handling of pilcrow symbols for code-block captions. */
+.rst-content div.code-block-caption .pull-left.headerlink {
+	margin-right:.3em
+}
+.rst-content div.code-block-caption .pull-right.headerlink {
+	margin-left:.3em
+}
+.rst-content div.code-block-caption .headerlink:before {
+	font-family:"FontAwesome";
+	display:inline-block;
+	font-style:normal;
+	font-weight:normal;
+	line-height:1;
+	text-decoration:inherit;
+	font-size:14px;
+	vertical-align:-15%
+	-webkit-font-smoothing:antialiased
+}
+.rst-content div.code-block-caption .headerlink:after {
+	visibility:visible;
+	content:"";
+	font-family:FontAwesome;
+	display:inline-block;
+	color:#2980B9
+}
+.rst-content div.code-block-caption:hover .headerlink {
+	display:inline-block
+}
+.rst-content div.code-block-caption .headerlink {
+	font:normal normal normal 14px/1 FontAwesome;
+	text-rendering:auto;
+	-webkit-font-smoothing:antialiased;
+	-moz-osx-font-smoothing:grayscale;
+	display:none;
+	visibility:hidden;
+	font-size:14px;
+	color:#fcfcfc;
+	text-decoration:inherit
+}
