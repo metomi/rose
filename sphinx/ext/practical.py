@@ -41,6 +41,31 @@ class Practical(BaseAdmonition):
         return super(Practical, self).run()
 
 
+class Spoiler(BaseAdmonition):
+    """Directive for auto-hiden "spoiler" sections.
+
+    When rendered in HTML the section will be collapsed and a "Show" button put
+    in its place.
+
+    Otherwise the content will be displayed normally.
+
+    """
+    node_class = nodes.admonition
+    required_arguments = 1
+
+    def run(self):
+        classes = ['spoiler']
+        args = self.arguments[0].split(' ')
+        if len(args) > 1:
+            classes.append(args[1])
+        self.arguments = args[:1]
+        self.options.update({'class': classes})
+        return super(Spoiler, self).run()
+
+
 def setup(app):
     """Sphinx setup function."""
     app.add_directive('practical', Practical)
+    app.add_directive('spoiler', Spoiler)
+    app.add_javascript('js/spoiler.js')  # self-hiding node.
+    app.add_stylesheet('css/rtd-theme-fix.css')
