@@ -8,9 +8,21 @@ Glossary
       A cylc suite is a directory containing a ``suite.rc`` file which contains
       :term:`graphing<graph>` representing a workflow.
 
+   suite directory
+      The suite directory contains all of the configuration for a suite (e.g.
+      the ``suite.rc`` file and for rose suites the ``rose-suite.conf`` file).
+
+      This is the directory which is registered using ``cylc reg`` or, for rose
+      suites, it is the one in which the ``rose suite-run`` command is
+      executed.
+
+      See also:
+
+      * :term:`run directory`
+
    rose suite
       A rose suite is a :term:`cylc suite` which also contains a
-      ``rose-suite.conf`` file and optionally :term:`rose apps<app>`,
+      ``rose-suite.conf`` file and optionally :term:`rose apps<rose app>`,
       :term:`metadata` and other rose components.
 
    graph
@@ -293,16 +305,162 @@ Glossary
       See also:
 
       * :ref:`cylc tutorial <tutorial-qualifiers>`
+      * :term:`task state`
 
    task
-      TODO
+      A task represents an activity in a workflow, it is a specification of
+      that activity, the script or executable to run and certain details of
+      the environment it is run in.
+
+      The task specification is used to create a :term:`job` which is executed
+      on behalf of the task.
+
+      Tasks submit :term:`jobs <job>`, each :term:`job` belongs to one task,
+      each task can submit multiple :term:`jobs <job>`.
+
+      See also:
+
+      * :term:`job`
+      * :term:`job script`
 
    task state
-      TODO
+      During a :term:`task's <task>` life it will proceed through various
+      states. These include:
 
-   app
-   application
-   rose application
+      * Waiting
+      * Running
+      * Succeeded
+
+      See also:
+
+      * :ref:`cylc tutorial <tutorial-tasks-and-jobs>`
+      * :term:`task`
+      * :term:`job`
+      * :term:`qualifier`
+
+   run directory
+      When a :term:`suite <cylc suite>` is run a directory is created for all
+      of the files created whilst the suite is running. This is called the run
+      directory and typically resides in the ``cylc-run`` directory:
+
+      ``~/cylc-run/<suite-name>``
+
+      The run directory can be accessed by a running suite using the
+      environment variable ``CYLC_SUITE_RUN_DIR``.
+
+      See also:
+
+      * :term:`suite directory`
+      * :term:`work directory`
+      * :term`share directory`
+      * :term`job log directory`
+
+   work directory
+      When cylc executes a :term:`job` it does so inside a suite's
+      :term:`job's <job>` working directory. This directory is created by cylc
+      and lies within the directory tree inside a suite's :term:`run directory`.
+
+      ``<run directory>/work/<cycle>/<task-name>``
+
+      The location of the work directory can be accessed by a :term:`job` via
+      the environment variable ``CYLC_TASK_WORK_DIR``.
+
+      Any files installed by :term:`rose apps <rose app>` will be placed within
+      this directory.
+
+      See also:
+
+      * :term:`run directory`
+      * :term:`share directory`
+
+   share directory
+      The share directory resides within a suite's :term:`run directory`, it
+      serves the purpose of providing a storage place for any files which need
+      to be shared between different tasks.
+
+      ``<run directory>/share``
+
+      The location of the share directory can be accessed by a :term:`job` via
+      the environment variable ``CYLC_SUITE_SHARE_DIR``.
+
+      In cycling suites files are typically stored in cycle sub-directories.
+
+      See also:
+
+      * :term:`run directory`
+      * :term:`work directory`
+
+   job log directory
+      When cylc executes a :term:`job`, stdout and stderr are redirected to the
+      ``job.out`` and ``job.err`` files which are stored in the job log
+      directory.
+
+      The job log directory lies within the :term:`run directory`:
+
+      ``<run directory>/log/job/<cycle>/<task-name>/<submission-no>``
+
+      Other files stored in the job log directory:
+
+      * `job`: The :term:`job script`.
+      * `job-activity.log`: A log file containing details of the
+        :term:`jobs <job>` progress.
+      * `job.status`: A file in which can be found cylc's most up-to-date
+        understanding of the :term:`job's <job>` present status.
+
+   job
+      A job is a realisation of a :term:`task`. A job consists of a file called
+      the :term:`job script` which is executed when the job "runs".
+
+      See also:
+
+      * :term:`task`
+      * :term:`job script`
+
+   job script
+      A job script is the file containing bash script which is executed when a
+      :term:`job` runs. A task's job script can be found in the
+      :term:`job log directory`.
+
+      See also:
+
+      * :term:`task`
+      * :term:`job`
+
+   job host
+      The job host is the compute platform that a :term:`job` runs on. For
+      example ``some-host`` would be the job host for the task ``some-task`` in
+      the following suite:
+
+      .. code-block:: cylc
+
+         [runtime]
+             [[some-task]]
+                 [[[remote]]]
+                     host = some-host
+
+   batch system
+      A batch system or job scheduler is a system for submitting
+      :term:`jobs <job>` onto a compute platform.
+
+      See also:
+
+      * `Wikipedia <https://en.wikipedia.org/wiki/Job_scheduler>`
+      * :term:`directive`
+
+   directive
+      Directives are used by :term:`batch systems <batch system>` to determine
+      what a :term:`jobs <job>` requirements are, e.g. how much memory it
+      requires.
+
+      Directives are set in the ``suite.rc`` file in the ``[runtime]`` section
+      (``[runtime][<task-name>][directives]``).
+
+      See also:
+
+      * :term:`batch system`
+
+   rose app
+   rose application configuration
       TODO
 
    metadata

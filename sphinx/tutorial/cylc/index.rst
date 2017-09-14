@@ -9,4 +9,5 @@ This section will cover the cylc framework and writing basic cylc suites.
 
    introduction
    scheduling/index
+   runtime/index
 

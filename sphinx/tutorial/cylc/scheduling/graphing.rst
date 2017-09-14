@@ -181,7 +181,8 @@ In a :term:`cylc suite` the :term:`graph` is stored under the
 This is a minimal :term:`cylc suite`, in which we have defined a :term:`graph`
 representing a workflow for cylc to run.
 We have not yet provided cylc with the scripts or binaries to run for
-each task, we will cover this later in the #TODO:Runtime section.
+each task, we will cover this later in the
+:ref:`runtime tutorial <tutorial-runtime>`.
 
 Cylc provides a GUI for visualising :term:`graphs<graph>`, it is run on the
 command line using the ``cylc graph <path>`` command where the path ``path``
@@ -206,7 +207,7 @@ seen so far. The number "1" which appears bellow each task is the
       user-guide.
 
       Within this directory create a new folder called ``graph-introduction``,
-      this is to be our "suite directory". Inside this directory create a
+      this is to be our :term:`suite directory`. Inside this directory create a
       ``suite.rc`` file and paste in the following text:
 
       .. code-block:: cylc
@@ -214,7 +215,7 @@ seen so far. The number "1" which appears bellow each task is the
          [scheduling]
              [[dependencies]]
                  graph = """
-                     # TODO: Write graph strings here!
+                     # Write graph strings here!
                  """
 
    #. **Write a graph.**

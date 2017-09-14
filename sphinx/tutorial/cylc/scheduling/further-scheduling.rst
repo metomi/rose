@@ -18,7 +18,7 @@ So far we have written dependencies like ``foo => bar``. This is, in-fact,
 shorthand for ``foo:succeed => bar``, it means that the task ``bar`` will run
 once ``foo`` has finished successfully. If ``foo`` were to fail then ``bar``
 would not run. We will talk more about these :term:`task states <task state>`
-in the TODO:Runtime_Section.
+in the `Runtime Section <tutorial-tasks-and-jobs>`_.
 
 We would refer to the ``:succeed`` as a :term:`qualifier`. There are qualifiers
 for different :term:`task states <task state>` e.g:
