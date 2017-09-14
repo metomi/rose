@@ -35,7 +35,6 @@ from rose.reporter import Event
 
 
 class AbortEvent(Event):
-
     """An event raised when a task failure will stop further task running"""
 
     LEVEL = Event.V
@@ -46,7 +45,6 @@ class AbortEvent(Event):
 
 
 class LaunchEvent(Event):
-
     """An event raised when adding a command to the task pool."""
 
     KIND = Event.KIND_OUT
@@ -57,7 +55,6 @@ class LaunchEvent(Event):
 
 
 class SucceededEvent(Event):
-
     """An event used to report success of a task in the pool."""
 
     LEVEL = Event.V
@@ -69,8 +66,8 @@ class SucceededEvent(Event):
 
 
 class PreviousSuccessEvent(Event):
-
     """Event raised when a command is not run in incremental mode"""
+
     LEVEL = Event.V
     KIND = Event.KIND_OUT
 
@@ -80,7 +77,6 @@ class PreviousSuccessEvent(Event):
 
 
 class SummaryEvent(Event):
-
     """Event for reporting bunch counts at end of job"""
 
     KIND = Event.KIND_OUT
@@ -95,7 +91,6 @@ class SummaryEvent(Event):
 
 
 class NotRunEvent(Event):
-
     """An event used to report commands that will not be run."""
 
     KIND = Event.KIND_OUT
@@ -106,7 +101,6 @@ class NotRunEvent(Event):
 
 
 class RoseBunchApp(BuiltinApp):
-
     """Run multiple commands under one app"""
 
     SCHEME = "rose_bunch"
@@ -146,7 +140,7 @@ class RoseBunchApp(BuiltinApp):
 
         if self.fail_mode not in self.FAIL_MODE_TYPES:
             raise ConfigValueError([self.BUNCH_SECTION, "fail-mode"],
-                                   fail_mode,
+                                   self.fail_mode,
                                    "not a valid setting")
 
         self.incremental = conf_tree.node.get_value([self.BUNCH_SECTION,
@@ -283,12 +277,13 @@ class RoseBunchApp(BuiltinApp):
                         self.dao.add_command(key)
 
                 app_runner.handle_event(LaunchEvent(key, cmd))
-                procs[key] = \
-                    app_runner.popen.run_bg(cmd,
-                                            shell=True,
-                                            stdout=open(cmd_stdout, 'w'),
-                                            stderr=open(cmd_stderr, 'w'),
-                                            env=bunch_environ)
+                procs[key] = app_runner.popen.run_bg(
+                    cmd,
+                    shell=True,
+                    stdout=open(cmd_stdout, 'w'),
+                    stderr=open(cmd_stderr, 'w'),
+                    env=bunch_environ)
+
             sleep(self.SLEEP_DURATION)
 
         if abort and commands:
@@ -312,7 +307,6 @@ class RoseBunchApp(BuiltinApp):
 
 
 class RoseBunchCmd(object):
-
     """A command instance to run."""
 
     OUTPUT_TEMPLATE = "bunch.%s.%s"
@@ -345,7 +339,6 @@ class RoseBunchCmd(object):
 
 
 class RoseBunchDAO(object):
-
     """Database object for rose_bunch"""
 
     TABLE_COMMANDS = "commands"
@@ -440,12 +433,12 @@ class RoseBunchDAO(object):
         s_stmt = ("SELECT * FROM " + self.TABLE_COMMANDS +
                   " WHERE name==? AND status==?")
         s_stmt_args = [name, self.S_PASS]
-        has_succeeded = False
-        for s_row in self.conn.execute(s_stmt, s_stmt_args):
-            has_succeeded = True
-        return has_succeeded
+        if self.conn.execute(s_stmt, s_stmt_args).fetchone():
+            return True
+        return False
 
-    def flatten_config(self, config):
+    @staticmethod
+    def flatten_config(config):
         """Flatten down a config node to set of keys and values to record"""
         flat = {}
         keys_and_nodes = list(config.node.walk())
