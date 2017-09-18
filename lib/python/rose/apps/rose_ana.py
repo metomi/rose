@@ -151,6 +151,64 @@ class KGODatabase(object):
         self.statement_buffer = []
 
 
+class AnalysisTask(object):
+    """
+    Base class for an analysis task; all custom user tasks should inherit
+    from this class and override the "run_analysis" method to perform
+    whatever analysis is required.
+
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, parent_app, task_options):
+        """
+        Initialise the analysis task, storing the user specified options
+        dictionary and a few references to useful objects from the parent app.
+
+        """
+        self.options = task_options
+
+        # This attribute gives access to the parent task; but it is only
+        # included for backwards compatibility and will be remove in the
+        # future (please instead use the other attributes below!)
+        self.parent = parent_app
+
+        # Attributes to access some helpful/relevant parts of the parent
+        # task environment for printing, running tasks, etc.
+        self.config = parent_app.ana_config
+        self.reporter = parent_app.reporter
+        self.kgo_db = parent_app.kgo_db
+        self.popen = parent_app.app_runner.popen
+
+        self.passed = False
+        self.skipped = False
+
+    @abc.abstractmethod
+    def run_analysis(self):
+        """
+        Will be called to start the analysis code; this method should be
+        overidden by the user's class to perform the desired analysis.
+
+        """
+        msg = "Abstract analysis task class should never be called directly"
+        raise ValueError(msg)
+
+    def process_opt_unhandled(self):
+        """
+        Options should be removed from the options dictionary as they are
+        processed; this method may then be called to catch and unknown options
+
+        """
+        unhandled = []
+        for option in self.options:
+            if option not in ["full_task_name", "description"]:
+                unhandled.append(option)
+        if len(unhandled) > 0:
+            msg = ("Options provided but not understood for this "
+                   "analysis type: {0}")
+            raise ValueError(msg.format(unhandled))
+
+
 class RoseAnaApp(BuiltinApp):
 
     """Run rosa ana as an application."""
@@ -512,64 +570,6 @@ class RoseAnaApp(BuiltinApp):
             os.path.join(os.path.dirname(__file__), "ana_builtin"))
 
         return method_paths
-
-
-class AnalysisTask(object):
-    """
-    Base class for an analysis task; all custom user tasks should inherit
-    from this class and override the "run_analysis" method to perform
-    whatever analysis is required.
-
-    """
-    __metaclass__ = abc.ABCMeta
-
-    def __init__(self, parent_app, task_options):
-        """
-        Initialise the analysis task, storing the user specified options
-        dictionary and a few references to useful objects from the parent app.
-
-        """
-        self.options = task_options
-
-        # This attribute gives access to the parent task; but it is only
-        # included for backwards compatibility and will be remove in the
-        # future (please instead use the other attributes below!)
-        self.parent = parent_app
-
-        # Attributes to access some helpful/relevant parts of the parent
-        # task environment for printing, running tasks, etc.
-        self.config = parent_app.ana_config
-        self.reporter = parent_app.reporter
-        self.kgo_db = parent_app.kgo_db
-        self.popen = parent_app.app_runner.popen
-
-        self.passed = False
-        self.skipped = False
-
-    @abc.abstractmethod
-    def run_analysis(self):
-        """
-        Will be called to start the analysis code; this method should be
-        overidden by the user's class to perform the desired analysis.
-
-        """
-        msg = "Abstract analysis task class should never be called directly"
-        raise ValueError(msg)
-
-    def process_opt_unhandled(self):
-        """
-        Options should be removed from the options dictionary as they are
-        processed; this method may then be called to catch and unknown options
-
-        """
-        unhandled = []
-        for option in self.options:
-            if option not in ["full_task_name", "description"]:
-                unhandled.append(option)
-        if len(unhandled) > 0:
-            msg = ("Options provided but not understood for this "
-                   "analysis type: {0}")
-            raise ValueError(msg.format(unhandled))
 
 
 class TestsFailedException(Exception):
