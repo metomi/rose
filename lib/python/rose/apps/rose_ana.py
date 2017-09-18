@@ -360,6 +360,9 @@ class RoseAnaApp(BuiltinApp):
                 try:
                     self.modules.add(__import__(module_name))
                 except Exception as err:
+                    # Note: We intentionally don't re-raise the exception
+                    # here, as we want to avoid a single mistake in a user
+                    # supplied method bringing down the entire task
                     msg = "Failed to import module: {0} ".format(module_name)
                     self.reporter(msg, prefix="[FAIL] ",
                                   kind=self.reporter.KIND_ERR)
@@ -462,8 +465,19 @@ class RoseAnaApp(BuiltinApp):
             if atype in self.methods:
                 self.analysis_tasks.append(self.methods[atype](self, options))
             else:
+                # If the analysis type isn't matched by one of the loaded
+                # methods, report the error and return a placeholder
+                # in its place (so that this tasks' main method can show
+                # the task as "failed")
                 msg = "Unrecognised analysis type: {0}"
-                raise ValueError(msg.format(atype))
+                self.reporter(msg.format(atype), prefix="[FAIL]   ")
+                # Create a simple object to return - when the run_analysis
+                # method is called by the main loop it will simply raise
+                # an exception, triggering the "error" trap
+                class Dummy(AnalysisTask):
+                    def run_analysis(self):
+                        raise ImportError(msg.format(atype))
+                self.analysis_tasks.append(Dummy(self, options))
 
     def _get_method_paths(self):
         """Create a listing of paths for analysis methods."""
