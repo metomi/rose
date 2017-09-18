@@ -27,7 +27,7 @@ To make a workflow repeat we must tell cylc three things:
 3) *Optionally* we can also tell cylc what cycle point we want to stop the
    workflow - the :term:`final cycle point`.
 
-Lets take the bakery example from the previous section. Bread is
+Let's take the bakery example from the previous section. Bread is
 produced in batches so the bakery will repeat this workflow for each
 batch of break they bake. We can make this workflow repeat with the addition of
 three lines:
@@ -300,9 +300,10 @@ This dependency means that the ``purchase_ingredients`` task will run after the
 Recurrence Sections
 -------------------
 
-In the previous examples we made the workflow cycle by placing the graph within
-the ``[[[P1]]`` section. To build more complex workflows we can use multiple
-recurrences:
+In the previous examples we made the workflow repeat by placing the graph within
+the ``[[[P1]]`` section. Here ``P1`` is a :term:`recurrence` meaning repeat
+every cycle, ``P2`` would mean repeat every other cycle etc. To build more
+complex workflows we can use multiple recurrences:
 
 .. code-block:: cylc
 
@@ -310,11 +311,11 @@ recurrences:
        cycling mode = integer
        initial cycle point = 1
        [[dependencies]]
-           [[[P1]]]
+           [[[P1]]]  # Repeat every cycle.
                graph = foo
-           [[[P2]]]
+           [[[P2]]]  # Repeat every second cycle.
                graph = bar
-           [[[P3]]]
+           [[[P3]]]  # Repeat every third cycle.
                graph = baz
 
 .. digraph:: example
@@ -345,7 +346,7 @@ recurrences:
 
 By default recurrences start at the :term:`initial cycle point`, however, it is
 possible to make them start at an arbitrary cycle point. This is done by
-writing the cycle point and the recurrence separated by a solidus character
+writing the cycle point and the recurrence separated by a forward slash
 (``/``). E.g. ``5/P3`` means repeat every third cycle starting *from* cycle
 number 5.
 

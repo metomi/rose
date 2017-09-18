@@ -1,5 +1,5 @@
-Advanced Scheduling
-===================
+Further Scheduling
+==================
 
 In this section we will quickly run through some of the more advanced features
 of cylc's scheduling logic.
@@ -24,12 +24,11 @@ We would refer to the ``:succeed`` as a :term:`qualifier`. There are qualifiers
 for different :term:`task states <task state>` e.g:
 
 ``:start``
-    When the task has started running.
+   When the task has started running.
 ``:fail``
-    Occurs when the task finishes if it fails (non-zero return code).
+   When the task finishes if it fails (non-zero return code).
 ``:finish``
-    Occurs when the task has stopped running irrespective of whether it has
-    succeeded or failed.
+   When the task has completed (either succeeded or failed).
 
 It is also possible to create your own custom :term:`qualifiers <qualifier>`
 to handle events within your code (custom outputs).
@@ -40,20 +39,23 @@ to handle events within your code (custom outputs).
 Clock Triggers
 --------------
 
-In cylc :term:`cycle points <cycle point>` are just labels. When using datetime
-cycling, clock triggers can be used to force cycles to wait for a particular
-time before running. This is necessary for certain operational and monitoring
-systems.
+In cylc :term:`cycle points <cycle point>` are just labels. Tasks are triggered
+when their dependencies are met irrespective of what cycle they are in. We can
+force cycles to wait for a particular time before running using clock triggers.
+This is necessary for certain operational and monitoring systems.
+
+For example in the following suite the cycle ``2000-01-01T12Z`` will wait
+until 11:00 on the 1st of January 2000 before running:
 
 .. code-block:: cylc
 
    [scheduling]
-       initial cycle point = 20000101T00Z
+       initial cycle point = 2000-01-01T00Z
        [[special tasks]]
            clock-trigger = daily(-PT1H)
        [[dependencies]]
            [[[T12]]]
-                graph = daily  # daily will run at the earliest, one hour
+                graph = daily  # "daily" will run at the earliest, one hour
                                # before midday.
 
 *See the TODO:clock trigger tutorial for more information.*

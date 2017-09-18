@@ -10,6 +10,4 @@ This section looks at how to write workflows in cylc.
    graphing
    integer-cycling
    datetime-cycling
-   advanced-scheduling
-   
-
+   further-scheduling

@@ -56,6 +56,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
     'sphinx.ext.graphviz',
+    'sphinx.ext.mathjax',
     'minicylc',
     'cylc-lang',
     'rose-lang',

@@ -5,11 +5,17 @@ Date-Time Cycling
 
 
 In the last section we looked at writing an :term:`integer cycling` workflow,
-that is one where the :term:`cycle points <cycle point>` are numbered.
+one where the :term:`cycle points <cycle point>` are numbered.
 
-Typically workflows are repeated every so often, say every day or every few
-hours. To make this easier cylc has a date-time cycling mode where the
+Typically workflows are repeated at a regular interval, say every day or every
+few hours. To make this easier cylc has a date-time cycling mode where the
 :term:`cycle points <cycle point>` use dates rather than numbers.
+
+.. admonition:: Reminder
+   :class: tip
+
+   :term:`Cycle points <cycle point>` are labels, cylc runs tasks as soon as
+   their dependencies are met so cycles do not necessarily run in order.
 
 
 .. _tutorial-iso8601:
@@ -17,7 +23,8 @@ hours. To make this easier cylc has a date-time cycling mode where the
 ISO8601
 -------
 
-In cylc dates, times and durations are written using the :term:`ISO8601` format.
+In cylc dates, times and durations are written using the :term:`ISO8601` format
+- an international standard for representing dates and times.
 
 .. _tutorial-iso8601-datetimes:
 
@@ -26,7 +33,7 @@ Date-Times
 
 In ISO8601 datetimes are written from the largest unit to the smallest
 (i.e: year, month, day, hour, minute, second) with the ``T`` character
-separating the date and time components For example midnight on the 1st of
+separating the date and time components. For example, midnight on the 1st of
 January 2000 is written ``20000101T000000``.
 
 For brevity we may omit seconds (and minutes) from the time i.e:
@@ -38,6 +45,27 @@ and colon ``:`` characters between the time components i.e:
 
 Time-zone information can be added onto the end. UTC is written ``Z``,
 UTC+1 is written ``+01``, etc. E.G: ``2000-01-01T00:00Z``.
+
+.. Diagram of an iso8601 datetime's components.
+
+.. math::
+
+   \color{blue}{\overbrace{
+   \underbrace{\huge 1985}_{_{\text{Year}}}
+   {\huge\text{-}}
+   \underbrace{\huge 04}_{_{\text{Month}}}
+   {\huge\text{-}}
+   \underbrace{\huge 12}_{_{\text{Day}}}
+   }^{\text{Date Components}}}
+   \overbrace{\huge \text{T}}^{\text{Seperator}}
+   \color{green}{\overbrace{
+   \underbrace{\huge 23}_{_{\text{Hour}}}
+   {\huge:}
+   \underbrace{\huge 20}_{_{\text{Minute}}}
+   {\huge:}
+   \underbrace{\huge 30}_{_{\text{Second}}}
+   \underbrace{\huge \text{Z}}_{_{\text{Time Zone}}}
+   }^{\text{Time Components}}}
 
 .. _tutorial-iso8601-durations:
 
@@ -55,7 +83,7 @@ following each unit:
 * ``M`` for minute.
 * ``S`` for second.
 
-As with dateitimes the components are written in order from largest to smallest
+As with datetimes the components are written in order from largest to smallest
 and the date and time components are separated by the ``T`` character. E.G:
 
 * ``P1D`` one day.
@@ -89,6 +117,8 @@ to be annual. E.G:
 * ``01T00`` every month on the first of the month.
 * ``T00`` every day at midnight.
 * ``T-00`` every hour at 0 minutes past (every hour on the hour).
+  *Note that the ``-`` takes the place of the hour digits as we may not omit
+  components after the ``T`` character.*
 
 Recurrence Formats
 ^^^^^^^^^^^^^^^^^^
@@ -126,7 +156,7 @@ As with integer cycling, recurrences start, by default, at the
 
    ``2000-01-01T12``, ``2000-01-02T12``, ``2000-01-03T12``, ...
 
-   This can be easily fixed. Both of the following recurrences mean, start at
+   This can be easily fixed. Both of the following recurrences mean start at
    the first midnight *after* the initial cycle point.
 
    * ``T00/P1D``
