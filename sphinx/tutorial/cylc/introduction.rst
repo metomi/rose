@@ -12,7 +12,7 @@ What Is A Workflow?
 
    -- Wikipedia
 
-In research, business and other fields we may have behaviors that we repeat
+In research, business and other fields we may have processes that we repeat
 in the course of our work. At its simplest a workflow is a set of steps that
 must be followed in a particular order to achieve some end goal.
 
@@ -31,8 +31,9 @@ arrows.
 What Is Cylc?
 -------------
 
-Cylc (pronounced silk) is a workflow engine, that is to say cylc is a
-system that can automate your workflows. In a cylc workflow each step is a
+Cylc (pronounced silk) is a workflow engine, a system that automatically
+executes tasks according to their schedules and dependencies.
+In a cylc workflow each step is a
 computational task, a script to execute. Cylc runs each task as soon as it is
 appropriate to do so.
 

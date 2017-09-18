@@ -1,3 +1,5 @@
+.. _ini-format: https://en.wikipedia.org/wiki/INI_file
+
 Graphing
 ========
 
@@ -10,7 +12,16 @@ The suite.rc File Format
 
 We refer to a cylc workflow as a :term:`cylc suite`. A cylc suite is a directory
 containing a ``suite.rc`` file. This configuration file is where
-we define our workflow. The ``suite.rc`` file uses a nested INI-based format:
+we define our workflow. The ``suite.rc`` file uses a nested
+`INI <ini-format>`_-based format:
+
+* Comments start with a ``#`` character.
+* Settings are written as ``key = value`` pairs.
+* Settings can be contained within sections, sections are written inside square
+  brackets i.e. ``[section-name]``.
+* Sections can be nested, we add an extra square bracket with each level, so a
+  sub section would be written ``[[sub-section]]`` a sub-sub-section
+  ``[[[sub-sub-section]]]`` and so on.
 
 .. code-block:: cylc
 
@@ -22,7 +33,7 @@ we define our workflow. The ``suite.rc`` file uses a nested INI-based format:
            yet-another-key = """
    A
    Multi-line
-   Setting
+   String
    """
 
 Throughout this tutorial we will refer to settings in the following format:
@@ -31,7 +42,7 @@ Throughout this tutorial we will refer to settings in the following format:
 * ``[section]key`` - Refers to a setting within the section.
 * ``[section]key=value`` - Expresses the value of the setting.
 * ``[section][sub-section]another-key`` - We only use one set of square
-  brackets with sub-sections.
+  brackets with nested sections.
 
 .. tip::
 
@@ -92,9 +103,7 @@ Graph Strings
 In cylc we consider workflows in terms of :term:`tasks <task>` and
 :term:`dependencies <dependency>`. Task are
 represented as words and dependencies as arrows (``=>``), so the following text
-defines two tasks where ``make_dough`` is dependent on
-``purchase_ingredients``. In a cylc workflow this would mean that
-``make_dough`` would only run once ``purchase_ingredients`` has succeeded.
+defines two tasks where ``make_dough`` is dependent on ``purchase_ingredients``:
 
 .. minicylc::
    :align: center
@@ -103,7 +112,9 @@ defines two tasks where ``make_dough`` is dependent on
 
    purchase_ingredients => make_dough
 
-These :term:`dependencies <dependency>` can be chained together:
+In a cylc workflow this would mean that ``make_dough`` would only run once
+``purchase_ingredients`` has succeeded. These :term:`dependencies <dependency>`
+can be chained together:
 
 .. minicylc::
    :align: center
@@ -193,7 +204,7 @@ seen so far. The number "1" which appears bellow each task is the
       A cylc suite is just a directory containing a ``suite.rc`` file.
       Somewhere on your system create a directory for the purposes of this
       user-guide.
-      
+
       Within this directory create a new folder called ``graph-introduction``,
       this is to be our "suite directory". Inside this directory create a
       ``suite.rc`` file and paste in the following text:
@@ -230,9 +241,9 @@ seen so far. The number "1" which appears bellow each task is the
 
          cylc graph <tutorials-directory>/graph-introduction/suite.rc
 
-      If the results weren't what you were hoping for try going back to the
+      If the results don't match the diagram above try going back to the
       suite.rc file and making changes.
-      
+
       .. tip::
 
          In the top right-hand corner of the ``cylc graph`` window there is a
@@ -248,7 +259,7 @@ seen so far. The number "1" which appears bellow each task is the
          There are multiple correct ways to write this graph. So long as what
          you see in ``cylc graph`` matches the above diagram then you have a
          correct solution.
-   
+
          Two valid examples:
 
          .. code-block:: cylc-graph
