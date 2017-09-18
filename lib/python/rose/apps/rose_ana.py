@@ -532,6 +532,7 @@ class RoseAnaApp(BuiltinApp):
                 # Create a simple object to return - when the run_analysis
                 # method is called by the main loop it will simply raise
                 # an exception, triggering the "error" trap
+
                 class Dummy(AnalysisTask):
                     def run_analysis(self):
                         raise ImportError(msg.format(atype))
