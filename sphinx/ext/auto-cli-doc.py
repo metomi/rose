@@ -46,6 +46,9 @@ LITERAL_REGEX = re.compile(r'(?<!\`)\`(?!\`)([^\`]+)(?<!\`)\`(?!\`)')
 RST_INDENT = '   '  # 3 spaces ( .. following sections must be flush with 'f').
 # Characters used to underline rst headings in order of precedence.
 RST_HEADING_CHARS = ['=', '-', '^', '"']
+# Concrete forms of the admonition directive.
+RST_ADMONITIONS = ['attention', 'caution', 'danger', 'error', 'hint',
+                   'important', 'note', 'tip', 'warning']
 
 
 # --- Rose specific regex'es. ---
@@ -100,6 +103,15 @@ def get_indentation(lines):
     if indentation is None and contains_new_lines:
         return 0
     return indentation
+
+
+def parse_admonitions(lines):
+    """Transform ``NOTE:`` into ``.. note::``."""
+    for itt, line in enumerate(lines):
+        for admonition in RST_ADMONITIONS:
+            tag = '%s:' % admonition.upper()
+            if tag in line:
+                lines[itt] = line.replace(tag, '.. %s::' % admonition)
 
 
 def line_strip(lines):
@@ -213,6 +225,7 @@ def write_rst_section(write, text, indent_level=0):
 
     """
     lines = line_strip(text.split('\n'))
+    parse_admonitions(lines)
     indentation = get_indentation(lines)
     for line in lines:
         write('%s%s' % (RST_INDENT * indent_level, line[indentation:]))

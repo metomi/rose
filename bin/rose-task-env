@@ -106,9 +106,9 @@
 #         E.g. `--cycle-offset=PT3H --cycle-offset=PT6H` will tell
 #         `rose task-env` to export `ROSE_DATACPT3H` and `ROSE_DATACPT6H`.
 #
-#         Note:  The main usage of this option is to reference a cycle time in
-#         the past, so a positive offset is used to go backward in time, and a
-#         negative offset is used to go forward in time.
+#         NOTE: The main usage of this option is to reference a cycle time in
+#               the past, so a positive offset is used to go backward in time,
+#               and a negative offset is used to go forward in time.
 #
 #         E.g. `--cycle-offset=-PT3H` will tell `rose task-env` to export
 #         `ROSE_DATAC__PT3H` for `ROSE_DATAC` of 3 hours ahead of the current
