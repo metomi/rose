@@ -19,13 +19,17 @@
     background: orange
 }
 
-/* Enable theme handling of pilcrow symbols for code-block captions. */
+/* Enable theme handling of pilcrow symbols for code-block captions and
+ * admonitions. */
+.rst-content p.admonition-title .pull-left.headerlink,
 .rst-content div.code-block-caption .pull-left.headerlink {
 	margin-right:.3em
 }
+.rst-content p.admonition-title .pull-right.headerlink,
 .rst-content div.code-block-caption .pull-right.headerlink {
 	margin-left:.3em
 }
+.rst-content p.admonition-title .headerlink:before,
 .rst-content div.code-block-caption .headerlink:before {
 	font-family:"FontAwesome";
 	display:inline-block;
@@ -37,6 +41,7 @@
 	vertical-align:-15%
 	-webkit-font-smoothing:antialiased
 }
+.rst-content p.admonition-title .headerlink:after,
 .rst-content div.code-block-caption .headerlink:after {
 	visibility:visible;
 	content:"";
@@ -44,9 +49,11 @@
 	display:inline-block;
 	color:#2980B9
 }
+.rst-content p.admonition-title:hover .headerlink,
 .rst-content div.code-block-caption:hover .headerlink {
 	display:inline-block
 }
+.rst-content p.admonition-title .headerlink,
 .rst-content div.code-block-caption .headerlink {
 	font:normal normal normal 14px/1 FontAwesome;
 	text-rendering:auto;
