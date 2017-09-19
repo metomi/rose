@@ -106,12 +106,18 @@ def get_indentation(lines):
 
 
 def parse_admonitions(lines):
-    """Transform ``NOTE:`` into ``.. note::``."""
+    """Transform admonitions into valid rst.
+
+    Example:
+        >>> parse_admonitions(['NOTE: Some text here.'])
+        ['.. note:: Some text here.']
+    """
     for itt, line in enumerate(lines):
         for admonition in RST_ADMONITIONS:
             tag = '%s:' % admonition.upper()
             if tag in line:
                 lines[itt] = line.replace(tag, '.. %s::' % admonition)
+    return lines
 
 
 def line_strip(lines):
@@ -141,7 +147,7 @@ def line_strip(lines):
 
 
 def format_literals(text, references_to_match=None, ref_template='%s'):
-    """Replace single back-quotes with double ones.
+    r"""Replace single back-quotes with double ones.
 
     Optionally replace certain strings with references to other sections in
     this document.
@@ -151,6 +157,12 @@ def format_literals(text, references_to_match=None, ref_template='%s'):
         references_to_match (list): List of strings which will be replaced
             by rst document references using the ref_template.
         ref_template (str): Template string for the document reference.
+
+    Examples:
+        >>> format_literals('a`x`a b`x` `x`c `x`')
+        'a\\ ``x``\\ a b\\ ``x`` ``x``\\ c ``x``\\ '
+        >>> format_literals('here-`bar`', ['bar'], 'foo%sbaz')
+        'here-:ref:`foobarbaz`\\ '
 
     Returns: str
 
@@ -202,6 +214,19 @@ def write_rst_heading(write, text, heading_level, label_section=False,
         label_template (str): A template for formatting the name assigned to
             the rst label.
 
+    Examples:
+        >>> write_rst_heading(print, 'Hello World!', 0)
+        Hello World!
+        ============
+        <BLANKLINE>
+
+        >>> write_rst_heading(print, 'Hello World!', 2, True, 'section-%s-')
+        .. _section-Hello-World!-:
+        <BLANKLINE>
+        Hello World!
+        ^^^^^^^^^^^^
+        <BLANKLINE>
+
     """
     text = text.strip()
     if label_section:
@@ -223,6 +248,19 @@ def write_rst_section(write, text, indent_level=0):
         text (str): The text to write out.
         indent_level (int): The desired indentation level for the output text.
 
+    Examples:
+        >>> write_rst_section(print, 'foo')
+        foo
+        <BLANKLINE>
+
+        >>> write_rst_section(print, 'NOTE: Foo')
+        .. note:: Foo
+        <BLANKLINE>
+
+        >>> write_rst_section(print, 'foo', 1)
+           foo
+        <BLANKLINE>
+
     """
     lines = line_strip(text.split('\n'))
     parse_admonitions(lines)
@@ -232,23 +270,43 @@ def write_rst_section(write, text, indent_level=0):
     write('')
 
 
-def write_rose_command_reference(write, command_name):
-    """Generate help text for a rose command.
+def write_command_reference(write, commands):
+    """Write out the provided command documentation in rst format.
 
     Args:
         write (function): A writer function which will be called with each line
             to be written.
-        command_name (str): The name of the rose command to be documented (i.e.
-            rose / rosie.
+        commands (dict): Dictionary of command, doc-text pairs.
+
+    Examples:
+        >>> write_command_reference(print, {'foo': '''
+        ... NAME
+        ...     Foo
+        ...
+        ... SYNOPSIS
+        ...     foo
+        ...
+        ... DESCRIPTION
+        ...     Foo bar baz.
+        ...
+        ...     NOTE: pub
+        ... '''})
+        .. _foo-label:
+        <BLANKLINE>
+        foo
+        ^^^
+        <BLANKLINE>
+        .. code-block:: bash
+        <BLANKLINE>
+           foo
+        <BLANKLINE>
+        Foo bar baz.
+        <BLANKLINE>
+        .. note:: pub
+        <BLANKLINE>
+        <BLANKLINE>
 
     """
-    # Obtain help text.
-    cmd = [command_name, 'doc']
-    stdout = Popen(cmd, stdout=PIPE).communicate()[0]
-
-    # Extract commands / aliases.
-    commands = dict((x, y) for x, y, _ in ROSE_COMMAND_REGEX.findall(stdout))
-
     # For each command.
     for num, (command, help_text) in enumerate(sorted(commands.items())):
         # Deal with aliases.
@@ -355,6 +413,24 @@ def write_rose_command_reference(write, command_name):
         write('')
 
 
+def get_rose_command_reference(command_name):
+    """Generate help text for a rose command.
+
+    Args:
+        command_name (str): The name of the rose command to be documented (i.e.
+            rose / rosie.
+
+    """
+    # Obtain help text.
+    cmd = [command_name, 'doc']
+    stdout = Popen(cmd, stdout=PIPE).communicate()[0]
+
+    # Extract commands / aliases.
+    commands = dict((x, y) for x, y, _ in ROSE_COMMAND_REGEX.findall(stdout))
+
+    return commands
+
+
 class AutoCLIDoc(Directive):
     """A custom ReStructured Text directive for auto-documenting CLIs.
 
@@ -375,7 +451,7 @@ class AutoCLIDoc(Directive):
             # Generate CLI documentation as a list of rst formatted text lines.
             lines = []
             write = lines.append
-            write_rose_command_reference(write, command)
+            write_command_reference(write, get_rose_command_reference(command))
 
             # Parse these lines into a docutills node.
             node = nodes.section()
@@ -403,7 +479,7 @@ if __name__ == '__main__':
     write_rst_heading(writer, 'Command Reference', 0)
 
     write_rst_heading(writer, 'Rose Commands', 1)
-    write_rose_command_reference(writer, 'rose')
+    write_command_reference(writer, get_rose_command_reference('rose'))
 
     write_rst_heading(writer, 'Rosie Commands', 1)
-    write_rose_command_reference(writer, 'rosie')
+    write_command_reference(writer, get_rose_command_reference('rosie'))
