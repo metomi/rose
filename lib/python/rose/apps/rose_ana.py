@@ -417,7 +417,7 @@ class RoseAnaApp(BuiltinApp):
                     os.path.basename(filename))[0]
                 try:
                     self.modules.add(__import__(module_name))
-                except ImportError as err:
+                except ImportError:
                     # Note: We intentionally don't re-raise the exception
                     # here, as we want to avoid a single mistake in a user
                     # supplied method bringing down the entire task
