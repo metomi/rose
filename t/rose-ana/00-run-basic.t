@@ -235,6 +235,6 @@ file_pcregrep $TEST_KEY "Running task #([0-9]+).*\n.*Check non-existent files ar
 
 #-------------------------------------------------------------------------------
 #Clean suite
-#rose suite-clean -q -y $NAME
+rose suite-clean -q -y $NAME
 #-------------------------------------------------------------------------------
 exit 0

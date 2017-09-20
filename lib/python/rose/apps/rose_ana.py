@@ -151,6 +151,64 @@ class KGODatabase(object):
         self.statement_buffer = []
 
 
+class AnalysisTask(object):
+    """
+    Base class for an analysis task; all custom user tasks should inherit
+    from this class and override the "run_analysis" method to perform
+    whatever analysis is required.
+
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, parent_app, task_options):
+        """
+        Initialise the analysis task, storing the user specified options
+        dictionary and a few references to useful objects from the parent app.
+
+        """
+        self.options = task_options
+
+        # This attribute gives access to the parent task; but it is only
+        # included for backwards compatibility and will be remove in the
+        # future (please instead use the other attributes below!)
+        self.parent = parent_app
+
+        # Attributes to access some helpful/relevant parts of the parent
+        # task environment for printing, running tasks, etc.
+        self.config = parent_app.ana_config
+        self.reporter = parent_app.reporter
+        self.kgo_db = parent_app.kgo_db
+        self.popen = parent_app.app_runner.popen
+
+        self.passed = False
+        self.skipped = False
+
+    @abc.abstractmethod
+    def run_analysis(self):
+        """
+        Will be called to start the analysis code; this method should be
+        overidden by the user's class to perform the desired analysis.
+
+        """
+        msg = "Abstract analysis task class should never be called directly"
+        raise ValueError(msg)
+
+    def process_opt_unhandled(self):
+        """
+        Options should be removed from the options dictionary as they are
+        processed; this method may then be called to catch and unknown options
+
+        """
+        unhandled = []
+        for option in self.options:
+            if option not in ["full_task_name", "description"]:
+                unhandled.append(option)
+        if unhandled:
+            msg = ("Options provided but not understood for this "
+                   "analysis type: {0}")
+            raise ValueError(msg.format(unhandled))
+
+
 class RoseAnaApp(BuiltinApp):
 
     """Run rosa ana as an application."""
@@ -359,13 +417,16 @@ class RoseAnaApp(BuiltinApp):
                     os.path.basename(filename))[0]
                 try:
                     self.modules.add(__import__(module_name))
-                except Exception as err:
+                except ImportError:
+                    # Note: We intentionally don't re-raise the exception
+                    # here, as we want to avoid a single mistake in a user
+                    # supplied method bringing down the entire task
                     msg = "Failed to import module: {0} ".format(module_name)
-                    self.reporter(msg, prefix="[FAIL] ",
+                    self.reporter(msg, prefix="[WARN] ",
                                   kind=self.reporter.KIND_ERR)
                     exception = traceback.format_exc().split("\n")
                     for line in exception:
-                        self.reporter(line, prefix="[FAIL]   ",
+                        self.reporter(line, prefix="[WARN]   ",
                                       kind=self.reporter.KIND_ERR)
 
             # Remove the method path from the sys.path
@@ -462,8 +523,20 @@ class RoseAnaApp(BuiltinApp):
             if atype in self.methods:
                 self.analysis_tasks.append(self.methods[atype](self, options))
             else:
+                # If the analysis type isn't matched by one of the loaded
+                # methods, report the error and return a placeholder
+                # in its place (so that this tasks' main method can show
+                # the task as "failed")
                 msg = "Unrecognised analysis type: {0}"
-                raise ValueError(msg.format(atype))
+                self.reporter(msg.format(atype), prefix="[FAIL]   ")
+                # Create a simple object to return - when the run_analysis
+                # method is called by the main loop it will simply raise
+                # an exception, triggering the "error" trap
+
+                class Dummy(AnalysisTask):
+                    def run_analysis(self):
+                        raise ImportError(msg.format(atype))
+                self.analysis_tasks.append(Dummy(self, options))
 
     def _get_method_paths(self):
         """Create a listing of paths for analysis methods."""
@@ -498,64 +571,6 @@ class RoseAnaApp(BuiltinApp):
             os.path.join(os.path.dirname(__file__), "ana_builtin"))
 
         return method_paths
-
-
-class AnalysisTask(object):
-    """
-    Base class for an analysis task; all custom user tasks should inherit
-    from this class and override the "run_analysis" method to perform
-    whatever analysis is required.
-
-    """
-    __metaclass__ = abc.ABCMeta
-
-    def __init__(self, parent_app, task_options):
-        """
-        Initialise the analysis task, storing the user specified options
-        dictionary and a few references to useful objects from the parent app.
-
-        """
-        self.options = task_options
-
-        # This attribute gives access to the parent task; but it is only
-        # included for backwards compatibility and will be remove in the
-        # future (please instead use the other attributes below!)
-        self.parent = parent_app
-
-        # Attributes to access some helpful/relevant parts of the parent
-        # task environment for printing, running tasks, etc.
-        self.config = parent_app.ana_config
-        self.reporter = parent_app.reporter
-        self.kgo_db = parent_app.kgo_db
-        self.popen = parent_app.app_runner.popen
-
-        self.passed = False
-        self.skipped = False
-
-    @abc.abstractmethod
-    def run_analysis(self):
-        """
-        Will be called to start the analysis code; this method should be
-        overidden by the user's class to perform the desired analysis.
-
-        """
-        msg = "Abstract analysis task class should never be called directly"
-        raise ValueError(msg)
-
-    def process_opt_unhandled(self):
-        """
-        Options should be removed from the options dictionary as they are
-        processed; this method may then be called to catch and unknown options
-
-        """
-        unhandled = []
-        for option in self.options:
-            if option not in ["full_task_name", "description"]:
-                unhandled.append(option)
-        if len(unhandled) > 0:
-            msg = ("Options provided but not understood for this "
-                   "analysis type: {0}")
-            raise ValueError(msg.format(unhandled))
 
 
 class TestsFailedException(Exception):
