@@ -203,7 +203,7 @@ class AnalysisTask(object):
         for option in self.options:
             if option not in ["full_task_name", "description"]:
                 unhandled.append(option)
-        if len(unhandled) > 0:
+        if unhandled:
             msg = ("Options provided but not understood for this "
                    "analysis type: {0}")
             raise ValueError(msg.format(unhandled))
@@ -417,16 +417,16 @@ class RoseAnaApp(BuiltinApp):
                     os.path.basename(filename))[0]
                 try:
                     self.modules.add(__import__(module_name))
-                except Exception as err:
+                except ImportError as err:
                     # Note: We intentionally don't re-raise the exception
                     # here, as we want to avoid a single mistake in a user
                     # supplied method bringing down the entire task
                     msg = "Failed to import module: {0} ".format(module_name)
-                    self.reporter(msg, prefix="[FAIL] ",
+                    self.reporter(msg, prefix="[WARN] ",
                                   kind=self.reporter.KIND_ERR)
                     exception = traceback.format_exc().split("\n")
                     for line in exception:
-                        self.reporter(line, prefix="[FAIL]   ",
+                        self.reporter(line, prefix="[WARN]   ",
                                       kind=self.reporter.KIND_ERR)
 
             # Remove the method path from the sys.path
