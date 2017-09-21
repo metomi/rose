@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 6
+tests 8
 #-------------------------------------------------------------------------------
 # Check fail-if/warn-if syntax checking.
 TEST_KEY=$TEST_KEY_BASE-ok
@@ -308,6 +308,17 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
     zoo=elephant=fail-if=zoo=num_mice > 0
         Not found: zoo=num_mice
 __ERR__
+teardown
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-len-this-1"
+setup
+init <<'__META_CONFIG__'
+[env=FOO]
+length=:
+warn-if=len(this(1)) > 2
+__META_CONFIG__
+run_pass "${TEST_KEY}" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 exit
