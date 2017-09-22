@@ -23,7 +23,8 @@ from __future__ import print_function
 
 from collections import OrderedDict
 import re
-from subprocess import Popen, PIPE
+from subprocess import PIPE, check_output, CalledProcessError
+import sys
 
 from docutils import nodes
 from docutils.parsers.rst import Directive
@@ -423,7 +424,10 @@ def get_rose_command_reference(command_name):
     """
     # Obtain help text.
     cmd = [command_name, 'doc']
-    stdout = Popen(cmd, stdout=PIPE).communicate()[0]
+    try:
+        stdout = check_output(cmd)
+    except CalledProcessError:
+        sys.exit(1)
 
     # Extract commands / aliases.
     commands = dict((x, y) for x, y, _ in ROSE_COMMAND_REGEX.findall(stdout))
