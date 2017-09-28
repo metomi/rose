@@ -72,10 +72,7 @@ class SuiteRestarter(object):
             raise SuiteNotFoundError(suite_dir)
 
         # Ensure suite is not running
-        hosts = []
-        if host:
-            hosts.append(host)
-        self.suite_engine_proc.check_suite_not_running(suite_name, hosts)
+        self.suite_engine_proc.check_suite_not_running(suite_name)
 
         # Determine suite host to restart suite
         if host:
@@ -108,11 +105,6 @@ class SuiteRestarter(object):
 
         # Restart the suite
         self.suite_engine_proc.run(suite_name, host, environ, "restart", args)
-
-        # Write suite host name to host file
-        host_file_name = self.suite_engine_proc.get_suite_dir(
-            suite_name, "log", "rose-suite-run.host")
-        open(host_file_name, "w").write(host + "\n")
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?

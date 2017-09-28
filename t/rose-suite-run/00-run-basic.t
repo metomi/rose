@@ -47,7 +47,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
+HOST="$(awk -F= '$1 == "CYLC_SUITE_HOST" {print $2}' "${SUITE_RUN_DIR}/.service/contact")"
 poll ! test -e "$SUITE_RUN_DIR/log/job/20130101T0000Z/my_task_1/01"
 if [[ $HOST == 'localhost' ]]; then
     SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>")
@@ -67,7 +67,7 @@ for OPTION in -i -l '' --restart; do
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] Suite "$NAME" has running processes on: ${HOST:-localhost}
-[FAIL] Try "rose suite-shutdown --name=$NAME" first?
+[FAIL] Try "cylc stop '$NAME'" first?
 __ERR__
 done
 # Don't reload until tasks begin

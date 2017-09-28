@@ -51,7 +51,6 @@ run_suite
 TEST_KEY="$TEST_KEY_BASE-work"
 run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work/20?00101T0000Z
 file_cmp  "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
 [INFO] delete: localhost:cylc-run/${NAME}/work/20200101T0000Z
 [INFO] delete: localhost:cylc-run/${NAME}/work/20100101T0000Z
 [INFO] delete: localhost:cylc-run/${NAME}/work/20000101T0000Z

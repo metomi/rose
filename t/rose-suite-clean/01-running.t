@@ -43,7 +43,7 @@ TEST_KEY=$TEST_KEY_BASE-running
 run_fail "$TEST_KEY" rose suite-clean -y $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] Suite "$NAME" has running processes on: $HOST
-[FAIL] Try "rose suite-shutdown --name=$NAME" first?
+[FAIL] Try "cylc stop '$NAME'" first?
 __ERR__
 if [[ ! -d $HOME/cylc-run/$NAME ]]; then
     exit 1
@@ -53,7 +53,7 @@ TEST_KEY=$TEST_KEY_BASE-running-name
 run_fail "$TEST_KEY" rose suite-clean -y -n $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] Suite "$NAME" has running processes on: $HOST
-[FAIL] Try "rose suite-shutdown --name=$NAME" first?
+[FAIL] Try "cylc stop '$NAME'" first?
 __ERR__
 if [[ ! -d $HOME/cylc-run/$NAME ]]; then
     exit 1
@@ -74,7 +74,6 @@ TEST_KEY=$TEST_KEY_BASE-stopped
 run_pass "$TEST_KEY" rose suite-clean -y $NAME
 sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[INFO] delete: $HOME/cylc-run/$NAME/log/rose-suite-run.host
 [INFO] delete: localhost:cylc-run/${NAME}/work
 [INFO] delete: localhost:cylc-run/${NAME}/share/cycle
 [INFO] delete: localhost:cylc-run/${NAME}/share

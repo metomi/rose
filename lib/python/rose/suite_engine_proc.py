@@ -204,7 +204,7 @@ class SuiteStillRunningError(Exception):
     FMT_HEAD = "Suite \"%(suite_name)s\" has running processes on:"
     FMT_BODY_1 = " %(host_name)s"
     FMT_BODY_M = "\n    %(host_name)s"
-    FMT_TAIL = "\nTry \"rose suite-shutdown --name=%(suite_name)s\" first?"
+    FMT_TAIL = "\nTry \"cylc stop '%(suite_name)s'\" first?"
 
     def __str__(self):
         suite_name, host_names = self.args
@@ -381,9 +381,9 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def check_suite_not_running(self, suite_name, hosts=None):
+    def check_suite_not_running(self, suite_name):
         """Raise SuiteStillRunningError if suite is still running."""
-        host_names = self.get_suite_run_hosts(None, suite_name, hosts)
+        host_names = self.get_suite_run_hosts(None, suite_name)
         if host_names:
             raise SuiteStillRunningError(suite_name, host_names)
 
@@ -416,7 +416,7 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_suite_run_hosts(self, user_name, suite_name, host_names=None):
+    def get_suite_run_hosts(self, user_name, suite_name):
         """Return host(s) where suite_name is running."""
         raise NotImplementedError()
 
