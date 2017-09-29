@@ -246,6 +246,8 @@ class RuleEvaluator(rose.macro.MacroBase):
             start, var_id, end = search_result
             if var_id == "this":
                 var_id = setting_id
+            elif self.REC_THIS_ELEMENT_ID.search(rule):
+                var_id = var_id.replace("this", setting_id)
             setting_value = get_value_from_id(
                 var_id, config, meta_config, setting_id)
             array_value = rose.variable.array_split(str(setting_value))
