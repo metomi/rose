@@ -12,3 +12,4 @@ system.
    building
    restructuredtext
    auto-cli-api
+   autodoc
