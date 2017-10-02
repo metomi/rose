@@ -1,4 +1,4 @@
-ReStructuredText
+reStructuredText
 ================
 
 
@@ -27,7 +27,7 @@ any of:
 
 Different characters are used to define different document levels e.g. section,
 sub-section, etc. reStructuredText doesn't actually care which character you
-use for each role it infers precedence from the order of appearance.
+use for each role, it infers precedence from the order of appearance.
 
 For consistency this documentation has been written in the standard-ish manner
 with:
@@ -48,7 +48,7 @@ with:
 
 For consistency:
 
-* Top level headings allways appear at the top of the document (only one per
+* Top level headings always appear at the top of the document (only one per
   document).
 * First level headings are preceded by two blank lines and followed by one.
 * Lower level headings are preceded and followed by a single blank line.
