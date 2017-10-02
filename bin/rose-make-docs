@@ -60,7 +60,7 @@
 #     `doctest`
 #         Runs any doctest examples present in documented python modules.
 #     `strict`
-#         Runs sphinx-build in a "strict" mode where cashing is turned off and
+#         Runs sphinx-build in a "strict" mode where caching is turned off and
 #         warnings are turned into errors.
 #     `linkcheck`
 #         Checks external links.

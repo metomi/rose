@@ -5,7 +5,7 @@ Auto CLI API
 The rose command line API is auto-documented by the extension ``auto-cli-api``.
 
 This translates the rose CLI help into reStructuredText. To keep the CLI docs
-clean they are written in a plain format which has some RreStructuredText
+clean they are written in a plain format which has some reStructuredText
 features built in.
 
 
@@ -40,8 +40,8 @@ underlying reStructuredText try:
    python ext/auto-api-doc.py
 
 
-RST Markup
-----------
+reStructuredText Markup
+-----------------------
 
 The following reStructuredText markup elements are supported:
 

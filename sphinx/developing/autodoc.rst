@@ -13,7 +13,7 @@ Writing Docstrings
 .. _Napoleon Numpy Example: http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html
 
 This documentation uses ``sphinx.ext.napoleon`` to pre-process docstrings
-allowing them to be written in plain text as opposed to ReStructuredText.
+allowing them to be written in plain text as opposed to reStructuredText.
 
 Napoleon accepts docstrings in one of two formats:
 
