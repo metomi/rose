@@ -5,6 +5,28 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2017.10.0 (2017-10-03)
+
+Rose release 52. This release is expected to be used with:
+* [cylc-7.5.0](https://github.com/cylc/cylc/releases/tag/7.5.0), and
+* [fcm-2017.10.0](https://github.com/metomi/fcm/releases/tag/2017.10.0).
+
+### Noteworthy Changes
+
+[#2117](https://github.com/metomi/rose/pull/2117):
+Rose Metadata mini language: support `len(this(N))` syntax.
+
+[#2114](https://github.com/metomi/rose/pull/2114):
+rose_ana: import errors for external plugins are now pushed to the task level
+so a plugin import error will no longer bring down everything else.
+
+[#2109](https://github.com/metomi/rose/pull/2109):
+rose suite-run, rose suite-restart, rose suite-clean, etc: now use the cylc-7.X
+contact file as an indicator that a suite is still alive. This should allow
+the commands to be faster, with reduced network calls.
+
+--------------------------------------------------------------------------------
+
 ## 2017.09.0 (2017-09-05)
 
 Rose release 51. This release is expected to be used with:
