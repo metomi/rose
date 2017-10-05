@@ -1,3 +1,5 @@
+.. _nowcasting: https://www.metoffice.gov.uk/learning/science/hours-ahead/nowcasting
+
 .. _tutorial-datetime-cycling:
 
 Date-Time Cycling
@@ -148,10 +150,10 @@ As with integer cycling, recurrences start, by default, at the
 
    For example if you set the initial cycle point to ``2000-01-01T00`` the
    recurrence ``P1D`` would yield:
-   
+
    ``2000-01-01T00``, ``2000-01-02T00``, ``2000-01-03T00``, ...
 
-   If, however the initial cycle point were changed from midnight to midday 
+   If, however the initial cycle point were changed from midnight to midday
    (``2000-01-01T12``) then the same recurrence would yield:
 
    ``2000-01-01T12``, ``2000-01-02T12``, ``2000-01-03T12``, ...
@@ -204,100 +206,121 @@ To make your suite use UTC set the ``[cylc]UTC mode`` setting to ``True``, i.e:
 Putting It All Together
 -----------------------
 
+Cylc was originally developed for running operational weather forecasting, in
+this section we will outline a basic (dummy) weather forecasting suite and how
+to implement it in cylc.
+
+.. note::
+
+   Technically the suite outlined in this section is a `nowcasting`_ suite.
+   We will refer to it as forecasting for simplicity.
+
+A basic weather forecasting workflow contains three main steps:
+
+1. Gathering Observations
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We gather observations from different weather stations and use them to
+build a picture of the current weather. Our dummy weather forecast
+will get wind observations from four weather stations:
+
+* Belmullet
+* Camborne
+* Heathrow
+* Shetland
+
+The tasks which get observation data will be called
+``get_observations_<site>`` where ``site`` is the name of a weather
+station.
+
+Next we need to consolidate these observations so that our forecasting
+system can work with them, to do this we have a
+``consolidate_observations`` task.
+
+We will fetch wind observations **every three hours starting at 00:00**.
+
+The ``consolidate_observations`` task must run after the
+``get_observations<site>`` tasks.
+
+.. digraph:: example
+   :align: center
+
+   size = "5,4"
+   bgcolor=none
+
+   get_observations_camborne -> consolidate_observations
+   get_observations_heathrow -> consolidate_observations
+   get_observations_aberdeen -> consolidate_observations
+
+We will also use the UK radar network to get rainfall data with a task
+called ``get_rainfall``.
+
+We will fetch rainfall data **every six hours starting at 06:00**.
+
+2. Running computer models to generate forecast data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We will do this with a task called ``forecast`` which will run
+**every six hours starting at 06:00**. The ``forecast`` task will be
+dependent on:
+
+* The ``consolidate_observations`` tasks from the previous two as well as
+  the present cycles.
+* The ``get_rainfall`` task from the present cycle.
+
+.. digraph:: example
+   :align: center
+
+   size = "5,4"
+   bgcolor=none
+
+   subgraph cluster_T00 {
+       label="T00"
+       style="dashed"
+       "observations.t00" [label="consolidate observations\nT00"]
+   }
+
+   subgraph cluster_T03 {
+       label="T03"
+       style="dashed"
+       "observations.t03" [label="consolidate observations\nT03"]
+   }
+
+   subgraph cluster_T06 {
+       label="T06"
+       style="dashed"
+       "forecast.t06" [label="forecast\nT06"]
+       "get_rainfall.t06" [label="get_rainfall\nT06"]
+       "observations.t06" [label="consolidate observations\nT06"]
+   }
+
+   "observations.t00" -> "forecast.t06"
+   "observations.t03" -> "forecast.t06"
+   "observations.t06" -> "forecast.t06"
+   "get_rainfall.t06" -> "forecast.t06"
+
+3. Processing the data output to produce user-friendly forecasts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This will be done with a task called ``post_process_<location>`` where
+``location`` is the place we want to generate the forecast for. For
+the moment we will use Exeter.
+
+The ``post_process_exeter`` task will run **every six hours starting at
+06:00** and will be dependent on the ``forecast`` task.
+
+.. digraph:: example
+   :align: center
+
+   size = "1.5,1"
+   bgcolor=none
+
+   "forecast" -> "post_process_exeter"
+
 .. practical::
 
-   .. rubric:: Cylc was originally developed for running operational weather
-      forecasting. In this practical we will create a dummy forecasting
-      suite using date-time cycling.
-
-   A basic weather forecasting workflow contains three main steps:
-
-   - Gathering observations from weather-stations.
-
-     We gather observations from different weather stations and use them to
-     build a picture of the current weather. Our dummy weather forecast
-     will get observations from three weather stations:
-
-     * Aberdeen
-     * Camborne
-     * Heathrow
-
-     The tasks which get observation data will be called
-     ``observations_<site>`` where ``site`` is the name of a weather
-     station.
-
-     Next we need to consolidate these observations so that our forecasting
-     system can work with them, to do this we have a
-     ``consolidate_observations`` task.
-
-     We will fetch observations **every three hours starting at 00:00**.
-
-     The ``consolidate_observations`` task must run after the
-     ``observations<site>`` tasks.
-
-     .. digraph:: example
-        :align: center
-
-        size = "5,4"
-        bgcolor=none
-
-        observations_camborne -> consolidate_observations
-        observations_heathrow -> consolidate_observations
-        observations_aberdeen -> consolidate_observations
-
-   - Running computer models to generate forecast data.
-
-     We will do this with a task called ``forecast`` which will run
-     **every six hours starting at 06:00**. The ``forecast`` task will be
-     dependent on the ``consolidate_observations`` tasks from the previous
-     two as well as the present cycles.
-
-     .. digraph:: example
-        :align: center
-
-        size = "5,4"
-        bgcolor=none
-
-        subgraph cluster_T00 {
-            label="T00"
-            style="dashed"
-            "observations.t00" [label="consolidate observations\nT00"]
-        }
-
-        subgraph cluster_T03 {
-            label="T03"
-            style="dashed"
-            "observations.t03" [label="consolidate observations\nT03"]
-        }
-
-        subgraph cluster_T06 {
-            label="T06"
-            style="dashed"
-            "forecast.t06" [label="forecast\nT06"]
-            "observations.t06" [label="consolidate observations\nT06"]
-        }
-
-        "observations.t00" -> "forecast.t06"
-        "observations.t03" -> "forecast.t06"
-        "observations.t06" -> "forecast.t06"        
-
-   - Processing the data output by the computer models to produce
-     user-friendly forecasts.
-
-     This will be done with a task called ``process_<location>`` where
-     ``location`` is the place we want to generate the forecast for. For
-     the moment we will use Exeter.
-
-     The ``process_exeter`` task will run **every six hours starting at
-     06:00** and will be dependent on the ``forecast`` task.
-
-     .. digraph:: example
-        :align: center
-
-        size = "1.5,1"
-        bgcolor=none
-
-        "forecast" -> "process_exeter"
+   .. rubric:: In this practical we will create a dummy forecasting suite
+      using date-time cycling.
 
    #. **Create A New Suite.**
 
@@ -348,11 +371,18 @@ Putting It All Together
          The dependencies you will need to write are:
 
          * The ``consolidate_observations`` task is dependent on the
-           ``observations_<site>`` tasks.
-         * The ``forecast`` task is dependent on the
-           ``consolidate_observations`` tasks from the cycles three and six
-           hours prior as well as from the current cycle.
-         * The ``process_exeter`` task is dependent on the ``forecast`` task.
+           ``get_observations_<site>`` tasks.
+         * The ``forecast`` task is dependent on:
+
+           * The ``get_rainfall`` task.
+           * The ``consolidate_observations`` tasks from:
+
+             * The present cycle.
+             * The cycle 3 hours before (``-PT3H``).
+             * The cycle 6 hours before (``-PT6H``).
+
+         * The ``post_process_exeter`` task is dependent on the ``forecast``
+           task.
 
       .. spoiler:: Solution warning
 
@@ -365,16 +395,16 @@ Putting It All Together
                [[dependencies]]
                    [[[T00/PT3H]]]
                        graph = """
-                           observations_camborne => gather_observations
-                           observations_heathrow => gather_observations
-                           observations_aberdeen => gather_observations
+                           get_observations_camborne => consolidate_observations
+                           get_observations_heathrow => consolidate_observations
+                           get_observations_aberdeen => consolidate_observations
                        """
                    [[[T06/PT6H]]]
                        graph = """
-                           gather_observations => forecast
-                           gather_observations[-PT3H] => forecast
-                           gather_observations[-PT6H] => forecast
-                           forecast => process_exeter
+                           consolidate_observations => forecast
+                           consolidate_observations[-PT3H] => forecast
+                           consolidate_observations[-PT6H] => forecast
+                           get_rainfall => forecast => process_exeter
                        """
 
    #. **Inter-Cycle Offsets.**
