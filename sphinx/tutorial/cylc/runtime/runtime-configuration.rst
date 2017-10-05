@@ -1,3 +1,5 @@
+.. _tutorial-cylc-runtime-configuration:
+
 Runtime Configuration
 =====================
 

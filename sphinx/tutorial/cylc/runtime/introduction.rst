@@ -85,7 +85,8 @@ the suite.
    cylc reg <name> <path>
 
 It is a good idea to check the suite for errors before running it.
-Cylc provides a command which automatically checks for obvious errors called
+Cylc provides a command which automatically checks for any obvious
+configuration issues called
 ``cylc validate``.
 
 .. code-block:: bash
@@ -186,74 +187,114 @@ a new directory for your suite within the ``cylc-run`` directory. This is
 called the :term:`run directory`, all of the files created when the suite runs
 are located within this directory and its subdirectories.
 
-When a :term:`job` is executed cylc creates a directory for it to run in, this
-is called the :term:`work directory`. The stdout and stderr of the job are
-redirected into the ``job.out`` and ``job.err`` files which are stored in the
+The Work Directory
+^^^^^^^^^^^^^^^^^^
+
+When a :term:`task` is run cylc creates a directory for the :term:`job` to run
+in, this is called the :term:`work directory`.
+
+By default the work directory is in a directory structure under the
+:term:`cycle point` and the :term:`task` name::
+
+   ~/cylc-run/<suite-name>/work/<cycle-point>/<task-name>
+
+The Job Log Directory
+^^^^^^^^^^^^^^^^^^^^^
+
+When a task is run cylc generates a :term:`job script`, this is stored in the
+:term:`job log directory` as the file ``job``.
+
+When the :term:`job script` is executed the stdout and stderr are redirected
+into the ``job.out`` and ``job.err`` files which are also stored in the
 :term:`job log directory`.
 
-TODO: Run Dir Overview
+The :term:`job log directory` lives in a directory structure under the
+:term:`cycle point`, :term:`task` name and the :term:`job submission number`::
 
+   ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-no>/
+
+The :term:`job submission number` starts at 1 and increments each time a taks
+is re-run.
 
 .. practical::
 
-   .. rubric:: In this practical we will add ``runtime`` configuration to the
+   .. rubric:: In this practical we will add some scripts to and run the
       :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>`
       from the :ref:`scheduling tutorial <tutorial-scheduling>`.
 
    #. **Create A New Suite.**
 
-      Create a new directory called "dummy-forecast" and paste the following
-      code in the ``suite.rc`` file:
+      The following command will copy some files for us to work with into a
+      directory called ``dummy-suite``:
 
-      .. code-block:: cylc
+      .. code-block:: bash
 
-         [cylc]
-             UTC mode = True
-         [scheduling]
-             initial cycle point = 20000101T00
-             [[dependencies]]
-                 [[[T00/PT3H]]]
-                     graph = """
-                         observations_camborne => gather_observations
-                         observations_heathrow => gather_observations
-                         observations_aberdeen => gather_observations
-                     """
-                 [[[T06/PT6H]]]
-                     graph = """
-                         gather_observations => forecast
-                         gather_observations[-PT3H] => forecast
-                         gather_observations[-PT6H] => forecast
-                         forecast => process_exeter
-                     """
-                 [[[T12/PT6H]]]
-                     graph = """
-                         forecast[-PT6H] => forecast
-                     """
+         rose tutorial cylc-dummy dummy-suite
 
-   #. **Add Scripts To The Suite.**
+      In this directory we have the ``suite.rc`` file from the
+      :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>`
+      with some runtime configuration added to it.
 
-      In the suite directory create a ``bin`` directory.
+      These is also a script called ``get-observations`` located in a bin
+      directory.
 
-      TODO: Add scripts.
+   #. **Add The Initial And Final Cycle Points.**
 
-   #. **Add Runtime Configuration.**
+      TODO
 
-      .. code-block:: cylc
+   #. **Register The Suite.**
 
-         [runtime]
-             [[observations_camborne]]
-                 script = get-observations camborne
-             [[observations_heathrow]]
-                 script = get-observations_heathrow
-             [[observations_aberdeen]]
-                 script = get-observations aberdeen
-             [[gather_observations]]
-                 script = gather-observations
-             [[forecast]]
-                 script = forecast
-             [[process_exeter]]
-                 script = post-process exeter
+      Register and validate your suite by running the following commands:
+
+      .. code-block:: bash
+
+         cd dummy-forecast
+         cylc reg dummy-forecast $PWD
+         cylc validate dummy-forecast
 
    #. **Run The Suite.**
 
-   #. **Open A Job Log / Script File.**
+      Open the cylc GUI by running the following command:
+
+      .. code-block:: bash
+
+         gcylc dummy-forecast &
+
+      Run the suite by executing the following command:
+
+      .. code-block:: bash
+
+         cylc run dummy-suite
+
+      The tasks will start to run, you should see them going through the
+      waiting, running and succeeded states.
+
+      When the suite reaches the final cycle point and all tasks have succeeded
+      it will shutdown automatically and the GUI will go blank.
+
+      .. tip::
+
+         You can also run a suite from the cylc gui by pressing the "play"
+         button.
+
+         .. image:: ../img/gcylc-play.png
+            :align: center
+
+   #. **Inspect A Job Log.**
+
+      Cylc will have created a :term:`run directory` for this suite in the
+      following location::
+
+         ~/cylc-run/dummy-forecast/
+
+      Try opening the ``job.out`` file for one of the ``get_observations``
+      jobs. The file will be located within the :term:`run directory`::
+
+         <run-directory>/log/job/<cycle-point>/get_observations_heathrow/01/job.out
+
+   #. **Inspect A Work Directory.**
+
+      The ``get_rainfall`` task should create a file called ``rainfall`` in its
+      :term:`work directory`. Try opening the file::
+
+         <run-directory>/work/<cycle-point>/get_rainfall/rainfall
