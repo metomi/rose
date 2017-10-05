@@ -1,0 +1,52 @@
+[cylc]
+    UTC mode = True
+[scheduling]
+    initial cycle point = 2000
+    final cycle point = 2001
+    [[dependencies]]
+        [[[T00/PT3H]]]
+            graph = """
+                observations_camborne => gather_observations
+                observations_heathrow => gather_observations
+                observations_shetland => gather_observations
+                observations_belmullet => gather_observations
+            """
+        [[[T06/PT6H]]]
+            graph = """
+                gather_observations => forecast
+                gather_observations[-PT3H] => forecast
+                gather_observations[-PT6H] => forecast
+                forecast => process_exeter
+            """
+        [[[T12/PT6H]]]
+            graph = """
+                forecast[-PT6H] => forecast
+            """
+
+[runtime]
+    [[observations_belmullet]]
+        script = get-observations
+
+    [[observations_camborne]]
+        script = get-observations
+
+    [[observations_heathrow]]
+        script = get-observations
+
+    [[observations_shetland]]
+        script = get-observations
+
+    [[gather observations]]
+        script = sleep 1;
+
+    [[forecast]]
+        script = echo 'Running forecast.'
+
+    [[get_rainfall]]
+        script = cat >rainfall <<<'The rain in Spain falls mainly on the plain'
+
+    [[process<site>]]
+        script = """python -c "
+from random import choice
+print choice(['Windy', 'Rainy', 'Sunny', 'Snowey'])"
+"""
