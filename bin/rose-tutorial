@@ -18,25 +18,30 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose rug-brief-tour
+#     rose tutorial
 #
 # SYNOPSIS
-#     rose rug-brief-tour [DEST]
+#     rose tutorial SUITE [DEST]
 #
 # DESCRIPTION
-#     Populate the destination directory for Rose User Guide: A Brief Tour.
+#     Make a copy of one of the tutorial SUITE in the directory DEST.
+#
+#     Avaliable tutorial suites:
+#
+#     * cylc
 #
 # ARGUMENTS
 #     DEST
 #         Destination directory. (`default=$PWD`)
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/../lib/bash/rose_init"
-echo -n 'rose rug-brief-tour: copying brief tour files to current directory...'
+DIRECTORY="${2:-${PWD}}"
+echo -n "rose tutorial: copying tutorial suite files to ${DIRECTORY}..."
 rose_init 'rose_log'
-if run rsync -a "${ROSE_HOME}/etc/$(basename "$0")/" "${1:-${PWD}}"; then
+if run rsync -a "${ROSE_HOME}/etc/tutorial/"$1"/" "${DIRECTORY}"; then
     echo 'done'
 else
     echo
-    echo 'rose rug-brief-tour: failed' >&2
+    echo "rose tutorial $1: failed" >&2
     exit 1
 fi
