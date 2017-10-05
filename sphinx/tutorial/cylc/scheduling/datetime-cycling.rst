@@ -136,6 +136,8 @@ As with integer cycling, recurrences start, by default, at the
    * ``2000-01-01T12/T00`` every day at midnight starting at the first midnight
      after the 1st of January at 12:00 (i.e ``2000-01-02T00``).
 
+.. _tutorial-cylc-datetime-offset-icp:
+
 2. By defining an offset from the initial cycle point (``offset/recurrence``).
    This offset is an ISO8601 duration preceded by a plus character.
 
@@ -237,7 +239,8 @@ Next we need to consolidate these observations so that our forecasting
 system can work with them, to do this we have a
 ``consolidate_observations`` task.
 
-We will fetch wind observations **every three hours starting at 00:00**.
+We will fetch wind observations **every three hours starting from the initial
+cycle point**.
 
 The ``consolidate_observations`` task must run after the
 ``get_observations<site>`` tasks.
@@ -248,23 +251,22 @@ The ``consolidate_observations`` task must run after the
    size = "5,4"
    bgcolor=none
 
-   get_observations_belmullet -> consolidate_observations
    get_observations_camborne -> consolidate_observations
    get_observations_heathrow -> consolidate_observations
-   get_observations_shetland -> consolidate_observations
-
+   get_observations_aberdeen -> consolidate_observations
 
 We will also use the UK radar network to get rainfall data with a task
 called ``get_rainfall``.
 
-We will fetch rainfall data **every six hours starting at 06:00**.
+We will fetch rainfall data **every six hours starting from six hours after the
+initial cycle point**.
 
 2. Running computer models to generate forecast data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We will do this with a task called ``forecast`` which will run
-**every six hours starting at 06:00**. The ``forecast`` task will be
-dependent on:
+**every six hours starting six hours after the initial cycle point**.
+The ``forecast`` task will be dependent on:
 
 * The ``consolidate_observations`` tasks from the previous two as well as
   the present cycles.
@@ -277,23 +279,23 @@ dependent on:
    bgcolor=none
 
    subgraph cluster_T00 {
-       label="T00"
+       label="+PT0H"
        style="dashed"
-       "observations.t00" [label="consolidate observations\nT00"]
+       "observations.t00" [label="consolidate observations\n+PT0H"]
    }
 
    subgraph cluster_T03 {
-       label="T03"
+       label="+PT3H"
        style="dashed"
-       "observations.t03" [label="consolidate observations\nT03"]
+       "observations.t03" [label="consolidate observations\n+PT3H"]
    }
 
    subgraph cluster_T06 {
-       label="T06"
+       label="+PT6H"
        style="dashed"
-       "forecast.t06" [label="forecast\nT06"]
-       "get_rainfall.t06" [label="get_rainfall\nT06"]
-       "observations.t06" [label="consolidate observations\nT06"]
+       "forecast.t06" [label="forecast\n+PT6H"]
+       "get_rainfall.t06" [label="get_rainfall\n+PT6H"]
+       "observations.t06" [label="consolidate observations\n+PT6H"]
    }
 
    "observations.t00" -> "forecast.t06"
@@ -308,8 +310,8 @@ This will be done with a task called ``post_process_<location>`` where
 ``location`` is the place we want to generate the forecast for. For
 the moment we will use Exeter.
 
-The ``post_process_exeter`` task will run **every six hours starting at
-06:00** and will be dependent on the ``forecast`` task.
+The ``post_process_exeter`` task will run **every six hours starting six hours
+after the initial cycle point** and will be dependent on the ``forecast`` task.
 
 .. digraph:: example
    :align: center
@@ -342,12 +344,18 @@ The ``post_process_exeter`` task will run **every six hours starting at
       This suite will require two recurrences. Add sections under the
       dependencies section for these.
 
+      .. hint::
+
+         See :ref:`Date-Time Recurrences<tutorial-cylc-datetime-offset-icp>`.
+
       .. spoiler:: Solution warning
 
          The two recurrences you need are
 
-         * ``T00/PT3H`` repeat every three hours starting at 00:00.
-         * ``T06/PT6H`` repeat every six hours starting at 06:00.
+         * ``PT3H`` repeat every three hours starting from the initial cycle
+           point.
+         * ``+PT6H/PT6H`` repeat every six hours starting six hours after the
+           initial cycle point
 
          .. code-block:: diff
 
@@ -356,8 +364,8 @@ The ``post_process_exeter`` task will run **every six hours starting at
              [scheduling]
                  initial cycle point = 20000101T00Z
                  [[dependencies]]
-            +        [[[T00/PT3H]]]
-            +        [[[T06/PT6H]]]
+            +        [[[PT3H]]]
+            +        [[[+PT6H/PT6H]]]
 
    #. **Write The Graphing.**
 
@@ -395,14 +403,14 @@ The ``post_process_exeter`` task will run **every six hours starting at
            [scheduling]
                initial cycle point = 20000101T00
                [[dependencies]]
-                   [[[T00/PT3H]]]
+                   [[[PT3H]]]
                        graph = """
                            get_observations_belmullet => consolidate_observations
                            get_observations_camborne => consolidate_observations
                            get_observations_heathrow => consolidate_observations
                            get_observations_shetland => consolidate_observations
                        """
-                   [[[T06/PT6H]]]
+                   [[[+PT6H/PT6H]]]
                        graph = """
                            consolidate_observations => forecast
                            consolidate_observations[-PT3H] => forecast
@@ -466,23 +474,23 @@ The ``post_process_exeter`` task will run **every six hours starting at
 
       Note that the ``forecast`` task in the 00:00 cycle is gray. The reason
       for this is that this task does not exist. Remember the forecast task runs
-      every six hours **starting at 06:00**.
+      every six hours **starting 6 hours after the initial cycle point**.
 
       The dependency is only valid from 12:00 onwards so to fix the problem we
       must add a new dependency section which repeats every six hours
-      **starting at 12:00**.
+      **starting 12 hours after the initial cycle point**.
 
       Make the following changes to your suite, the gray task should now
       disappear:
 
       .. code-block:: diff
 
-                    [[[T06/PT6H]]]
+                    [[[+PT6H/PT6H]]]
                         graph = """
                             ...
          -                  forecast[-PT6H] => forecast
                         """
-         +          [[[T12/PT6H]]]
+         +          [[[+PT12H/PT6H]]]
          +              graph = """
          +                  forecast[-PT6H] => forecast
          +              """
