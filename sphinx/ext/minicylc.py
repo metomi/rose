@@ -111,6 +111,7 @@ class MiniCylcDirective(GraphvizSimple):
     option_spec = dict(GraphvizSimple.option_spec)
     option_spec['snippet'] = directives.flag
     option_spec['theme'] = directives.unchanged
+    option_spec['size'] = directives.unchanged
     required_arguments = 0  # Arg will be provided in run().
 
     CONDITIONAL_CHARS = ['&', '|', '(', ')']
@@ -220,6 +221,8 @@ class MiniCylcDirective(GraphvizSimple):
 
         # Generate dotcode for graphviz.
         dotcode = ['bgcolor=none']
+        if 'size' in self.options:
+            dotcode.append('size="%s"' % self.options['size'])
         for left, right, conditional in self.get_triggers(self.content):
             if left:
                 dotcode.append('%s -> %s%s' % (

@@ -3,17 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. toctree::
+   :caption: Tutorial
+   :name: tutorial-toc
+   :maxdepth: 3
+
+   tutorial/index
+   glossary
 
 .. toctree::
-   :caption: Rose Documentation Demo
-   :name: mastertoc
+   :caption: Rose API Reference
+   :name: api-toc
    :maxdepth: 2
 
-   demo/basic
-   demo/lexers
-   demo/admonitions
-   demo/minicylc
    command-reference
+
 
 Indices and tables
 ==================
