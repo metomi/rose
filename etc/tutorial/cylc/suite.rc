@@ -1,0 +1,91 @@
+[cylc]
+    UTC mode = True
+    [[parameters]]
+        # A list of the weather stations we will be fetching observations from.
+        station = camborne, heathrow, shetland, belmullet
+        # A list of the sites we will be generating forecasts for.
+        site = exeter
+
+[scheduling]
+    initial cycle point = TODO
+    final cycle point = TODO
+    [[dependencies]]
+        [[[PT3H]]]
+            # Repeat every three hours starting at the initial cycle point.
+            graph = """
+                get_observations<station> => consolidate_observations
+            """
+
+        [[[+PT6H/PT6H]]]
+            # Repeat every six hours starting six hours after the initial
+            # cycle point.
+            graph = """
+                consolidate_observations => forecast
+                consolidate_observations[-PT3H] => forecast
+                consolidate_observations[-PT6H] => forecast
+                get_rainfall => forecast => post_process<site>
+            """
+
+        [[[+PT12H/PT6H]]]
+            # Repeat every six hours starting twelve hours after the initial
+            # cycle point.
+            graph = """
+                forecast[-PT6H] => forecast
+            """
+
+[runtime]
+    [[root]]
+        # These environment variables will be available to all tasks.
+        [[[environment]]]
+            # Add the `python` directory to the PYTHONPATH.
+            PYTHONPATH="$CYLC_SUITE_DEF_PATH/python:$PYTHONPATH"
+            # The dimensions of each grid cell in degrees.
+            RESOLUTION = 0.2
+            # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+            DOMAIN = -12,48,5,61  # Do not change!
+
+    [[get_observations<station>]]
+        script = get-observations
+        [[[environment]]]
+            # The key required to get weather data from the DataPoint service.
+            # To use archived data comment this line out.
+            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+    [[get_observations<station=camborne>]]
+        [[[environment]]]
+            SITE_ID = 3808
+    [[get_observations<station=heathrow>]]
+        [[[environment]]]
+            SITE_ID = 3772
+    [[get_observations<station=shetland>]]
+        [[[environment]]]
+            SITE_ID = 3005
+    [[get_observations<station=belmullet>]]
+        [[[environment]]]
+            SITE_ID = 3976
+
+    [[consolidate_observations]]
+        script = consolidate-observations
+
+    [[get_rainfall]]
+        script = get-rainfall
+        [[[environment]]]
+            # The key required to get weather data from the DataPoint service.
+            # To use archived data comment this line out.
+            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+
+    [[forecast]]
+        script = forecast 120 5  # Generate 5 forecasts at 60 minute intervals.
+        [[[environment]]]
+            # The cyclepoint 3 hours before the present one.
+            PT3H = $(cylc cyclepoint --offset-hours=-3)
+            # The cyclepoint 6 hours before the present one.
+            PT6H = $(cylc cyclepoint --offset-hours=-6)
+            # --- Science Parameters ---
+            # Effects the way rainfall is interpolated onto the grid
+            SPLINE_LEVEL=0
+            # The weighting to give to each observation set.
+            WEIGHTING = 0.7, 0.2, 0.1
+
+    [[post_process<site>]]
+        # Generate a forecast for the location <site> 60 minutes in the future.
+        script = post-process $CYLC_TASK_PARAM_site 120

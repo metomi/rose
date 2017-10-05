@@ -1,0 +1,81 @@
+#!/usr/bin/env python
+
+"""
+Usage:
+    post-process SITE TIME
+
+Arguments:
+    SITE: The name of the location to process data for.
+    TIME: The time ahead of the cycle point to produce the forecast for in
+          minutes.
+
+Environment Variables:
+    DOMIAN: The area in which to generate forecasts for in the format
+        (lng1, lat1, lng2, lat2).
+    RESOLUTION: The length/width of each grid cell in degrees.
+
+"""
+
+import os
+import sys
+
+import util
+
+
+SITE_LOCATIONS = {
+    "exeter": (-3.533, 50.717),
+    "london": (-0.1275, 51.507),
+    "cardiff": (-3.183, 51.483),
+    "edinburugh": (-3.189, 55.953),
+    "belfast": (-5.930, 54.597)
+}
+
+
+def main(site_name, time):
+    resolution = float(os.environ['RESOLUTION'])
+    domain = util.parse_domain(os.environ['DOMAIN'])
+    lng, lat = SITE_LOCATIONS[site_name]
+
+    # Load forecast data.
+    filename = '+PT%02dH%02dM.csv' % (time // 60, time % 60)
+    try:
+        # The path to the forecast data file.
+        forecast = util.read_csv(os.path.join(
+            os.environ['CYLC_SUITE_WORK_DIR'],
+            os.environ['CYLC_TASK_CYCLE_POINT'],
+            'forecast',
+            filename
+        ))
+    except IOError:
+        sys.exit('Could not find forecast "%s".' % filename)
+
+    # Extract forecast for specified location.
+    ind_x, ind_y = util.get_grid_coordinates(lng, lat, domain, resolution)
+    predicted_rainfall = forecast[ind_y][ind_x]
+
+    # Use forecast to choose an appropriate message.
+    if predicted_rainfall < 0.1:
+        message = 'Clear skies ahead!'
+    elif predicted_rainfall < 0.5:
+        message = 'A slim change of light rain.'
+    elif predicted_rainfall < 2:
+        message = 'Chance of a light rain.'
+    elif predicted_rainfall < 3:
+        message = 'Better take an umbrella.'
+    elif predicted_rainfall < 4:
+        message = 'Nice weather for ducks.'
+    elif predicted_rainfall < 5:
+        message = "Looks like it'll be chucking it down."
+    else:
+        message = 'Torrential downpour :('
+
+    print message
+
+
+if __name__ == '__main__':
+    try:
+        args = (sys.argv[1].lower(), int(sys.argv[2]))
+    except IndexError:
+        print __doc__
+        sys.exit(1)
+    main(*args)
