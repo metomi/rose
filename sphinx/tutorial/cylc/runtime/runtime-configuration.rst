@@ -1,4 +1,9 @@
+.. _DataPoint: https://www.metoffice.gov.uk/datapoint
+
 .. _tutorial-cylc-runtime-configuration:
+
+.. include:: ../../../hyperlinks.rst
+  :start-line: 1
 
 Runtime Configuration
 =====================
@@ -11,7 +16,7 @@ this section we will look at how we can configure these tasks.
 Environment Variables
 ---------------------
 
-We can specify environment variables in a tasks ``[environment]`` section.
+We can specify environment variables in a task's ``[environment]`` section.
 These environment variables are then provided to :term:`jobs <job>` when they
 run.
 
@@ -22,6 +27,21 @@ run.
            script = for i in $(seq $START_NUMBER); do echo $i; done
            [[[environment]]]
                START_NUMBER = 5
+
+Each job is also provided with some standard environment variables e.g:
+
+``CYLC_SUITE_RUN_DIR``
+    The path to the suite's :term:`run directory`
+    *(e.g. ~/cylc-run/suite)*.
+``CYLC_TASK_WORK_DIR``
+    The path to a task's :term:`work directory`
+    *(e.g. run-directory/work/cycle/task)*.
+``CYLC_TASK_CYCLE_POINT``
+    The :term:`cycle point` for a task
+    *(e.g. 20171009T0950)*.
+
+There are many more environment variables, see the `cylc user guide`_ for more
+information.
 
 
 Job Submission
@@ -40,16 +60,15 @@ running. We can tell cylc to run jobs on other machines by setting the
            [[[remote]]]
                host = computehost
 
-.. _wiki_background_process: https://en.wikipedia.org/wiki/Background_process
-.. _wiki_job_scheduler: https://en.wikipedia.org/wiki/Job_scheduler
+.. _background processes: https://en.wikipedia.org/wiki/Background_process
+.. _job scheduler: https://en.wikipedia.org/wiki/Job_scheduler
 
 .. _tutorial-batch-system:
 
-By default cylc runs executes jobs as
-`background processes <wiki_background_process>`_. When we are running
-jobs on other compute hosts we will often want to use a :term:`batch system`
-(`job scheduler <wiki_job_scheduler>`_) to submit our job. Cylc supports the
-following :term:`batch systems <batch system>`:
+By default cylc runs executes jobs as `background processes`_.
+When we are running jobs on other compute hosts we will often want to
+use a :term:`batch system` (`job scheduler`_) to submit our job.
+Cylc supports the following :term:`batch systems <batch system>`:
 
 * loadleveler
 * lsf
@@ -67,12 +86,15 @@ memory it requires or how many CPUs it will run on. For example:
    [runtime]
        [[big_task]]
            script = big-executable
+
            # Submit to the host "big-computer"
            [[[remote]]]
                host = big-computer
+
            # Submit the job using the "slurm" batch system.
            [[[job]]]
                batch system = slurm
+
            # Inform "slurm" that this job requires 500Mb of ram and 4 CPUs.
            [[[directives]]]
                --mem = 500
@@ -168,16 +190,225 @@ off and carries on as normal.
 
 .. practical::
 
-   .. rubric:: In this practical we will further develop the runtime of the
-      weather forecasting suite from the previous section.
+   .. rubric:: In this practical we will add runtime configuration to the
+      :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>`
+      from the :ref:`scheduling tutorial <tutorial-scheduling>`.
 
-   #. **Upgrade The Forecast Task.**
+   #. **Create A New Suite.**
 
-      * Change executable to one which actually does something.
-      * Add some environment variables.
-      * Add an execution time limit
-      * Add some retries
+      Create a new suite by running the command:
 
-   #. **Add a visualisation task?**
+      .. code-block:: bash
 
-   #. **Run, Stop and Restart The Suite.**
+         rose tutorial runtime-tutorial forecasting-suite
+
+      You will now have a copy of the weather forecasting suite along with some
+      executables and python modules.
+
+      Register the suite by running:
+
+      .. code-block:: bash
+
+         cd forecasting-suite
+         cylc reg forecasting-suite $PWD
+
+   #. **Set The Initial And Final Cycle Points.**
+
+      TODO
+
+   #. **Add Runtime Configuration For The** ``get_observation`` **Tasks.**
+
+      In the ``bin`` directory is a script called ``get-observations``. This
+      script gets weather data from the MetOffice `DataPoint`_ service.
+      This script requires two environment variables:
+
+      ``SITE_ID``
+          This is a four digit numerical code which is used to identify a
+          weather station e.g. ``3772`` is Heathrow Airport.
+      ``API_KEY``
+          An authentication key required for access to the service.
+
+      .. TODO: Add instructions for offline configuration
+
+      Add the following lines to the bottom of the ``suite.rc`` file.
+
+      .. code-block:: cylc
+
+         [runtime]
+             [[get_observations_heathrow]]
+                 script = get-observations
+                 [[[environment]]]
+                     SITE_ID = 3772
+                     API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+
+      The codes for the other three weather stations are:
+
+      * Camborne - ``3808``
+      * Shetland - ``3005``
+      * Belmullet - ``3976``
+
+      Add three more ``get_observations`` tasks for each of the remaining
+      weather stations.
+
+      .. spoiler:: Solution warning
+
+         .. code-block:: cylc
+
+            [runtime]
+                [[get_observations_heathrow]]
+                    script = get-observations
+                    [[[environment]]]
+                        SITE_ID = 3772
+                        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                [[get_observations_camborne]]
+                    script = get-observations
+                    [[[environment]]]
+                        SITE_ID = 3808
+                        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                [[get_observations_shetland]]
+                    script = get-observations
+                    [[[environment]]]
+                        SITE_ID = 3005
+                        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                [[get_observations_belmullet]]
+                    script = get-observations
+                    [[[environment]]]
+                        SITE_ID = 3976
+                        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+
+      Check the ``suite.rc`` file is valid by running the command:
+
+      .. code-block:: bash
+
+         cylc validate forecasting-suite
+
+      .. TODO: Add advice on what to do if the command fails.
+
+   #. **Test The** ``get_observations`` **Tasks.**
+
+      Next we will test the ``get_observations`` tasks.
+
+      Open the cylc GUI by running the following command:
+
+      .. code-block:: bash
+
+         gcylc forecasting-suite &
+
+      Run the suite either by pressing the play button in the cylc GUI or by
+      running the command:
+
+      .. code-block:: bash
+
+         cylc run forecasting-suite
+
+      If all goes well you will see the ``get_observations`` tasks run and
+      succeed in the cylc GUI. Once the suite has reached the final cycle point
+      and all tasks have succeeded the suite will automatically shutdown.
+
+      .. TODO: Advise on what to do if all does not go well.
+
+      The ``get-observations`` script produces a file called ``wind.csv`` which
+      contains the wind-speed and direction. This file is written in the task's
+      :term:`work directory`.
+
+      Try and open one of the ``wind.csv`` files. Note the path to the
+      :term:`work directory` is:
+
+      .. TODO: Move/Remove?
+
+      .. code-block:: sub
+
+         ~/cylc-run/<suite-name>/work/<cycle-point>/<task-name>
+
+      You should find a file with four numbers:
+
+      * The longitude of the weather station.
+      * The latitude of the weather station.
+      * The wind direction *[where the wind GOING]* (in degrees).
+      * The wind speed in miles per hour.
+
+      .. spoiler:: Hint hint
+
+         If you run ``ls ~/cylc-run/forecasting-suite/work`` you should see a
+         list of cycles. Pick one of them and open the file::
+
+            ~/cylc-run/forecasting-suite/work/<cycle-point>/get_observations_heathrow
+
+   #. **Add runtime configuration for the other tasks.**
+
+      The runtime configuration for the remaining tasks has been written out
+      for you in the ``runtime`` file which you will find in the
+      :term:`suite directory`. Copy the code from the ``runtime`` file to the
+      bottom of the ``suite.rc`` file.
+
+      Check the ``suite.rc`` file is valid by running the command:
+
+      .. code-block:: bash
+
+         cylc validate forecasting-suite
+
+      .. TODO: Add advice on what to do if the command fails.
+
+   #. **Run The Suite.**
+
+      Open the cylc GUI and run the suite.
+
+      .. spoiler:: Hint hint
+
+         .. code-block:: bash
+
+            gcylc runtime-tutorial &
+
+         Run the suite either by:
+          
+         * Press the play button in the cylc gui. Ensure "Cold Start" is
+           selected from the dialogue window then press "Start"
+         * Run the command ``cylc run forecasting-suite``.
+
+   #. **View The Forecast Summnary.**
+
+      The ``post_process_exeter`` task will produce a one line summary of the
+      weather in Exeter as forecast two hours ahead of time. This summary can
+      be found in the ``summary`` file in the :term:`work directory`.
+
+      Try opening the summary file for the first cycle. The path to the
+      :term:`work directory` is:
+
+      .. code-block:: sub
+
+          ~/cylc-run/<suite-name>/log/work/<cycle-point>/<task-name>
+
+      .. spoiler:: Hint hint
+
+         * ``suite-name`` - "forecasting-suite".
+         * ``cyclc-point`` - This will be the first cycle of the suite.
+           i.e. the intial cycle point.
+         * ``task-name`` - "post_process_exeter".
+         * ``submission-number`` - "00".
+
+   #. **View The Rainfall Data.**
+
+      .. TODO: Skip this if you don't have internet connection.
+
+      The ``forecast`` task will produce an html page where the rainfall
+      data is rendered on a map. This html file is called ``job-map.html`` and
+      is saved alongside the :term:`job log`.
+
+      Try opening this file in a web browser e.g::
+
+         firefox filename
+
+      The path to the :term:`job log directory` is:
+
+      .. code-block:: sub
+
+         ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<submission-number>
+
+      .. spoiler:: Hint hint
+
+         * ``suite-name`` - "forecasting-suite".
+         * ``cyclc-point`` - This will be the last cycle of the suite.
+           i.e. the final cycle point.
+         * ``task-name`` - "forecast".
+         * ``submission-number`` - "00".
+
