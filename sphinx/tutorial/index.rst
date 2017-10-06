@@ -9,3 +9,5 @@ explanations and practical exercises.
    :name: tutorial
 
    cylc/index
+   rose/index
+
