@@ -65,3 +65,9 @@
 	color:#fcfcfc;
 	text-decoration:inherit
 }
+
+/* Fix the lack of space underneath lists inside admonitions. */
+.rst-content div.admonition ul,
+.rst-content div.admonition ol > li {
+    padding-bottom: 0.5em;
+}
