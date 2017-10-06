@@ -201,6 +201,12 @@
               <dd>Remove items created by the previous suite
               runs.</dd>
 
+              <dt><a href="#rose-suite-cmp-vc">rose
+              suite-cmp-vc</a></dt>
+
+              <dd>Compare VCS information of a suite source between installation
+              and now.</dd>
+
               <dt><a href="#rose-suite-gcontrol">rose
               suite-gcontrol</a></dt>
 
@@ -2269,6 +2275,57 @@ launcher-preopts.mpiexec=-n $NPROC
             <p>Return the difference between the number of
             arguments and number of successfully cleaned suites,
             i.e. <samp>0</samp> if all successful.</p>
+
+            <h2 id="rose-suite-cmp-vc">rose suite-cmp-vc</h2>
+
+            <h3>NAME</h3>
+
+            <p>rose suite-cmp-vc</p>
+
+            <h3>SYNOPSIS</h3>
+
+            <p>Compare source info of a named suite:</p>
+
+            <p><kbd>rose suite-cmp-vc NAME<br />
+            rose suite-cmp-vc --name=NAME</kbd></p>
+
+            <p>Compare source info of the current suite from within a suite
+            task</p>
+
+            <p><kbd>rose suite-cmp-vc</kbd></p>
+
+            <h3>DESCRIPTION</h3>
+
+            <p>Compare VCS information of a suite source between installation
+            and now.</p>
+
+            <p>Version control system information of a suite is installed under
+            log/rose-suite-run.version file. This command attempts to regenerate
+            the information from the recorded source, and compare the original
+            file with the latest information.</p>
+
+            <p>Return 0 if no difference. Print unified diff and return 1 if
+            difference found. Return 2 on other errors.</p>
+
+            <h3>ARGUMENTS</h3>
+
+            <p>Specify the suite <var>NAME</var>.</p>
+
+            <h3>OPTIONS</h3>
+
+            <dl>
+              <dt><kbd>--name=NAME, -n NAME</kbd></dt>
+
+              <dd>Specify the suite <var>NAME</var>.</dd>
+
+              <dt><kbd>--quiet, -q</kbd></dt>
+
+              <dd>Decrement verbosity.</dd>
+
+              <dt><kbd>--verbose, -v</kbd></dt>
+
+              <dd>Increment verbosity.</dd>
+            </dl>
 
             <h2 id="rose-suite-gcontrol">rose suite-gcontrol</h2>
 

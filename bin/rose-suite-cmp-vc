@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose suite-cmp-vc
+#
+# SYNOPSIS
+#     # Compare source info of a named suite
+#     rose suite-cmp-vc NAME
+#     rose suite-cmp-vc --name=NAME
+#
+#     # Compare source info of the current suite from within a suite task
+#     rose suite-cmp-vc
+#
+# DESCRIPTION
+#     Compare VCS information of a suite source between installation and now.
+#
+#     Version control system information of a suite is installed under
+#     log/rose-suite-run.version file. This command attempts to regenerate the
+#     information from the recorded source, and compare the original file with
+#     the latest information.
+#
+#     Return 0 if no difference. Print unified diff and return 1 if difference
+#     found. Return 2 on other errors.
+#
+# ARGUMENTS
+#     Specify the suite NAME.
+#
+# OPTIONS
+#     --name=NAME, -n NAME
+#         Specify the suite NAME. 
+#     --quiet, -q
+#         Decrement verbosity.
+#     --verbose, -v
+#         Increment verbosity.
+#-------------------------------------------------------------------------------
+exec python -m rose.cmp_source_vc "$@"
