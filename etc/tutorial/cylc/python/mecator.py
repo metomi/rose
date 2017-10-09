@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office - GNU V3+.
+# This is illustrative code developed for tutorial purposes, it is not
+# intended for scientific use and is not guarantied to be accurate or correct.
+# -----------------------------------------------------------------------------
 import math
 
 
