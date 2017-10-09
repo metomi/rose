@@ -21,6 +21,7 @@ Environment Variables:
 
 """
 
+from datetime import datetime, timedelta
 import os
 import sys
 
@@ -54,6 +55,11 @@ def main(site_name, time):
     except IOError:
         sys.exit('Could not find forecast "%s".' % filename)
 
+    # Calculate the time for which this forecast is valid.
+    forecast_time = datetime.strptime(
+        os.environ['CYLC_TASK_CYCLE_POINT'], '%Y%m%dT%H%MZ'
+    ) + timedelta(minutes=time)
+
     # Extract forecast for specified location.
     ind_x, ind_y = util.get_grid_coordinates(lng, lat, domain, resolution)
     predicted_rainfall = forecast[ind_y][ind_x]
@@ -74,7 +80,10 @@ def main(site_name, time):
     else:
         message = 'Torrential downpour :('
 
-    print message
+    # Write out forecast summary.
+    with open('summary.txt', 'w+') as summary_file:
+        summary_file.write('The outlook at %s UTC for %s is "%s"' % (
+            forecast_time.strftime('%Y-%m-%dT%H:%M'), site_name, message))
 
 
 if __name__ == '__main__':
