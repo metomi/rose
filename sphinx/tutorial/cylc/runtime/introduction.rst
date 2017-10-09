@@ -104,7 +104,7 @@ Finally we run the suite using the ``cylc run`` command.
 Tasks And Jobs
 --------------
 
-When a :term:`task` is "Run" is creates a :term:`job`. The job is a bash
+When a :term:`task` is "Run" it creates a :term:`job`. The job is a bash
 file containing the script you have told the task to run along with
 configuration and a system for trapping errors. It is this :term:`job`
 which actually gets executed. This "job file" is called the :term:`job script`.
