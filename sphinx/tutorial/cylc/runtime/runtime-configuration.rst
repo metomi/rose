@@ -24,7 +24,7 @@ run.
 
    [runtime]
        [[countdown]]
-           script = for i in $(seq $START_NUMBER); do echo $i; done
+           script = seq $START_NUMBER
            [[[environment]]]
                START_NUMBER = 5
 
@@ -132,8 +132,8 @@ Sometimes jobs fail, this can be caused by two factors:
 * Something going wrong in the job submission e.g:
 
   * A network problem.
-  * The :term:`job host` becoming un-available.
-  * The :term:`batch system` rejecting the job due to system load.
+  * The :term:`job host` becoming un-available or over-loaded.
+  * An issue with the directives.
 
 In the event of failure cylc can automatically re-submit (retry) jobs. We
 configure retries using the ``[job]execution retry delays`` and
