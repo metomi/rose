@@ -194,7 +194,9 @@ When a :term:`task` is run cylc creates a directory for the :term:`job` to run
 in, this is called the :term:`work directory`.
 
 By default the work directory is in a directory structure under the
-:term:`cycle point` and the :term:`task` name::
+:term:`cycle point` and the :term:`task` name:
+
+.. code-block:: sub
 
    ~/cylc-run/<suite-name>/work/<cycle-point>/<task-name>
 
@@ -209,7 +211,9 @@ into the ``job.out`` and ``job.err`` files which are also stored in the
 :term:`job log directory`.
 
 The :term:`job log directory` lives in a directory structure under the
-:term:`cycle point`, :term:`task` name and the :term:`job submission number`::
+:term:`cycle point`, :term:`task` name and the :term:`job submission number`:
+
+.. code-block:: sub
 
    ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-no>/
 
@@ -280,6 +284,12 @@ is re-run.
          .. image:: ../img/gcylc-play.png
             :align: center
 
+         A box will appear, ensure that "Cold Start" is selected then press
+         "Start".
+
+         .. image:: ../img/cylc-gui-suite-start.png
+            :align: center
+
    #. **Inspect A Job Log.**
 
       Cylc will have created a :term:`run directory` for this suite in the
@@ -288,13 +298,17 @@ is re-run.
          ~/cylc-run/dummy-forecast/
 
       Try opening the ``job.out`` file for one of the ``get_observations``
-      jobs. The file will be located within the :term:`run directory`::
+      jobs. The file will be located within the :term:`run directory`:
+
+      .. code-block:: sub
 
          <run-directory>/log/job/<cycle-point>/get_observations_heathrow/01/job.out
 
    #. **Inspect A Work Directory.**
 
       The ``get_rainfall`` task should create a file called ``rainfall`` in its
-      :term:`work directory`. Try opening the file::
+      :term:`work directory`. Try opening the file:
+
+      .. code-block:: sub
 
          <run-directory>/work/<cycle-point>/get_rainfall/rainfall
