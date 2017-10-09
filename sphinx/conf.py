@@ -60,6 +60,7 @@ extensions = [
     'minicylc',
     'cylc-lang',
     'rose-lang',
+    'sub-lang',
     'practical',
     'auto-cli-doc'
 ]
