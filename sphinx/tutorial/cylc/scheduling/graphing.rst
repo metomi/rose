@@ -7,6 +7,8 @@ Graphing
 In this section we will cover writing basic workflows in cylc.
 
 
+.. _cylc file format:
+
 The suite.rc File Format
 ------------------------
 

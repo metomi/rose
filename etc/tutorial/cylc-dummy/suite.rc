@@ -6,10 +6,10 @@
     [[dependencies]]
         [[[T00/PT3H]]]
             graph = """
-                observations_camborne => gather_observations
-                observations_heathrow => gather_observations
-                observations_shetland => gather_observations
-                observations_belmullet => gather_observations
+                get_observations_camborne => gather_observations
+                get_observations_heathrow => gather_observations
+                get_observations_shetland => gather_observations
+                get_observations_belmullet => gather_observations
             """
         [[[T06/PT6H]]]
             graph = """
@@ -24,16 +24,16 @@
             """
 
 [runtime]
-    [[observations_belmullet]]
+    [[get_observations_belmullet]]
         script = get-observations
 
-    [[observations_camborne]]
+    [[get_observations_camborne]]
         script = get-observations
 
-    [[observations_heathrow]]
+    [[get_observations_heathrow]]
         script = get-observations
 
-    [[observations_shetland]]
+    [[get_observations_shetland]]
         script = get-observations
 
     [[gather observations]]

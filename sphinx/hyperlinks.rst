@@ -10,3 +10,4 @@
           :start-line: 1
 
 .. _cylc user guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
+.. _Jinja2: http://jinja.pocoo.org/
