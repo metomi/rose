@@ -8,8 +8,6 @@ from copy import copy
 import math
 import jinja2
 
-import matplotlib.pyplot as plt
-
 
 R_0 = 6371.  # Radius of the Earth (km).
 DEG2RAD = math.pi / 180.  # Conversion from degrees to radians.
@@ -176,6 +174,12 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
 
 
 def plot_vector_grid(filename, x_grid, y_grid):
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print 'Plotting diasbled'
+        return
+
     fig = plt.figure()
     x_coords = []
     y_coords = []
