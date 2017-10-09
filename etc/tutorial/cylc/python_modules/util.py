@@ -6,6 +6,7 @@
 # -----------------------------------------------------------------------------
 from copy import copy
 import math
+import os
 import jinja2
 
 
@@ -270,94 +271,16 @@ def parse_domain(domain):
 
 
 def generate_html_map(filename, data, domain, resolution):
-    template = """<html>
-  <head>
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
-  </head>
-  <body>
-    <div id="map" style="width:100%;height:100%"></div>
-
-    <script type="text/javascript">
-      // Define the colours to display for the different rainfall values.
-      // NOTE: Rainfall values range from 0 to 6+.
-      function get_colour(value) {
-          if (value < 0.1)
-              return '#ffffff88';
-          if (value < 0.5)
-              return '#00F7FF';
-          if (value < 1)
-              return '#00AAFF';
-          else if (value < 2)
-              return '#0051FF';
-          else if (value < 3)
-              return '#6600FF';
-          else if (value < 4)
-              return '#AE00FF';
-          else if (value < 5)
-              return '#FF00EA';
-          else
-              return '#FF0055';
-      }
-
-      // Forecast data as dict {'lead_time': [2d data matrix]}.
-      var data = {{ data }};
-
-      // Annotate map with data.
-      var lng;
-      var lat;
-      var rects;
-      var times = [];
-      var layers = [];
-      for (let time in data) {
-          rects = L.layerGroup();
-          for (let pos_y in data[time]) {
-              for (let pos_x in data[time][0]) {
-                  lng = (pos_x * {{ resolution }}) + {{ lng_1 }};
-                  lat = {{ lat_2}} - (pos_y * {{ resolution }});
-                  L.rectangle(
-                      [[lat, lng],
-                      [lat + {{ resolution }}, lng + {{ resolution }}]],
-                      {color: get_colour(data[time][pos_y][pos_x]),
-                       weight: 0, fillOpacity: 0.5}).addTo(rects);
-              }
-          }
-          layers.push(rects);
-          times.push(time);
-      }
-
-      // Sort map layers lexicographically.
-      var sorted_times = times.slice(0);  // Copy the times list.
-      var fcsts = {};  // {'lead_time': L.LayerGroup}  Note dicts are ordered.
-      sorted_times.sort();
-      var ind;
-      for (let time of sorted_times) {
-          ind = times.indexOf(time);
-          fcsts[times[ind]] = layers[ind];
-      }
-
-      // Create map.
-      var map = L.map('map', {layers: [fcsts[sorted_times[0]]]});
-
-      // Zoom / center map to fit domain.
-      map.fitBounds([[{{lat_1}}, {{lng_1}}], [{{lat_2}}, {{lng_2}}]]);
-
-      // Add mapp tiles.
-      map.addLayer(
-          L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'));
-
-      // Add layer selector.
-      L.control.layers(fcsts).addTo(map);
-    </script>
-  </body>
-</html>"""
-
-    with open(filename, 'w+') as html_file:
-        html_file.write(jinja2.Template(template).render(
-            resolution=resolution,
-            lng_1=domain['lng1'],
-            lng_2=domain['lng2'],
-            lat_1=domain['lat1'],
-            lat_2=domain['lat2'],
-            data=data))
+    template_file = os.path.join(
+        os.environ['CYLC_SUITE_DEF_PATH'],
+        'template',
+        'map.html')
+    with open(template_file, 'r') as template:
+        with open(filename, 'w+') as html_file:
+            html_file.write(jinja2.Template(template.read()).render(
+                resolution=resolution,
+                lng_1=domain['lng1'],
+                lng_2=domain['lng2'],
+                lat_1=domain['lat1'],
+                lat_2=domain['lat2'],
+                data=data))
