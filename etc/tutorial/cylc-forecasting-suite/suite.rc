@@ -50,6 +50,10 @@
             # The key required to get weather data from the DataPoint service.
             # To use archived data comment this line out.
             API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+
+    [[get_observations<station=belmullet>]]
+        [[[environment]]]
+            SITE_ID = 3976
     [[get_observations<station=camborne>]]
         [[[environment]]]
             SITE_ID = 3808
@@ -59,9 +63,6 @@
     [[get_observations<station=shetland>]]
         [[[environment]]]
             SITE_ID = 3005
-    [[get_observations<station=belmullet>]]
-        [[[environment]]]
-            SITE_ID = 3976
 
     [[consolidate_observations]]
         script = consolidate-observations

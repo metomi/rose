@@ -188,6 +188,8 @@ off and carries on as normal.
    cylc restart <name>
 
 
+.. _tutorial-cylc-runtime-forecasting-suite:
+
 .. practical::
 
    .. rubric:: In this practical we will add runtime configuration to the

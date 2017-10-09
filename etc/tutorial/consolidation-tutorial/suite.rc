@@ -1,0 +1,108 @@
+[cylc]
+    UTC mode = True
+
+[scheduling]
+    initial cycle point = TODO
+    final cycle point = TODO
+    [[dependencies]]
+        [[[PT3H]]]
+            # Repeat every three hours starting at the initial cycle point.
+            graph = """
+                get_observations_belmullet => consolidate_observations
+                get_observations_camborne => consolidate_observations
+                get_observations_heathrow => consolidate_observations
+                get_observations_shetland => consolidate_observations
+            """
+
+        [[[+PT6H/PT6H]]]
+            # Repeat every six hours starting six hours after the initial
+            # cycle point.
+            graph = """
+                consolidate_observations => forecast
+                consolidate_observations[-PT3H] => forecast
+                consolidate_observations[-PT6H] => forecast
+                get_rainfall => forecast => post_process_exeter
+            """
+
+        [[[+PT12H/PT6H]]]
+            # Repeat every six hours starting twelve hours after the initial
+            # cycle point.
+            graph = """
+                forecast[-PT6H] => forecast
+            """
+[runtime]
+    [[get_observations_belmullet]]
+        script = get-observations
+        [[[environment]]]
+            SITE_ID = 3976
+            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+    [[get_observations_camborne]]
+        script = get-observations
+        [[[environment]]]
+            SITE_ID = 3808
+            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+    [[get_observations_heathrow]]
+        script = get-observations
+        [[[environment]]]
+            SITE_ID = 3772
+            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+    [[get_observations_shetland]]
+        script = get-observations
+        [[[environment]]]
+            SITE_ID = 3005
+            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+
+
+    [[consolidate_observations]]
+        script = consolidate-observations
+        [[[environment]]]
+            # Add the `python` directory to the PYTHONPATH.
+            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+            # The dimensions of each grid cell in degrees.
+            RESOLUTION = 0.2
+            # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+            DOMAIN = -12,48,5,61  # Do not change!
+
+    [[get_rainfall]]
+        script = get-rainfall
+        [[[environment]]]
+            # The key required to get weather data from the DataPoint service.
+            # To use archived data comment this line out.
+            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+            # Add the `python` directory to the PYTHONPATH.
+            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+            # The dimensions of each grid cell in degrees.
+            RESOLUTION = 0.2
+            # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+            DOMAIN = -12,48,5,61  # Do not change!
+
+    [[forecast]]
+        script = forecast 120 5  # Generate 5 forecasts at 60 minute intervals.
+        [[[environment]]]
+            # List of cycle points to process wind data from.
+            WIND_CYCLES = """
+                $CYLC_TASK_CYCLE_POINT                # The current cycle point.
+                $(cylc cyclepoint --offset-hours=-3)  # The point 3 hours ago.
+                $(cylc cyclepoint --offset-hours=-6)  # The point 6 hours ago.
+            """
+            # The cyclepoint 3 hours before the present one.
+            PT3H = $(cylc cyclepoint --offset-hours=-3)
+            # The cyclepoint 6 hours before the present one.
+            PT6H = $(cylc cyclepoint --offset-hours=-6)
+            # Add the `python` directory to the PYTHONPATH.
+            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+            # The dimensions of each grid cell in degrees.
+            RESOLUTION = 0.2
+            # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+            DOMAIN = -12,48,5,61  # Do not change!
+
+    [[post_process_exeter]]
+        # Generate a forecast for Exeter 60 minutes in the future.
+        script = post-process exeter 120
+        [[[environment]]]
+            # Add the `python` directory to the PYTHONPATH.
+            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+            # The dimensions of each grid cell in degrees.
+            RESOLUTION = 0.2
+            # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+            DOMAIN = -12,48,5,61  # Do not change!
