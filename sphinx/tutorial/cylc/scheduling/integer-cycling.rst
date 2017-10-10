@@ -375,7 +375,13 @@ starting 5 cycles *after* the initial cycle point.
 
    #. **Create a new suite.**
 
-      Create a new directory and call it ``integer-cycling``.
+      Within your ``~/cylc-run/`` directory create a new directory called
+      ``integer-cycling`` and move into it:
+
+      .. code-block:: bash
+
+         mkdir ~/cylc-run/integer-cycling
+         cd ~/cylc-run/integer-cycling
 
       Copy the above code into a ``suite.rc`` file in that directory.
 
@@ -399,9 +405,9 @@ starting 5 cycles *after* the initial cycle point.
 
       Try visualising the suite using ``cylc graph``.
 
-      .. code-block:: bash
+      .. code-block:: none
 
-         cylc graph <tutorials-directory>/integer-cycling/suite.rc
+         cylc graph .
 
       .. tip::
 
@@ -417,10 +423,6 @@ starting 5 cycles *after* the initial cycle point.
          You can tell ``cylc graph`` to visualise the cycles between two points
          by providing them as arguments, for instance the following example
          would show all cycles between ``1`` and ``5`` (inclusive).
-
-         .. code-block:: bash
-
-            cylc graph <path/to/suite>/suite.rc 1 5
 
    #. **Add another recurrence.**
 

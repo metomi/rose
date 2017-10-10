@@ -328,8 +328,15 @@ after the initial cycle point** and will be dependent on the ``forecast`` task.
 
    #. **Create A New Suite.**
 
-      Create a new directory called ``datetime-cycling`` and paste the
-      following code into a ``suite.rc`` file.
+      Within your ``~/cylc-run`` directory create a new directory called
+      ``datetime-cycling`` and move into it:
+
+      .. code-block:: bash
+
+         mkdir ~/cylc-run/datetime-cycling
+         cd ~/cylc-run/datetime-cycling
+
+      Paste the following code into a ``suite.rc`` file:
 
       .. code-block:: cylc
 
@@ -393,6 +400,12 @@ after the initial cycle point** and will be dependent on the ``forecast`` task.
 
          * The ``post_process_exeter`` task is dependent on the ``forecast``
            task.
+
+         To launch cylc graph run the command:
+
+         .. code-block:: sub
+
+            cylc graph <path/to/suite.rc>
 
       .. spoiler:: Solution warning
 

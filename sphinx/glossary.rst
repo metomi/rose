@@ -16,6 +16,11 @@ Glossary
       suites, it is the one in which the ``rose suite-run`` command is
       executed.
 
+      .. note::
+
+         If a suite is written in the ``cylc-run`` directory the suite
+         directory is also the :term:`run directory`.
+
       See also:
 
       * :term:`run directory`
@@ -345,6 +350,11 @@ Glossary
 
       ``~/cylc-run/<suite-name>``
 
+      .. note::
+
+         If the suite was written in the ``cylc-run`` directory then the run
+         directory is also the :term:`suite directory`.
+
       The run directory can be accessed by a running suite using the
       environment variable ``CYLC_SUITE_RUN_DIR``.
 
@@ -360,7 +370,9 @@ Glossary
       :term:`job's <job>` working directory. This directory is created by cylc
       and lies within the directory tree inside a suite's :term:`run directory`.
 
-      ``<run directory>/work/<cycle>/<task-name>``
+      .. code-block:: sub
+
+         <run directory>/work/<cycle>/<task-name>
 
       The location of the work directory can be accessed by a :term:`job` via
       the environment variable ``CYLC_TASK_WORK_DIR``.
@@ -378,7 +390,9 @@ Glossary
       serves the purpose of providing a storage place for any files which need
       to be shared between different tasks.
 
-      ``<run directory>/share``
+      .. code-block:: sub
+
+         <run directory>/share
 
       The location of the share directory can be accessed by a :term:`job` via
       the environment variable ``CYLC_SUITE_SHARE_DIR``.
@@ -397,7 +411,9 @@ Glossary
 
       The job log directory lies within the :term:`run directory`:
 
-      ``<run directory>/log/job/<cycle>/<task-name>/<submission-no>``
+      .. code-block:: sub
+
+         <run directory>/log/job/<cycle>/<task-name>/<submission-no>
 
       Other files stored in the job log directory:
 

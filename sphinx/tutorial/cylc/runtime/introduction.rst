@@ -76,28 +76,43 @@ when tasks run. E.G:
 Running A Suite
 ---------------
 
-Before we run a suite we must register it with cylc. We do this using the
-``cylc reg`` command which we supply with a name which will be used to refer to
-the suite.
-
-.. code-block:: bash
-
-   cylc reg <name> <path>
-
 It is a good idea to check the suite for errors before running it.
 Cylc provides a command which automatically checks for any obvious
-configuration issues called
-``cylc validate``.
+configuration issues called ``cylc validate``.
 
-.. code-block:: bash
+.. code-block:: sub
 
-   cylc validate <name>
+   cylc validate <path/to/suite>
 
-Finally we run the suite using the ``cylc run`` command.
+Next we run the suite using the ``cylc run`` command.
 
 .. code-block:: bash
 
    cylc run <name>
+
+The ``name`` is the name of the :term:`suite directory` (i.e. if we create a
+suite in ``~/cylc-run/foo`` then the ``<name>`` would be ``foo``).
+
+.. note::
+
+   In this tutorial we are writing our suites in the ``cylc-run`` directory.
+
+   It is possible to write them elsewhere on the system. If we do so we
+   must register the suite with cylc before use.
+
+   We do this using the ``cylc reg`` command which we supply with a name which
+   will be used to refer to the suite in place of the path i.e:
+
+   .. code-block:: sub
+
+      cylc reg <name> <path/to/suite>
+      cylc validate <name>
+      cylc run <name>
+
+   The ``cylc reg`` command will create a directory for the suite in the
+   ``cylc-run`` directory meaning that we will have separate
+   :term:`suite directories <suite directory>` and
+   :term:`run directories <run directory>`.
 
 .. _tutorial-tasks-and-jobs:
 
@@ -181,12 +196,6 @@ This is the "graph view". The cylc gui has two other views called "tree" and
 Where Do All The Files Go
 -------------------------
 
-Cylc creates a directory for running suites in your homespace called
-``cylc-run`` (``~/cylc-run``). When you run the ``cylc reg`` command it creates
-a new directory for your suite within the ``cylc-run`` directory. This is
-called the :term:`run directory`, all of the files created when the suite runs
-are located within this directory and its subdirectories.
-
 The Work Directory
 ^^^^^^^^^^^^^^^^^^
 
@@ -217,7 +226,7 @@ The :term:`job log directory` lives in a directory structure under the
 
    ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-no>/
 
-The :term:`job submission number` starts at 1 and increments each time a taks
+The :term:`job submission number` starts at 1 and increments each time a task
 is re-run.
 
 .. practical::
@@ -229,11 +238,12 @@ is re-run.
    #. **Create A New Suite.**
 
       The following command will copy some files for us to work with into a
-      directory called ``dummy-suite``:
+      a new suite called ``runtime-introduction``:
 
       .. code-block:: bash
 
-         rose tutorial cylc-dummy dummy-suite
+         rose tutorial runtime-introduction
+         cd ~/cylc-run/runtime-introduction
 
       In this directory we have the ``suite.rc`` file from the
       :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>`
@@ -246,29 +256,25 @@ is re-run.
 
       TODO
 
-   #. **Register The Suite.**
+   #. **Run The Suite.**
 
-      Register and validate your suite by running the following commands:
+      First validate the suite by running:
 
       .. code-block:: bash
 
-         cd dummy-forecast
-         cylc reg dummy-forecast $PWD
-         cylc validate dummy-forecast
-
-   #. **Run The Suite.**
+         cylc validate .
 
       Open the cylc GUI by running the following command:
 
       .. code-block:: bash
 
-         gcylc dummy-forecast &
+         gcylc runtime-introduction &
 
-      Run the suite by executing the following command:
+      Finally run the suite by executing:
 
       .. code-block:: bash
 
-         cylc run dummy-suite
+         cylc run runtime-introduction
 
       The tasks will start to run, you should see them going through the
       waiting, running and succeeded states.
@@ -292,17 +298,12 @@ is re-run.
 
    #. **Inspect A Job Log.**
 
-      Cylc will have created a :term:`run directory` for this suite in the
-      following location::
-
-         ~/cylc-run/dummy-forecast/
-
       Try opening the ``job.out`` file for one of the ``get_observations``
-      jobs. The file will be located within the :term:`run directory`:
+      jobs. The file will be located within the :term:`log directory`:
 
       .. code-block:: sub
 
-         <run-directory>/log/job/<cycle-point>/get_observations_heathrow/01/job.out
+         ~/cylc-run/runtime-introduction/log/job/<cycle-point>/get_observations_heathrow/01/job.out
 
    #. **Inspect A Work Directory.**
 
@@ -311,4 +312,8 @@ is re-run.
 
       .. code-block:: sub
 
-         <run-directory>/work/<cycle-point>/get_rainfall/rainfall
+         ~/cylc-run/runtime-introduction/work/<cycle-point>/get_rainfall/rainfall
+
+      .. hint::
+
+         The ``get_rainfall`` task only runs every third cycle.
