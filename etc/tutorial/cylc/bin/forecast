@@ -35,8 +35,25 @@ import util
 MI2KM = 1.609344001  # Conversion between miles and kilometers.
 
 
-def get_wind_data(cycle_points):
+# The default location of the rainfall file output by the "get_rainfall" task.
+DEFAULT_RAINFALL_FILE = os.path.join(
+    os.environ.get('CYLC_SUITE_WORK_DIR'),
+    os.environ.get('CYLC_TASK_CYCLE_POINT'), 'get_rainfall', 'rainfall.csv')
+# The default location of the wind files output by "gather_observations".
+DEFAULT_WIND_FILE_TEMPLATE = os.path.join(
+    os.environ.get('CYLC_SUITE_WORK_DIR'), '{cycle}',
+    'consolidate_observations', 'wind_{xy}.csv')
+
+
+def get_wind_data(wind_file_path, wind_cycles):
     """Return wind field data for the provided cycle points.
+
+    Args:
+        wind_file_path (str): Template for the path to a wind data file.
+            The template should contain substitutions for `{cycles}`
+            (i.e. the cycle point) and `{xy}` (i.e. the value 'x' or 'y').
+        wind_cycles (list): List of cycle points to get wind data for
+            as strings.
 
     Return:
             list - A list 2-tuples containing wind field matricies i.e.
@@ -44,15 +61,9 @@ def get_wind_data(cycle_points):
 
     """
     wind_fields = []
-    for cycle_point in cycle_points:
-        wind_file = os.path.join(
-            os.environ['CYLC_SUITE_WORK_DIR'],
-            cycle_point,
-            'consolidate_observations',
-            'wind_%s.csv'
-        )
-        wind_x = util.read_csv(wind_file % 'x')
-        wind_y = util.read_csv(wind_file % 'y')
+    for cycle in wind_cycles:
+        wind_x = util.read_csv(wind_file_path.format(cycle=cycle, xy='x'))
+        wind_y = util.read_csv(wind_file_path.format(cycle=cycle, xy='y'))
         wind_fields.append((wind_x, wind_y))
     return wind_fields
 
@@ -95,7 +106,6 @@ def apply_weighting(wind_fields, weightings):
     util.plot_vector_grid('weighted-wind-data.png', weighted_x, weighted_y)
 
     return weighted_x, weighted_y
-
 
 
 def push_rainfall(rainfall, wind_data, step, resolution, spline_level):
@@ -169,25 +179,28 @@ def push_rainfall(rainfall, wind_data, step, resolution, spline_level):
 
 
 def main(forecast_interval, forecast_itterations):
+    # Get suite settings.
     domain = util.parse_domain(os.environ['DOMAIN'])
     resolution = float(os.environ['RESOLUTION'])
-    spline_level = int(os.environ['SPLINE_LEVEL'])
-    weighting = map(float, os.environ['WEIGHTING'].split(','))
+
+    # Get science settings.
+    spline_level = int(os.environ.get('SPLINE_LEVEL', 0))
+    weighting = map(float, os.environ.get('WEIGHTING', '1').split(','))
+
+    # Get the locations of the wind / rainfall data files.
+    rainfall_file = os.environ.get('RAINFALL_FILE', DEFAULT_RAINFALL_FILE)
+    wind_cycles = os.environ['WIND_CYCLES'].split()
+    wind_file_template = os.environ.get('WIND_FILE_TEMPLATE',
+                                        DEFAULT_WIND_FILE_TEMPLATE)
 
     # Get wind data from specified cycles.
-    wind_data = get_wind_data([os.environ['CYLC_TASK_CYCLE_POINT'],
-                               os.environ['PT3H'],
-                               os.environ['PT6H']])
+    wind_data = get_wind_data(wind_file_template, wind_cycles)
 
     # Convert these into a single data grid using the specified weighting.
     weighted_wind_data = apply_weighting(wind_data, weighting)
 
     # Get rainfall data.
-    rainfall = util.read_csv(os.path.join(
-        os.environ['CYLC_SUITE_WORK_DIR'],
-        os.environ['CYLC_TASK_CYCLE_POINT'],
-        'get_rainfall',
-        'rainfall.csv'))
+    rainfall = util.read_csv(rainfall_file)
 
     # Initiate the forecaster.
     generator = push_rainfall(rainfall, weighted_wind_data, forecast_interval,

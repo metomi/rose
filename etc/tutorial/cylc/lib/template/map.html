@@ -42,8 +42,8 @@
           rects = L.layerGroup();
           for (let pos_y in data[time]) {
               for (let pos_x in data[time][0]) {
-                  lng = (pos_x * {{ resolution }}) + {{ lng_1 }};
-                  lat = {{ lat_2}} - (pos_y * {{ resolution }});
+                  lng = (pos_x * {{ resolution }}) + {{ lng1 }};
+                  lat = {{ lat2 }} - (pos_y * {{ resolution }});
                   L.rectangle(
                       [[lat, lng],
                       [lat + {{ resolution }}, lng + {{ resolution }}]],
@@ -69,7 +69,7 @@
       var map = L.map('map', {layers: [fcsts[sorted_times[0]]]});
 
       // Zoom / center map to fit domain.
-      map.fitBounds([[{{lat_1}}, {{lng_1}}], [{{lat_2}}, {{lng_2}}]]);
+      map.fitBounds([[{{ lat1 }}, {{ lng1 }}], [{{ lat2 }}, {{ lng2 }}]]);
 
       // Add mapp tiles.
       map.addLayer(
