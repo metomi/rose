@@ -38,7 +38,7 @@
         # These environment variables will be available to all tasks.
         [[[environment]]]
             # Add the `python` directory to the PYTHONPATH.
-            PYTHONPATH="$CYLC_SUITE_DEF_PATH/python_modules:$PYTHONPATH"
+            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
             # The dimensions of each grid cell in degrees.
             RESOLUTION = 0.2
             # The area to generate forecasts for (lng1, lat1, lng2, lat2)
