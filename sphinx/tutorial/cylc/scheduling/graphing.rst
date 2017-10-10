@@ -203,12 +203,22 @@ seen so far. The number "1" which appears bellow each task is the
    #. **Create a cylc suite.**
 
       A cylc suite is just a directory containing a ``suite.rc`` file.
-      Somewhere on your system create a directory for the purposes of this
-      user-guide.
+
+      If you don't have one already create a ``cylc-run`` directory in your
+      user space i.e::
+
+         ~/cylc-run
 
       Within this directory create a new folder called ``graph-introduction``,
-      this is to be our :term:`suite directory`. Inside this directory create a
-      ``suite.rc`` file and paste in the following text:
+      this is to be our :term:`suite directory`. Move into it:
+
+      .. code-block:: bash
+
+         mkdir ~/cylc-run/graph-introduction
+         cd ~/cylc-run/graph-introduction
+
+      Inside this directory create a ``suite.rc`` file and paste in the
+      following text:
 
       .. code-block:: cylc
 
@@ -240,7 +250,12 @@ seen so far. The number "1" which appears bellow each task is the
 
       .. code-block:: bash
 
-         cylc graph <tutorials-directory>/graph-introduction/suite.rc
+         cylc graph .
+
+      .. note::
+
+         ``cylc graph`` takes the path to the suite as an argument. As we are
+         inside the :term:`suite directory` we can run ``cylc graph .``.
 
       If the results don't match the diagram above try going back to the
       suite.rc file and making changes.

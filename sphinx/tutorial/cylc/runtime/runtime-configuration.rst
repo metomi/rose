@@ -200,17 +200,11 @@ off and carries on as normal.
 
       .. code-block:: bash
 
-         rose tutorial runtime-tutorial forecasting-suite
+         rose tutorial runtime-tutorial
+         cd ~/cylc-run/runtime-tutotial
 
       You will now have a copy of the weather forecasting suite along with some
       executables and python modules.
-
-      Register the suite by running:
-
-      .. code-block:: bash
-
-         cd forecasting-suite
-         cylc reg forecasting-suite $PWD
 
    #. **Set The Initial And Final Cycle Points.**
 
@@ -280,7 +274,7 @@ off and carries on as normal.
 
       .. code-block:: bash
 
-         cylc validate forecasting-suite
+         cylc validate runtime-tutorial
 
       .. TODO: Add advice on what to do if the command fails.
 
@@ -292,14 +286,14 @@ off and carries on as normal.
 
       .. code-block:: bash
 
-         gcylc forecasting-suite &
+         gcylc runtime-tutorial &
 
       Run the suite either by pressing the play button in the cylc GUI or by
       running the command:
 
       .. code-block:: bash
 
-         cylc run forecasting-suite
+         cylc run runtime-tutorial
 
       If all goes well you will see the ``get_observations`` tasks run and
       succeed in the cylc GUI. Once the suite has reached the final cycle point
@@ -329,10 +323,10 @@ off and carries on as normal.
 
       .. spoiler:: Hint hint
 
-         If you run ``ls ~/cylc-run/forecasting-suite/work`` you should see a
+         If you run ``ls ~/cylc-run/runtime-tutorial/work`` you should see a
          list of cycles. Pick one of them and open the file::
 
-            ~/cylc-run/forecasting-suite/work/<cycle-point>/get_observations_heathrow
+            ~/cylc-run/runtime-tutorial/work/<cycle-point>/get_observations_heathrow
 
    #. **Add runtime configuration for the other tasks.**
 
@@ -345,7 +339,7 @@ off and carries on as normal.
 
       .. code-block:: bash
 
-         cylc validate forecasting-suite
+         cylc validate runtime-tutorial
 
       .. TODO: Add advice on what to do if the command fails.
 
@@ -363,7 +357,7 @@ off and carries on as normal.
           
          * Press the play button in the cylc gui. Ensure "Cold Start" is
            selected from the dialogue window then press "Start"
-         * Run the command ``cylc run forecasting-suite``.
+         * Run the command ``cylc run runtime-tutorial``.
 
    #. **View The Forecast Summnary.**
 
@@ -380,7 +374,7 @@ off and carries on as normal.
 
       .. spoiler:: Hint hint
 
-         * ``suite-name`` - "forecasting-suite".
+         * ``suite-name`` - "runtime-tutorial".
          * ``cyclc-point`` - This will be the first cycle of the suite.
            i.e. the intial cycle point.
          * ``task-name`` - "post_process_exeter".
@@ -406,7 +400,7 @@ off and carries on as normal.
 
       .. spoiler:: Hint hint
 
-         * ``suite-name`` - "forecasting-suite".
+         * ``suite-name`` - "runtime-tutorial".
          * ``cyclc-point`` - This will be the last cycle of the suite.
            i.e. the final cycle point.
          * ``task-name`` - "forecast".
