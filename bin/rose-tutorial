@@ -21,24 +21,22 @@
 #     rose tutorial
 #
 # SYNOPSIS
-#     rose tutorial SUITE [DEST]
+#     rose tutorial SUITE
 #
 # DESCRIPTION
-#     Make a copy of one of the tutorial SUITE in the directory DEST.
+#     Make a copy of one of the tutorial SUITE in the cylc-run directory.
 #
 #     Avaliable tutorial suites:
 #
 #     * cylc
 #
-# ARGUMENTS
-#     DEST
-#         Destination directory. (`default=$PWD`)
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/../lib/bash/rose_init"
-DIRECTORY="${2:-${PWD}}"
-echo -n "rose tutorial: copying tutorial suite files to ${DIRECTORY}..."
+mkdir -p "$HOME/cylc-run"
+DIRECTORY="$HOME/cylc-run/$1"
+echo -n "rose tutorial: copying tutorial suite files to ${DIRECTORY} ... "
 rose_init 'rose_log'
-if run rsync -a "${ROSE_HOME}/etc/tutorial/"$1"/" "${DIRECTORY}"; then
+if run rsync -a "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}"; then
     echo 'done'
 else
     echo
