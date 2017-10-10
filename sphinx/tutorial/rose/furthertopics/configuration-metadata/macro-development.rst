@@ -25,31 +25,31 @@ Custom macros are user-defined, but follow exactly the same API - they are just 
 Example
 -------
 
-These examples use the example suite from the brief tour which you should have familiarised yourself with.
+For these examples we will create an example app called ``hello_world_app`` that could be part of a typical suite.
 
-Change directory to that example suite directory, or recreate it.
+Create a directory for your suite app called ``hello_world_app``. Inside the ``hello_world_app`` directory, create a blank ``rose-app.conf`` file. We will add to it later.
 
-We are going to develop a macro for the app ``fred_hello_world/``. Change directory to ``app/fred_hello_world/``.
+We are going to develop a macro for the app ``hello_world_app/``. Make sure you are in the directory ``hello_world_app/`` now.
 
 The metadata for the app lives under the ``meta/`` sub directory. Our new macro will live with the metadata.
 
-For this example, we want to check the value of the option ``env=WORLD`` in our ``fred_hello_world`` application. Specifically, for this example, we want our macro to give us an error if the 'world' is too far away from Earth.
+For this example, we want to check the value of the option ``env=WORLD`` in our ``hello_world_app`` application. Specifically, for this example, we want our macro to give us an error if the 'world' is too far away from Earth.
 
 Create the directories ``meta/lib/python/macros/`` by running:
 
-.. code-block:: rose
+.. code-block:: console
 
    mkdir -p meta/lib/python/macros
 
 Create an empty file called ``__init__.py`` in the directory:
 
-.. code-block:: rose
+.. code-block:: console
 
    touch meta/lib/python/macros/__init__.py
 
 Finally, create a file called ``planet.py`` in the directory:
 
-.. code-block:: rose
+.. code-block:: console
 
    touch meta/lib/python/macros/planet.py
 
@@ -138,55 +138,54 @@ The ``self.add_report`` call is invoked when the planet choice the user has made
 
 Your final macro should look like this:
 
-.. spoiler:: Planet python file
+.. code-block:: python
 
-   .. code-block:: python
+   #!/usr/bin/env python
+   # -*- coding: utf-8 -*-
 
-      #!/usr/bin/env python
-      # -*- coding: utf-8 -*-
+   import re
+   import subprocess
 
-      import re
-      import subprocess
-
-      import rose.macro
+   import rose.macro
 
 
-      class PlanetChecker(rose.macro.MacroBase):
+   class PlanetChecker(rose.macro.MacroBase):
 
-          """Checks option values that refer to planets."""
+       """Checks option values that refer to planets."""
 
-          error_text = "planet is too far away."
-          opts_to_check = [("env", "WORLD")]
+       error_text = "planet is too far away."
+       opts_to_check = [("env", "WORLD")]
 
-          def validate(self, config, meta_config=None):
-              """Return a list of errors, if any."""
-              allowed_planets = self._get_allowed_planets()
-              for section, option in self.opts_to_check:
-                  node = config.get([section, option])
-                  if node is None or node.is_ignored():
-                      continue
-                  if node.value not in allowed_planets:
-                      self.add_report(section, option, node.value, self.error_text)
-              return self.reports
+       def validate(self, config, meta_config=None):
+           """Return a list of errors, if any."""
+           allowed_planets = self._get_allowed_planets()
+           for section, option in self.opts_to_check:
+               node = config.get([section, option])
+               if node is None or node.is_ignored():
+                   continue
+               if node.value not in allowed_planets:
+                   self.add_report(section, option, node.value, self.error_text)
+           return self.reports
 
-          def _get_allowed_planets(self):
-              # Retrieve planets less than a certain distance away.
-              cmd_strings = ["curl", "-s",
-                             "http://www.heavens-above.com/planetsummary.aspx"]
-              p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
-              text = p.communicate()[0]
-              planets = re.findall("(\w+)</td>",
-                                   re.sub(r'(?s)^.*(<thead.*?ascension).*$',
-                                          r"\1", text))
-              distances = re.findall("([\d.]+)</td>",
-                                     re.sub('(?s)^.*(Range.*?Brightness).*$',
-                                            r"\1", text))
-              for planet, distance in zip(planets, distances):
-                  if float(distance) > 5.0:
-                      # The planet is more than 5 AU away.
-                      planets.remove(planet)
-              planets += ["Earth"]  # Distance ~ 0
-              return planets
+       def _get_allowed_planets(self):
+           # Retrieve planets less than a certain distance away.
+           cmd_strings = ["curl", "-s",
+                          "http://www.heavens-above.com/planetsummary.aspx"]
+           p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
+           text = p.communicate()[0]
+           planets = re.findall("(\w+)</td>",
+                                re.sub(r'(?s)^.*(<thead.*?ascension).*$',
+                                       r"\1", text))
+           distances = re.findall("([\d.]+)</td>",
+                                  re.sub('(?s)^.*(Range.*?Brightness).*$',
+                                         r"\1", text))
+           for planet, distance in zip(planets, distances):
+               if float(distance) > 5.0:
+                   # The planet is more than 5 AU away.
+                   planets.remove(planet)
+           planets += ["Earth"]  # Distance ~ 0
+           return planets
+
 
 Results
 ^^^^^^^
@@ -220,7 +219,26 @@ Transformer Macro
 
 We'll now make a macro that changes the configuration. Our example will change the value of ``env=WORLD`` to something else.
 
-Open ``planet.py`` in a text editor and append this text.
+Open ``planet.py`` in a text editor and append the following code:
+
+.. code-block:: python
+
+   class PlanetChanger(rose.macro.MacroBase):
+
+       """Switch between planets."""
+
+       change_text = '{0} to {1}'
+       opts_to_change = [("env", "WORLD")]
+       planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn",
+                   "Uranus", "Neptune", "Eris"]
+
+       def transform(self, config, meta_config=None):
+           """Transform configuration and return it with a list of changes."""
+           for section, option in self.opts_to_change:
+               node = config.get([section, option])
+               # Do something to the configuration.
+           return config, self.reports
+
 
 This is another bare-bones macro class, although this time it supplies a ``transform`` method instead of a ``validate`` method.
 
@@ -253,13 +271,13 @@ This changes the option ``env=WORLD`` to the next planet on the list. It will se
 
 We also need to add a change message to flag what we've changed.
 
-Beneath:
+Beneath the line:
 
 .. code-block:: python
 
    config.set([section, option], new_planet)
 
-add:
+add the following two lines:
 
 .. code-block:: python
 
@@ -323,8 +341,8 @@ Save your changes and run the transformer macro either from the command line or 
 
 Specify a value to use for ``planet_name`` using a quoted string, e.g. ``"Vulcan"`` and accept the proposed changes. The ``WORLD`` variable should now be set to ``Vulcan``. Check your configuration to confirm this.
 
-Metdata Option
---------------
+Metadata Option
+---------------
 
 If a macro addresses particular sections, namespaces, or options, then it makes sense to write the relationship down in the metadata for the particular settings. You can do this using the ``macro`` metadata option.
 

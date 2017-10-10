@@ -16,6 +16,7 @@ Further Rose Topics
 .. toctree:: 
    :caption: Suite Development
    :name: rose-further-topics-suite-development
+   :maxdepth: 1
 
    suite-development/clock-triggered-tasks
    suite-development/command-keys
