@@ -138,7 +138,7 @@ def push_rainfall(rainfall, wind_data, step, resolution, spline_level):
     for itt_y in range(dim_y):
         for itt_x in range(dim_x):
             x_values.append(itt_x * resolution)
-            y_values.append(itt_y * resolution)
+            y_values.append((dim_y - itt_y) * resolution)  # y-axis is flipped.
             z_values.append(rainfall[itt_y][itt_x])
 
     yield util.interpolate_grid(zip(x_values, y_values, z_values),
@@ -151,7 +151,7 @@ def push_rainfall(rainfall, wind_data, step, resolution, spline_level):
             try:
                 domain = util.parse_domain(os.environ['DOMAIN'])
                 lng = domain['lng1'] + x_values[itt]
-                lat = domain['lng1'] + x_values[itt]
+                lat = domain['lat1'] + y_values[itt]
 
                 width = util.great_arc_distance(
                     (lng - (resolution / 2.), lat),
