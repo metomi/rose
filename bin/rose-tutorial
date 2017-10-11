@@ -34,7 +34,24 @@
 . "$(dirname "$0")/../lib/bash/rose_init"
 mkdir -p "$HOME/cylc-run"
 DIRECTORY="$HOME/cylc-run/$1"
-echo -n "rose tutorial: copying tutorial suite files to ${DIRECTORY} ... "
+
+# Prompt user if directory exists.
+if [[ -d $DIRECTORY ]]; then
+    while read -p "Directory ~/cylc-run/$1 exists, overwrite it (y/n)? " usr
+    do
+        case "${usr}" in
+            [Yy])
+                break
+                ;;
+            [Nn])
+                exit 1
+                ;;
+        esac
+    done
+fi
+
+# Copy files.
+echo -n "Copying tutorial files to ${DIRECTORY} ... "
 rose_init 'rose_log'
 if run rsync -rLptgoD "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}"; then
     echo 'done'
