@@ -1,21 +1,22 @@
 [cylc]
     UTC mode = True
 [scheduling]
-    initial cycle point = 2000
-    final cycle point = 2001
+    initial cycle point = 2000-01-01T00Z
+    final cycle point = 2000-01-01T06Z
     [[dependencies]]
         [[[T00/PT3H]]]
             graph = """
-                get_observations_camborne => gather_observations
-                get_observations_heathrow => gather_observations
-                get_observations_shetland => gather_observations
-                get_observations_belmullet => gather_observations
+                get_observations_camborne => consolidate_observations
+                get_observations_heathrow => consolidate_observations
+                get_observations_shetland => consolidate_observations
+                get_observations_belmullet => consolidate_observations
             """
         [[[T06/PT6H]]]
             graph = """
-                gather_observations => forecast
-                gather_observations[-PT3H] => forecast
-                gather_observations[-PT6H] => forecast
+                consolidate_observations => forecast
+                consolidate_observations[-PT3H] => forecast
+                consolidate_observations[-PT6H] => forecast
+                get_rainfall => forecast
                 forecast => process_exeter
             """
         [[[T12/PT6H]]]
@@ -36,11 +37,11 @@
     [[get_observations_shetland]]
         script = get-observations
 
-    [[gather observations]]
-        script = sleep 1;
+    [[consolidate_observations]]
+        script = sleep 3;
 
     [[forecast]]
-        script = echo 'Running forecast.'
+        script = echo 'Running forecast.'; sleep 5
 
     [[get_rainfall]]
         script = cat >rainfall <<<'The rain in Spain falls mainly on the plain'

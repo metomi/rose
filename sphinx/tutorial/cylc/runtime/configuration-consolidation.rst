@@ -1,7 +1,10 @@
-.. _Jinja2 Tutorial: .. http://jinja.pocoo.org/docs
+.. _Jinja2 Tutorial: http://jinja.pocoo.org/docs
+.. _shebang: https://en.wikipedia.org/wiki/Shebang_(Unix)
 
 .. include:: ../../../hyperlinks.rst
   :start-line: 1
+
+.. _tutorial-cylc-consolidating-configuration:
 
 Consolidating Configuration
 ===========================
@@ -246,9 +249,13 @@ In the following example the task ``bar`` will inherit the environment variable
          rose tutorial consolidation-tutorial
          cd ~/cylc-run/consolidation-tutorial
 
+      Set the intial and final cycle point as you did in the
+      :ref:`previous tutorial
+      <tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points>`.
+
    2. **Move Site-Wide Settings Into The** ``root`` **Family.**
 
-      The following three environment variables are used by multiple tasks.
+      The following three environment variables are used by multiple tasks:
 
       .. code-block:: none
 
@@ -300,7 +307,7 @@ In the following example the task ``bar`` will inherit the environment variable
          -         DOMAIN = -12,48,5,61  # Do not change!
 
            [[forecast]]
-               script = forecast 120 5  # Generate 5 forecasts at 60 minute intervals.
+               script = forecast 60 5  # Generate 5 forecasts at 60 minute intervals.
                [[[environment]]]
                    # List of cycle points to process wind data from.
                    WIND_CYCLES = """
@@ -321,7 +328,7 @@ In the following example the task ``bar`` will inherit the environment variable
 
            [[post_process_exeter]]
                # Generate a forecast for Exeter 60 minutes in the future.
-               script = post-process exeter 120
+               script = post-process exeter 60
          -     [[[environment]]]
          -         # Add the `python` directory to the PYTHONPATH.
          -         PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
@@ -340,6 +347,13 @@ In the following example the task ``bar`` will inherit the environment variable
 
       You should see the environment variables from the ``[root]`` section
       in the `[environment]` section for all tasks.
+
+      .. tip::
+
+         You may find it easier opening the output of this command in a text
+         editor e.g::
+
+            cylc get-config . --sparse -i "[runtime]" | gvim -
 
 
 Jinja2
@@ -391,8 +405,8 @@ Would result in:
       foo 1
       foo 2
 
-To enable Jinja2 in the ``suite.rc`` file add the following shebang at the top
-of the file:
+To enable Jinja2 in the ``suite.rc`` file add the following `shebang`_ to the
+top of the file:
 
 .. code-block:: none
 
@@ -540,7 +554,7 @@ written like so:
 Parameterised Tasks
 -------------------
 
-Parameterised tasks (or :term:`parameterisation`) provides a way of implicitly
+Parameterised tasks (:term:`parameterisation`) provide a way of implicitly
 looping over tasks without the need for Jinja2.
 
 Parameters are defined in their own section e.g:
@@ -549,30 +563,108 @@ Parameters are defined in their own section e.g:
 
    [cylc]
        [[parameters]]
-           stations = belmullet, camborne, heathrow, shetland
+           param = foo, bar, baz
 
 They can then be referenced by writing the name of the parameter in angle
 brackets e.g:
 
-.. code-block:: cylc-graph
+.. code-block:: cylc
 
-   get_observations<station>
+   [scheduling]
+       [[dependencies]]
+           graph = start => task<param> => end
+   [runtime]
+       [[task<param>]]
+           script = echo 'Hello World!'
 
-Would result in:
+When the ``suite.rc`` file is read by cylc, the parameters will be expanded.
+For example the code above is equivalent to:
 
-.. code-block:: cylc-graph
+.. code-block:: cylc
 
-   get_observations_belmullet
-   get_observations_camborne
-   get_observations_heathrow
-   get_observations_shetland
+   [scheduling]
+       [[dependencies]]
+           graph = start => (task_foo & task_bar & task_baz) => end
+   [runtime]
+       [[task_foo]]
+           script = echo 'Hello World!'
+       [[task_bar]]
+           script = echo 'Hello World!'
+       [[task_baz]]
+           script = echo 'Hello World!'
 
-We can refer to a particular value in a parametrisation by writing its name
-after an equals sign e.g:
+We can refer to a specific parameter by writing it after an ``=`` sign:
 
-.. code-block:: cylc-graph
+.. code-block:: cylc
 
-   get_observations<station=heathrow>
+   [runtime]
+       [[task<param=baz>]]
+           script = 'Do something special for baz!'
+
+The name of the parameter is provided to the job as an environment variable
+called ``CYLC_TASK_PARAM_<parameter>`` where ``<parameter>`` is the name of
+the parameter (in this case ``param``):
+
+.. code-block:: cylc
+
+   [runtime]
+       [[task<param=bar>]]
+           # This is equivalent to `echo 'bar'`
+           script = echo $CYLC_TASK_PARAM_param
+
+Parameters can be either words or integers:
+
+.. code-block:: cylc
+
+   [cylc]
+       [[parameters]]
+           foo = 1..5
+           bar = 1..5..2
+           baz = pub, qux, bol
+
+   [scheduling]
+       [[dependencies]]
+           graph = """
+               task<foo>
+               task<bar>
+               task<baz>
+           """
+
+.. warning::
+
+   Remember that cylc automatically inserts an underscore between the task and
+   the parameter. E.g. the following lines are equivalent:
+
+   .. code-block:: cylc-graph
+
+      task<baz=pub>
+      task_pub
+
+.. note::
+
+   When using integer parameters, to avoid confusion, cylc prefixes the
+   parameter value with the parameter name. For example the above code is
+   equivalent to:
+
+   .. code-block:: cylc
+
+      [scheduling]
+          [[dependencies]]
+              graph = """
+                  task_foo1
+                  task_foo2
+                  task_foo3
+                  task_foo4
+                  task_foo5
+
+                  task_bar1
+                  task_bar3
+                  task_bar5
+
+                  task_pub
+                  task_qux
+                  task_bol
+              """
 
 Using parameters the ``get_observations`` configuration could be written like
 so:
@@ -614,16 +706,7 @@ so:
       get_observations<station=heathrow>
       get_observations_heathrow
 
-Parameters can also be integers e.g:
-
-.. code-block:: cylc
-
-   [cylc]
-       [[parameters]]
-           foo = 1..5     # 1, 2, 3, 4, 5
-           bar = 1..5..2  # 1, 3, 5
-
-For more information see the `cylc user guide`.
+For more information see the `cylc user guide`_.
 
 .. practical::
 
@@ -684,16 +767,16 @@ For more information see the `cylc user guide`.
 
             [[get_observations<station=belmullet>]]
                 [[[environment]]]
-                    SITE_ID = 3772
+                    SITE_ID = 3976
             [[get_observations<station=camborne>]]
                 [[[environment]]]
-                    SITE_ID = 3772
+                    SITE_ID = 3808
             [[get_observations<station=heathrow>]]
                 [[[environment]]]
                     SITE_ID = 3772
             [[get_observations<station=shetland>]]
                 [[[environment]]]
-                    SITE_ID = 3772
+                    SITE_ID = 3005
 
       Using ``cylc get-config`` you should now see four ``get_observations``
       tasks each with a ``script``, an ``API_KEY`` and a ``SITE_ID``:
@@ -734,6 +817,12 @@ For more information see the `cylc user guide`.
       and ``edinburgh``. Parameterise the ``post_process`` task using this
       parameter.
 
+      .. hint::
+
+         The first argument to the ``post-process`` task is the name of the
+         site. We can use the ``CYLC_TASK_PARAM_site`` environment variable to
+         avoid having to write out this section twice.
+
       .. spoiler:: Solution warning
 
          First we must create the ``site`` parameter:
@@ -753,7 +842,8 @@ For more information see the `cylc user guide`.
             -[[post_process_exeter]]
             +[[post_process<site>]]
                  # Generate a forecast for Exeter 60 minutes in the future.
-                 script = post-process exeter 120
+            -    script = post-process exeter 60
+            +    script = post-process $CYLC_TASK_PARAM_site 60
 
 
 Which Approach To Use
@@ -771,37 +861,3 @@ what works best for us. As a rule of thumb:
 * :term:`Parameterisation <parameterisation>` works best for describing tasks
   which are very similar but which have subtly different configuration
   (e.g. different arguments or environment variables).
-
-
-The ``cylc get-config`` Command
--------------------------------
-
-To help assist with consolidating configurations the ``cylc get-config``
-command can be used to expand the ``suite.rc`` file back out into its full
-form.
-
-Call ``cylc get-config`` with the path of the suite (``.`` if you are in
-the :term:`suite directory`) and the ``--sparse`` option (which hides default
-values).
-
-.. code-block:: sub
-
-   cylc get-config <path> --sparse
-
-To view the configuration of a particular section or setting refer to it by
-name using the ``-i`` option (see :ref:`cylc file format` for details) e.g:
-
-.. code-block:: sub
-
-   # Print the contents of the [scheduling] section.
-   cylc get-config <path> --sparse -i '[scheduling]'
-   # Print the contents of the get_observations_heathrow task.
-   cylc get-config <path> --sparse -i '[runtime][get_observations_heathrow]'
-   # Print the value of the script setting in the get_observations_heathrow task
-   cylc get-config <path> --sparse -i '[runtime][get_observations_heathrow]script'
-
-The ``cylc get-config`` will expand:
-
-* Inheritance in families.
-* All Jinja2.
-* All parameters in the ``[runtime]`` section.

@@ -279,8 +279,8 @@ def generate_html_map(filename, data, domain, resolution):
         with open(filename, 'w+') as html_file:
             html_file.write(jinja2.Template(template.read()).render(
                 resolution=resolution,
-                lng_1=domain['lng1'],
-                lng_2=domain['lng2'],
-                lat_1=domain['lat1'],
-                lat_2=domain['lat2'],
+                lng1=domain['lng1'],
+                lng2=domain['lng2'],
+                lat1=domain['lat1'],
+                lat2=domain['lat2'],
                 data=data))
