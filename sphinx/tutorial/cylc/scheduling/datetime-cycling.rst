@@ -251,9 +251,11 @@ The ``consolidate_observations`` task must run after the
    size = "5,4"
    bgcolor=none
 
+   get_observations_belmullet -> consolidate_observations
    get_observations_camborne -> consolidate_observations
    get_observations_heathrow -> consolidate_observations
-   get_observations_aberdeen -> consolidate_observations
+   get_observations_shetland -> consolidate_observations
+
 
 We will also use the UK radar network to get rainfall data with a task
 called ``get_rainfall``.
