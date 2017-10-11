@@ -205,6 +205,8 @@ To make your suite use UTC set the ``[cylc]UTC mode`` setting to ``True``, i.e:
        UTC mode = True
 
 
+.. _tutorial-datetime-cycling-practical:
+
 Putting It All Together
 -----------------------
 
