@@ -71,7 +71,7 @@ values).
    cylc get-config <path> --sparse
 
 To view the configuration of a particular section or setting refer to it by
-name using the ``-i`` option (see :ref:`cylc file conf` for details) e.g:
+name using the ``-i`` option (see :ref:`cylc file format` for details) e.g:
 
 .. code-block:: sub
 
@@ -87,7 +87,7 @@ name using the ``-i`` option (see :ref:`cylc file conf` for details) e.g:
    The main use for ``cylc get-config`` is for inspecting the
    ``[runtime]`` section of a suite. The ``cylc get-config`` command does not
    expand :term:`Parameterisations <parameterisation>` and
-   :term:`families <family>` in the suite's :term:`graphing`. To inspect the
+   :term:`families <family>` in the suite's :term:`graph`. To inspect the
    graphing use the ``cylc graph`` command.
 
 
@@ -182,7 +182,7 @@ Using families the ``get_observations`` tasks could be written like so:
 Graphing
 ^^^^^^^^
 
-:term:`Families <family>` can be used in the suite's :term:`graphing` e.g:
+:term:`Families <family>` can be used in the suite's :term:`graph` e.g:
 
 .. code-block:: cylc-graph
 
@@ -535,6 +535,8 @@ written like so:
       Check the result with ``cylc get-config``, the Jinja2 will be processed
       so you should not see any difference after making these changes:
 
+.. _tutorial-cylc-parameterisation:
+
 Parameterised Tasks
 -------------------
 
@@ -787,7 +789,7 @@ values).
    cylc get-config <path> --sparse
 
 To view the configuration of a particular section or setting refer to it by
-name using the ``-i`` option (see :ref:`cylc file conf` for details) e.g:
+name using the ``-i`` option (see :ref:`cylc file format` for details) e.g:
 
 .. code-block:: sub
 

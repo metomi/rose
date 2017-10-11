@@ -1,3 +1,6 @@
+.. include:: hyperlinks.rst
+   :start-line: 1
+
 Glossary
 ========
 
@@ -404,6 +407,7 @@ Glossary
       * :term:`run directory`
       * :term:`work directory`
 
+   job log
    job log directory
       When cylc executes a :term:`job`, stdout and stderr are redirected to the
       ``job.out`` and ``job.err`` files which are stored in the job log
@@ -441,6 +445,7 @@ Glossary
 
       * :term:`task`
       * :term:`job`
+      * :term:`job submission number`
 
    job host
       The job host is the compute platform that a :term:`job` runs on. For
@@ -453,6 +458,17 @@ Glossary
              [[some-task]]
                  [[[remote]]]
                      host = some-host
+
+   job submission number
+      Cylc may run multiple :term:`jobs <job>` per :term:`task` (e.g. if the
+      task failed and was re-tried). Each time cylc runs a :term:`job` it is
+      assigned a submission number. The submission number starts at 1,
+      incrementing with each submission.
+
+      See also:
+
+      * :term:`job`
+      * :term:`job script`
 
    batch system
       A batch system or job scheduler is a system for submitting
@@ -474,6 +490,97 @@ Glossary
       See also:
 
       * :term:`batch system`
+
+   parameterisation
+      Parameterisation is a way to consolidate configuration in the cylc
+      ``suite.rc`` file by implicitly looping over a set of pre-defined
+      variables e.g.:
+
+      .. code-block:: cylc
+
+         [cylc]
+             [[parameters]]
+                 foo = 1..3
+         [scheduling]
+             [[dependencies]]
+                 graph = bar<foo> => baz<foo>
+
+      .. minicylc::
+         :theme: none
+
+         bar_foo1 => bar_foo2 => bar_foo3
+
+      See also:
+
+      * :ref:`cylc tutorial <tutorial-cylc-parameterisation>`
+
+   family
+      In cylc a family is a collection of :term:`tasks <task>` which share a
+      common configuration and which can be referred to collectively in the
+      :term:`graph`.
+
+      By convention families are named in upper case with the exception of the
+      special ``root`` family from which all tasks inherit.
+
+      See also:
+
+      * :ref: `cylc tutorial <tutorial-cylc-families>`
+      * :term:`family inheritance`
+      * :term:`family trigger`
+
+   family inheritance
+      A :term:`task` can be "added" to a :term:`family` by "inheriting" from
+      it.
+
+      For example the :term:`task` ``task`` "belongs" to the :term:`family`
+      ``FAMILY`` in the following snippet:
+
+      .. code-block:: cylc
+
+         [runtime]
+             [[FAMILY]]
+                 [[[environment]]]
+                     FOO = foo
+             [[task]]
+                 inherit = FAMILY
+
+      A task can inherit from multiple families by writing a coma separated
+      list e.g:
+
+      .. code-block:: cylc
+
+         inherit = foo, bar, baz
+
+      See also:
+
+      * `cylc user guide`_
+      * :term:`family`
+      * :term:`family trigger`
+
+   family trigger
+      :term:`Tasks <task>` which "belong" to
+      (:term:`inherit <family inheritance>` from) a :term:`family` can be
+      referred to collectively in the :term:`graph` using a family trigger.
+
+      A family trigger is written using the name of the family followed by a
+      special qualifier i.e. ``FAMILY_NAME:qualifier``. The most commonly used
+      qualifiers are:
+
+      ``succeed-all``
+          The dependency will only be met when **all** of the tasks in the
+          family have **succeeded**.
+      ``succeed-any``
+          The dependency will be met as soon as **any one** of the tasks in the
+          family has **succeeded**.
+      ``finish-all``
+          The dependency will only be met once **all** of the tasks in the
+          family have **succeeded**.
+
+      See also:
+
+      * `cylc user guide`_
+      * :term:`family`
+      * :term:`dependency`
 
    rose app
    rose application configuration

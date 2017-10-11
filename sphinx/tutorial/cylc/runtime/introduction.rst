@@ -299,7 +299,7 @@ is re-run.
    #. **Inspect A Job Log.**
 
       Try opening the ``job.out`` file for one of the ``get_observations``
-      jobs. The file will be located within the :term:`log directory`:
+      jobs. The file will be located within the :term:`job log directory`:
 
       .. code-block:: sub
 
