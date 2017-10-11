@@ -612,6 +612,17 @@ so:
       get_observations<station=heathrow>
       get_observations_heathrow
 
+Parameters can also be integers e.g:
+
+.. code-block:: cylc
+
+   [cylc]
+       [[parameters]]
+           foo = 1..5     # 1, 2, 3, 4, 5
+           bar = 1..5..2  # 1, 3, 5
+
+For more information see the `cylc user guide`.
+
 .. practical::
 
    4. **Use Parameterisation To Consolidate The** ``get_observations``
