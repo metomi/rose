@@ -274,7 +274,7 @@ off and carries on as normal.
 
       .. code-block:: bash
 
-         cylc validate runtime-tutorial
+         cylc validate .
 
       .. TODO: Add advice on what to do if the command fails.
 
@@ -318,7 +318,7 @@ off and carries on as normal.
 
       * The longitude of the weather station.
       * The latitude of the weather station.
-      * The wind direction *[where the wind GOING]* (in degrees).
+      * The wind direction *[direction the wind is blowing towards]* (in degrees).
       * The wind speed in miles per hour.
 
       .. spoiler:: Hint hint
