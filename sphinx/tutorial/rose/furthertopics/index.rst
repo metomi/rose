@@ -21,6 +21,7 @@ Further Rose Topics
    suite-development/clock-triggered-tasks
    suite-development/command-keys
    suite-development/date-time-manipulation
+   suite-development/family-triggers
    suite-development/jinja2-templating
    suite-development/optional-configurations
    suite-development/parameterisation-jinja2
