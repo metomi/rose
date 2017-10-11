@@ -36,7 +36,7 @@ mkdir -p "$HOME/cylc-run"
 DIRECTORY="$HOME/cylc-run/$1"
 echo -n "rose tutorial: copying tutorial suite files to ${DIRECTORY} ... "
 rose_init 'rose_log'
-if run rsync -a "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}"; then
+if run rsync -rLptgoD "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}"; then
     echo 'done'
 else
     echo
