@@ -76,12 +76,12 @@
     [[forecast]]
         script = forecast 120 5  # Generate 5 forecasts at 60 minute intervals.
         [[[environment]]]
+            # List of cycle points to process wind data from.
             WIND_CYCLES = """
                 $CYLC_TASK_CYCLE_POINT
                 $(cylc cyclepoint --offset-hours=-3)
                 $(cylc cyclepoint --offset-hours=-6)
             """
-
             # The cyclepoint 3 hours before the present one.
             PT3H = $(cylc cyclepoint --offset-hours=-3)
             # The cyclepoint 6 hours before the present one.
