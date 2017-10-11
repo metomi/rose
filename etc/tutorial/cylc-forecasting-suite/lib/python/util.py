@@ -201,9 +201,12 @@ def plot_vector_grid(filename, x_grid, y_grid):
 
 
 def get_grid_coordinates(lng, lat, domain, resolution):
+    """Return the grid coordinates for a lat, long coordinate pair."""
+    # NOTE: Grid coordinates run from *top* left to bottom right.
+    length_y = int(abs(domain['lat2'] - domain['lat1']) // resolution)
     return (
         int((abs(lng - domain['lng1'])) // resolution),
-        int((abs(lat - domain['lat1'])) // resolution))
+        length_y - int((abs(lat - domain['lat1'])) // resolution))
 
 
 class SurfaceFitter(object):
