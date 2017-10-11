@@ -203,16 +203,59 @@ off and carries on as normal.
       .. code-block:: bash
 
          rose tutorial runtime-tutorial
-         cd ~/cylc-run/runtime-tutotial
+         cd ~/cylc-run/runtime-tutorial
 
       You will now have a copy of the weather forecasting suite along with some
       executables and python modules.
 
+   .. _tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points:
+
    #. **Set The Initial And Final Cycle Points.**
 
-      TODO
+      First we will set the initial and final cycle points (see
+      :ref:`datetime tutorial <tutorial-iso8601-datetimes>` for help with
+      writing ISO8601 datetimes):
 
-   #. **Add Runtime Configuration For The** ``get_observation`` **Tasks.**
+      * The :term:`final cycle point` should be set to the time one hour ago
+        (with minutes and seconds ignored).
+
+        *E.g. if the current time is 9:45 UTC then the final cycle point shoud
+        be at 8:00 UTC*
+
+      * The :term:`initial cycle point` should be the final cycle point minus
+        six hours.
+
+      .. admonition:: Reminder
+         :class: tip
+
+         Remember that we are working in UTC mode (the ``+00`` time zone).
+         Datetimes should end with a ``Z`` character to reflect this.
+
+      .. spoiler:: Hint hint
+
+         For example if the current time is:
+
+         .. code-block:: none
+
+            2000-01-01T09:45Z
+
+         Then the final cycle point should be:
+
+         .. code-block:: none
+
+            2000-01-01T08:00Z
+
+         And the initial cycle point should be:
+
+         .. code-block:: none
+
+            2000-01-01T02:00Z
+
+      Run ``cylc validate`` to check for any errors::
+
+         cylc validate .
+
+   #. **Add Runtime Configuration For The** ``get_observations`` **Tasks.**
 
       In the ``bin`` directory is a script called ``get-observations``. This
       script gets weather data from the MetOffice `DataPoint`_ service.
@@ -297,9 +340,12 @@ off and carries on as normal.
 
          cylc run runtime-tutorial
 
-      If all goes well you will see the ``get_observations`` tasks run and
-      succeed in the cylc GUI. Once the suite has reached the final cycle point
-      and all tasks have succeeded the suite will automatically shutdown.
+      If all goes well the suite will startup, the tasks will run and succeed.
+      Note that the tasks which do not have a ``[runtime]`` section will still
+      run though they don't do anything as they don't call any scripts.
+
+      Once the suite has reached the final cycle point and all tasks have
+      succeeded the suite will automatically shutdown.
 
       .. TODO: Advise on what to do if all does not go well.
 
@@ -314,7 +360,7 @@ off and carries on as normal.
 
       .. code-block:: sub
 
-         ~/cylc-run/<suite-name>/work/<cycle-point>/<task-name>
+         work/<cycle-point>/<task-name>
 
       You should find a file with four numbers:
 
@@ -325,10 +371,10 @@ off and carries on as normal.
 
       .. spoiler:: Hint hint
 
-         If you run ``ls ~/cylc-run/runtime-tutorial/work`` you should see a
+         If you run ``ls work`` you should see a
          list of cycles. Pick one of them and open the file::
 
-            ~/cylc-run/runtime-tutorial/work/<cycle-point>/get_observations_heathrow
+            work/<cycle-point>/get_observations_heathrow/wind.csv
 
    #. **Add runtime configuration for the other tasks.**
 
@@ -341,13 +387,13 @@ off and carries on as normal.
 
       .. code-block:: bash
 
-         cylc validate runtime-tutorial
+         cylc validate .
 
       .. TODO: Add advice on what to do if the command fails.
 
    #. **Run The Suite.**
 
-      Open the cylc GUI and run the suite.
+      Open the cylc GUI (if not already open) and run the suite.
 
       .. spoiler:: Hint hint
 
@@ -357,30 +403,29 @@ off and carries on as normal.
 
          Run the suite either by:
           
-         * Press the play button in the cylc gui. Ensure "Cold Start" is
-           selected from the dialogue window then press "Start"
-         * Run the command ``cylc run runtime-tutorial``.
+         * Pressing the play button in the cylc gui. Then, ensureing that
+           "Cold Start" is selected from the dialogue window, pressing the
+           "Start" button.
+         * Running the command ``cylc run runtime-tutorial``.
 
    #. **View The Forecast Summnary.**
 
       The ``post_process_exeter`` task will produce a one line summary of the
       weather in Exeter as forecast two hours ahead of time. This summary can
-      be found in the ``summary`` file in the :term:`work directory`.
+      be found in the ``summary.txt`` file in the :term:`work directory`.
 
-      Try opening the summary file for the first cycle. The path to the
-      :term:`work directory` is:
+      Try opening the summary file - it will be in the last cycle. The path to
+      the :term:`work directory` is:
 
       .. code-block:: sub
 
-          ~/cylc-run/<suite-name>/log/work/<cycle-point>/<task-name>
+          work/<cycle-point>/<task-name>
 
       .. spoiler:: Hint hint
 
-         * ``suite-name`` - "runtime-tutorial".
-         * ``cyclc-point`` - This will be the first cycle of the suite.
-           i.e. the intial cycle point.
+         * ``cycle-point`` - This will be the last cycle of the suite.
+           i.e. the final cycle point.
          * ``task-name`` - "post_process_exeter".
-         * ``submission-number`` - "00".
 
    #. **View The Rainfall Data.**
 
@@ -390,21 +435,22 @@ off and carries on as normal.
       data is rendered on a map. This html file is called ``job-map.html`` and
       is saved alongside the :term:`job log`.
 
-      Try opening this file in a web browser e.g::
+      Try opening this file in a web browser e.g:
 
-         firefox filename
+      .. code-block:: sub
+
+         firefox <filename>
 
       The path to the :term:`job log directory` is:
 
       .. code-block:: sub
 
-         ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<submission-number>
+         log/job/<cycle-point>/<task-name>/<submission-number>
 
       .. spoiler:: Hint hint
 
-         * ``suite-name`` - "runtime-tutorial".
-         * ``cyclc-point`` - This will be the last cycle of the suite.
+         * ``cycle-point`` - This will be the last cycle of the suite.
            i.e. the final cycle point.
          * ``task-name`` - "forecast".
-         * ``submission-number`` - "00".
+         * ``submission-number`` - "01".
 

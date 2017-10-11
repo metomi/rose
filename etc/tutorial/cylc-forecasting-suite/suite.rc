@@ -75,7 +75,7 @@
             API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
 
     [[forecast]]
-        script = forecast 120 5  # Generate 5 forecasts at 60 minute intervals.
+        script = forecast 60 5  # Generate 5 forecasts at 60 minute intervals.
         [[[environment]]]
             # List of cycle points to process wind data from.
             WIND_CYCLES = """
@@ -90,4 +90,4 @@
 
     [[post_process<site>]]
         # Generate a forecast for the location <site> 60 minutes in the future.
-        script = post-process $CYLC_TASK_PARAM_site 120
+        script = post-process $CYLC_TASK_PARAM_site 60

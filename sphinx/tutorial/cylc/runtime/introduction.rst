@@ -1,3 +1,6 @@
+.. include:: ../../../hyperlinks.rst
+   :start-line: 1
+
 Introduction
 ============
 
@@ -224,10 +227,39 @@ The :term:`job log directory` lives in a directory structure under the
 
 .. code-block:: sub
 
-   ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-no>/
+   ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-num>/
 
 The :term:`job submission number` starts at 1 and increments each time a task
 is re-run.
+
+.. tip::
+
+   If a task has run and is still visible in the gui you can view its
+   :term:`job log files <job log>` by right-clicking on the task and selecting
+   "View".
+
+   .. image:: ../img/cylc-gui-view-log.png
+      :align: center
+      :scale: 75%
+
+Suite Files
+^^^^^^^^^^^
+
+Along with the :term:`work directory` and :term:`job log directory`, cylc
+generates other files and directories when it runs a suite:
+
+``cylc-suite.db``
+   A symlink to the database which cylc uses to record the state of the suite.
+``log/``
+   The directory in which various log files, including
+   :term:`job log files <job log>` live.
+``suite.rc.processed``
+   A copy of the ``suite.rc`` file made after any `Jinja2`_ has been processed
+   - we will cover this in the :ref:`tutorial-cylc-consolidating-configuration`
+   section.
+``share/``
+   The :term:`share directory` is a place where :term:`tasks <task>` can write
+   files which are intended to be shared within that cycle.
 
 .. practical::
 
@@ -252,9 +284,7 @@ is re-run.
       These is also a script called ``get-observations`` located in a bin
       directory.
 
-   #. **Add The Initial And Final Cycle Points.**
-
-      TODO
+      Take a look at the ``[runtime]`` section in the ``suite.rc`` file.
 
    #. **Run The Suite.**
 
@@ -303,7 +333,26 @@ is re-run.
 
       .. code-block:: sub
 
-         ~/cylc-run/runtime-introduction/log/job/<cycle-point>/get_observations_heathrow/01/job.out
+         log/job/<cycle-point>/get_observations_heathrow/01/job.out
+
+      You should see something like this:
+
+      .. code-block:: none
+
+         Suite    : runtime-introduction
+         Task Job : 20000101T0000Z/get_observations_heathrow/01 (try 1)
+         User@Host: username@hostname
+
+         Guessing Weather Conditions
+         Writing Out Wind Data
+         1970-01-01T00:00:00Z NORMAL - started
+         2038-01-19T03:14:08Z NORMAL - succeeded
+
+      * The first three lines are information which cylc has written to the file
+        to provide information about the job.
+      * The last two lines were also written by cylc, they provide timestamps
+        marking the stages in the jobs life.
+      * The lines in the middle are the stdout of the job itself.
 
    #. **Inspect A Work Directory.**
 
@@ -312,8 +361,30 @@ is re-run.
 
       .. code-block:: sub
 
-         ~/cylc-run/runtime-introduction/work/<cycle-point>/get_rainfall/rainfall
+         work/<cycle-point>/get_rainfall/rainfall
 
       .. hint::
 
          The ``get_rainfall`` task only runs every third cycle.
+
+   #. **Extension:** Explore The Cylc GUI
+
+      * Try re-running the suite.
+
+      * Try changing the current view(s).
+
+        .. tip::
+
+           You can do this from the "View" menu or from the toolbar:
+
+           .. image:: ../img/cylc-gui-view-selector.png
+              :align: center
+              :scale: 75%
+
+      * Try pressing the pause button which is found in the top left-hand
+        corner of the GUI.
+
+      * Try right-clicking on a task. From the context menu you could try:
+
+        * "Triger (run now)"
+        * "Reset State"

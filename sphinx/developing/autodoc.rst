@@ -67,7 +67,7 @@ Some quick examples:
             Returns:
                 tuple - (param1, param2)
                     - param1 (str) - If a function returns a tuple you can if
-                          desired list the components of the tuple like this.
+                      desired list the components of the tuple like this.
                     - param2 (str) - Something else.
 
             """
