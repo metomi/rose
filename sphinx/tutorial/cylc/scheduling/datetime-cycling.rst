@@ -248,9 +248,11 @@ The ``consolidate_observations`` task must run after the
    size = "5,4"
    bgcolor=none
 
+   get_observations_belmullet -> consolidate_observations
    get_observations_camborne -> consolidate_observations
    get_observations_heathrow -> consolidate_observations
-   get_observations_aberdeen -> consolidate_observations
+   get_observations_shetland -> consolidate_observations
+
 
 We will also use the UK radar network to get rainfall data with a task
 called ``get_rainfall``.
@@ -395,9 +397,10 @@ The ``post_process_exeter`` task will run **every six hours starting at
                [[dependencies]]
                    [[[T00/PT3H]]]
                        graph = """
+                           get_observations_belmullet => consolidate_observations
                            get_observations_camborne => consolidate_observations
                            get_observations_heathrow => consolidate_observations
-                           get_observations_aberdeen => consolidate_observations
+                           get_observations_shetland => consolidate_observations
                        """
                    [[[T06/PT6H]]]
                        graph = """

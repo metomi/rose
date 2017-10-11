@@ -7,7 +7,6 @@
 import math
 
 
-DEG2RAD = math.pi/180.
 R_0 = 6356752.3
 
 
@@ -47,8 +46,8 @@ def coord_to_pos(lng, lat, offset=(0., 0.), scale=(1., 1.)):
         # Subtract offset.
 
     """
-    lng *= DEG2RAD
-    lat *= DEG2RAD
+    lng = math.radians(lng)
+    lat = math.radians(lat)
     pos_x = R_0 * lng
     pos_y = R_0 * math.log(math.tan((math.pi / 4.) + (lat / 2.)))
     pos_x /= scale[0]
@@ -73,8 +72,4 @@ def pos_to_coord(pos_x, pos_y, offset=(0., 0.), scale=(1., 1.)):
     pos_y *= scale[1]
     lng = pos_x / R_0
     lat = 2 * math.atan(math.exp(pos_y / R_0)) - (math.pi / 2.)
-
-    lng /= DEG2RAD
-    lat /= DEG2RAD
-
-    return lng, lat
+    return math.degrees(lng), math.degrees(lat)

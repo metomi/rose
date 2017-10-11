@@ -11,7 +11,6 @@ import jinja2
 
 
 R_0 = 6371.  # Radius of the Earth (km).
-DEG2RAD = math.pi / 180.  # Conversion from degrees to radians.
 
 
 def frange(start, stop, step):
@@ -98,10 +97,10 @@ def great_arc_distance((lng_1, lat_1), (lng_2, lat_2)):
         coorinate_2 (tuple): A 2-tuple (lng, lat) of the second coordinate.
 
     """
-    lng_1 *= DEG2RAD
-    lat_1 *= DEG2RAD
-    lng_2 *= DEG2RAD
-    lat_2 *= DEG2RAD
+    lng_1 = math.radians(lng_1)
+    lat_1 = math.radians(lat_1)
+    lng_2 = math.radians(lng_2)
+    lat_2 = math.radians(lat_2)
     return (
         2 * R_0 * math.asin(
             math.sqrt(

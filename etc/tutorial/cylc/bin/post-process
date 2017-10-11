@@ -32,7 +32,7 @@ SITE_LOCATIONS = {
     "exeter": (-3.533, 50.717),
     "london": (-0.1275, 51.507),
     "cardiff": (-3.183, 51.483),
-    "edinburugh": (-3.189, 55.953),
+    "edinburgh": (-3.189, 55.953),
     "belfast": (-5.930, 54.597)
 }
 
