@@ -365,8 +365,8 @@ Glossary
 
       * :term:`suite directory`
       * :term:`work directory`
-      * :term`share directory`
-      * :term`job log directory`
+      * :term:`share directory`
+      * :term:`job log directory`
 
    work directory
       When cylc executes a :term:`job` it does so inside a suite's
@@ -437,8 +437,8 @@ Glossary
       * :term:`job script`
 
    job script
-      A job script is the file containing bash script which is executed when a
-      :term:`job` runs. A task's job script can be found in the
+      A job script is the file containing a bash script which is executed when
+      a :term:`job` runs. A task's job script can be found in the
       :term:`job log directory`.
 
       See also:
@@ -524,7 +524,7 @@ Glossary
 
       See also:
 
-      * :ref: `cylc tutorial <tutorial-cylc-families>`
+      * :ref:`cylc tutorial <tutorial-cylc-families>`
       * :term:`family inheritance`
       * :term:`family trigger`
 
@@ -544,7 +544,7 @@ Glossary
              [[task]]
                  inherit = FAMILY
 
-      A task can inherit from multiple families by writing a coma separated
+      A task can inherit from multiple families by writing a comma separated
       list e.g:
 
       .. code-block:: cylc

@@ -36,8 +36,8 @@ In the last section we wrote out the following code in the ``suite.rc`` file:
                API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
 
 In this code the ``script`` item and the ``API_KEY`` environment variable have
-been repeated for each task. This is bad practice as is makes the
-configuration un-necessary complex and making changes difficult.
+been repeated for each task. This is bad practice as it makes the
+configuration lengthy and making changes can become difficult.
 
 Likewise the graphing relating to the ``get_observations`` tasks is also
 repetitive:
