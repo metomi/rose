@@ -49,5 +49,5 @@
     [[process<site>]]
         script = """python -c "
 from random import choice
-print choice(['Windy', 'Rainy', 'Sunny', 'Snowey'])"
+print choice(['Windy', 'Rainy', 'Sunny', 'Snowy'])"
 """

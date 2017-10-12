@@ -17,16 +17,14 @@ or binaries to be executed when the task runs. This means working with the
 The Task Section
 ----------------
 
-The runtime settings for each task are stored in a sub-section in the
-``[runtime]`` section. E.G for a task called ``hello_world`` we would write
+The runtime settings for each task are stored in a sub-section of the
+``[runtime]`` section. E.g for a task called ``hello_world`` we would write
 settings inside this section:
 
 .. code-block:: cylc
 
    [runtime]
        [[hello_world]]
-
-TODO: This better.
 
 
 The ``script`` Setting
@@ -59,7 +57,7 @@ We can also call other scripts or executables in this way e.g:
 It is often a good idea to keep our scripts with the cylc suite rather than
 leaving them somewhere else on the system. If you create a ``bin`` directory
 within the :term:`suite directory` this directory will be added to the path
-when tasks run. E.G:
+when tasks run e.g:
 
 .. code-block:: bash
    :caption: bin/hello-world
@@ -152,10 +150,10 @@ The cylc GUI
 ------------
 
 To help you to keep track of a running suite cylc has a graphical user
-interface (GUI) called ``gcylc`` which can be used for monitoring and
+interface (the cylc GUI) which can be used for monitoring and
 interaction.
 
-The cylc gui looks quite like ``cylc graph`` but the tasks are colour-coded to
+The cylc GUI looks quite like ``cylc graph`` but the tasks are colour-coded to
 represent their state as in the following diagram.
 
 .. digraph:: example
@@ -174,30 +172,30 @@ represent their state as in the following diagram.
     b => d => f
     e => f
 
-This is the "graph view". The cylc gui has two other views called "tree" and
+This is the "graph view". The cylc GUI has two other views called "tree" and
 "dot".
 
 .. figure:: ../img/cylc-gui-graph.png
    :figwidth: 50%
    :align: center
 
-   Screenshot of the cylc gui in "Graph View" mode.
+   Screenshot of the cylc GUI in "Graph View" mode.
 
 .. figure:: ../img/cylc-gui-tree.png
    :figwidth: 50%
    :align: center
 
-   Screenshot of the cylc gui in "Tree View" mode.
+   Screenshot of the cylc GUI in "Tree View" mode.
 
 .. figure:: ../img/cylc-gui-dot.png
    :figwidth: 50%
    :align: center
 
-   Screenshot of the cylc gui in "Dot View" mode.
+   Screenshot of the cylc GUI in "Dot View" mode.
 
 
-Where Do All The Files Go
--------------------------
+Where Do All The Files Go?
+--------------------------
 
 The Work Directory
 ^^^^^^^^^^^^^^^^^^
@@ -234,7 +232,7 @@ is re-run.
 
 .. tip::
 
-   If a task has run and is still visible in the gui you can view its
+   If a task has run and is still visible in the cylc GUI you can view its
    :term:`job log files <job log>` by right-clicking on the task and selecting
    "View".
 
@@ -314,7 +312,7 @@ generates other files and directories when it runs a suite:
 
       .. tip::
 
-         You can also run a suite from the cylc gui by pressing the "play"
+         You can also run a suite from the cylc GUI by pressing the "play"
          button.
 
          .. image:: ../img/gcylc-play.png

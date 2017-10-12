@@ -49,7 +49,7 @@ Job Submission
 
 By default cylc runs :term:`jobs <job>` on the machine where the suite is
 running. We can tell cylc to run jobs on other machines by setting the
-``[remote]host`` setting to the name of the host. E.G To run a task on the host
+``[remote]host`` setting to the name of the host. E.g To run a task on the host
 ``computehost`` you might write:
 
 .. code-block:: cylc
@@ -65,16 +65,18 @@ running. We can tell cylc to run jobs on other machines by setting the
 
 .. _tutorial-batch-system:
 
-By default cylc runs executes jobs as `background processes`_.
+By default cylc executes jobs as `background processes`_.
 When we are running jobs on other compute hosts we will often want to
 use a :term:`batch system` (`job scheduler`_) to submit our job.
 Cylc supports the following :term:`batch systems <batch system>`:
 
+* at
 * loadleveler
 * lsf
 * pbs
 * sge
 * slurm
+* moab
 
 :term:`Batch systems <batch system>` typically require some form of
 :term:`directives <directive>`. :term:`Directives <directive>` inform the
@@ -142,7 +144,7 @@ configure retries using the ``[job]execution retry delays`` and
 would cause the job to retry every 10 minutes in the event of an execution
 failure.
 
-We can limit the number of retries by writing a multiple in-front of the
+We can limit the number of retries by writing a multiple infront of the
 duration e.g:
 
 .. code-block:: cylc
@@ -356,8 +358,6 @@ off and carries on as normal.
       Try and open one of the ``wind.csv`` files. Note the path to the
       :term:`work directory` is:
 
-      .. TODO: Move/Remove?
-
       .. code-block:: sub
 
          work/<cycle-point>/<task-name>
@@ -403,7 +403,7 @@ off and carries on as normal.
 
          Run the suite either by:
           
-         * Pressing the play button in the cylc gui. Then, ensureing that
+         * Pressing the play button in the cylc GUI. Then, ensureing that
            "Cold Start" is selected from the dialogue window, pressing the
            "Start" button.
          * Running the command ``cylc run runtime-tutorial``.
