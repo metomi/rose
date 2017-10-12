@@ -169,10 +169,10 @@ You can add separate helper messages for each expression:
 
 Try adding the above lines to the metadata, saving, and playing about with the array numbers in the config editor and re-running the fail-if/warn-if check.
 
-Further reading
----------------
+.. TODO:
 
-.. todo::
+   Further reading
+   ---------------
 
    For more information, see the metadata reference page.
 

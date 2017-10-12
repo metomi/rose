@@ -1,37 +1,26 @@
-Further Rose Topics
-===================
+Further Topics
+==============
+
+This section goes into detail in additional rose topics.
 
 .. toctree::
-   :caption: Configuration Metadata
-   :name: rose-further-topics-metadata
+   :caption: Contents
+   :name: rose-further-topics
    :maxdepth: 1
    
-   configuration-metadata/failif-warnif
-   configuration-metadata/macro-development
-   configuration-metadata/trigger
-   configuration-metadata/upgrading-macro-development
-   configuration-metadata/upgrading
-   configuration-metadata/widget-development
+   failif-warnif
+   macro-development
+   trigger
+   upgrading-macro-development
+   upgrading
+   widget-development
 
-.. toctree:: 
-   :caption: Suite Development
-   :name: rose-further-topics-suite-development
-   :maxdepth: 1
-
-   suite-development/clock-triggered-tasks
-   suite-development/command-keys
-   suite-development/date-time-manipulation
-   suite-development/family-triggers
-   suite-development/jinja2-templating
-   suite-development/optional-configurations
-   suite-development/parameterisation-jinja2
-   suite-development/polling
-   suite-development/queues
-   suite-development/remote-hosts
-   suite-development/retries
-   suite-development/rose-arch
-   suite-development/rose-bunch
-   suite-development/rose-stem
-   suite-development/suicide-triggers
-
-
+.. toctree::
+   :hidden:
+   :name: rose-further-topics-additional-files
+   
+   supplementary-files/planet-py
+   supplementary-files/planet-python-macro-args
+   supplementary-files/planet-python-reporter
+   supplementary-files/planet-python-transformer
+   supplementary-files/rocket-metadata

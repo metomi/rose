@@ -7,5 +7,4 @@ This section will cover the rose application.
    :caption: Contents
    :name: rose-tutorial
 
-   introduction
    furthertopics/index
