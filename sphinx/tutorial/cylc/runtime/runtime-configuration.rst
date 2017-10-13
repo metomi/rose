@@ -219,10 +219,8 @@ off and carries on as normal.
       writing ISO8601 datetimes):
 
       * The :term:`final cycle point` should be set to the time one hour ago
-        (with minutes and seconds ignored).
-
-        *E.g. if the current time is 9:45 UTC then the final cycle point shoud
-        be at 8:00 UTC*
+        (with minutes and seconds ignored). *E.g. if the current time is
+        9:45 UTC then the final cycle point should be at 8:00 UTC*
 
       * The :term:`initial cycle point` should be the final cycle point minus
         six hours.
@@ -233,25 +231,14 @@ off and carries on as normal.
          Remember that we are working in UTC mode (the ``+00`` time zone).
          Datetimes should end with a ``Z`` character to reflect this.
 
-      .. spoiler:: Hint hint
+      .. spoiler:: Solution warning
 
-         For example if the current time is:
+         You can check your answers by running:
 
-         .. code-block:: none
-
-            2000-01-01T09:45Z
-
-         Then the final cycle point should be:
-
-         .. code-block:: none
-
-            2000-01-01T08:00Z
-
-         And the initial cycle point should be:
-
-         .. code-block:: none
-
-            2000-01-01T02:00Z
+         Initial cycle point
+            ``rose date --utc --offset -PT7H --format CCYY-MM-DDThh00Z``
+         Final cycle point
+            ``rose date --utc --offset -PT1H --format CCYY-MM-DDThh00Z``
 
       Run ``cylc validate`` to check for any errors::
 
@@ -439,7 +426,7 @@ off and carries on as normal.
 
       .. code-block:: sub
 
-         firefox <filename>
+         firefox <filename> &
 
       The path to the :term:`job log directory` is:
 
