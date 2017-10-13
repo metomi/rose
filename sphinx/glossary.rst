@@ -214,7 +214,7 @@ Glossary
 
       * :term:`ISO8601 datetime`
       * :term:`recurrence`
-      * `Wikipedia <https://en.wikipedia.org/wiki/ISO_8601>`_
+      * `Wikipedia (ISO8601) <https://en.wikipedia.org/wiki/ISO_8601>`_
       * `International Orginisation For Standardisation
         <https://www.iso.org/iso-8601-date-and-time-format.html>`_
       * `A summary of the international standard date and time notation
@@ -407,6 +407,23 @@ Glossary
       * :term:`run directory`
       * :term:`work directory`
 
+   suite log
+   suite log directory
+      A cylc suite logs events and other information to the suite log files
+      when it runs. There are there log files:
+
+      * ``out`` - The stdout of the suite.
+      * ``err`` - The stderr of the suite, may contain useful debugging
+        information in the event of error.
+      * ``log`` - A log of suite events, contains information about
+        user interaction.
+
+      The suite log directory lies within the :term:`run directory`:
+
+      .. code-block:: sub
+
+         <run directory>/log/suite
+
    job log
    job log directory
       When cylc executes a :term:`job`, stdout and stderr are redirected to the
@@ -476,7 +493,8 @@ Glossary
 
       See also:
 
-      * `Wikipedia <https://en.wikipedia.org/wiki/Job_scheduler>`
+      * `Wikipedia (job scheduler)
+        <https://en.wikipedia.org/wiki/Job_scheduler>`_
       * :term:`directive`
 
    directive
@@ -494,7 +512,7 @@ Glossary
    parameterisation
       Parameterisation is a way to consolidate configuration in the cylc
       ``suite.rc`` file by implicitly looping over a set of pre-defined
-      variables e.g.:
+      variables e.g:
 
       .. code-block:: cylc
 
