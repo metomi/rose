@@ -58,7 +58,9 @@ until 11:00 on the 1st of January 2000 before running:
                 graph = daily  # "daily" will run at the earliest, one hour
                                # before midday.
 
-*See the TODO:clock trigger tutorial for more information.*
+.. TODO: Link to clock-trigger tutorial
+
+*See the clock trigger tutorial for more information.*
 
 
 Alternative Calendars
