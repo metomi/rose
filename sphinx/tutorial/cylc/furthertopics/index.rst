@@ -9,7 +9,6 @@ This section looks at further topics in cylc.
    :maxdepth: 1
 
    clock-triggered-tasks
-   command-keys
    cylc-broadcast
    date-time-manipulation
    family-triggers
