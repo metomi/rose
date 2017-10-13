@@ -9,7 +9,7 @@ This section looks at further topics in cylc.
    :maxdepth: 1
 
    clock-triggered-tasks
-   cylc-broadcast
+   broadcast
    date-time-manipulation
    family-triggers
    jinja2-templating
