@@ -7,7 +7,8 @@ This section goes into detail in additional rose topics.
    :caption: Contents
    :name: rose-further-topics
    :maxdepth: 1
-   
+
+   command-keys
    failif-warnif
    macro-development
    trigger
@@ -18,7 +19,7 @@ This section goes into detail in additional rose topics.
 .. toctree::
    :hidden:
    :name: rose-further-topics-additional-files
-   
+
    supplementary-files/planet-py
    supplementary-files/planet-python-macro-args
    supplementary-files/planet-python-reporter
