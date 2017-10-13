@@ -49,7 +49,7 @@
         [[[environment]]]
             # The key required to get weather data from the DataPoint service.
             # To use archived data comment this line out.
-            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+            API_KEY = DATAPOINT_API_KEY
 
     [[get_observations<station=belmullet>]]
         [[[environment]]]
@@ -72,7 +72,7 @@
         [[[environment]]]
             # The key required to get weather data from the DataPoint service.
             # To use archived data comment this line out.
-            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+            API_KEY = DATAPOINT_API_KEY
 
     [[forecast]]
         script = forecast 60 5  # Generate 5 forecasts at 60 minute intervals.
