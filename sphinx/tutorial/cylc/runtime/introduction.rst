@@ -246,11 +246,20 @@ Suite Files
 Along with the :term:`work directory` and :term:`job log directory`, cylc
 generates other files and directories when it runs a suite:
 
-``cylc-suite.db``
-   A symlink to the database which cylc uses to record the state of the suite.
+
 ``log/``
-   The directory in which various log files, including
-   :term:`job log files <job log>` live.
+   Directory containing log files including:
+
+   ``log/db``
+      A symlink to the database which cylc uses to record the state of the
+      suite.
+   ``log/job``
+      The directory where the :term:`job log files <job log>` live.
+   ``log/suite``
+      The directory there the :term:`suite log files <suite log>` live.
+      These files are written by cylc as the suite is run and are useful for
+      debugging purposes in the event of error.
+
 ``suite.rc.processed``
    A copy of the ``suite.rc`` file made after any `Jinja2`_ has been processed
    - we will cover this in the :ref:`tutorial-cylc-consolidating-configuration`
