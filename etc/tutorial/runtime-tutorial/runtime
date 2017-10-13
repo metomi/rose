@@ -13,7 +13,7 @@
         [[[environment]]]
             # The key required to get weather data from the DataPoint service.
             # To use archived data comment this line out.
-            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+            API_KEY = DATAPOINT_API_KEY
             # Add the `python` directory to the PYTHONPATH.
             PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
             # The dimensions of each grid cell in degrees.

@@ -50,10 +50,16 @@ if [[ -d $DIRECTORY ]]; then
     done
 fi
 
+# Acquire API Key.
+API_KEY=$(sort -R "${ROSE_HOME}/etc/tutorial/api-keys" | head -n 1)
+
 # Copy files.
 echo -n "Copying tutorial files to ${DIRECTORY} ... "
 rose_init 'rose_log'
 if run rsync -rLptgoD "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}"; then
+    for file in $(find "${DIRECTORY}" -type f); do
+        sed -i "s/DATAPOINT_API_KEY/$API_KEY/" $file
+    done
     echo 'done'
 else
     echo
