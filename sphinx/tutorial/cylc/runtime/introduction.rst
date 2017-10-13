@@ -251,8 +251,7 @@ generates other files and directories when it runs a suite:
    Directory containing log files including:
 
    ``log/db``
-      A symlink to the database which cylc uses to record the state of the
-      suite.
+      The database which cylc uses to record the state of the suite.
    ``log/job``
       The directory where the :term:`job log files <job log>` live.
    ``log/suite``
