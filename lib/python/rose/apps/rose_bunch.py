@@ -216,7 +216,14 @@ class RoseBunchApp(BuiltinApp):
         else:
             self.dao = None
 
+        if 'ROSE_TASK_LOG_DIR' in os.environ:
+            log_format = os.path.join(os.environ['ROSE_TASK_LOG_DIR'], "%s")
+        else:
+            log_format = os.path.join(os.getcwd(), "%s")
+
         commands = {}
+        stdout_files = {}
+        stderr_files = {}
         for index, name in enumerate(self.invocation_names):
             invocation = RoseBunchCmd(name, self.command_format, index)
             for key, vals in sorted(multi_args.items()):
@@ -224,13 +231,10 @@ class RoseBunchApp(BuiltinApp):
             if instances:
                 invocation.argsdict["command-instances"] = instances[index]
             commands[name] = invocation
+            stdout_files[name] = log_format % invocation.get_out_file()
+            stderr_files[name] = log_format % invocation.get_err_file()
 
         procs = {}
-        if 'ROSE_TASK_LOG_DIR' in os.environ:
-            log_format = os.path.join(os.environ['ROSE_TASK_LOG_DIR'], "%s")
-        else:
-            log_format = os.path.join(os.getcwd(), "%s")
-
         failed = {}
         abort = False
 
@@ -241,9 +245,13 @@ class RoseBunchApp(BuiltinApp):
                     if proc.returncode:
                         failed[key] = proc.returncode
                         run_fail += 1
-                        app_runner.handle_event(RosePopenError(str(key),
-                                                proc.returncode,
-                                                None, None))
+                        app_runner.handle_event(
+                            RosePopenError(
+                                str(key),
+                                proc.returncode,
+                                None, open(stderr_files[key], "r").read()
+                            )
+                        )
                         if self.dao:
                             self.dao.update_command_state(key, self.dao.S_FAIL)
                         if self.fail_mode == self.TYPE_ABORT_ON_FAIL:
@@ -261,8 +269,8 @@ class RoseBunchApp(BuiltinApp):
                 command = commands.pop(key)
                 self.invocation_names.pop(0)
                 cmd = command.get_command()
-                cmd_stdout = log_format % command.get_out_file()
-                cmd_stderr = log_format % command.get_err_file()
+                cmd_stdout = stdout_files[key]
+                cmd_stderr = stderr_files[key]
                 prefix = command.get_log_prefix()
                 bunch_environ = os.environ
                 bunch_environ['ROSE_BUNCH_LOG_PREFIX'] = prefix
