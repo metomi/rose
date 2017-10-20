@@ -18,20 +18,20 @@
 {% else -%}
 <div class="col-md-11">
 {% endif -%}
-{% if not file_content -%}
-{% set lines = lines | map(
-    'replace', 'DEBUG', '<span class="nocode text-muted">DEBUG</span>') | map(
-    'replace', 'INFO', '<span class="nocode text-info">INFO</span>') | map(
-    'replace', 'ERROR', '<span class="nocode text-dander">ERROR</span>') | map(
-    'replace', 'CRITICAL', '<span class="nocode text-dander">CRITICAL</span>') | map(
-    'replace', 'WARNING', '<span class="nocode text-warning">WARNING</span>') -%}
-{% endif -%}
 <pre id="filecode" {% if file_content %}class="prettyprint lang-{{file_content}}"{% endif -%}>
 {% for line in lines -%}
 {% for part in line -%}
-{% if loop.index % 2 == 1 -%}{{part}}{% else 
--%}<span class="highlight">{{part}}</span>{% endif -%}
+{% if not file_content -%}
+{% set part = part | replace(
+    'DEBUG', '<span class="nocode text-muted">DEBUG</span>') | replace(
+    'INFO', '<span class="nocode text-info">INFO</span>') | replace(
+    'ERROR', '<span class="nocode text-dander">ERROR</span>') | replace(
+    'CRITICAL', '<span class="nocode text-dander">CRITICAL</span>') | replace(
+    'WARNING', '<span class="nocode text-warning">WARNING</span>') -%}
 {% endif -%}
+{% if loop.index % 2 == 1 -%}{{part}}{% else 
+-%}<span class="highlight">{{part}}</span>{%
+endif -%}
 {% endfor -%}
 {{ "" }} 
 {% endfor -%}
