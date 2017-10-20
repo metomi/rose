@@ -23,12 +23,12 @@ import cherrypy
 from fnmatch import fnmatch
 from glob import glob
 import jinja2
+import json
 import mimetypes
 import os
 import re
 import pwd
 import shlex
-import simplejson
 import rose.config
 from rose.host_select import HostSelector
 from rose.resource import ResourceLocator
@@ -92,7 +92,7 @@ class RoseBushService(object):
             "script": cherrypy.request.script_name,
         }
         if form == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         try:
             return self.template_env.get_template("index.html").render(**data)
         except jinja2.TemplateError:
@@ -121,13 +121,13 @@ class RoseBushService(object):
         data["broadcast_states"] = (
             self.bush_dao.get_suite_broadcast_states(user, suite))
         if form == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         try:
             return self.template_env.get_template(
                 "broadcast-states.html").render(**data)
         except jinja2.TemplateError:
             traceback.print_exc()
-        return simplejson.dumps(data)
+        return json.dumps(data)
 
     @cherrypy.expose
     def broadcast_events(self, user, suite, form=None):
@@ -150,13 +150,13 @@ class RoseBushService(object):
         data["broadcast_events"] = (
             self.bush_dao.get_suite_broadcast_events(user, suite))
         if form == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         try:
             return self.template_env.get_template(
                 "broadcast-events.html").render(**data)
         except jinja2.TemplateError:
             traceback.print_exc()
-        return simplejson.dumps(data)
+        return json.dumps(data)
 
     @cherrypy.expose
     def cycles(
@@ -212,12 +212,12 @@ class RoseBushService(object):
             self.get_last_activity_time(user, suite))
         data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         try:
             return self.template_env.get_template("cycles.html").render(**data)
         except jinja2.TemplateError:
             traceback.print_exc()
-        return simplejson.dumps(data)
+        return json.dumps(data)
 
     @cherrypy.expose
     def taskjobs(
@@ -336,7 +336,7 @@ class RoseBushService(object):
             data["n_pages"] = 1
         data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         try:
             return self.template_env.get_template("taskjobs.html").render(
                 **data)
@@ -465,7 +465,7 @@ class RoseBushService(object):
                 pass
         data["time"] = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         if form == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         template = self.template_env.get_template("suites.html")
         return template.render(**data)
 

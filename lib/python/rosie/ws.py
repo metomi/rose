@@ -28,7 +28,7 @@ Classes:
 import cherrypy
 from isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 import jinja2
-import simplejson
+import json
 from rose.host_select import HostSelector
 from rose.resource import ResourceLocator
 import rosie.db
@@ -121,7 +121,7 @@ class RosieDiscoService(object):
         else:
             data = self.HELLO % "user"
         if format == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         return data
 
     @cherrypy.expose
@@ -134,7 +134,7 @@ class RosieDiscoService(object):
         filters = [_query_parse_string(q_str) for q_str in q]
         data = self.dao.query(filters, all_revs)
         if format == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         return self._render(all_revs, data, filters=filters)
 
     @cherrypy.expose
@@ -143,26 +143,26 @@ class RosieDiscoService(object):
         all_revs = int(all_revs)
         data = self.dao.search(s, all_revs)
         if format == "json":
-            return simplejson.dumps(data)
+            return json.dumps(data)
         return self._render(all_revs, data, s=s)
 
     @cherrypy.expose
     def get_known_keys(self, format=None):
         """Return the names of the common fields."""
         if format == "json":
-            return simplejson.dumps(self.dao.get_known_keys())
+            return json.dumps(self.dao.get_known_keys())
 
     @cherrypy.expose
     def get_query_operators(self, format=None):
         """Return the allowed query operators."""
         if format == "json":
-            return simplejson.dumps(self.dao.get_query_operators())
+            return json.dumps(self.dao.get_query_operators())
 
     @cherrypy.expose
     def get_optional_keys(self, format=None):
         """Return the names of the optional fields."""
         if format == "json":
-            return simplejson.dumps(self.dao.get_optional_keys())
+            return json.dumps(self.dao.get_optional_keys())
 
     def _render(self, all_revs=0, data=None, filters=None, s=None):
         """Render return data with a template."""

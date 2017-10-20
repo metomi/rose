@@ -396,7 +396,7 @@ rose_ws_json_greps() {
     shift 1
     run_pass "${TEST_KEY}" python - "$@" <<'__PYTHON__'
 import ast
-import simplejson as json
+import json
 import sys
 
 data = json.load(open(sys.argv[1]))

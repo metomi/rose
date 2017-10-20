@@ -25,16 +25,17 @@ Classes:
 """
 
 
+import json
 from multiprocessing import Pool
 import requests
+import shlex
+from time import sleep
+
 from rosie.suite_id import SuiteId
 from rosie.ws_client_auth import RosieWSClientAuthManager
 from rose.popen import RosePopener
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
-import shlex
-import simplejson
-from time import sleep
 
 
 class RosieWSClientConfError(Exception):
@@ -217,7 +218,7 @@ class RosieWSClient(object):
                 request_detail["auth_manager"].store_password()
             response_url = self._remove_params(response.url)
             try:
-                response_data = simplejson.loads(response.text)
+                response_data = json.loads(response.text)
                 if return_ok_prefixes:
                     ret.append(request_detail["prefix"])
                 else:
