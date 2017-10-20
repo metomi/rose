@@ -6,7 +6,7 @@
 <div class="col-md-1 text-right">
 <pre id="filelinenumbers" class="prettyprint">
 {% for num in line_numbers -%}
-<span><a id="{{num}}" class="line-number">{{num}}</a></span>
+<span><a id="{{num}}" href="#{{num}}" class="line-number">{{num}}</a></span>
 {% endfor -%}
 </pre>
 </div>
@@ -18,19 +18,17 @@
 {% else -%}
 <div class="col-md-11">
 {% endif -%}
+{% if not file_content -%}
+{% set lines = lines | map(
+    'replace', 'DEBUG', '<span class="nocode text-muted">DEBUG</span>') | map(
+    'replace', 'INFO', '<span class="nocode text-info">INFO</span>') | map(
+    'replace', 'ERROR', '<span class="nocode text-dander">ERROR</span>') | map(
+    'replace', 'CRITICAL', '<span class="nocode text-dander">CRITICAL</span>') | map(
+    'replace', 'WARNING', '<span class="nocode text-warning">WARNING</span>') -%}
+{% endif -%}
 <pre id="filecode" {% if file_content %}class="prettyprint lang-{{file_content}}"{% endif -%}>
-{% set PREFIXES = {
-  "[DEBUG]": "muted",
-  "[FAIL] ": "text-danger",
-  "[INFO] ": "text-info",
-  "[ OK ] ": "text-success",
-  "[WARN] ": "text-warning",
-} -%}
 {% for line in lines -%}
 {% for part in line -%}
-{% if loop.index == 1 and part|length > 7 and part[0:7] in PREFIXES
--%}<span class="{{PREFIXES[part[0:7]]}}">{{part[0:7]}}</span>{{part[7:]}}{%
-else -%}
 {% if loop.index % 2 == 1 -%}{{part}}{% else 
 -%}<span class="highlight">{{part}}</span>{% endif -%}
 {% endif -%}

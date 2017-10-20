@@ -60,23 +60,20 @@
 </pre>
 </div>
 <div class="col-md-11">
-<pre{% if file_content %} class="prettyprint lang-{{file_content}}"{% endif %}>
-{%- set PREFIXES = {
-    "[DEBUG]": "muted",
-    "[FAIL] ": "text-danger",
-    "[INFO] ": "text-info",
-    "[ OK ] ": "text-success",
-    "[WARN] ": "text-warning",
-} -%}
+{% if not file_content -%}
+{% set lines = lines | map(
+    'replace', 'DEBUG', '<span class="nocode text-muted">DEBUG</span>') | map(
+    'replace', 'INFO', '<span class="nocode text-info">INFO</span>') | map(
+    'replace', 'ERROR', '<span class="nocode text-dander">ERROR</span>') | map(
+    'replace', 'CRITICAL', '<span class="nocode text-dander">CRITICAL</span>') | map(
+    'replace', 'WARNING', '<span class="nocode text-warning">WARNING</span>') -%}
+{% endif -%}
+<pre id="filecode"{% if file_content %} class="prettyprint lang-{{file_content}}"{% endif %}>
 {% for line in lines -%}
-{% if line|length > 7 and line[0:7] in PREFIXES -%}
-<span class="{{PREFIXES[line[0:7]]}}">{{line[0:7]}}</span>{{line[7:]}}
-{% else -%}
 {% if mode == "tags" -%}
 {{line}}
 {% else -%}
 {{line|urlise}}
-{% endif -%}
 {% endif -%}
 {% endfor -%}
 </pre>
