@@ -471,7 +471,8 @@ class RoseBushService(object):
 
     def get_file(self, user, suite, path, path_in_tar=None, mode=None):
         """Returns file information / content or a cherrypy response."""
-        self._check_string_for_path(user, suite)
+        self._check_string_for_path(user)
+        self._check_path_normalised(suite)
         f_name = self._get_user_suite_dir(user, suite, path)
         conf = ResourceLocator.default().get_conf()
         view_size_max = int(conf.get_value(
@@ -743,15 +744,39 @@ class RoseBushService(object):
             self.bush_dao.SUITE_DIR_REL_ROOT))
 
     @staticmethod
-    def _check_string_for_path(*strings):
-        for string in strings:
-            temp = os.path.split(string)
-            if len(temp) > 2 or (len(temp) == 2 and temp[0] != ''):
-                raise cherrypy.HTTPError(403)
+    def _check_string_for_path(string):
+        """Raise HTTP 403 error if the provided string contain path chars.
+
+        Raises:
+            cherrypy.HTTPError(403)
+
+        """
+        temp = os.path.split(string)
+        if len(temp) > 2 or (len(temp) == 2 and temp[0] != ''):
+            raise cherrypy.HTTPError(403)
+
+    @staticmethod
+    def _check_path_normalised(path):
+        """Raise HTTP 403 error if path is not normalised.
+
+        E.g. the following will fail:
+
+        * foo//bar
+        * foo/bar/
+        * foo/./bar
+        * foo/../bar
+
+        Raises:
+            cherrypy.HTTPError(403)
+
+        """
+        if os.path.normpath(path) != path:
+            raise cherrypy.HTTPError(403)
 
     def _get_user_suite_dir(self, user, suite, *paths):
         """Return, e.g. ~user/cylc-run/suite/... for a cylc suite."""
-        self._check_string_for_path(user, suite)
+        self._check_string_for_path(user)
+        self._check_path_normalised(suite)
         suite_dir = os.path.join(
             self._get_user_home(user),
             self.bush_dao.SUITE_DIR_REL_ROOT,
