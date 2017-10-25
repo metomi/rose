@@ -471,6 +471,7 @@ class RoseBushService(object):
 
     def get_file(self, user, suite, path, path_in_tar=None, mode=None):
         """Returns file information / content or a cherrypy response."""
+        self._check_string_for_path(user, suite)
         f_name = self._get_user_suite_dir(user, suite, path)
         conf = ResourceLocator.default().get_conf()
         view_size_max = int(conf.get_value(
@@ -741,13 +742,29 @@ class RoseBushService(object):
             self._get_user_home(user),
             self.bush_dao.SUITE_DIR_REL_ROOT))
 
+    @staticmethod
+    def _check_string_for_path(*strings):
+        for string in strings:
+            temp = os.path.split(string)
+            if len(temp) > 2 or (len(temp) == 2 and temp[0] != ''):
+                raise cherrypy.HTTPError(403)
+
     def _get_user_suite_dir(self, user, suite, *paths):
         """Return, e.g. ~user/cylc-run/suite/... for a cylc suite."""
-        return self._check_dir_access(os.path.join(
+        self._check_string_for_path(user, suite)
+        suite_dir = os.path.join(
             self._get_user_home(user),
             self.bush_dao.SUITE_DIR_REL_ROOT,
-            suite,
-            *paths))
+            suite)
+        if not paths:
+            return self._check_dir_access(suite_dir)
+        path = os.path.join(suite_dir, *paths)
+        if not path.startswith(suite_dir):
+            # Raise HTTP 403 if path lies outside of the suite directory. Note:
+            # >>> os.path.join('/foo', '/bar')
+            # '/bar'
+            raise cherrypy.HTTPError(403)
+        return self._check_dir_access(path)
 
     @staticmethod
     def _sort_summary_entries(suite1, suite2):
