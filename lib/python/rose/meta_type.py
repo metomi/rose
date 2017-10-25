@@ -216,5 +216,5 @@ def meta_type_transform(value, meta_type):
     c = c()
     try:
         return c.transform(value)
-    except:
+    except Exception:
         return False

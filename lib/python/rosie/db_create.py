@@ -216,5 +216,6 @@ def main():
                 repos_path = conf.get_value(["rosie-db", "repos." + prefix])
                 init(db_url, repos_path)
 
+
 if __name__ == "__main__":
     main()

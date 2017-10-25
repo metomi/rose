@@ -214,6 +214,7 @@ class ReporterContext(object):
     """
 
     TTY_COLOUR_ERR = "\033[1;31m"
+    TTY_COLOUR_NORM = "\033[0m"
 
     def __init__(self,
                  kind=None,
@@ -262,10 +263,10 @@ class ReporterContext(object):
     def _tty_colour_err(self, s):
         try:
             if self.handle.isatty():
-                return self.TTY_COLOUR_ERR + s + "\033[0m"
-        except:
-            pass
-        return s
+                return "%s%s%s" % (self.TTY_COLOUR_ERR, s,
+                                   self.TTY_COLOUR_NORM)
+        except AttributeError:
+            return s
 
 
 class ReporterContextQueue(ReporterContext):

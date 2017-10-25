@@ -109,7 +109,7 @@ class RosieDiscoService(object):
         """Provide the index page."""
         try:
             return self._render()
-        except:
+        except (KeyError, AttributeError, jinja2.exceptions.TemplateError):
             import traceback
             traceback.print_exc()
 

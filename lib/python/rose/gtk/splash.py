@@ -290,6 +290,7 @@ class SplashScreenUpdaterThread(threading.Thread):
             *update_input["args"], **update_input["kwargs"])
         return False
 
+
 if __name__ == "__main__":
     sys.path.append(os.getenv('ROSE_HOME'))
     splash_screen = SplashScreen(*sys.argv[1:])

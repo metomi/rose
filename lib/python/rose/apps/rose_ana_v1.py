@@ -114,7 +114,7 @@ class KGODatabase(object):
             try:
                 conn.execute(*sql_args)
                 return
-            except:
+            except sqlite3.Error:
                 time.sleep(timeout)
         # In the event that the retries are exceeded, re-raise the final
         # exception for the calling application to handle
