@@ -266,7 +266,8 @@ class ReporterContext(object):
                 return "%s%s%s" % (self.TTY_COLOUR_ERR, s,
                                    self.TTY_COLOUR_NORM)
         except AttributeError:
-            return s
+            pass
+        return s
 
 
 class ReporterContextQueue(ReporterContext):
