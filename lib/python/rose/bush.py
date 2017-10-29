@@ -751,8 +751,7 @@ class RoseBushService(object):
             cherrypy.HTTPError(403)
 
         """
-        temp = os.path.split(string)
-        if len(temp) > 2 or (len(temp) == 2 and temp[0] != ''):
+        if os.path.split(string)[0] != '':
             raise cherrypy.HTTPError(403)
 
     @staticmethod
