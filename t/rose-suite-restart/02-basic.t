@@ -20,7 +20,7 @@
 # Test "rose suite-restart", basic usage.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-tests 4
+tests 3
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
@@ -41,7 +41,6 @@ file_grep "${TEST_KEY}.log" \
     "\\[jobs-submit cmd\\] cylc jobs-submit --debug -- ${SUITE_RUN_DIR}/log/job 1/t2/01" \
     "${SUITE_RUN_DIR}/log/suite/log"
 sed -i '/no HTTPS.* support/d' "$TEST_KEY.err"
-file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" '/dev/null'
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
 exit

@@ -75,7 +75,7 @@
 
 import math
 import os
-import simplejson
+import json
 import time
 
 DIFF_GEAR_RATIO = 4.00
@@ -119,7 +119,7 @@ if __name__ == "__main__":
         elapsed_time += dt
         time.sleep(dt)
         output_data.update({elapsed_time: dist})
-    f.write(simplejson.dumps(output_data))
+    f.write(json.dumps(output_data))
     f.close()
 </pre>
           </div>
