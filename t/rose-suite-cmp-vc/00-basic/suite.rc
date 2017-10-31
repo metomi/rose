@@ -1,0 +1,6 @@
+[scheduling]
+    [[dependencies]]
+        graph = meow
+[runtime]
+    [[meow]]
+        script = nice man cat head tail

@@ -42,6 +42,7 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
         handle = output
     else:
         handle = open(output, "wb")
+    handle.write("%s\n" % run_source_dir)
     environ = dict(os.environ)
     environ["LANG"] = "C"
     for vcs, args_list in [
