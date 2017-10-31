@@ -41,17 +41,14 @@ class SuiteVCComparator(object):
         self.suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=self.event_handler, popen=self.popen)
 
-    def cmp_source_vc_info(self, suite_name=None):
+    def cmp_source_vc_info(self, suite_name):
         """Compare source VC with installed "log/rose-suite-run.version".
 
         Return (list): Result in unified diff format.
 
         Args:
-            suite_name (str):
-                suite name, auto determine from environment if not specified.
+            suite_name (str): suite name.
         """
-        if not suite_name:
-            suite_name = os.environ[self.suite_engine_proc.SUITE_NAME_ENV]
         rund = self.suite_engine_proc.get_suite_dir(suite_name)
         old_info_file_name = self.suite_engine_proc.get_suite_dir(
             suite_name, 'log', 'rose-suite-run.version')
@@ -74,15 +71,18 @@ def main():
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options('name')
     opts, args = opt_parser.parse_args(sys.argv[1:])
-    name = opts.name
-    if not name and args:
-        name = args[0]
-    elif not name:
-        name = os.path.basename(os.getcwd())
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_vc_cmp = SuiteVCComparator(event_handler)
+    suite_name = opts.name
+    if not suite_name and args:
+        suite_name = args[0]
+    if not suite_name:
+        suite_name = os.getenv(suite_vc_cmp.suite_engine_proc.SUITE_NAME_ENV)
+    if not suite_name:
+        opt_parser.print_usage(sys.stderr)
+        sys.exit(2)
     try:
-        lines = suite_vc_cmp.cmp_source_vc_info(suite_name=name)
+        lines = suite_vc_cmp.cmp_source_vc_info(suite_name=suite_name)
     except (StandardError, RosePopenError) as exc:
         event_handler(exc)
         traceback.print_exc()

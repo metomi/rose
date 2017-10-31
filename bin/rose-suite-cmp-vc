@@ -21,11 +21,11 @@
 #     rose suite-cmp-vc
 #
 # SYNOPSIS
-#     # Compare source info of a named suite
 #     rose suite-cmp-vc NAME
 #     rose suite-cmp-vc --name=NAME
 #
-#     # Compare source info of the current suite from within a suite task
+#     # If CYLC_SUITE_NAME is exported, compare source info of the current
+#     # suite from within a suite task if no name is specified.
 #     rose suite-cmp-vc
 #
 # DESCRIPTION
