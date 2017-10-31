@@ -363,7 +363,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     except glib.GError:
         try:
             dialog.label.set_markup(rose.gtk.util.safe_str(text))
-        except:
+        except Exception:
             dialog.label.set_text(text)
     else:
         dialog.label.set_markup(text)

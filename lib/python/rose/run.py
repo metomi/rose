@@ -202,8 +202,8 @@ class Runner(object):
         finally:
             # Close handle on specific log file
             try:
-                self.event_handler.contexts.get(uuid).handle.close()
-            except:
+                self.event_handler.contexts[uuid].handle.close()
+            except (KeyError, IOError, AttributeError):
                 pass
             # Remove work files
             for work_file in work_files:
@@ -212,12 +212,12 @@ class Runner(object):
                         os.unlink(work_file)
                     elif os.path.isdir(work_file):
                         shutil.rmtree(work_file)
-                except:
+                except OSError:
                     pass
             # Change back to original working directory
             try:
                 os.chdir(cwd)
-            except:
+            except OSError:
                 pass
             # Reset os.environ
             os.environ = {}

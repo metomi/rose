@@ -136,7 +136,7 @@ def main():
     if opts.keys_mode:
         try:
             keys = root_node.get(args, opts.no_ignore).value.keys()
-        except:
+        except AttributeError:
             sys.exit(1)
         keys.sort()
         for key in keys:

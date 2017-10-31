@@ -385,5 +385,6 @@ def main():
         sys.exit(1)
     reporter(rose.macro.MacroFinishNothingEvent(), level=reporter.V)
 
+
 if __name__ == "__main__":
     main()

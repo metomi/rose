@@ -163,5 +163,6 @@ def main():
     dest_file = os.path.join(dest, rose.META_CONFIG_NAME)
     rose.config.dump(metadata_config, dest_file)
 
+
 if __name__ == "__main__":
     main()

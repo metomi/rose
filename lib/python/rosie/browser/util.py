@@ -844,7 +844,7 @@ class AdvancedSearchWidget(gtk.VBox):
         try:
             if self.adv_control_menuitem.get_active() != self.adv_controls_on:
                 self.adv_control_menuitem.set_active(self.adv_controls_on)
-        except:
+        except Exception:
             pass
         for child in self.filter_table.get_children():
             if isinstance(child, rosie.browser.util.BracketWidget):
