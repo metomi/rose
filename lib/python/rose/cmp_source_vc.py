@@ -77,6 +77,8 @@ def main():
     name = opts.name
     if not name and args:
         name = args[0]
+    elif not name:
+        name = os.path.basename(os.getcwd())
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_vc_cmp = SuiteVCComparator(event_handler)
     try:
