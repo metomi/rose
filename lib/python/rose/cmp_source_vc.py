@@ -44,7 +44,7 @@ class SuiteVCComparator(object):
     def cmp_source_vc_info(self, suite_name):
         """Compare source VC with installed "log/rose-suite-run.version".
 
-        Return (list): Result in unified diff format.
+        Return (list): Result in unified diff format or None if irrelevant.
 
         Args:
             suite_name (str): suite name.
@@ -52,7 +52,13 @@ class SuiteVCComparator(object):
         rund = self.suite_engine_proc.get_suite_dir(suite_name)
         old_info_file_name = self.suite_engine_proc.get_suite_dir(
             suite_name, 'log', 'rose-suite-run.version')
-        old_info = open(old_info_file_name).read().splitlines()
+        try:
+            old_info = open(old_info_file_name).read().splitlines()
+        except IOError:  # Cannot find/read version file
+            return None
+        else:
+            if len(old_info) <= 1:  # No VC information
+                return None
         handle = StringIO()
         write_source_vc_info(old_info[0], handle, self.popen)
         new_info = handle.getvalue().splitlines()
@@ -88,6 +94,11 @@ def main():
         traceback.print_exc()
         sys.exit(2)
     else:
+        if lines is None:
+            event_handler(
+                '%s: rose-suite-run.version: VC info not found' % (suite_name),
+                kind=Reporter.KIND_ERR, level=Reporter.FAIL)
+            sys.exit(2)
         lines = list(line for line in lines)
         for line in lines:
             event_handler('%s\n' % line, prefix='')
