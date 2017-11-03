@@ -248,8 +248,14 @@ class BaseSummaryDataPanel(gtk.VBox):
         if variables is not None:
             self.variables = variables
         old_cols = set(self.column_names)
-        expanded_rows = []
-        self._view.map_expanded_rows(lambda r, d: expanded_rows.append(d))
+
+        # Generate a set of expanded sections (one level only).
+        expanded_sections = set()
+        model = self._view.get_model()
+        self._view.map_expanded_rows(
+            lambda r, p:
+            expanded_sections.add(model.get_value(model.get_iter(p), 0)))
+
         start_path, start_column = self._view.get_cursor()
         should_redraw = self.update_tree_model()
         if should_redraw:
@@ -273,8 +279,18 @@ class BaseSummaryDataPanel(gtk.VBox):
                 self._group_widget.set_model(group_model)
                 self._group_widget.set_active(start_index)
         model = self._view.get_model()
-        for this_row in expanded_rows:
-            self._view.expand_to_path(this_row)
+
+        # Expand previously expanded sections (one level only).
+        path = (0,)
+        while True:
+            if model.get_value(model.get_iter(path), 0) in expanded_sections:
+                self._view.expand_to_path(path)
+
+            sibling = model.iter_next(model.get_iter(path))
+            if sibling:
+                path = model.get_path(sibling)
+            else:
+                break
 
     def add_new_columns(self, treeview, column_names):
         """Create new columns."""
@@ -724,8 +740,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         k = group_index
         data_rows = [r[k:k + 1] + r[0:k] + r[k + 1:] for r in data_rows]
         column_names.insert(0, column_names.pop(k))
-        data_rows.sort(lambda x, y:
-                       self._sort_row_data(x, y, 0, descending))
+        data_rows.sort(lambda x, y: self._sort_row_data(x, y, 0, descending))
         last_entry = None
         rows_are_descendants = []
         for i, row in enumerate(data_rows):
