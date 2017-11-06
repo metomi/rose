@@ -12,8 +12,8 @@ This section goes into detail in additional rose topics.
    failif-warnif
    macro-development
    trigger
-   upgrading-macro-development
    upgrading
+   upgrading-macro-development
    widget-development
 
 .. toctree::
