@@ -1,26 +1,36 @@
+.. include:: ../../../hyperlinks.rst
+   :start-line: 1
+
 Fail-If, Warn-If
 ================
 
-Introduction
-------------
+This tutorial walks you through using the metadata settings ``fail-if``
+and ``warn-if``
 
-This tutorial walks you through using the metadata settings fail-if and warn-if (see the reference).
+.. TODO - Link to the reference page.
 
-These allow errors and warnings to be flagged based on complex logical expressions, which can involve multiple settings.
+These allow errors and warnings to be flagged based on complex logical
+expressions, which can involve multiple settings.
+
 
 Purpose
 -------
 
-``fail-if`` and ``warn-if`` are intended to handle the evaluation of complex relationships between settings, without having to write custom macros.
+``fail-if`` and ``warn-if`` are intended to handle the evaluation of complex
+relationships between settings, without having to write custom macros.
 
 As with any complex setting, they should only be used when really necessary.
 
-``fail-if`` and ``warn-if`` are invoked on-demand in the config editor, as they can take longer to evaluate than other metadata settings such as ``range`` which can be done on-the-fly when a value changes.
+``fail-if`` and ``warn-if`` are invoked on-demand in the config editor, as
+they can take longer to evaluate than other metadata settings such as
+``range`` which can be done on-the-fly when a value changes.
+
 
 Syntax
 ------
 
-The syntax is Pythonic, and relies on *Jinja2* to actually evaluate relationships between values, after some initial pre-processing.
+The syntax is Pythonic, and relies on `Jinja2`_ to actually evaluate
+relationships between values, after some initial pre-processing.
 
 You can reference setting values by using their ids - for example:
 
@@ -28,16 +38,18 @@ You can reference setting values by using their ids - for example:
 
    fail-if=namelist:coffee=cup_volume < namelist:coffee=machine_output_volume;
 
-You can also use this as a shorthand for the current (metadata section) id - e.g.:
+You can also use this as a shorthand for the current (metadata section) id
+- e.g.:
 
 .. code-block:: rose
 
    [namelist:coffee=daily_amount]
    fail-if=this < namelist:coffee=daily_min or this >= namelist:coffee=daily_max;
 
-There is also some array shorthand, which we'll demonstrate later.
+There is also an array shorthand, which we'll demonstrate later.
 
-Note that the ``;`` at the end is optional when we only have one expression (it's a delimiter), but it's better style to keep it.
+Note that the ``;`` at the end is optional when we only have one expression
+(it's a delimiter), but it's better style to keep it.
 
 
 Example
@@ -45,7 +57,8 @@ Example
 
 We'll use the example of a rocket launch.
 
-Create a new, blank directory somewhere - for example, in your homespace - containing a ``rose-app.conf`` file that looks like this:
+Create a new, blank directory somewhere - for example, in your homespace -
+containing a ``rose-app.conf`` file that looks like this:
 
 .. code-block:: rose
 
@@ -65,70 +78,109 @@ Create a new, blank directory somewhere - for example, in your homespace - conta
    specific_impulse_s=311.0
 
 Example Metadata
-^^^^^^^^^^^^^^^^
+----------------
 
-We'll also want some basic metadata in place - create a ``meta/`` subdirectory containing a ``rose-meta.conf`` file that contains the :ref:`rocket-suite-metadata`.
+We'll also want some basic metadata in place - create a ``meta/``
+subdirectory containing a ``rose-meta.conf`` file that contains
+the :ref:`rocket-suite-metadata`.
 
-This app configuration controls the liftoff of a particular rocket - in our case, the Lunar Module (Apollo Program spacecraft).
+.. image:: http://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apollo16LM.jpg/533px-Apollo16LM.jpg
+   :align: right
+   :alt: Apollo 11 Lunar Module, returning from the surface of the Moon
+   :width: 200px
 
-If the ratio of rocket fuel to total weight is too high, or the efficiency of the rocket (specific impulse) is too low, the Lunar Module will never make it off the Moon.
-Apollo 11 Lunar Module, returning from the surface of the Moon
+This app configuration controls the liftoff of a particular rocket -
+in our case, the Lunar Module (Apollo Program spacecraft).
 
-Try running rose edit in the app directory. You should be able to navigate between the pages and view the help and description for the settings.
+If the ratio of rocket fuel to total weight is too high, or the efficiency
+of the rocket (specific impulse) is too low, the Lunar Module will never
+make it off the Moon.
 
-fail-if
-^^^^^^^
+Try running rose edit in the app directory. You should be able to navigate
+between the pages and view the help and description for the settings.
 
-We want to be able to flag an error based on a combination of the rocket settings and the necessary orbital velocity (``env=ORBITAL_VELOCITY_MS``). We need to set some ``fail-if`` metadata on one of these settings - as it's evaluated on-demand, it doesn't matter which one we choose.
+
+``fail-if``
+-----------
+
+We want to be able to flag an error based on a combination of the rocket
+settings and the necessary orbital velocity (``env=ORBITAL_VELOCITY_MS``).
+We need to set some ``fail-if`` metadata on one of these settings - as
+it's evaluated on-demand, it doesn't matter which one we choose.
 
 Open the ``meta/rose-meta.conf`` file in a text editor.
 
-Add the following lines to the metadata section ``[namelist:rocket=total_weight_kg]``:
+Add the following lines to the metadata section
+``[namelist:rocket=total_weight_kg]``:
 
 .. code-block:: rose
 
    fail-if=this < namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s));
 
-This states the relationship between these settings (a rearrangement of the `Tsiolkovsky rocket equation`_). The rocket must have a sufficient ratio of fuel to rocket mass, with a sufficiently fast exhaust velocity (``=9.8 * namelist:rocket=specific_impulse_s``) to get to the orbital speed ``env=ORBITAL_SPEED_MS``.
+This states the relationship between these settings (a rearrangement
+of the `Tsiolkovsky rocket equation`_). The rocket must have a
+sufficient ratio of fuel to rocket mass, with a sufficiently fast
+exhaust velocity (``=9.8 * namelist:rocket=specific_impulse_s``)
+to get to the orbital speed ``env=ORBITAL_SPEED_MS``.
 
-Save the metadata file and then reload the config editor metadata. You now need to ask Rose to evaluate the fail-if condition, as it's an on-demand process.
+Save the metadata file and then reload the config editor metadata.
+You now need to ask Rose to evaluate the ``fail-if`` condition, as
+it's an on-demand process.
 
-Either press the toolbar button ("Check fail-if ...") or click the menu ``Metadata -> Check fail-if, warn-if``.
+Either press the toolbar button :guilabel:`Check fail-if ...` or click
+the menu :menuselection:`Metadata --> Check fail-if, warn-if`.
 
-Hopefully, this should not flag any errors, as these are the Apollo mission parameters!
+Hopefully, this should not flag any errors, as these are the Apollo
+mission parameters!
 
-Try adding a few more moonrocks. Add ``1000`` to the values of ``total_weight_kg`` and ``fuelless_weight_kg``.
+Try adding a few more moonrocks. Add ``1000`` to the values
+of ``total_weight_kg`` and ``fuelless_weight_kg``.
 
-Re-run the check by clicking ``Metadata -> Check fail-if, warn-if``. An error dialog will appear, and the ``total_weight_kg`` setting will have an error flag.
+Re-run the check by clicking
+:menuselection:`Metadata --> Check fail-if, warn-if`. An error
+dialog will appear, and the ``total_weight_kg`` setting will have
+an error flag.
 
-However, neither of these are very informative, other than quoting the metadata.
+However, neither of these are very informative, other than quoting
+the metadata.
 
-Change the fail-if line to:
+Change the ``fail-if`` line to:
 
 .. code-block:: rose
 
    fail-if=this < namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s));  # Fuel mass ratio or specific impulse too low to achieve orbit.
 
-If you reload the metadata and run the check again, the error messages will include the helpful text.
+If you reload the metadata and run the check again, the error
+messages will include the helpful text.
 
-You can also check the ``fail-if`` metadata by running ``rose macro --validate`` or ``rose macro -V`` in a terminal, inside the app directory. Try saving the configuration in a failed state, and then run the command.
+You can also check the ``fail-if`` metadata by running
+``rose macro --validate`` or ``rose macro -V`` in a terminal,
+inside the app directory. Try saving the configuration in a failed
+state, and then run the command.
 
-warn-if
--------
 
-The warn-if metadata setting is exactly the same as ``fail-if``, but gives out warnings instead of errors - from a user perspective, this means something like "Watch out" rather than "This is wrong".
+``warn-if``
+-----------
+
+The ``warn-if`` metadata setting is exactly the same as ``fail-if``,
+but gives out warnings instead of errors - from a user perspective,
+this means something like "Watch out" rather than "This is wrong".
 
 Let's try adding something for ``namelist:rocket=battery_levels``.
 
-Open the metadata file ``meta/rose-meta.conf`` in a text editor, and add this line to the ``[namelist:rocket=battery_levels]`` section:
+Open the metadata file ``meta/rose-meta.conf`` in a text editor,
+and add this line to the ``[namelist:rocket=battery_levels]`` section:
 
 .. code-block:: rose
 
    warn-if=namelist:rocket=battery_levels(1) < 75 or namelist:rocket=battery_levels(2) < 75;
 
-This uses a special syntax for referencing the individual array elements in ``battery_levels``.
+This uses a special syntax for referencing the individual array
+elements in ``battery_levels``.
 
-If the first array element value and/or the second array element value of ``battery_levels`` is less than 75% full, a warning will be produced when the check is run.
+If the first array element value and/or the second array element
+value of ``battery_levels`` is less than 75% full, a warning will
+be produced when the check is run.
 
 We already know the shorthand syntax this, so rephrase the metadata to:
 
@@ -136,29 +188,41 @@ We already know the shorthand syntax this, so rephrase the metadata to:
 
    warn-if=this(1) < 75 or this(2) < 75;
 
-Save the metadata file and then reload the config editor metadata. Click ``Metadata -> Check fail-if, warn-if`` - a warning dialog should appear, and there should be a warning flag for the ``battery_levels`` option.
+Save the metadata file and then reload the config editor metadata.
+Click :menuselection:`Metadata --> Check fail-if, warn-if` - a
+warning dialog should appear, and there should be a warning flag
+for the ``battery_levels`` option.
 
-For large arrays, it can sometimes be convenient to use whole-array operations - the ``fail-if`` and ``warn-if`` syntax includes ``any()`` and ``all()``.
+For large arrays, it can sometimes be convenient to use whole-array
+operations - the ``fail-if`` and ``warn-if`` syntax includes ``any()``
+and ``all()``.
 
-We can change the warn-if setting to:
+We can change the ``warn-if`` setting to:
 
 .. code-block:: rose
 
    warn-if=any(this < 75);
 
-which will flag a warning if any ``battery_levels`` array element values are less than 75.
+which will flag a warning if any ``battery_levels`` array element
+values are less than 75.
+
 
 Multiple Expressions
 --------------------
 
-In both ``fail-if`` and ``warn-if``, expressions can be chained using the Python operator or, or you can separate them to give clearer error/warning messages. Using our ``battery_levels`` example again, change the setting to:
+In both ``fail-if`` and ``warn-if``, expressions can be chained
+using the Python operator or, or you can separate them to give
+clearer error/warning messages. Using our ``battery_levels`` example
+again, change the setting to:
 
 .. code-block:: rose
 
    warn-if=any(this < 75);
           =all(this > 95);
 
-This gives a warning if any elements are less than 75, and a separate warning if all elements are greater than 95 (we don't want to cook the batteries!).
+This gives a warning if any elements are less than 75, and a
+separate warning if all elements are greater than 95 (we don't
+want to cook the batteries!).
 
 You can add separate helper messages for each expression:
 
@@ -167,7 +231,9 @@ You can add separate helper messages for each expression:
    warn-if=any(this < 75);   # Battery level low
           =all(this > 95);   # Don't over-charge!
 
-Try adding the above lines to the metadata, saving, and playing about with the array numbers in the config editor and re-running the fail-if/warn-if check.
+Try adding the above lines to the metadata, saving, and playing
+about with the array numbers in the config editor and re-running
+the ``fail-if``/``warn-if`` check.
 
 .. TODO:
 
