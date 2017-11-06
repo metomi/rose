@@ -20,8 +20,4 @@ This section goes into detail in additional rose topics.
    :hidden:
    :name: rose-further-topics-additional-files
 
-   supplementary-files/planet-py
-   supplementary-files/planet-python-macro-args
-   supplementary-files/planet-python-reporter
-   supplementary-files/planet-python-transformer
    supplementary-files/rocket-metadata
