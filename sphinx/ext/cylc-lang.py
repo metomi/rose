@@ -129,7 +129,7 @@ class CylcLexer(RegexLexer):
             (r'\w+', GRAPH_TASK_TOKEN),
             (r'\s', Text),
             (r'=>', Operator),
-            (r'[\&\|]', Operator),
+            (r'[\&\|\!]', Operator),
             (r'[\(\)]', Punctuation),
             (r'\[', Text, 'intercycle-offset'),
             (r'.', Comment)
