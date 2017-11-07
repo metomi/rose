@@ -95,6 +95,23 @@ Glossary
       task ``foo``. This means that the task ``bar`` will only run once the
       task ``foo`` has successfully completed.
 
+      See also:
+
+      * :term:`task trigger`
+
+   task trigger
+      :term:`Dependency <dependency>` relationships can be thought of the other
+      way around as "triggers".
+
+      For example the dependency ``foo => bar`` could be described in two ways:
+
+      * "``bar`` is dependent on ``foo``"
+      * "``foo`` is triggered by ``bar``"
+
+      See also:
+
+      * :term:`dependency`
+
    cycle
       In a :term:`cycling suite<cycling>` one cycle is one repitition of the
       workflow.
