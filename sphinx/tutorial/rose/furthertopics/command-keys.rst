@@ -3,7 +3,8 @@ Command Keys
 
 This tutorial walks you through using command keys.
 
-Command keys allow you to specify and run different commands for an app.
+Command keys allow you to specify and run different commands for a
+:term:`rose app`.
 
 
 Purpose
@@ -54,7 +55,7 @@ This sets up a simple suite that contains the following:
 * A ``gather_ingredients`` task
 * A ``breadmaker`` task that runs the ``breadmaker`` app
 
-Save your changes and run the suite using ``rose suite-run``.
+Save your changes then run the suite using ``rose suite-run``.
 
 Once it has finished use ``rose suite-log`` to view the suite log. In the page
 that appears, click the "out" link for the breadmaker task. In the page you
@@ -92,7 +93,8 @@ run.
 Summary
 -------
 
-You have successfully made use of command keys to run alternate commands in an app.
+You have successfully made use of command keys to run alternate commands in
+an app.
 
 Possible uses of command keys might be:
 
@@ -100,4 +102,3 @@ Possible uses of command keys might be:
 * Running an app in different configurations
 * Specifying different options to an app
 * During suite development to aid in debugging an app
-
