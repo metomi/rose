@@ -1,30 +1,42 @@
+.. include:: ../../../hyperlinks.rst
+   :start-line: 1
+
 Clock Triggered Tasks
 =====================
-
-Introduction
-------------
 
 This part of the Rose user guide walks you through using clock triggered tasks.
 
 This allows you to trigger tasks based on the actual time.
 
+
 Purpose
 -------
 
-The typical use of clock triggered tasks is to perform real-time data retrieval
+.. TODO - Insert animation / diagram.
 
-In general, most tasks in a suite do not care about the wall clock time, simply running once their prerequisites are met. Clock triggered tasks, however, wait for a particular wall clock time to be reached in addition to their other prerequisites.
+The typical use of clock triggered tasks is to perform real-time data
+retrieval.
 
-Clock triggering
+In general, most tasks in a suite do not care about the wall clock time,
+simply running once their prerequisites are met. Clock triggered tasks,
+however, wait for a particular wall clock time to be reached in addition
+to their other prerequisites.
+
+
+Clock Triggering
 ----------------
 
-When clock triggering tasks we can use different offsets to the cycle time as follows:
+When clock triggering tasks we can use different
+:ref:`offsets <tutorial-iso8601-durations>` to the cycle time as follows:
 
 .. code-block:: cylc
 
    clock-trigger = taskname(CYCLE_OFFSET)
 
-Note that, regardless of the offset used, the task still belongs to the cycle from which the offset has been applied.
+.. note::
+
+   Regardless of the offset used, the task still belongs to the cycle from
+   which the offset has been applied.
 
 
 Example
@@ -32,16 +44,21 @@ Example
 
 Our example suite will simulate a clock chiming on the hour.
 
-Create a new suite (or just a new directory somewhere - e.g. in your homespace) containing a blank ``rose-suite.conf`` and a ``suite.rc`` file with the following contents:
+Within your ``~/cylc-run`` directroy create a new directory called
+``clock-trigger``::
 
+   mkdir ~/cylc-run/clock-trigger
+   cd ~/cylc-run/clock-trigger
+
+Paste the following code into a ``suite.rc`` file:
 
 .. code-block:: cylc
 
-   #!jinja2
    [cylc]
        UTC mode = True # Ignore DST
+
    [scheduling]
-       initial cycle point = 
+       initial cycle point = TODO
        final cycle point = +P1D # Run for one day
        [[dependencies]]
            [[[PT1H]]]
@@ -53,54 +70,70 @@ Create a new suite (or just a new directory somewhere - e.g. in your homespace) 
                mail events = failed
        [[bell]]
            env-script = eval $(rose task-env)
-           script = printf 'bong%.0s\n' $(seq 1 $(rose date -c --format=%H))i
+           script = printf 'bong%.0s\n' $(seq 1 $(cylc cyclepoint --print-hour))
 
-We now have a simple suite with a single task that prints "bong" a number of times equal to the (cycle time) hour.
+Change the initial cycle point to 00:00 this morning (e.g. if it was
+the first of January 2000 we would write ``2000-01-01T00Z``).
 
-Run your suite using:
+We now have a simple suite with a single task that prints "bong" a number
+of times equal to the (cycle point) hour.
 
-.. code-block:: console
+Run your suite using::
 
-   rose suite-run
+   cylc run clock-trigger
 
-and stop it after a few cycles using the stop button in the ``cylc gui``. Notice how the tasks run as soon as possible rather than waiting for the actual time to be equal to the cycle time.
+Stop the suite after a few cycles using the :guilabel:`stop` button in the
+``cylc gui``. Notice how the tasks run as soon as possible rather than
+waiting for the actual time to be equal to the cycle point.
 
-Use ``rose suite-log`` to view the suite logs and look at the output for one of the bell tasks to confirm it is behaving as expected. N.B. this particular clock is running in UTC so the number of "bong"s may vary from your local time.
 
-Clock triggering tasks
+Clock Triggering Tasks
 ----------------------
 
-We want our clock to only ring in real time rather than the accelerated cycle time.
+We want our clock to only ring in real time rather than the simulated
+cycle time.
 
-To do this, add the following lines to the ``[scheduling]`` section of your ``suite.rc``:
+To do this, add the following lines to the ``[scheduling]`` section of
+your ``suite.rc``:
 
 .. code-block:: cylc
 
    [[special tasks]]
        clock-trigger = bell(PT0M)
 
+This tells the suite to clock trigger the ``bell`` task with a cycle
+offset of ``0`` hours.
 
-This tells the suite to clock trigger the ``bell`` task with a cycle offset of 0 hours.
+Save your changes and run your suite::
 
-Save your changes and run your suite.
+   cylc run clock-trigger
 
 
 Results
 -------
 
-Your suite should now be running the bell task in realtime. Any cycle times that have already passed (such as the one defined by ``initial cycle time``) will be run as soon as possible, while those in the future will wait for that time to pass.
+Your suite should now be running the bell task in realtime. Any cycle times
+that have already passed (such as the one defined by ``initial cycle time``)
+will be run as soon as possible, while those in the future will wait for that
+time to pass.
 
-At this point you may want to leave your suite running until the next hour has passed in order to confirm the clock triggering is working correctly. Once you are satisfied, stop your suite.
+At this point you may want to leave your suite running until the next hour
+has passed in order to confirm the clock triggering is working correctly.
+Once you are satisfied, stop your suite.
 
-By making the ``bell`` task a clock triggered task we have made it run in realtime. Thus, when the time caught up with the cycle time, the bell task triggered.
+By making the ``bell`` task a clock triggered task we have made it run in
+realtime. Thus, when the time caught up with the cycle time, the bell task
+triggered.
 
 
-Further clock triggering
+Further Clock Triggering
 ------------------------
 
-We will now modify our suite to run tasks at quarter-past, half-past and quarter-to the hour.
+We will now modify our suite to run tasks at quarter-past, half-past and
+quarter-to the hour.
 
-Open your ``suite.rc`` and modify the ``[runtime]`` section by adding the following:
+Open your ``suite.rc`` and modify the ``[runtime]`` section by adding the
+following:
 
 .. code-block:: cylc
 
@@ -117,20 +150,21 @@ Similarly, modify the ``[[scheduling]]`` section as follows:
        [[[PT1H]]]
            graph = bell => quarter_past => half_past => quarter_to
 
-
 Note the different values used for the cycle offsets of the clock-trigger tasks.
 
-Save your changes and run your suite using:
+Save your changes and run your suite using::
 
-.. code-block:: console
+   cylc run clock-trigger now
 
-   rose suite-run now
+.. note::
 
-which will run your suite using the current time as the initial cycle time.
+   The ``now`` argument will run your suite using the current time for the
+   initial cycle point.
 
 Again, notice how the tasks trigger until the current time is reached.
 
-Leave your suite running for a while to confirm it is working as expected and then shut it down using the stop button in the ``cylc gui``.
+Leave your suite running for a while to confirm it is working as expected
+and then shut it down using the :guilabel:`stop` button in the ``cylc gui``.
 
 
 Summary
@@ -138,11 +172,8 @@ Summary
 
 You have now successfully created and run a suite that:
 
-   - runs a bell task in realtime on the hour
-   - runs different chiming tasks at quarter-past, half-past and quarter-to the hour
+* Runs a bell task in realtime on the hour
+* Runs different chiming tasks at quarter-past, half-past and quarter-to the
+  hour
 
 For more information see the `cylc User Guide`_.
-
-.. _cylc User Guide: http://cylc.github.io/cylc/html/single/cug-html.html
-
- 
