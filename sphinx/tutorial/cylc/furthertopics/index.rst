@@ -12,10 +12,7 @@ This section looks at further topics in cylc.
    broadcast
    date-time-manipulation
    family-triggers
-   jinja2-templating
-   multiple-inheritance
-   optional-configurations
-   parameterisation-jinja2
+   inheritance
    polling
    queues
    remote-hosts
