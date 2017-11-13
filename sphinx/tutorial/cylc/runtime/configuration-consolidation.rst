@@ -39,7 +39,7 @@ In this code the ``script`` item and the ``API_KEY`` environment variable have
 been repeated for each task. This is bad practice as it makes the
 configuration lengthy and making changes can become difficult.
 
-Likewise the graphing relating to the ``get_observations`` tasks is also
+Likewise the graphing relating to the ``get_observations`` tasks is highly
 repetitive:
 
 .. code-block:: cylc
@@ -55,7 +55,8 @@ repetitive:
                """
 
 Cylc offers three ways of consolidating configurations to help improve the
-structure of your suite and avoid duplication.
+structure of a suite and avoid duplication. We will cover these approaches in
+turn after the next section.
 
 
 The ``cylc get-config`` Command
@@ -65,16 +66,16 @@ To help assist with consolidating configurations the ``cylc get-config``
 command can be used to expand the ``suite.rc`` file back out into its full
 form.
 
-Call ``cylc get-config`` with the path of the suite (``.`` if you are in
-the :term:`suite directory`) and the ``--sparse`` option (which hides default
-values).
+Call ``cylc get-config`` with the path of the suite (``.`` if you are already
+in the :term:`suite directory`) and the ``--sparse`` option which hides
+default values.
 
 .. code-block:: sub
 
    cylc get-config <path> --sparse
 
 To view the configuration of a particular section or setting refer to it by
-name using the ``-i`` option (see :ref:`cylc file format` for details) e.g:
+name using the ``-i`` option (see :ref:`cylc file format` for details), e.g:
 
 .. code-block:: sub
 
@@ -87,9 +88,9 @@ name using the ``-i`` option (see :ref:`cylc file format` for details) e.g:
 
 .. note::
 
-   The main use for ``cylc get-config`` is for inspecting the
+   The main use of ``cylc get-config`` is inspecting the
    ``[runtime]`` section of a suite. The ``cylc get-config`` command does not
-   expand :term:`Parameterisations <parameterisation>` and
+   expand :term:`parameterisations <parameterisation>` and
    :term:`families <family>` in the suite's :term:`graph`. To inspect the
    graphing use the ``cylc graph`` command.
 
@@ -106,7 +107,7 @@ Runtime
 ^^^^^^^
 
 :term:`Families <family>` are groups of tasks which share a common
-configuration. In this example the common configuration is:
+configuration. In the present example the common configuration is:
 
 .. code-block:: cylc
 
@@ -114,7 +115,7 @@ configuration. In this example the common configuration is:
    [[[environment]]]
        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
 
-We define a family as a new task consisting of the common configuration, by
+We define a family as a new task consisting of the common configuration. By
 convention families are named in upper case:
 
 .. code-block:: cylc
@@ -124,7 +125,7 @@ convention families are named in upper case:
        [[[environment]]]
            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
 
-We "add" tasks to a family by using the ``inherit`` setting:
+We "add" tasks to a family using the ``inherit`` setting:
 
 .. code-block:: cylc
 
@@ -134,7 +135,7 @@ We "add" tasks to a family by using the ``inherit`` setting:
            SITE_ID = 3772
 
 When we add a task to a family in this way it :term:`inherits <family
-inheritance>` the configuration from the family i.e. the above example is
+inheritance>` the configuration from the family, i.e. the above example is
 equivalent to:
 
 .. code-block:: cylc
@@ -187,14 +188,14 @@ Using families the ``get_observations`` tasks could be written like so:
 Graphing
 ^^^^^^^^
 
-:term:`Families <family>` can be used in the suite's :term:`graph` e.g:
+:term:`Families <family>` can be used in the suite's :term:`graph`, e.g:
 
 .. code-block:: cylc-graph
 
    GET_OBSERVATIONS:succeed-all => gather_observations
 
 The ``:succeed-all`` is a special :term:`qualifier` which in this example means
-that the ``gather_observations`` task will run once **all** of the members of
+that the ``gather_observations`` task will run once *all* of the members of
 the ``GET_OBSERVATIONS`` family have succeeded. This is equivalent to:
 
 .. code-block:: cylc-graph
@@ -213,15 +214,15 @@ non-optional. The most commonly used ones are:
 ``succeed-any``
    Run as soon as any one family member has succeeded.
 ``finish-all``
-   Run as soon as all of the family members have completed (i.e. have succeeded
-   or failed).
+   Run as soon as all of the family members have completed (i.e. have each
+   either succeeded or failed).
 
 For more information on family triggers see the `cylc user guide`_.
 
-The root Family
-^^^^^^^^^^^^^^^
+The ``root`` Family
+^^^^^^^^^^^^^^^^^^^
 
-There is a special family called `root` (lowercase) which is used only in the
+There is a special family called `root` (in lowercase) which is used only in the
 runtime to provide configuration which will be inherited by all tasks.
 
 In the following example the task ``bar`` will inherit the environment variable
@@ -239,7 +240,7 @@ In the following example the task ``bar`` will inherit the environment variable
 .. practical::
 
    .. rubric:: In this practical we will consolidate the configuration of the
-      :ref:`weather forecasting suite <tutorial-cylc-runtime-forecasting-suite>`
+      :ref:`weather-forecasting suite <tutorial-cylc-runtime-forecasting-suite>`
       from the previous section.
 
    1. **Create A New Suite.**
@@ -251,7 +252,7 @@ In the following example the task ``bar`` will inherit the environment variable
          rose tutorial consolidation-tutorial
          cd ~/cylc-run/consolidation-tutorial
 
-      Set the intial and final cycle point as you did in the
+      Set the intial and final cycle points as you did in the
       :ref:`previous tutorial
       <tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points>`.
 
@@ -266,7 +267,7 @@ In the following example the task ``bar`` will inherit the environment variable
          DOMAIN = -12,48,5,61  # Do not change!
 
       Rather than manually adding them to each task individually we could put
-      them in the ``root`` family making them accessible to all tasks.
+      them in the ``root`` family, making them accessible to all tasks.
 
       Add a ``root`` section containing these three environment variables.
       Remove the variables from any other task's ``environment`` sections:
@@ -280,7 +281,7 @@ In the following example the task ``bar`` will inherit the environment variable
          +            PYTHONPATH="$CYLC_SUITE_DEF_PATH/python_modules:$PYTHONPATH"
          +            # The dimensions of each grid cell in degrees.
          +            RESOLUTION = 0.2
-         +            # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+         +            # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          +            DOMAIN = -12,48,5,61  # Do not change!
 
           ...
@@ -292,7 +293,7 @@ In the following example the task ``bar`` will inherit the environment variable
          -         PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -         # The dimensions of each grid cell in degrees.
          -         RESOLUTION = 0.2
-         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          -         DOMAIN = -12,48,5,61  # Do not change!
 
            [[get_rainfall]]
@@ -305,7 +306,7 @@ In the following example the task ``bar`` will inherit the environment variable
          -         PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -         # The dimensions of each grid cell in degrees.
          -         RESOLUTION = 0.2
-         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          -         DOMAIN = -12,48,5,61  # Do not change!
 
            [[forecast]]
@@ -325,18 +326,18 @@ In the following example the task ``bar`` will inherit the environment variable
          -         PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -         # The dimensions of each grid cell in degrees.
          -         RESOLUTION = 0.2
-         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          -         DOMAIN = -12,48,5,61  # Do not change!
 
            [[post_process_exeter]]
-               # Generate a forecast for Exeter 60 minutes in the future.
+               # Generate a forecast for Exeter 60 minutes into the future.
                script = post-process exeter 60
          -     [[[environment]]]
          -         # Add the `python` directory to the PYTHONPATH.
          -         PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -         # The dimensions of each grid cell in degrees.
          -         RESOLUTION = 0.2
-         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          -         DOMAIN = -12,48,5,61  # Do not change!
 
       To ensure that the environment variables are being inherited correctly
@@ -348,12 +349,12 @@ In the following example the task ``bar`` will inherit the environment variable
          cylc get-config . --sparse -i "[runtime]"
 
       You should see the environment variables from the ``[root]`` section
-      in the `[environment]` section for all tasks.
+      in the ``[environment]`` section for all tasks.
 
       .. tip::
 
-         You may find it easier opening the output of this command in a text
-         editor e.g::
+         You may find it easier to open the output of this command in a text
+         editor, e.g::
 
             cylc get-config . --sparse -i "[runtime]" | gvim -
 
@@ -361,37 +362,37 @@ In the following example the task ``bar`` will inherit the environment variable
 Jinja2
 ------
 
-`Jinja2`_ is a templating language often used in web-design with some
-similarities with python. It can be used to make your suite definition more
+`Jinja2`_ is a templating language often used in web design with some
+similarities to python. It can be used to make a suite definition more
 dynamic.
 
 The Jinja2 Language
 ^^^^^^^^^^^^^^^^^^^
 
-In Jinja2 statements are wrapped with ``{%`` characters i.e:
+In Jinja2 statements are wrapped with ``{%`` characters, i.e:
 
 .. code-block:: none
 
    {% ... %}
 
-Variables are initiated using the ``set`` statement e.g:
+Variables are initiated using the ``set`` statement, e.g:
 
 .. code-block:: none
 
    {% set foo = 3 %}
 
 Expressions wrapped with ``{{`` characters will be replaced with the value of
-the evaluation of the expression e.g:
+the evaluation of the expression, e.g:
 
 .. code-block:: none
 
    foo {{ foo }} foo
 
-Would result in::
+would result in::
 
    foo 3 foo
 
-Loops are written with ``for`` statements e.g:
+Loops are written with ``for`` statements, e.g:
 
 .. code-block:: none
 
@@ -399,7 +400,7 @@ Loops are written with ``for`` statements e.g:
       foo {{ x }}
    {% endfor %}
 
-Would result in:
+would result in:
 
 .. code-block:: none
 
@@ -407,7 +408,7 @@ Would result in:
       foo 1
       foo 2
 
-To enable Jinja2 in the ``suite.rc`` file add the following `shebang`_ to the
+To enable Jinja2 in the ``suite.rc`` file, add the following `shebang`_ to the
 top of the file:
 
 .. code-block:: none
@@ -420,7 +421,7 @@ Example
 ^^^^^^^
 
 To consolidate the configuration for the ``get_observations`` tasks we could
-define a dictionary of station, id pairs:
+define a dictionary of station and ID pairs:
 
 .. code-block:: none
 
@@ -437,7 +438,7 @@ We could then loop over the stations like so:
        {{ station }}
    {% endfor %}
 
-Which would result in:
+After processing, this would result in:
 
 .. code-block:: none
 
@@ -446,7 +447,7 @@ Which would result in:
        heathrow
        shetland
 
-We could loop over both station and ids like so:
+We could also loop over both the stations and corresponding IDs like so:
 
 .. code-block:: none
 
@@ -454,7 +455,7 @@ We could loop over both station and ids like so:
        {{ station }} - {{ id }}
    {% endfor %}
 
-Which would result in:
+This would result in:
 
 .. code-block:: none
 
@@ -463,8 +464,8 @@ Which would result in:
        heathrow - 3772
        shetland - 3005
 
-Putting this all together the ``get_observations`` configuration could be
-written like so:
+Putting this all together, the ``get_observations`` configuration could be
+written as follows:
 
 .. code-block:: cylc
 
@@ -510,7 +511,7 @@ written like so:
 
          {% set API_KEY = 'd6bfeab3-3489-4990-a604-44acac4d2dfb' %}
 
-      Next replace the key where it appears in the suite with
+      Next replace the key, where it appears in the suite, with
       ``{{ API_KEY }}``:
 
       .. code-block:: diff
@@ -548,18 +549,18 @@ written like so:
          -            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
          +            API_KEY = {{ API_KEY }}
 
-      Check the result with ``cylc get-config``, the Jinja2 will be processed
-      so you should not see any difference after making these changes:
+      Check the result with ``cylc get-config``. The Jinja2 will be processed
+      so you should not see any difference after making these changes.
 
 .. _tutorial-cylc-parameterisation:
 
 Parameterised Tasks
 -------------------
 
-Parameterised tasks (:term:`parameterisation`) provide a way of implicitly
+Parameterised tasks (see :term:`parameterisation`) provide a way of implicitly
 looping over tasks without the need for Jinja2.
 
-Parameters are defined in their own section e.g:
+Parameters are defined in their own section, e.g:
 
 .. code-block:: cylc
 
@@ -568,7 +569,7 @@ Parameters are defined in their own section e.g:
            param = foo, bar, baz
 
 They can then be referenced by writing the name of the parameter in angle
-brackets e.g:
+brackets, e.g:
 
 .. code-block:: cylc
 
@@ -605,7 +606,7 @@ We can refer to a specific parameter by writing it after an ``=`` sign:
 
 The name of the parameter is provided to the job as an environment variable
 called ``CYLC_TASK_PARAM_<parameter>`` where ``<parameter>`` is the name of
-the parameter (in this case ``param``):
+the parameter (in the present case ``param``):
 
 .. code-block:: cylc
 
@@ -635,7 +636,7 @@ Parameters can be either words or integers:
 .. warning::
 
    Remember that cylc automatically inserts an underscore between the task and
-   the parameter. E.g. the following lines are equivalent:
+   the parameter, e.g. the following lines are equivalent:
 
    .. code-block:: cylc-graph
 
@@ -644,8 +645,8 @@ Parameters can be either words or integers:
 
 .. note::
 
-   When using integer parameters, to avoid confusion, cylc prefixes the
-   parameter value with the parameter name. For example the above code is
+   When using integer parameters, to prevent confusion, cylc prefixes the
+   parameter value with the parameter name. For example, the above code is
    equivalent to:
 
    .. code-block:: cylc
@@ -700,8 +701,8 @@ so:
 
 .. warning::
 
-   Remember that cylc automatically inserts an underscore between the task and
-   the parameter. E.g. the following lines are equivalent:
+   Heeding the previous warning, the following lines are also
+   equivalent:
 
    .. code-block:: cylc-graph
 
@@ -736,8 +737,8 @@ For more information see the `cylc user guide`_.
              [[[environment]]]
                  API_KEY = {{ API_KEY }}
 
-      Using ``cylc get-config`` you should see that cylc will replace the
-      ``<station>`` with each of the stations in turn creating a new task for
+      Using ``cylc get-config`` you should see that cylc replaces the
+      ``<station>`` with each of the stations in turn, creating a new task for
       each:
 
       .. code-block:: bash
@@ -746,7 +747,7 @@ For more information see the `cylc user guide`_.
 
       The ``get_observations`` tasks are now missing the ``SITE_ID``
       environment variable. Add a new section for each station with a
-      ``SITE_ID`` environment variable:
+      ``SITE_ID``:
 
       .. code-block:: cylc
 
@@ -756,7 +757,7 @@ For more information see the `cylc user guide`_.
 
       .. hint::
 
-         The site-id's are:
+         The relevant IDs are:
 
          * Belmullet - ``3976``
          * Camborne - ``3808``
@@ -781,7 +782,7 @@ For more information see the `cylc user guide`_.
                     SITE_ID = 3005
 
       Using ``cylc get-config`` you should now see four ``get_observations``
-      tasks each with a ``script``, an ``API_KEY`` and a ``SITE_ID``:
+      tasks, each with a ``script``, an ``API_KEY`` and a ``SITE_ID``:
 
       .. code-block:: bash
 
@@ -789,7 +790,7 @@ For more information see the `cylc user guide`_.
 
       Finally we can use this parameterisation to simplify the suite's
       graphing. Replace the ``get_observations`` lines in the graph with
-      ``get_observations<station>``.
+      ``get_observations<station>``:
 
       .. code-block:: diff
 
@@ -851,15 +852,15 @@ For more information see the `cylc user guide`_.
 Which Approach To Use
 ---------------------
 
-Each approach has its uses, cylc permits mixing approaches allowing us to use
-what works best for us. As a rule of thumb:
+Each approach has its uses. Cylc permits mixing approaches, allowing us to
+use what works best for us. As a rule of thumb:
 
 * :term:`Families <family>` work best consolidating runtime configuration by
-  collecting tasks into broad groups e.g. tasks which run on a particular
-  machine or tasks belonging to a particular system.
-* `Jinja2`_ is good at configuring things which apply to the entire suite
-  rather than just a single task as we can define variables then use them
+  collecting tasks into broad groups, e.g. groups of tasks which run on a
+  particular machine or groups of tasks belonging to a particular system.
+* `Jinja2`_ is good at configuring settings which apply to the entire suite
+  rather than just a single task, as we can define variables then use them
   throughout the suite.
 * :term:`Parameterisation <parameterisation>` works best for describing tasks
-  which are very similar but which have subtly different configuration
+  which are very similar but which have subtly different configurations
   (e.g. different arguments or environment variables).

@@ -14,19 +14,19 @@ of cylc's scheduling logic.
 Qualifiers
 ----------
 
-So far we have written dependencies like ``foo => bar``. This is, in-fact,
-shorthand for ``foo:succeed => bar``, it means that the task ``bar`` will run
+So far we have written dependencies like ``foo => bar``. This is, in fact,
+shorthand for ``foo:succeed => bar``. It means that the task ``bar`` will run
 once ``foo`` has finished successfully. If ``foo`` were to fail then ``bar``
 would not run. We will talk more about these :term:`task states <task state>`
 in the `Runtime Section <tutorial-tasks-and-jobs>`_.
 
-We would refer to the ``:succeed`` as a :term:`qualifier`. There are qualifiers
-for different :term:`task states <task state>` e.g:
+We refer to the ``:succeed`` descriptor as a :term:`qualifier`.
+There are qualifiers for different :term:`task states <task state>` e.g:
 
 ``:start``
    When the task has started running.
 ``:fail``
-   When the task finishes if it fails (non-zero return code).
+   When the task finishes if it fails (produces non-zero return code).
 ``:finish``
    When the task has completed (either succeeded or failed).
 
@@ -39,10 +39,10 @@ to handle events within your code (custom outputs).
 Clock Triggers
 --------------
 
-In cylc :term:`cycle points <cycle point>` are just labels. Tasks are triggered
-when their dependencies are met irrespective of what cycle they are in. We can
-force cycles to wait for a particular time before running using clock triggers.
-This is necessary for certain operational and monitoring systems.
+In cylc, :term:`cycle points <cycle point>` are just labels. Tasks are triggered
+when their dependencies are met irrespective of the cycle they are in, but we
+can force cycles to wait for a particular time before running using clock
+triggers. This is necessary for certain operational and monitoring systems.
 
 For example in the following suite the cycle ``2000-01-01T12Z`` will wait
 until 11:00 on the 1st of January 2000 before running:
@@ -55,7 +55,7 @@ until 11:00 on the 1st of January 2000 before running:
            clock-trigger = daily(-PT1H)
        [[dependencies]]
            [[[T12]]]
-                graph = daily  # "daily" will run at the earliest, one hour
+                graph = daily  # "daily" will run, at the earliest, one hour
                                # before midday.
 
 .. TODO: Link to clock-trigger tutorial
@@ -66,8 +66,8 @@ until 11:00 on the 1st of January 2000 before running:
 Alternative Calendars
 ---------------------
 
-By default cylc uses the Gregorian calendar for :term:`datetime cycling`, cylc
-also supports the 360 day calendar (12 months of 30 days each in a year).
+By default cylc uses the Gregorian calendar for :term:`datetime cycling`, but
+cylc also supports the 360-day calendar (12 months of 30 days each in a year).
 
 .. code-block:: cylc
 
