@@ -19,11 +19,11 @@ we define our workflow. The ``suite.rc`` file uses a nested
 
 * Comments start with a ``#`` character.
 * Settings are written as ``key = value`` pairs.
-* Settings can be contained within sections, sections are written inside square
-  brackets i.e. ``[section-name]``.
-* Sections can be nested, we add an extra square bracket with each level, so a
-  sub section would be written ``[[sub-section]]`` a sub-sub-section
-  ``[[[sub-sub-section]]]`` and so on.
+* Settings can be contained within sections.
+* Sections are written inside square brackets i.e. ``[section-name]``.
+* Sections can be nested, by adding an extra square bracket with each level,
+  so a sub-section would be written ``[[sub-section]]``, a sub-sub-section
+  ``[[[sub-sub-section]]]``, and so on.
 
 .. code-block:: cylc
 
@@ -31,7 +31,7 @@ we define our workflow. The ``suite.rc`` file uses a nested
    [section]
        key = value
        [[sub-section]]
-           another-key = another-value  # Inline comment.
+           another-key = another-value  # Inline comment
            yet-another-key = """
    A
    Multi-line
@@ -40,15 +40,15 @@ we define our workflow. The ``suite.rc`` file uses a nested
 
 Throughout this tutorial we will refer to settings in the following format:
 
-* ``[section]`` - Refers to the entire section.
-* ``[section]key`` - Refers to a setting within the section.
-* ``[section]key=value`` - Expresses the value of the setting.
-* ``[section][sub-section]another-key`` - We only use one set of square
+* ``[section]`` - refers to the entire section.
+* ``[section]key`` - refers to a setting within the section.
+* ``[section]key=value`` - expresses the value of the setting.
+* ``[section][sub-section]another-key``. Note we only use one set of square
   brackets with nested sections.
 
 .. tip::
 
-   It is advisable to indent ``suite.rc`` files, this indentation, however,
+   It is advisable to indent ``suite.rc`` files. This indentation, however,
    is ignored when the file is parsed so settings must appear before
    sub-sections.
 
@@ -86,7 +86,7 @@ Throughout this tutorial we will refer to settings in the following format:
          d = D
 
    Settings, however, are not additive meaning that a duplicate setting will
-   override an earlier value. The following two examples are equivalent:
+   override an earlier value. The following two examples are also equivalent:
 
    .. code-block:: cylc
 
@@ -114,7 +114,7 @@ defines two tasks where ``make_dough`` is dependent on ``purchase_ingredients``:
 
    purchase_ingredients => make_dough
 
-In a cylc workflow this would mean that ``make_dough`` would only run once
+In a cylc workflow this would mean that ``make_dough`` would only run when
 ``purchase_ingredients`` has succeeded. These :term:`dependencies <dependency>`
 can be chained together:
 
@@ -138,7 +138,7 @@ can be combined to form more complex workflows:
    bake_bread => clean_oven
 
 Graph strings can also contain "and" (``&``) and "or" (``|``) operators, for
-instance the following lines are equivalent to the previous ones:
+instance the following lines are equivalent to the ones just above:
 
 .. code-block:: cylc-graph
 
@@ -151,14 +151,13 @@ Collectively these :term:`graph strings<graph string>` are referred to as a
 .. note::
 
    The order in which lines appear in the graph section doesn't matter, for
-   instance:
+   instance the following examples are the same as each other:
 
    .. code-block:: cylc-graph
 
       foo => bar
       bar => baz
 
-   Is the same as:
 
    .. code-block:: cylc-graph
 
@@ -183,18 +182,18 @@ In a :term:`cylc suite` the :term:`graph` is stored under the
 This is a minimal :term:`cylc suite`, in which we have defined a :term:`graph`
 representing a workflow for cylc to run.
 We have not yet provided cylc with the scripts or binaries to run for
-each task, we will cover this later in the
+each task. This will be covered later in the
 :ref:`runtime tutorial <tutorial-runtime>`.
 
-Cylc provides a GUI for visualising :term:`graphs<graph>`, it is run on the
+Cylc provides a GUI for visualising :term:`graphs<graph>`. It is run on the
 command line using the ``cylc graph <path>`` command where the path ``path``
 is to the suite.rc file you wish to visualise.
 
 When run, ``cylc graph`` will display a diagram similar to the ones you have
-seen so far. The number "1" which appears bellow each task is the
-:term:`cycle point`, we will explain what this means in the next section.
+seen so far. The number ``1`` which appears below each task is the
+:term:`cycle point`. We will explain what this means in the next section.
 
-.. image:: ../img/cylc-graph.png
+.. image:: ../img/cylc-graph-corrected.png
    :align: center
 
 .. practical::
@@ -206,13 +205,13 @@ seen so far. The number "1" which appears bellow each task is the
 
       A cylc suite is just a directory containing a ``suite.rc`` file.
 
-      If you don't have one already create a ``cylc-run`` directory in your
+      If you don't have one already, create a ``cylc-run`` directory in your
       user space i.e::
 
          ~/cylc-run
 
       Within this directory create a new folder called ``graph-introduction``,
-      this is to be our :term:`suite directory`. Move into it:
+      which is to be our :term:`suite directory`. Move into it:
 
       .. code-block:: bash
 
@@ -245,7 +244,7 @@ seen so far. The number "1" which appears bellow each task is the
          foo -> bar -> baz -> qux
          pub -> bar -> wop
 
-   #. **Use ``cylc-graph`` to visualise the workflow.**
+   #. **Use** ``cylc graph`` **to visualise the workflow.**
 
       Once you have written some graph strings try using ``cylc graph`` to
       display the workflow. Run the following command:
@@ -254,7 +253,8 @@ seen so far. The number "1" which appears bellow each task is the
 
          cylc graph .
 
-      .. note::
+      .. admonition:: Note
+         :class: hint
 
          ``cylc graph`` takes the path to the suite as an argument. As we are
          inside the :term:`suite directory` we can run ``cylc graph .``.

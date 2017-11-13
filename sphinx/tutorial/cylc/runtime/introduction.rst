@@ -11,15 +11,16 @@ the workflow is defined in terms of :term:`tasks <task>` and
 
 In order to make the workflow runnable we must associate tasks with scripts
 or binaries to be executed when the task runs. This means working with the
-``[runtime]`` section which determines what runs, where and how.
+``[runtime]`` section which determines what runs, as well as where and how
+it runs.
 
 
 The Task Section
 ----------------
 
 The runtime settings for each task are stored in a sub-section of the
-``[runtime]`` section. E.g for a task called ``hello_world`` we would write
-settings inside this section:
+``[runtime]`` section. E.g. for a task called ``hello_world`` we would write
+settings inside the following section:
 
 .. code-block:: cylc
 
@@ -30,9 +31,9 @@ settings inside this section:
 The ``script`` Setting
 ----------------------
 
-We tell cylc what to execute when a task is run using the ``script`` setting.
+We tell cylc *what* to execute when a task is run using the ``script`` setting.
 
-This setting is interpreted as bash script, the following example defines a
+This setting is interpreted as a bash script. The following example defines a
 task called ``hello_world`` which writes ``Hello World!`` to stdout upon
 execution.
 
@@ -46,7 +47,7 @@ execution.
 
    If you do not set the ``script`` for a task then nothing will be run.
 
-We can also call other scripts or executables in this way e.g:
+We can also call other scripts or executables in this way, e.g:
 
 .. code-block:: cylc
 
@@ -54,13 +55,13 @@ We can also call other scripts or executables in this way e.g:
        [[hello_world]]
            script = ~/foo/bar/baz/hello_world
 
-It is often a good idea to keep our scripts with the cylc suite rather than
-leaving them somewhere else on the system. If you create a ``bin`` directory
-within the :term:`suite directory` this directory will be added to the path
-when tasks run e.g:
+It is often a good idea to keep our scripts within the cylc suite directory
+tree rather than leaving them somewhere else on the system. If you create a
+``bin`` sub-directory within the :term:`suite directory` this directory will be
+added to the path when tasks run, e.g:
 
 .. code-block:: bash
-   :caption: bin/hello-world
+   :caption: bin/hello_world
 
    #!/usr/bin/bash
    echo 'Hello World!'
@@ -77,22 +78,26 @@ when tasks run e.g:
 Running A Suite
 ---------------
 
-It is a good idea to check the suite for errors before running it.
+It is a good idea to check a suite for errors before running it.
 Cylc provides a command which automatically checks for any obvious
-configuration issues called ``cylc validate``.
+configuration issues called ``cylc validate``, run via:
 
 .. code-block:: sub
 
    cylc validate <path/to/suite>
 
-Next we run the suite using the ``cylc run`` command.
+Here ``<path/to/suite>`` is the path to the suite's location within the
+filesystem (so if we create a suite in ``~/cylc-run/foo`` we would put
+``~/cylc-run/foo/suite.rc``).
+
+Next we can run the suite using the ``cylc run`` command.
 
 .. code-block:: bash
 
    cylc run <name>
 
-The ``name`` is the name of the :term:`suite directory` (i.e. if we create a
-suite in ``~/cylc-run/foo`` then the ``<name>`` would be ``foo``).
+The ``name`` is the name of the :term:`suite directory` (i.e. ``<name>`` would
+be ``foo`` in the above example).
 
 .. note::
 
@@ -122,28 +127,29 @@ Tasks And Jobs
 
 When a :term:`task` is "Run" it creates a :term:`job`. The job is a bash
 file containing the script you have told the task to run along with
-configuration and a system for trapping errors. It is this :term:`job`
-which actually gets executed. This "job file" is called the :term:`job script`.
+configuration specifications and a system for trapping errors. It is the
+:term:`job` which actually gets executed and not the task itself. This
+"job file" is called the :term:`job script`.
 
 During its life a typical :term:`task` goes through the following states:
 
 Waiting
    :term:`Tasks <task>` wait for their dependencies to be satisfied before
-   running, in the mean time they are in the "Waiting" state.
+   running. In the meantime they are in the "Waiting" state.
 Submitted
-   When the :term:`task's <task>` dependencies have been met it is ready for
+   When a :term:`task's <task>` dependencies have been met it is ready for
    submission. During this phase the :term:`job script` is created.
-   The :term:`job` is then submitted to the specified batch system, more on
-   this in the :ref:`next section <tutorial-batch-system>`.
+   The :term:`job` is then submitted to the specified batch system.
+   There is more about this in the :ref:`next section <tutorial-batch-system>`.
 Running
    A :term:`task` is in the "Running" state as soon as the :term:`job` is
    executed.
 Succeeded
-   If the :term:`job` the :term:`task` submitted has successfully completed
-   (zero return code) then it is said to have succeeded.
+   If the :term:`job` submitted by a :term:`task` has successfully
+   completed (i.e. there is zero return code) then it is said to have succeeded.
 
-These are called the :term:`task states <task state>` and there are a few more
-(e.g. failed).
+These descriptions, and a few more (e.g. failed), are called the :term:`task states <task state>`.
+
 
 
 The cylc GUI
@@ -154,7 +160,7 @@ interface (the cylc GUI) which can be used for monitoring and
 interaction.
 
 The cylc GUI looks quite like ``cylc graph`` but the tasks are colour-coded to
-represent their state as in the following diagram.
+represent their state, as in the following diagram.
 
 .. digraph:: example
    :align: center
@@ -201,10 +207,10 @@ The Work Directory
 ^^^^^^^^^^^^^^^^^^
 
 When a :term:`task` is run cylc creates a directory for the :term:`job` to run
-in, this is called the :term:`work directory`.
+in. This is called the :term:`work directory`.
 
-By default the work directory is in a directory structure under the
-:term:`cycle point` and the :term:`task` name:
+By default the work directory is located in a directory structure
+under the relevant :term:`cycle point` and :term:`task` name:
 
 .. code-block:: sub
 
@@ -213,7 +219,7 @@ By default the work directory is in a directory structure under the
 The Job Log Directory
 ^^^^^^^^^^^^^^^^^^^^^
 
-When a task is run cylc generates a :term:`job script`, this is stored in the
+When a task is run cylc generates a :term:`job script` which is stored in the
 :term:`job log directory` as the file ``job``.
 
 When the :term:`job script` is executed the stdout and stderr are redirected
@@ -221,14 +227,14 @@ into the ``job.out`` and ``job.err`` files which are also stored in the
 :term:`job log directory`.
 
 The :term:`job log directory` lives in a directory structure under the
-:term:`cycle point`, :term:`task` name and the :term:`job submission number`:
+:term:`cycle point`, :term:`task` name and :term:`job submission number`:
 
 .. code-block:: sub
 
    ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-num>/
 
-The :term:`job submission number` starts at 1 and increments each time a task
-is re-run.
+The :term:`job submission number` starts at 1 and increments by 1 each time
+a task is re-run.
 
 .. tip::
 
@@ -244,18 +250,18 @@ Suite Files
 ^^^^^^^^^^^
 
 Along with the :term:`work directory` and :term:`job log directory`, cylc
-generates other files and directories when it runs a suite:
+generates other files and directories when it runs a suite, namely:
 
 
 ``log/``
-   Directory containing log files including:
+   Directory containing log files, including:
 
    ``log/db``
-      The database which cylc uses to record the state of the suite.
+      The database which cylc uses to record the state of the suite;
    ``log/job``
-      The directory where the :term:`job log files <job log>` live.
+      The directory where the :term:`job log files <job log>` live;
    ``log/suite``
-      The directory there the :term:`suite log files <suite log>` live.
+      The directory where the :term:`suite log files <suite log>` live.
       These files are written by cylc as the suite is run and are useful for
       debugging purposes in the event of error.
 
@@ -269,7 +275,7 @@ generates other files and directories when it runs a suite:
 
 .. practical::
 
-   .. rubric:: In this practical we will add some scripts to and run the
+   .. rubric:: In this practical we will add some scripts to, and run, the
       :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>`
       from the :ref:`scheduling tutorial <tutorial-scheduling>`.
 
@@ -287,7 +293,7 @@ generates other files and directories when it runs a suite:
       :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>`
       with some runtime configuration added to it.
 
-      These is also a script called ``get-observations`` located in a bin
+      There is also a script called ``get-observations`` located in the bin
       directory.
 
       Take a look at the ``[runtime]`` section in the ``suite.rc`` file.
@@ -300,7 +306,7 @@ generates other files and directories when it runs a suite:
 
          cylc validate .
 
-      Open the cylc GUI by running the following command:
+      Open the cylc GUI (in the background) by running the following command:
 
       .. code-block:: bash
 
@@ -312,8 +318,8 @@ generates other files and directories when it runs a suite:
 
          cylc run runtime-introduction
 
-      The tasks will start to run, you should see them going through the
-      waiting, running and succeeded states.
+      The tasks will start to run - you should see them going through the
+      "Waiting", "Running" and "Succeeded" states.
 
       When the suite reaches the final cycle point and all tasks have succeeded
       it will shutdown automatically and the GUI will go blank.
@@ -326,7 +332,7 @@ generates other files and directories when it runs a suite:
          .. image:: ../img/gcylc-play.png
             :align: center
 
-         A box will appear, ensure that "Cold Start" is selected then press
+         A box will appear. Ensure that "Cold Start" is selected then press
          "Start".
 
          .. image:: ../img/cylc-gui-suite-start.png
@@ -334,8 +340,9 @@ generates other files and directories when it runs a suite:
 
    #. **Inspect A Job Log.**
 
-      Try opening the ``job.out`` file for one of the ``get_observations``
-      jobs. The file will be located within the :term:`job log directory`:
+      Try opening the file ``job.out`` for one of the
+      ``get_observations`` jobs in a text editor. The file will be
+      located within the :term:`job log directory`:
 
       .. code-block:: sub
 
@@ -356,14 +363,15 @@ generates other files and directories when it runs a suite:
 
       * The first three lines are information which cylc has written to the file
         to provide information about the job.
-      * The last two lines were also written by cylc, they provide timestamps
-        marking the stages in the jobs life.
+      * The last two lines were also written by cylc. They provide timestamps
+        marking the stages in the job's life.
       * The lines in the middle are the stdout of the job itself.
 
    #. **Inspect A Work Directory.**
 
       The ``get_rainfall`` task should create a file called ``rainfall`` in its
-      :term:`work directory`. Try opening the file:
+      :term:`work directory`. Try opening this file, recalling that the
+      format of the relevant path from within the work directory will be:
 
       .. code-block:: sub
 
@@ -373,7 +381,7 @@ generates other files and directories when it runs a suite:
 
          The ``get_rainfall`` task only runs every third cycle.
 
-   #. **Extension:** Explore The Cylc GUI
+   #. **Extension: Explore The Cylc GUI**
 
       * Try re-running the suite.
 
@@ -387,10 +395,10 @@ generates other files and directories when it runs a suite:
               :align: center
               :scale: 75%
 
-      * Try pressing the pause button which is found in the top left-hand
+      * Try pressing the "Pause" button which is found in the top left-hand
         corner of the GUI.
 
       * Try right-clicking on a task. From the context menu you could try:
 
-        * "Triger (run now)"
+        * "Trigger (run now)"
         * "Reset State"

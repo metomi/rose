@@ -15,7 +15,7 @@ Often, we will want to repeat the same workflow multiple times. In cylc this
 "repetition" is called :term:`cycling` and each repetition of the workflow is
 referred to as a :term:`cycle`.
 
-Each :term:`cycle` is given a unique label, this is called a
+Each :term:`cycle` is given a unique label. This is called a
 :term:`cycle point`. For now these :term:`cycle points<cycle point>` will be
 integers *(they can also be dates as we will see in the next section)*.
 
@@ -29,7 +29,7 @@ To make a workflow repeat we must tell cylc three things:
 
 Let's take the bakery example from the previous section. Bread is
 produced in batches so the bakery will repeat this workflow for each
-batch of break they bake. We can make this workflow repeat with the addition of
+batch of bread they bake. We can make this workflow repeat with the addition of
 three lines:
 
 .. code-block:: diff
@@ -47,10 +47,10 @@ three lines:
 * The ``cycling mode = integer`` setting tells cylc that we want our
   :term:`cycle points<cycle point>` to be numbered.
 * The ``initial cycle point = 1`` setting tells cylc to start counting from 1.
-* ``P1`` is the :term:`recurrence`, the :term:`graph` within the ``[[[P1]]]``
+* ``P1`` is the :term:`recurrence`. The :term:`graph` within the ``[[[P1]]]``
   section will be repeated at each :term:`cycle point`.
 
-The first three :term:`cycles<cycle>` would look like this with the entire
+The first three :term:`cycles<cycle>` would look like this, with the entire
 workflow repeated at each cycle point:
 
 .. digraph:: example
@@ -99,7 +99,8 @@ workflow repeated at each cycle point:
    "pur.3" -> "mak.3" -> "bak.3" -> "sel.3"
    "pre.3" -> "bak.3" -> "cle.3"
 
-Note the numbers under each task represent the :term:`cycle point` it is in.
+Note the numbers under each task which represent the :term:`cycle point` each
+task is in.
 
 
 Inter-Cycle Dependencies
@@ -113,11 +114,12 @@ necessarily run in order. This could cause problems, for instance we could find
 ourselves pre-heating the oven in one cycle whist we are still cleaning it in
 another.
 
-To resolve this we must add :term:`dependencies<dependency>` between the
-cycles. We do this by adding lines to the :term:`graph`, tasks at the previous
-cycle can be referred to by suffixing their name with ``[-P1]``. So to ensure
-the ``clean_oven`` task from the previous cycle has been completed before the
-``pre_heat_oven`` task starts we would write the following dependency:
+To resolve this we must add :term:`dependencies<dependency>` *between* the
+cycles. We do this by adding lines to the :term:`graph`. Tasks in the previous
+cycle can be referred to by suffixing their name with ``[-P1]``, for example.
+So to ensure, for every consecutive pair of cycles, the ``clean_oven`` task
+has been completed before the start of the ``pre_heat_oven`` task in the
+next cycle, we would write the following dependency:
 
 .. code-block:: cylc-graph
 
@@ -188,7 +190,7 @@ The resulting suite would look like this:
    "pur.3" -> "mak.3" -> "bak.3" -> "sel.3"
    "pre.3" -> "bak.3" -> "cle.3"
 
-Adding this dependency "strings together" the cycles forcing them to run in
+Adding this dependency "strings together" the cycles, forcing them to run in
 order. We refer to dependencies between cycles as
 :term:`inter-cycle dependencies<inter-cycle dependency>`.
 
@@ -199,12 +201,12 @@ ago.
 Note that the ``purchase_ingredients`` task has no arrows pointing at it
 meaning that it has no dependencies. Consequently the ``purchase_ingredients``
 tasks will all run straight away. This could cause our bakery to run into
-cash-flow problems as they are purchasing ingredients well in advance of using
-them.
+cash-flow problems as they would be purchasing ingredients well in advance
+of using them.
 
-To solve this the bakery wants to purchase ingredients two batches ahead to
-make sure that they never run out. This can be achieved by adding the following
-dependency:
+To solve this, but still make sure that they never run out of
+ingredients, the bakery wants to purchase ingredients two batches ahead.
+This can be achieved by adding the following dependency:
 
 .. code-block:: diff
 
@@ -221,13 +223,13 @@ dependency:
                 """
 
 This dependency means that the ``purchase_ingredients`` task will run after the
-``sell_bread`` task from two cycles before.
+``sell_bread`` task two cycles before.
 
 .. note::
 
    The ``[-P2]`` suffix is used to reference a task two cycles before. For the
    first two cycles this doesn't make sense as there was no cycle two cycles
-   before so this dependency will be ignored.
+   before, so this dependency will be ignored.
 
    Any inter-cycle dependencies stretching back to before the
    :term:`initial cycle point` will be ignored.
@@ -301,8 +303,8 @@ Recurrence Sections
 -------------------
 
 In the previous examples we made the workflow repeat by placing the graph within
-the ``[[[P1]]`` section. Here ``P1`` is a :term:`recurrence` meaning repeat
-every cycle, ``P2`` would mean repeat every other cycle etc. To build more
+the ``[[[P1]]]`` section. Here ``P1`` is a :term:`recurrence` meaning repeat
+every cycle, where ``P2`` would mean repeat every other cycle etc. To build more
 complex workflows we can use multiple recurrences:
 
 .. code-block:: cylc
@@ -344,14 +346,14 @@ complex workflows we can use multiple recurrences:
        "bar.3" [label="bar\n3"]
    }
 
-By default recurrences start at the :term:`initial cycle point`, however, it is
+By default recurrences start at the :term:`initial cycle point`, however it is
 possible to make them start at an arbitrary cycle point. This is done by
 writing the cycle point and the recurrence separated by a forward slash
-(``/``). E.g. ``5/P3`` means repeat every third cycle starting *from* cycle
+(``/``), e.g. ``5/P3`` means repeat every third cycle starting *from* cycle
 number 5.
 
 The start point of a recurrence can also be defined as an offset from the
-:term:`initial cycle point`. E.g. ``+P5/P3`` means repeat every third cycle
+:term:`initial cycle point`, e.g. ``+P5/P3`` means repeat every third cycle
 starting 5 cycles *after* the initial cycle point.
 
 
@@ -375,7 +377,7 @@ starting 5 cycles *after* the initial cycle point.
 
    #. **Create a new suite.**
 
-      Within your ``~/cylc-run/`` directory create a new directory called
+      Within your ``~/cylc-run/`` directory create a new (sub-)directory called
       ``integer-cycling`` and move into it:
 
       .. code-block:: bash
@@ -412,7 +414,7 @@ starting 5 cycles *after* the initial cycle point.
       .. tip::
 
          You can get cylc graph to draw dotted boxes around the cycles by
-         clicking the "Organise by cycle point" button on the toolbar:
+         clicking the "organise by cycle point" button on the toolbar:
 
          .. image:: ../img/cylc-graph-cluster.png
             :align: center
@@ -422,12 +424,14 @@ starting 5 cycles *after* the initial cycle point.
          By default ``cylc graph`` displays the first three cycles of a suite.
          You can tell ``cylc graph`` to visualise the cycles between two points
          by providing them as arguments, for instance the following example
-         would show all cycles between ``1`` and ``5`` (inclusive).
+         would show all cycles between ``1`` and ``5`` (inclusive)::
+
+            cylc graph . 1 5 &
 
    #. **Add another recurrence.**
 
-      Suppose we wanted the ``qux`` task to run every other cycle as opposed to
-      every cycle. We can do this by adding another recurrence.
+      Suppose we wanted the ``qux`` task to run every *other* cycle as opposed
+      to every cycle. We can do this by adding another recurrence.
 
       Make the following changes to your ``suite.rc`` file.
 
@@ -447,7 +451,7 @@ starting 5 cycles *after* the initial cycle point.
          +                baz => qux
          +            """
 
-      Use cylc graph to see the effect this has on the workflow.
+      Use ``cylc graph`` to see the effect this has on the workflow.
 
    #. **Inter-cycle dependencies.**
 
@@ -455,7 +459,7 @@ starting 5 cycles *after* the initial cycle point.
       three inter-cycle dependencies:
 
       #. Between ``wop`` from the previous cycle and ``pub``.
-      #. Between ``baz`` from the previous cycle and ``foo``.
+      #. Between ``baz`` from the previous cycle and ``foo``
          *every odd cycle*.
       #. Between ``qux`` from the previous cycle and ``foo``
          *every even cycle*.
