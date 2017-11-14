@@ -13,7 +13,6 @@ This section looks at further topics in cylc.
    date-time-manipulation
    family-triggers
    inheritance
-   polling
    queues
    remote-hosts
    retries

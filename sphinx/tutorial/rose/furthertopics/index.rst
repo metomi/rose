@@ -12,6 +12,7 @@ This section goes into detail in additional rose topics.
    failif-warnif
    macro-development
    optional-configurations
+   polling
    trigger
    upgrading
    upgrading-macro-development
