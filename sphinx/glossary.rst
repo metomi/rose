@@ -31,7 +31,7 @@ Glossary
    rose suite
       A rose suite is a :term:`cylc suite` which also contains a
       ``rose-suite.conf`` file and optionally :term:`rose apps<rose app>`,
-      :term:`metadata` and other rose components.
+      :term:`metadata` and/or other rose components.
 
    graph
       The graph of a :term:`suite<cylc suite>` refers to the
@@ -57,13 +57,13 @@ Glossary
              style = dashed
              "foo.01T00" [label="foo\n2000-01-01T00:00Z"]
              "bar.01T00" [label="bar\n2000-01-01T00:00Z"]
-             "baz.01T00" [label="bar\n2000-01-01T00:00Z"]
+             "baz.01T00" [label="baz\n2000-01-01T00:00Z"]
          }
 
          subgraph cluster_2 {
              label = "2000-01-01T12:00Z"
              style = dashed
-             "baz.01T12" [label="bar\n2000-01-01T12:00Z"]
+             "baz.01T12" [label="baz\n2000-01-01T12:00Z"]
          }
 
          subgraph cluster_3 {
@@ -71,7 +71,7 @@ Glossary
              style = dashed
              "foo.02T00" [label="foo\n2000-01-02T00:00Z"]
              "bar.02T00" [label="bar\n2000-01-02T00:00Z"]
-             "baz.02T00" [label="bar\n2000-01-02T00:00Z"]
+             "baz.02T00" [label="baz\n2000-01-02T00:00Z"]
          }
 
          "foo.01T00" -> "bar.01T00"
@@ -101,7 +101,7 @@ Glossary
 
       For example, in the following workflow each dotted box represents a cycle
       and the :term:`tasks<task>` within it are the :term:`tasks<task>`
-      belonging to that cycle. The numbers (i.e. 1, 2, 3) are the
+      belonging to that cycle. The numbers (i.e. ``1``, ``2``, ``3``) are the
       :term:`cycle points<cycle point>`.
 
       .. digraph:: example
@@ -115,7 +115,7 @@ Glossary
              style = dashed
              "foo.1" [label="foo\n1"]
              "bar.1" [label="bar\n1"]
-             "baz.1" [label="bar\n1"]
+             "baz.1" [label="baz\n1"]
          }
 
          subgraph cluster_2 {
@@ -123,7 +123,7 @@ Glossary
              style = dashed
              "foo.2" [label="foo\n2"]
              "bar.2" [label="bar\n2"]
-             "baz.2" [label="bar\n2"]
+             "baz.2" [label="baz\n2"]
          }
 
          subgraph cluster_3 {
@@ -131,7 +131,7 @@ Glossary
              style = dashed
              "foo.3" [label="foo\n3"]
              "bar.3" [label="bar\n3"]
-             "baz.3" [label="bar\n3"]
+             "baz.3" [label="baz\n3"]
          }
 
          "foo.1" -> "bar.1" -> "baz.1"
@@ -150,7 +150,7 @@ Glossary
    cycle point
       A cycle point is the unique label given to a particular :term:`cycle`.
       If the :term:`suite<cylc suite>` is using :term:`integer cycling` then
-      the cycle points will be numbers e.g ``1``, ``2``, ``3``, etc. If the
+      the cycle points will be numbers e.g. ``1``, ``2``, ``3``, etc. If the
       :term:`suite<cylc suite>` is using :term:`datetime cycling` then the
       labels will be :term:`ISO8601` datetimes e.g. ``2000-01-01T00:00Z``.
 
@@ -175,7 +175,7 @@ Glossary
       In a :term:`cycling suite <cycling>` the final cycle point is the point
       at which cycling ends.
 
-      If the final cycle point were 2001 then the final cycle would be on or
+      If the final cycle point were 2001 then the last cycle would start on or
       before 2001.
 
       See also:
@@ -185,11 +185,11 @@ Glossary
 
    integer cycling
       An integer cycling suite is a :term:`cycling suite<cycling>` which has
-      been configured to use integer cycling. This is done using by setting
+      been configured to use integer cycling, so that the
+      :term:`cycle points<cycle point>` will be integers and integer
+      :term:`recurrences <recurrence>` may be used in the :term:`graph` e.g.
+      ``P3`` means every third cycle. This is done by setting
       ``[scheduling]cycling mode = integer`` in the ``suite.rc`` file.
-      When a suite uses integer cycling the :term:`cycle points<cycle point>`
-      will be integers and integer :term:`recurrences <recurrence>` may be used
-      in the :term:`graph` e.g. ``P3`` means every third cycle.
 
       See also:
 
@@ -215,15 +215,16 @@ Glossary
       * :term:`ISO8601 datetime`
       * :term:`recurrence`
       * `Wikipedia (ISO8601) <https://en.wikipedia.org/wiki/ISO_8601>`_
-      * `International Orginisation For Standardisation
+      * `International Organisation For Standardisation
         <https://www.iso.org/iso-8601-date-and-time-format.html>`_
-      * `A summary of the international standard date and time notation
+      * `a summary of the international standard date and time notation
         <http://www.cl.cam.ac.uk/%7Emgk25/iso-time.html>`_
 
    ISO8601 datetime
-      A date-time written in the ISO8601 format e.g:
+      A date and time specification  written in the ISO8601
+      format e.g:
 
-      * ``2000-01-01T0000Z`` midnight on the 1st of January 2000
+      * ``2000-01-01T00:00Z``: midnight on the 1st of January 2000
 
       See also:
 
@@ -233,7 +234,7 @@ Glossary
    ISO8601 duration
       A duration written in the ISO8601 format e.g:
 
-      * ``PT1H30M`` one hour and thirty minutes.
+      * ``PT1H30M``: one hour and thirty minutes.
 
       See also:
 
@@ -256,7 +257,7 @@ Glossary
       In a :term:`cycling suite <cycling>` an inter-cycle dependency
       is a :term:`dependency` between two tasks in different cycles.
 
-      For example the in the following suite the task ``bar`` is dependent on
+      For example in the following suite the task ``bar`` is dependent on
       its previous occurrence:
 
       .. code-block:: cylc
@@ -282,7 +283,7 @@ Glossary
              style = dashed
              "foo.1" [label="foo\n1"]
              "bar.1" [label="bar\n1"]
-             "baz.1" [label="bar\n1"]
+             "baz.1" [label="baz\n1"]
          }
 
          subgraph cluster_2 {
@@ -290,7 +291,7 @@ Glossary
              style = dashed
              "foo.2" [label="foo\n2"]
              "bar.2" [label="bar\n2"]
-             "baz.2" [label="bar\n2"]
+             "baz.2" [label="baz\n2"]
          }
 
          subgraph cluster_3 {
@@ -298,7 +299,7 @@ Glossary
              style = dashed
              "foo.3" [label="foo\n3"]
              "bar.3" [label="bar\n3"]
-             "baz.3" [label="bar\n3"]
+             "baz.3" [label="baz\n3"]
          }
 
          "foo.1" -> "bar.1" -> "baz.1"
@@ -316,15 +317,15 @@ Glossary
       * :term:`task state`
 
    task
-      A task represents an activity in a workflow, it is a specification of
-      that activity, the script or executable to run and certain details of
-      the environment it is run in.
+      A task represents an activity in a workflow. It is a specification of
+      that activity consisting of the script or executable to run and certain
+      details of the environment it is run in.
 
       The task specification is used to create a :term:`job` which is executed
       on behalf of the task.
 
-      Tasks submit :term:`jobs <job>`, each :term:`job` belongs to one task,
-      each task can submit multiple :term:`jobs <job>`.
+      Tasks submit :term:`jobs <job>` and therefore each :term:`job` belongs
+      to one task. Each task can submit multiple :term:`jobs <job>`.
 
       See also:
 
@@ -335,9 +336,9 @@ Glossary
       During a :term:`task's <task>` life it will proceed through various
       states. These include:
 
-      * Waiting
-      * Running
-      * Succeeded
+      * waiting
+      * running
+      * succeeded
 
       See also:
 
@@ -348,14 +349,14 @@ Glossary
 
    run directory
       When a :term:`suite <cylc suite>` is run a directory is created for all
-      of the files created whilst the suite is running. This is called the run
-      directory and typically resides in the ``cylc-run`` directory:
+      of the files generated whilst the suite is running. This is called the
+      run directory and typically resides in the ``cylc-run`` parent directory:
 
       ``~/cylc-run/<suite-name>``
 
       .. note::
 
-         If the suite was written in the ``cylc-run`` directory then the run
+         If a suite is written in the ``cylc-run`` directory the run
          directory is also the :term:`suite directory`.
 
       The run directory can be accessed by a running suite using the
@@ -369,9 +370,10 @@ Glossary
       * :term:`job log directory`
 
    work directory
-      When cylc executes a :term:`job` it does so inside a suite's
+      When cylc executes a :term:`job` it does so inside the
       :term:`job's <job>` working directory. This directory is created by cylc
-      and lies within the directory tree inside a suite's :term:`run directory`.
+      and lies within the directory tree inside the relevant suite's
+      :term:`run directory`.
 
       .. code-block:: sub
 
@@ -389,7 +391,7 @@ Glossary
       * :term:`share directory`
 
    share directory
-      The share directory resides within a suite's :term:`run directory`, it
+      The share directory resides within a suite's :term:`run directory`. It
       serves the purpose of providing a storage place for any files which need
       to be shared between different tasks.
 
@@ -410,12 +412,12 @@ Glossary
    suite log
    suite log directory
       A cylc suite logs events and other information to the suite log files
-      when it runs. There are there log files:
+      when it runs. There are three log files:
 
-      * ``out`` - The stdout of the suite.
-      * ``err`` - The stderr of the suite, may contain useful debugging
-        information in the event of error.
-      * ``log`` - A log of suite events, contains information about
+      * ``out`` - the stdout of the suite.
+      * ``err`` - the stderr of the suite, which may contain useful debugging
+        information in the event of any error(s).
+      * ``log`` - a log of suite events, consisting of information about
         user interaction.
 
       The suite log directory lies within the :term:`run directory`:
@@ -438,14 +440,14 @@ Glossary
 
       Other files stored in the job log directory:
 
-      * `job`: The :term:`job script`.
-      * `job-activity.log`: A log file containing details of the
-        :term:`jobs <job>` progress.
-      * `job.status`: A file in which can be found cylc's most up-to-date
+      * `job`: the :term:`job script`.
+      * `job-activity.log`: a log file containing details of the
+        :term:`job's <job>` progress.
+      * `job.status`: a file holding cylc's most up-to-date
         understanding of the :term:`job's <job>` present status.
 
    job
-      A job is a realisation of a :term:`task`. A job consists of a file called
+      A job is the realisation of a :term:`task` consisting of a file called
       the :term:`job script` which is executed when the job "runs".
 
       See also:
@@ -499,8 +501,8 @@ Glossary
 
    directive
       Directives are used by :term:`batch systems <batch system>` to determine
-      what a :term:`jobs <job>` requirements are, e.g. how much memory it
-      requires.
+      what a :term:`job's <job>` requirements are, e.g. how much memory a
+      given job requires.
 
       Directives are set in the ``suite.rc`` file in the ``[runtime]`` section
       (``[runtime][<task-name>][directives]``).
@@ -526,7 +528,9 @@ Glossary
       .. minicylc::
          :theme: none
 
-         bar_foo1 => bar_foo2 => bar_foo3
+         bar_foo1 => baz_foo1
+         bar_foo2 => baz_foo2
+         bar_foo3 => baz_foo3
 
       See also:
 
@@ -562,7 +566,7 @@ Glossary
              [[task]]
                  inherit = FAMILY
 
-      A task can inherit from multiple families by writing a comma separated
+      A task can inherit from multiple families by writing a comma-separated
       list e.g:
 
       .. code-block:: cylc
@@ -592,7 +596,7 @@ Glossary
           family has **succeeded**.
       ``finish-all``
           The dependency will only be met once **all** of the tasks in the
-          family have **succeeded**.
+          family have **finished** (either succeeded or failed).
 
       See also:
 
