@@ -30,7 +30,8 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
-run_pass "$TEST_KEY" rose suite-run -q -n $NAME --no-gcontrol -C src -- --debug
+run_pass "$TEST_KEY" rose suite-run -q -n $NAME --no-gcontrol -C src \
+    -- --no-detach --debug
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit

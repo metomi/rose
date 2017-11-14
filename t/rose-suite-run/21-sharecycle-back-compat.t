@@ -36,7 +36,7 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 rose suite-run --no-gcontrol -q \
-    -n "${NAME}" -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" -- --debug
+    -n "${NAME}" -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" -- --no-detach --debug
 # Check contents of files written to ROSE_DATAC is going to historic location
 for DATETIME in '20200101T0000Z' '20200101T0000Z'; do
     file_cmp "nl-${DATETIME}" \

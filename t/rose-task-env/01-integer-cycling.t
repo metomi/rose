@@ -29,7 +29,7 @@ tests 7
 SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME=$(basename "${SUITE_RUN_DIR}")
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host=localhost -- --debug
+    --no-gcontrol --host=localhost -- --no-detach --debug
 
 run_pass "$TEST_KEY_BASE-0" ls -d $HOME/cylc-run/${NAME}/share/cycle/0
 run_pass "$TEST_KEY_BASE-1" ls -d $HOME/cylc-run/${NAME}/share/cycle/1

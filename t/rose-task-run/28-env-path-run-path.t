@@ -30,7 +30,7 @@ NAME="$(basename "${SUITE_RUN_DIR}")"
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
     rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' -- --debug
+    --no-gcontrol --host='localhost' -- --no-detach --debug
 TEST_KEY="${TEST_KEY_BASE}-hello.txt"
 file_cmp "${TEST_KEY}" "${SUITE_RUN_DIR}/hello.txt" <<__HELLO__
 Hello Earth!

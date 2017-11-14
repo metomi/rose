@@ -63,7 +63,7 @@ for SUFFIX in 'b' 'a' 'c'; do
     fi
     cp -p 'suite.rc' "${SUITE_DIR}/suite.rc"
     cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-    cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    cylc run --no-detach --debug "${SUITE_NAME}" 2>'/dev/null' \
         || cat "${SUITE_DIR}/log/suite/err" >&2
 done
 
@@ -75,7 +75,7 @@ for SUFFIX in $(seq -w 1 10); do
     mkdir -p "${SUITE_DIR}"
     cp -p 'suite.rc' "${SUITE_DIR}/suite.rc"
     cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-    cylc run --debug "${SUITE_NAME}" 2>'/dev/null' \
+    cylc run --no-detach --debug "${SUITE_NAME}" 2>'/dev/null' \
         || cat "${SUITE_DIR}/log/suite/err" >&2
 done
 #-------------------------------------------------------------------------------

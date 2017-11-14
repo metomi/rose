@@ -31,7 +31,7 @@ mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol \
-    -C $ROSE_HOME/etc/rose-rug-simple -- --debug
+    -C $ROSE_HOME/etc/rose-rug-simple -- --no-detach --debug
 #-------------------------------------------------------------------------------
 file_cmp "$TEST_KEY_BASE.hello.log" \
     $SUITE_RUN_DIR/share/data/hello.log <<'__LOG__'

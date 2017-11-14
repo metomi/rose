@@ -51,7 +51,8 @@ fi
 export ROSE_CONF_PATH=
 export ROSE_TEST_ROOT_DIR="${PWD}/root.d"
 set -e
-rose suite-run -q -C "${PWD}/${NAME}" --no-gcontrol --host='localhost' -- --debug
+rose suite-run -q -C "${PWD}/${NAME}" --no-gcontrol --host='localhost' \
+    -- --no-detach --debug
 # Prove that the directories exist before clean
 test -d "${HOME}/cylc-run/${NAME}"
 test -d "${PWD}/root.d/cylc-run/${NAME}"

@@ -56,7 +56,7 @@ NAME="$(basename "${SUITE_RUN_DIR}")"
 timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host='localhost' \
-    -S "HOST=\"${JOB_HOST}\"" -S "GREET=\"${GREET}\"" -- --debug
+    -S "HOST=\"${JOB_HOST}\"" -S "GREET=\"${GREET}\"" -- --no-detach --debug
 #-------------------------------------------------------------------------------
 JOB_HOST_HOME=$(ssh -n -oBatchMode=yes "${JOB_HOST}" 'echo "${HOME}"' | tail -1)
 ssh -n -oBatchMode=yes "${JOB_HOST}" \

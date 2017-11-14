@@ -56,7 +56,7 @@ cat >"${SUITE_DIR}/suite.rc" <<'__SUITE_RC__'
 __SUITE_RC__
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}" 2>'/dev/null' &
+cylc run --no-detach --debug "${SUITE_NAME}" 2>'/dev/null' &
 SUITE_PID="$!"
 CONTACT="${HOME}/cylc-run/${SUITE_NAME}/.service/contact"
 poll '!' test -s "${CONTACT}"

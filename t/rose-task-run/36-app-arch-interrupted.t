@@ -31,7 +31,7 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host=localhost -- --debug
+    --no-gcontrol --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-job.status"
 file_grep "${TEST_KEY}-archive-01" \

@@ -27,12 +27,13 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 rose suite-run --debug -q \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol -- \
-    --debug
+    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol \
+    -- --no-detach --debug
 
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
-    rose suite-restart --debug --name="${NAME}" --no-gcontrol -- --debug
+    rose suite-restart --debug --name="${NAME}" --no-gcontrol \
+    -- --no-detach --debug
 file_grep "${TEST_KEY}.out" \
     "\\[INFO\\] ${NAME}: will restart on localhost" \
     "${TEST_KEY}.out"

@@ -73,7 +73,7 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -p 'suite.rc' "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+cylc run --no-detach --debug "${SUITE_NAME}" 2>'/dev/null'
 TASKJOBS_URL="${TEST_ROSE_WS_URL}/taskjobs/${USER}/${SUITE_NAME}?form=json"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
