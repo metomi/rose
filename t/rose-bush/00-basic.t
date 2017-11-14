@@ -24,7 +24,7 @@ if ! python -c 'import cherrypy' 2>'/dev/null'; then
     skip_all '"cherrypy" not installed'
 fi
 
-tests 55
+tests 61
 
 ROSE_CONF_PATH= rose_ws_init 'rose' 'bush'
 if [[ -z "${TEST_ROSE_WS_PORT}" ]]; then
@@ -218,8 +218,8 @@ run_pass "${TEST_KEY}" \
     curl -I \
     "${TEST_ROSE_WS_URL}/view/${USER}/${SUITE_NAME}?path=log/of/minus-one"
 file_grep "${TEST_KEY}.out" 'HTTP/.* 404 Not Found' "${TEST_KEY}.out"
-
-# test the file search feature
+#-------------------------------------------------------------------------------
+# Test the file search feature.
 TEST_KEY="${TEST_KEY_BASE}-200-curl-viewsearch"
 FILE='log/job/20000101T0000Z/foo1/01/job.out'
 MODE="&mode=text"
@@ -234,7 +234,29 @@ run_pass "${TEST_KEY}" \
     curl "${URL}"
 file_grep "${TEST_KEY}.out" '<span class="highlight">Hello from</span>' \
     "${TEST_KEY}.out"
-
+#-------------------------------------------------------------------------------
+# Test requesting a file outside of the suite directory tree:
+# 1. By absolute path.
+TEST_KEY="${TEST_KEY_BASE}-403-curl-view-outside-absolute"
+run_pass "${TEST_KEY}" \
+    curl -I \
+    "${TEST_ROSE_WS_URL}/view/${USER}/${SUITE_NAME}?path=/dev/null"
+file_grep "${TEST_KEY}.out" 'HTTP/.* 403 Forbidden' "${TEST_KEY}.out"
+# 2. By absolute path to imaginary suite directory.
+TEST_KEY="${TEST_KEY_BASE}-403-curl-view-outside-imag"
+IMG_SUITE_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" \
+    "rtb-rose-bush-00-XXXXXXXX")"
+echo 'Welcome to the imaginery suite.'>"${IMG_SUITE_DIR}/welcome.txt"
+run_pass "${TEST_KEY}" \
+    curl -I \
+    "${TEST_ROSE_WS_URL}/view/${USER}/${SUITE_NAME}?path=${IMG_SUITE_DIR}/welcome.txt"
+file_grep "${TEST_KEY}.out" 'HTTP/.* 403 Forbidden' "${TEST_KEY}.out"
+# 3. By relative path.
+TEST_KEY="${TEST_KEY_BASE}-403-curl-view-outside-relative"
+run_pass "${TEST_KEY}" \
+    curl -I \
+    "${TEST_ROSE_WS_URL}/view/${USER}/${SUITE_NAME}?path=../$(basename $IMG_SUITE_DIR)/welcome.txt"
+file_grep "${TEST_KEY}.out" 'HTTP/.* 403 Forbidden' "${TEST_KEY}.out"
 #-------------------------------------------------------------------------------
 # Tidy up
 rose_ws_kill

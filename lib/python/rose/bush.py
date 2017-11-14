@@ -26,18 +26,20 @@ import jinja2
 import json
 import mimetypes
 import os
-import re
 import pwd
+import re
 import shlex
-import rose.config
-from rose.host_select import HostSelector
-from rose.resource import ResourceLocator
-from rose.bush_dao import RoseBushDAO
+import sys
 import tarfile
 from tempfile import NamedTemporaryFile
 from time import gmtime, strftime
 import traceback
 import urllib
+
+import rose.config
+from rose.host_select import HostSelector
+from rose.resource import ResourceLocator
+from rose.bush_dao import RoseBushDAO
 
 
 class RoseBushService(object):
@@ -471,8 +473,6 @@ class RoseBushService(object):
 
     def get_file(self, user, suite, path, path_in_tar=None, mode=None):
         """Returns file information / content or a cherrypy response."""
-        self._check_string_for_path(user)
-        self._check_path_normalised(suite)
         f_name = self._get_user_suite_dir(user, suite, path)
         conf = ResourceLocator.default().get_conf()
         view_size_max = int(conf.get_value(
@@ -714,7 +714,9 @@ class RoseBushService(object):
     def _check_dir_access(cls, path):
         """Check directory is accessible.
 
-        Raise 404 if path does not exist, or 403 if path not accessible.
+        Raises:
+            - cherrypy.HTTPError(404) if path does not exist
+            - cherrypy.HTTPError(403) if path not accessible
 
         Return path on success.
 
@@ -730,6 +732,9 @@ class RoseBushService(object):
         """Return, e.g. ~/cylc-run/ for a cylc suite.
 
         N.B. os.path.expanduser does not fail if ~user is invalid.
+
+        Raises:
+            cherrypy.HTTPError(404)
 
         """
         try:
@@ -747,6 +752,13 @@ class RoseBushService(object):
     def _check_string_for_path(string):
         """Raise HTTP 403 error if the provided string contain path chars.
 
+        Examples:
+            >>> RoseBushService._check_string_for_path(
+            ...     os.path.join('foo', 'bar'))
+            Traceback (most recent call last):
+             ...
+            HTTPError: (403, None)
+
         Raises:
             cherrypy.HTTPError(403)
 
@@ -758,24 +770,48 @@ class RoseBushService(object):
     def _check_path_normalised(path):
         """Raise HTTP 403 error if path is not normalised.
 
-        E.g. the following will fail:
-
-        * foo//bar
-        * foo/bar/
-        * foo/./bar
-        * foo/../bar
+        Examples:
+            >>> RoseBushService._check_path_normalised('foo//bar')
+            Traceback (most recent call last):
+             ...
+            HTTPError: (403, None)
+            >>> RoseBushService._check_path_normalised('foo/bar/')
+            Traceback (most recent call last):
+             ...
+            HTTPError: (403, None)
+            >>> RoseBushService._check_path_normalised('foo/./bar')
+            Traceback (most recent call last):
+             ...
+            HTTPError: (403, None)
+            >>> RoseBushService._check_path_normalised('foo/../bar')
+            Traceback (most recent call last):
+             ...
+            HTTPError: (403, None)
+            >>> RoseBushService._check_path_normalised('../foo')
+            Traceback (most recent call last):
+             ...
+            HTTPError: (403, None)
 
         Raises:
             cherrypy.HTTPError(403)
 
         """
+        path = os.path.join('foo', path)  # Enable checking of ../foo paths.
         if os.path.normpath(path) != path:
             raise cherrypy.HTTPError(403)
 
     def _get_user_suite_dir(self, user, suite, *paths):
-        """Return, e.g. ~user/cylc-run/suite/... for a cylc suite."""
+        """Return, e.g. ~user/cylc-run/suite/... for a cylc suite.
+
+        Raises:
+            - cherrypy.HTTPError(404) if path does not exist
+            - cherrypy.HTTPError(403) if path not accessible
+
+        """
         self._check_string_for_path(user)
         self._check_path_normalised(suite)
+        for path in paths:
+            self._check_path_normalised(path)
         suite_dir = os.path.join(
             self._get_user_home(user),
             self.bush_dao.SUITE_DIR_REL_ROOT,
@@ -801,6 +837,7 @@ class RoseBushService(object):
 if __name__ == "__main__":
     from rose.ws import ws_cli
     ws_cli(RoseBushService)
-else:
+elif not 'doctest' in sys.argv[0]:
+    # If called as a module but not by the doctest module.
     from rose.ws import wsgi_app
     application = wsgi_app(RoseBushService)
