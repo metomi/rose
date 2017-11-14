@@ -624,6 +624,9 @@ Glossary
    rose application configuration
       TODO
 
+   rose suite configuration
+      TODO
+
    metadata
    rose metadata
       TODO
