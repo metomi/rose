@@ -44,12 +44,13 @@ for I in $(seq 0 $N_RUNS); do
     # Run the suite
     TEST_KEY=$TEST_KEY_BASE-$I
     if ((I == I_KEEP)); then
-        run_pass "$TEST_KEY-keep" $ROSE_SUITE_RUN --log-name=keep -- --debug
+        run_pass "$TEST_KEY-keep" $ROSE_SUITE_RUN --log-name=keep \
+            -- --no-detach --debug
     elif ((I == I_NO_LOG_ARCHIVE)); then
         run_pass "$TEST_KEY-no-log-archive" \
-            $ROSE_SUITE_RUN --no-log-archive -- --debug
+            $ROSE_SUITE_RUN --no-log-archive -- --no-detach --debug
     else
-        run_pass "$TEST_KEY" $ROSE_SUITE_RUN -- --debug
+        run_pass "$TEST_KEY" $ROSE_SUITE_RUN -- --no-detach --debug
     fi
 
     TEST_KEY=$TEST_KEY_BASE-$I-log
@@ -67,7 +68,7 @@ for I in $(seq 0 $N_RUNS); do
 done
 
 TEST_KEY=$TEST_KEY_BASE-log-keep-0
-run_pass "$TEST_KEY" $ROSE_SUITE_RUN --log-keep=0 -- --debug
+run_pass "$TEST_KEY" $ROSE_SUITE_RUN --log-keep=0 -- --no-detach --debug
 
 TEST_KEY=$TEST_KEY_BASE-log-keep-0-ls
 ls -d $SUITE_RUN_DIR/log* >$TEST_KEY.out

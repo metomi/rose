@@ -32,7 +32,8 @@ SUITE_RUN_DIR=$(readlink -f $SUITE_RUN_DIR)
 NAME=$(basename $SUITE_RUN_DIR)
 # Install suite, and prove that directories are created
 rose suite-run --debug -q \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol -- --debug &
+    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol \
+    -- --no-detach --debug &
 ROSE_SUITE_RUN_PID=$!
 poll ! test -e $SUITE_RUN_DIR/log/job/2013010100/my_task_1/01/job
 SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>" \

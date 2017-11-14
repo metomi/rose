@@ -25,7 +25,7 @@ run_suite() {
     set -e
     rose suite-run --new -q \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" --name="$NAME" \
-        --no-gcontrol -S "HOST=\"$JOB_HOST\"" -- --debug
+        --no-gcontrol -S "HOST=\"$JOB_HOST\"" -- --no-detach --debug
     ssh "$JOB_HOST" "ls -d cylc-run/$NAME 1>/dev/null"
     ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e

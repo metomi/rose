@@ -25,7 +25,7 @@ run_suite() {
     set -e
     rose suite-run --new -q \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" --name="$NAME" \
-        --no-gcontrol -- --debug
+        --no-gcontrol -- --no-detach --debug
     ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e
 }

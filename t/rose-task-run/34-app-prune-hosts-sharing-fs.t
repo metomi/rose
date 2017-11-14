@@ -42,7 +42,7 @@ run_pass "${TEST_KEY}" \
     rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host='localhost' --debug \
     -S "JOB_HOST_1=\"${JOB_HOST_1}\"" -S "JOB_HOST_2=\"${JOB_HOST_2}\"" \
-    -- --debug
+    -- --no-detach --debug
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 grep \

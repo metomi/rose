@@ -29,7 +29,7 @@ tests 1
 SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME=$(basename "${SUITE_RUN_DIR}")
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host=localhost -- --debug
+    --no-gcontrol --host=localhost -- --no-detach --debug
 
 sqlite3 "${SUITE_RUN_DIR}/log/db" \
     'select distinct status from task_states;' >"$TEST_KEY_BASE-db.out"

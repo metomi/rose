@@ -42,7 +42,7 @@ NAME="$(basename "${SUITE_RUN_DIR}")"
 timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host='localhost' -S "FAST_DEST_ROOT=\"${PWD}/fast\"" \
-    -- --debug
+    -- --no-detach --debug
 #-------------------------------------------------------------------------------
 # Permission modes of make directory should be the same as a normal directory
 mkdir "${SUITE_RUN_DIR}/share/hello-make-perm-mode-test"

@@ -36,7 +36,7 @@ fi
 tests 46
 #-------------------------------------------------------------------------------
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost -- --debug
+    --no-gcontrol --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 MY_PATH=
 for P in $(ls -d $SUITE_RUN_DIR/etc/my-path/*); do

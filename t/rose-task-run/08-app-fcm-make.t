@@ -43,11 +43,11 @@ if [[ -n ${JOB_HOST:-} ]]; then
     timeout 60 rose suite-run -q \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
         --no-gcontrol --host='localhost' \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --debug
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --no-detach --debug
 else
     timeout 60 rose suite-run -q \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-        --no-gcontrol --host='localhost' -- --debug
+        --no-gcontrol --host='localhost' -- --no-detach --debug
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-status"

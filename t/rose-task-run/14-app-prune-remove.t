@@ -34,7 +34,7 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost \
-    -- --debug
+    -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-log
 run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/log/job/20100101T0000Z

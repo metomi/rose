@@ -27,7 +27,7 @@ tests 1
 RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rtb-rose-task-env-02.XXXXXX')"
 NAME="$(basename "${RUN_DIR}")"
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' -- --debug
+    --no-gcontrol --host='localhost' -- --no-detach --debug
 for CYCLE in \
     '20200227T0000Z' \
     '20200228T0000Z' \

@@ -51,7 +51,7 @@ __FIND__
 TEST_KEY="$TEST_KEY_BASE-suite-run"
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/hello_earth \
-    -n $NAME --no-gcontrol -- --debug
+    -n $NAME --no-gcontrol -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-suite-run-my-hello.log"
 LANG=C sort $SUITE_RUN_DIR/my-hello.log >"$TEST_KEY"

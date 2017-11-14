@@ -58,7 +58,7 @@ ssh -n -oBatchMode=yes "${JOB_HOST}" \
 timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host='localhost' \
-    -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --debug
+    -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --no-detach --debug
 #-------------------------------------------------------------------------------
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
     cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'

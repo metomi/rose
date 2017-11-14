@@ -39,7 +39,7 @@ while read OPT_KEY SUITE_RUN_DIR; do
     if [[ $OPT_KEY != 'world' ]]; then
         ROSE_SUITE_RUN="$ROSE_SUITE_RUN -O $OPT_KEY"
     fi
-    ROSE_SUITE_RUN="$ROSE_SUITE_RUN -- --debug"
+    ROSE_SUITE_RUN="$ROSE_SUITE_RUN -- --no-detach --debug"
     TEST_KEY=$TEST_KEY_BASE-$OPT_KEY
     run_pass "$TEST_KEY" $ROSE_SUITE_RUN
 done <tests

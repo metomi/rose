@@ -58,7 +58,7 @@ TEST_KEY=$TEST_KEY_BASE-basic-check
 run_pass "$TEST_KEY" \
    rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
              --source=$WORKINGCOPY --source=fcm:foo.x_tr@head --no-gcontrol \
-             --name $SUITENAME -- --debug
+             --name $SUITENAME -- --no-detach --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-basic-groups-to-run
@@ -82,7 +82,7 @@ TEST_KEY=$TEST_KEY_BASE-project-override
 run_pass "$TEST_KEY" \
    rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
              --source=bar=$WORKINGCOPY --source=fcm:foo.x_tr@head \
-             --no-gcontrol --name $SUITENAME -- --debug
+             --no-gcontrol --name $SUITENAME -- --no-detach --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-basic-groups-to-run
@@ -115,7 +115,7 @@ file_grep $TEST_KEY "SOURCE_FOO_MIRROR=fcm:foo.xm/trunk@1\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-suite-redirection
 run_pass "$TEST_KEY" \
    rose stem --group=lapsang -C $WORKINGCOPY/rose-stem --source=fcm:foo.x_tr@head\
-             --no-gcontrol --name $SUITENAME -- --debug
+             --no-gcontrol --name $SUITENAME -- --no-detach --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-suite-redirection-groups-to-run
@@ -131,7 +131,7 @@ file_grep $TEST_KEY "SOURCE_FOO_REV=@1\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory
 run_pass "$TEST_KEY" \
    rose stem --group=assam --source=$WORKINGCOPY/rose-stem --no-gcontrol \
-             --name $SUITENAME -- --debug
+             --name $SUITENAME -- --no-detach --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-subdirectory-groups-to-run
@@ -154,7 +154,7 @@ TEST_KEY=$TEST_KEY_BASE-relative-path
 cd $WORKINGCOPY
 run_pass "$TEST_KEY" \
    rose stem --group=ceylon -C rose-stem \
-             --no-gcontrol --name $SUITENAME -- --debug
+             --no-gcontrol --name $SUITENAME -- --no-detach --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-relative-path-groups-to-run
@@ -184,7 +184,7 @@ TEST_KEY=$TEST_KEY_BASE-check-with-config
 run_pass "$TEST_KEY" \
    rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
              --source=$WORKINGCOPY --source=fcm:foo.x_tr@head --no-gcontrol \
-             --name $SUITENAME -- --debug
+             --name $SUITENAME -- --no-detach --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-check-with-config-groups-to-run
@@ -212,7 +212,7 @@ EOF
 TEST_KEY=$TEST_KEY_BASE-check-with-config
 run_pass "$TEST_KEY" \
    rose stem --group=assam --source=$WORKINGCOPY/rose-stem --no-gcontrol \
-             --name $SUITENAME -- --debug
+             --name $SUITENAME -- --no-detach --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-multi-auto-config-first
@@ -226,7 +226,7 @@ TEST_KEY=$TEST_KEY_BASE-incompatible_versions
 run_fail "$TEST_KEY" \
    rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
              --source=$WORKINGCOPY --source=fcm:foo.x_tr@head --no-gcontrol \
-             --name $SUITENAME -- --debug 
+             --name $SUITENAME -- --no-detach --debug 
 OUTPUT=$TEST_DIR/${TEST_KEY}.err
 TEST_KEY=$TEST_KEY_BASE-incompatible-versions-correct_error
 file_grep $TEST_KEY "Running rose-stem version 1 but suite is at version 0" $OUTPUT
@@ -239,7 +239,7 @@ TEST_KEY=$TEST_KEY_BASE-project-not-in-keywords
 run_fail "$TEST_KEY" \
    rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
              --source=$WORKINGCOPY --source=fcm:foo.x_tr@head --no-gcontrol \
-             --name $SUITENAME -- --debug 
+             --name $SUITENAME -- --no-detach --debug 
 OUTPUT=$TEST_DIR/${TEST_KEY}.err
 TEST_KEY=$TEST_KEY_BASE-project-not-in-keywords-correct_error
 file_grep $TEST_KEY "Cannot ascertain project for source tree" $OUTPUT

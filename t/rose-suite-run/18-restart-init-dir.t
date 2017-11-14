@@ -27,14 +27,15 @@ cp -r $TEST_SOURCE_DIR/$TEST_KEY_BASE src
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -n $NAME --no-gcontrol -C src -- --debug
+rose suite-run -q -n $NAME --no-gcontrol -C src -- --no-detach --debug
 cat >'src/rose-suite.conf' <<__CONF__
 root-dir=*=$PWD
 __CONF__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-restart"
 run_pass "$TEST_KEY" \
-    rose suite-run -q -n $NAME --no-gcontrol -C src --restart -- --debug
+    rose suite-run -q -n $NAME --no-gcontrol -C src --restart \
+    -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-dir"
 run_pass "$TEST_KEY" test -d "$SUITE_RUN_DIR" 

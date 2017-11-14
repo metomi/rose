@@ -44,7 +44,7 @@ touch "${SUITE_RUN_DIR}/share/hello-make/junk1"
 
 timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' -- --debug
+    --no-gcontrol --host='localhost' -- --no-detach --debug
 #-------------------------------------------------------------------------------
 file_cmp "${TEST_KEY_BASE}" "${SUITE_RUN_DIR}/share/hello.txt" <<__TXT__
 ${SUITE_RUN_DIR}/share/hello-make/build/bin/hello

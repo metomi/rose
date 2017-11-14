@@ -36,7 +36,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 # N.B. SLEEP=\":\" means run the ":" command instead of "sleep $((RANDOM % 10))"
 run_pass "$TEST_KEY" \
-    rose suite-run --name=$NAME --no-gcontrol -S SLEEP=\":\" -- --debug
+    rose suite-run --name=$NAME --no-gcontrol -S SLEEP=\":\" -- --no-detach --debug
 #-------------------------------------------------------------------------------
 # Check that the suite runs to success
 TEST_KEY=$TEST_KEY_BASE-db

@@ -57,7 +57,7 @@ SUITE_NAME="$(basename "${SUITE_DIR}")"
 cp -pr 'suite.rc' "${SUITE_DIR}"
 export CYLC_CONF_PATH=
 cylc register "${SUITE_NAME}" "${SUITE_DIR}"
-cylc run --debug "${SUITE_NAME}" 2>'/dev/null'
+cylc run --no-detach --debug "${SUITE_NAME}" 2>'/dev/null'
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-200-curl-jobs"
 ECHO1="{'cycle': '19990101T0000Z', 'name': 'echo1', 'submit_num': 1}"
