@@ -837,7 +837,7 @@ class RoseBushService(object):
 if __name__ == "__main__":
     from rose.ws import ws_cli
     ws_cli(RoseBushService)
-elif not 'doctest' in sys.argv[0]:
+elif 'doctest' not in sys.argv[0]:
     # If called as a module but not by the doctest module.
     from rose.ws import wsgi_app
     application = wsgi_app(RoseBushService)
