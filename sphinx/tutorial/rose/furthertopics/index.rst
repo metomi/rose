@@ -11,6 +11,7 @@ This section goes into detail in additional rose topics.
    command-keys
    failif-warnif
    macro-development
+   optional-configurations
    trigger
    upgrading
    upgrading-macro-development
