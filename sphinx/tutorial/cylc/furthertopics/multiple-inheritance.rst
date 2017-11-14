@@ -1,4 +1,0 @@
-Multiple Inheritance
-====================
-
-
