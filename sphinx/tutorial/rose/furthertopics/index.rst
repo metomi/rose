@@ -18,6 +18,8 @@ This section goes into detail in additional rose topics.
    upgrading-macro-development
    widget-development
 
+   rose-arch
+
 .. toctree::
    :hidden:
    :name: rose-further-topics-additional-files
