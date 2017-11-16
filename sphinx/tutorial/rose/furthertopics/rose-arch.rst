@@ -1,0 +1,298 @@
+rose arch
+=========
+
+This tutorial walks you through developing ``rose_arch`` app's - built-in
+application that provides a generic solution to configure site specific
+archiving of suite files.
+
+This allows users to define which files to archive and to reduce disk space
+used for archived files which keeping data for prosperity.
+
+.. warning::
+
+   Only archive the minimum files needed at each cycle of your suite. Run
+   this before your housekeep app in the graphing of your ``suite.rc`` so that
+   you do not lose valuable data that is needed.
+
+
+Purpose
+-------
+
+``archive`` app's are user-defined :term:`app's <rose app>` that use
+``rose_arch``, the built-in application to archive data from a defined source
+to a defined location using a defined command. The follow examples will provide
+a guide to using ``rose_arch`` with the user-defined archive app.
+
+
+Syntax
+------
+
+.. _PythonHOWTO: https://docs.python.org/2/howto/regex.html
+
+The regular expression syntax is Pythonic. Some aspects use regular
+expressions `PythonHOWTO`_ how these are used in the ``app/archive/`` is
+explained in detail later.
+
+
+Example
+-------
+
+Create a new suite (or just a new directory somewhere - e.g. in your
+homespace) containing a blank ``rose-suite.conf`` and a ``suite.rc`` file
+that looks like this:
+
+.. code-block:: cylc
+
+   [cylc]
+       UTC mode = True # Ignore DST
+       [[events]]
+           abort on timeout = True
+           timeout = PT1H
+   [scheduling]
+       [[dependencies]]
+           graph = create_files => archive_files_rsync => archive_files_scp
+   [runtime]
+       [[root]]
+           env-script = eval $(rose task-env)
+           script = rose task-run
+
+       [[create_files]]
+           script = """
+               echo 'zip' >> $ROSE_DATAC/file_zip
+               echo 'solo' >> $ROSE_DATAC/file_solo
+               echo 'list1' >> $ROSE_DATA/file_list1
+               echo 'list2' >> $ROSE_DATA/file_list2
+               echo 'list3' >> $ROSE_DATA/file_list3
+               mkdir -p $ROSE_DATA/ARCHIVING || true
+               mkdir -p $ROSE_DATA/ARCHIVING/rename || true
+           """
+       [[archive_files_rsync]]
+       [[archive_files_scp]]
+
+In the suite directory create an ``app/`` directory::
+
+   mkdir app
+
+In the app directory create an ``archive_files_rsync/`` directory::
+
+   cd app
+   mkdir archive_files_rsync
+
+In the ``app/archive_files_rsync/`` directory create a ``rose-app.conf``
+file, this example uses vi, but please use your editor of choice::
+
+   cd archive_files_rsync
+   vi rose-app.conf
+
+Paste in the following lines:
+
+.. code-block:: rose
+
+   mode=rose_arch
+
+   [env]
+   ARCH_TARGET=$ROSE_DATA/ARCHIVING
+
+   [arch]
+   command-format=rsync -a %(sources)s %(target)s
+   source-prefix=$ROSE_DATAC/
+   target-prefix=$ARCH_TARGET/
+   update-check=mtime+size
+
+   [arch:solo.file]
+   source=file_solo
+
+   [arch:files]
+   source=file_list1 file_list3
+   source-prefix=$ROSE_DATA/
+
+   [arch:dir]
+   source=file*
+   source-prefix=$ROSE_DATA/
+
+   [arch:file_zipped.tar]
+   source=file_zip
+
+Move to the ``app/`` directory::
+
+   cd ..
+   ls
+
+The following should be returned:
+
+.. code-block:: none
+
+   archive_files_rsync
+
+Create an ``archive_files_scp/`` directory::
+
+   mkdir archive_files_scp
+
+In the ``archive_files_scp/`` directory create a ``rose-app.conf`` file,
+this example uses vi, but please use your editor of choice::
+
+   cd archive_files_scp
+   vi rose-app.conf
+
+Paste in the following lines:
+
+.. code-block:: rose
+
+   mode=rose_arch
+
+   [env]
+   ARCH_TARGET=$ROSE_DATA/ARCHIVING
+
+   [arch]
+   command-format=scp %(sources)s %(target)s
+   source-prefix=$ROSE_DATA/
+   target-prefix=$ARCH_TARGET/
+   update-check=mtime+size
+
+   [arch:rename/]
+   rename-format=%(cycle)s_%(tag)s_%(name)s
+   rename-parser=^.*list(?P<tag>.*)$
+   source=file_list?
+
+
+Description
+-----------
+
+You have now created a suite that defines three tasks:
+
+``make_files``
+   Sets up the files and ``ARCHIVING/`` directory for ``archive_files_rsync/``
+   and ``archive_files_scp/`` to "archive", move, date to.
+``archive_files_rsync``
+   "Archives", rsync's files to the ``ARCHIVING/`` folder in the
+   ``$ROSE_DATA/`` directory.
+``archive_files_scp``
+   "Archives", scp's the renamed files and moves them to the ``ARCHIVING/``
+   folder in the ``$ROSE_DATA/`` directory.
+
+Save your changes and run the suite::
+
+   rose suite-run
+
+View the suite output using ``rose suite-log`` and inspect the output of the
+``make_files``, ``archive_files_rsync`` and ``archive_files_scp`` tasks.
+
+
+Results Of "Archiving"
+----------------------
+
+Change to the ``$ROSE_DATA/ARCHVING/`` directory of the suite i.e::
+
+   cd ~cylc-run/SUITE_ID/share/data/ARCHIVING/
+
+List the directory by typing::
+
+   ls
+
+You should see the following returned:
+
+.. code-block:: none
+
+   dir  file_zipped.tar  files  rename  solo.file
+
+Change directory to ``files/`` and list the files::
+
+   cd files
+   ls
+
+The following should be returned:
+
+.. code-block:: none
+
+   file_list1  file_list3
+
+Change directory to ``ARCHIVING/dir/`` and list the files::
+
+   cd ..
+   cd dir
+   ls
+
+The following should be returned:
+
+.. code-block:: none
+
+   file_list1  file_list2 file_list3
+
+.. note::
+
+   These were all of the files in the ``$ROSE_DATA/`` directory.
+
+Change diectory to ``ARCHIVING/rename/`` and list the files::
+
+   cd ..
+   cd rename
+   ls
+
+The following should be returned:
+
+.. code-block:: none
+
+   1_1_file_list1 1_2_file_list2 1_3_file_list3 
+
+These are the renamed files.
+
+Most users will have there own system or location that they wish to archive
+their data to. Here the example shown uses ``rsync`` and ``scp``. Further
+information on Linux commands ``rsync``, ``scp`` Please refer your own site
+specific archiving solutions and seek site specfic advice.
+
+
+Arch Settings
+-------------
+
+Some settings that can be used are described below.
+
+.. TODO - link to reference material
+
+   Also see: Built-in Applications: rose_arch
+
+Above ``.tar`` was used to compress the file. However, ``compress=gzip``
+can also be used. Note either of these commands can be used to compress a
+file or a folder/directory.
+
+In the above example a regular expression (reg exp) was used by the
+``rename-parser``, for example, ``^.*list(?P<tag>.*)$``, where:
+
+* ``^`` = startof a string.
+* ``$`` = end of a string.
+* ``.`` = any character.
+* ``*`` = greedy (all).
+* ``?P<NAME>`` = named group.
+
+In the above example source was used to accept a list of glob patterns.
+For example, ``file_list?`` was used where the ``?`` relates to one unknown
+character. Similarly, if there were files named ``pa000``, ``pa012``,
+``pa018``, ``pa024`` which are to be source files can be identified using
+``source=pa???`` where the ``???`` relate to the three possible number
+characters.
+
+.. note::
+
+   These examples are just some possible examples and not a full list.
+
+As well as ``[arch]`` and ``[arch:TARGET]`` other options can be provided
+to the app, for example:
+
+``[env]``
+   Can be defined near the top of the app to allow an environment variable
+   to be available to the ``[arch:]`` commands in the app.
+
+   Also see the suite example above.
+``[poll]``
+   Polling can be defined, and is often near the bottom of the app. This
+   will allow the app to poll with a defined delay, e.g. ``delay=0``.
+``[file:TARGET]``
+   This option allows the user to, for example, make the directory
+   ``TARGET``, e.g. ``mode=mkdir``.
+
+.. TODO - link to reference material
+
+   Further Reading
+   ---------------
+
+   For more information, see the Built-in Applications: rose_arch.
