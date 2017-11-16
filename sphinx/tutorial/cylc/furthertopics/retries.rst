@@ -1,91 +1,139 @@
+.. include:: ../../../hyperlinks.rst
+   :start-line: 1
+
 Retries
 =======
 
-Introduction
-------------
+Retries allow use to automatically re-submit tasks which have failed due to
+failure in submission or execution.
 
-This part of the Rose user guide walks you through using cylc retries.
-
-This allows tasks to be automatically resubmitted after failure, after a certain delay, and even with different behaviour.
 
 Purpose 
 -------
 
-Retries can be useful for tasks that may occasionally fail due to external events, and are routinely fixable when they do - an example would be a task that is dependent on a system that experiences temporary outages.
+Retries can be useful for tasks that may occasionally fail due to external
+events, and are routinely fixable when they do - an example would be a task
+that is dependent on a system that experiences temporary outages.
 
-If a task fails, the cylc retry mechanism can resubmit it after a pre-determined delay. An environment variable, ``$CYLC_TASK_TRY_NUMBER`` is incremented and passed into the task - this means you can write your task script so that it changes behaviour accordingly.
+If a task fails, the cylc retry mechanism can resubmit it after a
+pre-determined delay. An environment variable, ``$CYLC_TASK_TRY_NUMBER``
+is incremented and passed into the task - this means you can write your
+task script so that it changes behaviour accordingly.
+
 
 Example
 -------
 
-Our example suite will simulate trying to roll doubles using two dice.
+.. image:: https://upload.wikimedia.org/wikipedia/commons/7/73/Double-six-dice.jpg
+   :width: 200px
+   :align: right
+   :alt: Two dice both showing the number six
 
-Create a new suite (or just a new directory somewhere - e.g. in your homespace) containing a blank ``rose-suite.conf`` and a ``suite.rc`` file with the following contents:
+Create a new suite by running the following commands::
+
+   rose tutorial retries-tutorial
+   cd retries-tutorial
+
+You will now have a suite with a ``roll_doubles`` task which simulates
+trying to roll doubles using two dice:
 
 .. code-block:: cylc
 
    [cylc]
        UTC mode = True # Ignore DST
+
    [scheduling]
        [[dependencies]]
            graph = start => roll_doubles => win
 
-We'll add some standard information in the ``[runtime]`` section:
-
-.. code-block:: cylc
-
    [runtime]
        [[start]]
        [[win]]
-
-We need to add a rolling doubles task - add these lines to the end of your ``suite.rc`` file:
-
-.. code-block:: cylc
-
-   [[roll_doubles]]
-       script = """
+       [[roll_doubles]]
+           script = """
    sleep 10
    RANDOM=$$  # Seed $RANDOM
    DIE_1=$((RANDOM%6 + 1))
    DIE_2=$((RANDOM%6 + 1))
    echo "Rolled $DIE_1 and $DIE_2..."
    if (($DIE_1 == $DIE_2)); then
-       echo "doubles!"
+      echo "doubles!"
    else
-       exit 1
+      exit 1
    fi
    """
 
-Running it without retries
---------------------------
 
-Let's see what happens when we run the suite as it is.
+Running Without Retries
+-----------------------
 
-Make sure you are in the root directory of your suite.
+Let's see what happens when we run the suite as it is. Open the cylc gui::
 
-Run the suite using:
+   gcylc retries-tutorial &
 
-.. code-block:: console
+Then run the suite::
 
-   rose suite-run 
+   cylc run retries-tutorial
 
+Unless you're lucky, the suite should fail at the roll_doubles task.
 
-Results
--------
+Stop the suite::
 
-What you should see is cylc retrying the ``roll_doubles`` task. Hopefully, it will succeed (about a 1 in 3 chance of every task failing) and the suite will continue.
-
-If you go to the suite output (run ``rose suite-log`` in your root suite directory), you can see the separate retry instances of the task.
+   cylc stop retries-tutorial
 
 
-Altering behaviour
-------------------
+Configuring Retries
+-------------------
 
-We can alter the behaviour of the task based on the number of retries, using ``$CYLC_TASK_TRY_NUMBER``:
+We need to tell cylc to retry it a few times - replace the line
+``[[roll_doubles]]`` in the ``suite.rc`` file with:
 
 .. code-block:: cylc
 
-        script = """
+   [[roll_doubles]]
+       [[[job]]]
+           execution retry delays = 5*PT6S
+
+This means that if the ``roll_doubles`` task fails, cylc expects to
+retry running it 5 times before finally failing. Each retry will have
+a delay of 6 seconds.
+
+We can multiple retry periods with the ``execution retry delays`` setting by
+separating them with commas, for example the following line would tell cylc to
+retry a task, first after 15 seconds, then after 10 minutes, then after one hour
+then after three hours.
+
+.. code-block:: cylc
+
+   execution retry delays = PT15S, PT10M, PT1H, PT3H
+
+We've chosen 6 seconds because it's relatively easy to observe for this example.
+
+
+Running With Retries
+--------------------
+
+If you closed it, re-open the cylc gui::
+
+   gcylc retries-tutorial &
+
+Re-run the suite::
+
+   cylc run retries-tutorial
+
+What you should see is cylc retrying the ``roll_doubles`` task. Hopefully,
+it will succeed (about a 1 in 3 chance of every task failing) and the
+suite will continue.
+
+
+Altering Behaviour
+------------------
+
+We can alter the behaviour of the task based on the number of retries, using
+``$CYLC_TASK_TRY_NUMBER``.
+
+Change the ``script`` setting for the ``roll_doubles`` task to this::
+
    sleep 10
    RANDOM=$$  # Seed $RANDOM
    DIE_1=$((RANDOM%6 + 1))
@@ -99,27 +147,15 @@ We can alter the behaviour of the task based on the number of retries, using ``$
    else
        exit 1
    fi
-        """
 
-If your suite is still running, stop it. Run it again using:
+If your suite is still running, stop it, then run it again::
 
-.. code-block:: console
-
-   rose suite-run
+   cylc run retries-tutorial
 
 This time, the task should definitely succeed before the third retry.
 
-Further reading
+
+Further Reading
 ---------------
 
 For more information see the `cylc User Guide`_.
-
-.. _cylc User Guide: https://cylc.github.io/cylc/html/single/cug-html.html
-
-
-
-
-
-
-
-
