@@ -23,6 +23,7 @@ The following people have contributed to this code under the terms of
 the Contributor Licence Agreement and Certificate of Origin detailed
 below:
 
+* Sadie Bartholomew (Met Office, UK)
 * Andrew Clark (Met Office, UK)
 * Kerry Day (Met Office, UK)
 * Martin Dix (CSIRO, Australia)
