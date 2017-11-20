@@ -16,6 +16,5 @@ This section looks at further topics in cylc.
    queues
    remote-hosts
    retries
-   rose-bunch
    rose-stem
    suicide-triggers
