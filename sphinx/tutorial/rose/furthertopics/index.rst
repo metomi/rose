@@ -13,6 +13,7 @@ This section goes into detail in additional rose topics.
    macro-development
    optional-configurations
    polling
+   rose-bunch
    trigger
    upgrading
    upgrading-macro-development
