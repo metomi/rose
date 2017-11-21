@@ -46,6 +46,17 @@ For readability we may add hyphen (``-``) characters between the date
 components and colon (``:``) characters between the time components, i.e:
 ``2000-01-01T00:00``.
 
+.. warning::
+
+   Hyphen and colon characters can be added to a date-time,
+   or can be omitted, depending on preference, but *both* the date and time
+   components must have the appropriate characters inserted, should
+   characters be used.
+
+   Date-times such as ``2000-01-01T0000`` or ``20000101T00:00``, with
+   characters inside only one such component, are invalid in :term:`ISO8601`
+   and hence will produce an error.
+
 Time-zone information can be added onto the end. UTC is written ``Z``,
 UTC+1 is written ``+01``, etc. E.G: ``2000-01-01T00:00Z``.
 
