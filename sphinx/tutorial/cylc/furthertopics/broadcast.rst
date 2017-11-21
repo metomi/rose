@@ -1,25 +1,20 @@
 Broadcast
 =========
 
-This tutorial walks you through using ``cylc broadcast``.
-
-This changes :ref:`task runtime configuration <tutorial-runtime>` in a
+This tutorial walks you through using ``cylc broadcast`` which can be used
+to change :ref:`task runtime configuration <tutorial-runtime>` in a
 running suite, on-the-fly.
 
 
 Purpose
 -------
 
-``cylc broadcast`` can be used to change any ``[runtime]`` setting during a
-suite's run.
+``cylc broadcast`` can be used to change any ``[runtime]`` setting whilst the
+suite is running.
 
-You could invoke it on the command line (e.g. as a manual response to a
-failure) or use it in a task script (e.g. as part of an auto-recovery task
-that fixes other tasks).
-
-``cylc broadcast`` can also be used to communicate between tasks, where
-file-based communication is not appropriate. You should not normally need to
-use ``cylc broadcast`` in a task.
+The standard use of ``cylc broadcast`` is to update the suite to an
+unexpected change in configuration, for example modifying the host a task
+runs on.
 
 
 Standalone Example
@@ -65,12 +60,12 @@ The ``cylc broadcast`` task enables us to change runtime configuration whilst
 the suite is running. For instance we could change the value of the ``WORD``
 environment variable using the command::
 
-   cylc broadcast tutorial-broadcast -n announce -s "[environment]WORD=if"
+   cylc broadcast tutorial-broadcast -n announce -s "[environment]WORD=it"
 
 * ``tutorial-broadcast`` is the name of the suite.
 * ``-n announce`` tells cylc we want to change the runtime configuration of the
   ``announce`` task.
-* ``-s "[environment]WORD=if"`` changes the value of the ``WORD`` environment
+* ``-s "[environment]WORD=it"`` changes the value of the ``WORD`` environment
   variable to ``it``.
 
 Run the suite then try using the ``cylc broadcast`` command to change the
@@ -78,7 +73,6 @@ message::
 
    cylc run tutorial-broadcast
    cylc broadcast tutorial-broadcast -n announce -s "[environment]WORD=it"
-   ...
 
 Inspect the ``share/knights`` file, you should see the message change at
 certain points.
@@ -91,7 +85,15 @@ Stop the suite::
 In-Situ Example
 ---------------
 
-We can call the ``cylc broadcast`` command from within a task's script.
+We can call ``cylc broadcast`` from within a task's script. This effectively
+provides the ability for tasks to communicate between themselves.
+
+It is almost always better for tasks to communicate using files but there are
+some niche situations where comminicating via ``cylc broadcast`` is justified.
+This tutorial walks you through using ``cylc broadcast`` to communicate between
+tasks.
+
+.. TODO - examples of this?
 
 Add the following recurrence to the ``dependencies`` section:
 
@@ -117,15 +119,15 @@ Add the following runtime configuration to the ``runtime`` section:
                cylc broadcast $CYLC_SUITE_NAME -n announce -s "[environment]WORD=${WORD}"
            """
            [[[environment]]]
-               WORDS = ni, it, eche eche foo vatang
+               WORDS = ni, it, ekke ekke ptang zoo boing
 
-Run the suite and inspect the log, you should see the message change randomly
-every third entry e.g::
+Run the suite and inspect the log. You should see the message change randomly
+every third entry (because the ``change_word`` task runs every 3 hours) e.g::
 
    10120101T0000Z - We are the knights who say "ni"!
    10120101T0100Z - We are the knights who say "ni"!
    10120101T0200Z - We are the knights who say "ni"!
-   10120101T0300Z - We are the knights who say "eche eche foo vatang"!
+   10120101T0300Z - We are the knights who say "ekke ekke ptang zoo boing!"
 
 Stop the suite::
 
