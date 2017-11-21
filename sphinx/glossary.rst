@@ -108,12 +108,17 @@ Glossary
       * "``bar`` is dependent on ``foo``"
       * "``foo`` is triggered by ``bar``"
 
+      In practice a trigger is the left-hand side of a dependency (``foo`` in
+      this example).
+
       See also:
 
       * :term:`dependency`
+      * :term:`qualifier`
+      * :term:`family trigger`
 
    cycle
-      In a :term:`cycling suite<cycling>` one cycle is one repitition of the
+      In a :term:`cycling suite<cycling>` one cycle is one repetition of the
       workflow.
 
       For example, in the following workflow each dotted box represents a cycle
@@ -618,7 +623,9 @@ Glossary
 
       * `cylc user guide`_
       * :term:`family`
+      * :term:`task trigger`
       * :term:`dependency`
+      * :ref:`Family Trigger Tutorial <tutorial-cylc-family-triggers>`
 
    rose app
    rose application configuration

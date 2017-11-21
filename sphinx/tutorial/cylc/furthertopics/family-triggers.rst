@@ -1,30 +1,51 @@
+.. _tutorial-cylc-family-triggers:
+
 Family Triggers
 ===============
 
-This tutorial walks you through using family :term:`triggers <task trigger>`.
+To reduce duplication in the :term:`graph` is is possible to write
+:term:`dependencies <dependency>` using collections of tasks called
+:term:`families <family>`).
 
-Family triggers allow you to build dependencies based on sets of tasks
-sharing the same namespace, referred to as
-:ref:`families <tutorial-cylc-families>`.
+This tutorial walks you through writing such dependencies using family
+:term:`triggers <task trigger>`.
 
 
-Purpose
--------
+Explanation
+-----------
 
-Family triggers are used to specify a condition to be met by a set of tasks
-in a particular :term:`family` that will :term:`trigger <task trigger>`
-the next task(s) in the :term:`graph`.
+Dependencies between tasks can be written using a :term:`qualifier` to describe
+the :term:`task state` that the dependency refers to (e.g. ``succeed``
+``fail``, etc). If a dependency does not use a qualifier then it is assumed
+that the dependency refers to the ``succeed`` state e.g:
 
-Like regular task triggers, family triggers can depend on the success or
-failure of tasks. However, because a family can contain multiple tasks, you
-need to specify whether you are concerned with all or any of the tasks in
-that family reaching the desired state.
+.. code-block:: cylc-graph
+
+   bake_bread => sell_bread          # sell_bread is dependent on bake_bread succeeding.
+   bake_bread:succeed => sell_bread  # sell_bread is dependent on bake_bread succeeding.
+   sell_bread:fail => through_away   # through_away is dependent on sell_bread failing.
+
+The left-hand side of a :term:`dependency` (e.g. ``sell_bread:fail``) is
+referred to as the :term:`trigger <task trigger>`.
+
+When we write a trigger involving a family, special qualifiers are required
+to specify whether the dependency is concerned with *all* or *any* of the tasks
+in that family reaching the desired :term:`state <task state>` e.g:
+
+* ``succeed-all``
+* ``succeed-any``
+* ``fail-all``
+
+Such :term:`triggers <task trigger>` are referred to as
+:term:`family triggers <family trigger>`
+
+Foo :command:`cylc gui` bar
 
 
 Example
 -------
 
-Create a new suite called tutorial-family-triggers::
+Create a new suite called ``tutorial-family-triggers``::
 
    mkdir ~/cylc-run/tutorial-family-triggers
    cd ~/cylc-run/tutorial-family-triggers
@@ -69,8 +90,8 @@ Open the ``cylc gui`` then run the suite by pressing the "play" button
 
 You should see the ``visit_mine`` task run, then trigger the members of the
 ``MINERS`` family. Note that some of the ``MINERS`` tasks may fail so you
-will need to stop your suite using the "stop" button in the cylc gui in order
-to allow it to shutdown.
+will need to stop your suite using the "stop" button in the ``cylc gui`` in
+order to allow it to shutdown.
 
 
 Family Triggering: Success
@@ -146,6 +167,8 @@ These changes add a ``close_shafts`` task which is run once all the
 it applies a *suicide trigger* to the ``MINERS`` family in order to allow
 the suite to shutdown.
 
+.. TODO - link to suicide trigger tutorial
+
 Save your changes and run your suite. You should see the new
 ``close_shafts`` run should any of the ``MINERS`` tasks be in the failed
 state once they have all finished.
@@ -154,31 +177,29 @@ state once they have all finished.
 Different Triggers
 ------------------
 
-Other types of triggers beyond those covered in the example are also available.
+Other family :term:`qualifiers <qualifier>` beyond those covered in the
+example are also available.
 
-The following types of "all" type triggers are available:
+The following types of "all" qualifier are available:
 
-* ``FAM:start-all`` - all the tasks in FAM have started
-* ``FAM:succeed-all`` - all the tasks in FAM have succeeded
-* ``FAM:fail-all`` - all the tasks in FAM have failed
-* ``FAM:finish-all`` - all the tasks in FAM have finished
+* ``:start-all`` - all the tasks in the family have started
+* ``:succeed-all`` - all the tasks in the family have succeeded
+* ``:fail-all`` - all the tasks in the family have failed
+* ``:finish-all`` - all the tasks in the family have finished
 
-The following types of "any" type triggers are available:
+The following types of "any" qualifier are available:
 
-* ``FAM:start-any`` - at least one task in FAM has started
-* ``FAM:succeed-any`` - at least one task in FAM has succeeded
-* ``FAM:fail-any`` - at least one task in FAM has failed
-* ``FAM:finish-any`` - at least one task in FAM has finished
+* ``:start-any`` - at least one task in the family has started
+* ``:succeed-any`` - at least one task in the family has succeeded
+* ``:fail-any`` - at least one task in the family has failed
+* ``:finish-any`` - at least one task in the family has finished
 
 
 Summary
 -------
 
-* Family triggers allow you to create dependencies on particular families.
-* Like task triggers, family triggers can be based on success, failure,
-  starting and finishing of tasks in a family.
-* Family triggers can trigger off either *all* or *any* of the tasks in a family.
-
-
-
-
+* Family triggers allow you to write dependencies for collections of tasks.
+* Like :term:`task triggers <task trigger>`, family triggers can be based on
+  success, failure, starting and finishing of tasks in a family.
+* Family triggers can trigger off either *all* or *any* of the tasks in a
+  family.
