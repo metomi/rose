@@ -164,7 +164,7 @@ Glossary
       from which cycling begins.
 
       If the initial cycle point were 2000 then the first cycle would
-      start on or after 2000.
+      be on the 1st of January 2000.
 
       See also:
 
@@ -175,8 +175,8 @@ Glossary
       In a :term:`cycling suite <cycling>` the final cycle point is the point
       at which cycling ends.
 
-      If the final cycle point were 2001 then the last cycle would start on or
-      before 2001.
+      If the final cycle point were 2001 then the final cycle would be no later
+      than the 1st of January 2001.
 
       See also:
 
@@ -185,10 +185,9 @@ Glossary
 
    integer cycling
       An integer cycling suite is a :term:`cycling suite<cycling>` which has
-      been configured to use integer cycling, so that the
-      :term:`cycle points<cycle point>` will be integers and integer
-      :term:`recurrences <recurrence>` may be used in the :term:`graph` e.g.
-      ``P3`` means every third cycle. This is done by setting
+      been configured to use integer cycling. When a suite uses integer cycling
+      integer :term:`recurrences <recurrence>` may be used in the :term:`graph`,
+      e.g. ``P3`` means every third cycle. This is configured by setting
       ``[scheduling]cycling mode = integer`` in the ``suite.rc`` file.
 
       See also:
@@ -221,8 +220,8 @@ Glossary
         <http://www.cl.cam.ac.uk/%7Emgk25/iso-time.html>`_
 
    ISO8601 datetime
-      A date and time specification  written in the ISO8601
-      format e.g:
+      A date-time written in the ISO8601
+      format, e.g:
 
       * ``2000-01-01T00:00Z``: midnight on the 1st of January 2000
 
@@ -350,7 +349,7 @@ Glossary
    run directory
       When a :term:`suite <cylc suite>` is run a directory is created for all
       of the files generated whilst the suite is running. This is called the
-      run directory and typically resides in the ``cylc-run`` parent directory:
+      run directory and typically resides in the ``cylc-run`` directory:
 
       ``~/cylc-run/<suite-name>``
 
@@ -501,8 +500,8 @@ Glossary
 
    directive
       Directives are used by :term:`batch systems <batch system>` to determine
-      what a :term:`job's <job>` requirements are, e.g. how much memory a
-      given job requires.
+      what a :term:`job's <job>` requirements are, e.g. how much memory
+      it requires.
 
       Directives are set in the ``suite.rc`` file in the ``[runtime]`` section
       (``[runtime][<task-name>][directives]``).

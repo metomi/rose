@@ -193,7 +193,7 @@ When run, ``cylc graph`` will display a diagram similar to the ones you have
 seen so far. The number ``1`` which appears below each task is the
 :term:`cycle point`. We will explain what this means in the next section.
 
-.. image:: ../img/cylc-graph-corrected.png
+.. image:: ../img/cylc-graph.png
    :align: center
 
 .. practical::
