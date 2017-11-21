@@ -117,9 +117,9 @@ another.
 To resolve this we must add :term:`dependencies<dependency>` *between* the
 cycles. We do this by adding lines to the :term:`graph`. Tasks in the previous
 cycle can be referred to by suffixing their name with ``[-P1]``, for example.
-So to ensure, for every consecutive pair of cycles, the ``clean_oven`` task
-has been completed before the start of the ``pre_heat_oven`` task in the
-next cycle, we would write the following dependency:
+So to ensure the ``clean_oven`` task has been completed before the start of
+the ``pre_heat_oven`` task in the next cycle, we would write the following
+dependency:
 
 .. code-block:: cylc-graph
 
@@ -302,10 +302,11 @@ This dependency means that the ``purchase_ingredients`` task will run after the
 Recurrence Sections
 -------------------
 
-In the previous examples we made the workflow repeat by placing the graph within
-the ``[[[P1]]]`` section. Here ``P1`` is a :term:`recurrence` meaning repeat
-every cycle, where ``P2`` would mean repeat every other cycle etc. To build more
-complex workflows we can use multiple recurrences:
+In the previous examples we made the workflow repeat by placing the graph
+within the ``[[[P1]]]`` section. Here ``P1`` is a :term:`recurrence` meaning
+repeat every cycle, where ``P1`` means every cycle, ``P2`` means every *other*
+cycle, and so on. To build more complex workflows we can use multiple
+recurrences:
 
 .. code-block:: cylc
 
@@ -414,7 +415,7 @@ starting 5 cycles *after* the initial cycle point.
       .. tip::
 
          You can get cylc graph to draw dotted boxes around the cycles by
-         clicking the "organise by cycle point" button on the toolbar:
+         clicking the "Organise by cycle point" button on the toolbar:
 
          .. image:: ../img/cylc-graph-cluster.png
             :align: center

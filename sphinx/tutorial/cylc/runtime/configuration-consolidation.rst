@@ -699,16 +699,6 @@ so:
            [[[environment]]]
                SITE_ID = 3005
 
-.. warning::
-
-   Heeding the previous warning, the following lines are also
-   equivalent:
-
-   .. code-block:: cylc-graph
-
-      get_observations<station=heathrow>
-      get_observations_heathrow
-
 For more information see the `cylc user guide`_.
 
 .. practical::
