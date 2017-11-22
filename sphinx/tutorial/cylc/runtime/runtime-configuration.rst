@@ -323,7 +323,7 @@ off and carries on as normal.
 
       .. code-block:: bash
 
-         gcylc runtime-tutorial &
+         cylc gui runtime-tutorial &
 
       Run the suite either by pressing the play button in the cylc GUI or by
       running the command:
@@ -391,7 +391,7 @@ off and carries on as normal.
 
          .. code-block:: bash
 
-            gcylc runtime-tutorial &
+            cylc gui runtime-tutorial &
 
          Run the suite either by:
           

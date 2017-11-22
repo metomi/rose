@@ -86,7 +86,7 @@ You have now created a suite that:
 Open the ``cylc gui`` then run the suite by pressing the "play" button
 (top left hand corner) then clicking :guilabel:`Start`::
 
-   gcylc tutorial-family-triggers &
+   cylc gui tutorial-family-triggers &
 
 You should see the ``visit_mine`` task run, then trigger the members of the
 ``MINERS`` family. Note that some of the ``MINERS`` tasks may fail so you

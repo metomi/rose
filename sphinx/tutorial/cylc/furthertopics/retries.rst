@@ -69,7 +69,7 @@ Running Without Retries
 
 Let's see what happens when we run the suite as it is. Open the cylc gui::
 
-   gcylc retries-tutorial &
+   cylc gui retries-tutorial &
 
 Then run the suite::
 
@@ -115,7 +115,7 @@ Running With Retries
 
 If you closed it, re-open the cylc gui::
 
-   gcylc retries-tutorial &
+   cylc gui retries-tutorial &
 
 Re-run the suite::
 
