@@ -310,7 +310,7 @@ generates other files and directories when it runs a suite, namely:
 
       .. code-block:: bash
 
-         gcylc runtime-introduction &
+         cylc gui runtime-introduction &
 
       Finally run the suite by executing:
 
