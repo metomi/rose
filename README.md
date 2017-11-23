@@ -1,6 +1,7 @@
 # Rose
 
 [![Build Status](https://travis-ci.org/metomi/rose.svg?branch=master)](https://travis-ci.org/metomi/rose)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ad021a33e7a64b398f792305dd901795)](https://www.codacy.com/app/metomi/rose?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=metomi/rose&amp;utm_campaign=Badge_Grade)
 [![DOI](https://zenodo.org/badge/6223866.svg)](https://zenodo.org/badge/latestdoi/6223866)
 
 Rose: a framework for managing and running meteorological suites.
