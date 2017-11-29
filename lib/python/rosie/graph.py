@@ -19,8 +19,6 @@
 # -----------------------------------------------------------------------------
 """Plot suite ancestry."""
 
-import subprocess
-import sys
 import textwrap
 import time
 
@@ -134,7 +132,6 @@ def calculate_edges(graph, suite_data, filter_id=None, properties=None,
         reporter = rose.reporter.Reporter()
 
         # Only plot the connections involving filter_id.
-        nodes = [n for edge in edges for n in edge]
         node_stack = []
         node_stack = [(filter_id, 0)]
         add_node(graph, filter_id, node_rosie_properties.get(filter_id),
@@ -240,7 +237,6 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     while children:
         next_children = []
         for c in children:
-            output = [c]
             reporter(PrintSuiteDetails(c,
                      [ancestry[c][p] for p in properties]),
                      prefix=PREFIX_CHILD_GEN_TMPL % generation)

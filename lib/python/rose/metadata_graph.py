@@ -123,7 +123,6 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
                     allowed_sections and section in allowed_sections):
                 ids.append(id_)
     ids.sort(rose.config.sort_settings)
-    delim = rose.CONFIG_DELIMITER
     for id_ in ids:
         section, option = rose.macro.get_section_option_from_id(id_)
         node_attrs = get_node_state_attrs(
@@ -271,8 +270,7 @@ def main():
     if os.path.exists(config_file_path):
         config = config_tree_loader(opts.conf_dir, rose.SUB_CONFIG_NAME,
                                     conf_dir_paths=sys.path).node
-        meta_path, warning = rose.macro.load_meta_path(
-            config, opts.conf_dir)
+        meta_path = rose.macro.load_meta_path(config, opts.conf_dir)[0]
         if meta_path is None:
             _exit_with_metadata_fail()
         meta_config = rose.macro.load_meta_config(

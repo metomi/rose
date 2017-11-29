@@ -333,9 +333,8 @@ class GroupOperations(object):
                 section, config_name)
             if ns not in nses:
                 nses.append(ns)
-            skipped_nses, ids = self.sect_ops.ignore_section(
-                config_name, section,
-                is_ignored, skip_update=True)
+            skipped_nses = self.sect_ops.ignore_section(
+                config_name, section, is_ignored, skip_update=True)[0]
             for ns in skipped_nses:
                 if ns not in nses:
                     nses.append(ns)
@@ -397,7 +396,7 @@ class GroupOperations(object):
         """Return data functions for summary (sub) data panels."""
         if not namespace.startswith("/"):
             namespace = "/" + namespace
-        config_name, subsp = self.util.split_full_ns(self.data, namespace)
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
         return SubDataOperations(
             config_name,
             self.add_section_with_options,

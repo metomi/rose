@@ -380,7 +380,7 @@ class SuiteId(object):
                 state = None
                 url = None
                 rev = None
-                for i, line in enumerate(open(suite_version_file_name)):
+                for line in open(suite_version_file_name):
                     line = line.strip()
                     if state is None:
                         if line.startswith("# svn info"):
@@ -515,7 +515,7 @@ class SuiteId(object):
             try:
                 info_entry = info_parser.parse(
                     self.svn("info", "--xml", location))
-            except RosePopenError as exc:
+            except RosePopenError:
                 raise SuiteIdTextError(location)
             else:
                 if "commit:revision" in info_entry:

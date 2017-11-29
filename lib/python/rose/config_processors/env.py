@@ -20,10 +20,8 @@
 """Process an env section in node of a rose.config_tree.ConfigTree."""
 
 import os
-import re
-from rose.env \
-    import env_export, env_var_process, UnboundEnvironmentVariableError
-from rose.reporter import Event
+from rose.env import (
+    env_export, env_var_process, UnboundEnvironmentVariableError)
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 
 

@@ -23,9 +23,6 @@ This module contains:
 """
 
 import copy
-import re
-
-import rose
 
 
 class Section(object):

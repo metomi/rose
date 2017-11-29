@@ -573,7 +573,7 @@ class ConfigNode(object):
             else:
                 self.set(keys=modified_key, value=value, state=state,
                          comments=comments)
-        for removed_key, removed_data in config_diff.get_removed():
+        for removed_key, _ in config_diff.get_removed():
             self.unset(keys=removed_key)
 
     def __add__(self, config_diff):
@@ -776,7 +776,7 @@ class ConfigNodeDiff(object):
         """
         node = ConfigNode()
         for keys, old_and_new_info in self.get_modified():
-            old_info, info = old_and_new_info
+            info = old_and_new_info[1]
             value, state, comments = info
             node.set(keys, value=value, state=state, comments=comments)
         for keys, info in self.get_added():

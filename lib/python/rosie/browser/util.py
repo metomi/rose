@@ -27,7 +27,6 @@ import gtk
 import rose.external
 import rose.gtk.dialog
 import rose.gtk.util
-from rose.opt_parse import RoseOptionParser
 import rosie.browser
 from rosie.suite_id import SuiteId
 from rosie.ws_client import RosieWSClientError
@@ -94,9 +93,6 @@ class AddressBar(rose.gtk.util.ToolBar):
         search_toolitem.add(self.simple_search_entry)
         search_toolitem.show()
         self.insert(search_toolitem, -1)
-
-        image = gtk.image_new_from_stock(gtk.STOCK_FIND,
-                                         gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.search_button = gtk.ToolItem()
         button = rose.gtk.util.CustomButton(
             label=rosie.browser.LABEL_SEARCH_SIMPLE,
@@ -412,9 +408,6 @@ class MenuBar(object):
         """Add the keyboard accelerators."""
         self.accelerators = gtk.AccelGroup()
         self.accelerators.lookup = {}  # Unfortunately, this is necessary.
-        key_list = []
-        mod_list = []
-        action_list = []
         for key_press, accel_func in accel_dict.items():
             key, mod = gtk.accelerator_parse(key_press)
             self.accelerators.lookup[str(key) + str(mod)] = accel_func
@@ -452,8 +445,7 @@ class StatusBarWidget(gtk.VBox):
         hbox.pack_start(vline, expand=False, fill=False)
 
         self.statusbox = rose.gtk.util.AsyncLabel()
-        x, y = self.statusbox.get_alignment()
-        self.statusbox.set_alignment(0, y)
+        self.statusbox.set_alignment(0, self.statusbox.get_alignment()[1])
         hbox.pack_start(self.statusbox, expand=True, fill=True, padding=5)
         self.statusbox.show()
         self.progressbar = rose.gtk.util.ThreadedProgressBar(adjustment=None)
@@ -719,7 +711,7 @@ class AdvancedSearchWidget(gtk.VBox):
     def clear_filters(self, *args):
         """Remove all filters from the GUI."""
         self.remove_filter()
-        added_ok = self.add_filter()
+        self.add_filter()
 
     def get_filter(self, and_or_combo, left_bracket_box, column_combo,
                    expr_combo, string_entry, right_bracket_box):

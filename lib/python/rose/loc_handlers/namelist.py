@@ -20,7 +20,6 @@
 """Process namelist: sections in a rose.config.ConfigNode matching a name."""
 
 
-import os
 import re
 import rose.config
 from rose.config_processor import ConfigProcessError

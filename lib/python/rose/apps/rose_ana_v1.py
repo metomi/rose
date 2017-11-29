@@ -32,8 +32,7 @@ import time
 # Rose modules
 import rose.config
 from rose.env import env_var_process
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
+from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 from rose.app_run import BuiltinApp
@@ -110,7 +109,7 @@ class KGODatabase(object):
         concurrency issues
 
         """
-        for retry in range(retries):
+        for _ in range(retries):
             try:
                 conn.execute(*sql_args)
                 return
@@ -320,36 +319,34 @@ class Analyse(object):
 
     def check_extract(self, task):
         """Check if an extract name is present in a user method."""
-        for module_name, class_name, method, help in self.user_methods:
+        for _, class_name, _, _ in self.user_methods:
             if task.extract == class_name:
                 return True
         return False
 
     def do_comparison(self, task):
         """Run the comparison."""
-        for module_name, class_name, method, help in self.user_methods:
-            comparison_name = ".".join([module_name, class_name])
+        for module_name, class_name, _, _ in self.user_methods:
             if task.comparison == class_name:
                 for module in self.modules:
                     if module.__name__ == module_name:
                         comparison_inst = getattr(module, class_name)()
-                        comparison_meth = getattr(comparison_inst, "run")(task)
+                        getattr(comparison_inst, "run")(task)
         return task
 
     def do_extract(self, task, var):
         """Extract the specified data."""
-        for module_name, class_name, method, help in self.user_methods:
-            extract_name = ".".join([module_name, class_name])
+        for module_name, class_name, _, _ in self.user_methods:
             if task.extract == class_name:
                 for module in self.modules:
                     if module.__name__ == module_name:
                         extract_inst = getattr(module, class_name)()
-                        extract_meth = getattr(extract_inst, "run")(task, var)
+                        getattr(extract_inst, "run")(task, var)
         return task
 
     def _run_command(self, command):
         """Run an external command using rose.popen."""
-        output, stderr = self.popen.run_ok(command, shell=True)
+        output = self.popen.run_ok(command, shell=True)[0]
         output = "".join(output).splitlines()
         return output
 

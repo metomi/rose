@@ -24,7 +24,6 @@ import json
 import os
 from subprocess import Popen, PIPE
 import sys
-import tempfile
 import threading
 import time
 
@@ -203,7 +202,7 @@ class SplashScreenProcess(object):
         while True:
             try:
                 self.process.stdin.write(json_text + "\n")
-            except IOError as e:
+            except IOError:
                 self.start()
                 self.process.stdin.write(json_text + "\n")
             else:
@@ -262,7 +261,7 @@ class SplashScreenUpdaterThread(threading.Thread):
                 continue
             try:
                 update_input = json.loads(stdin_line.strip())
-            except ValueError as e:
+            except ValueError:
                 continue
             if update_input == "stop":
                 self._stop()

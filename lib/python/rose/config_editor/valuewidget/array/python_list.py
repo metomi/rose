@@ -19,13 +19,10 @@
 # -----------------------------------------------------------------------------
 
 import ast
-import re
-import sys
 
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 from . import entry
 import rose.config_editor.util
@@ -111,8 +108,6 @@ class PythonListValueWidget(gtk.HBox):
             return
         text = '['
         for i, val in enumerate(value_array):
-            j = len(text)
-            v = self.value[j:].index(val)
             prefix = entry.get_next_delimiter(self.value[len(text):],
                                               val)
             if prefix is None:
@@ -131,7 +126,6 @@ class PythonListValueWidget(gtk.HBox):
         if value_array is None:
             value_array = python_array_split(self.value)
         entries = []
-        existing_entries_text = [e.get_text() for e in self.entries]
         for value_item in value_array:
             for entry in self.entries:
                 if entry.get_text() == value_item and entry not in entries:

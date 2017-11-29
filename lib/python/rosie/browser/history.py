@@ -199,8 +199,6 @@ class HistoryIO():
                 entry = entry.split(",")
                 entry[-1] = entry[-1].replace("\n", "")
 
-                end = None
-
                 if entry[-1] == "True":
                     entry[-1] = True
                 elif entry[-1] == "False":

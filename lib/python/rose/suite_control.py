@@ -25,7 +25,7 @@ from rose.fs_util import FileSystemUtil
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
-from rose.reporter import Event, Reporter
+from rose.reporter import Reporter
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_scan import SuiteScanner
 import sys
@@ -178,7 +178,7 @@ def main():
         confirm = prompt
     if opts.all:
         suite_scanner = SuiteScanner(event_handler=event_handler)
-        results, exceptions = suite_scanner.scan()
+        results = suite_scanner.scan()[0]
         suite_names = [result.name for result in results]
     else:
         if opts.name:

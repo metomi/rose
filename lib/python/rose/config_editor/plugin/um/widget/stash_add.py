@@ -175,7 +175,6 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         columns = ["Section", "Item", "Description", "?", "#"]
         sections = self.stash_lookup.keys()
         sections.sort(self.sort_util.cmp_)
-        mod_markup = rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
         props_excess = [self.STASH_PARSE_DESC_OPT, self.STASH_PARSE_ITEM_OPT,
                         self.STASH_PARSE_SECT_OPT]
         for section in sections:
@@ -206,7 +205,6 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         else:
             col_types = []
         self._store = gtk.TreeStore(*col_types)
-        parent_iter_ = None
         for i, row_data in enumerate(data_rows):
             if rows_are_descendants is None:
                 self._store.append(None, row_data)
@@ -306,7 +304,6 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         item_col_index = self.column_names.index("Item")
         streq_info_index = self.column_names.index("?")
         num_streqs_index = self.column_names.index("#")
-        parent_iter_stack = []
         # For speed, pass in the relevant indices here.
         user_data = (sect_col_index, item_col_index,
                      streq_info_index, num_streqs_index)
@@ -453,16 +450,15 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         return filter_hbox
 
     def _get_current_section_item(self):
-        # Return the current highlighted section (or None) and item (or None).
-        current_path, current_column = self._view.get_cursor()
+        """Return the current highlighted section and item."""
+        current_path = self._view.get_cursor()[0]
         if current_path is None:
             return (None, None)
         current_iter = self._view.get_model().get_iter(current_path)
         return self._get_section_item_from_iter(current_iter)
 
     def _get_section_item_col_indices(self):
-        # Return the column indices of the STASH section and item.
-        model = self._view.get_model()
+        """Return the column indices of the STASH section and item."""
         sect_index = 0
         if self.group_index is not None and self.group_index != sect_index:
             sect_index = 1
@@ -477,7 +473,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         return sect_index, item_index
 
     def _get_section_item_from_iter(self, iter_):
-        # Return the STASH section and item numbers for this row.
+        """Return the STASH section and item numbers for this row."""
         sect_index, item_index = self._get_section_item_col_indices()
         model = self._view.get_model()
         section = model.get_value(iter_, sect_index)
@@ -489,7 +485,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         return self.add_stash_request(section, item)
 
     def _handle_activation(self, view, path, column):
-        # React to an activation of a row in the dialog.
+        """React to an activation of a row in the dialog."""
         model = view.get_model()
         row_iter = model.get_iter(path)
         section, item = self._get_section_item_from_iter(row_iter)
@@ -498,11 +494,11 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         return self.add_stash_request(section, item)
 
     def _handle_button_press_event(self, treeview, event):
-        # React to a button press (mouse click).
+        """React to a button press (mouse click)."""
         pathinfo = treeview.get_path_at_pos(int(event.x),
                                             int(event.y))
         if pathinfo is not None:
-            path, col, cell_x, cell_y = pathinfo
+            path, col = pathinfo[0:2]
             if event.button != 3:
                 if event.type == gtk.gdk._2BUTTON_PRESS:
                     self._handle_activation(treeview, path, col)
@@ -510,7 +506,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                 self._popup_tree_menu(path, col, event)
 
     def _handle_group_change(self, combobox):
-        # Handle grouping (nesting) status changes.
+        """Handle grouping (nesting) status changes."""
         model = combobox.get_model()
         col_name = model.get_value(combobox.get_active_iter(), 0)
         if col_name:

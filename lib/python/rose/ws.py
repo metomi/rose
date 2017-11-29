@@ -28,7 +28,6 @@ import cherrypy
 from glob import glob
 import os
 import signal
-import sys
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator

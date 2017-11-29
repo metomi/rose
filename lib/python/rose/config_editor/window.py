@@ -20,14 +20,11 @@
 
 import os
 import re
-import sys
-import tempfile
 import webbrowser
 
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 import rose.config
 import rose.gtk.dialog
@@ -188,7 +185,6 @@ class MainWindow(object):
         section_completion.set_model(liststore)
         section_box.set_completion(section_completion)
         section_completion.set_text_column(0)
-        choices = []
         self._reload_choices(liststore, names[0], add_choices)
         section_box.show()
         config_name_box.connect(

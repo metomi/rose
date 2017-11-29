@@ -58,7 +58,7 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
         try:
             for args in args_list:
                 cmd = [vcs] + args
-                rc, out, err = popen.run(*cmd, env=environ)
+                rc, out, _ = popen.run(*cmd, env=environ)
                 if out:
                     handle.write("#" * 80 + "\n")
                     handle.write(("# %s\n" % popen.list_to_shell_str(cmd)))

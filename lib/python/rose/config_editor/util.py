@@ -25,12 +25,6 @@ one to import custom plugins.
 
 """
 
-import imp
-import inspect
-import os
-import re
-import sys
-
 import pygtk
 pygtk.require("2.0")
 import gtk
@@ -111,7 +105,6 @@ class ImportWidgetError(Exception):
 def launch_node_info_dialog(node, changes, search_function):
     """Launch a dialog displaying attributes of a variable or section."""
     title = node.__class__.__name__ + " " + node.metadata['id']
-    safe_str = rose.gtk.util.safe_str
     text = ''
     if changes:
         text += (rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(changes) +
@@ -223,8 +216,6 @@ def _pretty_format_data(data, global_indent=0, indent=4, width=60):
         for key, val in data.items():
             text += "\n" + " " * global_indent
             sub_prefix = sub_name.format(safe_str(key)) + delim
-            sub_ind0 = global_indent + len(sub_prefix)
-            sub_lenval = width - len(sub_prefix)
             indent_next = global_indent + indent
             str_val = _pretty_format_data(val,
                                           global_indent=indent_next)

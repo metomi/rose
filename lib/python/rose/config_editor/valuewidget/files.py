@@ -19,8 +19,6 @@
 # -----------------------------------------------------------------------------
 
 import os
-import shlex
-import subprocess
 
 import pygtk
 pygtk.require("2.0")
@@ -113,8 +111,6 @@ class FileEditorValueWidget(gtk.HBox):
         self.generate_editor_launcher()
 
     def generate_editor_launcher(self):
-        root = self.metadata[rose.config_editor.META_PROP_INTERNAL]
-        path = os.path.join(root, self.value)
         self.edit_button = rose.gtk.util.CustomButton(
             label=rose.config_editor.LABEL_EDIT,
             stock_id=gtk.STOCK_DND,

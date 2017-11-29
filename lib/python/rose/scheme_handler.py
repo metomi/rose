@@ -81,7 +81,7 @@ class SchemeHandlersManager(object):
                     scheme0_default = None
                     if len(members) == 1:
                         scheme0_default = os.path.basename(mod_path)
-                    for key, c in members:
+                    for _, c in members:
                         if any(getattr(c, a, None) is None for a in attrs):
                             continue
                         handler = None

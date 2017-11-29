@@ -95,9 +95,7 @@ class ChoicesListView(gtk.TreeView):
                                             int(event.y))
         if pathinfo is None:
             return False
-        path, col, cell_x, cell_y = pathinfo
-        iter_ = treeview.get_model().get_iter(path)
-        name = treeview.get_model().get_value(iter_, 0)
+        iter_ = treeview.get_model().get_iter(pathinfo[0])
         self._popup_menu(iter_, event)
         return False
 
@@ -396,9 +394,7 @@ class ChoicesTreeView(gtk.TreeView):
                                             int(event.y))
         if pathinfo is None:
             return False
-        path, col, cell_x, cell_y = pathinfo
-        iter_ = treeview.get_model().get_iter(path)
-        name = treeview.get_model().get_value(iter_, 0)
+        path, col = pathinfo[0:2]
         if treeview.get_columns().index(col) == 1:
             self._handle_cell_toggle(None, path)
 

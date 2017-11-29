@@ -56,10 +56,10 @@ class Updater(object):
             if config_name not in self.data.saved_config_names:
                 return rose.config_editor.TREE_PANEL_TIP_ADDED_CONFIG
             section_hashes = []
-            for sect, sect_data in config_sections.now.items():
+            for sect_data in config_sections.now.values():
                 section_hashes.append(sect_data.to_hashable())
             old_section_hashes = []
-            for sect, sect_data in config_sections.save.items():
+            for sect_data in config_sections.save.values():
                 old_section_hashes.append(sect_data.to_hashable())
             if set(section_hashes) ^ set(old_section_hashes):
                 return rose.config_editor.TREE_PANEL_TIP_CHANGED_CONFIG
@@ -273,7 +273,6 @@ class Updater(object):
 
     def sync_page_var_lists(self, page):
         """Make sure the list of page variables has the right members."""
-        config_name = self.util.split_full_ns(self.data, page.namespace)[0]
         real, miss = self.data.helper.get_data_for_namespace(page.namespace)
         page_real, page_miss = page.panel_data, page.ghost_data
         refresh_vars = []
@@ -324,8 +323,6 @@ class Updater(object):
         self.data.trigger_id_value_lookup.setdefault(config_name, {})
         trig_id_val_dict = self.data.trigger_id_value_lookup[config_name]
         trigger = self.data.trigger[config_name]
-        allowed_sections = self.data.helper.get_sections_from_namespace(
-            namespace)
         updated_ids = []
 
         this_ns_triggers = []
@@ -399,7 +396,6 @@ class Updater(object):
         config_data = self.data.config[config_name]
         trigger = self.data.trigger[config_name]
 
-        config = config_data.config
         meta_config = config_data.meta
         config_sections = config_data.sections
         config_data_for_trigger = {"sections": config_sections.now,
@@ -424,7 +420,6 @@ class Updater(object):
                             break
         triggered_ns_list = []
         this_id = var_id
-        nses = []
         for namespace, metadata in self.data.namespace_meta_lookup.items():
             this_name = self.util.split_full_ns(self.data, namespace)
             if this_name != config_name:
@@ -649,8 +644,8 @@ class Updater(object):
             if namespace is None:
                 real_variables = config_data.vars.get_all(skip_latent=True)
             else:
-                real_variables, latent_variables = (
-                    self.data.helper.get_data_for_namespace(namespace))
+                real_variables = (
+                    self.data.helper.get_data_for_namespace(namespace)[0])
             bad_list = checker.validate_variables(real_variables, meta)
             self.apply_macro_validation(config_name, rose.META_PROP_TYPE,
                                         bad_list,
@@ -664,8 +659,6 @@ class Updater(object):
         if bad_list is None:
             bad_list = []
         config_data = self.data.config[config_name]
-        config = config_data.config  # This should be up to date.
-        meta = config_data.meta
         config_sections = config_data.sections
         variables = config_data.vars.get_all()
         id_error_dict = {}

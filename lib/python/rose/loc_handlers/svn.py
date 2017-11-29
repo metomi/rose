@@ -20,7 +20,6 @@
 """A handler of Subversion locations."""
 
 import os
-from tempfile import mkdtemp
 from urlparse import urlparse
 import xml.parsers.expat
 
@@ -54,8 +53,8 @@ class SvnLocHandler(object):
     def parse(self, loc, conf_tree):
         """Set loc.real_name, loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEMES[0]
-        rc, xml_str, err = self.manager.popen.run(self.svn, "info", "--xml",
-                                                  loc.name)
+        rc, xml_str = self.manager.popen.run(
+            self.svn, "info", "--xml", loc.name)[0:2]
         if rc:
             raise ValueError(loc.name)
         info_entry = SvnInfoXMLParser()(xml_str)

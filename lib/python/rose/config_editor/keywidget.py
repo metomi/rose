@@ -19,7 +19,6 @@
 # -----------------------------------------------------------------------------
 
 import re
-import sys
 
 import pango
 import pygtk
@@ -482,7 +481,6 @@ class KeyWidget(gtk.VBox):
                         return None
             self.var_ops.remove_var(variable)
             variable.name = new_name
-            id_prefix = ':'
             variable.metadata['id'] = (section + rose.CONFIG_DELIMITER +
                                        variable.name)
             self.var_ops.add_var(variable)

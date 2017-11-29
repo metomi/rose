@@ -42,7 +42,6 @@ class RoseArchTarGzip(object):
 
         """
         sources = target.sources.values()
-        scheme = target.compress_scheme
         if (len(sources) == 1 and
                 sources[0].path.endswith("." + target.compress_scheme)):
             target.work_source_path = sources[0].path

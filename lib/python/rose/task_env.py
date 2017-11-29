@@ -21,7 +21,7 @@
 
 from glob import glob
 import os
-from rose.env import env_export, EnvExportEvent
+from rose.env import EnvExportEvent
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator

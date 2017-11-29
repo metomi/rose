@@ -24,7 +24,6 @@ import sys
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 from . import entry
 import rose.gtk.util
@@ -107,7 +106,7 @@ class MixedArrayValueWidget(gtk.HBox):
             self.max_rows = sys.maxint
         else:
             self.num_rows = int(self.array_length)
-            num, rem = divmod(len(self.value_array), self.num_cols)
+            rem = divmod(len(self.value_array), self.num_cols)[1]
             if self.num_rows == 0:
                 self.num_rows = 1
             self.max_rows = self.num_rows
@@ -211,7 +210,7 @@ class MixedArrayValueWidget(gtk.HBox):
         """Delete the last row of widgets."""
         r = self.entry_table.child_get_property(self.rows[-1][-1],
                                                 'top-attach')
-        for i in range(len(self.types_row)):
+        for _ in enumerate(self.types_row):
             entry = self.rows[-1][-1]
             self.rows[-1].pop(-1)
             self.entry_table.remove(entry)
@@ -264,7 +263,7 @@ class MixedArrayValueWidget(gtk.HBox):
             w_error = {}
             if el_piece_type in ['integer', 'real']:
                 try:
-                    test_value = [int, float][el_piece_type == 'real'](w_value)
+                    [int, float][el_piece_type == 'real'](w_value)
                 except (TypeError, ValueError):
                     if w_value != '':
                         hover_text = self.TIP_INVALID_ENTRY.format(

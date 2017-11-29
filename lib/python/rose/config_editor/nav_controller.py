@@ -61,8 +61,6 @@ class NavTreeManager(object):
             self.clear_namespace_tree(only_this_config)
         else:
             self.clear_namespace_tree()
-        view_missing = self.data.page_ns_show_modes[
-            rose.config_editor.SHOW_MODE_LATENT]
         # Reload the information into the tree.
         if only_this_config is None:
             configs = self.data.config.keys()
@@ -84,7 +82,6 @@ class NavTreeManager(object):
             self.update_namespace_tree(top_spaces, self.namespace_tree,
                                        prev_spaces=[])
             self.data.load_metadata_for_namespaces(config_name)
-            meta_config = config_data.meta
             # Load tree from sections (usually vast majority of tree nodes)
             self.data.load_node_namespaces(config_name)
             for section_data in config_data.sections.get_all():

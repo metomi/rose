@@ -21,7 +21,6 @@
 
 from multiprocessing import Pool
 from rose.reporter import Event
-from rose.resource import ResourceLocator
 from time import sleep
 
 
@@ -169,7 +168,6 @@ class JobRunner(object):
 
         """
         self.job_processor = job_processor
-        conf = ResourceLocator.default().get_conf()
         if nproc is None:
             nproc = self.NPROC
         self.nproc = nproc

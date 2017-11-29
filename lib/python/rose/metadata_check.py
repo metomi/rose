@@ -104,7 +104,6 @@ def _check_macro(value, module_files=None, meta_dir=None):
         macros = rose.variable.array_split(value, only_this_delim=",")
     except Exception as e:
         return INVALID_SYNTAX.format(e)
-    bad_macros = []
     for macro in macros:
         macro_name = macro
         method = None
@@ -140,7 +139,7 @@ def _check_range(value):
         test_meta_config = rose.config.ConfigNode()
         evaluator = rose.macros.rule.RuleEvaluator()
         try:
-            check_ok = evaluator.evaluate_rule(
+            evaluator.evaluate_rule(
                 value, test_id, test_config, test_meta_config)
         except rose.macros.rule.RuleValueError as e:
             return INVALID_RANGE_RULE_IDS.format(e)
@@ -148,7 +147,7 @@ def _check_range(value):
             return INVALID_SYNTAX.format(e)
     else:
         try:
-            check_func = rose.variable.parse_range_expression(value)
+            rose.variable.parse_range_expression(value)
         except rose.variable.RangeSyntaxError as e:
             return str(e)
         except Exception as e:
@@ -232,7 +231,7 @@ def _get_module_files(meta_dir=None):
     if meta_dir is not None:
         lib_dir = os.path.join(meta_dir, "lib", "python")
         if os.path.isdir(lib_dir):
-            for dirpath, dirnames, filenames in os.walk(lib_dir):
+            for dirpath, _, filenames in os.walk(lib_dir):
                 if '/.' in dirpath:
                     continue
                 for filename in filenames:
@@ -261,7 +260,6 @@ def metadata_check(meta_config, meta_dir=None,
             continue
         if node.get([rose.META_PROP_VALUES], no_ignore=True) is not None:
             # 'values' supercedes other type-like props, so don't use them.
-            unnecessary_props = []
             for type_like_prop in [rose.META_PROP_PATTERN,
                                    rose.META_PROP_RANGE,
                                    rose.META_PROP_TYPE]:
@@ -343,7 +341,6 @@ def metadata_check(meta_config, meta_dir=None,
                 new_rep_value = rep_trig_node.value
         reports.append(rose.macro.MacroReport(new_rep_section, new_rep_option,
                                               new_rep_value, report.info))
-    sorter = rose.config.sort_settings
     reports.sort(rose.macro.report_sort)
     return reports
 

@@ -72,11 +72,11 @@ class SuiteDirector():
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            rosie.browser.ERROR_PERMISSIONS +
                                            "\n\n" + str(e))
-            except rosie.vc.LocalCopyStatusError as e:
+            except LocalCopyStatusError as exc:
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
-                    "\n\n" + str(e))
+                    "\n\n" + str(exc))
             return True
 
         return False
@@ -100,7 +100,7 @@ class SuiteDirector():
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            rosie.browser.ERROR_PERMISSIONS +
                                            "\n\n" + str(e))
-            except rosie.vc.LocalCopyStatusError as e:
+            except LocalCopyStatusError:
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
@@ -115,8 +115,7 @@ class SuiteDirector():
         meta_config = rose.macro.load_meta_config(config)
         fixer_macro = rose.macros.DefaultTransforms()
         config_copy = copy.deepcopy(config)
-        config_copy, change_list = fixer_macro.transform(config_copy,
-                                                         meta_config)
+        config_copy = fixer_macro.transform(config_copy, meta_config)[0]
         for child in window.action_area:
             window.action_area.remove(child)
         for child in window.vbox:
@@ -128,7 +127,6 @@ class SuiteDirector():
             config_obj_types={"discovery": rose.INFO_CONFIG_NAME},
             pluggable=True)
         page_box = editor.get_orphan_page("/discovery")
-        page = page_box.get_children()[0]
         vbox = gtk.VBox()
         vbox.pack_start(page_box)
         vbox.show()

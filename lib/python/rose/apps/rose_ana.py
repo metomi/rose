@@ -242,7 +242,7 @@ class RoseAnaApp(BuiltinApp):
         # of the rose_ana app (renamed to rose_ana_v1)
         # **Once the old behaviour is removed the below block can be too**.
         new_style_app = False
-        for keys, node in self.config.walk(no_ignore=True):
+        for keys, _ in self.config.walk(no_ignore=True):
             task = keys[0]
             if task.startswith("ana:"):
                 new_style_app = True
@@ -315,7 +315,7 @@ class RoseAnaApp(BuiltinApp):
                         self._prefix_fail))
                     self.reporter(msg, prefix=self._prefix_fail)
 
-            except Exception as err:
+            except Exception:
                 # If an exception was raised, print a traceback and treat it
                 # as a failure.
                 task_error = True

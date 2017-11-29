@@ -19,16 +19,10 @@
 # -----------------------------------------------------------------------------
 
 import multiprocessing
-import os
 import Queue
 import re
-import shlex
-import subprocess
 import sys
-import tempfile
 import threading
-import time
-import traceback
 import webbrowser
 
 import pygtk
@@ -229,7 +223,6 @@ class CustomMenuButton(gtk.MenuToolButton):
     def __init__(self, label=None, stock_id=None,
                  size=gtk.ICON_SIZE_SMALL_TOOLBAR, tip_text=None,
                  menu_items=[], menu_funcs=[]):
-        hbox = None
         if stock_id is not None:
             self.stock_id = stock_id
             self.icon = gtk.Image()

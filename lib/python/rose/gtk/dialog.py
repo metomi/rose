@@ -21,12 +21,10 @@
 import multiprocessing
 import os
 import Queue
-import re
 import shlex
 import subprocess
 import sys
 import tempfile
-import threading
 import time
 import traceback
 import webbrowser
@@ -34,7 +32,6 @@ import webbrowser
 import pygtk
 pygtk.require("2.0")
 import gtk
-import gobject
 import glib
 import pango
 
@@ -205,7 +202,6 @@ class DialogProcess(object):
                     except Queue.Empty:
                         break
                     end = self.text_buffer.get_end_iter()
-                    tag = gtk
                     self.text_buffer.insert_with_tags(end, new_text,
                                                       self.text_tag)
             while gtk.events_pending():
@@ -255,7 +251,7 @@ def _process(cmd_args, stdout=sys.stdout, stderr=sys.stderr):
             func(*cmd_args)
         except Exception as e:
             stderr.write(type(e).__name__ + ": " + str(e) + "\n")
-            text1 = stderr.read()
+            stderr.read()
             return 1
         return 0
     p = subprocess.Popen(cmd_args,
@@ -266,8 +262,8 @@ def _process(cmd_args, stdout=sys.stdout, stderr=sys.stderr):
     for line in iter(p.stderr.readline, ""):
         stderr.write(line)
     p.wait()
-    text0 = stdout.read()  # Magically keep it alive.
-    text1 = stderr.read()
+    stdout.read()  # Magically keep it alive.
+    stderr.read()
     return p.poll()
 
 
@@ -331,8 +327,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     if parent_window is None:
         dialog.set_icon(rose.gtk.util.get_icon())
     if cancel:
-        cancel_button = dialog.add_button(gtk.STOCK_CANCEL,
-                                          gtk.RESPONSE_CANCEL)
+        dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
     if extra_text:
         info_button = gtk.Button(stock=gtk.STOCK_INFO)
         info_button.show()

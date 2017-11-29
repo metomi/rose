@@ -22,7 +22,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
-import rose.config_editor
+import rose
 
 
 class BoolToggleValueWidget(gtk.HBox):

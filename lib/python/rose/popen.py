@@ -175,6 +175,8 @@ class RosePopener(object):
         stdin = kwargs.get("stdin")
         if isinstance(stdin, str):
             kwargs["stdin"] = PIPE
+        else:
+            kwargs["stdin"] = open(os.devnull)
         self.handle_event(RosePopenEvent(args, stdin))
         sys.stdout.flush()
         try:
@@ -194,7 +196,6 @@ class RosePopener(object):
         Return out, err.
 
         """
-        stdin = kwargs.get("stdin")
         rc, stdout, stderr = self.run(*args, **kwargs)
         if rc:
             raise RosePopenError(args, rc, stdout, stderr, kwargs.get("stdin"))
@@ -209,7 +210,6 @@ class RosePopener(object):
         Return None.
 
         """
-        stdin = kwargs.get("stdin")
         stderr_level = kwargs.pop("stderr_level", None)
         stdout_level = kwargs.pop("stdout_level", None)
         rc, stdout, stderr = self.run(*args, **kwargs)

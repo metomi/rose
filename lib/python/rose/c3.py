@@ -63,16 +63,16 @@ def mro(target_name, get_base_names, *args, **kwargs):
                 # Walk the mro of each parent, breadth 1st.
                 # Generate a list of selection sequences.
                 seqs = []
-                q = list(base_names_of[name])  # queue
-                while q:
-                    base_name = q.pop(0)
+                queue = list(base_names_of[name])
+                while queue:
+                    base_name = queue.pop(0)
                     for i in range(len(results[base_name])):
-                        r = results[base_name][i:]
-                        if r not in seqs:
-                            seqs.append(r)
+                        res = results[base_name][i:]
+                        if res not in seqs:
+                            seqs.append(res)
                     for result in results[base_name][1:]:
-                        if result not in q:
-                            q.append(result)
+                        if result not in queue:
+                            queue.append(result)
                 # A successful candidate is one that is no longer a parent in
                 # any of the selection sequences.
                 while seqs:
@@ -119,9 +119,11 @@ class _Test(object):
         self.test_plan = "1..11"
 
     def get_base_names(self, name):
+        """Return base names of name."""
         return self.base_names_of[name]
 
-    def ok(self, key, cond):
+    def good(self, key, cond):
+        """Print ok or not ok."""
         self.test_num += 1
         if cond:
             print "ok %d - %s" % (self.test_num, key)
@@ -129,9 +131,11 @@ class _Test(object):
             print "not ok %d - %s" % (self.test_num, key)
 
     def test(self, key, actual, expect):
-        self.ok(key, actual == expect)
+        """Assert equal."""
+        self.good(key, actual == expect)
 
     def run(self):
+        """Run tests."""
         print self.test_plan
 
         # Test good cases
@@ -187,30 +191,30 @@ class _Test(object):
         self.base_names_of["CYCLIC"] = ["CYCLIC"]
         try:
             mro("CYCLIC", self.get_base_names)
-        except MROError as e:
-            self.test("cyclic", str(e), str(MROError("CYCLIC")))
+        except MROError as exc:
+            self.test("cyclic", str(exc), str(MROError("CYCLIC")))
         else:
-            self.ok("cyclic", False)
+            self.good("cyclic", False)
 
         self.base_names_of["CYCLIC1"] = ["CYCLIC3"]
         self.base_names_of["CYCLIC2"] = ["CYCLIC1"]
         self.base_names_of["CYCLIC3"] = ["CYCLIC2"]
         try:
             mro("CYCLIC3", self.get_base_names)
-        except MROError as e:
-            self.test("cyclic3", str(e), str(MROError("CYCLIC3")))
+        except MROError as exc:
+            self.test("cyclic3", str(exc), str(MROError("CYCLIC3")))
         else:
-            self.ok("cyclic3", False)
+            self.good("cyclic3", False)
 
         self.base_names_of["A1B1"] = ["A1", "B1"]
         self.base_names_of["B1A1"] = ["B1", "A1"]
         self.base_names_of["BAD"] = ["A1B1", "B1A1"]
         try:
             mro("BAD", self.get_base_names)
-        except MROError as e:
-            self.test("bad", str(e), str(MROError("BAD")))
+        except MROError as exc:
+            self.test("bad", str(exc), str(MROError("BAD")))
         else:
-            self.ok("bad", False)
+            self.good("bad", False)
 
 
 if __name__ == "__main__":

@@ -23,7 +23,6 @@ import errno
 import os
 from rose.reporter import Event
 import shutil
-import sys
 
 
 class FileSystemEvent(Event):

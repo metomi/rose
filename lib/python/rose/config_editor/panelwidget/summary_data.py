@@ -174,10 +174,8 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def update_tree_model(self):
         """Construct a data model of other page data."""
-        sub_sect_names = self.sections.keys()
-        sub_var_names = []
         self.var_id_map = {}
-        for section, variables in self.variables.items():
+        for variables in self.variables.values():
             for variable in variables:
                 self.var_id_map[variable.metadata["id"]] = variable
         data_rows, column_names = self.get_model_data()
@@ -238,7 +236,7 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def set_focus_node_id(self, node_id):
         """Set the focus on a particular node id, if possible."""
-        section, option = self.util.get_section_option_from_id(node_id)
+        section = self.util.get_section_option_from_id(node_id)[0]
         self.scroll_to_section(section)
 
     def update(self, sections=None, variables=None):
@@ -256,7 +254,6 @@ class BaseSummaryDataPanel(gtk.VBox):
             lambda r, p:
             expanded_sections.add(model.get_value(model.get_iter(p), 0)))
 
-        start_path, start_column = self._view.get_cursor()
         should_redraw = self.update_tree_model()
         if should_redraw:
             self.add_new_columns(self._view, self.column_names)
@@ -382,9 +379,9 @@ class BaseSummaryDataPanel(gtk.VBox):
         pathinfo = treeview.get_path_at_pos(int(event.x),
                                             int(event.y))
         if pathinfo is not None:
-            path, col, cell_x, cell_y = pathinfo
+            path, col = pathinfo[0:2]
             if event.button == 3:
-                model, rows = self._view.get_selection().get_selected_rows()
+                rows = self._view.get_selection().get_selected_rows()[1]
                 if len(rows) > 1:
                     # Multiple selection.
                     self._popup_tree_multi_menu(event)

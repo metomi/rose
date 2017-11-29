@@ -99,7 +99,7 @@ def type_gen(value):
         val_meta_type = "raw"
         for meta_type in ["integer", "real", "quoted", "character", "logical",
                           "boolean"]:
-            is_ok, err_text = rose.meta_type.meta_type_checker(val, meta_type)
+            is_ok = rose.meta_type.meta_type_checker(val, meta_type)[0]
             if is_ok:
                 val_meta_type = meta_type
                 break

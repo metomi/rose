@@ -151,7 +151,7 @@ class HostSelector(object):
                     continue
                 self.local_host_strs.append(item)
                 try:
-                    for addrinfo_item in socket.getaddrinfo(item, None):
+                    for addrinfo_item in getaddrinfo(item, None):
                         if addrinfo_item[4][0] in self.local_host_strs:
                             continue
                         self.local_host_strs.append(addrinfo_item[4][0])

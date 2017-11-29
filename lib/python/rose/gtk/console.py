@@ -19,7 +19,6 @@
 # -----------------------------------------------------------------------------
 
 import datetime
-import itertools
 
 import pygtk
 pygtk.require("2.0")
@@ -114,7 +113,7 @@ class ConsoleWindow(gtk.Window):
         category_hbox = gtk.HBox()
         category_hbox.show()
         top_vbox.pack_end(category_hbox, expand=False, fill=False)
-        for i, category in enumerate(categories + [self.CATEGORY_ALL]):
+        for category in categories + [self.CATEGORY_ALL]:
             togglebutton = gtk.ToggleButton(label=category,
                                             use_underline=False)
             togglebutton.connect("toggled",

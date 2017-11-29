@@ -22,8 +22,6 @@
 import Queue
 
 import multiprocessing
-import os
-import re
 import sys
 
 import time
@@ -311,12 +309,14 @@ class ReporterContextQueue(ReporterContext):
         self._send_pending_messages()
 
     def _send_pending_messages(self):
-        for message in list(self._messages_pending):
+        while self._messages_pending:
+            message = self._messages_pending[0]
             try:
-                self.queue.put(self._messages_pending[0], block=False)
+                self.queue.put(message, block=False)
             except Queue.Full:
                 break
-            self._messages_pending.pop(0)
+            else:
+                del self._messages_pending[0]
 
 
 class Event(object):

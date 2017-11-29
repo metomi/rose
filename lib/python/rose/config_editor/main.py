@@ -33,7 +33,6 @@ import shutil
 import sre_constants
 import sys
 import tempfile
-import traceback
 import warnings
 
 # Ignore add menu related warnings for now, but remove this later.
@@ -1201,8 +1200,8 @@ class MainController(object):
 
             # Run check fail-if, warn-if and validator macros if check_on_save
             if check_on_save:
-                changes, errors = self.nav_panel.get_change_error_totals(
-                    config_name=short_config_name)
+                errors = self.nav_panel.get_change_error_totals(
+                    config_name=short_config_name)[1]
                 if errors > 0:
                     dialog = gtk.MessageDialog(
                         None,
@@ -1756,7 +1755,7 @@ class MainController(object):
                 node_is_section = False
             else:
                 # A variable or section
-                sect, opt = self.util.get_section_option_from_id(node_id)
+                opt = self.util.get_section_option_from_id(node_id)[1]
                 node_is_section = (opt is None)
                 namespace = node.metadata.get('full_ns')
                 if namespace is None:

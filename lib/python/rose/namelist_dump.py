@@ -25,7 +25,6 @@ This contains wrapper functions for the namelist parser and the dumper
 
 """
 
-import os
 import re
 import sys
 import rose.config

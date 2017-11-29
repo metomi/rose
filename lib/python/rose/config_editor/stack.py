@@ -64,7 +64,6 @@ class StackViewer(gtk.Window):
 
     def __init__(self, undo_stack, redo_stack, undo_func):
         """Load a view of the stack."""
-        log_text = ''
         super(StackViewer, self).__init__()
         self.set_title(rose.config_editor.STACK_VIEW_TITLE)
         self.action_colour_map = {

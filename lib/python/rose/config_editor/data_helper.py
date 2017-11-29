@@ -21,7 +21,6 @@
 import re
 
 import rose.config
-import rose.config_editor
 
 
 REC_ELEMENT_SECTION = re.compile(r"^(.*)\((.+)\)$")
@@ -83,7 +82,6 @@ class ConfigDataHelper(object):
         """Retrieve the corresponding metadata for a variable."""
         config_data = self.data.config[config_name]
         meta_config = config_data.meta
-        meta_data = {}
         if not node_id:
             return {'id': node_id}
         return rose.macro.get_metadata_for_config_id(node_id, meta_config)
@@ -251,7 +249,6 @@ class ConfigDataHelper(object):
         """Sets if this namespace is the default for a section. Slow!"""
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
-        meta_config = config_data.meta
         allowed_sections = self.get_sections_from_namespace(namespace)
         empty = True
         for section in allowed_sections:
@@ -434,8 +431,7 @@ class ConfigDataHelper(object):
                 if key == rose.variable.IGNORED_BY_SECTION:
                     # Section ignored statuses need interpreting.
                     var_id = var.metadata["id"]
-                    section, option = self.util.get_section_option_from_id(
-                        var_id)
+                    section = self.util.get_section_option_from_id(var_id)[0]
                     sect_data = config_data.sections.get_sect(section)
                     for key in sect_data.ignored_reason:
                         variable_statuses.setdefault(key, 0)

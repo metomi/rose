@@ -205,7 +205,7 @@ class UpgradeController(object):
         return True
 
     def _handle_change_cursor(self, view):
-        path, column = self.treeview.get_cursor()
+        path = self.treeview.get_cursor()[0]
         iter_ = self.treemodel.get_iter(path)
         config_name = self.treemodel.get_value(iter_, 0)
         listmodel = self._config_version_model_dict[config_name]
@@ -260,7 +260,6 @@ class UpgradeController(object):
                 cell.set_property("inconsistent", False)
                 cell.set_property("sensitive", True)
         elif col_index == 2:
-            config_name = model.get_value(r_iter, 0)
             cell.set_property("text", model.get_value(r_iter, 2))
         else:
             text = model.get_value(r_iter, col_index)

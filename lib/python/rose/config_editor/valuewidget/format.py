@@ -46,7 +46,7 @@ class FormatsChooserValueWidget(gtk.HBox):
         self.entry_table = gtk.Table(rows=num_entries + 1, columns=1)
         self.entry_table.show()
         self.entries = []
-        for r, format_name in enumerate(value.split()):
+        for format_name in value.split():
             entry = self.get_entry(format_name)
             self.entries.append(entry)
         self.add_box = gtk.HBox()

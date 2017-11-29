@@ -274,9 +274,6 @@ class MenuBar(object):
         """Add the keyboard accelerators."""
         self.accelerators = gtk.AccelGroup()
         self.accelerators.lookup = {}  # Unfortunately, this is necessary.
-        key_list = []
-        mod_list = []
-        action_list = []
         for key_press, accel_func in accel_dict.items():
             key, mod = gtk.accelerator_parse(key_press)
             self.accelerators.lookup[str(key) + str(mod)] = accel_func
@@ -297,7 +294,7 @@ class MenuBar(object):
                   help, image_path, run_macro):
         """Add a macro to the macro menu."""
         macro_address = '/TopMenuBar/Metadata'
-        macro_menu = self.uimanager.get_widget(macro_address).get_submenu()
+        self.uimanager.get_widget(macro_address).get_submenu()
         if methodname == rose.macro.VALIDATE_METHOD:
             all_v_item = self.uimanager.get_widget(macro_address + "/All V")
             all_v_item.set_sensitive(True)
@@ -411,7 +408,7 @@ class MainMenuHandler(object):
 
     def check_all_extra(self):
         """Check fail-if, warn-if, and run all validator macros."""
-        for config_name in self.data.config.keys():
+        for config_name in self.data.config:
             if not self.data.config[config_name].is_preview:
                 self.update_config(config_name)
         num_errors = self.check_fail_rules(configs_updated=True)
@@ -430,13 +427,12 @@ class MainMenuHandler(object):
     def check_fail_rules(self, configs_updated=False):
         """Check the fail-if and warn-if conditions of the configurations."""
         if not configs_updated:
-            for config_name in self.data.config.keys():
+            for config_name in self.data.config:
                 if not self.data.config[config_name].is_preview:
                     self.update_config(config_name)
         macro = rose.macros.rule.FailureRuleChecker()
         macro_fullname = "rule.FailureRuleChecker.validate"
         error_count = 0
-        config_names = sorted(self.data.config.keys())
         for config_name in sorted(self.data.config.keys()):
             config_data = self.data.config[config_name]
             if config_data.is_preview:
@@ -520,7 +516,7 @@ class MainMenuHandler(object):
     def handle_graph(self):
         """Handle a graph metadata request."""
         config_sect_dict = {}
-        for config_name in self.data.config.keys():
+        for config_name in self.data.config:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = config_data.sections.now.keys()
             config_sect_dict[config_name].sort(rose.config.sort_settings)
@@ -555,7 +551,7 @@ class MainMenuHandler(object):
         return
 
     def handle_macro_entry_activate(self, entry_widget, dialog, entries):
-        for k, entry in entries.items():
+        for entry in entries.values():
             try:
                 ast.literal_eval(entry.get_text())
             except (ValueError, EOFError, SyntaxError):
@@ -571,8 +567,6 @@ class MainMenuHandler(object):
         # create the text input field
         entries = {}
         labels = {}
-        errs = {}
-        succeeded = False
         dialog = gtk.MessageDialog(
             None,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -809,7 +803,6 @@ class MainMenuHandler(object):
         macro_type = ".".join(macro_name.split(".")[:-1])
         var_changes = []
         sect_changes = []
-        sect_removes = []
         for item in list(change_list):
             if item.option is None:
                 sect_changes.append(item)
@@ -878,7 +871,7 @@ class MainMenuHandler(object):
     def handle_upgrade(self, only_this_config_name=None):
         """Run the upgrade manager for this suite."""
         config_dict = {}
-        for config_name in self.data.config.keys():
+        for config_name in self.data.config:
             config_data = self.data.config[config_name]
             if config_data.is_preview:
                 continue
@@ -895,11 +888,11 @@ class MainMenuHandler(object):
             upgrade_inspector=self.override_macro_defaults)
 
     def help(self, *args):
-        # Handle a GUI help request.
+        """Handle a GUI help request."""
         self.mainwindow.launch_help_dialog()
 
     def prefs(self, args):
-        # Handle a Preferences view request.
+        """Handle a Preferences view request."""
         self.mainwindow.launch_prefs()
 
     def launch_browser(self):
@@ -919,7 +912,9 @@ class MainMenuHandler(object):
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        str(e), title)
             return
-        config_name, subsp = self.util.split_full_ns(self.data, namespace)
+        else:
+            del pygraphviz
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
         self.update_config(config_name)
         config_data = self.data.config[config_name]
         if config_data.directory is None:
@@ -1025,7 +1020,7 @@ class MainMenuHandler(object):
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             macro = rose.macros.DefaultTransforms()
-            config, change_list = macro.transform(macro_config, meta_config)
+            change_list = macro.transform(macro_config, meta_config)[1]
             change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
             self.handle_macro_transforms(
                 config_name, "Autofixer.transform",

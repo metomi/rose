@@ -289,7 +289,6 @@ class TypeFixer(rose.macro.MacroBase):
         type_err_list = checker.validate(config, meta_config)
         if type_err_list is None:
             return config, None
-        changes_list = []
         for item in type_err_list:
             sect = item.section
             opt = item.option

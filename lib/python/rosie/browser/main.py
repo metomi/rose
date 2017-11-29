@@ -274,7 +274,7 @@ class MainWindow(gtk.Window):
     def clear_filters(self, *args):
         """Remove all filters from the GUI."""
         self.advanced_search_widget.remove_filter()
-        added_ok = self.advanced_search_widget.add_filter()
+        self.advanced_search_widget.add_filter()
 
     def close_history(self, widget):
         """Close down the history panel"""
@@ -349,9 +349,6 @@ class MainWindow(gtk.Window):
             gtk.main_iteration()
         result_columns = [c for c in self.get_tree_columns() if c != "local"]
         results = []
-        idx_index = result_columns.index("idx")
-        branch_index = result_columns.index("branch")
-        rev_index = result_columns.index("revision")
         self.display_box._result_info = {}
         address = "/TopMenuBar/View/View _{0}_".format("branch")
         branch_widget = self.menubar.uimanager.get_widget(address)
@@ -621,13 +618,13 @@ class MainWindow(gtk.Window):
 
     def handle_activation(self, treeview=None, event=None, somewidget=None):
         """Handle a button click on the main treeview."""
-        path, col = self.display_box.treeview.get_cursor()
+        path = self.display_box.treeview.get_cursor()[0]
         self.update_toolbar_sensitivity(path)
         if hasattr(event, "button"):
             pathinfo = treeview.get_path_at_pos(int(event.x),
                                                 int(event.y))
             if pathinfo is not None:
-                path, col, cell_x, cell_y = pathinfo
+                path = pathinfo[0]
                 if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
                     status = self.display_box._get_treeview_path_status(path)
                     if status in [SuiteId.STATUS_OK, SuiteId.STATUS_MO]:
@@ -639,7 +636,7 @@ class MainWindow(gtk.Window):
                 pathinfo = treeview.get_path_at_pos(int(event.x),
                                                     int(event.y))
                 if pathinfo is not None:
-                    path, col, cell_x, cell_y = pathinfo
+                    path, col = pathinfo[0:2]
                     self.popup_tree_menu(path, col, event)
         return False
 
@@ -748,7 +745,7 @@ class MainWindow(gtk.Window):
 
     def handle_historical_search(self, *args):
         """For running searches selected from the history menu."""
-        path, col = self.history_pane.treeview_hist.get_cursor()
+        path = self.history_pane.treeview_hist.get_cursor()[0]
         self.nav_bar.next_search_button.set_sensitive(False)
         if path is not None:
             this_iter = self.history_pane.treestore_hist.get_iter(path)
@@ -1301,8 +1298,8 @@ class MainWindow(gtk.Window):
         filters = ["and idx eq " + str(new_id)]
         try:
             items = {}
-            results, url = self._ws_client_lookup(
-                self.ws_client.query, [filters], items)
+            results = self._ws_client_lookup(
+                self.ws_client.query, [filters], items)[0]
         except Exception as exc:
             rose.reporter.Reporter()(exc)
             results = []

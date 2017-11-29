@@ -73,7 +73,6 @@ class PageTable(gtk.Table):
         for widget, index in widget_coordinate_list:
             if widget.variable.metadata["id"] == variable.metadata["id"]:
                 old_index = index
-                parent = widget.get_parent()
                 break
         if old_index is None:
             variable_is_ghost_list = self._get_sorted_variables()
@@ -301,7 +300,7 @@ class PageLatentTable(gtk.Table):
             lambda x, y: rose.config.sort_settings(
                 x[0] + "~" + x[1], y[0] + "~" + y[1]))
         v_sort_ids.sort(lambda x, y: cmp("=null" in x[1], "=null" in y[1]))
-        for sort_key, var_id in v_sort_ids:
+        for _, var_id in v_sort_ids:
             is_ghost = False
             for variable in self.panel_data:
                 if variable.metadata['id'] == var_id:

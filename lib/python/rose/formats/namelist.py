@@ -20,7 +20,6 @@
 """Utilities for parsing namelist files."""
 
 import re
-import sys
 
 
 # ERROR REPORTING:
@@ -145,11 +144,10 @@ class NamelistObject(object):
 
     def append_rhs(self, value, repeat=1):
         """Correctly append values to the right hand side of the assignment."""
-        for i in range(repeat):
-            self.rhs.append(value)
+        self.rhs.extend([value] * repeat)
 
     def _collect_rhs_repeats(self, min_repeat_length=5):
-        # Gather together repeated items.
+        """Gather together repeated items."""
         if len(self.rhs) < min_repeat_length:
             return [str(v) for v in self.rhs]
         R, V = (0, 1)

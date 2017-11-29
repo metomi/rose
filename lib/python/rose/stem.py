@@ -226,7 +226,7 @@ class StemRunner(object):
         if source_dict['project']:
             repo += '/' + source_dict['project']
 
-        rc, kpoutput, stderr = self.popen.run('fcm', 'kp', source_dict['url'])
+        kpoutput = self.popen.run('fcm', 'kp', source_dict['url'])[1]
 
         project = None
         for line in kpoutput.splitlines():

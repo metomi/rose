@@ -42,8 +42,7 @@ class DefaultTransforms(rose.macro.MacroTransformerCollection):
     def __init__(self):
         macros = []
         macro_info_tuples = rose.macro.get_macro_class_methods(MODULES)
-        for module_name, class_name, method, help in macro_info_tuples:
-            macro_name = ".".join([module_name, class_name])
+        for module_name, class_name, method, _ in macro_info_tuples:
             if method == rose.macro.TRANSFORM_METHOD:
                 for module in MODULES:
                     if module.__name__ == module_name:
@@ -59,8 +58,7 @@ class DefaultValidators(rose.macro.MacroValidatorCollection):
     def __init__(self):
         macros = []
         macro_info_tuples = rose.macro.get_macro_class_methods(MODULES)
-        for module_name, class_name, method, help in macro_info_tuples:
-            macro_name = ".".join([module_name, class_name])
+        for module_name, class_name, method, _ in macro_info_tuples:
             if method == rose.macro.VALIDATE_METHOD:
                 for module in MODULES:
                     if module.__name__ == module_name:

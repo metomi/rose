@@ -105,7 +105,6 @@ class NavPanelHandler(object):
             return False
         section = sections.pop()
         config_name = self.util.split_full_ns(self.data, namespace)[0]
-        config_data = self.data.config[config_name]
         return self.group_ops.copy_section(config_name, section,
                                            skip_update=skip_update)
 
@@ -131,14 +130,13 @@ class NavPanelHandler(object):
         """Handle an ignore or enable section request."""
         config_names = self.data.config.keys()
         if base_ns is not None and '/' in base_ns:
-            config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+            config_name = self.util.split_full_ns(self.data, base_ns)[0]
             prefer_name_sections = {
                 config_name:
                 self.data.helper.get_sections_from_namespace(base_ns)}
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
-        sorter = rose.config.sort_settings
         for config_name in config_names:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = []
@@ -171,7 +169,7 @@ class NavPanelHandler(object):
         if base_ns is None:
             return False
         base_ns = "/" + base_ns.lstrip("/")
-        config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+        config_name = self.util.split_full_ns(self.data, base_ns)[0]
         config_data = self.data.config[config_name]
         sections = self.data.helper.get_sections_from_namespace(base_ns)
         for section in list(sections):
@@ -199,7 +197,7 @@ class NavPanelHandler(object):
         if base_ns is None:
             return False
         base_ns = "/" + base_ns.lstrip("/")
-        config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+        config_name = self.util.split_full_ns(self.data, base_ns)[0]
         self._transform_default_func(only_this_config=config_name)
 
     def get_ns_metadata_and_comments(self, namespace):
@@ -217,7 +215,7 @@ class NavPanelHandler(object):
         """Handle a request for namespace info."""
         if namespace is None:
             return False
-        config_name, subsp = self.util.split_full_ns(self.data, namespace)
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
         sections = self.data.helper.get_sections_from_namespace(namespace)
         search_function = lambda i: self.search_request(namespace, i)
@@ -235,14 +233,13 @@ class NavPanelHandler(object):
         """Handle a delete section request."""
         config_names = self.data.config.keys()
         if base_ns is not None and '/' in base_ns:
-            config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+            config_name = self.util.split_full_ns(self.data, base_ns)[0]
             prefer_name_sections = {
                 config_name:
                 self.data.helper.get_sections_from_namespace(base_ns)}
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
-        sorter = rose.config.sort_settings
         for config_name in config_names:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = config_data.sections.now.keys()
@@ -257,8 +254,6 @@ class NavPanelHandler(object):
             group = (
                 rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time()))
             config_data = self.data.config[config_name]
-            sect_data = config_data.sections.now[section]
-            ns = sect_data.metadata["full_ns"]
             variable_sorter = lambda v, w: rose.config.sort_settings(
                 v.metadata['id'], w.metadata['id'])
             variables = list(config_data.vars.now.get(section, []))
@@ -273,7 +268,7 @@ class NavPanelHandler(object):
     def rename_dialog(self, base_ns):
         """Handle a rename section dialog and request."""
         if base_ns is not None and '/' in base_ns:
-            config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+            config_name = self.util.split_full_ns(self.data, base_ns)[0]
             prefer_name_sections = {
                 config_name:
                 self.data.helper.get_sections_from_namespace(base_ns)}
@@ -298,7 +293,7 @@ class NavPanelHandler(object):
 
     def search_request(self, namespace, setting_id):
         """Handle a search for an id (hyperlink)."""
-        config_name, subsp = self.util.split_full_ns(self.data, namespace)
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
         self.var_ops.search_for_var(config_name, setting_id)
 
     def popup_panel_menu(self, base_ns, event):
@@ -348,12 +343,9 @@ class NavPanelHandler(object):
             has_content = self.data.helper.is_ns_content(namespace)
             is_unsaved = self.data.helper.get_config_has_unsaved_changes(
                 config_name)
-            ignored_sections = self.data.helper.get_ignored_sections(namespace)
-            enabled_sections = self.data.helper.get_ignored_sections(
-                namespace, get_enabled=True)
             is_latent = self.data.helper.get_ns_latent_status(namespace)
             latent_sections = self.data.helper.get_latent_sections(namespace)
-            metadata, comments = self.get_ns_metadata_and_comments(namespace)
+            metadata = self.get_ns_metadata_and_comments(namespace)[0]
             if is_latent:
                 for i, section in enumerate(latent_sections):
                     action_name = "Add {0}".format(i)
