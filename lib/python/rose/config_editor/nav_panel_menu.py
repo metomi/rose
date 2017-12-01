@@ -150,9 +150,10 @@ class NavPanelHandler(object):
                         if is_ignored:
                             continue
                     if not is_ignored:
-                        co = sect_data.metadata.get(rose.META_PROP_COMPULSORY)
+                        mode = sect_data.metadata.get(
+                            rose.META_PROP_COMPULSORY)
                         if (not sect_data.ignored_reason or
-                                co == rose.META_PROP_VALUE_TRUE):
+                                mode == rose.META_PROP_VALUE_TRUE):
                             continue
                     config_sect_dict[config_name].append(section)
             config_sect_dict[config_name].sort(rose.config.sort_settings)
@@ -331,7 +332,7 @@ class NavPanelHandler(object):
                    ('Rename', gtk.STOCK_COPY,
                     rose.config_editor.TREE_PANEL_RENAME_GENERIC)]
         url = None
-        help = None
+        help_ = None
         is_empty = (not self.data.config)
         if namespace is not None:
             config_name = self.util.split_full_ns(self.data, namespace)[0]
@@ -374,12 +375,12 @@ class NavPanelHandler(object):
                 ui_config_string += '<separator name="graphsep"/>'
                 ui_config_string += '<menuitem action="Graph"/>'
             url = metadata.get(rose.META_PROP_URL)
-            help = metadata.get(rose.META_PROP_HELP)
-            if url is not None or help is not None:
+            help_ = metadata.get(rose.META_PROP_HELP)
+            if url is not None or help_ is not None:
                 ui_config_string += '<separator name="helpsep"/>'
                 if url is not None:
                     ui_config_string += '<menuitem action="URL"/>'
-                if help is not None:
+                if help_ is not None:
                     ui_config_string += '<menuitem action="Help"/>'
             if not is_empty:
                 ui_config_string += """<separator name="removesep"/>"""
@@ -442,7 +443,7 @@ class NavPanelHandler(object):
                                    lambda b: self.graph_request(namespace))
                 if is_unsaved:
                     graph_item.set_sensitive(False)
-            if help is not None:
+            if help_ is not None:
                 help_item = uimanager.get_widget('/Popup/Help')
                 help_title = namespace.split('/')[1:]
                 help_title = rose.config_editor.DIALOG_HELP_TITLE.format(
@@ -451,7 +452,7 @@ class NavPanelHandler(object):
                 help_item.connect(
                     "activate",
                     lambda b: rose.gtk.dialog.run_hyperlink_dialog(
-                        gtk.STOCK_DIALOG_INFO, help, help_title,
+                        gtk.STOCK_DIALOG_INFO, help_, help_title,
                         search_function))
             if url is not None:
                 url_item = uimanager.get_widget('/Popup/URL')

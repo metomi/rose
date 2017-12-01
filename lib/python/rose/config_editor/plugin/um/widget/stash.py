@@ -259,7 +259,7 @@ class BaseStashSummaryDataPanelv1(
         """(Override) Return the column index for the section (Rose section)"""
         return self.column_names.index(self.SECTION_INDEX_TITLE)
 
-    def get_stashmaster_meta_lookup_dict(self):
+    def get_stashmaster_meta_map(self):
         """Return a nested dictionary with STASHmaster metadata.
 
         This stores metadata about STASHmaster fields and their values.
@@ -285,10 +285,10 @@ class BaseStashSummaryDataPanelv1(
             config = rose.config_tree.ConfigTreeLoader().load(
                 self.STASHMASTER_META_PATH,
                 self.STASHMASTER_META_FILENAME).node
-        except (rose.config.ConfigSyntaxError, IOError, OSError) as e:
+        except (rose.config.ConfigSyntaxError, IOError, OSError) as exc:
             rose.reporter.Reporter()(
                 "Error loading STASHmaster metadata resource: " +
-                type(e).__name__ + ": " + str(e) + "\n",
+                type(exc).__name__ + ": " + str(exc) + "\n",
                 kind=rose.reporter.Reporter.KIND_ERR,
                 level=rose.reporter.Reporter.FAIL
             )
@@ -348,13 +348,13 @@ class BaseStashSummaryDataPanelv1(
                 tip_text += "\n" + section
             if col_name == self.DESCRIPTION_TITLE:
                 value = str(model.get_value(row_iter, col_index))
-                metadata = stash_util.get_metadata_for_stash_section_item(
+                metadata = stash_util.get_stash_section_meta(
                     self._stashmaster_meta_lookup, stash_section, stash_item,
                     value
                 )
-                help = metadata.get(rose.META_PROP_HELP)
-                if help is not None:
-                    tip_text += "\n\n" + help
+                help_ = metadata.get(rose.META_PROP_HELP)
+                if help_ is not None:
+                    tip_text += "\n\n" + help_
         else:
             option = self.column_names[col_index]
             id_ = self.util.get_id_from_section_option(section, option)
@@ -405,11 +405,11 @@ class BaseStashSummaryDataPanelv1(
         if col_title == self.DESCRIPTION_TITLE:
             meta_key = self.STASH_PARSE_DESC_OPT + "=" + str(value)
             metadata = self._stashmaster_meta_lookup.get(meta_key, {})
-            help = metadata.get(rose.META_PROP_HELP)
-            if help is not None:
+            help_ = metadata.get(rose.META_PROP_HELP)
+            if help_ is not None:
                 menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_HELP)
                 menuitem.set_label(label="Help")
-                menuitem._help_text = help
+                menuitem._help_text = help_
                 menuitem._help_title = "Help for %s" % value
                 menuitem.connect("activate", self._launch_record_help)
                 menuitem.show()
@@ -501,7 +501,7 @@ class BaseStashSummaryDataPanelv1(
                                                   self.package_config)
         self.generate_package_lookup()
         self._stashmaster_meta_lookup = (
-            self.get_stashmaster_meta_lookup_dict())
+            self.get_stashmaster_meta_map())
 
     def _add_new_diagnostic_launcher(self):
         # Create a button for launching the "Add new STASH" dialog.

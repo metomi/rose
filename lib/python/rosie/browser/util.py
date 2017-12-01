@@ -120,11 +120,11 @@ class AddressBar(rose.gtk.util.ToolBar):
 
     def pop_address_box(self, hist):
         """Populates the address box on startup."""
-        for h in hist:
-            if h.h_type == "url":
+        for item in hist:
+            if item.h_type == "url":
                 if (self.address_box.get_model().iter_n_children(None) <
                         rosie.browser.SIZE_ADDRESS):
-                    self.address_box.append_text(h.details)
+                    self.address_box.append_text(item.details)
                 else:
                     break
 
@@ -145,8 +145,8 @@ class BracketWidget(gtk.HBox):
         self.show_controls = show_controls
         self.combo_box = gtk.combo_box_new_text()
         self.char = self.CHARS[is_end]
-        for n in range(max(number, self.MAX_NUM) + 1):
-            self.combo_box.append_text(self.char * n)
+        for i in range(max(number, self.MAX_NUM) + 1):
+            self.combo_box.append_text(self.char * i)
         self.combo_box.set_active(number)
         self.combo_box.connect("changed", self.change_number)
         self.combo_box.show()
@@ -282,17 +282,18 @@ class HistoryTreeview(gtk.VBox):
 
     def pop_treeview_history(self, archive):
         """Populate the search history list"""
-        for h in archive:
-            if h.h_type == "query":
+        for item in archive:
+            if item.h_type == "query":
                 msg = "["
-                for m in range(len(h.details) - 1):
-                    msg = msg + "'" + h.details[m] + "', "
-                msg = msg + "'" + h.details[-1] + "']"
-                self.treestore_hist.append(None, [h.h_type,
-                                                  msg, h.search_history])
+                for i in range(len(item.details) - 1):
+                    msg = msg + "'" + item.details[i] + "', "
+                msg = msg + "'" + item.details[-1] + "']"
+                self.treestore_hist.append(
+                    None, [item.h_type, msg, item.search_history])
             else:
-                self.treestore_hist.append(None, [h.h_type, str(h.details),
-                                                  h.search_history])
+                self.treestore_hist.append(
+                    None,
+                    [item.h_type, str(item.details), item.search_history])
 
 
 class MenuBar(object):
@@ -497,10 +498,10 @@ class AdvancedSearchWidget(gtk.VBox):
         try:
             known_keys = ws_client.get_known_keys()
             query_operators = ws_client.get_query_operators()
-        except RosieWSClientError as e:
+        except RosieWSClientError as exc:
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       str(e))
-            sys.exit(str(e))
+                                       str(exc))
+            sys.exit(str(exc))
         self.display_columns = ["local"] + known_keys
         self.display_filters = {}
         for column in self.display_columns:

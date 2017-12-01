@@ -81,8 +81,8 @@ class RowArrayValueWidget(gtk.HBox):
         self.entry_table.connect('focus-in-event',
                                  self.hook.trigger_scroll)
         self.entry_table.show()
-        for r in range(self.num_rows):
-            self.insert_row(r)
+        for i in range(self.num_rows):
+            self.insert_row(i)
         self.normalise_width_widgets()
         self.generate_buttons(is_for_elements=not isinstance(self.type, list))
         self.pack_start(self.add_del_button_box, expand=False, fill=False)
@@ -147,17 +147,17 @@ class RowArrayValueWidget(gtk.HBox):
         self.set_value(self.value)
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
-        for r in range(self.num_rows):
-            self.insert_row(r)
+        for i in range(self.num_rows):
+            self.insert_row(i)
         self.normalise_width_widgets()
         self._decide_show_buttons()
 
     def add_row(self, *args):
         """Create a new row of widgets."""
-        r = self.entry_table.child_get_property(self.rows[-1][-1],
-                                                'top-attach')
-        self.entry_table.resize(r + 2, self.num_cols)
-        new_values = self.insert_row(r + 1)
+        nrows = self.entry_table.child_get_property(
+            self.rows[-1][-1], 'top-attach')
+        self.entry_table.resize(nrows + 2, self.num_cols)
+        new_values = self.insert_row(nrows + 1)
         if any(new_values):
             self.value_array = self.value_array + new_values
             self.value = rose.variable.array_join(self.value_array)
@@ -169,12 +169,12 @@ class RowArrayValueWidget(gtk.HBox):
 
     def get_focus_index(self):
         text = ''
-        for r, widget_list in enumerate(self.rows):
-            for i, widget in enumerate(widget_list):
-                value_index = r * self.num_cols + i
+        for i, widget_list in enumerate(self.rows):
+            for j, widget in enumerate(widget_list):
+                value_index = i * self.num_cols + j
                 if value_index > len(self.value_array) - 1:
                     return len(text)
-                val = self.value_array[r * self.num_cols + i]
+                val = self.value_array[i * self.num_cols + j]
                 prefix_text = entry.get_next_delimiter(self.value[len(text):],
                                                        val)
                 if prefix_text is None:
@@ -188,7 +188,7 @@ class RowArrayValueWidget(gtk.HBox):
                             if not hasattr(child, "get_position"):
                                 continue
                             position = child.get_position()
-                            if self.get_type(i) in ["character", "quoted"]:
+                            if self.get_type(j) in ["character", "quoted"]:
                                 position += 1
                             return len(text + prefix_text) + position
                     return len(text + prefix_text) + len(val)
@@ -210,9 +210,8 @@ class RowArrayValueWidget(gtk.HBox):
                 widgets[0].set_focus_index(focus_index)
             return
         for i, val in enumerate(value_array):
-            prefix = entry.get_next_delimiter(self.value[len(text):],
-                                              val)
-            if prefix_text is None:
+            prefix = entry.get_next_delimiter(self.value[len(text):], val)
+            if prefix is None:
                 return
             if len(text + prefix + val) >= focus_index:
                 if len(widgets) > i:
@@ -230,21 +229,21 @@ class RowArrayValueWidget(gtk.HBox):
         self.set_value(self.value)
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
-        for r in range(self.num_rows):
-            self.insert_row(r)
+        for i in range(self.num_rows):
+            self.insert_row(i)
         self.normalise_width_widgets()
         self._decide_show_buttons()
 
     def del_row(self, *args):
         """Delete the last row of widgets."""
-        r = self.entry_table.child_get_property(self.rows[-1][-1],
-                                                'top-attach')
+        nrows = self.entry_table.child_get_property(
+            self.rows[-1][-1], 'top-attach')
         for _ in enumerate(self.get_types()):
-            entry = self.rows[-1][-1]
+            widget = self.rows[-1][-1]
             self.rows[-1].pop(-1)
-            self.entry_table.remove(entry)
+            self.entry_table.remove(widget)
         self.rows.pop(-1)
-        self.entry_table.resize(r, self.num_cols)
+        self.entry_table.resize(nrows, self.num_cols)
 
         chop_index = len(self.value_array) - len(self.get_types())
         self.value_array = self.value_array[:chop_index]
@@ -284,8 +283,8 @@ class RowArrayValueWidget(gtk.HBox):
         widget_list = []
         new_values = []
         actual_num_cols = len(self.get_types())
-        for c, el_piece_type in enumerate(self.get_types()):
-            unwrapped_index = row_index * actual_num_cols + c
+        for i, el_piece_type in enumerate(self.get_types()):
+            unwrapped_index = row_index * actual_num_cols + i
             value_index = unwrapped_index
             if (not isinstance(self.type, list) and
                     value_index >= len(self.value_array)):
@@ -295,7 +294,7 @@ class RowArrayValueWidget(gtk.HBox):
                 widget.pack_start(eb0, expand=True, fill=True)
                 widget.show()
                 self.entry_table.attach(widget,
-                                        c, c + 1,
+                                        i, i + 1,
                                         row_index, row_index + 1,
                                         xoptions=(gtk.EXPAND | gtk.FILL),
                                         yoptions=gtk.SHRINK)
@@ -329,7 +328,7 @@ class RowArrayValueWidget(gtk.HBox):
                 widget.set_tooltip_text(hover_text)
             widget.show()
             self.entry_table.attach(widget,
-                                    c, c + 1,
+                                    i, i + 1,
                                     row_index, row_index + 1,
                                     xoptions=(gtk.EXPAND | gtk.FILL),
                                     yoptions=gtk.SHRINK)
@@ -358,9 +357,9 @@ class RowArrayValueWidget(gtk.HBox):
             while child_list:
                 child = child_list.pop()
                 if isinstance(child, gtk.Entry) and hasattr(child, 'get_text'):
-                    w = len(child.get_text())
-                    if w > max_width.get(i, -1):
-                        max_width.update({i: w})
+                    width = len(child.get_text())
+                    if width > max_width.get(i, -1):
+                        max_width.update({i: width})
                 if hasattr(child, 'get_children'):
                     child_list.extend(child.get_children())
                 elif hasattr(child, 'get_child'):

@@ -187,8 +187,8 @@ def main():
             try:
                 suite_name = get_suite_name(event_handler)
                 suite_names.append(suite_name)
-            except SuiteNotFoundError as e:
-                event_handler(e)
+            except SuiteNotFoundError as exc:
+                event_handler(exc)
                 sys.exit(1)
 
     if opts.debug_mode:
@@ -199,8 +199,8 @@ def main():
             try:
                 method(sname, opts.host, confirm, sys.stderr, sys.stdout,
                        *args)
-            except Exception as e:
-                event_handler(e)
+            except Exception as exc:
+                event_handler(exc)
                 sys.exit(1)
 
 

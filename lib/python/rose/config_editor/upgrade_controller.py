@@ -160,10 +160,10 @@ class UpgradeController(object):
                 try:
                     new_config, change_list = manager.transform(
                         macro_config, custom_inspector=upgrade_inspector)
-                except Exception as e:
+                except Exception as exc:
                     rose.gtk.dialog.run_dialog(
                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                        type(e).__name__ + ": " + str(e),
+                        type(exc).__name__ + ": " + str(exc),
                         rose.config_editor.ERROR_UPGRADE.format(
                             config_name.lstrip("/"))
                     )

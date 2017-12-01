@@ -45,11 +45,11 @@ class SuiteDirector():
             return False
         else:
             id_text = id_.to_string_with_version()
-        rc = rose.gtk.dialog.DialogProcess(
+        ret_code = rose.gtk.dialog.DialogProcess(
             [self.vc_client.checkout, id_],
             description=rosie.browser.DIALOG_MESSAGE_CHECKOUT.format(id_text),
             title=rosie.browser.DIALOG_TITLE_CHECKOUT).run()
-        if rc != 0:
+        if ret_code != 0:
             return False
 
     def delete(self, to_delete, *args):
@@ -68,10 +68,10 @@ class SuiteDirector():
         if response == gtk.RESPONSE_OK:
             try:
                 self.vc_client.delete(to_delete)
-            except rose.popen.RosePopenError as e:
+            except rose.popen.RosePopenError as exc:
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            rosie.browser.ERROR_PERMISSIONS +
-                                           "\n\n" + str(e))
+                                           "\n\n" + str(exc))
             except LocalCopyStatusError as exc:
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
@@ -96,15 +96,15 @@ class SuiteDirector():
         if response == gtk.RESPONSE_OK:
             try:
                 self.vc_client.delete(sid, True)
-            except rose.popen.RosePopenError as e:
+            except rose.popen.RosePopenError as exc:
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            rosie.browser.ERROR_PERMISSIONS +
-                                           "\n\n" + str(e))
+                                           "\n\n" + str(exc))
             except LocalCopyStatusError:
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
-                    "\n\n" + str(e))
+                    "\n\n" + str(exc))
             return True
 
         return False

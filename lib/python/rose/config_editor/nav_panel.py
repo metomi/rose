@@ -215,11 +215,11 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                                                    change])
             new_keylist = keylist + [key]
             name_iter_map["/".join(new_keylist)] = new_row
-            if type(value) is dict:
+            if isinstance(value, dict):
                 newer_initials = value.items()
                 newer_initials.sort(self.sort_tree_items)
-                for x in newer_initials:
-                    stack.append([new_row] + [list(new_keylist)] + list(x))
+                for vals in newer_initials:
+                    stack.append([new_row] + [list(new_keylist)] + list(vals))
             stack.pop(0)
 
     def _set_title_markup(self, column, cell, model, r_iter, index):
@@ -518,16 +518,16 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         tree_model = self.tree.get_model()
         root_iter = tree_model.get_iter(path)
         sub_iters = []
-        for n in range(tree_model.iter_n_children(root_iter)):
-            sub_iters.append(tree_model.iter_nth_child(root_iter, n))
+        for i in range(tree_model.iter_n_children(root_iter)):
+            sub_iters.append(tree_model.iter_nth_child(root_iter, i))
         sub_names = []
         while sub_iters:
             if sub_iters[0] is not None:
                 path = tree_model.get_path(sub_iters[0])
                 sub_names.append(self.get_name(path))
-                for n in range(tree_model.iter_n_children(sub_iters[0])):
+                for i in range(tree_model.iter_n_children(sub_iters[0])):
                     sub_iters.append(tree_model.iter_nth_child(sub_iters[0],
-                                                               n))
+                                                               i))
             sub_iters.pop(0)
         return sub_names
 

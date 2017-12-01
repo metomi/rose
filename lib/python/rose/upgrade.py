@@ -73,6 +73,7 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     """Class derived from MacroBase to aid upgrade functionality."""
 
+    BEFORE_TAG = "Before"
     ERROR_RENAME_OPT_TO_SECT = "Error: cannot rename {0}={1} to {2}"
     ERROR_RENAME_SECT_TO_OPT = "Error: cannot rename {0} to {1}={2}"
     INFO_ADDED_SECT = "Added"
@@ -115,7 +116,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             self.remove_setting(config, [section, option])
 
     def _get_config_resources(self):
-        # Get macro configuration resources.
+        """Get macro configuration resources."""
         macro_file = inspect.getfile(self.__class__)
         this_dir = os.path.dirname(os.path.abspath(macro_file))
         res_dir = os.path.join(this_dir, self.UPGRADE_RESOURCE_DIR,
@@ -361,6 +362,10 @@ class MacroUpgradeManager(object):
         else:
             self.tag = "HEAD"
         self.meta_flag_no_tag = "/".join(tag_items)
+        self.version_macros = None
+        self.version_module = None
+        self.reports = None
+        self.new_tag = None
         self.load_all_tags()
 
     def load_all_tags(self):
@@ -613,8 +618,8 @@ def main():
         sys.exit(1)
     try:
         upgrade_manager = MacroUpgradeManager(app_config, opts.downgrade)
-    except OSError as e:
-        reporter(e)
+    except OSError as exc:
+        reporter(exc)
         sys.exit(1)
 
     need_all_versions = opts.all_versions or args

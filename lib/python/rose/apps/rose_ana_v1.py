@@ -232,10 +232,10 @@ class TestsFailedException(Exception):
     """Exception raised if any rose-ana comparisons fail."""
 
     def __init__(self, num_failed):
-        self.rc = num_failed
+        self.ret_code = num_failed
 
     def __repr__(self):
-        return "%s tests did not pass" % (self.rc)
+        return "%s tests did not pass" % (self.ret_code)
 
     __str__ = __repr__
 
@@ -257,7 +257,7 @@ class Analyse(object):
         self.opts = opts
         self.args = args
         self.config = config
-        self.load_tasks()
+        self.tasks = self.load_tasks()
         modules = []
         for path in method_paths:
             for filename in glob.glob(path + "/*.py"):
@@ -266,7 +266,7 @@ class Analyse(object):
 
     def analyse(self):
         """Perform comparisons given a list of tasks."""
-        rc = 0
+        ret_code = 0
         for task in self.tasks:
 
             if self.check_extract(task):
@@ -314,8 +314,8 @@ class Analyse(object):
             self.reporter(TaskCompletionEvent(task),
                           prefix="[%s]" % (task.userstatus))
             if task.numericstatus != PASS:
-                rc += 1
-        return rc, self.tasks
+                ret_code += 1
+        return ret_code, self.tasks
 
     def check_extract(self, task):
         """Check if an extract name is present in a user method."""
@@ -437,7 +437,6 @@ class Analyse(object):
                 else:
                     break
             tasks.append(newtask)
-        self.tasks = tasks
         return tasks
 
     def load_user_comparison_modules(self, files):
@@ -453,8 +452,8 @@ class Analyse(object):
             sys.path.insert(0, os.path.abspath(directory))
             try:
                 modules.append(__import__(comparison_name))
-            except ImportError as e:
-                self.reporter(e)
+            except ImportError as exc:
+                self.reporter(exc)
             sys.path.pop(0)
         modules.sort()
         self.modules = modules
@@ -515,7 +514,7 @@ class AnalysisTask(object):
         numkgofiles             # Number of KGO files
         resultdata              # Data from result file
         kgo1data                # Data from KGO file
-        ok                      # True if test didn"t fail
+        good                    # True if test didn"t fail
         message                 # User message
         userstatus              # User status
         numericstatus           # Numeric status
@@ -543,7 +542,7 @@ class AnalysisTask(object):
         self.kgo1data = []
 
 # Variables set by comparison methods
-        self.ok = False
+        self.good = False
 
         self.message = None
         self.userstatus = "UNTESTED"
@@ -558,7 +557,7 @@ class AnalysisTask(object):
         if self.warnonfail:
             self.set_warning(message)
         else:
-            self.ok = False
+            self.good = False
             self.message = message
             self.userstatus = "FAIL"
             self.numericstatus = FAIL
@@ -566,7 +565,7 @@ class AnalysisTask(object):
     def set_pass(self, message):
         """Sets the status of the task to " OK "."""
 
-        self.ok = True
+        self.good = True
         self.message = message
         self.userstatus = " OK "
         self.numericstatus = PASS
@@ -574,7 +573,7 @@ class AnalysisTask(object):
     def set_warning(self, message):
         """Sets the status of the task to "WARN"."""
 
-        self.ok = True
+        self.good = True
         self.message = message
         self.userstatus = "WARN"
         self.numericstatus = WARN

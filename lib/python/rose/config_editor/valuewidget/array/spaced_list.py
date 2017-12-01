@@ -429,10 +429,10 @@ class SpacedListValueWidget(gtk.HBox):
 def get_next_delimiter(array_text, next_element):
     """Return the part of array_text immediately preceding next_element."""
     try:
-        v = array_text.index(next_element)
+        val = array_text.index(next_element)
     except ValueError:
         return
-    return array_text[:v]
+    return array_text[:val]
 
 
 def spaced_array_join(values):

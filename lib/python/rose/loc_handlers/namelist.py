@@ -70,7 +70,7 @@ class NamelistLocHandler(object):
         sections = self.parse(loc, conf_tree)
         if loc.name.endswith("(:)"):
             sections.sort(rose.config.sort_settings)
-        f = open(loc.cache, "wb")
+        handle = open(loc.cache, "wb")
         for section in sections:
             section_value = conf_tree.node.get_value([section])
             group = RE_NAMELIST_GROUP.match(section).group(1)
@@ -80,11 +80,11 @@ class NamelistLocHandler(object):
                     continue
                 try:
                     value = env_var_process(node.value)
-                except UnboundEnvironmentVariableError as e:
-                    raise ConfigProcessError([section, key], node.value, e)
+                except UnboundEnvironmentVariableError as exc:
+                    raise ConfigProcessError([section, key], node.value, exc)
                 nlg += "%s=%s,\n" % (key, value)
             nlg += "/" + "\n"
-            f.write(nlg)
+            handle.write(nlg)
             self.manager.handle_event(NamelistEvent(nlg))
 
-        f.close()
+        handle.close()

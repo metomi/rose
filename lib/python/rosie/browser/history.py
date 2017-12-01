@@ -24,13 +24,15 @@ import os
 import rosie.browser
 
 
-class HistoryManager():
+class HistoryManager(object):
 
     """Class for managing the search history."""
 
     def __init__(self, hist_path=None, hist_length=rosie.browser.SIZE_HISTORY):
         self.archive = []
         self.session_log = []
+        self.current_search = 0
+        self.timescale = 0
         if hist_path is not None:
             self.hist_path = os.path.expanduser(hist_path)
         else:
@@ -74,16 +76,6 @@ class HistoryManager():
     def set_hist_length(self, time):
         """Set the number of history items to store."""
         self.timescale = time
-
-    def print_archive(self):
-        """Print the history archive."""
-        for l in self.archive:
-            print str(l)
-
-    def print_session(self):
-        """Print the session history."""
-        for l in self.session_log:
-            print str(l)
 
     def load_history(self):
         """Load in the archived search history."""
@@ -175,62 +167,38 @@ class HistoryIO():
                  hist_length=rosie.browser.SIZE_HISTORY):
         self.hist_path = hist_path
         self.timescale = hist_length
-        path = hist_path.split("/")
-        path.pop(-1)
-        folder = ""
-        for f in range(len(path) - 1):
-            folder = folder + path[f] + "/"
-        folder = folder + path[-1]
+        folder = os.path.dirname(hist_path)
         if not os.path.isdir(folder):
-            os.mkdir(folder)
+            os.makedirs(folder)
 
     def load_history(self):
         """Read in the search history."""
         history = []
         if os.path.exists(self.hist_path):
-
-            f = open(self.hist_path, 'r+')
-            archive = f.readlines()
-            f.close()
-
-            for i, h in enumerate(archive):
-
-                entry = h
-                entry = entry.split(",")
-                entry[-1] = entry[-1].replace("\n", "")
-
-                if entry[-1] == "True":
-                    entry[-1] = True
-                elif entry[-1] == "False":
-                    entry[-1] = False
-                else:
-                    entry[-1] = False
-
-                details = ""
-
-                for i in range(1, len(entry) - 1):
-                    details = details + str(entry[i])
-                    if i < (len(entry) - 2):
-                        details = details + ","
-
-                history.append(HistoryItem(entry[0], details, entry[-1]))
-
+            archive = open(self.hist_path, 'r+').readlines()
+            for entry in archive:
+                head, tail = entry.rsplit(',', 1)
+                try:
+                    search_mode = ast.literal_eval(tail)
+                except (SyntaxError, ValueError):
+                    search_mode = False
+                h_type, details_str = head.split(',', 1)
+                history.append(HistoryItem(h_type, details_str, search_mode))
         else:
-            f = open(self.hist_path, 'w')
-            f.close()
+            open(self.hist_path, 'w').close()
 
         return history
 
     def write_history(self, archive=False):
         """Write out the search history."""
         if archive:
-            f = open(self.hist_path, 'w')
-            for i, h in enumerate(archive):
-                if i < self.timescale and h.h_type != "home":
-                    f.write(str(h) + '\n')
+            handle = open(self.hist_path, 'w')
+            for i, item in enumerate(archive):
+                if i < self.timescale and item.h_type != "home":
+                    handle.write(str(item) + '\n')
                 else:
                     break
-            f.close()
+            handle.close()
 
 
 class HistoryItem():

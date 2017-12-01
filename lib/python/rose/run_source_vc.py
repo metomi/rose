@@ -58,13 +58,13 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
         try:
             for args in args_list:
                 cmd = [vcs] + args
-                rc, out, _ = popen.run(*cmd, env=environ)
+                ret_code, out, _ = popen.run(*cmd, env=environ)
                 if out:
                     handle.write("#" * 80 + "\n")
                     handle.write(("# %s\n" % popen.list_to_shell_str(cmd)))
                     handle.write("#" * 80 + "\n")
                     handle.write(out)
-                if rc:  # If cmd fails once, chances are, it will fail again
+                if ret_code:  # If cmd fails once, it will likely fail again
                     break
         finally:
             os.chdir(cwd)

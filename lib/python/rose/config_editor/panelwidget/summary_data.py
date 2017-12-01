@@ -72,7 +72,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             multiple_selection=True)
         self._view.set_rules_hint(True)
         self.sort_util = rose.gtk.util.TreeModelSortUtil(
-            lambda: self._view.get_model(), multi_sort_num=2)
+            self._view.get_model, multi_sort_num=2)
         self._view.show()
         self._view.connect("button-press-event",
                            self._handle_button_press_event)
@@ -708,9 +708,7 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def _sort_row_data(self, row1, row2, sort_index, descending=False):
         fac = (-1 if descending else 1)
-        x = row1[sort_index]
-        y = row2[sort_index]
-        return fac * self.sort_util.cmp_(x, y)
+        return fac * self.sort_util.cmp_(row1[sort_index], row2[sort_index])
 
     def _handle_group_change(self, combobox):
         model = combobox.get_model()

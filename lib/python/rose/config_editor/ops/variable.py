@@ -412,7 +412,7 @@ class VariableOperations(object):
         """Actually launch a URL."""
         try:
             webbrowser.open(url)
-        except webbrowser.error as exc:
+        except webbrowser.Error as exc:
             rose.gtk.dialog.run_exception_dialog(exc)
 
     def search_for_var(self, config_name_or_namespace, setting_id):

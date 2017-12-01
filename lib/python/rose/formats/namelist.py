@@ -101,20 +101,20 @@ class NamelistGroup(object):
     name: the name of the namelist group.
     objects: a list containing the objects (i.e. key=value pairs) of the
              namelist groups. Each object is a NamelistObject object.
-    file: (optional) the name of the source file containing this namelist
+    file_: (optional) the name of the source file containing this namelist
           group.
 
     """
 
-    def __init__(self, name, objects=None, file=None):
+    def __init__(self, name, objects=None, file_=None):
         self.name = name
         if objects is None:
             objects = []
         self.objects = objects
-        self.file = file
+        self.file_ = file_
 
     def __repr__(self):
-        object_strings = [str(object) for object in self.objects]
+        object_strings = [str(obj) for obj in self.objects]
         object_strings.sort()
         return "&%s\n%s\n/\n" % (self.name, "\n".join(object_strings))
 
@@ -133,6 +133,9 @@ class NamelistObject(object):
 
     """
 
+    IDX_R = 0  # index: repeat
+    IDX_V = 1  # index: value
+
     def __init__(self, lhs, rhs=None):
         self.lhs = lhs
         if rhs is None:
@@ -150,23 +153,23 @@ class NamelistObject(object):
         """Gather together repeated items."""
         if len(self.rhs) < min_repeat_length:
             return [str(v) for v in self.rhs]
-        R, V = (0, 1)
         items = []  # ([value, repeat], ...)
         for value in self.rhs:
-            if items and str(value) == str(items[-1][V]):
-                items[-1][R] += 1
+            if items and str(value) == str(items[-1][self.IDX_V]):
+                items[-1][self.IDX_R] += 1
             else:
                 items.append([1, value])
         values = []
         for item in items:
-            if item[R] > 1:
-                if (item[R] >= min_repeat_length and
-                        REC_VALUE.search(str(item[V]))):
-                    values.append(str(item[R]) + "*" + str(item[V]))
+            if item[self.IDX_R] > 1:
+                if (item[self.IDX_R] >= min_repeat_length and
+                        REC_VALUE.search(str(item[self.IDX_V]))):
+                    values.append(
+                        str(item[self.IDX_R]) + "*" + str(item[self.IDX_V]))
                 else:
-                    values.extend([str(item[V])] * item[R])
+                    values.extend([str(item[self.IDX_V])] * item[self.IDX_R])
             else:
-                values.append(item[V])
+                values.append(item[self.IDX_V])
         return [str(v) for v in values]
 
     def get_rhs_as_string(self, min_repeats=5, wrapped=False, max_len=60):
@@ -219,8 +222,8 @@ class NamelistValue(object):
 
     def _tidy_complex(self, value):
         match = REC_COMPLEX_R_I.match(value)
-        r, i = match.group(1, 2)
-        return "(%s,%s)" % (self._tidy_real(r), self._tidy_real(i))
+        real, img = match.group(1, 2)
+        return "(%s,%s)" % (self._tidy_real(real), self._tidy_real(img))
 
     def _tidy_real(self, value):
         for rec, sub in REC_REAL_TIDY:
@@ -229,6 +232,7 @@ class NamelistValue(object):
 
 
 class _ParseContext(object):
+    """Convenient object for storing the parser's state."""
 
     def __init__(self):
         self.files = []
@@ -307,12 +311,12 @@ def _parse_func(ctx):
                         if next_state is not None:
                             ctx.state = next_state
                         return [tag, ctx.handle.name, data]
-                e = SyntaxError()
-                e.filename = ctx.handle.name
-                e.lineno = ctx.line_number
-                e.offset = ctx.line_length - len(ctx.tail) + 1
-                e.text = ctx.line
-                raise e
+                exc = SyntaxError()
+                exc.filename = ctx.handle.name
+                exc.lineno = ctx.line_number
+                exc.offset = ctx.line_length - len(ctx.tail) + 1
+                exc.text = ctx.line
+                raise exc
             else:
                 ctx.line = ctx.handle.readline()
                 ctx.line_number += 1
@@ -329,15 +333,15 @@ def _parse_func(ctx):
     return None
 
 
-def _handle_group(groups, file, data):
-    groups.append(NamelistGroup(data[0], file=file))
+def _handle_group(groups, file_, data):
+    groups.append(NamelistGroup(data[0], file_=file_))
 
 
-def _handle_name(groups, file, data):
+def _handle_name(groups, _, data):
     groups[-1].objects.append(NamelistObject(data[0]))
 
 
-def _handle_value(groups, file, data):
+def _handle_value(groups, _, data):
     value = None
     quote = False
     repeat = 1

@@ -33,7 +33,7 @@ class URLChecker(rose.macro.MacroBase):
                     try:
                         connection = httplib.HTTPConnection(value, 80)
                         connection.request("HEAD", "")
-                    except Exception as e:
-                        self.add_report(section, option, value, str(e))
+                    except IOError as exc:
+                        self.add_report(section, option, value, str(exc))
                     connection.close()
         return self.reports

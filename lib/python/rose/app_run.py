@@ -448,7 +448,9 @@ class AppRunner(Runner):
         self.handle_event("command: %s" % command)
         if opts.install_only_mode:
             return
-        self.popen(command, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+        self.popen(
+            command, shell=True, stdout=sys.stdout, stderr=sys.stderr,
+            stdin=sys.stdin)
 
 
 def main():
@@ -466,7 +468,7 @@ def main():
         if opts.debug_mode:
             traceback.print_exc(exc)
         if isinstance(exc, RosePopenError):
-            sys.exit(exc.rc)
+            sys.exit(exc.ret_code)
         else:
             sys.exit(1)
 

@@ -220,7 +220,7 @@ class TimePointDumper(object):
         try:
             (expr, info) = (
                 self._timepoint_parser.get_time_zone_info(time_zone_string))
-        except parsers.ISO8601SyntaxError as e:
+        except parsers.ISO8601SyntaxError:
             return None
         info = self._timepoint_parser.process_time_zone_info(info)
         if info.get('time_zone_utc'):

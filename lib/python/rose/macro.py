@@ -607,7 +607,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
     if opt_node is None or not opt_node.value:
         meta_keys = ["rose-all"]
     else:
-        key = opt_node.value
+        key = str(opt_node.value)
         split_key = key.split('/')
         if len(split_key) == 1:
             key = '/'.join([key, rose.META_DEFAULT_VN_DIR])
@@ -693,7 +693,7 @@ def load_meta_config_tree(config, directory=None, config_type=None,
         )
     except rose.resource.ResourceError:
         if not ignore_meta_error:
-            error_handler(text=ERROR_LOAD_META_PATH.format(meta_key))
+            error_handler(text=ERROR_LOAD_META_PATH.format(meta_list))
     except rose.config.ConfigSyntaxError as exc:
         error_handler(text=str(exc))
 
@@ -795,8 +795,8 @@ def check_config_integrity(app_config):
     """Verify that the configuration is sane - return an error otherwise."""
     try:
         keys_and_nodes = list(app_config.walk())
-    except Exception as e:
-        return MacroReturnedCorruptConfigError(str(e))
+    except Exception as exc:
+        return MacroReturnedCorruptConfigError(str(exc))
     keys_and_nodes.insert(0, ([], app_config))
     for keys, node in keys_and_nodes:
         if not isinstance(node, rose.config.ConfigNode):
@@ -1145,7 +1145,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     if macros_not_found:
         return False
 
-    rc = 0
+    ret_code = 0
 
     # Run any validator macros.
     if VALIDATE_METHOD in macros_by_type:
@@ -1160,7 +1160,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
                 validate_mode=True
             )
             if config_problems_map:
-                rc = 1
+                ret_code = 1
             for macro, problem_list in config_problems_map.items():
                 macro_config_problems_map.setdefault(macro, {})
                 problem_list.sort(report_sort)
@@ -1201,9 +1201,9 @@ def run_macros(config_map, meta_config, config_name, macro_names,
             opt_output_dir=opt_output_dir,
             reporter=reporter)
 
-    if not rc and no_changes:
+    if not ret_code and no_changes:
         reporter(MacroFinishNothingEvent())
-    return rc == 0
+    return ret_code == 0
 
 
 def report_sort(report1, report2):

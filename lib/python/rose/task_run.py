@@ -58,38 +58,39 @@ class TaskRunner(Runner):
             suite_engine_proc=self.suite_engine_proc)
 
     def run_impl(self, opts, args, uuid, work_files):
+        """Run application configuration as a suite task."""
         # "rose task-env"
-        t = self.suite_engine_proc.get_task_props(
+        t_prop = self.suite_engine_proc.get_task_props(
             cycle=opts.cycle,
             cycle_offsets=opts.cycle_offsets,
             prefix_delim=opts.prefix_delim,
             suffix_delim=opts.suffix_delim)
         is_changed = False
-        for k, v in t:
-            if os.getenv(k) != v:
-                env_export(k, v, self.event_handler)
+        for key, value in t_prop:
+            if os.getenv(key) != value:
+                env_export(key, value, self.event_handler)
                 is_changed = True
 
         path_globs = opts.path_globs
         if path_globs is None:
             path_globs = []
         prepend_paths_map = get_prepend_paths(self.event_handler,
-                                              t.suite_dir,
+                                              t_prop.suite_dir,
                                               path_globs,
                                               full_mode=is_changed)
-        for k, prepend_paths in prepend_paths_map.items():
+        for key, prepend_paths in prepend_paths_map.items():
             orig_paths = []
-            orig_v = os.getenv(k, "")
+            orig_v = os.getenv(key, "")
             if orig_v:
                 orig_paths = orig_v.split(os.pathsep)
-            v = os.pathsep.join(prepend_paths + orig_paths)
-            env_export(k, v, self.event_handler)
+            value = os.pathsep.join(prepend_paths + orig_paths)
+            env_export(key, value, self.event_handler)
 
         # Name association with builtin applications
         builtin_app = None
         if opts.app_mode is None:
             builtin_apps_manager = self.app_runner.builtins_manager
-            builtin_app = builtin_apps_manager.guess_handler(t.task_name)
+            builtin_app = builtin_apps_manager.guess_handler(t_prop.task_name)
             if builtin_app is not None:
                 opts.app_mode = builtin_app.SCHEME
 
@@ -97,22 +98,23 @@ class TaskRunner(Runner):
         if not opts.conf_dir:
             for app_key in [opts.app_key, os.getenv("ROSE_TASK_APP")]:
                 if app_key is not None:
-                    conf_dir = os.path.join(t.suite_dir, "app", app_key)
+                    conf_dir = os.path.join(t_prop.suite_dir, "app", app_key)
                     if not os.path.isdir(conf_dir):
-                        raise TaskAppNotFoundError(t.task_name, app_key)
+                        raise TaskAppNotFoundError(t_prop.task_name, app_key)
                     break
             else:
-                app_key = t.task_name
-                conf_dir = os.path.join(t.suite_dir, "app", t.task_name)
+                app_key = t_prop.task_name
+                conf_dir = os.path.join(
+                    t_prop.suite_dir, "app", t_prop.task_name)
                 if (not os.path.isdir(conf_dir) and
                         builtin_app is not None and
-                        builtin_app.get_app_key(t.task_name)):
+                        builtin_app.get_app_key(t_prop.task_name)):
                     # A builtin application may select a different app_key
                     # based on the task name.
-                    app_key = builtin_app.get_app_key(t.task_name)
-                    conf_dir = os.path.join(t.suite_dir, "app", app_key)
+                    app_key = builtin_app.get_app_key(t_prop.task_name)
+                    conf_dir = os.path.join(t_prop.suite_dir, "app", app_key)
                 if not os.path.isdir(conf_dir):
-                    raise TaskAppNotFoundError(t.task_name, app_key)
+                    raise TaskAppNotFoundError(t_prop.task_name, app_key)
             opts.conf_dir = conf_dir
 
         return self.app_runner(opts, args)
@@ -128,12 +130,12 @@ def main():
     runner = TaskRunner(event_handler)
     try:
         sys.exit(runner(opts, args))
-    except Exception as e:
-        runner.handle_event(e)
+    except Exception as exc:
+        runner.handle_event(exc)
         if opts.debug_mode:
-            traceback.print_exc(e)
-        if isinstance(e, RosePopenError):
-            sys.exit(e.rc)
+            traceback.print_exc(exc)
+        if isinstance(exc, RosePopenError):
+            sys.exit(exc.ret_code)
         else:
             sys.exit(1)
 

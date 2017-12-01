@@ -32,20 +32,20 @@ class RosePopenError(Exception):
 
     """An error raised when a shell command call fails."""
 
-    def __init__(self, command, rc, stdout, stderr, stdin=None):
+    def __init__(self, command, ret_code, stdout, stderr, stdin=None):
         self.command = command
-        self.rc = rc
+        self.ret_code = ret_code
         self.stdout = stdout
         self.stderr = stderr
         self.stdin = stdin
-        Exception.__init__(self, command, rc, stdout, stderr)
+        Exception.__init__(self, command, ret_code, stdout, stderr)
 
     def __str__(self):
         cmd_str = str(RosePopenEvent(self.command, self.stdin))
         tail = ""
         if self.stderr:
             tail = ", stderr=\n%s" % self.stderr
-        return "%s # return-code=%d%s" % (cmd_str, self.rc, tail)
+        return "%s # return-code=%d%s" % (cmd_str, self.ret_code, tail)
 
 
 class RosePopenEvent(Event):
@@ -147,17 +147,17 @@ class RosePopener(object):
     def run(self, *args, **kwargs):
         """Provide a Rose-friendly interface to subprocess.Popen.
 
-        Return rc, out, err.
+        Return ret_code, out, err.
 
         If kwargs["stdin"] is a str, communicate it to the command via a pipe.
 
         """
-        p = self.run_bg(*args, **kwargs)
+        proc = self.run_bg(*args, **kwargs)
         stdin = None
         if isinstance(kwargs.get("stdin"), str):
             stdin = kwargs.get("stdin")
-        stdout, stderr = p.communicate(stdin)
-        return p.wait(), stdout, stderr
+        stdout, stderr = proc.communicate(stdin)
+        return proc.wait(), stdout, stderr
 
     def run_bg(self, *args, **kwargs):
         """Provide a Rose-friendly interface to subprocess.Popen.
@@ -175,30 +175,31 @@ class RosePopener(object):
         stdin = kwargs.get("stdin")
         if isinstance(stdin, str):
             kwargs["stdin"] = PIPE
-        else:
+        elif stdin is None:
             kwargs["stdin"] = open(os.devnull)
         self.handle_event(RosePopenEvent(args, stdin))
         sys.stdout.flush()
         try:
             if kwargs.get("shell"):
-                p = Popen(args[0], **kwargs)
+                proc = Popen(args[0], **kwargs)
             else:
-                p = Popen(args, **kwargs)
-        except OSError as e:
-            if e.filename is None and args:
-                e.filename = args[0]
-            raise RosePopenError(args, 1, "", str(e))
-        return p
+                proc = Popen(args, **kwargs)
+        except OSError as exc:
+            if exc.filename is None and args:
+                exc.filename = args[0]
+            raise RosePopenError(args, 1, "", str(exc))
+        return proc
 
     def run_ok(self, *args, **kwargs):
-        """Same as RosePopener.run, but raise RosePopenError if rc != 1.
+        """Same as RosePopener.run, but raise RosePopenError if ret_code != 1.
 
         Return out, err.
 
         """
-        rc, stdout, stderr = self.run(*args, **kwargs)
-        if rc:
-            raise RosePopenError(args, rc, stdout, stderr, kwargs.get("stdin"))
+        ret_code, stdout, stderr = self.run(*args, **kwargs)
+        if ret_code:
+            raise RosePopenError(
+                args, ret_code, stdout, stderr, kwargs.get("stdin"))
         return stdout, stderr
 
     def run_simple(self, *args, **kwargs):
@@ -212,11 +213,12 @@ class RosePopener(object):
         """
         stderr_level = kwargs.pop("stderr_level", None)
         stdout_level = kwargs.pop("stdout_level", None)
-        rc, stdout, stderr = self.run(*args, **kwargs)
+        ret_code, stdout, stderr = self.run(*args, **kwargs)
         if stdout:
             self.handle_event(stdout, level=stdout_level)
-        if rc:
-            raise RosePopenError(args, rc, stdout, stderr, kwargs.get("stdin"))
+        if ret_code:
+            raise RosePopenError(
+                args, ret_code, stdout, stderr, kwargs.get("stdin"))
         if stderr:
             self.handle_event(stderr, level=stderr_level)
 
@@ -229,8 +231,8 @@ class RosePopener(object):
         """
         if os.path.isabs(name) and os.access(name, os.F_OK | os.X_OK):
             return name
-        for d in os.getenv("PATH").split(os.pathsep):
-            file_name = os.path.join(d, name)
+        for dir_ in os.getenv("PATH").split(os.pathsep):
+            file_name = os.path.join(dir_, name)
             if os.access(file_name, os.F_OK | os.X_OK):
                 return file_name
 
@@ -250,9 +252,9 @@ if __name__ == "__main__":
             name = "bad-command"
             try:
                 rose_popen.run(name)
-            except RosePopenError as e:
+            except RosePopenError as exc:
                 ose = OSError(errno.ENOENT, os.strerror(errno.ENOENT), name)
-                self.assertEqual(str(ose), e.stderr)
+                self.assertEqual(str(ose), exc.stderr)
             else:
                 self.fail("should return OSError")
 

@@ -180,8 +180,8 @@ class VariableWidget(object):
                                           set_value,
                                           hook_object,
                                           custom_arg)
-            except Exception as e:
-                self.handle_bad_valuewidget(str(e), variable, set_value)
+            except Exception as exc:
+                self.handle_bad_valuewidget(str(exc), variable, set_value)
         else:
             widget_maker = rose.config_editor.valuewidget.chooser(
                 variable.value, variable.metadata,

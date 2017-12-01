@@ -36,12 +36,12 @@ class MetaType(object):
         """Return the class for a named meta data type."""
         if key in cls.meta_type_classes:
             return cls.meta_type_classes[key]
-        for c in globals().values():
-            if inspect.isclass(c):
-                if c != cls and issubclass(c, cls):
-                    if c.KEY == key:
-                        cls.meta_type_classes[key] = c
-                        return c
+        for item in globals().values():
+            if inspect.isclass(item):
+                if item != cls and issubclass(item, cls):
+                    if item.KEY == key:
+                        cls.meta_type_classes[key] = item
+                        return item
         raise KeyError(key)
 
 
@@ -185,8 +185,8 @@ class QuotedMetaType(MetaType):
         quote_segs = value.split('"')
         if len(quote_segs) < 3 or quote_segs[0] or quote_segs[-1]:
             return [False, self.WARNING.format(repr(value))]
-        for i, s in enumerate(quote_segs):
-            num_end_esc = len(s) - len(s.rstrip("\\"))
+        for i, seg in enumerate(quote_segs):
+            num_end_esc = len(seg) - len(seg.rstrip("\\"))
             odd_num_end_esc = num_end_esc % 2 == 1
             if ((i == len(quote_segs) - 2 and odd_num_end_esc) or
                     (0 < i < len(quote_segs) - 2 and not odd_num_end_esc)):
@@ -206,15 +206,15 @@ class QuotedMetaType(MetaType):
 
 
 def meta_type_checker(value, meta_type):
-    c = MetaType.get_meta_type(meta_type)
-    c = c()
-    return c.is_valid(value)
+    item = MetaType.get_meta_type(meta_type)
+    item = item()
+    return item.is_valid(value)
 
 
 def meta_type_transform(value, meta_type):
-    c = MetaType.get_meta_type(meta_type)
-    c = c()
+    item = MetaType.get_meta_type(meta_type)
+    item = item()
     try:
-        return c.transform(value)
+        return item.transform(value)
     except Exception:
         return False

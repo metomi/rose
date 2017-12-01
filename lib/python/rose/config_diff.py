@@ -87,22 +87,22 @@ def annotate_config_with_metadata(config, meta_config, ignore_regexes=None,
     return config
 
 
-def expand_shorthand_in_ignore_regexes(ignore_regexes_in):
-    """Expand any shorthand patterns in ignore_regexes."""
-    if ignore_regexes_in is None:
+def expand_regexes_shorthands(in_regexes):
+    """Expand any shorthand patterns in in_regexes."""
+    if in_regexes is None:
         return None
-    ignore_regexes_in = list(ignore_regexes_in)
-    ignore_regexes = []
-    while ignore_regexes_in:
-        regex = ignore_regexes_in.pop(0)
+    in_regexes = list(in_regexes)
+    regexes = []
+    while in_regexes:
+        regex = in_regexes.pop(0)
         is_shorthand = False
         for shorthand, regexes in _DEFAULTS.SHORTHAND:
             if shorthand == regex:
-                ignore_regexes_in.extend(regexes)
+                in_regexes.extend(regexes)
                 is_shorthand = True
         if not is_shorthand:
-            ignore_regexes.append(regex)
-    return ignore_regexes
+            regexes.append(regex)
+    return regexes
 
 
 def format_metadata_as_text(metadata, only_these_options=None):
@@ -151,8 +151,7 @@ def main():
     else:
         properties = opts.properties.split(",")
 
-    ignore_regexes = expand_shorthand_in_ignore_regexes(
-        opts.ignore_patterns)
+    ignore_regexes = expand_regexes_shorthands(opts.ignore_patterns)
 
     # get file paths
     output_filenames = []
@@ -240,7 +239,7 @@ def load_override_config():
             continue
         try:
             cast_value = ast.literal_eval(node.value)
-        except Exception:
+        except (SyntaxError, ValueError):
             cast_value = node.value
         var_key = key.replace("-", "_").upper()
         if hasattr(_DEFAULTS, var_key):

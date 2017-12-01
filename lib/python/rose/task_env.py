@@ -34,7 +34,7 @@ PATH_GLOBS = {
 }
 
 
-def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=[],
+def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=None,
                       full_mode=False):
     """Return map of PATH-like env-var names to path lists to prepend to them.
 
@@ -70,9 +70,9 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=[],
                 if key != "path-prepend":
                     env_key = key[len("path-prepend."):]
                 values = []
-                for v in node.value.split():
-                    if os.path.exists(v):
-                        values.append(v)
+                for value in node.value.split():
+                    if os.path.exists(value):
+                        values.append(value)
                 if values:
                     prepend_paths_map[env_key] = values
 
@@ -81,16 +81,17 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=[],
     if full_mode:
         for name, path_globs in PATH_GLOBS.items():
             path_globs_map[name] = path_globs
-    for path_glob_arg in path_glob_args:
-        if path_glob_arg is None:
-            continue
-        if "=" in path_glob_arg:
-            name, value = path_glob_arg.split("=", 1)
-        else:
-            name, value = "PATH", path_glob_arg
-        if name not in path_globs_map:
-            path_globs_map[name] = []
-        path_globs_map[name].append(value)
+    if path_glob_args:
+        for path_glob_arg in path_glob_args:
+            if path_glob_arg is None:
+                continue
+            if "=" in path_glob_arg:
+                name, value = path_glob_arg.split("=", 1)
+            else:
+                name, value = "PATH", path_glob_arg
+            if name not in path_globs_map:
+                path_globs_map[name] = []
+            path_globs_map[name].append(value)
     more_prepend_paths_map = {}
     if not path_root:
         path_root = os.getcwd()
@@ -127,13 +128,11 @@ def main():
     report = Reporter(opts.verbosity - opts.quietness - 1)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
         event_handler=report)
-    kwargs = {}
-    for k, v in vars(opts).items():
-        kwargs[k] = v
+    kwargs = dict(vars(opts))
     try:
         task_props = suite_engine_proc.get_task_props(*args, **kwargs)
-        for k, v in task_props:
-            report(str(EnvExportEvent(k, v)) + "\n", level=0)
+        for key, value in task_props:
+            report(str(EnvExportEvent(key, value)) + "\n", level=0)
         path_globs = opts.path_globs
         if path_globs is None:
             path_globs = []
@@ -141,17 +140,17 @@ def main():
                                               task_props.suite_dir,
                                               path_globs,
                                               full_mode=True)
-        for k, prepend_paths in prepend_paths_map.items():
+        for key, prepend_paths in prepend_paths_map.items():
             orig_paths = []
-            orig_v = os.getenv(k, "")
+            orig_v = os.getenv(key, "")
             if orig_v:
                 orig_paths = orig_v.split(os.pathsep)
-            v = os.pathsep.join(prepend_paths + orig_paths)
-            report(str(EnvExportEvent(k, v)) + "\n", level=0)
-    except Exception as e:
-        report(e)
+            path = os.pathsep.join(prepend_paths + orig_paths)
+            report(str(EnvExportEvent(key, path)) + "\n", level=0)
+    except Exception as exc:
+        report(exc)
         if opts.debug_mode:
-            traceback.print_exc(e)
+            traceback.print_exc(exc)
         sys.exit(1)
 
 

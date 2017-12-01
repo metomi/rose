@@ -138,7 +138,7 @@ class Updater(object):
         for changed_id in setting_ids:
             sect, opt = self.util.get_section_option_from_id(changed_id)
             if opt is None:
-                ns = self.data.helper.get_default_namespace_for_section(
+                ns = self.data.helper.get_default_section_namespace(
                     sect, config_name)
                 if ns in [p.namespace for p in self.pagelist]:
                     index = [p.namespace for p in self.pagelist].index(ns)
@@ -250,7 +250,7 @@ class Updater(object):
 
     def update_ns_sub_data(self, namespaces=None):
         """Update any relevant summary data on another page."""
-        if type(namespaces) is not list:
+        if not isinstance(namespaces, list):
             namespaces = [namespaces]
         for page in self.pagelist:
             for namespace in namespaces:
@@ -356,7 +356,7 @@ class Updater(object):
             sect, opt = self.util.get_section_option_from_id(setting_id)
             if opt is None:
                 sect_vars = config_data.vars.now.get(sect, [])
-                ns = self.data.helper.get_default_namespace_for_section(
+                ns = self.data.helper.get_default_section_namespace(
                     sect, config_name)
                 if ns not in update_section_nses:
                     update_section_nses.append(ns)

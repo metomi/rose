@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
+"""Class to check if a URL is valid."""
 
 import httplib
 
@@ -45,12 +46,12 @@ class URLChecker(rose.macro.MacroBase):
                     try:
                         connection = httplib.HTTPConnection(value, 80)
                         connection.request("HEAD", "")
-                    except Exception as e:
-                        self._flag_problem(section, option, value, e)
+                    except IOError as exc:
+                        self._flag_problem(section, option, value, exc)
                     connection.close()
         return self.reports
 
-    def _flag_problem(self, sect, opt, val, e):
-        # Add a setting to the list of problems.
-        info = self.BAD_URL.format(val, e)
+    def _flag_problem(self, sect, opt, val, exc):
+        """Add a setting to the list of problems."""
+        info = self.BAD_URL.format(val, exc)
         self.add_report(sect, opt, val, info)

@@ -66,11 +66,11 @@ class ConfigValueError(Exception):
     SYNTAX = "syntax"
 
     def __str__(self):
-        keys, value, e = self.args
+        keys, value, exc = self.args
         key = keys.pop()
         if keys:
             key = "[" + "][".join(keys) + "]" + key
-        return "%s=%s: configuration value error: %s" % (key, value, str(e))
+        return "%s=%s: configuration value error: %s" % (key, value, str(exc))
 
 
 class NewModeError(Exception):
@@ -192,9 +192,7 @@ class Runner(object):
         if isinstance(opts, dict):
             opts = Dummy(**opts)
         cwd = os.getcwd()
-        environ = {}
-        for k, v in os.environ.items():
-            environ[k] = v
+        environ = dict(os.environ)
         uuid = str(uuid4())
         work_files = []
         try:
@@ -220,9 +218,7 @@ class Runner(object):
             except OSError:
                 pass
             # Reset os.environ
-            os.environ = {}
-            for k, v in environ.items():
-                os.environ[k] = v
+            os.environ = dict(environ)
 
     __call__ = run
 

@@ -42,8 +42,7 @@ class NoConnectionsEvent(rose.reporter.Event):
     KIND = rose.reporter.Reporter.KIND_ERR
 
     def __str__(self):
-        id = self.args[0]
-        return "%s: no copy relationships to other suites" % id
+        return "%s: no copy relationships to other suites" % self.args[0]
 
 
 class PrintSuiteDetails(rose.reporter.Event):
@@ -108,8 +107,8 @@ def calculate_edges(graph, suite_data, filter_id=None, properties=None,
     for dict_row in sorted(suite_data, key=lambda _: _["revision"]):
         idx = dict_row["idx"]
         node_rosie_properties[idx] = []
-        for property in properties:
-            node_rosie_properties[idx].append(dict_row.get(property))
+        for prop in properties:
+            node_rosie_properties[idx].append(dict_row.get(prop))
         from_idx = dict_row.get("from_idx")
 
         if from_idx is None:
@@ -192,10 +191,6 @@ def output_graph(graph, filename=None, debug_mode=False):
 
 def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     """Dump out list of graph entries relating to a suite"""
-
-    PREFIX_CHILD_GEN_TMPL = "[child%s]"
-    PREFIX_PARENT = "[parent]"
-
     if properties is None:
         properties = []
 
@@ -213,8 +208,8 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
         if from_idx:
             ancestry[idx]['parent'] = from_idx
 
-        for property in properties:
-            ancestry[idx][property] = dict_row.get(property)
+        for prop in properties:
+            ancestry[idx][prop] = dict_row.get(prop)
 
         if from_idx in ancestry:
             ancestry[from_idx]['children'].append(idx)
@@ -227,22 +222,22 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     if parent_id:
         reporter(PrintSuiteDetails(
                  parent_id, [ancestry[parent_id][p] for p in properties]),
-                 prefix=PREFIX_PARENT)
+                 prefix="[parent]")
     else:
-        reporter(PrintSuiteDetails(None), prefix=PREFIX_PARENT)
+        reporter(PrintSuiteDetails(None), prefix="[parent]")
 
     children = ancestry[filter_id]['children']
     generation = 1
     # Print out each generation of child suites
     while children:
         next_children = []
-        for c in children:
-            reporter(PrintSuiteDetails(c,
-                     [ancestry[c][p] for p in properties]),
-                     prefix=PREFIX_CHILD_GEN_TMPL % generation)
+        for child in children:
+            reporter(PrintSuiteDetails(child,
+                     [ancestry[child][p] for p in properties]),
+                     prefix="[child%s]" % generation)
             # If a child has children add to list of next generation children
-            if ancestry[c]['children']:
-                next_children += ancestry[c]['children']
+            if ancestry[child]['children']:
+                next_children += ancestry[child]['children']
         if max_distance and generation >= max_distance:
             break
         generation += 1

@@ -102,8 +102,8 @@ def _check_macro(value, module_files=None, meta_dir=None):
         return
     try:
         macros = rose.variable.array_split(value, only_this_delim=",")
-    except Exception as e:
-        return INVALID_SYNTAX.format(e)
+    except Exception as exc:
+        return INVALID_SYNTAX.format(exc)
     for macro in macros:
         macro_name = macro
         method = None
@@ -125,8 +125,8 @@ def _check_macro(value, module_files=None, meta_dir=None):
 def _check_pattern(value):
     try:
         re.compile(value, re.VERBOSE)
-    except Exception as e:
-        err_text = type(e).__name__ + ": " + str(e)
+    except (TypeError, re.error) as exc:
+        err_text = type(exc).__name__ + ": " + str(exc)
         return INVALID_SYNTAX.format(err_text)
 
 
@@ -141,29 +141,29 @@ def _check_range(value):
         try:
             evaluator.evaluate_rule(
                 value, test_id, test_config, test_meta_config)
-        except rose.macros.rule.RuleValueError as e:
-            return INVALID_RANGE_RULE_IDS.format(e)
-        except Exception as e:
-            return INVALID_SYNTAX.format(e)
+        except rose.macros.rule.RuleValueError as exc:
+            return INVALID_RANGE_RULE_IDS.format(exc)
+        except Exception as exc:
+            return INVALID_SYNTAX.format(exc)
     else:
         try:
             rose.variable.parse_range_expression(value)
-        except rose.variable.RangeSyntaxError as e:
-            return str(e)
-        except Exception as e:
-            return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
+        except rose.variable.RangeSyntaxError as exc:
+            return str(exc)
+        except Exception as exc:
+            return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
 
 
 def _check_value_titles(title_value, values_value):
     try:
         title_list = rose.variable.array_split(title_value,
                                                only_this_delim=",")
-    except Exception as e:
-        return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
+    except Exception as exc:
+        return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
     try:
         value_list = rose.variable.array_split(values_value,
                                                only_this_delim=",")
-    except Exception as e:
+    except Exception:
         return INCOMPATIBLE.format(rose.META_PROP_VALUES)
     if len(title_list) != len(value_list):
         return INCOMPATIBLE.format(rose.META_PROP_VALUES)
@@ -186,8 +186,8 @@ def _check_type(value):
 def _check_values(value):
     try:
         val_list = rose.variable.array_split(value, only_this_delim=",")
-    except Exception as e:
-        return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
+    except Exception as exc:
+        return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
     if not val_list:
         return INVALID_SYNTAX.format(value)
 

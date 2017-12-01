@@ -61,6 +61,7 @@ def _sort_config_key(key_1, key_2):
 
 
 def namelist_dump(args=None, output_file=None, case_mode=None):
+    """Convert Fortran namelist file to a Rose configuration."""
     # Input and output options
     if not args:
         args = [STD_FILE_ARG]
@@ -93,14 +94,14 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
             groups_by_name[name] = []
         groups_by_name[name].append(group)
         index_of_group[group] = len(groups_by_name[name])
-        if group.file not in groups_in_file:
-            groups_in_file[group.file] = []
-        groups_in_file[group.file].append(group)
+        if group.file_ not in groups_in_file:
+            groups_in_file[group.file_] = []
+        groups_in_file[group.file_].append(group)
 
     # Add contents to relevant file: sections
-    for file, groups in groups_in_file.items():
-        section = "file:" + file
-        if file == sys.stdin.name:
+    for file_, groups in groups_in_file.items():
+        section = "file:" + file_
+        if file_ == sys.stdin.name:
             section = "file:STDIN"
         group_sections = []
         for group in groups:
@@ -117,9 +118,9 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
             if len(groups) > 1:
                 section += "(" + str(index_of_group[group]) + ")"
             config.set([section], {})
-            for object in group.objects:
-                lhs = tr_case(object.lhs, case_mode)
-                config.set([section, lhs], object.get_rhs_as_string())
+            for obj in group.objects:
+                lhs = tr_case(obj.lhs, case_mode)
+                config.set([section, lhs], obj.get_rhs_as_string())
 
     # Config: write results
     rose.config.dump(config, output_file,
@@ -130,6 +131,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
 
 
 def main():
+    """CLI for "rose namelist-dump"."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("case_mode", "lower", "output_file", "upper")
     opts, args = opt_parser.parse_args()

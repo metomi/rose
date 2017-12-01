@@ -137,7 +137,7 @@ class MainWindow(gtk.Window):
                               rosie.browser.PROGRAM_NAME,
                               rosie.browser.SPLASH_SETUP_WINDOW))
         self.local_updater = rosie.browser.status.LocalStatusUpdater(
-            self.handle_update_treemodel_local_status)
+            self.handle_update_local_status)
         splash_updater.update(rosie.browser.SPLASH_LOADING.format(
                               rosie.browser.PROGRAM_NAME,
                               rosie.browser.SPLASH_DIRECTOR))
@@ -797,7 +797,7 @@ class MainWindow(gtk.Window):
 
     def _handle_prefix_change(self, menuitem):
         checkboxes = [child for child in menuitem.get_parent().get_children()
-                      if type(child) is gtk.CheckMenuItem]
+                      if isinstance(child, gtk.CheckMenuItem)]
         prefixes = [checkbox.prefix_text for checkbox in checkboxes
                     if checkbox.get_active()]
         if not prefixes:
@@ -1030,7 +1030,7 @@ class MainWindow(gtk.Window):
         show_history = not self.show_history_menuitem.get_active()
         self.show_history_menuitem.set_active(show_history)
 
-    def handle_update_treemodel_local_status(self, local_suites):
+    def handle_update_local_status(self, local_suites):
         """Update the local status column in the main tree model."""
         self.display_box.update_treemodel_local_status(local_suites,
                                                        self.ws_client)

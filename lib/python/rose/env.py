@@ -186,26 +186,24 @@ if __name__ == "__main__":
         def test_report_new(self):
             """Ensure that env_export only reports 1st time or on change."""
             events = []
-            event_handler = lambda event: events.append(event)
-            env_export("FOO", "foo", event_handler)
-            env_export("FOO", "foo", event_handler)
-            env_export("FOO", "food", event_handler)
-            env_export("FOO", "foot", event_handler)
-            env_export("FOO", "foot", event_handler)
+            env_export("FOO", "foo", events.append)
+            env_export("FOO", "foo", events.append)
+            env_export("FOO", "food", events.append)
+            env_export("FOO", "foot", events.append)
+            env_export("FOO", "foot", events.append)
             event_args = [event.args[1] for event in events]
             self.assertEqual(event_args, ["foo", "food", "foot"], "events")
 
         def test_report_old(self):
             """Ensure that env_export only reports 1st time or on change."""
             events = []
-            event_handler = lambda event: events.append(event)
             os.environ["BAR"] = "bar"
-            env_export("BAR", "bar", event_handler)
-            env_export("BAR", "bar", event_handler)
-            env_export("BAR", "bar", event_handler)
-            env_export("BAR", "barley", event_handler)
-            env_export("BAR", "barley", event_handler)
-            env_export("BAR", "barber", event_handler)
+            env_export("BAR", "bar", events.append)
+            env_export("BAR", "bar", events.append)
+            env_export("BAR", "bar", events.append)
+            env_export("BAR", "barley", events.append)
+            env_export("BAR", "barley", events.append)
+            env_export("BAR", "barber", events.append)
             event_args = [event.args[1] for event in events]
             self.assertEqual(event_args, ["bar", "barley", "barber"], "events")
 

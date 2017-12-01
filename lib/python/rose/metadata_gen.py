@@ -34,8 +34,10 @@ import rose.opt_parse
 import rose.resource
 
 
-def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
+def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
     """Automatically guess the metadata for an application configuration."""
+    if prop_map is None:
+        prop_map = {}
     rose.macro.standard_format_config(config)
     if meta_config is None:
         meta_config = rose.config.ConfigNode()

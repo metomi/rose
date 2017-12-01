@@ -53,9 +53,9 @@ class SvnLocHandler(object):
     def parse(self, loc, conf_tree):
         """Set loc.real_name, loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEMES[0]
-        rc, xml_str = self.manager.popen.run(
+        ret_code, xml_str = self.manager.popen.run(
             self.svn, "info", "--xml", loc.name)[0:2]
-        if rc:
+        if ret_code:
             raise ValueError(loc.name)
         info_entry = SvnInfoXMLParser()(xml_str)
         if info_entry["kind"] == "dir":
@@ -68,7 +68,7 @@ class SvnLocHandler(object):
     def pull(self, loc, conf_tree):
         """Run "svn export" to get loc to its cache."""
         if not loc.real_name:
-            self.parse(loc)
+            self.parse(loc, conf_tree)
         self.manager.popen("svn", "export", "-q", loc.real_name, loc.cache)
 
 

@@ -110,19 +110,19 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             get_tooltip_func=self.set_tree_tip)
         self._view.set_rules_hint(True)
         self.sort_util = rose.gtk.util.TreeModelSortUtil(
-            lambda: self._view.get_model(), 2)
+            self._view.get_model, 2)
         self._view.show()
         self._view.connect("button-press-event",
                            self._handle_button_press_event)
         self._view.connect("cursor-changed",
-                           lambda v: self._update_control_widget_sensitivity())
+                           lambda v: self._update_control_sensitivity())
         self._window = gtk.ScrolledWindow()
         self._window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.generate_tree_view(is_startup=True)
         self._window.add(self._view)
         self._window.show()
         self.pack_start(self._window, expand=True, fill=True)
-        self._update_control_widget_sensitivity()
+        self._update_control_sensitivity()
         self.show()
 
     def add_cell_renderer_for_value(self, column):
@@ -205,6 +205,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         else:
             col_types = []
         self._store = gtk.TreeStore(*col_types)
+        parent_iter = None
         for i, row_data in enumerate(data_rows):
             if rows_are_descendants is None:
                 self._store.append(None, row_data)
@@ -246,7 +247,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             stash_request_num = "None"
         name = self.column_names[col_index]
         value = model.get_value(row_iter, col_index)
-        help = None
+        help_ = None
         if value is None:
             return False
         if name == "?":
@@ -268,21 +269,21 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         if name == "Section":
             meta_key = self.STASH_PARSE_SECT_OPT + "=" + value
         elif name == "Description":
-            metadata = stash_util.get_metadata_for_stash_section_item(
+            metadata = stash_util.get_stash_section_meta(
                 self.stash_meta_lookup, stash_section, stash_item, value
             )
-            help = metadata.get(rose.META_PROP_HELP)
+            help_ = metadata.get(rose.META_PROP_HELP)
             meta_key = self.STASH_PARSE_DESC_OPT + "=" + value
         else:
             meta_key = name + "=" + value
         value_meta = self.stash_meta_lookup.get(meta_key, {})
         title = value_meta.get(rose.META_PROP_TITLE, "")
-        if help is None:
-            help = value_meta.get(rose.META_PROP_HELP, "")
-        if title and not help:
+        if help_ is None:
+            help_ = value_meta.get(rose.META_PROP_HELP, "")
+        if title and not help_:
             value += "\n" + title
-        if help:
-            value += "\n" + rose.gtk.util.safe_str(help)
+        if help_:
+            value += "\n" + rose.gtk.util.safe_str(help_)
         text = name + ": " + str(value) + "\n\n"
         text += "Section: " + str(stash_section) + "\n"
         text += "Item: " + str(stash_item) + "\n"
@@ -495,8 +496,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
 
     def _handle_button_press_event(self, treeview, event):
         """React to a button press (mouse click)."""
-        pathinfo = treeview.get_path_at_pos(int(event.x),
-                                            int(event.y))
+        pathinfo = treeview.get_path_at_pos(int(event.x), int(event.y))
         if pathinfo is not None:
             path, col = pathinfo[0:2]
             if event.button != 3:
@@ -657,14 +657,12 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         cell.set_property("markup", value)
 
     def _sort_row_data(self, row1, row2, sort_index, descending=False):
-        # Handle column sorting.
+        """Handle column sorting."""
         fac = (-1 if descending else 1)
-        x = row1[sort_index]
-        y = row2[sort_index]
-        return fac * self.sort_util.cmp_(x, y)
+        return fac * self.sort_util.cmp_(row1[sort_index], row2[sort_index])
 
     def _toggle_show_column_name(self, column_name):
-        # Handle a show/hide of a particular column.
+        """Handle a show/hide of a particular column."""
         col_index = self.column_names.index(column_name)
         column = self._view.get_columns()[col_index]
         if column.get_visible():
@@ -672,7 +670,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         return column.set_visible(True)
 
     def _toggle_show_more_info(self, widget, column_name=None):
-        # Handle a show/hide of extra information.
+        """Handle a show/hide of extra information."""
         should_show = widget.get_active()
         if column_name is None:
             column_names = self.column_names
@@ -691,7 +689,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._should_show_meta_column_titles = widget.get_active()
         self.generate_tree_view()
 
-    def _update_control_widget_sensitivity(self):
+    def _update_control_sensitivity(self):
         section, item = self._get_current_section_item()
         self._add_button.set_sensitive(section is not None and
                                        item is not None)

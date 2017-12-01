@@ -19,6 +19,7 @@
 # -----------------------------------------------------------------------------
 """Module to produce Graphviz graphing of Rose configuration metadata."""
 
+import ast
 import os
 import sys
 import tempfile
@@ -203,7 +204,7 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
                 graph.add_edge(value_id, dependent_id, **dependent_attrs)
 
 
-def output_graph(graph, debug_mode=False, filename=None, format="svg"):
+def output_graph(graph, debug_mode=False, filename=None, form="svg"):
     """Output a Graphviz Graph object.
 
     If debug_mode is True, print the 'dot' text output.
@@ -211,9 +212,9 @@ def output_graph(graph, debug_mode=False, filename=None, format="svg"):
 
     """
     if debug_mode:
-        format = "dot"
+        form = "dot"
     if filename is None:
-        image_file_handle = tempfile.NamedTemporaryFile(suffix=("." + format))
+        image_file_handle = tempfile.NamedTemporaryFile(suffix=("." + form))
     else:
         image_file_handle = open(filename, "w")
     graph.draw(image_file_handle.name, prog="dot")

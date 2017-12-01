@@ -26,8 +26,6 @@ import sys
 
 import time
 
-_DEFAULT_REPORTER = None
-
 
 class Reporter(object):
 
@@ -44,6 +42,7 @@ class Reporter(object):
     * and everything goes to the log file with -vv verbosity by default.
     """
 
+    _INST = None
     VV = 3
     V = 2
     DEFAULT = 1
@@ -58,10 +57,9 @@ class Reporter(object):
     @classmethod
     def default(cls, verbosity=None, reset=False):
         """Return the default reporter."""
-        global _DEFAULT_REPORTER
-        if _DEFAULT_REPORTER is None or reset:
-            _DEFAULT_REPORTER = Reporter(verbosity)
-        return _DEFAULT_REPORTER
+        if cls._INST is None or reset:
+            cls._INST = Reporter(verbosity)
+        return cls._INST
 
     def __init__(self, verbosity=DEFAULT, contexts=None, raise_on_exc=False):
         """Create a reporter with contexts at a given verbosity."""
@@ -137,7 +135,7 @@ class Reporter(object):
         arguments and return its result instead.
 
         """
-        if self.event_handler is not None:
+        if callable(self.event_handler):
             return self.event_handler(message, kind, level, prefix, clip)
 
         if isinstance(message, Event):
@@ -258,14 +256,15 @@ class ReporterContext(object):
         except UnicodeDecodeError:
             return self.handle.write(message)
 
-    def _tty_colour_err(self, s):
+    def _tty_colour_err(self, str_):
+        """Colour error string for terminal."""
         try:
             if self.handle.isatty():
-                return "%s%s%s" % (self.TTY_COLOUR_ERR, s,
-                                   self.TTY_COLOUR_NORM)
+                return "%s%s%s" % (
+                    self.TTY_COLOUR_ERR, str_, self.TTY_COLOUR_NORM)
         except AttributeError:
             pass
-        return s
+        return str_
 
 
 class ReporterContextQueue(ReporterContext):

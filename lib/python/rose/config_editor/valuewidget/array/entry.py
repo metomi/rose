@@ -469,13 +469,13 @@ class EntryArrayValueWidget(gtk.HBox):
 def get_next_delimiter(array_text, next_element):
     """Return the part of array_text immediately preceding next_element."""
     try:
-        v = array_text.index(next_element)
+        val = array_text.index(next_element)
     except ValueError:
         # Substring not found.
         return
-    if v == 0 and len(array_text) > 1:  # Null or whitespace element.
-        while array_text[v].isspace():
-            v += 1
-        if array_text[v] == ",":
-            v += 1
-    return array_text[:v]
+    if val == 0 and len(array_text) > 1:  # Null or whitespace element.
+        while array_text[val].isspace():
+            val += 1
+        if array_text[val] == ",":
+            val += 1
+    return array_text[:val]

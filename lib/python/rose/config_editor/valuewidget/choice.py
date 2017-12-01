@@ -241,9 +241,9 @@ class ChoicesValueWidget(gtk.HBox):
             return default_groups
         ok_groups = [n for n in names if set(n).issubset(name) and n != name]
         ok_groups.sort(lambda x, y: set(x).issubset(y) - set(y).issubset(x))
-        for g in default_groups:
-            if g in ok_groups:
-                ok_groups.remove(g)
+        for group in default_groups:
+            if group in ok_groups:
+                ok_groups.remove(group)
         return default_groups + ok_groups
 
     def _get_is_implicit(self, name):

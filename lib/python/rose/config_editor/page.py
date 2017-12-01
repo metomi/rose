@@ -482,8 +482,8 @@ class ConfigPage(gtk.VBox):
                 return False
             try:
                 self.sub_data_panel = custom_widget(*args, arg_str=widget_args)
-            except Exception as e:
-                self.handle_bad_custom_sub_widget(str(e))
+            except Exception as exc:
+                self.handle_bad_custom_sub_widget(str(exc))
         else:
             panel_module = rose.config_editor.panelwidget.summary_data
             self.sub_data_panel = (
@@ -655,8 +655,8 @@ class ConfigPage(gtk.VBox):
                                                     self.variable_ops,
                                                     self.show_modes,
                                                     arg_str=widget_args)
-            except Exception as e:
-                self.handle_bad_custom_main_widget(e)
+            except Exception as exc:
+                self.handle_bad_custom_main_widget(exc)
             else:
                 return
         std_table = rose.config_editor.pagewidget.table.PageTable

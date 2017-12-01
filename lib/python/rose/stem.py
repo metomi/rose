@@ -79,6 +79,7 @@ class ProjectNotFoundException(Exception):
     """Exception class when unable to determine project a source belongs to."""
 
     def __init__(self, source, error=None):
+        Exception.__init__(self, source, error)
         self.source = source
         self.error = error
 
@@ -98,6 +99,7 @@ class RoseStemVersionException(Exception):
     """Exception class when running the wrong rose-stem version."""
 
     def __init__(self, version):
+        Exception.__init__(self, version)
         if version is None:
             self.suite_version = "not rose-stem compatible"
         else:
@@ -115,6 +117,7 @@ class RoseSuiteConfNotFoundException(Exception):
     """Exception class when unable to find rose-suite.conf."""
 
     def __init__(self, location):
+        Exception.__init__(self, location)
         self.location = location
 
     def __repr__(self):
@@ -204,8 +207,8 @@ class StemRunner(object):
            * project
         """
 
-        rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
-        if rc != 0:
+        ret_code, output, stderr = self.popen.run('fcm', 'loc-layout', item)
+        if ret_code != 0:
             raise ProjectNotFoundException(item, stderr)
 
         ret = {}
@@ -344,7 +347,7 @@ class StemRunner(object):
 
         return suitedir
 
-    def _read_site_config_and_return_options(self):
+    def _read_auto_opts(self):
         """Read the site rose.conf file."""
         return ResourceLocator.default().get_conf().get_value(
             ["rose-stem", "automatic-options"])
@@ -424,7 +427,7 @@ class StemRunner(object):
                                      str(expanded_groups))
 
         # Load the config file and return any automatic-options
-        auto_opts = self._read_site_config_and_return_options()
+        auto_opts = self._read_auto_opts()
         if auto_opts:
             automatic_options = auto_opts.split()
             for option in automatic_options:
@@ -467,8 +470,8 @@ def main():
     else:
         try:
             opts = stem.process()
-        except Exception as e:
-            stem.reporter(e)
+        except Exception as exc:
+            stem.reporter(exc)
             sys.exit(1)
 
     # Get the suiterunner object and execute
@@ -479,10 +482,10 @@ def main():
         sys.exit(runner(opts, args))
     try:
         sys.exit(runner(opts, args))
-    except Exception as e:
-        runner.handle_event(e)
-        if isinstance(e, RosePopenError):
-            sys.exit(e.rc)
+    except Exception as exc:
+        runner.handle_event(exc)
+        if isinstance(exc, RosePopenError):
+            sys.exit(exc.ret_code)
         else:
             sys.exit(1)
 

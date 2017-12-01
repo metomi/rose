@@ -120,11 +120,11 @@ class CustomButton(gtk.Button):
 
     def position_menu(self, menu, widget):
         """Place a drop-down menu carefully below the button."""
-        x, y = widget.get_window().get_origin()
+        xpos, ypos = widget.get_window().get_origin()
         allocated_rectangle = widget.get_allocation()
-        x += allocated_rectangle.x
-        y += allocated_rectangle.y + allocated_rectangle.height
-        return x, y, False
+        xpos += allocated_rectangle.x
+        ypos += allocated_rectangle.y + allocated_rectangle.height
+        return xpos, ypos, False
 
 
 class CustomExpandButton(gtk.Button):
@@ -405,15 +405,15 @@ class Notebook(gtk.Notebook):
     def get_pages(self):
         """Return all 'page' container widgets."""
         pages = []
-        for n in range(self.get_n_pages()):
-            pages.append(self.get_nth_page(n))
+        for i in range(self.get_n_pages()):
+            pages.append(self.get_nth_page(i))
         return pages
 
     def get_page_labels(self):
         """Return all first pieces of text found in page labelwidgets."""
         labels = []
-        for n in range(self.get_n_pages()):
-            nth_page = self.get_nth_page(n)
+        for i in range(self.get_n_pages()):
+            nth_page = self.get_nth_page(i)
             widgets = [self.get_tab_label(nth_page)]
             while not hasattr(widgets[0], "get_text"):
                 if hasattr(widgets[0], "get_children"):
@@ -427,8 +427,8 @@ class Notebook(gtk.Notebook):
     def get_page_ids(self):
         """Return the namespace id attributes for all notebook pages."""
         ids = []
-        for n in range(self.get_n_pages()):
-            nth_page = self.get_nth_page(n)
+        for i in range(self.get_n_pages()):
+            nth_page = self.get_nth_page(i)
             if hasattr(nth_page, "namespace"):
                 ids.append(nth_page.namespace)
         return ids
@@ -475,10 +475,10 @@ class TooltipTreeView(gtk.TreeView):
             self.set_rubber_banding(True)
             self.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 
-    def _handle_tooltip(self, view, x, y, kbd_ctx, tip):
+    def _handle_tooltip(self, view, xpos, ypos, kbd_ctx, tip):
         """Handle creating a tooltip for the treeview."""
-        x, y = view.convert_widget_to_bin_window_coords(x, y)
-        pathinfo = view.get_path_at_pos(x, y)
+        xpos, ypos = view.convert_widget_to_bin_window_coords(xpos, ypos)
+        pathinfo = view.get_path_at_pos(xpos, ypos)
         if pathinfo is None:
             return False
         path, column = pathinfo[:2]
@@ -583,10 +583,6 @@ class TreeModelSortUtil(object):
             rval = next_cmp_factor * self.cmp_(val1, val2)
             i += 1
         return rval
-
-
-run_gtk_main = gtk.main
-quit_gtk_main = gtk.main_quit
 
 
 def color_parse(color_specification):

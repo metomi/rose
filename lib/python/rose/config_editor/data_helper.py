@@ -297,13 +297,13 @@ class ConfigDataHelper(object):
         full_sections.sort(sorter)
         return full_sections
 
-    def get_default_namespace_for_section(self, section, config_name):
+    def get_default_section_namespace(self, section, config_name):
         """Return the default namespace for the section."""
-        if config_name not in self.data._config_section_namespace_lookup:
-            self.data._config_section_namespace_lookup.setdefault(
+        if config_name not in self.data._config_section_namespace_map:
+            self.data._config_section_namespace_map.setdefault(
                 config_name, {})
         section_ns = (
-            self.data._config_section_namespace_lookup[config_name].get(
+            self.data._config_section_namespace_map[config_name].get(
                 section))
         if section_ns is None:
             config_data = self.data.config[config_name]
@@ -331,7 +331,7 @@ class ConfigDataHelper(object):
             section_ns = config_name + '/' + subspace
             if not subspace:
                 section_ns = config_name
-            self.data._config_section_namespace_lookup[config_name].update(
+            self.data._config_section_namespace_map[config_name].update(
                 {section: section_ns})
         return section_ns
 
