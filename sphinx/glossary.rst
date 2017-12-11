@@ -227,6 +227,15 @@ Glossary
 
       * :ref:`cylc tutorial <tutorial-datetime-cycling>`
 
+   wall-clock time
+      In a cylc suite the wall-clock time refers to the actual time (in the
+      real world).
+
+      See also:
+
+      * :term:`datetime cycling`
+      * :ref:`Clock Trigger Tutorial <tutorial-cylc-clock-trigger>`
+
    ISO8601
       ISO8601 is an international standard for writing dates and times which is
       used in cylc with :term:`datetime cycling`.
