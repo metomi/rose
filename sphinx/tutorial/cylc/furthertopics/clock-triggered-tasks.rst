@@ -1,32 +1,29 @@
 .. include:: ../../../hyperlinks.rst
    :start-line: 1
 
+.. _tutorial-cylc-clock-trigger:
+
 Clock Triggered Tasks
 =====================
 
-This part of the Rose user guide walks you through using clock triggered tasks.
+.. TODO
 
-This allows you to trigger tasks based on the actual time.
+   After #2423 has been finalised and merged this tutorial should be
+   re-factored / re-written to incorporate the usage of ``cylc-graph``.
 
+In a :term:`datetime cycling` suite the time represented by the
+:term:`cycle points <cycle point>` bear no relation to the real-world time.
+Using clock-triggers we can make tasks wait until their cycle point time before
+running.
 
-Purpose
--------
-
-.. TODO - Insert animation / diagram.
-
-The typical use of clock triggered tasks is to perform real-time data
-retrieval.
-
-In general, most tasks in a suite do not care about the wall clock time,
-simply running once their prerequisites are met. Clock triggered tasks,
-however, wait for a particular wall clock time to be reached in addition
-to their other prerequisites.
+Clock-triggering effectively enables us to tether the "cycle time" to the
+"real world time" which we refer to as the :term:`wall-clock time`.
 
 
 Clock Triggering
 ----------------
 
-When clock triggering tasks we can use different
+When clock-triggering tasks we can use different
 :ref:`offsets <tutorial-iso8601-durations>` to the cycle time as follows:
 
 .. code-block:: cylc
@@ -44,7 +41,7 @@ Example
 
 Our example suite will simulate a clock chiming on the hour.
 
-Within your ``~/cylc-run`` directroy create a new directory called
+Within your ``~/cylc-run`` directory create a new directory called
 ``clock-trigger``::
 
    mkdir ~/cylc-run/clock-trigger
@@ -87,10 +84,10 @@ Stop the suite after a few cycles using the :guilabel:`stop` button in the
 waiting for the actual time to be equal to the cycle point.
 
 
-Clock Triggering Tasks
+Clock-Triggering Tasks
 ----------------------
 
-We want our clock to only ring in real time rather than the simulated
+We want our clock to only ring in real-time rather than the simulated
 cycle time.
 
 To do this, add the following lines to the ``[scheduling]`` section of
@@ -104,15 +101,9 @@ your ``suite.rc``:
 This tells the suite to clock trigger the ``bell`` task with a cycle
 offset of ``0`` hours.
 
-Save your changes and run your suite::
+Save your changes and run your suite.
 
-   cylc run clock-trigger
-
-
-Results
--------
-
-Your suite should now be running the bell task in realtime. Any cycle times
+Your suite should now be running the ``bell`` task in real-time. Any cycle times
 that have already passed (such as the one defined by ``initial cycle time``)
 will be run as soon as possible, while those in the future will wait for that
 time to pass.
@@ -122,12 +113,12 @@ has passed in order to confirm the clock triggering is working correctly.
 Once you are satisfied, stop your suite.
 
 By making the ``bell`` task a clock triggered task we have made it run in
-realtime. Thus, when the time caught up with the cycle time, the bell task
-triggered.
+real-time. Thus, when the wall-clock time caught up with the cycle time, the
+``bell`` task triggered.
 
 
-Further Clock Triggering
-------------------------
+Adding More Clock-Triggered Tasks
+---------------------------------
 
 We will now modify our suite to run tasks at quarter-past, half-past and
 quarter-to the hour.
@@ -140,7 +131,7 @@ following:
    [[quarter_past, half_past, quarter_to]]
        script = echo 'chimes'
 
-Similarly, modify the ``[[scheduling]]`` section as follows:
+Edit the ``[[scheduling]]`` section to read:
 
 .. code-block:: cylc
 
@@ -148,7 +139,12 @@ Similarly, modify the ``[[scheduling]]`` section as follows:
        clock-trigger = bell(PT0M), quarter_past(PT15M), half_past(PT30M), quarter_to(PT45M)
    [[dependencies]]
        [[[PT1H]]]
-           graph = bell => quarter_past => half_past => quarter_to
+           graph = """
+               bell
+               quarter_past
+               half_past
+               quarter_to
+           """
 
 Note the different values used for the cycle offsets of the clock-trigger tasks.
 
@@ -170,10 +166,10 @@ and then shut it down using the :guilabel:`stop` button in the ``cylc gui``.
 Summary
 -------
 
-You have now successfully created and run a suite that:
-
-* Runs a bell task in realtime on the hour
-* Runs different chiming tasks at quarter-past, half-past and quarter-to the
-  hour
+* Clock triggers are a type of :term:`dependency` which cause
+  :term:`tasks <task>` to wait for the :term:`wall-clock time` to reach the
+  :term:`cycle point` time.
+* A clock trigger applies only to a single task.
+* Clock triggers can only be used in datetime cycling suites.
 
 For more information see the `cylc User Guide`_.
