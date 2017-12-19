@@ -16,8 +16,8 @@ Create a new suite by running the command::
    rose tutorial inheritance-tutorial
    cd ~/cylc-run/inheritance-tutorial
 
-You will now have a ``suite.rc`` file that defines two tasks representing two
-different aircraft the Airbus A380 jumbo jet and the Robson R44 helicopter:
+You will now have a ``suite.rc`` file that defines two tasks each representing
+a different aircraft, the Airbus A380 jumbo jet and the Robson R44 helicopter:
 
 .. image:: https://upload.wikimedia.org/wikipedia/commons/0/09/A6-EDY_A380_Emirates_31_jan_2013_jfk_%288442269364%29_%28cropped%29.jpg
    :width: 49%
@@ -42,7 +42,7 @@ different aircraft the Airbus A380 jumbo jet and the Robson R44 helicopter:
        [[AIR_VEHICLE]]
            inherit = VEHICLE
            [[[meta]]]
-               description = A vehicle which can fly
+               description = A vehicle which can fly.
        [[AIRPLANE]]
            inherit = AIR_VEHICLE
            [[[meta]]]
@@ -67,8 +67,12 @@ different aircraft the Airbus A380 jumbo jet and the Robson R44 helicopter:
 
 .. note::
 
-   The ``[meta]`` section is a freeform section we we can define metadata to be
-   associated with a task, family or the suite itself.
+   The ``[meta]`` section is a freeform section where we can define metadata
+   to be associated with a task, family or the suite itself.
+
+   This metadata should not be mistaken with rose metadata.
+
+   .. TODO - link to rose metadata section.
 
 .. admonition:: Reminder
    :class: hint
@@ -177,7 +181,7 @@ Add the following task to your ``suite.rc`` file.
        [[v22]]
            inherit = AIRPLANE, HELICOPTER
            [[[meta]]]
-               title = V22 Osprey military aircraft.
+               title = V-22 Osprey Military Aircraft.
 
 Refresh your cylc graph window or re-run the cylc graph command.
 
@@ -242,7 +246,7 @@ You should see that the ``CAN_TASK_OFF_VERTICALLY`` environment variable has
 been set to ``false`` which isn't right. This is because of the order in which
 inheritance is applied.
 
-Cylc handles multiple-inheritance by applying each family from last to first.
+Cylc handles multiple-inheritance by applying each family from right to left.
 For the ``v22`` task we specified ``inherit = AIRPLANE, HELICOPTER`` so the
 ``HELICOPTER`` family will be applied first and the ``AIRPLANE`` family after.
 
@@ -287,7 +291,7 @@ We will now add some more families and tasks to the suite.
 Engine Type
 ^^^^^^^^^^^
 
-Next we will define three families to represent different types of engine.
+Next we will define four families to represent three different types of engine.
 
 .. digraph:: Example
    :align: center
@@ -295,17 +299,21 @@ Next we will define three families to represent different types of engine.
    size = "5,5"
    bgcolor=none
 
-   ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   TURBINE_ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   INTERNAL_COMBUSTION_ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   HUMAN_ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+   ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled,
+       margin="0.3,0.055"]
+   TURBINE_ENGINE [color=royalblue, fillcolor=powderblue, shape=box,
+       style=filled, margin="0.3,0.055"]
+   INTERNAL_COMBUSTION_ENGINE [color=royalblue, fillcolor=powderblue,
+       shape=box, style=filled, margin="0.3,0.055"]
+   HUMAN_ENGINE [color=royalblue, fillcolor=powderblue, shape=box,
+       style=filled, margin="0.3,0.055"]
 
-   ENGINE -> TURBINE_ENGINE
-   ENGINE -> INTERNAL_COMBUSTION_ENGINE
-   ENGINE -> HUMAN_ENGINE
+   "ENGINE" -> "TURBINE_ENGINE"
+   "ENGINE" -> "INTERNAL_COMBUSTION_ENGINE"
+   "ENGINE" -> "HUMAN_ENGINE"
 
-Each engine type should set an environment variable called ``FUEL`` set to the
-following values:
+Each engine type should set an environment variable called ``FUEL`` which we
+will assign to the following values:
 
 * Turbine - kerosene
 * Internal Combustion - petrol
@@ -331,8 +339,8 @@ Add lines to the ``runtime`` section to represent these four families.
              [[[environment]]]
                   FUEL = pizza
 
-We now need to make the three aircraft inherit from one of the three engine
-families. The aircraft use the following types of engine:
+We now need to make the three aircraft inherit from one of the three engines.
+The aircraft use the following types of engine:
 
 * A380 - turbine
 * R44 - internal combustion
@@ -368,9 +376,9 @@ penny farthing.
    :alt: Penny Farthing Bicycle
    :align: center
 
-To do this we will need to add a new classification of vehicle ``LAND_VEHICLE``,
-and a new subclass of vehicle called ``BICYCLE`` and a new task called
-``penny_farthing`` related in the following manner:
+To do this we will need to add two new families, ``LAND_VEICHLE`` and
+``BICYCLE`` as well as a new task, ``penny_farthing`` related in the
+following manner:
 
 .. digraph:: Example
    :align: center
@@ -378,10 +386,13 @@ and a new subclass of vehicle called ``BICYCLE`` and a new task called
    bgcolor=none
 
    VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   LAND_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+   LAND_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box,
+       style=filled]
    BICYCLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   HUMAN_ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   penny_farthing [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+   HUMAN_ENGINE [color=royalblue, fillcolor=powderblue, shape=box,
+       style=filled, margin="0.3,0.055"]
+   penny_farthing [color=royalblue, fillcolor=powderblue, shape=box,
+       style=filled, margin="0.3,0.055"]
    VEHICLE -> LAND_VEHICLE -> BICYCLE -> penny_farthing
    HUMAN_ENGINE -> penny_farthing
 
@@ -399,7 +410,7 @@ task.
          [[LAND_VEHICLE]]
              inherit = VEHICLE
              [[[meta]]]
-                 description = A vehicle which can travel over the ground
+                 description = A vehicle which can travel over the ground.
 
          [[BICYCLE]]
              inherit = LAND_VEHICLE
@@ -437,8 +448,8 @@ task we can see that it inherits settings from the ``VEHICLE``,
 Hovercraft
 ^^^^^^^^^^
 
-We will now add a hovercraft called the Hoverwork BHT130 better known to some as
-the Isle Of Wight Ferry.
+We will now add a hovercraft called the Hoverwork BHT130, better known to some
+as the Isle Of Wight Ferry.
 
 .. image:: https://upload.wikimedia.org/wikipedia/commons/e/e7/Hovercraft_leaving_Ryde.JPG
    :width: 300px
@@ -456,12 +467,15 @@ of as flying vehicles.
 
    VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
    AIR_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   LAND_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   WATER_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+   LAND_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box,
+       style=filled]
+   WATER_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box,
+       style=filled]
    HOVERCRAFT [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
    bht130 [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
    ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
-   INTERNAL_COMBUSTION_ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+   INTERNAL_COMBUSTION_ENGINE [color=royalblue, fillcolor=powderblue,
+       shape=box, style=filled, margin="0.3,0.055"]
    VEHICLE -> AIR_VEHICLE -> HOVERCRAFT
    VEHICLE -> LAND_VEHICLE -> HOVERCRAFT
    VEHICLE -> WATER_VEHICLE -> HOVERCRAFT
@@ -480,17 +494,17 @@ Add a description (``[meta]description``) to the ``WATER_VEHICLE`` and
          [[WATER_VEHICLE]]
              inherit = VEHICLE
              [[[meta]]]
-                 description = A vehicle which can travel over water
+                 description = A vehicle which can travel over water.
 
          [[HOVERCRAFT]]
              inherit = LAND_VEHICLE, AIR_VEHICLE, WATER_VEHICLE
              [[[meta]]]
-                 description = A vehicle which can travel over ground, water and ice
+                 description = A vehicle which can travel over ground, water and ice.
 
          [[bht130]]
              inherit = HOVERCRAFT, INTERNAL_COMBUSTION_ENGINE
              [[[meta]]]
-                 title = Griffon Hoverwork BHT130 (Isle Of Whight Ferry)
+                 title = Griffon Hoverwork BHT130 (Isle Of Whight Ferry).
 
 
 Finished Suite
@@ -521,17 +535,20 @@ this:
    INTERNAL_COMBUSTION_ENGINE  [color=royalblue,
       fillcolor=powderblue,
       shape=box,
-      style=filled];
+      style=filled,
+      margin="0.3,0.055"];
    ENGINE -> INTERNAL_COMBUSTION_ENGINE    [color=royalblue];
    TURBINE_ENGINE  [color=royalblue,
       fillcolor=powderblue,
       shape=box,
-      style=filled];
+      style=filled,
+      margin="0.3,0.055"];
    ENGINE -> TURBINE_ENGINE    [color=royalblue];
    HUMAN_ENGINE    [color=royalblue,
       fillcolor=powderblue,
       shape=box,
-      style=filled];
+      style=filled,
+      margin="0.3,0.055"];
    ENGINE -> HUMAN_ENGINE   [color=royalblue];
    LAND_VEHICLE    [color=royalblue,
       fillcolor=powderblue,
@@ -571,7 +588,8 @@ this:
    penny_farthing  [color=royalblue,
       fillcolor=powderblue,
       shape=box,
-      style=filled];
+      style=filled,
+      margin="0.3,0.055"];
    HUMAN_ENGINE -> penny_farthing    [color=royalblue];
    AIRPLANE  [color=royalblue,
       fillcolor=powderblue,
