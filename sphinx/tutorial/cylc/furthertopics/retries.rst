@@ -4,7 +4,7 @@
 Retries
 =======
 
-Retries allow use to automatically re-submit tasks which have failed due to
+Retries allow us to automatically re-submit tasks which have failed due to
 failure in submission or execution.
 
 
@@ -67,7 +67,7 @@ trying to roll doubles using two dice:
 Running Without Retries
 -----------------------
 
-Let's see what happens when we run the suite as it is. Open the cylc gui::
+Let's see what happens when we run the suite as it is. Open the ``cylc gui``::
 
    cylc gui retries-tutorial &
 
@@ -98,22 +98,20 @@ This means that if the ``roll_doubles`` task fails, cylc expects to
 retry running it 5 times before finally failing. Each retry will have
 a delay of 6 seconds.
 
-We can multiple retry periods with the ``execution retry delays`` setting by
-separating them with commas, for example the following line would tell cylc to
-retry a task, first after 15 seconds, then after 10 minutes, then after one hour
-then after three hours.
+We can apply multiple retry periods with the ``execution retry delays`` setting
+by separating them with commas, for example the following line would tell cylc
+to retry a task four times, once after 15 seconds, then once after 10 minutes,
+then once after one hour then once after three hours.
 
 .. code-block:: cylc
 
    execution retry delays = PT15S, PT10M, PT1H, PT3H
 
-We've chosen 6 seconds because it's relatively easy to observe for this example.
-
 
 Running With Retries
 --------------------
 
-If you closed it, re-open the cylc gui::
+If you closed it, re-open the ``cylc gui``::
 
    cylc gui retries-tutorial &
 
@@ -122,8 +120,8 @@ Re-run the suite::
    cylc run retries-tutorial
 
 What you should see is cylc retrying the ``roll_doubles`` task. Hopefully,
-it will succeed (about a 1 in 3 chance of every task failing) and the
-suite will continue.
+it will succeed (there is only about a about a 1 in 3 chance of every task
+failing) and the suite will continue.
 
 
 Altering Behaviour
@@ -148,9 +146,7 @@ Change the ``script`` setting for the ``roll_doubles`` task to this::
        exit 1
    fi
 
-If your suite is still running, stop it, then run it again::
-
-   cylc run retries-tutorial
+If your suite is still running, stop it, then run it again.
 
 This time, the task should definitely succeed before the third retry.
 
