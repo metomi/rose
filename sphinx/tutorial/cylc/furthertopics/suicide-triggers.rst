@@ -1,398 +1,654 @@
+.. include:: ../../../hyperlinks.rst
+   :start-line: 1
+
+
 Suicide Triggers
 ================
 
-Introduction
-------------
+Suicide triggers allow us to remove a task from the suite's graph whilst the
+suite is running.
 
-This tutorial walks you through using suicide triggers.
+The main use of suicide triggers is for handling failures in the workflow.
 
-Suicide triggers allow you to remove tasks from the suite during runtime.
 
-Purpose
--------
+Stalled Suites
+--------------
 
-Suicide triggers can be used to remove any task from a suite while it is running.
+Imagine a bakery which has a workflow that involves making cake.
 
-They work much like any other type of trigger in a suite, except that rather than running a particular task once the triggering condition is met, the task is instead removed from the suite.
+.. minicylc::
+   :snippet:
+   :theme: none
 
-Example
--------
+   make_cake_mixture => bake_cake => sell_cake
 
-Create a new suite (or just a new directory somewhere - e.g. in your homespace) containing a blank ``rose-suite.conf`` and a ``suite.rc`` file that looks like this:
+There is a 50% chance that the cake will turn out fine, and a 50% chance that
+it will get burnt. In this case that we burn the cake the workflow gets stuck.
+
+.. digraph:: Example
+   :align: center
+
+   bgcolor = none
+
+   make_cake_mixture [style="filled" color="#ada5a5"]
+   bake_cake [style="filled" color="#ff0000" fontcolor="white"]
+   sell_cake [color="#88c6ff"]
+
+   make_cake_mixture -> bake_cake -> sell_cake
+
+In this event the ``sell_cake`` task will be unable to run as it depends on
+``bake_cake``. We would say that this suite has :term:`stalled <stalled suite>`
+When cylc detects that a suite has stalled it sends you an email to let you
+know that the suite has got stuck and requires human intervention to proceed.
+
+
+Handling Failures
+-----------------
+
+In order to prevent the suite from entering a stalled state we need to handle
+the failure of the ``bake_cake`` task.
+
+At the bakery if they burn a cake they eat it and make another.
+
+The following diagram outlines this workflow with its two possible pathways,
+``:succeed`` in the event that ``bake_cake`` is successful and ``:fail``
+otherwise.
+
+.. digraph:: Example
+   :align: center
+
+   bgcolor = none
+
+   make_cake_mixture
+   bake_cake
+
+   subgraph cluster_1 {
+      label = ":succeed"
+      labelloc = "b"
+      color = "green"
+      fontcolor = "green"
+      style = "dashed"
+      sell_cake
+   }
+
+   subgraph cluster_2 {
+      label = ":fail"
+      labelloc = "b"
+      color = "red"
+      fontcolor = "red"
+      style = "dashed"
+      eat_cake
+   }
+
+   make_cake_mixture -> bake_cake
+   bake_cake -> sell_cake
+   bake_cake -> eat_cake
+
+We can add this logic to our workflow using the ``fail`` :term:`qualifier`.
+
+.. code-block:: cylc-graph
+
+   bake_cake => sell_cake
+   bake_cake:fail => eat_cake
+
+.. admonition:: Reminder
+   :class: hint
+
+   If you don't specify a qualifier cylc assumes you mean ``:succeed`` so the
+   following two lines are equlivalent:
+
+   .. code-block:: cylc-graph
+
+      foo => bar
+      foo:succeed => bar
+
+
+Why Do We Need To Remove Tasks From The Graph?
+----------------------------------------------
+
+Create a new suite called ``suicide triggers``::
+
+   mkdir -p ~/cylc-run/suicide-triggers
+   cd ~/cylc-run/suicide-triggers
+
+Paste the following code into the ``suite.rc`` file:
 
 .. code-block:: cylc
 
-   [cylc]
-       UTC mode = True # Ignore DST
    [scheduling]
-       [[dependencies]]
-           graph = """
-               bake_cake:fail => purchase_cake
-               bake_cake | purchase_cake => eat_cake
-               """
-
-This sets up a simple suite which consists of the following:
-
-   - a ``bake_cake`` task which either succeeds or fails
-   - a ``purchase_cake`` "recovery" task which is run if ``bake_cake`` fails
-   - an ``eat_cake`` task which runs once cake has been obtained i.e. once ``bake_cake`` or ``purchase_cake`` has succeeded
-
-For purposes of this tutorial ``purchase_cake`` will always succeed as cake should be available to buy somewhere.
-
-It will need some runtime. Add the following to your ``suite.rc`` file:
-
-.. code-block:: cylc
-
+      cycling mode = integer
+      initial cycle point = 1
+      [[dependencies]]
+          [[[P1]]]
+              graph = """
+                  make_cake_mixture => bake_cake => sell_cake
+                  bake_cake:fail => eat_cake
+              """
    [runtime]
+       [[root]]
+           script = sleep 2
        [[bake_cake]]
-           script = """
-   sleep 10;
-   if (($RANDOM % 2)); then
-       echo 'Success'; true;
-   else
-       echo 'Burned the cake!'; false;
-   fi
-   """
-       [[purchase_cake]]
-           script = sleep 10; echo 'Off to the shops!'
-       [[eat_cake]]
-           script = sleep 10; echo 'Mmm cake!'
+           # Random outcome 50% chance of success 50% chance of failure.
+           script = sleep 2; if (( $RANDOM % 2 )); then true; else false; fi
+
+Open the ``cylc gui`` and run the suite::
+
+   cylc gui suicide-triggers &
+   cylc run suicide-triggers
+
+The suite will run for three cycles then get stuck. You should see something
+similar to the diagram below. As the ``bake_cake`` task fails randomly what
+you see might differ slightly. You may receive a "suite stalled" email.
+
+.. digraph:: Example
+   :align: center
+
+   bgcolor = none
+   size = "7,5"
+
+   subgraph cluster_1 {
+      label = "1"
+      style = "dashed"
+      "make_cake_mixture.1" [
+         label="make_cake_mixture\n1",
+         style="filled",
+         color="#ada5a5"]
+      "bake_cake.1" [
+         label="bake_cake\n1",
+         style="filled",
+         color="#ada5a5"]
+      "sell_cake.1" [
+         label="sell_cake\n1",
+         style="filled",
+         color="#ada5a5"]
+      "eat_cake.1" [
+         label="eat_cake\1",
+         color="#88c6ff"]
+   }
+
+   subgraph cluster_2 {
+      label = "2"
+      style = "dashed"
+      "make_cake_mixture.2" [
+         label="make_cake_mixture\n2",
+         style="filled",
+         color="#ada5a5"]
+      "bake_cake.2" [
+         label="bake_cake\n2",
+         style="filled",
+         color="#ff0000",
+         fontcolor="white"]
+      "sell_cake.2" [
+         label="sell_cake\2",
+         color="#88c6ff"]
+      "eat_cake.2" [
+         label="eat_cake\n2",
+         color="#888888",
+         fontcolor="#888888"]
+   }
+
+   subgraph cluster_3 {
+      label = "3"
+      style = "dashed"
+      "make_cake_mixture.3" [
+         label="make_cake_mixture\n3",
+         style="filled",
+         color="#ada5a5"]
+      "bake_cake.3" [
+         label="bake_cake\n3",
+         style="filled",
+         color="#ff0000",
+         fontcolor="white"]
+      "sell_cake.3" [
+         label="sell_cake\n3",
+         color="#888888",
+         fontcolor="#888888"]
+      "eat_cake.3" [
+         label="eat_cake\3",
+         color="#888888",
+         fontcolor="#888888"]
+   }
+
+   "make_cake_mixture.1" -> "bake_cake.1" -> "sell_cake.1"
+   "bake_cake.1" -> "eat_cake.1"
+
+   "make_cake_mixture.2" -> "bake_cake.2" -> "sell_cake.2"
+   "bake_cake.2" -> "eat_cake.2"
+
+   "make_cake_mixture.3" -> "bake_cake.3" -> "sell_cake.3"
+   "bake_cake.3" -> "eat_cake.3"
+
+The reason the suite stalls is that, by default, cylc will run a maximum of
+three cycles concurrently. As each cycle has at least one task which hasn't
+either succeeded or failed cylc cannot move onto the next cycle.
+
+.. tip::
+   
+   For more information search ``max active cycle points`` in the
+   `cylc user guide`_.
+
+You will also notice that some of the tasks (e.g. ``eat_cake`` in cycle ``2``
+in the above example) are drawn in a faded gray. This is because these tasks
+have not yet been run in earlier cycles and as such cannot run.
+
+.. TODO - Spawn On Demand!
 
 
-Save your changes and run the suite using ``rose suite-run``
+Removing Tasks From The Graph
+-----------------------------
 
-The suite should now run. If ``bake_cake`` fails, ``purchase_cake`` is triggered which triggers ``eat_cake``. Otherwise, ``bake_cake`` triggers ``eat_cake``.
+In order to get around these problems and prevent the suite from stalling we
+must remove the tasks that are no longer needed. We do this using suicide
+triggers.
 
-Notice that at once eat_cake has completed the suite does not shut down. This is because either ``bake_cake`` is in the failed state or ``purchase_cake`` is waiting to be triggered. Shut down the suite by pressing the stop button in the ``cylc gui``.
+A suicide trigger is written like a normal dependency but with an exclamation
+mark in-front of the task on the right-hand-side of the dependency meaning
+*"remove the following task from the graph at the current cycle point."*
 
-You may want to run the suite again to see both situations.
+For example the following :term:`graph string` would remove the task ``bar``
+from the graph if the task ``foo`` were to succeed.
+
+.. code-block:: cylc-graph
+
+   foo => ! bar
+
+There are three cases where we would need to remove a task in the cake-making
+example:
+
+#. If the ``bake_cake`` task succeeds we don't need the ``eat_cake`` task so
+   should remove it.
+
+   .. code-block:: cylc-graph
+
+      bake_cake => ! eat_cake
+
+#. If the ``bake_cake`` task fails we don't need the ``sell_cake`` task so
+   should remove it.
+
+   .. code-block:: cylc-graph
+
+      bake_cake:fail => ! sell_cake
+
+#. The ``bake_cake`` task needs to be removed else the suite will stall, we can
+   do this after the ``eat_cake`` task has succeeded.
+
+   .. code-block:: cylc-graph
+
+      eat_cake => ! bake_cake
+
+Add the following three lines to the suite's graph:
+
+.. code-block:: cylc-graph
+
+   bake_cake => ! eat_cake
+   bake_cake:fail => ! sell_cake
+   eat_cake => ! bake_cake
+
+We can view suicide triggers in ``cylc graph`` by un-selecting the
+:guilabel:`Ignore Suicide Triggers` button in the toolbar. Suicide triggers
+will then appear as dashed lines with circular endings. You should see
+something like this:
+
+.. digraph:: Example
+   :align: center
+
+   bgcolor = none
+
+   make_cake_mixture -> bake_cake
+   bake_cake -> sell_cake [style="dashed" arrowhead="dot"]
+   bake_cake -> eat_cake [style="dashed" arrowhead="dot"]
+   eat_cake -> bake_cake [style="dashed" arrowhead="dot"]
 
 
-Adding suicide triggers
+Downstream Dependencies
 -----------------------
 
-Since ``purchase_cake`` has corrected for the failure of ``bake_cake`` we don't need the suite to keep running - we would like the suite to be able to shutdown once the final cycle has completed.
+If we wanted to make the cycles run in order we might write an
+:term:`inter-cycle dependency` like this:
 
-We can make use of a suicide trigger to remove the failed ``bake_cake`` task.
+.. code-block:: cylc-graph
 
-Once ``purchase_cake`` has succeeded we no longer need ``bake_cake`` so we can use a suicide trigger to remove ``bake_cake`` from the suite.
+   sell_cake[-P1] => make_cake_mixture
 
-Modify the ``[scheduling]`` section to look like the following:
+In order to handle the event that the ``sell_cake`` task has been removed from
+the graph by a suicide trigger we can write our dependency with an or ``|`` like
+so:
+
+.. code-block:: cylc-graph
+
+   eat_cake[-P1] | sell_cake[-P1] => make_cake_mixture
+
+Now the ``make_cake_mixture`` task from the next cycle will run after whichever
+of the ``sell_cake`` or ``eat_cake`` tasks is run.
+
+.. digraph:: Example
+   :align: center
+
+   bgcolor = none
+
+   subgraph cluster_1 {
+      style="dashed"
+      label="1"
+      "make_cake_mixture.1" [label="make_cake_mixture\n1"]
+      "bake_cake.1" [label="bake_cake\n1"]
+      "make_cake_mixture.1" -> "bake_cake.1"
+      "bake_cake.1" -> "sell_cake.1" [style="dashed" arrowhead="dot"]
+      "bake_cake.1" -> "eat_cake.1" [style="dashed" arrowhead="dot"]
+      "eat_cake.1" -> "bake_cake.1" [style="dashed" arrowhead="dot"]
+      subgraph cluster_a {
+         label = ":fail"
+         fontcolor = "red"
+         color = "red"
+         style = "dashed"
+         "eat_cake.1" [label="eat_cake\n1" color="red" fontcolor="red"]
+      }
+      subgraph cluster_b {
+         label = ":success"
+         fontcolor = "green"
+         color = "green"
+         style = "dashed"
+         "sell_cake.1" [label="sell_cake\n1" color="green" fontcolor="green"]
+      }
+   }
+
+   subgraph cluster_2 {
+      style="dashed"
+      label="2"
+      "make_cake_mixture.2" [label="make_cake_mixture\n2"]
+      "bake_cake.2" [label="bake_cake\n2"]
+      "make_cake_mixture.2" -> "bake_cake.2"
+      "bake_cake.2" -> "sell_cake.2" [style="dashed" arrowhead="dot"]
+      "bake_cake.2" -> "eat_cake.2" [style="dashed" arrowhead="dot"]
+      "eat_cake.2" -> "bake_cake.2" [style="dashed" arrowhead="dot"]
+      subgraph cluster_c {
+         label = ":fail"
+         fontcolor = "red"
+         color = "red"
+         style = "dashed"
+         "eat_cake.2" [label="eat_cake\n2" color="red" fontcolor="red"]
+      }
+      subgraph cluster_d {
+         label = ":success"
+         fontcolor = "green"
+         color = "green"
+         style = "dashed"
+         "sell_cake.2" [label="sell_cake\n2" color="green" fontcolor="green"]
+      }
+   }
+
+   "eat_cake.1" -> "make_cake_mixture.2" [arrowhead="onormal"]
+   "sell_cake.1" -> "make_cake_mixture.2" [arrowhead="onormal"]
+
+Add the following :term:`graph string` to your suite.
+
+.. code-block:: cylc-graph
+
+   eat_cake[-P1] | sell_cake[-P1] => make_cake_mixture
+
+Open the ``cylc gui`` and run the suite. You should see that if the
+``bake_cake`` task fails both it and the ``sell_cake`` task disappear and 
+are replaced by the ``eat_cake`` task.
+
+
+Variations
+----------
+
+The following sections outline examples of how to use suicide triggers.
+
+Recovery Task
+^^^^^^^^^^^^^
+
+A common use case where a ``recover`` task is used to handle a task failure.
+
+.. digraph:: Example
+   :align: center
+
+   bgcolor = "none"
+
+   subgraph cluster_1 {
+      label = ":fail"
+      color = "red"
+      fontcolor = "red"
+      style = "dashed"
+      recover
+   }
+
+   foo -> bar
+   bar -> recover
+   recover -> baz [arrowhead="onormal"]
+   bar -> baz [arrowhead="onormal"]
 
 .. code-block:: cylc
 
    [scheduling]
        [[dependencies]]
            graph = """
-               bake_cake:fail => purchase_cake
-               bake_cake | purchase_cake => eat_cake
-               purchase_cake => !bake_cake
-               """
+               # Regular graph.
+               foo => bar
 
-The line ``purchase_cake => !bake_cake`` is the suicide trigger. When ``purchase_cake`` succeeds, ``bake_cake`` is removed from the suite.
+               # The fail case.
+               bar:fail => recover
 
-We also need to remove the ``purchase_cake`` from the suite if it is not needed i.e. when ``bake_cake`` succeeds.
+               # Remove the "recover" task in the success case.
+               bar => ! recover
 
-Add the ``line bake_cake => !purchase_cake`` to the dependencies graph.
+               # Remove the "bar" task in the fail case.
+               recover => ! bar
 
-Save your changes and run your suite. You should now be able to ``eat_cake`` and not worry about previous tasks keeping the suite from shutting down.
-
-You can see the suicide trigger dependency in the ``cylc gui`` Graph View if you unselect ``View->1 - Options->Ignore Suicide Triggers``.
-
-
-Note on suicide triggers
-------------------------
-
-While it is possible to have a task suicide triggering itself this is not recommended and may lead to difficulties if manual interaction with the suite is required to correct the problem (the task has been removed from the suite).
-
-Depending on your needs, possible places to put the suicide trigger are:
-
-   - triggering off the success of a recovery task
-   - triggering off the final task in a cycle
-   - triggering off a cleanup task in the suite
-
-
-Advanced suicide triggers example
----------------------------------
-
-Advanced example 1
-^^^^^^^^^^^^^^^^^^
-
-The first example checks the failure of an unreliable task, if it meets the criteria in the checking task then it tries a recovery task. If the recovery task succeeds then the suite carries on, else if it fails then the suite stops as it cannot be recovered.
-
-Possible Outcomes:
-
-If ``flaky_activity`` fails then run ``check``, the ``check`` checks to see if the suite is recoverable, if it is then ``recovery`` succeeds and the suite can continue. If it is not recoverable, i.e., ``check`` fails then don't run housekeep as the suite cannnot carry on and needs human interaction to fix.
-
-If ``flaky_activity`` succeeds the suite carries on as normal, i.e., going straight to housekeep and not running either of the check or recovery tasks.
-
-Create a new suite (or just a new directory somewhere - e.g. in your homespace) containing a ``suite.rc`` file that looks like this:
-
-.. code-block:: cylc
-
-   # Check the failure of `flaky_activity` and if it meets the criteria in the 
-   # `check` task then try a recovery task, `recovery`. If `recovery` succeeds 
-   # then the suite carrys on else if it fails then the suite stops as it cannot 
-   # be recovered.
-
-   [cylc]
-       UTC mode = True # Ignore DST
-
-   [scheduling]
-       [[dependencies]]
-           graph = """
-               start_install  => flaky_activity 
-
-               flaky_activity => !check
-               flaky_activity | recovery   => housekeep
-               flaky_activity:fail         => check => recovery
-
-               check:fail | flaky_activity => !recovery
-               check:fail    => !housekeep
+               # Downstream dependencies.
+               bar | recover => baz
            """
-
    [runtime]
        [[root]]
-           [[[job]]]
-               execution time limit = PT3M
-           [[[events]]]
-               mail events = failed, submission failed, submission timeout, execution timeout
-               submission timeout = PT24M
-
-       [[check]]
-           script = """
-               sleep 10;
-               echo ${CYLC_SUITE_LOG_DIR%suite}job/$CYLC_TASK_CYCLE_POINT/flaky_activity/NN/job.out
-               grep -F 'Fail, but I can recover, try recovery.' ${CYLC_SUITE_LOG_DIR%suite}job/$CYLC_TASK_CYCLE_POINT/flaky_activity/NN/job.out
-               if echo $? ; then
-                   echo 'This may recover'; true;
-               fi
-           """
-
-       [[flaky_activity]]
-           script = """ 
-               sleep 10;
-               if (($RANDOM % 2)); then
-                   echo 'Success'; true;
-               else
-                   if (($RANDOM % 2)); then
-                       echo 'Fail, but I can recover, try recovery.'; false;
-                   else
-                       echo 'Fail, I will never figure this out!'; false;
-                   fi
-               fi
-           """
-
-       [[housekeep]]
-           script = """ sleep 10;
-               echo 'finishing, I always run as expected, usually a housekeeping task.'
-           """
-
-       [[recovery]]
-           script = """
-               sleep 10;
-               if (($RANDOM % 2)); then
-                   echo 'Success, I could be helped by the recovery task'; true;
-               else
-                   echo 'Fail, I could not be helped by the recovery task'; false;
-               fi
-          """
-
-       [[start_install]]
-           script = """ sleep 10;
-               echo 'starting up, I always run as expected, usually an install task.'
-          """
-
-Advanced example 2
-^^^^^^^^^^^^^^^^^^
-
-In this example if a member of a specific family fails carry on. If a task important to that cycle fails go to the end of that cycle and remove the failed task from the task pool.
-
-Possible Outcomes:
-
-If ``sometimes_fail`` fails then go to the ``housekeep`` task.
-
-If ``sometimes_fail`` succeeds and ``FAMILY_PASS`` all succeed and ``SOME_DO_SOME_DONT`` all finish no matter if they succeed or fail then then go to the ``housekeep`` task.
-
-Create a new suite (or just a new directory somewhere - e.g. in your homespace) containing a ``suite.rc`` file that looks like this:
-
-.. code-block:: cylc
-
-   # If a member of family `SOME_DO_SOME_DONT` fails then carry on regardless.
-   # If then the `sometimes_fail` task fails go to the end of that cycle and 
-   # remove the failed task from the task pool.
-
-   [cylc]
-       UTC mode = True # Ignore DST
-
-   [scheduling]
-       [[dependencies]]
-           graph = """
-               start_install                => sometimes_fail => FAMILY_PASS
-               FAMILY_PASS:succeed-all      => SOME_DO_SOME_DONT
-               SOME_DO_SOME_DONT:finish-all => dependent_on_families
-               sometimes_fail:fail          => !sometimes_fail &\
-               !FAMILY_PASS & !SOME_DO_SOME_DONT & !dependent_on_families
-               dependent_on_families | sometimes_fail:fail => housekeep
-           """
-
-   [runtime]
-       [[root]]
-           [[[job]]]
-               execution time limit = PT3M
-           [[[events]]]
-               mail events = failed, submission failed, submission timeout, execution timeout
-               submission timeout = PT24M
-
-       [[FAMILY_PASS]]
-           script = sleep 10;
-
-       [[SOME_DO_SOME_DONT]]
-           script = sleep 5;
-
+           script = sleep 1
        [[bar]]
-           inherit = FAMILY_PASS
-           script = echo 'bar always succeeds'
+           script = false
 
-       [[dependent_on_families]]
-          script = """
-              sleep 10;
-              echo 'I can only run if all FAMILY_PASS succeed and 
-                    SOME_DO_SOME_DONT finish'
-              """
+Branched Workflow
+^^^^^^^^^^^^^^^^^
 
-       [[foo]]
-           inherit = FAMILY_PASS
-           script = echo 'foo always succeeds'
-                              
-       [[flaky_member]]
-           inherit = SOME_DO_SOME_DONT
-           script = """
-               echo 'flaky member is going to:'
-               sleep 10;
-               if (($RANDOM % 2)); then
-                   echo 'Success'; true; 
-               else
-                   echo 'Fail'; false;
-               fi
-           """
+A workflow where sub-graphs of tasks are to be run in the success and or fail
+cases.
 
-       [[housekeep]]
-           script = """ sleep 10;
-               echo 'finishing, I always run as expected, usually a housekeeping task.'
-           """
+.. digraph:: Example
+   :align: center
 
-       [[sometimes_fail]]
-          script = """
-              sleep 10;
-              if (($RANDOM % 2)); then
-                  echo 'Success'; true;
-              else
-                  echo 'Fail'; false;
-              fi
-          """
+   bgcolor = "none"
 
-       [[start_install]]
-           script = """ sleep 10;
-               echo 'starting up, I always run as expected, usually an install task.'
-           """
+   foo -> bar
+   bar -> tar -> par
+   bar -> jar -> par
+   bar -> baz -> jaz
 
-       [[stable_member]]
-           inherit = SOME_DO_SOME_DONT
-           script = echo 'stable member always succeeds'
+   subgraph cluster_1 {
+      label = ":success"
+      fontcolor = "green"
+      color = "green"
+      style = "dashed"
+      tar
+      jar
+      par
+   }
 
+   subgraph cluster_2 {
+      label = ":fail"
+      fontcolor = "red"
+      color = "red"
+      style = "dashed"
+      baz
+      jaz
+   }
 
-Advanced example 3
-^^^^^^^^^^^^^^^^^^
-
-For the third example if a specified task fails go to the end of the cycle. If the next task fails go to the second from last task and then to the end of that cycle.
-
-Possible Outcomes:
-
-If ``check_files_exist`` fails then go to the housekeep task.
-
-If ``check_files_exist`` succeeds but ``generate_plots`` fails go to ``move_data`` then go to the housekeep.
-
-If ``check_files_exist`` succeeds go to ``generate_plots`` if that succeeds go to ``raise_alert`` if that succeeds go to ``move_data`` then go to the ``housekeep`` task.
-
-Create a new suite (or just a new directory somewhere - e.g. in your homespace) containing a ``suite.rc`` file that looks like this:
+   tar -> pub [arrowhead="onormal"]
+   jaz -> pub [arrowhead="onormal"]
 
 .. code-block:: cylc
 
-   # If the `check_files_exist` task fails go to the end of the cycle and only do
-   # the `housekeep` task, or if `generate_plots` task fails go to the second 
-   # from last task, `raise_alert` and then to the end of that cycle and do the 
-   # `housekeep` task.
+   [scheduling]
+       [[dependencies]]
+           graph = """
+               # Regular graph.
+               foo => bar
 
-   [cylc]
-       UTC mode = True # Ignore DST
+               # Success case.
+               bar => tar & jar
+
+               # Fail case.
+               bar:fail => baz => jaz
+
+               # Remove tasks from the fail branch in the success case.
+               bar => ! baz & ! jaz
+
+               # Remove tasks from the success branch in the fail case.
+               bar:fail => ! tar & ! jar & ! par
+
+               # Remove the bar task in the fail case.
+               baz => ! bar
+
+               # Downstream dependencies.
+               tar | jaz => pub
+           """
+   [runtime]
+       [[root]]
+           script = sleep 1
+       [[bar]]
+           script = true
+
+Triggering Based On Other States
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In these examples we have been using suicide triggers to handle task failure.
+The suicide trigger mechanism works with other qualifiers as well for example:
+
+.. code-block:: cylc-graph
+
+   foo:start => ! bar
+
+Suicide triggers can also be used with custom outputs. In the following example
+the task ``showdown`` produces one of three possible custom outputs, ``good``,
+``bad`` or ``ugly``.
+
+.. TODO - link to custom task outputs / write an advanced tutorial for them.
+
+.. digraph:: Example
+   :align: center
+
+   bgcolor = "none"
+
+   subgraph cluster_1 {
+      label = ":good"
+      color = "green"
+      fontcolor = "green"
+      style = "dashed"
+      good
+   }
+   subgraph cluster_2 {
+      label = ":bad"
+      color = "red"
+      fontcolor = "red"
+      style = "dashed"
+      bad
+   }
+   subgraph cluster_3 {
+      label = ":ugly"
+      color = "purple"
+      fontcolor = "purple"
+      style = "dashed"
+      ugly
+   }
+   showdown -> good
+   showdown -> bad
+   showdown -> ugly
+   good -> fin [arrowhead="onormal"]
+   bad -> fin [arrowhead="onormal"]
+   ugly -> fin [arrowhead="onormal"]
+
+.. code-block:: cylc
 
    [scheduling]
        [[dependencies]]
-            graph = """
-                start_install          => check_files_exist
-                check_files_exist      => generate_plots
-                check_files_exist:fail => !generate_plots & !move_data
-                check_files_exist:fail | move_data => housekeep
+           [[[R1]]]
+               graph = """
+                   # In the "good" case run "good" but not "bad" or "ugly".
+                   showdown:good => good & ! bad & ! ugly
 
-                generate_plots:fail | check_files_exist:fail => !raise_alert
-                generate_plots:fail | raise_alert => move_data
-                generate_plots         => raise_alert
-            """
+                   # In the "bad" case run "bad" but not "good" or "ugly".
+                   showdown:bad => bad & ! good & ! ugly
 
+                   # In the "ugly" case run "ugly" but not "good" or "bad".
+                   showdown:ugly => ugly & ! good & ! bad
+
+                   good | bad | ugly => fin
+               """
    [runtime]
        [[root]]
-           [[[job]]]
-               execution time limit = PT3M
-           [[[events]]]
-               mail events = failed, submission failed, submission timeout, execution timeout
-               submission timeout = PT24M
-
-       [[check_files_exist]]
+           script = sleep 1
+       [[showdown]]
+           # Randomly return one of the three custom outputs.
            script = """
-               echo 'Do the files exist?'
-               sleep 10;
-               if (($RANDOM % 2)); then
-                   echo 'Yes, then success'; true; 
+               SEED=$RANDOM
+               if ! (( $SEED % 3 )); then
+                   cylc message 'The-Good'
+               elif ! (( ( $SEED + 1 ) % 3 )); then
+                   cylc message 'The-Bad'
                else
-                   echo 'No, then fail'; false;
+                   cylc message 'The-Ugly'
                fi
            """
+           [[[outputs]]]
+               # Register the three custom outputs with cylc.
+               good = 'The-Good'
+               bad = 'The-Bad'
+               ugly = 'The-Ugly'
 
-       [[generate_plots]]
-           script = """
-               echo 'You could run a script to plot data, but did they finish?'
-               sleep 10;
-               if (($RANDOM % 2)); then
-                   echo 'Yes, then success'; true; 
-               else
-                   echo 'No, then fail'; false;
-               fi
+Self-Suiciding Task
+^^^^^^^^^^^^^^^^^^^
+
+An example of a workflow where there are no tasks which are dependent on the
+task to suicide trigger.
+
+.. digraph:: Example
+   :align: center
+
+   bgcolor = "none"
+
+   subgraph cluster_1 {
+      label = "Faulty\nTask"
+      color = "orange"
+      fontcolor = "orange"
+      style = "dashed"
+      labelloc = "b"
+      baz
+   }
+
+   foo -> bar -> baz
+   bar -> pub
+
+
+It is possible for a task to suicide trigger itself e.g:
+
+.. code-block:: cylc-graph
+
+   foo:fail => ! foo
+
+.. warning::
+
+   This is usually not recommended but in case where there are no tasks
+   dependent on the one to remove it is an acceptable approach.
+
+.. code-block:: cylc
+
+   [scheduling]
+       [[dependencies]]
+           graph = """
+               foo => bar => baz
+               bar => pub
+
+               # Remove the "pub" task in the event of failure.
+               pub:fail => ! pub
            """
-
-       [[housekeep]]
-           script = """ sleep 10;
-               echo 'finishing, I always run as expected, usually a housekeeping task.'
-           """
-
-       [[move_data]]
-           script = """
-               sleep 10;
-               echo 'You could run a script to move data'
-           """
-
-       [[raise_alert]]
-           script = """
-               sleep 10;
-               echo 'You need to raise an alert: ALERT!'
-           """
-
-       [[start_install]]
-           script = """ sleep 10;
-               echo 'starting up, I always run as expected, usually an install task.'
-           """
-
-
-
-
-
+   [runtime]
+       [[root]]
+           script = sleep 1
+       [[pub]]
+           script = false

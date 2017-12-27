@@ -636,6 +636,31 @@ Glossary
       * :term:`dependency`
       * :ref:`Family Trigger Tutorial <tutorial-cylc-family-triggers>`
 
+   stalled suite
+   stalled state
+      If cylc is unable to proceed running a workflow due to unmet dependencies
+      the suite is said to be *stalled*.
+
+      This usually happens because of a task failure as in the following
+      diagram:
+
+      .. digraph:: Example
+         :align: center
+
+         bgcolor = none
+
+         foo [style="filled" color="#ada5a5"]
+         bar [style="filled" color="#ff0000" fontcolor="white"]
+         baz [color="#88c6ff"]
+
+         foo -> bar -> baz
+
+      In this example the task ``bar`` has failed meaning that ``baz`` is unable
+      to run as its dependency (``bar:succeed``) has not been met.
+
+      When a cylc detects that a suite has stalled an email will be sent to the
+      user. Human interaction is required to escape a stalled state.
+
    rose app
    rose application configuration
       TODO
