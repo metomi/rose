@@ -8,6 +8,13 @@ This translates the rose CLI help into reStructuredText. To keep the CLI docs
 clean they are written in a plain format which has some reStructuredText
 features built in.
 
+Commands can be referenced throughout the documentation by prefixing their name
+with ``command`` e.g for :ref:`command-rose-date`:
+
+.. code-block:: rst
+
+   :ref:`command-rose-date`
+
 
 Basic Help Page
 ---------------

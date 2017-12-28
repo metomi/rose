@@ -292,7 +292,7 @@ def write_command_reference(write, commands):
         ...
         ...     NOTE: pub
         ... '''})
-        .. _foo-label:
+        .. _command-foo:
         <BLANKLINE>
         foo
         ^^^
@@ -316,14 +316,14 @@ def write_command_reference(write, commands):
             command, alias = command.split('->')
             # Don't label alias sections, we shouldn't be referencing them!
             write_rst_heading(write, command, 2)
-            write('Alias - see :ref:`%s-label`' % (
+            write('Alias - see :ref:`command-%s`' % (
                 alias.strip().replace(' ', '-')))
             write('')
             continue
 
         # Replace single back-quotes with double ones and insert links to other
         # commands as required.
-        help_text = format_literals(help_text, commands, '%s-label')
+        help_text = format_literals(help_text, commands, 'command-%s')
 
         # Split the help-text into sections.
         sections = OrderedDict(
@@ -334,7 +334,7 @@ def write_command_reference(write, commands):
         del sections['NAME']
 
         # Write command name as a heading.
-        write_rst_heading(write, command, 2, True, '%s-label')
+        write_rst_heading(write, command, 2, True, 'command-%s')
 
         # Write synopsis as a bash formatted code block.
         write('.. code-block:: bash')
