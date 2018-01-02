@@ -13,7 +13,6 @@ This section looks at further topics in cylc.
    family-triggers
    inheritance
    queues
-   remote-hosts
    retries
    rose-stem
    suicide-triggers
