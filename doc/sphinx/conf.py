@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'rose-api-documentation'
-copyright = u'2017, Met Office'
+copyright = u'2018, Met Office'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
