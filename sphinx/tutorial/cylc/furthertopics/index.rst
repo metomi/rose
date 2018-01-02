@@ -10,7 +10,6 @@ This section looks at further topics in cylc.
 
    clock-triggered-tasks
    broadcast
-   date-time-manipulation
    family-triggers
    inheritance
    queues

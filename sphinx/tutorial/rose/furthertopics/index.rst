@@ -9,6 +9,7 @@ This section goes into detail in additional rose topics.
    :maxdepth: 1
 
    command-keys
+   date-time-manipulation
    failif-warnif
    macro-development
    optional-configurations
