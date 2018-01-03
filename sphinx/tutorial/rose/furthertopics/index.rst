@@ -21,6 +21,7 @@ This section goes into detail in additional rose topics.
    widget-development
 
    rose-arch
+   rose-stem
 
 .. toctree::
    :hidden:
