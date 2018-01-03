@@ -14,5 +14,4 @@ This section looks at further topics in cylc.
    inheritance
    queues
    retries
-   rose-stem
    suicide-triggers
