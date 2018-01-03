@@ -21,19 +21,29 @@
 #     rose tutorial
 #
 # SYNOPSIS
-#     rose tutorial SUITE
+#     # Print list of available suites.
+#     rose tutorial
+#     # Copy SUITE to DIR (defaults to ~/cylc-run/SUITE).
+#     rose tutorial SUITE [DIR]
 #
 # DESCRIPTION
 #     Make a copy of one of the tutorial SUITE in the cylc-run directory.
 #
-#     Avaliable tutorial suites:
-#
-#     * cylc
-#
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/../lib/bash/rose_init"
 mkdir -p "$HOME/cylc-run"
-DIRECTORY="$HOME/cylc-run/$1"
+
+if [[ $# == 1 ]]; then
+   DIRECTORY="$HOME/cylc-run/$1"
+elif [[ $# == 2 ]]; then
+   DIRECTORY="$2"
+else
+   echo 'rose tutorial SUITE [DIR]'
+   echo
+   echo 'Available tutorial suites:'
+   ls -1 "${ROSE_HOME}/etc/tutorial/" | sed -e 's/^/    /'
+   exit 0
+fi
 
 # Prompt user if directory exists.
 if [[ -d $DIRECTORY ]]; then
