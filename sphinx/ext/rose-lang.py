@@ -27,7 +27,10 @@ class RoseLexer(RegexLexer):
     """Pygments lexer for the rose rose-app.conf language."""
 
     # Pattern for a rose setting with capture groups.
-    ROSE_SETTING_PATTERN = r'^([\s\t]+)?([\w\{\}-]+)(\s+)?(=)(\s+)?'
+    ROSE_SETTING_PATTERN = (
+        r'([\w\{\}\[\]\-]+'  # setting-name{}[]
+        r'(?:\(.*\))?)'      # Brackets for namelists.
+        r'(\s+)?(=)(\s+)?')  # Optional spaces around = operator, value.
 
     # Pattern for a rose (ignored|trigger-ignored|regular) setting.
     ROSE_SETTING_VALUE_PATTERN = ('{0}'  # '', '!', '!!'.
@@ -81,7 +84,6 @@ class RoseLexer(RegexLexer):
         # separately.
         'setting': [
             (ROSE_SETTING_PATTERN, bygroups(
-                Text,
                 Name.Variable,
                 Text,
                 Operator,
