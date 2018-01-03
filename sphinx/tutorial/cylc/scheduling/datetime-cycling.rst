@@ -199,6 +199,8 @@ The initial cycle point can be referenced using a caret character ``^``, e.g:
 * ``baz[^]``: the task ``baz`` from the initial cycle point.
 
 
+.. _tutorial-cylc-datetime-utc:
+
 UTC Mode
 --------
 

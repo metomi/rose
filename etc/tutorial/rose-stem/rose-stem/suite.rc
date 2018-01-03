@@ -1,0 +1,74 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+
+# This links a name specified on the command in rose-stem with a
+# set of cylc task dependencies
+{# name_graphs contains test_option-dependency key-value pairs -#}
+{%- set name_graphs = {
+    "command_spaceship" : "fcm_make_spaceship => spaceship => \
+                           rose_ana_position",
+    "fire_lasers" : "fcm_make_weapons => fire => rose_ana_test_fire"
+                      }
+-%}
+# Define groups as lists of jobs and other groups
+{# groups contains group_option-trigger_list key-value pairs. -#}
+{# If a group option is set, each group or task in the trigger list will be set. -#}
+{%- set groups = {
+    "all"       : ["command_spaceship",  "fire_lasers"]
+    }
+%}
+
+# This loops over all tasks specified in the RUN_NAMES Jinja2 variable
+[scheduling]
+    [[dependencies]]
+        graph = """
+{#- Recursively add dependencies from RUN_NAMES, replacing groups with subgroups/tasks #}
+{%- set name_graphs_out = [] %}
+{%- set graphs_out = [] %}
+{%- for name in RUN_NAMES %}
+    {%- set namestack = [name] %}
+    {%- for stackname in namestack recursive %}
+        {%- if stackname in name_graphs %}
+            {%- if name_graphs_out.append(stackname) %}
+            {%- endif %}
+            {%- set outgraph = name_graphs[stackname] %}
+            {%- if outgraph not in graphs_out %}
+            {#- Add new dependency. #}
+{{ outgraph }}
+                {%- if graphs_out.append(outgraph) %}
+                {%- endif %}
+            {%- endif %}
+        {%- elif stackname in groups %}
+        {#- Add the group contents to the stack. #}
+{{ loop(groups[stackname]) }}
+        {%- endif %}
+    {%- endfor %}
+{%- endfor %}
+     """
+
+[runtime]
+# Root, inherited by everything
+    [[root]]
+        init-script = """
+export CYLC_VERSION={{CYLC_VERSION}}
+export ROSE_VERSION={{ROSE_VERSION}}
+"""
+        script = rose task-run --verbose
+        env-script = eval $(rose task-env)
+        [[[job]]]
+            execution time limit = PT3H
+        [[[events]]]
+            mail events = submission retry, submission failed, submission timeout, \
+                          retry, failed, execution timeout
+            submission timeout = PT12H
+
+    [[fcm_make_spaceship]]
+        [[[environment]]]
+            SOURCE_SPACESHIP = {{SOURCE_SPACESHIP}}
+
+    [[spaceship]]
+
+    [[rose_ana_position]]
+
+# TODO - Clean up.
