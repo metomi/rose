@@ -21,9 +21,3 @@ This section goes into detail in additional rose topics.
    upgrading
    upgrading-macro-development
    widget-development
-
-.. toctree::
-   :hidden:
-   :name: rose-further-topics-additional-files
-
-   supplementary-files/rocket-metadata

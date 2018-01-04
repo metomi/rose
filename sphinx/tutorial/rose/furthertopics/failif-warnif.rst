@@ -57,8 +57,13 @@ Example
 
 We'll use the example of a rocket launch.
 
-Create a new, blank directory somewhere - for example, in your homespace -
-containing a ``rose-app.conf`` file that looks like this:
+Create a new directory somewhere and run the following command replacing
+``DIRECTORY`` with the path to this new directory::
+
+   rose tutorial fail-if-warn-if DIRECTORY
+   cd DIRECTORY
+
+You will now have a new rose app with a ``rose-app.conf`` that looks like this:
 
 .. code-block:: rose
 
@@ -77,24 +82,16 @@ containing a ``rose-app.conf`` file that looks like this:
    fuelless_weight_kg=2353.0
    specific_impulse_s=311.0
 
-Example Metadata
-----------------
-
-We'll also want some basic metadata in place - create a ``meta/``
-subdirectory containing a ``rose-meta.conf`` file that contains
-the :ref:`rocket-suite-metadata`.
-
 .. image:: http://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apollo16LM.jpg/533px-Apollo16LM.jpg
    :align: right
    :alt: Apollo 11 Lunar Module, returning from the surface of the Moon
-   :width: 200px
+   :width: 250px
 
 This app configuration controls the liftoff of a particular rocket -
 in our case, the Lunar Module (Apollo Program spacecraft).
 
-If the ratio of rocket fuel to total weight is too high, or the efficiency
-of the rocket (specific impulse) is too low, the Lunar Module will never
-make it off the Moon.
+There is also metadata in the ``meta/rose-meta.conf`` file which provides the
+application inputs with descriptions, help text and type information.
 
 Try running rose edit in the app directory. You should be able to navigate
 between the pages and view the help and description for the settings.
@@ -103,6 +100,10 @@ between the pages and view the help and description for the settings.
 ``fail-if``
 -----------
 
+If the ratio of rocket fuel to total weight is too high, or the efficiency
+of the rocket (specific impulse) is too low, the Lunar Module will never
+make it off the Moon.
+
 We want to be able to flag an error based on a combination of the rocket
 settings and the necessary orbital velocity (``env=ORBITAL_VELOCITY_MS``).
 We need to set some ``fail-if`` metadata on one of these settings - as
@@ -110,7 +111,7 @@ it's evaluated on-demand, it doesn't matter which one we choose.
 
 Open the ``meta/rose-meta.conf`` file in a text editor.
 
-Add the following lines to the metadata section
+Add the following line to the metadata section
 ``[namelist:rocket=total_weight_kg]``:
 
 .. code-block:: rose
