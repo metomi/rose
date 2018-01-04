@@ -6,16 +6,15 @@
 # set of cylc task dependencies
 {# name_graphs contains test_option-dependency key-value pairs -#}
 {%- set name_graphs = {
-    "command_spaceship" : "fcm_make_spaceship => spaceship => \
-                           rose_ana_position",
-    "fire_lasers" : "fcm_make_weapons => fire => rose_ana_test_fire"
+    "command_spaceship": "fcm_make_spaceship => spaceship => rose_ana_position",
+    "fire_lasers": "fcm_make_weapons => fire => rose_ana_test_fire"
                       }
 -%}
 # Define groups as lists of jobs and other groups
 {# groups contains group_option-trigger_list key-value pairs. -#}
 {# If a group option is set, each group or task in the trigger list will be set. -#}
 {%- set groups = {
-    "all"       : ["command_spaceship",  "fire_lasers"]
+    "all": ["command_spaceship",  "fire_lasers"]
     }
 %}
 
@@ -48,20 +47,12 @@
      """
 
 [runtime]
-# Root, inherited by everything
     [[root]]
-        init-script = """
-export CYLC_VERSION={{CYLC_VERSION}}
-export ROSE_VERSION={{ROSE_VERSION}}
-"""
+        # Root, inherited by everything
         script = rose task-run --verbose
         env-script = eval $(rose task-env)
         [[[job]]]
             execution time limit = PT3H
-        [[[events]]]
-            mail events = submission retry, submission failed, submission timeout, \
-                          retry, failed, execution timeout
-            submission timeout = PT12H
 
     [[fcm_make_spaceship]]
         [[[environment]]]
@@ -70,5 +61,3 @@ export ROSE_VERSION={{ROSE_VERSION}}
     [[spaceship]]
 
     [[rose_ana_position]]
-
-# TODO - Clean up.
