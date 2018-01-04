@@ -14,14 +14,13 @@ This section goes into detail in additional rose topics.
    macro-development
    optional-configurations
    polling
+   rose-arch
    rose-bunch
+   rose-stem
    trigger
    upgrading
    upgrading-macro-development
    widget-development
-
-   rose-arch
-   rose-stem
 
 .. toctree::
    :hidden:
