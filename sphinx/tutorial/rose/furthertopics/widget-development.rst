@@ -2,11 +2,15 @@ Widget Development
 ==================
 
 
-This tutorial walks you through using custom widget plugins to the Rose config
-editor (``rose edit``).
+The ``rose edit`` GUI displays configurations using built-in widgets. For more
+complex requirements ``rose edit`` supports custom widgets as plugins.
 
-These allow users to define their own bespoke widgets that can help improve
-usability in specialised situations.
+In this tutorial we will write a custom widget which offers typing suggestions
+when entering usernames.
+
+.. image:: img/rose-edit-custom-widget.png
+   :align: center
+   :width: 450px
 
 .. warning::
 
@@ -16,55 +20,59 @@ usability in specialised situations.
 Example
 -------
 
-This example uses the example suite from the brief tour and assumes you are
-familiar with it. Change directory to your suite directory or recreate it if
-has been deleted.
+Create a new rose app by running the following command replacing
+``DIRECTORY`` with the path in which to create the suite::
 
-We are going to develop a value widget for the app ``fred_hello_world/``.
-Change directory to ``app/fred_hello_world/``.
+   rose tutorial widget DIRECTORY
+   cd DIRECTORY
 
-The metadata for the app lives under the ``meta/`` sub directory. Our new
-widget will live with the metadata.
+You will now have a rose app which contains the following files:
 
-Create the directories ``meta/lib/python/widget/`` by running::
+.. code-block:: none
 
-   mkdir -p meta/lib/python/widget
+   DIRECTORY
+   |-- meta
+   |   `-- lib
+   |       `-- python
+   |           `-- widget
+   |               |-- __init__.py
+   |               `-- username.py
+   `-- rose-app.conf
 
-Create an empty file called ``__init__.py`` in the directory::
+The ``rose-app.conf`` file defines an environment variable called ``USER``:
 
-   touch meta/lib/python/widget/__init__.py
+.. code-block:: rose
 
-Create a file called ``username.py`` in the directory::
+   [env]
+   USER=fred
 
-   touch meta/lib/python/widget/username.py
+.. _python package: https://docs.python.org/3/tutorial/modules.html#packages
+
+The ``__init__.py`` file is empty - the presence of this file declares the
+``widget`` directory as a `python package`_.
+
+The ``username.py`` file is where we will write our widget.
 
 Initial Code
 ^^^^^^^^^^^^
 
-Open ``username.py`` in a text editor and paste in this text.
-
-This is a slimmed-down copy of the class
-``rose.config_editor.valuewidget.text.RawValueWidget``. It contains all
-the API calls you would normally ever need.
+We will start with a slimmed-down copy of the class
+``rose.config_editor.valuewidget.text.RawValueWidget`` which you will find
+in the file ``username.py``. It contains all the API calls you would normally
+ever need.
 
 We are now going to extend the widget to be more useful.
 
-Add the line:
+Add a line importing the ``pwd`` package at the top of the file:
 
-.. code-block:: python
+.. code-block:: diff
 
-   import pwd
+   + import pwd
 
-at the top of the file, so it looks like this:
-
-.. code-block:: python
-
-   import pwd
-
-   import gobject
-   import pygtk
-   pygtk.require('2.0')
-   import gtk
+    import gobject
+    import pygtk
+    pygtk.require('2.0')
+    import gtk
 
 This adds the Python library that we'll use in a minute.
 
@@ -75,44 +83,30 @@ We need to write our method ``_set_completion``, and put it in the main body
 of the class. This will retrieve usernames from the ``pwd.getpwall()``
 function and store them so they can be used by the text widget ``self.entry``.
 
-Add the following method to the class (append to the bottom of the file):
+Add the following method to the ``UsernameValueWidget`` class:
 
 .. code-block:: python
 
-       def _set_completion(self):
-           # Return a predictive text model.
-           completion = gtk.EntryCompletion()
-           model = gtk.ListStore(str)
-           for username in [p.pw_name for p in pwd.getpwall()]:
-               model.append([username])
-           completion.set_model(model)
-           completion.set_text_column(0)
-           completion.set_inline_completion(True)
-           self.entry.set_completion(completion)
+   def _set_completion(self):
+       # Return a predictive text model.
+       completion = gtk.EntryCompletion()
+       model = gtk.ListStore(str)
+       for username in [p.pw_name for p in pwd.getpwall()]:
+           model.append([username])
+       completion.set_model(model)
+       completion.set_text_column(0)
+       completion.set_inline_completion(True)
+       self.entry.set_completion(completion)
 
 We need to make sure this method gets called at the right time, so we add
-the line:
+the following line to the ``__init__`` method:
 
-.. code-block:: python
+.. code-block:: diff
 
-           gobject.idle_add(self._set_completion)
-
-in the ``__init__`` method as follows:
-
-.. code-block:: python
-
-           self.entry.show()
-           self.pack_start(self.entry, expand=True, fill=True,
-                           padding=0)
-
-becomes
-
-.. code-block:: python
-
-           self.entry.show()
-           gobject.idle_add(self._set_completion)
-           self.pack_start(self.entry, expand=True, fill=True,
-                           padding=0)
+     self.entry.show()
+   + gobject.idle_add(self._set_completion)
+     self.pack_start(self.entry, expand=True, fill=True,
+                     padding=0)
 
 We could just call ``self._set_completion()`` there, but this would hang the
 config editor while the database is retrieved.
@@ -123,24 +117,20 @@ the page, and will be more-or-less invisible to the user. This is a better
 way to launch something that may take a second or two. If it took any longer,
 we'd probably want to use a separate process.
 
-Code Summary
-^^^^^^^^^^^^
-
-Our file should now look like this.
-
-Now we need to refer to it in the metadata to make use of it.
-
 Referencing the Widget
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Open the file ``meta/rose-meta.conf`` in a text editor and add the lines:
+Now we need to refer to it in the metadata to make use of it.
+
+Create the file ``meta/rose-meta.conf`` and paste the following configuration
+into it:
 
 .. code-block:: rose
 
-   [env=HELLO_GREETER]
+   [env=USER]
    widget[rose-config-edit]=username.UsernameValueWidget
 
-This means that we've set our widget up for the option ``HELLO_GREETER``
+This means that we've set our widget up for the option ``USER``
 under the section ``env``. It will now be used as the widget for this
 variable's value.
 
@@ -148,17 +138,19 @@ Results
 ^^^^^^^
 
 Try opening up the config editor in the application directory (where the
-``rose-app.conf`` is) by typing::
+``rose-app.conf`` is) by running::
 
    rose edit
 
-at the command line. Navigate to the env page. You should see your widget on
+Navigate to the ``env`` page. You should see your widget on
 the top right of the page! As you type, it should provide helpful
 auto-completion of usernames. Try typing your own username.
 
 Further Reading
 ---------------
 
-For more information, see the Rose API reference and the PyGTK web page.
+.. _PYGTK: http://www.pygtk.org/
 
-.. TODO - link me!
+For more information, see the Rose API reference and the `PyGTK`_ web page.
+
+.. TODO - link rose API reference once translated.
