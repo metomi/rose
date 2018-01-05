@@ -1,0 +1,2 @@
+rose metadata-check -C $TUT_DIR/meta
+rose macro -C $TUT_DIR -V

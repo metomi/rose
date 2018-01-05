@@ -1,0 +1,2 @@
+mkdir "$TEST_DIR/rose-stem"; echo -e '#!Jinja2\n{% set RUN_NAMES=["command_spaceship"] %}' > "$TEST_DIR/rose-stem/suite.rc"; cat "$TUT_DIR/rose-stem/suite.rc" >> "$TEST_DIR/rose-stem/suite.rc"
+cylc validate -v -v "$TEST_DIR/rose-stem/suite.rc" -s "SOURCE_SPACESHIP=foo"
