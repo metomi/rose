@@ -2,8 +2,8 @@
     UTC mode = True
 
 [scheduling]
-    initial cycle point = TODO
-    final cycle point = TODO
+    # TODO - set the initial cycle point.
+    # TODO - set the final cycle point.
     [[dependencies]]
         [[[PT3H]]]
             # Repeat every three hours starting at the initial cycle point.
