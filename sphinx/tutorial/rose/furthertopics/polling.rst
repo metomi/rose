@@ -1,17 +1,10 @@
 Polling
 =======
 
-This tutorial walks you through using polling.
-
 Polling allows you to check for some condition to be met prior to running the
-main command in an app.
+main command in an app without the need for additional entries in the
+dependencies graph.
 
-
-Purpose
--------
-
-Polling can be used to have a task wait until a particular condition is
-met, without the need for additional entries in the dependencies graph.
 For example, you might want to run a polling command to check for the
 existence of a particular file before running the main command which
 requires said file.

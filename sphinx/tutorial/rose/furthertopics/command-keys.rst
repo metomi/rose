@@ -6,12 +6,6 @@ This tutorial walks you through using command keys.
 Command keys allow you to specify and run different commands for a
 :term:`rose app`.
 
-
-Purpose
--------
-
-Command keys can be used to specify different ways of running a particular app.
-
 They work just like the default command for an app but have to be specified
 explicitly as an option of ``rose task-run``.
 

@@ -1,37 +1,14 @@
 rose arch
 =========
 
-This tutorial walks you through developing ``rose_arch`` app's - built-in
-application that provides a generic solution to configure site specific
-archiving of suite files.
+``rose_arch`` is a built-in :term:`rose app` that provides a generic solution
+to the archiving of suite files.
 
-This allows users to define which files to archive and to reduce disk space
-used for archived files which keeping data for prosperity.
-
-.. warning::
+.. admonition:: Good Practice
+   :class: hint
 
    Only archive the minimum files needed at each cycle of your suite. Run
-   this before your housekeep app in the graphing of your ``suite.rc`` so that
-   you do not lose valuable data that is needed.
-
-
-Purpose
--------
-
-``archive`` app's are user-defined :term:`app's <rose app>` that use
-``rose_arch``, the built-in application to archive data from a defined source
-to a defined location using a defined command. The follow examples will provide
-a guide to using ``rose_arch`` with the user-defined archive app.
-
-
-Syntax
-------
-
-.. _PythonHOWTO: https://docs.python.org/2/howto/regex.html
-
-The regular expression syntax is Pythonic. Some aspects use regular
-expressions `PythonHOWTO`_ how these are used in the ``app/archive/`` is
-explained in detail later.
+   the archiving task before any housekeeping in the graph.
 
 
 Example
@@ -263,6 +240,12 @@ In the above example a regular expression (reg exp) was used by the
 * ``.`` = any character.
 * ``*`` = greedy (all).
 * ``?P<NAME>`` = named group.
+
+.. note::
+
+   .. _python flavor: https://docs.python.org/2/howto/regex.html
+
+   ``rose arch`` uses the `python flavor`_ for regular expressions.
 
 In the above example source was used to accept a list of glob patterns.
 For example, ``file_list?`` was used where the ``?`` relates to one unknown

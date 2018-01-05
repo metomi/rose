@@ -2,7 +2,7 @@ Custom Macros
 =============
 
 Rose macros are custom python modules which can perform checking
-beyond what metadata (e.g. ``type``, ``range``, etc) can provide.
+beyond what metadata (e.g. ``type``, ``range``, ``warn-if``, etc) can provide.
 
 This tutorial covers the development of checking (**validator**),
 changing (**transformer**) and reporting (**reporter**) macros.

@@ -1,14 +1,15 @@
 Upgrading Macro Development
 ===========================
 
-This part of the Rose user guide walks you through writing macros to upgrade
-application configurations to newer metadata versions.
+Upgrade macros are used to upgrade :term:`rose apps <rose app>` to newer
+metadata versions. They are intended to keep application configurations in
+sync with changes to application inputs e.g. from new code releases.
 
-Upgrade macros are intended to keep application configurations in sync with
-changes to application inputs e.g. from new code releases.
+You should already be familiar with using ``rose app-upgrade`` (see the
+:ref:`Upgrade tutorial <tutorial-rose-upgrade-macros>` and the concepts in the
+reference material.
 
-You should already be familiar with using rose app-upgrade (see the Upgrade
-Usage tutorial) and the concepts in the reference.
+.. TODO - link reference material when translated
 
 
 Example
@@ -16,7 +17,7 @@ Example
 
 .. image:: http://upload.wikimedia.org/wikipedia/commons/b/b9/Proa1.jpg
    :align: right
-   :width: 200px
+   :width: 250px
 
 In this example, we'll be upgrading a boat on a desert island.
 
