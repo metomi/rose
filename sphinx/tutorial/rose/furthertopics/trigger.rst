@@ -1,18 +1,9 @@
 Trigger
 =======
 
-This part of the Rose user guide walks you through using the Configuration
-Metadata setting trigger.
-
-This is used to decide whether settings are relevant, based on the value
-or state of other settings.
-
-
-Purpose
--------
-
-``trigger`` is fundamentally intended to cut down the amount of
-irrelevant settings presented to the user.
+The ``trigger`` metadata item can be used to cut down the amount of irrelevant
+settings presented to the user in the ``rose edit`` gui by hiding any settings
+which are not relevant based on the value or state of other settings.
 
 Irrelevant (``ignored`` or ``trigger-ignored``) settings do not get
 included in output files at runtime. In effect, they are commented

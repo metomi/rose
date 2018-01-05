@@ -1,23 +1,21 @@
+.. _tutorial-rose-upgrade-macros:
+
 Upgrading
 =========
 
-This part of the Rose user guide walks you through upgrading application
-configurations to newer metadata versions.
-
-This is intended to automatically keep application configurations in sync
-with changes to application inputs e.g. from new code releases.
-
-
-Purpose
--------
-
-Newer metadata versions can be created each time the inputs to the parent
-code are changed, or just between major releases.
+As :term:`apps <rose app>` are developed, newer metadata versions can be
+created each time the application inputs are changed, or just between major
+releases.
 
 This may mean, for example, that a new compulsory option is added or an
 old one is removed.
 
 Upgrade macros may be written to automatically apply these changes.
+
+Upgrade macros are used to upgrade :term:`rose apps <rose app>` to newer
+metadata versions. They are intended to keep application configurations in
+sync with changes to application inputs e.g. from new code releases.
+This part of the Rose user guide walks you through upgrading application
 
 
 Example

@@ -1,11 +1,8 @@
 rose bunch
 ==========
 
-This part of the Rose user guide walks you through using the ``rose_bunch``
-built in :term:`app <rose app>`.
-
-``rose_bunch`` allows multiple variants of a command to be run under a single
-job.
+``rose_bunch`` is a built-in :term:`rose app` which allows multiple variants
+of a command to be run under a single job.
 
 
 Purpose

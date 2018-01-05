@@ -4,26 +4,19 @@
 Fail-If, Warn-If
 ================
 
-This tutorial walks you through using the metadata settings ``fail-if``
-and ``warn-if``
+Basic validation can be achieved using metadata settings such as ``type`` and
+``range``. The ``fail-if`` and ``warn-if`` metadata settings are scriptable
+enabling more advanced validation, they evaluate logical expressions,
+flagging warnings if they return false.
 
-.. TODO - Link to the reference page.
+``fail-if`` and ``warn-if`` can be run on the command line using ``rose macro``
+or on-demand in the ``rose edit`` GUI.
 
-These allow errors and warnings to be flagged based on complex logical
-expressions, which can involve multiple settings.
+.. note::
 
-
-Purpose
--------
-
-``fail-if`` and ``warn-if`` are intended to handle the evaluation of complex
-relationships between settings, without having to write custom macros.
-
-As with any complex setting, they should only be used when really necessary.
-
-``fail-if`` and ``warn-if`` are invoked on-demand in the config editor, as
-they can take longer to evaluate than other metadata settings such as
-``range`` which can be done on-the-fly when a value changes.
+   Simple metadata settings such as ``range`` can be evaluated on-the-fly when
+   a value changes. As ``fail-if`` and ``warn-if`` can take longer to evaluate
+   they must be done on-demand in the ``rose edit`` GUI.
 
 
 Syntax
