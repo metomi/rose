@@ -41,7 +41,7 @@ Copy the following configuration into a ``suite.rc`` file:
    [runtime]
        [[wipe_log]]
            # Delete any files in the suite's "share" directory.
-           script = rm "${CYLC_SUITE_SHARE_DIR}/*"
+           script = rm "${CYLC_SUITE_SHARE_DIR}/*" || true
 
        [[announce]]
            script = echo "${CYLC_TASK_CYCLE_POINT} - ${MESSAGE}" >> "${FILE}"
@@ -56,9 +56,9 @@ the log entry will look like this::
 
    10120101T0000Z - We are the knights who say "ni"!
 
-The ``cylc broadcast`` task enables us to change runtime configuration whilst
-the suite is running. For instance we could change the value of the ``WORD``
-environment variable using the command::
+The ``cylc broadcast`` command enables us to change runtime configuration
+whilst the suite is running. For instance we could change the value of the
+``WORD`` environment variable using the command::
 
    cylc broadcast tutorial-broadcast -n announce -s "[environment]WORD=it"
 
