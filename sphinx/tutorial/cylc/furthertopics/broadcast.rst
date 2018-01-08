@@ -41,7 +41,7 @@ Copy the following configuration into a ``suite.rc`` file:
    [runtime]
        [[wipe_log]]
            # Delete any files in the suite's "share" directory.
-           script = rm "${CYLC_SUITE_SHARE_DIR}/*" || true
+           script = rm "${CYLC_SUITE_SHARE_DIR}/knights" || true
 
        [[announce]]
            script = echo "${CYLC_TASK_CYCLE_POINT} - ${MESSAGE}" >> "${FILE}"
@@ -122,7 +122,8 @@ Add the following runtime configuration to the ``runtime`` section:
                WORDS = ni, it, ekke ekke ptang zoo boing
 
 Run the suite and inspect the log. You should see the message change randomly
-every third entry (because the ``change_word`` task runs every 3 hours) e.g::
+after every third entry (because the ``change_word`` task runs every 3 hours)
+e.g::
 
    10120101T0000Z - We are the knights who say "ni"!
    10120101T0100Z - We are the knights who say "ni"!
