@@ -642,7 +642,7 @@ def _edit_info_config(opts, client, info_config):
         temp_file.write(CREATE_INFO_CONFIG_COMMENT)
         temp_file.close()
         command_list = client.popen.get_cmd("editor", temp_name)
-        client.popen(*command_list, stdout=sys.stdout)
+        client.popen(*command_list, stdin=sys.stdin, stdout=sys.stdout)
     except (IOError, OSError, RosePopenError) as exc:
         client.event_handler(exc)
         sys.exit(1)

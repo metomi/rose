@@ -196,10 +196,8 @@ def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
 
 def null_cmp(x_item, y_item):
     """Compares sort_key and then id of the tuples x_item/y_item."""
-    x_sort_key = x_item[0]
-    x_id = x_item[1]
-    y_sort_key = y_item[0]
-    y_id = y_item[1]
+    x_sort_key, x_id = x_item[0:2]
+    y_sort_key, y_id = y_item[0:2]
     if x_id == '' or y_id == '':
         return (x_id == '') - (y_id == '')
     if x_sort_key == y_sort_key:

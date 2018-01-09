@@ -150,10 +150,10 @@ class MixedArrayValueWidget(gtk.HBox):
         text = ''
         if not self.value_array:
             return 0
-        for i, widget_list in enumerate(self.rows):
+        for i_row, widget_list in enumerate(self.rows):
             for i, widget in enumerate(widget_list):
                 try:
-                    val = self.value_array[i * self.num_cols + i]
+                    val = self.value_array[i_row * self.num_cols + i]
                 except IndexError:
                     return None
                 prefix_text = entry.get_next_delimiter(self.value[len(text):],

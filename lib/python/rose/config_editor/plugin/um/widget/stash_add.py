@@ -114,8 +114,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._view.show()
         self._view.connect("button-press-event",
                            self._handle_button_press_event)
-        self._view.connect("cursor-changed",
-                           lambda v: self._update_control_sensitivity())
+        self._view.connect("cursor-changed", self._update_control_sensitivity)
         self._window = gtk.ScrolledWindow()
         self._window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.generate_tree_view(is_startup=True)
@@ -689,7 +688,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._should_show_meta_column_titles = widget.get_active()
         self.generate_tree_view()
 
-    def _update_control_sensitivity(self):
+    def _update_control_sensitivity(self, _=None):
         section, item = self._get_current_section_item()
         self._add_button.set_sensitive(section is not None and
                                        item is not None)
