@@ -100,7 +100,8 @@ class CylcLexer(RegexLexer):
         'comment': [
             # Allow whitespace so this will work for comments following
             # headings.
-            (r'(\s+)?(#.*)', bygroups(Text, Comment.Single))
+            # NOTE: Does not highlight `${#`.
+            (r'(\s+)?(?<!\$\{)(#.*)', bygroups(Text, Comment.Single))
         ],
 
         # The value in a key = value pair.
