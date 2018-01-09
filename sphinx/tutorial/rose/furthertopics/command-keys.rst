@@ -80,7 +80,7 @@ Save your changes and run the suite. If you inspect the output from the
 breadmaker task you should see the line "dough for later".
 
 Edit the script for the ``[[breadmaker]]`` task to change the command key to
-``'timed_bread'``. Run the suite and confirm the timed_bread command has been
+``timed_bread``. Run the suite and confirm the timed_bread command has been
 run.
 
 
