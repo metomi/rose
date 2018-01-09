@@ -59,11 +59,11 @@ a different aircraft, the Airbus A380 jumbo jet and the Robson R44 helicopter:
        [[a380]]
            inherit = AIRPLANE
            [[[meta]]]
-               title = Airbus A380 Jumbo-Jet
+               title = Airbus A380 Jumbo-Jet.
        [[r44]]
            inherit = HELICOPTER
            [[[meta]]]
-               title = Robson R44 Helicopter
+               title = Robson R44 Helicopter.
 
 .. note::
 
@@ -150,8 +150,8 @@ You should see some settings which have been inherited from the ``VEHICLE`` and
    post-script = echo 'Arriving'                       # Inherited from VEHICLE
    inherit = AIRPLANE                                  # Defined in a380
    [[[meta]]]
-       description = An air vehicle with fixed wings.  # Inherited from AIR_VEHIHLE - overwritten by AIRPLANE
-       title = Airbus A380 Jumbo-Jet                   # Defined in a380
+       description = An air vehicle with fixed wings.  # Inherited from AIR_VEHICLE - overwritten by AIRPLANE
+       title = Airbus A380 Jumbo-Jet.                  # Defined in a380
    [[[environment]]]
        CAN_TAKE_OFF_VERTICALLY = false                 # Inherited from AIRPLANE
 
@@ -183,7 +183,7 @@ Add the following task to your ``suite.rc`` file.
            [[[meta]]]
                title = V-22 Osprey Military Aircraft.
 
-Refresh your cylc graph window or re-run the cylc graph command.
+Refresh your ``cylc graph`` window or re-run the cylc graph command.
 
 The inheritance hierarchy should now look like this:
 
@@ -336,7 +336,7 @@ Add lines to the ``runtime`` section to represent these four families.
                   FUEL = petrol
           [[HUMAN_ENGINE]]
               inherit = ENGINE
-             [[[environment]]]
+              [[[environment]]]
                   FUEL = pizza
 
 We now need to make the three aircraft inherit from one of the three engines.
@@ -355,15 +355,15 @@ Modify the three tasks so that they inherit from the relevant engine families.
          [[a380]]
              inherit = AIRPLANE, TURBINE_ENGINE
              [[[meta]]]
-                 title = Airbus A380 Jumbo-Jet
+                 title = Airbus A380 Jumbo-Jet.
          [[r44]]
              inherit = HELICOPTER, INTERNAL_COMBUSTION_ENGINE
              [[[meta]]]
-                 title = Robson R44 Helicopter
+                 title = Robson R44 Helicopter.
          [[v22]]
              inherit = AIRPLANE, HELICOPTER, TURBINE_ENGINE
              [[[meta]]]
-                 title = V-22 Ofsprey Military Aircraft
+                 title = V-22 Ofsprey Military Aircraft.
 
 Penny Farthing
 ^^^^^^^^^^^^^^

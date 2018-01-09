@@ -28,8 +28,8 @@
     [[a380]]
         inherit = AIRPLANE
         [[[meta]]]
-            title = Airbus A380 Jumbo-Jet
+            title = Airbus A380 Jumbo-Jet.
     [[r44]]
         inherit = HELICOPTER
         [[[meta]]]
-            title = Robson R44 Helicopter
+            title = Robson R44 Helicopter.
