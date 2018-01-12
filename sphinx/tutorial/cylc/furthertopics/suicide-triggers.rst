@@ -23,7 +23,7 @@ Imagine a bakery which has a workflow that involves making cake.
    make_cake_mixture => bake_cake => sell_cake
 
 There is a 50% chance that the cake will turn out fine, and a 50% chance that
-it will get burnt. In this case that we burn the cake the workflow gets stuck.
+it will get burnt. In the case that we burn the cake the workflow gets stuck.
 
 .. digraph:: Example
    :align: center
@@ -37,7 +37,7 @@ it will get burnt. In this case that we burn the cake the workflow gets stuck.
    make_cake_mixture -> bake_cake -> sell_cake
 
 In this event the ``sell_cake`` task will be unable to run as it depends on
-``bake_cake``. We would say that this suite has :term:`stalled <stalled suite>`
+``bake_cake``. We would say that this suite has :term:`stalled <stalled suite>`.
 When cylc detects that a suite has stalled it sends you an email to let you
 know that the suite has got stuck and requires human intervention to proceed.
 
@@ -95,7 +95,7 @@ We can add this logic to our workflow using the ``fail`` :term:`qualifier`.
    :class: hint
 
    If you don't specify a qualifier cylc assumes you mean ``:succeed`` so the
-   following two lines are equlivalent:
+   following two lines are equivalent:
 
    .. code-block:: cylc-graph
 
@@ -106,7 +106,7 @@ We can add this logic to our workflow using the ``fail`` :term:`qualifier`.
 Why Do We Need To Remove Tasks From The Graph?
 ----------------------------------------------
 
-Create a new suite called ``suicide triggers``::
+Create a new suite called ``suicide-triggers``::
 
    mkdir -p ~/cylc-run/suicide-triggers
    cd ~/cylc-run/suicide-triggers
@@ -269,8 +269,8 @@ example:
 
       bake_cake:fail => ! sell_cake
 
-#. The ``bake_cake`` task needs to be removed else the suite will stall, we can
-   do this after the ``eat_cake`` task has succeeded.
+#. If the ``bake_cake`` task fails then we will need to remove it else the
+   suite will stall. We can do this after the ``eat_cake`` task has succeeded.
 
    .. code-block:: cylc-graph
 
@@ -311,8 +311,8 @@ If we wanted to make the cycles run in order we might write an
    sell_cake[-P1] => make_cake_mixture
 
 In order to handle the event that the ``sell_cake`` task has been removed from
-the graph by a suicide trigger we can write our dependency with an or ``|`` like
-so:
+the graph by a suicide trigger we can write our dependency with an or
+symbol ``|`` like so:
 
 .. code-block:: cylc-graph
 
@@ -633,7 +633,7 @@ It is possible for a task to suicide trigger itself e.g:
 
 .. warning::
 
-   This is usually not recommended but in case where there are no tasks
+   This is usually not recommended but in the case where there are no tasks
    dependent on the one to remove it is an acceptable approach.
 
 .. code-block:: cylc
