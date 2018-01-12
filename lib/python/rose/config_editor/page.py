@@ -576,6 +576,8 @@ class ConfigPage(gtk.VBox):
         for variable in ghost_list:
             named_item = uimanager.get_widget(
                 '/Popup/Add meta/' + variable.metadata['id'])
+            if not named_item:
+                return None
             named_item.var_id = variable.metadata['id']
             tooltip_text = ""
             description = variable.metadata.get(rose.META_PROP_DESCRIPTION)
