@@ -39,6 +39,13 @@ from tempfile import mkdtemp
 from time import gmtime, strftime, time
 
 
+class RoseArchDuplicateError(ConfigValueError):
+
+    """An exception raised if dupluicate archive targets are provided."""
+
+    ERROR_FORMAT = '%s: duplicate archive target%s: "%s"'
+
+
 class RoseArchValueError(KeyError):
 
     """An error raised on a bad value."""
@@ -144,8 +151,7 @@ class RoseArchApp(BuiltinApp):
 
             # Don't permit duplicate targets.
             if s_key_tail in s_key_tails:
-                raise Exception('%s: Duplicate target "%s".' % (
-                    t_key, s_key_tail))
+                raise RoseArchDuplicateError([t_key], '', s_key_tail)
             else:
                 s_key_tails.add(s_key_tail)
 

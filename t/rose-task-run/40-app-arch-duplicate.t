@@ -34,7 +34,8 @@ rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --no-gcontrol --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}"
-file_grep "${TEST_KEY}" '[arch:foo]: Duplicate' \
+cat "${SUITE_RUN_DIR}/log/job/1/archive_fail_duplicate/NN/job.err" >&2
+file_grep "${TEST_KEY}" 'duplicate archive target: "foo"' \
     "${SUITE_RUN_DIR}/log/job/1/archive_fail_duplicate/NN/job.err"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"
