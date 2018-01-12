@@ -1,0 +1,19 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[events]]
+        timeout = PT1M
+        abort on timeout = True
+[scheduling]
+    [[dependencies]]
+        graph = archive_fail_duplicate
+
+[runtime]
+    [[archive_fail_duplicate]]
+        script = """
+            touch foo
+            touch bar
+            rose task-run || true
+        """
+        [[[environment]]]
+            ROSE_TASK_APP = archive
