@@ -193,8 +193,9 @@ class RosieSvnPreCommitHook(object):
                 continue
 
             names = path.split("/", self.LEN_ID + 1)
+            tail = None
             if not names[-1]:
-                names.pop()
+                tail = names.pop()
 
             # Directories above the suites must match the ID patterns
             is_bad = False
@@ -213,6 +214,11 @@ class RosieSvnPreCommitHook(object):
                 continue
             else:
                 is_meta_suite = "".join(names[0:self.LEN_ID]) == "ROSIE"
+
+            # A file at the branch level
+            if len(names) == self.LEN_ID + 1 and tail is None:
+                bad_changes.append(BadChange(status, path))
+                continue
 
             # No need to check non-trunk changes
             if len(names) > self.LEN_ID and names[self.LEN_ID] != "trunk":

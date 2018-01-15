@@ -203,7 +203,10 @@ class RosieSvnPostCommitHook(object):
                     branch_attribs_dict[(sid, branch)] = (
                         self._new_suite_branch_change(sid, branch))
                 branch_attribs = branch_attribs_dict[(sid, branch)]
-                tail = names[self.LEN_ID + 1]
+                try:
+                    tail = names[self.LEN_ID + 1]
+                except IndexError:
+                    tail = None
                 if tail == self.INFO_FILE:
                     # Suite info file change
                     if branch_attribs["info"] is None:

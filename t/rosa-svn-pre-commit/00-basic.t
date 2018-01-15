@@ -27,7 +27,7 @@ cat >conf/rose.conf <<'__ROSE_CONF__'
 super-users=rosie
 __ROSE_CONF__
 #-------------------------------------------------------------------------------
-tests 114
+tests 117
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo
@@ -137,6 +137,15 @@ svnlook changed repos/foo >"$TEST_KEY.changed"
 file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
 A   a/a/0/0/0/hello/
 __CHANGED__
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-add-file-at-branch-level"
+echo 'This is a blank file' >'null'
+run_fail "$TEST_KEY" svn import -q -m 't' 'null' "${SVN_URL}/a/a/0/0/0/null"
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <'/dev/null'
+sed -i '/^\[FAIL\]/!d' "${TEST_KEY}.err"
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
+[FAIL] PERMISSION DENIED: A   a/a/0/0/0/null
+__ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-branch-anyone
 run_pass "$TEST_KEY" \
