@@ -34,7 +34,7 @@ import rose.resource
 
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
-INVALID_IMPORT = "Could not import {0}: {1}"
+INVALID_IMPORT = "Could not import {0}: {1}: {2}"
 INCOMPATIBLE = "Incompatible with {0}"
 INVALID_OBJECT = "Not found: {0}"
 INVALID_RANGE_RULE_IDS = "Inter-variable comparison not allowed in range."
@@ -114,9 +114,8 @@ def _check_macro(value, module_files=None, meta_dir=None):
         try:
             macro_obj = rose.resource.import_object(
                 macro_name, module_files, _import_err_handler)
-        except Exception as e:
-            return INVALID_IMPORT.format(
-                macro, type(e).__name__ + ": " + str(e))
+        except Exception as exc:
+            return INVALID_IMPORT.format(macro, type(exc).__name__, exc)
         if macro_obj is None:
             return INVALID_OBJECT.format(macro)
         elif method is not None:
@@ -206,6 +205,10 @@ def _check_value_hints(hints_value):
 
 
 def _check_widget(value, module_files=None, meta_dir=None):
+    """Check widget setting is OK.
+
+    Ignore if no DISPLAY in environment and GTK widget requires display.
+    """
     if module_files is None:
         module_files = _get_module_files(meta_dir)
     if not module_files:
@@ -214,9 +217,14 @@ def _check_widget(value, module_files=None, meta_dir=None):
     try:
         widget = rose.resource.import_object(
             widget_name, module_files, _import_err_handler)
-    except Exception as e:
-        return INVALID_IMPORT.format(widget_name,
-                                     type(e).__name__ + ": " + str(e))
+    except RuntimeError as exc:
+        # Ignore if there is no display for GTK widget
+        if (not os.getenv('DISPLAY') and
+                exc.args == ('could not open display',)):
+            return
+        return INVALID_IMPORT.format(widget_name, type(exc).__name__, exc)
+    except Exception as exc:
+        return INVALID_IMPORT.format(widget_name, type(exc).__name__, exc)
     if widget is None:
         return INVALID_OBJECT.format(value)
 
