@@ -20,6 +20,7 @@
 # Test "rose suite-restart" on suites that are still running.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+set -x
 tests 4
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
@@ -27,21 +28,46 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 SUITE_RUN_DIR="$(readlink -f ${SUITE_RUN_DIR})"
 NAME="$(basename "${SUITE_RUN_DIR}")"
-rose suite-run --debug -q \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol
+timeout 120 rose suite-run --debug -q \
+    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol \
+    -- --no-detach &
+ROSE_SUITE_RUN_PID=$!
+CONTACT="${HOME}/cylc-run/${NAME}/.service/contact"
+poll ! test -e "${CONTACT}"
+poll ! test -e "${HOME}/cylc-run/${NAME}/log/job/1/foo/NN/job.status"
+SUITE_HOST="$(sed -n 's/CYLC_SUITE_HOST=//p' "${CONTACT}")"
+SUITE_OWNER="$(sed -n 's/CYLC_SUITE_OWNER=//p' "${CONTACT}")"
+SUITE_PORT="$(sed -n 's/CYLC_SUITE_PORT=//p' "${CONTACT}")"
+SUITE_PROCESS="$(sed -n 's/CYLC_SUITE_PROCESS=//p' "${CONTACT}")"
 
 TEST_KEY="${TEST_KEY_BASE}-name"
 run_fail "${TEST_KEY}" rose suite-restart --name="${NAME}"
-file_grep "${TEST_KEY}.err" \
-    "\[FAIL\] Suite \"${NAME}\" has running processes on:" "${TEST_KEY}.err"
+# Note: Error file CYLC_SUITE_* lines contain \t characters
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+[FAIL] Suite "${NAME}" appears to be running:
+[FAIL] Contact info from: "${CONTACT}"
+[FAIL] 	CYLC_SUITE_HOST=${SUITE_HOST}
+[FAIL] 	CYLC_SUITE_OWNER=${SUITE_OWNER}
+[FAIL] 	CYLC_SUITE_PORT=${SUITE_PORT}
+[FAIL] 	CYLC_SUITE_PROCESS=${SUITE_PROCESS}
+[FAIL] Try "cylc stop '${NAME}'" first?
+__ERR__
 
 TEST_KEY="${TEST_KEY_BASE}-cwd"
 run_fail "${TEST_KEY}" bash -c "cd '${SUITE_RUN_DIR}'; rose suite-restart"
-file_grep "${TEST_KEY}.err" \
-    "\[FAIL\] Suite \"${NAME}\" has running processes on:" "${TEST_KEY}.err"
+# Note: Error file CYLC_SUITE_* lines contain \t characters
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+[FAIL] Suite "${NAME}" appears to be running:
+[FAIL] Contact info from: "${CONTACT}"
+[FAIL] 	CYLC_SUITE_HOST=${SUITE_HOST}
+[FAIL] 	CYLC_SUITE_OWNER=${SUITE_OWNER}
+[FAIL] 	CYLC_SUITE_PORT=${SUITE_PORT}
+[FAIL] 	CYLC_SUITE_PROCESS=${SUITE_PROCESS}
+[FAIL] Try "cylc stop '${NAME}'" first?
+__ERR__
 #-------------------------------------------------------------------------------
 rm -f "${SUITE_RUN_DIR}/work/1/foo/file"
-timeout 60 \
-    bash -c "while test -e '${HOME}/cylc-run/${NAME}/.service/contact'; do sleep 1; done"
+wait "${ROSE_SUITE_RUN_PID}"
+poll test -e "${CONTACT}"
 rose suite-clean -q -y "${NAME}"
 exit
