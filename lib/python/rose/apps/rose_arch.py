@@ -39,6 +39,13 @@ from tempfile import mkdtemp
 from time import gmtime, strftime, time
 
 
+class RoseArchDuplicateError(ConfigValueError):
+
+    """An exception raised if dupluicate archive targets are provided."""
+
+    ERROR_FORMAT = '%s: duplicate archive target%s: "%s"'
+
+
 class RoseArchValueError(KeyError):
 
     """An error raised on a bad value."""
@@ -118,7 +125,9 @@ class RoseArchApp(BuiltinApp):
             "rose.apps.rose_arch_compressions",
             ["compress_sources"],
             None, app_runner)
+
         # Set up the targets
+        s_key_tails = set()
         targets = []
         for t_key, t_node in sorted(config.value.items()):
             if t_node.is_ignored() or ":" not in t_key:
@@ -126,8 +135,29 @@ class RoseArchApp(BuiltinApp):
             s_key_head, s_key_tail = t_key.split(":", 1)
             if s_key_head != self.SECTION or not s_key_tail:
                 continue
+
+            # Determine target path.
+            s_key_tail = t_key.split(":", 1)[1]
+            try:
+                s_key_tail = env_var_process(s_key_tail)
+            except UnboundEnvironmentVariableError as exc:
+                raise ConfigValueError([t_key, ""], "", exc)
+
+            # If parenthesised target is optional.
+            is_compulsory_target = True
+            if s_key_tail.startswith("(") and s_key_tail.endswith(")"):
+                s_key_tail = s_key_tail[1:-1]
+                is_compulsory_target = False
+
+            # Don't permit duplicate targets.
+            if s_key_tail in s_key_tails:
+                raise RoseArchDuplicateError([t_key], '', s_key_tail)
+            else:
+                s_key_tails.add(s_key_tail)
+
             target = self._run_target_setup(
-                app_runner, compress_manager, config, t_key, t_node)
+                app_runner, compress_manager, config, t_key, s_key_tail,
+                t_node, is_compulsory_target)
             old_target = dao.select(target.name)
             if old_target is None or old_target != target:
                 dao.delete(target)
@@ -147,19 +177,11 @@ class RoseArchApp(BuiltinApp):
             RoseArchTarget.ST_BAD)
 
     def _run_target_setup(
-            self, app_runner, compress_manager, config, t_key, t_node):
+            self, app_runner, compress_manager, config, t_key, s_key_tail,
+            t_node, is_compulsory_target=True):
         """Helper for _run. Set up a target."""
         target_prefix = self._get_conf(
             config, t_node, "target-prefix", default="")
-        s_key_tail = t_key.split(":", 1)[1]
-        try:
-            s_key_tail = env_var_process(s_key_tail)
-        except UnboundEnvironmentVariableError as exc:
-            raise ConfigValueError([t_key, ""], "", exc)
-        is_compulsory_target = True
-        if s_key_tail.startswith("(") and s_key_tail.endswith(")"):
-            s_key_tail = s_key_tail[1:-1]
-            is_compulsory_target = False
         target = RoseArchTarget(target_prefix + s_key_tail)
         target.command_format = self._get_conf(
             config, t_node, "command-format", compulsory=True)
