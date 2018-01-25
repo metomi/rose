@@ -41,7 +41,7 @@ from time import gmtime, strftime, time
 
 class RoseArchDuplicateError(ConfigValueError):
 
-    """An exception raised if dupluicate archive targets are provided."""
+    """An exception raised if duplicate archive targets are provided."""
 
     ERROR_FORMAT = '%s: duplicate archive target%s: "%s"'
 
