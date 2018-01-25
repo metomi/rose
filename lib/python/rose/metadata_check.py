@@ -217,13 +217,11 @@ def _check_widget(value, module_files=None, meta_dir=None):
     try:
         widget = rose.resource.import_object(
             widget_name, module_files, _import_err_handler)
-    except RuntimeError as exc:
+    except Exception as exc:
         # Ignore if there is no display for GTK widget
-        if (not os.getenv('DISPLAY') and
+        if (isinstance(exc, RuntimeError) and not os.getenv('DISPLAY') and
                 exc.args == ('could not open display',)):
             return
-        return INVALID_IMPORT.format(widget_name, type(exc).__name__, exc)
-    except Exception as exc:
         return INVALID_IMPORT.format(widget_name, type(exc).__name__, exc)
     if widget is None:
         return INVALID_OBJECT.format(value)
