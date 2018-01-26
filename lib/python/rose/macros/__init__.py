@@ -21,8 +21,6 @@
 Module to contain internal system macros for operating on a configuration.
 """
 
-import inspect
-
 import rose.macro
 import compulsory
 import duplicate

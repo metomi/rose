@@ -262,7 +262,7 @@ def _process(cmd_args, stdout=sys.stdout, stderr=sys.stderr):
     for line in iter(proc.stderr.readline, ""):
         stderr.write(line)
     proc.wait()
-    stdout.read()  # Magically keep it alive.
+    stdout.read()  # Magically keep it alive!?
     stderr.read()
     return proc.poll()
 
