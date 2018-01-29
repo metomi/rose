@@ -64,7 +64,6 @@ class VariableOperations(object):
 
     def add_var(self, variable, skip_update=False, skip_undo=False):
         """Add a variable to the internal list."""
-        existing_variable = self._get_proper_variable(variable)
         namespace = variable.metadata.get('full_ns')
         var_id = variable.metadata['id']
         sect, opt = self.__util.get_section_option_from_id(var_id)
@@ -121,7 +120,7 @@ class VariableOperations(object):
         variable.error = {}  # Kill any metadata errors before removing.
         namespace = variable.metadata.get('full_ns')
         var_id = variable.metadata['id']
-        sect, opt = self.__util.get_section_option_from_id(var_id)
+        sect = self.__util.get_section_option_from_id(var_id)[0]
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         config_data = self.__data.config[config_name]
         variables = config_data.vars.now.get(sect, [])
@@ -213,8 +212,6 @@ class VariableOperations(object):
         if (not override and
                 rose.variable.IGNORED_BY_SYSTEM in old_reason and
                 rose.variable.IGNORED_BY_SYSTEM not in new_reason_dict):
-            ns = variable.metadata['full_ns']
-            config_name = self.__util.split_full_ns(self.__data, ns)[0]
             if rose.config_editor.WARNING_TYPE_NOT_TRIGGER in variable.error:
                 variable.error.pop(
                     rose.config_editor.WARNING_TYPE_NOT_TRIGGER)
@@ -415,7 +412,7 @@ class VariableOperations(object):
         """Actually launch a URL."""
         try:
             webbrowser.open(url)
-        except webbrowser.error as exc:
+        except webbrowser.Error as exc:
             rose.gtk.dialog.run_exception_dialog(exc)
 
     def search_for_var(self, config_name_or_namespace, setting_id):

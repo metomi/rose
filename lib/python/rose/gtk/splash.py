@@ -24,7 +24,6 @@ import json
 import os
 from subprocess import Popen, PIPE
 import sys
-import tempfile
 import threading
 import time
 
@@ -120,8 +119,7 @@ class SplashScreen(gtk.Window):
                             self._start_pulse, fraction, text)
 
         if fraction == 1.0 and not no_progress:
-            gobject.timeout_add(self.TIME_WAIT_FINISH,
-                                lambda: self.finish())
+            gobject.timeout_add(self.TIME_WAIT_FINISH, self.finish)
 
         while gtk.events_pending():
             gtk.main_iteration()
@@ -203,7 +201,7 @@ class SplashScreenProcess(object):
         while True:
             try:
                 self.process.stdin.write(json_text + "\n")
-            except IOError as e:
+            except IOError:
                 self.start()
                 self.process.stdin.write(json_text + "\n")
             else:
@@ -215,12 +213,12 @@ class SplashScreenProcess(object):
             del self._buffer[:]
 
     def _update_buffered(self, *args, **kwargs):
-        t1 = time.time()
+        tinit = time.time()
         json_text = json.dumps({"args": args, "kwargs": kwargs})
-        if t1 - self._last_buffer_output_time > 0.02:
+        if tinit - self._last_buffer_output_time > 0.02:
             self._communicate(json_text)
             del self._buffer[:]
-            self._last_buffer_output_time = t1
+            self._last_buffer_output_time = tinit
         else:
             self._buffer.append(json_text)
 
@@ -243,9 +241,9 @@ class SplashScreenUpdaterThread(threading.Thread):
 
     """Update a splash screen using info from the stdin file object."""
 
-    def __init__(self, splash_screen, stop_event, stdin):
+    def __init__(self, window, stop_event, stdin):
         super(SplashScreenUpdaterThread, self).__init__()
-        self.splash_screen = splash_screen
+        self.window = window
         self.stop_event = stop_event
         self.stdin = stdin
 
@@ -262,7 +260,7 @@ class SplashScreenUpdaterThread(threading.Thread):
                 continue
             try:
                 update_input = json.loads(stdin_line.strip())
-            except ValueError as e:
+            except ValueError:
                 continue
             if update_input == "stop":
                 self._stop()
@@ -279,19 +277,19 @@ class SplashScreenUpdaterThread(threading.Thread):
 
     def _check_splash_screen_alive(self):
         """Check whether the splash screen is finished."""
-        if self.splash_screen.stopped or self.stop_event.is_set():
+        if self.window.stopped or self.stop_event.is_set():
             self._stop()
             return False
         return True
 
     def _update_splash_screen(self, update_input):
         """Update the splash screen with info extracted from stdin."""
-        self.splash_screen.update(
-            *update_input["args"], **update_input["kwargs"])
+        self.window.update(*update_input["args"], **update_input["kwargs"])
         return False
 
 
-if __name__ == "__main__":
+def main():
+    """Start splash screen."""
     sys.path.append(os.getenv('ROSE_HOME'))
     splash_screen = SplashScreen(*sys.argv[1:])
     stop_event = threading.Event()
@@ -305,3 +303,7 @@ if __name__ == "__main__":
     finally:
         stop_event.set()
         update_thread.join()
+
+
+if __name__ == "__main__":
+    main()

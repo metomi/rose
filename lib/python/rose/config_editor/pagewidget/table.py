@@ -73,7 +73,6 @@ class PageTable(gtk.Table):
         for widget, index in widget_coordinate_list:
             if widget.variable.metadata["id"] == variable.metadata["id"]:
                 old_index = index
-                parent = widget.get_parent()
                 break
         if old_index is None:
             variable_is_ghost_list = self._get_sorted_variables()
@@ -92,24 +91,24 @@ class PageTable(gtk.Table):
             new_variable_widget.insert_into(
                 self, self.MAX_COLS, row_above_new + 1)
             self._show_and_hide_variable_widgets(new_variable_widget)
-            r = row_above_new + 2
+            rownum = row_above_new + 2
             for variable_widget, widget_row in widget_coordinate_list:
                 if (widget_row > row_above_new and
                         variable_widget.variable.metadata.get('id') !=
                         variable.metadata.get('id')):
-                    variable_widget.insert_into(self, self.MAX_COLS, r)
-                    r += 1
+                    variable_widget.insert_into(self, self.MAX_COLS, rownum)
+                    rownum += 1
         else:
             self.reload_variable_widget(variable)
 
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
         """Create and attach variable widgets for these inputs."""
-        r = start_index
+        rownum = start_index
         for variable, is_ghost in variable_is_ghost_list:
             variable_widget = self.get_variable_widget(variable, is_ghost)
-            variable_widget.insert_into(self, self.MAX_COLS, r + 1)
+            variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)
-            r += 1
+            rownum += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
@@ -152,12 +151,12 @@ class PageTable(gtk.Table):
 
     def _get_sorted_variables(self):
         sort_key_vars = []
-        for v in self.panel_data + self.ghost_data:
-            sort_key = ((v.metadata.get("sort-key", "~")), v.metadata["id"])
-            is_ghost = v in self.ghost_data
-            sort_key_vars.append((sort_key, v, is_ghost))
-        sort_key_vars.sort(
-            lambda x, y: rose.config_editor.util.null_cmp(x, y))
+        for val in self.panel_data + self.ghost_data:
+            sort_key = (
+                (val.metadata.get("sort-key", "~")), val.metadata["id"])
+            is_ghost = val in self.ghost_data
+            sort_key_vars.append((sort_key, val, is_ghost))
+        sort_key_vars.sort(rose.config_editor.util.null_cmp)
         sort_key_vars.sort(lambda x, y: cmp("=null" in x[1].metadata["id"],
                                             "=null" in y[1].metadata["id"]))
         return [(x[1], x[2]) for x in sort_key_vars]
@@ -224,12 +223,12 @@ class PageArrayTable(PageTable):
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
         """Create and attach variable widgets for these inputs."""
         self._set_length()
-        r = start_index
+        rownum = start_index
         for variable, is_ghost in variable_is_ghost_list:
             variable_widget = self.get_variable_widget(variable, is_ghost)
-            variable_widget.insert_into(self, self.MAX_COLS, r + 1)
+            variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)
-            r += 1
+            rownum += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
@@ -292,16 +291,16 @@ class PageLatentTable(gtk.Table):
         self.title_on = (
             not self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE])
         self.alt_menu_class = rose.config_editor.menuwidget.CheckedMenuWidget
-        r = 0
+        rownum = 0
         v_sort_ids = []
-        for v in self.panel_data + self.ghost_data:
-            v_sort_ids.append((v.metadata.get("sort-key", ""),
-                               v.metadata["id"]))
+        for val in self.panel_data + self.ghost_data:
+            v_sort_ids.append((val.metadata.get("sort-key", ""),
+                               val.metadata["id"]))
         v_sort_ids.sort(
             lambda x, y: rose.config.sort_settings(
                 x[0] + "~" + x[1], y[0] + "~" + y[1]))
         v_sort_ids.sort(lambda x, y: cmp("=null" in x[1], "=null" in y[1]))
-        for sort_key, var_id in v_sort_ids:
+        for _, var_id in v_sort_ids:
             is_ghost = False
             for variable in self.panel_data:
                 if variable.metadata['id'] == var_id:
@@ -313,9 +312,9 @@ class PageLatentTable(gtk.Table):
                         break
             variable_widget = self.get_variable_widget(
                 variable, is_ghost=is_ghost)
-            variable_widget.insert_into(self, self.MAX_COLS, r + 1)
+            variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)
-            r += 1
+            rownum += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""

@@ -91,13 +91,10 @@ class ChoicesListView(gtk.TreeView):
         """Handle a right click event on the main list view."""
         if not hasattr(event, "button") or event.button != 3:
             return False
-        pathinfo = treeview.get_path_at_pos(int(event.x),
-                                            int(event.y))
+        pathinfo = treeview.get_path_at_pos(int(event.x), int(event.y))
         if pathinfo is None:
             return False
-        path, col, cell_x, cell_y = pathinfo
-        iter_ = treeview.get_model().get_iter(path)
-        name = treeview.get_model().get_value(iter_, 0)
+        iter_ = treeview.get_model().get_iter(pathinfo[0])
         self._popup_menu(iter_, event)
         return False
 
@@ -110,11 +107,12 @@ class ChoicesListView(gtk.TreeView):
         if not model.iter_n_children(None):
             model.append([rose.config_editor.CHOICE_LABEL_EMPTY])
 
-    def _handle_drag_received(self, treeview, drag, x, y, sel, info, time):
+    def _handle_drag_received(
+            self, treeview, drag, xpos, ypos, sel, info, time):
         """Handle an incoming drag request."""
         if sel.data is None:
             return False
-        drop_info = treeview.get_dest_row_at_pos(x, y)
+        drop_info = treeview.get_dest_row_at_pos(xpos, ypos)
         model = treeview.get_model()
         if drop_info:
             path, position = drop_info
@@ -392,13 +390,10 @@ class ChoicesTreeView(gtk.TreeView):
         """Connect a left click on the available section to a toggle."""
         if event.button != 1 or self._is_dragging:
             return False
-        pathinfo = treeview.get_path_at_pos(int(event.x),
-                                            int(event.y))
+        pathinfo = treeview.get_path_at_pos(int(event.x), int(event.y))
         if pathinfo is None:
             return False
-        path, col, cell_x, cell_y = pathinfo
-        iter_ = treeview.get_model().get_iter(path)
-        name = treeview.get_model().get_value(iter_, 0)
+        path, col = pathinfo[0:2]
         if treeview.get_columns().index(col) == 1:
             self._handle_cell_toggle(None, path)
 

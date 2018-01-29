@@ -21,7 +21,6 @@
 import re
 
 import rose.config
-import rose.config_editor
 
 
 REC_ELEMENT_SECTION = re.compile(r"^(.*)\((.+)\)$")
@@ -83,7 +82,6 @@ class ConfigDataHelper(object):
         """Retrieve the corresponding metadata for a variable."""
         config_data = self.data.config[config_name]
         meta_config = config_data.meta
-        meta_data = {}
         if not node_id:
             return {'id': node_id}
         return rose.macro.get_metadata_for_config_id(node_id, meta_config)
@@ -251,7 +249,6 @@ class ConfigDataHelper(object):
         """Sets if this namespace is the default for a section. Slow!"""
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
-        meta_config = config_data.meta
         allowed_sections = self.get_sections_from_namespace(namespace)
         empty = True
         for section in allowed_sections:
@@ -300,13 +297,13 @@ class ConfigDataHelper(object):
         full_sections.sort(sorter)
         return full_sections
 
-    def get_default_namespace_for_section(self, section, config_name):
+    def get_default_section_namespace(self, section, config_name):
         """Return the default namespace for the section."""
-        if config_name not in self.data._config_section_namespace_lookup:
-            self.data._config_section_namespace_lookup.setdefault(
+        if config_name not in self.data._config_section_namespace_map:
+            self.data._config_section_namespace_map.setdefault(
                 config_name, {})
         section_ns = (
-            self.data._config_section_namespace_lookup[config_name].get(
+            self.data._config_section_namespace_map[config_name].get(
                 section))
         if section_ns is None:
             config_data = self.data.config[config_name]
@@ -334,7 +331,7 @@ class ConfigDataHelper(object):
             section_ns = config_name + '/' + subspace
             if not subspace:
                 section_ns = config_name
-            self.data._config_section_namespace_lookup[config_name].update(
+            self.data._config_section_namespace_map[config_name].update(
                 {section: section_ns})
         return section_ns
 
@@ -434,8 +431,7 @@ class ConfigDataHelper(object):
                 if key == rose.variable.IGNORED_BY_SECTION:
                     # Section ignored statuses need interpreting.
                     var_id = var.metadata["id"]
-                    section, option = self.util.get_section_option_from_id(
-                        var_id)
+                    section = self.util.get_section_option_from_id(var_id)[0]
                     sect_data = config_data.sections.get_sect(section)
                     for key in sect_data.ignored_reason:
                         variable_statuses.setdefault(key, 0)

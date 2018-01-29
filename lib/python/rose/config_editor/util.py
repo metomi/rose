@@ -25,12 +25,6 @@ one to import custom plugins.
 
 """
 
-import imp
-import inspect
-import os
-import re
-import sys
-
 import pygtk
 pygtk.require("2.0")
 import gtk
@@ -111,7 +105,6 @@ class ImportWidgetError(Exception):
 def launch_node_info_dialog(node, changes, search_function):
     """Launch a dialog displaying attributes of a variable or section."""
     title = node.__class__.__name__ + " " + node.metadata['id']
-    safe_str = rose.gtk.util.safe_str
     text = ''
     if changes:
         text += (rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(changes) +
@@ -201,12 +194,10 @@ def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
     return "\n".join(lines)
 
 
-def null_cmp(x, y):
-    """Compares sort_key and then id of the tuple x and y to be sorted."""
-    x_sort_key = x[0]
-    x_id = x[1]
-    y_sort_key = y[0]
-    y_id = y[1]
+def null_cmp(x_item, y_item):
+    """Compares sort_key and then id of the tuples x_item/y_item."""
+    x_sort_key, x_id = x_item[0:2]
+    y_sort_key, y_id = y_item[0:2]
     if x_id == '' or y_id == '':
         return (x_id == '') - (y_id == '')
     if x_sort_key == y_sort_key:
@@ -223,8 +214,6 @@ def _pretty_format_data(data, global_indent=0, indent=4, width=60):
         for key, val in data.items():
             text += "\n" + " " * global_indent
             sub_prefix = sub_name.format(safe_str(key)) + delim
-            sub_ind0 = global_indent + len(sub_prefix)
-            sub_lenval = width - len(sub_prefix)
             indent_next = global_indent + indent
             str_val = _pretty_format_data(val,
                                           global_indent=indent_next)

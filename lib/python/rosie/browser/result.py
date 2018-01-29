@@ -25,7 +25,6 @@ pygtk.require("2.0")
 import gtk
 
 import rose.external
-from rose.opt_parse import RoseOptionParser
 import rosie.browser
 from rosie.suite_id import SuiteId
 
@@ -194,7 +193,6 @@ class DisplayBox(gtk.VBox):
         """Set the date to human readable format"""
         index = self.treeview.get_columns().index(column)
         epoch = model.get_value(r_iter, index)
-        path = model.get_path(r_iter)
         if epoch is not None:
             date = datetime.datetime.fromtimestamp(float(epoch))
         else:
@@ -205,12 +203,11 @@ class DisplayBox(gtk.VBox):
         """Set the icon for local status."""
         index = self.treeview.get_columns().index(column)
         status = model.get_value(r_iter, index)
-        path = model.get_path(r_iter)
         cell.set_property("stock-id", STATUS_ICON[status])
 
     def _update_local_status_row(self, model, path, r_iter, data):
         """Update the status for a row of the treeview"""
-        index_map, local_suites = data[0:2]
+        index_map = data[0]
         idx = model.get_value(r_iter, index_map["idx"])
         branch = model.get_value(r_iter, index_map["branch"])
         revision = int(model.get_value(r_iter, index_map["revision"]))
@@ -250,7 +247,7 @@ class DisplayBox(gtk.VBox):
 
     def update_treemodel(self, sort_index=0, descending=False):
         """Update or rearrange the main tree model."""
-        display_columns = self.display_cols_getter()
+        self.display_cols_getter()
         expanded_rows = []
         self.treeview.map_expanded_rows(lambda r, d: expanded_rows.append(d))
         expanded_groups = []
@@ -269,7 +266,6 @@ class DisplayBox(gtk.VBox):
         row_group_headers = {}
         prev_row = None
         prev_val = None
-        cs = [c.get_widget().get_text() for c in self.treeview.get_columns()]
         for i, values in enumerate(results):
             row_vals = [v for v in values]
             this_row = (row_vals + [""] *
@@ -353,7 +349,6 @@ class DisplayBox(gtk.VBox):
             self.treeview.set_model(self.treestore)
         else:
             self.treestore.clear()
-        result_columns = [c for c in cols if c != "local"]
         for i, title in enumerate(cols):
             col = gtk.TreeViewColumn()
             label = gtk.Label(title)

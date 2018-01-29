@@ -45,6 +45,5 @@ class FormatFixer(rose.macro.MacroBase):
             if inspect.ismodule(attr) and hasattr(attr, TRANSFORM_FUNC_NAME):
                 func = getattr(attr, TRANSFORM_FUNC_NAME)
                 if inspect.isfunction(func):
-                    config, c_list = func(config, meta_config,
-                                          self.add_report)
+                    config = func(config, meta_config, self.add_report)[0]
         return config, self.reports

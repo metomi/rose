@@ -28,7 +28,6 @@ import copy
 
 import pygtk
 pygtk.require('2.0')
-import gtk
 
 import rose.config_editor.stack
 import rose.gtk.dialog
@@ -69,7 +68,6 @@ class SectionOperations(object):
         """Add a section to this configuration."""
         config_data = self.__data.config[config_name]
         new_section_data = None
-        was_latent = False
         if not section or section in config_data.sections.now:
             rose.gtk.dialog.run_dialog(
                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
@@ -79,7 +77,6 @@ class SectionOperations(object):
             return
         if section in config_data.sections.latent:
             new_section_data = config_data.sections.latent.pop(section)
-            was_latent = True
         else:
             metadata = self.__data.helper.get_metadata_for_config_id(
                 section, config_name)

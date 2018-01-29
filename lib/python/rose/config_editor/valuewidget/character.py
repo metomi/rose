@@ -18,13 +18,11 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import re
-
 import pygtk
 pygtk.require('2.0')
 import gtk
 
-import rose.config_editor
+from rose import META_PROP_TYPE
 import rose.config_editor.util
 
 
@@ -37,7 +35,7 @@ class QuotedTextValueWidget(gtk.HBox):
                                                     spacing=0)
         # Importing here prevents cyclic imports
         import rose.macros.value
-        self.type = metadata.get(rose.META_PROP_TYPE)
+        self.type = metadata.get(META_PROP_TYPE)
         checker = rose.macros.value.ValueChecker()
         if self.type == "character":
             self.type_checker = checker.check_character

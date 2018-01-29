@@ -160,10 +160,10 @@ class UpgradeController(object):
                 try:
                     new_config, change_list = manager.transform(
                         macro_config, custom_inspector=upgrade_inspector)
-                except Exception as e:
+                except Exception as exc:
                     rose.gtk.dialog.run_dialog(
                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                        type(e).__name__ + ": " + str(e),
+                        type(exc).__name__ + ": " + str(exc),
                         rose.config_editor.ERROR_UPGRADE.format(
                             config_name.lstrip("/"))
                     )
@@ -205,7 +205,7 @@ class UpgradeController(object):
         return True
 
     def _handle_change_cursor(self, view):
-        path, column = self.treeview.get_cursor()
+        path = self.treeview.get_cursor()[0]
         iter_ = self.treemodel.get_iter(path)
         config_name = self.treemodel.get_value(iter_, 0)
         listmodel = self._config_version_model_dict[config_name]
@@ -260,7 +260,6 @@ class UpgradeController(object):
                 cell.set_property("inconsistent", False)
                 cell.set_property("sensitive", True)
         elif col_index == 2:
-            config_name = model.get_value(r_iter, 0)
             cell.set_property("text", model.get_value(r_iter, 2))
         else:
             text = model.get_value(r_iter, col_index)

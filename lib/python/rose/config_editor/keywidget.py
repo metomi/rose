@@ -19,7 +19,6 @@
 # -----------------------------------------------------------------------------
 
 import re
-import sys
 
 import pango
 import pygtk
@@ -90,7 +89,7 @@ class KeyWidget(gtk.VBox):
                              padding=0)
         self.comments_box = gtk.HBox()
         self.hbox.pack_start(self.comments_box, expand=False, fill=False)
-        self.grab_focus = lambda: self.entry.grab_focus()
+        self.grab_focus = self.entry.grab_focus
         self.set_sensitive(True)
         self.set_sensitive = self._set_sensitive
         event_box.connect('button-press-event', self.handle_launch_help)
@@ -245,8 +244,8 @@ class KeyWidget(gtk.VBox):
         self._last_var_comments = self.my_variable.comments
         if (self.my_variable.comments or
                 rose.config_editor.SHOULD_SHOW_ALL_COMMENTS):
-            format = rose.config_editor.VAR_COMMENT_TIP
-            comments = [format.format(c) for c in self.my_variable.comments]
+            tip_fmt = rose.config_editor.VAR_COMMENT_TIP
+            comments = [tip_fmt.format(c) for c in self.my_variable.comments]
             tooltip_text = "\n".join(comments)
             comment_widgets = self.comments_box.get_children()
             if comment_widgets:
@@ -412,10 +411,10 @@ class KeyWidget(gtk.VBox):
                 # No custom title, or a custom title without the name.
                 tooltip_text += ("\n (" + self.my_variable.name + ")")
         if self.my_variable.comments:
-            format = rose.config_editor.VAR_COMMENT_TIP
+            tip_fmt = rose.config_editor.VAR_COMMENT_TIP
             if tooltip_text:
                 tooltip_text += "\n"
-            comments = [format.format(c) for c in self.my_variable.comments]
+            comments = [tip_fmt.format(c) for c in self.my_variable.comments]
             tooltip_text += "\n".join(comments)
         changes = self.var_ops.get_var_changes(self.my_variable)
         if changes != '' and tooltip_text != '':
@@ -482,7 +481,6 @@ class KeyWidget(gtk.VBox):
                         return None
             self.var_ops.remove_var(variable)
             variable.name = new_name
-            id_prefix = ':'
             variable.metadata['id'] = (section + rose.CONFIG_DELIMITER +
                                        variable.name)
             self.var_ops.add_var(variable)

@@ -27,8 +27,7 @@ from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 import shlex
 import signal
-import socket
-from socket import getaddrinfo, gethostname, getfqdn
+from socket import getaddrinfo, gethostname, getfqdn, error as SocketError
 import sys
 from time import sleep, time
 import traceback
@@ -144,18 +143,18 @@ class HostSelector(object):
             for item in gethostname, getfqdn:
                 try:
                     items.append(item())
-                except socket.error:
+                except SocketError:
                     pass
             for item in items + ["localhost"]:
                 if item in self.local_host_strs:
                     continue
                 self.local_host_strs.append(item)
                 try:
-                    for addrinfo_item in socket.getaddrinfo(item, None):
+                    for addrinfo_item in getaddrinfo(item, None):
                         if addrinfo_item[4][0] in self.local_host_strs:
                             continue
                         self.local_host_strs.append(addrinfo_item[4][0])
-                except (IndexError, socket.error):
+                except (IndexError, SocketError):
                     pass
         return self.local_host_strs
 

@@ -33,7 +33,6 @@ import shutil
 import sre_constants
 import sys
 import tempfile
-import traceback
 import warnings
 
 # Ignore add menu related warnings for now, but remove this later.
@@ -81,9 +80,6 @@ import rose.macro
 import rose.opt_parse
 import rose.resource
 import rose.macros
-
-
-RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
 
 
 class MainController(object):
@@ -616,29 +612,29 @@ class MainController(object):
         # Load the keyboard accelerators.
         accel = {
             rose.config_editor.ACCEL_UNDO:
-            lambda: self.perform_undo(),
+            self.perform_undo,
             rose.config_editor.ACCEL_REDO:
             lambda: self.perform_undo(redo_mode_on=True),
             rose.config_editor.ACCEL_FIND:
-            lambda: self.find_entry.grab_focus(),
+            self.find_entry.grab_focus,
             rose.config_editor.ACCEL_FIND_NEXT:
             lambda: self.perform_find(self.find_hist['regex']),
             rose.config_editor.ACCEL_HELP_GUI:
-            lambda: self.main_handle.help(),
+            self.main_handle.help,
             rose.config_editor.ACCEL_OPEN:
-            lambda: self.load_from_file(),
+            self.load_from_file,
             rose.config_editor.ACCEL_SAVE:
-            lambda: self.save_to_file(),
+            self.save_to_file,
             rose.config_editor.ACCEL_QUIT:
-            lambda: self.main_handle.destroy(),
+            self.main_handle.destroy,
             rose.config_editor.ACCEL_METADATA_REFRESH:
-            lambda: self._refresh_metadata_if_on(),
+            self._refresh_metadata_if_on,
             rose.config_editor.ACCEL_SUITE_RUN:
-            lambda: self.main_handle.run_suite(),
+            self.main_handle.run_suite,
             rose.config_editor.ACCEL_BROWSER:
-            lambda: self.main_handle.launch_browser(),
+            self.main_handle.launch_browser,
             rose.config_editor.ACCEL_TERMINAL:
-            lambda: self.main_handle.launch_terminal()
+            self.main_handle.launch_terminal,
         }
         self.menubar.set_accelerators(accel)
 
@@ -1201,8 +1197,8 @@ class MainController(object):
 
             # Run check fail-if, warn-if and validator macros if check_on_save
             if check_on_save:
-                changes, errors = self.nav_panel.get_change_error_totals(
-                    config_name=short_config_name)
+                errors = self.nav_panel.get_change_error_totals(
+                    config_name=short_config_name)[1]
                 if errors > 0:
                     dialog = gtk.MessageDialog(
                         None,
@@ -1229,10 +1225,10 @@ class MainController(object):
             rose.macro.pretty_format_config(config, ignore_error=True)
             try:
                 rose.config.dump(config, save_path)
-            except (OSError, IOError) as e:
+            except (OSError, IOError) as exc:
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                    rose.config_editor.ERROR_SAVE_PATH_FAIL.format(e),
+                    rose.config_editor.ERROR_SAVE_PATH_FAIL.format(exc),
                     title=rose.config_editor.ERROR_SAVE_TITLE.format(
                         short_config_name),
                     modal=False
@@ -1305,9 +1301,9 @@ class MainController(object):
         try:
             os.mkdir(os.path.dirname(new_path))
             rose.config.dump(new_config, new_path)
-        except (OSError, IOError) as e:
+        except (OSError, IOError) as exc:
             text = rose.config_editor.ERROR_CONFIG_CREATE.format(
-                new_path, type(e), str(e))
+                new_path, type(exc), str(exc))
             title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        text, title)
@@ -1349,9 +1345,9 @@ class MainController(object):
         if dirpath is not None:
             try:
                 shutil.rmtree(dirpath)
-            except (shutil.Error, OSError, IOError) as e:
+            except (shutil.Error, OSError, IOError) as exc:
                 text = rose.config_editor.ERROR_CONFIG_DELETE.format(
-                    dirpath, type(e), str(e))
+                    dirpath, type(exc), str(exc))
                 title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            text, title)
@@ -1407,14 +1403,14 @@ class MainController(object):
         self._get_menu_widget('/Autofix').set_sensitive(bool(errors))
         self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_TRANSFORM,
                                           bool(errors))
-        self._update_change_widget_sensitivity(is_changed=bool(changes))
+        self._update_changed_sensitivity(is_changed=bool(changes))
 
     def update_status_text(self, *args, **kwargs):
         """Update the message displayed in the status bar."""
         if hasattr(self, "status_bar"):
             self.status_bar.set_message(*args, **kwargs)
 
-    def _update_change_widget_sensitivity(self, is_changed=False):
+    def _update_changed_sensitivity(self, is_changed=False):
         """Alter sensitivity of 'unsaved changes' related widgets."""
         self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_SAVE,
                                           is_changed)
@@ -1618,7 +1614,7 @@ class MainController(object):
         """Drive the finding of a setting id within the data."""
         section, option = self.util.get_section_option_from_id(setting_id)
         if option is None:
-            page_id = self.data.helper.get_default_namespace_for_section(
+            page_id = self.data.helper.get_default_section_namespace(
                 section, config_name)
             self.view_page(page_id)
         else:
@@ -1635,11 +1631,11 @@ class MainController(object):
         """Using regex expression, return a matching page and variable."""
         try:
             reg_find = re.compile(expression).search
-        except sre_constants.error as e:
+        except sre_constants.error as exc:
             rose.gtk.dialog.run_dialog(
                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                 rose.config_editor.ERROR_NOT_REGEX.format(
-                    expression, str(e)),
+                    expression, str(exc)),
                 rose.config_editor.ERROR_BAD_FIND)
             return None, None
         if self.find_hist['regex'] != expression:
@@ -1756,7 +1752,7 @@ class MainController(object):
                 node_is_section = False
             else:
                 # A variable or section
-                sect, opt = self.util.get_section_option_from_id(node_id)
+                opt = self.util.get_section_option_from_id(node_id)[1]
                 node_is_section = (opt is None)
                 namespace = node.metadata.get('full_ns')
                 if namespace is None:
@@ -1854,16 +1850,16 @@ def spawn_window(config_directory_path=None, debug_mode=False,
         opt_meta_paths = []
     if not debug_mode:
         warnings.filterwarnings('ignore')
-    RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
+    resourcer = rose.resource.ResourceLocator.default()
     rose.gtk.util.rc_setup(
-        RESOURCER.locate('etc/rose-config-edit/.gtkrc-2.0'))
+        resourcer.locate('rose-config-edit/.gtkrc-2.0'))
     rose.gtk.util.setup_stock_icons()
-    logo = RESOURCER.locate("etc/images/rose-splash-logo.png")
+    logo = resourcer.locate('images/rose-splash-logo.png')
     if rose.config_editor.ICON_PATH_SCHEDULER is None:
         gcontrol_icon = None
     else:
         try:
-            gcontrol_icon = RESOURCER.locate(
+            gcontrol_icon = resourcer.locate(
                 rose.config_editor.ICON_PATH_SCHEDULER)
         except rose.resource.ResourceError:
             gcontrol_icon = None
@@ -2004,7 +2000,7 @@ def main():
         cwd = None
     rose.gtk.dialog.set_exception_hook_dialog(keep_alive=True)
     if opts.profile_mode:
-        f = tempfile.NamedTemporaryFile()
+        handle = tempfile.NamedTemporaryFile()
         cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,
                                         load_all_apps=opts.load_all_apps,
                                         load_no_apps=opts.load_no_apps,
@@ -2012,10 +2008,10 @@ def main():
                                         initial_namespaces=args,
                                         opt_meta_paths=opt_meta_paths,
                                         no_warn=opts.no_warn)
-                        """, globals(), locals(), f.name)
-        p = pstats.Stats(f.name)
-        p.strip_dirs().sort_stats("cumulative").print_stats()
-        f.close()
+                        """, globals(), locals(), handle.name)
+        pstat = pstats.Stats(handle.name)
+        pstat.strip_dirs().sort_stats("cumulative").print_stats()
+        handle.close()
     else:
         spawn_window(cwd, debug_mode=opts.debug_mode,
                      load_all_apps=opts.load_all_apps,

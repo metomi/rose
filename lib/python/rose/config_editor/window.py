@@ -20,14 +20,11 @@
 
 import os
 import re
-import sys
-import tempfile
 import webbrowser
 
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 import rose.config
 import rose.gtk.dialog
@@ -62,17 +59,17 @@ class MetadataTable(object):
         table = gtk.Table(len(self.paths), 2)
 
         # table rows
-        for n, path in enumerate(self.paths):
+        for i, path in enumerate(self.paths):
             label = gtk.Label(path)
             label.set_alignment(xalign=0., yalign=0.5)
             # component, col_from, col_to, row_from, row_to
-            table.attach(label, 0, 1, n, n + 1, xoptions=gtk.FILL, xpadding=15)
+            table.attach(label, 0, 1, i, i + 1, xoptions=gtk.FILL, xpadding=15)
             label.show()
             button = gtk.Button('Remove')
             button.data = path
             # component, col_from, col_to, row_from, row_to
-            table.attach(button, 1, 2, n, n + 1)
-            button.connect('clicked', lambda b: self.remove_row(b))
+            table.attach(button, 1, 2, i, i + 1)
+            button.connect('clicked', self.remove_row)
             button.show()
 
         # append table
@@ -82,9 +79,9 @@ class MetadataTable(object):
 
         self.previous = table
 
-    def remove_row(self, b):
+    def remove_row(self, widget):
         """ To be called uppon 'remove' button press. """
-        self.paths.remove(b.data)
+        self.paths.remove(widget.data)
         self.draw_table()
 
     def add_row(self, path):
@@ -151,7 +148,7 @@ class MainWindow(object):
         """Create a dialog showing the 'About' information."""
         rose.gtk.dialog.run_about_dialog(
             name=rose.config_editor.PROGRAM_NAME,
-            copyright=rose.config_editor.COPYRIGHT,
+            copyright_=rose.config_editor.COPYRIGHT,
             logo_path="etc/images/rose-logo.png",
             website=rose.config_editor.PROJECT_URL)
 
@@ -188,7 +185,6 @@ class MainWindow(object):
         section_completion.set_model(liststore)
         section_box.set_completion(section_completion)
         section_completion.set_text_column(0)
-        choices = []
         self._reload_choices(liststore, names[0], add_choices)
         section_box.show()
         config_name_box.connect(
@@ -255,7 +251,7 @@ class MainWindow(object):
 
         """
         prefs = {}
-        return self._launch_config_section_chooser_dialog(
+        return self._launch_choose_section_dialog(
             name_section_dict, prefs,
             rose.config_editor.DIALOG_TITLE_GRAPH,
             rose.config_editor.DIALOG_BODY_GRAPH_CONFIG,
@@ -288,16 +284,14 @@ class MainWindow(object):
             section_title = rose.config_editor.DIALOG_BODY_IGNORE_SECTION
         else:
             section_title = rose.config_editor.DIALOG_BODY_ENABLE_SECTION
-        return self._launch_config_section_chooser_dialog(
+        return self._launch_choose_section_dialog(
             name_section_dict, prefs,
             dialog_title, config_title,
             section_title)
 
-    def _launch_config_section_chooser_dialog(self, name_section_dict, prefs,
-                                              dialog_title, config_title,
-                                              section_title,
-                                              null_section_choice=False,
-                                              do_target_section=False):
+    def _launch_choose_section_dialog(
+            self, name_section_dict, prefs, dialog_title, config_title,
+            section_title, null_section_choice=False, do_target_section=False):
         chooser_dialog = gtk.Dialog(
             title=dialog_title,
             parent=self.window,
@@ -574,7 +568,7 @@ class MainWindow(object):
         prefs is in the same format, but indicates preferred values.
 
         """
-        return self._launch_config_section_chooser_dialog(
+        return self._launch_choose_section_dialog(
             name_section_dict, prefs,
             rose.config_editor.DIALOG_TITLE_REMOVE,
             rose.config_editor.DIALOG_BODY_REMOVE_CONFIG,
@@ -589,7 +583,7 @@ class MainWindow(object):
         prefs is in the same format, but indicates preferred values.
 
         """
-        return self._launch_config_section_chooser_dialog(
+        return self._launch_choose_section_dialog(
             name_section_dict, prefs,
             rose.config_editor.DIALOG_TITLE_RENAME,
             rose.config_editor.DIALOG_BODY_RENAME_CONFIG,

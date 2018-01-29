@@ -18,7 +18,6 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import pango
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -89,8 +88,6 @@ class MenuWidget(gtk.HBox):
         if self.is_ghost or is_comp:
             option_ui_middle = (
                 option_ui_middle.replace("<menuitem action='Ignore'/>", ''))
-        var_type = variable.metadata.get(rose.META_PROP_TYPE, '')
-        var_values = variable.metadata.get(rose.META_PROP_VALUES, range(2))
         error_types = rose.config_editor.WARNING_TYPES_IGNORE
         if (set(error_types) & set(variable.error.keys()) or
             set(error_types) & set(variable.warning.keys()) or

@@ -102,9 +102,8 @@ def _check_macro(value, module_files=None, meta_dir=None):
         return
     try:
         macros = rose.variable.array_split(value, only_this_delim=",")
-    except Exception as e:
-        return INVALID_SYNTAX.format(e)
-    bad_macros = []
+    except Exception as exc:
+        return INVALID_SYNTAX.format(exc)
     for macro in macros:
         macro_name = macro
         method = None
@@ -126,8 +125,8 @@ def _check_macro(value, module_files=None, meta_dir=None):
 def _check_pattern(value):
     try:
         re.compile(value, re.VERBOSE)
-    except Exception as e:
-        err_text = type(e).__name__ + ": " + str(e)
+    except (TypeError, re.error) as exc:
+        err_text = type(exc).__name__ + ": " + str(exc)
         return INVALID_SYNTAX.format(err_text)
 
 
@@ -140,31 +139,31 @@ def _check_range(value):
         test_meta_config = rose.config.ConfigNode()
         evaluator = rose.macros.rule.RuleEvaluator()
         try:
-            check_ok = evaluator.evaluate_rule(
+            evaluator.evaluate_rule(
                 value, test_id, test_config, test_meta_config)
-        except rose.macros.rule.RuleValueError as e:
-            return INVALID_RANGE_RULE_IDS.format(e)
-        except Exception as e:
-            return INVALID_SYNTAX.format(e)
+        except rose.macros.rule.RuleValueError as exc:
+            return INVALID_RANGE_RULE_IDS.format(exc)
+        except Exception as exc:
+            return INVALID_SYNTAX.format(exc)
     else:
         try:
-            check_func = rose.variable.parse_range_expression(value)
-        except rose.variable.RangeSyntaxError as e:
-            return str(e)
-        except Exception as e:
-            return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
+            rose.variable.parse_range_expression(value)
+        except rose.variable.RangeSyntaxError as exc:
+            return str(exc)
+        except Exception as exc:
+            return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
 
 
 def _check_value_titles(title_value, values_value):
     try:
         title_list = rose.variable.array_split(title_value,
                                                only_this_delim=",")
-    except Exception as e:
-        return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
+    except Exception as exc:
+        return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
     try:
         value_list = rose.variable.array_split(values_value,
                                                only_this_delim=",")
-    except Exception as e:
+    except Exception:
         return INCOMPATIBLE.format(rose.META_PROP_VALUES)
     if len(title_list) != len(value_list):
         return INCOMPATIBLE.format(rose.META_PROP_VALUES)
@@ -187,8 +186,8 @@ def _check_type(value):
 def _check_values(value):
     try:
         val_list = rose.variable.array_split(value, only_this_delim=",")
-    except Exception as e:
-        return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
+    except Exception as exc:
+        return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
     if not val_list:
         return INVALID_SYNTAX.format(value)
 
@@ -232,7 +231,7 @@ def _get_module_files(meta_dir=None):
     if meta_dir is not None:
         lib_dir = os.path.join(meta_dir, "lib", "python")
         if os.path.isdir(lib_dir):
-            for dirpath, dirnames, filenames in os.walk(lib_dir):
+            for dirpath, _, filenames in os.walk(lib_dir):
                 if '/.' in dirpath:
                     continue
                 for filename in filenames:
@@ -261,7 +260,6 @@ def metadata_check(meta_config, meta_dir=None,
             continue
         if node.get([rose.META_PROP_VALUES], no_ignore=True) is not None:
             # 'values' supercedes other type-like props, so don't use them.
-            unnecessary_props = []
             for type_like_prop in [rose.META_PROP_PATTERN,
                                    rose.META_PROP_RANGE,
                                    rose.META_PROP_TYPE]:
@@ -343,7 +341,6 @@ def metadata_check(meta_config, meta_dir=None,
                 new_rep_value = rep_trig_node.value
         reports.append(rose.macro.MacroReport(new_rep_section, new_rep_option,
                                               new_rep_value, report.info))
-    sorter = rose.config.sort_settings
     reports.sort(rose.macro.report_sort)
     return reports
 

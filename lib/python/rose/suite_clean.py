@@ -19,11 +19,9 @@
 # ----------------------------------------------------------------------------
 """Implement the "rose suite-clean" command."""
 
-from glob import glob
 import os
 from pipes import quote
 from rose.config import ConfigLoader, ConfigNode, ConfigSyntaxError
-from rose.env import env_var_process
 from rose.fs_util import FileSystemEvent
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser

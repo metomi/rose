@@ -18,15 +18,11 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import ast
-import re
 import shlex
-import sys
 
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 import rose.config_editor.util
 import rose.gtk.util
@@ -120,7 +116,6 @@ class SpacedListValueWidget(gtk.HBox):
         if value_array is None:
             value_array = spaced_array_split(self.value)
         entries = []
-        existing_entries_text = [e.get_text() for e in self.entries]
         for value_item in value_array:
             for entry in self.entries:
                 if entry.get_text() == value_item and entry not in entries:
@@ -434,10 +429,10 @@ class SpacedListValueWidget(gtk.HBox):
 def get_next_delimiter(array_text, next_element):
     """Return the part of array_text immediately preceding next_element."""
     try:
-        v = array_text.index(next_element)
+        val = array_text.index(next_element)
     except ValueError:
         return
-    return array_text[:v]
+    return array_text[:val]
 
 
 def spaced_array_join(values):

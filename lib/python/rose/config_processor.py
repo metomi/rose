@@ -41,28 +41,28 @@ class ConfigProcessError(Exception):
 
     keys: the keys from the root config to the setting.
     value: the value of the setting.
-    e: the exception that triggers this exception.
+    exc: the exception that triggers this exception.
 
     """
 
-    def __init__(self, keys, value, e=None):
+    def __init__(self, keys, value, exc=None):
         self.keys = keys
         self.value = value
-        self.e = e
-        Exception.__init__(self, keys, value, e)
+        self.exc = exc
+        Exception.__init__(self, keys, value, exc)
 
     def __str__(self):
-        if isinstance(self.e, UnboundEnvironmentVariableError):
+        if isinstance(self.exc, UnboundEnvironmentVariableError):
             setting_str = "=".join(list(self.keys))
-            return "%s: %s: unbound variable" % (setting_str, self.e.args[0])
+            return "%s: %s: unbound variable" % (setting_str, self.exc.args[0])
         else:
             setting_str = ""
             if self.keys is not None:
                 setting_str += "=".join(list(self.keys))
             if self.value is not None:
                 setting_str += "=%s" % str(self.value)
-            e_str = str(self.e)
-            if self.e is None:
+            e_str = str(self.exc)
+            if self.exc is None:
                 e_str = "bad or missing value"
             return "%s: %s" % (setting_str, e_str)
 
@@ -80,6 +80,17 @@ class ConfigProcessorBase(object):
             self.PREFIX = self.SCHEME + ":"
 
     def process(self, conf_tree, item, orig_keys=None, orig_value=None):
+        """Sub-class should override this method.
+
+        conf_tree:
+            The relevant rose.config_tree.ConfigTree object with the full
+            configuration.
+        item: The current configuration item to process.
+        orig_keys:
+            The keys for locating the originating setting in conf_tree in a
+            recursive processing. None implies a top level call.
+        orig_value: The value of orig_keys in conf_tree.
+        """
         pass
 
 
@@ -94,11 +105,12 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        path = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         SchemeHandlersManager.__init__(
-            self, [p], "rose.config_processors", ["process"])
+            self, [path], "rose.config_processors", ["process"])
 
     def handle_event(self, *args, **kwargs):
+        """Report an event."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
@@ -106,7 +118,7 @@ class ConfigProcessorsManager(SchemeHandlersManager):
                 **kwargs):
         """Process a named item in the conf_tree.
 
-        orig_keys: The keys for locating the originating setting in conf_tree.
+        orig_keys: The keys for locating the originating setting in conf_tree
                    in a recursive processing. None implies a top level call.
         orig_value: The value of orig_keys in conf_tree.
         kwargs: Some processor may accept extra keyword arguments.
@@ -117,8 +129,8 @@ class ConfigProcessorsManager(SchemeHandlersManager):
             scheme = item.split(":", 1)[0]
         processor = self.get_handler(scheme)
         if processor is None:
-            e = UnknownContentError(scheme)
-            raise ConfigProcessError(orig_keys, orig_value, e)
-        return processor.process(conf_tree, item, orig_keys, orig_value,
-                                 **kwargs)
+            raise ConfigProcessError(
+                orig_keys, orig_value, UnknownContentError(scheme))
+        return processor.process(
+            conf_tree, item, orig_keys, orig_value, **kwargs)
     __call__ = process

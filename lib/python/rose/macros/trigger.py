@@ -19,7 +19,6 @@
 # -----------------------------------------------------------------------------
 
 import copy
-import os
 
 import rose.config
 import rose.config_tree
@@ -92,7 +91,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                 prev_ignoreds[node.state].append(n_id)
 
         ranked_ids = self._get_ranked_trigger_ids()
-        for rank, var_id in sorted(ranked_ids):
+        for _, var_id in sorted(ranked_ids):
             self.update(var_id, config, meta_config)
 
         # Report any discrepancies in ignored status.
@@ -183,10 +182,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                 this_id = alt_ids.pop(0)
             for alt_id in alt_ids:
                 id_stack.insert(1, (alt_id, has_ignored_parent))
-            is_duplicate = self._check_is_id_dupl(this_id, meta_config)
+            self._check_is_id_dupl(this_id, meta_config)
             # Triggered sections need their options to trigger sub children.
             if this_id in config_sections:
-                options = []
                 for option in self._get_config_section_options(config_data,
                                                                this_id):
                     skip_id = self._get_id_from_section_option(
@@ -317,7 +315,6 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         transform_reports = copy.deepcopy(reports)
         del self.reports[:]
         for report in transform_reports:
-            config_node = config.get([report.section, report.option])
             trig_config_node = trig_config.get([report.section, report.option])
             if report.option is None:
                 value = None
@@ -354,9 +351,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             triggered_ids = id_value_dict.keys()
             triggered_ids.sort()
             if self._check_is_id_dupl(start_id, meta_config):
-                st_sect, st_opt = self._get_section_option_from_id(start_id)
+                st_sect = self._get_section_option_from_id(start_id)[0]
                 for tr_id in triggered_ids:
-                    tr_sect, tr_opt = self._get_section_option_from_id(tr_id)
+                    tr_sect = self._get_section_option_from_id(tr_id)[0]
                     if tr_sect != st_sect:
                         return self._get_error_report_for_id(
                             start_id, config,
@@ -459,7 +456,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
 
     def _check_is_id_dupl(self, setting_id, meta_config):
         if setting_id not in self._id_is_duplicate:
-            sect, opt = self._get_section_option_from_id(setting_id)
+            sect = self._get_section_option_from_id(setting_id)[0]
             # Note: when modifier metadata ticket goes in, change the regex.
             sect = rose.macro.REC_ID_STRIP.sub("", sect)
             node = meta_config.get([sect, rose.META_PROP_DUPLICATE])

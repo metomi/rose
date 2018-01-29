@@ -18,16 +18,13 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import os
 import re
 import sys
-import webbrowser
 
 import pygtk
 pygtk.require('2.0')
 import gtk
 import gobject
-import pango
 
 import rose.config
 import rose.config_editor
@@ -139,7 +136,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         left = (event.keyval == gtk.keysyms.Left)
         right = (event.keyval == gtk.keysyms.Right)
         if left or right:
-            path, col = widget.get_cursor()
+            path = widget.get_cursor()[0]
             if path is not None:
                 if right:
                     widget.expand_row(path, open_all=False)
@@ -218,11 +215,11 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                                                    change])
             new_keylist = keylist + [key]
             name_iter_map["/".join(new_keylist)] = new_row
-            if type(value) is dict:
+            if isinstance(value, dict):
                 newer_initials = value.items()
                 newer_initials.sort(self.sort_tree_items)
-                for x in newer_initials:
-                    stack.append([new_row] + [list(new_keylist)] + list(x))
+                for vals in newer_initials:
+                    stack.append([new_row] + [list(new_keylist)] + list(vals))
             stack.pop(0)
 
     def _set_title_markup(self, column, cell, model, r_iter, index):
@@ -395,7 +392,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             while self.tree.row_expanded(path[:i]) and i <= len(path):
                 i += 1
             dest_path = path[:i]
-        cursor_path, cursor_column = self.tree.get_cursor()
+        cursor_path = self.tree.get_cursor()[0]
         if cursor_path != dest_path:
             self.tree.set_cursor(dest_path)
 
@@ -439,7 +436,6 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def get_change_error_totals(self, config_name=None):
         """Return the number of changes and total errors for the root nodes."""
-        tree_model = self.data_store
         if config_name:
             path = self.get_path_from_names([config_name], unfiltered=True)
             iter_ = self.data_store.get_iter(path)
@@ -469,7 +465,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 pathinfo = treeview.get_path_at_pos(int(event.x),
                                                     int(event.y))
                 if pathinfo is not None:
-                    path, col, cell_x, cell_y = pathinfo
+                    path, col, cell_x, _ = pathinfo
                     if (treeview.get_expander_column() == col and
                             cell_x < 1 + 18 * len(path)):  # Hardwired, bad.
                         if event.button != 3:
@@ -522,16 +518,16 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         tree_model = self.tree.get_model()
         root_iter = tree_model.get_iter(path)
         sub_iters = []
-        for n in range(tree_model.iter_n_children(root_iter)):
-            sub_iters.append(tree_model.iter_nth_child(root_iter, n))
+        for i in range(tree_model.iter_n_children(root_iter)):
+            sub_iters.append(tree_model.iter_nth_child(root_iter, i))
         sub_names = []
         while sub_iters:
             if sub_iters[0] is not None:
                 path = tree_model.get_path(sub_iters[0])
                 sub_names.append(self.get_name(path))
-                for n in range(tree_model.iter_n_children(sub_iters[0])):
+                for i in range(tree_model.iter_n_children(sub_iters[0])):
                     sub_iters.append(tree_model.iter_nth_child(sub_iters[0],
-                                                               n))
+                                                               i))
             sub_iters.pop(0)
         return sub_names
 
@@ -570,8 +566,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             child_dups = []
             while child_iter is not None:
                 child_name = self.get_name(treemodel.get_path(child_iter))
-                metadata, comment = self._get_metadata_comments_func(
-                    child_name)
+                metadata = self._get_metadata_comments_func(child_name)[0]
                 dupl = metadata.get(rose.META_PROP_DUPLICATE)
                 child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)

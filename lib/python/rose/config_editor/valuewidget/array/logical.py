@@ -18,13 +18,9 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import re
-import sys
-
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 import rose.gtk.util
 import rose.variable

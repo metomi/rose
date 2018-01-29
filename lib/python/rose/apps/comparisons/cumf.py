@@ -47,7 +47,7 @@ class Cumf(object):
             for line in open(task.cumfsummaryfile):
                 if "files compare" in line:
                     task.set_pass(CumfComparisonSuccess(task))
-            if not task.ok:
+            if not task.good:
                 task.set_failure(CumfComparisonFailure(task))
         else:
             task.set_failure(CumfSummaryNotFoundFailure(task))

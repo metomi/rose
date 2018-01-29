@@ -25,7 +25,7 @@ from rose.fs_util import FileSystemUtil
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
-from rose.reporter import Event, Reporter
+from rose.reporter import Reporter
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_scan import SuiteScanner
 import sys
@@ -178,7 +178,7 @@ def main():
         confirm = prompt
     if opts.all:
         suite_scanner = SuiteScanner(event_handler=event_handler)
-        results, exceptions = suite_scanner.scan()
+        results = suite_scanner.scan()[0]
         suite_names = [result.name for result in results]
     else:
         if opts.name:
@@ -187,8 +187,8 @@ def main():
             try:
                 suite_name = get_suite_name(event_handler)
                 suite_names.append(suite_name)
-            except SuiteNotFoundError as e:
-                event_handler(e)
+            except SuiteNotFoundError as exc:
+                event_handler(exc)
                 sys.exit(1)
 
     if opts.debug_mode:
@@ -199,8 +199,8 @@ def main():
             try:
                 method(sname, opts.host, confirm, sys.stderr, sys.stdout,
                        *args)
-            except Exception as e:
-                event_handler(e)
+            except Exception as exc:
+                event_handler(exc)
                 sys.exit(1)
 
 

@@ -135,8 +135,8 @@ class GPGAgentStore(object):
     def usable(cls):
         """Can this store be used?"""
         try:
-            gpg_socket = cls.get_socket()
-        except GPGAgentStoreConnectionError as exc:
+            cls.get_socket()
+        except GPGAgentStoreConnectionError:
             return False
         return True
 
@@ -192,7 +192,7 @@ class GPGAgentStore(object):
         gpg_socket = self.get_socket()
         gpg_socket.send("CLEAR_PASSPHRASE rosie:%s:%s\n" % (scheme, host))
         # This command always returns 'OK', even when the cache id is invalid.
-        reply = self._socket_receive(gpg_socket, "^OK")
+        self._socket_receive(gpg_socket, "^OK")
 
     def find_password(self, scheme, host, username):
         """Return the password of username@root."""

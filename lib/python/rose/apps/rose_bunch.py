@@ -106,7 +106,6 @@ class RoseBunchApp(BuiltinApp):
     SCHEME = "rose_bunch"
     ARGS_SECTION = "bunch-args"
     BUNCH_SECTION = "bunch"
-    MAX_PROCS = None
     SLEEP_DURATION = 0.5
     TYPE_ABORT_ON_FAIL = "abort"
     TYPE_CONTINUE_ON_FAIL = "continue"
@@ -207,9 +206,9 @@ class RoseBunchApp(BuiltinApp):
         max_procs = conf_tree.node.get_value([self.BUNCH_SECTION, "pool-size"])
 
         if max_procs:
-            self.MAX_PROCS = int(rose.env.env_var_process(max_procs))
+            max_procs = int(rose.env.env_var_process(max_procs))
         else:
-            self.MAX_PROCS = arglength
+            max_procs = arglength
 
         if self.incremental == "true":
             self.dao = RoseBunchDAO(conf_tree)
@@ -256,7 +255,7 @@ class RoseBunchApp(BuiltinApp):
                         if self.dao:
                             self.dao.update_command_state(key, self.dao.S_PASS)
 
-            while len(procs) < self.MAX_PROCS and commands and not abort:
+            while len(procs) < max_procs and commands and not abort:
                 key = self.invocation_names[0]
                 command = commands.pop(key)
                 self.invocation_names.pop(0)

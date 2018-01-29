@@ -85,8 +85,8 @@ def main():
                 if opts.meta:
                     try:
                         root_node = config_loader.load(fname)
-                    except ConfigSyntaxError as e:
-                        report(e)
+                    except ConfigSyntaxError as exc:
+                        report(exc)
                         sys.exit(1)
                     rel_path = os.sep.join(fname.split(os.sep)[:-1])
                     fpath = get_meta_path(root_node, rel_path)
@@ -105,8 +105,8 @@ def main():
                 os.getcwd(), rose.SUB_CONFIG_NAME)
             try:
                 root_node = config_loader.load(fname)
-            except ConfigSyntaxError as e:
-                report(e)
+            except ConfigSyntaxError as exc:
+                report(exc)
                 sys.exit(1)
         fpath = get_meta_path(root_node, meta_key=opts.meta_key)
         root_node.unset(["meta"])

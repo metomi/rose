@@ -48,6 +48,7 @@ class ValueChecker(rose.macro.MacroBase):
     WARNING_BAD_PATTERN = "Value {0} does not contain the pattern: {1}"
     WARNING_BAD_RANGE = "Value {0} is not in the range criteria: {1}"
     WARNING_INVALID_LENGTH = 'Derived type has an invalid length: {0}'
+    WARNING_NOT_STRING = 'Value {0} not a string'
     WARNING_WRONG_VALUES = 'Value {0} not in allowed values {1}'
     WARNING_WRONG_VALUE_FIXED = 'Value {0} should be {1}'
     WARNING_WRONG_LENGTH = 'Array longer than max length: {0} instead of {1}'
@@ -245,7 +246,9 @@ class ValueChecker(rose.macro.MacroBase):
         else:
             check_func = self.range_func_map[range_pat]
         check_ok = True
+        cur_val = None
         for i, val in enumerate(val_list):
+            cur_val = val
             if skip_nulls and not val:
                 continue
             if len(type_list) > 1:
@@ -271,7 +274,7 @@ class ValueChecker(rose.macro.MacroBase):
                     break
         if check_ok:
             return ""
-        return self.WARNING_BAD_RANGE.format(val, range_pat)
+        return self.WARNING_BAD_RANGE.format(cur_val, range_pat)
 
 
 class TypeFixer(rose.macro.MacroBase):
@@ -289,7 +292,6 @@ class TypeFixer(rose.macro.MacroBase):
         type_err_list = checker.validate(config, meta_config)
         if type_err_list is None:
             return config, None
-        changes_list = []
         for item in type_err_list:
             sect = item.section
             opt = item.option

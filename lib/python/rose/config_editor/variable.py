@@ -20,12 +20,8 @@
 
 import copy
 import difflib
-import inspect
-import os
 import re
-import sys
 
-import pango
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -170,8 +166,6 @@ class VariableWidget(object):
             else:
                 widget_path, custom_arg = info[0], None
             files = self.var_ops.get_ns_metadata_files(metadata["full_ns"])
-            lib = os.path.join("lib", "python", "widget")
-            widget_fpath = os.path.join(lib, *widget_path.split(".")[:-1])
             error_handler = lambda e: self.handle_bad_valuewidget(
                 str(e), variable, set_value)
             widget = rose.resource.import_object(widget_path,
@@ -186,8 +180,8 @@ class VariableWidget(object):
                                           set_value,
                                           hook_object,
                                           custom_arg)
-            except Exception as e:
-                self.handle_bad_valuewidget(str(e), variable, set_value)
+            except Exception as exc:
+                self.handle_bad_valuewidget(str(exc), variable, set_value)
         else:
             widget_maker = rose.config_editor.valuewidget.chooser(
                 variable.value, variable.metadata,

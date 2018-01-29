@@ -87,7 +87,7 @@ def chooser(value, metadata, error):
             return radiobuttons.RadioButtonsValueWidget
         if m_values is not None and len(m_values) > 4:
             return combobox.ComboBoxValueWidget
-    elif type(m_type) is not list:
+    elif not isinstance(m_type, list):
         if m_type in ['logical', 'boolean']:
             return array.logical.LogicalArrayValueWidget
         return array.entry.EntryArrayValueWidget
@@ -103,7 +103,7 @@ def chooser(value, metadata, error):
         return array.python_list.PythonListValueWidget
     if m_type == "spaced_list" and not error:
         return array.spaced_list.SpacedListValueWidget
-    if type(m_type) is list:
+    if isinstance(m_type, list):
         return array.mixed.MixedArrayValueWidget
     if m_hint is not None:
         return valuehints.HintsValueWidget

@@ -247,7 +247,7 @@ class GroupOperations(object):
         group = rose.config_editor.STACK_GROUP_ADD + "-" + str(time.time())
         self.sect_ops.add_section(config_name, new_section_name,
                                   skip_update=True)
-        namespace = self.data.helper.get_default_namespace_for_section(
+        namespace = self.data.helper.get_default_section_namespace(
             new_section_name, config_name)
         config_data = self.data.config[config_name]
         if opt_map is None:
@@ -329,13 +329,12 @@ class GroupOperations(object):
         group = rose.config_editor.STACK_GROUP_IGNORE + "-" + str(time.time())
         nses = []
         for section in sections:
-            ns = self.data.helper.get_default_namespace_for_section(
+            ns = self.data.helper.get_default_section_namespace(
                 section, config_name)
             if ns not in nses:
                 nses.append(ns)
-            skipped_nses, ids = self.sect_ops.ignore_section(
-                config_name, section,
-                is_ignored, skip_update=True)
+            skipped_nses = self.sect_ops.ignore_section(
+                config_name, section, is_ignored, skip_update=True)[0]
             for ns in skipped_nses:
                 if ns not in nses:
                     nses.append(ns)
@@ -383,7 +382,7 @@ class GroupOperations(object):
         group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
         nses = []
         for section in sections:
-            ns = self.data.helper.get_default_namespace_for_section(
+            ns = self.data.helper.get_default_section_namespace(
                 section, config_name)
             if ns not in nses:
                 nses.append(ns)
@@ -397,7 +396,7 @@ class GroupOperations(object):
         """Return data functions for summary (sub) data panels."""
         if not namespace.startswith("/"):
             namespace = "/" + namespace
-        config_name, subsp = self.util.split_full_ns(self.data, namespace)
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
         return SubDataOperations(
             config_name,
             self.add_section_with_options,

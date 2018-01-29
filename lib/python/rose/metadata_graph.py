@@ -19,6 +19,7 @@
 # -----------------------------------------------------------------------------
 """Module to produce Graphviz graphing of Rose configuration metadata."""
 
+import ast
 import os
 import sys
 import tempfile
@@ -123,7 +124,6 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
                     allowed_sections and section in allowed_sections):
                 ids.append(id_)
     ids.sort(rose.config.sort_settings)
-    delim = rose.CONFIG_DELIMITER
     for id_ in ids:
         section, option = rose.macro.get_section_option_from_id(id_)
         node_attrs = get_node_state_attrs(
@@ -204,7 +204,7 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
                 graph.add_edge(value_id, dependent_id, **dependent_attrs)
 
 
-def output_graph(graph, debug_mode=False, filename=None, format="svg"):
+def output_graph(graph, debug_mode=False, filename=None, form="svg"):
     """Output a Graphviz Graph object.
 
     If debug_mode is True, print the 'dot' text output.
@@ -212,9 +212,9 @@ def output_graph(graph, debug_mode=False, filename=None, format="svg"):
 
     """
     if debug_mode:
-        format = "dot"
+        form = "dot"
     if filename is None:
-        image_file_handle = tempfile.NamedTemporaryFile(suffix=("." + format))
+        image_file_handle = tempfile.NamedTemporaryFile(suffix=("." + form))
     else:
         image_file_handle = open(filename, "w")
     graph.draw(image_file_handle.name, prog="dot")
@@ -271,8 +271,7 @@ def main():
     if os.path.exists(config_file_path):
         config = config_tree_loader(opts.conf_dir, rose.SUB_CONFIG_NAME,
                                     conf_dir_paths=sys.path).node
-        meta_path, warning = rose.macro.load_meta_path(
-            config, opts.conf_dir)
+        meta_path = rose.macro.load_meta_path(config, opts.conf_dir)[0]
         if meta_path is None:
             _exit_with_metadata_fail()
         meta_config = rose.macro.load_meta_config(

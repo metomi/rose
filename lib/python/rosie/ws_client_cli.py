@@ -20,7 +20,6 @@
 """The CLI of the web service client."""
 
 
-import os
 import re
 from rosie.suite_id import SuiteId
 from rosie.ws_client import (

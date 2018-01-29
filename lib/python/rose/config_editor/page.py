@@ -19,9 +19,7 @@
 # -----------------------------------------------------------------------------
 
 import re
-import sys
 import time
-import traceback
 import webbrowser
 
 import pygtk
@@ -381,7 +379,7 @@ class ConfigPage(gtk.VBox):
 
     def update_info(self):
         """Driver routine to update non-variable information."""
-        button_list, label_list, info = self._get_page_info_widgets()
+        button_list, label_list, _ = self._get_page_info_widgets()
         if [l.get_text() for l in label_list] == self._last_info_labels:
             # No change - do not redraw.
             return False
@@ -484,8 +482,8 @@ class ConfigPage(gtk.VBox):
                 return False
             try:
                 self.sub_data_panel = custom_widget(*args, arg_str=widget_args)
-            except Exception as e:
-                self.handle_bad_custom_sub_widget(str(e))
+            except Exception as exc:
+                self.handle_bad_custom_sub_widget(str(exc))
         else:
             panel_module = rose.config_editor.panelwidget.summary_data
             self.sub_data_panel = (
@@ -531,7 +529,6 @@ class ConfigPage(gtk.VBox):
         add_ui_end = """</menu> </popup> </ui>"""
         actions = [('Add meta', gtk.STOCK_DIRECTORY,
                     rose.config_editor.ADD_MENU_META)]
-        missing_variables = []
         section_choices = []
         for sect_data in self.sections:
             if not sect_data.ignored_reason:
@@ -658,8 +655,8 @@ class ConfigPage(gtk.VBox):
                                                     self.variable_ops,
                                                     self.show_modes,
                                                     arg_str=widget_args)
-            except Exception as e:
-                self.handle_bad_custom_main_widget(e)
+            except Exception as exc:
+                self.handle_bad_custom_main_widget(exc)
             else:
                 return
         std_table = rose.config_editor.pagewidget.table.PageTable
@@ -732,7 +729,6 @@ class ConfigPage(gtk.VBox):
                 break
         else:
             return self.sort_main(remake_forced=True)
-        var_name = variable.name
         var_id = variable.metadata['id']
         widget_for_var = {}
         for widget in self.get_main_variable_widgets():
@@ -955,21 +951,18 @@ class ConfigPage(gtk.VBox):
         for variable in [v for v in self.panel_data]:
             # Remove redundant existing variables
             var_id = variable.metadata.get('id')
-            var_name = variable.name
             new_id_list = [x.metadata['id'] for x in new_config_data]
             if var_id not in new_id_list or var_id is None:
                 self.variable_ops.remove_var(variable)
         for variable in [v for v in self.ghost_data]:
             # Remove redundant metadata variables.
             var_id = variable.metadata.get('id')
-            var_name = variable.name
             new_id_list = [x.metadata['id'] for x in new_ghost_data]
             if var_id not in new_id_list:
                 self.variable_ops.remove_var(variable)  # From the ghost list.
         for variable in new_config_data:
             # Update or add variables
             var_id = variable.metadata['id']
-            var_name = variable.name
             old_id_list = [x.metadata.get('id') for x in self.panel_data]
             if var_id in old_id_list:
                 old_variable = self.panel_data[old_id_list.index(var_id)]
@@ -1000,7 +993,6 @@ class ConfigPage(gtk.VBox):
         for variable in new_ghost_data:
             # Update or remove variables
             var_id = variable.metadata['id']
-            var_name = variable.name
             old_id_list = [x.metadata.get('id')
                            for x in self.ghost_data]
             if var_id in old_id_list:
@@ -1053,8 +1045,8 @@ class ConfigPage(gtk.VBox):
             sorted_data.sort(descending_cmp)
         if [x[4] for x in sorted_data] == datavars:
             return False
-        for i, (key, title, name, value, variable) in enumerate(sorted_data):
-            datavars[i] = variable
+        for i, datum in enumerate(sorted_data):
+            datavars[i] = datum[4]  # variable
         return True
 
     def _macro_menu_launch(self, widget, event):
@@ -1088,10 +1080,11 @@ class ConfigPage(gtk.VBox):
                 class_name, method_name = class_name.split(".", 1)
         else:
             module_name = macro_name_string
-        rval = self._launch_macro_func(config_name=self.config_name,
-                                       module_name=module_name,
-                                       class_name=class_name,
-                                       method_name=method_name)
+        self._launch_macro_func(
+            config_name=self.config_name,
+            module_name=module_name,
+            class_name=class_name,
+            method_name=method_name)
 
     def search_for_id(self, id_):
         """Launch a search for variable or section id."""

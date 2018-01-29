@@ -20,8 +20,8 @@
 """This holds some shared functionality between stash and stash_add."""
 
 
-def get_metadata_for_stash_section_item(stash_meta_lookup, stash_section,
-                                        stash_item, stash_description):
+def get_stash_section_meta(stash_meta_lookup, stash_section,
+                           stash_item, stash_description):
     """Return a dictionary of metadata properties for this stash record."""
     try:
         stash_code = 1000 * int(stash_section) + int(stash_item)

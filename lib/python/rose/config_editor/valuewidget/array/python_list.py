@@ -19,13 +19,10 @@
 # -----------------------------------------------------------------------------
 
 import ast
-import re
-import sys
 
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 from . import entry
 import rose.config_editor.util
@@ -111,8 +108,6 @@ class PythonListValueWidget(gtk.HBox):
             return
         text = '['
         for i, val in enumerate(value_array):
-            j = len(text)
-            v = self.value[j:].index(val)
             prefix = entry.get_next_delimiter(self.value[len(text):],
                                               val)
             if prefix is None:
@@ -131,11 +126,10 @@ class PythonListValueWidget(gtk.HBox):
         if value_array is None:
             value_array = python_array_split(self.value)
         entries = []
-        existing_entries_text = [e.get_text() for e in self.entries]
         for value_item in value_array:
-            for entry in self.entries:
-                if entry.get_text() == value_item and entry not in entries:
-                    entries.append(entry)
+            for widget in self.entries:
+                if widget.get_text() == value_item and widget not in entries:
+                    entries.append(widget)
                     break
             else:
                 entries.append(self.get_entry(value_item))
@@ -221,36 +215,32 @@ class PythonListValueWidget(gtk.HBox):
 
     def move_element(self, num_places_right):
         """Move the entry left or right."""
-        entry = self.last_selected_src
-        if entry is None:
+        widget = self.last_selected_src
+        if widget is None:
             return
-        old_index = self.entries.index(entry)
+        old_index = self.entries.index(widget)
         if (old_index + num_places_right < 0 or
                 old_index + num_places_right > len(self.entries) - 1):
             return
-        self.entries.remove(entry)
-        self.entries.insert(old_index + num_places_right, entry)
+        self.entries.remove(widget)
+        self.entries.insert(old_index + num_places_right, widget)
         self.populate_table()
-        self.setter(entry)
+        self.setter(widget)
 
     def get_entry(self, value_item):
         """Create a gtk Entry for this array element."""
-        entry = gtk.Entry()
-        entry.set_text(value_item)
-        entry.connect('focus-in-event',
-                      self._handle_focus_on_entry)
-        entry.connect("button-release-event",
-                      self._handle_middle_click_paste)
-        entry.connect_after("paste-clipboard", self.setter)
-        entry.connect_after("key-release-event",
-                            lambda e, v: self.setter(e))
-        entry.connect_after("button-release-event",
-                            lambda e, v: self.setter(e))
-        entry.connect('focus-out-event',
-                      self._handle_focus_off_entry)
-        entry.set_width_chars(self.chars_width - 1)
-        entry.show()
-        return entry
+        widget = gtk.Entry()
+        widget.set_text(value_item)
+        widget.connect('focus-in-event', self._handle_focus_on_entry)
+        widget.connect("button-release-event", self._handle_middle_click_paste)
+        widget.connect_after("paste-clipboard", self.setter)
+        widget.connect_after("key-release-event", lambda e, v: self.setter(e))
+        widget.connect_after(
+            "button-release-event", lambda e, v: self.setter(e))
+        widget.connect('focus-out-event', self._handle_focus_off_entry)
+        widget.set_width_chars(self.chars_width - 1)
+        widget.show()
+        return widget
 
     def populate_table(self, focus_widget=None):
         """Populate a table with the array elements, dynamically."""
@@ -345,29 +335,29 @@ class PythonListValueWidget(gtk.HBox):
 
     def add_entry(self):
         """Add a new entry (with null text) to the variable array."""
-        entry = self.get_entry('')
-        self.entries.append(entry)
+        widget = self.get_entry('')
+        self.entries.append(widget)
         self._adjust_entry_length()
-        self.populate_table(focus_widget=entry)
+        self.populate_table(focus_widget=widget)
         if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
                 rose.META_PROP_VALUE_TRUE):
-            self.setter(entry)
+            self.setter(widget)
 
     def remove_entry(self):
         """Remove the last selected or the last entry."""
         if (self.last_selected_src is not None and
                 self.last_selected_src in self.entries):
             text = self.last_selected_src.get_text()
-            entry = self.entries.remove(self.last_selected_src)
+            widget = self.entries.remove(self.last_selected_src)
             self.last_selected_src = None
         else:
             text = self.entries[-1].get_text()
-            entry = self.entries.pop()
+            widget = self.entries.pop()
         self.populate_table()
         if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
                 rose.META_PROP_VALUE_TRUE or text):
             # Optional, or compulsory but not blank.
-            self.setter(entry)
+            self.setter(widget)
 
     def setter(self, widget):
         """Reconstruct the new variable value from the entry array."""
@@ -401,9 +391,9 @@ class PythonListValueWidget(gtk.HBox):
         return False
 
     def _adjust_entry_length(self):
-        for entry in self.entries:
-            entry.set_width_chars(self.chars_width)
-            entry.set_max_length(self.chars_width)
+        for widget in self.entries:
+            widget.set_width_chars(self.chars_width)
+            widget.set_max_length(self.chars_width)
         self.reshape_table()
 
     def _get_widget_for_focus(self):

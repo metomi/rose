@@ -46,7 +46,7 @@ class FormatsChooserValueWidget(gtk.HBox):
         self.entry_table = gtk.Table(rows=num_entries + 1, columns=1)
         self.entry_table.show()
         self.entries = []
-        for r, format_name in enumerate(value.split()):
+        for format_name in value.split():
             entry = self.get_entry(format_name)
             self.entries.append(entry)
         self.add_box = gtk.HBox()
@@ -79,7 +79,7 @@ class FormatsChooserValueWidget(gtk.HBox):
         entry = gtk.Entry()
         entry.set_text(format_name)
         entry.connect('focus-in-event', self.hook.trigger_scroll)
-        entry.connect('changed', lambda e: self.entry_change_handler(e))
+        entry.connect('changed', self.entry_change_handler)
         entry.show()
         return entry
 
@@ -89,9 +89,9 @@ class FormatsChooserValueWidget(gtk.HBox):
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
         self.entry_table.resize(rows=len(self.entries) + 1, columns=1)
-        for r, widget in enumerate(self.entries + [self.add_box]):
+        for i, widget in enumerate(self.entries + [self.add_box]):
             self.entry_table.attach(
-                widget, 0, 1, r, r + 1, xoptions=gtk.FILL)
+                widget, 0, 1, i, i + 1, xoptions=gtk.FILL)
         self.grab_focus = lambda: self.hook.get_focus(self.entries[-1])
 
     def add_new_section(self):

@@ -34,8 +34,10 @@ import rose.opt_parse
 import rose.resource
 
 
-def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
+def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
     """Automatically guess the metadata for an application configuration."""
+    if prop_map is None:
+        prop_map = {}
     rose.macro.standard_format_config(config)
     if meta_config is None:
         meta_config = rose.config.ConfigNode()
@@ -99,7 +101,7 @@ def type_gen(value):
         val_meta_type = "raw"
         for meta_type in ["integer", "real", "quoted", "character", "logical",
                           "boolean"]:
-            is_ok, err_text = rose.meta_type.meta_type_checker(val, meta_type)
+            is_ok = rose.meta_type.meta_type_checker(val, meta_type)[0]
             if is_ok:
                 val_meta_type = meta_type
                 break

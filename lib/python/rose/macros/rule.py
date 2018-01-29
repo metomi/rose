@@ -19,9 +19,7 @@
 # -----------------------------------------------------------------------------
 
 import ast
-import os
 import re
-import sys
 
 import jinja2
 import jinja2.exceptions
@@ -348,12 +346,12 @@ class RuleEvaluator(rose.macro.MacroBase):
                 if value is not None:
                     try:
                         index = int(element)
-                    except (TypeError, ValueError) as e:
+                    except (TypeError, ValueError):
                         raise RuleValueError(variable_id)
                     val_array = rose.variable.array_split(value)
                     try:
                         return_value = val_array[index - 1]
-                    except IndexError as e:
+                    except IndexError:
                         raise RuleValueError(variable_id)
                     else:
                         return self._evaluate(return_value)

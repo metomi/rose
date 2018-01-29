@@ -18,13 +18,9 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import re
-import sys
-
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 import rose.config_editor.util
 import rose.gtk.util
@@ -132,8 +128,6 @@ class EntryArrayValueWidget(gtk.HBox):
         value_array = rose.variable.array_split(self.value)
         text = ''
         for i, val in enumerate(value_array):
-            j = len(text)
-            v = self.value[j:].index(val)
             prefix = get_next_delimiter(self.value[len(text):],
                                         val)
             if prefix is None:
@@ -154,7 +148,6 @@ class EntryArrayValueWidget(gtk.HBox):
         if value_array is None:
             value_array = rose.variable.array_split(self.value)
         entries = []
-        existing_entries_text = [e.get_text() for e in self.entries]
         for value_item in value_array:
             for entry in self.entries:
                 if entry.get_text() == value_item and entry not in entries:
@@ -385,11 +378,9 @@ class EntryArrayValueWidget(gtk.HBox):
         """Remove the last selected or the last entry."""
         if (self.last_selected_src is not None and
                 self.last_selected_src in self.entries):
-            text = self.last_selected_src.get_text()
             entry = self.entries.remove(self.last_selected_src)
             self.last_selected_src = None
         else:
-            text = self.entries[-1].get_text()
             entry = self.entries.pop()
         self.populate_table()
         self.setter(entry)
@@ -478,13 +469,13 @@ class EntryArrayValueWidget(gtk.HBox):
 def get_next_delimiter(array_text, next_element):
     """Return the part of array_text immediately preceding next_element."""
     try:
-        v = array_text.index(next_element)
+        val = array_text.index(next_element)
     except ValueError:
         # Substring not found.
         return
-    if v == 0 and len(array_text) > 1:  # Null or whitespace element.
-        while array_text[v].isspace():
-            v += 1
-        if array_text[v] == ",":
-            v += 1
-    return array_text[:v]
+    if val == 0 and len(array_text) > 1:  # Null or whitespace element.
+        while array_text[val].isspace():
+            val += 1
+        if array_text[val] == ",":
+            val += 1
+    return array_text[:val]

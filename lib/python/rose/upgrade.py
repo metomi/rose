@@ -19,7 +19,6 @@
 # -----------------------------------------------------------------------------
 """Module that contains upgrade macro functionality."""
 
-import copy
 import inspect
 import os
 import sys
@@ -74,6 +73,7 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     """Class derived from MacroBase to aid upgrade functionality."""
 
+    BEFORE_TAG = "Before"
     ERROR_RENAME_OPT_TO_SECT = "Error: cannot rename {0}={1} to {2}"
     ERROR_RENAME_SECT_TO_OPT = "Error: cannot rename {0} to {1}={2}"
     INFO_ADDED_SECT = "Added"
@@ -116,7 +116,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             self.remove_setting(config, [section, option])
 
     def _get_config_resources(self):
-        # Get macro configuration resources.
+        """Get macro configuration resources."""
         macro_file = inspect.getfile(self.__class__)
         this_dir = os.path.dirname(os.path.abspath(macro_file))
         res_dir = os.path.join(this_dir, self.UPGRADE_RESOURCE_DIR,
@@ -150,7 +150,6 @@ class MacroUpgrade(rose.macro.MacroBase):
         conflict_id = None
         found_setting = False
         if config.get([section, option]) is None:
-            strip_dupl = rose.macro.REC_ID_STRIP
             for key in config.get_value():
                 existing_section = key
                 if not existing_section.startswith(section):
@@ -169,7 +168,7 @@ class MacroUpgrade(rose.macro.MacroBase):
                     conflict_id = existing_section
                     break
                 if option is not None:
-                    for keys, node in config.walk([existing_section]):
+                    for keys, _ in config.walk([existing_section]):
                         existing_option = keys[1]
                         existing_base_option = (
                             rose.macro.REC_ID_STRIP_DUPL.sub(
@@ -255,7 +254,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             if config.get([section]) is None:
                 return False
             option_node_pairs = config.walk([section])
-            for opt_keys, option_node in option_node_pairs:
+            for opt_keys, _ in option_node_pairs:
                 opt = opt_keys[1]
                 self._remove_setting(config, [section, opt], info)
         return self._remove_setting(config, [section, option], info)
@@ -313,7 +312,6 @@ class MacroUpgrade(rose.macro.MacroBase):
     def _ignore_setting(self, config, keys, info=None, state=None):
         """Set the ignored state of a setting, if it exists."""
         section, option = self._get_section_option_from_keys(keys)
-        id_ = self._get_id_from_section_option(section, option)
         node = config.get([section, option])
         if node is None or state is None:
             return False
@@ -333,7 +331,6 @@ class MacroUpgrade(rose.macro.MacroBase):
     def _remove_setting(self, config, keys, info=None):
         """Remove a setting from the configuration, if it exists."""
         section, option = self._get_section_option_from_keys(keys)
-        id_ = self._get_id_from_section_option(section, option)
         if config.get([section, option]) is None:
             return False
         if info is None:
@@ -365,12 +362,16 @@ class MacroUpgradeManager(object):
         else:
             self.tag = "HEAD"
         self.meta_flag_no_tag = "/".join(tag_items)
+        self.version_macros = None
+        self.version_module = None
+        self.reports = None
+        self.new_tag = None
         self.load_all_tags()
 
     def load_all_tags(self):
         """Load an ordered list of the available upgrade macros."""
-        meta_path, warning = rose.macro.load_meta_path(self.app_config,
-                                                       is_upgrade=True)
+        meta_path = rose.macro.load_meta_path(
+            self.app_config, is_upgrade=True)[0]
         if meta_path is None:
             raise OSError(rose.macro.ERROR_LOAD_CONF_META_NODE)
         meta_path = os.path.abspath(meta_path)
@@ -391,8 +392,7 @@ class MacroUpgradeManager(object):
             grade_method = DOWNGRADE_METHOD
         else:
             grade_method = UPGRADE_METHOD
-        for module_name, class_name, method, help in macro_info_tuples:
-            macro_name = ".".join([module_name, class_name])
+        for module_name, class_name, method, _ in macro_info_tuples:
             if method == grade_method:
                 for module in [self.version_module]:
                     if module.__name__ == module_name:
@@ -506,7 +506,6 @@ class MacroUpgradeManager(object):
         if self.tag == "HEAD":
             # Try to figure out the latest upgrade version.
             macro_insts.sort(self._upgrade_sort)
-            prev_taglist = [m.BEFORE_TAG for m in macro_insts]
             next_taglist = [m.AFTER_TAG for m in macro_insts]
             temp_list = list(macro_insts)
             for macro in list(temp_list[1:]):
@@ -605,7 +604,7 @@ def main():
     return_objects = parse_upgrade_args()
     if return_objects is None:
         sys.exit(1)
-    app_config, config_map, meta_config, config_name, args, opts = (
+    app_config, config_map, meta_config, _, args, opts = (
         return_objects)
     if opts.conf_dir is not None:
         os.chdir(opts.conf_dir)
@@ -619,8 +618,8 @@ def main():
         sys.exit(1)
     try:
         upgrade_manager = MacroUpgradeManager(app_config, opts.downgrade)
-    except OSError as e:
-        reporter(e)
+    except OSError as exc:
+        reporter(exc)
         sys.exit(1)
 
     need_all_versions = opts.all_versions or args
@@ -649,7 +648,6 @@ def main():
         reporter(UpgradeVersionError(user_choice))
         sys.exit(1)
     upgrade_manager.set_new_tag(user_choice)
-    macro_config = copy.deepcopy(app_config)
     combined_config_map = rose.macro.combine_opt_config_map(config_map)
     macro_function = (
         lambda conf, meta, conf_key: upgrade_manager.transform(

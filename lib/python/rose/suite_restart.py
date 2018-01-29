@@ -132,7 +132,7 @@ def main():
         if opts.debug_mode:
             traceback.print_exc(exc)
         if isinstance(exc, RosePopenError):
-            sys.exit(exc.rc)
+            sys.exit(exc.ret_code)
         else:
             sys.exit(1)
 

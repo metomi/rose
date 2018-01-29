@@ -20,10 +20,8 @@
 """Process an env section in node of a rose.config_tree.ConfigTree."""
 
 import os
-import re
-from rose.env \
-    import env_export, env_var_process, UnboundEnvironmentVariableError
-from rose.reporter import Event
+from rose.env import (
+    env_export, env_var_process, UnboundEnvironmentVariableError)
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 
 
@@ -46,8 +44,8 @@ class ConfigProcessorForEnv(ConfigProcessorBase):
                     continue
                 try:
                     environ[key] = env_var_process(node.value)
-                except UnboundEnvironmentVariableError as e:
-                    raise ConfigProcessError([item, key], node.value, e)
+                except UnboundEnvironmentVariableError as exc:
+                    raise ConfigProcessError([item, key], node.value, exc)
                 environ[key] = os.path.expanduser(environ[key])  # ~ expansion
         for key, value in sorted(environ.items()):
             env_export(key, value, self.manager.event_handler)

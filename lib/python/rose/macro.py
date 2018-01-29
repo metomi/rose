@@ -378,7 +378,7 @@ class MacroBaseRoseEdit(MacroBase):
         """Return all options within a section in config_data."""
         if isinstance(config_data, rose.config.ConfigNode):
             names = []
-            for keylist, node in config_data.walk([section]):
+            for keylist, _ in config_data.walk([section]):
                 names.append(keylist[-1])
             return names
         else:
@@ -504,7 +504,6 @@ class MacroReport(object):
         self.is_warning = is_warning
 
     def __repr__(self):
-        id = get_id_from_section_option(self.section, self.option)
         return (("<MacroReport section=%s option=%s value=%s info=%s " +
                  "is_warning=%s>") % (
                 self.section, self.option, self.value, self.info,
@@ -608,7 +607,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
     if opt_node is None or not opt_node.value:
         meta_keys = ["rose-all"]
     else:
-        key = opt_node.value
+        key = str(opt_node.value)
         split_key = key.split('/')
         if len(split_key) == 1:
             key = '/'.join([key, rose.META_DEFAULT_VN_DIR])
@@ -694,7 +693,7 @@ def load_meta_config_tree(config, directory=None, config_type=None,
         )
     except rose.resource.ResourceError:
         if not ignore_meta_error:
-            error_handler(text=ERROR_LOAD_META_PATH.format(meta_key))
+            error_handler(text=ERROR_LOAD_META_PATH.format(meta_list))
     except rose.config.ConfigSyntaxError as exc:
         error_handler(text=str(exc))
 
@@ -796,8 +795,8 @@ def check_config_integrity(app_config):
     """Verify that the configuration is sane - return an error otherwise."""
     try:
         keys_and_nodes = list(app_config.walk())
-    except Exception as e:
-        return MacroReturnedCorruptConfigError(str(e))
+    except Exception as exc:
+        return MacroReturnedCorruptConfigError(str(exc))
     keys_and_nodes.insert(0, ([], app_config))
     for keys, node in keys_and_nodes:
         if not isinstance(node, rose.config.ConfigNode):
@@ -847,7 +846,7 @@ def report_config(app_config, meta_config, run_macro_list, modules,
         macro_method = VALIDATE_METHOD
     else:
         macro_method = REPORT_METHOD
-    for module_name, class_name, method, help in macro_info_tuples:
+    for module_name, class_name, method, _ in macro_info_tuples:
         macro_name = ".".join([module_name, class_name])
         if macro_name in run_macro_list and method == macro_method:
             for module in modules:
@@ -900,7 +899,7 @@ def transform_config(config, meta_config, transformer_macro, modules,
     """Run transformer custom macros on the config and return problems."""
     if optional_values is None:
         optional_values = {}
-    for module_name, class_name, method, help in macro_info_tuples:
+    for module_name, class_name, method, _ in macro_info_tuples:
         if method != TRANSFORM_METHOD:
             continue
         macro_name = ".".join([module_name, class_name])
@@ -970,7 +969,7 @@ def standard_format_config(config):
     """
     for keylist, node in config.walk():
         if len(keylist) == 2:
-            scheme, option = keylist
+            scheme = keylist[0]
             if ":" in scheme:
                 scheme = scheme.split(":", 1)[0]
             try:
@@ -1022,11 +1021,11 @@ def get_metadata_for_config_id(setting_id, meta_config):
     """
     metadata = {}
     if rose.CONFIG_DELIMITER in setting_id:
-        section, option = setting_id.split(rose.CONFIG_DELIMITER, 1)
+        option = setting_id.split(rose.CONFIG_DELIMITER, 1)[1]
         search_option = REC_ID_STRIP_DUPL.sub("", option)
     else:
-        section = setting_id
         option = None
+        search_option = None
     search_id = REC_ID_STRIP_DUPL.sub("", setting_id)
     no_modifier_id = REC_MODIFIER.sub("", search_id)
     if no_modifier_id != search_id:
@@ -1096,7 +1095,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     macros_by_type = {}
     for macro_method in methods:
         macros_by_type[macro_method] = []
-        for module_name, class_name, method, help in macro_tuples:
+        for module_name, class_name, method, _ in macro_tuples:
             if opt_fix and not opt_transform_all:
                 # Only include internal transformer macros for
                 # rose macro --fix.
@@ -1111,12 +1110,12 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     # List all macros if none are given.
     if not macro_names and not [macros_by_type[method] for method in
                                 macros_by_type]:
-        for module_name, class_name, method, help in macro_tuples:
+        for module_name, class_name, method, help_ in macro_tuples:
             macro_name = ".".join([module_name, class_name])
             macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], macro_name)
-            if help:
+            if help_:
                 reporter(macro_id + "\n", prefix="")
-                for help_line in help.split("\n"):
+                for help_line in help_.split("\n"):
                     reporter(MACRO_OUTPUT_HELP.format(help_line),
                              level=reporter.V, prefix="")
             else:
@@ -1128,7 +1127,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
 
     # Categorise macros given as arguments.
     macros_not_found = [m for m in macro_names]
-    for module_name, class_name, method, help in macro_tuples:
+    for module_name, class_name, method, _ in macro_tuples:
         this_macro_name = ".".join([module_name, class_name])
         this_macro_method_name = ".".join([this_macro_name, method])
         if this_macro_name in macro_names:
@@ -1146,7 +1145,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     if macros_not_found:
         return False
 
-    rc = 0
+    ret_code = 0
 
     # Run any validator macros.
     if VALIDATE_METHOD in macros_by_type:
@@ -1161,7 +1160,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
                 validate_mode=True
             )
             if config_problems_map:
-                rc = 1
+                ret_code = 1
             for macro, problem_list in config_problems_map.items():
                 macro_config_problems_map.setdefault(macro, {})
                 problem_list.sort(report_sort)
@@ -1202,9 +1201,9 @@ def run_macros(config_map, meta_config, config_name, macro_names,
             opt_output_dir=opt_output_dir,
             reporter=reporter)
 
-    if not rc and no_changes:
+    if not ret_code and no_changes:
         reporter(MacroFinishNothingEvent())
-    return rc == 0
+    return ret_code == 0
 
 
 def report_sort(report1, report2):
@@ -1279,7 +1278,6 @@ def handle_transform(config_map, new_config_map, change_map, macro_id,
                      opt_conf_dir, opt_output_dir, opt_non_interactive,
                      reporter):
     """Prompt the user to go ahead with macro changes and dump the output."""
-    user_allowed_changes = False
     has_changes = False
     for change_list in change_map.values():
         for report in change_list:
@@ -1378,8 +1376,6 @@ def apply_macro_to_config_map(config_map, meta_config, macro_function,
         exception = check_config_integrity(new_config)
         if exception is not None:
             raise exception
-        if change_list:
-            no_changes = False
         changes_map[conf_key] = change_list
         if conf_key is None:
             # Always the first item.

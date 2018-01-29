@@ -24,7 +24,6 @@ import sys
 import pygtk
 pygtk.require('2.0')
 import gtk
-import pango
 
 from . import entry
 import rose.gtk.util
@@ -88,9 +87,8 @@ class MixedArrayValueWidget(gtk.HBox):
         self.entry_table.connect('focus-in-event',
                                  self.hook.trigger_scroll)
         self.entry_table.show()
-        r = 0
-        for r in range(self.num_rows):
-            self.insert_row(r)
+        for i in range(self.num_rows):
+            self.insert_row(i)
         self.normalise_width_widgets()
         self.generate_buttons()
         self.pack_start(self.add_del_button_box, expand=False, fill=False)
@@ -107,7 +105,7 @@ class MixedArrayValueWidget(gtk.HBox):
             self.max_rows = sys.maxint
         else:
             self.num_rows = int(self.array_length)
-            num, rem = divmod(len(self.value_array), self.num_cols)
+            rem = divmod(len(self.value_array), self.num_cols)[1]
             if self.num_rows == 0:
                 self.num_rows = 1
             self.max_rows = self.num_rows
@@ -135,10 +133,10 @@ class MixedArrayValueWidget(gtk.HBox):
 
     def add_row(self, *args):
         """Create a new row of widgets."""
-        r = self.entry_table.child_get_property(self.rows[-1][-1],
-                                                'top-attach')
-        self.entry_table.resize(r + 2, self.num_cols)
-        new_values = self.insert_row(r + 1)
+        nrows = self.entry_table.child_get_property(
+            self.rows[-1][-1], 'top-attach')
+        self.entry_table.resize(nrows + 2, self.num_cols)
+        new_values = self.insert_row(nrows + 1)
         if any(new_values):
             self.value_array = self.value_array + new_values
             self.value = rose.variable.array_join(self.value_array)
@@ -152,10 +150,10 @@ class MixedArrayValueWidget(gtk.HBox):
         text = ''
         if not self.value_array:
             return 0
-        for r, widget_list in enumerate(self.rows):
+        for i_row, widget_list in enumerate(self.rows):
             for i, widget in enumerate(widget_list):
                 try:
-                    val = self.value_array[r * self.num_cols + i]
+                    val = self.value_array[i_row * self.num_cols + i]
                 except IndexError:
                     return None
                 prefix_text = entry.get_next_delimiter(self.value[len(text):],
@@ -209,14 +207,14 @@ class MixedArrayValueWidget(gtk.HBox):
 
     def del_row(self, *args):
         """Delete the last row of widgets."""
-        r = self.entry_table.child_get_property(self.rows[-1][-1],
-                                                'top-attach')
-        for i in range(len(self.types_row)):
-            entry = self.rows[-1][-1]
+        nrows = self.entry_table.child_get_property(
+            self.rows[-1][-1], 'top-attach')
+        for _ in enumerate(self.types_row):
+            ent = self.rows[-1][-1]
             self.rows[-1].pop(-1)
-            self.entry_table.remove(entry)
+            self.entry_table.remove(ent)
         self.rows.pop(-1)
-        self.entry_table.resize(r, self.num_cols)
+        self.entry_table.resize(nrows, self.num_cols)
         chop_index = len(self.value_array) - self.num_cols
         self.value_array = self.value_array[:chop_index]
         self.value = rose.variable.array_join(self.value_array)
@@ -226,7 +224,7 @@ class MixedArrayValueWidget(gtk.HBox):
         return False
 
     def _decide_show_buttons(self):
-        # Show or hide the add row and delete row buttons.
+        """Show or hide the add row and delete row buttons."""
         if len(self.rows) >= self.max_rows and not self.unlimited:
             self.add_button.hide()
             self.del_button.show()
@@ -245,12 +243,12 @@ class MixedArrayValueWidget(gtk.HBox):
         widget_list = []
         new_values = []
         insert_row_index = row_index
-        for c, el_piece_type in enumerate(self.types_row):
+        for i, el_piece_type in enumerate(self.types_row):
             if self.has_titles:
                 raw_index = row_index - 1
             else:
                 raw_index = row_index
-            unwrapped_index = raw_index * self.num_cols + c
+            unwrapped_index = raw_index * self.num_cols + i
             value_index = unwrapped_index
             while value_index > len(self.value_array) - 1:
                 value_index -= len(self.types_row)
@@ -264,7 +262,7 @@ class MixedArrayValueWidget(gtk.HBox):
             w_error = {}
             if el_piece_type in ['integer', 'real']:
                 try:
-                    test_value = [int, float][el_piece_type == 'real'](w_value)
+                    [int, float][el_piece_type == 'real'](w_value)
                 except (TypeError, ValueError):
                     if w_value != '':
                         hover_text = self.TIP_INVALID_ENTRY.format(
@@ -277,7 +275,7 @@ class MixedArrayValueWidget(gtk.HBox):
             setter = ArrayElementSetter(self.setter, unwrapped_index)
             if self.has_titles and row_index == 0:
                 widget = gtk.HBox()
-                label = gtk.Label(self.metadata['element-titles'][c])
+                label = gtk.Label(self.metadata['element-titles'][i])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True)
             else:
@@ -286,7 +284,7 @@ class MixedArrayValueWidget(gtk.HBox):
                 widget.set_tooltip_text(hover_text)
             widget.show()
             self.entry_table.attach(widget,
-                                    c, c + 1,
+                                    i, i + 1,
                                     insert_row_index, insert_row_index + 1,
                                     xoptions=gtk.SHRINK,
                                     yoptions=gtk.SHRINK)
@@ -315,9 +313,9 @@ class MixedArrayValueWidget(gtk.HBox):
                 if (isinstance(child, gtk.Label) or
                         isinstance(child, gtk.Entry) and
                         hasattr(child, 'get_text')):
-                    w = len(child.get_text())
-                    if w > max_width.get(i, -1):
-                        max_width.update({i: w})
+                    width = len(child.get_text())
+                    if width > max_width.get(i, -1):
+                        max_width.update({i: width})
                 if hasattr(child, 'get_children'):
                     child_list.extend(child.get_children())
                 elif hasattr(child, 'get_child'):

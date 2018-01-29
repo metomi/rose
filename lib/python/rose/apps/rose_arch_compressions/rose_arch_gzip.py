@@ -21,7 +21,6 @@
 
 
 import os
-from rose.popen import RosePopenError
 
 
 class RoseArchGzip(object):

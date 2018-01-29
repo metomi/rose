@@ -43,7 +43,7 @@ def main():
     """Implement the "rose config-dump" command."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "files", "no_pretty_mode")
-    opts, args = opt_parser.parse_args()
+    opts = opt_parser.parse_args()[0]
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
     fs_util = FileSystemUtil(report)
@@ -53,19 +53,19 @@ def main():
     if opts.files:
         file_names = opts.files
     else:
-        for dirpath, dirnames, filenames in os.walk("."):
+        for dirpath, _, filenames in os.walk("."):
             for filename in fnmatch.filter(filenames, "rose-*.conf"):
-                p = os.path.join(dirpath, filename)[2:]  # remove leading ./
-                file_names.append(p)
+                path = os.path.join(dirpath, filename)[2:]  # remove leading ./
+                file_names.append(path)
     for file_name in file_names:
-        t = NamedTemporaryFile()
+        handle = NamedTemporaryFile()
         node = ConfigLoader()(file_name)
         if (not opts.no_pretty_mode and
                 os.path.basename(file_name) != META_CONFIG_NAME):
             pretty_format_config(node, ignore_error=True)
-        ConfigDumper()(node, t)
-        t.seek(0)
-        if not filecmp.cmp(t.name, file_name, shallow=False):
+        ConfigDumper()(node, handle)
+        handle.seek(0)
+        if not filecmp.cmp(handle.name, file_name, shallow=False):
             report(ConfigDumpEvent(file_name))
             ConfigDumper()(node, file_name)
 

@@ -81,20 +81,21 @@ class SchemeHandlersManager(object):
                     scheme0_default = None
                     if len(members) == 1:
                         scheme0_default = os.path.basename(mod_path)
-                    for key, c in members:
-                        if any(getattr(c, a, None) is None for a in attrs):
+                    for _, class_ in members:
+                        if any(getattr(class_, a, None) is None
+                                for a in attrs):
                             continue
                         handler = None
-                        scheme0 = getattr(c, "SCHEME", scheme0_default)
+                        scheme0 = getattr(class_, "SCHEME", scheme0_default)
                         schemes = []
                         if scheme0 is not None:
                             schemes = [scheme0]
-                        for scheme in getattr(c, "SCHEMES", schemes):
+                        for scheme in getattr(class_, "SCHEMES", schemes):
                             if scheme in self.handlers:
-                                raise ValueError(c)  # scheme already used
+                                raise ValueError(class_)  # scheme already used
                             kwargs["manager"] = self
                             if handler is None:
-                                handler = c(*args, **kwargs)
+                                handler = class_(*args, **kwargs)
                             self.handlers[scheme] = handler
             finally:
                 os.chdir(cwd)

@@ -23,7 +23,6 @@ import errno
 import os
 from rose.reporter import Event
 import shutil
-import sys
 
 
 class FileSystemEvent(Event):
@@ -116,9 +115,9 @@ class FileSystemUtil(object):
 
         """
 
-        d = os.path.dirname(path)
-        if d:
-            return d
+        dir_ = os.path.dirname(path)
+        if dir_:
+            return dir_
         else:
             return "."
 
@@ -137,11 +136,11 @@ class FileSystemUtil(object):
             self.delete(path)
             try:
                 os.makedirs(path)
-            except OSError as e:
-                if e.errno == errno.EEXIST:
+            except OSError as exc:
+                if exc.errno == errno.EEXIST:
                     pass
                 else:
-                    raise e
+                    raise exc
             else:
                 event = FileSystemEvent(FileSystemEvent.CREATE, path)
                 self.handle_event(event)
@@ -170,10 +169,10 @@ class FileSystemUtil(object):
             self.delete(target)
         try:
             os.symlink(source, target)
-        except OSError as e:
-            if e.filename is None:  # Python does not set filename :-(
-                e.filename = target
-            raise e
+        except OSError as exc:
+            if exc.filename is None:  # Python does not set filename :-(
+                exc.filename = target
+            raise exc
         event = FileSystemEvent(FileSystemEvent.SYMLINK, source, target)
         self.handle_event(event)
 

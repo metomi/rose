@@ -573,7 +573,7 @@ class ConfigNode(object):
             else:
                 self.set(keys=modified_key, value=value, state=state,
                          comments=comments)
-        for removed_key, removed_data in config_diff.get_removed():
+        for removed_key, _ in config_diff.get_removed():
             self.unset(keys=removed_key)
 
     def __add__(self, config_diff):
@@ -606,7 +606,7 @@ class ConfigNode(object):
             [['', 'baz'], ['', 'foo']]
 
         """
-        if type(config_diff) is ConfigNode:
+        if isinstance(config_diff, ConfigNode):
             config_node = config_diff
             config_diff = ConfigNodeDiff()
             config_diff.set_from_configs(self, config_node)
@@ -741,7 +741,7 @@ class ConfigNodeDiff(object):
                                       (config_node_2, settings_2)]:
             for keys, node in config_node.walk():
                 value = node.value
-                if type(node.value) is dict:
+                if isinstance(node.value, dict):
                     value = None
                 settings[tuple(keys)] = (value, node.state, node.comments)
         for keys in set(settings_2) - set(settings_1):
@@ -776,8 +776,7 @@ class ConfigNodeDiff(object):
         """
         node = ConfigNode()
         for keys, old_and_new_info in self.get_modified():
-            old_info, info = old_and_new_info
-            value, state, comments = info
+            value, state, comments = old_and_new_info[1]
             node.set(keys, value=value, state=state, comments=comments)
         for keys, info in self.get_added():
             value, state, comments = info

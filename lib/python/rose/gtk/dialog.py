@@ -18,15 +18,13 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import multiprocessing
+from multiprocessing import Process
 import os
 import Queue
-import re
 import shlex
-import subprocess
+from subprocess import Popen, PIPE
 import sys
 import tempfile
-import threading
 import time
 import traceback
 import webbrowser
@@ -34,7 +32,6 @@ import webbrowser
 import pygtk
 pygtk.require("2.0")
 import gtk
-import gobject
 import glib
 import pango
 
@@ -87,6 +84,7 @@ class DialogProcess(object):
                  stock_id=gtk.STOCK_EXECUTE,
                  hide_progress=False, modal=True,
                  event_queue=None):
+        self.proc = None
         window = get_dialog_parent()
         self.dialog = gtk.Dialog(buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT),
                                  parent=window)
@@ -190,13 +188,14 @@ class DialogProcess(object):
         self.dialog.show()
 
     def run(self):
+        """Launch dialog in child process."""
         stdout = tempfile.TemporaryFile()
         stderr = tempfile.TemporaryFile()
-        self.p = multiprocessing.Process(target=_sep_process,
-                                         args=[self.cmd_args, stdout, stderr])
-        self.p.start()
+        self.proc = Process(
+            target=_sep_process, args=[self.cmd_args, stdout, stderr])
+        self.proc.start()
         self.dialog.connect("destroy", self._handle_dialog_process_destroy)
-        while self.p.is_alive():
+        while self.proc.is_alive():
             self.progress_bar.pulse()
             if self.event_queue is not None:
                 while True:
@@ -205,7 +204,6 @@ class DialogProcess(object):
                     except Queue.Empty:
                         break
                     end = self.text_buffer.get_end_iter()
-                    tag = gtk
                     self.text_buffer.insert_with_tags(end, new_text,
                                                       self.text_tag)
             while gtk.events_pending():
@@ -213,9 +211,9 @@ class DialogProcess(object):
             time.sleep(0.1)
         stdout.seek(0)
         stderr.seek(0)
-        if self.p.exitcode != 0:
+        if self.proc.exitcode != 0:
             if self._is_destroyed:
-                return self.p.exitcode
+                return self.proc.exitcode
             else:
                 self.image.set_from_stock(gtk.STOCK_DIALOG_ERROR,
                                           gtk.ICON_SIZE_DIALOG)
@@ -229,11 +227,11 @@ class DialogProcess(object):
                         child.show()
                 self.dialog.run()
         self.dialog.destroy()
-        return self.p.exitcode
+        return self.proc.exitcode
 
     def _handle_dialog_process_destroy(self, dialog):
-        if self.p.is_alive():
-            self.p.terminate()
+        if self.proc.is_alive():
+            self.proc.terminate()
         self._is_destroyed = True
         return False
 
@@ -253,25 +251,23 @@ def _process(cmd_args, stdout=sys.stdout, stderr=sys.stderr):
         func = cmd_args.pop(0)
         try:
             func(*cmd_args)
-        except Exception as e:
-            stderr.write(type(e).__name__ + ": " + str(e) + "\n")
-            text1 = stderr.read()
+        except Exception as exc:
+            stderr.write(type(exc).__name__ + ": " + str(exc) + "\n")
+            stderr.read()
             return 1
         return 0
-    p = subprocess.Popen(cmd_args,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
-    for line in iter(p.stdout.readline, ""):
+    proc = Popen(cmd_args, stdout=PIPE, stderr=PIPE)
+    for line in iter(proc.stdout.readline, ""):
         stdout.write(line)
-    for line in iter(p.stderr.readline, ""):
+    for line in iter(proc.stderr.readline, ""):
         stderr.write(line)
-    p.wait()
-    text0 = stdout.read()  # Magically keep it alive.
-    text1 = stderr.read()
-    return p.poll()
+    proc.wait()
+    stdout.read()  # Magically keep it alive!?
+    stderr.read()
+    return proc.poll()
 
 
-def run_about_dialog(name=None, copyright=None,
+def run_about_dialog(name=None, copyright_=None,
                      logo_path=None, website=None):
     parent_window = get_dialog_parent()
     about_dialog = gtk.AboutDialog()
@@ -280,7 +276,7 @@ def run_about_dialog(name=None, copyright=None,
     licence_path = os.path.join(os.getenv("ROSE_HOME"),
                                 rose.FILEPATH_README)
     about_dialog.set_license(open(licence_path, "r").read())
-    about_dialog.set_copyright(copyright)
+    about_dialog.set_copyright(copyright_)
     resource_loc = rose.resource.ResourceLocator(paths=sys.path)
     logo_path = resource_loc.locate(logo_path)
     about_dialog.set_logo(gtk.gdk.pixbuf_new_from_file(logo_path))
@@ -331,8 +327,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     if parent_window is None:
         dialog.set_icon(rose.gtk.util.get_icon())
     if cancel:
-        cancel_button = dialog.add_button(gtk.STOCK_CANCEL,
-                                          gtk.RESPONSE_CANCEL)
+        dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
     if extra_text:
         info_button = gtk.Button(stock=gtk.STOCK_INFO)
         info_button.show()

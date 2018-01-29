@@ -27,7 +27,6 @@ import gtk
 import rose.external
 import rose.gtk.dialog
 import rose.gtk.util
-from rose.opt_parse import RoseOptionParser
 import rosie.browser
 from rosie.suite_id import SuiteId
 from rosie.ws_client import RosieWSClientError
@@ -94,9 +93,6 @@ class AddressBar(rose.gtk.util.ToolBar):
         search_toolitem.add(self.simple_search_entry)
         search_toolitem.show()
         self.insert(search_toolitem, -1)
-
-        image = gtk.image_new_from_stock(gtk.STOCK_FIND,
-                                         gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.search_button = gtk.ToolItem()
         button = rose.gtk.util.CustomButton(
             label=rosie.browser.LABEL_SEARCH_SIMPLE,
@@ -124,11 +120,11 @@ class AddressBar(rose.gtk.util.ToolBar):
 
     def pop_address_box(self, hist):
         """Populates the address box on startup."""
-        for h in hist:
-            if h.h_type == "url":
+        for item in hist:
+            if item.h_type == "url":
                 if (self.address_box.get_model().iter_n_children(None) <
                         rosie.browser.SIZE_ADDRESS):
-                    self.address_box.append_text(h.details)
+                    self.address_box.append_text(item.details)
                 else:
                     break
 
@@ -149,8 +145,8 @@ class BracketWidget(gtk.HBox):
         self.show_controls = show_controls
         self.combo_box = gtk.combo_box_new_text()
         self.char = self.CHARS[is_end]
-        for n in range(max(number, self.MAX_NUM) + 1):
-            self.combo_box.append_text(self.char * n)
+        for i in range(max(number, self.MAX_NUM) + 1):
+            self.combo_box.append_text(self.char * i)
         self.combo_box.set_active(number)
         self.combo_box.connect("changed", self.change_number)
         self.combo_box.show()
@@ -286,17 +282,18 @@ class HistoryTreeview(gtk.VBox):
 
     def pop_treeview_history(self, archive):
         """Populate the search history list"""
-        for h in archive:
-            if h.h_type == "query":
+        for item in archive:
+            if item.h_type == "query":
                 msg = "["
-                for m in range(len(h.details) - 1):
-                    msg = msg + "'" + h.details[m] + "', "
-                msg = msg + "'" + h.details[-1] + "']"
-                self.treestore_hist.append(None, [h.h_type,
-                                                  msg, h.search_history])
+                for i in range(len(item.details) - 1):
+                    msg = msg + "'" + item.details[i] + "', "
+                msg = msg + "'" + item.details[-1] + "']"
+                self.treestore_hist.append(
+                    None, [item.h_type, msg, item.search_history])
             else:
-                self.treestore_hist.append(None, [h.h_type, str(h.details),
-                                                  h.search_history])
+                self.treestore_hist.append(
+                    None,
+                    [item.h_type, str(item.details), item.search_history])
 
 
 class MenuBar(object):
@@ -412,9 +409,6 @@ class MenuBar(object):
         """Add the keyboard accelerators."""
         self.accelerators = gtk.AccelGroup()
         self.accelerators.lookup = {}  # Unfortunately, this is necessary.
-        key_list = []
-        mod_list = []
-        action_list = []
         for key_press, accel_func in accel_dict.items():
             key, mod = gtk.accelerator_parse(key_press)
             self.accelerators.lookup[str(key) + str(mod)] = accel_func
@@ -452,8 +446,7 @@ class StatusBarWidget(gtk.VBox):
         hbox.pack_start(vline, expand=False, fill=False)
 
         self.statusbox = rose.gtk.util.AsyncLabel()
-        x, y = self.statusbox.get_alignment()
-        self.statusbox.set_alignment(0, y)
+        self.statusbox.set_alignment(0, self.statusbox.get_alignment()[1])
         hbox.pack_start(self.statusbox, expand=True, fill=True, padding=5)
         self.statusbox.show()
         self.progressbar = rose.gtk.util.ThreadedProgressBar(adjustment=None)
@@ -505,10 +498,10 @@ class AdvancedSearchWidget(gtk.VBox):
         try:
             known_keys = ws_client.get_known_keys()
             query_operators = ws_client.get_query_operators()
-        except RosieWSClientError as e:
+        except RosieWSClientError as exc:
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       str(e))
-            sys.exit(str(e))
+                                       str(exc))
+            sys.exit(str(exc))
         self.display_columns = ["local"] + known_keys
         self.display_filters = {}
         for column in self.display_columns:
@@ -719,7 +712,7 @@ class AdvancedSearchWidget(gtk.VBox):
     def clear_filters(self, *args):
         """Remove all filters from the GUI."""
         self.remove_filter()
-        added_ok = self.add_filter()
+        self.add_filter()
 
     def get_filter(self, and_or_combo, left_bracket_box, column_combo,
                    expr_combo, string_entry, right_bracket_box):
