@@ -129,17 +129,8 @@ if [[ "${DEV_MODE:-false}" || "${VENV_MODE:-false}" ]]; then
     fi
 fi
 
-# Check optional builders.
-for build in ${BUILDS}; do
-    if ! rose-check-software-docs ${build} >/dev/null; then
-        echo "Software dependencies for a ${build} build are missing."
-        echo "run `rose check-software-docs ${build}` for details."
-        exit 1
-    fi
-done
-
 # Check core (sphinx) builder.
-if ! rose-check-software-docs core >/dev/null; then
+if ! rose-check-software-docs >/dev/null; then
     if ${VENV_MODE}; then
         venv-install
     else
