@@ -22,171 +22,229 @@
 
 SYNOPSIS
     rose check-software-docs
-    rose check-software-docs --builder BUILDER
 
 DESCRIPTION
-    Check software dependencies for the rose documentation builder.
-
-BUILDER
-    Check the dependencies for a particular builder or core for sphinx
-    itself. For details of avaliable builders see the sphinx documentation
-    (http://www.sphinx-doc.org/en/stable/builders.html).
-"""
+    Check software dependencies for the rose documentation builder."""
 
 import re
+from subprocess import Popen, PIPE
 import sys
-from subprocess import check_call, CalledProcessError, PIPE
 
 
-ENTRY_LENGTH = 45
-PASS = 'ok'
-FAIL = 'not ok'
-
-
-def parse_version(version):
-    return tuple(int(x) for x in version.split('.'))
-
-
-def string_version(version_tuple):
-    return '.'.join(str(x) for x in version_tuple)
-
-
-def check_python_version(min_version, max_version=None):
-    """Check if a minimum version of python is installed.
-
-    Args:
-        min_version (tuple): Tuple of the minimum acceptible version.
-        max_version (tuple - optional): Tuple of the close-ended top end of the
-            range.
+def get_terminal_width(default_width, min_width):
+    """Return the terminal width.
 
     Return:
-        bool
-
+        int - terminal width OR min_width if width < min_width ELSE min_width.
     """
-    if max_version:
-        msg = 'python (%s+, <%s)' % (string_version(min_version),
-                                     string_version(max_version))
+    proc = Popen(['stty', 'size'], stdout=PIPE)
+    if proc.wait():
+        return default_width
     else:
-        msg = 'python (%s+)' % string_version(min_version)
-    sys.stdout.write(msg + '.' * (ENTRY_LENGTH - len(msg)))
-    version = sys.version_info
-    ret = (version >= min_version and
-           (not max_version or version < max_version))
-    sys.stdout.write('%s (%s)\n' % (PASS if ret else FAIL + ' -',
-                                      string_version(version)))
-    return ret
+        try:
+            return max(min_width, int(proc.communicate()[0].split()[1]))
+        except IndexError:
+            return default_width
 
 
-def check_python_module_version(module, min_version):
-    """Check if a minimum version of a python module is installed.
+TERM_WIDTH = get_terminal_width(80, 60)
+DEP_NOT_FOUND = 'DEP_NOT_FOUND'
+
+
+def version_tuple(version_string):
+    """Return a tuple of version components suitable for comparison.
+
+    Splits versions on '.' characters and attempts to convert each component to
+    an integer.
+    """
+    version_list = []
+    for component in version_string.strip().split('.'):
+        try:
+            version_list.append(int(component))
+        except ValueError:
+            version_list.append(component)
+    return tuple(version_list)
+
+
+def version_str(version_tup):
+    """Converts a version tuple back into a regular string."""
+    return '.'.join(str(x) for x in version_tup)
+
+
+def cmd_exists(command):
+    """Returns True if provided shell command is present (`which` wrapper)."""
+    if Popen(['which', command], stdout=PIPE, stderr=PIPE).wait():
+        return False
+    return True
+
+
+def cmd_version(command, command_template='--version',
+                version_template=r'(.*)', outfile=1):
+    """Return the version number of a provided shell command.
 
     Args:
-        module (str): The name of the module - note module must be in the
-            python path.
-        min_version (tuple): Tuple of the version number.
+        command (str): The name of the command to check.
+        command_template (str): The command line argument required to extract
+            the version number from the script (e.g. --version).
+        version_template (str): Regex to extract the version from the returned
+            string.
+        outfile (int): The filenumber that the version output is written to
+            (e.g. 1 for stdout, 2 for stderr).
 
-    Return:
-        bool
-
+    Return: str or None if version cannot be determined or DEP_NOT_FOUND
+            if the command is not present at all.
     """
-    msg = 'python:%s (%s+)' % (module, string_version(min_version))
-    sys.stdout.write(msg + '.' * (ENTRY_LENGTH - len(msg)))
+    if not cmd_exists(command):
+        return DEP_NOT_FOUND
+    output = Popen([command, command_template], stdout=PIPE,
+                   stderr=PIPE).communicate()[outfile - 1].strip()
+    try:
+        return re.search(version_template, output).groups()[0]
+    except AttributeError:
+        return None
+
+
+def py_version(module, attr_name='__version__'):
+    """Return the version of the provided python module.
+
+    Args:
+        module (str): The name of the python module.
+        attr_name (str): The name of the "version" attribute.
+
+    Returns:
+        str - The version number if the module is found, None if the version
+        cannot be determined and DEP_NOT_FOUND if the module is not found.
+    """
     try:
         imported_module = __import__(module)
     except ImportError:
-        sys.stdout.write('%s - Module not installed.\n' % FAIL)
-        return False
+        return DEP_NOT_FOUND
     try:
-        module_version = imported_module.__version__
+        return getattr(imported_module, attr_name)
     except AttributeError:
-        sys.stdout.write('%s - Could not determine module version\n' % FAIL)
-        return False
-    if parse_version(module_version) >= min_version:
-        sys.stdout.write('%s (%s)\n' % (PASS, module_version))
-        return True
-    else:
-        sys.stdout.write('%s - (%s)\n' % (FAIL, module_version))
-        return False
+        return None
 
 
-def check_shell_command_present(command):
-    """Check that a shell command is avaliable.
+# List of functions for obtaining version types - default is cmd_version.
+VERSION_CHECKERS = {'py': py_version}
 
-    Runs which <command>
+
+def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
+    """Evaluate the provided dependency.
 
     Args:
-        command (str): The command to be tested.
+        dependency (str): The name of the dependency to evaluate.
+            Dependency should be prefixed as appropriate (e.g. 'py:' for a
+            python module.
+        min_version (tuple): A version tuple - dependency interpreted as
+            "version >= min_version".
+        min_incompat_version (tuple): A version tuple - dependency
+            interpreted as "version < min_incompat_version".
+        **kwargs (dict): Any options to be passed to the version checker.
 
-    Raises:
-        Exception: In the event that the command is scripted / invalid.
-
+    Returns:
+        list - List of tuples of the form (message, result).
     """
-    if not re.match('^[\w-]+$', command):
-        raise Exception('Invalid command "%s"' % command)
-    sys.stdout.write(command + '.' * (ENTRY_LENGTH - len(command)))
-    try:
-        check_call(['which', command], stdout=PIPE, stderr=PIPE)
-    except CalledProcessError:
-        sys.stdout.write('Fail - Command not found\n')
-        return False
+    # Determine version checker.
+    if ':' in dependency:
+        prefix, dependency_name = dependency.split(':')
+        version_checker = VERSION_CHECKERS[prefix]
     else:
-        sys.stdout.write('%s\n' % PASS)
+        dependency_name = dependency
+        version_checker = cmd_version
+
+    # Generate output message.
+    line = dependency
+    version_repr = None
+    if min_incompat_version:
+        if min_version:
+            version_repr = '%s+, <%s' % (version_str(min_version),
+                                         version_str(min_incompat_version))
+        else:
+            version_repr = '<%s' % (version_str(min_version))
+    elif min_version:
+        version_repr = '%s+' % version_str(min_version)
+    if version_repr:
+        line += ' (%s)' % version_repr
+    line += ' ' + '.' * (TERM_WIDTH - len(line) - 25) + ' '
+
+    # Get version number.
+    version_string = version_checker(dependency_name, **kwargs)
+    if version_string == DEP_NOT_FOUND:
+        return (line + 'not ok (not found)', False)
+
+    # If version not determinable.
+    if not version_string:
+        if min_version:
+            return (line + 'not ok (unknown version)', False)
+        return (line + 'ok (unknown version)', True)
+
+    # Check version < min_incompat_version.
+    version = version_tuple(version_string)
+    if min_incompat_version:
+        if version > min_incompat_version:
+            return(line + 'not ok (%s > %s)' % (
+                version_string, version_str(min_incompat_version)), False)
+
+    # Check version >= min_version.
+    if min_version:
+        if version >= min_version:
+            return (line  + 'ok (%s)' % version_string, True)
+        else:
+            return (line + 'not ok (%s < %s)' % (
+                version_string, version_str(min_version)), False)
+
+    return (line + 'ok (%s)' % version_string, True)
+
+
+def check_all(name, dep_list):
+    """Evaluate the provided list of dependencies.
+
+    Args:
+        name (str): The name of the group of dependencies.
+        dep_list (list): List of tuples as returned by `check`.
+
+    Returns:
+        bool - True if all checks passed, False otherwise.
+    """
+    print name
+    print '-' * len(name)
+    for msg, _ in dep_list:
+        print msg
+    if all(result for _, result in dep_list):
+        print 'Result: PASS\n'
         return True
-
-
-def check_core_deps():
-    """Check software dependencies for the sphinx documentation builder"""
-    sys.stdout.write(check_core_deps.__doc__ + ':\n')
-    ret = [
-        check_python_version((2, 7), (3,)),
-        check_python_module_version('sphinx', (1, 5, 3)),
-        check_python_module_version('sphinx_rtd_theme', (0, 2, 4))
-    ]
-    sys.stdout.write('*%s*\n' % (PASS if all(ret) else FAIL))
-    return all(ret)
-
-
-def check_latex_deps():
-    """Check software dependencies for the latex builder."""
-    sys.stdout.write(check_latex_deps.__doc__ + ':\n')
-    latex = [
-        check_shell_command_present('latexmk'),
-        check_shell_command_present('pdflatex')
-    ]
-    if all(latex):
-        sys.stdout.write('*%s*\n' % PASS)
     else:
-        sys.stdout.write('*%s*\n' % FAIL)
-    return all(latex)
+        print 'Result: FAIL\n'
+        return False
 
 
-BUILDER_CHECKS = {
-    'core': check_core_deps,
-    'latex': check_latex_deps,
-    'latexpdf': check_latex_deps,
-    'latexpdfja': check_latex_deps
-}
+def main():
+    """Check required and optional dependencies."""
+    ret = check_all('Required Software', [
+        check('python', (2, 7), (3,), version_template=r'Python (.*)',
+               outfile=2),
+        check('dot', command_template='-V',
+               version_template='graphviz version ([^\s]+)', outfile=2),
+        check('tex', version_template=r'TeX ([^\s]+)'),
+        check('pdflatex', version_template=r'pdfTeX .*-.*-([^\s]+)'),
+        check('py:sphinx', (1, 5, 3)),
+        check('py:sphinx_rtd_theme', (0, 2, 4))
+    ])
 
+    check_all('PDF Dependencies', [
+        check('latexmk', version_template=r'Version (.*)')
+    ])
 
-def main(builders):
-    # Test only dependencies for the sphinx builder by default.
-    if not builders:
-        builders = ['core']
+    check_all('Linkcheck Dependencies', [
+        check('py:requests')
+    ])
 
-    # Run requested builders
-    ret = []
-    for builder in builders:
-        try:
-            ret.append(BUILDER_CHECKS[builder]())
-        except KeyError:
-            pass
-
-    # Exit code
-    sys.exit(not all(ret))
+    sys.exit(0 if ret else 1)
 
 
 if __name__ == '__main__':
-    if 'help' in sys.argv or '--help' in sys.argv:
+    if '--help' in sys.argv:
         print __doc__
     else:
-        main(sys.argv[1:])
+        main()
