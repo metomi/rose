@@ -63,10 +63,10 @@ for OPTION in -i -l '' --restart; do
     file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 [FAIL] Suite "${NAME}" appears to be running:
 [FAIL] Contact info from: "${CONTACT}"
-[FAIL] 	CYLC_SUITE_HOST=${SUITE_HOST}
-[FAIL] 	CYLC_SUITE_OWNER=${SUITE_OWNER}
-[FAIL] 	CYLC_SUITE_PORT=${SUITE_PORT}
-[FAIL] 	CYLC_SUITE_PROCESS=${SUITE_PROCESS}
+[FAIL]     CYLC_SUITE_HOST=${SUITE_HOST}
+[FAIL]     CYLC_SUITE_OWNER=${SUITE_OWNER}
+[FAIL]     CYLC_SUITE_PORT=${SUITE_PORT}
+[FAIL]     CYLC_SUITE_PROCESS=${SUITE_PROCESS}
 [FAIL] Try "cylc stop '${NAME}'" first?
 __ERR__
 done

@@ -96,7 +96,7 @@ class CylcProcessor(SuiteEngineProcessor):
             extras = ["Contact info from: \"%s\"\n" % fname]
             for line in lines_str.splitlines(True):  # splitlines keep ends
                 if line.split("=")[0] in self.CONTACT_KEYS:
-                    extras.append("\t%s" % line)
+                    extras.append("    %s" % line)
             extras.append("Try \"cylc stop '%s'\" first?" % suite_name)
             raise SuiteStillRunningError(suite_name, extras)
 
