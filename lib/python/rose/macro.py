@@ -888,6 +888,7 @@ def update_optional_values(res, optionals, optional_values,
         res["optional_config_name"] = optional_config_name
         del optionals["optional_config_name"]
     for key in set(optionals) & set(optional_values):
+        optionals[key] = optional_values[key]
         res[key] = optional_values[key]
     res.update(get_user_values(optionals, res.keys()))
     optional_values.update(res)
