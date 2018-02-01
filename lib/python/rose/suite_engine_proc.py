@@ -372,7 +372,17 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def check_suite_not_running(self, suite_name):
-        """Raise SuiteStillRunningError if suite is still running."""
+        """Check that suite is not running.
+
+        This method is not implemented. Sub-class should override.
+
+        Arguments:
+            suite_name: name of suite to check.
+
+        Raise:
+            SuiteStillRunningError:
+                Should raise SuiteStillRunningError if suite is still running.
+        """
         raise NotImplementedError()
 
     def cmp_suite_conf(
