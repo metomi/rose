@@ -4,7 +4,8 @@ Custom Macros
 =============
 
 Rose macros are custom python modules which can perform checking
-beyond what metadata (e.g. ``type``, ``range``, ``warn-if``, etc) can provide.
+beyond that which (e.g. ``type``, ``range``, ``warn-if``, etc)
+can provide.
 
 This tutorial covers the development of checking (**validator**),
 changing (**transformer**) and reporting (**reporter**) macros.
@@ -13,12 +14,15 @@ changing (**transformer**) and reporting (**reporter**) macros.
 Warning
 -------
 
-Macros should only be written if there is a genuine need that is not
+Macros should **only** be written if there is a genuine need that is not
 covered by other metadata - make sure you are familiar with metadata
 capabilities before you write your own (real-life) macros.
 
 For example, ``fail-if`` and ``warn-if`` metadata options can perform
-complex inter-setting validation.
+complex inter-setting validation. See the
+:ref:`tutorial <tutorial-rose-fail-if-warn-if>` for details.
+
+.. TODO - link to metadata reference page
 
 
 Purpose
@@ -26,8 +30,8 @@ Purpose
 
 Macros are used in Rose to report problems with a configuration,
 and to change it. Nearly all metadata mechanics (checking vs metadata
-settings, and changing - e.g. ``trigger``) are performed within rose
-by the rose built-in macros.
+settings, and changing - e.g. ``trigger``) are performed within Rose
+by the Rose built-in macros.
 
 Custom macros are user-defined, but follow exactly the same API - they
 are just in a different filespace location. They can be invoked via
@@ -42,11 +46,16 @@ For these examples we will create an example app called
 ``hello_world_app`` that could be part of a typical suite.
 
 Create a directory for your suite app called ``hello_world_app``.
-Inside the ``hello_world_app`` directory, create a blank
-``rose-app.conf`` file. We will add to it later.
+Inside the ``hello_world_app`` directory, create a ``rose-app.conf``
+file and paste in the following contents:
 
-We are going to develop a macro for the app ``hello_world_app/``.
-Make sure you are in the directory ``hello_world_app/`` now.
+.. code-block:: rose
+
+   [command]
+   default=echo "Hello $WORLD!"
+
+   [env]
+   WORLD=Earth
 
 The metadata for the app lives under the ``meta/`` sub directory.
 Our new macro will live with the metadata.
@@ -56,21 +65,19 @@ For this example, we want to check the value of the option
 for this example, we want our macro to give us an error if the 'world'
 is too far away from Earth.
 
-Create the directories ``meta/lib/python/macros/`` by running:
-
-.. code-block:: console
+Create the directories ``meta/lib/python/macros/`` by running::
 
    mkdir -p meta/lib/python/macros
 
-Create an empty file called ``__init__.py`` in the directory:
+Create an empty file called ``rose-meta.conf`` in the directory::
 
-.. code-block:: console
+   touch meta/rose-meta.conf
+
+Create an empty file called ``__init__.py`` in the directory::
 
    touch meta/lib/python/macros/__init__.py
 
-Finally, create a file called ``planet.py`` in the directory:
-
-.. code-block:: console
+Finally, create a file called ``planet.py`` in the directory::
 
    touch meta/lib/python/macros/planet.py
 
@@ -105,7 +112,7 @@ Open ``planet.py`` in a text editor and paste in the following code:
                # Check the option value (node.value) here
            return self.reports
 
-This is the bare bones of a rose macro - a bit of Python that is a
+This is the bare bones of a Rose macro - a bit of Python that is a
 subclass of ``rose.macro.MacroBase``. At the moment, it doesn't
 do anything.
 
@@ -144,11 +151,11 @@ Now add the method ``_get_allowed_planets`` to the class:
                               re.sub('(?s)^.*(Range.*?Brightness).*$',
                                      r"\1", text))
        for planet, distance in zip(planets, distances):
-                   if float(distance) > 5.0:
-                       # The planet is more than 5 AU away.
-                       planets.remove(planet)
-               planets += ["Earth"]  # Distance ~ 0
-               return planets
+           if float(distance) > 5.0:
+               # The planet is more than 5 AU away.
+               planets.remove(planet)
+           planets += ["Earth"]  # Distance ~ 0
+       return planets
 
 This will give us a list of valid (nearby) solar system planets which
 our configuration option should be in. If it isn't, we need to send a
@@ -170,7 +177,7 @@ at the top of the class, like this:
        opts_to_check = [("env", "WORLD")]
 
        def validate(self, config, meta_config=None):
-       """Return a list of errors, if any."""
+           """Return a list of errors, if any."""
            allowed_planets = self._get_allowed_planets()
 
 Finally, we need to check if the configuration option is in the list,
@@ -250,9 +257,7 @@ Results
 
 Your validator macro is now ready to use.
 
-Run the config editor with the command:
-
-.. code-block:: console
+Run the config editor with the command::
 
    rose edit
 
@@ -260,24 +265,31 @@ in the application directory. Navigate to the ``env`` page, and
 change the option ``env=WORLD`` to ``Jupiter``.
 
 To run the macro, select the menu
-:menuselection:`Metadata --> fred_hello_world -->
+:menuselection:`Metadata --> hello_world_app -->
 planet.PlanetChecker.validate`.
 
-It should either return an "OK" dialog, or give an error dialog using
-the error text we wrote - it will depend on the current Earth-Jupiter
-distance.
+It should either return an "OK" dialog, or give an error dialog
+like the one bellow depending on the current Earth-Jupiter distance.
+
+.. image:: img/rose-macro-hello-world-app-fail.png
+   :width: 350px
+   :align: center
+   :alt: Screenshot of a rose macro failure message.
 
 If there is an error, the variable should display an error icon on
-the ``env`` page, which you can hover-over to get the error text.
-You can remove the error by fixing the value and re-running your macro.
+the ``env`` page, which you can hover-over to get the error text as in
+the screenshot below. You can remove the error by fixing the value and
+re-running your macro.
+
+.. image:: img/rose-edit-macro-fail.png
+   :width: 450px
+   :align: center
+   :alt: Screenshot of setting with an error detected by a rose macro.
 
 Try changing the value of ``env=WORLD`` to other solar system planets
 and re-running the macro.
 
-You can also run your macro from the command line in the application
-directory by invoking:
-
-.. code-block:: console
+You can also run your macro from the command line::
 
    rose macro planet.PlanetChecker
 
@@ -395,14 +407,8 @@ Your class should now look like this:
 
 Your transform macro is now ready to use.
 
-You can run it by running:
-
-.. code-block:: console
-
-   rose edit
-
-in the application directory. Select the top menu Metadata, then the
-item ``fred_hello_world``, then the item ``planet.PlanetChanger.transform``.
+You can run it from ``rose edit`` via the menu
+:menuselection:`metadata --> hello_world_app --> planet.PlanetChanger.transform`.
 
 It should give a dialog explaining the changes it's made and asking
 for permission to apply them. If you click OK, the changes will be
@@ -482,9 +488,7 @@ top of the file.
 
    import random
 
-Next run this macro from the command line by invoking:
-
-.. code-block:: console
+Next run this macro from the command line by invoking::
 
    rose macro planet.PlanetReporter
 
@@ -540,9 +544,9 @@ the option to specify a value for ``planet_name``. If you do, then
 that will be used as the new planet.
 
 Save your changes and run the transformer macro either from the
-command line or rose edit. You should be prompted to provide a value
-for ``planet_name``. At the command line this will take the form of
-a prompt while in rose edit you will be presented with a dialog to
+command line or ``rose edit``. You should be prompted to provide a
+value for ``planet_name``. At the command line this will take the form
+of a prompt while in rose edit you will be presented with a dialog to
 enter values in, with defaults already entered for you.
 
 Specify a value to use for ``planet_name`` using a quoted string,
@@ -560,8 +564,8 @@ metadata option.
 
 For example, our validator and transformer macros above are both
 specific to ``env=WORLD``. Open the file
-``app/fred_hello_world/meta/rose-meta.conf`` in a text editor, and
-make sure the file contains the following text:
+``hello_world_app/meta/rose-meta.conf`` in a text editor, and
+add the following lines
 
 .. code-block:: rose
 
