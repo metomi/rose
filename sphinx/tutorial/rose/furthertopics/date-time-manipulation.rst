@@ -40,7 +40,7 @@ The ``rose date`` command provides functionality for:
 
   .. code-block:: console
 
-     $ rose date '2000' '2001'
+     $ rose date '2000' '2001'  # Note - 2000 was a leap year!
      P366D
 
 See the :ref:`command-rose-date` command reference for more information.
@@ -82,7 +82,7 @@ The work directory
 
       <run directory>/work/<cycle>/<task-name>
 
-   The path a task's work directory can be obtained from the
+   The path to a task's work directory can be obtained from the
    ``CYLC_TASK_WORK_DIR`` environment variable.
 
 The share directory
