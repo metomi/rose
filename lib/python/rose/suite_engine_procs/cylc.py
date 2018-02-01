@@ -30,7 +30,7 @@ from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
 from rose.suite_engine_proc import (
     SuiteEngineProcessor, SuiteScanResult,
-    SuiteEngineGlobalConfCompatError, TaskProps)
+    SuiteEngineGlobalConfCompatError, SuiteStillRunningError, TaskProps)
 import signal
 import socket
 import sqlite3
@@ -47,6 +47,9 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the cylc suite engine."""
 
+    CONTACT_KEYS = (
+        "CYLC_SUITE_HOST", "CYLC_SUITE_OWNER", "CYLC_SUITE_PORT",
+        "CYLC_SUITE_PROCESS")
     PGREP_CYLC_RUN = r"python.*/bin/cylc-(run|restart)( | .+ )%s( |$)"
     REC_CYCLE_TIME = re.compile(
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
@@ -75,6 +78,27 @@ class CylcProcessor(SuiteEngineProcessor):
             if lines and lines[0] != expected:
                 raise SuiteEngineGlobalConfCompatError(
                     self.SCHEME, key, lines[0])
+
+    def check_suite_not_running(self, suite_name):
+        """Check if a suite is still running.
+
+        Args:
+            suite_name (str): the name of the suite as known by Cylc.
+        Raise:
+            SuiteStillRunningError: if suite is still running.
+        """
+        fname = self.get_suite_dir(suite_name, ".service", "contact")
+        try:
+            lines_str = open(fname).read()
+        except IOError:
+            return  # No contact file, suite not running
+        else:
+            extras = ["Contact info from: \"%s\"\n" % fname]
+            for line in lines_str.splitlines(True):  # splitlines keep ends
+                if line.split("=")[0] in self.CONTACT_KEYS:
+                    extras.append("    %s" % line)
+            extras.append("Try \"cylc stop '%s'\" first?" % suite_name)
+            raise SuiteStillRunningError(suite_name, extras)
 
     def cmp_suite_conf(
             self, suite_name, run_mode, strict_mode=False, debug_mode=False):

@@ -19,10 +19,10 @@
 #-------------------------------------------------------------------------------
 # Test "rose suite-run", with and without site/user configurations.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
+. "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
 # Run the suite.
-if [[ $TEST_KEY_BASE == *conf ]]; then
+if [[ "${TEST_KEY_BASE}" == *conf ]]; then
     if ! rose config -q 'rose-suite-run' 'hosts'; then
         skip_all '"[rose-suite-run]hosts" not defined'
     fi
@@ -38,55 +38,56 @@ sys.stdout.write(socket.gethostbyname_ex(sys.argv[1])[0] + "\n")
 __PYTHON__
 }
 #-------------------------------------------------------------------------------
-N_TESTS=11
-tests $N_TESTS
+tests 11
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-HOST="$(awk -F= '$1 == "CYLC_SUITE_HOST" {print $2}' "${SUITE_RUN_DIR}/.service/contact")"
-poll ! test -e "$SUITE_RUN_DIR/log/job/20130101T0000Z/my_task_1/01"
-if [[ $HOST == 'localhost' ]]; then
-    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>")
-    HOST="$(hostname -f)"
-else
-    CMD_PREFIX="ssh -oBatchMode=yes $HOST"
-    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run .*\\<$NAME\\>'")
-    HOST="$(get_host_fqdn "${HOST}")"
-fi
-SUITE_PROC=$(awk '{print "[FAIL]     " $0}' <<<"$SUITE_PROC")
+TEST_KEY="${TEST_KEY_BASE}"
+mkdir -p "${HOME}/cylc-run"
+RUND="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
+NAME="$(basename "${RUND}")"
+run_pass "${TEST_KEY}" \
+    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
+    --no-gcontrol
+CONTACT="${HOME}/cylc-run/${NAME}/.service/contact"
+SUITE_HOST="$(sed -n 's/CYLC_SUITE_HOST=//p' "${CONTACT}")"
+SUITE_OWNER="$(sed -n 's/CYLC_SUITE_OWNER=//p' "${CONTACT}")"
+SUITE_PORT="$(sed -n 's/CYLC_SUITE_PORT=//p' "${CONTACT}")"
+SUITE_PROCESS="$(sed -n 's/CYLC_SUITE_PROCESS=//p' "${CONTACT}")"
+poll ! test -e "${RUND}/log/job/20130101T0000Z/my_task_1/01"
 #-------------------------------------------------------------------------------
 # "rose suite-run" should not work while suite is running.
 # except --reload mode.
 for OPTION in -i -l '' --restart; do
-    TEST_KEY=$TEST_KEY_BASE-running$OPTION
-    run_fail "$TEST_KEY" rose suite-run $OPTION \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-    file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] Suite "$NAME" has running processes on: ${HOST:-localhost}
-[FAIL] Try "cylc stop '$NAME'" first?
+    TEST_KEY="${TEST_KEY_BASE}-running${OPTION}"
+    run_fail "${TEST_KEY}" rose suite-run "${OPTION}" \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol
+    file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
+[FAIL] Suite "${NAME}" appears to be running:
+[FAIL] Contact info from: "${CONTACT}"
+[FAIL]     CYLC_SUITE_HOST=${SUITE_HOST}
+[FAIL]     CYLC_SUITE_OWNER=${SUITE_OWNER}
+[FAIL]     CYLC_SUITE_PORT=${SUITE_PORT}
+[FAIL]     CYLC_SUITE_PROCESS=${SUITE_PROCESS}
+[FAIL] Try "cylc stop '${NAME}'" first?
 __ERR__
 done
 # Don't reload until tasks begin
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 while (($(date +%s) < TIMEOUT)) && ! (
-    cd $SUITE_RUN_DIR/log/job/
+    cd "${RUND}/log/job/"
     test -f "20130101T0000Z/my_task_1/01/job.out" && test -f "20130101T1200Z/my_task_1/01/job.out"
 )
 do
     sleep 1
 done
-TEST_KEY=$TEST_KEY_BASE-running-reload
-run_pass "$TEST_KEY" rose suite-run --reload \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol --debug
+TEST_KEY="${TEST_KEY_BASE}-running-reload"
+run_pass "${TEST_KEY}" rose suite-run --reload \
+    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol \
+    --debug
 sleep 1
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-touch $SUITE_RUN_DIR/flag # allow the task to die
+TEST_KEY="${TEST_KEY_BASE}-suite-run-wait"
+touch "${RUND}/flag" # allow the task to die
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 CONTACT="${HOME}/cylc-run/${NAME}/.service/contact"
 while [[ -e "${CONTACT}" ]] && (($(date +%s) < TIMEOUT))
@@ -94,11 +95,11 @@ do
     sleep 1
 done
 if [[ -e "${CONTACT}" ]]; then
-    fail "$TEST_KEY"
+    fail "${TEST_KEY}"
     exit 1
 else
-    pass "$TEST_KEY"
+    pass "${TEST_KEY}"
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+rose suite-clean -q -y "${NAME}"
 exit 0

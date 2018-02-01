@@ -201,21 +201,11 @@ class SuiteStillRunningError(Exception):
 
     """An exception raised when a suite is still running."""
 
-    FMT_HEAD = "Suite \"%(suite_name)s\" has running processes on:"
-    FMT_BODY_1 = " %(host_name)s"
-    FMT_BODY_M = "\n    %(host_name)s"
-    FMT_TAIL = "\nTry \"cylc stop '%(suite_name)s'\" first?"
+    FMT_HEAD = "Suite \"%(suite_name)s\" appears to be running:\n"
 
     def __str__(self):
-        suite_name, host_names = self.args
-        ret = self.FMT_HEAD % {"suite_name": suite_name}
-        if len(host_names) == 1:
-            ret += self.FMT_BODY_1 % {"host_name": host_names[0]}
-        else:
-            for host_name in host_names:
-                ret += self.FMT_BODY_M % {"host_name": host_name}
-        ret += self.FMT_TAIL % {"suite_name": suite_name}
-        return ret
+        suite_name, extras = self.args
+        return self.FMT_HEAD % {"suite_name": suite_name} + "".join(extras)
 
 
 class SuiteHostConnectError(Exception):
@@ -382,10 +372,18 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def check_suite_not_running(self, suite_name):
-        """Raise SuiteStillRunningError if suite is still running."""
-        host_names = self.get_suite_run_hosts(None, suite_name)
-        if host_names:
-            raise SuiteStillRunningError(suite_name, host_names)
+        """Check that suite is not running.
+
+        This method is not implemented. Sub-class should override.
+
+        Arguments:
+            suite_name: name of suite to check.
+
+        Raise:
+            SuiteStillRunningError:
+                Should raise SuiteStillRunningError if suite is still running.
+        """
+        raise NotImplementedError()
 
     def cmp_suite_conf(
             self, suite_name, run_mode, strict_mode=False, debug_mode=False):
