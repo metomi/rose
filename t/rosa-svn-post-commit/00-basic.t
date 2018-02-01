@@ -24,7 +24,7 @@
 if ! python -c 'import sqlalchemy' 2>/dev/null; then
     skip_all '"sqlalchemy" not installed'
 fi
-tests 68
+tests 71
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo || exit 1
@@ -430,5 +430,12 @@ foo-aa000|trunk|4|description|adhesive
 foo-aa000|trunk|11|access-list|*
 foo-aa000|trunk|11|description|adhesive
 __OUT__
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-suite-add-file-at-branch-level"
+echo 'Not much stuff' >'null'
+svn import -q -m t 'null' "${SVN_URL}/a/a/0/0/1/null" || exit 1
+file_cmp "${TEST_KEY}-hook.out" "${PWD}/rosa-svn-post-commit.out" <'/dev/null'
+file_cmp "${TEST_KEY}-hook.err" "${PWD}/rosa-svn-post-commit.err" <'/dev/null'
+file_cmp "${TEST_KEY}-hook.rc" "${PWD}/rosa-svn-post-commit.rc" <<<0
 #-------------------------------------------------------------------------------
 exit 0
