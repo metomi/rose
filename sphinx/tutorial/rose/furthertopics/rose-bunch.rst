@@ -12,13 +12,14 @@ Often, we want to run many instances of a command that differ only slightly
 from each other at the same time - an example would be where a command is
 run repeatedly with only its arguments changing.
 
-Rather than creating multiple apps or optional configs to change the way a
-command is to be run, we can instead use the built-in ``rose_bunch`` application
-to run multiple command variants, in parallel, under a single job as defined
-by an application configuration.
+Rather than creating multiple apps or
+:ref:`optional configs <rose-tutorial-optional-configurations>` to change
+the way a command is to be run, we can instead use the built-in
+``rose_bunch`` application to run multiple command variants, in parallel,
+under a single job as defined by an application configuration.
 
-Note, however, that for "embarassingly parallel" code it would be better to
-alter the code rather than use rose bunch to handle this for you.
+Note, however, that for "embarrassingly parallel" code it would be better to
+alter the code rather than use ``rose_bunch`` to handle this for you.
 
 
 .. warning::
@@ -120,7 +121,7 @@ directory and paste in these lines::
    sleep 10
    echo "[ $(rose date) ] Clear of terminal"
 
-This script capures the landing routine and expects two arguments; the plane
+This script captures the landing routine and expects two arguments: the plane
 type (its class) and the number of passengers it is carrying.
 
 Finally, make the new ``land`` file executable by navigating into the ``bin``
@@ -131,21 +132,21 @@ directory of the lander app and running::
 Navigate to the top directory of your suite (where the ``suite.rc`` and
 ``rose-suite.conf`` files can be found) and run ``rose suite-run``.
 
-Your suite should run, launch the cylc gui and successfully run the ``lander``
+Your suite should run, launch the cylc GUI and successfully run the ``lander``
 app.
 
 Once the suite has finished running and has shutdown, open rose bush to view
-its output (note that you can close the cylc gui at this point)::
+its output (note that you can close the cylc GUI at this point)::
 
-   rose slv
+   rose suite-log
 
 .. TODO - Make sure that this is consistent with advice given in the rose
    tutorial when written.
 
 .. note::
 
-   You can quickly get to the relevent page by running ``rose slv`` from
-   within the suite directory.
+   You can quickly get to the relevant page by running ``rose suite-log``
+   from within the suite directory.
 
 In the rose bush jobs page for your suite you should be presented with a
 page containing a single row for the ``lander`` task, from which you can
@@ -156,11 +157,11 @@ access its output. In that row you should see something like this:
    :alt: rose bush view of output
 
 In the rose bush entry you should see that the usual links are present for
-the task such as for ``job.out``, ``job.status`` etc. with the addition of
-two drop down boxes: one for ``bunch.*.err`` and one for ``bunch.*.out``.
+the task such as ``job.out``, ``job.status`` etc. with the addition of
+two drop-down boxes: one for ``bunch.*.err`` and one for ``bunch.*.out``.
 Rather than mixing the outputs from the multiple command invocations being
-run at once, rose bunch directs their output to individual output files.
-So, for example, the ouput from running the command with the first set of
+run at once, ``rose_bunch`` directs their output to individual output files.
+So, for example, the output from running the command with the first set of
 parameters can be found in the ``bunch.0.out`` file, the second set in the
 ``bunch.1.out`` file etc. Examine these output files now to confirm that all
 four of the args combinations have been run and produced output.
@@ -192,15 +193,16 @@ Limiting Concurrent Invocations
 
 In some situations we may need to limit the number of concurrently running
 command invocations - often as a result of resource limitations. Rather than
-batching up jobs into sets of N simultaneously running commands, ``rose_bunch``
+batching up jobs into sets of *N* simultaneously running commands,
+``rose_bunch``
 apps can be configured to run as many commands as possible within some limit
-i.e. while N commands are running, if one of them finishes, don't wait for the
-remaining N-1 jobs to finish before running the N+1th one.
+i.e. while *N* commands are running, if one of them finishes, don't wait for the
+remaining *N*-1 jobs to finish before running the (*N*+1)th one.
 
 In the case of our simulated airport we will pretend we only have two runways
 available at a time on which our planes can land. As such we need to limit the
-number of planes being landed. We do this using the ``[bunch]pool-size=``
-configuration option of the rose bunch app.
+number of planes landing. We do this using the ``[bunch]pool-size=``
+configuration option of the ``rose_bunch`` app.
 
 Open your app config (under ``app/lander/rose-app.conf``) and add the
 following line to the ``[bunch]`` section:
@@ -212,7 +214,7 @@ following line to the ``[bunch]`` section:
 Run your suite again. Notice that this time round it takes longer for the task
 to run as it has been limited in the number of command variants it can run
 simultaneously. You can see the individual commands being started by viewing
-the task stdout in the cylc gui by right clicking on the task and selecting
+the task stdout in the cylc GUI by right-clicking on the task and selecting
 :guilabel:`View` then :guilabel:`job stdout`. As an example, when the
 ``BA007`` invocation starts running you should see the line:
 
@@ -232,7 +234,7 @@ a set of command variants under one job. We have learnt how to name the
 individual variants for convenience in examining the logs and how to limit
 the number of concurrently running commands.
 
-Further options are listed in the rose bunch documentation. These include,
+Further options are listed in the ``rose_bunch`` documentation. These include
 configuring how to proceed following failure of an individual command
-invocation - ``[bunch]fail-mode=``), automatically generating N
-command-instances and enabling/disabling the app's incremental mode etc.
+invocation (``[bunch]fail-mode=``), automatically generating N
+command instances and enabling/disabling the app's incremental mode.
