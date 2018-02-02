@@ -1,3 +1,5 @@
+.. _rose-turorial-optional-configurations:
+
 Optional Configurations
 =======================
 
