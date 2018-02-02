@@ -27,13 +27,13 @@ that looks like this:
            timeout = PT1H
    [scheduling]
        [[dependencies]]
-           graph = create_files => archive_files_rsync => archive_files_scp
+           graph = make_files => archive_files_rsync => archive_files_scp
    [runtime]
        [[root]]
            env-script = eval $(rose task-env)
            script = rose task-run
 
-       [[create_files]]
+       [[make_files]]
            script = """
                echo 'zip' >> $ROSE_DATAC/file_zip
                echo 'solo' >> $ROSE_DATAC/file_solo
@@ -56,7 +56,7 @@ In the app directory create an ``archive_files_rsync/`` directory::
    mkdir archive_files_rsync
 
 In the ``app/archive_files_rsync/`` directory create a ``rose-app.conf``
-file, this example uses vi, but please use your editor of choice::
+file. This example uses vi, but please use your editor of choice::
 
    cd archive_files_rsync
    vi rose-app.conf
@@ -105,8 +105,8 @@ Create an ``archive_files_scp/`` directory::
 
    mkdir archive_files_scp
 
-In the ``archive_files_scp/`` directory create a ``rose-app.conf`` file,
-this example uses vi, but please use your editor of choice::
+In the ``archive_files_scp/`` directory create a ``rose-app.conf`` file.
+This example uses ``vi``, but please use your editor of choice::
 
    cd archive_files_scp
    vi rose-app.conf
@@ -139,12 +139,12 @@ You have now created a suite that defines three tasks:
 
 ``make_files``
    Sets up the files and ``ARCHIVING/`` directory for ``archive_files_rsync/``
-   and ``archive_files_scp/`` to "archive", move, date to.
+   and ``archive_files_scp/`` to "archive", move, data to.
 ``archive_files_rsync``
-   "Archives", rsync's files to the ``ARCHIVING/`` folder in the
+   "Archives" ``rsync``'s files to the ``ARCHIVING/`` folder in the
    ``$ROSE_DATA/`` directory.
 ``archive_files_scp``
-   "Archives", scp's the renamed files and moves them to the ``ARCHIVING/``
+   "Archives" ``scp``'s the renamed files and moves them to the ``ARCHIVING/``
    folder in the ``$ROSE_DATA/`` directory.
 
 Save your changes and run the suite::
@@ -158,9 +158,11 @@ View the suite output using ``rose suite-log`` and inspect the output of the
 Results Of "Archiving"
 ----------------------
 
-Change to the ``$ROSE_DATA/ARCHVING/`` directory of the suite i.e::
+Change to the ``$ROSE_DATA/ARCHVING/`` directory of the suite i.e:
 
-   cd ~cylc-run/SUITE_ID/share/data/ARCHIVING/
+.. code-block:: sub
+
+   cd ~/cylc-run/<SUITE_ID>/share/data/ARCHIVING/
 
 List the directory by typing::
 
@@ -213,10 +215,13 @@ The following should be returned:
 
 These are the renamed files.
 
-Most users will have there own system or location that they wish to archive
-their data to. Here the example shown uses ``rsync`` and ``scp``. Further
-information on Linux commands ``rsync``, ``scp`` Please refer your own site
-specific archiving solutions and seek site specfic advice.
+.. _rsync: https://linux.die.net/man/1/rsync
+.. _scp: https://www.lifewire.com/rcp-scp-ftp-commands-for-copying-files-3971107
+
+Most users will have their own system or location that they wish to archive
+their data to. Here the example shown uses `rsync`_ and `scp`_.
+Please refer your own site specific archiving solutions and seek site
+specfic advice.
 
 
 Arch Settings
@@ -232,27 +237,26 @@ Above ``.tar`` was used to compress the file. However, ``compress=gzip``
 can also be used. Note either of these commands can be used to compress a
 file or a folder/directory.
 
-In the above example a regular expression (reg exp) was used by the
+In the above example a regular expression 'reg exp' was used by the
 ``rename-parser``, for example, ``^.*list(?P<tag>.*)$``, where:
 
-* ``^`` = startof a string.
+.. _greedy: https://stackoverflow.com/questions/2301285/what-do-lazy-and-greedy-mean-in-the-context-of-regular-expressions
+
+* ``^`` = start of a string.
 * ``$`` = end of a string.
 * ``.`` = any character.
-* ``*`` = greedy (all).
+* ``*`` = `greedy`_ (all).
 * ``?P<NAME>`` = named group.
 
 .. note::
 
-   .. _python flavor: https://docs.python.org/2/howto/regex.html
+   .. _Python flavor: https://docs.python.org/2/howto/regex.html
 
-   ``rose arch`` uses the `python flavor`_ for regular expressions.
+   ``rose arch`` uses the `Python flavor`_ for regular expressions.
 
 In the above example source was used to accept a list of glob patterns.
 For example, ``file_list?`` was used where the ``?`` relates to one unknown
-character. Similarly, if there were files named ``pa000``, ``pa012``,
-``pa018``, ``pa024`` which are to be source files can be identified using
-``source=pa???`` where the ``???`` relate to the three possible number
-characters.
+character.
 
 .. note::
 
@@ -268,7 +272,7 @@ to the app, for example:
    Also see the suite example above.
 ``[poll]``
    Polling can be defined, and is often near the bottom of the app. This
-   will allow the app to poll with a defined delay, e.g. ``delay=0``.
+   will allow the app to poll with a defined delay, e.g. ``delay=5``.
 ``[file:TARGET]``
    This option allows the user to, for example, make the directory
    ``TARGET``, e.g. ``mode=mkdir``.
