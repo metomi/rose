@@ -21,7 +21,7 @@ This tutorial will walk you through creating a simple example of the
 through space.
 
 
-Getting started
+Getting Started
 ---------------
 
 We will start the ``rose stem`` tutorial by setting up an `FCM`_ repository
@@ -40,7 +40,8 @@ it after finishing this tutorial)::
    (cd $(mktemp -d); mkdir -p trunk/src; svn import -m "" . file://$HOME/spaceship_repos)
 
 We then need to link the project name ``SPACESHIP`` with this project.
-Add the following line to the file ``$HOME/.metomi/fcm/keyword.cfg``:
+Creating the file and directory if they do not exist
+add the following line to the file ``$HOME/.metomi/fcm/keyword.cfg``:
 
 .. code-block:: rose
 
@@ -108,7 +109,7 @@ that directory:
 The ``fcm-make`` app
 --------------------
 
-We now need to provide the instructions for ``fcm make`` to build the
+We now need to provide the instructions for ``fcm-make`` to build the
 Fortran executable.
 
 Create a new app called ``fcm_make_spaceship`` with an empty
@@ -147,7 +148,7 @@ case, the group ``command_spaceship`` gives you the graph:
 
 This variable ``name_graphs`` is used later to generate the graph when
 the suite is run. The Jinja2 variable ``groups`` is next. This enables you
-to set shortcuts to a list of groups, in this case specifying all on the
+to set shortcuts to a list of groups, in this case specifying ``all`` on the
 command line will run the tasks associated with both ``command_spaceship``
 and ``fire_lasers``.
 
@@ -166,7 +167,7 @@ its own configuration files.
 The ``rose-suite.conf`` file
 ----------------------------
 
-The suites associated with ``rose-stem`` require a version number
+The suites associated with ``rose stem`` require a version number
 indicating the version of the ``rose stem`` command with which they
 are compatible. This is specified in the ``rose-suite.conf`` file,
 together with the default values of ``RUN_NAMES`` and ``SOURCE_SPACESHIP``.
@@ -180,14 +181,14 @@ Paste the following into your ``rose-suite.conf`` file:
    RUN_NAMES=[]
    SOURCE_SPACESHIP='fcm:spaceship_tr@head'
 
-Both of the Jinja2 variables will be overriden by the user when they
+Both of the Jinja2 variables will be overridden by the user when they
 execute ``rose stem`` on the command line.
 
 
 The ``rose_ana_position`` app
 -----------------------------
 
-The final component is a ``rose ana`` app to test the position of our
+The final component is a ``rose ana`` app to test whether the position of our
 spaceship matches the correct output.
 
 Create an app named ``rose_ana_position`` and paste the following into its
@@ -219,13 +220,13 @@ Known Good Output
 
 In the root of the working copy is a file called ``kgo.txt``.
 
-Replace the ``/home/user/spaceship`` paths in the ``rose_ana_position``
-app with the path to this file.
-
 The known good output should be the result of a control run. ``rose ana``
 will compare the answers from this file (obtained using the extract and
 comparison methods in the ``rose-app.conf`` file) with the results from
 the user's code change.
+
+Replace the ``/home/user/spaceship`` paths in the ``rose_ana_position``
+app with the path to this file.
 
 
 Adding the suite to version control
@@ -245,7 +246,7 @@ We should now be able to run the test suite. Simply type::
 
    rose stem --group=command_spaceship
 
-anywhere in your working copy (the ``--source`` argument defaults to.
+anywhere in your working copy (the ``--source`` argument defaults to ``.``
 so it should automatically pick up your working copy as the source).
 
 .. note::
@@ -268,7 +269,9 @@ Now edit the file::
    rose-stem/app/spaceship/rose-app.conf
 
 and change one of the thrusts, then rerun ``rose stem``. You will find the
-``rose ana`` task fails, as the results have changed.
+``rose_ana_position`` task fails, as the results have changed.
+
+.. TODO - Do we need to reset previous changes?!
 
 Try modifying the Fortran source code - for example, changing the direction
 in which thrust is applied (by changing the acceleration to be subtracted
@@ -291,11 +294,11 @@ spaceship, you should be able to aim and fire the ship's weapons.
 Automatic Options
 -----------------
 
-It is possible to automatically add options to ``rose-stem`` using the
-automatic-options variable in a section named ``[rose-stem]`` in the site
+It is possible to automatically add options to ``rose stem`` using the
+``automatic-options`` variable in a section named ``[rose-stem]`` in the site
 ``rose.conf`` file. This takes the syntax of key-value pairs on a single
 line, and is functionally equivalent to adding them using the ``-S``
-option on the ``rose-stem`` command line. For example:
+option on the ``rose stem`` command line. For example:
 
 .. TODO - link to rose.conf file in user guide when translated
 
