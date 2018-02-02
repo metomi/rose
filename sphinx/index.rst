@@ -18,6 +18,12 @@
 
    command-reference
 
+.. toctree::
+   :caption: User Guide
+   :name: user-guide-toc
+   :maxdepth: 1
+
+   user-guide/variables
 
 Indices and tables
 ==================
