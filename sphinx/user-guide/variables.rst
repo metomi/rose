@@ -1,6 +1,7 @@
 Variables
 =========
 
+
 ``NPROC``
 ---------
 
@@ -13,6 +14,7 @@ Used By
 ^^^^^^^
 
 * rose mpi-launch
+
 
 ``ROSE_APP_COMMAND_KEY``
 ------------------------
@@ -28,22 +30,24 @@ Used By
 * rose app-run
 * rose task-run
 
+
 ``ROSE_APP_OPT_CONF_KEYS``
 --------------------------
 
 Description
 ^^^^^^^^^^^
 
-Each ``KEY`` in this space delimited list switches on an optional configuration
-in an application. The ``(KEY)`` syntax can be used to denote an optional
-configuration that can be missing. The configurations are applied in
-first-to-last order.
+Each ``KEY`` in this space delimited list switches on an optional
+configuration in an application. The ``(KEY)`` syntax can be used to denote
+an optional configuration that can be missing. The configurations are applied
+in first-to-last order.
 
 Used By
 ^^^^^^^
 
 * rose app-run
 * rose task-run
+
 
 ``ROSE_BUNCH_LOG_PREFIX``
 -------------------------
@@ -60,6 +64,7 @@ Provided At Runtime By
 
 * rose bunch
 
+
 ``ROSE_CONF_PATH``
 ------------------
 
@@ -75,6 +80,7 @@ Used By
 ^^^^^^^
 
 * rose test-battery
+
 
 ``ROSE_CYCLING_MODE``
 ---------------------
@@ -95,6 +101,7 @@ Provided By
 
 * rose task-env
 
+
 ``ROSE_DATA``
 -------------
 
@@ -108,6 +115,7 @@ Provided By
 
 * rose task-env
 
+
 ``ROSE_DATAC``
 --------------
 
@@ -120,6 +128,7 @@ Provided By
 ^^^^^^^^^^^
 
 * rose task-env
+
 
 ``ROSE_DATAC????``
 ------------------
@@ -148,6 +157,7 @@ Provided By
 
 * rose task-env
 
+
 ``ROSE_ETC``
 ------------
 
@@ -160,6 +170,7 @@ Provided By
 ^^^^^^^^^^^
 
 * rose task-env
+
 
 ``ROSE_FILE_INSTALL_ROOT``
 --------------------------
@@ -175,6 +186,7 @@ Used By
 * rose app-run
 * rose task-run
 
+
 ``ROSE_HOME``
 -------------
 
@@ -188,18 +200,21 @@ Used and Provided By
 
 * rose
 
+
 ``ROSE_HOME_BIN``
 -----------------
 
 Description
 ^^^^^^^^^^^
 
-Specifies the path to the ``bin/`` or ``sbin/`` directory of the current Rose utility.
+Specifies the path to the ``bin/`` or ``sbin/`` directory of the current
+Rose utility.
 
 Used and Provided By
 ^^^^^^^^^^^^^^^^^^^^
 
 * rose
+
 
 ``ROSE_LAUNCHER``
 -----------------
@@ -213,6 +228,7 @@ Used By
 ^^^^^^^
 
 * rose mpi-launch
+
 
 ``ROSE_LAUNCHER_FILEOPTS``
 --------------------------
@@ -228,6 +244,7 @@ Used By
 
 * rose mpi-launch
 
+
 ``ROSE_LAUNCHER_LIST``
 ----------------------
 
@@ -241,19 +258,21 @@ Used By
 
 * rose mpi-launch
 
+
 ``ROSE_LAUNCHER_PREOPTS``
 -------------------------
 
 Description
 ^^^^^^^^^^^
 
-Override ``[rose-mpi-launch]launcher-preopts.LAUNCHER`` setting for the selected
-``LAUNCHER``.
+Override ``[rose-mpi-launch]launcher-preopts.LAUNCHER`` setting for the
+selected ``LAUNCHER``.
 
 Used By
 ^^^^^^^
 
 * rose mpi-launch
+
 
 ``ROSE_LAUNCHER_POSTOPTS``
 --------------------------
@@ -261,13 +280,14 @@ Used By
 Description
 ^^^^^^^^^^^
 
-Override ``[rose-mpi-launch]launcher-postopts.LAUNCHER`` setting for the selected
-``LAUNCHER``.
+Override ``[rose-mpi-launch]launcher-postopts.LAUNCHER`` setting for the
+selected ``LAUNCHER``.
 
 Used By
 ^^^^^^^
 
 * rose mpi-launch
+
 
 ``ROSE_LAUNCHER_ULIMIT_OPTS``
 -----------------------------
@@ -298,6 +318,7 @@ Used By
 
 * rose mpi-launch
 
+
 ``ROSE_META_PATH``
 ------------------
 
@@ -311,6 +332,7 @@ Used by
 
 * rose config-edit
 * rose macro
+
 
 ``ROSE_NS``
 -----------
@@ -326,6 +348,7 @@ Used and Provided By
 
 * rose
 
+
 ``ROSE_ORIG_HOST``
 ------------------
 
@@ -338,6 +361,7 @@ Provided By
 ^^^^^^^^^^^
 
 * rose suite-run
+
 
 ``ROSE_SUITE_DIR``
 ------------------
@@ -352,6 +376,7 @@ Provided By
 
 * rose task-env
 
+
 ``ROSE_SUITE_DIR_REL``
 ----------------------
 
@@ -364,6 +389,7 @@ Provided By
 ^^^^^^^^^^^
 
 * rose task-env
+
 
 ``ROSE_SUITE_NAME``
 -------------------
@@ -378,21 +404,23 @@ Provided By
 
 * rose task-env
 
+
 ``ROSE_SUITE_OPT_CONF_KEYS``
 ----------------------------
 
 Description
 ^^^^^^^^^^^
 
-Each ``KEY`` in this space delimited list switches on an optional configuration
-when installing a suite. The ``(KEY)`` syntax can be used to denote an optional
-configuration that can be missing. The configurations are applied in
-first-to-last order.
+Each ``KEY`` in this space delimited list switches on an optional
+configuration when installing a suite. The ``(KEY)`` syntax can be used to
+denote an optional configuration that can be missing. The configurations are
+applied in first-to-last order.
 
 Used By
 ^^^^^^^
 
 * rose suite-run
+
 
 ``ROSE_TASK_APP``
 -----------------
@@ -407,6 +435,7 @@ Used By
 
 * rose task-run
 
+
 ``ROSE_TASK_CYCLE_TIME``
 ------------------------
 
@@ -419,6 +448,7 @@ Provided By
 ^^^^^^^^^^^
 
 * rose task-env
+
 
 ``ROSE_TASK_LOG_DIR``
 ---------------------
@@ -433,6 +463,7 @@ Provided By
 
 * rose task-env
 
+
 ``ROSE_TASK_LOG_ROOT``
 ----------------------
 
@@ -445,6 +476,7 @@ Provided By
 ^^^^^^^^^^^
 
 * rose task-env
+
 
 ``ROSE_TASK_N_JOBS``
 --------------------
@@ -463,6 +495,7 @@ Used By
 * fcm_make built-in application
 * fcm_make2 built-in application
 
+
 ``ROSE_TASK_MIRROR_TARGET``
 ---------------------------
 
@@ -476,6 +509,7 @@ Provided By
 ^^^^^^^^^^^
 
 * fcm_make built-in application
+
 
 ``ROSE_TASK_NAME``
 ------------------
@@ -495,13 +529,15 @@ Used By
 
 * rose app-run
 
+
 ``ROSE_TASK_OPTIONS``
 ---------------------
 
 Description
 ^^^^^^^^^^^
 
-(Deprecated) Use the ``args`` setting in the application configuration instead.
+(Deprecated) Use the ``args`` setting in the application configuration
+instead.
 
 Additional options and arguments for ``fcm make`` or ``rose app-run``.
 
@@ -510,6 +546,7 @@ Used By
 
 * fcm_make built-in application
 * fcm_make2 built-in application
+
 
 ``ROSE_TASK_PREFIX``
 --------------------
@@ -524,6 +561,7 @@ Provided By
 
 * rose task-env
 
+
 ``ROSE_TASK_SUFFIX``
 --------------------
 
@@ -537,6 +575,7 @@ Provided By
 
 * rose task-env
 
+
 ``ROSE_UTIL``
 -------------
 
@@ -549,6 +588,7 @@ Used and Provided By
 ^^^^^^^^^^^^^^^^^^^^
 
 * rose
+
 
 ``ROSE_VERSION``
 ----------------
