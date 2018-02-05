@@ -10,67 +10,69 @@ See Configuration Format.
 A configuration metadata is itself a configuration. Each configuration
 metadata is represented in a directory with the following:
 
-* rose-meta.conf, the main configuration file. See for detail.
-* opt/ directory. For detail, see Optional Configuration.
+* ``rose-meta.conf``, the main configuration file. See for detail.
+* ``opt/`` directory. For detail, see Optional Configuration.
 * other files, e.g.:
 
-  * lib/python/widget/my_widget.py would be the location of a custom widget.
-  * lib/python/macros/my_macro_validator.py would be the location of a custom
-    macro.
-  * etc/ would contain any resources for the logics in lib/python/, such
-    as an icon for the custom widget.
+  * ``lib/python/widget/my_widget.py`` would be the location of a custom
+    widget.
+  * ``lib/python/macros/my_macro_validator.py`` would be the location of a
+    custom macro.
+  * ``etc/`` would contain any resources for the logics in ``lib/python/``,
+    such as an icon for the custom widget.
 
 Rose utilities will do a path search for metadata using the following in order
 of precedence:
 
-* Configuration metadata embedded in the meta/ directory of a suite or an
+* Configuration metadata embedded in the ``meta/`` directory of a suite or an
   application.
-* The --meta-path=PATH option of relevant commands.
-* The value of the ROSE_META_PATH environment variable.
-* The meta-path setting in site/user configurations.
+* The ``--meta-path=PATH`` option of relevant commands.
+* The value of the ``ROSE_META_PATH`` environment variable.
+* The ``meta-path`` setting in site/user configurations.
 
 See Metadata Location for more details.
 
 The configuration metadata that controls default behaviour will be located in
-$ROSE_HOME/etc/rose-meta/.
+``$ROSE_HOME/etc/rose-meta/``.
 
 
 Configuration Metadata File
 ---------------------------
 
-The rose-meta.conf contains a serialised data structure that is an unordered
-map (sections=) of unordered maps (keys=values).
+The ``rose-meta.conf`` contains a serialised data structure that is an
+unordered map (``sections=``) of unordered maps (``keys=values``).
 
-The section name in a configuration metadata file should be a unique ID to the
-relevant configuration setting. The syntax of the ID is
-SECTION-NAME=OPTION-NAME or just SECTION-NAME. For example, env=MY_ENV_NAME is
-the ID of an environment variable called MY_ENV_NAME in an application
-configuration file; namelist:something_nl=variable_name1 is the ID of a
-namelist variable called variable_name1 in a namelist group called
-something_nl in an application configuration file. If the configuration
+The section name in a configuration metadata file should be a unique ID to
+the relevant configuration setting. The syntax of the ID is
+``SECTION-NAME=OPTION-NAME`` or just ``SECTION-NAME``. For example,
+``env=MY_ENV_NAME`` is the ID of an environment variable called
+``MY_ENV_NAME`` in an application configuration file;
+``namelist:something_nl=variable_name1`` is the ID of a
+namelist variable called ``variable_name1`` in a namelist group called
+``something_nl`` in an application configuration file. If the configuration
 metadata applies to a section in a configuration file, the ID is just the
 section name.
 
 Where multiple instances of a section are used in a configuration file,
 ending in brackets with numbers, the metadata id should just be based on the
-original section name (for example namelist:extract_control(2) should be
-found in the metadata under namelist:extract_control).
+original section name (for example ``namelist:extract_control(2)`` should be
+found in the metadata under ``namelist:extract_control``).
 
 Finally, the configuration metadata may group settings in namespaces, which
 may in turn have common configuration metadata settings. The ID for a
-namespace set in the metadata is ns=NAME, e.g.
-ns=env/MyFavouriteEnvironmentVars.
+namespace set in the metadata is ``ns=NAME``, e.g.
+``ns=env/MyFavouriteEnvironmentVars``.
 
 Metadata Inheritance (Import)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A root level import=MY_COMMAND1/VERSION1 MY_COMMAND2/VERSION2 ... setting in
-the rose-meta.conf file will tell Rose metadata utilities to locate the meta
-keys MY_COMMAND1/VERSION1, MY_COMMAND2/VERSION2 (and so on) and inherit their
-configuration and files if found.
+A root level ``import=MY_COMMAND1/VERSION1 MY_COMMAND2/VERSION2 ...`` setting
+in the ``rose-meta.conf`` file will tell Rose metadata utilities to locate
+the meta keys ``MY_COMMAND1/VERSION1``, ``MY_COMMAND2/VERSION2`` (and so on)
+and inherit their configuration and files if found.
 
-For example, you might have a rose-meta directory that contains the following
-files and directories:
+For example, you might have a ``rose-meta`` directory that contains the
+following files and directories:
 
    .. code-block:: none
 
@@ -83,7 +85,8 @@ files and directories:
           vn1.0/
               rose-meta.conf
 
-and write an app referencing this rose-meta directory that looks like this:
+and write an app referencing this ``rose-meta`` directory that looks like
+this:
 
    .. code-block:: rose
 
@@ -93,9 +96,9 @@ and write an app referencing this rose-meta directory that looks like this:
      CHEESE=camembert
      SANDWICH_BREAD=brown
 
-This will reference the metadata at rose-meta/cheese_sandwich/vn2.0.
+This will reference the metadata at ``rose-meta/cheese_sandwich/vn2.0``.
 
-Now, we can write the rose-meta.conf file using an import:
+Now, we can write the ``rose-meta.conf`` file using an import:
 
    .. code-block:: rose
 
@@ -105,7 +108,7 @@ Now, we can write the rose-meta.conf file using an import:
       values=white,brown,seeded
 
 which will inherit metadata from metadata from
-rose-meta/cheese/vn1.0/rose-meta.conf.
+``rose-meta/cheese/vn1.0/rose-meta.conf``.
 
 Metadata Options
 ^^^^^^^^^^^^^^^^
@@ -120,17 +123,17 @@ These configuration metadata are used for grouping and sorting the IDs of
 the configurations.
 
 ns
-  A forward slash / delimited hierarchical namespace for the container of
+  A forward slash ``/`` delimited hierarchical namespace for the container of
   the setting, which overrides the default. The default namespace for the
   setting is derived from the first part of the ID - by splitting up the
-  section name by colons : or forward slashes /. For example, a configuration
-  with an ID namelist:var_minimise=niter_set would have the namespace
-  namelist/var_minimise. If a namespace is defined for a section, it will
-  become the default for all the settings in that section.
+  section name by colons ``:`` or forward slashes ``/``. For example, a
+  configuration with an ID ``namelist:var_minimise=niter_set`` would have
+  the namespace ``namelist/var_minimise``. If a namespace is defined for a
+  section, it will become the default for all the settings in that section.
 
   The namespace is used by the config editor to group settings, so that
-  they can be placed in different pages. A namespace for a section will become
-  the default for all the settings in that section.
+  they can be placed in different pages. A namespace for a section will
+  become the default for all the settings in that section.
 
   Note that you should not assign namespaces to variables in duplicate
   sections.
@@ -146,8 +149,8 @@ sort-key
   without a sort-key will be sorted after, in ascending order of their IDs.
 
   The sorting procedure in pseudo code is a normal ASCII-like sorting of a
-  list of setting_sort_key + "~" + setting_id strings. If there is no
-  setting_sort_key, null string will be used.
+  list of ``setting_sort_key + "~" + setting_id`` strings. If there is no
+  ``setting_sort_key``, null string will be used.
 
   For example, the following metadata:
 
@@ -166,8 +169,8 @@ sort-key
      [env=prune]
      sort-key=do-not-like-00
 
-  would produce a sorting order of env=prune, env=melon, env=cherry,
-  env=apple, env=banana.
+  would produce a sorting order of ``env=prune``, ``env=melon``,
+  ``env=cherry``, ``env=apple``, ``env=banana``.
 
 Metadata for Values
 ^^^^^^^^^^^^^^^^^^^
@@ -180,98 +183,100 @@ metadata will normally be ignored.
 
 type
   The type/class of the setting. The type names are based on the intrinsic
-  Fortran types, such as integer and real. Currently supported types are:
+  Fortran types, such as ``integer`` and ``real``. Currently supported types
+  are:
 
-  boolean
-    example option: PRODUCE_THINGS=true
+  ``boolean``
+    *example option*: ``PRODUCE_THINGS=true``
 
-    description: either true or false
+    *description*: either ``true`` or ``false``
 
-    usage: environment variables, javascript/JSON inputs
+    *usage*: environment variables, javascript/JSON inputs
 
-  character
-    example option: sea_colour='blue'
+  ``character``
+    *example option*: ``sea_colour='blue'``
 
-    description: Fortran character type - a single quoted string, single
+    *description*: Fortran character type - a single quoted string, single
     quotes escaped in pairs
 
-    usage: Fortran character types
+    *usage*: Fortran character types
 
-  integer
-    example option: num_lucky=5
+  ``integer``
+    *example option*: ``num_lucky=5``
 
-    description: generic integer type
+    *description*: generic integer type
 
-    usage: any integer-type input
+    *usage*: any integer-type input
 
-  logical
-    example option: l_spock=.true.
+  ``logical``
+    *example option*: ``l_spock=.true.``
 
-    description: Fortran logical type - either .true. or .false.
+    *description*: Fortran logical type - either ``.true.`` or ``.false.``
 
-    usage: Fortran logical types
+    *usage*: Fortran logical types
 
-  python_boolean
-    example option: ENABLE_THINGS=True
+  ``python_boolean``
+    *example option*: ``ENABLE_THINGS=True``
 
-    description: Python boolean type - either True or False
+    *description*: Python boolean type - either ``True`` or ``False``
 
-    usage: Python boolean types
+    *usage*: Python boolean types
 
-  python_list
-    description: used to signify a Python-compatible formatted list such
-    as ["Foo", 50, False]. This encapsulates length, so do not use a separate
-    length declaration for this setting.
+  ``python_list``
+    *description*: used to signify a Python-compatible formatted list such
+    as ``["Foo", 50, False]``. This encapsulates ``length``, so do not use a
+    separate ``length`` declaration for this setting.
 
-    usage: use for inputs that expect a string that looks like a Python
+    *usage*: use for inputs that expect a string that looks like a Python
     list - e.g. Jinja2 list input variables.
 
-  quoted
-    example option: js_measure_cloud_mode="laser"
+  ``quoted``
+    *example option*: ``js_measure_cloud_mode="laser"``
 
-    description: a double quoted string, double quotes escaped with
+    *description*: a double quoted string, double quotes escaped with
     backslash
 
-    usage: Inputs that require double quotes and allow backslash escaping
+    *usage*: Inputs that require double quotes and allow backslash escaping
     e.g. javascript/JSON inputs.
 
-  real
-     example option: n_avogadro=6.02e23
+  ``real``
+     *example option*: ``n_avogadro=6.02e23``
      
-     description: Fortran real number type, generic floating point numbers
+     *description*: Fortran real number type, generic floating point numbers
 
-     usage: Fortran real types, generic floating point numbers. Scientific
+     *usage*: Fortran real types, generic floating point numbers. Scientific
      notation must use the "e" or "E" format.
 
-     comment: Internally implemented within Rose using Python's floating
+     *comment*: Internally implemented within Rose using Python's floating
      point specification.
 
-  raw
-    description: placeholder used in derived type specifications where
+  ``raw``
+    *description*: placeholder used in derived type specifications where
     none of the above types apply
 
-    usage: only in derived types
+    *usage*: only in derived types
 
-  spaced_list
-    description: used to signify a space separated list such as "Foo" 50
-    False.
+  ``spaced_list``
+    *description*: used to signify a space separated list such as
+    ``"Foo" 50 False``.
 
-    usage: use for inputs that expect a string that contains a number of
+    *usage*: use for inputs that expect a string that contains a number of
     space separated items - e.g. in fcm_make app configs.
 
-  Note that not all inputs need to have type defined. In some cases using
-  values or pattern is better.
+  Note that not all inputs need to have ``type`` defined. In some cases
+  using ``values`` or ``pattern`` is better.
 
-  A derived type may be defined by a comma , separated list of intrinsic
-  types, e.g. integer, character, real, integer. The default is a raw string.
+  A derived type may be defined by a comma ``,`` separated list of intrinsic
+  types, e.g. ``integer, character, real, integer``. The default is a raw
+  string.
 
 length
   Define the length of an array. If not present, the setting is assumed to
-  be a scalar. A positive integer defines a fixed length array. A colon :
+  be a scalar. A positive integer defines a fixed length array. A colon ``:``
   defines a dynamic length array.
 
-  N.B. You do not need to use length if you already have type=python_list
-  for a setting.
+  N.B. You do not need to use ``length`` if you already have
+  ``type=python_list`` for a setting.
 
 element-titles
   Define a list of comma separated "titles" to appear above array entries.
@@ -283,9 +288,9 @@ element-titles
   element-titles, blank headings will be placed above them.
 
 values
-  Define a comma , separated list of permitted values of a setting (or an
-  element in the setting if it is an array). This metadata overrides the type,
-  range and pattern metadata.
+  Define a comma ``,`` separated list of permitted values of a setting (or an
+  element in the setting if it is an array). This metadata overrides the
+  ``type``, ``range`` and ``pattern`` metadata.
 
   For example, the config editor may use this list to determine the widget
   to display the setting. It may display the choices using a set of radio
@@ -295,9 +300,9 @@ values
   special setting.
 
 value-titles
-  Define a comma , separated list of titles to associate with each of the
-  elements of values which will be displayed instead of the value. This list
-  should contain the same number of elements as the values entry.
+  Define a comma ``,`` separated list of titles to associate with each of the
+  elements of ``values`` which will be displayed instead of the value. This
+  list should contain the same number of elements as the ``values`` entry.
 
   For example, given the following metadata:
 
@@ -307,13 +312,13 @@ value-titles
      values=0, 1, 2
      value-titles=low, medium, high
 
-  the config editor will display low for option value 0, medium for 1 and
-  high for 2.
+  the config editor will display ``low`` for option value ``0``, ``medium``
+  for ``1`` and ``high`` for ``2``.
 
 value-hints
-  Define a comma , separated list of suggested values for a variable as
-  value-hints, but still allows the user to provide their own override. This
-  is like an auto-complete widget.
+  Define a comma ``,`` separated list of suggested values for a variable as
+  ``value-hints``, but still allows the user to provide their own override.
+  This is like an auto-complete widget.
 
   For example, given the following metadata:
 
@@ -327,18 +332,19 @@ value-hints
   starts typing if they match a suggested value.
 
 range
-  Specify a range of values. It can either be a simple comma , separated
+  Specify a range of values. It can either be a simple comma ``,`` separated
   list of allowed values, or a logical expression in the Rose metadata
-  mini-language. This metadata is only valid if type is either integer or real.
+  mini-language. This metadata is only valid if ``type`` is either ``integer``
+  or ``real``.
 
   A simple list may contain a mixture of allowed numbers and number ranges
-  such as 1, 2, 4:8, 10:, (which means the value can be 1, 2, between 4 and 8
-  inclusive, or any values greater than or equal to 10.)
+  such as ``1, 2, 4:8, 10:`` (which means the value can be 1, 2, between 4
+  and 8 inclusive, or any values greater than or equal to 10.)
 
   A logical expression uses the Rose metadata mini-language, using the
-  variable this to denote the value of the current setting, e.g. this <-1 and
-  this >1. Inter-variable comparisons are not permitted (but see the fail-if
-  property below for a way to implement this).
+  variable ``this`` to denote the value of the current setting, e.g.
+  ``this <-1 and this >1``. Inter-variable comparisons are not permitted
+  (but see the ``fail-if`` property below for a way to implement this).
 
 pattern
   Specify a regular expression (Python's extended regular expression
@@ -351,16 +357,16 @@ pattern
      [namelist:cheese=country_of_origin]
      pattern=^"[A-Z].+"$
 
-  then we expect all valid values for country_of_origin to start with a
-  double quote (^"), begin with an uppercase letter ([A-Z]), contain some other
-  characters or spaces (.+), and end with a quote ("$).
+  then we expect all valid values for ``country_of_origin`` to start with a
+  double quote (``^"``), begin with an uppercase letter (``[A-Z]``), contain
+  some other characters or spaces (``.+``), and end with a quote (``"$``).
 
   If you have an array variable (for example,
-  TARTAN_PAINT_COLOURS='blue','red','blue') and you want to specify a pattern
-  that each element of the array must match, you can construct a regular
-  expression that repeats and includes commas. For example, if each element in
-  our TARTAN_PAINT_COLOURS array must obey the regular expression 'red'|'blue',
-  then we can write:
+  ``TARTAN_PAINT_COLOURS='blue','red','blue'``) and you want to specify a
+  pattern that each element of the array must match, you can construct a
+  regular expression that repeats and includes commas. For example, if each
+  element in our ``TARTAN_PAINT_COLOURS`` array must obey the regular
+  expression ``'red'|'blue'``, then we can write:
 
   .. code-block:: rose
 
@@ -371,20 +377,20 @@ pattern
 fail-if, warn-if
   Specify a logical expression using the Rose mini-language to validate the
   value of the current setting with respect to other settings. If the logical
-  expression evaluates to true in a fail-if metadata, the system will consider
-  the setting in error. On the other hand, in a warn-if metadata, the system
-  will only issue a warning. The logical expression uses a Python-like syntax
-  (documented fully in the appendix). It can reference the value of the current
-  setting with the this variable and the value of other settings with their
-  IDs. E.g.:
+  expression evaluates to true in a ``fail-if`` metadata, the system will
+  consider the setting in error. On the other hand, in a ``warn-if`` metadata,
+  the system will only issue a warning. The logical expression uses a
+  Python-like syntax (documented fully in the appendix). It can reference the
+  value of the current setting with the ``this`` variable and the value of
+  other settings with their IDs. E.g.:
 
   .. code-block:: rose
 
      [namelist:test=my_test_var]
      fail-if=this < namelist:test=control_lt_var;
 
-  means that an error will be flagged if the numeric value of my_test_var
-  is less than the numeric value of control_lt_var.
+  means that an error will be flagged if the numeric value of ``my_test_var``
+  is less than the numeric value of ``control_lt_var``.
 
   .. code-block:: rose
 
@@ -400,14 +406,14 @@ fail-if, warn-if
 
      fail-if=this(2) != "'0A'" and this(4) == "'0A'";
 
-  Array elements can also be checked using any and all. E.g.:
+  Array elements can also be checked using ``any`` and ``all``. E.g.:
 
   .. code-block:: rose
 
      fail-if=any(namelist:test=ctrl_array < this);
      fail-if=all(this == 0);
 
-  Similarly, the number of array elements can be checked using len. E.g.:
+  Similarly, the number of array elements can be checked using ``len``. E.g.:
 
   .. code-block:: rose
 
@@ -424,8 +430,8 @@ fail-if, warn-if
   Multiple failure conditions can be added, by using a semicolon as the
   separator - the semicolon is optional for a single statement or the last in
   a block, but is recommended. Multiple failure conditions are essentially
-  similar to chaining them together with or, but the system can process each
-  expression one by one to target the error message.
+  similar to chaining them together with ``or``, but the system can process
+  each expression one by one to target the error message.
 
   .. code-block:: rose
 
@@ -460,12 +466,13 @@ fail-if, warn-if
 
   Please note: when dividing a real-numbered setting by something, make
   sure that the expression does not actually divide an integer by an
-  integer - for example, this / 2 will evaluate as 0 if this has a value of 1,
-  but 0.5 if it has a value of 1.0. This is a result of Python's implicit
-  typing.
+  integer - for example, ``this / 2`` will evaluate as ``0`` if ``this`` has
+  a value of ``1``, but ``0.5`` if it has a value of ``1.0``. This is a
+  result of Python's implicit typing.
 
   You can get around this by making sure either the numerator or denominator 
-  is a real number - e.g. by rewriting it as this / 2.0 or 1.0 * this / 2.
+  is a real number - e.g. by rewriting it as ``this / 2.0`` or
+  ``1.0 * this / 2``.
 
 Metadata for Behaviour
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -474,7 +481,7 @@ These metadata are used to define how the setting should behave in different
 states.
 
 compulsory
-  A true value indicates that the setting should be compulsory. If this
+  A ``true`` value indicates that the setting should be compulsory. If this
   flag is not set, the setting is optional.
 
   Compulsory sections should be physically present in the configuration at
@@ -490,9 +497,9 @@ trigger
   A setting has the following states:
 
   * normal
-  * user ignored (stored in the configuration file with a ! flag, ignored
+  * user ignored (stored in the configuration file with a ``!`` flag, ignored
     at run time)
-  * logically ignored (stored in the configuration file with a !! flag,
+  * logically ignored (stored in the configuration file with a ``!!`` flag,
     ignored at runtime)
 
   If a setting is user ignored, the trigger will do nothing. Otherwise:
@@ -507,9 +514,9 @@ trigger
 
   The syntax contains id-values pairs, where the values part is optional.
   Each pair must be separated by a semi-colon. Within each pair, any values
-  must be separated from the id by a colon and a space (: ). Values must be
-  formatted in the same way as the setting "values" defined above (i.e. comma
-  separated).
+  must be separated from the id by a colon and a space (``:``). Values must
+  be formatted in the same way as the setting "values" defined above (i.e.
+  comma separated).
 
   The trigger syntax looks like:
 
@@ -524,23 +531,26 @@ trigger
 
   In this example:
 
-  * When namelist:trig_nl=trigger_variable is ignored, all the variables
+  * When ``namelist:trig_nl=trigger_variable`` is ignored, all the variables
     in the trigger expression will be ignored, irrespective of its value.
-  * When namelist:trig_nl=trigger_variable is enabled, namelist:dep_nl=A
-    and namelist:dep_nl=B will both be enabled, and the other variables
-    may be enabled according to its value:
+  * When ``namelist:trig_nl=trigger_variable`` is enabled,
+    ``namelist:dep_nl=A`` and ``namelist:dep_nl=B`` will both be enabled,
+    and the other variables may be enabled according to its value:
 
-    * When the value of the setting is not 10, 20, 30, or 40,
-      namelist:value_nl=X, env=Y and namelist:value_nl=Z will be ignored.
-    * When the value of the setting is 10, namelist:value_nl=X will be
-      enabled, but env=Y and namelist:value_nl=Z will be ignored.
-    * When the value of the setting is 20, env=Y and
-      namelist:value_nl=Z will be enabled, but namelist:value_nl=X will
-      be ignored.
-    * When the value of the setting is 30, env=Y will be enabled,
-      but namelist:value_nl=X and namelist:value_nl=Z will be ignored.
+    * When the value of the setting is not ``10``, ``20``, ``30``, or ``40``,
+      ``namelist:value_nl=X``, ``env=Y`` and ``namelist:value_nl=Z`` will be
+      ignored.
+    * When the value of the setting is ``10``, ``namelist:value_nl=X`` will be
+      enabled, but ``env=Y`` and ``namelist:value_nl=Z`` will be ignored.
+    * When the value of the setting is ``20``, ``env=Y`` and
+      ``namelist:value_nl=Z`` will be enabled, but ``namelist:value_nl=X``
+      will be ignored.
+    * When the value of the setting is ``30``, ``env=Y`` will be enabled,
+      but ``namelist:value_nl=X`` and ``namelist:value_nl=Z`` will be
+      ignored.
     * If the value of the setting contains an environment
-      variable-like string, e.g. ${TEN_MULTIPLE}, all three will be enabled.
+      variable-like string, e.g. ``${TEN_MULTIPLE}``, all three will be
+      enabled.
 
   Settings mentioned in trigger expressions will have their default
   state set to ignored unless explicitly triggered. The config editor will
@@ -548,7 +558,7 @@ trigger
   loads a configuration. Triggering thereafter will work as normal.
 
   Where multiple triggers act on a setting, the setting is triggered only
-  if all triggers are active (i.e. an AND relationship). For example, for
+  if all triggers are active (i.e. an *AND* relationship). For example, for
   the two triggers here:
 
   .. code-block:: rose
@@ -559,12 +569,12 @@ trigger
      [env=IS_COLD]
      trigger=env=IS_ICE: true;
 
-  the setting env=IS_ICE is only enabled if both env=IS_WATER and
-  env=IS_COLD are true and enabled. Otherwise, it is ignored.
+  the setting ``env=IS_ICE`` is only enabled if both ``env=IS_WATER`` and
+  ``env=IS_COLD`` are ``true`` and enabled. Otherwise, it is ignored.
 
   The trigger syntax also supports a logical expression using the Rose 
-  metadata mini-language, in the same way as the range or fail-if metadata.
-  As with range, inter-variable comparisons are disallowed.
+  metadata mini-language, in the same way as the ``range`` or ``fail-if``
+  metadata. As with ``range``, inter-variable comparisons are disallowed.
 
   .. code-block:: rose
 
@@ -572,11 +582,12 @@ trigger
      trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
              env=SILLY_SNOWFLAKE_GEOMETRY: this < 2;
 
-  In this example, the setting env=CUSTOM_SNOWFLAKE_GEOMETRY is enabled
-  if env=SNOWFLAKE_SIDES is enabled and not 6. env=SILLY_SNOWFLAKE_GEOMETRY is
-  only enabled when env=SNOWFLAKE_SIDES is enabled and less than 2. The
-  logical expression syntax can be used with non-numeric variables in the
-  same way as the fail-if metadata.
+  In this example, the setting ``env=CUSTOM_SNOWFLAKE_GEOMETRY`` is enabled
+  if ``env=SNOWFLAKE_SIDES`` is enabled and not ``6``.
+  ``env=SILLY_SNOWFLAKE_GEOMETRY`` is only enabled when
+  ``env=SNOWFLAKE_SIDES`` is enabled and less than ``2``. The logical
+  expression syntax can be used with non-numeric variables in the same way
+  as the fail-if metadata.
 
 duplicate
   Allow duplicated copies of the setting. This is used for sections where
@@ -592,17 +603,17 @@ macro
   Associate a setting with a comma-delimited set of custom macros (but not
   upgrade macros).
 
-  E.g. for a macro class called FibonacciChecker in the metadata under
-  lib/python/macros/fib.py, we may have:
+  E.g. for a macro class called ``FibonacciChecker`` in the metadata under
+  ``lib/python/macros/fib.py``, we may have:
 
   .. code-block:: rose
 
      macro=fib.FibonacciChecker
 
   This may be used in the config editor to visually associate the setting
-  with these macros. If a macro class has both a transform and a validate
-  method, you can specify which you need by appending the method to the name
-  e.g.:
+  with these macros. If a macro class has both a ``transform`` and a
+  ``validate`` method, you can specify which you need by appending the
+  method to the name e.g.:
 
   .. code-block:: rose
 
@@ -616,25 +627,25 @@ widget[gui-application]
   point real number.
 
   The widget may take space-delimited arguments which would be specified
-  after the widget name. E.g. to set up a hypothetical table with named columns
-  X, Y, VCT, and Level, we may do:
+  after the widget name. E.g. to set up a hypothetical table with named
+  columns X, Y, VCT, and Level, we may do:
 
   .. code-block:: rose
 
      widget[rose-config-edit]=table.TableWidget X Y VCT Level
 
-  You may override to a Rose built-in widget by specifying a full rose
-  class path in Python - for example, to always show radiobuttons for an option
-  with values set:
+  You may override to a Rose built-in widget by specifying a full ``rose``
+  class path in Python - for example, to always show radiobuttons for an
+  option with ``values`` set:
 
   .. code-block:: rose
 
      widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
 
   Another useful Rose built-in widget to use is the array element aligning
-  page widget, rose.config_editor.pagewidget.table.PageArrayTable. You can set
-  this for a section or namespace to make sure each nth variable value element
-  lines up horizontally. For example:
+  page widget, ``rose.config_editor.pagewidget.table.PageArrayTable``. You
+  can set this for a section or namespace to make sure each nth variable
+  value element lines up horizontally. For example:
 
   .. code-block:: rose
 
@@ -662,7 +673,7 @@ widget[gui-application]
 
 copy-mode (metadata usage with the rose-suite.info file)
   Setting copy-mode in the metadata allows for the field to be either
-  never copied or copied with any value associated to be clear.
+  ``never`` copied or copied with any value associated to be ``clear``.
 
   For example: in a rose-suite.info file
 
@@ -671,17 +682,17 @@ copy-mode (metadata usage with the rose-suite.info file)
      [ensemble members]
      copy-mode=never
 
-  Setting the ensemble members field to include copy-mode=never means
-  that the ensemble members field would never be copied.
+  Setting the ``ensemble members`` field to include ``copy-mode=never``
+  means that the ensemble members field would never be copied.
 
    .. code-block:: rose
 
       [additional info]
       copy-mode=clear
 
-  Setting the additional info field to include copy-mode=never means that
-  the additional info field would be copied, but any value associated with
-  it would be cleared.
+  Setting the ``additional info`` field to include ``copy-mode=never`` means
+  that the additional info field would be copied, but any value associated
+  with it would be cleared.
 
 Metadata for Help
 ^^^^^^^^^^^^^^^^^
@@ -718,7 +729,7 @@ help
 
      help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to do something linear.
 
-  Web URLs beginning with http:// will also be presented as links in the
+  Web URLs beginning with ``http://`` will also be presented as links in the
   config editor.
 
 description
@@ -739,16 +750,16 @@ title
 Appendix: Metadata Location
 ---------------------------
 
-Centralised Rose metadata is referred to with either the meta or project
-top level flag in a configuration. It needs to live in a
+Centralised Rose metadata is referred to with either the ``meta`` or
+``project`` top level flag in a configuration. It needs to live in a
 system-global-readable location.
 
 Rose utilities will do a path search for metadata using the following in
 order of precedence:
 
-* The --meta-path=PATH option of relevant commands.
-* The content of the ROSE_META_PATH environment variable.
-* The meta-path setting in site/user configurations.
+* The ``--meta-path=PATH`` option of relevant commands.
+* The content of the ``ROSE_META_PATH`` environment variable.
+* The ``meta-path`` setting in site/user configurations.
 
 Each of the above settings can be a colon-separated list of paths.
 
@@ -767,14 +778,14 @@ Note that, in some cases, a number of different executables may share the
 same application configuration metadata in which case APP is given a name
 which covers all the uses.
 
-The Rose team recommend placing metadata in a rose-meta directory at the
-top of a project's source tree. Central metadata, if any, at the meta-path
-location in the site configuration, should be a collection of
-regularly-updated subdirectories from all of the relevant projects' rose-meta
-directories.
+The Rose team recommend placing metadata in a ``rose-meta`` directory at the
+top of a project's source tree. Central metadata, if any, at the
+``meta-path`` location in the site configuration, should be a collection of
+regularly-updated subdirectories from all of the relevant projects'
+``rose-meta`` directories.
 
-For example, a system CHOCOLATE may have a flat metadata structure within
-the repository:
+For example, a system ``CHOCOLATE`` may have a flat metadata structure
+within the repository:
 
    .. code-block:: bash
 
@@ -785,7 +796,7 @@ the repository:
       CHOCOLATE/rose-meta/choc-milk/
     
 
-and the system CAFFEINE may have a hybrid structure, with both flat and 
+and the system ``CAFFEINE`` may have a hybrid structure, with both flat and
 hierarchical components:
 
    .. code-block:: rose
@@ -804,7 +815,7 @@ and a site configuration with:
 
       meta-path=/path/to/rose-meta
 
-We would expect the following directories in /path/to/rose-meta:
+We would expect the following directories in ``/path/to/rose-meta``:
 
    .. code-block:: bash
 
@@ -814,8 +825,8 @@ We would expect the following directories in /path/to/rose-meta:
       /path/to/rose-meta/choc-dark/
       /path/to/rose-meta/choc-milk/
 
-with caffeine-coffee containing subdirectories cappuccino and latte, and
-caffeine-tea containing yorkshire and lapsang
+with ``caffeine-coffee`` containing subdirectories ``cappuccino`` and
+``latte``, and ``caffeine-tea`` containing ``yorkshire`` and ``lapsang``.
 
 
 Appendix: Upgrade and Versions
@@ -881,7 +892,7 @@ If the version defined does not correspond to a tagged version then a warning
 will be given.
 
 Please note that if a hierarchical structure for the metadata is being used,
-the HEAD tag must be specified explictly.
+the ``HEAD`` tag must be specified explictly.
 
 When to create named versions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -923,7 +934,7 @@ commands which you want to configure using the same set of inputs (i.e. a
 single application configuration).
 
 This works by setting an alternate command in the application configuration
-and then using the `--command-key` option to `rose app-run`.
+and then using the ``--command-key`` option to ``rose app-run``.
 
 Using development versions of upgrade macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -931,7 +942,7 @@ Using development versions of upgrade macros
 Users will be able to test out development versions of the upgrade macros by
 adding a working copy of the relevant branch into their metadata search path.
 However, care must be taken when doing this. Running the upgrade macro will
-change the `meta` setting to refer to the new tag. If the upgrade macro is
+change the ``meta`` setting to refer to the new tag. If the upgrade macro is
 subsequently changed or other upgrade macros are added to the chain prior to
 this tag (because they get committed to the trunk first) then this will
 result in application configurations which have not gone through the correct
@@ -946,14 +957,15 @@ Appendix: Metadata Mini-Language
 The Rose metadata mini-language supports writing a logical expression in
 Python-like syntax, using variable ids to reference their associated values.
 
-Expressions are set as the value of metadata properties such as fail-if and
-range.
+Expressions are set as the value of metadata properties such as ``fail-if``
+and ``range``.
 
 The language is a small sub-set of Python - a limited set of operators is
 supported. No built-in object methods, functions, or modules are
-supported - neither are control blocks such as if/for, statements such as
-del or with, or defining your own functions or classes. Anything that
-requires that kind of power should be in proper Python code as a macro.
+supported - neither are control blocks such as ``if``\/``for``, statements
+such as ``del`` or ``with``, or defining your own functions or classes.
+Anything that requires that kind of power should be in proper Python code
+as a macro.
 
 Nevertheless, the language allows considerable power in terms of defining
 simple rules for variable values.
@@ -961,7 +973,7 @@ simple rules for variable values.
 Operators
 ^^^^^^^^^
 
-The following numeric operators are supported:
+The following *numeric* operators are supported:
 
    .. code-block:: rose
 
@@ -973,7 +985,7 @@ The following numeric operators are supported:
       //    # integer divide (floor) - e.g. 3 // 2 implies 1
       %     # remainder e.g. 5 % 3 implies 2
 
-The following string operators are supported:
+The following *string* operators are supported:
 
    .. code-block:: rose
 
@@ -991,7 +1003,7 @@ The following string operators are supported:
         "oobar"
       [:n]  # get slice of string up to n - e.g. "foobar"[:5] implies "fooba"
 
-The following logical operators are supported:
+The following *logical* operators are supported:
 
    .. code-block:: rose
 
@@ -999,7 +1011,7 @@ The following logical operators are supported:
       or    # Logical OR
       not   # Logical NOT
 
-The following comparison operators are supported:
+The following *comparison* operators are supported:
 
    .. code-block:: rose
 
@@ -1012,8 +1024,8 @@ The following comparison operators are supported:
       !=    # Not equal to
 
 Operator precedence is intended to be the same as Python. However, with the
-current choice of language engine, the % and // operators may not obey
-this - make sure you force the correct behaviour using brackets.
+current choice of language engine, the ``%`` and ``//`` operators may not
+obey this - make sure you force the correct behaviour using brackets.
 
 Constants
 ^^^^^^^^^
@@ -1055,13 +1067,13 @@ then the expression would become:
 
 If the variable is not currently available (ignored or missing) then the
 expression cannot be evaluated. If inter-variable comparisons are not allowed
-for the expression's parent option (such as with trigger and range) then
-referencing other variable ids is not allowed.
+for the expression's parent option (such as with ``trigger`` and ``range``)
+then referencing other variable ids is not allowed.
 
 In this case the expression would be false.
 
-You may use this as a placeholder for the current variable id - for example,
-the fail-if expression:
+You may use ``this`` as a placeholder for the current variable id - for
+example, the fail-if expression:
 
    .. code-block:: rose
 
@@ -1082,16 +1094,16 @@ The syntax has some special ways of dealing with variable values that are
 arrays - i.e. comma-separated lists.
 
 You can refer to a single element of the value for a given variable id
-(or this) by suffixing a number in round brackets - e.g.:
+(or ``this``) by suffixing a number in round brackets - e.g.:
 
    .. code-block:: none
 
       namelist:foo=bar(2)
 
-references the second element in the value for bar in the section
-namelist:foo. This follows Fortran index numbering and syntax, which starts
-at 1 rather than 0 - i.e. referencing the 1st element in the array foo is
-written as foo(1).
+references the second element in the value for ``bar`` in the section
+``namelist:foo``. This follows Fortran index numbering and syntax, which
+starts at 1 rather than 0 - i.e. referencing the 1st element in the array
+``foo`` is written as ``foo(1)``.
 
 If we had a configuration:
 
@@ -1100,8 +1112,8 @@ If we had a configuration:
       [namelist:foo]
       bar='a', 'b', 'c', 'd'
 
-namelist:foo=bar(2) would get substituted in an expression with 'b' when the
-expression was evaluated. For example, an expression that contained:
+``namelist:foo=bar(2)`` would get substituted in an expression with ``'b'``
+when the expression was evaluated. For example, an expression that contained:
 
    .. code-block:: none
 
@@ -1114,7 +1126,7 @@ would be evaluated as:
       'b' == 'c'
 
 Should you wish to make use of the array length in an expression you can
-make use of the len function, which behaves in the same manner as its
+make use of the ``len`` function, which behaves in the same manner as its
 Python and Fortran equivalents to return the array length. For example:
 
    .. code-block:: none
@@ -1129,20 +1141,20 @@ would be expanded to:
 
 and evaluate as true.
 
-There are two other special array functions, any and all, which behave in
-a similar fashion to their Python and Fortran equivalents, but have a
-different syntax.
+There are two other special array functions, ``any`` and ``all``, which
+behave in a similar fashion to their Python and Fortran equivalents, but
+have a different syntax.
 
-They allow you to write a shorthand expression within an any() or all()
-bracket which implies a loop over each array element. For example:
+They allow you to write a shorthand expression within an ``any()`` or
+``all()`` bracket which implies a loop over each array element. For example:
 
    .. code-block:: none
 
       any(namelist:foo=bar == 'e')
 
-evaluates true if any elements in the value of bar in the section
-namelist:foo are 'e'. For the above configuration snippet, this would be
-expanded before evaluation to be:
+evaluates true if *any* elements in the value of ``bar`` in the section
+``namelist:foo`` are ``'e'``. For the above configuration snippet, this
+would be expanded before evaluation to be:
 
    .. code-block:: none
 
@@ -1154,8 +1166,8 @@ Similarly,
 
       all(namelist:foo=bar == 'e')
 
-evaluates true if all elements are 'e'. Again, with the above configuration,
-this would be expanded before proper evaluation:
+evaluates true if *all* elements are ``'e'``. Again, with the above
+configuration, this would be expanded before proper evaluation:
 
    .. code-block:: none
 
@@ -1165,13 +1177,13 @@ Internals
 ^^^^^^^^^
 
 Rose uses an external engine to evaluate the raw language string after
-variable ids and any any() and all() functions have been substituted and
-expanded.
+variable ids and any ``any()`` and ``all()`` functions have been substituted
+and expanded.
 
 The current choice of engine is Jinja2, which is responsible for the
 details of the supported Pythonic syntax. This may change.
 
-Do not use any Jinja2-specific syntax.
+**Do not use any Jinja2-specific syntax.**
 
 
 Appendix: Config Editor Ignored Mechanics
@@ -1182,7 +1194,7 @@ an ignored state mismatch for a setting - e.g. a setting might be enabled
 when it should be trigger-ignored.
 
 The config editor differs from the strict command line macro equivalent
-because the Switch Off Metadata mode and accidentally metadata-less
+because the *Switch Off Metadata* mode and accidentally metadata-less
 configurations need to be presented in a nice way without lots of
 not-necessarily-errors. The config editor should only report the errors
 where the state is definitely wrong or makes a material difference to the user.
@@ -1192,12 +1204,12 @@ ignored state mismatches. The actual situations are considerably more
 varied, given section-ignoring and latent variables - the table holds
 the most important varieties.
 
-The State contains the actual states. The Trigger State column contains
-the trigger-mechanism's expected states. The states can be:
+The ``State`` contains the actual states. The ``Trigger State`` column
+contains the trigger-mechanism's expected states. The states can be:
 
-IT - !!
+``IT`` - ``!!``
   trigger ignored
-IU - !
+``IU`` - ``!``
   user ignored
-E - (normal)
+``E`` - **(normal)**
   enabled

@@ -487,7 +487,7 @@ Description
 (Deprecated) Use the ``opt.jobs`` setting in the application configuration
 instead.
 
-The number of jobs to run in parallel in ``fcm make``. (default=4)
+The number of jobs to run in parallel in ``fcm make``. (``default=4``)
 
 Used By
 ^^^^^^^
