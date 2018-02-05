@@ -58,8 +58,10 @@ The procedure for implementing a custom value widget is as follows:
 Assign a widget[rose-config-edit] attribute to the relevant variable in the
 metadata configuration, e.g.
 
-[namelist:VerifConNL/ScalarAreaCodes]
-widget[rose-config-edit]=module_name.AreaCodeChooser
+   .. code-block:: rose
+
+      [namelist:VerifConNL/ScalarAreaCodes]
+      widget[rose-config-edit]=module_name.AreaCodeChooser
 
 where the widget class lives in the module module_name under
 lib/python/widget/ in the metadata directory for the application or suite.
@@ -67,9 +69,11 @@ Modules are imported by the config editor on demand.
 
 This class should have a constructor of the form
 
-class AreaCodeChooser(gtk.HBox):
+   .. code-block:: python
 
-    def __init__(self, value, metadata, set_value, hook, arg_str=None)
+      class AreaCodeChooser(gtk.HBox):
+
+          def __init__(self, value, metadata, set_value, hook, arg_str=None)
 
 with the following arguments
 
@@ -80,7 +84,9 @@ metadata
     a map or dictionary of configuration metadata properties for this value,
 such as
 
-    {'type': 'integer', 'help': 'This is used to count something'}
+   .. code-block:: python
+
+      {'type': 'integer', 'help': 'This is used to count something'}
 
     You may not need to use this information.
 set_value
@@ -88,7 +94,9 @@ set_value
     a function that should be called with a new string value of this widget,
 e.g.
 
-    set_value("20")
+   .. code-block:: python
+
+      set_value("20")
 
 hook
 
@@ -99,14 +107,18 @@ arg_str
     a keyword argument that stores extra text given to the widget option in
 the metadata, if any:
 
-    widget[rose-config-edit]=modulename.ClassName arg1 arg2 arg3 ...
+   .. code-block:: rose
+
+      widget[rose-config-edit]=modulename.ClassName arg1 arg2 arg3 ...
 
     would give a arg_str of "arg1 arg2 arg3 ...". This could help configure
 your widget - for example, for a table based widget, you might give the 
 column names
     :
 
-    widget[rose-config-edit]=table.TableValueWidget NAME ID WEIGHTING
+   .. code-block:: rose
+
+      widget[rose-config-edit]=table.TableValueWidget NAME ID WEIGHTING
 
     This means that you can write a generic widget and then configure it for
 different cases. 
@@ -117,14 +129,17 @@ hook.get_focus(widget) -> None
 
     which you should connect your top-level widget (self) to as follows:
 
-        self.grab_focus = lambda: hook.get_focus(my_favourite_focus_widget)
+   .. code-block:: python
+
+      self.grab_focus = lambda: hook.get_focus(my_favourite_focus_widget)
 
     or define a method in your class
 
-    def grab_focus(self):
-        """Override the focus method, so we can scroll to a particular
-widget."""
-        return hook.get_focus(my_favourite_focus_widget)
+   .. code-block:: python
+
+      def grab_focus(self):
+          """Override the focus method, so we can scroll to a particular widget."""
+          return hook.get_focus(my_favourite_focus_widget)
 
     which allows the correct widget (my_favourite_focus_widget) in your
 container to receive the focus such as a gtk.Entry
@@ -135,13 +150,17 @@ hook.trigger_scroll(widget) -> None
 
     accessed by
 
-        hook.trigger_scroll(my_favourite_focus_widget)
+   .. code-block:: python
+
+      hook.trigger_scroll(my_favourite_focus_widget)
 
     This should be connected to the focus-in-event GTK signal of your
 top-level widget (self):
 
-            self.entry.connect('focus-in-event',
-                               hook.trigger_scroll)
+   .. code-block:: python
+
+      self.entry.connect('focus-in-event',
+                         hook.trigger_scroll)
 
     This also is used to trigger a config editor page scroll to your widget.
 
@@ -153,9 +172,11 @@ set_focus_index(focus_index) -> None
     A method that takes a number as an argument, which is the current cursor
 position relative to the characters in the variable value:
 
-    def set_focus_index(self, focus_index):
-        """Set the cursor position to focus_index."""
-        self.entry.set_position(focus_index)
+   .. code-block:: python
+
+      def set_focus_index(self, focus_index):
+          """Set the cursor position to focus_index."""
+          self.entry.set_position(focus_index)
 
     For example, a focus_index of 0 means that your widget should set the
 cursor position to the beginning of the value. A focus_index of 4 for a
@@ -170,9 +191,11 @@ get_focus_index() -> focus_index
     A method that takes no arguments and returns a number which is the
 current cursor position relative to the characters in the variable value:
 
-    def get_focus_index(self):
-        """Return the cursor position."""
-        return self.entry.get_position()
+   .. code-block:: python
+
+      def get_focus_index(self):
+          """Return the cursor position."""
+          return self.entry.get_position()
 
     This has no real meaning or importance for widgets that don't display
 editable text. If you do not supply this method, the config editor will guess
@@ -184,10 +207,12 @@ re-instantiate the widget (refresh and redraw it). This can be overridden
 by defining this method in your value widget class. It takes a boolean
 is_in_error which is True if there is a value (type) error and False otherwise:
 
-    def handle_type_error(self, is_in_error):
-        """Change behaviour based on whether the variable is_in_error."""
-        icon_id = gtk.STOCK_DIALOG_ERROR if is_in_error else None
-        self.entry.set_icon_from_stock(0, gtk.STOCK_DIALOG_ERROR)
+   .. code-block:: python
+
+      def handle_type_error(self, is_in_error):
+          """Change behaviour based on whether the variable is_in_error."""
+          icon_id = gtk.STOCK_DIALOG_ERROR if is_in_error else None
+          self.entry.set_icon_from_stock(0, gtk.STOCK_DIALOG_ERROR)
 
     For example, this is used in a built-in widget for the quoted string
 types string and character. The quotes around the text are normally hidden,
@@ -224,16 +249,20 @@ The procedure for generating a custom page widget is as follows:
 Assign a widget option to the relevant namespace in the metadata
 configuration, e.g.
 
-    [ns:namelist/STASHNUM]
-    widget[rose-config-edit]=module_name.MyGreatBigTable
+   .. code-block:: rose
+
+      [ns:namelist/STASHNUM]
+      widget[rose-config-edit]=module_name.MyGreatBigTable
 
 The widget class should have a constructor of the form
 
-    class MyGreatBigTable(gtk.Table):
+   .. code-block:: python
 
-        def __init__(self, real_variable_list, missing_variable_list,
-                     variable_functions_inst, show_modes_dict,
-                     arg_str=None):
+      class MyGreatBigTable(gtk.Table):
+
+          def __init__(self, real_variable_list, missing_variable_list,
+                       variable_functions_inst, show_modes_dict,
+                       arg_str=None):
 
 The class can inherit from any gtk.Container-derived class.
 
@@ -259,9 +288,11 @@ lib/python/rose/config_editor/ops/variable.py.
 show_modes_dict
     a dictionary that looks like this:
 
-        show_modes_dict = {'latent': False, 'fixed': False, 'ignored': True,
-                           'user-ignored': False, 'title': False,
-                           'flag:optional': False, 'flag:no-meta': False}
+   .. code-block:: python
+
+      show_modes_dict = {'latent': False, 'fixed': False, 'ignored': True,
+                         'user-ignored': False, 'title': False,
+                         'flag:optional': False, 'flag:no-meta': False}
 
     which could be ignored for most custom pages, as you need. The meaning of
 the different keys in a non-custom page is:
@@ -295,7 +326,9 @@ setting), the custom page widget should expose a method named
 separately (more below). These methods should take a single boolean that
 indicates the display status. For example:
 
-    def show_fixed(self, should_show)
+   .. code-block:: python
+
+      def show_fixed(self, should_show)
 
     The argument should_show is a boolean. If True, fixed variables should
 be shown. If False, they should be hidden by your custom container.
@@ -304,14 +337,18 @@ arg_str
     a keyword argument that stores extra text given to the widget option
 in the metadata, if any:
 
-    widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
+   .. code-block:: rose
+
+      widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
 
     would give a arg_str of "arg1 arg2 arg3 ...". This could help configure
 your widget - for example, for a table based widget, you might give the
 column names
     :
 
-    widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
+   .. code-block:: rose
+
+      widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
 
     This means that you can write a generic widget and then configure it
 for different cases. 
@@ -384,8 +421,10 @@ The procedure for generating a custom sub panel widget is as follows:
 Assign a widget[rose-config-edit:sub-ns] option to the relevant namespace
 in the metadata configuration, e.g.
 
-    [ns:namelist/all_the_foo_namelists]
-    widget[rose-config-edit:sub-ns]=module_name.MySubPanelForFoos
+   .. code-block:: rose
+
+      [ns:namelist/all_the_foo_namelists]
+      widget[rose-config-edit:sub-ns]=module_name.MySubPanelForFoos
 
 Note that because the actual data on the page has a separate representation,
 you need to write [rose-config-edit:sub-ns] rather than just
@@ -393,12 +432,14 @@ you need to write [rose-config-edit:sub-ns] rather than just
 
 The widget class should have a constructor of the form
 
-    class MySubPanelForFoos(gtk.VBox):
+   .. code-block:: python
 
-        def __init__(self, section_dict, variable_dict,
-                     section_functions_inst, variable_functions_inst,
-                     search_for_id_function, sub_functions_inst,
-                     is_duplicate_boolean, arg_str=None):
+      class MySubPanelForFoos(gtk.VBox):
+
+          def __init__(self, section_dict, variable_dict,
+                       section_functions_inst, variable_functions_inst,
+                       search_for_id_function, sub_functions_inst,
+                       is_duplicate_boolean, arg_str=None):
 
 The class can inherit from any gtk.Container-derived class.
 
@@ -452,7 +493,9 @@ arg_str
     a keyword argument that stores extra text given to the widget option
 in the metadata, if any - e.g.:
 
-    widget[rose-config-edit:sub-ns] = modulename.ClassName arg1 arg2 arg3 ...
+   .. code-block:: rose
+
+      widget[rose-config-edit:sub-ns] = modulename.ClassName arg1 arg2 arg3 ...
 
     would give a arg_str of "arg1 arg2 arg3 ...". You can use this to help 
 configure your widget.
@@ -527,15 +570,17 @@ configuration that provides information about the configuration items.
 
 A validator macro should look like:
 
-import rose.macro
+   .. code-block:: python
 
-class SomeValidator(rose.macro.MacroBase):
+      import rose.macro
 
-    """This does some kind of check."""
+      class SomeValidator(rose.macro.MacroBase):
 
-    def validate(self, config, meta_config=None):
-        # Some check on config appends to self.reports using self.add_report
-        return self.reports
+      """This does some kind of check."""
+
+      def validate(self, config, meta_config=None):
+          # Some check on config appends to self.reports using self.add_report
+          return self.reports
 
 The returned list should be a list of rose.macro.MacroReport objects
 containing the section, option, value, and warning strings for each setting
@@ -543,7 +588,9 @@ that is in error. These are initialised behind the scenes by calling the
 inherited method rose.macro.MacroBase.add_report via self.add_report. This
 has the form:
 
-    def add_report(self, section=None, option=None, value=None, info=None,
+   .. code-block:: python
+
+      def add_report(self, section=None, option=None, value=None, info=None,
                    is_warning=False):
 
 This means that you should call it with the relevant section first, then the
@@ -551,14 +598,16 @@ relevant option, then the relevant value, then the relevant error message,
 and optionally a warning flag that we'll discuss later. If the setting is a
 section, the option should be None and the value None. For example,
 
-    def validate(self, config, meta_config=None):
-        editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
-        if editor_value != "sed":
-            self.add_report("env",                         # Section
-                            "MY_FAVOURITE_STREAM_EDITOR",  # Option
-                            editor_value,                  # Value
-                            "Should be 'sed'!")            # Message
-        return self.reports
+   .. code-block:: python
+
+      def validate(self, config, meta_config=None):
+          editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
+          if editor_value != "sed":
+              self.add_report("env",                         # Section
+                              "MY_FAVOURITE_STREAM_EDITOR",  # Option
+                              editor_value,                  # Value
+                              "Should be 'sed'!")            # Message
+          return self.reports
 
 Validator macros have the option to give warnings, which do not count as
 formal errors in the Rose config editor GUI. These should be used when
@@ -566,23 +615,27 @@ something may be wrong, such as warning when using an advanced-developer-only
 option. They are invoked by passing a 5th argument to self.add_report,
 is_warning, like so:
 
-            self.add_report("env",
-                            "MY_FAVOURITE_STREAM_EDITOR",
-                            editor_value,
-                            "Could be 'sed'",
-                            is_warning=True)
+   .. code-block:: python
+
+      self.add_report("env",
+                      "MY_FAVOURITE_STREAM_EDITOR",
+                      editor_value,
+                      "Could be 'sed'",
+                      is_warning=True)
 
 A transformer macro should look like:
 
-import rose.macro
+   .. code-block:: python
 
-class SomeTransformer(rose.macro.MacroBase):
+      import rose.macro
 
-    """This does some kind of change to the config."""
+      class SomeTransformer(rose.macro.MacroBase):
 
-    def transform(self, config, meta_config=None):
-        # Some operation on config which calls self.add_report for each change.
-        return config, self.reports
+      """This does some kind of change to the config."""
+
+      def transform(self, config, meta_config=None):
+          # Some operation on config which calls self.add_report for each change.
+          return config, self.reports
 
 The returned list should be a list of 4-tuples containing the section,
 option, value, and information strings for each setting that was changed
@@ -591,17 +644,19 @@ option should be None and the value None. If an option was removed, the
 value should be the old value - otherwise it should be the new one
 (added/changed). For example,
 
-    def transform(self, config, meta_config=None):
-        """Add some more snow control."""
-        if config.get(["namelist:snowflakes"]) is None:
-            config.set(["namelist:snowflakes"])
-            self.add_report(list_of_changes,
-                            "namelist:snowflakes", None, None,
-                            "Updated snow handling in time for Christmas")
-            config.set(["namelist:snowflakes", "l_unique"], ".true.")
-            self.add_report("namelist:snowflakes", "l_unique", ".true.",
-                            "So far, anyway.")
-        return config, self.reports
+   .. code-block:: python
+
+      def transform(self, config, meta_config=None):
+          """Add some more snow control."""
+          if config.get(["namelist:snowflakes"]) is None:
+              config.set(["namelist:snowflakes"])
+              self.add_report(list_of_changes,
+                              "namelist:snowflakes", None, None,
+                              "Updated snow handling in time for Christmas")
+              config.set(["namelist:snowflakes", "l_unique"], ".true.")
+              self.add_report("namelist:snowflakes", "l_unique", ".true.",
+                              "So far, anyway.")
+          return config, self.reports
 
 The current working directory within a macro is always the configuration's
 directory. This makes it easy to access non-rose-app.conf files (e.g. in the
@@ -611,23 +666,27 @@ There are also reporter macros which can be used where you need to output
 some information about a configuration. A reporter macro takes the same form
 as validator and transform macros but does not require a return value.
 
-    def report(self, config, meta_config=None):
-        """ Write some information about the configuration to a report file.
+   .. code-block:: python
 
-        Note: report methods do not have a return value.
+       def report(self, config, meta_config=None):
+           """ Write some information about the configuration to a report file.
 
-        """
-        with open('report/file', 'r') as report_file:
-            report_file.write(str(config.get(["namelist:snowflakes"])))
+           Note: report methods do not have a return value.
+
+           """
+           with open('report/file', 'r') as report_file:
+               report_file.write(str(config.get(["namelist:snowflakes"])))
 
 Macros also support the use of keyword arguments, giving you the ability to
 have the user specify some input or override to your macro. For example a
 transformer macro could be written as follows to allow the user to input
 some_value:
 
-    def transform(self, config, meta_config=None, some_value=None):
-        """Some transformer macro"""
-        return
+   .. code-block:: python
+
+      def transform(self, config, meta_config=None, some_value=None):
+          """Some transformer macro"""
+          return
 
 Note that the extra arguments require default values (=None in this example)
 and that you should add error handling for the input accordingly.
@@ -652,17 +711,19 @@ above, but with a few differences:
 
 An example upgrade macro might look like this:
 
-class Upgrade272to273(rose.upgrade.MacroUpgrade):
+   .. code-block:: python
 
-    """Upgrade from 27.2 to 27.3."""
+      class Upgrade272to273(rose.upgrade.MacroUpgrade):
 
-    BEFORE_TAG = "27.2"
-    AFTER_TAG = "27.3"
+      """Upgrade from 27.2 to 27.3."""
 
-    def upgrade(self, config, meta_config=None):
-        self.add_setting(config, ["env", "NEW_VARIABLE"], "0")
-        self.remove_setting(config, ["namelist:old_things", "OLD_VARIABLE"])
-        return config, self.reports
+      BEFORE_TAG = "27.2"
+      AFTER_TAG = "27.3"
+
+      def upgrade(self, config, meta_config=None):
+          self.add_setting(config, ["env", "NEW_VARIABLE"], "0")
+          self.remove_setting(config, ["namelist:old_things", "OLD_VARIABLE"])
+          return config, self.reports
 
 The class name is unimportant - the BEFORE_TAG and AFTER_TAG identify the
 macro.
@@ -689,198 +750,7 @@ the functionality of the transform macros documented above.
 rose.upgrade.MacroUpgrade also has some additional convenience methods
 defined for you to call. All methods return None unless otherwise specified.
 
-def act_from_files(self, config, downgrade=False)
-
-    A method that takes the app configuration (config, a
-rose.config.ConfigNode instance) and an optional boolean downgrade keyword
-argument. This initiates a search for etc/VERSION/rose-macro-add.conf and
-etc/VERSION/rose-macro-remove.conf, where VERSION is equal to the BEFORE_TAG
-of the macro. These files should be Rose app config-like patch files,
-containing settings to be added (rose-macro-add.conf) and settings to be
-removed (rose-macro-remove.conf). If downgrading (downgrade set to True),
-the settings in rose-macro-remove.conf will be added, and the ones in
-rose-macro-add.conf removed.
-
-        def upgrade(self, config, meta_config=None):
-            self.act_from_files(config)
-            return config, self.reports
-
-    Note that you can use other methods (below) as well as this in the
-same upgrade.
-
-    If settings are defined in either file, and changes can be made,
-the self.reports will be updated automatically.
-def add_setting(self, config, keys, value=None, forced=False, state=None,
-comments=None, info=None):
-
-    A method that attempts to add the setting defined by the list keys
-([section] or [section, option] strings) with the value value to the app
-config config. The arguments mostly follow rose.config.ConfigNode 
-attributes, and are as follows:
-
-    config
-        The application configuration object (rose.config.ConfigNode instance)
-    keys
-        A list of strings denoting config settings - [section_name] for a
-section, [section_name, option_name] for an option. For example, it might
-be ["namelist:foo", "bar"].
-    value (optional)
-        A string or None denoting the new setting value. None should be
-used for sections only. Options must have a string value defined.
-    forced (optional)
-        If the setting already exists, override the value to the new value.
-    state (optional)
-        Set the state of the new setting (rose.config.ConfigNode
-states) - None implies the default, which is
-rose.config.ConfigNode.STATE_NORMAL. You may also use
-rose.config.ConfigNode.STATE_USER_IGNORED.
-    comments (optional)
-        A list of comment strings (lines) for the new setting or None.
-    info (optional)
-        A short string containing no new lines, describing the addition of
-the setting.
-
-    Example usage:
-
-        def upgrade(self, config, meta_config=None):
-            self.add_setting(config, ["namelist:breakfast_nl", "bacon"], "2",
-                             comments=["Mmmm. Bacon."], info="Add for
-food:#810")
-            return config, self.reports
-
-def change_setting_value(self, config, keys, value, forced=False,
-comments=None, info=None):
-
-    A method that attempts to change an existing setting value defined by
-keys to a new one (value) in the app config config. The arguments are:
-
-    config, keys, comments, info
-        As in add_setting above.
-    value
-        Required argument, must be a string for option values, and can be
-None for section values.
-    forced (optional)
-        Add the setting if it does not exist.
-
-    Example usage:
-
-        def upgrade(self, config, meta_config=None):
-            self.change_setting_value(config, ["namelist:breakfast_nl",
-"coffee"], "'more'",
-                                      info="Add for food:#820")
-            return config, self.reports
-
-def get_setting_value(self, config, keys, no_ignore=False): (-> value)
-
-    A method that returns a setting value or None, functionally similar to
-rose.config.ConfigNode.get. The arguments are:
-
-    config, keys
-
-        As in add_setting above.
-    no_ignore (optional)
-        False means return the setting value if the setting is ignored. True
-means return None if the setting is ignored. If the setting is missing, None
-is returned.
-
-    Example usage:
-
-        def upgrade(self, config, meta_config=None):
-            if self.get_setting_value(
-                        config, ["namelist:breakfast_nl", "coffee"]) == "'empty'":
-                self.add_setting(config, ["namelist:breakfast_nl", "tea"],
-                                 "'extra_strong'")
-            return config, self.reports
-
-def remove_setting(self, config, keys, info=None):
-
-    A method that removes a setting defined by keys in config with an
-optional info message. The arguments are:
-
-    config, keys, info
-        As in add_setting above.
-
-    Example usage:
-
-        def upgrade(self, config, meta_config=None):
-            self.remove_setting(config, ["namelist:breakfast_nl", "cheeseburger"],
-                                info="Cheeseburgers are for lunch")
-            return config, self.reports
-
-    Example of removing an entire namelist:
-
-        def upgrade(self, config, meta_config=None):
-            self.remove_setting(config, ["namelist:breakfast_nl"],
-                                info="We don't serve breakfast anymore")
-            return config, self.reports
-
-def rename_setting(self, config, keys, new_keys, info=None):
-
-    A method that attempts to rename the setting defined by the list keys
-([section] or [section, option] strings) to the new name defined by new_keys.
-The arguments mostly follow rose.config.ConfigNode attributes, and are as
-follows:
-
-    config
-        The application configuration object (rose.config.ConfigNode instance)
-    keys
-        A list of strings denoting config settings - [section_name] for a
-section, [section_name, option_name] for an option. For example, it might be
-["namelist:foo", "bar_old"].
-    new_keys
-        A list of strings denoting config settings - [section_name] for a
-section, [section_name, option_name] for an option. For example, it might be
-["namelist:foo", "bar_new"].
-    info (optional)
-        A short string containing no new lines, describing the renaming of
-the setting.
-
-    Example usage:
-
-        def upgrade(self, config, meta_config=None):
-            self.rename_setting(config, ["namelist:breakfast_nl", "bad_coffee"],
-                                ["namelist:breakfast_nl", "good_coffee"],
-                                info="Mmmm... nicer coffee...")
-            return config, self.reports
-
-def enable_setting(self, config, keys, info=None):
-
-    A method to make sure a setting defined by keys in config is not
-user-ignored. The arguments are:
-
-    config, keys, info
-        As in add_setting above.
-
-    Example usage:
-
-        def upgrade(self, config, meta_config=None):
-            self.enable_setting(config, ["namelist:breakfast_nl", "egg_monitoring"])
-            return config, self.reports
-
-def ignore_setting(self, config, keys, info=None, state=rose.config.ConfigNode.STATE_USER_IGNORED):
-
-    Inverse of enable_setting, a method to make sure a setting defined by
-keys in config is ignored (default state is user-ignored). The arguments are:
-
-    config, keys, info
-        As in add_setting above.
-    state
-        One of rose.config.ConfigNode.STATE_USER_IGNORED (default),
-rose.config.ConfigNode.STATE_SYST_IGNORED (trigger-ignored). When using it,
-you can just use config.STATE... rather than the full
-rose.config.ConfigNode.STATE....
-
-    Example usage:
-
-        def upgrade(self, config, meta_config=None):
-            self.ignore_setting(config, ["namelist:breakfast_nl", "milk_bottle_date"])
-            return config, self.reports
-
-There is an upgrade macro development tutorial and more examples in the
-upgrade file for the upgrade usage tutorial (versions.py), at
-$ROSE_HOME/etc/rose-meta/rose-demo-upgrade/versions.py, where $ROSE_HOME
-is the path to your local Rose distribution, locatable by invoking rose
---version.
+   .. TODO - something must be done
 
 
 Rosie Web
@@ -908,425 +778,16 @@ http://host/PREFIX_NAME/get_known_keys?format=json
 Usage
 ^^^^^
 
-The API contains the following methods:
-
-get_known_keys
-    returns the main property names stored for suites (e.g. idx, branch,
-owner) plus any additional names specified in the site config and takes
-the format argument. For example, entering a URL in a web browser:
-
-    http://host/PREFIX_NAME/get_known_keys?format=json
-
-    may give
-
-    ["access-list", "idx", "branch", "owner", "project", "revision",
-"status",  "title"]
-
-get_optional_keys
-    returns all unique optional or user-defined property names given in
-suite discovery information and takes the format argument. For example,
-entering this URL in Firefox:
-
-    http://host/PREFIX_NAME/get_optional_keys?format=json
-
-    may give
-
-    ["access-list", "description", "endgame_status", "operational_flag",
-"tag-list"]
-
-get_query_operators
-    returns all the SQL-like operators used to compare column values that
-you may use in queries (below) (e.g. eq, ne, contains, like) and takes the
-format argument. For example, entering this URL in a web browser:
-
-    http://host/PREFIX_NAME/get_query_operators?format=json
-
-    may give
-
-    ["eq", "ge", "gt", "le", "lt", "ne", "contains", "endswith", "ilike",
-"like", "match", "startswith"]
-
-query
-    takes a list of queries q and the format argument. The syntax of the
-query looks like:
-
-    CONJUNCTION+[OPEN_GROUP+]FIELD+OPERATOR+VALUE[+CLOSE_GROUP]
-
-    where
-
-    CONJUNCTION
-        and or or
-    OPEN_GROUP
-        optional, one or more (
-    FIELD
-        e.g. idx or description
-    OPERATOR
-        e.g. contains or between, one of the operators returned by
-get_query_operators
-    VALUE
-        e.g. euro4m or 200
-    CLOSE_GROUP
-        optional, one or more )
-
-    The first CONJUNCTION is technically superfluous. The OPEN_GROUP and
-CLOSE_GROUP do not have to be used. Entering this URL in a web browser:
-
-    http://host/PREFIX_NAME/query?q=and+idx+endswith+78&q=or+owner+eq+bob&format=json
-
-    may give
-
-    [{"idx": "mo1-aa078", "branch": "trunk", "revision": 200, "owner": "fred",
-      "project": "fred's project.", "title": "fred's awesome suite",
-      "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"},
-     {"idx": "mo1-aa090", "branch": "trunk", "revision": 350, "owner": "bob",
-      "project": "var", "title": "A copy of var.vexcs.", "status": "M ",
-      "access-list": ["*"], "operational": "Y"}]
-
-    This returned all current suites that have an idx that ends with 78 and
-also all suites that have the owner bob. Each suite is returned as an entry
-in a list - each entry is an associative array of property name-value pairs.
-These pairs contain all database information about a suite.
-
-    query also takes the optional argument all_revs which switches on
-searching older revisions of current suites and deleted suites. For example,
-entering this URL in a web browser:
-
-    http://host/mo1/json/query?q=and+idx+endswith+78&all_revs&format=json
-
-    may give
-
-    [{"idx": "mo1-aa078", "branch": "trunk", "revision": 120, "owner": "fred",
-      "project": "fred's project.", "title": "fred's new suite",
-      "status": "A "}
-     {"idx": "mo1-aa078", "branch": "trunk", "revision": 199, "owner": "fred",
-      "project": "fred's project.", "title": "fred's awesome suite",
-      "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"},
-     {"idx": "mo1-aa078", "branch": "trunk", "revision": 200, "owner": "fred",
-      "project": "fred's project.", "title": "fred's awesome suite",
-      "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"}]
-
-    This returned all past and present suites that have an idx that ends
-with 78. You can see that older revisions of the aa078 suite appear.
-
-    You can also use parentheses in your search to group expressions. For
-example, entering this URL in a web browser:
-
-    http://host/PREFIX_NAME/query?q=and+(+owner+eq+bob&q=or+owner+eq+fred+)&q=and+project+eq+test&format=json
-
-    would search for all suites that are owned by bob or fred that have the
-project test.
-search
-    takes any number of string arguments and the format argument and returns
-a list of matching suites with properties in the same format as query. The
-suite database is searched for suites with any property with a value that
-contains any of the string arguments. For example, entering this URL in a
-web browser:
-
-    http://host/PREFIX_NAME/search?var+bob+nowcast&format=json
-
-    may give
-
-    [{"idx": "mo1-aa090", "branch": "trunk", "revision": 330, "owner": "bob",
-      "project": "um", "title": "A copy of um.alpra.", "status": "M ",
-      "description": "Bob's UM suite"},
-     {"idx": "mo1-aa092", "branch": "trunk", "revision": 340, "owner": "jim",
-      "project": "var", "title": "6D Quantum VAR.", "status": "M ",
-      "location": "NAE"},
-     {"idx": "mo1-aa100", "branch": "trunk", "revision": 352, "owner": "ops_account",
-      "project": "nowcast", "title": "The operational Nowcast suite",
-      "status": "M ", "ensemble": "yes"}]
-
-    This returned all suites that contain one or more of these search terms.
-Each suite is returned as an entry in a list, and each entry is an
-associative array of suite property name-value pairs. These pairs contain
-all database information about a suite.
-
-    search also takes the optional argument all_revs in the same way as
-query, above. This switches on searching older revisions of current suites
-and deleted suites. For example, entering this URL in a web browser:
-
-    http://host/PREFIX_NAME/search?var+bob&all_revs&format=json
-
-    may give
-
-    [{"idx": "mo1-aa001", "branch": "trunk", "revision": 120, "owner": "bob",
-      "project": "useless", "title": "Bob's useless suite.", "status": "A "},
-     {"idx": "mo1-aa001", "branch": "trunk", "revision": 122, "owner": "bob",
-      "project": "useless", "title": "Bob's useless suite.", "status": "D "},
-     {"idx": "mo1-aa090", "branch": "trunk", "revision": 320, "owner": "bob",
-      "project": "um", "title": "A copy of um.alpra.", "status": "A "},
-     {"idx": "mo1-aa090", "branch": "trunk", "revision": 321, "owner": "bob",
-      "project": "um", "title": "A copy of um.alpra.", "status": "M "},
-     {"idx": "mo1-aa090", "branch": "trunk", "revision": 330, "owner": "bob",
-      "project": "um", "title": "A copy of um.alpra.", "status": "M "},
-     {"idx": "mo1-aa092", "branch": "trunk", "revision": 335, "owner": "jim",
-      "project": "var", "title": "6D Quantum VAR.", "status": "A "},
-     {"idx": "mo1-aa092", "branch": "trunk", "revision": 338, "owner": "jim",
-      "project": "var", "title": "6D Quantum VAR.", "status": "M ",
-      "location": "Africa"},
-     {"idx": "mo1-aa092", "branch": "trunk", "revision": 340, "owner": "jim",
-      "project": "var", "title": "6D Quantum VAR.", "status": "M ",
-      "location": "NAE"}]
-
-    This returned all past and present suites that contained a match for at
-least one of the search terms. Older versions of suites appear, and you can
-also see a deleted suite (aa001).
+   .. TODO - something must be done
 
 
 Rose Python Modules
 -------------------
 
-This gives some brief information about Rose python modules. For more
-information, see the files themselves.
-
-Rose Main Modules
-^^^^^^^^^^^^^^^^^
-
-This section describes the modules under the lib/python/rose package.
-
-rose
-    (__init__.py) stores some constants used by Rose programs.
-rose.app_run
-    callable, Rose application runner.
-rose.apps.*
-    (package) built-in Rose applications.
-rose.bush
-    callable, Rose Bush services logic.
-rose.c3
-    library, implements the C3 algorithm (e.g. to linearise multiple
-inheritance).
-rose.checksum
-    library, determine the MD5 checksum for a file or files in a directory.
-rose.config
-    library, parses and dumps rose configuration files. Contains the main
-configuration object rose.config.ConfigNode which is manipulated in most
-rose programs.
-rose.config_cli
-    callable, implements the rose config command.
-rose.config_dump
-    callable, implements the rose config-dump command.
-rose.config_editor/*
-    (package) Rose configuration editor logic. See Rose Config Editor Modules.
-rose.config_processor
-    library, base class for rose configuration processing.
-rose.config_processors
-    (package) subclasses for rose configuration processing.
-rose.config_tree
-    library, representation of a Rose configruation directory.
-rose.date
-    callable, implements the rose date command. Contains date shift library.
-rose.env
-    library, handles environment variable substitution.
-rose.env_cat
-    callable, implements rose env-cat command.
-rose.external
-    library, contains minimal wrapper functions for calling external programs.
-rose.formats
-    (package) contains modules that deal with supported format parsing. The
-only current supported format is Fortran namelist, through
-rose.formats.namelist.
-rose.fs_util
-    library, file system utilities with event reporting.
-rose.gtk
-    (package) contains modules that deal with generic GTK operations and
-contain shared widgets.
-rose.host_select
-    callable, ranks and selects host machines.
-rose.job_runner
-    library, run jobs with multiple processes.
-rose.macro
-    callable, runs internal and custom macros for an application or suite.
-rose.macros
-    (package) Built-in macros. See Rose Build-in Macro Modules.
-rose.meta_type
-    library, classes for the various metadata type groups.
-rose.meta_type
-    library, data types in a Rose configuration metadata.
-rose.metadata_check
-    callable, validates configuration metadata.
-rose.metadata_gen
-    callable, generates template metadata for an application.
-rose.metadata_graph
-    callable, implement the rose metadata-graph command.
-rose.namelist_dump
-    callable, dumps namelist files to a Rose configuration object.
-rose.opt_parse
-    library, contains an optparse.OptionParser subclass. All command-line
-option parsing in Rose should use this.
-rose.popen
-    library, utilities for spawning and monitoring processes.
-rose.resource
-    library, locates files or directories.
-rose.run
-    library, base class for application, suite and task runners.
-rose.run_source_vc
-    library, functions to print out version control information for rose
-suite-run.
-rose.scheme_handler
-    library, logic to load python modules based on named schemes.
-rose.section
-    library, contains section-specific data utilities. Counterpart of
-rose.variable.
-rose.stem
-    callable, converts user-friendly options for testing code into options
-for rose suite-run.
-rose.suite_clean
-    callable, remove runtime directories of suites.
-rose.suite_control
-    Invoke control commands (currently gcontrol and shutdown) of a running
-suite.
-rose.suite_engine_proc
-    library, base class and utilities for interacting with a suite engine.
-rose.suite_engine_procs
-    (package) library for interacting with specific suite engines.
-rose.suite_hook
-    callable, hooks to suite engine events.
-rose.suite_log
-    callable, implements the rose suite-log command.
-rose.suite_restart
-    callable, implements the rose suite-restart command.
-rose.suite_run
-    callable, suite runner.
-rose.suite_scan
-    callable, scans for running suites.
-rose.task_env
-    callable, provides an environment for a suite task.
-rose.task_run
-    callable, task runner.
-rose.upgrade
-    library, provides configuration upgrade functionality.
-rose.variable
-    library, utilities for processing metadata and a basic data structure
-used by the config editor to hold values and metadata for options.
-rose.ws
-    library, logic for web services, e.g. Rose Bush and Rosie Disco.
-
-Rose Config Editor Modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This section describes the modules under the lib/python/rose/config_editor
-package. These are specific to the config editor.
-
-rose.config_editor
-    (__init__.py) stores some constants used for display in the config editor.
-All of these can be overridden using your user config.
-rose.config_editor.keywidget, rose.config_editor.menuwidget,
-rose.config_editor.pagewidget (package), rose.config_editor.variable,
-rose.config_editor.valuewidget (package)
-    These contain GTK code that control the adding/removing/modifying of
-options on a config editor tab. These can all be overridden using custom
-widgets (especially rose.config_editor.valuewidget modules).
-rose.config_editor.loader
-    This controls the loading and retrieval of configuration data within the
-config editor.
-rose.config_editor.main
-    This contains the centralised main control code of the config
-editor - updates, undo stack, etc.
-rose.config_editor.menu
-    This module contains the menu for the config editor and various
-menu-related functions such as adding and removing sections.
-rose.config_editor.page
-    This module contains control code for each config editor tab, and
-interfaces with rose.config_editor.pagewidget objects (including custom
-pages).
-rose.config_editor.panel
-    This creates and alters the GTK Treeview panel of the config editor.
-rose.config_editor.stack
-    This holds the Undo and Redo stack templates, and contains various
-functions to alter variables. This is the main functional interface for 
-custom pages.
-rose.config_editor.util
-    Various small utilities.
-rose.config_editor.window
-    Creates the main GTK window of the config editor and provides functions
-to launch dialogs.
-
-Rose Built-in Macro Modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The lib/python/rose/macros package contains built-in macros that perform
-checking against metadata. Most of these are run each time something changes
-in the config editor. They can be run on the command line via rose macro.
-
-rose.macros.compulsory
-    checks/fixes compulsory sections and options
-rose.macros.format
-    checks format-specific sections and options, using options in
-rose.formats modules
-rose.macros.rule
-    checks fail-if and warn-if metadata conditions
-rose.macros.trigger
-    checks trigger validity and transforms configuration ignored states
-rose.macros.value
-    checks type, range, length, pattern, or values metadata
-
-Rosie Modules
-^^^^^^^^^^^^^
-
-This section describes the modules under the lib/python/rosie package.
-
-rosie.browser
-    (package) GTK client code for rosie (rosie go).
-rosie.browser.history
-    Methods and classes for recording suite search history. Used by rosie go.
-rosie.browser.main
-    Main control code for rosie go.
-rosie.browser.result
-    Custom widget with methods for displaying suite search results. Used by
-rosie go.
-rosie.browser.status
-    Classes for getting and updating statuses for checked out suites. Used by
-rosie go.
-rosie.browser.suite
-    Contains a wrapper class for handling the creation, copying, checking out
-and deleting of suites. Used by rosie go.
-rosie.browser.util
-    Library of widgets for rosie.browser.
-rosie.db
-    Interface code to the suite database, called by the web server.
-rosie.db_create
-    Callable, implements rosa db-create command.
-rosie.graph
-    Callable, implements rosie graph command.
-rosie.suite_id
-    Callable, implements the rosie id command to identify suites.
-rosie.svn_post_commit
-    Callable, implements the rosa svn-post-commit command.
-rosie.svn_pre_commit
-    Callable, implements the rosa svn-pre-commit command.
-rosie.usertools.*
-    (package) logic shared by rosa svn-post-commit and rosa svn-pre-commit for
-accessing user information, e.g. from Unix password file or LDAP.
-rosie.vc
-    Callable, implements wrappers to version control system.
-rosie.ws
-    Callable, Rosie Discovery service (Rosie Disco).
-rosie.ws_client
-    Library, Rosie Disco clients.
-rosie.ws_client_auth
-    Library, Rosie Disco client authentication schemes and keyring
-management.
-rosie.ws_client_cli
-    Callable, Rosie Disco CLI clients.
+   .. TODO - something must be done
 
 
 Rose Bash Library
 -----------------
 
-They live under lib/bash/. Each module contains a set of functions. To import
-a module, load the file into your script. E.g. To load rose_usage, you would
-do:
-
-. $ROSE_HOME/lib/bash/rose_usage
-
-The modules are:
-
-rose_init
-    Called by rose on initialisation. This is not meant to be a module for
-general use.
-rose_log
-    Provide functions to print log messages.
-rose_usage
-    If your script has a header similar to the ones used by a Rose command
-line utility, you can use this function to print the synopsis section of the
-script header.
+   .. TODO - something must be done
