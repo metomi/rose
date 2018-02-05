@@ -13,6 +13,7 @@ metadata is represented in a directory with the following:
 * rose-meta.conf, the main configuration file. See for detail.
 * opt/ directory. For detail, see Optional Configuration.
 * other files, e.g.:
+
   * lib/python/widget/my_widget.py would be the location of a custom widget.
   * lib/python/macros/my_macro_validator.py would be the location of a custom
     macro.
@@ -119,55 +120,54 @@ These configuration metadata are used for grouping and sorting the IDs of
 the configurations.
 
 ns
+  A forward slash / delimited hierarchical namespace for the container of
+  the setting, which overrides the default. The default namespace for the
+  setting is derived from the first part of the ID - by splitting up the
+  section name by colons : or forward slashes /. For example, a configuration
+  with an ID namelist:var_minimise=niter_set would have the namespace
+  namelist/var_minimise. If a namespace is defined for a section, it will
+  become the default for all the settings in that section.
 
-    A forward slash / delimited hierarchical namespace for the container of
-the setting, which overrides the default. The default namespace for the
-setting is derived from the first part of the ID - by splitting up the
-section name by colons : or forward slashes /. For example, a configuration
-with an ID namelist:var_minimise=niter_set would have the namespace
-namelist/var_minimise. If a namespace is defined for a section, it will
-become the default for all the settings in that section.
+  The namespace is used by the config editor to group settings, so that
+  they can be placed in different pages. A namespace for a section will become
+  the default for all the settings in that section.
 
-    The namespace is used by the config editor to group settings, so that
-they can be placed in different pages. A namespace for a section will become
-the default for all the settings in that section.
+  Note that you should not assign namespaces to variables in duplicate
+  sections.
 
-    Note that you should not assign namespaces to variables in duplicate
-sections.
 sort-key
+  A character string that can be used as a sort key for ordering an option
+  within its namespace.
 
-    A character string that can be used as a sort key for ordering an option
-within its namespace.
+  It can also be used to order sections and namespaces.
 
-    It can also be used to order sections and namespaces.
+  The sort-key is used by the config editor to group settings on a page.
+  Items with a sort-key will be sorted to the top of a name-space. Items
+  without a sort-key will be sorted after, in ascending order of their IDs.
 
-    The sort-key is used by the config editor to group settings on a page.
-Items with a sort-key will be sorted to the top of a name-space. Items
-without a sort-key will be sorted after, in ascending order of their IDs.
+  The sorting procedure in pseudo code is a normal ASCII-like sorting of a
+  list of setting_sort_key + "~" + setting_id strings. If there is no
+  setting_sort_key, null string will be used.
 
-    The sorting procedure in pseudo code is a normal ASCII-like sorting of a
-list of setting_sort_key + "~" + setting_id strings. If there is no
-setting_sort_key, null string will be used.
+  For example, the following metadata:
 
-    For example, the following metadata:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [env=apple]
 
-      [env=apple]
+     [env=banana]
 
-      [env=banana]
+     [env=cherry]
+     sort-key=favourites-01
 
-      [env=cherry]
-      sort-key=favourites-01
+     [env=melon]
+     sort-key=do-not-like-01
 
-      [env=melon]
-      sort-key=do-not-like-01
+     [env=prune]
+     sort-key=do-not-like-00
 
-      [env=prune]
-      sort-key=do-not-like-00
-
-    would produce a sorting order of env=prune, env=melon, env=cherry,
-env=apple, env=banana.
+  would produce a sorting order of env=prune, env=melon, env=cherry,
+  env=apple, env=banana.
 
 Metadata for Values
 ^^^^^^^^^^^^^^^^^^^
@@ -179,297 +179,293 @@ a setting contains a string that looks like an environment variable, these
 metadata will normally be ignored.
 
 type
+  The type/class of the setting. The type names are based on the intrinsic
+  Fortran types, such as integer and real. Currently supported types are:
 
-    The type/class of the setting. The type names are based on the intrinsic
-Fortran types, such as integer and real. Currently supported types are:
+  boolean
+    example option: PRODUCE_THINGS=true
 
-    boolean
+    description: either true or false
 
-        example option: PRODUCE_THINGS=true
+    usage: environment variables, javascript/JSON inputs
 
-        description: either true or false
+  character
+    example option: sea_colour='blue'
 
-        usage: environment variables, javascript/JSON inputs
-    character
+    description: Fortran character type - a single quoted string, single
+    quotes escaped in pairs
 
-        example option: sea_colour='blue'
+    usage: Fortran character types
 
-        description: Fortran character type - a single quoted string, single 
-quotes escaped in pairs
+  integer
+    example option: num_lucky=5
 
-        usage: Fortran character types
-    integer
+    description: generic integer type
 
-        example option: num_lucky=5
+    usage: any integer-type input
 
-        description: generic integer type
+  logical
+    example option: l_spock=.true.
 
-        usage: any integer-type input
-    logical
+    description: Fortran logical type - either .true. or .false.
 
-        example option: l_spock=.true.
+    usage: Fortran logical types
 
-        description: Fortran logical type - either .true. or .false.
+  python_boolean
+    example option: ENABLE_THINGS=True
 
-        usage: Fortran logical types
-    python_boolean
+    description: Python boolean type - either True or False
 
-        example option: ENABLE_THINGS=True
+    usage: Python boolean types
 
-        description: Python boolean type - either True or False
+  python_list
+    description: used to signify a Python-compatible formatted list such
+    as ["Foo", 50, False]. This encapsulates length, so do not use a separate
+    length declaration for this setting.
 
-        usage: Python boolean types
-    python_list
+    usage: use for inputs that expect a string that looks like a Python
+    list - e.g. Jinja2 list input variables.
 
-        description: used to signify a Python-compatible formatted list such
-as ["Foo", 50, False]. This encapsulates length, so do not use a separate
-length declaration for this setting.
+  quoted
+    example option: js_measure_cloud_mode="laser"
 
-        usage: use for inputs that expect a string that looks like a Python
-list - e.g. Jinja2 list input variables.
-    quoted
+    description: a double quoted string, double quotes escaped with
+    backslash
 
-        example option: js_measure_cloud_mode="laser"
+    usage: Inputs that require double quotes and allow backslash escaping
+    e.g. javascript/JSON inputs.
 
-        description: a double quoted string, double quotes escaped with
-backslash
+  real
+     example option: n_avogadro=6.02e23
+     
+     description: Fortran real number type, generic floating point numbers
 
-        usage: Inputs that require double quotes and allow backslash escaping
-e.g. javascript/JSON inputs.
-    real
+     usage: Fortran real types, generic floating point numbers. Scientific
+     notation must use the "e" or "E" format.
 
-        example option: n_avogadro=6.02e23
+     comment: Internally implemented within Rose using Python's floating
+     point specification.
 
-        description: Fortran real number type, generic floating point numbers
+  raw
+    description: placeholder used in derived type specifications where
+    none of the above types apply
 
-        usage: Fortran real types, generic floating point numbers. Scientific
-notation must use the "e" or "E" format.
+    usage: only in derived types
 
-        comment: Internally implemented within Rose using Python's floating
-point specification.
-    raw
+  spaced_list
+    description: used to signify a space separated list such as "Foo" 50
+    False.
 
-        description: placeholder used in derived type specifications where
-none of the above types apply
+    usage: use for inputs that expect a string that contains a number of
+    space separated items - e.g. in fcm_make app configs.
 
-        usage: only in derived types
-    spaced_list
+  Note that not all inputs need to have type defined. In some cases using
+  values or pattern is better.
 
-        description: used to signify a space separated list such as "Foo" 50
-False.
+  A derived type may be defined by a comma , separated list of intrinsic
+  types, e.g. integer, character, real, integer. The default is a raw string.
 
-        usage: use for inputs that expect a string that contains a number of
-space separated items - e.g. in fcm_make app configs.
-
-    Note that not all inputs need to have type defined. In some cases using
-values or pattern is better.
-
-    A derived type may be defined by a comma , separated list of intrinsic
-types, e.g. integer, character, real, integer. The default is a raw string.
 length
+  Define the length of an array. If not present, the setting is assumed to
+  be a scalar. A positive integer defines a fixed length array. A colon :
+  defines a dynamic length array.
 
-    Define the length of an array. If not present, the setting is assumed to
-be a scalar. A positive integer defines a fixed length array. A colon :
-defines a dynamic length array.
+  N.B. You do not need to use length if you already have type=python_list
+  for a setting.
 
-    N.B. You do not need to use length if you already have type=python_list
-for a setting.
 element-titles
+  Define a list of comma separated "titles" to appear above array entries.
+  If not present then no titles are displayed.
 
-    Define a list of comma separated "titles" to appear above array entries.
-If not present then no titles are displayed.
+  N.B. where the number of element-titles is greater than the length of the
+  array, it will only display titles up to the length of the array.
+  Additionally, where the associated array is longer than the number of
+  element-titles, blank headings will be placed above them.
 
-    N.B. where the number of element-titles is greater than the length of the
-array, it will only display titles up to the length of the array.
-Additionally, where the associated array is longer than the number of
-element-titles, blank headings will be placed above them.
 values
+  Define a comma , separated list of permitted values of a setting (or an
+  element in the setting if it is an array). This metadata overrides the type,
+  range and pattern metadata.
 
-    Define a comma , separated list of permitted values of a setting (or an
-element in the setting if it is an array). This metadata overrides the type,
-range and pattern metadata.
+  For example, the config editor may use this list to determine the widget
+  to display the setting. It may display the choices using a set of radio
+  buttons if the list of values is small, or a drop down combo box if the list
+  of values is large. If the list only contains one value, the config editor
+  will expect the setting to always have this value, and may display it as a
+  special setting.
 
-    For example, the config editor may use this list to determine the widget
-to display the setting. It may display the choices using a set of radio
-buttons if the list of values is small, or a drop down combo box if the list
-of values is large. If the list only contains one value, the config editor
-will expect the setting to always have this value, and may display it as a
-special setting.
 value-titles
+  Define a comma , separated list of titles to associate with each of the
+  elements of values which will be displayed instead of the value. This list
+  should contain the same number of elements as the values entry.
 
-    Define a comma , separated list of titles to associate with each of the
-elements of values which will be displayed instead of the value. This list
-should contain the same number of elements as the values entry.
+  For example, given the following metadata:
 
-    For example, given the following metadata:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [env=HEAT]
+     values=0, 1, 2
+     value-titles=low, medium, high
 
-      [env=HEAT]
-      values=0, 1, 2
-      value-titles=low, medium, high
+  the config editor will display low for option value 0, medium for 1 and
+  high for 2.
 
-    the config editor will display low for option value 0, medium for 1 and
-high for 2.
 value-hints
+  Define a comma , separated list of suggested values for a variable as
+  value-hints, but still allows the user to provide their own override. This
+  is like an auto-complete widget.
 
-    Define a comma , separated list of suggested values for a variable as
-value-hints, but still allows the user to provide their own override. This
-is like an auto-complete widget.
+  For example, given the following metadata:
 
-    For example, given the following metadata:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [env=suggested_fruit]
+     value-hints=pineapple,cherry,banana,apple,pear,mango,kiwi,grapes,peach,fig,
+                =orange,strawberry,blackberry,blackcurrent,raspberry,melon,plum
 
-      [env=suggested_fruit]
-      value-hints=pineapple,cherry,banana,apple,pear,mango,kiwi,grapes,peach,fig,
-               =orange,strawberry,blackberry,blackcurrent,raspberry,melon,plum
+  the config editor will display possible option values when the user
+  starts typing if they match a suggested value.
 
-    the config editor will display possible option values when the user
-starts typing if they match a suggested value.
 range
+  Specify a range of values. It can either be a simple comma , separated
+  list of allowed values, or a logical expression in the Rose metadata
+  mini-language. This metadata is only valid if type is either integer or real.
 
-    Specify a range of values. It can either be a simple comma , separated
-list of allowed values, or a logical expression in the Rose metadata
-mini-language. This metadata is only valid if type is either integer or real.
+  A simple list may contain a mixture of allowed numbers and number ranges
+  such as 1, 2, 4:8, 10:, (which means the value can be 1, 2, between 4 and 8
+  inclusive, or any values greater than or equal to 10.)
 
-    A simple list may contain a mixture of allowed numbers and number ranges
-such as 1, 2, 4:8, 10:, (which means the value can be 1, 2, between 4 and 8
-inclusive, or any values greater than or equal to 10.)
+  A logical expression uses the Rose metadata mini-language, using the
+  variable this to denote the value of the current setting, e.g. this <-1 and
+  this >1. Inter-variable comparisons are not permitted (but see the fail-if
+  property below for a way to implement this).
 
-    A logical expression uses the Rose metadata mini-language, using the
-variable this to denote the value of the current setting, e.g. this <-1 and
-this >1. Inter-variable comparisons are not permitted (but see the fail-if
-property below for a way to implement this).
 pattern
+  Specify a regular expression (Python's extended regular expression
+  syntax) to compare against the whole value of the setting.
 
-    Specify a regular expression (Python's extended regular expression
-syntax) to compare against the whole value of the setting.
+  For example, if we write the following metadata:
 
-    For example, if we write the following metadata:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [namelist:cheese=country_of_origin]
+     pattern=^"[A-Z].+"$
 
-      [namelist:cheese=country_of_origin]
-      pattern=^"[A-Z].+"$
+  then we expect all valid values for country_of_origin to start with a
+  double quote (^"), begin with an uppercase letter ([A-Z]), contain some other
+  characters or spaces (.+), and end with a quote ("$).
 
-    then we expect all valid values for country_of_origin to start with a
-double quote (^"), begin with an uppercase letter ([A-Z]), contain some other
-characters or spaces (.+), and end with a quote ("$).
+  If you have an array variable (for example,
+  TARTAN_PAINT_COLOURS='blue','red','blue') and you want to specify a pattern
+  that each element of the array must match, you can construct a regular
+  expression that repeats and includes commas. For example, if each element in
+  our TARTAN_PAINT_COLOURS array must obey the regular expression 'red'|'blue',
+  then we can write:
 
-    If you have an array variable (for example,
-TARTAN_PAINT_COLOURS='blue','red','blue') and you want to specify a pattern
-that each element of the array must match, you can construct a regular
-expression that repeats and includes commas. For example, if each element in
-our TARTAN_PAINT_COLOURS array must obey the regular expression 'red'|'blue',
-then we can write:
+  .. code-block:: rose
 
-   .. code-block:: rose
-
-      [env=TARTAN_PAINT_COLOURS]
-      length=:
-      pattern=^('red'|'blue')(?:,('red'|'blue'))*$
+     [env=TARTAN_PAINT_COLOURS]
+     length=:
+     pattern=^('red'|'blue')(?:,('red'|'blue'))*$
 
 fail-if, warn-if
+  Specify a logical expression using the Rose mini-language to validate the
+  value of the current setting with respect to other settings. If the logical
+  expression evaluates to true in a fail-if metadata, the system will consider
+  the setting in error. On the other hand, in a warn-if metadata, the system
+  will only issue a warning. The logical expression uses a Python-like syntax
+  (documented fully in the appendix). It can reference the value of the current
+  setting with the this variable and the value of other settings with their
+  IDs. E.g.:
 
-    Specify a logical expression using the Rose mini-language to validate the
-value of the current setting with respect to other settings. If the logical
-expression evaluates to true in a fail-if metadata, the system will consider
-the setting in error. On the other hand, in a warn-if metadata, the system
-will only issue a warning. The logical expression uses a Python-like syntax
-(documented fully in the appendix). It can reference the value of the current
-setting with the this variable and the value of other settings with their IDs.
-E.g.:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [namelist:test=my_test_var]
+     fail-if=this < namelist:test=control_lt_var;
 
-      [namelist:test=my_test_var]
-      fail-if=this < namelist:test=control_lt_var;
+  means that an error will be flagged if the numeric value of my_test_var
+  is less than the numeric value of control_lt_var.
 
-    means that an error will be flagged if the numeric value of my_test_var
-is less than the numeric value of control_lt_var.
+  .. code-block:: rose
 
-   .. code-block:: rose
+     fail-if=this != 1 + namelist:test=ctrl_var_1 *
+     (namelist:test=ctrl_var_2 - this);
 
-      fail-if=this != 1 + namelist:test=ctrl_var_1 *
-      (namelist:test=ctrl_var_2 - this);
+  shows a more complex operation, again with numeric values.
 
-    shows a more complex operation, again with numeric values.
+  To check array elements, the ID should be expressed with a bracketed
+  index, as in the configuration:
 
-    To check array elements, the ID should be expressed with a bracketed
-index, as in the configuration:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     fail-if=this(2) != "'0A'" and this(4) == "'0A'";
 
-      fail-if=this(2) != "'0A'" and this(4) == "'0A'";
+  Array elements can also be checked using any and all. E.g.:
 
-    Array elements can also be checked using any and all. E.g.:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     fail-if=any(namelist:test=ctrl_array < this);
+     fail-if=all(this == 0);
 
-      fail-if=any(namelist:test=ctrl_array < this);
-      fail-if=all(this == 0);
+  Similarly, the number of array elements can be checked using len. E.g.:
 
-    Similarly, the number of array elements can be checked using len. E.g.:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     fail-if=len(namelist:test=ctrl_array) < this;
+     fail-if=len(this) == 0;
 
-      fail-if=len(namelist:test=ctrl_array) < this;
-      fail-if=len(this) == 0;
+  Expressions can be chained together and brackets used:
 
-    Expressions can be chained together and brackets used:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     fail-if=this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or
+     namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'));
 
-      fail-if=this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or
-      namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'));
+  Multiple failure conditions can be added, by using a semicolon as the
+  separator - the semicolon is optional for a single statement or the last in
+  a block, but is recommended. Multiple failure conditions are essentially
+  similar to chaining them together with or, but the system can process each
+  expression one by one to target the error message.
 
-    Multiple failure conditions can be added, by using a semicolon as the
-separator - the semicolon is optional for a single statement or the last in a
-block, but is recommended. Multiple failure conditions are essentially similar
-to chaining them together with or, but the system can process each expression
-one by one to target the error message.
+  .. code-block:: rose
 
-   .. code-block:: rose
+     fail-if=this > 0; this % 2 == 1; this * 3 > 100;
 
-      fail-if=this > 0; this % 2 == 1; this * 3 > 100;
+  You can add a message to the error or warning message to make it clearer
+  by adding a hash followed by the comment at the end of a configuration
+  metadata line:
 
-    You can add a message to the error or warning message to make it clearer
-by adding a hash followed by the comment at the end of a configuration
-metadata line:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     fail-if=any(namelist:test=ctrl_array % this == 0); # Needs to be common divisor for ctrl_array
 
-      fail-if=any(namelist:test=ctrl_array % this == 0); # Needs to be common
-divisor for ctrl_array
+  When using multiple failure conditions, different messages can be added
+  if they are placed on individual lines:
 
-    When using multiple failure conditions, different messages can be added
-if they are placed on individual lines:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     fail-if=this > 0; # Needs to be less than or equal to 0
+             this % 2 == 1; # Needs to be odd
+             this * 3 > 100; # Needs to be more than 100/3.
 
-      fail-if=this > 0; # Needs to be less than or equal to 0
-              this % 2 == 1; # Needs to be odd
-              this * 3 > 100; # Needs to be more than 100/3.
+  A slightly different usage of this functionality can do things like
+  warn of deprecated content:
 
-    A slightly different usage of this functionality can do things like
-warn of deprecated content:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     warn-if=True;  # This option is deprecated
 
-      warn-if=True;  # This option is deprecated
+  This would always evaluate True and give a warning if the setting is
+  present.
 
-    This would always evaluate True and give a warning if the setting is
-present.
+  Please note: when dividing a real-numbered setting by something, make
+  sure that the expression does not actually divide an integer by an
+  integer - for example, this / 2 will evaluate as 0 if this has a value of 1,
+  but 0.5 if it has a value of 1.0. This is a result of Python's implicit
+  typing.
 
-    Please note: when dividing a real-numbered setting by something, make
-sure that the expression does not actually divide an integer by an
-integer - for example, this / 2 will evaluate as 0 if this has a value of 1,
-but 0.5 if it has a value of 1.0. This is a result of Python's implicit
-typing.
-
-    You can get around this by making sure either the numerator or denominator 
-is a real number - e.g. by rewriting it as this / 2.0 or 1.0 * this / 2.
+  You can get around this by making sure either the numerator or denominator 
+  is a real number - e.g. by rewriting it as this / 2.0 or 1.0 * this / 2.
 
 Metadata for Behaviour
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -478,217 +474,214 @@ These metadata are used to define how the setting should behave in different
 states.
 
 compulsory
+  A true value indicates that the setting should be compulsory. If this
+  flag is not set, the setting is optional.
 
-    A true value indicates that the setting should be compulsory. If this
-flag is not set, the setting is optional.
+  Compulsory sections should be physically present in the configuration at
+  all times. Compulsory options should be physically present in the
+  configuration if their parent section is physically present.
 
-    Compulsory sections should be physically present in the configuration at
-all times. Compulsory options should be physically present in the
-configuration if their parent section is physically present.
-
-    Optional settings can be removed as the user wishes. Compulsory settings
-may however be triggered ignored (see below). For example, the config editor
-may issue a warning if a compulsory setting is not defined. It may also hide
-a compulsory variable that only has a single permitted value.
+  Optional settings can be removed as the user wishes. Compulsory settings
+  may however be triggered ignored (see below). For example, the config editor
+  may issue a warning if a compulsory setting is not defined. It may also hide
+  a compulsory variable that only has a single permitted value.
 
 trigger
+  A setting has the following states:
 
-    A setting has the following states:
+  * normal
+  * user ignored (stored in the configuration file with a ! flag, ignored
+    at run time)
+  * logically ignored (stored in the configuration file with a !! flag,
+    ignored at runtime)
 
-    * normal
-    * user ignored (stored in the configuration file with a ! flag, ignored
-      at run time)
-    * logically ignored (stored in the configuration file with a !! flag,
-      ignored at runtime)
+  If a setting is user ignored, the trigger will do nothing. Otherwise:
 
-    If a setting is user ignored, the trigger will do nothing. Otherwise:
+  * If the logic for a setting in the trigger is fulfilled, it will cause
+    the setting to be enabled.
+  * If it is not, it will cause the setting to be logically ignored.
 
-    * If the logic for a setting in the trigger is fulfilled, it will cause
-      the setting to be enabled.
-    * If it is not, it will cause the setting to be logically ignored.
+  The trigger expression is a list of settings triggered by (different
+  values of) this setting. If the values are not given, the setting will be
+  triggered only if the current setting is enabled.
 
-    The trigger expression is a list of settings triggered by (different
-values of) this setting. If the values are not given, the setting will be
-triggered only if the current setting is enabled.
+  The syntax contains id-values pairs, where the values part is optional.
+  Each pair must be separated by a semi-colon. Within each pair, any values
+  must be separated from the id by a colon and a space (: ). Values must be
+  formatted in the same way as the setting "values" defined above (i.e. comma
+  separated).
 
-    The syntax contains id-values pairs, where the values part is optional.
-Each pair must be separated by a semi-colon. Within each pair, any values
-must be separated from the id by a colon and a space (: ). Values must be
-formatted in the same way as the setting "values" defined above (i.e. comma
-separated).
+  The trigger syntax looks like:
 
-    The trigger syntax looks like:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [namelist:trig_nl=trigger_variable]
+     trigger=namelist:dep_nl=A;
+             namelist:dep_nl=B;
+             namelist:value_nl=X: 10;
+             env=Y: 20, 30, 40;
+             namelist:value_nl=Z: 20;
 
-      [namelist:trig_nl=trigger_variable]
-      trigger=namelist:dep_nl=A;
-              namelist:dep_nl=B;
-              namelist:value_nl=X: 10;
-              env=Y: 20, 30, 40;
-              namelist:value_nl=Z: 20;
+  In this example:
 
-    In this example:
+  * When namelist:trig_nl=trigger_variable is ignored, all the variables
+    in the trigger expression will be ignored, irrespective of its value.
+  * When namelist:trig_nl=trigger_variable is enabled, namelist:dep_nl=A
+    and namelist:dep_nl=B will both be enabled, and the other variables
+    may be enabled according to its value:
 
-    * When namelist:trig_nl=trigger_variable is ignored, all the variables
-      in the trigger expression will be ignored, irrespective of its value.
-    * When namelist:trig_nl=trigger_variable is enabled, namelist:dep_nl=A
-      and namelist:dep_nl=B will both be enabled, and the other variables
-      may be enabled according to its value:
-      * When the value of the setting is not 10, 20, 30, or 40,
-        namelist:value_nl=X, env=Y and namelist:value_nl=Z will be ignored.
-      * When the value of the setting is 10, namelist:value_nl=X will be
-        enabled, but env=Y and namelist:value_nl=Z will be ignored.
-      * When the value of the setting is 20, env=Y and
-        namelist:value_nl=Z will be enabled, but namelist:value_nl=X will
-        be ignored.
-      * When the value of the setting is 30, env=Y will be enabled,
-        but namelist:value_nl=X and namelist:value_nl=Z will be ignored.
-      * If the value of the setting contains an environment
-        variable-like string, e.g. ${TEN_MULTIPLE}, all three will be enabled.
+    * When the value of the setting is not 10, 20, 30, or 40,
+      namelist:value_nl=X, env=Y and namelist:value_nl=Z will be ignored.
+    * When the value of the setting is 10, namelist:value_nl=X will be
+      enabled, but env=Y and namelist:value_nl=Z will be ignored.
+    * When the value of the setting is 20, env=Y and
+      namelist:value_nl=Z will be enabled, but namelist:value_nl=X will
+      be ignored.
+    * When the value of the setting is 30, env=Y will be enabled,
+      but namelist:value_nl=X and namelist:value_nl=Z will be ignored.
+    * If the value of the setting contains an environment
+      variable-like string, e.g. ${TEN_MULTIPLE}, all three will be enabled.
 
-    Settings mentioned in trigger expressions will have their default
-state set to ignored unless explicitly triggered. The config editor will
-issue warnings if variables or sections are in the incorrect state when it
-loads a configuration. Triggering thereafter will work as normal.
+  Settings mentioned in trigger expressions will have their default
+  state set to ignored unless explicitly triggered. The config editor will
+  issue warnings if variables or sections are in the incorrect state when it
+  loads a configuration. Triggering thereafter will work as normal.
 
-    Where multiple triggers act on a setting, the setting is triggered only
-if all triggers are active (i.e. an AND relationship). For example, for
-the two triggers here:
+  Where multiple triggers act on a setting, the setting is triggered only
+  if all triggers are active (i.e. an AND relationship). For example, for
+  the two triggers here:
 
-   .. code-block:: rose
+  .. code-block:: rose
 
-      [env=IS_WATER]
-      trigger=env=IS_ICE: true;
+     [env=IS_WATER]
+     trigger=env=IS_ICE: true;
 
-      [env=IS_COLD]
-      trigger=env=IS_ICE: true;
+     [env=IS_COLD]
+     trigger=env=IS_ICE: true;
 
-    the setting env=IS_ICE is only enabled if both env=IS_WATER and
-env=IS_COLD are true and enabled. Otherwise, it is ignored.
+  the setting env=IS_ICE is only enabled if both env=IS_WATER and
+  env=IS_COLD are true and enabled. Otherwise, it is ignored.
 
-    The trigger syntax also supports a logical expression using the Rose 
-metadata mini-language, in the same way as the range or fail-if metadata.
-As with range, inter-variable comparisons are disallowed.
+  The trigger syntax also supports a logical expression using the Rose 
+  metadata mini-language, in the same way as the range or fail-if metadata.
+  As with range, inter-variable comparisons are disallowed.
 
-   .. code-block:: rose
+  .. code-block:: rose
 
-      [env=SNOWFLAKE_SIDES]
-      trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
-              env=SILLY_SNOWFLAKE_GEOMETRY: this < 2;
+     [env=SNOWFLAKE_SIDES]
+     trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
+             env=SILLY_SNOWFLAKE_GEOMETRY: this < 2;
 
-    In this example, the setting env=CUSTOM_SNOWFLAKE_GEOMETRY is enabled
-if env=SNOWFLAKE_SIDES is enabled and not 6. env=SILLY_SNOWFLAKE_GEOMETRY is
-only enabled when env=SNOWFLAKE_SIDES is enabled and less than 2. The logical
-expression syntax can be used with non-numeric variables in the same way as
-the fail-if metadata.
+  In this example, the setting env=CUSTOM_SNOWFLAKE_GEOMETRY is enabled
+  if env=SNOWFLAKE_SIDES is enabled and not 6. env=SILLY_SNOWFLAKE_GEOMETRY is
+  only enabled when env=SNOWFLAKE_SIDES is enabled and less than 2. The
+  logical expression syntax can be used with non-numeric variables in the
+  same way as the fail-if metadata.
+
 duplicate
+  Allow duplicated copies of the setting. This is used for sections where
+  there may be more than one with the same metadata - for example multiple
+  namelist groups of the same name. If this setting is true for a given name,
+  the application configuration will accept multiple namelist groups of this
+  name. The config editor may then provide the option to clone or copy a
+  namelist to generate an additional namelist. Otherwise, the config editor
+  may issue warning for configuration sections that are found with multiple
+  copies or an index.
 
-    Allow duplicated copies of the setting. This is used for sections where
-there may be more than one with the same metadata - for example multiple
-namelist groups of the same name. If this setting is true for a given name,
-the application configuration will accept multiple namelist groups of this
-name. The config editor may then provide the option to clone or copy a
-namelist to generate an additional namelist. Otherwise, the config editor
-may issue warning for configuration sections that are found with multiple
-copies or an index.
 macro
+  Associate a setting with a comma-delimited set of custom macros (but not
+  upgrade macros).
 
-    Associate a setting with a comma-delimited set of custom macros (but not
-upgrade macros).
+  E.g. for a macro class called FibonacciChecker in the metadata under
+  lib/python/macros/fib.py, we may have:
 
-    E.g. for a macro class called FibonacciChecker in the metadata under
-lib/python/macros/fib.py, we may have:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     macro=fib.FibonacciChecker
 
-      macro=fib.FibonacciChecker
+  This may be used in the config editor to visually associate the setting
+  with these macros. If a macro class has both a transform and a validate
+  method, you can specify which you need by appending the method to the name
+  e.g.:
 
-    This may be used in the config editor to visually associate the setting
-with these macros. If a macro class has both a transform and a validate
-method, you can specify which you need by appending the method to the name
-e.g.:
+  .. code-block:: rose
 
-   .. code-block:: rose
-
-      macro=fib.Fibonacci.validate
+     macro=fib.Fibonacci.validate
 
 widget[gui-application]
+  Indicate that the gui-application (e.g. config-edit) should use a
+  special widget to display this setting.
 
-    Indicate that the gui-application (e.g. config-edit) should use a
-special widget to display this setting.
+  E.g. If we want to use a slider instead of an entry box for a floating
+  point real number.
 
-    E.g. If we want to use a slider instead of an entry box for a floating
-point real number.
+  The widget may take space-delimited arguments which would be specified
+  after the widget name. E.g. to set up a hypothetical table with named columns
+  X, Y, VCT, and Level, we may do:
 
-    The widget may take space-delimited arguments which would be specified
-after the widget name. E.g. to set up a hypothetical table with named columns
-X, Y, VCT, and Level, we may do:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     widget[rose-config-edit]=table.TableWidget X Y VCT Level
 
-      widget[rose-config-edit]=table.TableWidget X Y VCT Level
+  You may override to a Rose built-in widget by specifying a full rose
+  class path in Python - for example, to always show radiobuttons for an option
+  with values set:
 
-    You may override to a Rose built-in widget by specifying a full rose
-class path in Python - for example, to always show radiobuttons for an option
-with values set:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
 
-      widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
+  Another useful Rose built-in widget to use is the array element aligning
+  page widget, rose.config_editor.pagewidget.table.PageArrayTable. You can set
+  this for a section or namespace to make sure each nth variable value element
+  lines up horizontally. For example:
 
-    Another useful Rose built-in widget to use is the array element aligning
-page widget, rose.config_editor.pagewidget.table.PageArrayTable. You can set
-this for a section or namespace to make sure each nth variable value element
-lines up horizontally. For example:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [namelist:meal_choices]
+     customers='Athos','Porthos','Aramis','d''Artagnan'
+     entrees='soup','pate','soup','asparagus'
+     main='beef','spaghetti','coq au vin','lamb'
+     petits_fours=.false.,.true.,.false.,.true.
 
-      [namelist:meal_choices]
-      customers='Athos','Porthos','Aramis','d''Artagnan'
-      entrees='soup','pate','soup','asparagus'
-      main='beef','spaghetti','coq au vin','lamb'
-      petits_fours=.false.,.true.,.false.,.true.
+  could use the following metadata:
 
-    could use the following metadata:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [namelist:meal_choices]
+     widget[rose-config-edit]=rose.config_editor.pagewidget.table.PageArrayTable
 
-      [namelist:meal_choices]
-      widget[rose-config-edit]=rose.config_editor.pagewidget.table.PageArrayTable
+  to align the elements on the page like this:
 
-    to align the elements on the page like this:
+  .. code-block:: none
 
-   .. code-block:: none
-
-      customers        Athos      Porthos      Aramis      d'Artagnan
-      entrees          soup        pate         soup       asparagus
-      main             beef      spaghetti   coq au vin       lamb
-      petits_fours    .false.     .true.       .false.       .true.
+     customers        Athos      Porthos      Aramis      d'Artagnan
+     entrees          soup        pate         soup       asparagus
+     main             beef      spaghetti   coq au vin       lamb
+     petits_fours    .false.     .true.       .false.       .true.
 
 copy-mode (metadata usage with the rose-suite.info file)
+  Setting copy-mode in the metadata allows for the field to be either
+  never copied or copied with any value associated to be clear.
 
-    Setting copy-mode in the metadata allows for the field to be either
-never copied or copied with any value associated to be clear.
+  For example: in a rose-suite.info file
 
-    For example: in a rose-suite.info file
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [ensemble members]
+     copy-mode=never
 
-      [ensemble members]
-      copy-mode=never
-
-    Setting the ensemble members field to include copy-mode=never means
-that the ensemble members field would never be copied.
+  Setting the ensemble members field to include copy-mode=never means
+  that the ensemble members field would never be copied.
 
    .. code-block:: rose
 
       [additional info]
       copy-mode=clear
 
-    Setting the additional info field to include copy-mode=never means that
-the additional info field would be copied, but any value associated with it
-would be cleared.
+  Setting the additional info field to include copy-mode=never means that
+  the additional info field would be copied, but any value associated with
+  it would be cleared.
 
 Metadata for Help
 ^^^^^^^^^^^^^^^^^
@@ -696,54 +689,51 @@ Metadata for Help
 These metadata provide help for a configuration.
 
 url
+  A web URL containing help for the setting. For example:
 
-    A web URL containing help for the setting. For example:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     url=http://www.something.com/FOO/view/dev/doc/FOO.html
 
-      url=http://www.something.com/FOO/view/dev/doc/FOO.html
+  For example, the config editor will trigger a web browser to display this
+  when a variable name is clicked. A partial URL can be used for variables if
+  the variable's section or namespace has a relevant parent url property to
+  use as a prefix. For example:
 
-    For example, the config editor will trigger a web browser to display this
-when a variable name is clicked. A partial URL can be used for variables if
-the variable's section or namespace has a relevant parent url property to use
-as a prefix. For example:
+  .. code-block:: rose
 
-   .. code-block:: rose
+     [namelist:foo]
+     url=https://www.google.com/search
 
-      [namelist:foo]
-      url=https://www.google.com/search
-
-      [namelist:foo=bar]
-      url=?q=nearest+bar
+     [namelist:foo=bar]
+     url=?q=nearest+bar
 
 help
+  (Long) help for the setting. For example, the config editor will use
+  this in a popup dialog for a variable. Embedding variable ids in the help
+  string will allow links to the variables to be created within the popup
+  dialog box, e.g.
 
-    (Long) help for the setting. For example, the config editor will use
-this in a popup dialog for a variable. Embedding variable ids in the help
-string will allow links to the variables to be created within the popup
-dialog box, e.g.
+  .. code-block:: rose
 
-   .. code-block:: rose
+     help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to do something linear.
 
-      help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test
-to do something linear.
+  Web URLs beginning with http:// will also be presented as links in the
+  config editor.
 
-    Web URLs beginning with http:// will also be presented as links in the
-config editor.
 description
+  (Medium) description for the setting. For example, the configuration
+  editor will use this as part of the hover over text.
 
-    (Medium) description for the setting. For example, the configuration
-editor will use this as part of the hover over text.
+  The config editor will also use descriptions set for sections or
+  namespaces as page header text (appears at the top of a panel or page),
+  with clickable id and URL links as in help. Descriptions set for variables
+  may be automatically shown underneath the variable name in the config editor,
+  depending on view options.
 
-    The config editor will also use descriptions set for sections or
-namespaces as page header text (appears at the top of a panel or page),
-with clickable id and URL links as in help. Descriptions set for variables
-may be automatically shown underneath the variable name in the config editor,
-depending on view options.
 title
-
-    (Short) title for the setting. For example, the config editor can use
-this specification as the label of a setting, instead of the variable name.
+  (Short) title for the setting. For example, the config editor can use
+  this specification as the label of a setting, instead of the variable name.
 
 
 Appendix: Metadata Location
@@ -834,13 +824,14 @@ Appendix: Upgrade and Versions
 Terminology:
 
 The HEAD (i.e. development) version
-    The configuration metadata most relevant to the latest revision of the
-source tree.
+  The configuration metadata most relevant to the latest revision of the
+  source tree.
+
 A named version
-    The configuration metadata most relevant to a release, or a particular
-revision, of the software. This will normally be a copy of the HEAD version
-at a given revision, although it may be updated with some backward compatible
-fixes.
+  The configuration metadata most relevant to a release, or a particular
+  revision, of the software. This will normally be a copy of the HEAD version
+  at a given revision, although it may be updated with some backward
+  compatible fixes.
 
 Each change in the HEAD version that requires an upgrade procedure should
 introduce an upgrade macro. Each upgrade macro will provide the following
@@ -1205,8 +1196,8 @@ The State contains the actual states. The Trigger State column contains
 the trigger-mechanism's expected states. The states can be:
 
 IT - !!
-    trigger ignored
+  trigger ignored
 IU - !
-    user ignored
+  user ignored
 E - (normal)
-    enabled
+  enabled
