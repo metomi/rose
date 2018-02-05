@@ -96,37 +96,37 @@ We have added the following conventions into our INI format:
 #. Values of settings accept syntax such as $NAME or ${NAME} for environment
    variable substitution.
 
-E.g.
+   .. code-block:: cylc
 
-# This is line 1 of the comment for this file.
-# This is line 2 of the comment for this file.
+      # This is line 1 of the comment for this file.
+      # This is line 2 of the comment for this file.
 
-# This comment will be ignored.
+      # This comment will be ignored.
 
-# This is a comment for section-1.
-[section-1]
-# This is a comment for key-1.
-key-1=value 1
-# This comment will be ignored.
+      # This is a comment for section-1.
+      [section-1]
+      # This is a comment for key-1.
+      key-1=value 1
+      # This comment will be ignored.
 
-# This is line 1 of the comment for key-2.
-# This is line 2 of the comment for key-2.
-key-2=value 2 line 1
-      value 2 line 2
-# This is a comment for key-3.
-key-3=value 3 line 1
-     =    value 3 line 2 has leading identation.
-     =
-     =    value 3 line 3 is blank. This is line 4.
+      # This is line 1 of the comment for key-2.
+      # This is line 2 of the comment for key-2.
+      key-2=value 2 line 1
+            value 2 line 2
+      # This is a comment for key-3.
+      key-3=value 3 line 1
+           =    value 3 line 2 has leading identation.
+           =
+           =    value 3 line 3 is blank. This is line 4.
 
-# section-2 is user-ignored.
-[!section-2]
-key-4=value 4
-# ...
+      # section-2 is user-ignored.
+      [!section-2]
+      key-4=value 4
+      # ...
 
-[section-3]
-# key-5 is program ignored.
-!!key-5=value 5
+      [section-3]
+      # key-5 is program ignored.
+      !!key-5=value 5
 
 In this document, the shorthand SECTION=KEY=VALUE is used to represent a
 KEY=VALUE pair in a [SECTION] of an INI format file.
@@ -151,7 +151,9 @@ configuration keys from environment variables and/or command line options.
 Where multiple $KEY settings are given, the optional configurations are 
 applied in that order - for example, a setting:
 
-opts=ketchup mayonnaise
+   .. code-block:: rose
+
+      opts=ketchup mayonnaise
 
 implies loading the optional configuration rose-app-ketchup.conf and then the
 optional configuration rose-app-mayonnaise.conf, which may override the
@@ -161,7 +163,9 @@ By default, a Rose command will fail if an optional configuration file is
 missing. However, if you put the optional configuration key in brackets,
 then the optional configuration file is allowed to be missing. E.g.:
 
-opts=ketchup (mayonnaise)
+   .. code-block:: rose
+
+      opts=ketchup (mayonnaise)
 
 In the above example, rose-app-mayonnaise.conf can be missing.
 
@@ -193,11 +197,13 @@ The logic for transforming or upgrading a main configuration C with optional
 configurations O1 and O2 into a new main configuration Ct and new optional
 configurations O1t and O2t can be represented like this:
 
-C => Ct
-C + O1 => C1t
-C + O2 => C2t
-O1t = C1t - Ct
-O2t = C2t - Ct
+   .. code-block:: none
+
+      C => Ct
+      C + O1 => C1t
+      C + O2 => C2t
+      O1t = C1t - Ct
+      O2t = C2t - Ct
 
 
 Import Configuration
@@ -219,19 +225,14 @@ allow you to re-define configuration settings at run time using the
 command line. This would add new settings or override any settings defined in
 the main and optional configurations. E.g.:
 
-(shell)$
-(shell)$
-(shell)$
-(shell)$
-(shell)$
-(shell)$
+   .. code-block:: bash
 
-# Set [env]FOO=foo, and [env]BAR=bar
-# (Overriding any original settings of [env]FOO or [env]BAR)
-rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
-
-# Switch off [env]BAZ
-rose task-run -D '[env]!BAZ='
+      (shell)$ # Set [env]FOO=foo, and [env]BAR=bar
+      (shell)$ # (Overriding any original settings of [env]FOO or [env]BAR)
+      (shell)$ rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
+      (shell)$
+      (shell)$ # Switch off [env]BAZ
+      (shell)$ rose task-run -D '[env]!BAZ='
 
 
 Site and User Configuration
@@ -258,8 +259,10 @@ rosie go. To change the keyboard shortcut of the Find Next action in the
 config editor to F3, put the following lines in your user config file, and
 the setting will apply the next time you run rose config-edit:
 
-[rose-config-edit]
-accel-find-next=F3
+   .. code-block:: rose
+
+      [rose-config-edit]
+      accel-find-next=F3
 
 
 Suite Configuration
@@ -335,8 +338,10 @@ root-dir=LIST
 a glob-like pattern for matching a host name. The DIR should be the root
 directory to install a suite run directory. E.g.:
 
-    root-dir=hpc*=$WORKDIR
-            =*=$DATADIR
+   .. code-block:: rose
+
+      root-dir=hpc*=$WORKDIR
+              =*=$DATADIR
 
     In this example, rose suite-run of a suite with name $NAME will
 create ~/cylc-run/$NAME as a symbolic link to $DATADIR/cylc-run/$NAME/ on
@@ -424,14 +429,16 @@ contain the following:
 
 E.g. The application configuration directory may look like:
 
-./bin/
-./rose-app.conf
-./file/file1
-./file/file2
-./meta/rose-meta.conf
-./opt/rose-app-extra1.conf
-./opt/rose-app-extra2.conf
-...
+   .. code-block:: bash
+
+      ./bin/
+      ./rose-app.conf
+      ./file/file1
+      ./file/file2
+      ./meta/rose-meta.conf
+      ./opt/rose-app-extra1.conf
+      ./opt/rose-app-extra2.conf
+      ...
 
 Application Configuration File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -519,8 +526,10 @@ return code.
 of file paths. If this is not enough, e.g. you want to test for the existence
 of a string in each file, you can specify a file-test to do a grep. E.g.:
 
-    all-files=file1 file2
-    file-test=test -e {} && grep -q 'hello' {}
+   .. code-block:: rose
+
+      all-files=file1 file2
+      file-test=test -e {} && grep -q 'hello' {}
 
     At runtime, any {} pattern in the above would be replaced with the name
 of the file. The above make sure that both file1 and file2 exist and that
@@ -534,17 +543,19 @@ The list is a comma-separated list. The syntax looks like [n*][DURATION],
 where DURATION is an ISO 8601 duration such as PT5S (5 seconds) or
 PT10M (10 minutes), and n is an optional number of times to repeat it. E.g.:
 
-    # Default
-    delays=0
+   .. code-block:: rose
 
-    # Poll 1 minute after the runner begins, repeat every minute 10 times
-    delays=10*PT1M
+      # Default
+      delays=0
 
-    # Poll when runner begins,
-    # repeat every 10 seconds 6 times,
-    # repeat every minute 60 times,
-    # repeat once after 1 hour
-    delays=0,6*PT10S,60*PT1M,PT1H
+      # Poll 1 minute after the runner begins, repeat every minute 10 times
+      delays=10*PT1M
+
+      # Poll when runner begins,
+      # repeat every 10 seconds 6 times,
+      # repeat every minute 60 times,
+      # repeat once after 1 hour
+      delays=0,6*PT10S,60*PT1M,PT1H
 
 Application Configuration File: Built-in Application: fcm_make
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -630,19 +641,23 @@ version control system, or a path to a plain file. The root level schemes
 setting can be used to help the system to do the right thing. The general
 syntax of the value of the root level schemes setting looks like:
 
-schemes=PATTERN-1=SCHEME-1
-       =PATTERN-2=SCHEME-2
+   .. code-block:: rose
+
+      schemes=PATTERN-1=SCHEME-1
+             =PATTERN-2=SCHEME-2
 
 E.g.:
 
-schemes=hpc*:*=rsync
-       =http://host/svn-repos/*=svn
+   .. code-block:: rose
 
-[file:foo.txt]
-source=hpc1:/path/to/foo.txt
+      schemes=hpc*:*=rsync
+             =http://host/svn-repos/*=svn
 
-[file:bar.txt]
-source=http://host/svn-repos/path/to/bar.txt
+      [file:foo.txt]
+      source=hpc1:/path/to/foo.txt
+
+      [file:bar.txt]
+      source=http://host/svn-repos/path/to/bar.txt
 
 In this example, a URI matching the pattern hpc*:* would use the rsync
 scheme to pull the source to the current host, and a URI matching the
