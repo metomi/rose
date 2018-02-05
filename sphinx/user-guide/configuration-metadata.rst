@@ -1213,3 +1213,5 @@ contains the trigger-mechanism's expected states. The states can be:
   user ignored
 ``E`` - **(normal)**
   enabled
+
+  .. TODO - large table to go here

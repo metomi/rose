@@ -47,10 +47,12 @@ or application. Widgets going into the Rose core should be added to the
 distribution.
 
 Example
+"""""""
 
 See the Advanced Tutorial.
 
 API Reference
+"""""""""""""
 
 All value widgets, custom or core, use the same API. This means that a good
 ractical reference is the set of existing value widgets in the package
@@ -245,6 +247,7 @@ You may even wish to do something off-the-wall such as an xdot-based widget
 set!
 
 API Reference
+"""""""""""""
 
 The procedure for generating a custom page widget is as follows:
 
@@ -426,6 +429,7 @@ Sub panels are capable of using quite a lot of functionality such as
 modifying the sections and options in the sub-pages directly.
 
 API Reference
+"""""""""""""
 
 The procedure for generating a custom sub panel widget is as follows:
 
@@ -567,15 +571,18 @@ Code
 ^^^^
 
 Examples
+""""""""
 
 See the macro Advanced Tutorial.
 
 API Documentation
+"""""""""""""""""
 
 The ``rose.macro.MacroBase`` class (subclassed by all rose macros) is
 documented here.
 
 API Reference
+"""""""""""""
 
 Validator, transformer and reporter macros are python classes which subclass
 from ``rose.macro.MacroBase`` (api docs).
