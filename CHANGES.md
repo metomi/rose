@@ -5,6 +5,66 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2018-Q1)
+
+Rose release 53. This release is expected to be used with:
+* [cylc-7.5.0](https://github.com/cylc/cylc/releases/tag/7.5.0) or upcoming, and
+* [fcm-2017.10.0](https://github.com/metomi/fcm/releases/tag/2017.10.0).
+
+### Noteworthy Changes
+
+[#2146](https://github.com/metomi/rose/pull/2146):
+Rose Bush: fix links for viewing files in suites with `/` in their names.
+
+[#2145](https://github.com/metomi/rose/pull/2145):
+rose suite-clean, rose suite-run, rose-suite-restart, etc: improve diagnostic
+message when the commands detect that the suite may still be running. The
+commands now include information of the location of the contact file and
+relevant information from within.
+
+[#2141](https://github.com/metomi/rose/pull/2141):
+rose metadata-check: allow check to pass for GTK widgets if there is no display
+in the environment.
+
+[#2140](https://github.com/metomi/rose/pull/2140):
+rose macro: fix behaviour with transfomer macro with custom argument where it
+would die on an optional configuration that did not have the custom argument.
+
+[#2139](https://github.com/metomi/rose/pull/2139):
+rosa svn-pre-commit: now prevent users from adding a file at the branch level.
+
+[#2138](https://github.com/metomi/rose/pull/2138):
+rose_arch: prevents users from specifying a target as compulsory as well as
+optional, e.g. `[arch:foo]` and `[arch:(foo)]`.
+
+[#2137](https://github.com/metomi/rose/pull/2137):
+rose config-edit: fix traceback opening page menu for `rose-suite.conf`.
+
+[#2127](https://github.com/metomi/rose/pull/2127):
+Rose Bush: file view: Prevent files being served outside of suite directory.
+
+[#2124](https://github.com/metomi/rose/pull/2124):
+rose config-edit: STASH panel: fix update of the expanded selection in the
+event that re-orddering of rows are required when a table is modified.
+
+[#2123](https://github.com/metomi/rose/pull/2123):
+Rose installation no longer depends on the external `simplejson` library.
+It now uses `json` in Python's standard library.
+
+[#2122](https://github.com/metomi/rose/pull/2122):
+Rose Bush:
+* When a line number is specified in the URL the line will be highlighted on
+  page load.
+* Selecting a line no longer requires a content reload.
+* Highlighting of logger level information (i.e. INFO, DEBUG, ...) is now
+  restored (broken by the new logging system).
+
+[#2120](https://github.com/metomi/rose/pull/2120):
+rose suite-cmp-vc: new command to compare version control system information of
+suite source between latest install and now.
+
+--------------------------------------------------------------------------------
+
 ## 2017.10.0 (2017-10-03)
 
 Rose release 52. This release is expected to be used with:
