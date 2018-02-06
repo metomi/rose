@@ -1,3 +1,16 @@
+.. include:: ../hyperlinks.rst
+   :start-line: 1
+
+.. _calendar: https://developer.gnome.org/pygtk/stable/class-gtkcalendar.html
+.. _slider: http://www.pygtk.org/pygtk2tutorial/sec-RangeWidgetEample.html
+.. _xdot-based: https://github.com/jrfonseca/xdot.py
+.. _PEP8: https://www.python.org/dev/peps/pep-0008/
+.. _PEP257: https://www.python.org/dev/peps/pep-0257/
+.. _RESTful: https://en.wikipedia.org/wiki/Representational_state_transfer
+.. _RDBMS: https://en.wikipedia.org/wiki/Relational_database_management_system
+.. _JSON: http://www.json.org/
+
+
 API
 ===
 
@@ -5,7 +18,7 @@ API
 Introduction
 ------------
 
-Rose is mainly implemented in Python and bash.
+Rose is mainly implemented in `Python`_ and `bash`_.
 
 The sub-sections below explain how to make use of various application
 programming interfaces within Rose which are designed for extension. These
@@ -19,7 +32,7 @@ Rose GTK library
 ----------------
 
 The Rose/Rosie GUIs (such as the config editor) are written using the Python
-bindings for the GTK GUI toolkit (PyGTK). You can write your own custom GTK
+bindings for the GTK GUI toolkit (`PyGTK`_). You can write your own custom GTK
 widgets and use them within Rose. They should live with the metadata under 
 the ``lib/python/widget/`` directory.
 
@@ -37,9 +50,9 @@ the default widgets. These have the same API, but live in the metadata
 directories rather than the Rose source code.
 
 For example, you may wish to add widgets that deal with dates (e.g. using
-something based on a calendar widget) or use a slider widget for numbers.
-You may even want something that uses an image-based interface such as a
-latitude-longitude chooser based on a map.
+something based on a `calendar`_ widget) or use a `slider`_ widget for
+numbers. You may even want something that uses an image-based interface
+such as a latitude-longitude chooser based on a map.
 
 Normally, widgets will be placed within the metadata directory for the suite
 or application. Widgets going into the Rose core should be added to the
@@ -49,7 +62,7 @@ distribution.
 Example
 """""""
 
-See the Advanced Tutorial.
+See the :ref:`Advanced Tutorial <widget-dev>`.
 
 API Reference
 """""""""""""
@@ -229,6 +242,8 @@ All the existing variable value widgets are implemented using this API, so
 a good resource is the modules within the
 ``lib/python/rose/config_editor/valuewidget package``.
 
+.. _conf-ed-cust-pages:
+
 Config Editor Custom Pages
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -243,8 +258,8 @@ two-dimensional form rather than as a simple list. You may want to strip
 down or add to the information presented by default - e.g. hiding names or
 embedding widgets within a block of help text.
 
-You may even wish to do something off-the-wall such as an xdot-based widget
-set!
+You may even wish to do something off-the-wall such as an `xdot-based`_
+widget set!
 
 API Reference
 """""""""""""
@@ -536,18 +551,20 @@ metadata. There are four types of macros:
 * Changers (transformers) - change a configuration e.g. adding/removing
   options.
 * Upgraders - these are special transformer macros for upgrading and
-  downgrading configurations. (covered in the Upgrade Macro API)
+  downgrading configurations. (covered in the
+  :ref:`Upgrade Macro API <rose-upgr-macros>`)
 * Reporters - output information about a configuration.
 
 There are built-in rose macros that handle standard behaviour such as trigger
 changing and type checking.
 
 This section explains how to add your own custom macros to transform and
-validate configurations. See Upgrade Macro API for upgrade macros.
+validate configurations. See :ref:`Upgrade Macro API <rose-upgr-macros>` for
+upgrade macros.
 
 Macros use a Python API, and should be written in Python, unless you are
 doing something very fancy. In the absence of a Python house style, it's
-usual to follow the standard Python style guidance (PEP8, PEP257).
+usual to follow the standard Python style guidance (`PEP8`_, `PEP257`_).
 
 They can be run within ``rose config-edit`` or via ``rose macro``.
 
@@ -573,7 +590,7 @@ Code
 Examples
 """"""""
 
-See the macro Advanced Tutorial.
+See the macro :ref:`Advanced Tutorial <macro-dev>`.
 
 API Documentation
 """""""""""""""""
@@ -581,11 +598,15 @@ API Documentation
 The ``rose.macro.MacroBase`` class (subclassed by all rose macros) is
 documented here.
 
+.. TODO - add reference link to Rose Config API page (once added) on 'here'.
+
 API Reference
 """""""""""""
 
 Validator, transformer and reporter macros are python classes which subclass
 from ``rose.macro.MacroBase`` (api docs).
+
+.. TODO - add ref link to Rose Config API page (once added) on 'api docs'.
 
 These macros implement their behaviours by providing a ``validate``,
 ``transform`` or ``report`` method. A macro can contain any combination of
@@ -595,6 +616,8 @@ transformer.
 These methods should accept two ``rose.config.ConfigNode`` (api docs)
 instances as arguments - one is the configuration, and one is the metadata
 configuration that provides information about the configuration items.
+
+.. TODO - add ref link to Rose Config API page (once added) on 'api docs'.
 
 A validator macro should look like:
 
@@ -723,6 +746,8 @@ On running your macro the user will be prompted to supply values for these
 arguments or accept the default values.
 
 
+.. _rose-upgr-macros:
+
 Rose Upgrade Macros
 -------------------
 
@@ -779,7 +804,7 @@ the functionality of the transform macros documented above.
 defined for you to call. All methods return ``None`` unless otherwise
 specified.
 
-   .. TODO - something must be done
+.. TODO - complete the python API part that goes here
 
 
 Rosie Web
@@ -787,8 +812,8 @@ Rosie Web
 
 This section explains how to use the Rosie web service API. All Rosie
 discovery services (e.g. ``rosie search``, ``rosie go``, web page) use a
-RESTful API to interrogate a web server, which then interrogates an RDBMS.
-Returned data is encoded in the JSON format.
+`RESTful`_ API to interrogate a web server, which then interrogates an
+`RDBMS`_. Returned data is encoded in the `JSON`_ format.
 
 You may wish to utilise the Python class ``rosie.ws_client.Client`` as an
 alternative to this API.
@@ -809,16 +834,16 @@ supported format is 'json') and use a url that looks like:
 Usage
 ^^^^^
 
-   .. TODO - something must be done
+.. TODO - complete/remove section
 
 
 Rose Python Modules
 -------------------
 
-   .. TODO - something must be done
+.. TODO - complete/remove section
 
 
 Rose Bash Library
 -----------------
 
-   .. TODO - something must be done
+.. TODO - complete/remove section
