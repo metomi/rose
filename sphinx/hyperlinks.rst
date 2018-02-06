@@ -12,3 +12,6 @@
 .. _cylc user guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
 .. _Jinja2: http://jinja.pocoo.org/
 .. _FCM: https://metomi.github.io/fcm/doc/
+.. _Python: https://www.python.org/
+.. _bash: https://www.gnu.org/software/bash/
+.. _PyGTK: http://www.pygtk.org/

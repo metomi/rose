@@ -1,3 +1,12 @@
+.. include:: ../hyperlinks.rst
+   :start-line: 1
+
+.. _floating point: https://docs.python.org/3/library/stdtypes.html#typesnumeric
+.. _cast: https://docs.python.org/2/library/ast.html#ast.literal_eval
+
+.. _conf-meta:
+
+
 Configuration Metadata
 ======================
 
@@ -5,13 +14,13 @@ Configuration Metadata
 Format and Location
 -------------------
 
-See Configuration Format.
+See :ref:`conf-format`.
 
 A configuration metadata is itself a configuration. Each configuration
 metadata is represented in a directory with the following:
 
 * ``rose-meta.conf``, the main configuration file. See for detail.
-* ``opt/`` directory. For detail, see Optional Configuration.
+* ``opt/`` directory. For detail, see :ref:`opt-config`.
 * other files, e.g.:
 
   * ``lib/python/widget/my_widget.py`` would be the location of a custom
@@ -28,9 +37,10 @@ of precedence:
   application.
 * The ``--meta-path=PATH`` option of relevant commands.
 * The value of the ``ROSE_META_PATH`` environment variable.
-* The ``meta-path`` setting in site/user configurations.
+* The ``meta-path`` setting in :ref:`site/user <site-n-user-conf>`
+  configurations.
 
-See Metadata Location for more details.
+See :ref:`app-meta-loc` for more details.
 
 The configuration metadata that controls default behaviour will be located in
 ``$ROSE_HOME/etc/rose-meta/``.
@@ -247,8 +257,8 @@ type
      *usage*: Fortran real types, generic floating point numbers. Scientific
      notation must use the "e" or "E" format.
 
-     *comment*: Internally implemented within Rose using Python's floating
-     point specification.
+     *comment*: Internally implemented within Rose using Python's
+     `floating point`_ specification.
 
   ``raw``
     *description*: placeholder used in derived type specifications where
@@ -334,17 +344,18 @@ value-hints
 range
   Specify a range of values. It can either be a simple comma ``,`` separated
   list of allowed values, or a logical expression in the Rose metadata
-  mini-language. This metadata is only valid if ``type`` is either ``integer``
-  or ``real``.
+  :ref:`mini-language <app-meta-mini-lang>`. This metadata is only valid if
+  ``type`` is either ``integer`` or ``real``.
 
   A simple list may contain a mixture of allowed numbers and number ranges
   such as ``1, 2, 4:8, 10:`` (which means the value can be 1, 2, between 4
   and 8 inclusive, or any values greater than or equal to 10.)
 
-  A logical expression uses the Rose metadata mini-language, using the
-  variable ``this`` to denote the value of the current setting, e.g.
-  ``this <-1 and this >1``. Inter-variable comparisons are not permitted
-  (but see the ``fail-if`` property below for a way to implement this).
+  A logical expression uses the Rose metadata
+  :ref:`mini-language <app-meta-mini-lang>`, using the variable ``this`` to
+  denote the value of the current setting, e.g. ``this <-1 and this >1``.
+  Inter-variable comparisons are not permitted (but see the ``fail-if``
+  property below for a way to implement this).
 
 pattern
   Specify a regular expression (Python's extended regular expression
@@ -375,14 +386,16 @@ pattern
      pattern=^('red'|'blue')(?:,('red'|'blue'))*$
 
 fail-if, warn-if
-  Specify a logical expression using the Rose mini-language to validate the
+  Specify a logical expression using the Rose
+  :ref:`mini-language <app-meta-mini-lang>` to validate the
   value of the current setting with respect to other settings. If the logical
   expression evaluates to true in a ``fail-if`` metadata, the system will
   consider the setting in error. On the other hand, in a ``warn-if`` metadata,
   the system will only issue a warning. The logical expression uses a
-  Python-like syntax (documented fully in the appendix). It can reference the
-  value of the current setting with the ``this`` variable and the value of
-  other settings with their IDs. E.g.:
+  Python-like syntax (documented fully in the
+  :ref:`appendix <app-meta-mini-lang>`). It can reference the value of the
+  current setting with the ``this`` variable and the value of other settings
+  with their IDs. E.g.:
 
   .. code-block:: rose
 
@@ -573,8 +586,9 @@ trigger
   ``env=IS_COLD`` are ``true`` and enabled. Otherwise, it is ignored.
 
   The trigger syntax also supports a logical expression using the Rose 
-  metadata mini-language, in the same way as the ``range`` or ``fail-if``
-  metadata. As with ``range``, inter-variable comparisons are disallowed.
+  metadata :ref:`mini-language <app-meta-mini-lang>`, in the same way as
+  the ``range`` or ``fail-if`` metadata. As with ``range``, inter-variable
+  comparisons are disallowed.
 
   .. code-block:: rose
 
@@ -642,10 +656,11 @@ widget[gui-application]
 
      widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
 
-  Another useful Rose built-in widget to use is the array element aligning
-  page widget, ``rose.config_editor.pagewidget.table.PageArrayTable``. You
-  can set this for a section or namespace to make sure each nth variable
-  value element lines up horizontally. For example:
+  Another useful Rose built-in widget to use is the array element
+  aligning :ref:`page widget <conf-ed-cust-pages>`,
+  ``rose.config_editor.pagewidget.table.PageArrayTable``. You can set this
+  for a section or namespace to make sure each *n* th variable value element
+  lines up horizontally. For example:
 
   .. code-block:: rose
 
@@ -747,6 +762,8 @@ title
   this specification as the label of a setting, instead of the variable name.
 
 
+.. _app-meta-loc:
+
 Appendix: Metadata Location
 ---------------------------
 
@@ -759,7 +776,8 @@ order of precedence:
 
 * The ``--meta-path=PATH`` option of relevant commands.
 * The content of the ``ROSE_META_PATH`` environment variable.
-* The ``meta-path`` setting in site/user configurations.
+* The ``meta-path`` setting in :ref:`site/user <site-n-user-conf>`
+  configurations.
 
 Each of the above settings can be a colon-separated list of paths.
 
@@ -799,7 +817,7 @@ within the repository:
 and the system ``CAFFEINE`` may have a hybrid structure, with both flat and
 hierarchical components:
 
-   .. code-block:: rose
+   .. code-block:: bash
 
       CAFFEINE/doc/
       ...
@@ -951,6 +969,8 @@ macros it is safest to not commit any resulting changes (or to use a branch
 of the suite which you are happy to discard).
 
 
+.. _app-meta-mini-lang:
+
 Appendix: Metadata Mini-Language
 --------------------------------
 
@@ -975,7 +995,7 @@ Operators
 
 The following *numeric* operators are supported:
 
-   .. code-block:: rose
+   .. code-block:: python
 
       +     # add
       -     # subtract
@@ -987,7 +1007,7 @@ The following *numeric* operators are supported:
 
 The following *string* operators are supported:
 
-   .. code-block:: rose
+   .. code-block:: python
 
       +      # concatenate - e.g. "foo" + "bar" implies "foobar"
       *      # self-concatenate some number of times - e.g. "foo" * 2 implies "foofoo"
@@ -998,14 +1018,15 @@ The following *string* operators are supported:
       # Where m, n are integers or expressions that evaluate to integers
       # (negative numbers count from the end of the string):
       [n]   # get nth character from string - e.g. "foo"[1] implies "o"
-      [m:n] # get slice of string from m to n - e.g. "foobar"[1:5] implies "ooba"
+      [m:n] # get slice of string from m to n - e.g. "foobar"[1:5] implies
+            # "ooba"
       [m:]  # get slice of string from m onwards - e.g. "foobar"[1:] implies
-        "oobar"
+            # "oobar"
       [:n]  # get slice of string up to n - e.g. "foobar"[:5] implies "fooba"
 
 The following *logical* operators are supported:
 
-   .. code-block:: rose
+   .. code-block:: python
 
       and   # Logical AND
       or    # Logical OR
@@ -1013,7 +1034,7 @@ The following *logical* operators are supported:
 
 The following *comparison* operators are supported:
 
-   .. code-block:: rose
+   .. code-block:: python
 
       is    # Is the same object as (usually used for 'is none')
       <     # Less than
@@ -1032,7 +1053,7 @@ Constants
 
 The following are special constants:
 
-   .. code-block:: rose
+   .. code-block:: python
 
       None  # Python None
       False # Python False
@@ -1042,8 +1063,8 @@ Using Variable Ids
 ^^^^^^^^^^^^^^^^^^
 
 Putting a variable id in the expression means that when the expression
-is evaluated, the string value of the variable is cast and substituted into
-the expression.
+is evaluated, the string value of the variable is `cast`_ and substituted
+into the expression.
 
 For example, if we have a configuration that looks like this:
 
@@ -1180,7 +1201,7 @@ Rose uses an external engine to evaluate the raw language string after
 variable ids and any ``any()`` and ``all()`` functions have been substituted
 and expanded.
 
-The current choice of engine is Jinja2, which is responsible for the
+The current choice of engine is `Jinja2`_, which is responsible for the
 details of the supported Pythonic syntax. This may change.
 
 **Do not use any Jinja2-specific syntax.**

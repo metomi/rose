@@ -1,3 +1,5 @@
+.. _macro-dev:
+
 Custom Macros
 =============
 

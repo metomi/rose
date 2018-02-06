@@ -13,7 +13,7 @@ Specifies the number of processors to run on. Default is 1.
 Used By
 ^^^^^^^
 
-* rose mpi-launch
+* :ref:`command-rose-mpi-launch`
 
 
 ``ROSE_APP_COMMAND_KEY``
@@ -27,8 +27,8 @@ Can be set to define which command in an app config to use.
 Used By
 ^^^^^^^
 
-* rose app-run
-* rose task-run
+* :ref:`command-rose-app-run`
+* :ref:`command-rose-task-run`
 
 
 ``ROSE_APP_OPT_CONF_KEYS``
@@ -45,8 +45,8 @@ in first-to-last order.
 Used By
 ^^^^^^^
 
-* rose app-run
-* rose task-run
+* :ref:`command-rose-app-run`
+* :ref:`command-rose-task-run`
 
 
 ``ROSE_BUNCH_LOG_PREFIX``
@@ -62,7 +62,9 @@ the log prefix that will be used for output e.g. for a bunch instance named
 Provided At Runtime By
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* rose bunch
+* rose-bunch
+
+   .. TODO - link 'rose bunch' to relevant built-in app page
 
 
 ``ROSE_CONF_PATH``
@@ -79,7 +81,7 @@ normal behaviour is to search for and load ``rose.conf`` from
 Used By
 ^^^^^^^
 
-* rose test-battery
+* :ref:`command-rose-test-battery`
 
 
 ``ROSE_CYCLING_MODE``
@@ -94,12 +96,12 @@ The cycling mode to use when manipulating dates. Can be either ``360day`` or
 Used By
 ^^^^^^^
 
-* rose date
+* :ref:`command-rose-date`
 
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_DATA``
@@ -113,7 +115,7 @@ The path to the data directory of the running suite.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_DATAC``
@@ -127,7 +129,7 @@ The path to the data directory of this cycle time in the running suite.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_DATAC????``
@@ -155,7 +157,7 @@ of 1 day before the current cycle time.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_ETC``
@@ -169,7 +171,7 @@ The path to the etc directory of the running suite.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_FILE_INSTALL_ROOT``
@@ -183,8 +185,8 @@ If specified, change to the specified directory to install files.
 Used By
 ^^^^^^^
 
-* rose app-run
-* rose task-run
+* :ref:`command-rose-app-run`
+* :ref:`command-rose-task-run`
 
 
 ``ROSE_HOME``
@@ -227,7 +229,7 @@ Specifies the launcher program to run the prog.
 Used By
 ^^^^^^^
 
-* rose mpi-launch
+* :ref:`command-rose-mpi-launch`
 
 
 ``ROSE_LAUNCHER_FILEOPTS``
@@ -242,7 +244,7 @@ selected ``LAUNCHER``.
 Used By
 ^^^^^^^
 
-* rose mpi-launch
+* :ref:`command-rose-mpi-launch`
 
 
 ``ROSE_LAUNCHER_LIST``
@@ -256,7 +258,7 @@ Specifies an alternative list of launchers.
 Used By
 ^^^^^^^
 
-* rose mpi-launch
+* :ref:`command-rose-mpi-launch`
 
 
 ``ROSE_LAUNCHER_PREOPTS``
@@ -271,7 +273,7 @@ selected ``LAUNCHER``.
 Used By
 ^^^^^^^
 
-* rose mpi-launch
+* :ref:`command-rose-mpi-launch`
 
 
 ``ROSE_LAUNCHER_POSTOPTS``
@@ -286,7 +288,7 @@ selected ``LAUNCHER``.
 Used By
 ^^^^^^^
 
-* rose mpi-launch
+* :ref:`command-rose-mpi-launch`
 
 
 ``ROSE_LAUNCHER_ULIMIT_OPTS``
@@ -316,7 +318,7 @@ results in:
 Used By
 ^^^^^^^
 
-* rose mpi-launch
+* :ref:`command-rose-mpi-launch`
 
 
 ``ROSE_META_PATH``
@@ -330,8 +332,8 @@ Defines a metadata search path, colon-separated for multiple paths.
 Used by
 ^^^^^^^
 
-* rose config-edit
-* rose macro
+* :ref:`command-rose-config-edit`
+* :ref:`command-rose-macro`
 
 
 ``ROSE_NS``
@@ -360,7 +362,7 @@ The name of the host where the ``rose suite-run`` command was invoked.
 Provided By
 ^^^^^^^^^^^
 
-* rose suite-run
+* :ref:`command-rose-suite-run`
 
 
 ``ROSE_SUITE_DIR``
@@ -374,7 +376,7 @@ The path to the root directory of the running suite.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_SUITE_DIR_REL``
@@ -388,7 +390,7 @@ The path to the root directory of the running suite relative to ``$HOME``.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_SUITE_NAME``
@@ -402,7 +404,7 @@ The name of the running suite.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_SUITE_OPT_CONF_KEYS``
@@ -419,7 +421,7 @@ applied in first-to-last order.
 Used By
 ^^^^^^^
 
-* rose suite-run
+* :ref:`command-rose-suite-run`
 
 
 ``ROSE_TASK_APP``
@@ -433,7 +435,7 @@ Specify a named application configuration.
 Used By
 ^^^^^^^
 
-* rose task-run
+* :ref:`command-rose-task-run`
 
 
 ``ROSE_TASK_CYCLE_TIME``
@@ -447,7 +449,7 @@ The cycle time of the suite task, if there is one.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_TASK_LOG_DIR``
@@ -461,7 +463,7 @@ The directory for log files of the suite task.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_TASK_LOG_ROOT``
@@ -475,7 +477,7 @@ The root path for log files of the suite task.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_TASK_N_JOBS``
@@ -492,8 +494,8 @@ The number of jobs to run in parallel in ``fcm make``. (``default=4``)
 Used By
 ^^^^^^^
 
-* fcm_make built-in application
-* fcm_make2 built-in application
+* ``fcm_make`` built-in application
+* ``fcm_make2`` built-in application
 
 
 ``ROSE_TASK_MIRROR_TARGET``
@@ -508,7 +510,7 @@ configuration``.
 Provided By
 ^^^^^^^^^^^
 
-* fcm_make built-in application
+* ``fcm_make`` built-in application
 
 
 ``ROSE_TASK_NAME``
@@ -522,12 +524,12 @@ The name of the suite task.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 Used By
 ^^^^^^^
 
-* rose app-run
+* :ref:`command-rose-app-run`
 
 
 ``ROSE_TASK_OPTIONS``
@@ -544,8 +546,8 @@ Additional options and arguments for ``fcm make`` or ``rose app-run``.
 Used By
 ^^^^^^^
 
-* fcm_make built-in application
-* fcm_make2 built-in application
+* ``fcm_make`` built-in application
+* ``fcm_make2`` built-in application
 
 
 ``ROSE_TASK_PREFIX``
@@ -559,7 +561,7 @@ The prefix in the task name.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_TASK_SUFFIX``
@@ -573,7 +575,7 @@ The suffix in the task name.
 Provided By
 ^^^^^^^^^^^
 
-* rose task-env
+* :ref:`command-rose-task-env`
 
 
 ``ROSE_UTIL``
@@ -602,4 +604,4 @@ Used and Provided By
 ^^^^^^^^^^^^^^^^^^^^
 
 * rose
-* rose suite-run
+* :ref:`command-rose-suite-run`

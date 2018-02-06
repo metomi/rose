@@ -1,3 +1,5 @@
+.. _widget-dev:
+
 Widget Development
 ==================
 

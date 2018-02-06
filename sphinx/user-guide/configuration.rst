@@ -1,3 +1,12 @@
+.. include:: ../hyperlinks.rst
+   :start-line: 1
+
+.. _INI file: https://en.wikipedia.org/wiki/INI_file
+.. _cylc: http://cylc.github.io/cylc/
+.. _ISO 8601 duration: https://en.wikipedia.org/wiki/ISO_8601#Durations
+.. _User: http://man.openbsd.org/ssh_config#User
+
+
 Configuration
 =============
 
@@ -30,13 +39,15 @@ configuration metadata for the suite and application configurations will
 drive the Rose config editor GUI, but will not be bound or restricted by it.
 
 
+.. _conf-format:
+
 Configuration Format
 --------------------
 
 A configuration in Rose is normally represented by a directory with the
 following:
 
-* a configuration file in a modified INI file format.
+* a configuration file in a modified `INI file`_ format.
 * (optionally) files containing data that cannot easily be represented by the
   INI format.
 
@@ -137,6 +148,7 @@ We have added the following conventions into our INI format:
 In this document, the shorthand ``SECTION=KEY=VALUE`` is used to represent a
 ``KEY=VALUE`` pair in a ``[SECTION]`` of an INI format file.
 
+.. _opt-config:
 
 Optional Configuration
 ----------------------
@@ -175,8 +187,9 @@ then the optional configuration file is allowed to be missing. E.g.:
 
 In the above example, ``rose-app-mayonnaise.conf`` can be missing.
 
-Some Rose utilities (e.g. rose suite-run, rose task-run, rose app-run,
-etc) allow optional configurations to be selected at run time using:
+Some Rose utilities (e.g. :ref:`command-rose-suite-run`,
+:ref:`command-rose-task-run`, :ref:`command-rose-app-run`, etc) allow
+optional configurations to be selected at run time using:
 
 #. The ROSE_APP_OPT_CONF_KEYS Environment variables.
 #. The command line options ``--opt-conf-key=KEY`` or ``-O KEY``.
@@ -226,11 +239,12 @@ At the moment, use of this is only encouraged for configuration metadata.
 Re-define Configuration at Run Time
 -----------------------------------
 
-Some Rose utilities (e.g. rose suite-run, rose task-run, rose app-run, etc)
-allow you to re-define configuration settings at run time using the
-``--define=[SECTION]NAME=VALUE`` or ``-D [SECTION]NAME=VALUE`` options on the
-command line. This would add new settings or override any settings defined in
-the main and optional configurations. E.g.:
+Some Rose utilities (e.g. :ref:`command-rose-suite-run`,
+:ref:`command-rose-task-run`, :ref:`command-rose-app-run`, etc) allow you
+to re-define configuration settings at run time using the
+``--define=[SECTION]NAME=VALUE`` or ``-D [SECTION]NAME=VALUE`` options on
+the command line. This would add new settings or override any settings
+defined in the main and optional configurations. E.g.:
 
    .. code-block:: bash
 
@@ -241,6 +255,8 @@ the main and optional configurations. E.g.:
       (shell)$ # Switch off [env]BAZ
       (shell)$ rose task-run -D '[env]!BAZ='
 
+
+.. _site-n-user-conf:
 
 Site and User Configuration
 ---------------------------
@@ -276,7 +292,7 @@ Suite Configuration
 -------------------
 
 The configuration and functionality of a suite will usually be covered by
-the use of cylc. In which case, most of the suite configuration will live
+the use of `cylc`_. In which case, most of the suite configuration will live
 in the cylc ``suite.rc`` file. Otherwise, a suite is just a directory of
 files.
 
@@ -284,21 +300,24 @@ A suite directory may contain the following:
 
 * A file called ``rose-suite.conf``, a configuration file in the modified INI
   format described above. It stores the information on how to install the
-  suite. See below for detail.
+  suite. See :ref:`below <suite-config-suite-inst>` for detail.
 * A file called ``rose-suite.info``, a configuration file in the modified INI
   format described above. It describes the suite's purpose and identity, e.g.
   the title, the description, the owner, the access control list, and other
   information. Apart from a few standard fields, a suite is free to store
-  any information in this file. See below for detail.
+  any information in this file. See :ref:`below <suite-config-suite-info>`
+  for detail.
 * An ``app/`` directory of application configurations used by the suite.
 * A ``bin/`` directory of scripts and utilities used by the suite.
 * An ``etc/`` directory of other configurations and resources used the suite.
   E.g. fcm make configurations.
 * A ``meta/`` directory containing the suite's configuration metadata.
-* ``opt/`` directory. For detail, see Optional Configuration.
+* ``opt/`` directory. For detail, see :ref:`opt-config`.
 * Other items, as long as they do not clash with the scheduler's working
   directories. E.g. for a cylc suite, ``log*/``, ``share/``, ``state/`` and
   ``work/`` should be avoided.
+
+.. _suite-config-suite-inst:
 
 Suite Configuration: Suite Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -325,17 +344,17 @@ and root level options:
     will attempt to use this version of cylc.
 
 ``[jinja2:suite.rc]``
-  For a cylc suite, if jinja2 assignments are required for ``suite.rc``, they
-  may be defined as ``key=value`` pairs in the ``[jinja2:suite.rc]`` section.
-  The assignments will be inserted after the ``#!jinja2`` line of the
-  installed ``suite.rc`` file.
+  For a cylc suite, if `Jinja2`_ assignments are required for
+  ``suite.rc``, they may be defined as ``key=value`` pairs in the
+  ``[jinja2:suite.rc]`` section. The assignments will be inserted after the
+  ``#!jinja2`` line of the installed ``suite.rc`` file.
 
 ``[file:NAME]``
   Specify a file/directory to be installed. ``NAME`` should be a path
   relative to the run time ``$PWD``.
 
   * E.g. ``file:app/APP=source=LOCATION``.
-  * See Appendix: File Creation Mode.
+  * See :ref:`Appendix: File Creation Mode <app-file-cre-mode>`.
 
 It may have the following top level (no section) options:
 
@@ -383,6 +402,8 @@ It may have the following top level (no section) options:
 ``root-dir-work=LIST``
   Deprecated. Same as ``root-dir{work}=LIST``.
 
+.. _suite-config-suite-info:
+
 Suite Configuration: Suite Information
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -424,7 +445,8 @@ The configuration of an application is represented by a directory. It may
 contain the following:
 
 * ``rose-app.conf``: a compulsory configuration file in the modified INI format.
-  See below for detail. It contains the following information:
+  See :ref:`below <app-conf-file>` for detail. It contains the following
+  information:
 
   * the command(s) to run.
   * the metadata type for the application.
@@ -452,7 +474,8 @@ contain the following:
   at run time. If a ``bin/`` exists in the application configuration, it will 
   prepended to the ``PATH`` environment variable at run time.
 * ``meta/`` directory for the metadata of the application.
-* ``opt/`` directory. For detail, see Optional Configuration.
+* ``opt/`` directory. For detail, see
+  :ref:`Optional Configuration <opt-config>`.
 
 E.g. The application configuration directory may look like:
 
@@ -466,6 +489,8 @@ E.g. The application configuration directory may look like:
       ./opt/rose-app-extra1.conf
       ./opt/rose-app-extra2.conf
       ...
+
+.. _app-conf-file:
 
 Application Configuration File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -489,6 +514,8 @@ keys can be:
   Root level setting. Specify the name of a builtin application, instead of
   running a command specified in the ``[command]`` section. See also Running
   Tasks > rose task-run > Built-in Applications Selection
+
+.. TODO - create internal link to section on above line
 
 ``[command]``
   Specify the command(s) to run. The default key can be used to define the
@@ -518,7 +545,7 @@ keys can be:
   ``STDIN``.
 
   * E.g. ``file:app/APP=source=LOCATION``.
-  * See Appendix: File Creation Mode.
+  * See :ref:`Appendix: File Creation Mode <app-file-cre-mode>`.
 
 ``[namelist:NAME]``
   Specify a namelist with the group name called ``NAME``, which can be
@@ -577,8 +604,8 @@ keys can be:
   number of times with delays between them. If the prerequisites are still
   not met  after the number of delays, the application runner will fail with
   a time out. The list is a comma-separated list. The syntax looks like
-  ``[n*][DURATION]``, where ``DURATION`` is an ISO 8601 duration such as
-  ``PT5S`` (5 seconds) or ``PT10M`` (10 minutes), and ``n`` is an optional
+  ``[n*][DURATION]``, where ``DURATION`` is an `ISO 8601 duration`_ such
+  as ``PT5S`` (5 seconds) or ``PT10M`` (10 minutes), and ``n`` is an optional
   number of times to repeat it. E.g.:
 
   .. code-block:: rose
@@ -600,28 +627,38 @@ Application Configuration File: Built-in Application: fcm_make
 
 See Running Tasks > rose task-run > Built-in Application: fcm_make.
 
+.. TODO - create internal link to section on above line
+
 Application Configuration File: Built-in Application: rose_ana
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 See Running Tasks > rose task-run > Built-in Application: rose_ana and
 rose stem > Analysing output with rose_ana.
 
+.. TODO - create internal (2 x) links to sections on above line
+
 Application Configuration File: Built-in Application: rose_arch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 See Running Tasks > rose task-run > Built-in Application: rose_arch.
+
+.. TODO - create internal link to section on above line
 
 Application Configuration File: Built-in Application: rose_prune
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 See Running Tasks > rose task-run > Built-in Application: rose_prune.
 
+.. TODO - create internal link to section on above line
+
 
 Configuration Metadata
 ----------------------
 
-See Configuration Metadata.
+See :ref:`conf-meta`.
 
+
+.. _app-file-cre-mode:
 
 Appendix: File Creation Mode
 ----------------------------
@@ -729,7 +766,7 @@ The system has built-in support for the following schemes:
 ``rsync``
   This scheme is useful for pulling a file or directory from a remote
   host using ``rsync`` via ``ssh``. A URI should have the form ``HOST:PATH``.
-  (Note: If required, you can use the User setting in ``~/.ssh/config`` to
+  (Note: If required, you can use the `User`_ setting in ``~/.ssh/config`` to
   specify the user ID for logging into ``HOST``.)
 
 The application launcher will use the following logic to determine the
