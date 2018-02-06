@@ -28,9 +28,9 @@ class RoseLexer(RegexLexer):
 
     # Pattern for a rose setting with capture groups.
     ROSE_SETTING_PATTERN = (
-        r'([\w\{\}\[\]\-]+'  # setting-name{}[]
-        r'(?:\(.*\))?)'      # Brackets for namelists.
-        r'(\s+)?(=)(\s+)?')  # Optional spaces around = operator, value.
+        r'([\w\{\}\[\]\:\-]+'  # setting-name{}[]
+        r'(?:\(.*\))?)'        # Brackets for namelists.
+        r'(\s+)?(=)(\s+)?')    # Optional spaces around = operator, value.
 
     # Pattern for a rose (ignored|trigger-ignored|regular) setting.
     ROSE_SETTING_VALUE_PATTERN = ('{0}'  # '', '!', '!!'.
