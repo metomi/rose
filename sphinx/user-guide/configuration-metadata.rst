@@ -407,8 +407,7 @@ fail-if, warn-if
 
   .. code-block:: rose
 
-     fail-if=this != 1 + namelist:test=ctrl_var_1 *
-     (namelist:test=ctrl_var_2 - this);
+     fail-if=this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this);
 
   shows a more complex operation, again with numeric values.
 
@@ -1082,7 +1081,7 @@ and an expression in the configuration metadata:
 
 then the expression would become:
 
-   .. code-block:: rose
+   .. code-block:: none
 
       'peaceful' != 'annoyed' and 2 >= 2
 

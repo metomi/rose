@@ -113,7 +113,7 @@ We have added the following conventions into our INI format:
 #. Values of settings accept syntax such as ``$NAME`` or ``${NAME}`` for
    environment variable substitution.
 
-   .. code-block:: cylc
+   .. code-block:: rose
 
       # This is line 1 of the comment for this file.
       # This is line 2 of the comment for this file.
@@ -144,6 +144,10 @@ We have added the following conventions into our INI format:
       [section-3]
       # key-5 is program ignored.
       !!key-5=value 5
+
+.. TODO - edit 'rose-lang.py' syntax highlighting to not throw error e.g. for
+   'key-2' double-line specification above (with multiple instances in other
+   User Guide files).
 
 In this document, the shorthand ``SECTION=KEY=VALUE`` is used to represent a
 ``KEY=VALUE`` pair in a ``[SECTION]`` of an INI format file.
