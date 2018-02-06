@@ -1234,4 +1234,30 @@ contains the trigger-mechanism's expected states. The states can be:
 ``E`` - **(normal)**
   enabled
 
-  .. TODO - large table to go here
+A subset of possible ignored/enabled states, errors and fixes:
+
+======  ===============    ==========  ==============  ============  ========
+State   Trigger State      Compulsory  Display Error?  User Options  Notes
+======  ===============    ==========  ==============  ============  ========
+``IT``  ``IT``             compulsory  no              None          
+``IT``  ``IT``             optional    no              None
+``IT``  ``E``              compulsory  error           ``E``
+``IT``  ``E``              optional    error           ``E``
+``IT``  ``not trigger``    compulsory  error           ``E``
+``IT``  ``not trigger``    optional    overlook        ``E``         See [1]_
+``IU``  ``IT``             compulsory  overlook        None          See [2]_
+``IU``  ``IT``             optional    no              None
+``IU``  ``E``              compulsory  error           ``E``
+``IU``  ``E``              optional    no              ``E``
+``IU``  ``not trigger``    compulsory  error           ``E``
+``IU``  ``not trigger``    optional    no              ``E``
+``E``   ``IT``             compulsory  error           ``IT``
+``E``   ``IT``             optional    error           ``IT``
+``E``   ``E``              compulsory  no              None
+``E``   ``E``              optional    no              ``IU``
+``E``   ``not trigger``    compulsory  no              None
+``E``   ``not trigger``    optional    no              ``IU``
+======  ===============    ==========  ==============  ============  ========
+
+.. [1] Overlooking mainly in order to de-clutter the ``No Metadata`` view.
+.. [2] Same basic state - macro will ask to fix this.
