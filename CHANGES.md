@@ -5,10 +5,10 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2018-Q1)
+## 2018.02.0 (2018-02-07)
 
 Rose release 53. This release is expected to be used with:
-* [cylc-7.5.0](https://github.com/cylc/cylc/releases/tag/7.5.0) or upcoming, and
+* [cylc-7.6.0](https://github.com/cylc/cylc/releases/tag/7.6.0), and
 * [fcm-2017.10.0](https://github.com/metomi/fcm/releases/tag/2017.10.0).
 
 ### Noteworthy Changes
