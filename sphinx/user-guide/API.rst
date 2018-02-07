@@ -93,7 +93,7 @@ This class should have a constructor of the form
 
           def __init__(self, value, metadata, set_value, hook, arg_str=None)
 
-with the following arguments
+with the following arguments:
 
 ``value``
   a string that represents the value that the widget should display.
@@ -383,7 +383,7 @@ The constructor arguments are
 Refreshing the whole page in order to display a small change to a variable
 (the default) can be undesirable. To deal with this, custom page widgets can
 optionally expose some variable-change specific methods that do this
-themselves. These take a single rose.variable.Variable instance as an
+themselves. These take a single ``rose.variable.Variable`` instance as an
 argument.
 
 ``def add_variable_widget(self, variable) -> None``
@@ -400,9 +400,9 @@ argument.
   nothing - e.g. one that contains just ``pass``).
 
 If you take the step of using your own variable widgets, rather than the
-VariableWidget class in ``lib/python/rose/config_editor/variable.py`` (the
-default for normal config-edit pages), each variable-specific widget should
-have an attribute ``variable`` set to their ``rose.variable.Variable``
+``VariableWidget`` class in ``lib/python/rose/config_editor/variable.py``
+(the default for normal config-edit pages), each variable-specific widget
+should have an attribute ``variable`` set to their ``rose.variable.Variable``
 instance. You can implement 'ignored' status display by giving the widget a
 method ``set_ignored`` which takes no arguments. This should examine the
 ``ignored_reason`` dictionary attribute of the widget's ``variable``
@@ -662,9 +662,9 @@ section, the option should be ``None`` and the value None. For example,
 
 Validator macros have the option to give warnings, which do not count as
 formal errors in the Rose config editor GUI. These should be used when
-something may be wrong, such as warning when using an advanced-developer-only
-option. They are invoked by passing a 5th argument to ``self.add_report``,
-``is_warning``, like so:
+something *may* be wrong, such as warning when using an
+advanced-developer-only option. They are invoked by passing a 5th argument
+to ``self.add_report``, ``is_warning``, like so:
 
    .. code-block:: python
 
@@ -793,7 +793,7 @@ If you have many upgrade macros, you may want to separate them into different
 modules in the same directory. You can then import from those in
 ``versions.py``, so that they are still exposed in that module. You'll need
 to make your directory a package by creating an ``__init__.py`` file, which
-should contain the line import versions. To avoid conflict with other
+should contain the line ``import versions``. To avoid conflict with other
 ``CATEGORY`` upgrade modules (or other Python modules), please name these
 very modules carefully or use absolute or package level imports like this:
 ``from .versionXX_YY import FooBar``.
@@ -834,16 +834,16 @@ supported format is 'json') and use a url that looks like:
 Usage
 ^^^^^
 
-.. TODO - complete/remove section
+.. TODO - complete/remove section as desired
 
 
 Rose Python Modules
 -------------------
 
-.. TODO - complete/remove section
+.. TODO - complete/remove section as desired
 
 
 Rose Bash Library
 -----------------
 
-.. TODO - complete/remove section
+.. TODO - complete/remove section as desired

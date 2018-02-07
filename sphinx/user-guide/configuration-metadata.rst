@@ -4,8 +4,8 @@
 .. _floating point: https://docs.python.org/3/library/stdtypes.html#typesnumeric
 .. _cast: https://docs.python.org/2/library/ast.html#ast.literal_eval
 
-.. _conf-meta:
 
+.. _conf-meta:
 
 Configuration Metadata
 ======================
@@ -124,7 +124,7 @@ Metadata Options
 ^^^^^^^^^^^^^^^^
 
 The metadata options for a configuration fall into 4 categories: sorting,
-values, behaviour and help. They are be described separated below:
+values, behaviour and help. They are be described separated below.
 
 Metadata for Sorting
 ^^^^^^^^^^^^^^^^^^^^
@@ -271,7 +271,7 @@ type
     ``"Foo" 50 False``.
 
     *usage*: use for inputs that expect a string that contains a number of
-    space separated items - e.g. in fcm_make app configs.
+    space separated items - e.g. in ``fcm_make`` app configs.
 
   Note that not all inputs need to have ``type`` defined. In some cases
   using ``values`` or ``pattern`` is better.
@@ -455,7 +455,7 @@ fail-if, warn-if
 
   .. code-block:: rose
 
-     fail-if=any(namelist:test=ctrl_array % this == 0); # Needs to be common divisor for ctrl_array
+     fail-if=any(namelist:test=ctrl_array % this == 0); # Need common divisor for ctrl_array
 
   When using multiple failure conditions, different messages can be added
   if they are placed on individual lines:
@@ -473,7 +473,7 @@ fail-if, warn-if
 
      warn-if=True;  # This option is deprecated
 
-  This would always evaluate True and give a warning if the setting is
+  This would always evaluate ``True`` and give a warning if the setting is
   present.
 
   Please note: when dividing a real-numbered setting by something, make
@@ -526,9 +526,12 @@ trigger
 
   The syntax contains id-values pairs, where the values part is optional.
   Each pair must be separated by a semi-colon. Within each pair, any values
-  must be separated from the id by a colon and a space (``:``). Values must
-  be formatted in the same way as the setting "values" defined above (i.e.
-  comma separated).
+  must be separated from the id by a colon (``:``) and a space. Values
+  must be formatted in the same way as the setting "values" defined above
+  (i.e. comma separated).
+
+  .. NOTEFORWRITERS - it is not possible to put a space at end of double
+     backquotes so can't put ': ' in inline monospace font above :(.
 
   The trigger syntax looks like:
 
@@ -658,7 +661,7 @@ widget[gui-application]
   Another useful Rose built-in widget to use is the array element
   aligning :ref:`page widget <conf-ed-cust-pages>`,
   ``rose.config_editor.pagewidget.table.PageArrayTable``. You can set this
-  for a section or namespace to make sure each *n* th variable value element
+  for a section or namespace to make sure each *n*-th variable value element
   lines up horizontally. For example:
 
   .. code-block:: rose
@@ -685,11 +688,11 @@ widget[gui-application]
      main             beef      spaghetti   coq au vin       lamb
      petits_fours    .false.     .true.       .false.       .true.
 
-copy-mode (metadata usage with the rose-suite.info file)
+copy-mode (metadata usage with the ``rose-suite.info`` file)
   Setting copy-mode in the metadata allows for the field to be either
   ``never`` copied or copied with any value associated to be ``clear``.
 
-  For example: in a rose-suite.info file
+  For example: in a ``rose-suite.info`` file
 
   .. code-block:: rose
 
@@ -732,6 +735,9 @@ url
 
      [namelist:foo=bar]
      url=?q=nearest+bar
+
+.. TODO - mend rose syntax highlighting which is not showing the 2nd section
+   above correctly (section ':' then '=' regex inclusion required?).
 
 help
   (Long) help for the setting. For example, the config editor will use
@@ -1116,7 +1122,7 @@ arrays - i.e. comma-separated lists.
 You can refer to a single element of the value for a given variable id
 (or ``this``) by suffixing a number in round brackets - e.g.:
 
-   .. code-block:: none
+   .. code-block:: rose
 
       namelist:foo=bar(2)
 
@@ -1135,7 +1141,7 @@ If we had a configuration:
 ``namelist:foo=bar(2)`` would get substituted in an expression with ``'b'``
 when the expression was evaluated. For example, an expression that contained:
 
-   .. code-block:: none
+   .. code-block:: rose
 
       namelist:foo=bar(2) == 'c'
 
@@ -1227,6 +1233,10 @@ the most important varieties.
 The ``State`` contains the actual states. The ``Trigger State`` column
 contains the trigger-mechanism's expected states. The states can be:
 
+.. TODO - convert IT, IU, etc. markers in list and table below into symbols
+   as in old docs - can't see a way of doing this from basic rst text docs.
+   Or at least put them in a different colour etc to make them stand out.
+
 ``IT`` - ``!!``
   trigger ignored
 ``IU`` - ``!``
@@ -1261,3 +1271,5 @@ State   Trigger State      Compulsory  Display Error?  User Options  Notes
 
 .. [1] Overlooking mainly in order to de-clutter the ``No Metadata`` view.
 .. [2] Same basic state - macro will ask to fix this.
+
+.. TODO - include long table items removing need for footnotes, if possible?
