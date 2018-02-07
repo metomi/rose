@@ -62,7 +62,7 @@ the log prefix that will be used for output e.g. for a bunch instance named
 Provided At Runtime By
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* rose-bunch
+* rose bunch
 
    .. TODO - link 'rose bunch' to relevant built-in app page
 
@@ -143,14 +143,15 @@ the current cycle time. ``????`` is a duration:
 
 * A ``__`` (double underscore) prefix denotes a cycle time in the future.
   Otherwise, it is a cycle time in the past.
-* ``PnM`` denotes n months.
-* ``PnW`` denotes n weeks.
-* ``PnD`` or ``nD`` denotes n days.
-* ``PTnH`` or ``TnH`` denotes n hours.
-* ``PTnM`` denotes n minutes.
+* ``PnM`` denotes *n* months.
+* ``PnW`` denotes *n* weeks.
+* ``PnD`` or ``nD`` denotes *n* days.
+* ``PTnH`` or ``TnH`` denotes *n* hours.
+* ``PTnM`` denotes *n* minutes.
 
 E.g. ``ROSE_DATACPT6H`` is the data directory of 6 hours before the current
 cycle time.
+
 E.g. ``ROSE_DATACP1D`` and ``ROSE_DATACPT24H`` are both the data directory
 of 1 day before the current cycle time.
 
@@ -166,7 +167,7 @@ Provided By
 Description
 ^^^^^^^^^^^
 
-The path to the etc directory of the running suite.
+The path to the ``etc`` directory of the running suite.
 
 Provided By
 ^^^^^^^^^^^
@@ -299,19 +300,22 @@ Description
 
 Tell launcher to run:
 
-.. code-block:: bash
+.. NOTEFORWRITERS - bash syntax highlighting is ugly on below code
+   blocks so instead just use 'none'
+
+.. code-block:: none
 
    rose mpi-launch --inner $@
 
 Specify the arguments to ``ulimit``. E.g. Setting this variable to:
 
-.. code-block:: bash
+.. code-block:: none
 
    -a -s unlimited -d unlimited -a
 
 results in:
 
-.. code-block:: bash
+.. code-block:: none
 
    ulimit -a; ulimit -s unlimited; ulimit -d unlimited; ulimit -a
 
@@ -504,8 +508,8 @@ Used By
 Description
 ^^^^^^^^^^^
 
-(Deprecated) The mirror target for the mirror step in the ``fcm-make.cfg``
-configuration``.
+(Deprecated) The mirror target for the mirror step in the
+``fcm-make.cfg`` configuration.
 
 Provided By
 ^^^^^^^^^^^

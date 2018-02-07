@@ -53,7 +53,7 @@ following:
 
 We have added the following conventions into our INI format:
 
-#. The file name is normally called ``rose\*.conf``, e.g. ``rose.conf``,
+#. The file name is normally called ``rose*.conf``, e.g. ``rose.conf``,
    ``rose-app.conf``, ``rose-meta.conf``, etc.
 #. Only a hash ``#`` in the beginning of a line starts a comment. Empty lines
    and lines with only white spaces are ignored. There is no support for
@@ -74,7 +74,7 @@ We have added the following conventions into our INI format:
 #. Only the equal sign ``=`` is used to delimit a key-value pair - because the 
    colon ``:`` may be used in keys of namelist declarations.
 #. A key-value pair declaration does not have to live under a section 
-   declaration. Such a declaration lives directly under the root level.
+   declaration. Such a declaration lives directly under the *root* level.
 #. Key-value pair declarations following a line with only ``[]`` are placed 
    directly under the root level.
 #. Declarations are case sensitive. When dealing with case-insensitive
@@ -96,9 +96,9 @@ We have added the following conventions into our INI format:
    * E.g. It will be ignored in run time but may be used by other Rose
      utilities.
    * A single exclamation denotes a user-ignored setting.
-   * A double exclamation denotes a program-ignored setting. E.g. rose
-     config-edit may use a double exclamation to switch off a setting
-     according to the setting metadata.
+   * A double exclamation denotes a program-ignored setting. E.g.
+     ``rose config-edit`` may use a double exclamation to switch off a
+     setting according to the setting metadata.
 
 #. The open square bracket (``[``) and close square bracket (``]``) characters
    cannot be used within a section declaration. E.g.
@@ -112,6 +112,8 @@ We have added the following conventions into our INI format:
    not assume order of environment variables.
 #. Values of settings accept syntax such as ``$NAME`` or ``${NAME}`` for
    environment variable substitution.
+
+E.g.
 
    .. code-block:: rose
 
@@ -195,7 +197,7 @@ Some Rose utilities (e.g. :ref:`command-rose-suite-run`,
 :ref:`command-rose-task-run`, :ref:`command-rose-app-run`, etc) allow
 optional configurations to be selected at run time using:
 
-#. The ROSE_APP_OPT_CONF_KEYS Environment variables.
+#. The ``ROSE_APP_OPT_CONF_KEYS`` Environment variables.
 #. The command line options ``--opt-conf-key=KEY`` or ``-O KEY``.
 
 See reference of individual commands for detail.
@@ -272,14 +274,14 @@ configuration in the user configuration overrides the site configuration and
 the default. Rose expects these files to be in the modified INI format
 described above. Rose utilities search for its site configuration at
 ``$ROSE_HOME/etc/rose.conf`` where ``$ROSE_HOME/bin/rose`` is the location of
-the rose command, and they search for the user configuration at
+the ``rose`` command, and they search for the user configuration at
 ``$HOME/.metomi/rose.conf`` where ``$HOME`` is the home directory of the
 current user.
 
-Allowed settings in the site and user configuration files will be documented
+*Allowed settings in the site and user configuration files will be documented
 in a future version of this document. In the mean time, the settings are 
-documented as comments in the ``etc/rose.conf.example`` file of each
-distribution of Rose.
+documented as comments in the* ``etc/rose.conf.example`` *file of each
+distribution of Rose.*
 
 You can also override many internal constants of the ``rose config edit`` and
 ``rosie go``. To change the keyboard shortcut of the ``Find Next`` action in
@@ -337,7 +339,7 @@ and root level options:
   invoked. However, it is unsafe to reference other environment variables
   defined in this section. If the value of an environment variable setting
   begins with a  tilde ``~``, all of the characters preceding the 1st slash
-  ``/`` are considered a tilde-prefix. Where possible, a tilde-prefix is
+  ``/`` are considered a *tilde-prefix*. Where possible, a tilde-prefix is
   replaced with the home  directory associated with the specified login name
   at run time. There are 2  special environment variables which can be
   specified in this section:
@@ -455,7 +457,7 @@ contain the following:
   * the command(s) to run.
   * the metadata type for the application.
   * the list of environment variables.
-  * other configurations that can be represented in un-ordered key=value
+  * other configurations that can be represented in un-ordered ``key=value``
     pairs, e.g. Fortran namelists.
 
 * ``file/`` directory: other input files, e.g.:
@@ -536,7 +538,7 @@ keys can be:
   time. It can be used to indicate that a value must be overridden at run
   time. If the value of an environment variable setting begins with a tilde
   ``~``, all of the characters preceding the 1st slash ``/`` are considered a
-  tilde-prefix. Where possible, a tilde-prefix is replaced with the home
+  *tilde-prefix*. Where possible, a tilde-prefix is replaced with the home
   directory associated with the specified login name at run time.
 
 ``[etc]``
@@ -580,14 +582,17 @@ keys can be:
   Specify prerequisites to poll for before running the actual application.
   3 types of tests can be performed:
 
-  ``all-files``: A list of space delimited list of file paths. This test
-  passes only if all file paths in the list exist.
+  ``all-files``
+    A list of space delimited list of file paths. This test
+    passes only if all file paths in the list exist.
 
-  ``any-files``: A list of space delimited list of file paths. This test
-  passes if any file path in the list exists.
+  ``any-files``
+    A list of space delimited list of file paths. This test
+    passes if any file path in the list exists.
 
-  ``test``: A shell command. This test passes if the command returns a 0
-  (zero) return code.
+  ``test``
+    A shell command. This test passes if the command returns a 0
+    (zero) return code.
 
   Normally, the ``all-files`` and ``any-files`` tests both test for the
   existence of file paths. If this is not enough, e.g. you want to test for
@@ -677,11 +682,12 @@ A ``[file:TARGET]`` section may have the following settings:
   section with a supported scheme in the current configuration, e.g. a
   ``namelist:NAME section``. Otherwise the URI must be in a supported scheme
   or be given sufficient information for the system to determine its scheme,
-  e.g. via the root level ``schemes`` setting described below. Normally, a
-  source that does not exist would trigger an error in run time. However, it
-  may be useful to have an optional source for a file sometimes. In which
-  case, the syntax ``source=(SOURCE)`` can be used to specify an optional
-  source. E.g. ``source=namelist:foo`` ``(namelist:bar)`` would allow
+  e.g. via the root level ``schemes`` setting described below.
+
+  Normally, a source that does not exist would trigger an error in run time.
+  However, it may be useful to have an optional source for a file sometimes.
+  In which case, the syntax ``source=(SOURCE)`` can be used to specify an
+  optional source. E.g. ``source=namelist:foo (namelist:bar)`` would allow
   ``namelist:bar`` to be missing or ignored without an error.
 
 ``checksum``
@@ -692,32 +698,32 @@ A ``[file:TARGET]`` section may have the following settings:
   checksum tells the system to report the target checksum in verbose mode.
 
 ``mode``
-  ``auto`` (default), ``mkdir``, ``symlink`` or ``symlink+``. See below.
+  ``auto`` (default), ``mkdir``, ``symlink`` or ``symlink+``.
 
-The following is a list of all the supported usages:
+  The following is a list of all the supported usages:
 
-``mode=auto,source=``
-  Target is an empty file.
+  ``mode=auto,source=``
+    Target is an empty file.
 
-``mode=auto,source=SOURCE``
-  Target is a copy of ``SOURCE``.
+  ``mode=auto,source=SOURCE``
+    Target is a copy of ``SOURCE``.
 
-``mode=auto,source=SOURCE-LIST``
-  Target is created by concatenating the contents of ``SOURCE-LIST``. The
-  sources should either be all files or all directories.
+  ``mode=auto,source=SOURCE-LIST``
+    Target is created by concatenating the contents of ``SOURCE-LIST``. The
+    sources should either be all files or all directories.
 
-``mode=mkdir``
-  Target is a directory.
+  ``mode=mkdir``
+    Target is a directory.
 
-``mode=symlink,source=SOURCE``
-  Target is created as a symlink of an FS ``SOURCE``. N.B. In this mode,
-  ``SOURCE`` must be a single source. ``SOURCE`` does not have to exist when
-  the symbolic link is created.
+  ``mode=symlink,source=SOURCE``
+    Target is created as a symlink of an FS ``SOURCE``. N.B. In this mode,
+    ``SOURCE`` must be a single source. ``SOURCE`` does not have to exist when
+    the symbolic link is created.
 
-``mode=symlink+,source=SOURCE``
-  Target is created as a symlink of an FS ``SOURCE``. N.B. In this mode,
-  ``SOURCE`` must be a single source. ``SOURCE`` must exist when the symbolic
-  link is created.
+  ``mode=symlink+,source=SOURCE``
+    Target is created as a symlink of an FS ``SOURCE``. N.B. In this mode,
+    ``SOURCE`` must be a single source. ``SOURCE`` must exist when the symbolic
+    link is created.
 
 The root level ``schemes`` setting: While the system would attempt to
 automatically detect the scheme of a source, the name of the source can
@@ -786,12 +792,12 @@ root directory to install file targets with a relative path:
 Appendix: rose-ana configuration format
 ---------------------------------------
 
-The ``rose-ana`` builtin application reads information about which analysis
+The ``rose-ana`` built-in application reads information about which analysis
 steps it should perform from the ``rose-app.conf`` file for that task. Each
 of the section names (in square brackets) which describe an analysis step
 must follow a particular format:
 
-* the name must begin with ``ana``:. This is required for ``rose-ana`` to
+* the name must begin with ``ana:``. This is required for ``rose-ana`` to
   recognise it as a valid section.
 * the next part gives the name of the class within one of the analysis
   modules, including namespace information; for example to use the built-in
@@ -803,7 +809,7 @@ must follow a particular format:
 
 The content within each of these sections consists of a series of key-value
 option pairs; just like other standard Rose apps. However the availability
-of options for a given section is specified and controlled by the class
+of options for a given section is specified and controlled by the *class*
 rather than the meta-data. This makes it easy to provide your own analysis
 modules without requiring changes to Rose itself.
 
@@ -812,14 +818,14 @@ analysis module you wish to use for details of which options it supports.
 Additionally, some special treatment is applied to all options depending
 on what they contain:
 
-* **Environment vars**: If the option contains any words prefixed by ``$`` they
-  will be substituted for the equivalent environment variable, if one is
-  available.
+* **Environment vars**: If the option contains any words prefixed by ``$``
+  they will be substituted for the equivalent environment variable, if one
+  is available.
 * **Lists**: If the option contains newlines it will be returned as a list of
   strings automatically.
-* **Argument substitution**: If the option contains one or more pairs of empty
-  curved-parentheses ``{}`` the option will be returned multiple times with
-  the parentheses substituted once for each argument passed to
+* **Argument substitution**: If the option contains one or more pairs of
+  empty curved-parentheses ``{}`` the option will be returned multiple times
+  with the parentheses substituted once for each argument passed to
   ``rose task-run``
 
 The app may also define a configuration section; ``[ana:config]``, whose
