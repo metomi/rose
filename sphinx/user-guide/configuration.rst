@@ -108,8 +108,11 @@ We have added the following conventions into our INI format:
    settings to the earlier one. If the same key in the same section is
    declared twice, the later value will override the earlier one. This logic
    applies to the state of a setting as well.
-#. Once the file is parsed, declaration ordering is insignificant. N.B. Do
-   not assume order of environment variables.
+#. Once the file is parsed, declaration ordering is insignificant.
+
+   .. note::
+      Do not assume order of environment variables.
+
 #. Values of settings accept syntax such as ``$NAME`` or ``${NAME}`` for
    environment variable substitution.
 
@@ -151,8 +154,9 @@ E.g.
    'key-2' double-line specification above (with multiple instances in other
    User Guide files).
 
-In this document, the shorthand ``SECTION=KEY=VALUE`` is used to represent a
-``KEY=VALUE`` pair in a ``[SECTION]`` of an INI format file.
+.. note::
+   In this document, the shorthand ``SECTION=KEY=VALUE`` is used to represent a
+   ``KEY=VALUE`` pair in a ``[SECTION]`` of an INI format file.
 
 .. _opt-config:
 
@@ -200,11 +204,13 @@ optional configurations to be selected at run time using:
 #. The ``ROSE_APP_OPT_CONF_KEYS`` Environment variables.
 #. The command line options ``--opt-conf-key=KEY`` or ``-O KEY``.
 
-See reference of individual commands for detail.
+.. tip::
+   See reference of individual commands for detail.
 
-Note that by default optional configurations must exist else an error will
-be raised. To specify an optional configuration which may be missing write
-the name of the configuration inside parenthesis (e.g. ``(foo)``).
+.. note::
+   By default optional configurations must exist else an error will
+   be raised. To specify an optional configuration which may be missing write
+   the name of the configuration inside parenthesis (e.g. ``(foo)``).
 
 Optional Configurations and Metadata
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -239,7 +245,8 @@ A root level ``import=PATH1 PATH2...`` setting in the main configuration will
 tell Rose utilities to search for configurations at ``PATH1``, ``PATH2`` (and
 so on) and inherit configuration and files from them if found.
 
-At the moment, use of this is only encouraged for configuration metadata.
+.. tip::
+   At the moment, use of this is only encouraged for configuration metadata.
 
 
 Re-define Configuration at Run Time
@@ -278,10 +285,11 @@ the ``rose`` command, and they search for the user configuration at
 ``$HOME/.metomi/rose.conf`` where ``$HOME`` is the home directory of the
 current user.
 
-*Allowed settings in the site and user configuration files will be documented
-in a future version of this document. In the mean time, the settings are 
-documented as comments in the* ``etc/rose.conf.example`` *file of each
-distribution of Rose.*
+.. note::
+   Allowed settings in the site and user configuration files will be
+   documented in a future version of this document. In the mean time, the
+   settings are documented as comments in the ``etc/rose.conf.example``
+   file of each distribution of Rose.
 
 You can also override many internal constants of the ``rose config edit`` and
 ``rosie go``. To change the keyboard shortcut of the ``Find Next`` action in
@@ -403,10 +411,16 @@ It may have the following top level (no section) options:
   created.
 
 ``root-dir-share=LIST``
-  Deprecated. Same as ``root-dir{share}=LIST``.
+  .. warning::
+     Deprecated.
+
+  Same as ``root-dir{share}=LIST``.
 
 ``root-dir-work=LIST``
-  Deprecated. Same as ``root-dir{work}=LIST``.
+  .. warning::
+     Deprecated.
+
+  Same as ``root-dir{work}=LIST``.
 
 .. _suite-config-suite-info:
 
@@ -468,14 +482,16 @@ contain the following:
 
   Files in this directory are copied to the working directory in run time.
 
-  Note: If there is a clash between a ``[file:*]`` section and a file under
-  ``file/``, the setting in the ``[file:*]`` section takes precedence. E.g.
-  Suppose we have a file ``file/hello.txt``. In the absence of
-  ``[file:hello.txt]``, it will copy ``file/hello.txt`` to ``$PWD/hello.txt``
-  in run time. However, if we have a ``[file:hello.txt]`` section and a
-  ``source=SOURCE`` setting, then it will install
-  the file from ``SOURCE`` instead. If we have ``[!file:hello.txt]``, then
-  the file will not be installed at all.
+  .. note::
+     If there is a clash between a ``[file:*]`` section and a file under
+     ``file/``, the setting in the ``[file:*]`` section takes precedence.
+     E.g. Suppose we have a file ``file/hello.txt``. In the absence of
+     ``[file:hello.txt]``, it will copy ``file/hello.txt`` to
+     ``$PWD/hello.txt`` in run time. However, if we have a
+     ``[file:hello.txt]`` section and a ``source=SOURCE`` setting, then it
+     will install the file from ``SOURCE`` instead. If we have
+     ``[!file:hello.txt]``, then the file will not be installed at all.
+
 * ``bin/`` directory for e.g. scripts and executables used by the application
   at run time. If a ``bin/`` exists in the application configuration, it will 
   prepended to the ``PATH`` environment variable at run time.
@@ -533,17 +549,24 @@ keys can be:
   The usual ``$NAME`` or ``${NAME}`` syntax can be used in values to reference
   environment variables that are already defined when the application runner
   is invoked. However, it is unsafe to reference other environment variables
-  defined in this section. Note: ``UNDEF`` is a special variable that is
-  always undefined at run time. Reference to it will cause a failure at run
-  time. It can be used to indicate that a value must be overridden at run
-  time. If the value of an environment variable setting begins with a tilde
+  defined in this section.
+
+  .. note::
+     ``UNDEF`` is a special variable that is always undefined at run time.
+     Reference to it will cause a failure at run time. It can be used to
+     indicate that a value must be overridden at run time.
+  
+  If the value of an environment variable setting begins with a tilde
   ``~``, all of the characters preceding the 1st slash ``/`` are considered a
   *tilde-prefix*. Where possible, a tilde-prefix is replaced with the home
   directory associated with the specified login name at run time.
 
 ``[etc]``
-  Specify misc. settings. Currently, only UM defs for science sections are
-  thought to require this section.
+  Specify misc. settings.
+
+  .. tip::
+     Currently, only UM defs for science sections are
+     thought to require this section.
 
 ``[file:NAME]``
   Specify a file/directory to be generated by the application runner at
@@ -595,18 +618,21 @@ keys can be:
     (zero) return code.
 
   Normally, the ``all-files`` and ``any-files`` tests both test for the
-  existence of file paths. If this is not enough, e.g. you want to test for
-  the existence of a string in each file, you can specify a ``file-test`` to
-  do a ``grep``. E.g.:
+  existence of file paths.
+  
+  .. tip::
+     If this is not enough, e.g. you want to test for the existence of a
+     string in each file, you can specify a ``file-test`` to
+     do a ``grep``. E.g.:
 
-  .. code-block:: rose
+     .. code-block:: rose
 
-     all-files=file1 file2
-     file-test=test -e {} && grep -q 'hello' {}
+        all-files=file1 file2
+        file-test=test -e {} && grep -q 'hello' {}
 
-  At runtime, any ``{}`` pattern in the above would be replaced with the name
-  of the file. The above make sure that both ``file1`` and ``file2`` exist
-  and that they both contain the string ``hello``.
+     At runtime, any ``{}`` pattern in the above would be replaced with the
+     name of the file. The above make sure that both ``file1`` and ``file2``
+     exist and that they both contain the string ``hello``.
 
   The above tests will only be performed once when the application runner
   starts. If a list of ``delays`` are added, the tests will be performed a
@@ -684,18 +710,22 @@ A ``[file:TARGET]`` section may have the following settings:
   or be given sufficient information for the system to determine its scheme,
   e.g. via the root level ``schemes`` setting described below.
 
-  Normally, a source that does not exist would trigger an error in run time.
-  However, it may be useful to have an optional source for a file sometimes.
-  In which case, the syntax ``source=(SOURCE)`` can be used to specify an
-  optional source. E.g. ``source=namelist:foo (namelist:bar)`` would allow
-  ``namelist:bar`` to be missing or ignored without an error.
+  .. tip::
+     Normally, a source that does not exist would trigger an error in run
+     time. However, it may be useful to have an optional source for a file
+     sometimes. In which case, the syntax ``source=(SOURCE)`` can be used to
+     specify an optional source. E.g. ``source=namelist:foo (namelist:bar)``
+     would allow ``namelist:bar`` to be missing or ignored without an error.
 
 ``checksum``
   The expected MD5 checksum of the target. If specified, the file
   generation will fail if the actual checksum of the target does not match
   with this setting. This setting is only meaningful if ``TARGET`` is a
-  regular file or a symbolic link to a regular file. N.B. An empty value for
-  checksum tells the system to report the target checksum in verbose mode.
+  regular file or a symbolic link to a regular file.
+
+  .. note::
+     An empty value for checksum tells the system to report the target
+     checksum in verbose mode.
 
 ``mode``
   ``auto`` (default), ``mkdir``, ``symlink`` or ``symlink+``.
@@ -716,14 +746,18 @@ A ``[file:TARGET]`` section may have the following settings:
     Target is a directory.
 
   ``mode=symlink,source=SOURCE``
-    Target is created as a symlink of an FS ``SOURCE``. N.B. In this mode,
-    ``SOURCE`` must be a single source. ``SOURCE`` does not have to exist when
-    the symbolic link is created.
+    Target is created as a symlink of an FS ``SOURCE``.
+
+    .. note::
+       In this mode, ``SOURCE`` must be a single source. ``SOURCE`` does
+       not have to exist when the symbolic link is created.
 
   ``mode=symlink+,source=SOURCE``
-    Target is created as a symlink of an FS ``SOURCE``. N.B. In this mode,
-    ``SOURCE`` must be a single source. ``SOURCE`` must exist when the symbolic
-    link is created.
+    Target is created as a symlink of an FS ``SOURCE``.
+
+    .. note::
+       In this mode, ``SOURCE`` must be a single source. ``SOURCE`` must
+       exist when the symbolic link is created.
 
 The root level ``schemes`` setting: While the system would attempt to
 automatically detect the scheme of a source, the name of the source can
@@ -755,8 +789,9 @@ In this example, a URI matching the pattern ``hpc*:*`` would use the
 the pattern ``http://host/svn-repos/*`` would use the ``svn`` scheme. For all
 other URIs, the system will try to make an intelligent guess.
 
-The system will always match a URI in the order as specified by the setting
-to avoid ambiguity.
+.. tip::
+   The system will always match a URI in the order as specified by the
+   setting to avoid ambiguity.
 
 The system has built-in support for the following schemes:
 
@@ -776,8 +811,10 @@ The system has built-in support for the following schemes:
 ``rsync``
   This scheme is useful for pulling a file or directory from a remote
   host using ``rsync`` via ``ssh``. A URI should have the form ``HOST:PATH``.
-  (Note: If required, you can use the `User`_ setting in ``~/.ssh/config`` to
-  specify the user ID for logging into ``HOST``.)
+  
+  .. note::
+     If required, you can use the `User`_ setting in ``~/.ssh/config`` to
+     specify the user ID for logging into ``HOST``.
 
 The application launcher will use the following logic to determine the
 root directory to install file targets with a relative path:

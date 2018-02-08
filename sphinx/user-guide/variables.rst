@@ -490,8 +490,9 @@ Provided By
 Description
 ^^^^^^^^^^^
 
-(Deprecated) Use the ``opt.jobs`` setting in the application configuration
-instead.
+.. warning::
+   (Deprecated) Use the ``opt.jobs`` setting in the application configuration
+   instead.
 
 The number of jobs to run in parallel in ``fcm make``. (``default=4``)
 
@@ -508,8 +509,10 @@ Used By
 Description
 ^^^^^^^^^^^
 
-(Deprecated) The mirror target for the mirror step in the
-``fcm-make.cfg`` configuration.
+.. warning::
+   (Deprecated)
+
+The mirror target for the mirror step in the ``fcm-make.cfg`` configuration.
 
 Provided By
 ^^^^^^^^^^^
@@ -542,8 +545,9 @@ Used By
 Description
 ^^^^^^^^^^^
 
-(Deprecated) Use the ``args`` setting in the application configuration
-instead.
+.. warning::
+   (Deprecated) Use the ``args`` setting in the application configuration
+   instead.
 
 Additional options and arguments for ``fcm make`` or ``rose app-run``.
 
