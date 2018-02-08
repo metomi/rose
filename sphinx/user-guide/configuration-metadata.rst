@@ -40,7 +40,8 @@ of precedence:
 * The ``meta-path`` setting in :ref:`site/user <site-n-user-conf>`
   configurations.
 
-See :ref:`app-meta-loc` for more details.
+.. tip::
+   See :ref:`app-meta-loc` for more details.
 
 The configuration metadata that controls default behaviour will be located in
 ``$ROSE_HOME/etc/rose-meta/``.
@@ -145,8 +146,8 @@ ns
   they can be placed in different pages. A namespace for a section will
   become the default for all the settings in that section.
 
-  Note that you should not assign namespaces to variables in duplicate
-  sections.
+  .. note::
+     You should not assign namespaces to variables in duplicate sections.
 
 sort-key
   A character string that can be used as a sort key for ordering an option
@@ -234,8 +235,11 @@ type
 
   ``python_list``
     *description*: used to signify a Python-compatible formatted list such
-    as ``["Foo", 50, False]``. This encapsulates ``length``, so do not use a
-    separate ``length`` declaration for this setting.
+    as ``["Foo", 50, False]``.
+    
+    .. warning::
+       This encapsulates ``length``, so do not use a
+       separate ``length`` declaration for this setting.
 
     *usage*: use for inputs that expect a string that looks like a Python
     list - e.g. Jinja2 list input variables.
@@ -254,8 +258,10 @@ type
      
      *description*: Fortran real number type, generic floating point numbers
 
-     *usage*: Fortran real types, generic floating point numbers. Scientific
-     notation must use the "e" or "E" format.
+     *usage*: Fortran real types, generic floating point numbers.
+     
+     .. note::
+        Scientific notation must use the "e" or "E" format.
 
      *comment*: Internally implemented within Rose using Python's
      `floating point`_ specification.
@@ -273,8 +279,9 @@ type
     *usage*: use for inputs that expect a string that contains a number of
     space separated items - e.g. in ``fcm_make`` app configs.
 
-  Note that not all inputs need to have ``type`` defined. In some cases
-  using ``values`` or ``pattern`` is better.
+    .. note::
+       Not all inputs need to have ``type`` defined. In some cases using
+       ``values`` or ``pattern`` is better.
 
   A derived type may be defined by a comma ``,`` separated list of intrinsic
   types, e.g. ``integer, character, real, integer``. The default is a raw
@@ -285,17 +292,19 @@ length
   be a scalar. A positive integer defines a fixed length array. A colon ``:``
   defines a dynamic length array.
 
-  N.B. You do not need to use ``length`` if you already have
-  ``type=python_list`` for a setting.
+  .. note::
+     You do not need to use ``length`` if you already have
+     ``type=python_list`` for a setting.
 
 element-titles
   Define a list of comma separated "titles" to appear above array entries.
   If not present then no titles are displayed.
 
-  N.B. where the number of element-titles is greater than the length of the
-  array, it will only display titles up to the length of the array.
-  Additionally, where the associated array is longer than the number of
-  element-titles, blank headings will be placed above them.
+  .. note::
+     Where the number of element-titles is greater than the length of the
+     array, it will only display titles up to the length of the array.
+     Additionally, where the associated array is longer than the number of
+     element-titles, blank headings will be placed above them.
 
 values
   Define a comma ``,`` separated list of permitted values of a setting (or an
@@ -354,8 +363,10 @@ range
   A logical expression uses the Rose metadata
   :ref:`mini-language <app-meta-mini-lang>`, using the variable ``this`` to
   denote the value of the current setting, e.g. ``this <-1 and this >1``.
-  Inter-variable comparisons are not permitted (but see the ``fail-if``
-  property below for a way to implement this).
+
+  .. warning::
+     Inter-variable comparisons are not permitted (but see the ``fail-if``
+     property below for a way to implement this).
 
 pattern
   Specify a regular expression (Python's extended regular expression
@@ -476,15 +487,16 @@ fail-if, warn-if
   This would always evaluate ``True`` and give a warning if the setting is
   present.
 
-  Please note: when dividing a real-numbered setting by something, make
-  sure that the expression does not actually divide an integer by an
-  integer - for example, ``this / 2`` will evaluate as ``0`` if ``this`` has
-  a value of ``1``, but ``0.5`` if it has a value of ``1.0``. This is a
-  result of Python's implicit typing.
+  .. note::
+     When dividing a real-numbered setting by something, make
+     sure that the expression does not actually divide an integer by an
+     integer - for example, ``this / 2`` will evaluate as ``0`` if ``this``
+     has a value of ``1``, but ``0.5`` if it has a value of ``1.0``. This is
+     a result of Python's implicit typing.
 
-  You can get around this by making sure either the numerator or denominator 
-  is a real number - e.g. by rewriting it as ``this / 2.0`` or
-  ``1.0 * this / 2``.
+     You can get around this by making sure either the numerator or
+     denominator is a real number - e.g. by rewriting it as ``this / 2.0`` or
+     ``1.0 * this / 2``.
 
 Metadata for Behaviour
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -795,20 +807,23 @@ following:
       ${APP}/${VERSION}/
       ${APP}/versions.py # i.e. the upgrade macros
 
-N.B. A Rose suite info is likely to have no versions.
+.. note::
+   A Rose suite info is likely to have no versions.
 
-Note that, in some cases, a number of different executables may share the
-same application configuration metadata in which case APP is given a name
-which covers all the uses.
+.. note::
+   In some cases, a number of different executables may share the
+   same application configuration metadata in which case APP is given a
+   name which covers all the uses.
 
-The Rose team recommend placing metadata in a ``rose-meta`` directory at the
-top of a project's source tree. Central metadata, if any, at the
-``meta-path`` location in the site configuration, should be a collection of
-regularly-updated subdirectories from all of the relevant projects'
-``rose-meta`` directories.
+.. tip::
+   The Rose team recommend placing metadata in a ``rose-meta`` directory at
+   the top of a project's source tree. Central metadata, if any, at the
+   ``meta-path`` location in the site configuration, should be a collection
+   of regularly-updated subdirectories from all of the relevant projects'
+   ``rose-meta`` directories.
 
-For example, a system ``CHOCOLATE`` may have a flat metadata structure
-within the repository:
+   For example, a system ``CHOCOLATE`` may have a flat metadata structure
+   within the repository:
 
    .. code-block:: bash
 
@@ -819,8 +834,8 @@ within the repository:
       CHOCOLATE/rose-meta/choc-milk/
     
 
-and the system ``CAFFEINE`` may have a hybrid structure, with both flat and
-hierarchical components:
+   and the system ``CAFFEINE`` may have a hybrid structure, with both flat
+   and hierarchical components:
 
    .. code-block:: bash
 
@@ -832,13 +847,13 @@ hierarchical components:
       CAFFEINE/rose-meta/caffeine-tea/yorkshire/
       CAFFEINE/rose-meta/caffeine-tea/lapsang/
 
-and a site configuration with:
+   and a site configuration with:
 
    .. code-block:: rose
 
       meta-path=/path/to/rose-meta
 
-We would expect the following directories in ``/path/to/rose-meta``:
+   We would expect the following directories in ``/path/to/rose-meta``:
 
    .. code-block:: bash
 
@@ -848,8 +863,8 @@ We would expect the following directories in ``/path/to/rose-meta``:
       /path/to/rose-meta/choc-dark/
       /path/to/rose-meta/choc-milk/
 
-with ``caffeine-coffee`` containing subdirectories ``cappuccino`` and
-``latte``, and ``caffeine-tea`` containing ``yorkshire`` and ``lapsang``.
+   with ``caffeine-coffee`` containing subdirectories ``cappuccino`` and
+   ``latte``, and ``caffeine-tea`` containing ``yorkshire`` and ``lapsang``.
 
 
 Appendix: Upgrade and Versions
@@ -914,8 +929,9 @@ that the configuration metadata being used requires upgrade macros to be run.
 If the version defined does not correspond to a tagged version then a warning
 will be given.
 
-Please note that if a hierarchical structure for the metadata is being used,
-the ``HEAD`` tag must be specified explictly.
+.. note::
+   If a hierarchical structure for the metadata is being used,
+   the ``HEAD`` tag must be specified explictly.
 
 When to create named versions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -929,10 +945,11 @@ version at releases which require changes. The name then indicates the
 metadata is relevant for a particular release and all subsequent releases
 (unless an upgrade macro is available to a later release).
 
-It is also possible to make any tagged version between releases a named
-version, but it will usually be better not to. In which case, the user will
-be using HEAD and will be prompted to upgrade (which is probably what you
-want if you're not using a release).
+.. tip::
+   It is also possible to make any tagged version between releases a named
+   version, but it will usually be better not to. In which case, the user
+   will be using HEAD and will be prompted to upgrade (which is probably what
+   you want if you're not using a release).
 
 Sharing metadata between different executables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -947,10 +964,11 @@ One downside of sharing metadata is that your application configuration may
 contain (ignored) settings which have no relevance to the command you are
 using.
 
-Note that we intend to introduce support for configuration metadata to
-include / inherit from other metadata. This may mean that it makes sense to
-have separate metadata for different commands even when the majority of
-inputs are shared.
+.. note::
+   We intend to introduce support for configuration metadata to
+   include / inherit from other metadata. This may mean that it makes sense
+   to have separate metadata for different commands even when the majority
+   of inputs are shared.
 
 Another reason you may want to share metadata is if you have 2 related
 commands which you want to configure using the same set of inputs (i.e. a
@@ -986,11 +1004,14 @@ Expressions are set as the value of metadata properties such as ``fail-if``
 and ``range``.
 
 The language is a small sub-set of Python - a limited set of operators is
-supported. No built-in object methods, functions, or modules are
-supported - neither are control blocks such as ``if``\/``for``, statements
-such as ``del`` or ``with``, or defining your own functions or classes.
-Anything that requires that kind of power should be in proper Python code
-as a macro.
+supported.
+
+.. warning::
+   No built-in object methods, functions, or modules are
+   supported - neither are control blocks such as ``if``\/``for``, statements
+   such as ``del`` or ``with``, or defining your own functions or classes.
+   Anything that requires that kind of power should be in proper Python code
+   as a macro.
 
 Nevertheless, the language allows considerable power in terms of defining
 simple rules for variable values.
@@ -1209,7 +1230,8 @@ and expanded.
 The current choice of engine is `Jinja2`_, which is responsible for the
 details of the supported Pythonic syntax. This may change.
 
-**Do not use any Jinja2-specific syntax.**
+.. warning::
+   **Do not** use any Jinja2-specific syntax.
 
 
 Appendix: Config Editor Ignored Mechanics

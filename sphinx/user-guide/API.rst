@@ -25,7 +25,8 @@ programming interfaces within Rose which are designed for extension. These
 are useful for extending Rose components or creating standalone programs that
 seek to manipulate Rose information.
 
-Most of these interfaces require a good knowledge of Python.
+.. tip::
+   Most of these interfaces require a good knowledge of Python.
 
 
 Rose GTK library
@@ -106,7 +107,8 @@ with the following arguments:
 
      {'type': 'integer', 'help': 'This is used to count something'}
 
-  You may not need to use this information.
+  .. note::
+     You may not need to use this information.
 
 ``set_value``
   a function that should be called with a new string value of this widget,
@@ -198,9 +200,10 @@ to preserve cursor position when a widget is refreshed:
   ``4`` for a variable value of ``Operational`` means that the cursor should
   be placed between the ``r`` and the ``a``.
 
-  This has no real meaning or importance for widgets that don't display
-  editable text. If you do not supply this method, the config editor will
-  attempt to do the right thing anyway.
+  .. note::
+     This has no real meaning or importance for widgets that don't display
+     editable text. If you do not supply this method, the config editor will
+     attempt to do the right thing anyway.
 
 ``get_focus_index() -> focus_index``
   A method that takes no arguments and returns a number which is the
@@ -212,9 +215,11 @@ to preserve cursor position when a widget is refreshed:
          """Return the cursor position."""
          return self.entry.get_position()
 
-  This has no real meaning or importance for widgets that don't display
-  editable text. If you do not supply this method, the config editor will guess
-  the cursor position anyway, based on the last change to the variable value.
+  .. note::
+     This has no real meaning or importance for widgets that don't display
+     editable text. If you do not supply this method, the config editor will
+     guess the cursor position anyway, based on the last change to the
+     variable value.
 
 ``handle_type_error(is_in_error) -> None``
   The default behaviour when a variable error is added or removed is to
@@ -235,12 +240,14 @@ to preserve cursor position when a widget is refreshed:
   normally hidden, but the ``handle_type_error`` shows them if there is an
   error. The method also keeps the keyboard focus, which is the main purpose.
 
-  You may not have much need for this method, as the default error flagging
-  and cursor focus handling is normally sufficient.
+  .. tip::
+     You may not have much need for this method, as the default error
+     flagging and cursor focus handling is normally sufficient.
 
-All the existing variable value widgets are implemented using this API, so
-a good resource is the modules within the
-``lib/python/rose/config_editor/valuewidget package``.
+.. tip::
+   All the existing variable value widgets are implemented using this
+   API, so a good resource is the modules within the
+   ``lib/python/rose/config_editor/valuewidget package``.
 
 .. _conf-ed-cust-pages:
 
@@ -409,8 +416,9 @@ method ``set_ignored`` which takes no arguments. This should examine the
 instance - the variable is ignored if this is not empty. If the variable is
 ignored, the widget should indicate this e.g. by greying out part of it.
 
-All existing page widgets use this API, so a good resource is the modules in
-``lib/python/rose/config_editor/pagewidget/``.
+.. tip::
+   All existing page widgets use this API, so a good resource is the
+   modules in ``lib/python/rose/config_editor/pagewidget/``.
 
 Generally speaking, a visible change, click, or key press in the custom page
 widget should make instant changes to variable value(s), and the value that
@@ -423,10 +431,11 @@ The custom class should return a gtk object to be packed into the page
 framework, so it's best to subclass from an existing gtk Container type
 such as ``gtk.VBox`` (or ``gtk.Table``, in the example above).
 
-In line with the general philosophy, metadata should not be critical to
-page operations - it should be capable of displaying variables even when
-they have no or very little metadata, and still make sense if some
-variables are missing or new.
+.. note::
+   In line with the general philosophy, metadata should not be critical to
+   page operations - it should be capable of displaying variables even when
+   they have no or very little metadata, and still make sense if some
+   variables are missing or new.
 
 Config Editor Custom Sub Panels
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -537,8 +546,9 @@ The constructor arguments are:
   would give a ``arg_str`` of ``"arg1 arg2 arg3 ..."``. You can use this to
   help configure your widget.
 
-All existing sub panel widgets use this API, so a good resource is the
-modules in ``lib/python/rose/config_editor/panelwidget/``.
+.. tip::
+   All existing sub panel widgets use this API, so a good resource is the
+   modules in ``lib/python/rose/config_editor/panelwidget/``.
 
 
 Rose Macros
@@ -558,9 +568,10 @@ metadata. There are four types of macros:
 There are built-in rose macros that handle standard behaviour such as trigger
 changing and type checking.
 
-This section explains how to add your own custom macros to transform and
-validate configurations. See :ref:`Upgrade Macro API <rose-upgr-macros>` for
-upgrade macros.
+.. note::
+   This section explains how to add your own custom macros to transform
+   and validate configurations. See
+   :ref:`Upgrade Macro API <rose-upgr-macros>` for upgrade macros.
 
 Macros use a Python API, and should be written in Python, unless you are
 doing something very fancy. In the absence of a Python house style, it's
@@ -568,8 +579,9 @@ usual to follow the standard Python style guidance (`PEP8`_, `PEP257`_).
 
 They can be run within ``rose config-edit`` or via ``rose macro``.
 
-You should avoid writing checker macros if the checking can be expressed via
-metadata.
+.. tip::
+   You should avoid writing checker macros if the checking can be expressed
+   via metadata.
 
 Location
 ^^^^^^^^
@@ -739,8 +751,10 @@ transformer macro could be written as follows to allow the user to input
           """Some transformer macro"""
           return
 
-Note that the extra arguments require default values (``=None`` in this
-example) and that you should add error handling for the input accordingly.
+.. note::
+   The extra arguments require default values (``=None`` in this
+   example) and that you should add error handling for the input
+   accordingly.
 
 On running your macro the user will be prompted to supply values for these
 arguments or accept the default values.
@@ -778,8 +792,9 @@ An example upgrade macro might look like this:
           self.remove_setting(config, ["namelist:old_things", "OLD_VARIABLE"])
           return config, self.reports
 
-The class name is unimportant - the ``BEFORE_TAG`` and ``AFTER_TAG`` identify
-the macro.
+.. note::
+   The class name is unimportant - the ``BEFORE_TAG`` and ``AFTER_TAG``
+   identify the macro.
 
 Metadata versions are usually structured in a ``rose-meta/CATEGORY/VERSION/``
 hierarchy - where ``CATEGORY`` denotes the type or family of application
@@ -789,14 +804,15 @@ e.g. ``27.2`` or ``HEAD``.
 Upgrade macros live under the ``CATEGORY`` directory in a ``versions.py``
 file - ``rose-meta/CATEGORY/versions.py``.
 
-If you have many upgrade macros, you may want to separate them into different
-modules in the same directory. You can then import from those in
-``versions.py``, so that they are still exposed in that module. You'll need
-to make your directory a package by creating an ``__init__.py`` file, which
-should contain the line ``import versions``. To avoid conflict with other
-``CATEGORY`` upgrade modules (or other Python modules), please name these
-very modules carefully or use absolute or package level imports like this:
-``from .versionXX_YY import FooBar``.
+.. tip::
+   If you have many upgrade macros, you may want to separate them into
+   different modules in the same directory. You can then import from those
+   in ``versions.py``, so that they are still exposed in that module. You'll
+   need to make your directory a package by creating an ``__init__.py`` file,
+   which should contain the line ``import versions``. To avoid conflict with
+   other ``CATEGORY`` upgrade modules (or other Python modules), please name
+   these very modules carefully or use absolute or package level imports like
+   this: ``from .versionXX_YY import FooBar``.
 
 Upgrade macros are subclasses of ``rose.upgrade.MacroUpgrade``. They have all
 the functionality of the transform macros documented above.
