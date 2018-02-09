@@ -20,7 +20,6 @@
 # Test "rose suite-restart" on suites that are still running.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-set -x
 tests 4
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
@@ -69,5 +68,6 @@ __ERR__
 rm -f "${SUITE_RUN_DIR}/work/1/foo/file"
 wait "${ROSE_SUITE_RUN_PID}"
 poll test -e "${CONTACT}"
+rm -f "${CONTACT}"  # In case suite takes long time and is killed by timeout
 rose suite-clean -q -y "${NAME}"
 exit
