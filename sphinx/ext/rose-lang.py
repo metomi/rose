@@ -32,10 +32,15 @@ class RoseLexer(RegexLexer):
         r'(?:\(.*\))?)'        # Brackets for namelists.
         r'(\s+)?(=)(\s+)?')    # Optional spaces around = operator, value.
 
-    # Pattern for a rose (ignored|trigger-ignored|regular) setting.
-    ROSE_SETTING_VALUE_PATTERN = ('{0}'  # '', '!', '!!'.
-                                  r'[\w{{}}-]+(\s+)?=(\s+)?'
-                                  r'[^\n]+((\n[\s\t]+=[^\n]+)+)?')
+    # Patter for the value to a rose setting.
+    ROSE_VALUE_PATTERN = (
+        r'.*\n'        # Match anything after the = to the end of the line.
+        r'(?:'         # Optionally match additional lines.
+        r'(?:'         # Repeating line matching group.
+        r'(?: +.*\n)'  # Lines must be prefixed with a space (do not use \s).
+        r'\n?'         # Blank lines are permitted (e.g. foo\n\n bar).
+        r')+'          # End repeating multiline group.
+        r')?')         # End optional group.
 
     # Pygments tokens for rose config elements which have no direct
     # translation.
@@ -94,45 +99,23 @@ class RoseLexer(RegexLexer):
         # Values handled separately so as to colour the equals sign in
         # multi-line values.
         'value': [
-            (r'(\n[\s\t]+)(=)', bygroups(
+            (r'(\n[\s\t]+)(=)?', bygroups(
                 Text,
                 Operator,
             )),
             (r'.', String)
         ],
 
-        # [!foo]bar=baz.
-        'setting-in-user-ignored-section': [
-            (ROSE_SETTING_VALUE_PATTERN.format(''), ROSE_USER_IGNORED_TOKEN)
-        ],
-
-        # [!!foo]bar=baz.
-        'setting-in-trigger-ignored-section': [
-            include('comment'),
-            (ROSE_SETTING_VALUE_PATTERN.format(''), ROSE_TRIGGER_IGNORED_TOKEN)
-        ],
-
         # !bar=baz.
         'user-ignored-setting': [
-            (ROSE_SETTING_VALUE_PATTERN.format('\!'), ROSE_USER_IGNORED_TOKEN)
-        ],
-
-        # [!!foo]!bar=baz.
-        'user-ignored-setting-in-trigger-ignored-section': [
-            (ROSE_SETTING_VALUE_PATTERN.format('\!'),
-             ROSE_TRIGGER_IGNORED_TOKEN)
+            (r'\!' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
+             ROSE_USER_IGNORED_TOKEN),
         ],
 
         # !!bar=baz.
         'trigger-ignored-setting': [
-            (ROSE_SETTING_VALUE_PATTERN.format('\!\!'),
+            (r'\!\!' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
              ROSE_TRIGGER_IGNORED_TOKEN)
-        ],
-
-        # [!foo]!!bar=baz.
-        'trigger-ignored-setting-in-user-ignored-section': [
-            (ROSE_SETTING_VALUE_PATTERN.format('\!\!'),
-             ROSE_USER_IGNORED_TOKEN)
         ],
 
         # [...].
@@ -143,7 +126,8 @@ class RoseLexer(RegexLexer):
             include('setting'),
             include('user-ignored-setting'),
             include('trigger-ignored-setting'),
-            (r'\n', Text, '#pop')
+            # Escape section without swallowing any characters if no matches.
+            (r'(?=.)', Text, '#pop')
         ],
 
         # [!...].
@@ -151,10 +135,11 @@ class RoseLexer(RegexLexer):
             (r'\n(?!([\s\t]+)?\[)', Text),
             # A newline that is not followed by a '['.
             include('comment'),
-            include('setting-in-user-ignored-section'),
-            include('user-ignored-setting'),
-            include('trigger-ignored-setting-in-user-ignored-section'),
-            (r'\n', Text, '#pop')
+            # Match any regular, ignored or trigger ignored setting.
+            (r'([\!]+)?' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
+             ROSE_USER_IGNORED_TOKEN),
+            # Escape section without swallowing any characters if no matches.
+            (r'(?=.)', Text, '#pop')
         ],
 
         # [!!...].
@@ -162,10 +147,11 @@ class RoseLexer(RegexLexer):
             (r'\n(?!([\s\t]+)?\[)', Text),
             # A newline that is not followed by a '['.
             include('comment'),
-            include('setting-in-trigger-ignored-section'),
-            include('user-ignored-setting-in-trigger-ignored-section'),
-            include('trigger-ignored-setting'),
-            (r'\n', Text, '#pop')
+            # Match any regular, ignored or trigger ignored setting.
+            (r'([\!]+)?' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
+             ROSE_TRIGGER_IGNORED_TOKEN),
+            # Escape section without swallowing any characters if no matches.
+            (r'(?=.)', Text, '#pop')
         ]
     }
 
