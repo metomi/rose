@@ -179,9 +179,9 @@ configuration keys from environment variables and/or command line options.
 Where multiple ``$KEY`` settings are given, the optional configurations are 
 applied in that order - for example, a setting:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      opts=ketchup mayonnaise
+   opts=ketchup mayonnaise
 
 implies loading the optional configuration ``rose-app-ketchup.conf`` and then
 the optional configuration ``rose-app-mayonnaise.conf``, which may override
@@ -191,9 +191,9 @@ By default, a Rose command will fail if an optional configuration file is
 missing. However, if you put the optional configuration key in brackets,
 then the optional configuration file is allowed to be missing. E.g.:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      opts=ketchup (mayonnaise)
+   opts=ketchup (mayonnaise)
 
 In the above example, ``rose-app-mayonnaise.conf`` can be missing.
 
@@ -259,14 +259,14 @@ to re-define configuration settings at run time using the
 the command line. This would add new settings or override any settings
 defined in the main and optional configurations. E.g.:
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      (shell)$ # Set [env]FOO=foo, and [env]BAR=bar
-      (shell)$ # (Overriding any original settings of [env]FOO or [env]BAR)
-      (shell)$ rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
-      (shell)$
-      (shell)$ # Switch off [env]BAZ
-      (shell)$ rose task-run -D '[env]!BAZ='
+   # Set [env]FOO=foo, and [env]BAR=bar
+   # (Overriding any original settings of [env]FOO or [env]BAR)
+   rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
+
+   # Switch off [env]BAZ
+   rose task-run -D '[env]!BAZ='
 
 
 .. _site-n-user-conf:
@@ -296,10 +296,10 @@ You can also override many internal constants of the ``rose config edit`` and
 the config editor to ``F3``, put the following lines in your user config file,
 and the setting will apply the next time you run ``rose config-edit``:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      [rose-config-edit]
-      accel-find-next=F3
+   [rose-config-edit]
+   accel-find-next=F3
 
 
 Suite Configuration
@@ -766,23 +766,23 @@ version control system, or a path to a plain file. The root level ``schemes``
 setting can be used to help the system to do the right thing. The general
 syntax of the value of the root level ``schemes`` setting looks like:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      schemes=PATTERN-1=SCHEME-1
-             =PATTERN-2=SCHEME-2
+   schemes=PATTERN-1=SCHEME-1
+          =PATTERN-2=SCHEME-2
 
 E.g.:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      schemes=hpc*:*=rsync
-             =http://host/svn-repos/*=svn
+   schemes=hpc*:*=rsync
+          =http://host/svn-repos/*=svn
 
-      [file:foo.txt]
-      source=hpc1:/path/to/foo.txt
+   [file:foo.txt]
+   source=hpc1:/path/to/foo.txt
 
-      [file:bar.txt]
-      source=http://host/svn-repos/path/to/bar.txt
+   [file:bar.txt]
+   source=http://host/svn-repos/path/to/bar.txt
 
 In this example, a URI matching the pattern ``hpc*:*`` would use the
 ``rsync`` scheme to pull the source to the current host, and a URI matching
