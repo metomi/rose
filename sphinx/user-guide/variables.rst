@@ -64,7 +64,7 @@ Provided At Runtime By
 
 * rose bunch
 
-   .. TODO - link 'rose bunch' to relevant built-in app page
+.. TODO - link 'rose bunch' to relevant built-in app page
 
 
 ``ROSE_CONF_PATH``
