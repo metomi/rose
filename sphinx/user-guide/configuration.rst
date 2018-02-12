@@ -118,37 +118,37 @@ We have added the following conventions into our INI format:
 
 E.g.
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      # This is line 1 of the comment for this file.
-      # This is line 2 of the comment for this file.
+   # This is line 1 of the comment for this file.
+   # This is line 2 of the comment for this file.
 
-      # This comment will be ignored.
+   # This comment will be ignored.
 
-      # This is a comment for section-1.
-      [section-1]
-      # This is a comment for key-1.
-      key-1=value 1
-      # This comment will be ignored.
+   # This is a comment for section-1.
+   [section-1]
+   # This is a comment for key-1.
+   key-1=value 1
+   # This comment will be ignored.
 
-      # This is line 1 of the comment for key-2.
-      # This is line 2 of the comment for key-2.
-      key-2=value 2 line 1
-            value 2 line 2
-      # This is a comment for key-3.
-      key-3=value 3 line 1
-           =    value 3 line 2 has leading identation.
-           =
-           =    value 3 line 3 is blank. This is line 4.
+   # This is line 1 of the comment for key-2.
+   # This is line 2 of the comment for key-2.
+   key-2=value 2 line 1
+         value 2 line 2
+   # This is a comment for key-3.
+   key-3=value 3 line 1
+        =    value 3 line 2 has leading identation.
+        =
+        =    value 3 line 3 is blank. This is line 4.
 
-      # section-2 is user-ignored.
-      [!section-2]
-      key-4=value 4
-      # ...
+   # section-2 is user-ignored.
+   [!section-2]
+   key-4=value 4
+   # ...
 
-      [section-3]
-      # key-5 is program ignored.
-      !!key-5=value 5
+   [section-3]
+   # key-5 is program ignored.
+   !!key-5=value 5
 
 .. TODO - edit 'rose-lang.py' syntax highlighting to not throw error e.g. for
    'key-2' double-line specification above (with multiple instances in other
@@ -229,13 +229,13 @@ optional configurations ``O1`` and ``O2`` into a new main configuration ``Ct``
 and new optional configurations ``O1t`` and ``O2t`` can be represented like
 this:
 
-   .. code-block:: none
+.. code-block:: none
 
-      C => Ct
-      C + O1 => C1t
-      C + O2 => C2t
-      O1t = C1t - Ct
-      O2t = C2t - Ct
+   C => Ct
+   C + O1 => C1t
+   C + O2 => C2t
+   O1t = C1t - Ct
+   O2t = C2t - Ct
 
 
 Import Configuration

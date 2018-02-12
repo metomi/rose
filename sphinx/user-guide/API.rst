@@ -77,10 +77,10 @@ The procedure for implementing a custom value widget is as follows:
 Assign a ``widget[rose-config-edit]`` attribute to the relevant variable in the
 metadata configuration, e.g.
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      [namelist:VerifConNL/ScalarAreaCodes]
-      widget[rose-config-edit]=module_name.AreaCodeChooser
+   [namelist:VerifConNL/ScalarAreaCodes]
+   widget[rose-config-edit]=module_name.AreaCodeChooser
 
 where the widget class lives in the module ``module_name`` under
 ``lib/python/widget/`` in the metadata directory for the application or suite.
@@ -88,11 +88,11 @@ Modules are imported by the config editor on demand.
 
 This class should have a constructor of the form
 
-   .. code-block:: python
+.. code-block:: python
 
-      class AreaCodeChooser(gtk.HBox):
+   class AreaCodeChooser(gtk.HBox):
 
-          def __init__(self, value, metadata, set_value, hook, arg_str=None)
+       def __init__(self, value, metadata, set_value, hook, arg_str=None)
 
 with the following arguments:
 
@@ -276,20 +276,20 @@ The procedure for generating a custom page widget is as follows:
 Assign a ``widget`` option to the relevant namespace in the metadata
 configuration, e.g.
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      [ns:namelist/STASHNUM]
-      widget[rose-config-edit]=module_name.MyGreatBigTable
+   [ns:namelist/STASHNUM]
+   widget[rose-config-edit]=module_name.MyGreatBigTable
 
 The widget class should have a constructor of the form
 
-   .. code-block:: python
+.. code-block:: python
 
-      class MyGreatBigTable(gtk.Table):
+   class MyGreatBigTable(gtk.Table):
 
-          def __init__(self, real_variable_list, missing_variable_list,
-                       variable_functions_inst, show_modes_dict,
-                       arg_str=None):
+       def __init__(self, real_variable_list, missing_variable_list,
+                    variable_functions_inst, show_modes_dict,
+                    arg_str=None):
 
 The class can inherit from any ``gtk.Container``\-derived class.
 
@@ -460,10 +460,10 @@ The procedure for generating a custom sub panel widget is as follows:
 Assign a ``widget[rose-config-edit:sub-ns]`` option to the relevant
 namespace in the metadata configuration, e.g.
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      [ns:namelist/all_the_foo_namelists]
-      widget[rose-config-edit:sub-ns]=module_name.MySubPanelForFoos
+   [ns:namelist/all_the_foo_namelists]
+   widget[rose-config-edit:sub-ns]=module_name.MySubPanelForFoos
 
 Note that because the actual data on the page has a separate representation,
 you need to write ``[rose-config-edit:sub-ns]`` rather than just
@@ -471,14 +471,14 @@ you need to write ``[rose-config-edit:sub-ns]`` rather than just
 
 The widget class should have a constructor of the form
 
-   .. code-block:: python
+.. code-block:: python
 
-      class MySubPanelForFoos(gtk.VBox):
+   class MySubPanelForFoos(gtk.VBox):
 
-          def __init__(self, section_dict, variable_dict,
-                       section_functions_inst, variable_functions_inst,
-                       search_for_id_function, sub_functions_inst,
-                       is_duplicate_boolean, arg_str=None):
+       def __init__(self, section_dict, variable_dict,
+                    section_functions_inst, variable_functions_inst,
+                    search_for_id_function, sub_functions_inst,
+                    is_duplicate_boolean, arg_str=None):
 
 The class can inherit from any ``gtk.Container``\-derived class.
 
@@ -633,17 +633,17 @@ configuration that provides information about the configuration items.
 
 A validator macro should look like:
 
-   .. code-block:: python
+.. code-block:: python
 
-      import rose.macro
+   import rose.macro
 
-      class SomeValidator(rose.macro.MacroBase):
+   class SomeValidator(rose.macro.MacroBase):
 
-      """This does some kind of check."""
+   """This does some kind of check."""
 
-      def validate(self, config, meta_config=None):
-          # Some check on config appends to self.reports using self.add_report
-          return self.reports
+   def validate(self, config, meta_config=None):
+       # Some check on config appends to self.reports using self.add_report
+       return self.reports
 
 The returned list should be a list of ``rose.macro.MacroReport`` objects
 containing the section, option, value, and warning strings for each setting
@@ -651,26 +651,26 @@ that is in error. These are initialised behind the scenes by calling the
 inherited method ``rose.macro.MacroBase.add_report`` via
 ``self.add_report``. This has the form:
 
-   .. code-block:: python
+.. code-block:: python
 
-      def add_report(self, section=None, option=None, value=None, info=None,
-                   is_warning=False):
+   def add_report(self, section=None, option=None, value=None, info=None,
+                  is_warning=False):
 
 This means that you should call it with the relevant section first, then the
 relevant option, then the relevant value, then the relevant error message,
 and optionally a warning flag that we'll discuss later. If the setting is a
 section, the option should be ``None`` and the value None. For example,
 
-   .. code-block:: python
+.. code-block:: python
 
-      def validate(self, config, meta_config=None):
-          editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
-          if editor_value != "sed":
-              self.add_report("env",                         # Section
-                              "MY_FAVOURITE_STREAM_EDITOR",  # Option
-                              editor_value,                  # Value
-                              "Should be 'sed'!")            # Message
-          return self.reports
+   def validate(self, config, meta_config=None):
+       editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
+       if editor_value != "sed":
+           self.add_report("env",                         # Section
+                           "MY_FAVOURITE_STREAM_EDITOR",  # Option
+                           editor_value,                  # Value
+                           "Should be 'sed'!")            # Message
+       return self.reports
 
 Validator macros have the option to give warnings, which do not count as
 formal errors in the Rose config editor GUI. These should be used when
@@ -678,27 +678,27 @@ something *may* be wrong, such as warning when using an
 advanced-developer-only option. They are invoked by passing a 5th argument
 to ``self.add_report``, ``is_warning``, like so:
 
-   .. code-block:: python
+.. code-block:: python
 
-      self.add_report("env",
-                      "MY_FAVOURITE_STREAM_EDITOR",
-                      editor_value,
-                      "Could be 'sed'",
-                      is_warning=True)
+   self.add_report("env",
+                   "MY_FAVOURITE_STREAM_EDITOR",
+                   editor_value,
+                   "Could be 'sed'",
+                   is_warning=True)
 
 A transformer macro should look like:
 
-   .. code-block:: python
+.. code-block:: python
 
-      import rose.macro
+   import rose.macro
 
-      class SomeTransformer(rose.macro.MacroBase):
+   class SomeTransformer(rose.macro.MacroBase):
 
-      """This does some kind of change to the config."""
+   """This does some kind of change to the config."""
 
-      def transform(self, config, meta_config=None):
-          # Some operation on config which calls self.add_report for each change.
-          return config, self.reports
+   def transform(self, config, meta_config=None):
+       # Some operation on config which calls self.add_report for each change.
+       return config, self.reports
 
 The returned list should be a list of 4-tuples containing the section,
 option, value, and information strings for each setting that was changed
@@ -707,19 +707,19 @@ option should be ``None`` and the value None. If an option was removed,
 the value should be the old value - otherwise it should be the new one
 (added/changed). For example,
 
-   .. code-block:: python
+.. code-block:: python
 
-      def transform(self, config, meta_config=None):
-          """Add some more snow control."""
-          if config.get(["namelist:snowflakes"]) is None:
-              config.set(["namelist:snowflakes"])
-              self.add_report(list_of_changes,
-                              "namelist:snowflakes", None, None,
-                              "Updated snow handling in time for Christmas")
-              config.set(["namelist:snowflakes", "l_unique"], ".true.")
-              self.add_report("namelist:snowflakes", "l_unique", ".true.",
-                              "So far, anyway.")
-          return config, self.reports
+   def transform(self, config, meta_config=None):
+       """Add some more snow control."""
+       if config.get(["namelist:snowflakes"]) is None:
+           config.set(["namelist:snowflakes"])
+           self.add_report(list_of_changes,
+                           "namelist:snowflakes", None, None,
+                           "Updated snow handling in time for Christmas")
+           config.set(["namelist:snowflakes", "l_unique"], ".true.")
+           self.add_report("namelist:snowflakes", "l_unique", ".true.",
+                           "So far, anyway.")
+       return config, self.reports
 
 The current working directory within a macro is always the configuration's
 directory. This makes it easy to access non-``rose-app.conf`` files (e.g.
@@ -729,27 +729,27 @@ There are also reporter macros which can be used where you need to output
 some information about a configuration. A reporter macro takes the same form
 as validator and transform macros but does not require a return value.
 
-   .. code-block:: python
+.. code-block:: python
 
-       def report(self, config, meta_config=None):
-           """ Write some information about the configuration to a report file.
+   def report(self, config, meta_config=None):
+       """ Write some information about the configuration to a report file.
 
-           Note: report methods do not have a return value.
+       Note: report methods do not have a return value.
 
-           """
-           with open('report/file', 'r') as report_file:
-               report_file.write(str(config.get(["namelist:snowflakes"])))
+       """
+       with open('report/file', 'r') as report_file:
+           report_file.write(str(config.get(["namelist:snowflakes"])))
 
 Macros also support the use of keyword arguments, giving you the ability to
 have the user specify some input or override to your macro. For example a
 transformer macro could be written as follows to allow the user to input
 ``some_value``:
 
-   .. code-block:: python
+.. code-block:: python
 
-      def transform(self, config, meta_config=None, some_value=None):
-          """Some transformer macro"""
-          return
+   def transform(self, config, meta_config=None, some_value=None):
+       """Some transformer macro"""
+       return
 
 .. note::
    The extra arguments require default values (``=None`` in this
@@ -778,19 +778,19 @@ above, but with a few differences:
 
 An example upgrade macro might look like this:
 
-   .. code-block:: python
+.. code-block:: python
 
-      class Upgrade272to273(rose.upgrade.MacroUpgrade):
+   class Upgrade272to273(rose.upgrade.MacroUpgrade):
 
-      """Upgrade from 27.2 to 27.3."""
+   """Upgrade from 27.2 to 27.3."""
 
-      BEFORE_TAG = "27.2"
-      AFTER_TAG = "27.3"
+   BEFORE_TAG = "27.2"
+   AFTER_TAG = "27.3"
 
-      def upgrade(self, config, meta_config=None):
-          self.add_setting(config, ["env", "NEW_VARIABLE"], "0")
-          self.remove_setting(config, ["namelist:old_things", "OLD_VARIABLE"])
-          return config, self.reports
+   def upgrade(self, config, meta_config=None):
+       self.add_setting(config, ["env", "NEW_VARIABLE"], "0")
+       self.remove_setting(config, ["namelist:old_things", "OLD_VARIABLE"])
+       return config, self.reports
 
 .. note::
    The class name is unimportant - the ``BEFORE_TAG`` and ``AFTER_TAG``
@@ -843,9 +843,9 @@ name) can be found in your rose site configuration file as the value of
 with prefix ``PREFIX_NAME``, you must select a format (the only currently
 supported format is 'json') and use a url that looks like:
 
-   .. code-block:: none
+.. code-block:: none
 
-      http://host/PREFIX_NAME/get_known_keys?format=json
+   http://host/PREFIX_NAME/get_known_keys?format=json
 
 Usage
 ^^^^^
