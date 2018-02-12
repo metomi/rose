@@ -85,38 +85,38 @@ and inherit their configuration and files if found.
 For example, you might have a ``rose-meta`` directory that contains the
 following files and directories:
 
-   .. code-block:: none
+.. code-block:: none
 
-      cheese_sandwich/
-          vn1.5/
-              rose-meta.conf
-          vn2.0/
-              rose-meta.conf
-      cheese/
-          vn1.0/
-              rose-meta.conf
+   cheese_sandwich/
+       vn1.5/
+           rose-meta.conf
+       vn2.0/
+           rose-meta.conf
+   cheese/
+       vn1.0/
+           rose-meta.conf
 
 and write an app referencing this ``rose-meta`` directory that looks like
 this:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-     meta=cheese_sandwich/vn2.0
+   meta=cheese_sandwich/vn2.0
 
-     [env]
-     CHEESE=camembert
-     SANDWICH_BREAD=brown
+   [env]
+   CHEESE=camembert
+   SANDWICH_BREAD=brown
 
 This will reference the metadata at ``rose-meta/cheese_sandwich/vn2.0``.
 
 Now, we can write the ``rose-meta.conf`` file using an import:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      import=cheese/vn1.0
+   import=cheese/vn1.0
 
-      [env=SANDWICH_BREAD]
-      values=white,brown,seeded
+   [env=SANDWICH_BREAD]
+   values=white,brown,seeded
 
 which will inherit metadata from metadata from
 ``rose-meta/cheese/vn1.0/rose-meta.conf``.
@@ -714,10 +714,10 @@ copy-mode (metadata usage with the ``rose-suite.info`` file)
   Setting the ``ensemble members`` field to include ``copy-mode=never``
   means that the ensemble members field would never be copied.
 
-   .. code-block:: rose
+  .. code-block:: rose
 
-      [additional info]
-      copy-mode=clear
+     [additional info]
+     copy-mode=clear
 
   Setting the ``additional info`` field to include ``copy-mode=never`` means
   that the additional info field would be copied, but any value associated
@@ -801,11 +801,11 @@ Each of the above settings can be a colon-separated list of paths.
 Underneath each directory in the search path should be a hierarchy like the
 following:
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      ${APP}/HEAD/
-      ${APP}/${VERSION}/
-      ${APP}/versions.py # i.e. the upgrade macros
+   ${APP}/HEAD/
+   ${APP}/${VERSION}/
+   ${APP}/versions.py # i.e. the upgrade macros
 
 .. note::
    A Rose suite info is likely to have no versions.
@@ -906,21 +906,21 @@ application configuration.
 Application configurations can reference the configuration metadata as
 follows:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      #!cfg
-      # Refer to the HEAD version
-      # (typically you wouldn't do this since no upgrade process is possible)
-      # For flat metadata
-      meta=my-command
-      # For hierarchical metadata
-      meta=/path/to/metadata/my-command/HEAD
+   #!cfg
+   # Refer to the HEAD version
+   # (typically you wouldn't do this since no upgrade process is possible)
+   # For flat metadata
+   meta=my-command
+   # For hierarchical metadata
+   meta=/path/to/metadata/my-command/HEAD
 
-      # Refer to a named or tagged version in the flat metadata
-      meta=my-command/8.3
-      meta=my-command/t123
-      # Refer to a named or tagged version in the hierarchical metadata
-      meta=/path/to/metadata/my-command/8.3
+   # Refer to a named or tagged version in the flat metadata
+   meta=my-command/8.3
+   meta=my-command/t123
+   # Refer to a named or tagged version in the hierarchical metadata
+   meta=/path/to/metadata/my-command/8.3
 
 If a version is defined then the Rose utilities will first look for the
 corresponding named version. If this cannot be found then the HEAD version
@@ -1021,54 +1021,52 @@ Operators
 
 The following *numeric* operators are supported:
 
-   .. code-block:: python
+.. code-block:: python
 
-      +     # add
-      -     # subtract
-      *     # multiply
-      **    # power or exponent - e.g. 2 ** 3 implies 8
-      /     # divide
-      //    # integer divide (floor) - e.g. 3 // 2 implies 1
-      %     # remainder e.g. 5 % 3 implies 2
+   +     # add
+   -     # subtract
+   *     # multiply
+   **    # power or exponent - e.g. 2 ** 3 implies 8
+   /     # divide
+   //    # integer divide (floor) - e.g. 3 // 2 implies 1
+   %     # remainder e.g. 5 % 3 implies 2
 
 The following *string* operators are supported:
 
-   .. code-block:: python
+.. code-block:: python
 
-      +      # concatenate - e.g. "foo" + "bar" implies "foobar"
-      *      # self-concatenate some number of times - e.g. "foo" * 2 implies "foofoo"
-      %      # formatting - e.g. "foo %s baz" % "bar" implies "foo bar baz"
-      in     # contained in (True/False) - e.g. "oo" in "foobar" implies True
-      not in # opposite sense of in
+   +      # concatenate - e.g. "foo" + "bar" implies "foobar"
+   *      # self-concatenate some number of times - e.g. "foo" * 2 implies "foofoo"
+   %      # formatting - e.g. "foo %s baz" % "bar" implies "foo bar baz"
+   in     # contained in (True/False) - e.g. "oo" in "foobar" implies True
+   not in # opposite sense of in
 
-      # Where m, n are integers or expressions that evaluate to integers
-      # (negative numbers count from the end of the string):
-      [n]   # get nth character from string - e.g. "foo"[1] implies "o"
-      [m:n] # get slice of string from m to n - e.g. "foobar"[1:5] implies
-            # "ooba"
-      [m:]  # get slice of string from m onwards - e.g. "foobar"[1:] implies
-            # "oobar"
-      [:n]  # get slice of string up to n - e.g. "foobar"[:5] implies "fooba"
+   # Where m, n are integers or expressions that evaluate to integers
+   # (negative numbers count from the end of the string):
+   [n]   # get nth character from string - e.g. "foo"[1] implies "o"
+   [m:n] # get slice of string from m to n - e.g. "foobar"[1:5] implies "ooba"
+   [m:]  # get slice of string from m onwards - e.g. "foobar"[1:] implies "oobar"
+   [:n]  # get slice of string up to n - e.g. "foobar"[:5] implies "fooba"
 
 The following *logical* operators are supported:
 
-   .. code-block:: python
+.. code-block:: python
 
-      and   # Logical AND
-      or    # Logical OR
-      not   # Logical NOT
+   and   # Logical AND
+   or    # Logical OR
+   not   # Logical NOT
 
 The following *comparison* operators are supported:
 
-   .. code-block:: python
+.. code-block:: python
 
-      is    # Is the same object as (usually used for 'is none')
-      <     # Less than
-      >     # Greater than
-      ==    # Equal to
-      >=    # Greater than or equal to
-      <=    # Less than or equal to
-      !=    # Not equal to
+   is    # Is the same object as (usually used for 'is none')
+   <     # Less than
+   >     # Greater than
+   ==    # Equal to
+   >=    # Greater than or equal to
+   <=    # Less than or equal to
+   !=    # Not equal to
 
 Operator precedence is intended to be the same as Python. However, with the
 current choice of language engine, the ``%`` and ``//`` operators may not
@@ -1079,11 +1077,11 @@ Constants
 
 The following are special constants:
 
-   .. code-block:: python
+.. code-block:: python
 
-      None  # Python None
-      False # Python False
-      True  # Python True
+   None  # Python None
+   False # Python False
+   True  # Python True
 
 Using Variable Ids
 ^^^^^^^^^^^^^^^^^^
@@ -1094,23 +1092,23 @@ into the expression.
 
 For example, if we have a configuration that looks like this:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      [namelist:zoo]
-      num_elephants=2
-      elephant_mood='peaceful'
+   [namelist:zoo]
+   num_elephants=2
+   elephant_mood='peaceful'
 
 and an expression in the configuration metadata:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      namelist:zoo=elephant_mood != 'annoyed' and num_elephants >= 2
+   namelist:zoo=elephant_mood != 'annoyed' and num_elephants >= 2
 
 then the expression would become:
 
-   .. code-block:: none
+.. code-block:: none
 
-      'peaceful' != 'annoyed' and 2 >= 2
+   'peaceful' != 'annoyed' and 2 >= 2
 
 If the variable is not currently available (ignored or missing) then the
 expression cannot be evaluated. If inter-variable comparisons are not allowed
@@ -1122,17 +1120,17 @@ In this case the expression would be false.
 You may use ``this`` as a placeholder for the current variable id - for
 example, the fail-if expression:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      [namelist:foo=bar]
-      fail-if=namelist:foo=bar > 100 and namelist:foo=bar % 2 == 1
+   [namelist:foo=bar]
+   fail-if=namelist:foo=bar > 100 and namelist:foo=bar % 2 == 1
 
 is the same as:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      [namelist:foo=bar]
-      fail-if=this > 100 and this % 2 == 1
+   [namelist:foo=bar]
+   fail-if=this > 100 and this % 2 == 1
 
 Arrays
 ^^^^^^
@@ -1143,9 +1141,9 @@ arrays - i.e. comma-separated lists.
 You can refer to a single element of the value for a given variable id
 (or ``this``) by suffixing a number in round brackets - e.g.:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      namelist:foo=bar(2)
+   namelist:foo=bar(2)
 
 references the second element in the value for ``bar`` in the section
 ``namelist:foo``. This follows Fortran index numbering and syntax, which
@@ -1154,37 +1152,37 @@ starts at 1 rather than 0 - i.e. referencing the 1st element in the array
 
 If we had a configuration:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      [namelist:foo]
-      bar='a', 'b', 'c', 'd'
+   [namelist:foo]
+   bar='a', 'b', 'c', 'd'
 
 ``namelist:foo=bar(2)`` would get substituted in an expression with ``'b'``
 when the expression was evaluated. For example, an expression that contained:
 
-   .. code-block:: rose
+.. code-block:: rose
 
-      namelist:foo=bar(2) == 'c'
+   namelist:foo=bar(2) == 'c'
 
 would be evaluated as:
 
-   .. code-block:: none
+.. code-block:: none
 
-      'b' == 'c'
+   'b' == 'c'
 
 Should you wish to make use of the array length in an expression you can
 make use of the ``len`` function, which behaves in the same manner as its
 Python and Fortran equivalents to return the array length. For example:
 
-   .. code-block:: none
+.. code-block:: none
 
-      len(namelist:foo=bar) > 3
+   len(namelist:foo=bar) > 3
 
 would be expanded to:
 
-   .. code-block:: none
+.. code-block:: none
 
-      4 > 3
+   4 > 3
 
 and evaluate as true.
 
@@ -1195,30 +1193,30 @@ have a different syntax.
 They allow you to write a shorthand expression within an ``any()`` or
 ``all()`` bracket which implies a loop over each array element. For example:
 
-   .. code-block:: none
+.. code-block:: none
 
-      any(namelist:foo=bar == 'e')
+   any(namelist:foo=bar == 'e')
 
 evaluates true if *any* elements in the value of ``bar`` in the section
 ``namelist:foo`` are ``'e'``. For the above configuration snippet, this
 would be expanded before evaluation to be:
 
-   .. code-block:: none
+.. code-block:: none
 
-      'a' == 'e' or 'b' == 'e' or 'c' == 'e' or 'd' == 'e'
+   'a' == 'e' or 'b' == 'e' or 'c' == 'e' or 'd' == 'e'
 
 Similarly,
 
-   .. code-block:: none
+.. code-block:: none
 
-      all(namelist:foo=bar == 'e')
+   all(namelist:foo=bar == 'e')
 
 evaluates true if *all* elements are ``'e'``. Again, with the above
 configuration, this would be expanded before proper evaluation:
 
-   .. code-block:: none
+.. code-block:: none
 
-      'a' == 'e' and 'b' == 'e' and 'c' == 'e' and 'd' == 'e'
+   'a' == 'e' and 'b' == 'e' and 'c' == 'e' and 'd' == 'e'
 
 Internals
 ^^^^^^^^^
