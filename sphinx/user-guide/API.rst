@@ -25,7 +25,7 @@ programming interfaces within Rose which are designed for extension. These
 are useful for extending Rose components or creating standalone programs that
 seek to manipulate Rose information.
 
-.. tip::
+.. note::
    Most of these interfaces require a good knowledge of Python.
 
 
@@ -247,7 +247,7 @@ to preserve cursor position when a widget is refreshed:
 .. tip::
    All the existing variable value widgets are implemented using this
    API, so a good resource is the modules within the
-   ``lib/python/rose/config_editor/valuewidget package``.
+   ``lib/python/rose/config_editor/valuewidget`` package.
 
 .. _conf-ed-cust-pages:
 

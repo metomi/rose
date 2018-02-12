@@ -125,7 +125,7 @@ Metadata Options
 ^^^^^^^^^^^^^^^^
 
 The metadata options for a configuration fall into 4 categories: sorting,
-values, behaviour and help. They are be described separated below.
+values, behaviour and help. They are described separately below.
 
 Metadata for Sorting
 ^^^^^^^^^^^^^^^^^^^^
