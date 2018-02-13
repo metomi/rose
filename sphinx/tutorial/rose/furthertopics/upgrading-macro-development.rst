@@ -6,8 +6,8 @@ metadata versions. They are intended to keep application configurations in
 sync with changes to application inputs e.g. from new code releases.
 
 You should already be familiar with using ``rose app-upgrade`` (see the
-:ref:`Upgrade tutorial <tutorial-rose-upgrade-macros>` and the concepts in the
-reference material.
+:ref:`Upgrading tutorial <tutorial-rose-upgrade-macros>` and the concepts in the
+reference material).
 
 .. TODO - link reference material when translated
 
@@ -21,8 +21,8 @@ Example
 
 In this example, we'll be upgrading a boat on a desert island.
 
-Create a new directory called make-boat-app somewhere - e.g. in your homespace
-- containing a ``rose-app.conf`` file with the following content:
+Create a new directory called ``make-boat-app`` somewhere - e.g. in your
+homespace - containing a ``rose-app.conf`` file with the following content:
 
 .. code-block:: rose
 
@@ -33,7 +33,7 @@ Create a new directory called make-boat-app somewhere - e.g. in your homespace
    paddling_twigs=1
 
 This creates an app config that configures our simple boat (a dugout
-canoe). It references a meta-flag (for which metadata is unlikely to
+canoe). It references a meta flag (for which metadata is unlikely to
 already exist), made up of a category (``make-boat``) at a particular
 version (``0.1``). The meta flag is used by Rose to locate a configuration
 metadata directory.
@@ -56,9 +56,7 @@ We need a ``rose-meta/`` directory somewhere, to store our metadata -
 for the purposes of this tutorial it's easiest to put in in your homespace,
 but the location does not matter.
 
-Create a ``rose-meta/make-boat/`` directory in your homespace:
-
-.. code-block:: bash
+Create a ``rose-meta/make-boat/`` directory in your homespace::
 
    mkdir -p ~/rose-meta/make-boat/
 
@@ -70,16 +68,12 @@ N.B. Configuration metadata would normally be managed by whoever manages
 Rose installation at your site.
 
 We know we need some metadata for the ``0.1`` version, so create a
-``0.1/`` subdirectory under ``rose-meta/make-boat/``:
+``0.1/`` subdirectory under ``rose-meta/make-boat/``::
 
-.. code-block:: bash
-
-   mkdir -p ~/rose-meta/make-boat/0.1/
+   mkdir ~/rose-meta/make-boat/0.1/
 
 We'll need a ``rose-meta.conf`` file there too, so create an empty one in
-the new directory:
-
-.. code-block:: bash
+the new directory::
 
    touch ~/rose-meta/make-boat/0.1/rose-meta.conf
 
@@ -122,7 +116,7 @@ after any upgrade (don't change it yet!):
 
 It looks like we've added the inputs ``misc_branches``,
 ``outrigger_tree_trunks`` and ``paddling_branches``. ``paddling_twigs``
-is no longer there (now redundant), so we can remove it from the
+is now no longer there (now redundant), so we can remove it from the
 configuration when we upgrade.
 
 Let's create the new metadata version, to document what we need and
@@ -166,8 +160,8 @@ We now want to automate the process of updating our app config from
 ``make-boat/0.1`` to the new ``make-boat/0.2`` version.
 
 
-versions.py
------------
+``versions.py``
+---------------
 
 Upgrade macros are invoked through a Python module, ``versions.py``,
 that doesn't live with any particular version metadata - it should be
@@ -266,17 +260,19 @@ We need to get the macro to do the following:
 * add the option ``namelist:materials=paddling_branches``
 * remove the option ``namelist:materials=paddling_twigs``
 
-We can use the nice API provided to express this in Python code - replace
+.. TODO - link to API docs when implemented
+
+We can use the API provided to express this in Python code - replace
 the ``# Some code doing something...`` line with:
 
 .. code-block:: python
 
-        self.add_setting(config, ["namelist:materials", "misc_branches"], "4")
-        self.add_setting(
-                 config, ["namelist:materials", "outrigger_tree_trunks"], "2")
-        self.add_setting(
-                 config, ["namelist:materials", "paddling_branches"], "1")
-        self.remove_setting(config, ["namelist:materials", "paddling_twigs"])
+   self.add_setting(config, ["namelist:materials", "misc_branches"], "4")
+   self.add_setting(
+            config, ["namelist:materials", "outrigger_tree_trunks"], "2")
+   self.add_setting(
+            config, ["namelist:materials", "paddling_branches"], "1")
+   self.remove_setting(config, ["namelist:materials", "paddling_twigs"])
 
 This changes the app configuration (``config``) in the way we want, and
 (behind the scenes) adds some things to the ``self.reports`` list
@@ -284,11 +280,13 @@ mentioned in the ``return config, self.reports`` line.
 
 .. note::
 
-   When we add options like ``misc_branches``, we need values to add them
-   with - what they are will often be a matter of judgement.
+   When we add options like ``misc_branches``, we must specify default values
+   to assign to them.
 
-However, even if they appear to be numeric inputs, values should always be
-entered as strings (``"1"`` rather than ``1``).
+.. tip::
+
+   Values should always be specified as strings e.g. (``"1"`` rather than
+   ``1``).
 
 Customising the Output
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -296,37 +294,33 @@ Customising the Output
 The methods ``self.add_setting`` and ``self.remove_setting`` will provide
 a default message to the user about the change (e.g.
 ``"Added X with value Y"``), but you can customise them to add your own
-by passing an info 'keyword argument' like this:
+using the info 'keyword argument' like this:
 
 .. code-block:: python
 
-           self.add_setting(
-                    config, ["namelist:materials", "outrigger_tree_trunks"], "2",
-                    info="This makes it into a trimaran!")
+   self.add_setting(
+       config, ["namelist:materials", "outrigger_tree_trunks"], "2",
+       info="This makes it into a trimaran!")
 
 If you want to, try adding your own messages.
 
-Running rose app-upgrade
-^^^^^^^^^^^^^^^^^^^^^^^^
+Running ``rose app-upgrade``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Our upgrade macro will now work - change directory to the application
-directory and run:
-
-.. code-block:: bash
+directory and run::
 
    rose app-upgrade --meta-path=~/rose-meta/
+
+This should display some information about the current and available
+versions - see the help by running ``rose help app-upgrade``.
 
 ``--meta-path`` equals the path to the ``rose-meta/`` directory you
 created - as this path isn't configured in the site/user configuration,
 we need to set it manually. This won't normally be the case for users,
 if the metadata is centrally managed.
 
-This should display some information about the current and available
-versions - see the help by running ``rose help app-upgrade``.
-
-Let's upgrade to ``0.2``. Run:
-
-.. code-block:: bash
+Let's upgrade to ``0.2``. Run::
 
    rose app-upgrade --meta-path=~/rose-meta/ 0.2
 
@@ -335,7 +329,7 @@ messages you may have added) and prompt you to accept them. Accept them
 and have a look at the app config file - it should have been changed
 accordingly.
 
-Using patch configurations
+Using Patch Configurations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For relatively straightforward changes like the one above, we can
@@ -411,8 +405,8 @@ file that looks like this:
 .. note::
 
    If a ``rose-macro-add.conf`` setting is already defined, the
-   value will not be overwritten. In our case, we don't need a
-   ``rose-macro-remove.conf`` file.
+   value of ``l_rudder_branch`` will not be overwritten. In our case, we
+   don't need a ``rose-macro-remove.conf`` file.
 
 Go ahead and upgrade the app configuration to ``0.3``, as you did before.
 
@@ -426,14 +420,16 @@ More Complex Upgrade Macros
 The Upgrade Macro API gives us quite a bit of power without having to write
 too much Python.
 
-For our ``1.0`` release, we want to add sailing gear - we need the number
-of ``misc_branches`` to be at least ``6``, and add a ``sail_canvas_sq_m``
-option.
+For our ``1.0`` release we want to make some improvements to out sailing
+equipment:
+
+* We want to increase the number of ``misc_branches`` to be at least 6.
+* We want to add a ``sail_canvas_sq_m`` option.
 
 We may want to issue a warning for a deprecated option
 (``paddle_branches``) so that the user can decide whether to remove it.
 
-Create the file ``~/rose-meta/make-boat/1.0 directory/rose-meta.conf``
+Create the file ``~/rose-meta/make-boat/1.0/rose-meta.conf``
 and paste in the following configuration:
 
 .. code-block:: rose
@@ -518,7 +514,7 @@ In a similar way, to flag a warning, insert:
 This calls ``self.add_report`` if the option ``paddling_branches`` is
 present. This is a method that notifies the user of actions and issues
 by appending things to the ``self.reports`` list which appears on the
-``return ...line``.
+``return ...`` line.
 
 Run ``rose app-upgrade --meta-path=~/rose-meta/ 1.0`` to see the effect of
 your changes. You should see a warning message for
@@ -544,10 +540,9 @@ like it was at ``0.1``:
    paddling_twigs=1
 
 Run ``rose app-upgrade --meta-path=~/rose-meta/`` in the application
-directory. You should see the available versions to upgrade to - let's
-choose ``1.0``. Run:
-
-.. code-block:: bash
+directory. You should see that the version has been downgraded to 0.1,
+the available versions to upgrade to shoudl also be listed - let's
+choose ``1.0``. Run::
 
    rose app-upgrade --meta-path=~/rose-meta/ 1.0
 
