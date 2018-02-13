@@ -2,7 +2,7 @@ Trigger
 =======
 
 The ``trigger`` metadata item can be used to cut down the amount of irrelevant
-settings presented to the user in the ``rose edit`` gui by hiding any settings
+settings presented to the user in the ``rose edit`` GUI by hiding any settings
 which are not relevant based on the value or state of other settings.
 
 Irrelevant (``ignored`` or ``trigger-ignored``) settings do not get
@@ -16,10 +16,70 @@ Example
 In this example, we'll be ordering pizza.
 
 Create a new directory somewhere - e.g. in your homespace - containing
-a ``rose-app.conf`` file that looks like this.
+a ``rose-app.conf`` file that looks like this:
+
+.. TODO - Perhaps move these large code blocks out of this file using
+          the rose tutorial command.
+
+.. code-block:: rose
+
+   [command]
+   default=order.exe
+
+   [env]
+   BUDGET=10
+
+   [file:order.nl]
+   source=namelist:pizza_order namelist:side_order
+
+   [namelist:pizza_order]
+   extra_chicken=.false.
+   pepperoni_multiple=1
+   no_mushrooms=.false.
+   pizza_type='Veggie Supreme'
+   truffle='none'
+
+   [namelist:side_order]
+   garlic_bread=.false.
+   soft_drink=.false.
 
 We'll add some metadata to make it nice. Create a ``meta/``
-sub-directory with a ``rose-meta.conf`` file that looks like this.
+sub-directory with a ``rose-meta.conf`` file that looks like this:
+
+.. code-block:: rose
+
+   [env]
+
+   [env=BUDGET]
+   type=integer
+
+   [file:order.nl]
+
+   [namelist:pizza_order]
+
+   [namelist:pizza_order=extra_chicken]
+   type=logical
+
+   [namelist:pizza_order=pepperoni_multiple]
+   values=1,2,3
+
+   [namelist:pizza_order=no_mushrooms]
+   type=logical
+
+   [namelist:pizza_order=pizza_type]
+   sort-key=00-type
+   values='Veggie Supreme', 'Pepperoni', 'BBQ Chicken'
+
+   [namelist:pizza_order=truffle]
+   values='none', 'white', 'black'
+
+   [namelist:side_order]
+
+   [namelist:side_order=garlic_bread]
+   type=logical
+
+   [namelist:side_order=soft_drink]
+   type=logical
 
 Once you've done that, run ``rose edit`` in the application directory
 and navigate around the pages.
@@ -89,7 +149,7 @@ in three ways:
 * By clicking the :menuselection:`Metadata --> Autofix all configurations`
   menu.
 * Using the :guilabel:`Auto-fix` toolbar button.
-* Or via the right click menu for the root page in the left hand tree panel,
+* Or via the right-click menu for the root page in the left-hand tree panel,
   in this case ``pizza_order``.
 
 Run "Autofix" in one of the above ways.
@@ -103,8 +163,8 @@ actually just commented out, and viewable via the menu
 :menuselection:`View --> View All Ignored Variables`.
 
 Try altering the values of ``namelist:pizza_order=pizza_type`` and
-``env=BUDGET`` - with :menuselection:`View --> View All Ignored Variables`
-on and off. This should enable and ``trigger-ignore`` different settings.
+``env=BUDGET`` with :menuselection:`View --> View All Ignored Variables`
+on and off. This should enable and ``trigger-ignore different settings``.
 
 When ``env=BUDGET`` is below 10, the ``namelist:side_order`` section will
 be ``trigger-ignored``, and the ``garlic_bread`` and ``soft_drink`` will
@@ -114,7 +174,7 @@ You can get more information about why an option is ignored in the config
 editor by hovering over its ignored flag, or looking at the option's menu
 button ``Info`` entry.
 
-Setting ids mentioned in the Info dialog are usually clickable links, so
+Setting ids mentioned in the ``Info`` dialog are usually clickable links, so
 you can go directly to the relevant id.
 
 
@@ -126,7 +186,7 @@ case, the subject is relevant only if all the parents agree that it is -
 an AND relationship.
 
 For example, we already have one trigger for
-``namelist:pizza_order=truffle (env=BUDGET)`` - but it should also only
+``namelist:pizza_order=truffle`` (``env=BUDGET``) - but it should also only
 be relevant when ``namelist:pizza_order=no_mushrooms`` is ``.false.``.
 
 Open the metadata file in a text editor, and add the following to the
@@ -149,10 +209,7 @@ Cascading Triggering
 
 Triggering is not just based on values - if a setting is missing or
 ``trigger-ignored``, any settings that it triggers will be
-``trigger-ignored`` by default.
-
-This is another way of saying if something is irrelevant, all the settings
-that depend on it should also be irrelevant. This means that triggers can
+``trigger-ignored`` by default i.e. triggers can
 act in a cascade - A triggers B triggers C.
 
 We can see this by replacing the ``env=BUDGET`` trigger with:
@@ -168,7 +225,7 @@ will be ``trigger-ignored``. This means that all of its triggered
 settings like ``namelist:pizza_order=extra_chicken`` are irrelevant and
 will also be ``trigger-ignored``.
 
-We need to add no_mushrooms to the ``[namelist:pizza_order=pizza_type]``
+We need to add ``no_mushrooms`` to the ``[namelist:pizza_order=pizza_type]``
 section so that it is ``trigger-ignored`` when no pizza can be ordered -
 replace the ``[namelist:pizza_order=pizza_type]`` trigger with:
 
@@ -218,12 +275,14 @@ This means that ``namelist:pizza_order=dip_type`` is dependent on
 ``namelist:pizza_order=pizza_type``, and will only be ignored when that
 is ignored - but the value of ``pizza_type`` doesn't matter to it.
 
+.. TODO - Rephrase this ^
+
 Save the file and reload the metadata in the config editor. We'll need to
 add the ``namelist:pizza_order=dip_type`` to use it properly - you can do
-this from the ``namelist:pizza_order`` page by:
+this from the ``namelist:pizza_order`` page via:
 
 * The :guilabel:`Add` toolbar button.
-* The right click page menu.
+* The right-click page menu.
 * The :menuselection:`View --> View Latent Variables` menu.
 
 After enabling the view, you should see ``dip_type`` appear as an option
