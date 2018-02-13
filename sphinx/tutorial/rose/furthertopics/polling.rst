@@ -65,7 +65,7 @@ In the suite directory create an ``app`` directory.
 
 In the ``app`` directory create a directory called ``bob``.
 
-In the newly created ``bob`` directory, create a ``rose-app.conf`` file.
+In the newly-created ``bob`` directory, create a ``rose-app.conf`` file.
 
 Edit the ``rose-app.conf`` file to look like this:
 
@@ -103,7 +103,7 @@ Improving The Polling
 ---------------------
 
 At present we have specified our own routine for testing for the existence
-of a particular file using the ``test`` option. However, rose provides a
+of a particular file using the ``test`` option. However, Rose provides a
 simpler method for doing this.
 
 Edit the ``rose-app.conf`` in your ``bob`` app to look like the following:
@@ -125,19 +125,20 @@ run the suite to confirm it still works.
 Available Polling Types
 -----------------------
 
-test and all-files are just two of the available polling options:
+Test and all-files are just two of the available polling options:
 
 ``all-files``
-   A list of space delimited list of files which only passes if all file
-   paths in the list exist.
+   Tests if all of the files in a list exist.
 ``any-files``
-   A list of space delimited list of files which passes if any file path in
-   the list exists.
+   Tests if and of the files in a list exist.
 ``file-test``
-   Allows you perform tests on a file if checking its existence is not enough
-   e.g. perform a ``grep``.
+   Changes the test used to evaluate the ``any-files`` and ``all-files`` lists
+   to a shell script to be run on each file (e.g. ``grep``). Passes if the
+   command exits with a zero return code.
 ``test``
-   A shell command which passes if the command returns a 0 (zero) return code.
+   Tests using a shell script, passes if the command exits with a zero return
+   code. *Note this is separate from the ``all-files``, ``any-files`` testing
+   logic.*
 
 .. TODO - link to rose configuration
 
@@ -150,7 +151,7 @@ Possible Uses For Polling
 
 Depending on your needs, possible uses for polling might include:
 
-* Checking for required output from a long running task rather than waiting
+* Checking for required output from a long-running task rather than waiting
   for the task to complete.
 * Monitoring output from another suite.
 * Checking if a file has required content before using it.
