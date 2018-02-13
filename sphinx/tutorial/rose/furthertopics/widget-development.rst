@@ -23,20 +23,22 @@ Example
 -------
 
 Create a new rose app by running the following command replacing
-``DIRECTORY`` with the path in which to create the suite::
+``DIRECTORY`` with the path in which to create the suite:
 
-   rose tutorial widget DIRECTORY
-   cd DIRECTORY
+.. code-block:: sub
+
+   rose tutorial widget <DIRECTORY>
+   cd <DIRECTORY>
 
 You will now have a rose app which contains the following files:
 
-.. code-block:: none
+.. code-block:: sub
 
-   DIRECTORY
-   |-- meta
-   |   `-- lib
-   |       `-- python
-   |           `-- widget
+   <DIRECTORY>/
+   |-- meta/
+   |   `-- lib/
+   |       `-- python/
+   |           `-- widget/
    |               |-- __init__.py
    |               `-- username.py
    `-- rose-app.conf
@@ -145,7 +147,7 @@ Try opening up the config editor in the application directory (where the
    rose edit
 
 Navigate to the ``env`` page. You should see your widget on
-the top right of the page! As you type, it should provide helpful
+the page! As you type, it should provide helpful
 auto-completion of usernames. Try typing your own username.
 
 Further Reading
