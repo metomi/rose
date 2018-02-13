@@ -13,7 +13,8 @@ from each other at the same time - an example would be where a command is
 run repeatedly with only its arguments changing.
 
 Rather than creating multiple apps or
-:ref:`optional configs <rose-tutorial-optional-configurations>` to change
+
+:ref:`optional configs <rose-turorial-optional-configurations>` to change
 the way a command is to be run, we can instead use the built-in
 ``rose_bunch`` application to run multiple command variants, in parallel,
 under a single job as defined by an application configuration.
@@ -197,7 +198,7 @@ batching up jobs into sets of *N* simultaneously running commands,
 ``rose_bunch``
 apps can be configured to run as many commands as possible within some limit
 i.e. while *N* commands are running, if one of them finishes, don't wait for the
-remaining *N*-1 jobs to finish before running the (*N*+1)th one.
+remaining *N*\ -1 jobs to finish before running the (\ *N*\ +1)th one.
 
 In the case of our simulated airport we will pretend we only have two runways
 available at a time on which our planes can land. As such we need to limit the
