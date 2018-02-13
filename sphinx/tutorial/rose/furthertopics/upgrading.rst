@@ -15,17 +15,14 @@ Upgrade macros may be written to automatically apply these changes.
 Upgrade macros are used to upgrade :term:`rose apps <rose app>` to newer
 metadata versions. They are intended to keep application configurations in
 sync with changes to application inputs e.g. from new code releases.
-This part of the Rose user guide walks you through upgrading application
+
+This part tutorial walks you through upgrading applications.
 
 
 Example
 -------
 
-Create a new directory:
-
-.. code-block:: bash
-
-   mkdir ~/garden/
+Create a new directory somewhere in your filesystem called ``garden``.
 
 Create within it a ``rose-app.conf`` file that looks like this:
 
@@ -39,7 +36,7 @@ Create within it a ``rose-app.conf`` file that looks like this:
    [namelist:features]
    rose_bushes=2
 
-The ``meta=...`` line references a category (rose-demo-upgrade) at a
+The ``meta=...`` line references a category (``rose-demo-upgrade``) at a
 particular version (``garden0.1``). It's the version that we want to
 change.
 
@@ -102,7 +99,7 @@ the intermediary versions to the new one. Have a look at the
 ``rose-app.conf`` file.
 
 If you run rose ``app-upgrade`` with no arguments, you can see that
-you're at the latest version.
+you're using the latest version.
 
 
 Downgrading
@@ -117,9 +114,9 @@ upgrading. You can see if this is supported by running:
 
 You can then use it to downgrade by running:
 
-.. code-block:: bash
+.. code-block:: sub
 
-   rose app-upgrade --downgrade VERSION
+   rose app-upgrade --downgrade <VERSION>
 
 where ``VERSION`` is a lower supported version. This time, some settings
 may be removed.

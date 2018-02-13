@@ -64,8 +64,8 @@ class UpgradeGarden03(rose.upgrade.MacroUpgrade):
                 config, ["namelist:features", "shrubberies"], "1")
         return config, self.reports
 
-    def upgrade(self, config, meta_config=None, ignore_other_shrubbery=False):
-        if self._get_shrub_num(config) == 1 and not ignore_other_shrubbery:
+    def upgrade(self, config, meta_config=None):
+        if self._get_shrub_num(config) == 1:
             self.change_setting_value(
                 config, ["namelist:features", "shrubberies"], "2",
                 info="Fetched another shrubbery")
