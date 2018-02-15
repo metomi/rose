@@ -1,16 +1,16 @@
 .. _rose-upgr-macros:
 
-Rose Upgrade Macros
-===================
+Rose Upgrade Macro API
+======================
 
 Rose upgrade macros are used to upgrade application configurations between
-metadata versions. They are classes, very similar to the Transform macros
-above, but with a few differences:
+metadata versions. They are classes, very similar to
+:ref:`transformer macros <api-rose-macro>`, but with a few differences:
 
-* an ``upgrade`` method instead of a ``transform`` method
-* an optional ``downgrade`` method, identical in API to the ``upgrade``
+* An ``upgrade`` method instead of a ``transform`` method
+* An optional ``downgrade`` method, identical in API to the ``upgrade``
   method, but intended for performing the reverse operation
-* a more helpful API via ``rose.upgrade.MacroUpgrade`` methods
+* A more helpful API via :py:class:`rose.upgrade.MacroUpgrade` methods
 * ``BEFORE_TAG`` and ``AFTER_TAG`` attributes - the version of metadata they
   apply to (``BEFORE_TAG``) and the version they upgrade to (``AFTER_TAG``)
 
@@ -52,10 +52,8 @@ file - ``rose-meta/CATEGORY/versions.py``.
    these very modules carefully or use absolute or package level imports like
    this: ``from .versionXX_YY import FooBar``.
 
-Upgrade macros are subclasses of ``rose.upgrade.MacroUpgrade``. They have all
-the functionality of the transform macros documented above.
-``rose.upgrade.MacroUpgrade`` also has some additional convenience methods
-defined for you to call. All methods return ``None`` unless otherwise
-specified.
+Upgrade macros are subclasses of :py:class:`rose.upgrade.MacroUpgrade`. They
+have all the functionality of the :ref:`transformer macros <api-rose-macro>`.
 
-.. TODO - complete the python API part that goes here
+.. autoclass:: rose.upgrade.MacroUpgrade
+   :members:
