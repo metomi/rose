@@ -1,6 +1,8 @@
 .. _PEP8: https://www.python.org/dev/peps/pep-0008/
 .. _PEP257: https://www.python.org/dev/peps/pep-0257/
 
+.. _api-rose-macro:
+
 Rose Macros
 ===========
 

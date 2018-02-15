@@ -87,7 +87,28 @@ class MacroUpgrade(rose.macro.MacroBase):
     UPGRADE_RESOURCE_DIR = MACRO_UPGRADE_RESOURCE_DIR
 
     def act_from_files(self, config, downgrade=False):
-        """Parse a change configuration into actions."""
+        """Parse a change configuration into actions.
+
+        Searches for:
+        
+        * ``etc/VERSION/rose-macro-add.conf`` (settings to be added)
+        * ``etc/VERSION/rose-macro-remove.conf`` (settings to be removed)
+        
+        Where ``VERSION`` is equal to ``self.BEFORE_TAG``.
+
+        If settings are defined in either file, and changes can be made, the
+        ``self.reports`` will be updated automatically.
+        
+        Note that ``act_from_files`` can be used in combination with other
+        methods as part of the same upgrade.
+
+        Args:
+            config (rose.config.ConfigNode): The application configuration.
+            downgrade (bool): True if downgrading.
+
+        Returns:
+            None
+        """
         res_map = self._get_config_resources()
         add_config = res_map.get(MACRO_UPGRADE_RESOURCE_FILE_ADD)
         rem_config = res_map.get(MACRO_UPGRADE_RESOURCE_FILE_REMOVE)
@@ -135,7 +156,31 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     def add_setting(self, config, keys, value=None, forced=False,
                     state=None, comments=None, info=None):
-        """Add a setting to the configuration."""
+        """Add a setting to the configuration.
+     
+
+        Args:
+            config (rose.config.ConfigNode): The application configuration.
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                A section will be a list of one keys, an option will have two.
+            value (string - optional): String denoting the new setting value.
+                Required for options but not for settings.
+            forced (bool - optional)
+                If True override value if the setting already exists.
+            state (str - optional):
+                The state of the new setting - should be one of the
+                ``rose.config.ConfigNode`` states e.g.
+                ``rose.config.ConfigNode.STATE_USER_IGNORED``. Defaults to
+                ``rose.config.ConfigNode.STATE_NORMAL``.
+            comments (list - optional): List of comment lines (strings) for
+                the new setting or ``None``.
+            info (string - optional): A short string containing no new lines,
+                describing the addition of the setting.    
+
+        Returns:
+            None
+        
+        """
         section, option = self._get_section_option_from_keys(keys)
         id_ = self._get_id_from_section_option(section, option)
         if option is not None and value is None:
@@ -216,7 +261,24 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     def change_setting_value(self, config, keys, value, forced=False,
                              comments=None, info=None):
-        """Change a setting (option) value in the configuration."""
+        """Change a setting (option) value in the configuration.
+
+        Args:
+            config (rose.config.ConfigNode): The application configuration.
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                A section will be a list of one keys, an option will have two.
+            value (string): The new value. Required for options, can be ``None``
+                for sections.
+            forced (bool): Create the setting if it is not present in config.
+            comments (list - optional): List of comment lines (strings) for
+                the new setting or ``None``.
+            info (string - optional): A short string containing no new lines,
+                describing the addition of the setting.    
+
+        Returns:
+            None
+
+        """
         section, option = self._get_section_option_from_keys(keys)
         id_ = self._get_id_from_section_option(section, option)
         node = config.get([section, option])
@@ -241,14 +303,36 @@ class MacroUpgrade(rose.macro.MacroBase):
         self.add_report(section, option, value, info)
 
     def get_setting_value(self, config, keys, no_ignore=False):
-        """Return the value of a setting."""
+        """Return the value of a setting or ``None`` if not set.
+
+        Args:
+            config (rose.config.ConfigNode): The application configuration.
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                A section will be a list of one keys, an option will have two.
+            no_ignore (bool - optional): If ``True`` return ``None`` if the
+                setting is ignored (else return the value).
+
+        Returns:
+            object - The setting value or ``None`` if not defined.
+        """
         section, option = self._get_section_option_from_keys(keys)
         if config.get([section, option], no_ignore=no_ignore) is None:
             return None
         return config.get([section, option]).value
 
     def remove_setting(self, config, keys, info=None):
-        """Remove a setting from the configuration."""
+        """Remove a setting from the configuration.
+        
+        Args:
+            config (rose.config.ConfigNode): The application configuration.
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                A section will be a list of one keys, an option will have two.
+            info (string - optional): A short string containing no new lines,
+                describing the addition of the setting.    
+
+        Returns:
+            None
+        """
         section, option = self._get_section_option_from_keys(keys)
         if option is None:
             if config.get([section]) is None:
@@ -260,7 +344,19 @@ class MacroUpgrade(rose.macro.MacroBase):
         return self._remove_setting(config, [section, option], info)
 
     def rename_setting(self, config, keys, new_keys, info=None):
-        """Rename a setting in the configuration."""
+        """Rename a setting in the configuration.
+        
+        Args:
+            config (rose.config.ConfigNode): The application configuration.
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                A section will be a list of one keys, an option will have two.
+            new_keys (list): The new hierarchy of node.value 'keys'.
+            info (string - optional): A short string containing no new lines,
+                describing the addition of the setting.    
+
+        Returns:
+            None
+        """
         section, option = self._get_section_option_from_keys(keys)
         new_section, new_option = self._get_section_option_from_keys(new_keys)
         if option is None:
@@ -298,14 +394,38 @@ class MacroUpgrade(rose.macro.MacroBase):
         self.remove_setting(config, keys)
 
     def enable_setting(self, config, keys, info=None):
-        """Enable a setting in the configuration."""
+        """Enable a setting in the configuration.
+        
+        Args:
+            config (rose.config.ConfigNode): The application configuration.
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                A section will be a list of one keys, an option will have two.
+            info (string - optional): A short string containing no new lines,
+                describing the addition of the setting.    
+
+        Returns:
+            False - if the setting's state is not changed else ``None``.
+        """
         return self._ignore_setting(config, list(keys),
                                     info=info,
                                     state=rose.config.ConfigNode.STATE_NORMAL)
 
     def ignore_setting(self, config, keys, info=None,
                        state=rose.config.ConfigNode.STATE_USER_IGNORED):
-        """User-ignore a setting in the configuration."""
+        """User-ignore a setting in the configuration.
+        
+        Args:
+            config (rose.config.ConfigNode): The application configuration.
+            keys (list): A list defining a hierarchy of node.value 'keys'.
+                A section will be a list of one keys, an option will have two.
+            info (string - optional): A short string containing no new lines,
+                describing the addition of the setting.    
+            state (string - optional): A ``rose.config.ConfigNode`` state.
+                ``STATE_USER_IGNORED`` by default.
+
+        Returns:
+            False - if the setting's state is not changed else ``None``.
+        """
         return self._ignore_setting(config, list(keys),
                                     info=info, state=state)
 
