@@ -369,18 +369,22 @@ optionally expose some variable-change specific methods that do this
 themselves. These take a single ``rose.variable.Variable`` instance as an
 argument.
 
-``def add_variable_widget(self, variable) -> None``
-  will be called when a variable is created.
-``def reload_variable_widget(self, variable) -> None``
-  will be called when a variable's status is changed, e.g. it goes into
-  an error state.
-``def remove_variable_widget(self, variable) -> None``
-  will be called when a variable is removed.
-``def update_ignored(self) -> None``
-  will be called to allow you to update ignored widget display, if (for
-  example) you show/hide ignored variables. If you don't have any custom
-  behaviour for ignored variables, it's worth writing a method that does
-  nothing - e.g. one that contains just ``pass``).
+.. py:method:: add_variable_widget(self, variable) -> None
+
+   Will be called when a variable is created.
+.. py:method:: reload_variable_widget(self, variable) -> None
+
+   Will be called when a variable's status is changed, e.g. it goes into
+   an error state.
+.. py:method:: remove_variable_widget(self, variable) -> None
+
+   Will be called when a variable is removed.
+.. py:method:: update_ignored(self) -> None
+
+   Will be called to allow you to update ignored widget display, if (for
+   example) you show/hide ignored variables. If you don't have any custom
+   behaviour for ignored variables, it's worth writing a method that does
+   nothing - e.g. one that contains just ``pass``).
 
 If you take the step of using your own variable widgets, rather than the
 ``VariableWidget`` class in ``lib/python/rose/config_editor/variable.py``
