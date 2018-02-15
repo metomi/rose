@@ -6,17 +6,10 @@
 .. toctree::
    :caption: Tutorial
    :name: tutorial-toc
-   :maxdepth: 3
-
-   tutorial/index
-   glossary
-
-.. toctree::
-   :caption: Rose API Reference
-   :name: api-toc
    :maxdepth: 2
 
-   command-reference
+   tutorial/cylc/index
+   tutorial/rose/index
 
 .. toctree::
    :caption: User Guide
@@ -25,8 +18,22 @@
 
    user-guide/configuration
    user-guide/configuration-metadata
-   user-guide/API
-   user-guide/variables
+   glossary
+
+.. toctree::
+   :caption: Rose API Reference
+   :name: api-toc
+   :maxdepth: 1
+
+   api/command-reference
+   api/variables
+   api/gtk
+   api/macros
+   api/upgrader-macros
+   api/rosie-web
+   api/python
+   api/bash
+
 
 Indices and tables
 ==================
