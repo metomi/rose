@@ -229,7 +229,8 @@ def main():
         check('tex', version_template=r'TeX ([^\s]+)'),
         check('pdflatex', version_template=r'pdfTeX .*-.*-([^\s]+)'),
         check('py:sphinx', (1, 5, 3)),
-        check('py:sphinx_rtd_theme', (0, 2, 4))
+        check('py:sphinx_rtd_theme', (0, 2, 4)),
+        check('py:sphinxcontrib.httpdomain')
     ])
 
     check_all('PDF Dependencies', [
