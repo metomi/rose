@@ -141,10 +141,10 @@ You have now created a suite that defines three tasks:
    Sets up the files and ``ARCHIVING/`` directory for ``archive_files_rsync/``
    and ``archive_files_scp/`` to "archive", move, data to.
 ``archive_files_rsync``
-   "Archives" ``rsync``'s files to the ``ARCHIVING/`` folder in the
+   "Archives" (``rsync``'s) files to the ``ARCHIVING/`` folder in the
    ``$ROSE_DATA/`` directory.
 ``archive_files_scp``
-   "Archives" ``scp``'s the renamed files and moves them to the ``ARCHIVING/``
+   "Archives" (``scp``'s) the renamed files and moves them to the ``ARCHIVING/``
    folder in the ``$ROSE_DATA/`` directory.
 
 Save your changes and run the suite::
