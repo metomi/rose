@@ -130,14 +130,14 @@ Test and all-files are just two of the available polling options:
 ``all-files``
    Tests if all of the files in a list exist.
 ``any-files``
-   Tests if and of the files in a list exist.
+   Tests if any of the files in a list exist.
 ``file-test``
    Changes the test used to evaluate the ``any-files`` and ``all-files`` lists
    to a shell script to be run on each file (e.g. ``grep``). Passes if the
    command exits with a zero return code.
 ``test``
    Tests using a shell script, passes if the command exits with a zero return
-   code. *Note this is separate from the ``all-files``, ``any-files`` testing
+   code. *Note this is separate from the* ``all-files``, ``any-files`` *testing
    logic.*
 
 .. TODO - link to rose configuration

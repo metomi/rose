@@ -541,7 +541,7 @@ like it was at ``0.1``:
 
 Run ``rose app-upgrade --meta-path=~/rose-meta/`` in the application
 directory. You should see that the version has been downgraded to 0.1,
-the available versions to upgrade to shoudl also be listed - let's
+the available versions to upgrade to should also be listed - let's
 choose ``1.0``. Run::
 
    rose app-upgrade --meta-path=~/rose-meta/ 1.0
