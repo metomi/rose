@@ -245,11 +245,11 @@ class ConfigNode(object):
         Yields:
             tuple - (keys, sub_node)
                 - keys (list) - A list defining a hierarchy of node.value
-                     'keys'. If a sub-node is at the top level, and does not
-                     contain any node children, a null string will be
-                     prepended to the returned keylist.
+                  'keys'. If a sub-node is at the top level, and does not
+                  contain any node children, a null string will be
+                  prepended to the returned keylist.
                 - sub_node (ConfigNode) - The config node at the position of
-                     keys.
+                  keys.
 
         Examples:
             >>> config_node = ConfigNode()
@@ -1537,13 +1537,13 @@ class ConfigSyntaxError(Exception):
 
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,
          env_escape_ok=False):
-    """See ConfigDumper.dump for detail."""
+    """Shorthand for :py:func:`ConfigDumper.dump`."""
     return ConfigDumper()(root, target, sort_sections, sort_option_items,
                           env_escape_ok)
 
 
 def load(source, root=None):
-    """See ConfigLoader.load for detail."""
+    """Shorthand for :py:func:`ConfigLoader.load`."""
     return ConfigLoader()(source, root)
 
 

@@ -1,4 +1,4 @@
-.. _ini-format: https://en.wikipedia.org/wiki/INI_file
+.. include:: ../../../hyperlinks.rst
 
 Graphing
 ========
@@ -14,8 +14,7 @@ The suite.rc File Format
 
 We refer to a cylc workflow as a :term:`cylc suite`. A cylc suite is a directory
 containing a ``suite.rc`` file. This configuration file is where
-we define our workflow. The ``suite.rc`` file uses a nested
-`INI <ini-format>`_-based format:
+we define our workflow. The ``suite.rc`` file uses a nested `INI`_-based format:
 
 * Comments start with a ``#`` character.
 * Settings are written as ``key = value`` pairs.

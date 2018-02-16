@@ -1,11 +1,10 @@
 .. include:: ../hyperlinks.rst
    :start-line: 1
 
-.. _INI file: https://en.wikipedia.org/wiki/INI_file
-.. _cylc: http://cylc.github.io/cylc/
-.. _ISO 8601 duration: https://en.wikipedia.org/wiki/ISO_8601#Durations
 .. _User: http://man.openbsd.org/ssh_config#User
 
+
+.. _rose-configuration:
 
 Configuration
 =============
@@ -47,7 +46,7 @@ Configuration Format
 A configuration in Rose is normally represented by a directory with the
 following:
 
-* a configuration file in a modified `INI file`_ format.
+* a configuration file in a modified `INI`_ format.
 * (optionally) files containing data that cannot easily be represented by the
   INI format.
 
@@ -639,7 +638,8 @@ keys can be:
   number of times with delays between them. If the prerequisites are still
   not met  after the number of delays, the application runner will fail with
   a time out. The list is a comma-separated list. The syntax looks like
-  ``[n*][DURATION]``, where ``DURATION`` is an `ISO 8601 duration`_ such
+  ``[n*][DURATION]``, where ``DURATION`` is an
+  :ref:`ISO8601 duration <tutorial-iso8601-durations>` such
   as ``PT5S`` (5 seconds) or ``PT10M`` (10 minutes), and ``n`` is an optional
   number of times to repeat it. E.g.:
 
