@@ -154,7 +154,7 @@ Now add the method ``_get_allowed_planets`` to the class:
            if float(distance) > 5.0:
                # The planet is more than 5 AU away.
                planets.remove(planet)
-           planets += ["Earth"]  # Distance ~ 0
+       planets += ["Earth"]  # Distance ~ 0
        return planets
 
 This will give us a list of valid (nearby) solar system planets which
@@ -269,7 +269,7 @@ To run the macro, select the menu
 planet.PlanetChecker.validate`.
 
 It should either return an "OK" dialog, or give an error dialog
-like the one bellow depending on the current Earth-Jupiter distance.
+like the one below depending on the current Earth-Jupiter distance.
 
 .. image:: img/rose-macro-hello-world-app-fail.png
    :width: 350px
