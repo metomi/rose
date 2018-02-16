@@ -62,7 +62,8 @@ extensions = [
     'rose-lang',
     'sub-lang',
     'practical',
-    'auto-cli-doc'
+    'auto-cli-doc',
+    'sphinxcontrib.httpdomain'
 ]
 
 graphviz_output_format = 'svg'
