@@ -32,7 +32,6 @@
    api/macros
    api/upgrader-macros
    api/rosie-web
-   api/python
    api/bash
 
 
