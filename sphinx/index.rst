@@ -26,6 +26,7 @@
    :maxdepth: 1
 
    api/command-reference
+   api/config
    api/environment-variables
    api/gtk
    api/macros
