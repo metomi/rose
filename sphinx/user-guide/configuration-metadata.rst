@@ -183,6 +183,8 @@ sort-key
   would produce a sorting order of ``env=prune``, ``env=melon``,
   ``env=cherry``, ``env=apple``, ``env=banana``.
 
+.. _metadata-values:
+
 Metadata for Values
 ^^^^^^^^^^^^^^^^^^^
 
