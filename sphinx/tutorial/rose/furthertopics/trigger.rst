@@ -164,7 +164,7 @@ actually just commented out, and viewable via the menu
 
 Try altering the values of ``namelist:pizza_order=pizza_type`` and
 ``env=BUDGET`` with :menuselection:`View --> View All Ignored Variables`
-on and off. This should enable and ``trigger-ignore different settings``.
+on and off. This should enable and ``trigger-ignore`` different settings.
 
 When ``env=BUDGET`` is below 10, the ``namelist:side_order`` section will
 be ``trigger-ignored``, and the ``garlic_bread`` and ``soft_drink`` will
