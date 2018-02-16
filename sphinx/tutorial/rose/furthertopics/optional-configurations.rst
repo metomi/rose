@@ -1,4 +1,4 @@
-.. _rose-turorial-optional-configurations:
+.. _rose-tutorial-optional-configurations:
 
 Optional Configurations
 =======================

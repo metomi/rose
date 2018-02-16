@@ -14,7 +14,7 @@ run repeatedly with only its arguments changing.
 
 Rather than creating multiple apps or
 
-:ref:`optional configs <rose-turorial-optional-configurations>` to change
+:ref:`optional configs <rose-tutorial-optional-configurations>` to change
 the way a command is to be run, we can instead use the built-in
 ``rose_bunch`` application to run multiple command variants, in parallel,
 under a single job as defined by an application configuration.
@@ -237,5 +237,5 @@ the number of concurrently running commands.
 
 Further options are listed in the ``rose_bunch`` documentation. These include
 configuring how to proceed following failure of an individual command
-invocation (``[bunch]fail-mode=``), automatically generating N
+invocation (``[bunch]fail-mode=``), automatically generating *N*
 command instances and enabling/disabling the app's incremental mode.

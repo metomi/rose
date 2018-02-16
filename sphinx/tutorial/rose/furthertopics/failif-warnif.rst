@@ -219,7 +219,7 @@ again, change the setting to:
    warn-if=any(this < 75);
           =all(this > 95);
 
-This will profuce a warning if any elements are less than 75, and a
+This will produce a warning if any elements are less than 75, and a
 separate warning if all elements are greater than 95 (we don't
 want to cook the batteries!).
 
