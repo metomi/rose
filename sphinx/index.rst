@@ -16,6 +16,7 @@
    :name: user-guide-toc
    :maxdepth: 1
 
+   user-guide/installation
    user-guide/configuration
    user-guide/configuration-metadata
    glossary

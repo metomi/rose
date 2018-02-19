@@ -9,6 +9,8 @@
        .. include:: path/to/thisfile.rst
           :start-line: 1
 
+.. _rose github: https://github.com/metomi/rose
+.. _metomi-vms: https://github.com/metomi/metomi-vms
 .. _cylc: http://cylc.github.io/cylc/
 .. _cylc user guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
 .. _Jinja2: http://jinja.pocoo.org/
