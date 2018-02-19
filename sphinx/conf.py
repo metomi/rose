@@ -44,6 +44,7 @@ extensions = [
     'sub-lang',
     'practical',
     'auto-cli-doc',
+    'script-include',
     'sphinxcontrib.httpdomain'
 ]
 
