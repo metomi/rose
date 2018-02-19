@@ -28,9 +28,8 @@ class RoseLexer(RegexLexer):
 
     # Pattern for a rose setting with capture groups.
     ROSE_SETTING_PATTERN = (
-        r'([\w\{\}\[\]\:\-]+'  # setting-name{}[]
-        r'(?:\(.*\))?)'        # Brackets for namelists.
-        r'(\s+)?(=)(\s+)?')    # Optional spaces around = operator, value.
+        r'(\w[^\=\n]+)'      # Setting pattern.
+        r'(\s+)?(=)(\s+)?')  # Optional spaces around = operator, value.
 
     # Patter for the value to a rose setting.
     ROSE_VALUE_PATTERN = (
@@ -99,7 +98,7 @@ class RoseLexer(RegexLexer):
         # Values handled separately so as to colour the equals sign in
         # multi-line values.
         'value': [
-            (r'(\n[\s\t]+)(=)?', bygroups(
+            (r'(\n[ \t]+)(=)?', bygroups(
                 Text,
                 Operator,
             )),
