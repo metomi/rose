@@ -130,7 +130,7 @@ if [[ "${DEV_MODE:-false}" || "${VENV_MODE:-false}" ]]; then
 fi
 
 # Check core (sphinx) builder.
-if ! rose-check-software-docs >/dev/null; then
+if ! rose-check-software --docs >/dev/null; then
     if ${VENV_MODE}; then
         venv-install
     else
