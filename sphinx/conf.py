@@ -110,6 +110,8 @@ latex_documents = [
 latex_show_pagerefs = True
 # If true, show URL addresses after external links.
 latex_show_urls = 'inline'
+# Don't link RST source page.
+html_show_sourcelink = False
 
 
 # -- Options for manual page output ---------------------------------------

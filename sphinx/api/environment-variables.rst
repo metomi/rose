@@ -1,5 +1,5 @@
-Environment Variables
-=====================
+Rose Environment Variables
+==========================
 
 
 .. envvar:: NPROC
