@@ -19,7 +19,8 @@ class ScriptInclude(Directive):
         stdout = Popen(command, stdout=PIPE).communicate()[0]
         node = nodes.section()
         node.document = self.state.document
-        nested_parse_with_titles(self.state, ViewList(stdout.split('\n')), node)
+        nested_parse_with_titles(self.state, ViewList(stdout.split('\n')),
+                                 node)
         return node.children
 
 

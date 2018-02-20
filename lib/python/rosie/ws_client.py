@@ -65,7 +65,7 @@ class RosieWSClientQuerySplitError(RosieWSClientError):
 class RosieWSClient(object):
 
     """A client for the Rosie web service.
-    
+
     Args:
         prefixes (list): List of prefix names as strings.
             (run ``rose config rosie-id`` for more info).
@@ -113,7 +113,7 @@ class RosieWSClient(object):
 
     def set_prefixes(self, prefixes):
         """Replace the default prefixes.
-        
+
         Args:
             prefixes (list): List of prefix names as strings.
         """

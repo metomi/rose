@@ -38,7 +38,8 @@ run_pass "${TEST_KEY_BASE}" \
     pycodestyle --ignore=E402,E731,W503,W504 \
     "${ROSE_HOME}/lib/python/isodatetime" \
     "${ROSE_HOME}/lib/python/rose" \
-    "${ROSE_HOME}/lib/python/rosie"
+    "${ROSE_HOME}/lib/python/rosie" \
+    "${ROSE_HOME}/sphinx/conf.py"
 file_cmp "${TEST_KEY_BASE}.out" "${TEST_KEY_BASE}.out" <'/dev/null'
 file_cmp "${TEST_KEY_BASE}.err" "${TEST_KEY_BASE}.err" <'/dev/null'
 

@@ -48,7 +48,7 @@ extensions = [
     'sphinxcontrib.httpdomain'
 ]
 
-# Use SVG for all graphviz (and by extension minicylc) blocks (alternative png).
+# Use SVG for all graphviz (and by extension minicylc) blocks (alt png).
 graphviz_output_format = 'svg'
 
 # Add any paths that contain templates here, relative to this directory.
@@ -67,7 +67,7 @@ copyright = (': British Crown Copyright 2012-8 Met Office. See Terms of Use. '
 
 # The full version for the project you're documenting, acts as replacement for
 # |version|.
-release = ResourceLocator().get_version() 
+release = ResourceLocator().get_version()
 # The short X.Y version, acts as replacement for |release|.
 version = release.split('-')[0]
 
@@ -82,7 +82,8 @@ pygments_style = 'autumn'
 # -- Options for HTML output ----------------------------------------------
 
 html_theme = 'sphinx_rtd_theme'
-html_theme_options = {'navigation_depth': 4}  # rtd_theme only handles 4 levels.
+# rtd_theme only handles 4 levels for the sidebar navigation.
+html_theme_options = {'navigation_depth': 4}
 html_static_path = ['_static']
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 html_show_sphinx = False
@@ -96,16 +97,16 @@ htmlhelp_basename = 'rose-doc'
 
 latex_elements = {
     'papersize': 'a4paper'
-    #'preamble': '',  # Additional stuff for the LaTeX preamble.
+    # 'preamble': '',  # Additional stuff for the LaTeX preamble.
 }
 
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'rose-documentation.tex', 'Rose Documentation',
-   'Metomi', 'manual'),
+    ('index', 'rose-documentation.tex', 'Rose Documentation',
+     'Metomi', 'manual'),
 ]
-#latex_logo = None
+# latex_logo = None
 # If true, show page references after internal links.
 latex_show_pagerefs = True
 # If true, show URL addresses after external links.
@@ -128,8 +129,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'rose-doc','Rose Documentation', 'Metomi', 'rose-doc',
-  'Documentation For The Rose Configuration System.', 'Miscellaneous'),
+    ('index', 'rose-doc', 'Rose Documentation', 'Metomi', 'rose-doc',
+     'Documentation For The Rose Configuration System.', 'Miscellaneous'),
 ]
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
-#texinfo_show_urls = 'footnote'
+# texinfo_show_urls = 'footnote'
