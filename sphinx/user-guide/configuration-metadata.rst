@@ -750,9 +750,6 @@ url
      [namelist:foo=bar]
      url=?q=nearest+bar
 
-.. TODO - mend rose syntax highlighting which is not showing the 2nd section
-   above correctly (section ':' then '=' regex inclusion required?).
-
 help
   (Long) help for the setting. For example, the config editor will use
   this in a popup dialog for a variable. Embedding variable ids in the help

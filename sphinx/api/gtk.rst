@@ -5,6 +5,8 @@
 .. _slider: http://www.pygtk.org/pygtk2tutorial/sec-RangeWidgetEample.html
 .. _xdot-based: https://github.com/jrfonseca/xdot.py
 
+.. _api-gtk:
+
 Rose GTK library
 ================
 

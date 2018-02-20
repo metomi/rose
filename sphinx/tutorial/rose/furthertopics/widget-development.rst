@@ -155,6 +155,4 @@ Further Reading
 
 .. _PYGTK: http://www.pygtk.org/
 
-For more information, see the Rose API reference and the `PyGTK`_ web page.
-
-.. TODO - link rose API reference once translated.
+For more information, see :ref:`api-gtk` and the `PyGTK`_ web page.

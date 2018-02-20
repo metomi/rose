@@ -234,12 +234,9 @@ Try adding the above lines to the metadata, saving and playing
 about with the array numbers in the config editor and re-running
 the ``fail-if``/``warn-if`` check.
 
-.. TODO:
+.. tip::
 
-   Further reading
-   ---------------
-
-   For more information, see the metadata reference page.
+   For more information, see :ref:`conf-meta`.
 
 
 .. _Tsiolkovsky rocket equation: https://en.wikipedia.org/wiki/Tsiolkovsky_rocket_equation
