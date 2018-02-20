@@ -15,14 +15,13 @@ Warning
 -------
 
 Macros should **only** be written if there is a genuine need that is not
-covered by other metadata - make sure you are familiar with metadata
-capabilities before you write your own (real-life) macros.
+covered by :ref:`other metadata <metadata-values>` - make sure you are
+familiar with :ref:`conf-meta` before you write your own (real-life)
+macros.
 
 For example, ``fail-if`` and ``warn-if`` metadata options can perform
 complex inter-setting validation. See the
 :ref:`tutorial <tutorial-rose-fail-if-warn-if>` for details.
-
-.. TODO - link to metadata reference page
 
 
 Purpose

@@ -149,10 +149,6 @@ E.g.
    # key-5 is program ignored.
    !!key-5=value 5
 
-.. TODO - edit 'rose-lang.py' syntax highlighting to not throw error e.g. for
-   'key-2' double-line specification above (with multiple instances in other
-   User Guide files).
-
 .. note::
    In this document, the shorthand ``SECTION=KEY=VALUE`` is used to represent a
    ``KEY=VALUE`` pair in a ``[SECTION]`` of an INI format file.
@@ -457,6 +453,8 @@ space-delimited list. The following keys are known to have special meanings:
   Specify a sub-division of ``project``, if applicable.
 
 
+.. _application-configuration:
+
 Application Configuration
 -------------------------
 
@@ -533,10 +531,10 @@ keys can be:
 
 ``mode``
   Root level setting. Specify the name of a builtin application, instead of
-  running a command specified in the ``[command]`` section. See also Running
-  Tasks > rose task-run > Built-in Applications Selection
+  running a command specified in the ``[command]`` section.
 
-.. TODO - create internal link to section on above line
+.. TODO - See also Running
+   Tasks > rose task-run > Built-in Applications Selection
 
 ``[command]``
   Specify the command(s) to run. The default key can be used to define the
@@ -657,34 +655,36 @@ keys can be:
      # repeat once after 1 hour
      delays=0,6*PT10S,60*PT1M,PT1H
 
-Application Configuration File: Built-in Application: fcm_make
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. TODO
 
-See Running Tasks > rose task-run > Built-in Application: fcm_make.
+   Application Configuration File: Built-in Application: fcm_make
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - create internal link to section on above line
+   See Running Tasks > rose task-run > Built-in Application: fcm_make.
 
-Application Configuration File: Built-in Application: rose_ana
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   .. TODO - create internal link to section on above line
 
-See Running Tasks > rose task-run > Built-in Application: rose_ana and
-rose stem > Analysing output with rose_ana.
+   Application Configuration File: Built-in Application: rose_ana
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - create internal (2 x) links to sections on above line
+   See Running Tasks > rose task-run > Built-in Application: rose_ana and
+   rose stem > Analysing output with rose_ana.
 
-Application Configuration File: Built-in Application: rose_arch
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   .. TODO - create internal (2 x) links to sections on above line
 
-See Running Tasks > rose task-run > Built-in Application: rose_arch.
+   Application Configuration File: Built-in Application: rose_arch
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - create internal link to section on above line
+   See Running Tasks > rose task-run > Built-in Application: rose_arch.
 
-Application Configuration File: Built-in Application: rose_prune
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   .. TODO - create internal link to section on above line
 
-See Running Tasks > rose task-run > Built-in Application: rose_prune.
+   Application Configuration File: Built-in Application: rose_prune
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - create internal link to section on above line
+   See Running Tasks > rose task-run > Built-in Application: rose_prune.
+
+   .. TODO - create internal link to section on above line
 
 
 Configuration Metadata

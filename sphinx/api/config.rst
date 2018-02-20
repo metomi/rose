@@ -1,3 +1,5 @@
+.. _config-api:
+
 Rose Config API
 ===============
 

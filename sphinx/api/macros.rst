@@ -62,8 +62,6 @@ Writing Macros
 Validator, transformer and reporter macros are python classes which subclass
 from :py:class:`rose.macro.MacroBase` (:ref:`API <api-rose-macro-base>`).
 
-.. TODO - add ref link to Rose Config API page (once added) on 'api docs'.
-
 These macros implement their behaviours by providing a ``validate``,
 ``transform`` or ``report`` method. A macro can contain any combination of
 these methods so, for example, a macro might be both a validator and a
@@ -73,7 +71,9 @@ These methods should accept two :py:class:`rose.config.ConfigNode` (api docs)
 instances as arguments - one is the configuration, and one is the metadata
 configuration that provides information about the configuration items.
 
-.. TODO - add ref link to Rose Config API page (once added) on 'api docs'.
+.. tip::
+
+   See also :ref:`config-api`.
 
 A validator macro should look like:
 
