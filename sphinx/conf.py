@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Rose Documentation'
-copyright = (': British Crown Copyright 2012-7 Met Office. See Terms of Use. '
+copyright = (': British Crown Copyright 2012-8 Met Office. See Terms of Use. '
              'This document is released under the Open Government Licence')
 
 # The full version for the project you're documenting, acts as replacement for
