@@ -274,7 +274,7 @@ containing the following (with the paths set appropriately)::
    WSGIScriptAlias /rose-bush /path/to/rose/lib/python/rose/bush.py
 
 Use the Apache log at e.g. ``/var/log/httpd/`` to debug problems.
-See also `Configuring Rosie Server`_.
+See also `Configuring a Rosie Server`_.
 
 
 Configuring a Rosie Server
@@ -288,7 +288,7 @@ site, you may or may not be able to set up this service.
 You will need to select a machine to host the Subversion repositories.
 This machine will also host the web server and databases.
 
-.. _Subversion FSFS:: https://en.wikipedia.org/wiki/Apache_Subversion#FSFS
+.. _Subversion FSFS: https://en.wikipedia.org/wiki/Apache_Subversion#FSFS
 
 Login to your host, create one or more `Subversion FSFS`_ repositories.
 
