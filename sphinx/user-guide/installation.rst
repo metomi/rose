@@ -45,7 +45,7 @@ the lowest system load average will be used.
 
 Installation requirements:
    * Rose, cylc, Bash, Python, jinja2.
-   * Subversion & FCM *(only if you want ``rose suite-run`` to install files
+   * Subversion & FCM *(only if you want* ``rose suite-run`` *to install files
      from Subversion using FCM keywords).*
 Connectivity requirements:
    * Must be able to submit tasks to the hosts which run the suite tasks,
