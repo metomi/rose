@@ -20,7 +20,7 @@ Rose Environment Variables
 .. envvar:: ROSE_APP_OPT_CONF_KEYS
 
    Description
-      Each .. envvar:: KEY in this space delimited list switches on an optional
+      Each ``KEY`` in this space delimited list switches on an optional
       configuration in an application. The ``(KEY)`` syntax can be used to
       denote an optional configuration that can be missing. The configurations
       are applied in first-to-last order.
@@ -77,7 +77,7 @@ Rose Environment Variables
       The path to the data directory of the cycle time with an offset relative
       to the current cycle time. ``????`` is a duration:
 
-      * A .. envvar:: __ (double underscore) prefix denotes a cycle time in the
+      * A ``__`` (double underscore) prefix denotes a cycle time in the
         future. Otherwise, it is a cycle time in the past.
       * ``PnM`` denotes *n* months.
       * ``PnW`` denotes *n* weeks.
@@ -235,7 +235,7 @@ Rose Environment Variables
 .. envvar:: ROSE_SUITE_OPT_CONF_KEYS
 
    Description
-      Each .. envvar:: KEY in this space delimited list switches on an optional
+      Each ``KEY`` in this space delimited list switches on an optional
       configuration when installing a suite. The ``(KEY)`` syntax can be used to
       denote an optional configuration that can be missing. The configurations
       are applied in first-to-last order.
@@ -277,7 +277,7 @@ Rose Environment Variables
       instead.
 
    Description
-      The number of jobs to run in parallel in ``fcm make``. (``default=4``)
+      The number of jobs to run in parallel in ``fcm make`` (``default=4``).
    Used By
       * ``fcm_make`` built-in application
       * ``fcm_make2`` built-in application

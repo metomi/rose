@@ -14,8 +14,8 @@ Checkers (validators)
 Changers (transformers)
    Change a configuration e.g. adding/removing options.
 Upgraders
-   Apecial transformer macros for upgrading and downgrading configurations.
-   (covered in the :ref:`Upgrade Macro API <rose-upgr-macros>`)
+   A special transformer macros for upgrading and downgrading configurations
+   (covered in the :ref:`Upgrade Macro API <rose-upgr-macros>`).
 Reporters
    output information about a configuration.
 
@@ -90,8 +90,8 @@ A validator macro should look like:
        return self.reports
 
 The returned list should be a list of :py:class:`rose.macro.MacroReport` objects
-containing the section, option, value, and warning strings for each setting
-that is in error. These are initialised behind the scenes by calling the
+containing the section, option, value, and warning strings (info) for each
+setting that is in error. These are initialised behind the scenes by calling the
 inherited method :py:meth:`rose.macro.MacroBase.add_report` via
 :py:meth:`self.add_report`. This has the form:
 

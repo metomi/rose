@@ -284,7 +284,7 @@ def main(check=check):
         check('py:requests', (2, 2, 1)),
         check('py:sqlalchemy', (0, 6, 9)),
         check('svn', (1, 8), command_template=['--version', '--quiet']),
-        check('fcm', version_template='FCM ([\d\.\-]+)'),
+        check('fcm', version_template=r'FCM ([\d\.\-]+)'),
         check('perl', (5, 10, 1), command_template='-v',
               version_template=r'This is perl, v([^\s]+)')
     ])

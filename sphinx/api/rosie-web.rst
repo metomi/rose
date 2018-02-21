@@ -19,7 +19,7 @@ The URLs to access the web API of a Rosie web service (with a given prefix
 name) can be found in your rose site configuration file as the value of
 ``[rosie-id]prefix-ws.PREFIX_NAME``. To access the API for a given repository
 with prefix ``PREFIX_NAME``, you must select a format (the only currently
-supported format is 'json') and use a url that looks like:
+supported format is JSON) and use a url that looks like:
 
 .. code-block:: sub
 
@@ -51,7 +51,7 @@ REST API
 .. http:get:: (str:prefix)/get_optional_keys
 
    Return all unique optional or user-defined property names given in suite
-   discovery information and takes the format argument.
+   discovery information.
 
    :arg str prefix: Repository prefix.
    :param string format: Desired return format (``json`` or ``None``).
@@ -110,13 +110,13 @@ REST API
          CONJUNCTION+[OPEN_GROUP+]FIELD+OPERATOR+VALUE[+CLOSE_GROUP]
 
       The first ``CONJUNCTION`` is technically superfluous. The ``OPEN_GROUP``
-      and ``CLOSE_GROUP`` do not have to be used 
+      and ``CLOSE_GROUP`` do not have to be used.
 
-      Parentheses can be used in the query to group expressions
+      Parentheses can be used in the query to group expressions.
 
    Example Request
-      Return all current suites that have an idx that ends with 78 and also
-      all suites that have the owner bob.
+      Return all current suites that have an ``idx`` that ends with 78 and also
+      all suites that have the owner ``bob``.
 
       .. code-block:: http
 
