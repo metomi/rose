@@ -14,7 +14,7 @@ Checkers (validators)
 Changers (transformers)
    Change a configuration e.g. adding/removing options.
 Upgraders
-   A special transformer macros for upgrading and downgrading configurations
+   Special transformer macros for upgrading and downgrading configurations
    (covered in the :ref:`Upgrade Macro API <rose-upgr-macros>`).
 Reporters
    output information about a configuration.
