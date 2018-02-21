@@ -272,13 +272,17 @@ def main(check=check):
               outfile=2),
         check('cylc'),
         check('py:pygtk<gtk>', (2, 12), attr_name='pygtk_version'),
-        check('py:cherrypy'),
-        check('py:jinja2'),
-        check('py:requests', (2, 2, 1)),
-        check('py:sqlalchemy', (1, 1)),
+        check('py:jinja2')
     ])
 
-    check_all('Rosie Dependencies', [
+    check_all('Rose Bush', [
+        check('py:cherrypy')
+    ])
+
+    check_all('Rosie', [
+        check('py:cherrypy'),
+        check('py:requests', (2, 2, 1)),
+        check('py:sqlalchemy', (0, 6, 9)),
         check('svn', (1, 8), command_template=['--version', '--quiet']),
         check('fcm', version_template='FCM ([\d\.\-]+)'),
         check('perl', (5, 10, 1), command_template='-v',
@@ -331,7 +335,7 @@ if __name__ == '__main__':
     elif '--rst' in sys.argv:
         # Print dependencies in RST format and exit.
         sys.exit(0 if main(check=echo) else 1)
-    elif '--doc' in sys.argv:
+    elif any(arg in sys.argv for arg in ['--doc', '--docs']):
         sys.exit(0 if docs() else 1)
     else:
         # Check software dependencies, report and exit.
