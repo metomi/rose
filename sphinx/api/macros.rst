@@ -23,7 +23,7 @@ They can be run within :ref:`command-rose-config-edit` or via
 :ref:`command-rose-macro`.
 
 .. note::
-   This section covers validator, transformer and reporter macros, for upgrader
+   This section covers validator, transformer and reporter macros. For upgrader
    macros see :ref:`Upgrade Macro API <rose-upgr-macros>`.
 
 There are built-in rose macros that handle standard behaviour such as trigger
@@ -48,7 +48,7 @@ should be a Python package.
 When developing macros for Rose internals, macros should be placed in the
 :py:mod:`rose.macros` package in the Rose Python library. They should be
 referenced by the ``lib/python/rose/macros/__init__.py`` classes and a call to
-them can be added in the ``lib/python/rose/config_editor/main.py module`` if
+them can be added in the ``lib/python/rose/config_editor/main.py`` module if
 they need to be run implicitly by the config editor.
 
 
@@ -59,7 +59,7 @@ Writing Macros
 
    For basic usage see the :ref:`macro tutorial <macro-dev>`.
 
-Validator, transformer and reporter macros are python classes which subclass
+Validator, transformer and reporter macros are Python classes which subclass
 from :py:class:`rose.macro.MacroBase` (:ref:`API <api-rose-macro-base>`).
 
 These macros implement their behaviours by providing a ``validate``,
@@ -67,7 +67,7 @@ These macros implement their behaviours by providing a ``validate``,
 these methods so, for example, a macro might be both a validator and a
 transformer.
 
-These methods should accept two :py:class:`rose.config.ConfigNode` (api docs)
+These methods should accept two :py:class:`rose.config.ConfigNode`
 instances as arguments - one is the configuration, and one is the metadata
 configuration that provides information about the configuration items.
 
