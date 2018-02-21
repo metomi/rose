@@ -161,7 +161,9 @@ def process_dependency(dependency):
         tuple - (prefix, dependency_name, dependency, version_checker)
             - prefix (str) - Dependency domain (e.g. python module 'py').
             - dependency_name (str) - Dependency with prefix stripped.
+              This is the target if provided e.g. bar for `foo<bar>`.
             - dependency (str) - Full dependency name with prefix.
+              This is the alt if a target if provided e.g. foo for `foo<bar>`.
             - version_checker (callable) - Function for acquiring version
               string.
     """
@@ -174,7 +176,7 @@ def process_dependency(dependency):
         prefix = ''
 
     if '<' in dependency_name:
-        dependency = re.sub(TARGET_REGEX, '', dependency)
+        dependency = re.sub(TARGET_REGEX, '', dependency).strip()
         dependency_name = re.search(TARGET_REGEX, dependency_name).groups()[0]
 
     return prefix, dependency_name, dependency, version_checker
