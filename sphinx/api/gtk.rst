@@ -47,7 +47,7 @@ API Reference
 ^^^^^^^^^^^^^
 
 All value widgets, custom or core, use the same API. This means that a good
-ractical reference is the set of existing value widgets in the package
+practical reference is the set of existing value widgets in the package
 ``rose.config_editor.valuewidget``.
 
 The procedure for implementing a custom value widget is as follows:

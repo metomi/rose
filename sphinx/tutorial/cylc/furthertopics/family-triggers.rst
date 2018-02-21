@@ -173,7 +173,7 @@ state once they have all finished.
 
 .. tip::
 
-   See the :ref:`tut-cylc-suicide-triggers` tutorial for handelling task
+   See the :ref:`tut-cylc-suicide-triggers` tutorial for handling task
    failures.
 
 

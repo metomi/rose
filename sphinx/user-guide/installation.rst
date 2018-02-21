@@ -6,12 +6,12 @@ Installation
 
 .. _archives: https://github.com/metomi/rose/tags
 
-The source code for Rose is available via `github <rose github>`_, code releases
+The source code for Rose is available via `Github`_, code releases
 are available in ``zip`` and ``tar.gz`` `archives`_.
 
 1. Un-pack the archive file into an appropriate location on your system.
 2. Add the ``rose/bin/`` directory into your ``PATH`` environment variable.
-3. Check system compatability by running ``rose check-software``.
+3. Check system compatibility by running ``rose check-software``.
 
 
 System Requirements
@@ -40,12 +40,12 @@ Each user can just run their suites on the host where they issue the
 necessary requirements for connectivity (to the hosts running the tasks)
 or for availability (the host needs to remain up for the duration of
 the suite). Therefore, Rose can be configured to run the suites on
-remote hosts. If multiple hosts are available, by default the least loaded
-of the available hosts will be used.
+remote hosts. If multiple hosts are available, by default the host with
+the lowest system load average will be used.
 
 Installation requirements:
    * Rose, cylc, Bash, Python, jinja2.
-   * Subversion & FCM *(only if you want rose suite-run to install files
+   * Subversion & FCM *(only if you want ``rose suite-run`` to install files
      from Subversion using FCM keywords).*
 Connectivity requirements:
    * Must be able to submit tasks to the hosts which run the suite tasks,
@@ -56,8 +56,8 @@ Hosts For Running Tasks In Suites
 
 Installation requirements:
    * Rose, cylc, Bash, Python.
-   * Subversion & FCM (only if you want to use the Rose install utility
-     to install files from Subversion using FCM keywords).
+   * Subversion & FCM *only if you want to use the Rose install utility
+     to install files from Subversion using FCM keywords*.
 
 Connectivity requirements:
    * Must be able to communicate back to the hosts running the cylc suites
@@ -75,7 +75,7 @@ Connectivity requirements:
    * Must have access to the Rosie Subversion repositories via the
      appropriate protocol.
    * Must have HTTP and SSH access to the hosts running the cylc suites.
-   * Must share user accounts and $HOME directories with the hosts running
+   * Must share user accounts and ``$HOME`` directories with the hosts running
      the cylc suites.
 
 Hosts For Running Rose Bush
@@ -87,7 +87,7 @@ Installation requirements:
 Connectivity requirements:
    * Must be able to access the home directories of users' cylc run directories.
 
-Hosts For Rosie Subversion Repositories And The Rosie web Services
+Hosts For Rosie Subversion Repositories And The Rosie Web Services
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Typically you will only need a single host but you can have multiple
@@ -146,7 +146,7 @@ a web interface for suite discovery and lookup.
 If users at your site are able to access Rosie services on the Internet
 or if someone else has already configured Rosie services at your site,
 all you need to do is configure the client to talk to the servers.
-Refer to the Configuring a Rosie Server section if you need to
+Refer to the `Configuring a Rosie Server`_ section if you need to
 configure a Rosie server for your site.
 
 To set up the Rosie client for the site, add/modify the ``[rosie-id]``
@@ -274,9 +274,7 @@ containing the following (with the paths set appropriately)::
    WSGIScriptAlias /rose-bush /path/to/rose/lib/python/rose/bush.py
 
 Use the Apache log at e.g. ``/var/log/httpd/`` to debug problems.
-See also Configuring Rosie Server below.
-
-.. TODO ---
+See also `Configuring Rosie Server`_.
 
 
 Configuring a Rosie Server
@@ -290,13 +288,15 @@ site, you may or may not be able to set up this service.
 You will need to select a machine to host the Subversion repositories.
 This machine will also host the web server and databases.
 
-Login to your host, create one or more Subversion FSFS repositories.
+.. _Subversion FSFS:: https://en.wikipedia.org/wiki/Apache_Subversion#FSFS
+
+Login to your host, create one or more `Subversion FSFS`_ repositories.
 
 If you want to use FCM for your version control, you should set a
 special property on the repository to allow branching and merging
 with FCM in the Rosie convention. For example, if your repository
 is served from ``HOST_AND_PATH`` (e.g. ``myhost001/svn-repos``) with
-given repository base name NAME (e.g. ``roses_foo``), change into a
+given repository base name ``NAME`` (e.g. ``roses_foo``), change into a
 new directory and enter the following commands::
 
    svn co -q "svn://${HOST_AND_PATH}/${NAME}/"
@@ -317,15 +317,19 @@ new directory and enter the following commands::
 
 Add the following hook scripts to the repository:
 
-* pre-commit::
+* pre-commit:
+
+  .. code-block:: sub
 
      #!/bin/bash
-     exec /path/to/rose/sbin/rosa svn-pre-commit "$@"
+     exec <path-to-rose>/sbin/rosa svn-pre-commit "$@"
 
-* post-commit::
+* post-commit:
+
+  .. code-block:: sub
 
       #!/bin/bash
-      exec /path/to/rose/sbin/rosa svn-post-commit "$@"
+      exec <path-to-rose>/sbin/rosa svn-post-commit "$@"
 
 You should replace ``/path/to/rose/`` with the location of your Rose
 installation.
@@ -369,9 +373,7 @@ following (with the paths set appropriately)::
    WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
 
 Use the Apache log at e.g. ``/var/log/httpd/`` to debug problems.
-See also Configuring Rose Bush below.
-
-.. TODO ---
+See also `Configuring Rose Bush`_.
 
 Hopefully, you should now have a working Rosie service server. Configure
 the client settings by editing the ``[rosie-id]`` settings in
@@ -383,7 +385,7 @@ should ensure that you include the port number in the URL. E.g.:
    [rosie-id]
    prefix-ws.foo=http://127.0.0.1:1234/foo
 
-You should now be able to talk to the Rosie web service server using
+You should now be able to talk to the Rosie web service server via
 the Rosie web service client. Test by doing::
 
    rosie hello
@@ -398,12 +400,12 @@ ending in ``aa000`` - e.g. ``foo-aa000``. Locate it by running::
 
    rosie lookup 000
 
-ROSIE special suite
-^^^^^^^^^^^^^^^^^^^
+``ROSIE`` special suite
+^^^^^^^^^^^^^^^^^^^^^^^
 
 You can define a special suite in each Rosie repository that provides
 some additional repository-specific data and metadata. The suite
-ID will end with ROSIE - e.g. ``foo-ROSIE``.
+ID will end with ``ROSIE`` - e.g. ``foo-ROSIE``.
 
 This can be created by running ``rosie create --meta-suite``.
 
@@ -412,7 +414,7 @@ Creating a Known Keys File
 
 You can extend the list of search keys used in the Rosie discovery
 interfaces (such as ``rosie go``). Create a text file at the root
-of a ROSIE suite working copy called ``rosie-keys``.
+of a Rosie suite working copy called ``rosie-keys``.
 
 Add a space-delimited list of search keys into the file - for example:
 
