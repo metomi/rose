@@ -4,33 +4,11 @@
 .. _calendar: https://developer.gnome.org/pygtk/stable/class-gtkcalendar.html
 .. _slider: http://www.pygtk.org/pygtk2tutorial/sec-RangeWidgetEample.html
 .. _xdot-based: https://github.com/jrfonseca/xdot.py
-.. _PEP8: https://www.python.org/dev/peps/pep-0008/
-.. _PEP257: https://www.python.org/dev/peps/pep-0257/
-.. _RESTful: https://en.wikipedia.org/wiki/Representational_state_transfer
-.. _RDBMS: https://en.wikipedia.org/wiki/Relational_database_management_system
-.. _JSON: http://www.json.org/
 
-
-API
-===
-
-
-Introduction
-------------
-
-Rose is mainly implemented in `Python`_ and `bash`_.
-
-The sub-sections below explain how to make use of various application
-programming interfaces within Rose which are designed for extension. These
-are useful for extending Rose components or creating standalone programs that
-seek to manipulate Rose information.
-
-.. note::
-   Most of these interfaces require a good knowledge of Python.
-
+.. _api-gtk:
 
 Rose GTK library
-----------------
+================
 
 The Rose/Rosie GUIs (such as the config editor) are written using the Python
 bindings for the GTK GUI toolkit (`PyGTK`_). You can write your own custom GTK
@@ -38,7 +16,7 @@ widgets and use them within Rose. They should live with the metadata under
 the ``lib/python/widget/`` directory.
 
 Value Widgets
-^^^^^^^^^^^^^
+-------------
 
 Value widgets are used for operating on the values of settings. In the config
 editor, they appear next to the menu button and name label. There are builtin
@@ -61,15 +39,15 @@ or application. Widgets going into the Rose core should be added to the
 distribution.
 
 Example
-"""""""
+^^^^^^^
 
 See the :ref:`Advanced Tutorial <widget-dev>`.
 
 API Reference
-"""""""""""""
+^^^^^^^^^^^^^
 
 All value widgets, custom or core, use the same API. This means that a good
-ractical reference is the set of existing value widgets in the package
+practical reference is the set of existing value widgets in the package
 ``rose.config_editor.valuewidget``.
 
 The procedure for implementing a custom value widget is as follows:
@@ -252,7 +230,7 @@ to preserve cursor position when a widget is refreshed:
 .. _conf-ed-cust-pages:
 
 Config Editor Custom Pages
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 
 A 'page' in the config editor is the container inside a tab or detached tab
 that (by default) contains a table of variable widgets. The config editor
@@ -269,7 +247,7 @@ You may even wish to do something off-the-wall such as an `xdot-based`_
 widget set!
 
 API Reference
-"""""""""""""
+^^^^^^^^^^^^^
 
 The procedure for generating a custom page widget is as follows:
 
@@ -393,18 +371,22 @@ optionally expose some variable-change specific methods that do this
 themselves. These take a single ``rose.variable.Variable`` instance as an
 argument.
 
-``def add_variable_widget(self, variable) -> None``
-  will be called when a variable is created.
-``def reload_variable_widget(self, variable) -> None``
-  will be called when a variable's status is changed, e.g. it goes into
-  an error state.
-``def remove_variable_widget(self, variable) -> None``
-  will be called when a variable is removed.
-``def update_ignored(self) -> None``
-  will be called to allow you to update ignored widget display, if (for
-  example) you show/hide ignored variables. If you don't have any custom
-  behaviour for ignored variables, it's worth writing a method that does
-  nothing - e.g. one that contains just ``pass``).
+.. py:method:: add_variable_widget(self, variable) -> None
+
+   Will be called when a variable is created.
+.. py:method:: reload_variable_widget(self, variable) -> None
+
+   Will be called when a variable's status is changed, e.g. it goes into
+   an error state.
+.. py:method:: remove_variable_widget(self, variable) -> None
+
+   Will be called when a variable is removed.
+.. py:method:: update_ignored(self) -> None
+
+   Will be called to allow you to update ignored widget display, if (for
+   example) you show/hide ignored variables. If you don't have any custom
+   behaviour for ignored variables, it's worth writing a method that does
+   nothing - e.g. one that contains just ``pass``).
 
 If you take the step of using your own variable widgets, rather than the
 ``VariableWidget`` class in ``lib/python/rose/config_editor/variable.py``
@@ -438,7 +420,7 @@ such as ``gtk.VBox`` (or ``gtk.Table``, in the example above).
    variables are missing or new.
 
 Config Editor Custom Sub Panels
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------
 
 A 'sub panel' or 'summary panel' in the config editor is a panel that
 appears at the bottom of a page and is intended to display some summarised
@@ -453,7 +435,7 @@ Sub panels are capable of using quite a lot of functionality such as
 modifying the sections and options in the sub-pages directly.
 
 API Reference
-"""""""""""""
+^^^^^^^^^^^^^
 
 The procedure for generating a custom sub panel widget is as follows:
 
@@ -549,317 +531,3 @@ The constructor arguments are:
 .. tip::
    All existing sub panel widgets use this API, so a good resource is the
    modules in ``lib/python/rose/config_editor/panelwidget/``.
-
-
-Rose Macros
------------
-
-Rose macros manipulate or check configurations, often based on their
-metadata. There are four types of macros:
-
-* Checkers (validators) - check a configuration, perhaps using metadata.
-* Changers (transformers) - change a configuration e.g. adding/removing
-  options.
-* Upgraders - these are special transformer macros for upgrading and
-  downgrading configurations. (covered in the
-  :ref:`Upgrade Macro API <rose-upgr-macros>`)
-* Reporters - output information about a configuration.
-
-There are built-in rose macros that handle standard behaviour such as trigger
-changing and type checking.
-
-.. note::
-   This section explains how to add your own custom macros to transform
-   and validate configurations. See
-   :ref:`Upgrade Macro API <rose-upgr-macros>` for upgrade macros.
-
-Macros use a Python API, and should be written in Python, unless you are
-doing something very fancy. In the absence of a Python house style, it's
-usual to follow the standard Python style guidance (`PEP8`_, `PEP257`_).
-
-They can be run within ``rose config-edit`` or via ``rose macro``.
-
-.. tip::
-   You should avoid writing checker macros if the checking can be expressed
-   via metadata.
-
-Location
-^^^^^^^^
-
-A module containing macros should be stored under a directory
-``lib/python/macros/`` in the metadata for a configuration. This directory
-should be a Python package.
-
-When developing macros for Rose internals, macros should be placed in the
-``rose.macros`` package in the Rose Python library. They should be referenced
-by the ``lib/python/rose/macros/__init__.py`` classes and a call to them can
-be added in the ``lib/python/rose/config_editor/main.py module`` if they need
-to be run implicitly by the config editor.
-
-Code
-^^^^
-
-Examples
-""""""""
-
-See the macro :ref:`Advanced Tutorial <macro-dev>`.
-
-API Documentation
-"""""""""""""""""
-
-The ``rose.macro.MacroBase`` class (subclassed by all rose macros) is
-documented here.
-
-.. TODO - add reference link to Rose Config API page (once added) on 'here'.
-
-API Reference
-"""""""""""""
-
-Validator, transformer and reporter macros are python classes which subclass
-from ``rose.macro.MacroBase`` (api docs).
-
-.. TODO - add ref link to Rose Config API page (once added) on 'api docs'.
-
-These macros implement their behaviours by providing a ``validate``,
-``transform`` or ``report`` method. A macro can contain any combination of
-these methods so, for example, a macro might be both a validator and a
-transformer.
-
-These methods should accept two ``rose.config.ConfigNode`` (api docs)
-instances as arguments - one is the configuration, and one is the metadata
-configuration that provides information about the configuration items.
-
-.. TODO - add ref link to Rose Config API page (once added) on 'api docs'.
-
-A validator macro should look like:
-
-.. code-block:: python
-
-   import rose.macro
-
-   class SomeValidator(rose.macro.MacroBase):
-
-   """This does some kind of check."""
-
-   def validate(self, config, meta_config=None):
-       # Some check on config appends to self.reports using self.add_report
-       return self.reports
-
-The returned list should be a list of ``rose.macro.MacroReport`` objects
-containing the section, option, value, and warning strings for each setting
-that is in error. These are initialised behind the scenes by calling the
-inherited method ``rose.macro.MacroBase.add_report`` via
-``self.add_report``. This has the form:
-
-.. code-block:: python
-
-   def add_report(self, section=None, option=None, value=None, info=None,
-                  is_warning=False):
-
-This means that you should call it with the relevant section first, then the
-relevant option, then the relevant value, then the relevant error message,
-and optionally a warning flag that we'll discuss later. If the setting is a
-section, the option should be ``None`` and the value None. For example,
-
-.. code-block:: python
-
-   def validate(self, config, meta_config=None):
-       editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
-       if editor_value != "sed":
-           self.add_report("env",                         # Section
-                           "MY_FAVOURITE_STREAM_EDITOR",  # Option
-                           editor_value,                  # Value
-                           "Should be 'sed'!")            # Message
-       return self.reports
-
-Validator macros have the option to give warnings, which do not count as
-formal errors in the Rose config editor GUI. These should be used when
-something *may* be wrong, such as warning when using an
-advanced-developer-only option. They are invoked by passing a 5th argument
-to ``self.add_report``, ``is_warning``, like so:
-
-.. code-block:: python
-
-   self.add_report("env",
-                   "MY_FAVOURITE_STREAM_EDITOR",
-                   editor_value,
-                   "Could be 'sed'",
-                   is_warning=True)
-
-A transformer macro should look like:
-
-.. code-block:: python
-
-   import rose.macro
-
-   class SomeTransformer(rose.macro.MacroBase):
-
-   """This does some kind of change to the config."""
-
-   def transform(self, config, meta_config=None):
-       # Some operation on config which calls self.add_report for each change.
-       return config, self.reports
-
-The returned list should be a list of 4-tuples containing the section,
-option, value, and information strings for each setting that was changed
-(e.g. added, removed, value changed). If the setting is a section, the
-option should be ``None`` and the value None. If an option was removed,
-the value should be the old value - otherwise it should be the new one
-(added/changed). For example,
-
-.. code-block:: python
-
-   def transform(self, config, meta_config=None):
-       """Add some more snow control."""
-       if config.get(["namelist:snowflakes"]) is None:
-           config.set(["namelist:snowflakes"])
-           self.add_report(list_of_changes,
-                           "namelist:snowflakes", None, None,
-                           "Updated snow handling in time for Christmas")
-           config.set(["namelist:snowflakes", "l_unique"], ".true.")
-           self.add_report("namelist:snowflakes", "l_unique", ".true.",
-                           "So far, anyway.")
-       return config, self.reports
-
-The current working directory within a macro is always the configuration's
-directory. This makes it easy to access non-``rose-app.conf`` files (e.g.
-in the ``file/`` subdirectory).
-
-There are also reporter macros which can be used where you need to output
-some information about a configuration. A reporter macro takes the same form
-as validator and transform macros but does not require a return value.
-
-.. code-block:: python
-
-   def report(self, config, meta_config=None):
-       """ Write some information about the configuration to a report file.
-
-       Note: report methods do not have a return value.
-
-       """
-       with open('report/file', 'r') as report_file:
-           report_file.write(str(config.get(["namelist:snowflakes"])))
-
-Macros also support the use of keyword arguments, giving you the ability to
-have the user specify some input or override to your macro. For example a
-transformer macro could be written as follows to allow the user to input
-``some_value``:
-
-.. code-block:: python
-
-   def transform(self, config, meta_config=None, some_value=None):
-       """Some transformer macro"""
-       return
-
-.. note::
-   The extra arguments require default values (``=None`` in this
-   example) and that you should add error handling for the input
-   accordingly.
-
-On running your macro the user will be prompted to supply values for these
-arguments or accept the default values.
-
-
-.. _rose-upgr-macros:
-
-Rose Upgrade Macros
--------------------
-
-Rose upgrade macros are used to upgrade application configurations between
-metadata versions. They are classes, very similar to the Transform macros
-above, but with a few differences:
-
-* an ``upgrade`` method instead of a ``transform`` method
-* an optional ``downgrade`` method, identical in API to the ``upgrade``
-  method, but intended for performing the reverse operation
-* a more helpful API via ``rose.upgrade.MacroUpgrade`` methods
-* ``BEFORE_TAG`` and ``AFTER_TAG`` attributes - the version of metadata they
-  apply to (``BEFORE_TAG``) and the version they upgrade to (``AFTER_TAG``)
-
-An example upgrade macro might look like this:
-
-.. code-block:: python
-
-   class Upgrade272to273(rose.upgrade.MacroUpgrade):
-
-   """Upgrade from 27.2 to 27.3."""
-
-   BEFORE_TAG = "27.2"
-   AFTER_TAG = "27.3"
-
-   def upgrade(self, config, meta_config=None):
-       self.add_setting(config, ["env", "NEW_VARIABLE"], "0")
-       self.remove_setting(config, ["namelist:old_things", "OLD_VARIABLE"])
-       return config, self.reports
-
-.. note::
-   The class name is unimportant - the ``BEFORE_TAG`` and ``AFTER_TAG``
-   identify the macro.
-
-Metadata versions are usually structured in a ``rose-meta/CATEGORY/VERSION/``
-hierarchy - where ``CATEGORY`` denotes the type or family of application
-(sometimes it is the command used), and ``VERSION`` is the particular version 
-e.g. ``27.2`` or ``HEAD``.
-
-Upgrade macros live under the ``CATEGORY`` directory in a ``versions.py``
-file - ``rose-meta/CATEGORY/versions.py``.
-
-.. tip::
-   If you have many upgrade macros, you may want to separate them into
-   different modules in the same directory. You can then import from those
-   in ``versions.py``, so that they are still exposed in that module. You'll
-   need to make your directory a package by creating an ``__init__.py`` file,
-   which should contain the line ``import versions``. To avoid conflict with
-   other ``CATEGORY`` upgrade modules (or other Python modules), please name
-   these very modules carefully or use absolute or package level imports like
-   this: ``from .versionXX_YY import FooBar``.
-
-Upgrade macros are subclasses of ``rose.upgrade.MacroUpgrade``. They have all
-the functionality of the transform macros documented above.
-``rose.upgrade.MacroUpgrade`` also has some additional convenience methods
-defined for you to call. All methods return ``None`` unless otherwise
-specified.
-
-.. TODO - complete the python API part that goes here
-
-
-Rosie Web
----------
-
-This section explains how to use the Rosie web service API. All Rosie
-discovery services (e.g. ``rosie search``, ``rosie go``, web page) use a
-`RESTful`_ API to interrogate a web server, which then interrogates an
-`RDBMS`_. Returned data is encoded in the `JSON`_ format.
-
-You may wish to utilise the Python class ``rosie.ws_client.Client`` as an
-alternative to this API.
-
-Location
-^^^^^^^^
-
-The URLs to access the web API of a Rosie web service (with a given prefix
-name) can be found in your rose site configuration file as the value of
-``[rosie-id]prefix-ws.PREFIX_NAME``. To access the API for a given repository
-with prefix ``PREFIX_NAME``, you must select a format (the only currently
-supported format is 'json') and use a url that looks like:
-
-.. code-block:: none
-
-   http://host/PREFIX_NAME/get_known_keys?format=json
-
-Usage
-^^^^^
-
-.. TODO - complete/remove section as desired
-
-
-Rose Python Modules
--------------------
-
-.. TODO - complete/remove section as desired
-
-
-Rose Bash Library
------------------
-
-.. TODO - complete/remove section as desired

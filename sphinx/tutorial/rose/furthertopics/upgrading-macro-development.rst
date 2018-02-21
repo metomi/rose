@@ -9,8 +9,6 @@ You should already be familiar with using ``rose app-upgrade`` (see the
 :ref:`Upgrading tutorial <tutorial-rose-upgrade-macros>` and the concepts in the
 reference material).
 
-.. TODO - link reference material when translated
-
 
 Example
 -------
@@ -260,10 +258,8 @@ We need to get the macro to do the following:
 * add the option ``namelist:materials=paddling_branches``
 * remove the option ``namelist:materials=paddling_twigs``
 
-.. TODO - link to API docs when implemented
-
-We can use the API provided to express this in Python code - replace
-the ``# Some code doing something...`` line with:
+We can use the :ref:`rose-upgr-macros` provided to express this in Python code.
+Replace the ``# Some code doing something...`` line with:
 
 .. code-block:: python
 
@@ -415,10 +411,8 @@ The ``rose-app.conf`` should now contain the new option, ``l_rudder_branch``.
 More Complex Upgrade Macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - link the upgrade macro API
-
-The Upgrade Macro API gives us quite a bit of power without having to write
-too much Python.
+The :ref:`rose-upgr-macros` gives us quite a bit of power without having to
+write too much Python.
 
 For our ``1.0`` release we want to make some improvements to out sailing
 equipment:
@@ -551,13 +545,12 @@ accept the changes, it will upgrade all the way to the ``1.0`` version we
 had before.
 
 
-.. TODO - Link me!
+.. tip::
 
-   Further Reading
-   ---------------
+   See also:
 
-   * Upgrade API Ref
-   * Macro API Ref
+   * :ref:`rose-upgr-macros`
+   * :ref:`api-rose-macro`
 
 
 .. _outriggers: https://en.wikipedia.org/wiki/Outrigger_canoe

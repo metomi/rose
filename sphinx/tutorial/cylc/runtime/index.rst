@@ -10,8 +10,8 @@ This section covers:
 * Running cylc suites.
 
 .. toctree::
-   :caption: Contents
    :name: rug-runtime-toc
+   :maxdepth: 2
 
    introduction
    runtime-configuration

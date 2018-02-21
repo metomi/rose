@@ -183,6 +183,8 @@ sort-key
   would produce a sorting order of ``env=prune``, ``env=melon``,
   ``env=cherry``, ``env=apple``, ``env=banana``.
 
+.. _metadata-values:
+
 Metadata for Values
 ^^^^^^^^^^^^^^^^^^^
 
@@ -747,9 +749,6 @@ url
 
      [namelist:foo=bar]
      url=?q=nearest+bar
-
-.. TODO - mend rose syntax highlighting which is not showing the 2nd section
-   above correctly (section ':' then '=' regex inclusion required?).
 
 help
   (Long) help for the setting. For example, the config editor will use

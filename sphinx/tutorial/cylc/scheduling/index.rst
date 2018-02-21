@@ -6,8 +6,8 @@ Scheduling
 This section looks at how to write workflows in cylc.
 
 .. toctree::
-   :caption: Contents
    :name: rug-scheduling-toc
+   :maxdepth: 2
 
    graphing
    integer-cycling

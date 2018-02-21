@@ -64,7 +64,18 @@ class RosieWSClientQuerySplitError(RosieWSClientError):
 
 class RosieWSClient(object):
 
-    """A client for the Rosie web service."""
+    """A client for the Rosie web service.
+
+    Args:
+        prefixes (list): List of prefix names as strings.
+            (run ``rose config rosie-id`` for more info).
+        prompt_func (function): Optional function for requesting user
+            credentials. Takes and returns the arguments username and password.
+        popen (rose.popen.RosePopener): Use initiated RosePopener instance
+            create a new one if ``None``.
+        event_handler (object): A callable object for reporting popen output,
+            see :py:class:`rose.reporter.Reporter`.
+    """
 
     MAX_LOCAL_QUERIES = 64
     POLL_DELAY = 0.1
@@ -101,7 +112,11 @@ class RosieWSClient(object):
         self.set_prefixes(prefixes)
 
     def set_prefixes(self, prefixes):
-        """Replace the default prefixes."""
+        """Replace the default prefixes.
+
+        Args:
+            prefixes (list): List of prefix names as strings.
+        """
         prefixes.sort()
         if self.prefixes != prefixes:
             self.prefixes = prefixes

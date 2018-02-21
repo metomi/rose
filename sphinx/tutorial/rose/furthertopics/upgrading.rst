@@ -122,12 +122,9 @@ where ``VERSION`` is a lower supported version. This time, some settings
 may be removed.
 
 
-.. TODO - Link me!
+.. tip::
 
-   Further Reading
-   ---------------
+   See also:
 
-   For more information, see:
-
-   * config meta reference
-   * upgrade macro dev further topic
+   * :ref:`conf-meta`
+   * :ref:`rose-upgr-macros`

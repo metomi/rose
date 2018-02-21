@@ -167,11 +167,14 @@ These changes add a ``close_shafts`` task which is run once all the
 it applies a *suicide trigger* to the ``MINERS`` family in order to allow
 the suite to shutdown.
 
-.. TODO - link to suicide trigger tutorial
-
 Save your changes and run your suite. You should see the new
 ``close_shafts`` run should any of the ``MINERS`` tasks be in the failed
 state once they have all finished.
+
+.. tip::
+
+   See the :ref:`tut-cylc-suicide-triggers` tutorial for handling task
+   failures.
 
 
 Different Triggers

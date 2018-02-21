@@ -2,6 +2,8 @@
    :start-line: 1
 
 
+.. _tut-cylc-suicide-triggers:
+
 Suicide Triggers
 ================
 

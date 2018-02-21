@@ -140,10 +140,9 @@ Test and all-files are just two of the available polling options:
    code. *Note this is separate from the* ``all-files``, ``any-files`` *testing
    logic.*
 
-.. TODO - link to rose configuration
+.. tip::
 
-   For more details see the application configuration file section of
-   Configuration.
+   For more details see :ref:`application-configuration`.
 
 
 Possible Uses For Polling

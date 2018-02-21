@@ -1,11 +1,10 @@
 .. include:: ../hyperlinks.rst
    :start-line: 1
 
-.. _INI file: https://en.wikipedia.org/wiki/INI_file
-.. _cylc: http://cylc.github.io/cylc/
-.. _ISO 8601 duration: https://en.wikipedia.org/wiki/ISO_8601#Durations
 .. _User: http://man.openbsd.org/ssh_config#User
 
+
+.. _rose-configuration:
 
 Configuration
 =============
@@ -47,7 +46,7 @@ Configuration Format
 A configuration in Rose is normally represented by a directory with the
 following:
 
-* a configuration file in a modified `INI file`_ format.
+* a configuration file in a modified `INI`_ format.
 * (optionally) files containing data that cannot easily be represented by the
   INI format.
 
@@ -149,10 +148,6 @@ E.g.
    [section-3]
    # key-5 is program ignored.
    !!key-5=value 5
-
-.. TODO - edit 'rose-lang.py' syntax highlighting to not throw error e.g. for
-   'key-2' double-line specification above (with multiple instances in other
-   User Guide files).
 
 .. note::
    In this document, the shorthand ``SECTION=KEY=VALUE`` is used to represent a
@@ -458,6 +453,8 @@ space-delimited list. The following keys are known to have special meanings:
   Specify a sub-division of ``project``, if applicable.
 
 
+.. _application-configuration:
+
 Application Configuration
 -------------------------
 
@@ -534,10 +531,10 @@ keys can be:
 
 ``mode``
   Root level setting. Specify the name of a builtin application, instead of
-  running a command specified in the ``[command]`` section. See also Running
-  Tasks > rose task-run > Built-in Applications Selection
+  running a command specified in the ``[command]`` section.
 
-.. TODO - create internal link to section on above line
+.. TODO - See also Running
+   Tasks > rose task-run > Built-in Applications Selection
 
 ``[command]``
   Specify the command(s) to run. The default key can be used to define the
@@ -639,7 +636,8 @@ keys can be:
   number of times with delays between them. If the prerequisites are still
   not met  after the number of delays, the application runner will fail with
   a time out. The list is a comma-separated list. The syntax looks like
-  ``[n*][DURATION]``, where ``DURATION`` is an `ISO 8601 duration`_ such
+  ``[n*][DURATION]``, where ``DURATION`` is an
+  :ref:`ISO8601 duration <tutorial-iso8601-durations>` such
   as ``PT5S`` (5 seconds) or ``PT10M`` (10 minutes), and ``n`` is an optional
   number of times to repeat it. E.g.:
 
@@ -657,34 +655,36 @@ keys can be:
      # repeat once after 1 hour
      delays=0,6*PT10S,60*PT1M,PT1H
 
-Application Configuration File: Built-in Application: fcm_make
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. TODO
 
-See Running Tasks > rose task-run > Built-in Application: fcm_make.
+   Application Configuration File: Built-in Application: fcm_make
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - create internal link to section on above line
+   See Running Tasks > rose task-run > Built-in Application: fcm_make.
 
-Application Configuration File: Built-in Application: rose_ana
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   .. TODO - create internal link to section on above line
 
-See Running Tasks > rose task-run > Built-in Application: rose_ana and
-rose stem > Analysing output with rose_ana.
+   Application Configuration File: Built-in Application: rose_ana
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - create internal (2 x) links to sections on above line
+   See Running Tasks > rose task-run > Built-in Application: rose_ana and
+   rose stem > Analysing output with rose_ana.
 
-Application Configuration File: Built-in Application: rose_arch
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   .. TODO - create internal (2 x) links to sections on above line
 
-See Running Tasks > rose task-run > Built-in Application: rose_arch.
+   Application Configuration File: Built-in Application: rose_arch
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - create internal link to section on above line
+   See Running Tasks > rose task-run > Built-in Application: rose_arch.
 
-Application Configuration File: Built-in Application: rose_prune
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   .. TODO - create internal link to section on above line
 
-See Running Tasks > rose task-run > Built-in Application: rose_prune.
+   Application Configuration File: Built-in Application: rose_prune
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO - create internal link to section on above line
+   See Running Tasks > rose task-run > Built-in Application: rose_prune.
+
+   .. TODO - create internal link to section on above line
 
 
 Configuration Metadata

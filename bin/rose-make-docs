@@ -87,6 +87,7 @@ venv-install () {
     venv-activate
     pip install sphinx
     pip install sphinx_rtd_theme
+    pip install sphinxcontrib-httpdomain
 }
 
 venv-deactivate () {
@@ -123,19 +124,21 @@ if [[ -z "${BUILDS}" ]]; then
 fi
 
 # Use virtualenv if present and requested or if we are in development mode.
-if [[ "${DEV_MODE:-false}" || "${VENV_MODE:-false}" ]]; then
+if [[ "${DEV_MODE}" != 'false' || "${VENV_MODE}" != false ]]; then
     if [ -d "${VENV_PATH}" ]; then
         venv-activate
     fi
 fi
 
 # Check core (sphinx) builder.
-if ! rose-check-software-docs >/dev/null; then
+if ! rose-check-software --doc >/dev/null; then
     if ${VENV_MODE}; then
         venv-install
     else
+        echo "$(rose check-software --doc)"
+        echo "$(python -c 'import sphinxcontrib.httpdomain')"
         echo 'Software required by the rose documentation builder is not'
-        echo 'present (run `rose check-software-docs` for details).'
+        echo 'present (run `rose check-software --doc` for details).'
         echo
         echo 'The documentation can still be built by installing dependencies'
         echo 'in a python virtual enironment (virtualenv). This environment'

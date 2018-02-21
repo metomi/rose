@@ -4,7 +4,6 @@ Further Topics
 This section goes into detail in additional rose topics.
 
 .. toctree::
-   :caption: Contents
    :name: rose-further-topics
    :maxdepth: 1
 
