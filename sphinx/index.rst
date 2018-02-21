@@ -64,3 +64,10 @@ Indices
 
 * :ref:`genindex`
 * :ref:`modindex`
+* :ref:`terms`
+
+.. toctree::
+   :hidden:
+   :name: hidden-index
+
+   terms
