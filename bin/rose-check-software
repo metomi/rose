@@ -298,7 +298,7 @@ def docs(check=check):
     ret = check_all('Documentation Builder', [
         check('python', (2, 7), (3,), version_template=r'Python (.*)',
                outfile=2),
-        check('dot', command_template='-V',
+        check('graphviz-dot <dot>', command_template='-V',
                version_template='graphviz version ([^\s]+)', outfile=2),
         check('tex', version_template=r'TeX ([^\s]+)'),
         check('pdflatex', version_template=r'pdfTeX .*-.*-([^\s]+)'),
