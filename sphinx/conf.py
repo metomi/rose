@@ -41,6 +41,7 @@ extensions = [
     'minicylc',
     'cylc_lang',
     'rose_lang',
+    'rose_domain',
     'sub_lang',
     'practical',
     'auto_cli_doc',
