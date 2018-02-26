@@ -67,9 +67,9 @@ By making a contribution to this project, I certify that:
 
 (d) I understand and agree that this project and the contribution
     are public and that a record of the contribution (including my
-    name and email address) is maintained indefinitely and may be
-    redistributed consistent with this project or the licence(s)
-    involved.
+    name and email address) is maintained retained for the full term of
+    the copyright and may be redistributed consistent with this project
+    or the licence(s) involved.
 
 (e) I, or my employer, grant to the UK Met Office and all recipients of
     this software a perpetual, worldwide, non-exclusive, no-charge,
