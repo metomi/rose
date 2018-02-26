@@ -67,7 +67,7 @@ By making a contribution to this project, I certify that:
 
 (d) I understand and agree that this project and the contribution
     are public and that a record of the contribution (including my
-    name and email address) is maintained retained for the full term of
+    name and email address) is retained for the full term of
     the copyright and may be redistributed consistent with this project
     or the licence(s) involved.
 
