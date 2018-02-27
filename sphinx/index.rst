@@ -50,6 +50,7 @@ applications. :ref:`What Is Cylc? <cylc-introduction>`
    :maxdepth: 1
 
    api/command-reference
+   api/built-in
    api/environment-variables
    api/config
    api/macros
