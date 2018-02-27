@@ -13,3 +13,4 @@ system.
    restructuredtext
    auto-cli-api
    autodoc
+   domains
