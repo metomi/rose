@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 """NAME
-    rose check-software-docs
+    rose check-software
 
 SYNOPSIS
-    rose check-software-docs [OPTIONS]
+    rose check-software [OPTIONS]
 
 DESCRIPTION
     Check software dependencies for the rose documentation builder.
