@@ -142,7 +142,7 @@ Test and all-files are just two of the available polling options:
 
 .. tip::
 
-   For more details see :ref:`application-configuration`.
+   For more details see :ref:`Rose Applications`.
 
 
 Possible Uses For Polling
