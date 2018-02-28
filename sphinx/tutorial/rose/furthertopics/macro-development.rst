@@ -15,7 +15,7 @@ Warning
 -------
 
 Macros should **only** be written if there is a genuine need that is not
-covered by :ref:`other metadata <metadata-values>` - make sure you are
+covered by :ref:`other metadata <metadata values>` - make sure you are
 familiar with :ref:`conf-meta` before you write your own (real-life)
 macros.
 

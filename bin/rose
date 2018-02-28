@@ -44,7 +44,7 @@ rose_init
 get_alias() {
     local NAME=$1
     local ALIAS=$(sed '/^#/d' $ROSE_HOME_BIN/$ROSE_NS-$NAME || true)
-    if [[ $(wc -l <<<"$ALIAS") == 1 ]] \
+    if [[ $(wc -l <<<"$ALIAS" | tr -d '[:space:]') == 1 ]] \
         && grep -q "^exec \$(dirname \$0)/$ROSE_NS-.* \"\$@\"\$" <<<"$ALIAS"
     then
         ALIAS=${ALIAS#"exec \$(dirname \$0)/$ROSE_NS-"}

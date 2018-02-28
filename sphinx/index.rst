@@ -41,7 +41,6 @@ applications. :ref:`What Is Cylc? <cylc-introduction>`
 
    user-guide/installation
    user-guide/configuration
-   user-guide/configuration-metadata
    glossary
 
 .. toctree::
@@ -52,7 +51,6 @@ applications. :ref:`What Is Cylc? <cylc-introduction>`
    api/command-reference
    api/built-in
    api/environment-variables
-   api/config
    api/macros
    api/upgrader-macros
    api/bash
