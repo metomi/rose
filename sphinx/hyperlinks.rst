@@ -16,6 +16,7 @@
 .. _Jinja2: http://jinja.pocoo.org/
 .. _FCM: https://metomi.github.io/fcm/doc/
 .. _Python: https://www.python.org/
+.. _Python Regular Expressions: https://docs.python.org/2/library/re.html#regular-expression-syntax
 .. _bash: https://www.gnu.org/software/bash/
 .. _PyGTK: http://www.pygtk.org/
 .. _INI: https://en.wikipedia.org/wiki/INI_file
