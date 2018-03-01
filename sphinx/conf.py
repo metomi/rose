@@ -39,12 +39,12 @@ extensions = [
     'sphinx.ext.graphviz',
     'sphinx.ext.mathjax',
     'minicylc',
-    'cylc-lang',
-    'rose-lang',
-    'sub-lang',
+    'cylc_lang',
+    'rose_lang',
+    'sub_lang',
     'practical',
-    'auto-cli-doc',
-    'script-include',
+    'auto_cli_doc',
+    'script_include',
     'sphinxcontrib.httpdomain'
 ]
 
