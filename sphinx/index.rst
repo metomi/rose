@@ -27,42 +27,29 @@ applications. :ref:`What Is Cylc? <cylc-introduction>`
 
 
 .. toctree::
-   :caption: Tutorial
+   :caption: User Guide
    :name: tutorial-toc
    :maxdepth: 2
 
+   installation
    tutorial/cylc/index
    tutorial/rose/index
-
-.. toctree::
-   :caption: User Guide
-   :name: user-guide-toc
-   :maxdepth: 1
-
-   user-guide/installation
-   user-guide/configuration
    glossary
+
 
 .. toctree::
    :caption: Rose API Reference
    :name: api-toc
    :maxdepth: 1
+   :glob:
 
-   api/command-reference
-   api/built-in
-   api/environment-variables
-   api/macros
-   api/upgrader-macros
-   api/bash
-   api/gtk
-   api/rosie-web
+   api/*
 
 
-Indices
+Other
 -------
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`terms`
 
 .. toctree::

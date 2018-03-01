@@ -1,10 +1,7 @@
-
-
-
 .. _rose-configuration:
 
-Configuration
-=============
+Rose Configuration
+==================
 
 Rose is configured by a collection of configuration files which all use the
 same :ref:`Rose Configuration Format`. They are used for:

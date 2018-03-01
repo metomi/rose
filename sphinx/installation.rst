@@ -1,4 +1,4 @@
-.. include:: ../hyperlinks.rst
+.. include:: hyperlinks.rst
    :start-line: 1
 
 Installation
@@ -132,7 +132,7 @@ Configuring Rose
 ``etc/rose.conf``
    You should add/edit this file to meet the requirement of your site.
    Examples can be found at the ``etc/rose.conf.example`` file in your
-   Rose distribution.
+   Rose distribution. See also :rose:file:`rose.conf` in the API reference.
 
 
 Configuring Rosie Client
@@ -149,8 +149,8 @@ all you need to do is configure the client to talk to the servers.
 Refer to the `Configuring a Rosie Server`_ section if you need to
 configure a Rosie server for your site.
 
-To set up the Rosie client for the site, add/modify the ``[rosie-id]``
-section of ``etc/rose.conf``. E.g.:
+To set up the Rosie client for the site, add/modify the
+:rose:conf:`rose.conf[rosie-id]` E.g.:
 
 .. code-block:: rose
 
@@ -201,7 +201,7 @@ Deploying Configuration Metadata
 You may want to deploy :ref:`conf-meta` for projects using Rose
 in a globally readable location at your site, so that they can be
 easily accessed by users when using Rose utilities such as
-``rose config-edit`` or ``rose macro``.
+:ref:`command-rose-config-edit` or :ref:`command-rose-macro`.
 
 If the source tree of a project is version controlled under a
 trusted Subversion repository, it is possible to automatically deploy
@@ -213,7 +213,7 @@ recommendation and store Rose configuration metadata under the
   ``rose-meta/`` directory.
 * Set up a crontab job to regularly update the working copies.
 
-For example, suppose you want to deploy Rose configuration metadata
+For example, suppose you want to deploy Rose :ref:`Metadata`
 under ``/etc/rose-meta/`` at your site. You can do::
 
    # Deployment location
@@ -338,8 +338,8 @@ Make sure the hook scripts are executable.
 
 The ``rosa svn-post-commit`` command in the ``post-commit`` hook is used
 to populate a database with the suite discovery information as suites
-are committed to the repository. Edit the ``[rosie-db]`` settings
-in ``etc/rose.conf`` to point to your host machine and provide relevant
+are committed to the repository. Edit the :rose:conf:`rose.conf[rosie-db]`
+settings to point to your host machine and provide relevant
 paths such as the location for your repository and database.
 
 Once you have done that, create the Rosie database by running::
@@ -350,7 +350,7 @@ Make sure that the account that runs the repository hooks has read/write
 access to the database and database directory.
 
 You can test that everything is working using the built-in web server.
-Edit the ``[rosie-ws]`` settings in ``etc/rose.conf`` to configure
+Edit the :rose:conf:`rose.conf[rosie-ws]` settings to configure
 the web server's log directory and port number. Start the web server
 by running::
 
@@ -376,8 +376,8 @@ Use the Apache log at e.g. ``/var/log/httpd/`` to debug problems.
 See also `Configuring Rose Bush`_.
 
 Hopefully, you should now have a working Rosie service server. Configure
-the client settings by editing the ``[rosie-id]`` settings in
-``etc/rose.conf``. If you are using the built-in web server, you
+the client settings by editing the :rose:conf:`rose.conf[rosie-id]`
+settings. If you are using the built-in web server, you
 should ensure that you include the port number in the URL. E.g.:
 
 .. code-block:: rose
