@@ -36,7 +36,7 @@ Reference Syntax:
     ``:rose:CONFIG-FILE.[parent-section]child-config``
 
     Where ``CONFIG-FILE`` is:
-   
+
     * ``APP-NAME`` for applications (e.g. ``fcm_make``).
     * ``FILE-NAME`` for configuration files (e.g. ``rose.conf``).
 
@@ -412,9 +412,7 @@ class RoseDirective(ObjectDescription):
 
     def add_target_and_index(self, name_cls, sig, signode):
         """This method handles namespacing."""
-        name, obj_type = name_cls[0:2]
-
-        name = self.process_name(name)[0]
+        name = self.process_name(name_cls[0])[0]
 
         # Get the current context in tokenised form.
         context_tokens = []
@@ -437,7 +435,8 @@ class RoseDirective(ObjectDescription):
         # Generate a namespace from the tokens.
         namespace = namespace_from_tokens(context_tokens)
         if namespace is False:
-            logger.error('Invalid namespace for rose object "%s"' % namespace)
+            logger.error('Invalid namespace for rose object "%s"' % namespace,
+                         location=signode)
 
         # Register this namespace.
         signode['ids'].append(namespace)
