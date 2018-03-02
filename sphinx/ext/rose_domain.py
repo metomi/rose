@@ -1,3 +1,22 @@
+# -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
 """The rose domain is for documenting rose configurations and built-in
 applications.
 
@@ -133,13 +152,12 @@ def tokenise_namespace(namespace):
 
     if typ in ['file', 'app']:
         ret = [('rose:%s' % typ, conf_file)]
+    elif '.' in conf_file:
+        # Must be a rose config file.
+        ret = [('rose:file', conf_file)]
     else:
-        if '.' in conf_file:
-            # Must be a rose config file.
-            ret = [('rose:file', conf_file)]
-        else:
-            # Must be a rose application.
-            ret = [('rose:app', conf_file)]
+        # Must be a rose application.
+        ret = [('rose:app', conf_file)]
 
     if conf_section:
        ret.append(('rose:conf', conf_section))
@@ -396,7 +414,7 @@ class RoseDirective(ObjectDescription):
         """This method handles namespacing."""
         name, obj_type = name_cls[0:2]
 
-        name, _, _ = self.process_name(name)
+        name = self.process_name(name)[0]
 
         # Get the current context in tokenised form.
         context_tokens = []
