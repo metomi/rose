@@ -675,6 +675,12 @@ class RoseOptionParser(OptionParser):
              "dest": "validate_all",
              "default": False,
              "help": "Prepend all validator macros to the argument list."}],
+        "validate_suite_only": [
+            ["--validate-suite-only"],
+            {"action": "store_true",
+             "dest": "validate_suite_only_mode",
+             "default": False,
+             "help": "Validate only. Don't install or run."}],
         "verbosity": [
             ["--verbose", "-v"],
             {"action": "count",

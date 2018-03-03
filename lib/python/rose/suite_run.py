@@ -36,8 +36,9 @@ from rose.run_source_vc import write_source_vc_info
 from rose.suite_clean import SuiteRunCleaner
 from rose.suite_control import SuiteNotRunningError
 import shlex
+import shutil
 import sys
-from tempfile import TemporaryFile
+from tempfile import TemporaryFile, mkdtemp
 from time import sleep, strftime, time
 import traceback
 
@@ -80,11 +81,27 @@ class SuiteRunner(Runner):
 
     SLEEP_PIPE = 0.05
     NAME = "suite"
-    OPTIONS = ["conf_dir", "defines", "defines_suite", "gcontrol_mode", "host",
-               "install_only_mode", "local_install_only_mode",
-               "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
-               "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
-               "restart_mode", "run_mode", "strict_mode"]
+    OPTIONS = [
+        "conf_dir",
+        "defines",
+        "defines_suite",
+        "gcontrol_mode",
+        "host",
+        "install_only_mode",
+        "local_install_only_mode",
+        "log_archive_mode",
+        "log_keep",
+        "log_name",
+        "name",
+        "new_mode",
+        "no_overwrite_mode",
+        "opt_conf_keys",
+        "reload_mode",
+        "remote",
+        "restart_mode",
+        "run_mode",
+        "strict_mode",
+        "validate_suite_only"]
 
     # Lists of rsync (always) exclude globs
     SYNC_EXCLUDES = (
@@ -184,112 +201,144 @@ class SuiteRunner(Runner):
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
-        suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
 
-        suite_conf_dir = os.getcwd()
-        locs_conf = ConfigNode()
-        if opts.new_mode:
-            if os.getcwd() == suite_dir:
-                raise NewModeError("PWD", os.getcwd())
-            elif opts.run_mode in ["reload", "restart"]:
-                raise NewModeError("--run", opts.run_mode)
-            self.suite_run_cleaner.clean(suite_name)
-        if os.getcwd() != suite_dir:
-            if opts.run_mode == "run":
-                self._run_init_dir(opts, suite_name, conf_tree,
-                                   locs_conf=locs_conf)
-            os.chdir(suite_dir)
+        # Unfortunately a large try/finally block to ensure a temporary folder
+        # created in validate only mode is cleaned up. Exceptions are not
+        # caught here
+        try:
+            if opts.validate_suite_only_mode:
+                temp_dir = mkdtemp()
+                suite_dir = os.path.join(temp_dir, suite_dir_rel)
+                os.makedirs(suite_dir, 0o0700)
+            else:
+                suite_dir = os.path.join(
+                    os.path.expanduser("~"), suite_dir_rel)
 
-        # Housekeep log files
-        now_str = None
-        if not opts.install_only_mode and not opts.local_install_only_mode:
-            now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-            self._run_init_dir_log(opts, now_str)
-        self.fs_util.makedirs("log/suite")
+            suite_conf_dir = os.getcwd()
+            locs_conf = ConfigNode()
+            if opts.new_mode:
+                if os.getcwd() == suite_dir:
+                    raise NewModeError("PWD", os.getcwd())
+                elif opts.run_mode in ["reload", "restart"]:
+                    raise NewModeError("--run", opts.run_mode)
+                self.suite_run_cleaner.clean(suite_name)
+            if os.getcwd() != suite_dir:
+                if opts.run_mode == "run":
+                    self._run_init_dir(opts, suite_name, conf_tree,
+                                       locs_conf=locs_conf)
+                os.chdir(suite_dir)
 
-        # Rose configuration and version logs
-        self.fs_util.makedirs("log/rose-conf")
-        run_mode = opts.run_mode
-        if run_mode not in ["reload", "restart", "run"]:
-            run_mode = "run"
-        mode = run_mode
-        if opts.install_only_mode:
-            mode = "install-only"
-        elif opts.local_install_only_mode:
-            mode = "local-install-only"
-        prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), mode)
+            # Housekeep log files
+            now_str = None
+            if not opts.install_only_mode and not opts.local_install_only_mode:
+                now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+                self._run_init_dir_log(opts, now_str)
+            self.fs_util.makedirs("log/suite")
 
-        # Dump the actual configuration as rose-suite-run.conf
-        ConfigDumper()(conf_tree.node, "log/" + prefix + ".conf")
+            # Rose configuration and version logs
+            self.fs_util.makedirs("log/rose-conf")
+            run_mode = opts.run_mode
+            if run_mode not in ["reload", "restart", "run"]:
+                run_mode = "run"
+            mode = run_mode
+            if opts.validate_suite_only_mode:
+                mode = "validate-suite-only"
+            elif opts.install_only_mode:
+                mode = "install-only"
+            elif opts.local_install_only_mode:
+                mode = "local-install-only"
+            prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), mode)
 
-        # Install version information file
-        write_source_vc_info(
-            suite_conf_dir, "log/" + prefix + ".version", self.popen)
+            # Dump the actual configuration as rose-suite-run.conf
+            ConfigDumper()(conf_tree.node, "log/" + prefix + ".conf")
 
-        # If run through rose-stem, install version information files for
-        # each source tree if they're a working copy
-        if hasattr(opts, 'source') and hasattr(opts, 'project'):
-            for i, url in enumerate(opts.source):
-                if os.path.isdir(url):
-                    write_source_vc_info(
-                        url, "log/" + opts.project[i] + "-" + str(i) +
-                        ".version", self.popen)
+            # Install version information file
+            write_source_vc_info(
+                suite_conf_dir, "log/" + prefix + ".version", self.popen)
 
-        for ext in [".conf", ".version"]:
-            self.fs_util.symlink(prefix + ext, "log/rose-suite-run" + ext)
+            # If run through rose-stem, install version information files for
+            # each source tree if they're a working copy
+            if hasattr(opts, 'source') and hasattr(opts, 'project'):
+                for i, url in enumerate(opts.source):
+                    if os.path.isdir(url):
+                        write_source_vc_info(
+                            url, "log/" + opts.project[i] + "-" + str(i) +
+                            ".version", self.popen)
 
-        # Move temporary log to permanent log
-        if hasattr(self.event_handler, "contexts"):
-            log_file_path = os.path.abspath(
-                os.path.join("log", "rose-suite-run.log"))
-            log_file = open(log_file_path, "ab")
-            temp_log_file = self.event_handler.contexts[uuid].handle
-            temp_log_file.seek(0)
-            log_file.write(temp_log_file.read())
-            self.event_handler.contexts[uuid].handle = log_file
-            temp_log_file.close()
+            for ext in [".conf", ".version"]:
+                self.fs_util.symlink(prefix + ext, "log/rose-suite-run" + ext)
+
+            # Move temporary log to permanent log
+            if hasattr(self.event_handler, "contexts"):
+                log_file_path = os.path.abspath(
+                    os.path.join("log", "rose-suite-run.log"))
+                log_file = open(log_file_path, "ab")
+                temp_log_file = self.event_handler.contexts[uuid].handle
+                temp_log_file.seek(0)
+                log_file.write(temp_log_file.read())
+                self.event_handler.contexts[uuid].handle = log_file
+                temp_log_file.close()
+
+            # Process Environment Variables
+            environ = self.config_pm(conf_tree, "env")
+
+            # Process Files
+            cwd = os.getcwd()
+            for rel_path, conf_dir in conf_tree.files.items():
+                if (conf_dir == cwd or
+                        any(fnmatchcase(os.sep + rel_path, exclude)
+                            for exclude in self.SYNC_EXCLUDES) or
+                        conf_tree.node.get(
+                            ["jinja2:" + rel_path]) is not None):
+                    continue
+                # No sub-directories, very slow otherwise
+                if os.sep in rel_path:
+                    rel_path = rel_path.split(os.sep, 1)[0]
+                target_key = self.config_pm.get_handler(
+                    "file").PREFIX + rel_path
+                target_node = conf_tree.node.get([target_key])
+                if target_node is None:
+                    conf_tree.node.set([target_key])
+                    target_node = conf_tree.node.get([target_key])
+                elif target_node.is_ignored():
+                    continue
+                source_node = target_node.get("source")
+                if source_node is None:
+                    target_node.set(
+                        ["source"], os.path.join(
+                            conf_dir, rel_path))
+                elif source_node.is_ignored():
+                    continue
+            self.config_pm(conf_tree, "file",
+                           no_overwrite_mode=opts.no_overwrite_mode)
+
+            # Process Jinja2 configuration
+            self.config_pm(conf_tree, "jinja2")
+
+            # Ask suite engine to parse suite configuration
+            # and determine if it is up to date (unchanged)
+            if opts.validate_suite_only_mode:
+                suite_conf_unchanged = self.suite_engine_proc.cmp_suite_conf(
+                    suite_dir, opts.run_mode, opts.strict_mode,
+                    debug_mode=True)
+            else:
+                suite_conf_unchanged = self.suite_engine_proc.cmp_suite_conf(
+                    suite_name, opts.run_mode, opts.strict_mode,
+                    opts.debug_mode)
+        finally:
+            # Ensure the temporary directory created is cleaned up regardless
+            # of success or failure
+            if opts.validate_suite_only_mode and os.path.exists(temp_dir):
+                shutil.rmtree(temp_dir)
+
+        # Only validating so finish now
+        if opts.validate_suite_only_mode:
+            return
 
         # Install share/work directories (local)
         for name in ["share", "share/cycle", "work"]:
             self._run_init_dir_work(
                 opts, suite_name, name, conf_tree, locs_conf=locs_conf)
-
-        # Process Environment Variables
-        environ = self.config_pm(conf_tree, "env")
-
-        # Process Files
-        cwd = os.getcwd()
-        for rel_path, conf_dir in conf_tree.files.items():
-            if (conf_dir == cwd or
-                    any(fnmatchcase(os.sep + rel_path, exclude)
-                        for exclude in self.SYNC_EXCLUDES) or
-                    conf_tree.node.get(["jinja2:" + rel_path]) is not None):
-                continue
-            # No sub-directories, very slow otherwise
-            if os.sep in rel_path:
-                rel_path = rel_path.split(os.sep, 1)[0]
-            target_key = self.config_pm.get_handler("file").PREFIX + rel_path
-            target_node = conf_tree.node.get([target_key])
-            if target_node is None:
-                conf_tree.node.set([target_key])
-                target_node = conf_tree.node.get([target_key])
-            elif target_node.is_ignored():
-                continue
-            source_node = target_node.get("source")
-            if source_node is None:
-                target_node.set(["source"], os.path.join(conf_dir, rel_path))
-            elif source_node.is_ignored():
-                continue
-        self.config_pm(conf_tree, "file",
-                       no_overwrite_mode=opts.no_overwrite_mode)
-
-        # Process Jinja2 configuration
-        self.config_pm(conf_tree, "jinja2")
-
-        # Ask suite engine to parse suite configuration
-        # and determine if it is up to date (unchanged)
-        suite_conf_unchanged = self.suite_engine_proc.cmp_suite_conf(
-            suite_name, opts.run_mode, opts.strict_mode, opts.debug_mode)
 
         if opts.local_install_only_mode:
             return
@@ -433,7 +482,7 @@ class SuiteRunner(Runner):
     def _run_conf(
             cls, key, default=None, host=None, conf_tree=None, r_opts=None):
         """Return the value of a setting given by a key for a given host. If
-        r_opts is defined, we are alerady in a remote host, so there is no need
+        r_opts is defined, we are already in a remote host, so there is no need
         to do a host match. Otherwise, the setting may be found in the run time
         configuration, or the default (i.e. site/user configuration). The value
         of each setting in the configuration would be in a line delimited list
