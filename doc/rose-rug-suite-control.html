@@ -236,7 +236,12 @@
             <code>-l</code> option. The former will stop after
             validating the suite and installing it to the task
             hosts. The latter will stop after validating the
-            suite.</p>
+            suite. If you do not want to install the suite locally,
+            but would like to perform validation on the suite.rc
+            file, then the <code>--validate-suite-only</code> option
+            is available. This option will install the suite in a
+            temporary location, validate it, and then cleanup
+            afterwards.</p>
 
             <h3 id="rose-suite-run.environment">Environment and
             Jinja2 Settings</h3>

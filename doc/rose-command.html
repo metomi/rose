@@ -2714,6 +2714,14 @@ launcher-preopts.mpiexec=-n $NPROC
               hosts. Do not run it. Implies
               <kbd>--no-gcontrol</kbd>.</dd>
 
+              <dt><kbd>--validate-suite-only</kbd></dt>
+
+              <dd>Install the suite in a temporary location. Do not
+              setup any directories. Do not run any jobs. Implies
+              <kbd>--no-gcontrol</kbd>. Overrides
+              <kbd>--install-only</kbd> and
+              <kbd>--local-install-only</kbd>.</dd>
+
               <dt><kbd>--name=NAME, -n NAME</kbd></dt>
 
               <dd>Specify the suite <var>NAME</var> in cylc,
