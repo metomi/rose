@@ -4,10 +4,10 @@ Optional Configurations
 =======================
 
 Optional configurations are configuration files which can add or overrite
-the default configuration. They can be used with ``rose app-run`` for
-:term:`rose application configurations <rose application configuration>` and
-``rose suite-run`` for :term:`rose suite configurations <rose suite
-configuration>`.
+the default configuration. They can be used with :ref:`command-rose-app-run`
+for :term:`rose application configurations <rose application configuration>`
+and :ref:`command-rose-suite-run` for
+:term:`rose suite configurations <rose suite configuration>`.
 
 
 Example
@@ -23,7 +23,7 @@ Create a new :term:`rose app` called ``rose-opt-conf-tutorial``::
    mkdir rose-opt-conf-tutorial
    cd rose-opt-conf-tutorial
 
-Create a ``rose-app.conf`` file with the following contents:
+Create a :rose:file:`rose-app.conf` file with the following contents:
 
 .. code-block:: rose
 
@@ -72,11 +72,11 @@ containing the following configuration:
    [env]
    FLAVOUR=chocolate
 
-Next we need to tell ``rose app-run`` to use the ``chocolate`` optional
-configuration. We can do this in one of two ways:
+Next we need to tell :ref:`command-rose-app-run` to use the ``chocolate``
+optional configuration. We can do this in one of two ways:
 
 1. Using the ``--opt-conf-key`` option.
-2. Using the ``ROSE_APP_OPT_CONF_KEYS`` environment variable.
+2. Using the :envvar:`ROSE_APP_OPT_CONF_KEYS` environment variable.
 
 Run the app using the ``chocolate`` optional configuration::
 
@@ -89,7 +89,7 @@ You should see the following output:
    I'd like to order a chocolate ice cream in a regular-cone with no toppings.
 
 The ``chocolate`` optional configuration has overwritten the ``FLAVOUR``
-environment variable from the ``rose-app.conf`` file.
+environment variable from the :rose:file:`rose-app.conf` file.
 
 
 Using Multiple Optional Configurations
@@ -138,8 +138,9 @@ variable from the ``fudge sundae`` configuration. This is because optional
 configurations as applied first to last so in this case the ``chocolate``
 configuration was loaded last.
 
-To see how the optional configurations would be applied use the ``rose config``
-command providing the configuration files in the order they would be loaded::
+To see how the optional configurations would be applied use the
+:ref:`command-rose-config` command providing the configuration files in the
+order they would be loaded::
 
    rose config --file rose-app.conf --file opt/rose-app-fudge-sundae --file chocolate
 
@@ -158,7 +159,7 @@ You should see:
 
 .. note::
 
-   Optional configurations specified using the ``ROSE_APP_OPT_CONF_KEYS``
+   Optional configurations specified using the :envvar:`ROSE_APP_OPT_CONF_KEYS`
    environment variable are loaded before those specified using the
    ``--opt-conf-key`` command line option.
 
@@ -168,7 +169,7 @@ Using Optional Configurations By Default
 
 Optional configurations can be switched on by default using the ``opt`` setting.
 
-Add the following line at the top of the ``rose-app.conf`` file:
+Add the following line at the top of the :rose:file:`rose-app.conf` file:
 
 .. code-block:: rose
 
@@ -176,7 +177,7 @@ Add the following line at the top of the ``rose-app.conf`` file:
 
 Now the ``chocolate`` optional configuration will *always* be turned on. For this
 reason its generally better to use the ``--opt-conf-key`` setting or
-``ROSE_APP_OPT_CONF_KEYS`` environment variable instead.
+:envvar:`ROSE_APP_OPT_CONF_KEYS` environment variable instead.
 
 
 Other Optional Configurations
@@ -185,12 +186,13 @@ Other Optional Configurations
 All Rose configurations can have optional configurations, not just application
 configurations.
 
-* Suites can have optional configurations that override ``rose-suite.conf``
-  settings, controlled through ``rose suite-run``. Optional suite configurations
+* Suites can have optional configurations that override
+  :rose:file:`rose-suite.conf` settings, controlled through
+  :ref:`command-rose-suite-run`. Optional suite configurations
   can be used either using the ``--opt-conf-key`` option with
-  ``rose suite-run`` or the ``$ROSE_SUITE_OPT_CONF_KEYS`` environment variable.
+  :ref:`command-rose-suite-run` or the :envvar:`$ROSE_SUITE_OPT_CONF_KEYS`
+  environment variable.
 * Metadata configurations can also have optional configurations, typically
   included via the ``opts`` top-level setting.
 
-
-
+.. TODO - opts? this is not documented!

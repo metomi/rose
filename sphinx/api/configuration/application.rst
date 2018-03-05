@@ -61,18 +61,18 @@ E.g. The application configuration directory may look like:
 
    .. rose:conf:: meta
 
-      Root level setting. Specify the configuration metadata for the application.
-      This is ignored by the application runner, but may be used by other
-      Rose utilities, such as the config editor GUI. It can be used to specify
-      the application type.
+      Root level setting. Specify the configuration metadata for the
+      application. This is ignored by the application runner, but may be used
+      by other Rose utilities, such as :ref:`command-rose-config-edit`.
+      It can be used to specify the application type.
 
    .. rose:conf:: mode
 
       Root level setting. Specify the name of a builtin application, instead of
-      running a command specified in the ``[command]`` section.
+      running a command specified in the :rose:conf:`[command]`
+      section.
 
-      .. TODO - See also Running
-         Tasks > rose task-run > Built-in Applications Selection
+      See also :ref:`Rose Built-In Applications`.
 
    .. rose:conf:: command
 
@@ -89,12 +89,12 @@ E.g. The application configuration directory may look like:
          Specify an alternate command refered to by the name ``ALTERNATE``
          which can be selected at runtime.
 
-         .. TODO - Reference command keys.
+         See the :ref:`rose-tutorial-command-keys` tutorial.
   
    .. rose:conf:: env
 
-      Specify environment variables to be provided to the :rose:conf:`[command]`
-      at runtime.
+      Specify environment variables to be provided to the
+      :rose:conf:`[command]` at runtime.
 
       The usual ``$NAME`` or ``${NAME}`` syntax can be used in values to
       reference environment variables that are already defined when the
@@ -102,9 +102,9 @@ E.g. The application configuration directory may look like:
       environment variables defined in this section.
 
       If the value of an environment variable setting begins with a tilde
-      ``~``, all of the characters preceding the 1st slash ``/`` are considered a
-      *tilde-prefix*. Where possible, a tilde-prefix is replaced with the home
-      directory associated with the specified login name at run time.
+      ``~``, all of the characters preceding the 1st slash ``/`` are considered
+      a *tilde-prefix*. Where possible, a tilde-prefix is replaced with the
+      home directory associated with the specified login name at run time.
 
       .. rose:conf:: KEY=VALUE
 
