@@ -7,7 +7,7 @@ Rose is configured by a collection of configuration files which all use the
 same :ref:`Rose Configuration Format`. They are used for:
 
 :ref:`Rose Applications`
-  * :rose:file:`rose-meta.conf`
+  * :rose:file:`rose-app.conf`
 :ref:`Rose Suites`
   * :rose:file:`rose-suite.conf`
   * :rose:file:`rose-suite.info`

@@ -1,3 +1,5 @@
+.. _Rose Built-In Applications:
+
 Rose Built-In Applications
 ==========================
 

@@ -124,10 +124,8 @@ sections of the :rose:file:`rose-app.conf` file.
    .. rose:conf:: bunch-args
 
       This section is used to specify the various combinations of args to be
-      passed to the ``command`` specified under
+      passed to the :rose:conf:`rose-app.conf[command]` specified under
       :rose:conf:`[bunch]command-format`.
-
-      .. TODO - ref command from conf api
 
       .. rose:conf:: argname=val1 val2 ...
 

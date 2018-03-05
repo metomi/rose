@@ -11,8 +11,9 @@ Basic validation can be achieved using metadata settings such as ``type`` and
 enabling more advanced validation. They evaluate logical expressions,
 flagging warnings if they return false.
 
-``fail-if`` and ``warn-if`` can be run on the command line using ``rose macro``
-or on-demand in the ``rose edit`` GUI.
+``fail-if`` and ``warn-if`` can be run on the command line using
+:ref:`command-rose-macro` or on-demand in the :ref:`command-rose-config-edit`
+GUI.
 
 .. note::
 
@@ -59,7 +60,8 @@ Create a new directory somewhere and run the following command, replacing
    rose tutorial fail-if-warn-if DIRECTORY
    cd DIRECTORY
 
-You will now have a new rose app with a ``rose-app.conf`` that looks like this:
+You will now have a new rose app with a :rose:file:`rose-app.conf` that
+looks like this:
 
 .. code-block:: rose
 
@@ -89,8 +91,8 @@ in our case, the Lunar Module (Apollo Program spacecraft).
 There is also metadata in the ``meta/rose-meta.conf`` file which provides the
 application inputs with descriptions, help text and type information.
 
-Try running ``rose edit`` in the app directory. You should be able to
-navigate between the pages and view the help and description for the
+Try running :ref:`command-rose-config-edit` in the app directory. You should
+be able to navigate between the pages and view the help and description for the
 settings.
 
 

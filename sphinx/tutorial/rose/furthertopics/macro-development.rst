@@ -34,7 +34,7 @@ by the Rose built-in macros.
 
 Custom macros are user-defined, but follow exactly the same API - they
 are just in a different filespace location. They can be invoked via
-the command line (``rose macro``) or from within the
+the command line (:ref:`command-rose-macro`) or from within the
 :menuselection:`Metadata` menu in the config editor.
 
 
@@ -45,7 +45,7 @@ For these examples we will create an example app called
 ``hello_world_app`` that could be part of a typical suite.
 
 Create a directory for your suite app called ``hello_world_app``.
-Inside the ``hello_world_app`` directory, create a ``rose-app.conf``
+Inside the ``hello_world_app`` directory, create a :rose:file:`rose-app.conf`
 file and paste in the following contents:
 
 .. code-block:: rose
@@ -68,7 +68,7 @@ Create the directories ``meta/lib/python/macros/`` by running::
 
    mkdir -p meta/lib/python/macros
 
-Create an empty file called ``rose-meta.conf`` in the directory::
+Create an empty file called :rose:file:`rose-meta.conf` in the directory::
 
    touch meta/rose-meta.conf
 
@@ -112,7 +112,7 @@ Open ``planet.py`` in a text editor and paste in the following code:
            return self.reports
 
 This is the bare bones of a Rose macro - a bit of Python that is a
-subclass of ``rose.macro.MacroBase``. At the moment, it doesn't
+subclass of :py:class:`rose.macro.MacroBase`. At the moment, it doesn't
 do anything.
 
 We need to check the value of the option (``env=WORLD``) in our
@@ -322,7 +322,7 @@ Open ``planet.py`` in a text editor and append the following code:
 This is another bare-bones macro class, although this time it supplies
 a ``transform`` method instead of a ``validate`` method.
 
-You can see that it returns a configuration object (`config`) as well
+You can see that it returns a configuration object (``config``) as well
 as ``self.reports``. This means that you can modify the configuration
 e.g. by adding or deleting a variable and then returning the changed
 config object.
@@ -406,7 +406,7 @@ Your class should now look like this:
 
 Your transform macro is now ready to use.
 
-You can run it from ``rose edit`` via the menu
+You can run it from :ref:`command-rose-config-edit` via the menu
 :menuselection:`metadata --> hello_world_app --> planet.PlanetChanger.transform`.
 
 It should give a dialog explaining the changes it's made and asking
@@ -543,9 +543,9 @@ the option to specify a value for ``planet_name``. If you do, then
 that will be used as the new planet.
 
 Save your changes and run the transformer macro either from the
-command line or ``rose edit``. You should be prompted to provide a
-value for ``planet_name``. At the command line this will take the form
-of a prompt while in rose edit you will be presented with a dialog to
+command line or :ref:`command-rose-config-edit`. You should be prompted to
+provide a value for ``planet_name``. At the command line this will take the
+form of a prompt while in rose edit you will be presented with a dialog to
 enter values in, with defaults already entered for you.
 
 Specify a value to use for ``planet_name`` using a quoted string,

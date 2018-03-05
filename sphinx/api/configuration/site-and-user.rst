@@ -1,6 +1,6 @@
 .. _Site And User Configuration:
 
-Site and User Configuration
+Site And User Configuration
 ---------------------------
 
 Aspects of some Rose utilities can be configured per installation via the
@@ -49,3 +49,11 @@ and the setting will apply the next time you run ``rose config-edit``:
    .. rose:conf:: [rosie-ws]
 
       TODO
+
+   .. rose:conf:: rose-stem
+
+      TODO
+
+      .. rose:conf:: automatic-options
+
+         TODO

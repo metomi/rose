@@ -119,9 +119,11 @@ which will inherit metadata from metadata from
 Metadata Options
 ^^^^^^^^^^^^^^^^
 
-The metadata options for a configuration fall into 4 categories: sorting,
-:ref:`values <metadata values>`, behaviour and help. They are described
-separately below.
+The metadata options for a configuration fall into four categories:
+:ref:`sorting <metadata sorting>`,
+:ref:`values <metadata values>`,
+:ref:`behaviour <metadata behaviour>` and
+:ref:`help <metadata help>` as outlined below.
 
 .. rose:file:: rose-meta.conf
 
@@ -142,9 +144,9 @@ separately below.
      the namespace ``namelist/var_minimise``. If a namespace is defined for a
      section, it will become the default for all the settings in that section.
 
-     The namespace is used by the config editor to group settings, so that
-     they can be placed in different pages. A namespace for a section will
-     become the default for all the settings in that section.
+     The namespace is used by :ref:`command-rose-config-edit` to group
+     settings, so that they can be placed in different pages. A namespace for
+     a section will become the default for all the settings in that section.
 
      .. note::
         You should not assign namespaces to variables in duplicate sections.
@@ -156,8 +158,8 @@ separately below.
 
      It can also be used to order sections and namespaces.
 
-     The :rose:conf:`sort-key` is used by the config editor
-     (:ref:`command-rose-config-edit`) to group settings on a page.
+     The :rose:conf:`sort-key` is used by :ref:`command-rose-config-edit` to
+     group settings on a page.
      Items with a :rose:conf:`sort-key` will be sorted to the top of a
      name-space. Items without a :rose:conf:`sort-key` will be sorted after,
      in ascending order of their IDs.
@@ -191,7 +193,8 @@ separately below.
    .. rubric:: Metadata for Values
 
    These configuration metadata are used to define the valid values of a
-   setting. A Rose utility such as the config editor can use these metadata to
+   setting. A Rose utility such as :ref:`command-rose-config-edit` can use
+   these metadata to
    display the correct widget for a setting and to check its input. However,
    if the value of a setting contains a string that looks like an environment
    variable, these metadata will normally be ignored.
@@ -323,12 +326,13 @@ separately below.
       overrides the :rose:conf:`type`, :rose:conf:`range` and
       :rose:conf`pattern` metadata.
 
-      For example, the config editor may use this list to determine the widget
+      For example, :ref:`command-rose-config-edit` may use this list to
+      determine the widget
       to display the setting. It may display the choices using a set of radio
       buttons if the list of values is small, or a drop down combo box if the
       list of :rose:conf:`values` is large. If the list only contains one
-      value, the config editor will expect the setting to always have this
-      value, and may display it as a special setting.
+      value, :ref:`command-rose-config-edit` will expect the setting to always
+      have this value, and may display it as a special setting.
 
    .. rose:conf:: value-titles
 
@@ -345,8 +349,8 @@ separately below.
          values=0, 1, 2
          value-titles=low, medium, high
 
-      the config editor will display ``low`` for option value ``0``, ``medium``
-      for ``1`` and ``high`` for ``2``.
+      :ref:`command-rose-config-edit` will display ``low`` for option value
+      ``0``, ``medium`` for ``1`` and ``high`` for ``2``.
 
    .. rose:conf:: value-hints
 
@@ -365,16 +369,12 @@ separately below.
       :ref:`command-rose-config-edit` will display possible option values when
       the user starts typing if they match a suggested value.
 
-      .. TODO - all rose edit references
-
    .. rose:conf:: range
 
       Specify a range of values. It can either be a simple comma ``,``
       separated list of allowed values, or a logical expression in the Rose
       metadata :ref:`mini-language <app-meta-mini-lang>`. This metadata is
       only valid if :rose:conf:`type` is either ``integer`` or ``real``.
-
-      .. TODO - chase down this reference and probs rename it
 
       A simple list may contain a mixture of allowed numbers and number ranges
       such as ``1, 2, 4:8, 10:`` (which means the value can be 1, 2, between 4
@@ -539,8 +539,6 @@ separately below.
 
       See the associated setting :rose:conf:`fail-if` for more detail.
 
-
-
    .. _metadata behaviour:
 
    .. rubric:: Metadata for Behaviour
@@ -673,10 +671,10 @@ separately below.
       there may be more than one with the same metadata - for example multiple
       namelist groups of the same name. If this setting is true for a given
       name, the application configuration will accept multiple namelist groups
-      of this name. The config editor may then provide the option to clone or
-      copy a namelist to generate an additional namelist. Otherwise,
-      :ref:`command-rose-config-edit` may issue warning for configuration
-      sections that are found with multiple copies or an index.
+      of this name. :ref:`command-rose-config-edit` may then provide the
+      option to clone or copy a namelist to generate an additional namelist.
+      Otherwise, :ref:`command-rose-config-edit` may issue warning for
+      configuration sections that are found with multiple copies or an index.
 
    .. rose:conf:: macro
 
@@ -795,10 +793,10 @@ separately below.
 
          url=http://www.something.com/FOO/view/dev/doc/FOO.html
 
-      For example, the config editor will trigger a web browser to display this
-      when a variable name is clicked. A partial URL can be used for variables
-      if the variable's section or namespace has a relevant parent url property
-      to use as a prefix. For example:
+      For example, the :ref:`command-rose-config-edit` will trigger a web
+      browser to display this when a variable name is clicked. A partial URL
+      can be used for variables if the variable's section or namespace has a
+      relevant parent url property to use as a prefix. For example:
 
       .. code-block:: rose
 
@@ -821,7 +819,7 @@ separately below.
          help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to do something linear.
 
       Web URLs beginning with ``http://`` will also be presented as links in
-      the config editor.
+      the :ref:command-rose-config-edit`.
 
    .. rose:conf:: description
 
@@ -833,7 +831,7 @@ separately below.
       sections or namespaces as page header text (appears at the top of a
       panel or page), with clickable id and URL links as in help. Descriptions
       set for variables may be automatically shown underneath the variable
-      name in the config editor, depending on view options.
+      name in :ref:`command-rose-config-edit`, depending on view options.
 
    .. rose:conf:: title
 
@@ -859,8 +857,6 @@ order of precedence:
 * The content of the :envvar:`ROSE_META_PATH` environment variable.
 * The :rose:conf:`rose.conf|meta-path` setting (see :ref:`Site And User
   Configuration`).
-
-  .. TODO - document site "N" user conf.
 
 Each of the above settings can be a colon-separated list of paths.
 
@@ -1303,16 +1299,17 @@ details of the supported Pythonic syntax. This may change.
 Config Editor Ignored Mechanics
 -------------------------------
 
-This describes the intended behaviour of the config editor when there is
-an ignored state mismatch for a setting - e.g. a setting might be enabled
-when it should be trigger-ignored.
+This describes the intended behaviour of :ref:`command-rose-config-edit` when
+there is an ignored state mismatch for a setting - e.g. a setting might be
+enabled when it should be trigger-ignored.
 
 :ref:`command-rose-config-edit` differs from the strict command line macro
 equivalent (:ref:`command-rose-macro`)
 because the *Switch Off Metadata* mode and accidentally metadata-less
 configurations need to be presented in a nice way without lots of
-not-necessarily-errors. The config editor should only report the errors
-where the state is definitely wrong or makes a material difference to the user.
+not-necessarily-errors. :ref:`command-rose-config-edit` should only report the
+errors where the state is definitely wrong or makes a material difference to
+the user.
 
 The table contains error and fixing information for some varieties of
 ignored state mismatches. The actual situations are considerably more

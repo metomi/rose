@@ -82,7 +82,7 @@ Create a new rose app called ``spaceship``::
 
    mkdir -p rose-stem/app/spaceship
 
-Paste the following configuration into a ``rose-app.conf`` file within
+Paste the following configuration into a :rose:file:`rose-app.conf` file within
 that directory:
 
 .. code-block:: rose
@@ -109,11 +109,11 @@ that directory:
 The ``fcm-make`` app
 --------------------
 
-We now need to provide the instructions for ``fcm-make`` to build the
+We now need to provide the instructions for :rose:app:`fcm_make` to build the
 Fortran executable.
 
 Create a new app called ``fcm_make_spaceship`` with an empty
-``rose-app.conf`` file.
+:rose:file:`rose-app.conf` file.
 
 Inside this app create a subdirectory called ``file`` and paste the following
 into the ``fcm-make.cfg`` file within that directory:
@@ -169,9 +169,9 @@ The ``rose-suite.conf`` file
 
 The suites associated with ``rose stem`` require a version number
 indicating the version of the ``rose stem`` command with which they
-are compatible. This is specified in the ``rose-suite.conf`` file,
+are compatible. This is specified in the :rose:file:`rose-suite.conf` file,
 together with the default values of ``RUN_NAMES`` and ``SOURCE_SPACESHIP``.
-Paste the following into your ``rose-suite.conf`` file:
+Paste the following into your :rose:file:`rose-suite.conf` file:
 
 .. code-block:: rose
 
@@ -188,11 +188,11 @@ execute ``rose stem`` on the command line.
 The ``rose_ana_position`` app
 -----------------------------
 
-The final component is a ``rose ana`` app to test whether the position of our
-spaceship matches the correct output.
+The final component is a :rose:app:`rose_ana` app to test whether the position
+of our spaceship matches the correct output.
 
 Create an app named ``rose_ana_position`` and paste the following into its
-``rose-app.conf`` file:
+:rose:file:`rose-app.conf` file.
 
 .. code-block:: rose
 
@@ -222,8 +222,8 @@ In the root of the working copy is a file called ``kgo.txt``.
 
 The known good output should be the result of a control run. ``rose ana``
 will compare the answers from this file (obtained using the extract and
-comparison methods in the ``rose-app.conf`` file) with the results from
-the user's code change.
+comparison methods in the :rose:file:`rose-app.conf` file) with the results
+from the user's code change.
 
 Replace the ``/home/user/spaceship`` paths in the ``rose_ana_position``
 app with the path to this file.
@@ -295,12 +295,11 @@ Automatic Options
 -----------------
 
 It is possible to automatically add options to ``rose stem`` using the
-``automatic-options`` variable in a section named ``[rose-stem]`` in the site
-``rose.conf`` file. This takes the syntax of key-value pairs on a single
+:rose:conf:`rose.conf[rose-stem]automatic-options` variable in the
+:ref:`Site And User Configuration` file.
+This takes the syntax of key-value pairs on a single
 line, and is functionally equivalent to adding them using the ``-S``
 option on the ``rose stem`` command line. For example:
-
-.. TODO - link to rose.conf file in user guide when translated
 
 .. code-block:: rose
 
