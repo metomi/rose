@@ -127,717 +127,737 @@ The metadata options for a configuration fall into four categories:
 
 .. rose:file:: rose-meta.conf
 
-   .. _metadata sorting:
+   .. rose:conf:: SETTING
 
-   .. rubric:: Metadata for Sorting
+      A section containing metadata items relating to a particular setting.
 
-   These configuration metadata are used for grouping and sorting the IDs of
-   the configurations.
+      ``SETTING`` should be the full name of a configuration containing the
+      name of the section and the name of the setting separated by an equals
+      ``=`` sign e.g:
 
-   .. rose:conf:: ns
+      * ``[env=FOO]`` would refer to the environment variable ``FOO``
+      * ``[namelist:foo=BAR]`` would refer to ``BAR`` from the namelist
+        ``foo``.
 
-     A forward slash ``/`` delimited hierarchical namespace for the container
-     of the setting, which overrides the default. The default namespace for the
-     setting is derived from the first part of the ID - by splitting up the
-     section name by colons ``:`` or forward slashes ``/``. For example, a
-     configuration with an ID ``namelist:var_minimise=niter_set`` would have
-     the namespace ``namelist/var_minimise``. If a namespace is defined for a
-     section, it will become the default for all the settings in that section.
+      .. _metadata sorting:
 
-     The namespace is used by :ref:`command-rose-config-edit` to group
-     settings, so that they can be placed in different pages. A namespace for
-     a section will become the default for all the settings in that section.
+      .. rubric:: Metadata for Sorting
 
-     .. note::
-        You should not assign namespaces to variables in duplicate sections.
+      These configuration metadata are used for grouping and sorting the IDs of
+      the configurations.
 
-   .. rose:conf:: sort-key
+      .. rose:conf:: ns
 
-     A character string that can be used as a sort key for ordering an option
-     within its namespace.
+        A forward slash ``/`` delimited hierarchical namespace for the
+        container of the setting, which overrides the default. The default
+        namespace for the setting is derived from the first part of the ID -
+        by splitting up the section name by colons ``:`` or forward slashes
+        ``/``. For example, a configuration with an ID
+        ``namelist:var_minimise=niter_set`` would have the namespace
+        ``namelist/var_minimise``. If a namespace is defined for a section, it
+        will become the default for all the settings in that section.
 
-     It can also be used to order sections and namespaces.
-
-     The :rose:conf:`sort-key` is used by :ref:`command-rose-config-edit` to
-     group settings on a page.
-     Items with a :rose:conf:`sort-key` will be sorted to the top of a
-     name-space. Items without a :rose:conf:`sort-key` will be sorted after,
-     in ascending order of their IDs.
-
-     The sorting procedure in pseudo code is a normal ASCII-like sorting of a
-     list of ``setting_sort_key + "~" + setting_id`` strings. If there is no
-     ``setting_sort_key``, null string will be used.
-
-     For example, the following metadata:
-
-     .. code-block:: rose
-
-        [env=apple]
-
-        [env=banana]
-
-        [env=cherry]
-        sort-key=favourites-01
-
-        [env=melon]
-        sort-key=do-not-like-01
-
-        [env=prune]
-        sort-key=do-not-like-00
-
-     would produce a sorting order of ``env=prune``, ``env=melon``,
-     ``env=cherry``, ``env=apple``, ``env=banana``.
-
-   .. _metadata values:
-
-   .. rubric:: Metadata for Values
-
-   These configuration metadata are used to define the valid values of a
-   setting. A Rose utility such as :ref:`command-rose-config-edit` can use
-   these metadata to
-   display the correct widget for a setting and to check its input. However,
-   if the value of a setting contains a string that looks like an environment
-   variable, these metadata will normally be ignored.
-
-   .. rose:conf:: type
-
-      :default: raw
-
-      The type/class of the setting. The type names are based on the
-      intrinsic Fortran types, such as ``integer`` and ``real``. Currently
-      supported types are:
-
-      boolean
-        *example option*: ``PRODUCE_THINGS=true``
-
-        *description*: either ``true`` or ``false``
-
-        *usage*: environment variables, javascript/JSON inputs
-
-      character
-        *example option*: ``sea_colour='blue'``
-
-        *description*: Fortran character type - a single quoted string, single
-        quotes escaped in pairs
-
-        *usage*: Fortran character types
-
-      integer
-        *example option*: ``num_lucky=5``
-
-        *description*: generic integer type
-
-        *usage*: any integer-type input
-
-      logical
-        *example option*: ``l_spock=.true.``
-
-        *description*: Fortran logical type - either ``.true.`` or ``.false.``
-
-        *usage*: Fortran logical types
-
-      python_boolean
-        *example option*: ``ENABLE_THINGS=True``
-
-        *description*: Python boolean type - either ``True`` or ``False``
-
-        *usage*: Python boolean types
-
-      python_list
-        *description*: used to signify a Python-compatible formatted list such
-        as ``["Foo", 50, False]``.
-       
-        .. warning::
-           This encapsulates ``length``, so do not use a
-           separate ``length`` declaration for this setting.
-
-        *usage*: use for inputs that expect a string that looks like a Python
-        list - e.g. Jinja2 list input variables.
-
-      quoted
-        *example option*: ``js_measure_cloud_mode="laser"``
-
-        *description*: a double quoted string, double quotes escaped with
-        backslash
-
-        *usage*: Inputs that require double quotes and allow backslash escaping
-        e.g. javascript/JSON inputs.
-
-      real
-         *example option*: ``n_avogadro=6.02e23``
-        
-         *description*: Fortran real number type, generic floating point numbers
-
-         *usage*: Fortran real types, generic floating point numbers.
-        
-         .. note::
-            Scientific notation must use the "e" or "E" format.
-
-         *comment*: Internally implemented within Rose using Python's
-         `floating point`_ specification.
-
-      raw
-        *description*: placeholder used in derived type specifications where
-        none of the above types apply
-
-        *usage*: only in derived types
-
-      spaced_list
-        *description*: used to signify a space separated list such as
-        ``"Foo" 50 False``.
-
-        *usage*: use for inputs that expect a string that contains a number of
-        space separated items - e.g. in ``fcm_make`` app configs.
+        The namespace is used by :ref:`command-rose-config-edit` to group
+        settings, so that they can be placed in different pages. A namespace for
+        a section will become the default for all the settings in that section.
 
         .. note::
-           Not all inputs need to have ``type`` defined. In some cases using
-           ``values`` or ``pattern`` is better.
+           You should not assign namespaces to variables in duplicate sections.
 
-      A derived type may be defined by a comma ``,`` separated list of intrinsic
-      types, e.g. ``integer, character, real, integer``. The default is a raw
-      string.
+      .. rose:conf:: sort-key
 
-   .. rose:conf:: length
+        A character string that can be used as a sort key for ordering an option
+        within its namespace.
 
-      Define the length of an array. If not present, the setting is assumed to
-      be a scalar. A positive integer defines a fixed length array. A colon
-      ``:`` defines a dynamic length array.
+        It can also be used to order sections and namespaces.
 
-      .. note::
-         You do not need to use :rose:conf:`length` if you already have
-         :rose:conf:`type=python_list` for a setting.
+        The :rose:conf:`sort-key` is used by :ref:`command-rose-config-edit` to
+        group settings on a page.
+        Items with a :rose:conf:`sort-key` will be sorted to the top of a
+        name-space. Items without a :rose:conf:`sort-key` will be sorted after,
+        in ascending order of their IDs.
 
-   .. rose:conf:: element-titles
+        The sorting procedure in pseudo code is a normal ASCII-like sorting of a
+        list of ``setting_sort_key + "~" + setting_id`` strings. If there is no
+        ``setting_sort_key``, null string will be used.
 
-      Define a list of comma separated "titles" to appear above array entries.
-      If not present then no titles are displayed.
+        For example, the following metadata:
 
-      .. note::
-         Where the number of :rose:conf:`element-titles` is greater than
-         the length of the array, it will only display titles up to the
-         length of the array.
-         Additionally, where the associated array is longer than the number of
-         :rose:conf:`element-titles`, blank headings will be placed above them.
+        .. code-block:: rose
 
-   .. rose:conf:: values
+           [env=apple]
 
-      Define a comma ``,`` separated list of permitted values of a setting
-      (or an element in the setting if it is an array). This metadata
-      overrides the :rose:conf:`type`, :rose:conf:`range` and
-      :rose:conf`pattern` metadata.
+           [env=banana]
 
-      For example, :ref:`command-rose-config-edit` may use this list to
-      determine the widget
-      to display the setting. It may display the choices using a set of radio
-      buttons if the list of values is small, or a drop down combo box if the
-      list of :rose:conf:`values` is large. If the list only contains one
-      value, :ref:`command-rose-config-edit` will expect the setting to always
-      have this value, and may display it as a special setting.
+           [env=cherry]
+           sort-key=favourites-01
 
-   .. rose:conf:: value-titles
+           [env=melon]
+           sort-key=do-not-like-01
 
-      Define a comma ``,`` separated list of titles to associate with each
-      of the elements of :rose:conf:`values` which will be displayed
-      instead of the value. This list should contain the same number of
-      elements as the :rose:conf:`values` entry.
+           [env=prune]
+           sort-key=do-not-like-00
 
-      For example, given the following metadata:
+        would produce a sorting order of ``env=prune``, ``env=melon``,
+        ``env=cherry``, ``env=apple``, ``env=banana``.
 
-      .. code-block:: rose
+      .. _metadata values:
 
-         [env=HEAT]
-         values=0, 1, 2
-         value-titles=low, medium, high
+      .. rubric:: Metadata for Values
 
-      :ref:`command-rose-config-edit` will display ``low`` for option value
-      ``0``, ``medium`` for ``1`` and ``high`` for ``2``.
+      These configuration metadata are used to define the valid values of a
+      setting. A Rose utility such as :ref:`command-rose-config-edit` can use
+      these metadata to
+      display the correct widget for a setting and to check its input. However,
+      if the value of a setting contains a string that looks like an environment
+      variable, these metadata will normally be ignored.
 
-   .. rose:conf:: value-hints
+      .. rose:conf:: type
 
-      Define a comma ``,`` separated list of suggested values for a variable as
-      value "hints", but still allows the user to provide their own override.
-      This is like an auto-complete widget.
+         :default: raw
 
-      For example, given the following metadata:
+         The type/class of the setting. The type names are based on the
+         intrinsic Fortran types, such as ``integer`` and ``real``. Currently
+         supported types are:
 
-      .. code-block:: rose
+         boolean
+           *example option*: ``PRODUCE_THINGS=true``
 
-         [env=suggested_fruit]
-         value-hints=pineapple,cherry,banana,apple,pear,mango,kiwi,grapes,peach,fig,
-                    =orange,strawberry,blackberry,blackcurrent,raspberry,melon,plum
+           *description*: either ``true`` or ``false``
 
-      :ref:`command-rose-config-edit` will display possible option values when
-      the user starts typing if they match a suggested value.
+           *usage*: environment variables, javascript/JSON inputs
 
-   .. rose:conf:: range
+         character
+           *example option*: ``sea_colour='blue'``
 
-      Specify a range of values. It can either be a simple comma ``,``
-      separated list of allowed values, or a logical expression in the Rose
-      metadata :ref:`mini-language <app-meta-mini-lang>`. This metadata is
-      only valid if :rose:conf:`type` is either ``integer`` or ``real``.
+           *description*: Fortran character type - a single quoted string,
+           single quotes escaped in pairs
 
-      A simple list may contain a mixture of allowed numbers and number ranges
-      such as ``1, 2, 4:8, 10:`` (which means the value can be 1, 2, between 4
-      and 8 inclusive, or any values greater than or equal to 10.)
+           *usage*: Fortran character types
 
-      A logical expression uses the Rose metadata
-      :ref:`mini-language <app-meta-mini-lang>`, using the variable ``this``
-      to denote the value of the current setting, e.g.
-      ``this <-1 and this >1``.
+         integer
+           *example option*: ``num_lucky=5``
 
-      .. warning::
-         Inter-variable comparisons are not permitted (but see the ``fail-if``
-         property below for a way to implement this).
+           *description*: generic integer type
 
-   .. rose:conf:: pattern
+           *usage*: any integer-type input
 
-      Specify a regular expression (`Python Regular Expressions`_) to
-      compare against the whole value of the setting.
+         logical
+           *example option*: ``l_spock=.true.``
 
-      For example, if we write the following metadata:
+           *description*: Fortran logical type - either ``.true.`` or
+           ``.false.``
 
-      .. code-block:: rose
+           *usage*: Fortran logical types
 
-         [namelist:cheese=country_of_origin]
-         pattern=^"[A-Z].+"$
+         python_boolean
+           *example option*: ``ENABLE_THINGS=True``
 
-      then we expect all valid values for ``country_of_origin`` to start with a
-      double quote (``^"``), begin with an uppercase letter (``[A-Z]``),
-      contain some other characters or spaces (``.+``), and end with a quote
-      (``"$``).
+           *description*: Python boolean type - either ``True`` or ``False``
 
-      If you have an array variable (for example,
-      ``TARTAN_PAINT_COLOURS='blue','red','blue'``) and you want to specify a
-      pattern that each element of the array must match, you can construct a
-      regular expression that repeats and includes commas. For example, if each
-      element in our ``TARTAN_PAINT_COLOURS`` array must obey the regular
-      expression ``'red'|'blue'``, then we can write:
+           *usage*: Python boolean types
 
-      .. code-block:: rose
+         python_list
+           *description*: used to signify a Python-compatible formatted list
+           such as ``["Foo", 50, False]``.
 
-         [env=TARTAN_PAINT_COLOURS]
-         length=:
-         pattern=^('red'|'blue')(?:,('red'|'blue'))*$
+           .. warning::
+              This encapsulates ``length``, so do not use a
+              separate ``length`` declaration for this setting.
 
-   .. rose:conf:: fail-if
+           *usage*: use for inputs that expect a string that looks like a Python
+           list - e.g. Jinja2 list input variables.
 
-      Specify a logical expression using the Rose
-      :ref:`mini-language <app-meta-mini-lang>` to validate the
-      value of the current setting with respect to other settings. If the
-      logical expression evaluates to true, the system will
-      consider the setting in error.
+         quoted
+           *example option*: ``js_measure_cloud_mode="laser"``
 
-      See the associated setting :rose:conf:`warn-if` for raising warnings.
-      
-      The logical expression uses a Python-like syntax (documented in the
-      :ref:`appendix <app-meta-mini-lang>`). It can reference the value of the
-      current setting with the ``this`` variable and the value of other
-      settings with their IDs. E.g.:
+           *description*: a double quoted string, double quotes escaped with
+           backslash
 
-      .. code-block:: rose
+           *usage*: Inputs that require double quotes and allow backslash
+           escaping e.g. javascript/JSON inputs.
 
-         [namelist:test=my_test_var]
-         fail-if=this < namelist:test=control_lt_var;
+         real
+            *example option*: ``n_avogadro=6.02e23``
 
-      means that an error will be flagged if the numeric value of
-      ``my_test_var`` is less than the numeric value of ``control_lt_var``.
+            *description*: Fortran real number type, generic floating point
+            numbers
 
-      .. code-block:: rose
+            *usage*: Fortran real types, generic floating point numbers.
 
-         fail-if=this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this);
+            .. note::
+               Scientific notation must use the "e" or "E" format.
 
-      shows a more complex operation, again with numeric values.
+            *comment*: Internally implemented within Rose using Python's
+            `floating point`_ specification.
 
-      To check array elements, the ID should be expressed with a bracketed
-      index, as in the configuration:
+         raw
+           *description*: placeholder used in derived type specifications where
+           none of the above types apply
 
-      .. code-block:: rose
+           *usage*: only in derived types
 
-         fail-if=this(2) != "'0A'" and this(4) == "'0A'";
+         spaced_list
+           *description*: used to signify a space separated list such as
+           ``"Foo" 50 False``.
 
-      .. note::
+           *usage*: use for inputs that expect a string that contains a number
+           of space separated items - e.g. in ``fcm_make`` app configs.
 
-         With array elements indexing starts from 1.
+           .. note::
+              Not all inputs need to have ``type`` defined. In some cases using
+              ``values`` or ``pattern`` is better.
 
-      Array elements can also be checked using ``any`` and ``all``. E.g.:
+         A derived type may be defined by a comma ``,`` separated list of
+         intrinsic types, e.g. ``integer, character, real, integer``. The
+         default is a raw string.
 
-      .. code-block:: rose
+      .. rose:conf:: length
 
-         fail-if=any(namelist:test=ctrl_array < this);
-         fail-if=all(this == 0);
+         Define the length of an array. If not present, the setting is assumed
+         to be a scalar. A positive integer defines a fixed length array. A
+         colon ``:`` defines a dynamic length array.
 
-      Similarly, the number of array elements can be checked using ``len``. E.g.:
+         .. note::
+            You do not need to use :rose:conf:`length` if you already have
+            :rose:conf:`type=python_list` for a setting.
 
-      .. code-block:: rose
+      .. rose:conf:: element-titles
 
-         fail-if=len(namelist:test=ctrl_array) < this;
-         fail-if=len(this) == 0;
+         Define a list of comma separated "titles" to appear above array
+         entries. If not present then no titles are displayed.
 
-      Expressions can be chained together and brackets used:
+         .. note::
+            Where the number of :rose:conf:`element-titles` is greater than
+            the length of the array, it will only display titles up to the
+            length of the array.
+            Additionally, where the associated array is longer than the number
+            of :rose:conf:`element-titles`, blank headings will be placed above
+            them.
 
-      .. code-block:: rose
+      .. rose:conf:: values
 
-         fail-if=this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or
-         namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'));
+         Define a comma ``,`` separated list of permitted values of a setting
+         (or an element in the setting if it is an array). This metadata
+         overrides the :rose:conf:`type`, :rose:conf:`range` and
+         :rose:conf`pattern` metadata.
 
-      Multiple failure conditions can be added, by using a semicolon as the
-      separator - the semicolon is optional for a single statement or the last in
-      a block, but is recommended. Multiple failure conditions are essentially
-      similar to chaining them together with ``or``, but the system can process
-      each expression one by one to target the error message.
+         For example, :ref:`command-rose-config-edit` may use this list to
+         determine the widget
+         to display the setting. It may display the choices using a set of radio
+         buttons if the list of values is small, or a drop down combo box if the
+         list of :rose:conf:`values` is large. If the list only contains one
+         value, :ref:`command-rose-config-edit` will expect the setting to
+         always have this value, and may display it as a special setting.
 
-      .. code-block:: rose
+      .. rose:conf:: value-titles
 
-         fail-if=this > 0; this % 2 == 1; this * 3 > 100;
+         Define a comma ``,`` separated list of titles to associate with each
+         of the elements of :rose:conf:`values` which will be displayed
+         instead of the value. This list should contain the same number of
+         elements as the :rose:conf:`values` entry.
 
-      You can add a message to the error or warning message to make it clearer
-      by adding a hash followed by the comment at the end of a configuration
-      metadata line:
+         For example, given the following metadata:
 
-      .. code-block:: rose
+         .. code-block:: rose
 
-         # Need common divisor for ctrl_array
-         fail-if=any(namelist:test=ctrl_array % this == 0);
+            [env=HEAT]
+            values=0, 1, 2
+            value-titles=low, medium, high
 
-      When using multiple failure conditions, different messages can be added
-      if they are placed on individual lines:
+         :ref:`command-rose-config-edit` will display ``low`` for option value
+         ``0``, ``medium`` for ``1`` and ``high`` for ``2``.
 
-      .. code-block:: rose
+      .. rose:conf:: value-hints
 
-         fail-if=this > 0; # Needs to be less than or equal to 0
-                 this % 2 == 1; # Needs to be odd
-                 this * 3 > 100; # Needs to be more than 100/3.
+         Define a comma ``,`` separated list of suggested values for a variable
+         as value "hints", but still allows the user to provide their own
+         override. This is like an auto-complete widget.
 
-      A slightly different usage of this functionality can do things like
-      warn of deprecated content:
+         For example, given the following metadata:
 
-      .. code-block:: rose
+         .. code-block:: rose
 
-         warn-if=True;  # This option is deprecated
+            [env=suggested_fruit]
+            value-hints=pineapple,cherry,banana,apple,pear,mango,kiwi,grapes,peach,fig,
+                       =orange,strawberry,blackberry,blackcurrent,raspberry,melon,plum
 
-      This would always evaluate ``True`` and give a warning if the setting is
-      present.
+         :ref:`command-rose-config-edit` will display possible option values when
+         the user starts typing if they match a suggested value.
 
-      .. note::
-         When dividing a real-numbered setting by something, make
-         sure that the expression does not actually divide an integer by an
-         integer - for example, ``this / 2`` will evaluate as ``0`` if ``this``
-         has a value of ``1``, but ``0.5`` if it has a value of ``1.0``. This
-         is a result of Python's implicit typing.
+      .. rose:conf:: range
 
-         You can get around this by making sure either the numerator or
-         denominator is a real number - e.g. by rewriting it as ``this / 2.0``
-         or ``1.0 * this / 2``.
+         Specify a range of values. It can either be a simple comma ``,``
+         separated list of allowed values, or a logical expression in the Rose
+         metadata :ref:`mini-language <app-meta-mini-lang>`. This metadata is
+         only valid if :rose:conf:`type` is either ``integer`` or ``real``.
 
-   .. rose:conf:: warn-if
+         A simple list may contain a mixture of allowed numbers and number
+         ranges such as ``1, 2, 4:8, 10:`` (which means the value can be 1, 2,
+         between 4 and 8 inclusive, or any values greater than or equal to 10.)
 
-      Specify a logical expression using the Rose
-      :ref:`mini-language <app-meta-mini-lang>` to validate the
-      value of the current setting with respect to other settings. If the
-      logical expression evaluates to true, the system will
-      issue a warning.
+         A logical expression uses the Rose metadata
+         :ref:`mini-language <app-meta-mini-lang>`, using the variable ``this``
+         to denote the value of the current setting, e.g.
+         ``this <-1 and this >1``.
 
-      See the associated setting :rose:conf:`fail-if` for more detail.
+         .. warning::
+            Inter-variable comparisons are not permitted (but see the ``fail-if``
+            property below for a way to implement this).
 
-   .. _metadata behaviour:
+      .. rose:conf:: pattern
 
-   .. rubric:: Metadata for Behaviour
+         Specify a regular expression (`Python Regular Expressions`_) to
+         compare against the whole value of the setting.
 
-   These metadata are used to define how the setting should behave in different
-   states.
+         For example, if we write the following metadata:
 
-   .. rose:conf:: compulsory
+         .. code-block:: rose
 
-      A ``true`` value indicates that the setting should be compulsory. If this
-      flag is not set, the setting is optional.
+            [namelist:cheese=country_of_origin]
+            pattern=^"[A-Z].+"$
 
-      Compulsory sections should be physically present in the configuration at
-      all times. Compulsory options should be physically present in the
-      configuration if their parent section is physically present.
+         then we expect all valid values for ``country_of_origin`` to start with
+         a double quote (``^"``), begin with an uppercase letter (``[A-Z]``),
+         contain some other characters or spaces (``.+``), and end with a quote
+         (``"$``).
 
-      Optional settings can be removed as the user wishes. Compulsory settings
-      may however be triggered ignored (see :rose:conf:`trigger`). For
-      example, the :ref:`command-rose-config-edit` may
-      issue a warning if a compulsory setting is not defined. It may also hide
-      a compulsory variable that only has a single permitted value.
+         If you have an array variable (for example,
+         ``TARTAN_PAINT_COLOURS='blue','red','blue'``) and you want to specify a
+         pattern that each element of the array must match, you can construct a
+         regular expression that repeats and includes commas. For example, if
+         each element in our ``TARTAN_PAINT_COLOURS`` array must obey the
+         regular expression ``'red'|'blue'``, then we can write:
 
-   .. rose:conf:: trigger
+         .. code-block:: rose
 
-      A setting has the following states:
+            [env=TARTAN_PAINT_COLOURS]
+            length=:
+            pattern=^('red'|'blue')(?:,('red'|'blue'))*$
 
-      * normal
-      * user ignored (stored in the configuration file with a ``!`` flag,
-        ignored at run time)
-      * logically ignored (stored in the configuration file with a ``!!`` flag,
-        ignored at runtime)
+      .. rose:conf:: fail-if
 
-      If a setting is user ignored, the trigger will do nothing. Otherwise:
+         Specify a logical expression using the Rose
+         :ref:`mini-language <app-meta-mini-lang>` to validate the
+         value of the current setting with respect to other settings. If the
+         logical expression evaluates to true, the system will
+         consider the setting in error.
 
-      * If the logic for a setting in the trigger is fulfilled, it will cause
-        the setting to be enabled.
-      * If it is not, it will cause the setting to be logically ignored.
+         See the associated setting :rose:conf:`warn-if` for raising warnings.
 
-      The trigger expression is a list of settings triggered by (different
-      values of) this setting. If the values are not given, the setting will be
-      triggered only if the current setting is enabled.
+         The logical expression uses a Python-like syntax (documented in the
+         :ref:`appendix <app-meta-mini-lang>`). It can reference the value of
+         the current setting with the ``this`` variable and the value of other
+         settings with their IDs. E.g.:
 
-      The syntax contains id-values pairs, where the values part is optional.
-      Each pair must be separated by a semi-colon. Within each pair, any values
-      must be separated from the id by a colon (``:``) and a space. Values
-      must be formatted in the same way as the setting :rose:conf:`values`
-      defined above (i.e. comma separated).
+         .. code-block:: rose
 
-      .. NOTEFORWRITERS - it is not possible to put a space at end of double
-         backquotes so can't put ': ' in inline monospace font above :(.
+            [namelist:test=my_test_var]
+            fail-if=this < namelist:test=control_lt_var;
 
-      The trigger syntax looks like:
+         means that an error will be flagged if the numeric value of
+         ``my_test_var`` is less than the numeric value of ``control_lt_var``.
 
-      .. code-block:: rose
+         .. code-block:: rose
 
-         [namelist:trig_nl=trigger_variable]
-         trigger=namelist:dep_nl=A;
-                 namelist:dep_nl=B;
-                 namelist:value_nl=X: 10;
-                 env=Y: 20, 30, 40;
-                 namelist:value_nl=Z: 20;
+            fail-if=this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this);
 
-      In this example:
+         shows a more complex operation, again with numeric values.
 
-      * When ``namelist:trig_nl=trigger_variable`` is ignored, all the
-        variables in the trigger expression will be ignored, irrespective of
-        its value.
-      * When ``namelist:trig_nl=trigger_variable`` is enabled,
-        ``namelist:dep_nl=A`` and ``namelist:dep_nl=B`` will both be enabled,
-        and the other variables may be enabled according to its value:
+         To check array elements, the ID should be expressed with a bracketed
+         index, as in the configuration:
 
-        * When the value of the setting is not ``10``, ``20``, ``30``, or
-          ``40``, ``namelist:value_nl=X``, ``env=Y`` and
-          ``namelist:value_nl=Z`` will be ignored.
-        * When the value of the setting is ``10``, ``namelist:value_nl=X``
-          will be enabled, but ``env=Y`` and ``namelist:value_nl=Z`` will be
-          ignored.
-        * When the value of the setting is ``20``, ``env=Y`` and
-          ``namelist:value_nl=Z`` will be enabled, but ``namelist:value_nl=X``
-          will be ignored.
-        * When the value of the setting is ``30``, ``env=Y`` will be enabled,
-          but ``namelist:value_nl=X`` and ``namelist:value_nl=Z`` will be
-          ignored.
-        * If the value of the setting contains an environment
-          variable-like string, e.g. ``${TEN_MULTIPLE}``, all three will be
-          enabled.
+         .. code-block:: rose
 
-      Settings mentioned in trigger expressions will have their default
-      state set to ignored unless explicitly triggered.
-      :ref:`command-rose-config-edit` will issue warnings if variables or
-      sections are in the incorrect state when it loads a configuration.
-      Triggering thereafter will work as normal.
+            fail-if=this(2) != "'0A'" and this(4) == "'0A'";
 
-      Where multiple triggers act on a setting, the setting is triggered only
-      if all triggers are active (i.e. an *AND* relationship). For example, for
-      the two triggers here:
+         .. note::
 
-      .. code-block:: rose
+            With array elements indexing starts from 1.
 
-         [env=IS_WATER]
-         trigger=env=IS_ICE: true;
+         Array elements can also be checked using ``any`` and ``all``. E.g.:
 
-         [env=IS_COLD]
-         trigger=env=IS_ICE: true;
+         .. code-block:: rose
 
-      the setting ``env=IS_ICE`` is only enabled if both ``env=IS_WATER`` and
-      ``env=IS_COLD`` are ``true`` and enabled. Otherwise, it is ignored.
+            fail-if=any(namelist:test=ctrl_array < this);
+            fail-if=all(this == 0);
 
-      The trigger syntax also supports a logical expression using the Rose 
-      metadata :ref:`mini-language <app-meta-mini-lang>`, in the same way as
-      the :rose:conf:`range` or :rose:conf`fail-if` metadata. As with
-      :rose:conf`range`, inter-variable comparisons are disallowed.
+         Similarly, the number of array elements can be checked using ``len``.
+         E.g.:
 
-      .. code-block:: rose
+         .. code-block:: rose
 
-         [env=SNOWFLAKE_SIDES]
-         trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
-                 env=SILLY_SNOWFLAKE_GEOMETRY: this < 2;
+            fail-if=len(namelist:test=ctrl_array) < this;
+            fail-if=len(this) == 0;
 
-      In this example, the setting ``env=CUSTOM_SNOWFLAKE_GEOMETRY`` is enabled
-      if ``env=SNOWFLAKE_SIDES`` is enabled and not ``6``.
-      ``env=SILLY_SNOWFLAKE_GEOMETRY`` is only enabled when
-      ``env=SNOWFLAKE_SIDES`` is enabled and less than ``2``. The logical
-      expression syntax can be used with non-numeric variables in the same way
-      as the fail-if metadata.
+         Expressions can be chained together and brackets used:
 
-   .. rose:conf:: duplicate
+         .. code-block:: rose
 
-      Allow duplicated copies of the setting. This is used for sections where
-      there may be more than one with the same metadata - for example multiple
-      namelist groups of the same name. If this setting is true for a given
-      name, the application configuration will accept multiple namelist groups
-      of this name. :ref:`command-rose-config-edit` may then provide the
-      option to clone or copy a namelist to generate an additional namelist.
-      Otherwise, :ref:`command-rose-config-edit` may issue warning for
-      configuration sections that are found with multiple copies or an index.
+            fail-if=this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or
+            namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'));
 
-   .. rose:conf:: macro
+         Multiple failure conditions can be added, by using a semicolon as the
+         separator - the semicolon is optional for a single statement or the
+         last in a block, but is recommended. Multiple failure conditions are
+         essentially similar to chaining them together with ``or``, but the
+         system can process each expression one by one to target the error
+         message.
 
-      Associate a setting with a comma-delimited set of custom macros (but not
-      upgrade macros).
+         .. code-block:: rose
 
-      E.g. for a macro class called ``FibonacciChecker`` in the metadata under
-      ``lib/python/macros/fib.py``, we may have:
+            fail-if=this > 0; this % 2 == 1; this * 3 > 100;
 
-      .. code-block:: rose
+         You can add a message to the error or warning message to make it
+         clearer by adding a hash followed by the comment at the end of a
+         configuration metadata line:
 
-         macro=fib.FibonacciChecker
+         .. code-block:: rose
 
-      This may be used in :ref:`command-rose-config-edit` to visually
-      associate the setting with these macros. If a macro class has both a
-      ``transform`` and a ``validate`` method, you can specify which you need
-      by appending the method to the name e.g.:
+            # Need common divisor for ctrl_array
+            fail-if=any(namelist:test=ctrl_array % this == 0);
 
-     .. code-block:: rose
+         When using multiple failure conditions, different messages can be added
+         if they are placed on individual lines:
 
-        macro=fib.Fibonacci.validate
+         .. code-block:: rose
 
-   .. rose:conf:: widget[gui-application]
+            fail-if=this > 0; # Needs to be less than or equal to 0
+                    this % 2 == 1; # Needs to be odd
+                    this * 3 > 100; # Needs to be more than 100/3.
 
-      Indicate that the gui-application (e.g. :ref:`command-rose-config-edit`)
-      should use a special widget to display this setting.
+         A slightly different usage of this functionality can do things like
+         warn of deprecated content:
 
-      E.g. If we want to use a slider instead of an entry box for a floating
-      point real number.
+         .. code-block:: rose
 
-      The widget may take space-delimited arguments which would be specified
-      after the widget name. E.g. to set up a hypothetical table with named
-      columns X, Y, VCT, and Level, we may do:
+            warn-if=True;  # This option is deprecated
 
-      .. code-block:: rose
+         This would always evaluate ``True`` and give a warning if the setting
+         is present.
 
-         widget[rose-config-edit]=table.TableWidget X Y VCT Level
+         .. note::
+            When dividing a real-numbered setting by something, make
+            sure that the expression does not actually divide an integer by an
+            integer - for example, ``this / 2`` will evaluate as ``0`` if
+            ``this`` has a value of ``1``, but ``0.5`` if it has a value of
+            ``1.0``. This is a result of Python's implicit typing.
 
-      You may override to a Rose built-in widget by specifying a full ``rose``
-      class path in Python - for example, to always show radiobuttons for an
-      option with :rose:conf:`values` set:
+            You can get around this by making sure either the numerator or
+            denominator is a real number - e.g. by rewriting it as
+            ``this / 2.0`` or ``1.0 * this / 2``.
 
-      .. code-block:: rose
+      .. rose:conf:: warn-if
 
-         widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
+         Specify a logical expression using the Rose
+         :ref:`mini-language <app-meta-mini-lang>` to validate the
+         value of the current setting with respect to other settings. If the
+         logical expression evaluates to true, the system will
+         issue a warning.
 
-      Another useful Rose built-in widget to use is the array element
-      aligning :ref:`page widget <conf-ed-cust-pages>`,
-      ``rose.config_editor.pagewidget.table.PageArrayTable``. You can set this
-      for a section or namespace to make sure each *n*-th variable value
-      element lines up horizontally. For example:
+         See the associated setting :rose:conf:`fail-if` for more detail.
 
-      .. code-block:: rose
+      .. _metadata behaviour:
 
-         [namelist:meal_choices]
-         customers='Athos','Porthos','Aramis','d''Artagnan'
-         entrees='soup','pate','soup','asparagus'
-         main='beef','spaghetti','coq au vin','lamb'
-         petits_fours=.false.,.true.,.false.,.true.
+      .. rubric:: Metadata for Behaviour
 
-      could use the following metadata:
+      These metadata are used to define how the setting should behave in
+      different states.
 
-      .. code-block:: rose
+      .. rose:conf:: compulsory
 
-         [namelist:meal_choices]
-         widget[rose-config-edit]=rose.config_editor.pagewidget.table.PageArrayTable
+         A ``true`` value indicates that the setting should be compulsory. If
+         this flag is not set, the setting is optional.
 
-      to align the elements on the page like this:
+         Compulsory sections should be physically present in the configuration
+         at all times. Compulsory options should be physically present in the
+         configuration if their parent section is physically present.
 
-      .. code-block:: none
+         Optional settings can be removed as the user wishes. Compulsory
+         settings may however be triggered ignored (see :rose:conf:`trigger`).
+         For example, the :ref:`command-rose-config-edit` may issue a warning
+         if a compulsory setting is not defined. It may also hide a compulsory
+         variable that only has a single permitted value.
 
-         customers        Athos      Porthos      Aramis      d'Artagnan
-         entrees          soup        pate         soup       asparagus
-         main             beef      spaghetti   coq au vin       lamb
-         petits_fours    .false.     .true.       .false.       .true.
+      .. rose:conf:: trigger
 
-   .. rose:conf:: copy-mode
-   
-      For use with settings in the :rose:file:`rose-suite.info` file.
-      
-      Setting :rose:conf:`copy-mode` in the metadata allows for the field to
-      be either ``never`` copied or copied with any value associated to be
-      ``clear``.
+         A setting has the following states:
 
-      For example: in a :rose:file:`rose-suite.info` file:
+         * normal
+         * user ignored (stored in the configuration file with a ``!`` flag,
+           ignored at run time)
+         * logically ignored (stored in the configuration file with a ``!!``
+           flag, ignored at runtime)
 
-      .. code-block:: rose
+         If a setting is user ignored, the trigger will do nothing. Otherwise:
 
-         [ensemble members]
-         copy-mode=never
+         * If the logic for a setting in the trigger is fulfilled, it will cause
+           the setting to be enabled.
+         * If it is not, it will cause the setting to be logically ignored.
 
-      Setting the ``ensemble members`` field to include ``copy-mode=never``
-      means that the ensemble members field would never be copied.
+         The trigger expression is a list of settings triggered by (different
+         values of) this setting. If the values are not given, the setting will
+         be triggered only if the current setting is enabled.
 
-      .. code-block:: rose
+         The syntax contains id-values pairs, where the values part is optional.
+         Each pair must be separated by a semi-colon. Within each pair, any
+         values must be separated from the id by a colon (``:``) and a space.
+         Values must be formatted in the same way as the setting
+         :rose:conf:`values` defined above (i.e. comma separated).
 
-         [additional info]
-         copy-mode=clear
+         .. NOTEFORWRITERS - it is not possible to put a space at end of double
+            backquotes so can't put ': ' in inline monospace font above :(.
 
-      Setting the ``additional info`` field to include ``copy-mode=never``
-      means that the additional info field would be copied, but any value
-      associated with it would be cleared.
+         The trigger syntax looks like:
 
+         .. code-block:: rose
 
-   .. _metadata help:
+            [namelist:trig_nl=trigger_variable]
+            trigger=namelist:dep_nl=A;
+                    namelist:dep_nl=B;
+                    namelist:value_nl=X: 10;
+                    env=Y: 20, 30, 40;
+                    namelist:value_nl=Z: 20;
 
-   .. rubric:: Metadata for Help
+         In this example:
 
-   These metadata provide help for a configuration.
+         * When ``namelist:trig_nl=trigger_variable`` is ignored, all the
+           variables in the trigger expression will be ignored, irrespective of
+           its value.
+         * When ``namelist:trig_nl=trigger_variable`` is enabled,
+           ``namelist:dep_nl=A`` and ``namelist:dep_nl=B`` will both be enabled,
+           and the other variables may be enabled according to its value:
 
-   .. rose:conf:: url
+           * When the value of the setting is not ``10``, ``20``, ``30``, or
+             ``40``, ``namelist:value_nl=X``, ``env=Y`` and
+             ``namelist:value_nl=Z`` will be ignored.
+           * When the value of the setting is ``10``, ``namelist:value_nl=X``
+             will be enabled, but ``env=Y`` and ``namelist:value_nl=Z`` will be
+             ignored.
+           * When the value of the setting is ``20``, ``env=Y`` and
+             ``namelist:value_nl=Z`` will be enabled, but
+             ``namelist:value_nl=X`` will be ignored.
+           * When the value of the setting is ``30``, ``env=Y`` will be enabled,
+             but ``namelist:value_nl=X`` and ``namelist:value_nl=Z`` will be
+             ignored.
+           * If the value of the setting contains an environment
+             variable-like string, e.g. ``${TEN_MULTIPLE}``, all three will be
+             enabled.
 
-      A web URL containing help for the setting. For example:
+         Settings mentioned in trigger expressions will have their default
+         state set to ignored unless explicitly triggered.
+         :ref:`command-rose-config-edit` will issue warnings if variables or
+         sections are in the incorrect state when it loads a configuration.
+         Triggering thereafter will work as normal.
 
-      .. code-block:: rose
+         Where multiple triggers act on a setting, the setting is triggered only
+         if all triggers are active (i.e. an *AND* relationship). For example,
+         for the two triggers here:
 
-         url=http://www.something.com/FOO/view/dev/doc/FOO.html
+         .. code-block:: rose
 
-      For example, the :ref:`command-rose-config-edit` will trigger a web
-      browser to display this when a variable name is clicked. A partial URL
-      can be used for variables if the variable's section or namespace has a
-      relevant parent url property to use as a prefix. For example:
+            [env=IS_WATER]
+            trigger=env=IS_ICE: true;
 
-      .. code-block:: rose
+            [env=IS_COLD]
+            trigger=env=IS_ICE: true;
 
-         [namelist:foo]
-         url=https://www.google.com/search
+         the setting ``env=IS_ICE`` is only enabled if both ``env=IS_WATER`` and
+         ``env=IS_COLD`` are ``true`` and enabled. Otherwise, it is ignored.
 
-         [namelist:foo=bar]
-         url=?q=nearest+bar
+         The trigger syntax also supports a logical expression using the Rose
+         metadata :ref:`mini-language <app-meta-mini-lang>`, in the same way as
+         the :rose:conf:`range` or :rose:conf`fail-if` metadata. As with
+         :rose:conf`range`, inter-variable comparisons are disallowed.
 
-   .. rose:conf:: help
+         .. code-block:: rose
 
-      (Long) help for the setting. For example, :ref:`command-rose-config-edit`
-      will use
-      this in a popup dialog for a variable. Embedding variable ids in the help
-      string will allow links to the variables to be created within the popup
-      dialog box, e.g.
+            [env=SNOWFLAKE_SIDES]
+            trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
+                    env=SILLY_SNOWFLAKE_GEOMETRY: this < 2;
 
-      .. code-block:: rose
+         In this example, the setting ``env=CUSTOM_SNOWFLAKE_GEOMETRY`` is
+         enabled if ``env=SNOWFLAKE_SIDES`` is enabled and not ``6``.
+         ``env=SILLY_SNOWFLAKE_GEOMETRY`` is only enabled when
+         ``env=SNOWFLAKE_SIDES`` is enabled and less than ``2``. The logical
+         expression syntax can be used with non-numeric variables in the same
+         way as the fail-if metadata.
 
-         help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to do something linear.
+      .. rose:conf:: duplicate
 
-      Web URLs beginning with ``http://`` will also be presented as links in
-      the :ref:command-rose-config-edit`.
+         Allow duplicated copies of the setting. This is used for sections where
+         there may be more than one with the same metadata - for example
+         multiple namelist groups of the same name. If this setting is true for
+         a given name, the application configuration will accept multiple
+         namelist groups of this name. :ref:`command-rose-config-edit` may then
+         provide the option to clone or copy a namelist to generate an
+         additional namelist. Otherwise, :ref:`command-rose-config-edit` may
+         issue warning for configuration sections that are found with multiple
+         copies or an index.
 
-   .. rose:conf:: description
+      .. rose:conf:: macro
 
-      (Medium) description for the setting. For example,
-      :ref:`command-rose-config-edit` will use this as part of the hover over
-      text.
+         Associate a setting with a comma-delimited set of custom macros (but
+         not upgrade macros).
 
-      :ref:`command-rose-config-edit` will also use descriptions set for
-      sections or namespaces as page header text (appears at the top of a
-      panel or page), with clickable id and URL links as in help. Descriptions
-      set for variables may be automatically shown underneath the variable
-      name in :ref:`command-rose-config-edit`, depending on view options.
+         E.g. for a macro class called ``FibonacciChecker`` in the metadata
+         under ``lib/python/macros/fib.py``, we may have:
 
-   .. rose:conf:: title
+         .. code-block:: rose
 
-      (Short) title for the setting. For example,
-      :ref:`command-rose-config-edit` can use this specification as the label
-      of a setting, instead of the variable name.
+            macro=fib.FibonacciChecker
+
+         This may be used in :ref:`command-rose-config-edit` to visually
+         associate the setting with these macros. If a macro class has both a
+         ``transform`` and a ``validate`` method, you can specify which you need
+         by appending the method to the name e.g.:
+
+        .. code-block:: rose
+
+           macro=fib.Fibonacci.validate
+
+      .. rose:conf:: widget[gui-application]
+
+         Indicate that the gui-application (e.g.
+         :ref:`command-rose-config-edit`) should use a special widget to display
+         this setting.
+
+         E.g. If we want to use a slider instead of an entry box for a floating
+         point real number.
+
+         The widget may take space-delimited arguments which would be specified
+         after the widget name. E.g. to set up a hypothetical table with named
+         columns X, Y, VCT, and Level, we may do:
+
+         .. code-block:: rose
+
+            widget[rose-config-edit]=table.TableWidget X Y VCT Level
+
+         You may override to a Rose built-in widget by specifying a full
+         ``rose`` class path in Python - for example, to always show
+         radiobuttons for an option with :rose:conf:`values` set:
+
+         .. code-block:: rose
+
+            widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
+
+         Another useful Rose built-in widget to use is the array element
+         aligning :ref:`page widget <conf-ed-cust-pages>`,
+         ``rose.config_editor.pagewidget.table.PageArrayTable``. You can set
+         this for a section or namespace to make sure each *n*-th variable value
+         element lines up horizontally. For example:
+
+         .. code-block:: rose
+
+            [namelist:meal_choices]
+            customers='Athos','Porthos','Aramis','d''Artagnan'
+            entrees='soup','pate','soup','asparagus'
+            main='beef','spaghetti','coq au vin','lamb'
+            petits_fours=.false.,.true.,.false.,.true.
+
+         could use the following metadata:
+
+         .. code-block:: rose
+
+            [namelist:meal_choices]
+            widget[rose-config-edit]=rose.config_editor.pagewidget.table.PageArrayTable
+
+         to align the elements on the page like this:
+
+         .. code-block:: none
+
+            customers        Athos      Porthos      Aramis      d'Artagnan
+            entrees          soup        pate         soup       asparagus
+            main             beef      spaghetti   coq au vin       lamb
+            petits_fours    .false.     .true.       .false.       .true.
+
+      .. rose:conf:: copy-mode
+
+         For use with settings in the :rose:file:`rose-suite.info` file.
+
+         Setting :rose:conf:`copy-mode` in the metadata allows for the field to
+         be either ``never`` copied or copied with any value associated to be
+         ``clear``.
+
+         For example: in a :rose:file:`rose-suite.info` file:
+
+         .. code-block:: rose
+
+            [ensemble members]
+            copy-mode=never
+
+         Setting the ``ensemble members`` field to include ``copy-mode=never``
+         means that the ensemble members field would never be copied.
+
+         .. code-block:: rose
+
+            [additional info]
+            copy-mode=clear
+
+         Setting the ``additional info`` field to include ``copy-mode=never``
+         means that the additional info field would be copied, but any value
+         associated with it would be cleared.
+
+
+      .. _metadata help:
+
+      .. rubric:: Metadata for Help
+
+      These metadata provide help for a configuration.
+
+      .. rose:conf:: url
+
+         A web URL containing help for the setting. For example:
+
+         .. code-block:: rose
+
+            url=http://www.something.com/FOO/view/dev/doc/FOO.html
+
+         For example, the :ref:`command-rose-config-edit` will trigger a web
+         browser to display this when a variable name is clicked. A partial URL
+         can be used for variables if the variable's section or namespace has a
+         relevant parent url property to use as a prefix. For example:
+
+         .. code-block:: rose
+
+            [namelist:foo]
+            url=https://www.google.com/search
+
+            [namelist:foo=bar]
+            url=?q=nearest+bar
+
+      .. rose:conf:: help
+
+         (Long) help for the setting. For example,
+         :ref:`command-rose-config-edit` will use this in a popup dialog for a
+         variable. Embedding variable ids in the help string will allow links
+         to the variables to be created within the popup dialog box, e.g.
+
+         .. code-block:: rose
+
+            help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to do something linear.
+
+         Web URLs beginning with ``http://`` will also be presented as links in
+         the :ref:command-rose-config-edit`.
+
+      .. rose:conf:: description
+
+         (Medium) description for the setting. For example,
+         :ref:`command-rose-config-edit` will use this as part of the hover over
+         text.
+
+         :ref:`command-rose-config-edit` will also use descriptions set for
+         sections or namespaces as page header text (appears at the top of a
+         panel or page), with clickable id and URL links as in help.
+         Descriptions set for variables may be automatically shown underneath
+         the variable name in :ref:`command-rose-config-edit`, depending on
+         view options.
+
+      .. rose:conf:: title
+
+         (Short) title for the setting. For example,
+         :ref:`command-rose-config-edit` can use this specification as the label
+         of a setting, instead of the variable name.
 
 
 .. _app-meta-loc:
@@ -894,7 +914,7 @@ following:
       CHOCOLATE/rose-meta/
       CHOCOLATE/rose-meta/choc-dark/
       CHOCOLATE/rose-meta/choc-milk/
-    
+
 
    and the system ``CAFFEINE`` may have a hybrid structure, with both flat
    and hierarchical components:
@@ -1064,7 +1084,8 @@ The Rose metadata mini-language supports writing a logical expression in
 Python-like syntax, using variable ids to reference their associated values.
 
 Expressions are set as the value of metadata properties such as
-:rose:conf:`rose-meta.conf|fail-if` and :rose:conf:`rose-meta.conf|range`.
+:rose:conf:`rose-meta.conf[SETTING]fail-if` and
+:rose:conf:`rose-meta.conf[SETTING]range`.
 
 The language is a small sub-set of Python - a limited set of operators is
 supported.
@@ -1176,7 +1197,8 @@ then the expression would become:
 If the variable is not currently available (ignored or missing) then the
 expression cannot be evaluated. If inter-variable comparisons are not allowed
 for the expression's parent option (such as with
-:rose:conf:`rose-meta.conf|trigger` and :rose:conf:`rose-meta.conf|range`)
+:rose:conf:`rose-meta.conf[SETTING]trigger` and
+:rose:conf:`rose-meta.conf[SETTING]range`)
 then referencing other variable ids is not allowed.
 
 In this case the expression would be false.
@@ -1335,7 +1357,7 @@ A subset of possible ignored/enabled states, errors and fixes:
 ======  ===============    ==========  ==============  ============  ========
 State   Trigger State      Compulsory  Display Error?  User Options  Notes
 ======  ===============    ==========  ==============  ============  ========
-``IT``  ``IT``             compulsory  no              None          
+``IT``  ``IT``             compulsory  no              None
 ``IT``  ``IT``             optional    no              None
 ``IT``  ``E``              compulsory  error           ``E``
 ``IT``  ``E``              optional    error           ``E``

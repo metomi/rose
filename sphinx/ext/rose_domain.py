@@ -49,7 +49,7 @@ Referencing From RST Files:
        :rose:TYPE:`CONFIG-FILE.[parent-section]child-config`
 
     e.g:
-   
+
     .. code-block:: rst
 
        * :rose:app:`fcm_make`
@@ -102,7 +102,7 @@ ROSE_DOMAIN_REGEX = re.compile(
    r'(?:\|?(.*))?'   # Configuration setting.
 )
 SECTION_REGEX = re.compile(r'(\[.*\])(.*)')
-
+OPT_ARG_REGEX = re.compile(r'=([^\]]+)?$', flags=re.M)
 
 def tokenise_namespace(namespace):
     """Convert a namespace string into a list of tokens.
@@ -549,6 +549,8 @@ class RoseConfigDirective(RoseDirective):
             # configuration section. Apply a custom_name_template so that it is
             # written inside square brackets.
             self.custom_name_template = '[%s]'
+            # Sections cannot be written with argument examples.
+            self.ARGUMENT_SEPARATOR = None
             # Add a ref_context variable to mark this node as a config section.
             self.add_ref_context(self.SECTION_REF_CONTEXT)
 
@@ -679,8 +681,9 @@ class RoseDomain(Domain):
 
            :rose:app:`foo`
         """
-        # Strip any argument from the target.
-        target = target.split('=')[0]
+        if OPT_ARG_REGEX.search(target):
+           # If target has a trailing argument ignore it.
+           target = target.split('=')[0]
 
         # Determine the namespace of the object being referenced.
         if typ in ['app', 'file']:
@@ -726,7 +729,7 @@ class RoseDomain(Domain):
             data = self.data['objects'][namespace]
         except KeyError:
             # No reference exists for "object_name".
-            logger.warning('No Ref for %s' % namespace, location=node)
+            logger.warning('No Ref for "%s"' % namespace, location=node)
             return None
 
         # Create a link pointing at the object.
