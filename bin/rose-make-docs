@@ -135,8 +135,8 @@ if [[ -z "${BUILDS}" ]]; then
 fi
 
 # Use virtualenv if present and requested or if we are in development mode.
-if [[ "${DEV_MODE}" != 'false' || "${VENV_MODE}" != false ]]; then
-    if [[ -z "${VENV_COMPLIANT}" ]]; then
+if [[ "${DEV_MODE}" != 'false' || ${VENV_MODE} != false ]]; then
+    if ! ${VENV_COMPLIANT}; then
         echo 'The virtualenv command is required for the --venv option.'
         exit 1
     fi
@@ -149,13 +149,13 @@ fi
 if ! rose-check-software --doc >/dev/null; then
     if ${VENV_MODE}; then
         venv-install
-    elif [[ "${FORCE}" == 'false' ]]; then
+    elif ! ${FORCE}; then
         echo "$(rose check-software --doc)"
         echo "$(python -c 'import sphinxcontrib.httpdomain')"
         echo 'Software required by the rose documentation builder is not'
         echo 'present (run `rose check-software --doc` for details).'
 
-        if [[ "${VENV_COMPLIANT}" == 'false' ]]; then
+        if ! ${VENV_COMPLIANT}; then
             echo
             echo 'Unable to build documentation.'
             echo
