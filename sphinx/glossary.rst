@@ -706,16 +706,17 @@ Glossary
 
       This information can include:
 
-      * Documentation and help text, e.g.:rose:conf:`rose-meta.conf|title`
+      * Documentation and help text, e.g.
+        :rose:conf:`rose-meta.conf[SETTING]title`
         provides a short title to describe a setting.
       * Information about permitted values for the setting, e.g.
-        :rose:conf:`rose-meta.conf|type` can be used to specify the data type
-        a setting requires (integer, string, boolean, etc).
+        :rose:conf:`rose-meta.conf[SETTING]type` can be used to specify the
+        data type a setting requires (integer, string, boolean, etc).
       * Settings affecting how the configurations are displayed in
         :ref:`command-rose-config-edit` (e.g.
-        :rose:conf:`rose-meta.conf|sort-key`).
+        :rose:conf:`rose-meta.conf[SETTING]sort-key`).
       * Metadata which defines how settings should behave in different states
-        (e.g. :rose:conf:`rose-meta.conf|trigger`).
+        (e.g. :rose:conf:`rose-meta.conf[SETTING]trigger`).
 
       This information is used for:
 
@@ -725,8 +726,6 @@ Glossary
 
       Metadata does not affect the running of an
       :term:`application <rose app>` or :term:`cylc suite`.
-
-      .. TODO - rose-meta.conf should store settings under a section.
 
       see also:
 
