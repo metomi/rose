@@ -23,22 +23,25 @@ applications.
 Rose Objects:
     The rose domain supports the following object types:
 
-    * Applications using the prefix ``app`` (i.e. ``rose:app``).
-    * Configuration files using the prefix ``file`` (i.e. ``rose:file``).
-    * Configuration sections using the prefix ``conf`` (i.e. ``rose:conf``).
-    * Configuration settings using the prefix ``conf`` (i.e. ``rose:conf``).
+    * ``rose:app`` - Rose Applications.
+    * ``rose:file`` - Root rose configurations.
+    * ``rose:conf`` - Rose configurations. Nest them to create configuration
+      sections.
 
     See the corresponding directives for more information on each object type.
 
 Reference Syntax:
-    Once documented objects can be referenced using the following syntax:
+    Once documented, objects can be referenced using the following syntax:
 
-    ``:rose:CONFIG-FILE.[parent-section]child-config``
+    .. code-block:: none
+
+        :rose:CONFIG-FILE[parent-section]child-config
+        :rose:CONFIG-FILE|top-level-config
 
     Where ``CONFIG-FILE`` is:
 
-    * ``APP-NAME`` for applications (e.g. ``fcm_make``).
-    * ``FILE-NAME`` for configuration files (e.g. ``rose.conf``).
+    * The ``APP-NAME`` for applications (e.g. ``fcm_make``).
+    * The ``FILE-NAME`` for configuration files (e.g. ``rose.conf``).
 
 Referencing From RST Files:
     To reference a rose object add the object ``TYPE`` into the domain
@@ -46,7 +49,7 @@ Referencing From RST Files:
 
     .. code-block:: rst
 
-       :rose:TYPE:`CONFIG-FILE.[parent-section]child-config`
+       :rose:TYPE:`CONFIG-FILE[parent-section]child-config`
 
     e.g:
 
@@ -64,22 +67,32 @@ Example:
 
           .. rose:conf:: jinja2:suite.rc
 
-             A section for specifying Jinja2 settings for use in the ``suite.rc``
-             file.
+             A section for specifying Jinja2 settings for use in the
+             ``suite.rc`` file.
 
-             Note that one ommits the square brackets for config sections, if
-             :rose:conf: contains other :rose:conf:`s then it is implicitly a
+             Note that one ommits the square brackets for config sections. If
+             :rose:conf: contains other :rose:conf:'s then it is implicitly a
              section and the brackets are added automatically. If you wish to
              document a section which contains no settings write it using
              square brackets.
 
              .. rose:conf:: ROSE_VERSION
 
-                Provide the intended rose version to the suite.
+                provide the intended rose version to the suite.
 
                 .. deprecated:: 6.1.0
 
                    No longer required, this context is now provided internally.
+
+             .. rose:conf:: CYLC_VERSION
+
+                provide the intended rose version to the suite.
+
+                .. deprecated:: 6.1.0
+
+                   See :rose:conf:`ROSE_VERSION`.
+
+                   ..            ^ relative reference
 
 """
 
@@ -227,19 +240,20 @@ class RoseDirective(ObjectDescription):
     """Base class for implementing rose objects.
 
     Subclasses must provide:
-        - NAME
+        - ``NAME``
 
     Subclasses can provide:
-        - LABEL
-        - ARGUMENT_SEPARATOR
-        - ALT_FORM_SEPARATOR
-        - ALT_FORM_TEMPLATE
-        - doc_field_types - List of ``Field`` objects for object parameters.
-        - run() - For adding special rev_context variables via add_rev_context.
-        - handle_signature() - For changing the display of objects.
-        - custom_name_template - String template accepting one string format
+        - ``LABEL``
+        - ``ARGUMENT_SEPARATOR``
+        - ``ALT_FORM_SEPARATOR``
+        - ``ALT_FORM_TEMPLATE``
+        - ``doc_field_types`` - List of ``Field`` objects for object parameters.
+        - ``run()`` - For adding special rev_context variables via
+          ``add_rev_context``.
+        - ``handle_signature()`` - For changing the display of objects.
+        - ``custom_name_template`` - String template accepting one string format
           argument for custom formatting the node name (e.g. ``'[%s]'`` for conf
-          sections.
+          sections).
 
     ref_context Variables:
         Sphinx domains use ``ref_context`` variables to determine the
@@ -259,7 +273,7 @@ class RoseDirective(ObjectDescription):
     """Override in settings which are permitted to be nested (e.g. 'conf')."""
 
     NAME = None
-    """The rose domain this directive implements see RoseDomain.directives"""
+    """The rose domain this directive implements, see RoseDomain.directives"""
     LABEL = ''
     """Label to prepend to objects."""
     ARGUMENT_SEPARATOR = '='
@@ -467,7 +481,7 @@ class RoseAppDirective(RoseDirective):
 
 
 class RoseFileDirective(RoseDirective):
-    """Directive for documenting rose apps.
+    """Directive for documenting rose files.
 
     Example:
 
@@ -491,7 +505,7 @@ class RoseConfigDirective(RoseDirective):
     Optional Attributes:
         * ``envvar`` - Associate an environment variable with this
           configuration option.
-        * ``compulsory`` - Set to ``True`` for compulsory settings, ommit this
+        * ``compulsory`` - Set to ``True`` for compulsory settings, omit this
           field for optional settings.
 
     Additional ref_context:
