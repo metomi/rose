@@ -3,8 +3,8 @@ Sphinx Domains
 
 .. _domains: http://www.sphinx-doc.org/en/stable/domains.html
 
-Sphinx includes a sysmtem for documenting objects in a structured way via
-`domains`_. For example to document a python function one might do:
+Sphinx includes a system for documenting objects in a structured way via
+`domains`_. For example to document a Python function one might do:
 
 .. code-block:: rst
 
