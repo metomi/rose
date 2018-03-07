@@ -889,7 +889,7 @@ following:
    ${APP}/versions.py # i.e. the upgrade macros
 
 .. note::
-   A :rose:conf:`rose-suite.info` is likely to have no versions.
+   A :rose:file:`rose-suite.info` is likely to have no versions.
 
 .. note::
    In some cases, a number of different executables may share the

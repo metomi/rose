@@ -30,10 +30,10 @@ Example
 Invocation
 ----------
 
-* If a tasks name contains the string ``fcm_make`` then
+* If a task's name contains the string ``fcm_make`` then
   :ref:`command-rose-task-run` will run this built-in application
   automatically.
-* If a tasks name contains the string ``fcm_make2*`` and it does not
+* If a task's name contains the string ``fcm_make2*`` and it does not
   have its own application configuration then
   :ref:`command-rose-task-run` will attempt to associate it with
   the corresponding ``fcm_make*`` application configuration.
@@ -96,7 +96,7 @@ Rose Configuration API
 
       Specify the context name of the continuation make. If the default
       ``fcm_make`` → ``fcm_make2`` mapping is used, the context name of
-      the continuation make will be set to 2. You can specify an alternate
+      the continuation make will be set to ``2``. You can specify an alternate
       context name if this is undesirable. The continuation command will
       be invoked with the ``--name=NAME`` option of ``fcm make``.
 

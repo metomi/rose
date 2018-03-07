@@ -16,7 +16,7 @@ following:
 We have added the following conventions into the rose configuraiton format:
 
 #. The file name is normally called ``rose*.conf``, e.g. ``rose.conf``,
-   :rose:conf:`rose-app.conf`, :rose:conf:`rose-meta.conf`, etc.
+   :rose:file:`rose-app.conf`, :rose:file:`rose-meta.conf`, etc.
 #. Only a hash ``#`` in the beginning of a line starts a comment. Empty lines
    and lines with only white spaces are ignored. There is no support for
    trailing comments. Comments are normally ignored when a configuration file
