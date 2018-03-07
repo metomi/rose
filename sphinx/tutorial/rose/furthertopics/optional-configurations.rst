@@ -3,7 +3,7 @@
 Optional Configurations
 =======================
 
-Optional configurations are configuration files which can add or overrite
+Optional configurations are configuration files which can add or overwrite
 the default configuration. They can be used with :ref:`command-rose-app-run`
 for :term:`rose application configurations <rose application configuration>`
 and :ref:`command-rose-suite-run` for
@@ -190,7 +190,7 @@ configurations.
   :rose:file:`rose-suite.conf` settings, controlled through
   :ref:`command-rose-suite-run`. Optional suite configurations
   can be used either using the ``--opt-conf-key`` option with
-  :ref:`command-rose-suite-run` or the :envvar:`$ROSE_SUITE_OPT_CONF_KEYS`
+  :ref:`command-rose-suite-run` or the :envvar:`ROSE_SUITE_OPT_CONF_KEYS`
   environment variable.
 * Metadata configurations can also have optional configurations, typically
   included via the ``opts`` top-level setting.
