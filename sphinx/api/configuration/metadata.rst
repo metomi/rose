@@ -60,7 +60,7 @@ metadata applies to a section in a configuration file, the ID is just the
 section name.
 
 Where multiple instances of a section are used in a configuration file,
-ending in brackets with numbers, the metadata id should just be based on the
+ending in brackets with numbers, the metadata ID should just be based on the
 original section name (for example ``namelist:extract_control(2)`` should be
 found in the metadata under ``namelist:extract_control``).
 
@@ -526,16 +526,6 @@ The metadata options for a configuration fall into four categories:
                     this % 2 == 1; # Needs to be odd
                     this * 3 > 100; # Needs to be more than 100/3.
 
-         A slightly different usage of this functionality can do things like
-         warn of deprecated content:
-
-         .. code-block:: rose
-
-            warn-if=True;  # This option is deprecated
-
-         This would always evaluate ``True`` and give a warning if the setting
-         is present.
-
          .. note::
             When dividing a real-numbered setting by something, make
             sure that the expression does not actually divide an integer by an
@@ -553,9 +543,17 @@ The metadata options for a configuration fall into four categories:
          :ref:`mini-language <app-meta-mini-lang>` to validate the
          value of the current setting with respect to other settings. If the
          logical expression evaluates to true, the system will
-         issue a warning.
+         issue a warning. E.g.:
 
-         See the associated setting :rose:conf:`fail-if` for more detail.
+         .. code-block:: rose
+
+            warn-if=True;
+
+         This would always evaluate ``True`` and give a warning if the setting
+         is present.
+
+         See the associated setting :rose:conf:`fail-if` for examples of
+         logical expressions that may be added.
 
       .. _metadata behaviour:
 
@@ -599,9 +597,9 @@ The metadata options for a configuration fall into four categories:
          values of) this setting. If the values are not given, the setting will
          be triggered only if the current setting is enabled.
 
-         The syntax contains id-values pairs, where the values part is optional.
+         The syntax contains ID-value pairs, where the values part is optional.
          Each pair must be separated by a semi-colon. Within each pair, any
-         values must be separated from the id by a colon (``:``) and a space.
+         values must be separated from the ID by a colon (``:``) and a space.
          Values must be formatted in the same way as the setting
          :rose:conf:`values` defined above (i.e. comma separated).
 
@@ -667,8 +665,8 @@ The metadata options for a configuration fall into four categories:
 
          The trigger syntax also supports a logical expression using the Rose
          metadata :ref:`mini-language <app-meta-mini-lang>`, in the same way as
-         the :rose:conf:`range` or :rose:conf`fail-if` metadata. As with
-         :rose:conf`range`, inter-variable comparisons are disallowed.
+         the :rose:conf:`range` or :rose:conf:`fail-if` metadata. As with
+         :rose:conf:`range`, inter-variable comparisons are disallowed.
 
          .. code-block:: rose
 
@@ -816,7 +814,7 @@ The metadata options for a configuration fall into four categories:
          For example, the :ref:`command-rose-config-edit` will trigger a web
          browser to display this when a variable name is clicked. A partial URL
          can be used for variables if the variable's section or namespace has a
-         relevant parent url property to use as a prefix. For example:
+         relevant parent ``url`` property to use as a prefix. For example:
 
          .. code-block:: rose
 
@@ -829,16 +827,17 @@ The metadata options for a configuration fall into four categories:
       .. rose:conf:: help
 
          (Long) help for the setting. For example,
-         :ref:`command-rose-config-edit` will use this in a popup dialog for a
-         variable. Embedding variable ids in the help string will allow links
-         to the variables to be created within the popup dialog box, e.g.
+         :ref:`command-rose-config-edit` will use this in a pop-up dialog for
+         a variable. Embedding variable IDs in the help string will allow
+         links to the variables to be created within the pop-up dialog box,
+         e.g.
 
          .. code-block:: rose
 
             help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to do something linear.
 
          Web URLs beginning with ``http://`` will also be presented as links in
-         the :ref:command-rose-config-edit`.
+         the :ref:`command-rose-config-edit`.
 
       .. rose:conf:: description
 
@@ -848,7 +847,7 @@ The metadata options for a configuration fall into four categories:
 
          :ref:`command-rose-config-edit` will also use descriptions set for
          sections or namespaces as page header text (appears at the top of a
-         panel or page), with clickable id and URL links as in help.
+         panel or page), with clickable ID and URL links as in help.
          Descriptions set for variables may be automatically shown underneath
          the variable name in :ref:`command-rose-config-edit`, depending on
          view options.
@@ -890,11 +889,11 @@ following:
    ${APP}/versions.py # i.e. the upgrade macros
 
 .. note::
-   A Rose suite info is likely to have no versions.
+   A :rose:conf:`rose-suite.info` is likely to have no versions.
 
 .. note::
    In some cases, a number of different executables may share the
-   same application configuration metadata in which case APP is given a
+   same application configuration metadata in which case ``APP`` is given a
    name which covers all the uses.
 
 .. tip::
@@ -1036,7 +1035,7 @@ metadata is relevant for a particular release and all subsequent releases
 Sharing metadata between different executables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If 2 different commands share the majority of their inputs then you may
+If two different commands share the majority of their inputs then you may
 choose to use the same configuration metadata for both commands. Any
 differences (in terms of available inputs) can then be triggered by the
 command in use. Whether this is desirable will partly depend on how many of
@@ -1052,7 +1051,7 @@ using.
    to have separate metadata for different commands even when the majority
    of inputs are shared.
 
-Another reason you may want to share metadata is if you have 2 related
+Another reason you may want to share metadata is if you have two related
 commands which you want to configure using the same set of inputs (i.e. a
 single application configuration).
 
@@ -1081,7 +1080,7 @@ Metadata Mini-Language
 ----------------------
 
 The Rose metadata mini-language supports writing a logical expression in
-Python-like syntax, using variable ids to reference their associated values.
+Python-like syntax, using variable IDs to reference their associated values.
 
 Expressions are set as the value of metadata properties such as
 :rose:conf:`rose-meta.conf[SETTING]fail-if` and
@@ -1167,10 +1166,10 @@ The following are special constants:
    False # Python False
    True  # Python True
 
-Using Variable Ids
+Using Variable IDs
 ^^^^^^^^^^^^^^^^^^
 
-Putting a variable id in the expression means that when the expression
+Putting a variable ID in the expression means that when the expression
 is evaluated, the string value of the variable is `cast`_ and substituted
 into the expression.
 
@@ -1199,11 +1198,11 @@ expression cannot be evaluated. If inter-variable comparisons are not allowed
 for the expression's parent option (such as with
 :rose:conf:`rose-meta.conf[SETTING]trigger` and
 :rose:conf:`rose-meta.conf[SETTING]range`)
-then referencing other variable ids is not allowed.
+then referencing other variable IDs is not allowed.
 
 In this case the expression would be false.
 
-You may use ``this`` as a placeholder for the current variable id - for
+You may use ``this`` as a placeholder for the current variable ID - for
 example, the fail-if expression:
 
 .. code-block:: rose
@@ -1224,7 +1223,7 @@ Arrays
 The syntax has some special ways of dealing with variable values that are
 arrays - i.e. comma-separated lists.
 
-You can refer to a single element of the value for a given variable id
+You can refer to a single element of the value for a given variable ID
 (or ``this``) by suffixing a number in round brackets - e.g.:
 
 .. code-block:: rose
@@ -1233,8 +1232,8 @@ You can refer to a single element of the value for a given variable id
 
 references the second element in the value for ``bar`` in the section
 ``namelist:foo``. This follows Fortran index numbering and syntax, which
-starts at 1 rather than 0 - i.e. referencing the 1st element in the array
-``foo`` is written as ``foo(1)``.
+starts at 1 rather than 0, i.e. ``foo(1)`` references the first element in
+the array ``foo``.
 
 If we had a configuration:
 
@@ -1308,7 +1307,7 @@ Internals
 ^^^^^^^^^
 
 Rose uses an external engine to evaluate the raw language string after
-variable ids and any ``any()`` and ``all()`` functions have been substituted
+variable IDs and any ``any()`` and ``all()`` functions have been substituted
 and expanded.
 
 The current choice of engine is `Jinja2`_, which is responsible for the
@@ -1329,7 +1328,7 @@ enabled when it should be trigger-ignored.
 equivalent (:ref:`command-rose-macro`)
 because the *Switch Off Metadata* mode and accidentally metadata-less
 configurations need to be presented in a nice way without lots of
-not-necessarily-errors. :ref:`command-rose-config-edit` should only report the
+unnecessary errors. :ref:`command-rose-config-edit` should only report the
 errors where the state is definitely wrong or makes a material difference to
 the user.
 
