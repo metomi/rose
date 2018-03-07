@@ -20,12 +20,12 @@ A suite directory may contain the following:
   modified INI format described above. It describes the suite's purpose and
   identity, e.g. the title, the description, the owner, the access control
   list, and other information. Apart from a few standard fields, a suite is
-  free to store any information in this file. See :rose:file:`rose-suite.info`.
+  free to store any information in this file. See :rose:file:`rose-suite.info`
   for detail.
 * An ``app/`` directory of application configurations used by the suite.
 * A ``bin/`` directory of scripts and utilities used by the suite.
 * An ``etc/`` directory of other configurations and resources used the suite.
-  E.g. fcm make configurations.
+  E.g. ``fcm_make`` configurations.
 * A ``meta/`` directory containing the suite's configuration metadata.
 * ``opt/`` directory. For detail, see :ref:`Optional Configuration`.
 * Other items, as long as they do not clash with the scheduler's working
@@ -34,7 +34,7 @@ A suite directory may contain the following:
 
 .. rose:file:: rose-suite.conf
 
-   The suite install configuration file :rose:file:`rose-suite.conf` should
+   The suite install configuration file ``rose-suite.conf`` should
    contain the information on how to install the suite.
 
    .. rose:conf:: env
@@ -44,10 +44,10 @@ A suite directory may contain the following:
       environment variables that are already defined before the suite runner is
       invoked. However, it is unsafe to reference other environment variables
       defined in this section. If the value of an environment variable setting
-      begins with a  tilde ``~``, all of the characters preceding the 1st slash
-      ``/`` are considered a *tilde-prefix*. Where possible, a tilde-prefix is
-      replaced with the home  directory associated with the specified login name
-      at run time.
+      begins with a  tilde ``~``, all of the characters preceding the first
+      slash ``/`` are considered a *tilde-prefix*. Where possible, a
+      tilde-prefix is replaced with the home  directory associated with the
+      specified login name at run time.
 
       .. rose:conf:: KEY=VALUE
 
@@ -80,8 +80,8 @@ A suite directory may contain the following:
 
       E.g. ``file:app/APP=source=LOCATION``.
 
-      For a list of configuration options see :rose:conf:`*[file:TARGET]` for
-      details.
+      For a list of configuration options and details on each see
+      :rose:conf:`*[file:TARGET]`.
 
    .. rose:conf:: meta
 
@@ -136,16 +136,17 @@ A suite directory may contain the following:
 
       .. deprecated:: 2015.04
 
-         Equivalent to :rose:conf`root-dir{work}=LIST`.
+         Equivalent to :rose:conf:`root-dir{work}=LIST`.
 
 .. rose:file:: rose-suite.info
 
-   The suite information file ``rose-suite.info`` should contain the information
-   on identify and the purpose of the suite. It has no sections, only
-   ``KEY=VALUE`` pairs. The ``owner``, ``project`` and ``title`` settings are
-   compulsory. Otherwise, any ``KEY=VALUE`` pairs can appear in this file. If
-   the name of a ``KEY`` ends with ``-list``, the value is expected to be a
-   space-delimited list. The following keys are known to have special meanings:
+   The suite information file ``rose-suite.info`` should contain the
+   information on identify and the purpose of the suite. It has no sections,
+   only ``KEY=VALUE`` pairs. The ``owner``, ``project`` and ``title`` settings
+   are compulsory. Otherwise, any ``KEY=VALUE`` pairs can appear in this
+   file. If the name of a ``KEY`` ends with ``-list``, the value is expected
+   to be a space-delimited list. The following keys are known to have special
+   meanings:
 
    .. rose:conf:: owner
 

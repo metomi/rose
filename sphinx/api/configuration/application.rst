@@ -68,8 +68,8 @@ E.g. The application configuration directory may look like:
 
    .. rose:conf:: mode
 
-      Root level setting. Specify the name of a builtin application, instead of
-      running a command specified in the :rose:conf:`[command]`
+      Root level setting. Specify the name of a built-in application,
+      instead of running a command specified in the :rose:conf:`[command]`
       section.
 
       See also :ref:`Rose Built-In Applications`.
@@ -102,20 +102,21 @@ E.g. The application configuration directory may look like:
       environment variables defined in this section.
 
       If the value of an environment variable setting begins with a tilde
-      ``~``, all of the characters preceding the 1st slash ``/`` are considered
-      a *tilde-prefix*. Where possible, a tilde-prefix is replaced with the
-      home directory associated with the specified login name at run time.
+      ``~``, all of the characters preceding the first slash ``/`` are
+      considered a *tilde-prefix*. Where possible, a tilde-prefix is replaced
+      with the home directory associated with the specified login name at run
+      time.
 
       .. rose:conf:: KEY=VALUE
 
          Define an environment variable ``KEY`` with the value ``VALUE``.
 
-   .. rose:conf:: UNDEF
+      .. rose:conf:: UNDEF
       
-       A special variable that is always undefined at run time.
+         A special variable that is always undefined at run time.
 
-       Reference to it will cause a failure at run time. It can be used to
-       indicate that a value must be overridden at run time.
+         Reference to it will cause a failure at run time. It can be used to
+         indicate that a value must be overridden at run time.
   
    .. rose:conf:: [etc]
 
@@ -138,14 +139,14 @@ E.g. The application configuration directory may look like:
 
    .. rose:conf:: namelist:NAME
 
-      Specify a fortran namelist with the group name called ``NAME``, which
+      Specify a Fortran namelist with the group name called ``NAME``, which
       can be referred to by a :rose:conf:`*[file:TARGET]source` setting of
       a file.
 
       .. rose:conf:: KEY=VALUE
 
          Define a new namelist setting ``KEY`` set to ``VALUE`` exactly like a
-         fortran namelist, but without the trailing comma.
+         Fortran namelist, but without the trailing comma.
 
       Namelists can be grouped in two ways:
 
@@ -172,7 +173,7 @@ E.g. The application configuration directory may look like:
    .. rose:conf:: poll
 
       Specify prerequisites to poll for before running the actual application.
-      3 types of tests can be performed:
+      Three types of tests can be performed:
 
       .. rose:conf:: all-files
 
@@ -211,7 +212,7 @@ E.g. The application configuration directory may look like:
       .. rose:conf:: delays
 
          The above tests will only be performed once when the application
-         runner starts. If a list of :rose:conf`delays` are added, the tests
+         runner starts. If a list of :rose:conf:`delays` are added, the tests
          will be performed a number of times with delays between them. If the
          prerequisites are still not met  after the number of delays, the
          application runner will fail with a time out. The list is a
