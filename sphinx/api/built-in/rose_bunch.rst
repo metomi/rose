@@ -19,7 +19,7 @@ command to create the appropriate subdirectory for working in.
    Under load balancing systems such as PBS or Slurm, you will need to
    set resource requests to reflect the resources required by running
    multiple commands at once e.g. if one command would require 1GB
-   memory and you have configured your app to run up to 4 commands at
+   memory and you have configured your app to run up to four commands at
    once then you will need to request 4GB of memory.
 
 
@@ -59,7 +59,7 @@ sections of the :rose:file:`rose-app.conf` file.
 
          :compulsory: True
 
-         A Pythonic ``printf`` style format string to construct the commands
+         A Pythonic ``printf``-style format string to construct the commands
          to run. Insert placeholders ``%(argname)s`` for substitution of the
          arguments specified under :rose:conf:`[bunch-args]` to the invoked
          command. The placeholder ``%(command-instances)s`` is reserved for
@@ -73,7 +73,7 @@ sections of the :rose:file:`rose-app.conf` file.
          used by the ``%(command-instances)s`` value in command-format.
          Useful for cases where the only difference between invocations
          would be an index number e.g. ensemble members. Note indexes
-         start at 0.
+         start at ``0``.
 
       .. rose:conf:: pool-size=N
 
@@ -90,14 +90,14 @@ sections of the :rose:file:`rose-app.conf` file.
          variants will be run by the job and the job will return a non-zero
          exit code upon completion e.g. if three commands are to be run and
          the second one fails, all three will be run and the job will exit
-         with a return code of 1. Alternatively, if :rose:conf:`fail-mode`
+         with a return code of ``1``. Alternatively, if :rose:conf:`fail-mode`
          is set to abort then on failure of any one of the command variants
          it will stop trying to run any further variants N.B. the job will
          wait for any already running commands to finish before exiting.
          Commands that won't be run due to aborting will be reported in the
          job output with a ``[SKIP]`` prefix when running in verbose mode.
          For example in the case of three command variants with a
-         :rose:conf:`pool-size` of 1 and :rose:conf:`fail-mode=abort`,
+         :rose:conf:`pool-size` of ``1`` and :rose:conf:`fail-mode=abort`,
          if the second variant failed then the job would exit with a
          non-zero error code without having run the third variant.
 
@@ -105,10 +105,11 @@ sections of the :rose:file:`rose-app.conf` file.
 
          :default: true
          
-         If set to true then only failed commands will be re-run on retrying
-         running of the job. If any changes are made to the configuration
-         being run then all variants will be re-run. Similarly, running the
-         app with the ``--new`` option to :ref:`command-rose-task-run`
+         If set to ``true`` then only failed commands will be re-run on
+         retrying running of the job. If any changes are made to the
+         configuration being run then all variants will be re-run. Similarly,
+         running the app with the ``--new`` option to
+         :ref:`command-rose-task-run`
          will result in all commands being run. In verbose mode the app
          will report commands that won't be run due to previous successes
          in the job output with a ``[PASS]`` prefix.

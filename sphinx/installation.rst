@@ -6,7 +6,7 @@ Installation
 
 .. _archives: https://github.com/metomi/rose/tags
 
-The source code for Rose is available via `Github`_, code releases
+The source code for Rose is available via `GitHub`_, code releases
 are available in ``zip`` and ``tar.gz`` `archives`_.
 
 1. Un-pack the archive file into an appropriate location on your system.
