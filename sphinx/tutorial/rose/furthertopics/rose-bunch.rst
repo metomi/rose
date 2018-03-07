@@ -13,7 +13,6 @@ from each other at the same time - an example would be where a command is
 run repeatedly with only its arguments changing.
 
 Rather than creating multiple apps or
-
 :ref:`optional configs <rose-tutorial-optional-configurations>` to change
 the way a command is to be run, we can instead use the built-in
 :rose:app:`rose_bunch` application to run multiple command variants, in
@@ -133,7 +132,7 @@ directory of the lander app and running::
 
 Navigate to the top directory of your suite (where the ``suite.rc`` and
 :rose:file:`rose-suite.conf` files can be found) and run
-:ref`command-rose-suite-run`.
+:ref:`command-rose-suite-run`.
 
 Your suite should run, launch the cylc GUI and successfully run the ``lander``
 app.
@@ -176,7 +175,7 @@ Naming Invocations
 While the different invocations of the command have their own output directed
 to indexed files, it can sometimes be difficult to quickly identify which file
 to look in for output. To aid this, :rose:app:`rose_bunch` supports naming
-command instances via the :rose:conf:`rose_bunch[bunch]names=`` option.
+command instances via the :rose:conf:`rose_bunch[bunch]names=` option.
 
 Open your app config (under ``app/lander/rose-app.conf``) and add the
 following line under the :rose:conf:`rose_bunch[bunch]` section:
@@ -240,6 +239,6 @@ the number of concurrently running commands.
 
 Further options are listed in the :rose:app:`rose_bunch` documentation. These
 include configuring how to proceed following failure of an individual command
-invocation (:rose:conf:`rose_bunch[bunch]fail-mode=``), automatically
+invocation (:rose:conf:`rose_bunch[bunch]fail-mode=`), automatically
 generating *N* command instances and enabling/disabling the app's incremental
 mode.
