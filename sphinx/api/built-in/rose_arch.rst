@@ -101,7 +101,7 @@ Example
 Output
 ------
 
-On completion, :rose:conf:`rose_arch` writes a status summary for each
+On completion, :rose:app:`rose_arch` writes a status summary for each
 target to the standard output, which looks like this:
 
 .. code-block:: none
