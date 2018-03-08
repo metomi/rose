@@ -541,16 +541,18 @@ The metadata options for a configuration fall into four categories:
 
          Specify a logical expression using the Rose
          :ref:`mini-language <app-meta-mini-lang>` to validate the
-         value of the current setting with respect to other settings. If the
-         logical expression evaluates to true, the system will
-         issue a warning. E.g.:
+         value of the current setting with respect to other settings. If
+         the logical expression evaluates to true, the system will
+         issue a warning. It is a slightly different usage of the
+         ``fail-if`` functionality which can do things like warn of
+         deprecated content, e.g.:
 
          .. code-block:: rose
 
             warn-if=True;
 
-         This would always evaluate ``True`` and give a warning if the setting
-         is present.
+         would always evaluate ``True`` and give a warning if the
+         setting is present.
 
          See the associated setting :rose:conf:`fail-if` for examples of
          logical expressions that may be added.
@@ -602,9 +604,6 @@ The metadata options for a configuration fall into four categories:
          values must be separated from the ID by a colon (``:``) and a space.
          Values must be formatted in the same way as the setting
          :rose:conf:`values` defined above (i.e. comma separated).
-
-         .. NOTEFORWRITERS - it is not possible to put a space at end of double
-            backquotes so can't put ': ' in inline monospace font above :(.
 
          The trigger syntax looks like:
 

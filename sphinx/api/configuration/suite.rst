@@ -25,7 +25,7 @@ A suite directory may contain the following:
 * An ``app/`` directory of application configurations used by the suite.
 * A ``bin/`` directory of scripts and utilities used by the suite.
 * An ``etc/`` directory of other configurations and resources used the suite.
-  E.g. ``fcm_make`` configurations.
+  E.g. :rose:app:`fcm_make` configurations.
 * A ``meta/`` directory containing the suite's configuration metadata.
 * ``opt/`` directory. For detail, see :ref:`Optional Configuration`.
 * Other items, as long as they do not clash with the scheduler's working
@@ -34,7 +34,7 @@ A suite directory may contain the following:
 
 .. rose:file:: rose-suite.conf
 
-   The suite install configuration file ``rose-suite.conf`` should
+   The suite install configuration file :rose:file:`rose-suite.conf` should
    contain the information on how to install the suite.
 
    .. rose:conf:: env
@@ -140,7 +140,7 @@ A suite directory may contain the following:
 
 .. rose:file:: rose-suite.info
 
-   The suite information file ``rose-suite.info`` should contain the
+   The suite information file :rose:file:`rose-suite.info` should contain the
    information on identify and the purpose of the suite. It has no sections,
    only ``KEY=VALUE`` pairs. The ``owner``, ``project`` and ``title`` settings
    are compulsory. Otherwise, any ``KEY=VALUE`` pairs can appear in this
