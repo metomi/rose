@@ -7,7 +7,7 @@ This built-in application runs the ``rose-ana`` analysis engine.
 a common usage is to compare two files and report whether they differ
 or not. It can write the details of any comparisons it runs to a
 database in the suite's log directory to assist with any automated
-updating of control data
+updating of control data.
 
 
 Invocation
@@ -21,7 +21,7 @@ Analysis Modules
 ----------------
 
 The built-in application will search for suitable analysis modules to
-load firstly in the ana subdirectory of the ``rose-ana`` app, then in
+load firstly in the ``ana`` subdirectory of the ``rose-ana`` app, then in
 the ``ana`` subdirectory of the top-most suite directory. Any
 additional directories to search (for example a site-wide central
 directory) may be specified by setting the
@@ -47,7 +47,7 @@ describe an analysis step. These sections must follow a particular format:
   can otherwise simply act as a description or note.
 
 The content within each of these sections consists of a series of key-value
-option pairs; just like other standard Rose apps. However the availability
+option pairs, just like other standard Rose apps. However the availability
 of options for a given section is specified and controlled by the *class*
 rather than the meta-data. This makes it easy to provide your own analysis
 modules without requiring changes to Rose itself.
@@ -65,15 +65,14 @@ Lists
    If the option contains newlines it will be returned as a list of
    strings automatically.
 Argument substitution
-   If the option contains one or more pairs of
-   empty curved-parentheses ``{}`` the option will be returned multiple times
-   with the parentheses substituted once for each argument passed to
-   ``rose task-run``
+   If the option contains one or more pairs of braces (``{}``) the option
+   will be returned multiple times with the parentheses substituted once for
+   each argument passed to ``rose task-run``
 
-The app may also define a configuration section; ``[ana:config]``, whose
+The app may also define a configuration section, ``[ana:config]``, whose
 key-value pairs define app-wide settings that are passed through to the
 analysis classes. In the same way that the task options are dependent on
-the class definition; interpretation of the ``config`` options is done by the
+the class definition, interpretation of the ``config`` options is done by the
 class(es), so their documentation or source code should be consulted for
 details.
 

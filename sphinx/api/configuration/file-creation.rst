@@ -30,7 +30,7 @@ root directory to install file targets with a relative path:
          form ``HOST:PATH``.
 
       Rose will automatically attempt to detect the type of a source
-      (i.e. file, directory, url), however, the name of the source can
+      (i.e. file, directory, URL), however, the name of the source can
       sometimes be ambiguous. E.g. A URL with a ``http`` scheme can be a
       path in a version control system, or a path to a plain file. The
       :rose:conf:`schemes` setting can be used to help the system to do
@@ -114,8 +114,8 @@ root directory to install file targets with a relative path:
 
             * :rose:conf:`source=` - If source is undefined create an empty
               file.
-            * :rose:conf:`source=path` - If source is a single path to a file or
-              directory then the path will be coppied to the target path.
+            * :rose:conf:`source=path` - If source is a single path to a file
+              or directory then the path will be coppied to the target path.
             * :rose:conf:`source=file1 file2 ...` - If the source is a list of
               files then the files will be concatenated in the target path.
             * :rose:conf:`source=dir1 dir2 ...` - If the source is a list of

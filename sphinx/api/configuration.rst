@@ -13,7 +13,7 @@ same :ref:`Rose Configuration Format`. They are used for:
   * :rose:file:`rose-suite.info`
 :ref:`Site And User Configuration`
   * :rose:file:`rose.conf`
-Suite / Application :ref:`Metadata`
+Suite/Application :ref:`Metadata`
   * :rose:file:`rose-meta.conf`
 
 .. toctree::
@@ -51,8 +51,8 @@ Python API
 ----------
 
 Rose provides a Python API for loading, processing, editing and dumping rose
-configurations via the :py:mod:`rose.config` module located within the rose
-python library.
+configurations via the :py:mod:`rose.config` module located within the Rose
+Python library.
 
 .. automodule:: rose.config
    :members:
