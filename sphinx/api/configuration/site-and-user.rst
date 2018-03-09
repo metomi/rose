@@ -32,28 +32,4 @@ and the setting will apply the next time you run ``rose config-edit``:
 
 .. rose:file:: rose.conf
 
-   .. TODO - The API!
-
-   .. rose:conf:: meta-path
-
-      .. TODO
-
-   .. rose:conf:: [rosie-id]
-
-      .. TODO
-
-   .. rose:conf:: [rosie-db]
-
-      .. TODO
-
-   .. rose:conf:: [rosie-ws]
-
-      .. TODO
-
-   .. rose:conf:: rose-stem
-
-      .. TODO
-
-      .. rose:conf:: automatic-options
-
-         .. TODO
+   .. autoconfig:: ../etc/rose.conf.example
