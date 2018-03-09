@@ -26,7 +26,7 @@
 # DESCRIPTION
 #     Create Rosie discovery databases.
 #
-#     Use the rosie-ws=db.* settings in the site configuration file to
+#     Use the rosie-disco=db.* settings in the site configuration file to
 #     determine the list of databases to create.
 #     Does not override existing databases.
 #-------------------------------------------------------------------------------
