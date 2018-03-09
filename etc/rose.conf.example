@@ -410,10 +410,6 @@ prefixes-ws-default=PREFIX ...
 access-list-default=USER-ID ...
 
 
-# TODO - write this section
-[rosie-ws]
-
-
 # Test Battery Configuration
 [t]
 # :default: diff -u

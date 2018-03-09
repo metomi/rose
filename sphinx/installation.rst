@@ -350,7 +350,7 @@ Make sure that the account that runs the repository hooks has read/write
 access to the database and database directory.
 
 You can test that everything is working using the built-in web server.
-Edit the :rose:conf:`rose.conf[rosie-ws]` settings to configure
+Edit the :rose:conf:`rose.conf[rosie-disco]` settings to configure
 the web server's log directory and port number. Start the web server
 by running::
 

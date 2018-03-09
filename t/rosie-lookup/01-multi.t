@@ -54,7 +54,7 @@ local-copy-root=$PWD/roses
 prefix-location.foo=$SVN_URL_FOO
 prefix-location.bar=$SVN_URL_BAR
 
-[rosie-ws]
+[rosie-disco]
 log-dir=$PWD/rosie/log
 __ROSE_CONF__
 export ROSE_CONF_PATH="${PWD}/conf"
