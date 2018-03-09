@@ -36,3 +36,5 @@ Rose Domain
 .. autoclass:: rose_domain.RoseFileDirective
    
 .. autoclass:: rose_domain.RoseConfigDirective
+
+.. autoclass:: rose_domain.RoseAutoDirective
