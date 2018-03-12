@@ -19,6 +19,7 @@
 # -----------------------------------------------------------------------------
 """Sphinx directive for including the output of external commands into RST."""
 
+import os
 from shlex import split as sh_split
 from subprocess import Popen, PIPE
 
@@ -38,10 +39,11 @@ class ScriptInclude(Directive):
 
     def run(self):
         command = sh_split(' '.join(self.arguments[0:]))
-        stdout = Popen(command, stdout=PIPE).communicate()[0]
+        stdout = Popen(command, stdout=PIPE, stdin=open(os.devnull)
+        ).communicate()[0]
         node = nodes.section()
         node.document = self.state.document
-        nested_parse_with_titles(self.state, ViewList(stdout.split('\n')),
+        nested_parse_with_titles(self.state, ViewList(stdout.splitlines()),
                                  node)
         return node.children
 

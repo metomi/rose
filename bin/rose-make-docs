@@ -33,11 +33,6 @@
 #     --dev
 #         Development mode, don't remove virtualenv after build.
 #
-# ENVIRONMENT VARIABLES
-#     SPHINX_DEV_MODE
-#         Set to `true` in order to make the `rose test-battery` command use
-#         development mode.
-#
 # BUILD
 #     The format(s) to build the documentation in - default html.
 #     Avaliable formats are listed in the sphinx documentation
@@ -99,7 +94,7 @@ venv-destroy () {
     rm -rf "${VENV_PATH}"
 }
 
-if $(which virtualenv >/dev/null 2>/dev/null); then
+if which virtualenv >/dev/null 2>&1; then
     VENV_COMPLIANT=true
 else
     VENV_COMPLIANT=false
@@ -108,7 +103,7 @@ fi
 # Parse command line args.
 VENV_MODE=false
 FORCE=false
-DEV_MODE=${SPHINX_DEV_MODE:=false}
+DEV_MODE=false
 BUILDS=''
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -135,27 +130,27 @@ if [[ -z "${BUILDS}" ]]; then
 fi
 
 # Use virtualenv if present and requested or if we are in development mode.
-if [[ "${DEV_MODE}" != 'false' || ${VENV_MODE} != false ]]; then
-    if ! ${VENV_COMPLIANT}; then
+if "${DEV_MODE}" || "${VENV_MODE}"; then
+    if ! "${VENV_COMPLIANT}"; then
         echo 'The virtualenv command is required for the --venv option.'
         exit 1
     fi
-    if [ -d "${VENV_PATH}" ]; then
+    if [[ -d "${VENV_PATH}" ]]; then
         venv-activate
     fi
 fi
 
 # Check core (sphinx) builder.
 if ! rose-check-software --doc >/dev/null; then
-    if ${VENV_MODE}; then
+    if "${VENV_MODE}"; then
         venv-install
-    elif ! ${FORCE}; then
+    elif ! "${FORCE}"; then
         echo "$(rose check-software --doc)"
         echo "$(python -c 'import sphinxcontrib.httpdomain')"
         echo 'Software required by the rose documentation builder is not'
         echo 'present (run `rose check-software --doc` for details).'
 
-        if ! ${VENV_COMPLIANT}; then
+        if ! "${VENV_COMPLIANT}"; then
             echo
             echo 'Unable to build documentation.'
             echo
@@ -175,7 +170,7 @@ if ! rose-check-software --doc >/dev/null; then
         echo 'to build use the "--force" option.'
         echo
         while read -p 'Proceed using a virtualenv (y/n)? ' usr; do
-            case ${usr} in
+            case "${usr}" in
                 [Yy])
                     venv-install
                     break
@@ -194,8 +189,8 @@ fi
 make -C "${SPHINX_PATH}" ${BUILDS}
 
 # Remove virtualenv if used and if we are not in development mode.
-if ${USING_VENV}; then
-    if ! ${DEV_MODE}; then
+if "${USING_VENV}"; then
+    if ! "${DEV_MODE}"; then
         venv-destroy
     fi 
 fi
