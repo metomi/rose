@@ -210,7 +210,7 @@ smtp-host=HOST[:PORT]
 # E.g. If ``$HOME/public_html/cylc-run`` is a symlink of ``$HOME/cylc-run``
 # and ``$HOME/public_html/`` is served as ``http://host/~$USER/``:
 home-public-html=http://host/~$USER public_html
-# :default: http://host/rose-bush/
+# :default: ``http://host/rose-bush/``
 #
 # URL to the site's Rose Bush web service.
 rose-bush=URL
