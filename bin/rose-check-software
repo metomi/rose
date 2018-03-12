@@ -301,7 +301,7 @@ def main(check=check):
         check('svn', (1, 8), command_template=['--version', '--quiet']),
         check('fcm', version_template=r'FCM ([\d\.\-]+)'),
         check('cmd:perl', (5, 10, 1),
-              shell=['perl', '-e', 'print substr($^V, 1)'])
+              shell=['perl', '-e', 'print(substr($^V, 1))'])
     ])
 
     docs(check=check)
