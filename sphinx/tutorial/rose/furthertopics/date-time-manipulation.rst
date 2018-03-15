@@ -18,7 +18,7 @@ provides an easy way to get the path of the ``share/cycle`` directory.
 The ``rose date`` Command
 -------------------------
 
-The ``rose date`` command provides functionality for:
+The :ref:`command-rose-date` command provides functionality for:
 
 * Parsing and formatting datetimes e.g:
 
@@ -49,8 +49,8 @@ See the :ref:`command-rose-date` command reference for more information.
 Using ``rose date`` In A Suite
 ------------------------------
 
-In datetime cycling suites ``rose date`` can work with the cyclepoint using
-the ``CYLC_TASK_CYCLE_POINT`` environment variable:
+In datetime cycling suites :ref:`command-rose-date` can work with the
+cyclepoint using the ``CYLC_TASK_CYCLE_POINT`` environment variable:
 
 .. code-block:: cylc
 
@@ -104,8 +104,8 @@ The share directory
 
       "$CYLC_SUITE_SHARE_DIR/$CYLC_SUITE_CYCLE_POINT"
 
-The ``rose task-env`` command provides the environment variable
-``ROSE_DATAC`` which is a more convenient way to obtain the path of the
+The :ref:`command-rose-task-env` command provides the environment variable
+:envvar:`ROSE_DATAC` which is a more convenient way to obtain the path of the
 ``share/cycle`` directory.
 
 To get the path to a previous (or a future) ``share/cycle`` directory we can

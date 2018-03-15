@@ -71,3 +71,14 @@
 .rst-content div.admonition ol > li {
     padding-bottom: 0.5em;
 }
+
+/* Add warning symbol before deprecated items. */
+.deprecated p:before {
+	font-family:FontAwesome;
+	content:"\f071  ";
+	color: rgb(200, 90, 70);
+}
+
+.deprecated p span.versionmodified{
+	font-weight: bold;
+}

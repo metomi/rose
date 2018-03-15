@@ -35,7 +35,7 @@ usual to follow the standard Python style guidance (`PEP8`_, `PEP257`_).
 
 .. tip::
    You should avoid writing validator macros if the checking can be expressed
-   via :ref:`metadata <metadata-values>`.
+   via :ref:`metadata <metadata values>`.
 
 
 Location

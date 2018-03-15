@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 """NAME
-    rose check-software-docs
+    rose check-software
 
 SYNOPSIS
-    rose check-software-docs [OPTIONS]
+    rose check-software [OPTIONS]
 
 DESCRIPTION
     Check software dependencies for the rose documentation builder.
@@ -113,6 +113,14 @@ def cmd_version(command, command_template='--version',
         return None
 
 
+def shell_command(_, shell=None, version_template=r'(.*)', outfile=1):
+    output = Popen(shell, stdout=PIPE).communicate()[outfile - 1]
+    try:
+        return re.search(version_template, output).groups()[0]
+    except AttributeError:
+        return None
+
+
 def py_version(module, attr_name='__version__'):
     """Return the version of the provided python module.
 
@@ -126,7 +134,7 @@ def py_version(module, attr_name='__version__'):
     """
     try:
         imported_module = __import__(module)
-    except ImportError:
+    except (ImportError, RuntimeError):
         return DEP_NOT_FOUND
     try:
         version = getattr(imported_module, attr_name)
@@ -138,7 +146,7 @@ def py_version(module, attr_name='__version__'):
 
 
 # List of functions for obtaining version types - default is cmd_version.
-VERSION_CHECKERS = {'py': py_version}
+VERSION_CHECKERS = {'py': py_version, 'cmd': shell_command}
 
 
 def dep_str(min_version=None, min_incompat_version=None):
@@ -167,14 +175,19 @@ def process_dependency(dependency):
             - version_checker (callable) - Function for acquiring version
               string.
     """
+    # Process dependency prefix (e.g. "py:sphinx").
     if ':' in dependency:
         prefix, dependency_name = dependency.split(':')
         version_checker = VERSION_CHECKERS[prefix]
+        if prefix == 'cmd':
+            # The "cmd" prefix should not be displayed.
+            dependency = dependency_name
     else:
         dependency_name = dependency
         version_checker = cmd_version
         prefix = ''
 
+    # Process dependecy target (e.g. "dot<graphviz>").
     if '<' in dependency_name:
         dependency = re.sub(TARGET_REGEX, '', dependency).strip()
         dependency_name = re.search(TARGET_REGEX, dependency_name).groups()[0]
@@ -287,8 +300,8 @@ def main(check=check):
         check('py:sqlalchemy', (0, 6, 9)),
         check('svn', (1, 8), command_template=['--version', '--quiet']),
         check('fcm', version_template=r'FCM ([\d\.\-]+)'),
-        check('perl', (5, 10, 1), command_template='-v',
-              version_template=r'This is perl, v([^\s]+)')
+        check('cmd:perl', (5, 10, 1),
+              shell=['perl', '-e', 'print(substr($^V, 1))'])
     ])
 
     docs(check=check)

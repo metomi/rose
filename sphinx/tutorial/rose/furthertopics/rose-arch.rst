@@ -1,8 +1,8 @@
 rose arch
 =========
 
-``rose_arch`` is a built-in :term:`rose app` that provides a generic solution
-to the archiving of suite files.
+:rose:app:`rose_arch` is a built-in :term:`rose app` that provides a generic
+solution to the archiving of suite files.
 
 .. admonition:: Good Practice
    :class: hint
@@ -15,8 +15,8 @@ Example
 -------
 
 Create a new suite (or just a new directory somewhere - e.g. in your
-homespace) containing a blank ``rose-suite.conf`` and a ``suite.rc`` file
-that looks like this:
+homespace) containing a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+file that looks like this:
 
 .. code-block:: cylc
 
@@ -55,8 +55,9 @@ In the app directory create an ``archive_files_rsync/`` directory::
    cd app
    mkdir archive_files_rsync
 
-In the ``app/archive_files_rsync/`` directory create a ``rose-app.conf``
-file. This example uses vi, but please use your editor of choice::
+In the ``app/archive_files_rsync/`` directory create a
+:rose:file:`rose-app.conf` file. This example uses ``vi``, but please use your
+editor of choice::
 
    cd archive_files_rsync
    vi rose-app.conf
@@ -105,8 +106,8 @@ Create an ``archive_files_scp/`` directory::
 
    mkdir archive_files_scp
 
-In the ``archive_files_scp/`` directory create a ``rose-app.conf`` file.
-This example uses ``vi``, but please use your editor of choice::
+In the ``archive_files_scp/`` directory create a :rose:file:`rose-app.conf`
+file. This example uses ``vi``, but please use your editor of choice::
 
    cd archive_files_scp
    vi rose-app.conf
@@ -227,11 +228,8 @@ specfic advice.
 Arch Settings
 -------------
 
-Some settings that can be used are described below.
-
-.. TODO - link to reference material
-
-   Also see: Built-in Applications: rose_arch
+Some settings that can be used are described below. See the :ref:`rose_arch`
+documentation for more information:
 
 Above ``.tar`` was used to compress the file. However, ``compress=gzip``
 can also be used. Note either of these commands can be used to compress a
@@ -262,24 +260,20 @@ character.
 
    These examples are just some possible examples and not a full list.
 
-As well as ``[arch]`` and ``[arch:TARGET]`` other options can be provided
-to the app, for example:
+As well as :rose:conf:`rose_arch[arch]` and ``[arch:TARGET]`` other options
+can be provided to the app, for example:
 
 ``[env]``
    Can be defined near the top of the app to allow an environment variable
    to be available to the ``[arch:]`` commands in the app.
 
-   Also see the suite example above.
+   Also see :rose:conf:`rose-app.conf[env]` and the suite example above.
 ``[poll]``
    Polling can be defined, and is often near the bottom of the app. This
-   will allow the app to poll with a defined delay, e.g. ``delay=5``.
+   will allow the app to poll with a defined delay, e.g.
+   :rose:conf:`rose-app.conf[poll]delays=5`.
 ``[file:TARGET]``
    This option allows the user to, for example, make the directory
-   ``TARGET``, e.g. ``mode=mkdir``.
+   ``TARGET``, e.g. :rose:conf:`*[file:TARGET]mode=mkdir`.
 
-.. TODO - link to reference material
-
-   Further Reading
-   ---------------
-
-   For more information, see the Built-in Applications: rose_arch.
+For more information, see the :ref:`rose_arch` documentation.

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# (C) British Crown Copyright 2012-7 Met Office.
+# (C) British Crown Copyright 2012-8 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -39,12 +39,13 @@ extensions = [
     'sphinx.ext.graphviz',
     'sphinx.ext.mathjax',
     'minicylc',
-    'cylc-lang',
-    'rose-lang',
-    'sub-lang',
+    'cylc_lang',
+    'rose_lang',
+    'rose_domain',
+    'sub_lang',
     'practical',
-    'auto-cli-doc',
-    'script-include',
+    'auto_cli_doc',
+    'script_include',
     'sphinxcontrib.httpdomain'
 ]
 

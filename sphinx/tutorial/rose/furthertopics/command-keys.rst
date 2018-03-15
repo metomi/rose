@@ -1,3 +1,5 @@
+.. _rose-tutorial-command-keys:
+
 Command Keys
 ============
 
@@ -7,15 +9,15 @@ Command keys allow you to specify and run different commands for a
 :term:`rose app`.
 
 They work just like the default command for an app but have to be specified
-explicitly as an option of ``rose task-run``.
+explicitly as an option of :ref:`command-rose-task-run`.
 
 
 Example
 -------
 
 Create a new suite (or just a new directory somewhere - e.g. in your homespace)
-containing a blank ``rose-suite.conf`` and a ``suite.rc`` file that looks like
-this:
+containing a blank :rose:file:`rose-suite.conf` and a ``suite.rc`` file that
+looks like this:
 
 .. code-block:: cylc
 
@@ -35,8 +37,8 @@ In your suite directory create an ``app`` directory.
 
 In the ``app`` directory create a new directory called ``breadmaker``.
 
-In the ``breadmaker`` directory create a ``rose-app.conf`` file that looks like
-this:
+In the ``breadmaker`` directory create a :rose:file:`rose-app.conf` file that
+looks like this:
 
 .. code-block:: rose
 
@@ -49,17 +51,17 @@ This sets up a simple suite that contains the following:
 * A ``gather_ingredients`` task
 * A ``breadmaker`` task that runs the ``breadmaker`` app
 
-Save your changes then run the suite using ``rose suite-run``.
+Save your changes then run the suite using :ref:`command-rose-suite-run`.
 
-Once it has finished use ``rose suite-log`` to view the suite log. In the page
-that appears, click the "out" link for the breadmaker task. In the page you
-are taken to you should see a line saying "fresh bread".
+Once it has finished use :ref:`command-rose-suite-log` to view the suite log.
+In the page that appears, click the "out" link for the breadmaker task. In the
+page you are taken to you should see a line saying "fresh bread".
 
 
 Adding Alternative Commands
 ---------------------------
 
-Open the ``rose-app.conf`` file and edit to look like this:
+Open the :rose:file:`rose-app.conf` file and edit to look like this:
 
 .. code-block:: rose
 

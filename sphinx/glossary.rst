@@ -655,19 +655,78 @@ Glossary
 
          foo -> bar -> baz
 
-      In this example the task ``bar`` has failed meaning that ``baz`` is unable
-      to run as its dependency (``bar:succeed``) has not been met.
+      In this example the task ``bar`` has failed meaning that ``baz`` is
+      unable to run as its dependency (``bar:succeed``) has not been met.
 
       When a cylc detects that a suite has stalled an email will be sent to the
       user. Human interaction is required to escape a stalled state.
 
    rose app
    rose application configuration
-      TODO
+      A rose application configuration (or rose app) is a directory containing
+      a :rose:file:`rose-app.conf` file along with some other optional files
+      and directories.
+
+      An application can configure:
+
+      * The command to run (:rose:conf:`rose-app.conf[command]`).
+      * Any environment variables to provide it with
+        (:rose:conf:`rose-app.conf[env]`)
+      * Input files e.g. namelists (:rose:conf:`rose-app.conf[namelist:NAME]`)
+      * Metadata for the application (:rose:file:`rose-meta.conf`).
+
+      see also:
+
+      * :ref:`Rose Applications`
 
    rose suite configuration
-      TODO
+      A rose suite configuration is a :rose:file:`rose-suite.conf` file along
+      with other optional files and directories which configure the way in
+      which a :term:`cylc suite` is run. E.g:
+
+      * Jinja2 variables to be passed into the ``suite.rc`` file (
+        :rose:conf:`rose-suite.conf[jinja2:suite.rc]`).
+      * Environment variables to be provided to ``cylc run`` (
+        :rose:conf:`rose-suite.conf[env]`).
+      * Installation configuration (e.g.
+        :rose:conf:`rose-suite.conf|root-dir`,
+        :rose:conf:`rose-suite.conf[file:NAME]`).
+
+      see also:
+
+      * :ref:`Rose Suites`
 
    metadata
    rose metadata
-      TODO
+      Rose metadata provides information about settings in
+      :term:`rose application configurations <rose application configuration>`
+      and :term:`rose suite configurations <rose suite configuration>`. This
+      information is stored in a :rose:file:`rose-meta.conf` file in a
+      ``meta/`` directory alongside the configuration it applies to.
+
+      This information can include:
+
+      * Documentation and help text, e.g.
+        :rose:conf:`rose-meta.conf[SETTING]title`
+        provides a short title to describe a setting.
+      * Information about permitted values for the setting, e.g.
+        :rose:conf:`rose-meta.conf[SETTING]type` can be used to specify the
+        data type a setting requires (integer, string, boolean, etc).
+      * Settings affecting how the configurations are displayed in
+        :ref:`command-rose-config-edit` (e.g.
+        :rose:conf:`rose-meta.conf[SETTING]sort-key`).
+      * Metadata which defines how settings should behave in different states
+        (e.g. :rose:conf:`rose-meta.conf[SETTING]trigger`).
+
+      This information is used for:
+
+      * Presentation and validation in the :ref:`command-rose-config-edit`
+        GUI.
+      * Validation using the :ref:`command-rose-macro` command.
+
+      Metadata does not affect the running of an
+      :term:`application <rose app>` or :term:`cylc suite`.
+
+      see also:
+
+      * :ref:`Metadata`

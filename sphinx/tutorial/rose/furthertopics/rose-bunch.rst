@@ -1,8 +1,8 @@
 rose bunch
 ==========
 
-``rose_bunch`` is a built-in :term:`rose app` which allows multiple variants
-of a command to be run under a single job.
+:rose:app:`rose_bunch` is a built-in :term:`rose app` which allows multiple
+variants of a command to be run under a single job.
 
 
 Purpose
@@ -13,14 +13,13 @@ from each other at the same time - an example would be where a command is
 run repeatedly with only its arguments changing.
 
 Rather than creating multiple apps or
-
 :ref:`optional configs <rose-tutorial-optional-configurations>` to change
 the way a command is to be run, we can instead use the built-in
-``rose_bunch`` application to run multiple command variants, in parallel,
-under a single job as defined by an application configuration.
+:rose:app:`rose_bunch` application to run multiple command variants, in
+parallel, under a single job as defined by an application configuration.
 
 Note, however, that for "embarrassingly parallel" code it would be better to
-alter the code rather than use ``rose_bunch`` to handle this for you.
+alter the code rather than use :rose:app:`rose_bunch` to handle this for you.
 
 
 .. warning::
@@ -46,8 +45,8 @@ landings is the plane type, number of passengers carried and the resulting
 timings for each stage of the landing process.
 
 Create a new suite (or just a new directory somewhere - e.g. in your
-homespace) containing a blank ``rose-suite.conf`` and a ``suite.rc`` file
-that looks like this:
+homespace) containing a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+file that looks like this:
 
 .. code-block:: cylc
 
@@ -70,8 +69,8 @@ In the app directory create a ``lander/`` directory::
    cd app
    mkdir lander
 
-In the ``app/lander/`` directory create a ``rose-app.conf`` file using your
-editor of choice and paste the following lines into it:
+In the ``app/lander/`` directory create a :rose:file:`rose-app.conf` file
+using your editor of choice and paste the following lines into it:
 
 .. code-block:: rose
 
@@ -84,9 +83,10 @@ editor of choice and paste the following lines into it:
    class=airbus concorde airbus cessna
    passengers=40 20 30 2
 
-This configuration will run a ``rose_bunch`` task that calls multiple
+This configuration will run a :rose:app:`rose_bunch` task that calls multiple
 instances of the ``land`` command, supplying arguments to each instance
-from the ``class`` and ``passengers`` entries under ``[bunch-args]``.
+from the ``class`` and ``passengers`` entries under
+:rose:conf:`rose_bunch[bunch-args]`.
 
 In the ``app/lander/`` directory create a ``bin/`` directory::
 
@@ -131,7 +131,8 @@ directory of the lander app and running::
    chmod +x land
 
 Navigate to the top directory of your suite (where the ``suite.rc`` and
-``rose-suite.conf`` files can be found) and run ``rose suite-run``.
+:rose:file:`rose-suite.conf` files can be found) and run
+:ref:`command-rose-suite-run`.
 
 Your suite should run, launch the cylc GUI and successfully run the ``lander``
 app.
@@ -146,8 +147,8 @@ its output (note that you can close the cylc GUI at this point)::
 
 .. note::
 
-   You can quickly get to the relevant page by running ``rose suite-log``
-   from within the suite directory.
+   You can quickly get to the relevant page by running
+   :ref:`command-rose-suite-log` from within the :term:`suite directory`.
 
 In the rose bush jobs page for your suite you should be presented with a
 page containing a single row for the ``lander`` task, from which you can
@@ -161,9 +162,9 @@ In the rose bush entry you should see that the usual links are present for
 the task such as ``job.out``, ``job.status`` etc. with the addition of
 two drop-down boxes: one for ``bunch.*.err`` and one for ``bunch.*.out``.
 Rather than mixing the outputs from the multiple command invocations being
-run at once, ``rose_bunch`` directs their output to individual output files.
-So, for example, the output from running the command with the first set of
-parameters can be found in the ``bunch.0.out`` file, the second set in the
+run at once, :rose:app:`rose_bunch` directs their output to individual output
+files. So, for example, the output from running the command with the first set
+of parameters can be found in the ``bunch.0.out`` file, the second set in the
 ``bunch.1.out`` file etc. Examine these output files now to confirm that all
 four of the args combinations have been run and produced output.
 
@@ -173,11 +174,11 @@ Naming Invocations
 
 While the different invocations of the command have their own output directed
 to indexed files, it can sometimes be difficult to quickly identify which file
-to look in for output. To aid this, ``rose_bunch`` supports naming command
-instances via the ``[bunch]names=`` option.
+to look in for output. To aid this, :rose:app:`rose_bunch` supports naming
+command instances via the :rose:conf:`rose_bunch[bunch]names=` option.
 
 Open your app config (under ``app/lander/rose-app.conf``) and add the
-following line under the ``[bunch]`` section:
+following line under the :rose:conf:`rose_bunch[bunch]` section:
 
 .. code-block:: rose
 
@@ -195,18 +196,19 @@ Limiting Concurrent Invocations
 In some situations we may need to limit the number of concurrently running
 command invocations - often as a result of resource limitations. Rather than
 batching up jobs into sets of *N* simultaneously running commands,
-``rose_bunch``
+:rose:app:`rose_bunch`
 apps can be configured to run as many commands as possible within some limit
 i.e. while *N* commands are running, if one of them finishes, don't wait for the
 remaining *N*\ -1 jobs to finish before running the (\ *N*\ +1)th one.
 
 In the case of our simulated airport we will pretend we only have two runways
 available at a time on which our planes can land. As such we need to limit the
-number of planes landing. We do this using the ``[bunch]pool-size=``
-configuration option of the ``rose_bunch`` app.
+number of planes landing. We do this using the
+:rose:conf:`rose_bunch[bunch]pool-size=` configuration option of the
+:rose:app:`rose_bunch` app.
 
 Open your app config (under ``app/lander/rose-app.conf``) and add the
-following line to the ``[bunch]`` section:
+following line to the :rose:conf:`rose_bunch[bunch]` section:
 
 .. code-block:: rose
 
@@ -224,18 +226,19 @@ the task stdout in the cylc GUI by right-clicking on the task and selecting
    [INFO] BA007: added to pool
 
 appear in the job output after a while whereas, when running without a
-``pool-size``, the line will appear pretty quickly.
+:rose:conf:`rose_bunch[bunch]pool-size`, the line will appear pretty quickly.
 
 
 Summary
 -------
 
-In this tutorial we have learnt how to configure a ``rose_bunch`` app to run
-a set of command variants under one job. We have learnt how to name the
+In this tutorial we have learnt how to configure a :rose:app:`rose_bunch` app
+to run a set of command variants under one job. We have learnt how to name the
 individual variants for convenience in examining the logs and how to limit
 the number of concurrently running commands.
 
-Further options are listed in the ``rose_bunch`` documentation. These include
-configuring how to proceed following failure of an individual command
-invocation (``[bunch]fail-mode=``), automatically generating *N*
-command instances and enabling/disabling the app's incremental mode.
+Further options are listed in the :rose:app:`rose_bunch` documentation. These
+include configuring how to proceed following failure of an individual command
+invocation (:rose:conf:`rose_bunch[bunch]fail-mode=`), automatically
+generating *N* command instances and enabling/disabling the app's incremental
+mode.

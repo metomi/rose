@@ -116,7 +116,7 @@ by splashing out on truffles. Add the following to ``[env=BUDGET]``:
    trigger=namelist:pizza_order=truffle: this > 25;
            namelist:side_order: this >= 10;
 
-.. TODO - link the logical syntax reference page.
+See :ref:`app-meta-mini-lang` for details on this syntax.
 
 What we've done here is use a small subset of the Rose configuration
 metadata logical syntax to specify a range of allowed values (the
@@ -292,9 +292,7 @@ that this works! You can then just add it via the menu button for the
 option.
 
 
-.. TODO - Link the configuration metadata reference
+Further Reading
+---------------
 
-   Further Reading
-   ---------------
-
-   For more information, see the `Configuration Metadata Reference`_.
+For more informaiton see :ref:`Metadata`.
