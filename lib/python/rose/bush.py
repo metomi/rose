@@ -29,6 +29,7 @@ import os
 import pwd
 import re
 import shlex
+from stat import S_IMODE
 import sys
 import tarfile
 from tempfile import NamedTemporaryFile
@@ -103,6 +104,8 @@ class RoseBushService(object):
     @cherrypy.expose
     def broadcast_states(self, user, suite, form=None):
         """List current broadcasts of a running or completed suite."""
+        self.check_suite_permission(suite, user)
+
         data = {
             "logo": self.logo,
             "title": self.title,
@@ -134,6 +137,8 @@ class RoseBushService(object):
     @cherrypy.expose
     def broadcast_events(self, user, suite, form=None):
         """List broadcasts history of a running or completed suite."""
+        self.check_suite_permission(suite, user)
+
         data = {
             "logo": self.logo,
             "title": self.title,
@@ -165,6 +170,8 @@ class RoseBushService(object):
             self, user, suite, page=1, order=None, per_page=None,
             no_fuzzy_time="0", form=None):
         """List cycles of a running or completed suite."""
+        self.check_suite_permission(suite, user)
+
         conf = ResourceLocator.default().get_conf()
         per_page_default = int(conf.get_value(
             ["rose-bush", "cycles-per-page"], self.CYCLES_PER_PAGE))
@@ -259,6 +266,8 @@ class RoseBushService(object):
                 return a JSON data structure.
 
         """
+        self.check_suite_permission(suite, user)
+
         conf = ResourceLocator.default().get_conf()
         per_page_default = int(conf.get_value(
             ["rose-bush", "jobs-per-page"], self.JOBS_PER_PAGE))
@@ -353,6 +362,8 @@ class RoseBushService(object):
 
         Convert "no_status" to "task_status" argument of self.taskjobs.
         """
+        self.check_suite_permission(suite, user)
+
         task_status = None
         if no_status:
             task_status = []
@@ -423,6 +434,11 @@ class RoseBushService(object):
                 dnames[:] = []
             else:
                 continue
+            try:
+                self.check_permissions(dirpath)
+            except cherrypy.HTTPError:
+                # Suite directory does not have global read permission.
+                continue
             item = os.path.relpath(dirpath, user_suite_dir_root)
             if not any(fnmatch(item, glob_) for glob_ in name_globs):
                 continue
@@ -473,7 +489,10 @@ class RoseBushService(object):
 
     def get_file(self, user, suite, path, path_in_tar=None, mode=None):
         """Returns file information / content or a cherrypy response."""
+        self.check_suite_permission(suite, user)
+
         f_name = self._get_user_suite_dir(user, suite, path)
+        self.check_permissions(f_name)
         conf = ResourceLocator.default().get_conf()
         view_size_max = int(conf.get_value(
             ["rose-bush", "view-size-max"], self.VIEW_SIZE_MAX))
@@ -563,6 +582,8 @@ class RoseBushService(object):
 
     def get_last_activity_time(self, user, suite):
         """Returns last activity time for a suite based on database stat"""
+        self.check_suite_permission(suite, user)
+
         for name in [os.path.join("log", "db"), "cylc-suite.db"]:
             fname = os.path.join(self._get_user_suite_dir(user, suite), name)
             try:
@@ -575,6 +596,8 @@ class RoseBushService(object):
     def viewsearch(self, user, suite, path=None, path_in_tar=None, mode=None,
                    search_string=None, search_mode=None):
         """Search a text log file."""
+        self.check_suite_permission(suite, user)
+
         # get file or serve raw data
         file_output = self.get_file(
             user, suite, path, path_in_tar=path_in_tar, mode=mode)
@@ -631,6 +654,8 @@ class RoseBushService(object):
     def view(self, user, suite, path, path_in_tar=None, mode=None,
              no_fuzzy_time="0"):
         """View a text log file."""
+        self.check_suite_permission(suite, user)
+
         # get file or serve raw data
         file_output = self.get_file(
             user, suite, path, path_in_tar=path_in_tar, mode=mode)
@@ -667,6 +692,8 @@ class RoseBushService(object):
 
     def _get_suite_logs_info(self, user, suite):
         """Return a dict with suite logs and Rosie suite info."""
+        self.check_suite_permission(suite, user)
+
         data = {"info": {}, "files": {}}
         user_suite_dir = self._get_user_suite_dir(user, suite)
 
@@ -799,6 +826,35 @@ class RoseBushService(object):
         path = os.path.join('foo', path)  # Enable checking of ../foo paths.
         if os.path.normpath(path) != path:
             raise cherrypy.HTTPError(403)
+
+    def check_suite_permission(self, suite, user):
+        """Check the suite directory has global read privilege."""
+        suite_path = os.path.join(self._get_user_suite_dir_root(user), suite)
+        self.check_permissions(suite_path)
+
+    @staticmethod
+    def check_permissions(path, user=None, group=None, public=4):
+        """Pass is file permissions are satisfied else raise an error.
+
+        Checks permissions up the full tree to root.
+
+        The default test checks for public read access (xx4).
+
+        Raises:
+            cherrypy.HTTPError(403) if permissions of path are less
+            than those specified.
+        """
+        base = True
+        while path and base:
+            _, user_p, group_p, public_p = (
+                int(x) for x in str(oct(S_IMODE(os.lstat(path).st_mode))))
+            if (
+                (user and user_p < user) or
+                (group and group_p < group) or
+                (public and public_p < public)
+            ):
+                raise cherrypy.HTTPError(403)
+            path, base = os.path.split(path)
 
     def _get_user_suite_dir(self, user, suite, *paths):
         """Return, e.g. ~user/cylc-run/suite/... for a cylc suite.
