@@ -40,10 +40,14 @@ TEST_KEY="${TEST_KEY_BASE}"
 mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
-OPTION='-i'
-if [[ "${TEST_KEY_BASE}" == *local* ]]; then
-    OPTION='-l'
-fi
+case "${TEST_KEY_BASE}" in
+    *local*)
+        OPTION='-l';;
+    *validate*)
+        OPTION='--validate-suite-only';;
+    *)
+        OPTION='-i';;
+esac
 mkdir "${TEST_KEY_BASE}"
 cp -pr "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/"* "${TEST_KEY_BASE}"
 touch "${TEST_KEY_BASE}/colon:is:ok"
@@ -62,17 +66,25 @@ TEST_KEY="${TEST_KEY_BASE}-port-file"
 run_fail "${TEST_KEY}" test -e "${HOME}/cylc-run/${NAME}/.service/contact"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-items"
-run_pass "${TEST_KEY}" find "${SUITE_RUN_DIR}/"{app,colon:is:ok,etc} -type f
-sort "${TEST_KEY}.out" >"${TEST_KEY}.out.sort"
-file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.sort" <<__OUT__
+_run_mode=run_pass
+if [[ "${TEST_KEY_BASE}" == *validate* ]]; then
+    _run_mode=run_fail
+fi
+"$_run_mode" "${TEST_KEY}" find "${SUITE_RUN_DIR}/"{app,colon:is:ok,etc} -type f
+if [[ "${TEST_KEY_BASE}" != *validate* ]]; then
+    sort "${TEST_KEY}.out" >"${TEST_KEY}.out.sort"
+    file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.sort" <<__OUT__
 ${SUITE_RUN_DIR}/app/my_task_1/rose-app.conf
 ${SUITE_RUN_DIR}/colon:is:ok
 ${SUITE_RUN_DIR}/etc/junk
 __OUT__
+fi
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-items-${JOB_HOST}"
 if [[ "${TEST_KEY_BASE}" == *local* ]]; then
     skip 2 "${TEST_KEY}: local-install-only"
+elif [[ "${TEST_KEY_BASE}" == *validate* ]]; then
+    skip 3 "${TEST_KEY}: validate-suite-only"
 elif [[ -n "${JOB_HOST}" ]]; then
     run_pass "${TEST_KEY}" \
         ssh -oBatchMode=yes "${JOB_HOST}" \

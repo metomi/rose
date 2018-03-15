@@ -60,6 +60,10 @@
 #     --local-install-only, -l
 #         Install the suite locally. Do not install to job hosts. Do not run
 #         it. Implies --no-gcontrol.
+#     --validate-suite-only
+#         Install the suite in a temporary location. Do not setup any directories.
+#         Do not run any jobs. Implies --no-gcontrol. Overrides --install-only and
+#         --local-install-only.
 #     --log-keep=DAYS
 #         Specify the number of days to keep log directories/archives.
 #         Do not housekeep if not specified. Named log directories (created by
