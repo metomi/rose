@@ -65,4 +65,5 @@ and on-the-fly validation purposes.
    :caption: Contents
    :maxdepth: 1
 
+   applications
    furthertopics/index
