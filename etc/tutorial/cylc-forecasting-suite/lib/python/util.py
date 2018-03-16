@@ -272,12 +272,7 @@ def parse_domain(domain):
     }
 
 
-def generate_html_map(filename, data, domain, resolution):
-    template_file = os.path.join(
-        os.environ['CYLC_SUITE_RUN_DIR'],
-        'lib',
-        'template',
-        'map.html')
+def generate_html_map(filename, template_file, data, domain, resolution):
     with open(template_file, 'r') as template:
         with open(filename, 'w+') as html_file:
             html_file.write(jinja2.Template(template.read()).render(
