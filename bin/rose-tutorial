@@ -47,7 +47,7 @@ fi
 
 # Prompt user if directory exists.
 if [[ -d $DIRECTORY ]]; then
-    while read -p "Directory ~/cylc-run/$1 exists, overwrite it (y/n)? " usr
+    while read -p "Directory $DIRECTORY exists, overwrite it (y/n)? " usr
     do
         case "${usr}" in
             [Yy])

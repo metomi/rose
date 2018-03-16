@@ -661,6 +661,21 @@ Glossary
       When a cylc detects that a suite has stalled an email will be sent to the
       user. Human interaction is required to escape a stalled state.
 
+   rose configuration
+      Rose configurations are directories containing a rose configuration
+      file along with other optional files and directories.
+
+      The two types of rose configuration relevant to cylc suites are:
+
+      * :term:`rose application configuration`
+      * :term:`rose suite configuration`
+
+      See also:
+
+      * :ref:`Rose Configurations`
+      * :ref:`Optional Configuration Tutorial
+        <rose-tutorial-optional-configurations>`
+
    rose app
    rose application configuration
       A rose application configuration (or rose app) is a directory containing
@@ -675,9 +690,14 @@ Glossary
       * Input files e.g. namelists (:rose:conf:`rose-app.conf[namelist:NAME]`)
       * Metadata for the application (:rose:file:`rose-meta.conf`).
 
-      see also:
+      See also:
 
       * :ref:`Rose Applications`
+
+   application directory
+      The application directory is the folder in which the
+      :rose:file:`rose-app.conf` file is located in a :term:`rose application
+      configuration`.
 
    rose suite configuration
       A rose suite configuration is a :rose:file:`rose-suite.conf` file along
@@ -692,7 +712,7 @@ Glossary
         :rose:conf:`rose-suite.conf|root-dir`,
         :rose:conf:`rose-suite.conf[file:NAME]`).
 
-      see also:
+      See also:
 
       * :ref:`Rose Suites`
 
@@ -727,6 +747,6 @@ Glossary
       Metadata does not affect the running of an
       :term:`application <rose app>` or :term:`cylc suite`.
 
-      see also:
+      See also:
 
       * :ref:`Metadata`
