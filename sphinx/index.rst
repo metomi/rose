@@ -10,8 +10,7 @@ Rose Documentation
 ==================
 
 Rose is a system for writing, editing and running application configurations.
-
-.. TODO - Add "What Is Rose" link when written.
+:ref:`What Is Rose`?
 
 .. image:: img/rose-logo.png
    :width: 250px
