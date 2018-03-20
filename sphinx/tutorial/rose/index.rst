@@ -66,4 +66,5 @@ and on-the-fly validation purposes.
    :maxdepth: 1
 
    applications
+   metadata
    furthertopics/index
