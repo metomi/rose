@@ -1,3 +1,5 @@
+.. _Cylc Tutorial:
+
 Cylc Tutorial
 =============
 
