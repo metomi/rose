@@ -21,7 +21,7 @@ As a task grows in complexity it could require:
 * Input files.
 * Scripts and libraries.
 
-A rose application or rose app is a runnable :term:`rose configuration` which
+A rose application or "rose app" is a runnable :term:`rose configuration` which
 executes a defined commmand.
 
 Rose applications provide a convenient way to encapsulate all of this
@@ -29,54 +29,14 @@ configuration, storing it all in one place to make it easier to handle and
 maintain.
 
 
-.. _Rose Configurations:
+.. _Application Configuration:
 
-Rose Configurations
--------------------
-
-Rose configurations are directories containing a rose configuration file along
-with other optional files and directories.
-
-All rose configuration files use the same format which is based on the `INI`_
-file format.
-
-* Comments start with a ``#`` character.
-* Settings are written as ``key=value`` pairs.
-* Sections are written inside square brackets i.e. ``[section-name]``
-
-Unlike the :ref:`cylc file format <cylc file format>`:
-
-* Sections cannot be nested.
-* Settings should not be indented.
-* Comments must start on a new line (i.e. you cannot have inline comments).
-* There should not be spaces around the ``=`` operator in a ``key=value`` pair.
-
-.. code-block:: rose
-
-   # Comment.
-   setting=value
-
-   [section]
-   key=value
-   multi-line-setting=multi
-                     =line
-                     =value
-
-Throughout this tutorial we will refer to settings in the following format:
-
-* ``file`` - would refer to a rose configuration file.
-* ``file|setting`` - would refer to a setting in a rose configuration file.
-* ``file[section]`` - would refer to a section in a rose configuration file.
-* ``file[section]setting`` - would refer to a setting in a section in a rose
-  configuration file.
-
-
-Application Configurations
---------------------------
+Application Configuration
+-------------------------
 
 An application configuration is a directory containing a
 :rose:file:`rose-app.conf` file. Application configurations are also refered to
-as applications or apps.
+as "applications" or "apps".
 
 The command to execute when the application is run is defined using the
 :rose:conf:`rose-app.conf[command]default` setting e.g:
@@ -111,11 +71,25 @@ is run e.g.:
 
 Any static input files can be placed in the ``file/`` directory.
 
+
+Running Rose Applications
+-------------------------
+
 An application can be run using the :ref:`command-rose-app-run` command:
 
 .. code-block:: console
 
-   $ rose app-run -q
+   $ rose app-run -q  # -q for quiet output
+   Hello Earth!
+
+The application will run in the current directory so it is a good idea to run
+the application elsewhere to keep run files separate. If running the rose
+application from outside of the :term:`application directory` the ``-C`` option
+can be used to provide the path to the rose application:
+
+.. code-block:: console
+
+   $ rose app-run -q -C path/to/application
    Hello Earth!
 
 
@@ -144,8 +118,8 @@ An application can be run using the :ref:`command-rose-app-run` command:
 
       The ``forecast`` application requires three resources.
 
-      * The ``bin/forecast`` script
-      * The ``lib/python/util.py`` python library
+      * The ``bin/forecast`` script.
+      * The ``lib/python/util.py`` python library.
       * The ``lib/template/map.html`` html template.
 
       Rather than leaving these resources scattered throughout the

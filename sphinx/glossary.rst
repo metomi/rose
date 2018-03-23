@@ -395,6 +395,7 @@ Glossary
       See also:
 
       * :term:`suite directory`
+      * :ref:`Suite Directory Vs Run Directory`
       * :term:`work directory`
       * :term:`share directory`
       * :term:`job log directory`
@@ -672,11 +673,13 @@ Glossary
 
       See also:
 
-      * :ref:`Rose Configurations`
+      * :ref:`Rose Configuration Format`
+      * :ref:`Rose Configuration Tutorial <tutorial-rose-configurations>`
       * :ref:`Optional Configuration Tutorial
         <rose-tutorial-optional-configurations>`
 
    rose app
+   rose application
    rose application configuration
       A rose application configuration (or rose app) is a directory containing
       a :rose:file:`rose-app.conf` file along with some other optional files
