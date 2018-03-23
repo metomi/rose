@@ -20,7 +20,7 @@ be stored inside a rose configuration in a ``meta/`` directory, or elsewhere
 outside of the configuration.
 
 The :rose:file:`rose-meta.conf` file uses the standard 
-:ref:`Rose configuration format <Rose Configurations>`.
+:ref:`Rose configuration format <tutorial-rose-configurations>`.
 
 The metadata for a setting is written in a section which is named after the ID
 of the setting which is the section and setting name separated by an equals

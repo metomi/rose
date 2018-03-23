@@ -10,7 +10,7 @@ Rose Documentation
 ==================
 
 Rose is a system for writing, editing and running application configurations.
-:ref:`What Is Rose`?
+:ref:`What Is Rose <Rose Tutorial>`?
 
 .. image:: img/rose-logo.png
    :width: 250px
@@ -33,6 +33,7 @@ applications. :ref:`What Is Cylc? <cylc-introduction>`
    installation
    tutorial/cylc/index
    tutorial/rose/index
+   cheat-sheet
    glossary
 
 
