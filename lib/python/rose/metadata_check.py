@@ -214,6 +214,12 @@ def _check_widget(value, module_files=None, meta_dir=None):
         return
     widget_name = value.split()[0]
     try:
+        import pygtk
+        pygtk.require('2.0')
+    except ImportError:
+        # gtk 2.0 not available, skip check.
+        return
+    try:
         widget = rose.resource.import_object(
             widget_name, module_files, _import_err_handler)
     except Exception as exc:
