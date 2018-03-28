@@ -1,3 +1,5 @@
+.. _tutorial-rose-metadata:
+
 Rose Metadata
 =============
 
