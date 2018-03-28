@@ -82,12 +82,8 @@
             WIND_FILE_TEMPLATE = """
                 $CYLC_SUITE_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
             """
-            # List of cycle points to process wind data from.
-            WIND_CYCLES = """
-                $CYLC_TASK_CYCLE_POINT
-                $(cylc cyclepoint --offset-hours=-3)
-                $(cylc cyclepoint --offset-hours=-6)
-            """
+            # Offset in hours to cycles to process wind data from.
+            WIND_CYCLES = 0, -3, -6
             # The path to the rainfall file.
             RAINFALL_FILE = """
                 $CYLC_SUITE_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv

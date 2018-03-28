@@ -27,6 +27,7 @@ Environment Variables:
 """
 
 import os
+from subprocess import Popen, PIPE
 import sys
 
 import util
@@ -168,6 +169,17 @@ def push_rainfall(rainfall, wind_data, step, resolution, spline_level):
                                     spline_level)
 
 
+def get_cyclepoint(offset_hours):
+    """Calculate a cyclepoint from a relative offset.
+
+    Run the system call `cylc cyclepoint --offset-hours <offset_hours>`
+    """
+    return Popen(
+        ['cylc', 'cyclepoint', '--offset-hours', str(int(offset_hours))],
+        stdout=PIPE
+    ).communicate()[0].strip()
+
+
 def main(forecast_interval, forecast_itterations):
     # Get suite settings.
     domain = util.parse_domain(os.environ['DOMAIN'])
@@ -179,7 +191,8 @@ def main(forecast_interval, forecast_itterations):
 
     # Get file paths.
     rainfall_file = os.environ['RAINFALL_FILE']
-    wind_cycles = os.environ['WIND_CYCLES'].split()
+    wind_cycles = [get_cyclepoint(offset) for offset in
+                   os.environ['WIND_CYCLES'].split(',')]
     wind_file_template = os.environ['WIND_FILE_TEMPLATE']
     map_file = os.environ['MAP_FILE']
     map_template = os.environ['MAP_TEMPLATE']
