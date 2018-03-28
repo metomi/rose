@@ -175,6 +175,8 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
 
 def plot_vector_grid(filename, x_grid, y_grid):
     try:
+        import matplotlib
+        matplotlib.use('Agg')
         import matplotlib.pyplot as plt
     except ImportError:
         print 'Plotting diasbled'
