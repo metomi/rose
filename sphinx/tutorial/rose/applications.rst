@@ -202,14 +202,19 @@ can be used to provide the path to the rose application:
       To make this application work outside of a suite we will also need to
       provide the ``DOMAIN`` and ``RESOLUTION`` environment variables defined
       in the ``[runtime][root][environment]`` section of the ``suite.rc``
-      file. Add the following lines to the :rose:file:`rose-app.conf`:
+      file as well as the ``CYLC_TASK_CYCLE_POINT`` environment variable
+      provided by cylc when it runs a task.
+
+      Add the following lines to the :rose:file:`rose-app.conf`:
 
       .. code-block:: rose
 
+         # The cycle point for the test data
+         CYLC_TASK_CYCLE_POINT=20171101T0000Z
          # The dimensions of each grid cell in degrees.
-         RESOLUTION = 0.2
+         RESOLUTION=0.2
          # The area to generate forecasts for (lng1, lat1, lng2, lat2)
-         DOMAIN = -12,48,5,61
+         DOMAIN=-12,48,5,61
 
    #. **Copy the test data.**
 
