@@ -106,7 +106,7 @@ Example:
 
 import re
 
-from docutils.nodes import block_quote, paragraph
+from docutils.nodes import block_quote
 from docutils.parsers.rst import Directive
 from docutils.statemachine import StringList
 
