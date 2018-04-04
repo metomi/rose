@@ -410,10 +410,24 @@ app>` in the task defined below.
          script = rose task-run --app-key hello
 
 
-.. TODO - Rose Bush
+Rose Bush
+---------
 
-   Rose provides a utility for viewing the status and logs for cylc suites called
-   Rose Bush. Rose Bush displays suite information in web-pages
+.. TODO - move this into the cylc tutorial with the upcomming cylc "nameless".
+
+Rose provides a utility for viewing the status and logs for cylc suites called
+Rose Bush. Rose Bush displays suite information in web-pages.
+
+.. image:: img/rose-bush.png
+   :alt: rose bush screenshot
+   :width: 100%
+
+If a rose bush server is provided at your site you can open the rose bush
+page for a suite by running the :ref:`command-rose-suite-log` command
+in the suite directory.
+
+Otherwise an add-hoc web-server can be set up using the
+:ref:`command-rose-bush` ``start`` command.
 
 
 .. practical::
@@ -509,7 +523,7 @@ app>` in the task defined below.
       task of the ``suite.rc`` file into the :rose:file:`rose-app.conf` file
       of the ``forecast`` application.
 
-      TODO - remove tripple quotes in cylc tutorial
+      TODO - remove triple quotes in cylc tutorial
 
       Remember, in rose configuration files:
 
@@ -557,10 +571,23 @@ app>` in the task defined below.
 
    #. **Run The Suite.**
 
-      ::
+      Install, validate and run the suite::
 
          rose suite-run
 
       The ``cylc gui`` should open, the suite should run and complete.
 
-      .. TODO - view output in rose bush
+   #. **View Output In Rose Bush.**
+
+      Open the rose bush page in a browser by running the following command
+      from within the suite directory::
+
+         rose suite-log
+
+      On this page you will see the tasks run by the suite ordered from most to
+      least recent. Near the top you should see an entry for the ``forecast``
+      task. On the right-hand side of the screen click
+      :guilabel:`job-map.html`.
+      
+      As this file has a ``.html`` extension rose bush will render it,
+      otherwise the raw text would be displayed.
