@@ -10,7 +10,7 @@ Rose Configurations
 rose configuration file along with other optional assets which define behaviour
 such as:
 
-* Executables.
+* Execution.
 * File installation.
 * Environment variables.
 
