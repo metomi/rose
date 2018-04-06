@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<!-- Remember to ensure image paths are relative! -->
+
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.1"
+   width="917.05646"
+   height="691.88763"
+   id="svg2">
+  <defs
+     id="defs6">
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="Arrow2Lend"
+       style="overflow:visible">
+      <path
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+         id="path3616"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="Arrow1Lend"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         id="path3598"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+  </defs>
+  <image
+     xlink:href="rosie-go.png"
+     x="13.056454"
+     y="61.88763"
+     width="904"
+     height="630"
+     id="image6622" />
+  <path
+     d="m 469.69293,14.061289 c 85.24189,-0.100288 201.14541,8.830565 191.30844,131.936851"
+     id="path2818"
+     style="fill:none;stroke:#002fff;stroke-width:10.39999962;stroke-miterlimit:0;stroke-opacity:1;stroke-dasharray:none;marker-end:none" />
+  <text
+     x="298.17502"
+     y="23.296875"
+     id="text6422"
+     xml:space="preserve"
+     style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;fill:#001bff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+       x="298.17502"
+       y="23.296875"
+       id="tspan6424"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#001bff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial">Search Bar</tspan></text>
+  <path
+     d="m 49.595601,377.54732 c -2.198273,47.97593 4.073619,96.72787 40.900434,143.81117"
+     id="path2818-4"
+     style="fill:none;stroke:#002fff;stroke-width:10.39999962;stroke-miterlimit:0;stroke-opacity:1;stroke-dasharray:none;marker-end:none" />
+  <text
+     x="102.625"
+     y="551.94244"
+     id="text6422-8"
+     xml:space="preserve"
+     style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;text-anchor:middle;fill:#0018ff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+       x="102.625"
+       y="551.94244"
+       id="tspan6424-5"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#0018ff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial">Show checked</tspan><tspan
+       x="102.625"
+       y="591.94244"
+       id="tspan6473"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#0018ff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial">out suites</tspan></text>
+  <path
+     d="m 547.54105,476.93787 c 1.81545,9.65942 -5.74429,-129.79166 117.73368,-127.53005"
+     id="use6475"
+     style="fill:none;stroke:#002fff;stroke-width:10.39999962;stroke-miterlimit:0;stroke-opacity:1;stroke-dasharray:none;marker-end:none" />
+  <text
+     x="545.93286"
+     y="512.36139"
+     id="use6479"
+     xml:space="preserve"
+     style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;text-anchor:middle;fill:#0018ff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+       x="545.93286"
+       y="512.36139"
+       id="tspan6485"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#0018ff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial">Check out</tspan><tspan
+       x="545.93286"
+       y="552.36139"
+       id="tspan6489"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#0018ff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial">suites from the</tspan><tspan
+       x="545.93286"
+       y="592.36139"
+       id="tspan6491"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#0018ff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial">GUI</tspan></text>
+  <path
+     d="m 862.39358,33.851822 c 13.996,22.32897 37.54372,41.81477 34.30359,121.381898"
+     id="use6493"
+     style="fill:none;stroke:#002fff;stroke-width:10.39999962;stroke-miterlimit:0;stroke-opacity:1;stroke-dasharray:none;marker-end:none" />
+  <text
+     x="666.40448"
+     y="23.296875"
+     id="use6497"
+     xml:space="preserve"
+     style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;fill:#001bff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+       x="666.40448"
+       y="23.296875"
+       id="tspan6501"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#001bff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial">Advanced Search</tspan></text>
+</svg>

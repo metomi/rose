@@ -418,9 +418,11 @@ Rose Bush
 Rose provides a utility for viewing the status and logs for cylc suites called
 Rose Bush. Rose Bush displays suite information in web-pages.
 
-.. image:: img/rose-bush.png
+.. figure:: img/rose-bush.png
    :alt: rose bush screenshot
    :width: 100%
+
+   Screenshot of a rose bush web page.
 
 If a rose bush server is provided at your site you can open the rose bush
 page for a suite by running the :ref:`command-rose-suite-log` command
