@@ -24,10 +24,10 @@
 #     rosa db-create
 #
 # DESCRIPTION
-#     Create Rosie discovery databases.
+#     Create Rosie discovery database files.
 #
-#     Use the rosie-disco=db.* settings in the site configuration file to
-#     determine the list of databases to create.
-#     Does not override existing databases.
+#     Use the [rosie-db] settings in the site configuration file to
+#     determine the list of database files to create.
+#     Does not override existing database files.
 #-------------------------------------------------------------------------------
 exec python -m rosie.db_create "$@"

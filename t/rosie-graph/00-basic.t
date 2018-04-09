@@ -47,9 +47,6 @@ db.foo=sqlite:///$PWD/repos/foo.db
 local-copy-root=$PWD/roses
 prefix-default=foo
 prefix-location.foo=$SVN_URL
-
-[rosie-disco]
-log-dir=$PWD/rosie/log
 __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD/conf
 
