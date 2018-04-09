@@ -1,3 +1,5 @@
+.. _Rose Further Topics:
+
 Further Topics
 ==============
 

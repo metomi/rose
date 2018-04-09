@@ -22,4 +22,5 @@ Rose also contains other optional tools for:
    metadata
    suites
    rosie
+   summary
    furthertopics/index
