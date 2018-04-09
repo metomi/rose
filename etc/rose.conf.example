@@ -3,9 +3,9 @@
 # * ``$ROSE_HOME/etc/`` for site configuration.
 # * ``$HOME/.metomi/rose/`` for user configuration.
 #
-# This file documents the settings and their default values.
-# Values of settings in this file are mostly placeholders,
-# so this file should NOT be used as-is.
+#.. This file documents the settings and their default values.
+#   Values of settings in this file are mostly placeholders,
+#   so this file should NOT be used as-is.
 
 
 # :default: md5
