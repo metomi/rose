@@ -82,4 +82,3 @@ and on-the-fly validation purposes.
 .. TODO - add rose edit screenshot.
 
 .. TODO - rename rose config-edit to rose edit.
-

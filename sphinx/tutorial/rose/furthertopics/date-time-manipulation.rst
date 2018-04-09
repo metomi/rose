@@ -1,3 +1,5 @@
+.. _rose-tutorial-datetime-manipulation:
+
 Date and Time Manipulation
 ==========================
 
