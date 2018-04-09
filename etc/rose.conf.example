@@ -2,12 +2,21 @@
 #
 # * ``$ROSE_HOME/etc/`` for site configuration.
 # * ``$HOME/.metomi/rose/`` for user configuration.
+#
+# This file documents the settings and their default values.
+# Values of settings in this file are mostly placeholders,
+# so this file should NOT be used as-is.
 
+
+# :default: md5
+#
 # Default method for checksum calculation
 # Values can be any algorithm available from Python's hashlib.
 checksum-method=md5|sha1|...
 # Paths to locate configuration metadata e.g. ``meta-path=/opt/rose-meta``
 meta-path=DIR1[:DIR2[:...]]
+# :default: file://${ROSE_HOME}/doc/
+#
 # URL to Rose documentation.
 rose-doc=http://metomi.github.io/rose/doc/
 
@@ -47,7 +56,7 @@ rsync=COMMAND
 # The ``ssh`` command.
 ssh=COMMAND
 # :default: xterm
-
+#
 # Launch terminal.
 terminal=COMMAND
 
@@ -169,6 +178,8 @@ default=GROUP/HOST ...
 #    group{hpc1}=hpc1a hpc1b hpc1c hpc1d
 #    group{hpc2}=hpc2a hpc2b hpc2c hpc2d
 group{NAME}=GROUP/HOST ...
+# :default: load
+#
 # Declare the default ranking method for a group of hosts e.g.
 # ``method{hpc}=random``.
 # For detail on the methods see :ref:`command-rose-host-select`.
@@ -195,23 +206,8 @@ timeout=FLOAT
 automatic-options=VARIABLE=VALUE
 
 
-# Configuration related to :ref:`command-rose-suite-hook`.
-[rose-suite-hook]
-# Default host name for email addresses. (Use "localhost" if not specified.)
-email-host=HOST
-# SMTP server host (use ``localhost`` if not specified ) e.g.:
-# ``smtp-host=mysmtp.myorganisation.org:2525``.
-smtp-host=HOST[:PORT]
-
-
 # Configuration related to :ref:`command-rose-suite-log`
 [rose-suite-log]
-# Mapping ``$HOME/cylc-run/SUITE`` to a ``http:// URL``.
-# E.g. If ``$HOME/public_html/cylc-run`` is a symlink of ``$HOME/cylc-run``
-# and ``$HOME/public_html/`` is served as ``http://host/~$USER/``:
-home-public-html=http://host/~$USER public_html
-# :default: ``http://host/rose-bush/``
-#
 # URL to the site's Rose Bush web service.
 rose-bush=URL
 
