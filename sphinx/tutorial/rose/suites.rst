@@ -40,7 +40,7 @@ Jinja2 variable ``WORLD`` are both set in the :rose:file:`rose-suite.conf`
 file. These variables can then be used in the ``suite.rc`` file:
 
 .. code-block:: rose
-   :caption: *rose-suite.conf*
+   :caption: rose-suite.conf
 
    [env]
    GREETING=Hello
@@ -49,7 +49,7 @@ file. These variables can then be used in the ``suite.rc`` file:
    WORLD=Earth
 
 .. code-block:: cylc
-   :caption: *suite.rc*
+   :caption: suite.rc
 
    [scheduling]
       [[dependencies]]
@@ -385,14 +385,14 @@ In this example the ``hello`` task will run the application located in
 ``app/hello/``:
 
 .. code-block:: cylc
-   :caption: *suite.rc*
+   :caption: suite.rc
 
    [runtime]
       [[hello]]
          script = rose task-run
 
 .. code-block:: rose
-   :caption: *app/hello/rose-app.conf*
+   :caption: app/hello/rose-app.conf
 
    [command]
    default=echo "Hello World!"
@@ -403,7 +403,7 @@ example the ``greetings`` :term:`task` will run the ``hello`` :term:`app <rose
 app>` in the task defined below.
 
 .. code-block:: cylc
-   :caption: *suite.rc*
+   :caption: suite.rc
 
    [runtime]
       [[greetings]]
