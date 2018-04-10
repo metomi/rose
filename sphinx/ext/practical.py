@@ -34,11 +34,19 @@ class Practical(BaseAdmonition):
 
     """
     node_class = nodes.admonition
+    NAME = 'Practical'
+    CLASSES = ['note']
 
     def run(self):
-        self.options.update({'class': ['note']})  # Affects the display.
-        self.arguments = ['Practical']  # Sets the title of the admonition.
+        self.options.update({'class': self.CLASSES})  # Affects the display.
+        self.arguments = [self.NAME]  # Sets the title of the admonition.
         return super(Practical, self).run()
+
+
+class PracticalExtension(Practical):
+    """Directive for practical extension exercises."""
+    NAME = 'Practical Extension'
+    CLASSES = ['note', 'spoiler']
 
 
 class Spoiler(BaseAdmonition):
@@ -66,5 +74,6 @@ class Spoiler(BaseAdmonition):
 def setup(app):
     """Sphinx setup function."""
     app.add_directive('practical', Practical)
+    app.add_directive('practical-extension', PracticalExtension)
     app.add_directive('spoiler', Spoiler)
     app.add_javascript('js/spoiler.js')  # self-hiding node.
