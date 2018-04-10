@@ -20,8 +20,8 @@ Example
 
 Create a new :term:`rose app` called ``rose-opt-conf-tutorial``::
 
-   mkdir rose-opt-conf-tutorial
-   cd rose-opt-conf-tutorial
+   mkdir -p ~/rose-tutorial/rose-opt-conf-tutorial
+   cd ~/rose-tutorial/rose-opt-conf-tutorial
 
 Create a :rose:file:`rose-app.conf` file with the following contents:
 

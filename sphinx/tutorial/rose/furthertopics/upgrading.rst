@@ -22,9 +22,12 @@ This part tutorial walks you through upgrading applications.
 Example
 -------
 
-Create a new directory somewhere in your filesystem called ``garden``.
+Create a new rose application called ``garden``::
 
-Create within it a ``rose-app.conf`` file that looks like this:
+   mkdir -p ~/rose-tutorial/garden
+   cd ~/rose-tutorial/garden
+
+Create within it a :rose:file:`rose-app.conf` file that looks like this:
 
 .. code-block:: rose
 
@@ -55,8 +58,8 @@ This gives you a list of versions to upgrade to - see the help for more
 information (run ``rose help app-upgrade``).
 
 There can often be more versions than you can see by just running
-``rose app-upgrade``. They will not have formal metadata, and represent
-intermediary steps along the way between proper named versions. You
+:ref:`command-rose-app-upgrade`. They will not have formal metadata, and
+represent intermediary steps along the way between proper named versions. You
 can see all the possible versions by running:
 
 .. code-block:: bash
@@ -78,7 +81,7 @@ This will give you a list of changes that the upgrade will apply to your
 configuration. Accept it, and your application configuration will be
 upgraded, with a new option (``shrubberies``) and a new ``meta=...``
 version of the metadata to point to. Have a look at the changed
-``rose-app.conf`` if you like.
+:rose:file:`rose-app.conf` if you like.
 
 Try repeating this by upgrading to ``garden0.3`` in the same way.
 This time, you'll get a warning - warnings are used to point out
@@ -96,10 +99,10 @@ Try running:
 
 If you accept the changes, your app config will be upgraded through all
 the intermediary versions to the new one. Have a look at the
-``rose-app.conf`` file.
+:rose:file:`rose-app.conf` file.
 
-If you run rose ``app-upgrade`` with no arguments, you can see that
-you're using the latest version.
+If you run rose :ref:`command-rose-app-upgrade` with no arguments, you can see
+that you're using the latest version.
 
 
 Downgrading

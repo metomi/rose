@@ -15,8 +15,12 @@ explicitly as an option of :ref:`command-rose-task-run`.
 Example
 -------
 
-Create a new suite (or just a new directory somewhere - e.g. in your homespace)
-containing a blank :rose:file:`rose-suite.conf` and a ``suite.rc`` file that
+Create a new Rose suite configuration called ``command-keys``::
+
+   mkdir -p ~/rose-tutorial/command-keys
+   cd ~/rose-tutorial/command-keys
+
+Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc`` file that
 looks like this:
 
 .. code-block:: cylc

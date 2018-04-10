@@ -14,8 +14,11 @@ solution to the archiving of suite files.
 Example
 -------
 
-Create a new suite (or just a new directory somewhere - e.g. in your
-homespace) containing a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+Create a new rose suite configuration::
+
+   mkdir -p ~/rose-tutorial/rose-arch-tutorial
+
+Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
 file that looks like this:
 
 .. code-block:: cylc
