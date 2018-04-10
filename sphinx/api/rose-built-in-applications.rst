@@ -14,7 +14,7 @@ built-in application. For example to use the :rose:app:`rose_prune` built-in
 application:
 
 .. code-block:: rose
-   :caption: *rose-app.conf*
+   :caption: rose-app.conf
 
    mode=rose_prune
    # There may also be metadata which can be picked up using the `meta` setting.

@@ -104,3 +104,9 @@
 .grid-table div.highlight {
     margin-bottom: 0;
 }
+
+/* Place code-block captions in italics. */
+.code-block-caption {
+    font-style: italic;
+    color: #808080;
+}
