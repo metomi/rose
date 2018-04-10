@@ -36,8 +36,9 @@ purposes of this tutorial we will create a new one.
 Type the follow to create a temporary repository (you can safely delete
 it after finishing this tutorial)::
 
-   svnadmin create ~/spaceship_repos
-   (cd $(mktemp -d); mkdir -p trunk/src; svn import -m "" . file://$HOME/spaceship_repos)
+   mkdir -p ~/rose-tutorial
+   svnadmin create ~/rose-tutorial/spaceship_repos
+   (cd $(mktemp -d); mkdir -p trunk/src; svn import -m "" . file://$HOME/rose-tutorial/spaceship_repos)
 
 We then need to link the project name ``SPACESHIP`` with this project.
 Creating the file and directory if they do not exist
@@ -45,18 +46,18 @@ add the following line to the file ``$HOME/.metomi/fcm/keyword.cfg``:
 
 .. code-block:: rose
 
-   location{primary}[spaceship] = file:///home/user/spaceship_repos
+   location{primary}[spaceship] = file:///home/user/rose-tutorial/spaceship_repos
 
 Make sure the path on the right-hand side matches the location you
 specified in the ``svnadmin`` command.
 
 Now you can checkout a working copy of your repository by typing::
 
-   mkdir ~/spaceship_working_copy
-   cd ~/spaceship_working_copy
+   mkdir -p ~/rose-tutorial/spaceship_working_copy
+   cd ~/rose-tutorial/spaceship_working_copy
    fcm checkout fcm:spaceship_tr .
 
-Finally populate your working copy by running::
+Finally populate your working copy by running (answering ``y`` to the prompt)::
 
    rose tutorial rose-stem .
 

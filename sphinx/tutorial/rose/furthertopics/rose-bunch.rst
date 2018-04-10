@@ -44,8 +44,12 @@ clear. We can refer to this as the "landing" routine. What differs between
 landings is the plane type, number of passengers carried and the resulting
 timings for each stage of the landing process.
 
-Create a new suite (or just a new directory somewhere - e.g. in your
-homespace) containing a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+Create a new rose suite configuration::
+
+   mkdir -p ~/rose-tutorial/rose-bunch
+   cd ~/rose-tutorial/rose-bunch
+
+Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
 file that looks like this:
 
 .. code-block:: cylc

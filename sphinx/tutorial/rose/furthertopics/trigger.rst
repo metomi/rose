@@ -15,8 +15,12 @@ Example
 
 In this example, we'll be ordering pizza.
 
-Create a new directory somewhere - e.g. in your homespace - containing
-a ``rose-app.conf`` file that looks like this:
+Create a new rose application called ``trigger``::
+
+   mkdir -p ~/rose-tutorial/trigger
+   cd ~/rose-tutorial/trigger
+
+Create a :rose:file:`rose-app.conf` file that looks like this:
 
 .. TODO - Perhaps move these large code blocks out of this file using
           the rose tutorial command.
@@ -44,7 +48,7 @@ a ``rose-app.conf`` file that looks like this:
    soft_drink=.false.
 
 We'll add some metadata to make it nice. Create a ``meta/``
-sub-directory with a ``rose-meta.conf`` file that looks like this:
+sub-directory with a :rose:file:`rose-meta.conf` file that looks like this:
 
 .. code-block:: rose
 
@@ -81,8 +85,8 @@ sub-directory with a ``rose-meta.conf`` file that looks like this:
    [namelist:side_order=soft_drink]
    type=logical
 
-Once you've done that, run ``rose edit`` in the application directory
-and navigate around the pages.
+Once you've done that, run :ref:`command-rose-config-edit` in the application
+directory and navigate around the pages.
 
 There are quite a lot of settings that are only relevant in certain
 contexts - for example, ``namelist:pizza_order=extra_chicken`` is
@@ -94,8 +98,8 @@ Adding Triggers
 
 Let's add some trigger information.
 
-In the ``rose-meta.conf`` file, under ``[namelist:pizza_order=pizza_type]``,
-add:
+In the :rose:file:`rose-meta.conf` file, under
+``[namelist:pizza_order=pizza_type]``, add:
 
 .. code-block:: cylc
 

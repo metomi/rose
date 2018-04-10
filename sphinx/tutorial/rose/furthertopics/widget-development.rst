@@ -4,8 +4,9 @@ Widget Development
 ==================
 
 
-The ``rose edit`` GUI displays configurations using built-in widgets. For more
-complex requirements ``rose edit`` supports custom widgets as plugins.
+The :ref:`command-rose-config-edit` GUI displays configurations using built-in
+widgets. For more complex requirements :ref:`command-rose-config-edit` supports
+custom widgets as plugins.
 
 In this tutorial we will write a custom widget which offers typing suggestions
 when entering usernames.
@@ -43,7 +44,8 @@ You will now have a rose app which contains the following files:
    |               `-- username.py
    `-- rose-app.conf
 
-The ``rose-app.conf`` file defines an environment variable called ``USER``:
+The :rose:file:`rose-app.conf` file defines an environment variable called
+``USER``:
 
 .. code-block:: rose
 
@@ -61,9 +63,9 @@ Initial Code
 ^^^^^^^^^^^^
 
 We will start with a slimmed-down copy of the class
-``rose.config_editor.valuewidget.text.RawValueWidget`` which you will find
-in the file ``username.py``. It contains all the API calls you would normally
-ever need.
+:py:class:`rose.config_editor.valuewidget.text.RawValueWidget` which you will
+find in the file ``username.py``. It contains all the API calls you would
+normally ever need.
 
 We are now going to extend the widget to be more useful.
 
@@ -142,7 +144,7 @@ Results
 ^^^^^^^
 
 Try opening up the config editor in the application directory (where the
-``rose-app.conf`` is) by running::
+:rose:file:`rose-app.conf` is) by running::
 
    rose edit
 

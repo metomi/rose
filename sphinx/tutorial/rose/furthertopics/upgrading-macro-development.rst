@@ -19,8 +19,13 @@ Example
 
 In this example, we'll be upgrading a boat on a desert island.
 
-Create a new directory called ``make-boat-app`` somewhere - e.g. in your
-homespace - containing a ``rose-app.conf`` file with the following content:
+Create a rose application called ``make-boat-app``::
+
+   mkdir -p ~/rose-tutorial/make-boat-app
+   cd ~/rose-tutorial/make-boat-app
+
+
+Create a ``rose-app.conf`` file with the following content:
 
 .. code-block:: rose
 
@@ -30,8 +35,8 @@ homespace - containing a ``rose-app.conf`` file with the following content:
    hollow_tree_trunks=1
    paddling_twigs=1
 
-This creates an app config that configures our simple boat (a dugout
-canoe). It references a meta flag (for which metadata is unlikely to
+You now have a rose application configuration that configures our simple boat
+(a dugout canoe). It references a meta flag (for which metadata is unlikely to
 already exist), made up of a category (``make-boat``) at a particular
 version (``0.1``). The meta flag is used by Rose to locate a configuration
 metadata directory.
@@ -60,7 +65,7 @@ Create a ``rose-meta/make-boat/`` directory in your homespace::
 
 This is the category (also called command) directory for the metadata,
 which will hold sub-directories for actual configuration metadata
-versions (each containing a ``rose-meta.conf`` file, etc).
+versions (each containing a :rose:file:`rose-meta.conf` file, etc).
 
 N.B. Configuration metadata would normally be managed by whoever manages
 Rose installation at your site.
@@ -70,14 +75,14 @@ We know we need some metadata for the ``0.1`` version, so create a
 
    mkdir ~/rose-meta/make-boat/0.1/
 
-We'll need a ``rose-meta.conf`` file there too, so create an empty one in
-the new directory::
+We'll need a :rose:file:`rose-meta.conf` file there too, so create an empty
+one in the new directory::
 
    touch ~/rose-meta/make-boat/0.1/rose-meta.conf
 
 We can safely say that our two namelist inputs are essential for the
 construction and testing of the boat, so we can paste the following into
-the newly created ``rose-meta.conf`` file:
+the newly created :rose:file:`rose-meta.conf` file:
 
 .. code-block:: rose
 
@@ -121,7 +126,7 @@ Let's create the new metadata version, to document what we need and
 don't need.
 
 Create a new subdirectory under ``make-boat/`` called ``0.2/`` containing
-a ``rose-meta.conf`` file that looks like this:
+a :rose:file:`rose-meta.conf` file that looks like this:
 
 .. code-block:: rose
 
@@ -215,7 +220,8 @@ Upgrade macros are bits of Python code that essentially look like this:
            # Some code doing something to config goes here.
            return config, self.reports
 
-They are sub-classes of a particular class, ``rose.upgrade.MacroUpgrade``,
+They are sub-classes of a particular class,
+:py:class:`rose.upgrade.MacroUpgrade`,
 which means that some of the Python functionality is done 'under the hood'
 to make things easier.
 
@@ -336,7 +342,7 @@ We'll add a rudder option for our ``0.3`` version, with a
 ``namelist:materials=l_rudder_branch``.
 
 Create a ``0.3`` directory in the same way that you created the ``0.1``
-and ``0.2`` metadata directories. Add a ``rose-meta.conf`` file that
+and ``0.2`` metadata directories. Add a :rose:file:`rose-meta.conf` file that
 looks like this:
 
 .. code-block:: rose
@@ -406,7 +412,8 @@ file that looks like this:
 
 Go ahead and upgrade the app configuration to ``0.3``, as you did before.
 
-The ``rose-app.conf`` should now contain the new option, ``l_rudder_branch``.
+The :rose:file:`rose-app.conf` should now contain the new option,
+``l_rudder_branch``.
 
 More Complex Upgrade Macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
