@@ -76,7 +76,7 @@ RE_VALUE = (
 REC_VALUE = _rec(r"\A" + RE_VALUE + r"\Z")
 # Matches a repeat-value, captures count and value
 RE_VALUE_REPEAT = r"(" + RE_NATURAL + r")\*(?:" + RE_VALUE + r")?"
-REC_VALUE_REPEAT = _rec("\A" + RE_VALUE_REPEAT + "\Z")
+REC_VALUE_REPEAT = _rec(r"\A" + RE_VALUE_REPEAT + r"\Z")
 # Matches a group initialisation, captures group name
 RE_GROUP_INIT = r"[^&]* &(" + RE_NAME + r")"
 # Matches a group termination

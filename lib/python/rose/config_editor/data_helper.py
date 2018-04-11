@@ -355,8 +355,8 @@ class ConfigDataHelper(object):
         return icon_path
 
     def get_macro_module_prefix(self, config_name):
-        # Return a valid module-like name for macros.
-        return re.sub("[^\w]", "_", config_name.strip("/")) + "/"
+        """Return a valid module-like name for macros."""
+        return re.sub(r"[^\w]", "_", config_name.strip("/")) + "/"
 
     def get_ignored_sections(self, namespace, get_enabled=False):
         """Return the user-ignored sections for this namespace.

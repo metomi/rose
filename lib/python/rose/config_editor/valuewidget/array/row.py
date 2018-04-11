@@ -36,7 +36,7 @@ class RowArrayValueWidget(gtk.HBox):
 
     BAD_COLOUR = rose.gtk.util.color_parse(
         rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
-    CHECK_NAME_IS_ELEMENT = re.compile('.*\(\d+\)$').match
+    CHECK_NAME_IS_ELEMENT = re.compile(r'.*\(\d+\)$').match
     TIP_ADD = 'Add array element'
     TIP_DELETE = 'Remove last array element'
     TIP_INVALID_ENTRY = "Invalid entry - not {0}"

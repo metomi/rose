@@ -284,7 +284,7 @@ class GroupOperations(object):
         start_stack_index = len(self.undo_stack)
         group = rose.config_editor.STACK_GROUP_COPY + "-" + str(time.time())
         config_data = self.data.config[config_name]
-        section_base = re.sub('(.*)\(\w+\)$', r"\1", section)
+        section_base = re.sub(r'(.*)\(\w+\)$', r"\1", section)
         existing_sections = []
         clone_vars = []
         existing_sections = config_data.vars.now.keys()

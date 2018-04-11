@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""This package contains the specific Python code driving rosie go.
+r"""This package contains the specific Python code driving rosie go.
 
 This module contains constants that are only used in rosie go.
 

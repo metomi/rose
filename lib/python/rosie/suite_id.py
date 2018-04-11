@@ -116,7 +116,7 @@ class SuiteId(object):
     FORMAT_VERSION = r"/%s@%s"
     SID_0 = "aa000"
     SID_LEN = len(SID_0)
-    REC_IDX = re.compile("\A(?:(\w+)-)?(\w+)(?:/([^\@/]+))?(?:@([^\@/]+))?\Z")
+    REC_IDX = re.compile(r"\A(?:(\w+)-)?(\w+)(?:/([^\@/]+))?(?:@([^\@/]+))?\Z")
     BRANCH_TRUNK = "trunk"
     REV_HEAD = "HEAD"
     svn = SvnCaller()
