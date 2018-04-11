@@ -25,8 +25,17 @@ fi
 
 tests 3
 
+# Ignores:
+# E402 module level import not at top of file:
+# - To allow import on demand for expensive modules.
+# E731 do not assign a lambda expression, use a def
+# - There are too many in the logic at the moment.
+# - Most are in the GUI logic, which is due for replacement soon.
+# W503 line break before binary operator
+# W504 line break after binary operator
+# - PEP8 allows both, line break before binary preferred for new code.
 run_pass "${TEST_KEY_BASE}" \
-    pycodestyle --ignore=E402,E731 \
+    pycodestyle --ignore=E402,E731,W503,W504 \
     "${ROSE_HOME}/lib/python/isodatetime" \
     "${ROSE_HOME}/lib/python/rose" \
     "${ROSE_HOME}/lib/python/rosie"
