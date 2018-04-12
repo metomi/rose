@@ -108,7 +108,7 @@ class RosieSvnPostCommitHook(object):
     LEN_ID = len(ID_CHARS_LIST)
     INFO_FILE = "rose-suite.info"
     KNOWN_KEYS_FILE_PATH = "R/O/S/I/E/trunk/rosie-keys"
-    REC_COPY_INFO = re.compile("\A\s+\(from\s(\S+):r(\d+)\)\s*\Z")
+    REC_COPY_INFO = re.compile(r"\A\s+\(from\s(\S+):r(\d+)\)\s*\Z")
     ST_ADDED = "A"
     ST_DELETED = "D"
     ST_MODIFIED = "M"

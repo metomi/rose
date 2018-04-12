@@ -89,7 +89,7 @@ MACRO_OUTPUT_WARNING_ISSUES = "{0}: warnings: {1}\n"
 OPT_CONFIG_REPORT = "(opts={0})"
 REC_MODIFIER = re.compile(r"\{.+\}")
 REC_ID_STRIP_DUPL = re.compile(r"\([^()]+\)")
-REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([^()]+\))?$')
+REC_ID_STRIP = re.compile(r'(?:\{.+\})?(?:\([^()]+\))?$')
 REC_ID_ELEMENT = re.compile(r"\(([^()]+)\)$")
 REC_ID_SINGLE_ELEMENT = re.compile(r"\((\d+)\)$")
 ID_ELEMENT_FORMAT = "{0}({1})"

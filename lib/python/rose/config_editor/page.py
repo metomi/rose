@@ -468,7 +468,7 @@ class ConfigPage(gtk.VBox):
             widget_dir = rose.META_DIR_WIDGET
             metadata_files.sort(
                 lambda x, y: (widget_dir in y) - (widget_dir in x))
-            prefix = re.sub("[^\w]", "_", self.config_name.strip("/"))
+            prefix = re.sub(r"[^\w]", "_", self.config_name.strip("/"))
             prefix += "/" + rose.META_DIR_WIDGET + "/"
             custom_widget = rose.resource.import_object(
                 widget_path,

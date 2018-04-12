@@ -32,7 +32,7 @@ import rose.formats.namelist
 from rose.opt_parse import RoseOptionParser
 
 
-RE_NAME_INDEX = re.compile("^(.*)\((\d+)\)$")
+RE_NAME_INDEX = re.compile(r"^(.*)\((\d+)\)$")
 STD_FILE_ARG = "-"
 
 

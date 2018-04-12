@@ -38,8 +38,8 @@ ERR_SYNTAX = "Syntax error: {0}"
 PRINT_FORMAT_DEFAULT = "%local %suite %owner %project %title"
 PRINT_FORMAT_QUIET = "%suite"
 
-REC_COL_IN_FORMAT = re.compile("(?:^|[^%])%([\w-]+)")
-DATE_TIME_FORMAT = "%FT%H:%M:%SZ"
+REC_COL_IN_FORMAT = re.compile(r"(?:^|[^%])%([\w-]+)")
+DATE_TIME_FORMAT = r"%FT%H:%M:%SZ"
 
 
 class URLEvent(Event):

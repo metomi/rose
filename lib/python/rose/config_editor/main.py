@@ -108,7 +108,7 @@ class MainController(object):
 
     """
 
-    RE_ARRAY_ELEMENT = re.compile('\([\d:, ]+\)$')
+    RE_ARRAY_ELEMENT = re.compile(r'\([\d:, ]+\)$')
 
     def __init__(self, config_directory=None, config_objs=None,
                  config_obj_types=None, pluggable=False, load_updater=None,
@@ -1895,7 +1895,7 @@ def spawn_window(config_directory_path=None, debug_mode=False,
         # for each partial namespace get the full namespace
         full_namespaces = []
         for namespace in initial_namespaces:
-            exp = re.compile('(.*%s?[^\/]+)' % (re.escape(namespace),))
+            exp = re.compile(r'(.*%s?[^\/]+)' % (re.escape(namespace),))
             for ns in sorted(sorted(ctrl.data.namespace_meta_lookup),
                              key=len):
                 match = exp.search(ns)

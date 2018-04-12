@@ -32,16 +32,16 @@ import re
 import rose
 
 
-RE_REAL = "[\+\-]?\d*\.?\d*(?:[de][\+\-]?\d+)?"
+RE_REAL = r"[\+\-]?\d*\.?\d*(?:[de][\+\-]?\d+)?"
 RE_CAPT_REAL = '(' + RE_REAL + ')'
 
-REC_RANGE_NUM = re.compile(RE_CAPT_REAL + "$")
-REC_RANGE_SPLIT = re.compile('\s*(,)\s*')
+REC_RANGE_NUM = re.compile(RE_CAPT_REAL + r"$")
+REC_RANGE_SPLIT = re.compile(r'\s*(,)\s*')
 REC_RANGE_RANGE = re.compile(
-    "(" + RE_REAL + "?)" + "\s*:\s*" +
-    "(" + RE_REAL + "?)" +
-    "(?<!^:)$")  # Expression can't just be a colon.
-REC_FULL_URL = re.compile("^(\w+://|www\.)")
+    r"(" + RE_REAL + r"?)" + r"\s*:\s*" +
+    r"(" + RE_REAL + r"?)" +
+    r"(?<!^:)$")  # Expression can't just be a colon.
+REC_FULL_URL = re.compile(r"^(\w+://|www\.)")
 
 # Ignored types used in rose.variable.ignored_reason,
 # used by macros and user switches.
