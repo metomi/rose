@@ -24,9 +24,10 @@ outside of the configuration.
 The :rose:file:`rose-meta.conf` file uses the standard 
 :ref:`Rose configuration format <tutorial-rose-configurations>`.
 
-The metadata for a setting is written in a section which is named after the ID
-of the setting which is the section and setting name separated by an equals
-symbol.
+The metadata for a setting is written in a section named ``section=setting``
+where ``setting`` is the name of the setting and ``section`` is the section to
+which the setting belongs (leave blank if the setting does not belong to
+a section).
 
 For example take the following application configuration.
 
@@ -39,7 +40,7 @@ For example take the following application configuration.
    [env]
    WORLD=Earth
 
-For example if we were to write metadata for ``WORLD`` environemt variable we
+If we were to write metadata for ``WORLD`` environment variable we
 would create a section called ``[env=WORLD]``.
 
 .. code-block:: rose
@@ -88,7 +89,7 @@ There are many metadata items, here are some of the commonly used ones:
    Specify the length of comma separated lists e.g. ``length=:`` for a
    limitless list.
 ``range``
-   Specify numberical bounds for the value of a setting e.g. ``range=1, 10``
+   Specify numerical bounds for the value of a setting e.g. ``range=1, 10``
    for a value between 1 and 10.
 
 For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
@@ -128,7 +129,7 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
       Hover the mouse over the hash to reveal the comment.
 
       Keep the :ref:`command-rose-config-edit` window open as we will use it
-      throught the rest of this practical.
+      throughout the rest of this practical.
 
    #. **Descriptions.**
 
@@ -166,11 +167,13 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
          rose metadata-check -C meta/
       
       Next reload the metadata in the :ref:`command-rose-config-edit` window
-      using the :menuselection:`Metadata -> Refresh Metadata` menu item.
+      using the :menuselection:`Metadata --> Refresh Metadata` menu item.
       The descriptions should now display under each environment variable.
 
-      If you don't see the description for a setting it is possible that you
-      miss-spelt the name of the setting in the section heading.
+      .. tip::
+
+         If you don't see the description for a setting it is possible that you
+         miss-spelt the name of the setting in the section heading.
 
    #. **Length.**
 
@@ -199,7 +202,7 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
          rose metadata-check -C meta/
 
       Refresh the metadata in the :ref:`command-rose-config-edit` window be
-      selecting :menuselection:`Metadata -> Refresh Metadata`.
+      selecting :menuselection:`Metadata --> Refresh Metadata`.
       The three settings we have edited should now appear as lists.
 
    #. **Types.**
@@ -221,6 +224,9 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
       ``INTERVAL`` to a string, it shouldn't let you.
 
       Add similar ``type`` entries for the following settings:
+
+      .. note that :align: center does not work with the `table` directive
+         see https://github.com/sphinx-doc/sphinx/issues/3942
 
       ====================  =========================
       ``integer`` settings  ``real`` (float) settings

@@ -20,17 +20,6 @@ Rosie:
    control see the `FCM User Guide`_.
 
 
-Version Control
----------------
-
-When a rose suite configuration is managed with Rosie the :term:`suite
-directory` is added to `version control`_ using `FCM`_.
-
-FCM is a `subversion <SVN>`_ (SVN) wrapper which provides a standard working
-practice for SVN projects. FCM implements all of the SVN commands as well as
-additional functionality. See the `FCM User Guide`_ for more information.
-
-
 Rosie Suites
 ------------
 
@@ -43,7 +32,18 @@ system. Rosie suites can be created by the command:
    Create a new suite or copy an existing one.
 
 By default Rosie creates the `working copy`_ (local copy) of new suites in the
-``~/roses`` directory though Rosie working coppies can be created elsewhere.
+``~/roses`` directory though Rosie working copies can be created elsewhere.
+
+
+Version Control
+---------------
+
+In Rosie suites the :term:`suite directory` is added to `version control`_
+using `FCM`_.
+
+FCM is a `subversion <SVN>`_ (SVN) wrapper which provides a standard working
+practice for SVN projects. FCM implements all of the SVN commands as well as
+additional functionality. See the `FCM User Guide`_ for more information.
 
 
 Suite Naming
@@ -56,15 +56,18 @@ hyphen and then an identifier made up of two characters and three numbers e.g:
    :align: center
 
    bgcolor = "none"
+   ranksep=0
+
    node [shape="plaintext", fontsize="11"]
    edge [style="invis"]
-   graph [ranksep=0]
+
    a1 [label="u", fontsize=20]
    a2 [label="Prefix", fontcolor="#707070"]
    b1 [label="-", fontsize=20]
    b2 [label="", fontcolor="#707070"]
    c1 [label="aa001", fontsize=20]
    c2 [label="Unique Identifier", fontcolor="#707070"]
+
    a1 -- a2
    b1 -- b2
    c1 -- c2
@@ -142,7 +145,7 @@ commands called :ref:`command-rosie-go`.
       to you.
 
       You can specify the repository to use with the ``--prefix`` command line
-      option. For instance to use the (internal) MetOffice Testing Repository
+      option. For instance to use the (internal) Met Office Testing Repository
       supply the command line argument ``--prefix=mot``.
 
       .. code-block:: sub
