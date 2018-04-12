@@ -23,9 +23,7 @@ A rose suite configuration is a cylc :term:`suite directory` containing a
 
 The :rose:file:`rose-suite.conf` file is written in the same
 :ref:`format <tutorial-rose-configurations>` as the :rose:file:`rose-app.conf`
-file. It is used to configure:
-
-Its main configuration sections are:
+file. Its main configuration sections are:
 
 :rose:conf:`rose-suite.conf[env]`
    Environment variables for use by the whole suite.
@@ -78,7 +76,7 @@ directory. As cylc runs suites in the ``cylc-run`` directory the
 in the same directory in which it is written.
 
 With Rose we develop suites in a separate directory to the one in which they
-run meaning that the :term:`suite directory` is separate from the
+run meaning that the :term:`suite directory` is different from the
 :term:`run directory`. This helps keep the suite separate from its output and
 means that you can safely work on a suite and its resources whilst it is
 running.
