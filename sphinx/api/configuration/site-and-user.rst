@@ -14,12 +14,6 @@ site configuration at ``$ROSE_HOME/etc/rose.conf`` where
 search for the user configuration at ``$HOME/.metomi/rose.conf`` where
 ``$HOME`` is the home directory of the current user.
 
-.. note::
-   Allowed settings in the site and user configuration files will be
-   documented in a future version of this document. In the mean time, the
-   settings are documented as comments in the ``etc/rose.conf.example``
-   file of each distribution of Rose.
-
 You can also override many internal constants of the ``rose config edit`` and
 ``rosie go``. To change the keyboard shortcut of the ``Find Next`` action in
 the config editor to ``F3``, put the following lines in your user config file,

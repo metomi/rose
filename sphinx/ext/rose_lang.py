@@ -31,7 +31,7 @@ class RoseLexer(RegexLexer):
         r'(\w[^\=\n]+)'      # Setting pattern.
         r'(\s+)?(=)(\s+)?')  # Optional spaces around = operator, value.
 
-    # Patter for the value to a rose setting.
+    # Pattern for the value to a rose setting.
     ROSE_VALUE_PATTERN = (
         r'.*\n'        # Match anything after the = to the end of the line.
         r'(?:'         # Optionally match additional lines.
