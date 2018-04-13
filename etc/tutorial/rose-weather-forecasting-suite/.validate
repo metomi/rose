@@ -1,0 +1,4 @@
+rose metadata-check -C "$TUT_DIR/meta"
+rose metadata-check -C "$TUT_DIR/app/forecast/meta"
+rose macro -C "$TUT_DIR" -V
+# TODO install and validate in temp directory?
