@@ -62,14 +62,14 @@ directory and are configured using a :rose:file:`rose-app.conf` file.
 Suite Commands
 --------------
 
-.. rubric:: We have learned the following cylc commands:
+.. rubric:: We have learned the following Cylc commands:
 
 ``cylc graph``
    Draws the suite's :term:`graph`.
 ``cylc get-config``
    Processes the ``suite.rc`` file and prints it back out.
 ``cylc validate``
-   Validate the cylc ``suite.rc`` file to check for any obvious errors.
+   Validate the Cylc ``suite.rc`` file to check for any obvious errors.
 ``cylc run``
    Runs a suite.
 ``cylc stop``
@@ -88,13 +88,13 @@ Suite Commands
 :ref:`command-rose-app-run`
    Runs a Rose application.
 :ref:`command-rose-task-run`
-   Used to run a Rose application from within a cylc suite.
+   Used to run a Rose application from within a Cylc suite.
 :ref:`command-rose-suite-run`
    Runs a Rose suite.
 :ref:`command-rose-suite-restart`
    Runs a Rose suite picking up where it left off.
 
-The cylc commands do not know about the :rose:file:`rose-suite.conf` file
+The Cylc commands do not know about the :rose:file:`rose-suite.conf` file
 so for Rose suite configurations you will have to install the suite before
 using commands such as ``cylc graph`` e.g:
 
@@ -111,7 +111,7 @@ Rose contains some utilities to make life easier:
 
 :ref:`command-rose-date`
    A utility for parsing, manipulating and formatting date-times which is
-   useful for working with the cylc :term:`cycle point`:
+   useful for working with the Cylc :term:`cycle point`:
 
    .. code-block:: console
 
@@ -145,7 +145,7 @@ Rose contains some utilities to make life easier:
       $ rose host-select mycluster
       computer2
 
-   The :ref:`command-rose-host-select` command can by used within cylc suites
+   The :ref:`command-rose-host-select` command can by used within Cylc suites
    to determine which host a task runs on:
 
    .. code-block:: cylc
@@ -189,13 +189,13 @@ Next Steps
    covered in the main tutorial.
 :ref:`Cheat Sheet`
    A quick breakdown of the commands for running
-   and interacting with suites using cylc and rose.
+   and interacting with suites using Cylc and Rose.
 :ref:`Command Reference`
    Contains the command line documentation
    (also obtainable by calling ``rose --help``).
 :ref:`Rose Configuration <rose-configuration>`
    The possible settings which can be used in the different Rose
    configuration files.
-`cylc suite design guide`_
-   Contains recommended best-practice for the style and structure of cylc
+`Cylc Suite Design Guide`_
+   Contains recommended best-practice for the style and structure of Cylc
    suites.

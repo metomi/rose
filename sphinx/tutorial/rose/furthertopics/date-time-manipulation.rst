@@ -6,7 +6,7 @@ Date and Time Manipulation
 :term:`Datetime cycling <datetime cycling>` suites inevitably involve
 performing some form of datetime arithmetic. In the
 :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>` we wrote
-in the cylc tutorial this arithmetic was done using the ``cylc cyclepoint``
+in the Cylc tutorial this arithmetic was done using the ``cylc cyclepoint``
 command. For example we calculated the cycle point three hours before the
 present cycle using::
 

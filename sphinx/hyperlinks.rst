@@ -9,11 +9,9 @@
        .. include:: path/to/thisfile.rst
           :start-line: 1
 
-.. _GitHub: https://github.com/metomi/rose
-.. _metomi-vms: https://github.com/metomi/metomi-vms
-.. _cylc: http://cylc.github.io/cylc/
-.. _cylc user guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
-.. _cylc suite design guide: http://cylc.github.io/cylc/doc/suite-design-guide.pdf
+.. _Cylc: http://cylc.github.io/cylc/
+.. _Cylc User Guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
+.. _Cylc Suite Design Guide: http://cylc.github.io/cylc/doc/suite-design-guide.pdf
 .. _FCM: https://metomi.github.io/fcm/doc/
 .. _FCM User Guide: http://metomi.github.io/fcm/doc/user_guide/
 .. _Github: https://github.com/metomi/rose

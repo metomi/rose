@@ -63,7 +63,7 @@ whilst the suite is running. For instance we could change the value of the
    cylc broadcast tutorial-broadcast -n announce -s "[environment]WORD=it"
 
 * ``tutorial-broadcast`` is the name of the suite.
-* ``-n announce`` tells cylc we want to change the runtime configuration of the
+* ``-n announce`` tells Cylc we want to change the runtime configuration of the
   ``announce`` task.
 * ``-s "[environment]WORD=it"`` changes the value of the ``WORD`` environment
   variable to ``it``.

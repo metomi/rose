@@ -102,4 +102,4 @@ The customers will obviously have to wait!
 Further Reading
 ---------------
 
-For more information, see the `cylc User Guide`_.
+For more information, see the `Cylc User Guide`_.

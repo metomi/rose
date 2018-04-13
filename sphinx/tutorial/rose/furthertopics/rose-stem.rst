@@ -252,8 +252,8 @@ so it should automatically pick up your working copy as the source).
 
 .. note::
 
-   If your site uses a cylc server, and your home directory is not shared
-   with the cylc server, you will need to add the option::
+   If your site uses a Cylc server, and your home directory is not shared
+   with the Cylc server, you will need to add the option::
 
       --host=localhost
 

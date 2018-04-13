@@ -15,7 +15,7 @@ Retries can be useful for tasks that may occasionally fail due to external
 events, and are routinely fixable when they do - an example would be a task
 that is dependent on a system that experiences temporary outages.
 
-If a task fails, the cylc retry mechanism can resubmit it after a
+If a task fails, the Cylc retry mechanism can resubmit it after a
 pre-determined delay. An environment variable, ``$CYLC_TASK_TRY_NUMBER``
 is incremented and passed into the task - this means you can write your
 task script so that it changes behaviour accordingly.
@@ -85,7 +85,7 @@ Stop the suite::
 Configuring Retries
 -------------------
 
-We need to tell cylc to retry it a few times - replace the line
+We need to tell Cylc to retry it a few times - replace the line
 ``[[roll_doubles]]`` in the ``suite.rc`` file with:
 
 .. code-block:: cylc
@@ -94,12 +94,12 @@ We need to tell cylc to retry it a few times - replace the line
        [[[job]]]
            execution retry delays = 5*PT6S
 
-This means that if the ``roll_doubles`` task fails, cylc expects to
+This means that if the ``roll_doubles`` task fails, Cylc expects to
 retry running it 5 times before finally failing. Each retry will have
 a delay of 6 seconds.
 
 We can apply multiple retry periods with the ``execution retry delays`` setting
-by separating them with commas, for example the following line would tell cylc
+by separating them with commas, for example the following line would tell Cylc
 to retry a task four times, once after 15 seconds, then once after 10 minutes,
 then once after one hour then once after three hours.
 
@@ -119,7 +119,7 @@ Re-run the suite::
 
    cylc run retries-tutorial
 
-What you should see is cylc retrying the ``roll_doubles`` task. Hopefully,
+What you should see is Cylc retrying the ``roll_doubles`` task. Hopefully,
 it will succeed (there is only about a about a 1 in 3 chance of every task
 failing) and the suite will continue.
 
@@ -154,4 +154,4 @@ This time, the task should definitely succeed before the third retry.
 Further Reading
 ---------------
 
-For more information see the `cylc User Guide`_.
+For more information see the `Cylc User Guide`_.

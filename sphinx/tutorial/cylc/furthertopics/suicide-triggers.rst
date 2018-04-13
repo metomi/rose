@@ -40,7 +40,7 @@ it will get burnt. In the case that we burn the cake the workflow gets stuck.
 
 In this event the ``sell_cake`` task will be unable to run as it depends on
 ``bake_cake``. We would say that this suite has :term:`stalled <stalled suite>`.
-When cylc detects that a suite has stalled it sends you an email to let you
+When Cylc detects that a suite has stalled it sends you an email to let you
 know that the suite has got stuck and requires human intervention to proceed.
 
 
@@ -96,7 +96,7 @@ We can add this logic to our workflow using the ``fail`` :term:`qualifier`.
 .. admonition:: Reminder
    :class: hint
 
-   If you don't specify a qualifier cylc assumes you mean ``:succeed`` so the
+   If you don't specify a qualifier Cylc assumes you mean ``:succeed`` so the
    following two lines are equivalent:
 
    .. code-block:: cylc-graph
@@ -220,14 +220,14 @@ you see might differ slightly. You may receive a "suite stalled" email.
    "make_cake_mixture.3" -> "bake_cake.3" -> "sell_cake.3"
    "bake_cake.3" -> "eat_cake.3"
 
-The reason the suite stalls is that, by default, cylc will run a maximum of
+The reason the suite stalls is that, by default, Cylc will run a maximum of
 three cycles concurrently. As each cycle has at least one task which hasn't
-either succeeded or failed cylc cannot move onto the next cycle.
+either succeeded or failed Cylc cannot move onto the next cycle.
 
 .. tip::
    
    For more information search ``max active cycle points`` in the
-   `cylc user guide`_.
+   `Cylc User Guide`_.
 
 You will also notice that some of the tasks (e.g. ``eat_cake`` in cycle ``2``
 in the above example) are drawn in a faded gray. This is because these tasks

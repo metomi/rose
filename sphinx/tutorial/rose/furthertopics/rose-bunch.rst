@@ -138,11 +138,11 @@ Navigate to the top directory of your suite (where the ``suite.rc`` and
 :rose:file:`rose-suite.conf` files can be found) and run
 :ref:`command-rose-suite-run`.
 
-Your suite should run, launch the cylc GUI and successfully run the ``lander``
+Your suite should run, launch the Cylc GUI and successfully run the ``lander``
 app.
 
 Once the suite has finished running and has shutdown, open Rose Bush to view
-its output (note that you can close the cylc GUI at this point)::
+its output (note that you can close the Cylc GUI at this point)::
 
    rose suite-log
 
@@ -221,7 +221,7 @@ following line to the :rose:conf:`rose_bunch[bunch]` section:
 Run your suite again. Notice that this time round it takes longer for the task
 to run as it has been limited in the number of command variants it can run
 simultaneously. You can see the individual commands being started by viewing
-the task stdout in the cylc GUI by right-clicking on the task and selecting
+the task stdout in the Cylc GUI by right-clicking on the task and selecting
 :guilabel:`View` then :guilabel:`job stdout`. As an example, when the
 ``BA007`` invocation starts running you should see the line:
 

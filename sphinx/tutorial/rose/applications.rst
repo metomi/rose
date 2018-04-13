@@ -4,7 +4,7 @@
 Rose Applications
 =================
 
-The cylc ``suite.rc`` file allows us to define environment variables for use by
+The Cylc ``suite.rc`` file allows us to define environment variables for use by
 :term:`tasks <task>` e.g:
 
 .. code-block:: cylc
@@ -203,7 +203,7 @@ can be used to provide the path to the Rose application:
       provide the ``DOMAIN`` and ``RESOLUTION`` environment variables defined
       in the ``[runtime][root][environment]`` section of the ``suite.rc``
       file as well as the ``CYLC_TASK_CYCLE_POINT`` environment variable
-      provided by cylc when it runs a task.
+      provided by Cylc when it runs a task.
 
       Add the following lines to the :rose:file:`rose-app.conf`:
 
