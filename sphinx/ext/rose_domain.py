@@ -58,6 +58,14 @@ Referencing From RST Files:
        * :rose:app:`fcm_make`
        * :rose:conf:`fcm_make.args`
 
+Autodocumentation:
+    Documentation can be auto-built from RST formatted comments in rose
+    configuration files using the ``autoconfig`` directive.
+
+    Note that due to the implementation of :py:mod:`rose.config` the
+    autodocumenter will represent empty sections as top level configuration
+    nodes.
+
 Example:
     .. code-block:: rst
 
@@ -98,24 +106,39 @@ Example:
 
 import re
 
+from docutils.nodes import block_quote
+from docutils.parsers.rst import Directive
+from docutils.statemachine import StringList
+
 from sphinx import addnodes
-from sphinx.domains import Domain, ObjType
 from sphinx.directives import ObjectDescription
+from sphinx.domains import Domain, ObjType
 from sphinx.roles import XRefRole
 from sphinx.util.nodes import make_refnode
 from sphinx.util import logging
 from sphinx.util.docfields import Field, TypedField
 
-logger = logging.getLogger(__name__)
+from rose import config
 
-ROSE_DOMAIN_REGEX = re.compile(
+
+LOGGER = logging.getLogger(__name__)
+
+ROSE_DOMAIN_REGEX = re.compile(  # Regex for a fully qualified rose domain.
    r'rose:(\w+):'    # Rose domain prefix + object type.
    r'([^\|\[ \n]+)'  # Configuration file.
    r'(\[.*\])?'      # Configuration section.
    r'(?:\|?(.*))?'   # Configuration setting.
 )
-SECTION_REGEX = re.compile(r'(\[.*\])(.*)')
-OPT_ARG_REGEX = re.compile(r'=([^\]]+)?$', flags=re.M)
+SECTION_REGEX = re.compile(  # Regex for splitting sections and settings.
+    r'(\[.*\])(.*)'
+)
+OPT_ARG_REGEX = re.compile(  # Regex for splitting domains and arguments
+    r'(^(?:[^\[\|=]+)?'  # Configuration file.
+    r'(?:\[[^\]]+\])?'   # Configuration section.
+    r'(?:[^=]+)?)'       # Configuration setting.
+    r'(?:=(.*))?$'       # Argument.
+)
+
 
 def tokenise_namespace(namespace):
     """Convert a namespace string into a list of tokens.
@@ -173,9 +196,9 @@ def tokenise_namespace(namespace):
         ret = [('rose:app', conf_file)]
 
     if conf_section:
-       ret.append(('rose:conf', conf_section))
+        ret.append(('rose:conf', conf_section))
     if setting:
-       ret.append(('rose:conf', setting))
+        ret.append(('rose:conf', setting))
 
     return ret
 
@@ -209,7 +232,7 @@ def namespace_from_tokens(tokens):
         if domain in ['rose:app', 'rose:file']:
             if previous_domain:
                 # App must be a root domain.
-                logger.warning('Invalid tokens "%s"' % tokens)
+                LOGGER.warning('Invalid tokens "%s"' % tokens)
                 return False
             else:
                 ret += name
@@ -218,19 +241,19 @@ def namespace_from_tokens(tokens):
         elif domain == 'rose:conf':
             if previous_domain in ['rose:app', 'rose:file']:
                 if name.startswith('['):
-                   # section requires no separator
-                   ret += name
+                    # section requires no separator
+                    ret += name
                 else:
-                   # Setting requires `|` separator.
-                   ret += '|%s' % name
+                    # Setting requires `|` separator.
+                    ret += '|%s' % name
             elif previous_domain == 'rose:conf':
                 # Setting requires no separator if following a section.
                 ret += name
             else:
-                logger.warning('Invalid tokens "%s"' % tokens)
+                LOGGER.warning('Invalid tokens "%s"' % tokens)
                 return False
         else:
-            logger.warning('Invalid tokens "%s"' % tokens)
+            LOGGER.warning('Invalid tokens "%s"' % tokens)
             return False
         previous_domain = domain
     return ret
@@ -244,7 +267,7 @@ class RoseDirective(ObjectDescription):
 
     Subclasses can provide:
         - ``LABEL``
-        - ``ARGUMENT_SEPARATOR``
+        - ``ARGUMENT_SEPARATOR`` & ``ARGUMENT_REGEX``
         - ``ALT_FORM_SEPARATOR``
         - ``ALT_FORM_TEMPLATE``
         - ``doc_field_types`` - List of ``Field`` objects for object parameters.
@@ -276,8 +299,10 @@ class RoseDirective(ObjectDescription):
     """The rose domain this directive implements, see RoseDomain.directives"""
     LABEL = ''
     """Label to prepend to objects."""
-    ARGUMENT_SEPARATOR = '='
-    """String for splitting the directive argument into a name and a suffix."""
+    ARGUMENT_SEPARATOR = None
+    """String for separating the configuration name and argument."""
+    ARGUMENT_REGEX = None
+    """Regex for splitting the directive name and argument."""
     ALT_FORM_SEPARATOR = '&'
     """String for splitting alternate names."""
     ALT_FORM_TEMPLATE = '(alternate: %s)'
@@ -289,6 +314,7 @@ class RoseDirective(ObjectDescription):
 
     def __init__(self, *args, **kwargs):
         self.ref_context_to_remove = []  # Cannot do this in run().
+        self.registered_children = []
         ObjectDescription.__init__(self, *args, **kwargs)
 
     def run(self):
@@ -302,7 +328,23 @@ class RoseDirective(ObjectDescription):
         cont_node.ref_context = {context_var: self.process_name(
             self.arguments[0].strip())[0]}
 
+        # Add children if initialised via python - see RoseAutoDirective.
+        block = block_quote()  # Create indented section.
+        for child_node in self.registered_children:
+            block.append(child_node)  # Add child node to indented section.
+        cont_node.append(block)  # Add indented section to this node.
+
         return [index_node, cont_node]
+
+    def register_subnode(self, subnode):
+        """Register a sub-configuration when creating Rose objects with Python.
+
+        Special method for the RoseDirective to facilitate building rose domain
+        objects using the Python API rather than RST.
+
+        See :py:meth:`RoseAutoDirective.run` for usage example.
+        """
+        self.registered_children.append(subnode)
 
     def add_ref_context(self, key):
         """Add a new ``ref_context`` variable.
@@ -354,6 +396,8 @@ class RoseDirective(ObjectDescription):
         ``run()`` before child objects have been processed but after the
         current object has been processed.
         """
+        for ind, child_node in enumerate(self.registered_children):
+            self.registered_children[ind] = child_node.run()[1]
         for context_var in self.ref_context_to_remove:
             self.remove_ref_context(context_var)
         ObjectDescription.after_content(self)
@@ -381,9 +425,9 @@ class RoseDirective(ObjectDescription):
 
         # Separate argument strings (e.g. foo=FOO).
         argument = ''
-        if self.ARGUMENT_SEPARATOR:
+        if self.ARGUMENT_REGEX:
             try:
-                name, argument = name.split(self.ARGUMENT_SEPARATOR)
+                name, argument = self.ARGUMENT_REGEX.search(name).groups()
             except ValueError:
                 pass
 
@@ -424,7 +468,7 @@ class RoseDirective(ObjectDescription):
     def needs_arglist(self):
         return False
 
-    def add_target_and_index(self, name_cls, sig, signode):
+    def add_target_and_index(self, name_cls, _, signode):
         """This method handles namespacing."""
         name = self.process_name(name_cls[0])[0]
 
@@ -449,7 +493,7 @@ class RoseDirective(ObjectDescription):
         # Generate a namespace from the tokens.
         namespace = namespace_from_tokens(context_tokens)
         if namespace is False:
-            logger.error('Invalid namespace for rose object "%s"' % namespace,
+            LOGGER.error('Invalid namespace for rose object "%s"' % namespace,
                          location=signode)
 
         # Register this namespace.
@@ -540,6 +584,7 @@ class RoseConfigDirective(RoseDirective):
     NAME = 'conf'
     LABEL = 'Config'
     SECTION_REF_CONTEXT = 'conf-section'
+    ARGUMENT_REGEX = OPT_ARG_REGEX
     ARGUMENT_SEPARATOR = '='
 
     # Add custom fields.
@@ -558,13 +603,15 @@ class RoseConfigDirective(RoseDirective):
     def run(self):
         """Overridden to add the :rose:conf-section: ``ref_context`` variable
         for nested sections."""
-        if any('.. rose:conf::' in line for line in self.content):
+        if self.registered_children or any('.. rose:conf::' in line for
+                                           line in self.content):
             # This configuration contains other configurations i.e. it is a
             # configuration section. Apply a custom_name_template so that it is
             # written inside square brackets.
             self.custom_name_template = '[%s]'
             # Sections cannot be written with argument examples.
             self.ARGUMENT_SEPARATOR = None
+            self.ARGUMENT_REGEX = None
             # Add a ref_context variable to mark this node as a config section.
             self.add_ref_context(self.SECTION_REF_CONTEXT)
 
@@ -695,9 +742,8 @@ class RoseDomain(Domain):
 
            :rose:app:`foo`
         """
-        if OPT_ARG_REGEX.search(target):
-           # If target has a trailing argument ignore it.
-           target = target.split('=')[0]
+        # If target has a trailing argument ignore it.
+        target = OPT_ARG_REGEX.search(target).groups()[0]
 
         # Determine the namespace of the object being referenced.
         if typ in ['app', 'file']:
@@ -723,7 +769,7 @@ class RoseDomain(Domain):
                 # Target is not a root config - path is relative.
                 context_namespace = self.get_context_namespace(node)
                 if not context_namespace:
-                    logger.warning(
+                    LOGGER.warning(
                         'Relative reference requires local context "%s".' % (
                         target), location=node)
                     return
@@ -743,7 +789,7 @@ class RoseDomain(Domain):
             data = self.data['objects'][namespace]
         except KeyError:
             # No reference exists for "object_name".
-            logger.warning('No Ref for "%s"' % namespace, location=node)
+            LOGGER.warning('No Ref for "%s"' % namespace, location=node)
             return None
 
         # Create a link pointing at the object.
@@ -751,5 +797,87 @@ class RoseDomain(Domain):
                             contnode, namespace)
 
 
+class RoseAutoDirective(Directive):
+    """Directive for autodocumenting rose configuration files.
+
+    Uses RST formatted comments in rose configuration files using
+    :py:mod:`rose.config`.
+
+    Note the directive only documents config objects not the file itself.
+
+    Example:
+
+        .. code-block:: rst
+
+           .. rose:file: foo.conf
+
+              .. autoconfig:: path/to/foo.conf
+    """
+    option_spec = {}
+    required_arguments = 1
+    domain = 'rose'
+
+    def run(self):
+        filename = self.arguments[0]
+
+        # Load rose configuration.
+        try:
+            conf = config.load(filename)
+        except config.ConfigSyntaxError:
+            LOGGER.error(
+                'Syntax error in rose configuration file "%s".' % filename)
+
+        # Append file level comments if present.
+        nodes = []
+        if conf.comments:
+            contentnode = addnodes.desc_content()
+            contentnode.document = self.state.document
+            self.state.nested_parse(
+                StringList(conf.comments),
+                self.content_offset,
+                contentnode
+            )
+            nodes.append(contentnode)
+
+        # Append configurations.
+        section = None
+        node = block_quote()
+        for key, conf_node in sorted(conf.walk()):
+            if isinstance(conf_node.value, str):
+                # Configuration setting - "name=arg".
+                name = '%s=%s' % (key[-1], conf_node.value or '')
+            else:
+                # Configuration section - "name"
+                name = key[-1]
+            # Prepare directive object.
+            directive = RoseConfigDirective(
+                'rose:conf',
+                [name],
+                {},
+                StringList(conf_node.comments),
+                self.lineno,
+                self.content_offset,
+                self.block_text,
+                self.state,
+                self.state_machine,
+            )
+            if isinstance(conf_node.value, dict):
+                # Configuration section.
+                if section:
+                    node.append(section.run()[1])
+                section = directive
+            elif key[0]:
+                # Sub-configuration.
+                section.register_subnode(directive)
+            else:
+                # Top-level configuration
+                node.append(directive.run()[1])
+        if section:
+            node.append(section.run()[1])
+        nodes.append(node)
+        return nodes
+
+
 def setup(app):
     app.add_domain(RoseDomain)
+    app.add_directive('autoconfig', RoseAutoDirective)
