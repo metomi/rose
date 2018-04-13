@@ -6,7 +6,6 @@
 # -----------------------------------------------------------------------------
 from copy import copy
 import math
-import os
 import jinja2
 
 

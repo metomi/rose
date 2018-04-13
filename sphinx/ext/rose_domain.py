@@ -124,10 +124,10 @@ from rose import config
 LOGGER = logging.getLogger(__name__)
 
 ROSE_DOMAIN_REGEX = re.compile(  # Regex for a fully qualified rose domain.
-   r'rose:(\w+):'    # Rose domain prefix + object type.
-   r'([^\|\[ \n]+)'  # Configuration file.
-   r'(\[.*\])?'      # Configuration section.
-   r'(?:\|?(.*))?'   # Configuration setting.
+    r'rose:(\w+):'    # Rose domain prefix + object type.
+    r'([^\|\[ \n]+)'  # Configuration file.
+    r'(\[.*\])?'      # Configuration section.
+    r'(?:\|?(.*))?'   # Configuration setting.
 )
 SECTION_REGEX = re.compile(  # Regex for splitting sections and settings.
     r'(\[.*\])(.*)'
@@ -165,8 +165,10 @@ def tokenise_namespace(namespace):
         [('rose:app', 'foo'), ('rose:conf', '[bar]')]
         >>> tokenise_namespace('rose:conf:foo[bar]baz')
         [('rose:app', 'foo'), ('rose:conf', '[bar]'), ('rose:conf', 'baz')]
-        >>> tokenise_namespace('rose:conf:foo.conf[bar:pub]baz')
-        [('rose:file', 'foo.conf'), ('rose:conf', '[bar:pub]'), ('rose:conf', 'baz')]
+        >>> tokenise_namespace('rose:conf:foo.conf[bar:pub]baz'
+        ... ) # doctest: +NORMALIZE_WHITESPACE
+        [('rose:file', 'foo.conf'), ('rose:conf', '[bar:pub]'),
+        ('rose:conf', 'baz')]
     """
     match = ROSE_DOMAIN_REGEX.match(namespace)
 
@@ -270,13 +272,14 @@ class RoseDirective(ObjectDescription):
         - ``ARGUMENT_SEPARATOR`` & ``ARGUMENT_REGEX``
         - ``ALT_FORM_SEPARATOR``
         - ``ALT_FORM_TEMPLATE``
-        - ``doc_field_types`` - List of ``Field`` objects for object parameters.
+        - ``doc_field_types`` - List of ``Field`` objects for object
+          parameters.
         - ``run()`` - For adding special rev_context variables via
           ``add_rev_context``.
         - ``handle_signature()`` - For changing the display of objects.
-        - ``custom_name_template`` - String template accepting one string format
-          argument for custom formatting the node name (e.g. ``'[%s]'`` for conf
-          sections).
+        - ``custom_name_template`` - String template accepting one string
+          format argument for custom formatting the node name (e.g. ``'[%s]'``
+          for conf sections).
 
     ref_context Variables:
         Sphinx domains use ``ref_context`` variables to determine the
@@ -391,7 +394,7 @@ class RoseDirective(ObjectDescription):
 
     def after_content(self):
         """This method is called after child objects have been processed.
-        
+
         There is also the ``before_content()`` method which is called during
         ``run()`` before child objects have been processed but after the
         current object has been processed.
@@ -436,10 +439,10 @@ class RoseDirective(ObjectDescription):
             name = self.custom_name_template % name
 
         return name, argument, alt_forms
-        
+
     def handle_signature(self, sig, signode, display_text=None):
         """This method determines the appearance of the object.
-        
+
         Overloaded Args:
             display_test: Used for overriding the object name.
         """
@@ -553,8 +556,8 @@ class RoseConfigDirective(RoseDirective):
           field for optional settings.
 
     Additional ref_context:
-        * ``rose:conf-section`` - Set for parent configurations, is available to
-          any child nodes.
+        * ``rose:conf-section`` - Set for parent configurations, is available
+          to any child nodes.
 
     Example:
 
@@ -620,7 +623,7 @@ class RoseConfigDirective(RoseDirective):
 
 class RoseXRefRole(XRefRole):
     """Handle references to rose objects.
-    
+
     This should be minimal."""
 
     def process_link(self, env, refnode, has_explicit_title, title, target):
@@ -631,7 +634,7 @@ class RoseXRefRole(XRefRole):
 
 class RoseDomain(Domain):
     """Sphinx extension to add the ability to document rose objects.
-    
+
     Example:
 
         Click :guilabel:`source` to view source code.
@@ -691,7 +694,7 @@ class RoseDomain(Domain):
 
     def clear_doc(self, docname):
         """Removes documented items from  the rose domain.
-        
+
         Not sure why, but apparently necessary.
         """
         for fullname, (pkg_docname, _l) in list(self.data['objects'].items()):
@@ -706,7 +709,7 @@ class RoseDomain(Domain):
     @staticmethod
     def get_context_namespace(node):
         """Extract the namespace from a content node.
-        
+
         Walks up the node hierarchy from the current node collecting
         ref_context information as it does. See ``RoseDirective.run`` for
         information on how this context comes to reside in the node.
@@ -724,7 +727,7 @@ class RoseDomain(Domain):
     def resolve_xref(self, env, fromdocname, builder, typ, target, node,
                      contnode):
         """Associate a reference with a documented object.
-        
+
         The important parameters are:
             typ (str): The object type - see ``RoseDomain.object_types``.
             target (str): The rest of the reference as written in the rst.
@@ -770,8 +773,8 @@ class RoseDomain(Domain):
                 context_namespace = self.get_context_namespace(node)
                 if not context_namespace:
                     LOGGER.warning(
-                        'Relative reference requires local context "%s".' % (
-                        target), location=node)
+                        'Relative reference requires local context ' +
+                        '"%s".' % (target), location=node)
                     return
                 if relative_to_conf:
                     # Target is relative to the context conf_file.

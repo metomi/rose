@@ -40,7 +40,7 @@ class ScriptInclude(Directive):
     def run(self):
         command = sh_split(' '.join(self.arguments[0:]))
         stdout = Popen(command, stdout=PIPE, stdin=open(os.devnull)
-        ).communicate()[0]
+                       ).communicate()[0]
         node = nodes.section()
         node.document = self.state.document
         nested_parse_with_titles(self.state, ViewList(stdout.splitlines()),
