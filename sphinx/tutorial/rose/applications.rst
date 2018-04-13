@@ -108,22 +108,23 @@ can be used to provide the path to the Rose application:
 
    #. **Create a Rose application**
 
-      Create a new directory called ``forecast``, this is to be our
+      Create a new directory called ``application-tutorial``, this is to be our
       :term:`application directory`::
 
          mkdir application-tutorial
          cd application-tutorial
 
-   #. **Move the required resources into the** ``forecast`` **application.**
+   #. **Move the required resources into the** ``application-tutorial``
+      **application.**
 
-      The ``forecast`` application requires three resources.
+      The application requires three resources.
 
       * The ``bin/forecast`` script.
       * The ``lib/python/util.py`` python library.
       * The ``lib/template/map.html`` html template.
 
       Rather than leaving these resources scattered throughout the
-      :term:`suite directory` we can encapsulate them into the ``forecast``
+      :term:`suite directory` we can encapsulate them into the
       application directory.
 
       Copy the ``forecast`` script and ``util.py`` library into the ``bin/``
@@ -173,7 +174,7 @@ can be used to provide the path to the Rose application:
       * ``MAP_TEMPLATE``
 
       We will now move these into the application. This way all of the
-      configuration speciffic to the forecast application lives within it.
+      configuration speciffic to the application live within it.
 
       Add the following lines to the :rose:conf:`rose-app.conf[env]` section:
 

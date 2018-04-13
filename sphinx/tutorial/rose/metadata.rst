@@ -97,13 +97,13 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
 
 .. practical::
 
-   .. rubric:: In this practical we will write metadata for the forecast app we
-      wrote in the :ref:`Rose application practical
-      <rose-applications-practical>`.
+   .. rubric:: In this practical we will write metadata for the
+      ``application-tutorial`` app we wrote in the
+      :ref:`Rose application practical <rose-applications-practical>`.
 
-   #. **Create the** ``forecast`` **app.**
+   #. **Create a Rose application called** ``metadata-tutorial``.
 
-      Create a new copy of the ``forecast`` app by running::
+      Create a new copy of the ``application-tutorial`` application by running::
 
          rose tutorial metadata-tutorial ~/rose-tutorial/metadata-tutorial
          cd ~/rose-tutorial/metadata-tutorial
@@ -111,7 +111,7 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
    #. **View the application in** :ref:`command-rose-config-edit`.
 
       The :ref:`command-rose-config-edit` command opens a GUI which displays
-      Rose configurations. Open the ``forecast`` app::
+      Rose configurations. Open the ``metadata-tutorial`` app::
 
          rose config-edit &
 
