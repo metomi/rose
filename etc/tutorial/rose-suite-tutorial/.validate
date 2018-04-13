@@ -1,0 +1,3 @@
+cylc validate "$TUT_DIR" --icp=2000 -v -v
+rose metadata-check -C "$TUT_DIR/app/forecast/meta"
+rose macro -C "$TUT_DIR/app/forecast" -V
