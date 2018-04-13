@@ -20,7 +20,7 @@ Napoleon accepts docstrings in one of two formats:
 * `Google <Google Docstrings>`_  - `Napoleon Google Example`_
 * `Numpy <Numpy Docstrings>`_  - `Napoleon Numpy Example`_
 
-For rose docstrings please stick to the **Google** convention.
+For Rose docstrings please stick to the **Google** convention.
 Some quick examples:
 
 .. code-block:: python
@@ -80,7 +80,7 @@ Writing Doctests
 Examples [in docstrings] written in  `doctest format
 <https://docs.python.org/2/library/doctest.html>`_ will appear nicely
 formatted in the API docs, as an added bonus they are testable (``make -C doc
-doctest``, incorporated in the rose test battery).
+doctest``, incorporated in the :ref:`command-rose-test-battery`).
 
 Use ``>>>`` for statements and ``...`` for continuation lines. Any return
 values will have to be provided and should sit on the next newline.

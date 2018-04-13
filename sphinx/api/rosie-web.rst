@@ -16,7 +16,7 @@ Location
 --------
 
 The URLs to access the web API of a Rosie web service (with a given prefix
-name) can be found in your rose site configuration file as the value of
+name) can be found in your Rose site configuration file as the value of
 ``[rosie-id]prefix-ws.PREFIX_NAME``. To access the API for a given repository
 with prefix ``PREFIX_NAME``, you must select a format (the only currently
 supported format is JSON) and use a url that looks like:

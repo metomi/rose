@@ -13,11 +13,12 @@ Glossary
 
    suite directory
       The suite directory contains all of the configuration for a suite (e.g.
-      the ``suite.rc`` file and for rose suites the ``rose-suite.conf`` file).
+      the ``suite.rc`` file and for Rose suites the :rose:file:`rose-suite.conf`
+      file).
 
-      This is the directory which is registered using ``cylc reg`` or, for rose
-      suites, it is the one in which the ``rose suite-run`` command is
-      executed.
+      This is the directory which is registered using ``cylc reg`` or, for Rose
+      suites, it is the one in which the :ref:`command-rose-suite-run` command
+      is executed.
 
       .. note::
 
@@ -28,10 +29,10 @@ Glossary
 
       * :term:`run directory`
 
-   rose suite
-      A rose suite is a :term:`cylc suite` which also contains a
-      ``rose-suite.conf`` file and optionally :term:`rose apps<rose app>`,
-      :term:`metadata` and/or other rose components.
+   Rose suite
+      A Rose suite is a :term:`cylc suite` which also contains a
+      ``rose-suite.conf`` file and optionally :term:`Rose apps<Rose app>`,
+      :term:`metadata` and/or other Rose components.
 
    graph
       The graph of a :term:`suite<cylc suite>` refers to the
@@ -413,7 +414,7 @@ Glossary
       The location of the work directory can be accessed by a :term:`job` via
       the environment variable ``CYLC_TASK_WORK_DIR``.
 
-      Any files installed by :term:`rose apps <rose app>` will be placed within
+      Any files installed by :term:`Rose apps <Rose app>` will be placed within
       this directory.
 
       See also:
@@ -662,14 +663,14 @@ Glossary
       When a cylc detects that a suite has stalled an email will be sent to the
       user. Human interaction is required to escape a stalled state.
 
-   rose configuration
-      Rose configurations are directories containing a rose configuration
+   Rose configuration
+      Rose configurations are directories containing a Rose configuration
       file along with other optional files and directories.
 
-      The two types of rose configuration relevant to cylc suites are:
+      The two types of Rose configuration relevant to cylc suites are:
 
-      * :term:`rose application configuration`
-      * :term:`rose suite configuration`
+      * :term:`Rose application configuration`
+      * :term:`Rose suite configuration`
 
       See also:
 
@@ -678,10 +679,10 @@ Glossary
       * :ref:`Optional Configuration Tutorial
         <rose-tutorial-optional-configurations>`
 
-   rose app
-   rose application
-   rose application configuration
-      A rose application configuration (or rose app) is a directory containing
+   Rose app
+   Rose application
+   Rose application configuration
+      A Rose application configuration (or Rose app) is a directory containing
       a :rose:file:`rose-app.conf` file along with some other optional files
       and directories.
 
@@ -699,11 +700,11 @@ Glossary
 
    application directory
       The application directory is the folder in which the
-      :rose:file:`rose-app.conf` file is located in a :term:`rose application
+      :rose:file:`rose-app.conf` file is located in a :term:`Rose application
       configuration`.
 
-   rose suite configuration
-      A rose suite configuration is a :rose:file:`rose-suite.conf` file along
+   Rose suite configuration
+      A Rose suite configuration is a :rose:file:`rose-suite.conf` file along
       with other optional files and directories which configure the way in
       which a :term:`cylc suite` is run. E.g:
 
@@ -720,10 +721,10 @@ Glossary
       * :ref:`Rose Suites`
 
    metadata
-   rose metadata
+   Rose metadata
       Rose metadata provides information about settings in
-      :term:`rose application configurations <rose application configuration>`
-      and :term:`rose suite configurations <rose suite configuration>`. This
+      :term:`Rose application configurations <Rose application configuration>`
+      and :term:`Rose suite configurations <Rose suite configuration>`. This
       information is stored in a :rose:file:`rose-meta.conf` file in a
       ``meta/`` directory alongside the configuration it applies to.
 
@@ -748,7 +749,7 @@ Glossary
       * Validation using the :ref:`command-rose-macro` command.
 
       Metadata does not affect the running of an
-      :term:`application <rose app>` or :term:`cylc suite`.
+      :term:`application <Rose app>` or :term:`cylc suite`.
 
       See also:
 

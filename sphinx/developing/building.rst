@@ -5,8 +5,8 @@ Building & Testing
 ``rose make-docs``
 ------------------
 
-The documentation is built by the ``rose make-docs`` command. Its arguments are
-provided to the sphinx makefile in order.
+The documentation is built by the :ref:`command-rose-make-docs` command. Its
+arguments are provided to the sphinx makefile in order.
 
 Whenever making changes to the sphinx infrastructure use a clean build e.g:
 
@@ -27,10 +27,8 @@ The following builders are useful for development:
 ``rose test-battery``
 ---------------------
 
-The ``rose test-battery`` runs:
+The :ref:`command-rose-test-battery` runs:
 
-* ``rose make-docs clean strict doctest linkcheck``.
 * pep8 on the python extensions (``sphinx/ext``).
 * ``python -m doctest <file>`` for python extensions (``sphinx/ext``).
 * eslint on any static javascript files (``sphinx/static/js``).
-

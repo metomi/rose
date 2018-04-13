@@ -415,10 +415,10 @@ def write_command_reference(write, commands):
 
 
 def get_rose_command_reference(command_name):
-    """Generate help text for a rose command.
+    """Generate help text for a Rose command.
 
     Args:
-        command_name (str): The name of the rose command to be documented (i.e.
+        command_name (str): The name of the Rose command to be documented (i.e.
             rose / rosie.
 
     """

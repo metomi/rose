@@ -1,13 +1,13 @@
 Upgrading Macro Development
 ===========================
 
-Upgrade macros are used to upgrade :term:`rose apps <rose app>` to newer
+Upgrade macros are used to upgrade :term:`Rose apps <Rose app>` to newer
 metadata versions. They are intended to keep application configurations in
 sync with changes to application inputs e.g. from new code releases.
 
-You should already be familiar with using ``rose app-upgrade`` (see the
-:ref:`Upgrading tutorial <tutorial-rose-upgrade-macros>` and the concepts in the
-reference material).
+You should already be familiar with using :ref:`command-rose-app-upgrade` (see
+the :ref:`Upgrading tutorial <tutorial-rose-upgrade-macros>` and the concepts
+in the reference material).
 
 
 Example
@@ -19,7 +19,7 @@ Example
 
 In this example, we'll be upgrading a boat on a desert island.
 
-Create a rose application called ``make-boat-app``::
+Create a Rose application called ``make-boat-app``::
 
    mkdir -p ~/rose-tutorial/make-boat-app
    cd ~/rose-tutorial/make-boat-app
@@ -35,7 +35,7 @@ Create a ``rose-app.conf`` file with the following content:
    hollow_tree_trunks=1
    paddling_twigs=1
 
-You now have a rose application configuration that configures our simple boat
+You now have a Rose application configuration that configures our simple boat
 (a dugout canoe). It references a meta flag (for which metadata is unlikely to
 already exist), made up of a category (``make-boat``) at a particular
 version (``0.1``). The meta flag is used by Rose to locate a configuration
@@ -182,8 +182,8 @@ and an ``AFTER_TAG`` (e.g. ``"0.2"``). The ``BEFORE_TAG`` is the 'start'
 version (if upgrading) and the ``AFTER_TAG`` is the 'destination' version.
 
 When a user requests an upgrade for their configuration (e.g. by running
-``rose app-upgrade``), the ``versions.py`` file will be searched for a
-macro whose ``BEFORE_TAG`` matches the ``meta=...`` version.
+:ref:`command-rose-app-upgrade`), the ``versions.py`` file will be searched
+for a macro whose ``BEFORE_TAG`` matches the ``meta=...`` version.
 
 For example, for our ``meta=make-boat/0.1`` flag, we'd need a macro whose
 ``BEFORE_TAG`` was ``"0.1"``.

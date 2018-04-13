@@ -26,7 +26,7 @@ They can be run within :ref:`command-rose-config-edit` or via
    This section covers validator, transformer and reporter macros. For upgrader
    macros see :ref:`Upgrade Macro API <rose-upgr-macros>`.
 
-There are built-in rose macros that handle standard behaviour such as trigger
+There are built-in Rose macros that handle standard behaviour such as trigger
 changing and type checking.
 
 Macros use a Python API, and should be written in Python, unless you are

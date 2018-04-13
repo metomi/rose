@@ -2,8 +2,9 @@ Trigger
 =======
 
 The ``trigger`` metadata item can be used to cut down the amount of irrelevant
-settings presented to the user in the ``rose edit`` GUI by hiding any settings
-which are not relevant based on the value or state of other settings.
+settings presented to the user in the :ref:`command-rose-config-edit` GUI by
+hiding any settings which are not relevant based on the value or state of other
+settings.
 
 Irrelevant (``ignored`` or ``trigger-ignored``) settings do not get
 included in output files at runtime. In effect, they are commented
@@ -15,7 +16,7 @@ Example
 
 In this example, we'll be ordering pizza.
 
-Create a new rose application called ``trigger``::
+Create a new Rose application called ``trigger``::
 
    mkdir -p ~/rose-tutorial/trigger
    cd ~/rose-tutorial/trigger
@@ -23,7 +24,7 @@ Create a new rose application called ``trigger``::
 Create a :rose:file:`rose-app.conf` file that looks like this:
 
 .. TODO - Perhaps move these large code blocks out of this file using
-          the rose tutorial command.
+          the Rose tutorial command.
 
 .. code-block:: rose
 

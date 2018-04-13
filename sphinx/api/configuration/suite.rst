@@ -100,8 +100,8 @@ A suite directory may contain the following:
          root-dir=hpc*=$WORKDIR
                  =*=$DATADIR
 
-      In this example, ``rose suite-run`` of a suite with name ``$NAME`` will
-      create ``~/cylc-run/$NAME`` as a symbolic link to
+      In this example, :ref:`command-rose-suite-run` of a suite with name
+      ``$NAME`` will create ``~/cylc-run/$NAME`` as a symbolic link to
       ``$DATADIR/cylc-run/$NAME/`` on any machine, except those with their
       hostnames matching ``hpc*``. In which case, it will create
       ``~/cylc-run/$NAME`` as a symbolic link to ``$WORKDIR/cylc-run/$NAME/``.

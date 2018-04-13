@@ -5,9 +5,9 @@ Optional Configurations
 
 Optional configurations are configuration files which can add or overwrite
 the default configuration. They can be used with :ref:`command-rose-app-run`
-for :term:`rose application configurations <rose application configuration>`
+for :term:`Rose application configurations <Rose application configuration>`
 and :ref:`command-rose-suite-run` for
-:term:`rose suite configurations <rose suite configuration>`.
+:term:`Rose suite configurations <Rose suite configuration>`.
 
 
 Example
@@ -18,7 +18,7 @@ Example
    :width: 250px
    :alt: Ice Cream
 
-Create a new :term:`rose app` called ``rose-opt-conf-tutorial``::
+Create a new :term:`Rose app` called ``rose-opt-conf-tutorial``::
 
    mkdir -p ~/rose-tutorial/rose-opt-conf-tutorial
    cd ~/rose-tutorial/rose-opt-conf-tutorial

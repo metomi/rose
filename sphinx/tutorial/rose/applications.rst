@@ -21,7 +21,7 @@ As a task grows in complexity it could require:
 * Input files.
 * Scripts and libraries.
 
-A rose application or "rose app" is a runnable :term:`rose configuration` which
+A Rose application or "Rose app" is a runnable :term:`Rose configuration` which
 executes a defined commmand.
 
 Rose applications provide a convenient way to encapsulate all of this
@@ -83,9 +83,9 @@ An application can be run using the :ref:`command-rose-app-run` command:
    Hello Earth!
 
 The application will run in the current directory so it is a good idea to run
-the application elsewhere to keep run files separate. If running the rose
+the application elsewhere to keep run files separate. If running the Rose
 application from outside of the :term:`application directory` the ``-C`` option
-can be used to provide the path to the rose application:
+can be used to provide the path to the Rose application:
 
 .. code-block:: console
 
@@ -99,14 +99,14 @@ can be used to provide the path to the rose application:
 
    .. rubric:: In this practical we will convert the ``forecast`` task from the
       :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
-      into a rose application.
+      into a Rose application.
 
    Create a directory on your filesystem called ``rose-tutorial``::
 
       mkdir ~/rose-tutorial
       cd ~/rose-tutorial
 
-   #. **Create a rose application**
+   #. **Create a Rose application**
 
       Create a new directory called ``forecast``, this is to be our
       :term:`application directory`::

@@ -50,10 +50,10 @@ The relationship between them is as follows:
         }
     }
 
-Cylc suites can have rose applications. These are stored in an ``app``
+Cylc suites can have Rose applications. These are stored in an ``app``
 directory and are configured using a :rose:file:`rose-app.conf` file.
 
-.. TODO - A file tree for an example rose suite + a full file tree showing
+.. TODO - A file tree for an example Rose suite + a full file tree showing
           all possible files and directories with descriptions, this will
           require an extension and some CSS magic to ensure viable output
           in HTML and PDF.
@@ -90,12 +90,12 @@ Suite Commands
 :ref:`command-rose-task-run`
    Used to run a Rose application from within a cylc suite.
 :ref:`command-rose-suite-run`
-   Runs a rose suite.
+   Runs a Rose suite.
 :ref:`command-rose-suite-restart`
-   Runs a rose suite picking up where it left off.
+   Runs a Rose suite picking up where it left off.
 
 The cylc commands do not know about the :rose:file:`rose-suite.conf` file
-so for rose suite configurations you will have to install the suite before
+so for Rose suite configurations you will have to install the suite before
 using commands such as ``cylc graph`` e.g:
 
 .. code-block:: sub
@@ -163,7 +163,7 @@ Rose contains some utilities to make life easier:
 Rose Built-In Applications
 --------------------------
 
-Along with the rose utilities there are also the rose built-in applications.
+Along with the Rose utilities there are also the Rose built-in applications.
 
 :rose:app:`fcm_make`
    A template for running the ``fcm make`` command.
@@ -185,7 +185,7 @@ Next Steps
 ----------
 
 :ref:`Rose Further Topics`
-   Tutorials going over some of the more specific aspects of rose not
+   Tutorials going over some of the more specific aspects of Rose not
    covered in the main tutorial.
 :ref:`Cheat Sheet`
    A quick breakdown of the commands for running
@@ -194,7 +194,7 @@ Next Steps
    Contains the command line documentation
    (also obtainable by calling ``rose --help``).
 :ref:`Rose Configuration <rose-configuration>`
-   The possible settings which can be used in the different rose
+   The possible settings which can be used in the different Rose
    configuration files.
 `cylc suite design guide`_
    Contains recommended best-practice for the style and structure of cylc

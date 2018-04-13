@@ -11,7 +11,7 @@ are available in ``zip`` and ``tar.gz`` `archives`_.
 
 1. Un-pack the archive file into an appropriate location on your system.
 2. Add the ``rose/bin/`` directory into your ``PATH`` environment variable.
-3. Check system compatibility by running ``rose check-software``.
+3. Check system compatibility by running :ref:`command-rose-check-software`.
 
 
 System Requirements
@@ -20,7 +20,8 @@ System Requirements
 Rose runs on Unix/Linux systems and is known to run on RHEL6 and a number of
 systems including those documented under `metomi-vms`_.
 
-System compatibility can be tested using the ``rose check-software`` command.
+System compatibility can be tested using the :ref:`command-rose-check-software`
+command.
 
 .. script-include:: rose check-software --rst
 
@@ -36,7 +37,7 @@ Hosts For Running Cylc Suites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Each user can just run their suites on the host where they issue the
-``rose suite-run`` command. However, the local host may not meet the
+:ref:`command-rose-suite-run` command. However, the local host may not meet the
 necessary requirements for connectivity (to the hosts running the tasks)
 or for availability (the host needs to remain up for the duration of
 the suite). Therefore, Rose can be configured to run the suites on
@@ -45,8 +46,8 @@ the lowest system load average will be used.
 
 Installation requirements:
    * Rose, cylc, Bash, Python, jinja2.
-   * Subversion & FCM *(only if you want* ``rose suite-run`` *to install files
-     from Subversion using FCM keywords).*
+   * Subversion & FCM *(only if you want* :ref:`command-rose-suite-run` *to
+     install files from Subversion using FCM keywords).*
 Connectivity requirements:
    * Must be able to submit tasks to the hosts which run the suite tasks,
      either directly or via SSH access to another host.

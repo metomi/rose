@@ -4,8 +4,8 @@ Cheat Sheet
 ===========
 
 This page outlines how to perform suite operations for "pure" :term:`cylc
-suites <cylc suite>` (*the cylc way*) and those using :term:`rose suite
-configurations <rose suite configuration>` (*the rose way*).
+suites <cylc suite>` (*the cylc way*) and those using :term:`Rose suite
+configurations <rose suite configuration>` (*the Rose way*).
 
 .. Use the "sub" lexer as the default for this file.
 
@@ -23,8 +23,8 @@ Starting Suites
 .. list-table::
    :class: grid-table
 
-   * - .. rubric:: The cylc way
-     - .. rubric:: The rose way
+   * - .. rubric:: The Cylc Way
+     - .. rubric:: The Rose way
    * - ::
 
          cylc validate <name>
@@ -69,8 +69,8 @@ any jobs from the previous run.
 .. list-table::
    :class: grid-table
 
-   * - .. rubric:: The cylc way
-     - .. rubric:: The rose way
+   * - .. rubric:: The Cylc Way
+     - .. rubric:: The Rose Way
    * - ::
 
          cylc restart <name>
@@ -97,8 +97,8 @@ suite without making any changes to the :term:`run directory`. Cylc will
 .. list-table::
    :class: grid-table
 
-   * - .. rubric:: The cylc way
-     - .. rubric:: The rose way
+   * - .. rubric:: The Cylc Way
+     - .. rubric:: The Rose Way
    * - ::
 
          cylc stop <name> --now --now
@@ -117,8 +117,8 @@ Change the configuration of a running suite.
 .. list-table::
    :class: grid-table
 
-   * - .. rubric:: The cylc way
-     - .. rubric:: The rose way
+   * - .. rubric:: The Cylc Way
+     - .. rubric:: The Rose Way
    * - ::
 
          cylc reload <name>
@@ -157,8 +157,8 @@ Visualise A Suite's :term:`Graph`
 .. list-table::
    :class: grid-table
 
-   * - .. rubric:: The cylc way
-     - .. rubric:: The rose way
+   * - .. rubric:: The Cylc Way
+     - .. rubric:: The Rose Way
    * - ::
 
          # No special steps required.
@@ -177,8 +177,8 @@ View A Suite's ``suite.rc`` Configuration
 .. list-table::
    :class: grid-table
 
-   * - .. rubric:: The cylc way
-     - .. rubric:: The rose way
+   * - .. rubric:: The Cylc Way
+     - .. rubric:: The Rose Way
    * - ::
 
          # No special steps required.

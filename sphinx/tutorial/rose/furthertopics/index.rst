@@ -3,7 +3,7 @@
 Further Topics
 ==============
 
-This section goes into detail in additional rose topics.
+This section goes into detail in additional Rose topics.
 
 .. toctree::
    :name: rose-further-topics

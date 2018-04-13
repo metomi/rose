@@ -4,14 +4,14 @@
 Rosie
 =====
 
-Rosie is a tool for managing rose suite configurations which is included in
+Rosie is a tool for managing Rose suite configurations which is included in
 Rose.
 The purpose of Rosie is to facilitate suite development, management and
 collaboration.
 Rosie:
 
-* Adds version control to rose suite configurations.
-* Updates a database to keep track of rose suite configurations.
+* Adds version control to Rose suite configurations.
+* Updates a database to keep track of Rose suite configurations.
 
 .. warning::
    

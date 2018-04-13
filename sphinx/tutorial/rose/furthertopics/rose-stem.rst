@@ -1,12 +1,12 @@
 .. include:: ../../../hyperlinks.rst
    :start-line: 1
 
-rose stem
+Rose Stem
 =========
 
 .. warning::
 
-   Before proceeding you should already be familiar with the ``rose stem``
+   Before proceeding you should already be familiar with the Rose Stem
    part of the user guide.
 
    .. TODO - link in the rose user guide page when translated.
@@ -17,19 +17,19 @@ rose stem
    :width: 300px
 
 This tutorial will walk you through creating a simple example of the
-``rose stem`` testing system which will involve piloting a spaceship
+Rose Stem testing system which will involve piloting a spaceship
 through space.
 
 
 Getting Started
 ---------------
 
-We will start the ``rose stem`` tutorial by setting up an `FCM`_ repository
+We will start the Rose Stem tutorial by setting up an `FCM`_ repository
 called ``SPACESHIP`` to store the code and test suite in.
 
 .. _keyword: https://metomi.github.io/fcm/doc/user_guide/code_management.html#svn_basic_keywords
 
-Usually you would add a ``rose stem`` suite to an existing repository with
+Usually you would add a Rose Stem suite to an existing repository with
 the `keyword`_ already set up to test the accompanying source code. For the
 purposes of this tutorial we will create a new one.
 
@@ -79,7 +79,7 @@ The ``spaceship`` app
 
 .. TODO - outline what this app does.
 
-Create a new rose app called ``spaceship``::
+Create a new Rose app called ``spaceship``::
 
    mkdir -p rose-stem/app/spaceship
 
@@ -126,7 +126,7 @@ into the ``fcm-make.cfg`` file within that directory:
    build.target{task} = link
 
 The ``$SOURCE_SPACESHIP`` environment variable will be set using the
-Jinja2 variable of the same name which is provided by ``rose stem``.
+Jinja2 variable of the same name which is provided by Rose Stem.
 
 
 The ``suite.rc`` file
@@ -168,7 +168,7 @@ its own configuration files.
 The ``rose-suite.conf`` file
 ----------------------------
 
-The suites associated with ``rose stem`` require a version number
+The suites associated with Rose Stem require a version number
 indicating the version of the ``rose stem`` command with which they
 are compatible. This is specified in the :rose:file:`rose-suite.conf` file,
 together with the default values of ``RUN_NAMES`` and ``SOURCE_SPACESHIP``.
