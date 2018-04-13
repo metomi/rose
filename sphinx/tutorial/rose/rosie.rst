@@ -173,7 +173,8 @@ commands called :ref:`command-rosie-go`.
 
       Add the files from the Weather Forecasting Suite by running::
 
-         TODO
+         rose tutorial rose-weather-forecasting-suite ~/rose-tutorial/rosie
+         cd ~/rose-tutorial/rosie
 
       We now need to add these files to version control. First check the SVN
       status by running::

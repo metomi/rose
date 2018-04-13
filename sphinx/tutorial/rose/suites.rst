@@ -522,7 +522,7 @@ Otherwise an add-hoc web-server can be set up using the
       task of the ``suite.rc`` file into the :rose:file:`rose-app.conf` file
       of the ``forecast`` application.
 
-      TODO - remove triple quotes in Cylc tutorial
+      .. TODO - remove triple quotes in Cylc tutorial
 
       Remember, in Rose configuration files:
 
@@ -531,7 +531,8 @@ Otherwise an add-hoc web-server can be set up using the
 
       .. TODO -- what what, point this out earlier!
 
-      Your :rose:file:`rose-app.conf` file should now look like this:
+      The ``[env]`` section of your :rose:file:`rose-app.conf` file should now
+      look like this:
 
       .. code-block:: rose
 
