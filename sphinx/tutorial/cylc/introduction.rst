@@ -24,7 +24,6 @@ arrows.
 .. digraph:: bakery
    :align: center
 
-   bgcolor=none
    "purchase ingredients" -> "make dough" -> "bake bread" -> "sell bread"
    "bake bread" -> "clean oven"
    "pre-heat oven" -> "bake bread"

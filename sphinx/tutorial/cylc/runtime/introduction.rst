@@ -165,8 +165,6 @@ represent their state, as in the following diagram.
 .. digraph:: example
    :align: center
 
-   bgcolor=none
-
    Waiting [color="#88c6ff"]
    Running [style="filled" color="#00c410"]
    Succeeded [style="filled" color="#ada5a5"]

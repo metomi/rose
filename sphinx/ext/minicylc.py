@@ -220,7 +220,8 @@ class MiniCylcDirective(GraphvizSimple):
         clean_graphing = self.content
 
         # Generate dotcode for graphviz.
-        dotcode = ['bgcolor=none']
+        # dotcode = ['bgcolor=none'] now set in conf.py:graphviz_dot_args
+        dotcode = []
         if 'size' in self.options:
             dotcode.append('size="%s"' % self.options['size'])
         for left, right, conditional in self.get_triggers(self.content):

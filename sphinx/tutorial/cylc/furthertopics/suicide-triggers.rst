@@ -30,8 +30,6 @@ it will get burnt. In the case that we burn the cake the workflow gets stuck.
 .. digraph:: Example
    :align: center
 
-   bgcolor = none
-
    make_cake_mixture [style="filled" color="#ada5a5"]
    bake_cake [style="filled" color="#ff0000" fontcolor="white"]
    sell_cake [color="#88c6ff"]
@@ -58,8 +56,6 @@ otherwise.
 
 .. digraph:: Example
    :align: center
-
-   bgcolor = none
 
    make_cake_mixture
    bake_cake
@@ -145,7 +141,6 @@ you see might differ slightly. You may receive a "suite stalled" email.
 .. digraph:: Example
    :align: center
 
-   bgcolor = none
    size = "7,5"
 
    subgraph cluster_1 {
@@ -294,8 +289,6 @@ something like this:
 .. digraph:: Example
    :align: center
 
-   bgcolor = none
-
    make_cake_mixture -> bake_cake
    bake_cake -> sell_cake [style="dashed" arrowhead="dot"]
    bake_cake -> eat_cake [style="dashed" arrowhead="dot"]
@@ -325,8 +318,6 @@ of the ``sell_cake`` or ``eat_cake`` tasks is run.
 
 .. digraph:: Example
    :align: center
-
-   bgcolor = none
 
    subgraph cluster_1 {
       style="dashed"
@@ -405,8 +396,6 @@ A common use case where a ``recover`` task is used to handle a task failure.
 .. digraph:: Example
    :align: center
 
-   bgcolor = "none"
-
    subgraph cluster_1 {
       label = ":fail"
       color = "red"
@@ -454,8 +443,6 @@ cases.
 
 .. digraph:: Example
    :align: center
-
-   bgcolor = "none"
 
    foo -> bar
    bar -> tar -> par
@@ -535,8 +522,6 @@ the task ``showdown`` produces one of three possible custom outputs, ``good``,
 .. digraph:: Example
    :align: center
 
-   bgcolor = "none"
-
    subgraph cluster_1 {
       label = ":good"
       color = "green"
@@ -611,8 +596,6 @@ task to suicide trigger.
 
 .. digraph:: Example
    :align: center
-
-   bgcolor = "none"
 
    subgraph cluster_1 {
       label = "Faulty\nTask"
