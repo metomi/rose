@@ -3,7 +3,7 @@
 Upgrading
 =========
 
-As :term:`apps <rose app>` are developed, newer metadata versions can be
+As :term:`apps <Rose app>` are developed, newer metadata versions can be
 created each time the application inputs are changed, or just between major
 releases.
 
@@ -12,7 +12,7 @@ old one is removed.
 
 Upgrade macros may be written to automatically apply these changes.
 
-Upgrade macros are used to upgrade :term:`rose apps <rose app>` to newer
+Upgrade macros are used to upgrade :term:`Rose apps <Rose app>` to newer
 metadata versions. They are intended to keep application configurations in
 sync with changes to application inputs e.g. from new code releases.
 
@@ -22,7 +22,7 @@ This part tutorial walks you through upgrading applications.
 Example
 -------
 
-Create a new rose application called ``garden``::
+Create a new Rose application called ``garden``::
 
    mkdir -p ~/rose-tutorial/garden
    cd ~/rose-tutorial/garden
@@ -101,7 +101,7 @@ If you accept the changes, your app config will be upgraded through all
 the intermediary versions to the new one. Have a look at the
 :rose:file:`rose-app.conf` file.
 
-If you run rose :ref:`command-rose-app-upgrade` with no arguments, you can see
+If you run Rose :ref:`command-rose-app-upgrade` with no arguments, you can see
 that you're using the latest version.
 
 

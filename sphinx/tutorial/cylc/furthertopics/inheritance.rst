@@ -70,7 +70,7 @@ a different aircraft, the Airbus A380 jumbo jet and the Robson R44 helicopter:
    The ``[meta]`` section is a freeform section where we can define metadata
    to be associated with a task, family or the suite itself.
 
-   This metadata should not be mistaken with rose :ref:`conf-meta`.
+   This metadata should not be mistaken with Rose :ref:`conf-meta`.
 
 .. admonition:: Reminder
    :class: hint

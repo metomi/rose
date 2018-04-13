@@ -19,8 +19,8 @@ GUI.
 
    Simple metadata settings such as ``range`` can be evaluated on-the-fly when
    a value changes. As ``fail-if`` and ``warn-if`` can take longer to evaluate
-   they must be done on-demand in the ``rose edit`` GUI or on the command
-   line.
+   they must be done on-demand in the :ref:`command-rose-config-edit` GUI or
+   on the command line.
 
 
 Syntax
@@ -60,7 +60,7 @@ Create a new application called ``failif-warnif``::
    rose tutorial failif-warnif ~/rose-tutorial/failif-warnif
    cd ~/rose-tutorial/failif-warnif
 
-You will now have a new rose app with a :rose:file:`rose-app.conf` that
+You will now have a new Rose app with a :rose:file:`rose-app.conf` that
 looks like this:
 
 .. code-block:: rose

@@ -4,18 +4,18 @@
 Rose Suite Configurations
 =========================
 
-:term:`Rose application configurations <rose application configuration>`
+:term:`Rose application configurations <Rose application configuration>`
 can be used to encapsulate the environment and resources required by a cylc
 :term:`task`.
 
-Similarly :term:`rose suite configurations <rose suite configuration>` can
+Similarly :term:`Rose suite configurations <Rose suite configuration>` can
 be used to do the same for a :term:`cylc suite`.
 
 
 Configuration Format
 --------------------
 
-A rose suite configuration is a cylc :term:`suite directory` containing a
+A Rose suite configuration is a cylc :term:`suite directory` containing a
 :rose:file:`rose-suite.conf` file.
 
 .. NOTE - The rose-suite.info is not mentioned here as it is really a rosie
@@ -176,7 +176,7 @@ validated but not run (i.e. :ref:`steps 1, 2 and 3 <rose-suite-run-stages>`).
 Start, Stop, Restart
 --------------------
 
-Under rose, suites will run using the name of the suite directory. For instance
+Under Rose, suites will run using the name of the suite directory. For instance
 if you run :ref:`command-rose-suite-run` on a suite in the directory
 ``~/foo/bar`` then it will run with the name ``bar``.
 
@@ -216,7 +216,7 @@ See the :ref:`Cheat Sheet` for more information.
 
 .. practical::
 
-   .. rubric:: In this tutorial we will create a rose Suite Configuration for
+   .. rubric:: In this tutorial we will create a Rose Suite Configuration for
       the :ref:`Weather Forecasting Suite<tutorial-datetime-cycling-practical>`.
 
    #. **Create A New Suite.**
@@ -236,7 +236,7 @@ See the :ref:`Cheat Sheet` for more information.
 
          touch rose-suite.conf
 
-      You now have a rose suite configuration. A :rose:file:`rose-suite.conf`
+      You now have a Rose suite configuration. A :rose:file:`rose-suite.conf`
       file does not need to have anything in it but it is required to run
       :ref:`command-rose-suite-run`.
 
@@ -340,8 +340,8 @@ See the :ref:`Cheat Sheet` for more information.
 
    #. **Install The Suite.**
 
-      Running ``rose suite-run`` will cause the suite to be installed,
-      validated and run.
+      Running :ref:`command-rose-suite-run` will cause the suite to be
+      installed, validated and run.
 
       The ``--local-install-only`` command line option will cause the suite
       to be installed (only on your local machine not on any job hosts) and
@@ -362,11 +362,11 @@ See the :ref:`Cheat Sheet` for more information.
 Rose Applications In Rose Suite Configurations
 ----------------------------------------------
 
-In cylc suites, rose applications are placed in an ``app/`` directory which
+In cylc suites, Rose applications are placed in an ``app/`` directory which
 is copied across to run directory with the rest of the suite by
 :ref:`command-rose-suite-run` when the suite configuration is run.
 
-When we run rose applications in cylc suites we use the
+When we run Rose applications in cylc suites we use the
 :ref:`command-rose-task-run` command rather than the
 :ref:`command-rose-app-run` command.
 
@@ -397,7 +397,7 @@ In this example the ``hello`` task will run the application located in
 
 The name of the application to run can be overridden using the ``--app-key``
 command line option or the :envvar:`ROSE_TASK_APP` environment variable. For
-example the ``greetings`` :term:`task` will run the ``hello`` :term:`app <rose
+example the ``greetings`` :term:`task` will run the ``hello`` :term:`app <Rose
 app>` in the task defined below.
 
 .. code-block:: cylc
@@ -417,12 +417,12 @@ Rose provides a utility for viewing the status and logs for cylc suites called
 Rose Bush. Rose Bush displays suite information in web-pages.
 
 .. figure:: img/rose-bush.png
-   :alt: rose bush screenshot
+   :alt: Rose Bush screenshot
    :width: 100%
 
-   Screenshot of a rose bush web page.
+   Screenshot of a Rose Bush web page.
 
-If a rose bush server is provided at your site you can open the rose bush
+If a Bose Bush server is provided at your site you can open the Rose Bush
 page for a suite by running the :ref:`command-rose-suite-log` command
 in the suite directory.
 
@@ -432,7 +432,7 @@ Otherwise an add-hoc web-server can be set up using the
 
 .. practical::
 
-   .. rubric:: In this practical we will take the ``forecast`` rose application
+   .. rubric:: In this practical we will take the ``forecast`` Rose application
       that we developed in the :ref:`Metadata Tutorial <tutorial-rose-metadata>`
       and integrate it into the :ref:`Weather Forecasting Suite
       <tutorial-datetime-cycling-practical>`.
@@ -464,7 +464,7 @@ Otherwise an add-hoc web-server can be set up using the
          mkdir app/forecast/opt
          touch app/forecast/opt/rose-app-test.conf
 
-      This optional configuration is a regular rose configuration file, its
+      This optional configuration is a regular Rose configuration file, its
       settings will override those in the :rose:file:`rose-app.conf` file if
       requested.
 
@@ -507,7 +507,7 @@ Otherwise an add-hoc web-server can be set up using the
          rose app-run --opt-conf-key=test -C ../
          cd ../../../
 
-      You should see the stdout output of the rose application. If there are
+      You should see the stdout output of the Rose application. If there are
       any errors they will be marked with the ``[FAIL]`` prefix.
 
    #. **Integrate The** ``forecast`` **Application Into The Suite.**
@@ -525,7 +525,7 @@ Otherwise an add-hoc web-server can be set up using the
 
       TODO - remove triple quotes in cylc tutorial
 
-      Remember, in rose configuration files:
+      Remember, in Rose configuration files:
 
       * We don't use spaces around the equals ``=`` operator.
       * Environment variables shouldn't be quoted.
@@ -579,7 +579,7 @@ Otherwise an add-hoc web-server can be set up using the
 
    #. **View Output In Rose Bush.**
 
-      Open the rose bush page in a browser by running the following command
+      Open the Rose Bush page in a browser by running the following command
       from within the suite directory::
 
          rose suite-log
@@ -589,5 +589,5 @@ Otherwise an add-hoc web-server can be set up using the
       task. On the right-hand side of the screen click
       :guilabel:`job-map.html`.
       
-      As this file has a ``.html`` extension rose bush will render it,
+      As this file has a ``.html`` extension Rose Bush will render it,
       otherwise the raw text would be displayed.

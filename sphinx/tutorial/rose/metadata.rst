@@ -3,7 +3,7 @@
 Rose Metadata
 =============
 
-Metadata can be used to provide information about settings in rose
+Metadata can be used to provide information about settings in Rose
 configurations. It is used for:
 
 * Documenting settings.
@@ -18,7 +18,7 @@ The Metadata Format
 -------------------
 
 Metadata is written in a :rose:file:`rose-meta.conf` file. This file can either
-be stored inside a rose configuration in a ``meta/`` directory, or elsewhere
+be stored inside a Rose configuration in a ``meta/`` directory, or elsewhere
 outside of the configuration.
 
 The :rose:file:`rose-meta.conf` file uses the standard 
@@ -98,7 +98,7 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
 .. practical::
 
    .. rubric:: In this practical we will write metadata for the forecast app we
-      wrote in the :ref:`rose application practical
+      wrote in the :ref:`Rose application practical
       <rose-applications-practical>`.
 
    #. **Create the** ``forecast`` **app.**
@@ -111,13 +111,13 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
    #. **View the application in** :ref:`command-rose-config-edit`.
 
       The :ref:`command-rose-config-edit` command opens a GUI which displays
-      rose configurations. Open the ``forecast`` app::
+      Rose configurations. Open the ``forecast`` app::
 
          rose config-edit &
 
       .. tip::
 
-         Note :ref:`command-rose-config-edit` searches for rose configuration in
+         Note :ref:`command-rose-config-edit` searches for Rose configuration in
          the current directory, use the ``-C`` option to specify a directory.
 
       In the panel on the left you will see the different sections of the
@@ -178,7 +178,7 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
    #. **Length.**
 
       The ``DOMAIN`` and ``WEIGHTING`` settings both accept comma separated
-      lists of values. We can represent this in rose metadata using the
+      lists of values. We can represent this in Rose metadata using the
       :rose:conf:`rose-meta.conf[SETTING]length` setting.
 
       To represent the ``DOMAIN`` setting as a list of four elements add the

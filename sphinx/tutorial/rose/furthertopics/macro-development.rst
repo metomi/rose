@@ -276,7 +276,7 @@ like the one below depending on the current Earth-Jupiter distance.
 .. image:: img/rose-macro-tutorial-app-fail.png
    :width: 350px
    :align: center
-   :alt: Screenshot of a rose macro failure message.
+   :alt: Screenshot of a Rose macro failure message.
 
 If there is an error, the variable should display an error icon on
 the ``env`` page, which you can hover-over to get the error text as in
@@ -286,7 +286,7 @@ re-running your macro.
 .. image:: img/rose-edit-macro-fail.png
    :width: 450px
    :align: center
-   :alt: Screenshot of setting with an error detected by a rose macro.
+   :alt: Screenshot of setting with an error detected by a Rose macro.
 
 Try changing the value of ``env=WORLD`` to other solar system planets
 and re-running the macro.
@@ -548,8 +548,8 @@ that will be used as the new planet.
 Save your changes and run the transformer macro either from the
 command line or :ref:`command-rose-config-edit`. You should be prompted to
 provide a value for ``planet_name``. At the command line this will take the
-form of a prompt while in rose edit you will be presented with a dialog to
-enter values in, with defaults already entered for you.
+form of a prompt while in :ref:`command-rose-config-edit` you will be presented
+with a dialog to enter values in, with defaults already entered for you.
 
 Specify a value to use for ``planet_name`` using a quoted string,
 e.g. ``"Vulcan"`` and accept the proposed changes. The ``WORLD``

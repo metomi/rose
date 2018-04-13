@@ -50,7 +50,7 @@ For more information see the :ref:`command-rose-config` command line reference.
 Python API
 ----------
 
-Rose provides a Python API for loading, processing, editing and dumping rose
+Rose provides a Python API for loading, processing, editing and dumping Rose
 configurations via the :py:mod:`rose.config` module located within the Rose
 Python library.
 

@@ -3,13 +3,13 @@
 Rose Tutorial
 =============
 
-Rose is a system for creating, editing and running rose configurations.
+Rose is a system for creating, editing and running Rose configurations.
 
 Rose also contains other optional tools for:
 
 * Version control.
 * Suite discovery and management.
-* Validating and tranforming rose configurations.
+* Validating and tranforming Rose configurations.
 * Tools for interfacing with cylc.
 
 

@@ -13,7 +13,7 @@ requires said file.
 Example
 -------
 
-Create a new rose suite configuration::
+Create a new Rose suite configuration::
 
    mkdir -p ~/rose-tutorial/polling
    cd ~/rose-tutorial/polling

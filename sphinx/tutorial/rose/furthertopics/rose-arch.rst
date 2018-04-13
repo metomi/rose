@@ -1,7 +1,7 @@
 rose arch
 =========
 
-:rose:app:`rose_arch` is a built-in :term:`rose app` that provides a generic
+:rose:app:`rose_arch` is a built-in :term:`Rose app` that provides a generic
 solution to the archiving of suite files.
 
 .. admonition:: Good Practice
@@ -14,7 +14,7 @@ solution to the archiving of suite files.
 Example
 -------
 
-Create a new rose suite configuration::
+Create a new Rose suite configuration::
 
    mkdir -p ~/rose-tutorial/rose-arch-tutorial
 
@@ -155,8 +155,9 @@ Save your changes and run the suite::
 
    rose suite-run
 
-View the suite output using ``rose suite-log`` and inspect the output of the
-``make_files``, ``archive_files_rsync`` and ``archive_files_scp`` tasks.
+View the suite output using :ref:`command-rose-suite-log` and inspect the
+output of the ``make_files``, ``archive_files_rsync`` and ``archive_files_scp``
+tasks.
 
 
 Results Of "Archiving"

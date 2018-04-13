@@ -1,7 +1,7 @@
 Rose Bash Library
 =================
 
-The rose bash library lives in ``lib/bash/``. To import a module, load the file
+The Rose bash library lives in ``lib/bash/``. To import a module, load the file
 into your script. E.g. To load ``rose_usage``, you would do::
 
    . $ROSE_HOME/lib/bash/rose_usage

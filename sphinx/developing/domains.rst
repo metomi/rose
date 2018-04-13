@@ -17,7 +17,7 @@ Sphinx includes a system for documenting objects in a structured way via
 This is what the ``sphinx.ext.autodoc`` system does (e.g. ``autofunction``)
 for you automatically.
 
-For documenting rose components an extension adding a rose domain has been
+For documenting Rose components an extension adding a Rose domain has been
 added.
 
 

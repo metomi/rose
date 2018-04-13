@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""The rose domain is for documenting rose configurations and built-in
+"""The Rose domain is for documenting Rose configurations and built-in
 applications.
 
 Rose Objects:
-    The rose domain supports the following object types:
+    The Rose domain supports the following object types:
 
     * ``rose:app`` - Rose Applications.
-    * ``rose:file`` - Root rose configurations.
+    * ``rose:file`` - Root Rose configurations.
     * ``rose:conf`` - Rose configurations. Nest them to create configuration
       sections.
 
@@ -44,7 +44,7 @@ Reference Syntax:
     * The ``FILE-NAME`` for configuration files (e.g. ``rose.conf``).
 
 Referencing From RST Files:
-    To reference a rose object add the object ``TYPE`` into the domain
+    To reference a Rose object add the object ``TYPE`` into the domain
     (e.g. ``conf`` or ``app``).
 
     .. code-block:: rst
@@ -59,7 +59,7 @@ Referencing From RST Files:
        * :rose:conf:`fcm_make.args`
 
 Autodocumentation:
-    Documentation can be auto-built from RST formatted comments in rose
+    Documentation can be auto-built from RST formatted comments in Rose
     configuration files using the ``autoconfig`` directive.
 
     Note that due to the implementation of :py:mod:`rose.config` the
@@ -86,7 +86,7 @@ Example:
 
              .. rose:conf:: ROSE_VERSION
 
-                provide the intended rose version to the suite.
+                provide the intended Rose version to the suite.
 
                 .. deprecated:: 6.1.0
 
@@ -94,7 +94,7 @@ Example:
 
              .. rose:conf:: CYLC_VERSION
 
-                provide the intended rose version to the suite.
+                provide the intended Rose version to the suite.
 
                 .. deprecated:: 6.1.0
 
@@ -123,7 +123,7 @@ from rose import config
 
 LOGGER = logging.getLogger(__name__)
 
-ROSE_DOMAIN_REGEX = re.compile(  # Regex for a fully qualified rose domain.
+ROSE_DOMAIN_REGEX = re.compile(  # Regex for a fully qualified Rose domain.
     r'rose:(\w+):'    # Rose domain prefix + object type.
     r'([^\|\[ \n]+)'  # Configuration file.
     r'(\[.*\])?'      # Configuration section.
@@ -191,10 +191,10 @@ def tokenise_namespace(namespace):
     if typ in ['file', 'app']:
         ret = [('rose:%s' % typ, conf_file)]
     elif '.' in conf_file:
-        # Must be a rose config file.
+        # Must be a Rose config file.
         ret = [('rose:file', conf_file)]
     else:
-        # Must be a rose application.
+        # Must be a Rose application.
         ret = [('rose:app', conf_file)]
 
     if conf_section:
@@ -262,7 +262,7 @@ def namespace_from_tokens(tokens):
 
 
 class RoseDirective(ObjectDescription):
-    """Base class for implementing rose objects.
+    """Base class for implementing Rose objects.
 
     Subclasses must provide:
         - ``NAME``
@@ -283,7 +283,7 @@ class RoseDirective(ObjectDescription):
 
     ref_context Variables:
         Sphinx domains use ``ref_context`` variables to determine the
-        relationship between objects. E.g. for a rose app the ``rose:app``
+        relationship between objects. E.g. for a Rose app the ``rose:app``
         variable is set to the name of the app. This variable will be made
         available to all children which is how they determine that they belong
         to the app.
@@ -299,7 +299,7 @@ class RoseDirective(ObjectDescription):
     """Override in settings which are permitted to be nested (e.g. 'conf')."""
 
     NAME = None
-    """The rose domain this directive implements, see RoseDomain.directives"""
+    """The Rose domain this directive implements, see RoseDomain.directives"""
     LABEL = ''
     """Label to prepend to objects."""
     ARGUMENT_SEPARATOR = None
@@ -313,7 +313,7 @@ class RoseDirective(ObjectDescription):
     argument."""
 
     ROSE_CONTEXT = 'rose:%s'
-    """Prefix for all rose ref_context variables."""
+    """Prefix for all Rose ref_context variables."""
 
     def __init__(self, *args, **kwargs):
         self.ref_context_to_remove = []  # Cannot do this in run().
@@ -342,7 +342,7 @@ class RoseDirective(ObjectDescription):
     def register_subnode(self, subnode):
         """Register a sub-configuration when creating Rose objects with Python.
 
-        Special method for the RoseDirective to facilitate building rose domain
+        Special method for the RoseDirective to facilitate building Rose domain
         objects using the Python API rather than RST.
 
         See :py:meth:`RoseAutoDirective.run` for usage example.
@@ -496,7 +496,7 @@ class RoseDirective(ObjectDescription):
         # Generate a namespace from the tokens.
         namespace = namespace_from_tokens(context_tokens)
         if namespace is False:
-            LOGGER.error('Invalid namespace for rose object "%s"' % namespace,
+            LOGGER.error('Invalid namespace for Rose object "%s"' % namespace,
                          location=signode)
 
         # Register this namespace.
@@ -509,7 +509,7 @@ class RoseDirective(ObjectDescription):
 
 
 class RoseAppDirective(RoseDirective):
-    """Directive for documenting rose apps.
+    """Directive for documenting Rose apps.
 
     Example:
 
@@ -528,7 +528,7 @@ class RoseAppDirective(RoseDirective):
 
 
 class RoseFileDirective(RoseDirective):
-    """Directive for documenting rose files.
+    """Directive for documenting Rose files.
 
     Example:
 
@@ -622,7 +622,7 @@ class RoseConfigDirective(RoseDirective):
 
 
 class RoseXRefRole(XRefRole):
-    """Handle references to rose objects.
+    """Handle references to Rose objects.
 
     This should be minimal."""
 
@@ -633,7 +633,7 @@ class RoseXRefRole(XRefRole):
 
 
 class RoseDomain(Domain):
-    """Sphinx extension to add the ability to document rose objects.
+    """Sphinx extension to add the ability to document Rose objects.
 
     Example:
 
@@ -659,9 +659,9 @@ class RoseDomain(Domain):
     """
 
     name = 'rose'
-    """Prefix for rose domain (used by sphinx)."""
+    """Prefix for Rose domain (used by sphinx)."""
     label = 'Rose'
-    """Display label for the rose domain (used by sphinx)."""
+    """Display label for the Rose domain (used by sphinx)."""
 
     object_types = {
         'app': ObjType('app', 'app', 'obj'),
@@ -693,7 +693,7 @@ class RoseDomain(Domain):
     """This sets ``self.data`` on initialisation."""
 
     def clear_doc(self, docname):
-        """Removes documented items from  the rose domain.
+        """Removes documented items from  the Rose domain.
 
         Not sure why, but apparently necessary.
         """
@@ -702,7 +702,7 @@ class RoseDomain(Domain):
                 del self.data['objects'][fullname]
 
     def get_objects(self):
-        """Iterates through documented items in the rose domain."""
+        """Iterates through documented items in the Rose domain."""
         for refname, (docname, type_) in list(self.data['objects'].items()):
             yield refname, refname, type_, docname, refname, 1
 
@@ -801,9 +801,9 @@ class RoseDomain(Domain):
 
 
 class RoseAutoDirective(Directive):
-    """Directive for autodocumenting rose configuration files.
+    """Directive for autodocumenting Rose configuration files.
 
-    Uses RST formatted comments in rose configuration files using
+    Uses RST formatted comments in Rose configuration files using
     :py:mod:`rose.config`.
 
     Note the directive only documents config objects not the file itself.
@@ -828,7 +828,7 @@ class RoseAutoDirective(Directive):
             conf = config.load(filename)
         except config.ConfigSyntaxError:
             LOGGER.error(
-                'Syntax error in rose configuration file "%s".' % filename)
+                'Syntax error in Rose configuration file "%s".' % filename)
 
         # Append file level comments if present.
         nodes = []
