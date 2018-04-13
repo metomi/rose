@@ -34,7 +34,7 @@ from sphinx.ext.graphviz import (
 
 
 class MiniCylc(graphviz):
-    """Node to represent an animated cylc graph.
+    """Node to represent an animated Cylc graph.
 
     Works by extending the built-in ``sphinx.ext.graphviz`` code.
 
@@ -103,7 +103,7 @@ class MiniCylc(graphviz):
 
 
 class MiniCylcDirective(GraphvizSimple):
-    """Implement the ``mini-cylc`` directive for animating cylc graphs.
+    """Implement the ``mini-cylc`` directive for animating Cylc graphs.
 
     Works by extending the built-in ``sphinx.ext.graphviz`` code.
 
@@ -203,7 +203,7 @@ class MiniCylcDirective(GraphvizSimple):
         # Provide a dummy argument to match the spec of GraphvizSimple.
         self.arguments = ['Mini_Cylc']
 
-        # Generate cylc code snippet if requested.
+        # Generate Cylc code snippet if requested.
         if 'snippet' in self.options:
             ret.extend(CodeBlock(self.name,
                                  ['cylc-graph'],

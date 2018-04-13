@@ -31,7 +31,7 @@ settings inside the following section:
 The ``script`` Setting
 ----------------------
 
-We tell cylc *what* to execute when a task is run using the ``script`` setting.
+We tell Cylc *what* to execute when a task is run using the ``script`` setting.
 
 This setting is interpreted as a bash script. The following example defines a
 task called ``hello_world`` which writes ``Hello World!`` to stdout upon
@@ -55,7 +55,7 @@ We can also call other scripts or executables in this way, e.g:
        [[hello_world]]
            script = ~/foo/bar/baz/hello_world
 
-It is often a good idea to keep our scripts within the cylc suite directory
+It is often a good idea to keep our scripts within the Cylc suite directory
 tree rather than leaving them somewhere else on the system. If you create a
 ``bin`` sub-directory within the :term:`suite directory` this directory will be
 added to the path when tasks run, e.g:
@@ -104,7 +104,7 @@ be ``foo`` in the above example).
    In this tutorial we are writing our suites in the ``cylc-run`` directory.
 
    It is possible to write them elsewhere on the system. If we do so we
-   must register the suite with cylc before use.
+   must register the suite with Cylc before use.
 
    We do this using the ``cylc reg`` command which we supply with a name which
    will be used to refer to the suite in place of the path i.e:
@@ -152,14 +152,14 @@ These descriptions, and a few more (e.g. failed), are called the :term:`task sta
 
 
 
-The cylc GUI
+The Cylc GUI
 ------------
 
-To help you to keep track of a running suite cylc has a graphical user
-interface (the cylc GUI) which can be used for monitoring and
+To help you to keep track of a running suite Cylc has a graphical user
+interface (the Cylc GUI) which can be used for monitoring and
 interaction.
 
-The cylc GUI looks quite like ``cylc graph`` but the tasks are colour-coded to
+The Cylc GUI looks quite like ``cylc graph`` but the tasks are colour-coded to
 represent their state, as in the following diagram.
 
 .. digraph:: example
@@ -178,26 +178,26 @@ represent their state, as in the following diagram.
     b => d => f
     e => f
 
-This is the "graph view". The cylc GUI has two other views called "tree" and
+This is the "graph view". The Cylc GUI has two other views called "tree" and
 "dot".
 
 .. figure:: ../img/cylc-gui-graph.png
    :figwidth: 50%
    :align: center
 
-   Screenshot of the cylc GUI in "Graph View" mode.
+   Screenshot of the Cylc GUI in "Graph View" mode.
 
 .. figure:: ../img/cylc-gui-tree.png
    :figwidth: 50%
    :align: center
 
-   Screenshot of the cylc GUI in "Tree View" mode.
+   Screenshot of the Cylc GUI in "Tree View" mode.
 
 .. figure:: ../img/cylc-gui-dot.png
    :figwidth: 50%
    :align: center
 
-   Screenshot of the cylc GUI in "Dot View" mode.
+   Screenshot of the Cylc GUI in "Dot View" mode.
 
 
 Where Do All The Files Go?
@@ -206,7 +206,7 @@ Where Do All The Files Go?
 The Work Directory
 ^^^^^^^^^^^^^^^^^^
 
-When a :term:`task` is run cylc creates a directory for the :term:`job` to run
+When a :term:`task` is run Cylc creates a directory for the :term:`job` to run
 in. This is called the :term:`work directory`.
 
 By default the work directory is located in a directory structure
@@ -219,7 +219,7 @@ under the relevant :term:`cycle point` and :term:`task` name:
 The Job Log Directory
 ^^^^^^^^^^^^^^^^^^^^^
 
-When a task is run cylc generates a :term:`job script` which is stored in the
+When a task is run Cylc generates a :term:`job script` which is stored in the
 :term:`job log directory` as the file ``job``.
 
 When the :term:`job script` is executed the stdout and stderr are redirected
@@ -238,7 +238,7 @@ a task is re-run.
 
 .. tip::
 
-   If a task has run and is still visible in the cylc GUI you can view its
+   If a task has run and is still visible in the Cylc GUI you can view its
    :term:`job log files <job log>` by right-clicking on the task and selecting
    "View".
 
@@ -249,7 +249,7 @@ a task is re-run.
 Suite Files
 ^^^^^^^^^^^
 
-Along with the :term:`work directory` and :term:`job log directory`, cylc
+Along with the :term:`work directory` and :term:`job log directory`, Cylc
 generates other files and directories when it runs a suite, namely:
 
 
@@ -257,12 +257,12 @@ generates other files and directories when it runs a suite, namely:
    Directory containing log files, including:
 
    ``log/db``
-      The database which cylc uses to record the state of the suite;
+      The database which Cylc uses to record the state of the suite;
    ``log/job``
       The directory where the :term:`job log files <job log>` live;
    ``log/suite``
       The directory where the :term:`suite log files <suite log>` live.
-      These files are written by cylc as the suite is run and are useful for
+      These files are written by Cylc as the suite is run and are useful for
       debugging purposes in the event of error.
 
 ``suite.rc.processed``
@@ -306,7 +306,7 @@ generates other files and directories when it runs a suite, namely:
 
          cylc validate .
 
-      Open the cylc GUI (in the background) by running the following command:
+      Open the Cylc GUI (in the background) by running the following command:
 
       .. code-block:: bash
 
@@ -326,7 +326,7 @@ generates other files and directories when it runs a suite, namely:
 
       .. tip::
 
-         You can also run a suite from the cylc GUI by pressing the "play"
+         You can also run a suite from the Cylc GUI by pressing the "play"
          button.
 
          .. image:: ../img/gcylc-play.png
@@ -361,7 +361,7 @@ generates other files and directories when it runs a suite, namely:
          1970-01-01T00:00:00Z NORMAL - started
          2038-01-19T03:14:08Z NORMAL - succeeded
 
-      * The first three lines are information which cylc has written to the file
+      * The first three lines are information which Cylc has written to the file
         to provide information about the job.
       * The last two lines were also written by cylc. They provide timestamps
         marking the stages in the job's life.

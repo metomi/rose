@@ -10,7 +10,7 @@ In the last section we looked at writing an :term:`integer cycling` workflow,
 one where the :term:`cycle points <cycle point>` are numbered.
 
 Typically workflows are repeated at a regular time interval, say every day
-or every few hours. To make this easier cylc has a date-time cycling mode
+or every few hours. To make this easier Cylc has a date-time cycling mode
 where the :term:`cycle points <cycle point>` use date and time specifications
 rather than numbers.
 
@@ -26,7 +26,7 @@ rather than numbers.
 ISO8601
 -------
 
-In cylc, dates, times and durations are written using the :term:`ISO8601` format
+In Cylc, dates, times and durations are written using the :term:`ISO8601` format
 - an international standard for representing dates and times.
 
 .. _tutorial-iso8601-datetimes:
@@ -206,7 +206,7 @@ UTC Mode
 
 Due to all of the difficulties caused by time zones, particularly with
 respect to daylight savings, we typically use UTC (that's the ``+00`` time
-zone) in cylc suites.
+zone) in Cylc suites.
 
 When a suite uses UTC all of the cycle points will be written in the
 ``+00`` time zone.

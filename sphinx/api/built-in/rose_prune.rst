@@ -62,7 +62,7 @@ Configuration
          Specify a key to a format string for use in conjunction with a
          :rose:conf`prune{item-root}=cycle:globs` setting. For example, we may
          have something like ``cycle-format{cycle_year}=CCYY`` and
-         ``prune{share}=-P1Y:xmas-present-%(cycle_year)s/``. In cylc, if the
+         ``prune{share}=-P1Y:xmas-present-%(cycle_year)s/``. In Cylc, if the
          current cycle point is ``20151201T0000Z``, it will clear out the
          directory ``share/xmas-present-2014/``.
 
@@ -89,19 +89,19 @@ Configuration
 
          Remove the sub-directories under ``item-root`` (e.g.
          :term:`work/ <work directory>` of the specified cycles.
-         E.g. In cylc, if current cycle is ``20141225T1200Z``,
+         E.g. In Cylc, if current cycle is ``20141225T1200Z``,
          ``prune{work}=-PT12H`` will clear out ``work/20141225T0000Z/``.
 
          If globs are specified for a cycle, it will attempt to prune only
          items matching ``CYCLE/GLOBS`` under ``item-root``.
-         E.g. In cylc, if current cycle is ``20141225T1200Z``, then
+         E.g. In Cylc, if current cycle is ``20141225T1200Z``, then
          ``prune{share/cycle}=-PT12H:wild*`` will clear out all items
          matching ``share/cycle/20141225T0000Z/wild*``.
 
          A glob can also be specified as a formatting string containing a
          single substitution ``%(cycle)s``\ . In this mode, the cycle
          string will not be added as a sub-directory of the ``item-root``.
-         E.g. In cylc, if current cycle is ``20141225T1200Z``, then
+         E.g. In Cylc, if current cycle is ``20141225T1200Z``, then
          ``prune{share}=-PT12H:hello-*-at-%(cycle)s.txt`` will clear out
          all items matching ``share/hello-*-at-20141225T0000Z.txt``.
 

@@ -16,13 +16,13 @@ Rose is a system for writing, editing and running application configurations.
    :width: 250px
    :align: center
 
-Rose uses the `cylc`_ workflow engine for running suites of inter-dependent
-applications. :ref:`What Is Cylc? <cylc-introduction>`
+Rose uses the `Cylc`_ workflow engine for running suites of inter-dependent
+applications. :ref:`What Is Cylc? <Cylc-introduction>`
 
 .. image:: img/cylc-logo.png
    :width: 250px
    :align: center
-   :target: `cylc`_
+   :target: `Cylc`_
 
 
 .. toctree::

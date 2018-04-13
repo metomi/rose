@@ -169,7 +169,7 @@ land vertically.
    :align: center
 
 As the V-22 can be thought of as both a plane and a helicopter we want it to
-inherit from both the ``AIRPLANE`` and ``HELICOPTER`` families. In cylc we can
+inherit from both the ``AIRPLANE`` and ``HELICOPTER`` families. In Cylc we can
 inherit from multiple families by separating their names with commas:
 
 Add the following task to your ``suite.rc`` file.
@@ -181,7 +181,7 @@ Add the following task to your ``suite.rc`` file.
            [[[meta]]]
                title = V-22 Osprey Military Aircraft.
 
-Refresh your ``cylc graph`` window or re-run the cylc graph command.
+Refresh your ``cylc graph`` window or re-run the ``cylc graph`` command.
 
 The inheritance hierarchy should now look like this:
 

@@ -172,4 +172,4 @@ Summary
 * A clock trigger applies only to a single task.
 * Clock triggers can only be used in datetime cycling suites.
 
-For more information see the `cylc User Guide`_.
+For more information see the `Cylc User Guide`_.

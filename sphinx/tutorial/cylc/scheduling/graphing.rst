@@ -7,12 +7,12 @@ Graphing
 In this section we will cover writing basic workflows in cylc.
 
 
-.. _cylc file format:
+.. _Cylc file format:
 
 The suite.rc File Format
 ------------------------
 
-We refer to a cylc workflow as a :term:`cylc suite`. A cylc suite is a directory
+We refer to a Cylc workflow as a :term:`Cylc suite`. A Cylc suite is a directory
 containing a ``suite.rc`` file. This configuration file is where
 we define our workflow. The ``suite.rc`` file uses a nested `INI`_-based format:
 
@@ -101,7 +101,7 @@ Throughout this tutorial we will refer to settings in the following format:
 Graph Strings
 -------------
 
-In cylc we consider workflows in terms of :term:`tasks <task>` and
+In Cylc we consider workflows in terms of :term:`tasks <task>` and
 :term:`dependencies <dependency>`. Task are
 represented as words and dependencies as arrows (``=>``), so the following text
 defines two tasks where ``make_dough`` is dependent on ``purchase_ingredients``:
@@ -113,7 +113,7 @@ defines two tasks where ``make_dough`` is dependent on ``purchase_ingredients``:
 
    purchase_ingredients => make_dough
 
-In a cylc workflow this would mean that ``make_dough`` would only run when
+In a Cylc workflow this would mean that ``make_dough`` would only run when
 ``purchase_ingredients`` has succeeded. These :term:`dependencies <dependency>`
 can be chained together:
 
@@ -166,7 +166,7 @@ Collectively these :term:`graph strings<graph string>` are referred to as a
 Cylc Graphs
 -----------
 
-In a :term:`cylc suite` the :term:`graph` is stored under the
+In a :term:`Cylc suite` the :term:`graph` is stored under the
 ``[scheduling][dependencies]graph`` setting, i.e:
 
 .. code-block:: cylc
@@ -178,9 +178,9 @@ In a :term:`cylc suite` the :term:`graph` is stored under the
                pre_heat_oven & make_dough => bake_bread => sell_bread & clean_oven
            """
 
-This is a minimal :term:`cylc suite`, in which we have defined a :term:`graph`
-representing a workflow for cylc to run.
-We have not yet provided cylc with the scripts or binaries to run for
+This is a minimal :term:`Cylc suite`, in which we have defined a :term:`graph`
+representing a workflow for Cylc to run.
+We have not yet provided Cylc with the scripts or binaries to run for
 each task. This will be covered later in the
 :ref:`runtime tutorial <tutorial-runtime>`.
 
@@ -197,12 +197,12 @@ seen so far. The number ``1`` which appears below each task is the
 
 .. practical::
 
-   .. rubric:: In this practical we will create a new cylc suite and write a
+   .. rubric:: In this practical we will create a new Cylc suite and write a
       graph for it to use.
 
-   #. **Create a cylc suite.**
+   #. **Create a Cylc suite.**
 
-      A cylc suite is just a directory containing a ``suite.rc`` file.
+      A Cylc suite is just a directory containing a ``suite.rc`` file.
 
       If you don't have one already, create a ``cylc-run`` directory in your
       user space i.e::
@@ -230,7 +230,7 @@ seen so far. The number ``1`` which appears below each task is the
 
    #. **Write a graph.**
 
-      We now have a blank cylc suite, next we need to define a workflow.
+      We now have a blank Cylc suite, next we need to define a workflow.
 
       Edit your ``suite.rc`` file to add graph strings representing the
       following graph:
@@ -243,7 +243,7 @@ seen so far. The number ``1`` which appears below each task is the
          foo -> bar -> baz -> qux
          pub -> bar -> wop
 
-   #. **Use** ``cylc graph`` **to visualise the workflow.**
+   #. **Use** ``Cylc graph`` **to visualise the workflow.**
 
       Once you have written some graph strings try using ``cylc graph`` to
       display the workflow. Run the following command:

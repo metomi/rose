@@ -15,13 +15,13 @@ such as:
 * Environment variables.
 
 Rose configurations may be used standalone or alternatively in combination with
-the `cylc`_ workflow engine. There are two types of Rose configuration for use
-with `cylc`_:
+the `Cylc`_ workflow engine. There are two types of Rose configuration for use
+with `Cylc`_:
 
 :term:`Rose application configuration`
    A runnable Rose configuration which executes a defined command.
 :term:`Rose suite configuration`
-   A Rose configuration designed to run :term:`cylc suites <cylc suite>`.
+   A Rose configuration designed to run :term:`Cylc suites <Cylc suite>`.
    For instance it may be used to define Jinja2 variables for use in the
    ``suite.rc`` file.
 
@@ -39,7 +39,7 @@ file format.
 * Settings are written as ``key=value`` pairs.
 * Sections are written inside square brackets i.e. ``[section-name]``
 
-Unlike the :ref:`cylc file format <cylc file format>`:
+Unlike the :ref:`Cylc file format`:
 
 * Sections cannot be nested.
 * Settings should not be indented.

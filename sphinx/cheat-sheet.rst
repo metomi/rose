@@ -4,7 +4,7 @@ Cheat Sheet
 ===========
 
 This page outlines how to perform suite operations for "pure" :term:`cylc
-suites <cylc suite>` (*the cylc way*) and those using :term:`Rose suite
+suites <Cylc suite>` (*the Cylc way*) and those using :term:`Rose suite
 configurations <rose suite configuration>` (*the Rose way*).
 
 .. Use the "sub" lexer as the default for this file.
@@ -54,7 +54,7 @@ Stopping Suites
    cylc stop <name> --kill
 
    # Shutdown the suite now leaving any running / submitted tasks behind.
-   # If the suite is restarted cylc will "re-connect" with these jobs
+   # If the suite is restarted Cylc will "re-connect" with these jobs
    # continuing where it left off:
    cylc stop <name> --now --now
 

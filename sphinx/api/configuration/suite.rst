@@ -7,8 +7,8 @@ Suite Configuration
 -------------------
 
 The configuration and functionality of a suite will usually be covered by
-the use of `cylc`_. In which case, most of the suite configuration will live
-in the cylc ``suite.rc`` file. Otherwise, a suite is just a directory of
+the use of `Cylc`_. In which case, most of the suite configuration will live
+in the Cylc ``suite.rc`` file. Otherwise, a suite is just a directory of
 files.
 
 A suite directory may contain the following:
@@ -29,7 +29,7 @@ A suite directory may contain the following:
 * A ``meta/`` directory containing the suite's configuration metadata.
 * ``opt/`` directory. For detail, see :ref:`Optional Configuration`.
 * Other items, as long as they do not clash with the scheduler's working
-  directories. E.g. for a cylc suite, ``log*/``, ``share/``, ``state/`` and
+  directories. E.g. for a Cylc suite, ``log*/``, ``share/``, ``state/`` and
   ``work/`` should be avoided.
 
 .. rose:file:: rose-suite.conf
@@ -60,7 +60,7 @@ A suite directory may contain the following:
 
       .. rose:conf:: CYLC_VERSION=CYLC_VERSION_NUMBER
          
-         If specified for a cylc suite, the Rose suite runner
+         If specified for a Cylc suite, the Rose suite runner
          will attempt to use this version of cylc.
 
    .. rose:conf:: jinja2:suite.rc

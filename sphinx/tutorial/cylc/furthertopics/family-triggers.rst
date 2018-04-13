@@ -39,7 +39,7 @@ in that family reaching the desired :term:`state <task state>` e.g:
 Such :term:`triggers <task trigger>` are referred to as
 :term:`family triggers <family trigger>`
 
-Foo :command:`cylc gui` bar
+Foo ``cylc gui`` bar
 
 
 Example
