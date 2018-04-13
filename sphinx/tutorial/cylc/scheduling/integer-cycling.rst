@@ -56,7 +56,6 @@ workflow repeated at each cycle point:
 .. digraph:: example
    :align: center
 
-   bgcolor=none
    size = "7,15"
 
    subgraph cluster_1 {
@@ -145,7 +144,6 @@ The resulting suite would look like this:
 .. digraph:: example
    :align: center
 
-   bgcolor=none
    size = "7,15"
 
    subgraph cluster_1 {
@@ -237,7 +235,6 @@ This dependency means that the ``purchase_ingredients`` task will run after the
 .. digraph:: example
    :align: center
 
-   bgcolor=none
    size = "4.5,15"
 
    subgraph cluster_1 {
@@ -323,8 +320,6 @@ recurrences:
 
 .. digraph:: example
    :align: center
-
-   bgcolor=none
 
    subgraph cluster_1 {
        label = 1
@@ -476,7 +471,6 @@ starting 5 cycles *after* the initial cycle point.
       .. digraph:: example
         :align: center
 
-         bgcolor=none
          size = "4.5,7"
 
          subgraph cluster_1 {

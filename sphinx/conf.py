@@ -52,6 +52,10 @@ extensions = [
 # Use SVG for all graphviz (and by extension minicylc) blocks (alt png).
 graphviz_output_format = 'svg'
 
+# Global configuration for graphviz diagrams.
+graphviz_dot_args = ['-Gfontname=sans', '-Gbgcolor=none',
+                     '-Nfontname=sans']
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

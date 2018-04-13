@@ -265,7 +265,6 @@ The ``consolidate_observations`` task must run after the
    :align: center
 
    size = "5,4"
-   bgcolor=none
 
    get_observations_belmullet -> consolidate_observations
    get_observations_camborne -> consolidate_observations
@@ -294,7 +293,6 @@ The ``forecast`` task will be dependent on:
    :align: center
 
    size = "5,4"
-   bgcolor=none
 
    subgraph cluster_T00 {
        label="+PT0H"
@@ -335,7 +333,6 @@ after the initial cycle point** and will be dependent on the ``forecast`` task.
    :align: center
 
    size = "1.5,1"
-   bgcolor=none
 
    "forecast" -> "post_process_exeter"
 
@@ -460,7 +457,6 @@ after the initial cycle point** and will be dependent on the ``forecast`` task.
          :align: center
 
          size = "4,1.5"
-         bgcolor=none
          rankdir=LR
 
          subgraph cluster_T06 {
@@ -494,7 +490,6 @@ after the initial cycle point** and will be dependent on the ``forecast`` task.
         :align: center
 
          size = "4,1"
-         bgcolor=none
          rankdir=LR
 
          "forecast.t00" [label="forecast\n20000101T0000Z"

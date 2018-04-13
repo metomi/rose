@@ -88,8 +88,6 @@ Running this command will generate the following output:
 .. digraph:: Example
    :align: center
 
-   bgcolor=none
-
    AIRPLANE  [color=royalblue,
       fillcolor=powderblue,
       shape=box,
@@ -187,8 +185,6 @@ The inheritance hierarchy should now look like this:
 
 .. digraph:: Example
    :align: center
-
-   bgcolor=none
 
    AIRPLANE  [color=royalblue,
       fillcolor=powderblue,
@@ -295,7 +291,6 @@ Next we will define four families to represent three different types of engine.
    :align: center
 
    size = "5,5"
-   bgcolor=none
 
    ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled,
        margin="0.3,0.055"]
@@ -381,8 +376,6 @@ following manner:
 .. digraph:: Example
    :align: center
 
-   bgcolor=none
-
    VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
    LAND_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box,
        style=filled]
@@ -461,7 +454,6 @@ of as flying vehicles.
    :align: center
 
    size = "7,5"
-   bgcolor=none
 
    VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
    AIR_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
@@ -514,7 +506,6 @@ this:
 .. digraph:: Example
 
    size = "7, 5"
-   bgcolor = none
 
    root   [color=royalblue,
       fillcolor=powderblue,

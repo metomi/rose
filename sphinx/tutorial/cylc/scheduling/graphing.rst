@@ -238,8 +238,6 @@ seen so far. The number ``1`` which appears below each task is the
       .. digraph:: graph_tutorial
          :align: center
 
-         bgcolor=none
-
          foo -> bar -> baz -> qux
          pub -> bar -> wop
 

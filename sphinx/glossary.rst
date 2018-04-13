@@ -50,7 +50,6 @@ Glossary
       .. digraph:: example
          :align: center
 
-         bgcolor=none
          size = "7,15"
 
          subgraph cluster_1 {
@@ -130,7 +129,6 @@ Glossary
       .. digraph:: example
          :align: center
 
-         bgcolor=none
          size = "3,5"
 
          subgraph cluster_1 {
@@ -306,7 +304,6 @@ Glossary
       .. digraph:: example
          :align: center
 
-         bgcolor=none
          size = "3,5"
 
          subgraph cluster_1 {
@@ -648,8 +645,6 @@ Glossary
 
       .. digraph:: Example
          :align: center
-
-         bgcolor = none
 
          foo [style="filled" color="#ada5a5"]
          bar [style="filled" color="#ff0000" fontcolor="white"]

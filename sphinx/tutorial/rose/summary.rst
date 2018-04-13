@@ -19,17 +19,15 @@ The relationship between them is as follows:
    :align: center
 
     ranksep = 0
-    bgcolor = none
     size = "7, 5"
 
-    node [shape="plaintext", fontcolor="#606060", fontname="sans"]
+    node [shape="plaintext", fontcolor="#606060"]
     edge [style="invis"]
 
     subgraph cluster_1 {
         label = "Cylc Suite"
         fontsize="20"
         fontcolor="#5050aa"
-        fontname="sans"
         labelloc="r"
         "suite.rc" [fontsize="18", fontname="mono", fontcolor"black"]
         "rcinfo" [label="Defines the workflow\nin terms of tasks\nand dependencies"]

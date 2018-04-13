@@ -143,8 +143,6 @@ case, the group ``command_spaceship`` gives you the graph:
 .. digraph:: Example
    :align: center
 
-   bgcolor = "none"
-
    fcm_make_spaceship -> spaceship -> rose_ana_position
 
 This variable ``name_graphs`` is used later to generate the graph when

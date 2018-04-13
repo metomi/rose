@@ -113,11 +113,10 @@ When a suite configuration is run:
 .. digraph:: Example
    :align: center
 
-    graph [rankdir="LR", fontname="sanz"]
-    node [fontname="sanz", shape="none"]
+    graph [rankdir="LR"]
+    node [shape="none"]
     edge [color="blue"]
 
-    bgcolor="none"
     size="7,5"
     ranksep=0.75
 

@@ -55,7 +55,6 @@ hyphen and then an identifier made up of two characters and three numbers e.g:
 .. graph:: Example
    :align: center
 
-   bgcolor = "none"
    ranksep=0
 
    node [shape="plaintext", fontsize="11"]
