@@ -3,7 +3,7 @@
 Cheat Sheet
 ===========
 
-This page outlines how to perform suite operations for "pure" :term:`cylc
+This page outlines how to perform suite operations for "pure" :term:`Cylc
 suites <Cylc suite>` (*the Cylc way*) and those using :term:`Rose suite
 configurations <rose suite configuration>` (*the Rose way*).
 
@@ -14,7 +14,7 @@ configurations <rose suite configuration>` (*the Rose way*).
 
 .. _Starting Suites:
 
-Running/Interracting With Suites
+Running/Interacting With Suites
 --------------------------------
 
 Starting Suites
@@ -31,14 +31,14 @@ Starting Suites
          cylc run <name>
      - ::
 
-         # run the suite in the current directory
+         # run the suite in the current directory:
          rose suite-run
 
-         # run using a custom name
-         rose suite-run --name <name>
-
-         # run a suite in another directory
+         # run a suite in another directory:
          rose suite-run --path <path>
+
+         # run using a custom name:
+         rose suite-run --name <name>
 
 .. _Stopping Suites:
 
@@ -47,20 +47,20 @@ Stopping Suites
 
 ::
 
-   # Wait for running / submitted tasks to finish then shutdown the suite:
+   # Wait for running/submitted tasks to finish then shut down the suite:
    cylc stop <name>
 
-   # Kill all running / submitted tasks then shutdown the suite:
+   # Kill all running/submitted tasks then shut down the suite:
    cylc stop <name> --kill
 
-   # Shutdown the suite now leaving any running / submitted tasks behind.
-   # If the suite is restarted Cylc will "re-connect" with these jobs
+   # Shut down the suite now leaving any running/submitted tasks behind.
+   # If the suite is restarted Cylc will "re-connect" with these jobs,
    # continuing where it left off:
    cylc stop <name> --now --now
 
 .. _Restarting Suites:
 
-Restarting Suites (from stopped)
+Restarting Suites (From Stopped)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Pick up a suite where it left off after a shutdown. Cylc will "re-connect" with
@@ -84,11 +84,11 @@ any jobs from the previous run.
          # directory then restart:
          rose suite-run --restart
 
-Restarting Suites (from running)
+Restarting Suites (From Running)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *This might be needed, for instance, to upgrade a running suite to a
-newer version of cylc.*
+newer version of Cylc.*
 
 Stop a suite leaving all running/submitted jobs unchanged, then restart the
 suite without making any changes to the :term:`run directory`. Cylc will
