@@ -11,7 +11,7 @@ configurations. It is used for:
 * Formatting the :ref:`command-rose-config-edit` GUI.
 
 Metadata can be used to ensure that configurations are valid before they are
-run and to assist those who are edit the configurations.
+run and to assist those who edit the configurations.
 
 
 The Metadata Format
@@ -26,10 +26,10 @@ The :rose:file:`rose-meta.conf` file uses the standard
 
 The metadata for a setting is written in a section named ``section=setting``
 where ``setting`` is the name of the setting and ``section`` is the section to
-which the setting belongs (leave blank if the setting does not belong to
+which the setting belongs (left blank if the setting does not belong to
 a section).
 
-For example take the following application configuration.
+For example, take the following application configuration:
 
 .. code-block:: rose
    :caption: rose-app.conf
@@ -40,7 +40,7 @@ For example take the following application configuration.
    [env]
    WORLD=Earth
 
-If we were to write metadata for ``WORLD`` environment variable we
+If we were to write metadata for the ``WORLD`` environment variable we
 would create a section called ``[env=WORLD]``.
 
 .. code-block:: rose
@@ -66,7 +66,7 @@ The configuration can be tested against the metadata using the
 
    rose macro -V
 
-For example if we were to change the value of ``WORLD`` to ``Pluto`` then
+For example, if we were to change the value of ``WORLD`` to ``Pluto``
 ``rose macro -V`` would return the following error message:
 
 .. code-block:: none
@@ -77,22 +77,22 @@ For example if we were to change the value of ``WORLD`` to ``Pluto`` then
 Metadata Items
 --------------
 
-There are many metadata items, here are some of the commonly used ones:
+There are many metadata items, some of the most commonly-used ones being:
 
 ``title``
-   Assign a title to the setting.
+   Assign a title to a setting.
 ``description``
    Attach a short description to a setting.
 ``type``
    Specify the data type a setting expects, e.g. ``type=integer``.
 ``length``
-   Specify the length of comma separated lists e.g. ``length=:`` for a
+   Specify the length of comma-separated lists, e.g. ``length=:`` for a
    limitless list.
 ``range``
-   Specify numerical bounds for the value of a setting e.g. ``range=1, 10``
+   Specify numerical bounds for the value of a setting, e.g. ``range=1, 10``
    for a value between 1 and 10.
 
-For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
+For a full list of metadata items, see :rose:conf:`rose-meta.conf[SETTING]`.
 
 
 .. practical::
@@ -117,21 +117,22 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
 
       .. tip::
 
-         Note :ref:`command-rose-config-edit` searches for Rose configuration in
-         the current directory, use the ``-C`` option to specify a directory.
+         Note :ref:`command-rose-config-edit` searches for any Rose
+         configuration in the current directory. Use the ``-C`` option
+         to specify another directory.
 
       In the panel on the left you will see the different sections of the
       :rose:file:`rose-app.conf` file.
 
-      Click on :guilabel:`env`, here you will find all of the environment
-      variables. Each setting will have a hash symbol ``#`` next to its name,
-      these are the comments defined in the :rose:file:`rose-app.conf` file.
+      Click on :guilabel:`env`, where you will find all of the environment
+      variables. Each setting will have a hash symbol (``#``) next to its name.
+      These are the comments defined in the :rose:file:`rose-app.conf` file.
       Hover the mouse over the hash to reveal the comment.
 
       Keep the :ref:`command-rose-config-edit` window open as we will use it
       throughout the rest of this practical.
 
-   #. **Descriptions.**
+   #. **Add descriptions.**
 
       Now we will start writing some metadata.
 
@@ -143,9 +144,8 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
 
       In the :rose:file:`rose-app.conf` file there are comments associated with
       each setting. Take these comments out of the :rose:file:`rose-app.conf`
-      file and add them as descriptions in the metadata.
-
-      E.g. for the ``INTERVAL`` environment variable we could create a metadata
+      file and add them as descriptions in the metadata. As an example,
+      for the ``INTERVAL`` environment variable you would create a metadata
       entry that looks like this:
 
       .. code-block:: rose
@@ -173,15 +173,15 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
       .. tip::
 
          If you don't see the description for a setting it is possible that you
-         miss-spelt the name of the setting in the section heading.
+         misspelt the name of the setting in the section heading.
 
-   #. **Length.**
+   #. **Indicate list settings and their length.**
 
-      The ``DOMAIN`` and ``WEIGHTING`` settings both accept comma separated
+      The ``DOMAIN`` and ``WEIGHTING`` settings both accept comma-separated
       lists of values. We can represent this in Rose metadata using the
       :rose:conf:`rose-meta.conf[SETTING]length` setting.
 
-      To represent the ``DOMAIN`` setting as a list of four elements add the
+      To represent the ``DOMAIN`` setting as a list of four elements, add the
       following to the ``[env=DOMAIN]`` section:
 
       .. code-block:: rose
@@ -190,7 +190,7 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
 
       The ``WEIGHTING`` and ``WIND_CYCLES`` settings are different as we don't
       know how many items they will contain. For flexible lists we use a colon,
-      add the following line to the ``[env=WEIGHTING]`` and
+      so add the following line to the ``[env=WEIGHTING]`` and
       ``[env=WIND_CYCLES`` sections:
 
       .. code-block:: rose
@@ -201,11 +201,11 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
 
          rose metadata-check -C meta/
 
-      Refresh the metadata in the :ref:`command-rose-config-edit` window be
+      Refresh the metadata in the :ref:`command-rose-config-edit` window by
       selecting :menuselection:`Metadata --> Refresh Metadata`.
       The three settings we have edited should now appear as lists.
 
-   #. **Types.**
+   #. **Impose types.**
 
       Next we will add type information to the metadata.
 
@@ -220,8 +220,8 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
       window. The ``INTERVAL`` setting should now appear as an integer
       rather than a text field.
 
-      In the :ref:`command-rose-config-edit` window try changing the value of
-      ``INTERVAL`` to a string, it shouldn't let you.
+      In the :ref:`command-rose-config-edit` window, try changing the value of
+      ``INTERVAL`` to a string. It shouldn't let you do so.
 
       Add similar ``type`` entries for the following settings:
 
@@ -238,13 +238,13 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
       Validate the metadata to check for errors.
 
       In the :ref:`command-rose-config-edit` window try changing the value of
-      ``RESOLUTION`` to a string, it should be marked as an error.
+      ``RESOLUTION`` to a string. It should be marked as an error.
 
-   #. **Values.**
+   #. **Define sets of allowed values.**
 
       We will now add a new input to our application called ``SPLINE_LEVEL``.
       This is a science setting used to determine the interpolation method
-      used on the rainfall data. It accepts the following values
+      used on the rainfall data. It accepts the following values:
 
       * ``0`` - for nearest member interpolation.
       * ``1`` - for linear interpolation.
@@ -269,13 +269,14 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
       As we have made a change to the configuration (by editing the
       :rose:file:`rose-app.conf` file) we will need to close and reload
       the :ref:`command-rose-config-edit` GUI.
-      The setting should appear as a radio-button with the options ``0`` and
+      The setting should appear as a button with only the options ``0`` and
       ``1``.
 
-      Unfortunately ``0`` and ``1`` are not particularly descriptive, it might
-      not be obvious that they mean "nearest" and "linear" respectively. The
-      :rose:conf:`rose-meta.conf[SETTING]value-titles` metadata item can be
-      used to add titles to such settings to make the values clearer.
+      Unfortunately ``0`` and ``1`` are not particularly descriptive, so
+      it might not be obvious that they mean "nearest" and "linear"
+      respectively. The :rose:conf:`rose-meta.conf[SETTING]value-titles`
+      metadata item can be used to add titles to such settings to make the
+      values clearer.
 
       Add the following lines to the ``[env=SPLINE_LEVEL]`` section in the
       :rose:file:`rose-meta.conf` file:
@@ -294,7 +295,7 @@ For a full list of metadata items see :rose:conf:`rose-meta.conf[SETTING]`.
          The :rose:conf:`rose-meta.conf[SETTING]value-hints` metadata option 
          can be used to provide a longer description of each option.
 
-   #. **rose macro.**
+   #. **Validate with** ``rose macro``.
 
       On the command line :ref:`command-rose-macro` can be used to check that
       the configuration is compliant with the metadata.

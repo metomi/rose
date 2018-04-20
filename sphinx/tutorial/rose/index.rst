@@ -10,7 +10,7 @@ Rose also contains other optional tools for:
 * Version control.
 * Suite discovery and management.
 * Validating and tranforming Rose configurations.
-* Tools for interfacing with cylc.
+* Interfacing with Cylc.
 
 
 .. toctree::

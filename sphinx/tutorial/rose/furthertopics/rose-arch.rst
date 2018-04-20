@@ -1,4 +1,4 @@
-rose arch
+Rose Arch
 =========
 
 :rose:app:`rose_arch` is a built-in :term:`Rose app` that provides a generic
