@@ -236,12 +236,13 @@ off and carries on as normal.
 
       .. spoiler:: Solution warning
 
-         You can check your answers by running the following commands.
+         You can check your answers by running the following commands
+         (hyphens and colons optional):
 
          For the initial cycle point:
-            ``rose date --utc --offset -PT7H --format CCYY-MM-DDThh00Z``
+            ``rose date --utc --offset -PT7H --format CCYY-MM-DDThh:00Z``
          For the final cycle point:
-            ``rose date --utc --offset -PT1H --format CCYY-MM-DDThh00Z``
+            ``rose date --utc --offset -PT1H --format CCYY-MM-DDThh:00Z``
 
       Run ``cylc validate`` to check for any errors::
 
