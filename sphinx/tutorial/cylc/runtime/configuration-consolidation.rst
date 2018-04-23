@@ -237,6 +237,36 @@ In the following example the task ``bar`` will inherit the environment variable
        [[bar]]
            script = echo $FOO
 
+Families and ``cylc graph``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, ``cylc graph`` groups together all members of a family
+in the :term:`graph`. To un-group a family right click on it and select
+:menuselection:`UnGroup`.
+
+For instance if the tasks ``bar`` and ``baz`` both
+inherited from ``BAR`` ``cylc graph`` would produce:
+
+.. digraph:: Example
+   :align: center
+
+   subgraph cluster_1 {
+      label = "Grouped"
+      "foo.1" [label="foo"]
+      "BAR.1" [label="BAR", shape="doubleoctagon"]
+   }
+
+   subgraph cluster_2 {
+      label = "Un-Grouped"
+      "foo.2" [label="foo"]
+      "bar.2" [label="bar"]
+      "baz.2" [label="baz"]
+   }
+
+   "foo.1" -> "BAR.1"
+   "foo.2" -> "bar.2"
+   "foo.2" -> "baz.2"
+
 .. practical::
 
    .. rubric:: In this practical we will consolidate the configuration of the
