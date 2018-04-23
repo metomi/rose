@@ -15,4 +15,4 @@ This section covers:
 
    introduction
    runtime-configuration
-   configuration-consolidation
+   configuration-consolidation/index
