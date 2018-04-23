@@ -195,6 +195,17 @@ seen so far. The number ``1`` which appears below each task is the
 .. image:: ../img/cylc-graph.png
    :align: center
 
+.. note::
+
+   A graph can be drawn in multiple ways, for instance the following two
+   examples are equilivalent:
+
+   .. image:: ../img/cylc-graph-reversible.svg
+      :align: center
+
+   The graph drawn by ``cylc graph`` may vary slightly from one run to another
+   but the output will always be equivalent.
+
 .. practical::
 
    .. rubric:: In this practical we will create a new Cylc suite and write a
