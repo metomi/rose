@@ -36,7 +36,7 @@ The relationship between them is as follows:
         subgraph cluster_2 {
             label = "Rose Suite Configuration"
             "rose-suite.conf" [fontsize="18", fontname="mono", fontcolor"black"]
-            "confinfo" [label="Defines Jinja2 variables for\nthesuite.rc and environment\nvariable for use throughout\nthe suite"]
+            "confinfo" [label="Defines Jinja2 variables for\nthe suite.rc and environment\nvariable for use throughout\nthe suite"]
             "rose-suite.conf" -- "confinfo"
 
             subgraph cluster_3 {
@@ -98,8 +98,11 @@ using commands such as ``cylc graph`` e.g:
 
 .. code-block:: sub
 
-   rose suite-run -l  # install the suite on the local host only - don't run it.
-   cylc graph <suite> # run cylc graph using the installed version of the suite.
+   # install the suite on the local host only - don't run it.
+   rose suite-run --local-install-only
+
+   # run cylc graph using the installed version of the suite.
+   cylc graph <suite>
 
 
 Rose Utilities

@@ -173,8 +173,7 @@ commands called :ref:`command-rosie-go`.
 
       Add the files from the Weather Forecasting Suite by running::
 
-         rose tutorial rose-weather-forecasting-suite ~/rose-tutorial/rosie
-         cd ~/rose-tutorial/rosie
+         rose tutorial rose-weather-forecasting-suite .
 
       We now need to add these files to version control. First check the SVN
       status by running::
@@ -265,7 +264,7 @@ commands called :ref:`command-rosie-go`.
       the "trunk" (referred to as "master" in git terminology) we will work in a
       new "branch".
 
-      Create a new branch by running::
+      Create a new branch called "configuration-change" by running::
 
          fcm bc configuration-change
 
@@ -298,7 +297,7 @@ commands called :ref:`command-rosie-go`.
       Switch back to the trunk then merge your change branch into the trunk::
 
          fcm sw trunk
-         fcm merge change
+         fcm merge configuration-change
 
       Check the status (you should see the ``M`` symbol next to the
       :rose:file:`rose-suite.conf` file) then commit the merge::
