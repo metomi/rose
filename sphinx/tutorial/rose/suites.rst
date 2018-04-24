@@ -351,16 +351,10 @@ See the :ref:`Cheat Sheet` for more information.
 
          rose suite-run --local-install-only
 
-      Inspect the installed suite, which you will find in::
+      Inspect the installed suite, which you will find in
+      the :term:`run directory`, i.e::
 
          ~/cylc-run/rose-suite-tutorial
-
-      .. tip::
-
-         Remember this is the :term:`run directory`, which is different to
-         the directory we were working in previously, the
-         :term:`suite directory` ``~/rose-tutorial/rose-suite-tutorial``,
-         despite having the same sub-directory name.
 
       You should find all the files contained in the :term:`suite directory`
       as well as the :term:`run directory` folders ``log``, ``work`` and
@@ -445,14 +439,12 @@ Otherwise an add-hoc web server can be set up using the
       and integrate it into the :ref:`weather-forecasting suite
       <tutorial-datetime-cycling-practical>`.
 
-   #. **Set-up The Forecast Application.**
+   Move into the suite directory from the previous practical::
 
-      Move into the suite directory from the previous practical::
+      cd ~/rose-tutorial/rose-suite-tutorial
 
-         cd ~/rose-tutorial/rose-suite-tutorial
-
-      You will find a copy of the ``forecast`` application located in
-      ``app/forecast``.
+   You will find a copy of the ``forecast`` application located in
+   ``app/forecast``.
 
    #. **Create A Test Configuration For The** ``forecast`` **Application.**
 
@@ -492,6 +484,9 @@ Otherwise an add-hoc web server can be set up using the
       * ``WIND_FILE_TEMPLATE``
       * ``RAINFALL_FILE``
       * ``MAP_FILE``
+      * ``CYLC_TASK_CYCLE_POINT``
+      * ``RESOLUTION``
+      * ``DOMAIN``
 
       .. spoiler:: Solution warning
 
@@ -507,6 +502,9 @@ Otherwise an add-hoc web server can be set up using the
             WIND_FILE_TEMPLATE=test-data/wind_{cycle}_{xy}.csv
             RAINFALL_FILE=test-data/rainfall.csv
             MAP_FILE=map.html
+            CYLC_TASK_CYCLE_POINT=20171101T0000Z
+            RESOLUTION=0.2
+            DOMAIN=-12,48,5,61
 
       Run the application in "test mode" by providing the option
       ``--opt-conf-key=test`` to the :ref:`command-rose-app-run` command::
@@ -559,9 +557,9 @@ Otherwise an add-hoc web server can be set up using the
          RAINFALL_FILE=$CYLC_SUITE_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
          MAP_FILE=${CYLC_TASK_LOG_ROOT}-map.html
 
-      Finally we need to change the ``forecast`` task to instead simply run
-      :ref:`command-rose-task-run`. Change the ``script`` setting in this way.
-      The runtime section for the ``forecast`` task should now look like this:
+      Finally we need to change the ``forecast`` task to run
+      :ref:`command-rose-task-run`. The runtime section for the ``forecast``
+      task should now look like this:
 
       .. code-block:: cylc
 

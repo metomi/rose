@@ -207,7 +207,7 @@ For a full list of metadata items, see :rose:conf:`rose-meta.conf[SETTING]`.
       selecting :menuselection:`Metadata --> Refresh Metadata`.
       The three settings we have edited should now appear as lists.
 
-   #. **Impose types.**
+   #. **Specify data types.**
 
       Next we will add type information to the metadata.
 
