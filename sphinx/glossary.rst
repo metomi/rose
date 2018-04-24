@@ -7,9 +7,16 @@ Glossary
 .. glossary::
    :sorted:
 
+   suite
    Cylc suite
       A Cylc suite is a directory containing a ``suite.rc`` file which contains
       :term:`graphing<graph>` representing a workflow.
+
+      See also:
+
+      * :ref:`Relationship between Cylc suites, Rose suite configurations and
+        Rosie suites <cylc-rose-rosie-suite-relationship-diagram>`
+
 
    suite directory
       The suite directory contains all of the configuration for a suite (e.g.
@@ -28,11 +35,8 @@ Glossary
       See also:
 
       * :term:`run directory`
-
-   Rose suite
-      A Rose suite is a :term:`Cylc suite` which also contains a
-      ``rose-suite.conf`` file and optionally :term:`Rose apps<Rose app>`,
-      :term:`metadata` and/or other Rose components.
+      * :ref:`Rose suite installation diagram
+        <rose-suite-installation-diagram>`
 
    graph
       The graph of a :term:`suite<Cylc suite>` refers to the
@@ -418,6 +422,8 @@ Glossary
 
       * :term:`run directory`
       * :term:`share directory`
+      * :ref:`Rose suite installation diagram
+        <rose-suite-installation-diagram>`
 
    share directory
       The share directory resides within a suite's :term:`run directory`. It
@@ -539,6 +545,111 @@ Glossary
       See also:
 
       * :term:`batch system`
+
+
+
+   suite server program
+      When we say that a :term:`suite` is "running" we mean that the cylc
+      suite server program is running.
+
+      The suite server program is responsible for running the suite, it submits
+      :term:`jobs <job>`, monitors their status and maintains the suite state.
+
+      .. _daemon: https://en.wikipedia.org/wiki/Daemon_(computing)
+
+      By default a suite server program is a `daemon`_ meaning that is runs in
+      the background (potentially on another host).
+
+   start
+   startup
+      When a :term:`suite` starts the cylc :term:`suite server program` is
+      run. This program controls the suite and is what we refer to as
+      "running".
+
+      * A :term:`Cylc suite` is started using ``cylc run``.
+      * A :term:`Rose suite configuration` (or :term:`Rosie Suite`) is started
+        using :ref:`command-rose-suite-run`.
+
+      A suite start can be either :term:`cold <cold start>` or :term:`warm <warm
+      start>` (cold by default).
+
+      See also:
+
+      * :ref:`Starting Suites`
+      * :term:`suite server program`
+      * :term:`warm start`
+      * :term:`cold start`
+      * :term:`shutdown`
+      * :term:`restart`
+      * :term:`reload`
+
+   cold start
+      A cold start is one in which the :term:`suite` :term:`starts <start>`
+      from the :term:`initial cycle point`. This is the default behaviour of
+      ``cylc run``.
+
+      See also:
+
+      * :term:`warm start`
+
+   warm start
+      In a :term:`datetime cycling` suite
+      a warm start is one in which the :term:`suite` :term:`starts <start>`
+      from a :term:`cycle point` after the :term`initial cycle point`.
+      Tasks in cycles before this point as assumed to have succeeded.
+
+      See also:
+
+      * :term:`cold start`
+
+   stop
+   shutdown
+      When a :term:`suite` is shutdown the :term:`suite server program` is
+      stopped. This means that no further :term:`jobs <job>` will be submitted.
+
+      By default cylc waits for any submitted or running :term:`jobs <job>` to
+      complete (either succeed or fail) before shutting down.
+
+      See also:
+
+      * :ref:`Stopping Suites`
+      * :term:`start`
+      * :term:`restart`
+      * :term:`reload`
+
+   restart
+      When a :term:`stopped <stop>` :term:`suite` is "restarted" Cylc will pick
+      up where it left off. Cylc will detect any :term:`jobs <job>` which
+      have changed state (e.g. succeed) during the period in which the
+      :term:`suite` was :term:`shutdown`.
+
+      See also:
+
+      * :ref:`Restarting Suites`
+      * :term:`start`
+      * :term:`Stop`
+      * :term:`Reload`
+
+   reload
+      Any changes made to the ``suite.rc`` file whilst the suite is running
+      will not have any effect untill the suite is:
+      
+      * :term:`Shutdown` and :term:`rerun <start>`
+      * :term:`Shutdown` and :term:`restarted <restart>`
+      * "Reloaded"
+
+      Reloading does not require the suite to be :term:`shutdown`. When a suite
+      is reloaded any currently "active" :term:`tasks <task>` will continue with
+      their "pre-reload" configuration, new tasks will use the new
+      configuration.
+
+      Reloading changes to the ``[runtime]`` section is safe, reloading changes
+      to the ``[scheduling]`` section has caveats, see the `Cylc User Guide`_.
+
+      See also:
+
+      * :ref:`Reloading Suites`
+      * `Cylc User Guide`_
 
    parameterisation
       Parameterisation is a way to consolidate configuration in the Cylc
@@ -698,6 +809,14 @@ Glossary
       :rose:file:`rose-app.conf` file is located in a :term:`Rose application
       configuration`.
 
+   Rose built-in application
+      A Rose built-in application is a generic :term:`Rose application`
+      providing common functionality which is provided in the Rose installation.
+
+      See also:
+
+      * :ref:`Rose Built-In Applications`
+
    Rose suite configuration
       A Rose suite configuration is a :rose:file:`rose-suite.conf` file along
       with other optional files and directories which configure the way in
@@ -749,3 +868,16 @@ Glossary
       See also:
 
       * :ref:`Metadata`
+
+   Rosie Suite
+      A Rosie suite is a :term:`Rose suite configuration` which is managed
+      using the Rosie system.
+
+      When a suite is managed using Rosie:
+
+      * The :term:`suite directory` is added to version control.
+      * The suite is registered in a database.
+
+      See also:
+
+      * :ref:`Rosie Tutorial <tutorial-rosie>`

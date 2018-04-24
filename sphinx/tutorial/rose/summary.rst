@@ -13,6 +13,8 @@ So far we have covered:
 * Rose suite configurations.
 * Rosie suites.
 
+.. _cylc-rose-rosie-suite-relationship-diagram:
+
 The relationship between them is as follows:
 
 .. graph:: Example

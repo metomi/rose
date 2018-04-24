@@ -110,6 +110,8 @@ When a suite configuration is run:
 #. The Cylc suite is run.
 #. The Cylc GUI is launched.
 
+.. _rose-suite-installation-diagram:
+
 .. digraph:: Example
    :align: center
 

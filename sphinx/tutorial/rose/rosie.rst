@@ -1,6 +1,8 @@
 .. include:: ../../hyperlinks.rst
    :start-line: 1
 
+.. _tutorial-rosie:
+
 Rosie
 =====
 
