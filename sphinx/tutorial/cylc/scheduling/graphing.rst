@@ -9,8 +9,8 @@ In this section we will cover writing basic workflows in cylc.
 
 .. _Cylc file format:
 
-The suite.rc File Format
-------------------------
+The ``suite.rc`` File Format
+----------------------------
 
 We refer to a Cylc workflow as a :term:`Cylc suite`. A Cylc suite is a directory
 containing a ``suite.rc`` file. This configuration file is where

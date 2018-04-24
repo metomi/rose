@@ -51,8 +51,9 @@ additional functionality. See the `FCM User Guide`_ for more information.
 Suite Naming
 ------------
 
-Each Rosie suite is assigned a unique name made up of a prefix followed by a
-hyphen and then an identifier made up of two characters and three numbers e.g:
+Each Rosie suite is assigned a unique name made up of a *prefix* followed by a
+hyphen and then an *identifier* made up of two characters and three
+numbers, e.g:
 
 .. graph:: Example
    :align: center
@@ -77,8 +78,8 @@ The prefix denotes the repository in which the suite is located. Prefixes are
 site specific and are configured by the
 :rose:conf:`rose.conf[rosie-id]prefix-location.PREFIX` setting.
 
-Within the Rose user community the "u" prefix is typically configured to point
-at the `SRS`_ repository.
+Within the Rose user community the ``u`` prefix is typically configured to
+point at the `SRS`_ repository.
 
 
 The :rose:file:`rose-suite.info` File
@@ -86,14 +87,16 @@ The :rose:file:`rose-suite.info` File
 
 All Rosie suites require a :rose:file:`rose-suite.info` file. This file provides information about the suite for use in the suite management and version control
 systems. The :rose:file:`rose-suite.info` file uses the
-`Rose Configuration Format <tutorial-rose-configurations>`_, the main settings
-are:
+:ref:`Rose Configuration Format <tutorial-rose-configurations>`.
+The main settings are:
 
 ``title``
    A short title for the suite.
 ``owner``
-   The user who has control over the suite (i.e. your username).
+   The user who has control over the suite (i.e. their username).
 ``project``
+   .. TODO - add in description.
+
    ???
 ``access-list``
    An optional list of users who have permission to commit to the trunk of the
@@ -103,18 +106,18 @@ are:
 Managing Suites
 ---------------
 
-Rosie provides commands for managing suites including:
+Rosie provides commands for managing suites, including:
 
 :ref:`command-rosie-checkout`
    Creates a local copy of a suite.
 :ref:`command-rosie-ls`
    Lists all locally checked-out suites.
 :ref:`command-rosie-lookup`
-   Search the suite database (using information from suite's
+   Searches the suite database (using information from suite's
    :rose:file:`rose-suite.info` files).
 
-Rosie also provides a GUI which incorporates the functionality of the above
-commands called :ref:`command-rosie-go`.
+Rosie also provides a GUI called :ref:`command-rosie-go` which incorporates
+the functionality of the above commands.
 
 .. figure:: img/rosie-go-annotated.png
    :align: center
@@ -128,9 +131,10 @@ commands called :ref:`command-rosie-go`.
 
 .. practical::
 
-   .. rubric:: In this practical we will add the Weather Forecasting Suite from
-      the previous practical to a rosie repository make some changes and commit
-      them to the repository.
+   .. rubric:: In this practical we will add the
+      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      from the :ref:`previous practical <suites-practical>` to a rosie
+      repository, make some changes, and commit them to the repository.
 
    .. note::
       :class: tip
@@ -145,7 +149,7 @@ commands called :ref:`command-rosie-go`.
       You will probably want to use a "testing" repository if one is available
       to you.
 
-      You can specify the repository to use with the ``--prefix`` command line
+      You can specify the repository to use with the ``--prefix`` command-line
       option. For instance to use the (internal) Met Office Testing Repository
       supply the command line argument ``--prefix=mot``.
 
@@ -163,8 +167,8 @@ commands called :ref:`command-rosie-go`.
          If the text editor does not appear you may have to press enter on the
          keyboard.
 
-      Rosie will create the new suite in the ``~/roses`` directory, the exact
-      location will appear in the command output. Move into the suite
+      Rosie will create the new suite in the ``~/roses`` directory and the
+      exact location will appear in the command output. Move into the suite
       directory:
 
       .. code-block:: sub
@@ -182,68 +186,70 @@ commands called :ref:`command-rosie-go`.
 
          fcm st
 
-      You should see a list of files with the ``?`` symbols next to them
-      meaning that they are un-tracked (not version controlled). Add all
-      un-tracked files to version control by running::
+      You should see a list of files with the ``?`` symbol next to them,
+      as well as :file:`rose-suite.conf` with an ``M`` symbol beside it. ``?``
+      means the files marked are untracked (not version controlled), whereas
+      ``M`` indicates files which have been modified. Add all untracked files
+      to version control by running::
 
          fcm add --check .
 
-      Answer yes where prompted. Now check the status again::
+      Answer yes ("y") where prompted. Now check the status again::
 
          fcm st
 
-      You should see a list of files with the ``A`` character next to them
-      meaning "added". Finally commit the changes by running::
+      You should see a list of files with the ``A`` character, meaning "added",
+      next to them. Finally commit the changes by running::
 
          fcm ci
 
-      A text editor will open, add a message for your commit, save the file and
-      close the editor. You will the be prompted whether you want to make the
-      commit, answer yes.
+      A text editor will open. Add a message for your commit, save the file and
+      close the editor. You will then be prompted as to whether you want to
+      make the commit. Answer yes.
 
       You have now added the Weather Forecasting Suite to version control. Open
       the Trac browser to see your suite::
 
          fcm browse
       
-      A web browser window will open showing the Trac page for your Rosie
+      A web browser window will open, showing the Trac page for your Rosie
       suite.
 
       .. TODO - Note remove ?rev=xxxx to see latest revision?
 
    #. **Find The Suite In Rosie Go.**
 
-      Open The :ref:`command-rosie-go` GUI::
+      Open the :ref:`command-rosie-go` GUI::
 
          rosie go &
 
-      Open the advanced search options by clicking the add :guilabel:`+`
+      Open the advanced search options by clicking the add (:guilabel:`+`)
       button in the top right-hand corner of the window.
 
       Search for suites which you have authored by selecting :guilabel:`author`
-      and filling in your username into the right-hand box:
+      and filling in your username in the right-hand box:
 
       .. image:: img/rosie-go-author-search.png
          :align: center
          :alt: rosie go advanced search for author screenshot
 
       Press :guilabel:`Search`. You should see your suite appear with a home
-      icon next to it meaning that you have a local copy checked out.
+      icon next to it, meaning that you have a local copy checked out.
 
-      Right-click on the suite and click :guilabel:`Info`, you should see the
-      information defined in the :rose:file:`rose-suite.info` file.
+      Right-click on the suite and then click :guilabel:`Info`. You should
+      see the information defined in the :rose:file:`rose-suite.info` file.
 
       .. admonition:: Help
          :class: tip
 
-         If your suite does not show up select the menu item
+         If your suite does not show up, select the menu item
          :menuselection:`Edit --> Data Source` and ensure the repository you
          committed to is checked.
 
    #. **Checkout The Suite.**
 
       Now that the suite is in the Rosie repository a working copy can be
-      checked out on any machine with access to the repository by doing:
+      checked out on any machine with access to the repository by executing:
 
       .. code-block:: sub
 
@@ -257,18 +263,22 @@ commands called :ref:`command-rosie-go`.
          rm -rf <suite>
          rosie checkout <suite>
 
+.. TODO - introduce practical extension / mention what useful for (or similar).
 
 .. practical-extension::
 
    #. **Make Changes In A Branch.**
 
-      Next we will make a change to the suite. Rather than making the change in
-      the "trunk" (referred to as "master" in git terminology) we will work in a
-      new "branch".
+      Next we will make a change to the suite. Rather than making this change
+      in the "trunk" (referred to as "master" in git terminology) we will
+      work in a new "branch".
 
       Create a new branch called "configuration-change" by running::
 
          fcm bc configuration-change
+
+      Provide a brief commit message of your choosing when prompted and enter
+      yes ("y").
 
       You can list all branches by running::
 
@@ -278,16 +288,16 @@ commands called :ref:`command-rosie-go`.
 
          fcm sw configuration-change
 
-      Next, either by using the :ref:`command-rose-config-edit` GUI or a text
-      editor change the ``RESOLUTION`` setting in the
+      Next, either using the :ref:`command-rose-config-edit` GUI or a text
+      editor, change the ``RESOLUTION`` setting in the
       :rose:file:`rose-suite.conf` file to ``0.1``.
 
       Check the status of the project::
 
          fcm st
 
-      You should see the :rose:file:`rose-suite.conf` file with a ``M`` next to
-      it meaning modified. Commit the change by running::
+      You should see the :rose:file:`rose-suite.conf` file with a ``M``,
+      meaning modified, next to it. Commit the change by running::
 
          fcm ci
 

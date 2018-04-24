@@ -50,12 +50,12 @@ file. These variables can then be used in the ``suite.rc`` file:
    :caption: suite.rc
 
    [scheduling]
-      [[dependencies]]
-         graph = hello_{{WORLD}}
+       [[dependencies]]
+           graph = hello_{{WORLD}}
 
    [runtime]
-      [[hello_{{WORLD}}]]
-          script = echo "$GREETING {{WORLD}}"
+       [[hello_{{WORLD}}]]
+           script = echo "$GREETING {{WORLD}}"
 
 
 .. _Suite Directory Vs Run Directory:
@@ -64,10 +64,10 @@ Suite Directory Vs Run Directory
 --------------------------------
 
 :term:`suite directory`
-   The directory in which the suite is written, the ``suite.rc`` and
+   The directory in which the suite is written. The ``suite.rc`` and
    :rose:file:`rose-suite.conf` files live here.
 :term:`run directory`
-   The directory in which the suite runs, the ``work``, ``share`` and ``log``
+   The directory in which the suite runs. The ``work``, ``share`` and ``log``
    directories live here.
 
 Throughout the :ref:`Cylc Tutorial` we wrote suites in the ``cylc-run``
@@ -85,9 +85,9 @@ running.
 
    Using Cylc it is possible to separate the :term:`suite directory` and
    :term:`run directory` using the ``cylc register`` command. Note though
-   that suite resources e.g. scripts in the ``bin/`` directory will remain in
-   the :term:`suite directory` so cannot safely be edited whilst the suite is
-   running.
+   that suite resources, e.g. scripts in the ``bin/`` directory, will remain
+   in the :term:`suite directory` so cannot safely be edited whilst the suite
+   is running.
 
 
 Running Rose Suite Configurations
@@ -101,14 +101,14 @@ Rose :ref:`Application Configurations <Application Configuration>` are run using
 
 When a suite configuration is run:
 
-#. The :term:`suite directory` is coppied into the ``cylc-run`` directory where
+#. The :term:`suite directory` is copied into the ``cylc-run`` directory where
    it becomes the :term:`run directory`.
 #. Any files defined in the :rose:file:`rose-suite.conf` file are installed.
 #. Jinja2 variables defined in the :rose:file:`rose-suite.conf` file are added
    to the top of the ``suite.rc`` file.
 #. The Cylc suite is validated.
 #. The Cylc suite is run.
-#. The Cylc gui is launched.
+#. The Cylc GUI is launched.
 
 .. _rose-suite-installation-diagram:
 
@@ -170,7 +170,7 @@ from other locations using the ``-C`` argument::
    rose suite-run -C /path/to/suite/configuration/
 
 The ``--local-install-only`` command line option will cause the suite
-to be installed (only on your local machine not on any job hosts) and
+to be installed (though only on your local machine, not on any job hosts) and
 validated but not run (i.e. :ref:`steps 1-4 <rose-suite-run-stages>`).
 
 
@@ -191,16 +191,16 @@ The name can be overridden using the ``--name`` option i.e:
    Suites must be run using the :ref:`command-rose-suite-run` command which
    in turn calls the ``cylc run`` command.
 :ref:`Stopping Suites`
-   Suites can be stopped using the ``cylc stop <SUITE_NAME>`` as for regular
-   Cylc suites.
+   Suites can be stopped using the ``cylc stop <SUITE_NAME>`` command,
+   as for regular Cylc suites.
 :ref:`Restarting Suites`
    There are two options for restarting:
 
    * To pick up where the suite left off use :ref:`command-rose-suite-restart`.
      No changes will be made to the run directory. *This is usually the
      recommended option.*
-   * To restart picking up changes made in the suite directory use the
-     ``--restart`` option with :ref:`command-rose-suite-run`.
+   * To restart in a way that picks up changes made in the suite directory,
+     use the ``--restart`` option to the :ref:`command-rose-suite-run` command.
 
 See the :ref:`Cheat Sheet` for more information.
 
@@ -209,26 +209,28 @@ See the :ref:`Cheat Sheet` for more information.
    :ref:`command-rose-suite-run` installs suites to the run directory
    incrementally so if you change a file and restart the suite using
    ``rose suite-run --restart`` only the changed file will be re-installed.
-   This process is strictly constructive, any files deleted in the suite
+   This process is strictly constructive i.e. any files deleted in the suite
    directory will *not* be removed from the run directory. To force
    :ref:`command-rose-suite-run` to perform a complete rebuild, use the
    ``--new`` option.
 
+.. _suites-practical:
 
 .. practical::
 
    .. rubric:: In this tutorial we will create a Rose Suite Configuration for
-      the :ref:`Weather Forecasting Suite<tutorial-datetime-cycling-practical>`.
+      the
+      :ref:`weather-forecasting suite<tutorial-datetime-cycling-practical>`.
 
    #. **Create A New Suite.**
 
-      Create a copy of the :ref:`weather forecasting suite
+      Create a copy of the :ref:`weather-forecasting suite
       <tutorial-cylc-runtime-forecasting-suite>` by running::
 
          rose tutorial rose-suite-tutorial ~/rose-tutorial/rose-suite-tutorial
          cd ~/rose-tutorial/rose-suite-tutorial
 
-      Set the initial and final cycle points as :ref:`in previous tutorials
+      Set the initial and final cycle points as in :ref:`previous tutorials
       <tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points>`.
 
    #. **Create A Rose Suite Configuration.**
@@ -270,7 +272,7 @@ See the :ref:`Cheat Sheet` for more information.
       Create a ``meta/rose-meta.conf`` file and write some metadata for the
       settings defined in the :rose:file:`rose-suite.conf` file.
 
-      * ``station`` is a list of un-limited length.
+      * ``station`` is a list of unlimited length.
       * ``RESOLUTION`` is a "real" number.
       * ``DOMAIN`` is a list of four integers.
 
@@ -310,7 +312,7 @@ See the :ref:`Cheat Sheet` for more information.
       We can delete the ``RESOLUTION`` and ``DOMAIN`` settings in the
       ``[runtime][root][environment]`` section which would otherwise override
       the variables we have just defined in the :rose:file:`rose-suite.conf`
-      file.
+      file, like so:
 
       .. code-block:: diff
 
@@ -325,7 +327,7 @@ See the :ref:`Cheat Sheet` for more information.
          -            # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          -            DOMAIN = -12,48,5,61  # Do not change!
 
-      We can write out the list of stations using the `Jinja2`_ ``join``
+      We can write out the list of stations, using the `Jinja2`_ ``join``
       filter to write the commas between the list items:
 
       .. code-block:: diff
@@ -344,27 +346,26 @@ See the :ref:`Cheat Sheet` for more information.
       Running :ref:`command-rose-suite-run` will cause the suite to be
       installed, validated and run.
 
-      The ``--local-install-only`` command line option will cause the suite
-      to be installed (only on your local machine not on any job hosts) and
-      validated but not run.
-
-      Install the suite::
+      Use the ``--local-install-only`` command-line option to install the
+      suite on your local machine and validate it::
 
          rose suite-run --local-install-only
 
-      Inspect the installed suite, you will find it in::
+      Inspect the installed suite, which you will find in
+      the :term:`run directory`, i.e::
 
          ~/cylc-run/rose-suite-tutorial
 
-      You shuld find all files contained in the :term:`suite directory` as well
-      as the :term:`run directory` folders ``log``, ``work`` and ``share``.
+      You should find all the files contained in the :term:`suite directory`
+      as well as the :term:`run directory` folders ``log``, ``work`` and
+      ``share``.
 
 
 Rose Applications In Rose Suite Configurations
 ----------------------------------------------
 
 In Cylc suites, Rose applications are placed in an ``app/`` directory which
-is copied across to run directory with the rest of the suite by
+is copied across to the :term:`run directory` with the rest of the suite by
 :ref:`command-rose-suite-run` when the suite configuration is run.
 
 When we run Rose applications in Cylc suites we use the
@@ -376,9 +377,9 @@ name as the Cylc task in the ``app/`` directory.
 
 The :ref:`command-rose-task-run` command also interfaces with Cylc to provide
 a few useful environment variables (see the
-:ref:`command line reference <command-rose-task-run>` for details). The
-application will run in the :term:`work directory` the same as a regular Cylc
-task.
+:ref:`command-line reference <command-rose-task-run>` for details). The
+application will run in the :term:`work directory`, just like for a
+regular Cylc task.
 
 In this example the ``hello`` task will run the application located in
 ``app/hello/``:
@@ -387,8 +388,8 @@ In this example the ``hello`` task will run the application located in
    :caption: suite.rc
 
    [runtime]
-      [[hello]]
-         script = rose task-run
+       [[hello]]
+           script = rose task-run
 
 .. code-block:: rose
    :caption: app/hello/rose-app.conf
@@ -397,7 +398,7 @@ In this example the ``hello`` task will run the application located in
    default=echo "Hello World!"
 
 The name of the application to run can be overridden using the ``--app-key``
-command line option or the :envvar:`ROSE_TASK_APP` environment variable. For
+command-line option or the :envvar:`ROSE_TASK_APP` environment variable. For
 example the ``greetings`` :term:`task` will run the ``hello`` :term:`app <Rose
 app>` in the task defined below.
 
@@ -405,8 +406,8 @@ app>` in the task defined below.
    :caption: suite.rc
 
    [runtime]
-      [[greetings]]
-         script = rose task-run --app-key hello
+       [[greetings]]
+           script = rose task-run --app-key hello
 
 
 Rose Bush
@@ -414,8 +415,8 @@ Rose Bush
 
 .. TODO - move this into the Cylc tutorial with the upcomming Cylc "nameless".
 
-Rose provides a utility for viewing the status and logs for Cylc suites called
-Rose Bush. Rose Bush displays suite information in web-pages.
+Rose provides a utility for viewing the status and logs of Cylc suites called
+Rose Bush. Rose Bush displays suite information in web pages.
 
 .. figure:: img/rose-bush.png
    :alt: Rose Bush screenshot
@@ -423,19 +424,19 @@ Rose Bush. Rose Bush displays suite information in web-pages.
 
    Screenshot of a Rose Bush web page.
 
-If a Bose Bush server is provided at your site you can open the Rose Bush
+If a Rose Bush server is provided at your site, you can open the Rose Bush
 page for a suite by running the :ref:`command-rose-suite-log` command
 in the suite directory.
 
-Otherwise an add-hoc web-server can be set up using the
-:ref:`command-rose-bush` ``start`` command.
+Otherwise an add-hoc web server can be set up using the
+:ref:`command-rose-bush` ``start`` command argument.
 
 
 .. practical::
 
    .. rubric:: In this practical we will take the ``forecast`` Rose application
       that we developed in the :ref:`Metadata Tutorial <tutorial-rose-metadata>`
-      and integrate it into the :ref:`Weather Forecasting Suite
+      and integrate it into the :ref:`weather-forecasting suite
       <tutorial-datetime-cycling-practical>`.
 
    Move into the suite directory from the previous practical::
@@ -445,19 +446,19 @@ Otherwise an add-hoc web-server can be set up using the
    You will find a copy of the ``forecast`` application located in
    ``app/forecast``.
 
-   #. **Create A "test" Configuration For The** ``forecast`` **Application.**
+   #. **Create A Test Configuration For The** ``forecast`` **Application.**
 
       We have configured the ``forecast`` application to use test data. We will
       now adjust this configuration to make it work with real data generated by
       the Cylc suite. It is useful to keep the ability to run the application
-      using test data so we won't delete this configuration but, instead we
-      will move it into an :ref:`Optional Configuration`. This way we can run
+      using test data, so we won't delete this configuration. Instead we
+      will move it into an :ref:`Optional Configuration` so that we can run
       the application in "test mode" or "live mode".
 
       Optional configurations are covered in more detail in the
       :ref:`Optional Configurations
-      Tutorial <rose-tutorial-optional-configurations>`, for now all we need to
-      know is that they enable use to store alternative configurations.
+      Tutorial <rose-tutorial-optional-configurations>`. For now all we need to
+      know is that they enable us to store alternative configurations.
 
       Create an optional configuration called ``test`` inside the ``forecast``
       application::
@@ -465,9 +466,14 @@ Otherwise an add-hoc web-server can be set up using the
          mkdir app/forecast/opt
          touch app/forecast/opt/rose-app-test.conf
 
-      This optional configuration is a regular Rose configuration file, its
+      This optional configuration is a regular Rose configuration file. Its
       settings will override those in the :rose:file:`rose-app.conf` file if
       requested.
+
+      .. tip::
+
+         Take care not to confuse the ``rose-app.conf`` and
+         ``rose-app-test.conf`` files used within this practical.
 
       Move the following environment variables from the
       ``app/forecast/rose-app.conf`` file into an ``[env]``
@@ -500,7 +506,7 @@ Otherwise an add-hoc web-server can be set up using the
             RESOLUTION=0.2
             DOMAIN=-12,48,5,61
 
-      Run the application in "test" mode by providing the option
+      Run the application in "test mode" by providing the option
       ``--opt-conf-key=test`` to the :ref:`command-rose-app-run` command::
 
          mkdir app/forecast/run
@@ -521,15 +527,17 @@ Otherwise an add-hoc web-server can be set up using the
       ``suite.rc`` file.
 
       Copy the remaining environment variables defined in the ``forecast``
-      task of the ``suite.rc`` file into the :rose:file:`rose-app.conf` file
-      of the ``forecast`` application.
+      task within the ``suite.rc`` file into the :rose:file:`rose-app.conf`
+      file of the ``forecast`` application, replacing any values already
+      specified if necessary. Remove the lines from the ``suite.rc`` file
+      when you are done.
 
       .. TODO - remove triple quotes in Cylc tutorial
 
       Remember, in Rose configuration files:
 
-      * We don't use spaces around the equals ``=`` operator.
-      * Environment variables shouldn't be quoted.
+      * Spaces are not used around the equals (``=``) operator.
+      * Environment variables should not be quoted.
 
       .. TODO -- what what, point this out earlier!
 
@@ -541,22 +549,22 @@ Otherwise an add-hoc web-server can be set up using the
          [env]
          INTERVAL=60
          N_FORECASTS=5
+         WEIGHTING=1
          MAP_TEMPLATE=map-template.html
          SPLINE_LEVEL=0
          WIND_FILE_TEMPLATE=$CYLC_SUITE_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
          WIND_CYCLES=0, -3, -6
          RAINFALL_FILE=$CYLC_SUITE_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
-         # Create the html map file in the task's log directory.
          MAP_FILE=${CYLC_TASK_LOG_ROOT}-map.html
 
       Finally we need to change the ``forecast`` task to run
-      :ref:`command-rose-task-run`. Change the ``script`` setting, the runtime
-      section for the ``forecast`` task should now look like this:
+      :ref:`command-rose-task-run`. The runtime section for the ``forecast``
+      task should now look like this:
 
       .. code-block:: cylc
 
          [[forecast]]
-            script = rose task-run
+             script = rose task-run
 
    #. **Make Changes To The Configuration.**
 
@@ -567,9 +575,17 @@ Otherwise an add-hoc web-server can be set up using the
 
       Navigate to the :guilabel:`forecast > env` panel.
 
-      Add a new variable called ``WEIGHTING`` and set it to the values::
+      Edit the ``WEIGHTING`` variable so that it is equal to the following
+      list of values::
 
          0.7, 0.2, 0.1
+
+      .. tip::
+
+         Click the "Add array element" button (:guilabel:`+`) to extend the
+         number of elements assigned to ``WEIGHTING``.
+
+      Finally, save these settings via :guilabel:`File > Save` in the menu.
 
    #. **Run The Suite.**
 
@@ -577,7 +593,7 @@ Otherwise an add-hoc web-server can be set up using the
 
          rose suite-run
 
-      The ``cylc gui`` should open, the suite should run and complete.
+      The ``cylc gui`` should open and the suite should run and complete.
 
    #. **View Output In Rose Bush.**
 
@@ -586,10 +602,10 @@ Otherwise an add-hoc web-server can be set up using the
 
          rose suite-log
 
-      On this page you will see the tasks run by the suite ordered from most to
-      least recent. Near the top you should see an entry for the ``forecast``
-      task. On the right-hand side of the screen click
+      On this page you will see the tasks run by the suite, ordered from most
+      to least recent. Near the top you should see an entry for the
+      ``forecast`` task. On the right-hand side of the screen click
       :guilabel:`job-map.html`.
       
-      As this file has a ``.html`` extension Rose Bush will render it,
-      otherwise the raw text would be displayed.
+      As this file has a ``.html`` extension Rose Bush will render it.
+      The raw text would be displayed otherwise.

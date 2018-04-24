@@ -54,9 +54,9 @@ section e.g:
    [env]
    WORLD=Earth
 
-Scripts and executables can be placed in a ``bin/`` directory, they will be
+Scripts and executables can be placed in a ``bin/`` directory. They will be
 automatically added to the ``PATH`` environment variable when the application
-is run e.g.:
+is run, e.g.:
 
 .. code-block:: bash
    :caption: bin/hello
@@ -82,10 +82,10 @@ An application can be run using the :ref:`command-rose-app-run` command:
    $ rose app-run -q  # -q for quiet output
    Hello Earth!
 
-The application will run in the current directory so it is a good idea to run
-the application elsewhere to keep run files separate. If running the Rose
-application from outside of the :term:`application directory` the ``-C`` option
-can be used to provide the path to the Rose application:
+The Rose application will by default run in the current directory so it is a
+good idea to run it outside of the :term:`application directory` to keep run
+files separate, using the  ``-C`` option to provide the path to the
+application:
 
 .. code-block:: console
 
@@ -117,11 +117,11 @@ can be used to provide the path to the Rose application:
    #. **Move the required resources into the** ``application-tutorial``
       **application.**
 
-      The application requires three resources.
+      The application requires three resources:
 
       * The ``bin/forecast`` script.
-      * The ``lib/python/util.py`` python library.
-      * The ``lib/template/map.html`` html template.
+      * The ``lib/python/util.py`` Python library.
+      * The ``lib/template/map.html`` HTML template.
 
       Rather than leaving these resources scattered throughout the
       :term:`suite directory` we can encapsulate them into the
@@ -132,17 +132,18 @@ can be used to provide the path to the Rose application:
 
          rose tutorial forecast-script bin
 
-      These file will be automatically added to the ``PATH`` when the
+      These files will be automatically added to the ``PATH`` when the
       application is run.
 
-      Copy the html template into the ``file/`` directory by running::
+      Copy the HTML template into the ``file/`` directory by running::
 
          rose tutorial map-template file
 
    #. **Create the** :rose:file:`rose-app.conf` **file.**
 
       The :rose:file:`rose-app.conf` file needs to define the command to run.
-      Create a :rose:file:`rose-app.conf` file containing the following:
+      Create a :rose:file:`rose-app.conf` file directly inside the
+      :term:`application directory` containing the following:
 
       .. code-block:: rose
 
@@ -150,7 +151,8 @@ can be used to provide the path to the Rose application:
          default=forecast $INTERVAL $N_FORECASTS
 
       The ``INTERVAL`` and ``N_FORECASTS`` environment variables need to be
-      defined, to do this add an :rose:conf:`rose-app.conf[env]` section:
+      defined. To do this add a :rose:conf:`rose-app.conf[env]` section
+      to the file:
 
       .. code-block:: rose
 
@@ -173,8 +175,8 @@ can be used to provide the path to the Rose application:
       * ``MAP_FILE``
       * ``MAP_TEMPLATE``
 
-      We will now move these into the application. This way all of the
-      configuration speciffic to the application live within it.
+      We will now move these into the application. This way, all of the
+      configuration specific to the application live within it.
 
       Add the following lines to the :rose:conf:`rose-app.conf[env]` section:
 
@@ -186,18 +188,18 @@ can be used to provide the path to the Rose application:
          # Comma separated list of cycle points to get wind data from.
          WIND_CYCLES=0
          # Path to the wind files. {cycle}, {xy} will get filled in by the
-         # forecast script
+         # forecast script.
          WIND_FILE_TEMPLATE=test-data/wind_{cycle}_{xy}.csv
          # Path to the rainfall file.
          RAINFALL_FILE=test-data/rainfall.csv
-         # The path to create the html map in.
+         # The path to create the HTML map in.
          MAP_FILE=map.html
-         # The path to the html map template file.
+         # The path to the HTML map template file.
          MAP_TEMPLATE=map-template.html
 
       To start with we will run this application with test data outside of a
       suite so the ``WIND_FILE_TEMPLATE`` and ``RAINFALL_FILE`` environment
-      variables have been set to point at files in the ``test-data`` directroy
+      variables have been set to point at files in the ``test-data`` directory
       which we will create in the next step.
 
       To make this application work outside of a suite we will also need to
@@ -210,11 +212,11 @@ can be used to provide the path to the Rose application:
 
       .. code-block:: rose
 
-         # The cycle point for the test data
+         # The cycle point for the test data.
          CYLC_TASK_CYCLE_POINT=20171101T0000Z
          # The dimensions of each grid cell in degrees.
          RESOLUTION=0.2
-         # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+         # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          DOMAIN=-12,48,5,61
 
    #. **Copy the test data.**
@@ -226,20 +228,17 @@ can be used to provide the path to the Rose application:
    #. **Run the application.**
 
       All of the scripts, libraries, files and environment variables required
-      to make a forecast are now all provided inside this application directory.
+      to make a forecast are now provided inside this application directory.
 
-      We should now be able to run the application. :ref:`command-rose-app-run`
-      will run an application in the current directory so it is a good idea to
-      move somewhere else before calling the command.
+      We should now be able to run the application.
 
-      Create a directory and run the application in it::
+      :ref:`command-rose-app-run` will run an application in the current
+      directory so it is a good idea to move somewhere else before calling
+      the command. Create a directory and run the application in it::
 
          mkdir run
          cd run
          rose app-run -C ../
 
-      The ``-C`` argument to :ref:`command-rose-app-run` provides the path to
-      the application directory.
-
-      The application should run successuly leaving behind some files. Try
-      opening the ``map.html`` file.
+      The application should run successfully, leaving behind some files. Try
+      opening the ``map.html`` file in a web browser.

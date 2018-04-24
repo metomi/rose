@@ -132,7 +132,8 @@ to be annual. E.G:
 * ``01T00``: every month on the first of the month.
 * ``T00``: every day at midnight.
 * ``T-00``: every hour at zero minutes past (every hour on the hour).
-  *Note that the ``-`` character takes the place of the hour digits as we may not omit components after the ``T`` character.*
+  *Note that the* ``-`` *character takes the place of the hour digits*
+  *as we may not omit components after the* ``T`` *character.*
 
 Recurrence Formats
 ^^^^^^^^^^^^^^^^^^

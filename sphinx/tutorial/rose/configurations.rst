@@ -7,8 +7,8 @@ Rose Configurations
 ===================
 
 :term:`Rose configurations <Rose configuration>` are directories containing a
-Rose configuration file along with other optional assets which define behaviour
-such as:
+Rose configuration file along with other optional assets which define
+behaviours such as:
 
 * Execution.
 * File installation.
@@ -33,18 +33,21 @@ Rose configurations are directories containing a Rose configuration file along
 with other optional files and directories.
 
 All Rose configuration files use the same format which is based on the `INI`_
-file format.
+file format. *Like* the file format for :ref:`Cylc suites <Cylc file format>`:
 
 * Comments start with a ``#`` character.
 * Settings are written as ``key=value`` pairs.
 * Sections are written inside square brackets i.e. ``[section-name]``
 
-Unlike the :ref:`Cylc file format`:
+However, there are also key differences, and *unlike* the file format for
+:ref:`Cylc suites <Cylc file format>`:
 
 * Sections cannot be nested.
 * Settings should not be indented.
 * Comments must start on a new line (i.e. you cannot have inline comments).
 * There should not be spaces around the ``=`` operator in a ``key=value`` pair.
+
+For example:
 
 .. code-block:: rose
 
@@ -59,10 +62,10 @@ Unlike the :ref:`Cylc file format`:
 
 Throughout this tutorial we will refer to settings in the following format:
 
-* ``file`` - would refer to a Rose configuration file.
-* ``file|setting`` - would refer to a setting in a Rose configuration file.
-* ``file[section]`` - would refer to a section in a Rose configuration file.
-* ``file[section]setting`` - would refer to a setting in a section in a Rose
+* ``file`` - will refer to a Rose configuration *file*.
+* ``file|setting`` - will refer to a *setting* in a Rose configuration file.
+* ``file[section]`` - will refer to a *section* in a Rose configuration file.
+* ``file[section]setting`` - will refer to a *setting in a section* in a Rose
   configuration file.
 
 
