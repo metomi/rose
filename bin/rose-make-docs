@@ -32,6 +32,9 @@
 #         if necessary.
 #     --dev
 #         Development mode, don't remove virtualenv after build.
+#     --strict
+#         Disable cashe forcing a complete re-build and turn warnings into
+#         errors.
 #
 # BUILD
 #     The format(s) to build the documentation in - default html.
@@ -54,9 +57,6 @@
 #
 #     `doctest`
 #         Runs any doctest examples present in documented python modules.
-#     `strict`
-#         Runs sphinx-build in a "strict" mode where caching is turned off and
-#         warnings are turned into errors.
 #     `linkcheck`
 #         Checks external links.
 #
@@ -106,6 +106,7 @@ VENV_MODE=false
 FORCE=false
 DEV_MODE=false
 BUILDS=''
+SPHINXOPTS=''
 while [[ $# -gt 0 ]]; do
     case $1 in
         --venv)
@@ -118,6 +119,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --force)
             FORCE=true
+            shift
+            ;;
+        --strict)
+            SPHINXOPTS='SPHINXOPTS=-aEW'
             shift
             ;;
         *)
@@ -187,7 +192,7 @@ if ! rose-check-software --doc >/dev/null; then
 fi
 
 # Run sphinx make.
-make -C "${SPHINX_PATH}" ${BUILDS}
+make -C "${SPHINX_PATH}" ${BUILDS} "${SPHINXOPTS}"
 
 # Remove virtualenv if used and if we are not in development mode.
 if "${USING_VENV}"; then
