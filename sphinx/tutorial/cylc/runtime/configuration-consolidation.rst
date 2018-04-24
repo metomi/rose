@@ -612,7 +612,7 @@ the parameter (in the present case ``param``):
 
    [runtime]
        [[task<param=bar>]]
-           # This is equivalent to `echo 'bar'`
+           # This is equivalent to `echo 'bar'`
            script = echo $CYLC_TASK_PARAM_param
 
 Parameters can be either words or integers:

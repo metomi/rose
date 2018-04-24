@@ -14,11 +14,12 @@
 .. _Cylc Suite Design Guide: http://cylc.github.io/cylc/doc/suite-design-guide.pdf
 .. _FCM: https://metomi.github.io/fcm/doc/
 .. _FCM User Guide: http://metomi.github.io/fcm/doc/user_guide/
-.. _Github: https://github.com/metomi/rose
 .. _INI: https://en.wikipedia.org/wiki/INI_file
 .. _Jinja2: http://jinja.pocoo.org/
 .. _metomi-vms: https://github.com/metomi/metomi-vms
 .. _PyGTK: http://www.pygtk.org/
 .. _Python: https://www.python.org/
 .. _Python Regular Expressions: https://docs.python.org/2/library/re.html#regular-expression-syntax
+.. _Rose GitHub: https://github.com/metomi/rose
 .. _SRS: https://code.metoffice.gov.uk/
+.. _SVN: https://subversion.apache.org/

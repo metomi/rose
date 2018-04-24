@@ -13,6 +13,8 @@ So far we have covered:
 * Rose suite configurations.
 * Rosie suites.
 
+.. _cylc-rose-rosie-suite-relationship-diagram:
+
 The relationship between them is as follows:
 
 .. graph:: Example
@@ -98,8 +100,11 @@ using commands such as ``cylc graph``, e.g:
 
 .. code-block:: sub
 
-   rose suite-run -l  # install the suite on the local host only - don't run it.
-   cylc graph <suite> # run cylc graph using the installed version of the suite.
+   # install the suite on the local host only - don't run it.
+   rose suite-run --local-install-only
+
+   # run cylc graph using the installed version of the suite.
+   cylc graph <suite>
 
 
 Rose Utilities

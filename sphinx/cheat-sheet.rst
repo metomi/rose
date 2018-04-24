@@ -109,6 +109,8 @@ suite without making any changes to the :term:`run directory`. Cylc will
          rose suite-restart
 
 
+.. _Reloading Suites:
+
 Reloading Suites
 ^^^^^^^^^^^^^^^^
 

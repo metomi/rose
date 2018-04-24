@@ -183,9 +183,9 @@ application:
       .. code-block:: rose
 
          # The weighting to give to the wind file from each WIND_CYCLE
-         # (should add up to 1).
+         # (comma separated list, values should add up to 1).
          WEIGHTING=1
-         # List of cycle points to get wind data from.
+         # Comma separated list of cycle points to get wind data from.
          WIND_CYCLES=0
          # Path to the wind files. {cycle}, {xy} will get filled in by the
          # forecast script.

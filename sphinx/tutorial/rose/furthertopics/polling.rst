@@ -30,7 +30,7 @@ file that looks like this:
            graph = """compose_letter => send_letter
                       bob => read_letter"""
 
-This is simple suite which consists of the following:
+This is a simple suite which consists of the following:
 
 * A ``compose_letter`` task.
 * A ``send_letter`` task which is run once the letter is composed.

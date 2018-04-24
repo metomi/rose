@@ -24,7 +24,7 @@ outside of the configuration.
 The :rose:file:`rose-meta.conf` file uses the standard 
 :ref:`Rose configuration format <tutorial-rose-configurations>`.
 
-The metadata for a setting is written in a section named ``section=setting``
+The metadata for a setting is written in a section named ``[section=setting]``
 where ``setting`` is the name of the setting and ``section`` is the section to
 which the setting belongs (left blank if the setting does not belong to
 a section).
@@ -47,7 +47,7 @@ would create a section called ``[env=WORLD]``.
    :caption: meta/rose-meta.conf
 
    [env=WORLD]
-   title=The name of the world to say hello to.
+   description=The name of the world to say hello to.
    values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 
 This example gives the ``WORLD`` variable a title and a list of allowed values.
@@ -165,6 +165,8 @@ For a full list of metadata items, see :rose:conf:`rose-meta.conf[SETTING]`.
       :ref:`command-rose-metadata-check`::
 
          rose metadata-check -C meta/
+
+      There should not be any errors so this check will silently pass.
       
       Next reload the metadata in the :ref:`command-rose-config-edit` window
       using the :menuselection:`Metadata --> Refresh Metadata` menu item.
@@ -191,7 +193,7 @@ For a full list of metadata items, see :rose:conf:`rose-meta.conf[SETTING]`.
       The ``WEIGHTING`` and ``WIND_CYCLES`` settings are different as we don't
       know how many items they will contain. For flexible lists we use a colon,
       so add the following line to the ``[env=WEIGHTING]`` and
-      ``[env=WIND_CYCLES`` sections:
+      ``[env=WIND_CYCLES]`` sections:
 
       .. code-block:: rose
 
