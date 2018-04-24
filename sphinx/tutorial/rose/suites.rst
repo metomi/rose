@@ -169,7 +169,7 @@ from other locations using the ``-C`` argument::
 
 The ``--local-install-only`` command line option will cause the suite
 to be installed (only on your local machine not on any job hosts) and
-validated but not run (i.e. :ref:`steps 1, 2 and 3 <rose-suite-run-stages>`).
+validated but not run (i.e. :ref:`steps 1-4 <rose-suite-run-stages>`).
 
 
 Start, Stop, Restart
