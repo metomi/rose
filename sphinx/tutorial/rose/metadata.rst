@@ -161,6 +161,8 @@ For a full list of metadata items, see :rose:conf:`rose-meta.conf[SETTING]`.
          description=The interval
                     =between forecasts.
 
+      .. TODO - this is a bit tedious, do something to speed this up.
+
       Once you have finished save your work and validate the metadata using
       :ref:`command-rose-metadata-check`::
 

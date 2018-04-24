@@ -368,7 +368,7 @@ In Cylc suites, Rose applications are placed in an ``app/`` directory which
 is copied across to the :term:`run directory` with the rest of the suite by
 :ref:`command-rose-suite-run` when the suite configuration is run.
 
-When we run Rose applications in Cylc suites we use the
+When we run Rose applications from within Cylc suites we use the
 :ref:`command-rose-task-run` command rather than the
 :ref:`command-rose-app-run` command.
 
@@ -523,7 +523,7 @@ Otherwise an add-hoc web server can be set up using the
 
       We have moved the map template file (``map-template.html``) into the
       ``forecast`` application so we can delete the ``MAP_TEMPLATE``
-      environment variable from the ``forecast`` section of the
+      environment variable from the ``[runtime]forecast`` section of the
       ``suite.rc`` file.
 
       Copy the remaining environment variables defined in the ``forecast``
@@ -558,8 +558,8 @@ Otherwise an add-hoc web server can be set up using the
          MAP_FILE=${CYLC_TASK_LOG_ROOT}-map.html
 
       Finally we need to change the ``forecast`` task to run
-      :ref:`command-rose-task-run`. The runtime section for the ``forecast``
-      task should now look like this:
+      :ref:`command-rose-task-run`. The ``[runtime]forecast`` section of the
+      ``suite.rc`` file should now look like this:
 
       .. code-block:: cylc
 

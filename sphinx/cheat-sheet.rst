@@ -35,7 +35,7 @@ Starting Suites
          rose suite-run
 
          # run a suite in another directory:
-         rose suite-run --path <path>
+         rose suite-run -C <path>
 
          # run using a custom name:
          rose suite-run --name <name>
