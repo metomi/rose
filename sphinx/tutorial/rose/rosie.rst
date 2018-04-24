@@ -187,7 +187,7 @@ the functionality of the above commands.
          fcm st
 
       You should see a list of files with the ``?`` symbol next to them,
-      as well as ``rose-suite.conf`` with an ``M`` symbol beside it. ``?``
+      as well as :file:`rose-suite.conf` with an ``M`` symbol beside it. ``?``
       means the files marked are untracked (not version controlled), whereas
       ``M`` indicates files which have been modified. Add all untracked files
       to version control by running::
