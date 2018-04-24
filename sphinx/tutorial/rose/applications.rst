@@ -162,6 +162,17 @@ application:
          # The number of forecasts to run.
          N_FORECASTS=5
 
+   #. **Copy the test data.**
+
+      For now we will run the ``forecast`` application using some sample data
+      so that we can run it outside of the weather forecasting suite.
+
+      The test data was gathered in November 2017.
+
+      Copy the test data files into the ``file/`` directory by running::
+
+         rose tutorial test-data file/test-data
+
    #. **Move environment variables defined in the** ``suite.rc`` **file.** 
 
       In the ``[runtime][forecast][environment]`` section of the ``suite.rc``
@@ -197,12 +208,11 @@ application:
          # The path to the HTML map template file.
          MAP_TEMPLATE=map-template.html
 
-      To start with we will run this application with test data outside of a
-      suite so the ``WIND_FILE_TEMPLATE`` and ``RAINFALL_FILE`` environment
-      variables have been set to point at files in the ``test-data`` directory
-      which we will create in the next step.
+      Note that the ``WIND_FILE_TEMPLATE`` and ``RAINFALL_FILE`` environment
+      variables are pointing at files in the ``test-data`` directory.
 
-      To make this application work outside of a suite we will also need to
+      To make this application work outside of the weather forecasting suite
+      we will also need to
       provide the ``DOMAIN`` and ``RESOLUTION`` environment variables defined
       in the ``[runtime][root][environment]`` section of the ``suite.rc``
       file as well as the ``CYLC_TASK_CYCLE_POINT`` environment variable
@@ -212,18 +222,12 @@ application:
 
       .. code-block:: rose
 
-         # The cycle point for the test data.
+         # The date when the test data was gathered.
          CYLC_TASK_CYCLE_POINT=20171101T0000Z
          # The dimensions of each grid cell in degrees.
          RESOLUTION=0.2
          # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          DOMAIN=-12,48,5,61
-
-   #. **Copy the test data.**
-
-      Copy the test data files into the ``file/`` directory by running::
-
-         rose tutorial test-data file/test-data
 
    #. **Run the application.**
 
