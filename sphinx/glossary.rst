@@ -593,7 +593,7 @@ Glossary
       * :term:`warm start`
 
    warm start
-      In a :term:`datetime cycling` suite
+      In a :term:`cycling suite <cycling>`
       a warm start is one in which the :term:`suite` :term:`starts <start>`
       from a :term:`cycle point` after the :term`initial cycle point`.
       Tasks in cycles before this point as assumed to have succeeded.
@@ -643,8 +643,9 @@ Glossary
       their "pre-reload" configuration, new tasks will use the new
       configuration.
 
-      Reloading changes to the ``[runtime]`` section is safe, reloading changes
-      to the ``[scheduling]`` section has caveats, see the `Cylc User Guide`_.
+      Reloading changes is safe providing they don't affect the
+      :term:`suite's <suite>` :term:`graph`. Changes to the graph have certain
+      caveats attached, see the `Cylc User Guide`_.
 
       See also:
 
