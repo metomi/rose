@@ -282,9 +282,11 @@ class MiniCylc {
 
 
 // Activate minicylc.
-$('.minicylc').each(function() {
-    var obj = this;
-    $(this).find('object:first').on('load', function() {
-        new MiniCylc(obj).run();
+$(document).ready(function() {
+    $('.minicylc').each(function() {
+        var obj = this;
+        $(this).find('object:first').on('load', function() {
+            new MiniCylc(obj).run();
+        });
     });
 });
