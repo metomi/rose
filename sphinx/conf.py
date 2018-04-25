@@ -46,8 +46,14 @@ extensions = [
     'practical',
     'auto_cli_doc',
     'script_include',
-    'sphinxcontrib.httpdomain'
+    'sphinxcontrib.httpdomain',
+    'hieroglyph'
 ]
+
+# Slide (hieroglyph) settings.
+slide_theme = 'single-level'
+slide_link_to_html = True
+slide_theme_options = {'custom_css': 'css/slides-custom.css'}
 
 # Use SVG for all graphviz (and by extension minicylc) blocks (alt png).
 graphviz_output_format = 'svg'
