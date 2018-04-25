@@ -401,7 +401,7 @@ starting 5 cycles *after* the initial cycle point.
 
    #. **Visualise the suite.**
 
-      Try visualising the suite using ``Cylc graph``.
+      Try visualising the suite using ``cylc graph``.
 
       .. code-block:: none
 
