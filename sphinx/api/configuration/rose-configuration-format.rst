@@ -13,7 +13,7 @@ following:
 * (optionally) files containing data that cannot easily be represented by the
   INI format.
 
-We have added the following conventions into the Rose configuraiton format:
+We have added the following conventions into the Rose configuration format:
 
 #. The file name is normally called ``rose*.conf``, e.g. :rose:file:`rose.conf`,
    :rose:file:`rose-app.conf`, :rose:file:`rose-meta.conf`, etc.

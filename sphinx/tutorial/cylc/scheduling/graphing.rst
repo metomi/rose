@@ -241,7 +241,7 @@ seen so far. The number ``1`` which appears below each task is the
          foo -> bar -> baz -> qux
          pub -> bar -> wop
 
-   #. **Use** ``Cylc graph`` **to visualise the workflow.**
+   #. **Use** ``cylc graph`` **to visualise the workflow.**
 
       Once you have written some graph strings try using ``cylc graph`` to
       display the workflow. Run the following command:
