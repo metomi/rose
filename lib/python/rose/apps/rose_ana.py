@@ -152,10 +152,25 @@ class KGODatabase(object):
 
 
 class AnalysisTask(object):
-    """
-    Base class for an analysis task; all custom user tasks should inherit
-    from this class and override the "run_analysis" method to perform
-    whatever analysis is required.
+    """Base class for an analysis task.
+
+    All custom user tasks should inherit from this class and override
+    the ``run_analysis`` method to perform whatever analysis is required.
+
+    This class provides the following attributes:
+
+    Attributes:
+        self.config:
+            A dictionary containing any Rose Ana configuration options.
+        self.reporter:
+            A reference to the :py:class:`rose.reporter.Reporter` instance used
+            by the parent app (for printing to stderr/stdout).
+        self.kgo_db:
+            A reference to the KGO database object created by the parent app
+            (for adding entries to the database).
+        self.popen:
+            A reference to the :py:class:`rose.popen.RosePopener` instance
+            used by the parent app (for spawning subprocesses).
 
     """
     __metaclass__ = abc.ABCMeta

@@ -318,6 +318,11 @@ path-prepend.PYTHONPATH=
 [rose-ana]
 # Items to prepend to the search path for user methods.
 method-path=/path/1 /path2
+# :default: .false.
+#
+# Turns on the :ref:`Rose Ana Comparison Database
+# <The Rose Ana Comparison Database>`.
+kgo-database=.true.
 
 
 # Configuration related to the database of the Rosie web service server.
