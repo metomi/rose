@@ -20,6 +20,5 @@
 .. _PyGTK: http://www.pygtk.org/
 .. _Python: https://www.python.org/
 .. _Python Regular Expressions: https://docs.python.org/2/library/re.html#regular-expression-syntax
-.. _Rose GitHub: https://github.com/metomi/rose
 .. _SRS: https://code.metoffice.gov.uk/
 .. _SVN: https://subversion.apache.org/

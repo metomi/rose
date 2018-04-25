@@ -552,17 +552,17 @@ Glossary
       When we say that a :term:`suite` is "running" we mean that the cylc
       suite server program is running.
 
-      The suite server program is responsible for running the suite, it submits
+      The suite server program is responsible for running the suite. It submits
       :term:`jobs <job>`, monitors their status and maintains the suite state.
 
       .. _daemon: https://en.wikipedia.org/wiki/Daemon_(computing)
 
-      By default a suite server program is a `daemon`_ meaning that is runs in
+      By default a suite server program is a `daemon`_ meaning that it runs in
       the background (potentially on another host).
 
    start
    startup
-      When a :term:`suite` starts the cylc :term:`suite server program` is
+      When a :term:`suite` starts the Cylc :term:`suite server program` is
       run. This program controls the suite and is what we refer to as
       "running".
 
@@ -595,7 +595,7 @@ Glossary
    warm start
       In a :term:`cycling suite <cycling>`
       a warm start is one in which the :term:`suite` :term:`starts <start>`
-      from a :term:`cycle point` after the :term`initial cycle point`.
+      from a :term:`cycle point` after the :term:`initial cycle point`.
       Tasks in cycles before this point as assumed to have succeeded.
 
       See also:
@@ -607,7 +607,7 @@ Glossary
       When a :term:`suite` is shutdown the :term:`suite server program` is
       stopped. This means that no further :term:`jobs <job>` will be submitted.
 
-      By default cylc waits for any submitted or running :term:`jobs <job>` to
+      By default Cylc waits for any submitted or running :term:`jobs <job>` to
       complete (either succeed or fail) before shutting down.
 
       See also:
@@ -620,7 +620,7 @@ Glossary
    restart
       When a :term:`stopped <stop>` :term:`suite` is "restarted" Cylc will pick
       up where it left off. Cylc will detect any :term:`jobs <job>` which
-      have changed state (e.g. succeed) during the period in which the
+      have changed state (e.g. succeeded) during the period in which the
       :term:`suite` was :term:`shutdown`.
 
       See also:
@@ -632,7 +632,7 @@ Glossary
 
    reload
       Any changes made to the ``suite.rc`` file whilst the suite is running
-      will not have any effect untill the suite is:
+      will not have any effect until the suite is either:
       
       * :term:`Shutdown` and :term:`rerun <start>`
       * :term:`Shutdown` and :term:`restarted <restart>`
@@ -640,12 +640,12 @@ Glossary
 
       Reloading does not require the suite to be :term:`shutdown`. When a suite
       is reloaded any currently "active" :term:`tasks <task>` will continue with
-      their "pre-reload" configuration, new tasks will use the new
+      their "pre-reload" configuration, whilst new tasks will use the new
       configuration.
 
       Reloading changes is safe providing they don't affect the
       :term:`suite's <suite>` :term:`graph`. Changes to the graph have certain
-      caveats attached, see the `Cylc User Guide`_.
+      caveats attached, see the `Cylc User Guide`_ for details.
 
       See also:
 

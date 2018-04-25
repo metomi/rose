@@ -4,6 +4,7 @@
 Installation
 ============
 
+.. _GitHub: https://github.com/metomi/rose
 .. _archives: https://github.com/metomi/rose/tags
 
 The source code for Rose is available via `GitHub <Rose GitHub>`_, code
