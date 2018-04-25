@@ -1,7 +1,9 @@
+.. _Cylc Tutorial:
+
 Cylc Tutorial
 =============
 
-This section will cover the cylc framework and writing basic cylc suites.
+This section will cover the Cylc framework and writing basic Cylc suites.
 
 .. toctree::
    :name: cylc-tutorial

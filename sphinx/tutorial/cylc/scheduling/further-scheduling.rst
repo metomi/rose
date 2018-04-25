@@ -2,7 +2,7 @@ Further Scheduling
 ==================
 
 In this section we will quickly run through some of the more advanced features
-of cylc's scheduling logic.
+of Cylc's scheduling logic.
 
 
 .. include:: ../../../hyperlinks.rst
@@ -33,13 +33,13 @@ There are qualifiers for different :term:`task states <task state>` e.g:
 It is also possible to create your own custom :term:`qualifiers <qualifier>`
 to handle events within your code (custom outputs).
 
-*For more information see the* `cylc user guide`_.
+*For more information see the* `Cylc User Guide`_.
 
 
 Clock Triggers
 --------------
 
-In cylc, :term:`cycle points <cycle point>` are just labels. Tasks are triggered
+In Cylc, :term:`cycle points <cycle point>` are just labels. Tasks are triggered
 when their dependencies are met irrespective of the cycle they are in, but we
 can force cycles to wait for a particular time before running using clock
 triggers. This is necessary for certain operational and monitoring systems.
@@ -66,12 +66,12 @@ until 11:00 on the 1st of January 2000 before running:
 Alternative Calendars
 ---------------------
 
-By default cylc uses the Gregorian calendar for :term:`datetime cycling`, but
-cylc also supports the 360-day calendar (12 months of 30 days each in a year).
+By default Cylc uses the Gregorian calendar for :term:`datetime cycling`, but
+Cylc also supports the 360-day calendar (12 months of 30 days each in a year).
 
 .. code-block:: cylc
 
    [scheduling]
        cycling mode = 360day
 
-*For more information see the* `cylc user guide`_.
+*For more information see the* `Cylc User Guide`_.

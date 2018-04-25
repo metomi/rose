@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""An extension providing a pygments lexer for rose configuration files."""
+"""An extension providing a pygments lexer for Rose configuration files."""
 
 from pygments.lexer import RegexLexer, bygroups, include, words
 from pygments.token import (Comment, Name, Text, Operator, String)
 
 
 class RoseLexer(RegexLexer):
-    """Pygments lexer for the rose rose-app.conf language."""
+    """Pygments lexer for the Rose rose-app.conf language."""
 
-    # Pattern for a rose setting with capture groups.
+    # Pattern for a Rose setting with capture groups.
     ROSE_SETTING_PATTERN = (
         r'(\w[^\=\n]+)'      # Setting pattern.
         r'(\s+)?(=)(\s+)?')  # Optional spaces around = operator, value.
 
-    # Pattern for the value to a rose setting.
+    # Pattern for the value to a Rose setting.
     ROSE_VALUE_PATTERN = (
         r'.*\n'        # Match anything after the = to the end of the line.
         r'(?:'         # Optionally match additional lines.
@@ -41,7 +41,7 @@ class RoseLexer(RegexLexer):
         r')+'          # End repeating multiline group.
         r')?')         # End optional group.
 
-    # Pygments tokens for rose config elements which have no direct
+    # Pygments tokens for Rose config elements which have no direct
     # translation.
     ROSE_USER_IGNORED_TOKEN = Comment
     ROSE_TRIGGER_IGNORED_TOKEN = Comment.Preproc

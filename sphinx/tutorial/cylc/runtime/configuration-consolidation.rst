@@ -75,7 +75,7 @@ default values.
    cylc get-config <path> --sparse
 
 To view the configuration of a particular section or setting refer to it by
-name using the ``-i`` option (see :ref:`cylc file format` for details), e.g:
+name using the ``-i`` option (see :ref:`Cylc file format` for details), e.g:
 
 .. code-block:: sub
 
@@ -217,7 +217,7 @@ non-optional. The most commonly used ones are:
    Run as soon as all of the family members have completed (i.e. have each
    either succeeded or failed).
 
-For more information on family triggers see the `cylc user guide`_.
+For more information on family triggers see the `Cylc User Guide`_.
 
 The ``root`` Family
 ^^^^^^^^^^^^^^^^^^^
@@ -580,7 +580,7 @@ brackets, e.g:
        [[task<param>]]
            script = echo 'Hello World!'
 
-When the ``suite.rc`` file is read by cylc, the parameters will be expanded.
+When the ``suite.rc`` file is read by Cylc, the parameters will be expanded.
 For example the code above is equivalent to:
 
 .. code-block:: cylc
@@ -612,7 +612,7 @@ the parameter (in the present case ``param``):
 
    [runtime]
        [[task<param=bar>]]
-           # This is equivalent to `echo 'bar'`
+           # This is equivalent to `echo 'bar'`
            script = echo $CYLC_TASK_PARAM_param
 
 Parameters can be either words or integers:
@@ -635,7 +635,7 @@ Parameters can be either words or integers:
 
 .. warning::
 
-   Remember that cylc automatically inserts an underscore between the task and
+   Remember that Cylc automatically inserts an underscore between the task and
    the parameter, e.g. the following lines are equivalent:
 
    .. code-block:: cylc-graph
@@ -645,7 +645,7 @@ Parameters can be either words or integers:
 
 .. note::
 
-   When using integer parameters, to prevent confusion, cylc prefixes the
+   When using integer parameters, to prevent confusion, Cylc prefixes the
    parameter value with the parameter name. For example, the above code is
    equivalent to:
 
@@ -699,7 +699,7 @@ so:
            [[[environment]]]
                SITE_ID = 3005
 
-For more information see the `cylc user guide`_.
+For more information see the `Cylc User Guide`_.
 
 .. practical::
 
@@ -727,7 +727,7 @@ For more information see the `cylc user guide`_.
              [[[environment]]]
                  API_KEY = {{ API_KEY }}
 
-      Using ``cylc get-config`` you should see that cylc replaces the
+      Using ``cylc get-config`` you should see that Cylc replaces the
       ``<station>`` with each of the stations in turn, creating a new task for
       each:
 

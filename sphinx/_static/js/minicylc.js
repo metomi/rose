@@ -1,4 +1,4 @@
-// Default cylc colour theme.
+// Default Cylc colour theme.
 var minicylc_default_theme = {
     'waiting_fill': 'none',
     'waiting_stroke': '#88c6ff',

@@ -7,17 +7,25 @@ Glossary
 .. glossary::
    :sorted:
 
-   cylc suite
-      A cylc suite is a directory containing a ``suite.rc`` file which contains
+   suite
+   Cylc suite
+      A Cylc suite is a directory containing a ``suite.rc`` file which contains
       :term:`graphing<graph>` representing a workflow.
+
+      See also:
+
+      * :ref:`Relationship between Cylc suites, Rose suite configurations and
+        Rosie suites <cylc-rose-rosie-suite-relationship-diagram>`
+
 
    suite directory
       The suite directory contains all of the configuration for a suite (e.g.
-      the ``suite.rc`` file and for rose suites the ``rose-suite.conf`` file).
+      the ``suite.rc`` file and for Rose suites the :rose:file:`rose-suite.conf`
+      file).
 
-      This is the directory which is registered using ``cylc reg`` or, for rose
-      suites, it is the one in which the ``rose suite-run`` command is
-      executed.
+      This is the directory which is registered using ``cylc reg`` or, for Rose
+      suites, it is the one in which the :ref:`command-rose-suite-run` command
+      is executed.
 
       .. note::
 
@@ -27,14 +35,11 @@ Glossary
       See also:
 
       * :term:`run directory`
-
-   rose suite
-      A rose suite is a :term:`cylc suite` which also contains a
-      ``rose-suite.conf`` file and optionally :term:`rose apps<rose app>`,
-      :term:`metadata` and/or other rose components.
+      * :ref:`Rose suite installation diagram
+        <rose-suite-installation-diagram>`
 
    graph
-      The graph of a :term:`suite<cylc suite>` refers to the
+      The graph of a :term:`suite<Cylc suite>` refers to the
       :term:`graph strings<graph string>` contained within the
       ``[scheduling][dependencies]`` section. For example the following is,
       collectively, a graph:
@@ -49,7 +54,6 @@ Glossary
       .. digraph:: example
          :align: center
 
-         bgcolor=none
          size = "7,15"
 
          subgraph cluster_1 {
@@ -129,7 +133,6 @@ Glossary
       .. digraph:: example
          :align: center
 
-         bgcolor=none
          size = "3,5"
 
          subgraph cluster_1 {
@@ -162,7 +165,7 @@ Glossary
          "bar.1" -> "bar.2" -> "bar.3"
 
    cycling
-      A cycling :term:`suite<cylc suite>` is one in which the workflow repeats.
+      A cycling :term:`suite<Cylc suite>` is one in which the workflow repeats.
 
       See also:
 
@@ -171,9 +174,9 @@ Glossary
 
    cycle point
       A cycle point is the unique label given to a particular :term:`cycle`.
-      If the :term:`suite<cylc suite>` is using :term:`integer cycling` then
+      If the :term:`suite<Cylc suite>` is using :term:`integer cycling` then
       the cycle points will be numbers e.g. ``1``, ``2``, ``3``, etc. If the
-      :term:`suite<cylc suite>` is using :term:`datetime cycling` then the
+      :term:`suite<Cylc suite>` is using :term:`datetime cycling` then the
       labels will be :term:`ISO8601` datetimes e.g. ``2000-01-01T00:00Z``.
 
       See also:
@@ -214,7 +217,7 @@ Glossary
 
       See also:
 
-      * :ref:`cylc tutorial <tutorial-integer-cycling>`
+      * :ref:`Cylc tutorial <tutorial-integer-cycling>`
 
    datetime cycling
       A datetime cycling is the default for a :term:`cycling suite<cycling>`.
@@ -225,10 +228,10 @@ Glossary
 
       See also:
 
-      * :ref:`cylc tutorial <tutorial-datetime-cycling>`
+      * :ref:`Cylc tutorial <tutorial-datetime-cycling>`
 
    wall-clock time
-      In a cylc suite the wall-clock time refers to the actual time (in the
+      In a Cylc suite the wall-clock time refers to the actual time (in the
       real world).
 
       See also:
@@ -238,7 +241,7 @@ Glossary
 
    ISO8601
       ISO8601 is an international standard for writing dates and times which is
-      used in cylc with :term:`datetime cycling`.
+      used in Cylc with :term:`datetime cycling`.
 
       See also:
 
@@ -258,7 +261,7 @@ Glossary
 
       See also:
 
-      * :ref:`cylc tutorial <tutorial-iso8601-datetimes>`
+      * :ref:`Cylc tutorial <tutorial-iso8601-datetimes>`
       * :term:`ISO8601`
 
    ISO8601 duration
@@ -268,14 +271,14 @@ Glossary
 
       See also:
 
-      * :ref:`cylc tutorial <tutorial-iso8601-durations>`
+      * :ref:`Cylc tutorial <tutorial-iso8601-durations>`
       * :term:`ISO8601`
 
    recurrence
       A recurrence is a repeating sequence which may be used to define a
       :term:`cycling suite<cycling>`. Recurrences determine how often something
       repeats and take one of two forms depending on whether the
-      :term:`suite<cylc suite>` is configured to use :term:`integer cycling`
+      :term:`suite<Cylc suite>` is configured to use :term:`integer cycling`
       or :term:`datetime cycling`.
 
       See also:
@@ -305,7 +308,6 @@ Glossary
       .. digraph:: example
          :align: center
 
-         bgcolor=none
          size = "3,5"
 
          subgraph cluster_1 {
@@ -343,7 +345,7 @@ Glossary
 
       See also:
 
-      * :ref:`cylc tutorial <tutorial-qualifiers>`
+      * :ref:`Cylc tutorial <tutorial-qualifiers>`
       * :term:`task state`
 
    task
@@ -372,13 +374,13 @@ Glossary
 
       See also:
 
-      * :ref:`cylc tutorial <tutorial-tasks-and-jobs>`
+      * :ref:`Cylc tutorial <tutorial-tasks-and-jobs>`
       * :term:`task`
       * :term:`job`
       * :term:`qualifier`
 
    run directory
-      When a :term:`suite <cylc suite>` is run a directory is created for all
+      When a :term:`suite <Cylc suite>` is run a directory is created for all
       of the files generated whilst the suite is running. This is called the
       run directory and typically resides in the ``cylc-run`` directory:
 
@@ -395,13 +397,14 @@ Glossary
       See also:
 
       * :term:`suite directory`
+      * :ref:`Suite Directory Vs Run Directory`
       * :term:`work directory`
       * :term:`share directory`
       * :term:`job log directory`
 
    work directory
-      When cylc executes a :term:`job` it does so inside the
-      :term:`job's <job>` working directory. This directory is created by cylc
+      When Cylc executes a :term:`job` it does so inside the
+      :term:`job's <job>` working directory. This directory is created by Cylc
       and lies within the directory tree inside the relevant suite's
       :term:`run directory`.
 
@@ -412,13 +415,15 @@ Glossary
       The location of the work directory can be accessed by a :term:`job` via
       the environment variable ``CYLC_TASK_WORK_DIR``.
 
-      Any files installed by :term:`rose apps <rose app>` will be placed within
+      Any files installed by :term:`Rose apps <Rose app>` will be placed within
       this directory.
 
       See also:
 
       * :term:`run directory`
       * :term:`share directory`
+      * :ref:`Rose suite installation diagram
+        <rose-suite-installation-diagram>`
 
    share directory
       The share directory resides within a suite's :term:`run directory`. It
@@ -441,7 +446,7 @@ Glossary
 
    suite log
    suite log directory
-      A cylc suite logs events and other information to the suite log files
+      A Cylc suite logs events and other information to the suite log files
       when it runs. There are three log files:
 
       * ``out`` - the stdout of the suite.
@@ -458,7 +463,7 @@ Glossary
 
    job log
    job log directory
-      When cylc executes a :term:`job`, stdout and stderr are redirected to the
+      When Cylc executes a :term:`job`, stdout and stderr are redirected to the
       ``job.out`` and ``job.err`` files which are stored in the job log
       directory.
 
@@ -473,7 +478,7 @@ Glossary
       * `job`: the :term:`job script`.
       * `job-activity.log`: a log file containing details of the
         :term:`job's <job>` progress.
-      * `job.status`: a file holding cylc's most up-to-date
+      * `job.status`: a file holding Cylc's most up-to-date
         understanding of the :term:`job's <job>` present status.
 
    job
@@ -510,7 +515,7 @@ Glossary
 
    job submission number
       Cylc may run multiple :term:`jobs <job>` per :term:`task` (e.g. if the
-      task failed and was re-tried). Each time cylc runs a :term:`job` it is
+      task failed and was re-tried). Each time Cylc runs a :term:`job` it is
       assigned a submission number. The submission number starts at 1,
       incrementing with each submission.
 
@@ -541,8 +546,114 @@ Glossary
 
       * :term:`batch system`
 
+
+
+   suite server program
+      When we say that a :term:`suite` is "running" we mean that the cylc
+      suite server program is running.
+
+      The suite server program is responsible for running the suite. It submits
+      :term:`jobs <job>`, monitors their status and maintains the suite state.
+
+      .. _daemon: https://en.wikipedia.org/wiki/Daemon_(computing)
+
+      By default a suite server program is a `daemon`_ meaning that it runs in
+      the background (potentially on another host).
+
+   start
+   startup
+      When a :term:`suite` starts the Cylc :term:`suite server program` is
+      run. This program controls the suite and is what we refer to as
+      "running".
+
+      * A :term:`Cylc suite` is started using ``cylc run``.
+      * A :term:`Rose suite configuration` (or :term:`Rosie Suite`) is started
+        using :ref:`command-rose-suite-run`.
+
+      A suite start can be either :term:`cold <cold start>` or :term:`warm <warm
+      start>` (cold by default).
+
+      See also:
+
+      * :ref:`Starting Suites`
+      * :term:`suite server program`
+      * :term:`warm start`
+      * :term:`cold start`
+      * :term:`shutdown`
+      * :term:`restart`
+      * :term:`reload`
+
+   cold start
+      A cold start is one in which the :term:`suite` :term:`starts <start>`
+      from the :term:`initial cycle point`. This is the default behaviour of
+      ``cylc run``.
+
+      See also:
+
+      * :term:`warm start`
+
+   warm start
+      In a :term:`cycling suite <cycling>`
+      a warm start is one in which the :term:`suite` :term:`starts <start>`
+      from a :term:`cycle point` after the :term:`initial cycle point`.
+      Tasks in cycles before this point as assumed to have succeeded.
+
+      See also:
+
+      * :term:`cold start`
+
+   stop
+   shutdown
+      When a :term:`suite` is shutdown the :term:`suite server program` is
+      stopped. This means that no further :term:`jobs <job>` will be submitted.
+
+      By default Cylc waits for any submitted or running :term:`jobs <job>` to
+      complete (either succeed or fail) before shutting down.
+
+      See also:
+
+      * :ref:`Stopping Suites`
+      * :term:`start`
+      * :term:`restart`
+      * :term:`reload`
+
+   restart
+      When a :term:`stopped <stop>` :term:`suite` is "restarted" Cylc will pick
+      up where it left off. Cylc will detect any :term:`jobs <job>` which
+      have changed state (e.g. succeeded) during the period in which the
+      :term:`suite` was :term:`shutdown`.
+
+      See also:
+
+      * :ref:`Restarting Suites`
+      * :term:`start`
+      * :term:`Stop`
+      * :term:`Reload`
+
+   reload
+      Any changes made to the ``suite.rc`` file whilst the suite is running
+      will not have any effect until the suite is either:
+      
+      * :term:`Shutdown` and :term:`rerun <start>`
+      * :term:`Shutdown` and :term:`restarted <restart>`
+      * "Reloaded"
+
+      Reloading does not require the suite to be :term:`shutdown`. When a suite
+      is reloaded any currently "active" :term:`tasks <task>` will continue with
+      their "pre-reload" configuration, whilst new tasks will use the new
+      configuration.
+
+      Reloading changes is safe providing they don't affect the
+      :term:`suite's <suite>` :term:`graph`. Changes to the graph have certain
+      caveats attached, see the `Cylc User Guide`_ for details.
+
+      See also:
+
+      * :ref:`Reloading Suites`
+      * `Cylc User Guide`_
+
    parameterisation
-      Parameterisation is a way to consolidate configuration in the cylc
+      Parameterisation is a way to consolidate configuration in the Cylc
       ``suite.rc`` file by implicitly looping over a set of pre-defined
       variables e.g:
 
@@ -564,10 +675,10 @@ Glossary
 
       See also:
 
-      * :ref:`cylc tutorial <tutorial-cylc-parameterisation>`
+      * :ref:`Cylc tutorial <tutorial-cylc-parameterisation>`
 
    family
-      In cylc a family is a collection of :term:`tasks <task>` which share a
+      In Cylc a family is a collection of :term:`tasks <task>` which share a
       common configuration and which can be referred to collectively in the
       :term:`graph`.
 
@@ -576,7 +687,7 @@ Glossary
 
       See also:
 
-      * :ref:`cylc tutorial <tutorial-cylc-families>`
+      * :ref:`Cylc tutorial <tutorial-cylc-families>`
       * :term:`family inheritance`
       * :term:`family trigger`
 
@@ -605,7 +716,7 @@ Glossary
 
       See also:
 
-      * `cylc user guide`_
+      * `Cylc User Guide`_
       * :term:`family`
       * :term:`family trigger`
 
@@ -630,7 +741,7 @@ Glossary
 
       See also:
 
-      * `cylc user guide`_
+      * `Cylc User Guide`_
       * :term:`family`
       * :term:`task trigger`
       * :term:`dependency`
@@ -638,7 +749,7 @@ Glossary
 
    stalled suite
    stalled state
-      If cylc is unable to proceed running a workflow due to unmet dependencies
+      If Cylc is unable to proceed running a workflow due to unmet dependencies
       the suite is said to be *stalled*.
 
       This usually happens because of a task failure as in the following
@@ -646,8 +757,6 @@ Glossary
 
       .. digraph:: Example
          :align: center
-
-         bgcolor = none
 
          foo [style="filled" color="#ada5a5"]
          bar [style="filled" color="#ff0000" fontcolor="white"]
@@ -658,12 +767,29 @@ Glossary
       In this example the task ``bar`` has failed meaning that ``baz`` is
       unable to run as its dependency (``bar:succeed``) has not been met.
 
-      When a cylc detects that a suite has stalled an email will be sent to the
+      When a Cylc detects that a suite has stalled an email will be sent to the
       user. Human interaction is required to escape a stalled state.
 
-   rose app
-   rose application configuration
-      A rose application configuration (or rose app) is a directory containing
+   Rose configuration
+      Rose configurations are directories containing a Rose configuration
+      file along with other optional files and directories.
+
+      The two types of Rose configuration relevant to Cylc suites are:
+
+      * :term:`Rose application configuration`
+      * :term:`Rose suite configuration`
+
+      See also:
+
+      * :ref:`Rose Configuration Format`
+      * :ref:`Rose Configuration Tutorial <tutorial-rose-configurations>`
+      * :ref:`Optional Configuration Tutorial
+        <rose-tutorial-optional-configurations>`
+
+   Rose app
+   Rose application
+   Rose application configuration
+      A Rose application configuration (or Rose app) is a directory containing
       a :rose:file:`rose-app.conf` file along with some other optional files
       and directories.
 
@@ -675,14 +801,27 @@ Glossary
       * Input files e.g. namelists (:rose:conf:`rose-app.conf[namelist:NAME]`)
       * Metadata for the application (:rose:file:`rose-meta.conf`).
 
-      see also:
+      See also:
 
       * :ref:`Rose Applications`
 
-   rose suite configuration
-      A rose suite configuration is a :rose:file:`rose-suite.conf` file along
+   application directory
+      The application directory is the folder in which the
+      :rose:file:`rose-app.conf` file is located in a :term:`Rose application
+      configuration`.
+
+   Rose built-in application
+      A Rose built-in application is a generic :term:`Rose application`
+      providing common functionality which is provided in the Rose installation.
+
+      See also:
+
+      * :ref:`Rose Built-In Applications`
+
+   Rose suite configuration
+      A Rose suite configuration is a :rose:file:`rose-suite.conf` file along
       with other optional files and directories which configure the way in
-      which a :term:`cylc suite` is run. E.g:
+      which a :term:`Cylc suite` is run. E.g:
 
       * Jinja2 variables to be passed into the ``suite.rc`` file (
         :rose:conf:`rose-suite.conf[jinja2:suite.rc]`).
@@ -692,15 +831,15 @@ Glossary
         :rose:conf:`rose-suite.conf|root-dir`,
         :rose:conf:`rose-suite.conf[file:NAME]`).
 
-      see also:
+      See also:
 
       * :ref:`Rose Suites`
 
    metadata
-   rose metadata
+   Rose metadata
       Rose metadata provides information about settings in
-      :term:`rose application configurations <rose application configuration>`
-      and :term:`rose suite configurations <rose suite configuration>`. This
+      :term:`Rose application configurations <Rose application configuration>`
+      and :term:`Rose suite configurations <Rose suite configuration>`. This
       information is stored in a :rose:file:`rose-meta.conf` file in a
       ``meta/`` directory alongside the configuration it applies to.
 
@@ -725,8 +864,21 @@ Glossary
       * Validation using the :ref:`command-rose-macro` command.
 
       Metadata does not affect the running of an
-      :term:`application <rose app>` or :term:`cylc suite`.
+      :term:`application <Rose app>` or :term:`Cylc suite`.
 
-      see also:
+      See also:
 
       * :ref:`Metadata`
+
+   Rosie Suite
+      A Rosie suite is a :term:`Rose suite configuration` which is managed
+      using the Rosie system.
+
+      When a suite is managed using Rosie:
+
+      * The :term:`suite directory` is added to version control.
+      * The suite is registered in a database.
+
+      See also:
+
+      * :ref:`Rosie Tutorial <tutorial-rosie>`

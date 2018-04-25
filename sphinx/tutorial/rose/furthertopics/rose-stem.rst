@@ -1,12 +1,12 @@
 .. include:: ../../../hyperlinks.rst
    :start-line: 1
 
-rose stem
+Rose Stem
 =========
 
 .. warning::
 
-   Before proceeding you should already be familiar with the ``rose stem``
+   Before proceeding you should already be familiar with the Rose Stem
    part of the user guide.
 
    .. TODO - link in the rose user guide page when translated.
@@ -17,27 +17,28 @@ rose stem
    :width: 300px
 
 This tutorial will walk you through creating a simple example of the
-``rose stem`` testing system which will involve piloting a spaceship
+Rose Stem testing system which will involve piloting a spaceship
 through space.
 
 
 Getting Started
 ---------------
 
-We will start the ``rose stem`` tutorial by setting up an `FCM`_ repository
+We will start the Rose Stem tutorial by setting up an `FCM`_ repository
 called ``SPACESHIP`` to store the code and test suite in.
 
 .. _keyword: https://metomi.github.io/fcm/doc/user_guide/code_management.html#svn_basic_keywords
 
-Usually you would add a ``rose stem`` suite to an existing repository with
+Usually you would add a Rose Stem suite to an existing repository with
 the `keyword`_ already set up to test the accompanying source code. For the
 purposes of this tutorial we will create a new one.
 
 Type the follow to create a temporary repository (you can safely delete
 it after finishing this tutorial)::
 
-   svnadmin create ~/spaceship_repos
-   (cd $(mktemp -d); mkdir -p trunk/src; svn import -m "" . file://$HOME/spaceship_repos)
+   mkdir -p ~/rose-tutorial
+   svnadmin create ~/rose-tutorial/spaceship_repos
+   (cd $(mktemp -d); mkdir -p trunk/src; svn import -m "" . file://$HOME/rose-tutorial/spaceship_repos)
 
 We then need to link the project name ``SPACESHIP`` with this project.
 Creating the file and directory if they do not exist
@@ -45,18 +46,18 @@ add the following line to the file ``$HOME/.metomi/fcm/keyword.cfg``:
 
 .. code-block:: rose
 
-   location{primary}[spaceship] = file:///home/user/spaceship_repos
+   location{primary}[spaceship] = file:///home/user/rose-tutorial/spaceship_repos
 
 Make sure the path on the right-hand side matches the location you
 specified in the ``svnadmin`` command.
 
 Now you can checkout a working copy of your repository by typing::
 
-   mkdir ~/spaceship_working_copy
-   cd ~/spaceship_working_copy
+   mkdir -p ~/rose-tutorial/spaceship_working_copy
+   cd ~/rose-tutorial/spaceship_working_copy
    fcm checkout fcm:spaceship_tr .
 
-Finally populate your working copy by running::
+Finally populate your working copy by running (answering ``y`` to the prompt)::
 
    rose tutorial rose-stem .
 
@@ -78,7 +79,7 @@ The ``spaceship`` app
 
 .. TODO - outline what this app does.
 
-Create a new rose app called ``spaceship``::
+Create a new Rose app called ``spaceship``::
 
    mkdir -p rose-stem/app/spaceship
 
@@ -125,7 +126,7 @@ into the ``fcm-make.cfg`` file within that directory:
    build.target{task} = link
 
 The ``$SOURCE_SPACESHIP`` environment variable will be set using the
-Jinja2 variable of the same name which is provided by ``rose stem``.
+Jinja2 variable of the same name which is provided by Rose Stem.
 
 
 The ``suite.rc`` file
@@ -141,8 +142,6 @@ case, the group ``command_spaceship`` gives you the graph:
 
 .. digraph:: Example
    :align: center
-
-   bgcolor = "none"
 
    fcm_make_spaceship -> spaceship -> rose_ana_position
 
@@ -167,7 +166,7 @@ its own configuration files.
 The ``rose-suite.conf`` file
 ----------------------------
 
-The suites associated with ``rose stem`` require a version number
+The suites associated with Rose Stem require a version number
 indicating the version of the ``rose stem`` command with which they
 are compatible. This is specified in the :rose:file:`rose-suite.conf` file,
 together with the default values of ``RUN_NAMES`` and ``SOURCE_SPACESHIP``.
@@ -251,8 +250,8 @@ so it should automatically pick up your working copy as the source).
 
 .. note::
 
-   If your site uses a cylc server, and your home directory is not shared
-   with the cylc server, you will need to add the option::
+   If your site uses a Cylc server, and your home directory is not shared
+   with the Cylc server, you will need to add the option::
 
       --host=localhost
 

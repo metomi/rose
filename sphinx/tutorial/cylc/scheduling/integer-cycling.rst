@@ -11,7 +11,7 @@ workflows.
 Repeating Workflows
 -------------------
 
-Often, we will want to repeat the same workflow multiple times. In cylc this
+Often, we will want to repeat the same workflow multiple times. In Cylc this
 "repetition" is called :term:`cycling` and each repetition of the workflow is
 referred to as a :term:`cycle`.
 
@@ -19,12 +19,12 @@ Each :term:`cycle` is given a unique label. This is called a
 :term:`cycle point`. For now these :term:`cycle points<cycle point>` will be
 integers *(they can also be dates as we will see in the next section)*.
 
-To make a workflow repeat we must tell cylc three things:
+To make a workflow repeat we must tell Cylc three things:
 
 1) How often we want the workflow to repeat - the :term:`recurrence`.
 2) At what cycle point we want to start the workflow - the
    :term:`initial cycle point`.
-3) *Optionally* we can also tell cylc what cycle point we want to stop the
+3) *Optionally* we can also tell Cylc what cycle point we want to stop the
    workflow - the :term:`final cycle point`.
 
 Let's take the bakery example from the previous section. Bread is
@@ -44,9 +44,9 @@ three lines:
                     pre_heat_oven & make_dough => bake_bread => sell_bread & clean_oven
                 """
 
-* The ``cycling mode = integer`` setting tells cylc that we want our
+* The ``cycling mode = integer`` setting tells Cylc that we want our
   :term:`cycle points<cycle point>` to be numbered.
-* The ``initial cycle point = 1`` setting tells cylc to start counting from 1.
+* The ``initial cycle point = 1`` setting tells Cylc to start counting from 1.
 * ``P1`` is the :term:`recurrence`. The :term:`graph` within the ``[[[P1]]]``
   section will be repeated at each :term:`cycle point`.
 
@@ -56,7 +56,6 @@ workflow repeated at each cycle point:
 .. digraph:: example
    :align: center
 
-   bgcolor=none
    size = "7,15"
 
    subgraph cluster_1 {
@@ -145,7 +144,6 @@ The resulting suite would look like this:
 .. digraph:: example
    :align: center
 
-   bgcolor=none
    size = "7,15"
 
    subgraph cluster_1 {
@@ -194,7 +192,7 @@ Adding this dependency "strings together" the cycles, forcing them to run in
 order. We refer to dependencies between cycles as
 :term:`inter-cycle dependencies<inter-cycle dependency>`.
 
-In the dependency the ``[-P1]`` suffix tells cylc that we are referring to a
+In the dependency the ``[-P1]`` suffix tells Cylc that we are referring to a
 task in the previous cycle. Equally ``[-P2]`` would refer to a task two cycles
 ago.
 
@@ -237,7 +235,6 @@ This dependency means that the ``purchase_ingredients`` task will run after the
 .. digraph:: example
    :align: center
 
-   bgcolor=none
    size = "4.5,15"
 
    subgraph cluster_1 {
@@ -324,8 +321,6 @@ recurrences:
 .. digraph:: example
    :align: center
 
-   bgcolor=none
-
    subgraph cluster_1 {
        label = 1
        style = dashed
@@ -360,7 +355,7 @@ starting 5 cycles *after* the initial cycle point.
 
 .. practical::
 
-   .. rubric:: In this practical we will take the :term:`suite <cylc suite>`
+   .. rubric:: In this practical we will take the :term:`suite <Cylc suite>`
       we wrote in the previous section and turn it into a
       :term:`cycling suite <cycling>`.
 
@@ -414,7 +409,7 @@ starting 5 cycles *after* the initial cycle point.
 
       .. tip::
 
-         You can get cylc graph to draw dotted boxes around the cycles by
+         You can get Cylc graph to draw dotted boxes around the cycles by
          clicking the "Organise by cycle point" button on the toolbar:
 
          .. image:: ../img/cylc-graph-cluster.png
@@ -476,7 +471,6 @@ starting 5 cycles *after* the initial cycle point.
       .. digraph:: example
         :align: center
 
-         bgcolor=none
          size = "4.5,7"
 
          subgraph cluster_1 {

@@ -27,22 +27,13 @@ Environment Variables:
 """
 
 import os
+from subprocess import Popen, PIPE
 import sys
 
 import util
 
 
 MI2KM = 1.609344001  # Conversion between miles and kilometers.
-
-
-# The default location of the rainfall file output by the "get_rainfall" task.
-DEFAULT_RAINFALL_FILE = os.path.join(
-    os.environ.get('CYLC_SUITE_WORK_DIR'),
-    os.environ.get('CYLC_TASK_CYCLE_POINT'), 'get_rainfall', 'rainfall.csv')
-# The default location of the wind files output by "gather_observations".
-DEFAULT_WIND_FILE_TEMPLATE = os.path.join(
-    os.environ.get('CYLC_SUITE_WORK_DIR'), '{cycle}',
-    'consolidate_observations', 'wind_{xy}.csv')
 
 
 def get_wind_data(wind_file_path, wind_cycles):
@@ -178,6 +169,17 @@ def push_rainfall(rainfall, wind_data, step, resolution, spline_level):
                                     spline_level)
 
 
+def get_cyclepoint(offset_hours):
+    """Calculate a cyclepoint from a relative offset.
+
+    Run the system call `cylc cyclepoint --offset-hours <offset_hours>`
+    """
+    return Popen(
+        ['cylc', 'cyclepoint', '--offset-hours', str(int(offset_hours))],
+        stdout=PIPE
+    ).communicate()[0].strip()
+
+
 def main(forecast_interval, forecast_itterations):
     # Get suite settings.
     domain = util.parse_domain(os.environ['DOMAIN'])
@@ -187,11 +189,13 @@ def main(forecast_interval, forecast_itterations):
     spline_level = int(os.environ.get('SPLINE_LEVEL', 0))
     weighting = map(float, os.environ.get('WEIGHTING', '1').split(','))
 
-    # Get the locations of the wind / rainfall data files.
-    rainfall_file = os.environ.get('RAINFALL_FILE', DEFAULT_RAINFALL_FILE)
-    wind_cycles = os.environ['WIND_CYCLES'].split()
-    wind_file_template = os.environ.get('WIND_FILE_TEMPLATE',
-                                        DEFAULT_WIND_FILE_TEMPLATE)
+    # Get file paths.
+    rainfall_file = os.environ['RAINFALL_FILE']
+    wind_cycles = [get_cyclepoint(offset) for offset in
+                   os.environ['WIND_CYCLES'].split(',')]
+    wind_file_template = os.environ['WIND_FILE_TEMPLATE']
+    map_file = os.environ['MAP_FILE']
+    map_template = os.environ['MAP_TEMPLATE']
 
     # Get wind data from specified cycles.
     wind_data = get_wind_data(wind_file_template, wind_cycles)
@@ -219,10 +223,8 @@ def main(forecast_interval, forecast_itterations):
         util.write_csv(forecast_name + '.csv', forecast)
 
     # Generate html page from forecast data.
-    util.generate_html_map(
-        os.environ['CYLC_TASK_LOG_ROOT'] + '-map.html', forecasts,
-        domain, resolution
-    )
+    util.generate_html_map(map_file, map_template, forecasts, domain,
+                           resolution)
 
 
 if __name__ == '__main__':

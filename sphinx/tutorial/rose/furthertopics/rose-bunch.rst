@@ -1,7 +1,7 @@
-rose bunch
+Rose Bunch
 ==========
 
-:rose:app:`rose_bunch` is a built-in :term:`rose app` which allows multiple
+:rose:app:`rose_bunch` is a built-in :term:`Rose app` which allows multiple
 variants of a command to be run under a single job.
 
 
@@ -25,7 +25,7 @@ alter the code rather than use :rose:app:`rose_bunch` to handle this for you.
 .. warning::
 
    It is important to note that when running your ``rose_bunch``
-   :term:`app <rose app>` under load balancing systems such as PBS or Slurm,
+   :term:`app <Rose app>` under load balancing systems such as PBS or Slurm,
    you will need to set resource requests to reflect the resources required
    by running multiple commands at once.
 
@@ -44,8 +44,12 @@ clear. We can refer to this as the "landing" routine. What differs between
 landings is the plane type, number of passengers carried and the resulting
 timings for each stage of the landing process.
 
-Create a new suite (or just a new directory somewhere - e.g. in your
-homespace) containing a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+Create a new Rose suite configuration::
+
+   mkdir -p ~/rose-tutorial/rose-bunch
+   cd ~/rose-tutorial/rose-bunch
+
+Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
 file that looks like this:
 
 .. code-block:: cylc
@@ -134,15 +138,15 @@ Navigate to the top directory of your suite (where the ``suite.rc`` and
 :rose:file:`rose-suite.conf` files can be found) and run
 :ref:`command-rose-suite-run`.
 
-Your suite should run, launch the cylc GUI and successfully run the ``lander``
+Your suite should run, launch the Cylc GUI and successfully run the ``lander``
 app.
 
-Once the suite has finished running and has shutdown, open rose bush to view
-its output (note that you can close the cylc GUI at this point)::
+Once the suite has finished running and has shutdown, open Rose Bush to view
+its output (note that you can close the Cylc GUI at this point)::
 
    rose suite-log
 
-.. TODO - Make sure that this is consistent with advice given in the rose
+.. TODO - Make sure that this is consistent with advice given in the Rose
    tutorial when written.
 
 .. note::
@@ -150,15 +154,15 @@ its output (note that you can close the cylc GUI at this point)::
    You can quickly get to the relevant page by running
    :ref:`command-rose-suite-log` from within the :term:`suite directory`.
 
-In the rose bush jobs page for your suite you should be presented with a
+In the Rose Bush jobs page for your suite you should be presented with a
 page containing a single row for the ``lander`` task, from which you can
 access its output. In that row you should see something like this:
 
 .. image:: img/rose-bunch-bush-page.png
    :align: center
-   :alt: rose bush view of output
+   :alt: Rose Bush view of output
 
-In the rose bush entry you should see that the usual links are present for
+In the Rose Bush entry you should see that the usual links are present for
 the task such as ``job.out``, ``job.status`` etc. with the addition of
 two drop-down boxes: one for ``bunch.*.err`` and one for ``bunch.*.out``.
 Rather than mixing the outputs from the multiple command invocations being
@@ -184,7 +188,7 @@ following line under the :rose:conf:`rose_bunch[bunch]` section:
 
    names=BA123 Emirates345 BA007 PC456
 
-Re-run your suite and, once it has finished, open up rose bush and examine the
+Re-run your suite and, once it has finished, open up Rose Bush and examine the
 job listing. In the drop-down ``bunch.*.err`` and ``bunch.*.out`` boxes you
 should now see entries for the names you've configured rather than the
 ``bunch.0.out ... bunch.3.out`` entries previously present.
@@ -217,7 +221,7 @@ following line to the :rose:conf:`rose_bunch[bunch]` section:
 Run your suite again. Notice that this time round it takes longer for the task
 to run as it has been limited in the number of command variants it can run
 simultaneously. You can see the individual commands being started by viewing
-the task stdout in the cylc GUI by right-clicking on the task and selecting
+the task stdout in the Cylc GUI by right-clicking on the task and selecting
 :guilabel:`View` then :guilabel:`job stdout`. As an example, when the
 ``BA007`` invocation starts running you should see the line:
 

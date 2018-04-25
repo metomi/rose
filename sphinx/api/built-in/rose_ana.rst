@@ -67,7 +67,7 @@ Lists
 Argument substitution
    If the option contains one or more pairs of braces (``{}``) the option
    will be returned multiple times with the parentheses substituted once for
-   each argument passed to ``rose task-run``
+   each argument passed to :ref:`command-rose-task-run`
 
 The app may also define a configuration section, ``[ana:config]``, whose
 key-value pairs define app-wide settings that are passed through to the

@@ -31,18 +31,18 @@ Rose Environment Variables
 .. envvar:: ROSE_BUNCH_LOG_PREFIX
 
    Description
-      Environment variable provided to rose bunch instances at runtime to
+      Environment variable provided to Rose Bunch instances at runtime to
       identify the log prefix that will be used for output e.g. for a bunch
       instance named  ``foo`` then ``ROSE_BUNCH_LOG_PREFIX=foo``.
    Provided At Runtime By
-      * rose bunch
+      * Rose Bunch
 
 .. envvar:: ROSE_CONF_PATH
 
    Description
       Specify a colon (``:``) separated list of paths for searching and loading
       site/user configuration. If this environment variable is not defined, the
-      normal behaviour is to search for and load ``rose.conf`` from
+      normal behaviour is to search for and load :rose:file:`rose.conf` from
       ``$ROSE_HOME/etc`` and then ``$HOME/.metomi``.
    Used By
       * :ref:`command-rose-test-battery`
@@ -111,9 +111,9 @@ Rose Environment Variables
 .. envvar:: ROSE_HOME
 
    Description
-      Specifies the path to the rose home directory.
+      Specifies the path to the Rose home directory.
    Used and Provided By
-      * rose
+      * ``rose``
 
 .. envvar:: ROSE_HOME_BIN
 
@@ -121,7 +121,7 @@ Rose Environment Variables
       Specifies the path to the ``bin/`` or ``sbin/`` directory of the current
       Rose utility.
    Used and Provided By
-      * rose
+      * ``rose``
 
 .. envvar:: ROSE_LAUNCHER
 
@@ -202,12 +202,13 @@ Rose Environment Variables
       Defines the rose namespace. Used to identify if a utility belongs to
       ``rose`` or ``rosie``.
    Used and Provided By
-      * rose
+      * ``rose``
 
 .. envvar:: ROSE_ORIG_HOST
 
    Description
-      The name of the host where the ``rose suite-run`` command was invoked.
+      The name of the host where the :ref:`command-rose-suite-run` command was
+      invoked.
    Provided By
       * :ref:`command-rose-suite-run`
 
@@ -309,7 +310,8 @@ Rose Environment Variables
       instead.
 
    Description
-      Additional options and arguments for ``fcm make`` or ``rose app-run``.
+      Additional options and arguments for ``fcm make`` or
+      :ref:`command-rose-app-run`.
    Used By
       * ``fcm_make`` built-in application
       * ``fcm_make2`` built-in application
@@ -333,12 +335,12 @@ Rose Environment Variables
    Description
       Used to identify which ``rose`` or ``rosie`` utility is being run.
    Used and Provided By
-      * rose
+      * ``rose``
 
 .. envvar:: ROSE_VERSION
 
    Description
       The current version of Rose.
    Used and Provided By
-      * rose
+      * ``rose``
       * :ref:`command-rose-suite-run`

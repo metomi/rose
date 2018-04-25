@@ -10,7 +10,7 @@ In the last section we looked at writing an :term:`integer cycling` workflow,
 one where the :term:`cycle points <cycle point>` are numbered.
 
 Typically workflows are repeated at a regular time interval, say every day
-or every few hours. To make this easier cylc has a date-time cycling mode
+or every few hours. To make this easier Cylc has a date-time cycling mode
 where the :term:`cycle points <cycle point>` use date and time specifications
 rather than numbers.
 
@@ -26,7 +26,7 @@ rather than numbers.
 ISO8601
 -------
 
-In cylc, dates, times and durations are written using the :term:`ISO8601` format
+In Cylc, dates, times and durations are written using the :term:`ISO8601` format
 - an international standard for representing dates and times.
 
 .. _tutorial-iso8601-datetimes:
@@ -132,7 +132,8 @@ to be annual. E.G:
 * ``01T00``: every month on the first of the month.
 * ``T00``: every day at midnight.
 * ``T-00``: every hour at zero minutes past (every hour on the hour).
-  *Note that the ``-`` character takes the place of the hour digits as we may not omit components after the ``T`` character.*
+  *Note that the* ``-`` *character takes the place of the hour digits*
+  *as we may not omit components after the* ``T`` *character.*
 
 Recurrence Formats
 ^^^^^^^^^^^^^^^^^^
@@ -206,7 +207,7 @@ UTC Mode
 
 Due to all of the difficulties caused by time zones, particularly with
 respect to daylight savings, we typically use UTC (that's the ``+00`` time
-zone) in cylc suites.
+zone) in Cylc suites.
 
 When a suite uses UTC all of the cycle points will be written in the
 ``+00`` time zone.
@@ -265,7 +266,6 @@ The ``consolidate_observations`` task must run after the
    :align: center
 
    size = "5,4"
-   bgcolor=none
 
    get_observations_belmullet -> consolidate_observations
    get_observations_camborne -> consolidate_observations
@@ -294,7 +294,6 @@ The ``forecast`` task will be dependent on:
    :align: center
 
    size = "5,4"
-   bgcolor=none
 
    subgraph cluster_T00 {
        label="+PT0H"
@@ -335,7 +334,6 @@ after the initial cycle point** and will be dependent on the ``forecast`` task.
    :align: center
 
    size = "1.5,1"
-   bgcolor=none
 
    "forecast" -> "post_process_exeter"
 
@@ -460,7 +458,6 @@ after the initial cycle point** and will be dependent on the ``forecast`` task.
          :align: center
 
          size = "4,1.5"
-         bgcolor=none
          rankdir=LR
 
          subgraph cluster_T06 {
@@ -494,7 +491,6 @@ after the initial cycle point** and will be dependent on the ``forecast`` task.
         :align: center
 
          size = "4,1"
-         bgcolor=none
          rankdir=LR
 
          "forecast.t00" [label="forecast\n20000101T0000Z"

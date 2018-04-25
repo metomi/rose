@@ -13,9 +13,9 @@ following:
 * (optionally) files containing data that cannot easily be represented by the
   INI format.
 
-We have added the following conventions into the rose configuraiton format:
+We have added the following conventions into the Rose configuration format:
 
-#. The file name is normally called ``rose*.conf``, e.g. ``rose.conf``,
+#. The file name is normally called ``rose*.conf``, e.g. :rose:file:`rose.conf`,
    :rose:file:`rose-app.conf`, :rose:file:`rose-meta.conf`, etc.
 #. Only a hash ``#`` in the beginning of a line starts a comment. Empty lines
    and lines with only white spaces are ignored. There is no support for
@@ -59,8 +59,8 @@ We have added the following conventions into the rose configuraiton format:
      utilities.
    * A single exclamation denotes a user-ignored setting.
    * A double exclamation denotes a program-ignored setting. E.g.
-     ``rose config-edit`` may use a double exclamation to switch off a
-     setting according to the setting metadata.
+     :ref:`command-rose-config-edit` may use a double exclamation to switch
+     off a setting according to the setting metadata.
 
 #. The open square bracket (``[``) and close square bracket (``]``) characters
    cannot be used within a section declaration. E.g.
@@ -202,7 +202,8 @@ optional configurations to be selected at run time using:
 Optional Configurations and Metadata
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Metadata utilities such as ``rose app-upgrade`` and ``rose macro`` treat each
+Metadata utilities such as :ref:`command-rose-app-upgrade` and
+:ref:`command-rose-macro` treat each
 main + optional configuration as a separate entity to be transformed,
 upgraded, or validated. Use cases with more than one optional configuration
 are not handled.

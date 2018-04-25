@@ -70,7 +70,7 @@ a different aircraft, the Airbus A380 jumbo jet and the Robson R44 helicopter:
    The ``[meta]`` section is a freeform section where we can define metadata
    to be associated with a task, family or the suite itself.
 
-   This metadata should not be mistaken with rose :ref:`conf-meta`.
+   This metadata should not be mistaken with Rose :ref:`conf-meta`.
 
 .. admonition:: Reminder
    :class: hint
@@ -87,8 +87,6 @@ Running this command will generate the following output:
 
 .. digraph:: Example
    :align: center
-
-   bgcolor=none
 
    AIRPLANE  [color=royalblue,
       fillcolor=powderblue,
@@ -169,7 +167,7 @@ land vertically.
    :align: center
 
 As the V-22 can be thought of as both a plane and a helicopter we want it to
-inherit from both the ``AIRPLANE`` and ``HELICOPTER`` families. In cylc we can
+inherit from both the ``AIRPLANE`` and ``HELICOPTER`` families. In Cylc we can
 inherit from multiple families by separating their names with commas:
 
 Add the following task to your ``suite.rc`` file.
@@ -181,14 +179,12 @@ Add the following task to your ``suite.rc`` file.
            [[[meta]]]
                title = V-22 Osprey Military Aircraft.
 
-Refresh your ``cylc graph`` window or re-run the cylc graph command.
+Refresh your ``cylc graph`` window or re-run the ``cylc graph`` command.
 
 The inheritance hierarchy should now look like this:
 
 .. digraph:: Example
    :align: center
-
-   bgcolor=none
 
    AIRPLANE  [color=royalblue,
       fillcolor=powderblue,
@@ -295,7 +291,6 @@ Next we will define four families to represent three different types of engine.
    :align: center
 
    size = "5,5"
-   bgcolor=none
 
    ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled,
        margin="0.3,0.055"]
@@ -381,8 +376,6 @@ following manner:
 .. digraph:: Example
    :align: center
 
-   bgcolor=none
-
    VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
    LAND_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box,
        style=filled]
@@ -461,7 +454,6 @@ of as flying vehicles.
    :align: center
 
    size = "7,5"
-   bgcolor=none
 
    VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
    AIR_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
@@ -514,7 +506,6 @@ this:
 .. digraph:: Example
 
    size = "7, 5"
-   bgcolor = none
 
    root   [color=royalblue,
       fillcolor=powderblue,

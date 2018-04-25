@@ -10,20 +10,19 @@ Rose Documentation
 ==================
 
 Rose is a system for writing, editing and running application configurations.
-
-.. TODO - Add "What Is Rose" link when written.
+:ref:`What Is Rose <Rose Tutorial>`?
 
 .. image:: img/rose-logo.png
    :width: 250px
    :align: center
 
-Rose uses the `cylc`_ workflow engine for running suites of inter-dependent
-applications. :ref:`What Is Cylc? <cylc-introduction>`
+Rose uses the `Cylc`_ workflow engine for running suites of inter-dependent
+applications. :ref:`What Is Cylc? <Cylc-introduction>`
 
 .. image:: img/cylc-logo.png
    :width: 250px
    :align: center
-   :target: `cylc`_
+   :target: `Cylc`_
 
 
 .. toctree::
@@ -34,6 +33,7 @@ applications. :ref:`What Is Cylc? <cylc-introduction>`
    installation
    tutorial/cylc/index
    tutorial/rose/index
+   cheat-sheet
    glossary
 
 

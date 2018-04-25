@@ -4,8 +4,9 @@ Widget Development
 ==================
 
 
-The ``rose edit`` GUI displays configurations using built-in widgets. For more
-complex requirements ``rose edit`` supports custom widgets as plugins.
+The :ref:`command-rose-config-edit` GUI displays configurations using built-in
+widgets. For more complex requirements :ref:`command-rose-config-edit` supports
+custom widgets as plugins.
 
 In this tutorial we will write a custom widget which offers typing suggestions
 when entering usernames.
@@ -22,7 +23,7 @@ when entering usernames.
 Example
 -------
 
-Create a new rose app by running the following command replacing
+Create a new Rose app by running the following command replacing
 ``DIRECTORY`` with the path in which to create the suite:
 
 .. code-block:: sub
@@ -30,7 +31,7 @@ Create a new rose app by running the following command replacing
    rose tutorial widget <DIRECTORY>
    cd <DIRECTORY>
 
-You will now have a rose app which contains the following files:
+You will now have a Rose app which contains the following files:
 
 .. code-block:: sub
 
@@ -43,7 +44,8 @@ You will now have a rose app which contains the following files:
    |               `-- username.py
    `-- rose-app.conf
 
-The ``rose-app.conf`` file defines an environment variable called ``USER``:
+The :rose:file:`rose-app.conf` file defines an environment variable called
+``USER``:
 
 .. code-block:: rose
 
@@ -61,9 +63,9 @@ Initial Code
 ^^^^^^^^^^^^
 
 We will start with a slimmed-down copy of the class
-``rose.config_editor.valuewidget.text.RawValueWidget`` which you will find
-in the file ``username.py``. It contains all the API calls you would normally
-ever need.
+:py:class:`rose.config_editor.valuewidget.text.RawValueWidget` which you will
+find in the file ``username.py``. It contains all the API calls you would
+normally ever need.
 
 We are now going to extend the widget to be more useful.
 
@@ -135,18 +137,18 @@ into it:
    widget[rose-config-edit]=username.UsernameValueWidget
 
 This means that we've set our widget up for the option ``USER``
-under the section ``env``. It will now be used as the widget for this
+under the section :guilabel:`env`. It will now be used as the widget for this
 variable's value.
 
 Results
 ^^^^^^^
 
 Try opening up the config editor in the application directory (where the
-``rose-app.conf`` is) by running::
+:rose:file:`rose-app.conf` is) by running::
 
-   rose edit
+   rose config-edit
 
-Navigate to the ``env`` page. You should see your widget on
+Navigate to the :guilabel:`env` page. You should see your widget on
 the page! As you type, it should provide helpful
 auto-completion of usernames. Try typing your own username.
 

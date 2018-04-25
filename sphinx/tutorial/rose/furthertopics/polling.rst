@@ -13,8 +13,12 @@ requires said file.
 Example
 -------
 
-Create a new cylc suite (or just a new directory somewhere - e.g. in
-your homespace) containing a blank ``rose-suite.conf`` and a ``suite.rc``
+Create a new Rose suite configuration::
+
+   mkdir -p ~/rose-tutorial/polling
+   cd ~/rose-tutorial/polling
+
+Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
 file that looks like this:
 
 .. code-block:: cylc
@@ -26,7 +30,7 @@ file that looks like this:
            graph = """compose_letter => send_letter
                       bob => read_letter"""
 
-This sets up a simple suite which consists of the following:
+This is a simple suite which consists of the following:
 
 * A ``compose_letter`` task.
 * A ``send_letter`` task which is run once the letter is composed.
@@ -65,9 +69,10 @@ In the suite directory create an ``app`` directory.
 
 In the ``app`` directory create a directory called ``bob``.
 
-In the newly-created ``bob`` directory, create a ``rose-app.conf`` file.
+In the newly-created ``bob`` directory, create a :rose:file:`rose-app.conf`
+file.
 
-Edit the ``rose-app.conf`` file to look like this:
+Edit the :rose:file:`rose-app.conf` file to look like this:
 
 .. code-block:: rose
 
@@ -90,7 +95,7 @@ We now have an app that does the following:
    In practice, it may be preferable to have the ``[command]`` section at
    the top as that should contain the main command(s) being run by the app.
 
-Save your changes and run the suite using ``rose suite-run``.
+Save your changes and run the suite using :ref:`command-rose-suite-run`.
 
 The suite should now run.
 
@@ -106,7 +111,8 @@ At present we have specified our own routine for testing for the existence
 of a particular file using the ``test`` option. However, Rose provides a
 simpler method for doing this.
 
-Edit the ``rose-app.conf`` in your ``bob`` app to look like the following:
+Edit the :rose:file:`rose-app.conf` in your ``bob`` app to look like the
+following:
 
 .. code-block:: rose
 

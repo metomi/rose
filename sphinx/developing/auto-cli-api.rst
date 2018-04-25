@@ -2,9 +2,9 @@ Auto CLI API
 ============
 
 
-The rose command line API is auto-documented by the extension ``auto-cli-api``.
+The Rose command line API is auto-documented by the extension ``auto-cli-api``.
 
-This translates the rose CLI help into reStructuredText. To keep the CLI docs
+This translates the Rose CLI help into reStructuredText. To keep the CLI docs
 clean they are written in a plain format which has some reStructuredText
 features built in.
 

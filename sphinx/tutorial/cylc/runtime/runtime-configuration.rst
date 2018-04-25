@@ -40,15 +40,15 @@ Each job is also provided with some standard environment variables e.g:
     The :term:`cycle point` for the associated task
     *(e.g. 20171009T0950)*.
 
-There are many more environment variables - see the `cylc user guide`_ for more
+There are many more environment variables - see the `Cylc User Guide`_ for more
 information.
 
 
 Job Submission
 --------------
 
-By default cylc runs :term:`jobs <job>` on the machine where the suite is
-running. We can tell cylc to run jobs on other machines by setting the
+By default Cylc runs :term:`jobs <job>` on the machine where the suite is
+running. We can tell Cylc to run jobs on other machines by setting the
 ``[remote]host`` setting to the name of the host, e.g. to run a task on the host
 ``computehost`` you might write:
 
@@ -138,7 +138,7 @@ Sometimes jobs fail. This can be caused by two factors:
   * The :term:`job host` becoming unavailable or overloaded;
   * An issue with the directives.
 
-In the event of failure cylc can automatically re-submit (retry) jobs. We
+In the event of failure Cylc can automatically re-submit (retry) jobs. We
 configure retries using the ``[job]execution retry delays`` and
 ``[job]submission retry delays`` settings. These settings are both set to an
 :term:`ISO8601 duration`, e.g. setting ``execution retry delays`` to ``PT10M``
@@ -165,17 +165,17 @@ duration, e.g:
 Start, Stop, Restart
 --------------------
 
-We have seen how to start and stop cylc suites with ``cylc run`` and
-``cylc stop`` respectively. The ``cylc stop`` command causes cylc to wait
+We have seen how to start and stop Cylc suites with ``cylc run`` and
+``cylc stop`` respectively. The ``cylc stop`` command causes Cylc to wait
 for all running jobs to finish before it stops the suite. There are two
 options which change this behaviour:
 
 ``cylc stop --kill``
-   When the ``--kill`` option is used cylc will kill all running jobs
+   When the ``--kill`` option is used Cylc will kill all running jobs
    before stopping. *Cylc can kill jobs on remote hosts and uses the
    appropriate command when a* :term:`batch system` *is used.*
 ``cylc stop --now --now``
-   When the ``--now`` option is used twice cylc stops straight away, leaving
+   When the ``--now`` option is used twice Cylc stops straight away, leaving
    any jobs running.
 
 Once a suite has stopped it is possible to restart it using the
@@ -319,13 +319,13 @@ off and carries on as normal.
 
       Next we will test the ``get_observations`` tasks.
 
-      Open the cylc GUI by running the following command:
+      Open the Cylc GUI by running the following command:
 
       .. code-block:: bash
 
          cylc gui runtime-tutorial &
 
-      Run the suite either by pressing the play button in the cylc GUI or by
+      Run the suite either by pressing the play button in the Cylc GUI or by
       running the command:
 
       .. code-block:: bash
@@ -385,7 +385,7 @@ off and carries on as normal.
 
    #. **Run The Suite.**
 
-      Open the cylc GUI (if not already open) and run the suite.
+      Open the Cylc GUI (if not already open) and run the suite.
 
       .. spoiler:: Hint hint
 
@@ -395,7 +395,7 @@ off and carries on as normal.
 
          Run the suite either by:
           
-         * Pressing the play button in the cylc GUI. Then, ensuring that
+         * Pressing the play button in the Cylc GUI. Then, ensuring that
            "Cold Start" is selected within the dialogue window, pressing the
            "Start" button.
          * Running the command ``cylc run runtime-tutorial``.

@@ -6,7 +6,6 @@
 # -----------------------------------------------------------------------------
 from copy import copy
 import math
-import os
 import jinja2
 
 
@@ -175,6 +174,8 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
 
 def plot_vector_grid(filename, x_grid, y_grid):
     try:
+        import matplotlib
+        matplotlib.use('Agg')
         import matplotlib.pyplot as plt
     except ImportError:
         print 'Plotting diasbled'
@@ -272,12 +273,7 @@ def parse_domain(domain):
     }
 
 
-def generate_html_map(filename, data, domain, resolution):
-    template_file = os.path.join(
-        os.environ['CYLC_SUITE_RUN_DIR'],
-        'lib',
-        'template',
-        'map.html')
+def generate_html_map(filename, template_file, data, domain, resolution):
     with open(template_file, 'r') as template:
         with open(filename, 'w+') as html_file:
             html_file.write(jinja2.Template(template.read()).render(

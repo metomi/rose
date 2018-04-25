@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""An extension providing pygments lexers for suite.rc files and cylc graph
+"""An extension providing pygments lexers for suite.rc files and Cylc graph
 strings."""
 
 from pygments.lexer import RegexLexer, bygroups, include, words
@@ -26,9 +26,9 @@ from pygments.token import (Name, Comment, Text, Operator, String,
 
 
 class CylcLexer(RegexLexer):
-    """Pygments lexer for the cylc suite.rc language."""
+    """Pygments lexer for the Cylc suite.rc language."""
 
-    # Pygments tokens for cylc suite.rc elements which have no direct
+    # Pygments tokens for Cylc suite.rc elements which have no direct
     # translation.
     HEADING_TOKEN = Name.Tag
     SETTING_TOKEN = Name.Variable
@@ -248,7 +248,7 @@ class CylcLexer(RegexLexer):
 
 
 class CylcGraphLexer(CylcLexer):
-    """Pygments lexer for cylc graph strings."""
+    """Pygments lexer for Cylc graph strings."""
 
     tokens = dict(CylcLexer.tokens)
     tokens['root'] = list(tokens['graph'])

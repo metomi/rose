@@ -42,10 +42,13 @@ Example
 -------
 
 For these examples we will create an example app called
-``hello_world_app`` that could be part of a typical suite.
+``macro_tutorial_app`` that could be part of a typical suite.
 
-Create a directory for your suite app called ``hello_world_app``.
-Inside the ``hello_world_app`` directory, create a :rose:file:`rose-app.conf`
+Create a directory for your suite app called ``macro_tutorial_app``::
+
+   mkdir -p ~/rose-tutorial/macro_tutorial_app
+
+Inside the ``macro_tutorial_app`` directory, create a :rose:file:`rose-app.conf`
 file and paste in the following contents:
 
 .. code-block:: rose
@@ -60,7 +63,7 @@ The metadata for the app lives under the ``meta/`` sub directory.
 Our new macro will live with the metadata.
 
 For this example, we want to check the value of the option
-``env=WORLD`` in our ``hello_world_app`` application. Specifically,
+``env=WORLD`` in our ``macro_tutorial_app`` application. Specifically,
 for this example, we want our macro to give us an error if the 'world'
 is too far away from Earth.
 
@@ -264,16 +267,16 @@ in the application directory. Navigate to the ``env`` page, and
 change the option ``env=WORLD`` to ``Jupiter``.
 
 To run the macro, select the menu
-:menuselection:`Metadata --> hello_world_app -->
+:menuselection:`Metadata --> macro_tutorial_app -->
 planet.PlanetChecker.validate`.
 
 It should either return an "OK" dialog, or give an error dialog
 like the one below depending on the current Earth-Jupiter distance.
 
-.. image:: img/rose-macro-hello-world-app-fail.png
+.. image:: img/rose-macro-tutorial-app-fail.png
    :width: 350px
    :align: center
-   :alt: Screenshot of a rose macro failure message.
+   :alt: Screenshot of a Rose macro failure message.
 
 If there is an error, the variable should display an error icon on
 the ``env`` page, which you can hover-over to get the error text as in
@@ -283,7 +286,7 @@ re-running your macro.
 .. image:: img/rose-edit-macro-fail.png
    :width: 450px
    :align: center
-   :alt: Screenshot of setting with an error detected by a rose macro.
+   :alt: Screenshot of setting with an error detected by a Rose macro.
 
 Try changing the value of ``env=WORLD`` to other solar system planets
 and re-running the macro.
@@ -407,7 +410,7 @@ Your class should now look like this:
 Your transform macro is now ready to use.
 
 You can run it from :ref:`command-rose-config-edit` via the menu
-:menuselection:`metadata --> hello_world_app --> planet.PlanetChanger.transform`.
+:menuselection:`metadata --> macro_tutorial_app --> planet.PlanetChanger.transform`.
 
 It should give a dialog explaining the changes it's made and asking
 for permission to apply them. If you click OK, the changes will be
@@ -545,8 +548,8 @@ that will be used as the new planet.
 Save your changes and run the transformer macro either from the
 command line or :ref:`command-rose-config-edit`. You should be prompted to
 provide a value for ``planet_name``. At the command line this will take the
-form of a prompt while in rose edit you will be presented with a dialog to
-enter values in, with defaults already entered for you.
+form of a prompt while in :ref:`command-rose-config-edit` you will be presented
+with a dialog to enter values in, with defaults already entered for you.
 
 Specify a value to use for ``planet_name`` using a quoted string,
 e.g. ``"Vulcan"`` and accept the proposed changes. The ``WORLD``
@@ -563,7 +566,7 @@ metadata option.
 
 For example, our validator and transformer macros above are both
 specific to ``env=WORLD``. Open the file
-``hello_world_app/meta/rose-meta.conf`` in a text editor, and
+``macro_tutorial_app/meta/rose-meta.conf`` in a text editor, and
 add the following lines
 
 .. code-block:: rose

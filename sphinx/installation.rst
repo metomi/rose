@@ -4,14 +4,15 @@
 Installation
 ============
 
+.. _GitHub: https://github.com/metomi/rose
 .. _archives: https://github.com/metomi/rose/tags
 
-The source code for Rose is available via `GitHub`_, code releases
-are available in ``zip`` and ``tar.gz`` `archives`_.
+The source code for Rose is available via `GitHub <Rose GitHub>`_, code
+releases are available in ``zip`` and ``tar.gz`` `archives`_.
 
 1. Un-pack the archive file into an appropriate location on your system.
 2. Add the ``rose/bin/`` directory into your ``PATH`` environment variable.
-3. Check system compatibility by running ``rose check-software``.
+3. Check system compatibility by running :ref:`command-rose-check-software`.
 
 
 System Requirements
@@ -20,7 +21,8 @@ System Requirements
 Rose runs on Unix/Linux systems and is known to run on RHEL6 and a number of
 systems including those documented under `metomi-vms`_.
 
-System compatibility can be tested using the ``rose check-software`` command.
+System compatibility can be tested using the :ref:`command-rose-check-software`
+command.
 
 .. script-include:: rose check-software --rst
 
@@ -28,7 +30,7 @@ System compatibility can be tested using the ``rose check-software`` command.
 Host Requirements
 -----------------
 
-Whilst you can install and use Rose & cylc on a single host (i.e. machine),
+Whilst you can install and use Rose & Cylc on a single host (i.e. machine),
 most installations are likely to be more complex. There are five types of
 installation:
 
@@ -36,7 +38,7 @@ Hosts For Running Cylc Suites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Each user can just run their suites on the host where they issue the
-``rose suite-run`` command. However, the local host may not meet the
+:ref:`command-rose-suite-run` command. However, the local host may not meet the
 necessary requirements for connectivity (to the hosts running the tasks)
 or for availability (the host needs to remain up for the duration of
 the suite). Therefore, Rose can be configured to run the suites on
@@ -44,9 +46,9 @@ remote hosts. If multiple hosts are available, by default the host with
 the lowest system load average will be used.
 
 Installation requirements:
-   * Rose, cylc, Bash, Python, jinja2.
-   * Subversion & FCM *(only if you want* ``rose suite-run`` *to install files
-     from Subversion using FCM keywords).*
+   * Rose, Cylc, Bash, Python, jinja2.
+   * Subversion & FCM *(only if you want* :ref:`command-rose-suite-run` *to
+     install files from Subversion using FCM keywords).*
 Connectivity requirements:
    * Must be able to submit tasks to the hosts which run the suite tasks,
      either directly or via SSH access to another host.
@@ -55,28 +57,28 @@ Hosts For Running Tasks In Suites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Installation requirements:
-   * Rose, cylc, Bash, Python.
+   * Rose, Cylc, Bash, Python.
    * Subversion & FCM *only if you want to use the Rose install utility
      to install files from Subversion using FCM keywords*.
 
 Connectivity requirements:
-   * Must be able to communicate back to the hosts running the cylc suites
+   * Must be able to communicate back to the hosts running the Cylc suites
      via HTTPS (preferred), HTTP or SSH.
 
 Hosts For Running User Interactive Tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Installation requirements:
-   * Rose, cylc, Bash, Python, requests, Subversion, FCM,
+   * Rose, Cylc, Bash, Python, requests, Subversion, FCM,
      Pygraphviz (+ graphviz), PyGTK (+ GTK).
 
 Connectivity requirements:
    * Must have HTTP access to the hosts running the Rosie web service.
    * Must have access to the Rosie Subversion repositories via the
      appropriate protocol.
-   * Must have HTTP and SSH access to the hosts running the cylc suites.
+   * Must have HTTP and SSH access to the hosts running the Cylc suites.
    * Must share user accounts and ``$HOME`` directories with the hosts running
-     the cylc suites.
+     the Cylc suites.
 
 Hosts For Running Rose Bush
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -85,7 +87,7 @@ Installation requirements:
    * Rose, Bash, Python, cherrypy, jinja2.
 
 Connectivity requirements:
-   * Must be able to access the home directories of users' cylc run directories.
+   * Must be able to access the home directories of users' Cylc run directories.
 
 Hosts For Rosie Subversion Repositories And The Rosie Web Services
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -98,13 +100,13 @@ Installation requirements:
 
 .. note::
 
-   This section has assumed that you wish to use Rose & cylc (including
+   This section has assumed that you wish to use Rose & Cylc (including
    their respective GUIs) and use Rosie to store your suites. However,
    there are many ways of using Rose. For instance:
 
    * You can use Rose without using cylc.
-   * You can use Rose & cylc but not use Rosie.
-   * You can use Rose & cylc from the command line without using their GUIs.
+   * You can use Rose & Cylc but not use Rosie.
+   * You can use Rose & Cylc from the command line without using their GUIs.
 
 
 Configuring Rose

@@ -9,14 +9,16 @@
        .. include:: path/to/thisfile.rst
           :start-line: 1
 
-.. _GitHub: https://github.com/metomi/rose
-.. _metomi-vms: https://github.com/metomi/metomi-vms
-.. _cylc: http://cylc.github.io/cylc/
-.. _cylc user guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
-.. _Jinja2: http://jinja.pocoo.org/
+.. _Cylc: http://cylc.github.io/cylc/
+.. _Cylc User Guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
+.. _Cylc Suite Design Guide: http://cylc.github.io/cylc/doc/suite-design-guide.pdf
 .. _FCM: https://metomi.github.io/fcm/doc/
+.. _FCM User Guide: http://metomi.github.io/fcm/doc/user_guide/
+.. _INI: https://en.wikipedia.org/wiki/INI_file
+.. _Jinja2: http://jinja.pocoo.org/
+.. _metomi-vms: https://github.com/metomi/metomi-vms
+.. _PyGTK: http://www.pygtk.org/
 .. _Python: https://www.python.org/
 .. _Python Regular Expressions: https://docs.python.org/2/library/re.html#regular-expression-syntax
-.. _bash: https://www.gnu.org/software/bash/
-.. _PyGTK: http://www.pygtk.org/
-.. _INI: https://en.wikipedia.org/wiki/INI_file
+.. _SRS: https://code.metoffice.gov.uk/
+.. _SVN: https://subversion.apache.org/

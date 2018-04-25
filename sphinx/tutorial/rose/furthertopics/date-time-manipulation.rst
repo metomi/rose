@@ -1,18 +1,21 @@
+.. _rose-tutorial-datetime-manipulation:
+
 Date and Time Manipulation
 ==========================
 
 :term:`Datetime cycling <datetime cycling>` suites inevitably involve
 performing some form of datetime arithmetic. In the
 :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>` we wrote
-in the cylc tutorial this arithmetic was done using the ``cylc cyclepoint``
+in the Cylc tutorial this arithmetic was done using the ``cylc cyclepoint``
 command. For example we calculated the cycle point three hours before the
 present cycle using::
 
    cylc cyclepoint --offset-hours=-3
 
-Rose provides the ``rose date`` command which provides functionality beyond
-``cylc cyclepoint`` as well as the ``ROSE_DATAC`` environment variable which
-provides an easy way to get the path of the ``share/cycle`` directory.
+Rose provides the :ref:`command-rose-date` command which provides functionality
+beyond ``cylc cyclepoint`` as well as the :envvar:`ROSE_DATAC` environment
+variable which provides an easy way to get the path of the ``share/cycle``
+directory.
 
 
 The ``rose date`` Command
@@ -58,7 +61,7 @@ cyclepoint using the ``CYLC_TASK_CYCLE_POINT`` environment variable:
        [[hello_america]]
            script = rose date $CYLC_TASK_CYCLE_POINT --format='MM-DD-CCYY'
 
-Alternatively, if you are providing the standard rose task environment using
+Alternatively, if you are providing the standard Rose task environment using
 :ref:`command-rose-task-env` then :ref:`command-rose-date` can use the ``-c``
 option to pick up the cycle point:
 
@@ -109,7 +112,7 @@ The :ref:`command-rose-task-env` command provides the environment variable
 ``share/cycle`` directory.
 
 To get the path to a previous (or a future) ``share/cycle`` directory we can
-provide an offset to ``rose task-env`` e.g::
+provide an offset to :ref:`command-rose-task-env` e.g::
 
    rose task-env --cycle-offset=PT1H
 
