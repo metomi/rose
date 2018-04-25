@@ -237,7 +237,7 @@ off and carries on as normal.
       .. spoiler:: Solution warning
 
          You can check your answers by running the following commands
-         (hyphens and colons optional):
+         (hyphens and colons optional but can't be mixed):
 
          For the initial cycle point:
             ``rose date --utc --offset -PT7H --format CCYY-MM-DDThh:00Z``

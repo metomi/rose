@@ -198,13 +198,13 @@ seen so far. The number ``1`` which appears below each task is the
 .. note::
 
    A graph can be drawn in multiple ways, for instance the following two
-   examples are equilivalent:
+   examples are equivalent:
 
    .. image:: ../img/cylc-graph-reversible.svg
       :align: center
 
    The graph drawn by ``cylc graph`` may vary slightly from one run to another
-   but the output will always be equivalent.
+   but the tasks and dependencies will always be the same.
 
 .. practical::
 
