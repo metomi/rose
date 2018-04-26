@@ -5,12 +5,18 @@
 
 
 Parameterised Tasks
--------------------
+===================
 
 Parameterised tasks (see :term:`parameterisation`) provide a way of implicitly
 looping over tasks without the need for Jinja2.
 
-Parameters are defined in their own section, e.g:
+
+Cylc Parameters
+---------------
+
+.. ifnotslides::
+
+   Parameters are defined in their own section, e.g:
 
 .. code-block:: cylc
 
@@ -18,8 +24,10 @@ Parameters are defined in their own section, e.g:
        [[parameters]]
            param = foo, bar, baz
 
-They can then be referenced by writing the name of the parameter in angle
-brackets, e.g:
+.. ifnotslides::
+
+   They can then be referenced by writing the name of the parameter in angle
+   brackets, e.g:
 
 .. code-block:: cylc
 
@@ -30,8 +38,12 @@ brackets, e.g:
        [[task<param>]]
            script = echo 'Hello World!'
 
-When the ``suite.rc`` file is read by Cylc, the parameters will be expanded.
-For example the code above is equivalent to:
+.. nextslide::
+
+.. ifnotslides::
+
+   When the ``suite.rc`` file is read by Cylc, the parameters will be expanded.
+   For example the code above is equivalent to:
 
 .. code-block:: cylc
 
@@ -46,7 +58,11 @@ For example the code above is equivalent to:
        [[task_baz]]
            script = echo 'Hello World!'
 
-We can refer to a specific parameter by writing it after an ``=`` sign:
+.. nextslide::
+
+.. ifnotslides::
+
+   We can refer to a specific parameter by writing it after an ``=`` sign:
 
 .. code-block:: cylc
 
@@ -54,9 +70,15 @@ We can refer to a specific parameter by writing it after an ``=`` sign:
        [[task<param=baz>]]
            script = 'Do something special for baz!'
 
-The name of the parameter is provided to the job as an environment variable
-called ``CYLC_TASK_PARAM_<parameter>`` where ``<parameter>`` is the name of
-the parameter (in the present case ``param``):
+
+Environment Variables
+---------------------
+
+.. ifnotslides::
+
+   The name of the parameter is provided to the job as an environment variable
+   called ``CYLC_TASK_PARAM_<parameter>`` where ``<parameter>`` is the name of
+   the parameter (in the present case ``param``):
 
 .. code-block:: cylc
 
@@ -64,6 +86,10 @@ the parameter (in the present case ``param``):
        [[task<param=bar>]]
            # This is equivalent to `echo 'bar'`
            script = echo $CYLC_TASK_PARAM_param
+
+
+Parameter Types
+---------------
 
 Parameters can be either words or integers:
 
@@ -83,7 +109,9 @@ Parameters can be either words or integers:
                task<baz>
            """
 
-.. warning::
+.. nextslide::
+
+.. hint::
 
    Remember that Cylc automatically inserts an underscore between the task and
    the parameter, e.g. the following lines are equivalent:
@@ -93,11 +121,19 @@ Parameters can be either words or integers:
       task<baz=pub>
       task_pub
 
-.. note::
+.. nextslide::
 
-   When using integer parameters, to prevent confusion, Cylc prefixes the
-   parameter value with the parameter name. For example, the above code is
-   equivalent to:
+.. hint::
+
+   .. ifnotslides::
+
+      When using integer parameters, to prevent confusion, Cylc prefixes the
+      parameter value with the parameter name. For example, the above code is
+      equivalent to:
+
+   .. ifslides::
+
+      Cylc prefixes integer parameters with the parameter name:
 
    .. code-block:: cylc
 
@@ -119,8 +155,12 @@ Parameters can be either words or integers:
                   task_bol
               """
 
-Using parameters the ``get_observations`` configuration could be written like
-so:
+.. nextslide::
+
+.. ifnotslides::
+
+   Using parameters the ``get_observations`` configuration could be written like
+   so:
 
 .. code-block:: cylc
 
@@ -149,7 +189,19 @@ so:
            [[[environment]]]
                SITE_ID = 3005
 
-For more information see the `Cylc User Guide`_.
+.. nextslide::
+
+.. ifnotslides::
+
+   For more information see the `Cylc User Guide`_.
+
+.. ifslides::
+
+   .. rubric:: This practical continues on from the
+      :ref:`Jinja2 practical <cylc-tutorial-jinja2-practical>`.
+
+   Next section: :ref:`Which approach to use
+   <cylc-tutorial-consolidation-conclusion>`
 
 
 .. _cylc-tutorial-parameters-practical:

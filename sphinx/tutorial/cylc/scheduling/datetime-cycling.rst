@@ -9,10 +9,12 @@ Date-Time Cycling
 In the last section we looked at writing an :term:`integer cycling` workflow,
 one where the :term:`cycle points <cycle point>` are numbered.
 
-Typically workflows are repeated at a regular time interval, say every day
-or every few hours. To make this easier Cylc has a date-time cycling mode
-where the :term:`cycle points <cycle point>` use date and time specifications
-rather than numbers.
+.. ifnotslides::
+
+   Typically workflows are repeated at a regular time interval, say every day
+   or every few hours. To make this easier Cylc has a date-time cycling mode
+   where the :term:`cycle points <cycle point>` use date and time specifications
+   rather than numbers.
 
 .. admonition:: Reminder
    :class: tip
@@ -34,32 +36,22 @@ In Cylc, dates, times and durations are written using the :term:`ISO8601` format
 Date-Times
 ^^^^^^^^^^
 
-In ISO8601, datetimes are written from the largest unit to the smallest
-(i.e: year, month, day, hour, minute, second in succession) with the ``T``
-character separating the date and time components. For example, midnight
-on the 1st of January 2000 is written ``20000101T000000``.
+.. ifnotslides::
 
-For brevity we may omit seconds (and minutes) from the time i.e:
-``20000101T0000`` (``20000101T00``).
+   In ISO8601, datetimes are written from the largest unit to the smallest
+   (i.e: year, month, day, hour, minute, second in succession) with the ``T``
+   character separating the date and time components. For example, midnight
+   on the 1st of January 2000 is written ``20000101T000000``.
 
-For readability we may add hyphen (``-``) characters between the date
-components and colon (``:``) characters between the time components, i.e:
-``2000-01-01T00:00``. This is the "extended" format.
+   For brevity we may omit seconds (and minutes) from the time i.e:
+   ``20000101T0000`` (``20000101T00``).
 
-.. warning::
+   For readability we may add hyphen (``-``) characters between the date
+   components and colon (``:``) characters between the time components, i.e:
+   ``2000-01-01T00:00``. This is the "extended" format.
 
-   The "basic" (purely numeric except for ``T``) and "extended" (written with
-   hyphens and colons) formats cannot be mixed. For example the following
-   date-times are invalid:
-
-   .. code-block:: none
-
-      2000-01-01T0000
-      20000101T00:00
-
-
-Time-zone information can be added onto the end. UTC is written ``Z``,
-UTC+1 is written ``+01``, etc. E.G: ``2000-01-01T00:00Z``.
+   Time-zone information can be added onto the end. UTC is written ``Z``,
+   UTC+1 is written ``+01``, etc. E.G: ``2000-01-01T00:00Z``.
 
 .. Diagram of an iso8601 datetime's components.
 
@@ -82,13 +74,28 @@ UTC+1 is written ``+01``, etc. E.G: ``2000-01-01T00:00Z``.
    \underbrace{\huge \text{Z}}_{_{\text{Time Zone}}}
    }^{\text{Time Components}}}
 
+.. nextslide::
+
+.. warning::
+
+   The "basic" (purely numeric except for ``T``) and "extended" (written with
+   hyphens and colons) formats cannot be mixed. For example the following
+   date-times are invalid:
+
+   .. code-block:: none
+
+      2000-01-01T0000
+      20000101T00:00
+
 .. _tutorial-iso8601-durations:
 
 Durations
 ^^^^^^^^^
 
-In ISO8601, durations are prefixed with a ``P`` and are written with a character
-following each unit:
+.. ifnotslides::
+
+   In ISO8601, durations are prefixed with a ``P`` and are written with a
+   character following each unit:
 
 * ``Y`` for year.
 * ``M`` for month.
@@ -98,8 +105,13 @@ following each unit:
 * ``M`` for minute.
 * ``S`` for second.
 
-As with datetimes the components are written in order from largest to smallest
-and the date and time components are separated by the ``T`` character. E.G:
+.. nextslide::
+
+.. ifnotslides::
+
+   As with datetimes the components are written in order from largest to
+   smallest and the date and time components are separated by the ``T``
+   character. E.G:
 
 * ``P1D``: one day.
 * ``PT1H``: one hour.
@@ -124,9 +136,11 @@ recurrences:
 Inferred Recurrence
 ^^^^^^^^^^^^^^^^^^^
 
-A recurrence can be inferred from a date-time by omitting digits from the
-front. For example, if the year is omitted then the recurrence can be inferred
-to be annual. E.G:
+.. ifnotslides::
+
+   A recurrence can be inferred from a date-time by omitting digits from the
+   front. For example, if the year is omitted then the recurrence can be
+   inferred to be annual. E.G:
 
 * ``01-01T00``: every year on the 1st of January.
 * ``01T00``: every month on the first of the month.
@@ -138,8 +152,10 @@ to be annual. E.G:
 Recurrence Formats
 ^^^^^^^^^^^^^^^^^^
 
-As with integer cycling, recurrences start, by default, at the
-:term:`initial cycle point`. We can override this in one of two ways:
+.. ifnotslides::
+
+   As with integer cycling, recurrences start, by default, at the
+   :term:`initial cycle point`. We can override this in one of two ways:
 
 1. By defining an arbitrary cycle point (``datetime/recurrence``):
 
@@ -149,6 +165,8 @@ As with integer cycling, recurrences start, by default, at the
    * ``2000-01-01T12/T00``: every day at midnight starting on the first midnight
      after the 1st of January at 12:00 (i.e. ``2000-01-02T00``).
 
+.. nextslide::
+
 .. _tutorial-cylc-datetime-offset-icp:
 
 2. By defining an offset from the initial cycle point (``offset/recurrence``).
@@ -157,6 +175,8 @@ As with integer cycling, recurrences start, by default, at the
    * ``+P1Y/P1Y``: every year starting one year after the initial cycle point.
    * ``+PT1H/T00``: every day starting on the first midnight after the point one
      hour after the initial cycle point.
+
+.. nextslide::
 
 .. warning::
 
@@ -182,20 +202,29 @@ As with integer cycling, recurrences start, by default, at the
 The Initial & Final Cycle Points
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are two special recurrences for the initial and final cycle points:
+.. ifnotslides::
+
+   There are two special recurrences for the initial and final cycle points:
 
 * ``R1``: repeat once at the initial cycle point.
 * ``R1/P0Y``: repeat once at the final cycle point.
 
+.. TODO - change terminology as done in the cylc user guide, "repeat" can be
+   confusing. Use occur?
+
 Inter-Cycle Dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Inter-cycle dependencies are written as ISO8601 durations, e.g:
+.. ifnotslides::
+
+   Inter-cycle dependencies are written as ISO8601 durations, e.g:
 
 * ``foo[-P1D]``: the task ``foo`` from the cycle one day before.
 * ``bar[-PT1H30M]``: the task ``bar`` from the cycle 1 hour 30 minutes before.
 
-The initial cycle point can be referenced using a caret character ``^``, e.g:
+.. ifnotslides::
+
+   The initial cycle point can be referenced using a caret character ``^``, e.g:
 
 * ``baz[^]``: the task ``baz`` from the initial cycle point.
 
@@ -205,14 +234,17 @@ The initial cycle point can be referenced using a caret character ``^``, e.g:
 UTC Mode
 --------
 
-Due to all of the difficulties caused by time zones, particularly with
-respect to daylight savings, we typically use UTC (that's the ``+00`` time
-zone) in Cylc suites.
+.. ifnotslides::
 
-When a suite uses UTC all of the cycle points will be written in the
-``+00`` time zone.
+   Due to all of the difficulties caused by time zones, particularly with
+   respect to daylight savings, we typically use UTC (that's the ``+00`` time
+   zone) in Cylc suites.
 
-To make your suite use UTC set the ``[cylc]UTC mode`` setting to ``True``, i.e:
+   When a suite uses UTC all of the cycle points will be written in the
+   ``+00`` time zone.
+
+   To make your suite use UTC set the ``[cylc]UTC mode`` setting to ``True``,
+   i.e:
 
 .. code-block:: cylc
 
@@ -225,75 +257,91 @@ To make your suite use UTC set the ``[cylc]UTC mode`` setting to ``True``, i.e:
 Putting It All Together
 -----------------------
 
-Cylc was originally developed for running operational weather forecasting. In
-this section we will outline a basic (dummy) weather-forecasting suite and
-explain how to implement it in cylc.
+.. ifslides::
 
-.. note::
+   We will now develop a simple weather forecasting suite.
 
-   Technically the suite outlined in this section is a `nowcasting`_ suite.
-   We will refer to it as forecasting for simplicity.
+.. ifnotslides::
 
-A basic weather-forecasting workflow consists of three main steps:
+   Cylc was originally developed for running operational weather forecasting. In
+   this section we will outline a basic (dummy) weather-forecasting suite and
+   explain how to implement it in cylc.
+
+   .. note::
+
+      Technically the suite outlined in this section is a `nowcasting`_ suite.
+      We will refer to it as forecasting for simplicity.
+
+   A basic weather-forecasting workflow consists of three main steps:
 
 1. Gathering Observations
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We gather observations from different weather stations and use them to
-build a picture of the current weather. Our dummy weather forecast
-will get wind observations from four weather stations:
+.. ifnotslides::
 
-* Belmullet
-* Camborne
-* Heathrow
-* Shetland
+   We gather observations from different weather stations and use them to
+   build a picture of the current weather. Our dummy weather forecast
+   will get wind observations from four weather stations:
 
-The tasks which retrieve observation data will be called
-``get_observations_<site>`` where ``site`` is the name of the weather
-station in question.
+   * Belmullet
+   * Camborne
+   * Heathrow
+   * Shetland
 
-Next we need to consolidate these observations so that our forecasting
-system can work with them. To do this we have a
-``consolidate_observations`` task.
+   The tasks which retrieve observation data will be called
+   ``get_observations_<site>`` where ``site`` is the name of the weather
+   station in question.
 
-We will fetch wind observations **every three hours starting from the initial
-cycle point**.
+   Next we need to consolidate these observations so that our forecasting
+   system can work with them. To do this we have a
+   ``consolidate_observations`` task.
 
-The ``consolidate_observations`` task must run after the
-``get_observations<site>`` tasks.
+   We will fetch wind observations **every three hours starting from the initial
+   cycle point**.
+
+   The ``consolidate_observations`` task must run after the
+   ``get_observations<site>`` tasks.
 
 .. digraph:: example
    :align: center
 
-   size = "5,4"
+   size = "7,4"
 
    get_observations_belmullet -> consolidate_observations
    get_observations_camborne -> consolidate_observations
    get_observations_heathrow -> consolidate_observations
    get_observations_shetland -> consolidate_observations
 
+   hidden [style="invis"]
+   get_observations_belmullet -> hidden [style="invis"]
+   get_observations_camborne -> hidden [style="invis"]
+   hidden -> consolidate_observations [style="invis"]
 
-We will also use the UK radar network to get rainfall data with a task
-called ``get_rainfall``.
+.. ifnotslides::
 
-We will fetch rainfall data **every six hours starting six hours after the
-initial cycle point**.
+   We will also use the UK radar network to get rainfall data with a task
+   called ``get_rainfall``.
+
+   We will fetch rainfall data **every six hours starting six hours after the
+   initial cycle point**.
 
 2. Running computer models to generate forecast data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We will do this with a task called ``forecast`` which will run
-**every six hours starting six hours after the initial cycle point**.
-The ``forecast`` task will be dependent on:
+.. ifnotslides::
 
-* The ``consolidate_observations`` task from the previous two cycles as well
-  as from the present cycle.
-* The ``get_rainfall`` task from the present cycle.
+   We will do this with a task called ``forecast`` which will run
+   **every six hours starting six hours after the initial cycle point**.
+   The ``forecast`` task will be dependent on:
+
+   * The ``consolidate_observations`` task from the previous two cycles as well
+     as from the present cycle.
+   * The ``get_rainfall`` task from the present cycle.
 
 .. digraph:: example
    :align: center
 
-   size = "5,4"
+   size = "7,4"
 
    subgraph cluster_T00 {
        label="+PT0H"
@@ -323,19 +371,34 @@ The ``forecast`` task will be dependent on:
 3. Processing the data output to produce user-friendly forecasts
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This will be done with a task called ``post_process_<location>`` where
-``location`` is the place we want to generate the forecast for. For
-the moment we will use Exeter.
+.. ifnotslides::
 
-The ``post_process_exeter`` task will run **every six hours starting six hours
-after the initial cycle point** and will be dependent on the ``forecast`` task.
+   This will be done with a task called ``post_process_<location>`` where
+   ``location`` is the place we want to generate the forecast for. For
+   the moment we will use Exeter.
+
+   The ``post_process_exeter`` task will run **every six hours starting six
+   hours after the initial cycle point** and will be dependent on the
+   ``forecast`` task.
 
 .. digraph:: example
    :align: center
 
-   size = "1.5,1"
+   size = "2.5,2"
 
    "forecast" -> "post_process_exeter"
+
+.. nextslide::
+
+.. ifslides::
+
+   .. rubric:: Next Steps
+
+   1. Read through the "Putting It All Together" section.
+   2. Complete the practical.
+
+   Next section: :ref:`tutorial-cylc-further-scheduling`
+
 
 .. practical::
 

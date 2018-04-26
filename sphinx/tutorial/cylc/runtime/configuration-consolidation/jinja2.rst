@@ -2,15 +2,18 @@
 .. _shebang: https://en.wikipedia.org/wiki/Shebang_(Unix)
 
 
+.. _tutorial-cylc-jinja2:
+
 Jinja2
-------
+======
 
 `Jinja2`_ is a templating language often used in web design with some
 similarities to python. It can be used to make a suite definition more
 dynamic.
 
+
 The Jinja2 Language
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 In Jinja2 statements are wrapped with ``{%`` characters, i.e:
 
@@ -20,30 +23,34 @@ In Jinja2 statements are wrapped with ``{%`` characters, i.e:
 
 Variables are initiated using the ``set`` statement, e.g:
 
-.. code-block:: none
+.. code-block:: css+jinja
 
    {% set foo = 3 %}
+
+.. nextslide::
 
 Expressions wrapped with ``{{`` characters will be replaced with the value of
 the evaluation of the expression, e.g:
 
-.. code-block:: none
+.. code-block:: css+jinja
 
    foo {{ foo }} foo
 
-would result in::
+Would result in::
 
    foo 3 foo
 
+.. nextslide::
+
 Loops are written with ``for`` statements, e.g:
 
-.. code-block:: none
+.. code-block:: css+jinja
 
    {% for x in range(foo) %}
       foo {{ x }}
    {% endfor %}
 
-would result in:
+Would result in:
 
 .. code-block:: none
 
@@ -51,31 +58,36 @@ would result in:
       foo 1
       foo 2
 
+.. nextslide::
+
 To enable Jinja2 in the ``suite.rc`` file, add the following `shebang`_ to the
 top of the file:
 
-.. code-block:: none
+.. code-block:: cylc
 
    #!Jinja2
 
 For more information see the `Jinja2 Tutorial`_.
 
+
 Example
-^^^^^^^
+-------
 
 To consolidate the configuration for the ``get_observations`` tasks we could
 define a dictionary of station and ID pairs:
 
-.. code-block:: none
+.. code-block:: css+jinja
 
-   {% set stations = {'belmullet: 3976,
+   {% set stations = {'belmullet': 3976,
                       'camborne': 3808,
                       'heathrow': 3772,
                       'shetland': 3005} %}
 
+.. nextslide::
+
 We could then loop over the stations like so:
 
-.. code-block:: none
+.. code-block:: css+jinja
 
    {% for station in stations %}
        {{ station }}
@@ -90,9 +102,11 @@ After processing, this would result in:
        heathrow
        shetland
 
+.. nextslide::
+
 We could also loop over both the stations and corresponding IDs like so:
 
-.. code-block:: none
+.. code-block:: css+jinja
 
    {% for station, id in stations.items() %}
        {{ station }} - {{ id }}
@@ -107,8 +121,12 @@ This would result in:
        heathrow - 3772
        shetland - 3005
 
-Putting this all together, the ``get_observations`` configuration could be
-written as follows:
+.. nextslide::
+
+.. ifnotslides::
+
+   Putting this all together, the ``get_observations`` configuration could be
+   written as follows:
 
 .. code-block:: cylc
 
@@ -128,6 +146,10 @@ written as follows:
    {% endfor %}
                """
 
+.. nextslide::
+
+.. code-block:: cylc
+
    [runtime]
    {% for station, id in stations.items() %}
        [[get_observations_{{station}}]]
@@ -136,6 +158,15 @@ written as follows:
                SITE_ID = {{ id }}
                API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
    {% endfor %}
+
+.. nextslide::
+
+.. ifslides::
+
+   .. rubric:: This practical continues on from the
+      :ref:`families practical <cylc-tutorial-families-practical>`.
+
+   Next section: :ref:`tutorial-cylc-parameterisation`
 
 
 .. _cylc-tutorial-jinja2-practical:

@@ -1,8 +1,10 @@
 .. include:: ../../../hyperlinks.rst
 
+
+.. _tutorial-cylc-graphing:
+
 Graphing
 ========
-
 
 In this section we will cover writing basic workflows in cylc.
 
@@ -12,17 +14,30 @@ In this section we will cover writing basic workflows in cylc.
 The ``suite.rc`` File Format
 ----------------------------
 
-We refer to a Cylc workflow as a :term:`Cylc suite`. A Cylc suite is a directory
-containing a ``suite.rc`` file. This configuration file is where
-we define our workflow. The ``suite.rc`` file uses a nested `INI`_-based format:
+.. ifnotslides::
 
-* Comments start with a ``#`` character.
-* Settings are written as ``key = value`` pairs.
-* Settings can be contained within sections.
-* Sections are written inside square brackets i.e. ``[section-name]``.
-* Sections can be nested, by adding an extra square bracket with each level,
-  so a sub-section would be written ``[[sub-section]]``, a sub-sub-section
-  ``[[[sub-sub-section]]]``, and so on.
+   We refer to a Cylc workflow as a :term:`Cylc suite`. A Cylc suite is a
+   directory containing a ``suite.rc`` file. This configuration file is where
+   we define our workflow. The ``suite.rc`` file uses a nested `INI`_-based
+   format:
+
+.. ifslides::
+
+   * Cylc workflow == Cylc suite
+   * Cylc suite is a directory containing a ``suite.rc`` file
+   * The ``suite.rc`` file is written in a nested `INI`_-based format
+
+.. ifnotslides::
+
+   * Comments start with a ``#`` character.
+   * Settings are written as ``key = value`` pairs.
+   * Settings can be contained within sections.
+   * Sections are written inside square brackets i.e. ``[section-name]``.
+   * Sections can be nested, by adding an extra square bracket with each level,
+     so a sub-section would be written ``[[sub-section]]``, a sub-sub-section
+     ``[[[sub-sub-section]]]``, and so on.
+
+.. nextslide::
 
 .. code-block:: cylc
 
@@ -37,6 +52,8 @@ we define our workflow. The ``suite.rc`` file uses a nested `INI`_-based format:
    String
    """
 
+.. nextslide::
+
 Throughout this tutorial we will refer to settings in the following format:
 
 * ``[section]`` - refers to the entire section.
@@ -44,6 +61,8 @@ Throughout this tutorial we will refer to settings in the following format:
 * ``[section]key=value`` - expresses the value of the setting.
 * ``[section][sub-section]another-key``. Note we only use one set of square
   brackets with nested sections.
+
+.. nextslide::
 
 .. tip::
 
@@ -62,10 +81,15 @@ Throughout this tutorial we will refer to settings in the following format:
           # Always write settings before defining any sub-sections!
           key = value
 
-.. note::
+.. nextslide::
 
-   In the ``suite.rc`` file format duplicate sections are additive, that is to
-   say the following two examples are equivalent:
+.. admonition:: Note
+   :class: tip
+
+   .. ifnotslides::
+
+      In the ``suite.rc`` file format duplicate sections are additive, that is
+      to say the following two examples are equivalent:
 
    .. code-block:: cylc
 
@@ -84,8 +108,12 @@ Throughout this tutorial we will refer to settings in the following format:
       [b]
          d = D
 
-   Settings, however, are not additive meaning that a duplicate setting will
-   override an earlier value. The following two examples are also equivalent:
+   .. ifnotslides::
+
+      Settings, however, are not additive meaning that a duplicate setting will
+      override an earlier value. The following two examples are also equivalent:
+
+   .. nextslide::
 
    .. code-block:: cylc
 
@@ -102,9 +130,13 @@ Graph Strings
 -------------
 
 In Cylc we consider workflows in terms of :term:`tasks <task>` and
-:term:`dependencies <dependency>`. Task are
-represented as words and dependencies as arrows (``=>``), so the following text
-defines two tasks where ``make_dough`` is dependent on ``purchase_ingredients``:
+:term:`dependencies <dependency>`.
+
+.. ifnotslides::
+
+   Task are represented as words and dependencies as arrows (``=>``), so the
+   following text defines two tasks where ``make_dough`` is dependent on
+   ``purchase_ingredients``:
 
 .. minicylc::
    :align: center
@@ -113,9 +145,13 @@ defines two tasks where ``make_dough`` is dependent on ``purchase_ingredients``:
 
    purchase_ingredients => make_dough
 
-In a Cylc workflow this would mean that ``make_dough`` would only run when
-``purchase_ingredients`` has succeeded. These :term:`dependencies <dependency>`
-can be chained together:
+.. nextslide::
+
+.. ifnotslides::
+
+   In a Cylc workflow this would mean that ``make_dough`` would only run when
+   ``purchase_ingredients`` has succeeded. These :term:`dependencies
+   <dependency>` can be chained together:
 
 .. minicylc::
    :align: center
@@ -124,8 +160,12 @@ can be chained together:
 
    purchase_ingredients => make_dough => bake_bread => sell_bread
 
-This line of text is referred to as a :term:`graph string`. These graph strings
-can be combined to form more complex workflows:
+.. nextslide::
+
+.. ifnotslides::
+
+   This line of text is referred to as a :term:`graph string`. These graph
+   strings can be combined to form more complex workflows:
 
 .. minicylc::
    :align: center
@@ -136,38 +176,49 @@ can be combined to form more complex workflows:
    pre_heat_oven => bake_bread
    bake_bread => clean_oven
 
-Graph strings can also contain "and" (``&``) and "or" (``|``) operators, for
-instance the following lines are equivalent to the ones just above:
+.. nextslide::
+
+.. ifnotslides::
+
+   Graph strings can also contain "and" (``&``) and "or" (``|``) operators, for
+   instance the following lines are equivalent to the ones just above:
 
 .. code-block:: cylc-graph
 
    purchase_ingredients => make_dough
    pre_heat_oven & make_dough => bake_bread => sell_bread & clean_oven
 
+.. nextslide::
+
 Collectively these :term:`graph strings<graph string>` are referred to as a
 :term:`graph`.
 
-.. note::
+.. admonition:: Note
+   :class: tip
 
-   The order in which lines appear in the graph section doesn't matter, for
-   instance the following examples are the same as each other:
+   .. ifnotslides::
+
+      The order in which lines appear in the graph section doesn't matter, for
+      instance the following examples are the same as each other:
 
    .. code-block:: cylc-graph
 
       foo => bar
       bar => baz
 
-
    .. code-block:: cylc-graph
 
       bar => baz
       foo => bar
+
 
 Cylc Graphs
 -----------
 
-In a :term:`Cylc suite` the :term:`graph` is stored under the
-``[scheduling][dependencies]graph`` setting, i.e:
+.. ifnotslides::
+
+   In a :term:`Cylc suite` the :term:`graph` is stored under the
+   ``[scheduling][dependencies]graph`` setting, i.e:
 
 .. code-block:: cylc
 
@@ -178,24 +229,30 @@ In a :term:`Cylc suite` the :term:`graph` is stored under the
                pre_heat_oven & make_dough => bake_bread => sell_bread & clean_oven
            """
 
-This is a minimal :term:`Cylc suite`, in which we have defined a :term:`graph`
-representing a workflow for Cylc to run.
-We have not yet provided Cylc with the scripts or binaries to run for
-each task. This will be covered later in the
-:ref:`runtime tutorial <tutorial-runtime>`.
+.. nextslide::
 
-Cylc provides a GUI for visualising :term:`graphs<graph>`. It is run on the
-command line using the ``cylc graph <path>`` command where the path ``path``
-is to the suite.rc file you wish to visualise.
+.. ifnotslides::
 
-When run, ``cylc graph`` will display a diagram similar to the ones you have
-seen so far. The number ``1`` which appears below each task is the
-:term:`cycle point`. We will explain what this means in the next section.
+   This is a minimal :term:`Cylc suite`, in which we have defined a
+   :term:`graph` representing a workflow for Cylc to run.
+   We have not yet provided Cylc with the scripts or binaries to run for
+   each task. This will be covered later in the
+   :ref:`runtime tutorial <tutorial-runtime>`.
+
+   Cylc provides a GUI for visualising :term:`graphs <graph>`. It is run on the
+   command line using the ``cylc graph <path>`` command where the path ``path``
+   is to the ``suite.rc`` file you wish to visualise.
+
+   When run, ``cylc graph`` will display a diagram similar to the ones you have
+   seen so far. The number ``1`` which appears below each task is the
+   :term:`cycle point`. We will explain what this means in the next section.
 
 .. image:: ../img/cylc-graph.png
    :align: center
 
-.. note::
+.. nextslide::
+
+.. hint::
 
    A graph can be drawn in multiple ways, for instance the following two
    examples are equivalent:
@@ -205,6 +262,15 @@ seen so far. The number ``1`` which appears below each task is the
 
    The graph drawn by ``cylc graph`` may vary slightly from one run to another
    but the tasks and dependencies will always be the same.
+
+.. nextslide::
+
+.. ifslides::
+
+   .. rubric:: In this practical we will create a new Cylc suite and write a
+      graph for it to use.
+
+   Next session: :ref:`tutorial-integer-cycling`
 
 .. practical::
 
