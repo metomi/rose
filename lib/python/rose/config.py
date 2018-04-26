@@ -575,7 +575,7 @@ class ConfigNode(object):
             self.unset(keys=removed_key)
 
     def __add__(self, config_diff):
-        """Apply a ConfigNodeDiff or ConfigNode to self and return new node.
+        """Return a new node by applying a node or diff to self.
 
         Create a new node by applying either a ConfigNodeDiff or ConfigNode
         instance to this ConfigNode.
