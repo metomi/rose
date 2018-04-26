@@ -1,29 +1,32 @@
 .. include:: ../../../../hyperlinks.rst
   :start-line: 1
 
+
 .. _tutorial-cylc-families:
 
-
 Families
---------
+========
 
 :term:`Families <family>` provide a way of grouping tasks together so they can
 be treated as one.
 
+
 Runtime
-^^^^^^^
+-------
 
-:term:`Families <family>` are groups of tasks which share a common
-configuration. In the present example the common configuration is:
+.. ifnotslides::
 
-.. code-block:: cylc
+   :term:`Families <family>` are groups of tasks which share a common
+   configuration. In the present example the common configuration is:
 
-   script = get-observations
-   [[[environment]]]
-       API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+   .. code-block:: cylc
 
-We define a family as a new task consisting of the common configuration. By
-convention families are named in upper case:
+      script = get-observations
+      [[[environment]]]
+          API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+
+   We define a family as a new task consisting of the common configuration. By
+   convention families are named in upper case:
 
 .. code-block:: cylc
 
@@ -32,7 +35,9 @@ convention families are named in upper case:
        [[[environment]]]
            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
 
-We "add" tasks to a family using the ``inherit`` setting:
+.. ifnotslides::
+
+   We "add" tasks to a family using the ``inherit`` setting:
 
 .. code-block:: cylc
 
@@ -41,9 +46,11 @@ We "add" tasks to a family using the ``inherit`` setting:
        [[[environment]]]
            SITE_ID = 3772
 
-When we add a task to a family in this way it :term:`inherits <family
-inheritance>` the configuration from the family, i.e. the above example is
-equivalent to:
+.. ifnotslides::
+
+   When we add a task to a family in this way it :term:`inherits <family
+   inheritance>` the configuration from the family, i.e. the above example is
+   equivalent to:
 
 .. code-block:: cylc
 
@@ -53,11 +60,16 @@ equivalent to:
            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
            SITE_ID = 3772
 
-It is possible to override inherited configuration within the task. For example
-if we wanted the ``get_observations_heathrow`` task to use a different API key
-we could write:
+.. nextslide::
+
+.. ifnotslides::
+
+   It is possible to override inherited configuration within the task. For
+   example if we wanted the ``get_observations_heathrow`` task to use a
+   different API key we could write:
 
 .. code-block:: cylc
+   :emphasize-lines: 4
 
    [[get_observations_heathrow]]
        inherit = GET_OBSERVATIONS
@@ -65,7 +77,11 @@ we could write:
            API_KEY = special-api-key
            SITE_ID = 3772
 
-Using families the ``get_observations`` tasks could be written like so:
+.. nextslide::
+
+.. ifnotslides::
+
+   Using families the ``get_observations`` tasks could be written like so:
 
 .. code-block:: cylc
 
@@ -92,18 +108,24 @@ Using families the ``get_observations`` tasks could be written like so:
        [[[environment]]]
            SITE_ID = 3976
 
-Graphing
-^^^^^^^^
 
-:term:`Families <family>` can be used in the suite's :term:`graph`, e.g:
+Graphing
+--------
+
+.. ifnotslides::
+
+   :term:`Families <family>` can be used in the suite's :term:`graph`, e.g:
 
 .. code-block:: cylc-graph
 
    GET_OBSERVATIONS:succeed-all => gather_observations
 
-The ``:succeed-all`` is a special :term:`qualifier` which in this example means
-that the ``gather_observations`` task will run once *all* of the members of
-the ``GET_OBSERVATIONS`` family have succeeded. This is equivalent to:
+.. ifnotslides::
+
+   The ``:succeed-all`` is a special :term:`qualifier` which in this example
+   means that the ``gather_observations`` task will run once *all* of the
+   members of the ``GET_OBSERVATIONS`` family have succeeded. This is
+   equivalent to:
 
 .. code-block:: cylc-graph
 
@@ -112,28 +134,40 @@ the ``GET_OBSERVATIONS`` family have succeeded. This is equivalent to:
    get_observations_shetland => gather_observations
    get_observations_belmullet => gather_observations
 
-The ``GET_OBSERVATIONS:succeed-all`` part is referred to as a
-:term:`family trigger`. Family triggers use special qualifiers which are
-non-optional. The most commonly used ones are:
+.. ifnotslides::
 
-``succeed-all``
-   Run if all of the members of the family have succeeded.
-``succeed-any``
-   Run as soon as any one family member has succeeded.
-``finish-all``
-   Run as soon as all of the family members have completed (i.e. have each
-   either succeeded or failed).
+   The ``GET_OBSERVATIONS:succeed-all`` part is referred to as a
+   :term:`family trigger`. Family triggers use special qualifiers which are
+   non-optional. The most commonly used ones are:
 
-For more information on family triggers see the `Cylc User Guide`_.
+   ``succeed-all``
+      Run if all of the members of the family have succeeded.
+   ``succeed-any``
+      Run as soon as any one family member has succeeded.
+   ``finish-all``
+      Run as soon as all of the family members have completed (i.e. have each
+      either succeeded or failed).
+
+   For more information on family triggers see the `Cylc User Guide`_.
+
+.. ifslides::
+
+   * ``succeed-all``
+   * ``succeed-any``
+   * ``finish-all``
+
 
 The ``root`` Family
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
-There is a special family called `root` (in lowercase) which is used only in the
-runtime to provide configuration which will be inherited by all tasks.
+.. ifnotslides::
 
-In the following example the task ``bar`` will inherit the environment variable
-``FOO`` from the ``[root]`` section:
+   There is a special family called `root` (in lowercase) which is used only
+   in the runtime to provide configuration which will be inherited by all
+   tasks.
+
+   In the following example the task ``bar`` will inherit the environment
+   variable ``FOO`` from the ``[root]`` section:
 
 .. code-block:: cylc
 
@@ -144,15 +178,18 @@ In the following example the task ``bar`` will inherit the environment variable
        [[bar]]
            script = echo $FOO
 
+
 Families and ``cylc graph``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
 
-By default, ``cylc graph`` groups together all members of a family
-in the :term:`graph`. To un-group a family right click on it and select
-:menuselection:`UnGroup`.
+.. ifnotslides::
 
-For instance if the tasks ``bar`` and ``baz`` both
-inherited from ``BAR`` ``cylc graph`` would produce:
+   By default, ``cylc graph`` groups together all members of a family
+   in the :term:`graph`. To un-group a family right click on it and select
+   :menuselection:`UnGroup`.
+
+   For instance if the tasks ``bar`` and ``baz`` both
+   inherited from ``BAR`` ``cylc graph`` would produce:
 
 .. digraph:: Example
    :align: center
@@ -173,6 +210,16 @@ inherited from ``BAR`` ``cylc graph`` would produce:
    "foo.1" -> "BAR.1"
    "foo.2" -> "bar.2"
    "foo.2" -> "baz.2"
+
+.. nextslide::
+
+.. ifslides::
+
+   .. rubric:: In this practical we will consolidate the configuration of the
+      :ref:`weather-forecasting suite <tutorial-cylc-runtime-forecasting-suite>`
+      from the previous section.
+
+   Next section: :ref:`Jinja2 <tutorial-cylc-jinja2>`
 
 
 .. _cylc-tutorial-families-practical:

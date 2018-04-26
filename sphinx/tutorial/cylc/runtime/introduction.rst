@@ -1,26 +1,40 @@
 .. include:: ../../../hyperlinks.rst
    :start-line: 1
 
+
+.. _tutorial-cylc-runtime-introduction:
+
 Introduction
 ============
 
+.. ifnotslides::
 
-So far we have been working with the ``[scheduling]`` section. This is where
-the workflow is defined in terms of :term:`tasks <task>` and
-:term:`dependencies <dependency>`.
+   So far we have been working with the ``[scheduling]`` section. This is where
+   the workflow is defined in terms of :term:`tasks <task>` and
+   :term:`dependencies <dependency>`.
 
-In order to make the workflow runnable we must associate tasks with scripts
-or binaries to be executed when the task runs. This means working with the
-``[runtime]`` section which determines what runs, as well as where and how
-it runs.
+   In order to make the workflow runnable we must associate tasks with scripts
+   or binaries to be executed when the task runs. This means working with the
+   ``[runtime]`` section which determines what runs, as well as where and how
+   it runs.
+
+.. slides::
+
+   ``[scheduling]``
+      Defines the workflow in terms of :term:`tasks <task>` and
+      :term:`dependencies <dependency>`.
+   ``[runtime]``   
+      Defines what runs, where and how it runs.
 
 
 The Task Section
 ----------------
 
-The runtime settings for each task are stored in a sub-section of the
-``[runtime]`` section. E.g. for a task called ``hello_world`` we would write
-settings inside the following section:
+.. ifnotslides::
+
+   The runtime settings for each task are stored in a sub-section of the
+   ``[runtime]`` section. E.g. for a task called ``hello_world`` we would write
+   settings inside the following section:
 
 .. code-block:: cylc
 
@@ -31,11 +45,14 @@ settings inside the following section:
 The ``script`` Setting
 ----------------------
 
-We tell Cylc *what* to execute when a task is run using the ``script`` setting.
+.. ifnotslides::
 
-This setting is interpreted as a bash script. The following example defines a
-task called ``hello_world`` which writes ``Hello World!`` to stdout upon
-execution.
+   We tell Cylc *what* to execute when a task is run using the ``script``
+   setting.
+
+   This setting is interpreted as a bash script. The following example defines a
+   task called ``hello_world`` which writes ``Hello World!`` to stdout upon
+   execution.
 
 .. code-block:: cylc
 
@@ -55,10 +72,14 @@ We can also call other scripts or executables in this way, e.g:
        [[hello_world]]
            script = ~/foo/bar/baz/hello_world
 
-It is often a good idea to keep our scripts within the Cylc suite directory
-tree rather than leaving them somewhere else on the system. If you create a
-``bin`` sub-directory within the :term:`suite directory` this directory will be
-added to the path when tasks run, e.g:
+.. nextslide::
+
+.. ifnotslides::
+
+   It is often a good idea to keep our scripts within the Cylc suite directory
+   tree rather than leaving them somewhere else on the system. If you create a
+   ``bin`` sub-directory within the :term:`suite directory` this directory will
+   be added to the path when tasks run, e.g:
 
 .. code-block:: bash
    :caption: bin/hello_world
@@ -78,26 +99,32 @@ added to the path when tasks run, e.g:
 Running A Suite
 ---------------
 
-It is a good idea to check a suite for errors before running it.
-Cylc provides a command which automatically checks for any obvious
-configuration issues called ``cylc validate``, run via:
+.. ifnotslides::
+
+   It is a good idea to check a suite for errors before running it.
+   Cylc provides a command which automatically checks for any obvious
+   configuration issues called ``cylc validate``, run via:
 
 .. code-block:: sub
 
    cylc validate <path/to/suite>
 
-Here ``<path/to/suite>`` is the path to the suite's location within the
-filesystem (so if we create a suite in ``~/cylc-run/foo`` we would put
-``~/cylc-run/foo/suite.rc``).
+.. ifnotslides::
 
-Next we can run the suite using the ``cylc run`` command.
+   Here ``<path/to/suite>`` is the path to the suite's location within the
+   filesystem (so if we create a suite in ``~/cylc-run/foo`` we would put
+   ``~/cylc-run/foo/suite.rc``).
+
+   Next we can run the suite using the ``cylc run`` command.
 
 .. code-block:: bash
 
    cylc run <name>
 
-The ``name`` is the name of the :term:`suite directory` (i.e. ``<name>`` would
-be ``foo`` in the above example).
+.. ifnotslides::
+
+   The ``name`` is the name of the :term:`suite directory` (i.e. ``<name>``
+   would be ``foo`` in the above example).
 
 .. note::
 
@@ -125,42 +152,59 @@ be ``foo`` in the above example).
 Tasks And Jobs
 --------------
 
-When a :term:`task` is "Run" it creates a :term:`job`. The job is a bash
-file containing the script you have told the task to run along with
-configuration specifications and a system for trapping errors. It is the
-:term:`job` which actually gets executed and not the task itself. This
-"job file" is called the :term:`job script`.
+.. ifnotslides::
 
-During its life a typical :term:`task` goes through the following states:
+   When a :term:`task` is "Run" it creates a :term:`job`. The job is a bash
+   file containing the script you have told the task to run along with
+   configuration specifications and a system for trapping errors. It is the
+   :term:`job` which actually gets executed and not the task itself. This
+   "job file" is called the :term:`job script`.
 
-Waiting
-   :term:`Tasks <task>` wait for their dependencies to be satisfied before
-   running. In the meantime they are in the "Waiting" state.
-Submitted
-   When a :term:`task's <task>` dependencies have been met it is ready for
-   submission. During this phase the :term:`job script` is created.
-   The :term:`job` is then submitted to the specified batch system.
-   There is more about this in the :ref:`next section <tutorial-batch-system>`.
-Running
-   A :term:`task` is in the "Running" state as soon as the :term:`job` is
-   executed.
-Succeeded
-   If the :term:`job` submitted by a :term:`task` has successfully
-   completed (i.e. there is zero return code) then it is said to have succeeded.
+   During its life a typical :term:`task` goes through the following states:
 
-These descriptions, and a few more (e.g. failed), are called the :term:`task states <task state>`.
+   Waiting
+      :term:`Tasks <task>` wait for their dependencies to be satisfied before
+      running. In the meantime they are in the "Waiting" state.
+   Submitted
+      When a :term:`task's <task>` dependencies have been met it is ready for
+      submission. During this phase the :term:`job script` is created.
+      The :term:`job` is then submitted to the specified batch system.
+      There is more about this in the :ref:`next section
+      <tutorial-batch-system>`.
+   Running
+      A :term:`task` is in the "Running" state as soon as the :term:`job` is
+      executed.
+   Succeeded
+      If the :term:`job` submitted by a :term:`task` has successfully
+      completed (i.e. there is zero return code) then it is said to have
+      succeeded.
 
+   These descriptions, and a few more (e.g. failed), are called the
+   :term:`task states <task state>`.
+
+.. ifslides::
+
+   When a :term:`task` is "Run" it creates a :term:`job`.
+
+   The life-cycle of a job:
+
+   * Waiting
+   * Submitted
+   * Running
+   * Succeeded / Failed
 
 
 The Cylc GUI
 ------------
 
-To help you to keep track of a running suite Cylc has a graphical user
-interface (the Cylc GUI) which can be used for monitoring and
-interaction.
+.. ifnotslides::
 
-The Cylc GUI looks quite like ``cylc graph`` but the tasks are colour-coded to
-represent their state, as in the following diagram.
+   To help you to keep track of a running suite Cylc has a graphical user
+   interface (the Cylc GUI) which can be used for monitoring and
+   interaction.
+
+   The Cylc GUI looks quite like ``cylc graph`` but the tasks are colour-coded
+   to represent their state, as in the following diagram.
 
 .. digraph:: example
    :align: center
@@ -176,23 +220,31 @@ represent their state, as in the following diagram.
     b => d => f
     e => f
 
-This is the "graph view". The Cylc GUI has two other views called "tree" and
-"dot".
+.. nextslide::
+
+.. ifnotslides::
+
+   This is the "graph view". The Cylc GUI has two other views called "tree" and
+   "dot".
 
 .. figure:: ../img/cylc-gui-graph.png
-   :figwidth: 50%
+   :figwidth: 75%
    :align: center
 
    Screenshot of the Cylc GUI in "Graph View" mode.
 
+.. nextslide::
+
 .. figure:: ../img/cylc-gui-tree.png
-   :figwidth: 50%
+   :figwidth: 75%
    :align: center
 
    Screenshot of the Cylc GUI in "Tree View" mode.
 
+.. nextslide::
+
 .. figure:: ../img/cylc-gui-dot.png
-   :figwidth: 50%
+   :figwidth: 75%
    :align: center
 
    Screenshot of the Cylc GUI in "Dot View" mode.
@@ -201,75 +253,111 @@ This is the "graph view". The Cylc GUI has two other views called "tree" and
 Where Do All The Files Go?
 --------------------------
 
-The Work Directory
-^^^^^^^^^^^^^^^^^^
+.. ifnotslides::
 
-When a :term:`task` is run Cylc creates a directory for the :term:`job` to run
-in. This is called the :term:`work directory`.
+   The Work Directory
+   ^^^^^^^^^^^^^^^^^^
 
-By default the work directory is located in a directory structure
-under the relevant :term:`cycle point` and :term:`task` name:
+   When a :term:`task` is run Cylc creates a directory for the :term:`job` to
+   run in. This is called the :term:`work directory`.
 
-.. code-block:: sub
+   By default the work directory is located in a directory structure
+   under the relevant :term:`cycle point` and :term:`task` name:
 
-   ~/cylc-run/<suite-name>/work/<cycle-point>/<task-name>
+   .. code-block:: sub
 
-The Job Log Directory
-^^^^^^^^^^^^^^^^^^^^^
+      ~/cylc-run/<suite-name>/work/<cycle-point>/<task-name>
 
-When a task is run Cylc generates a :term:`job script` which is stored in the
-:term:`job log directory` as the file ``job``.
+   The Job Log Directory
+   ^^^^^^^^^^^^^^^^^^^^^
 
-When the :term:`job script` is executed the stdout and stderr are redirected
-into the ``job.out`` and ``job.err`` files which are also stored in the
-:term:`job log directory`.
+   When a task is run Cylc generates a :term:`job script` which is stored in the
+   :term:`job log directory` as the file ``job``.
 
-The :term:`job log directory` lives in a directory structure under the
-:term:`cycle point`, :term:`task` name and :term:`job submission number`:
+   When the :term:`job script` is executed the stdout and stderr are redirected
+   into the ``job.out`` and ``job.err`` files which are also stored in the
+   :term:`job log directory`.
 
-.. code-block:: sub
+   The :term:`job log directory` lives in a directory structure under the
+   :term:`cycle point`, :term:`task` name and :term:`job submission number`:
 
-   ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-num>/
+   .. code-block:: sub
 
-The :term:`job submission number` starts at 1 and increments by 1 each time
-a task is re-run.
+      ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-num>/
 
-.. tip::
+   The :term:`job submission number` starts at 1 and increments by 1 each time
+   a task is re-run.
 
-   If a task has run and is still visible in the Cylc GUI you can view its
-   :term:`job log files <job log>` by right-clicking on the task and selecting
-   "View".
+   .. tip::
 
-   .. image:: ../img/cylc-gui-view-log.png
-      :align: center
-      :scale: 75%
+      If a task has run and is still visible in the Cylc GUI you can view its
+      :term:`job log files <job log>` by right-clicking on the task and
+      selecting "View".
+
+      .. image:: ../img/cylc-gui-view-log.png
+         :align: center
+         :scale: 75%
+
+.. ifslides::
+
+   The Work Directory
+      .. code-block:: sub
+
+         ~/cylc-run/<suite-name>/work/<cycle-point>/<task-name>
+   The Job Log Directory
+      .. code-block:: sub
+
+         ~/cylc-run/<suite-name>/log/job/<cycle-point>/<task-name>/<job-submission-num>/
+
+      .. image:: ../img/cylc-gui-view-log.png
+         :align: center
+         :scale: 75%
 
 Suite Files
 ^^^^^^^^^^^
 
-Along with the :term:`work directory` and :term:`job log directory`, Cylc
-generates other files and directories when it runs a suite, namely:
+.. ifnotslides::
 
+   Along with the :term:`work directory` and :term:`job log directory`, Cylc
+   generates other files and directories when it runs a suite, namely:
 
-``log/``
-   Directory containing log files, including:
+   ``log/``
+      Directory containing log files, including:
 
-   ``log/db``
-      The database which Cylc uses to record the state of the suite;
-   ``log/job``
-      The directory where the :term:`job log files <job log>` live;
-   ``log/suite``
-      The directory where the :term:`suite log files <suite log>` live.
-      These files are written by Cylc as the suite is run and are useful for
-      debugging purposes in the event of error.
+      ``log/db``
+         The database which Cylc uses to record the state of the suite;
+      ``log/job``
+         The directory where the :term:`job log files <job log>` live;
+      ``log/suite``
+         The directory where the :term:`suite log files <suite log>` live.
+         These files are written by Cylc as the suite is run and are useful for
+         debugging purposes in the event of error.
 
-``suite.rc.processed``
-   A copy of the ``suite.rc`` file made after any `Jinja2`_ has been processed
-   - we will cover this in the :ref:`tutorial-cylc-consolidating-configuration`
-   section.
-``share/``
-   The :term:`share directory` is a place where :term:`tasks <task>` can write
-   files which are intended to be shared within that cycle.
+   ``suite.rc.processed``
+      A copy of the ``suite.rc`` file made after any `Jinja2`_ has been
+      processed - we will cover this in the
+      :ref:`tutorial-cylc-consolidating-configuration` section.
+   ``share/``
+      The :term:`share directory` is a place where :term:`tasks <task>` can
+      write files which are intended to be shared within that cycle.
+
+.. ifslides::
+
+   * ``log/``
+      * ``log/db``
+      * ``log/job``
+      * ``log/suite``
+   * ``suite.rc.processed``
+   * ``share/``
+
+   .. nextslide::
+
+   .. rubric:: In this practical we will add some scripts to, and run, the
+      :ref:`weather forecasting suite <tutorial-datetime-cycling-practical>`
+      from the :ref:`scheduling tutorial <tutorial-scheduling>`.
+
+   Next section: :ref:`tutorial-cylc-runtime-configuration`
+
 
 .. practical::
 
@@ -279,7 +367,7 @@ generates other files and directories when it runs a suite, namely:
 
    #. **Create A New Suite.**
 
-      The following command will copy some files for us to work with into a
+      The following command will copy some files for us to work with into
       a new suite called ``runtime-introduction``:
 
       .. code-block:: bash

@@ -1,13 +1,13 @@
-.. _DataPoint: https://www.metoffice.gov.uk/datapoint
-
-.. _tutorial-cylc-runtime-configuration:
-
 .. include:: ../../../hyperlinks.rst
   :start-line: 1
 
+.. _DataPoint: https://www.metoffice.gov.uk/datapoint
+
+
+.. _tutorial-cylc-runtime-configuration:
+
 Runtime Configuration
 =====================
-
 
 In the last section we associated tasks with scripts and ran a simple suite. In
 this section we will look at how we can configure these tasks.
@@ -16,9 +16,11 @@ this section we will look at how we can configure these tasks.
 Environment Variables
 ---------------------
 
-We can specify environment variables in a task's ``[environment]`` section.
-These environment variables are then provided to :term:`jobs <job>` when they
-run.
+.. ifnotslides::
+
+   We can specify environment variables in a task's ``[environment]`` section.
+   These environment variables are then provided to :term:`jobs <job>` when they
+   run.
 
 .. code-block:: cylc
 
@@ -28,29 +30,41 @@ run.
            [[[environment]]]
                START_NUMBER = 5
 
-Each job is also provided with some standard environment variables e.g:
+.. ifnotslides::
 
-``CYLC_SUITE_RUN_DIR``
-    The path to the suite's :term:`run directory`
-    *(e.g. ~/cylc-run/suite)*.
-``CYLC_TASK_WORK_DIR``
-    The path to the associated task's :term:`work directory`
-    *(e.g. run-directory/work/cycle/task)*.
-``CYLC_TASK_CYCLE_POINT``
-    The :term:`cycle point` for the associated task
-    *(e.g. 20171009T0950)*.
+   Each job is also provided with some standard environment variables e.g:
 
-There are many more environment variables - see the `Cylc User Guide`_ for more
-information.
+   ``CYLC_SUITE_RUN_DIR``
+       The path to the suite's :term:`run directory`
+       *(e.g. ~/cylc-run/suite)*.
+   ``CYLC_TASK_WORK_DIR``
+       The path to the associated task's :term:`work directory`
+       *(e.g. run-directory/work/cycle/task)*.
+   ``CYLC_TASK_CYCLE_POINT``
+       The :term:`cycle point` for the associated task
+       *(e.g. 20171009T0950)*.
 
+   There are many more environment variables - see the `Cylc User Guide`_ for more
+   information.
+
+.. ifslides::
+
+   * ``CYLC_SUITE_RUN_DIR``
+   * ``CYLC_TASK_WORK_DIR``
+   * ``CYLC_TASK_CYCLE_POINT``
+
+
+.. _tutorial-batch-system:
 
 Job Submission
 --------------
 
-By default Cylc runs :term:`jobs <job>` on the machine where the suite is
-running. We can tell Cylc to run jobs on other machines by setting the
-``[remote]host`` setting to the name of the host, e.g. to run a task on the host
-``computehost`` you might write:
+.. ifnotslides::
+
+   By default Cylc runs :term:`jobs <job>` on the machine where the suite is
+   running. We can tell Cylc to run jobs on other machines by setting the
+   ``[remote]host`` setting to the name of the host, e.g. to run a task on the
+   host ``computehost`` you might write:
 
 .. code-block:: cylc
 
@@ -63,12 +77,14 @@ running. We can tell Cylc to run jobs on other machines by setting the
 .. _background processes: https://en.wikipedia.org/wiki/Background_process
 .. _job scheduler: https://en.wikipedia.org/wiki/Job_scheduler
 
-.. _tutorial-batch-system:
+.. nextslide::
 
-Cylc also executes jobs as `background processes`_ by default.
-When we are running jobs on other compute hosts we will often want to
-use a :term:`batch system` (`job scheduler`_) to submit our job.
-Cylc supports the following :term:`batch systems <batch system>`:
+.. ifnotslides::
+
+   Cylc also executes jobs as `background processes`_ by default.
+   When we are running jobs on other compute hosts we will often want to
+   use a :term:`batch system` (`job scheduler`_) to submit our job.
+   Cylc supports the following :term:`batch systems <batch system>`:
 
 * at
 * loadleveler
@@ -78,11 +94,15 @@ Cylc supports the following :term:`batch systems <batch system>`:
 * slurm
 * moab
 
-:term:`Batch systems <batch system>` typically require
-:term:`directives <directive>` in some form. :term:`Directives <directive>`
-inform the :term:`batch system` of the requirements of a :term:`job`, for
-example how much memory a given job requires or how many CPUs the job will
-run on. For example:
+.. nextslide::
+
+.. ifnotslides::
+
+   :term:`Batch systems <batch system>` typically require
+   :term:`directives <directive>` in some form. :term:`Directives <directive>`
+   inform the :term:`batch system` of the requirements of a :term:`job`, for
+   example how much memory a given job requires or how many CPUs the job will
+   run on. For example:
 
 .. code-block:: cylc
 
@@ -107,10 +127,12 @@ run on. For example:
 Timeouts
 --------
 
-We can specify a time limit after which a job will be terminated using the
-``[job]execution time limit`` setting. The value of the setting is an
-:term:`ISO8601 duration`. Cylc automatically inserts this into a job's
-directives as appropriate.
+.. ifnotslides::
+
+   We can specify a time limit after which a job will be terminated using the
+   ``[job]execution time limit`` setting. The value of the setting is an
+   :term:`ISO8601 duration`. Cylc automatically inserts this into a job's
+   directives as appropriate.
 
 .. code-block:: cylc
 
@@ -138,15 +160,19 @@ Sometimes jobs fail. This can be caused by two factors:
   * The :term:`job host` becoming unavailable or overloaded;
   * An issue with the directives.
 
-In the event of failure Cylc can automatically re-submit (retry) jobs. We
-configure retries using the ``[job]execution retry delays`` and
-``[job]submission retry delays`` settings. These settings are both set to an
-:term:`ISO8601 duration`, e.g. setting ``execution retry delays`` to ``PT10M``
-would cause the job to retry every 10 minutes in the event of execution
-failure.
+.. nextslide::
 
-We can limit the number of retries by writing a multiple in front of the
-duration, e.g:
+.. ifnotslides::
+
+   In the event of failure Cylc can automatically re-submit (retry) jobs. We
+   configure retries using the ``[job]execution retry delays`` and
+   ``[job]submission retry delays`` settings. These settings are both set to an
+   :term:`ISO8601 duration`, e.g. setting ``execution retry delays`` to ``PT10M``
+   would cause the job to retry every 10 minutes in the event of execution
+   failure.
+
+   We can limit the number of retries by writing a multiple in front of the
+   duration, e.g:
 
 .. code-block:: cylc
 
@@ -154,42 +180,64 @@ duration, e.g:
        [[some-task]]
            script = some-script
            [[[job]]]
-               # In the event of execution failure, retry a maximum of three
-               # times every 15 minutes.
+               # In the event of execution failure, retry a maximum
+               # of three times every 15 minutes.
                execution retry delays = 3*PT15M
-               # In the event of submission failure, retry a maximum of two
-               # times every ten minutes and then every 30 minutes thereafter.
+               # In the event of submission failure, retry a maximum
+               # of two times every ten minutes and then every 30
+               # minutes thereafter.
                submission retry delays = 2*PT10M, PT30M
 
 
 Start, Stop, Restart
 --------------------
 
-We have seen how to start and stop Cylc suites with ``cylc run`` and
-``cylc stop`` respectively. The ``cylc stop`` command causes Cylc to wait
-for all running jobs to finish before it stops the suite. There are two
-options which change this behaviour:
+.. ifnotslides::
 
-``cylc stop --kill``
-   When the ``--kill`` option is used Cylc will kill all running jobs
-   before stopping. *Cylc can kill jobs on remote hosts and uses the
-   appropriate command when a* :term:`batch system` *is used.*
-``cylc stop --now --now``
-   When the ``--now`` option is used twice Cylc stops straight away, leaving
-   any jobs running.
+   We have seen how to start and stop Cylc suites with ``cylc run`` and
+   ``cylc stop`` respectively. The ``cylc stop`` command causes Cylc to wait
+   for all running jobs to finish before it stops the suite. There are two
+   options which change this behaviour:
 
-Once a suite has stopped it is possible to restart it using the
-``cylc restart`` command. When the suite restarts it picks up where it left
-off and carries on as normal.
+   ``cylc stop --kill``
+      When the ``--kill`` option is used Cylc will kill all running jobs
+      before stopping. *Cylc can kill jobs on remote hosts and uses the
+      appropriate command when a* :term:`batch system` *is used.*
+   ``cylc stop --now --now``
+      When the ``--now`` option is used twice Cylc stops straight away, leaving
+      any jobs running.
 
-.. code-block:: bash
+   Once a suite has stopped it is possible to restart it using the
+   ``cylc restart`` command. When the suite restarts it picks up where it left
+   off and carries on as normal.
 
-   # Run the suite "name".
-   cylc run <name>
-   # Stop the suite "name", killing any running tasks.
-   cylc stop <name> --kill
-   # Restart the suite "name", picking up where it left off.
-   cylc restart <name>
+   .. code-block:: bash
+
+      # Run the suite "name".
+      cylc run <name>
+      # Stop the suite "name", killing any running tasks.
+      cylc stop <name> --kill
+      # Restart the suite "name", picking up where it left off.
+      cylc restart <name>
+
+.. ifslides::
+
+   .. code-block:: sub
+
+      cylc run <suite>
+      cylc stop <suite>
+      cylc restart <suite>
+
+      cylc stop <suite> --kill
+      cylc stop <suite> --now --now
+
+   .. nextslide::
+
+   .. rubric:: In this practical we will add runtime configuration to the
+      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      from the :ref:`scheduling tutorial <tutorial-scheduling>`.
+
+   Next section: :ref:`tutorial-cylc-consolidating-configuration`
 
 
 .. _tutorial-cylc-runtime-forecasting-suite:

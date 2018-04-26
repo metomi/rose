@@ -1,18 +1,26 @@
+.. slideconf::
+   :autoslides: False
+
 .. _cylc-introduction:
 
 Introduction
 ============
 
+.. slide:: Introduction
+
 What Is A Workflow?
 -------------------
 
-.. epigraph::
+.. slide:: What Is A Workflow?
+   :level: 2
 
-   A workflow consists of an orchestrated and repeatable pattern of business
-   activity enabled by the systematic organization of resources into processes
-   that transform materials, provide services, or process information.
+   .. epigraph::
 
-   -- Wikipedia
+      A workflow consists of an orchestrated and repeatable pattern of business
+      activity enabled by the systematic organization of resources into processes
+      that transform materials, provide services, or process information.
+
+      -- Wikipedia
 
 In research, business and other fields we may have processes that we repeat
 in the course of our work. At its simplest a workflow is a set of steps that
@@ -38,19 +46,25 @@ In a Cylc workflow each step is a
 computational task, a script to execute. Cylc runs each task as soon as it is
 appropriate to do so.
 
-.. minicylc::
-   :align: center
-   :theme: demo
+.. slide:: What Is Cylc?
+   :level: 2
 
-    a => b => c
-    b => d => f
-    e => f
+   .. minicylc::
+      :align: center
+      :theme: demo
 
-Cylc can automatically:
+       a => b => c
+       b => d => f
+       e => f
 
-- Submit tasks across computer systems and resource managers.
-- Recover from failures.
-- Repeat workflows.
+.. slide:: What Is Cylc?
+   :level: 2
+
+   Cylc can automatically:
+
+   - Submit tasks across computer systems and resource managers.
+   - Recover from failures.
+   - Repeat workflows.
 
 Cylc was originally developed at NIWA (The National Institute of Water and
 Atmospheric Research - New Zealand) for running their weather forecasting
@@ -59,7 +73,27 @@ members from NIWA and the Met Office (UK). Though initially developed for
 meteorological purposes Cylc is a general purpose tool as applicable in
 business as in scientific research.
 
-Cylc provides a variety of command line and GUI tools for visualising and
-interacting with workflows.
+.. ifslides::
 
-.. image:: img/cylc-gui.png
+   .. slide:: What Is Cylc?
+      :level: 2
+
+      * Originally developed at NIWA (New Zealand)
+      * Now developed by an international partnership including the
+        Met Office (UK).
+      * General purpose tool as applicable in business as in
+        scientific research.
+
+.. slide:: What Is Cylc?
+   :level: 2
+
+   Cylc provides a variety of command line and GUI tools for visualising and
+   interacting with workflows.
+
+   .. image:: img/cylc-gui.png
+
+.. ifslides::
+
+   .. slide:: Next
+
+      :ref:`tutorial-cylc-graphing`

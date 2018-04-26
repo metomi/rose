@@ -11,13 +11,15 @@ workflows.
 Repeating Workflows
 -------------------
 
-Often, we will want to repeat the same workflow multiple times. In Cylc this
-"repetition" is called :term:`cycling` and each repetition of the workflow is
-referred to as a :term:`cycle`.
+.. ifnotslides::
 
-Each :term:`cycle` is given a unique label. This is called a
-:term:`cycle point`. For now these :term:`cycle points<cycle point>` will be
-integers *(they can also be dates as we will see in the next section)*.
+   Often, we will want to repeat the same workflow multiple times. In Cylc this
+   "repetition" is called :term:`cycling` and each repetition of the workflow is
+   referred to as a :term:`cycle`.
+
+   Each :term:`cycle` is given a unique label. This is called a
+   :term:`cycle point`. For now these :term:`cycle points<cycle point>` will be
+   integers *(they can also be dates as we will see in the next section)*.
 
 To make a workflow repeat we must tell Cylc three things:
 
@@ -27,10 +29,14 @@ To make a workflow repeat we must tell Cylc three things:
 3) *Optionally* we can also tell Cylc what cycle point we want to stop the
    workflow - the :term:`final cycle point`.
 
-Let's take the bakery example from the previous section. Bread is
-produced in batches so the bakery will repeat this workflow for each
-batch of bread they bake. We can make this workflow repeat with the addition of
-three lines:
+.. nextslide::
+
+.. ifnotslides::
+
+   Let's take the bakery example from the previous section. Bread is
+   produced in batches so the bakery will repeat this workflow for each
+   batch of bread they bake. We can make this workflow repeat with the addition
+   of three lines:
 
 .. code-block:: diff
 
@@ -44,14 +50,19 @@ three lines:
                     pre_heat_oven & make_dough => bake_bread => sell_bread & clean_oven
                 """
 
-* The ``cycling mode = integer`` setting tells Cylc that we want our
-  :term:`cycle points<cycle point>` to be numbered.
-* The ``initial cycle point = 1`` setting tells Cylc to start counting from 1.
-* ``P1`` is the :term:`recurrence`. The :term:`graph` within the ``[[[P1]]]``
-  section will be repeated at each :term:`cycle point`.
+.. nextslide::
 
-The first three :term:`cycles<cycle>` would look like this, with the entire
-workflow repeated at each cycle point:
+.. ifnotslides::
+
+   * The ``cycling mode = integer`` setting tells Cylc that we want our
+     :term:`cycle points <cycle point>` to be numbered.
+   * The ``initial cycle point = 1`` setting tells Cylc to start counting
+     from 1.
+   * ``P1`` is the :term:`recurrence`. The :term:`graph` within the ``[[[P1]]]``
+     section will be repeated at each :term:`cycle point`.
+
+   The first three :term:`cycles<cycle>` would look like this, with the entire
+   workflow repeated at each cycle point:
 
 .. digraph:: example
    :align: center
@@ -98,33 +109,37 @@ workflow repeated at each cycle point:
    "pur.3" -> "mak.3" -> "bak.3" -> "sel.3"
    "pre.3" -> "bak.3" -> "cle.3"
 
-Note the numbers under each task which represent the :term:`cycle point` each
-task is in.
+.. ifnotslides::
+
+   Note the numbers under each task which represent the :term:`cycle point` each
+   task is in.
 
 
 Inter-Cycle Dependencies
 ------------------------
 
-In the last section we saw how to write a workflow that repeats every
-:term:`cycle`.
+.. ifnotslides::
 
-Cylc runs tasks as soon as their dependencies are met so cycles are not
-necessarily run in order. This could cause problems, for instance we could find
-ourselves pre-heating the oven in one cycle whist we are still cleaning it in
-another.
+   We've just seen how to write a workflow that repeats every :term:`cycle`.
 
-To resolve this we must add :term:`dependencies<dependency>` *between* the
-cycles. We do this by adding lines to the :term:`graph`. Tasks in the previous
-cycle can be referred to by suffixing their name with ``[-P1]``, for example.
-So to ensure the ``clean_oven`` task has been completed before the start of
-the ``pre_heat_oven`` task in the next cycle, we would write the following
-dependency:
+   Cylc runs tasks as soon as their dependencies are met so cycles are not
+   necessarily run in order. This could cause problems, for instance we could
+   find ourselves pre-heating the oven in one cycle whist we are still
+   cleaning it in another.
 
-.. code-block:: cylc-graph
+   To resolve this we must add :term:`dependencies<dependency>` *between* the
+   cycles. We do this by adding lines to the :term:`graph`. Tasks in the
+   previous cycle can be referred to by suffixing their name with ``[-P1]``,
+   for example. So to ensure the ``clean_oven`` task has been completed before
+   the start of the ``pre_heat_oven`` task in the next cycle, we would write
+   the following dependency:
 
-   clean_oven[-P1] => pre_heat_oven
+   .. code-block:: cylc-graph
 
-This dependency can be added to the suite by adding it to the other graph lines:
+      clean_oven[-P1] => pre_heat_oven
+
+   This dependency can be added to the suite by adding it to the other graph
+   lines:
 
 .. code-block:: diff
 
@@ -139,7 +154,11 @@ This dependency can be added to the suite by adding it to the other graph lines:
    +                clean_oven[-P1] => pre_heat_oven
                 """
 
-The resulting suite would look like this:
+.. nextslide::
+
+.. ifnotslides::
+
+   The resulting suite would look like this:
 
 .. digraph:: example
    :align: center
@@ -299,11 +318,13 @@ This dependency means that the ``purchase_ingredients`` task will run after the
 Recurrence Sections
 -------------------
 
-In the previous examples we made the workflow repeat by placing the graph
-within the ``[[[P1]]]`` section. Here ``P1`` is a :term:`recurrence` meaning
-repeat every cycle, where ``P1`` means every cycle, ``P2`` means every *other*
-cycle, and so on. To build more complex workflows we can use multiple
-recurrences:
+.. ifnotslides::
+
+   In the previous examples we made the workflow repeat by placing the graph
+   within the ``[[[P1]]]`` section. Here ``P1`` is a :term:`recurrence` meaning
+   repeat every cycle, where ``P1`` means every cycle, ``P2`` means every
+   *other* cycle, and so on. To build more complex workflows we can use multiple
+   recurrences:
 
 .. code-block:: cylc
 
@@ -342,16 +363,35 @@ recurrences:
        "bar.3" [label="bar\n3"]
    }
 
-By default recurrences start at the :term:`initial cycle point`, however it is
-possible to make them start at an arbitrary cycle point. This is done by
-writing the cycle point and the recurrence separated by a forward slash
-(``/``), e.g. ``5/P3`` means repeat every third cycle starting *from* cycle
-number 5.
+.. nextslide::
 
-The start point of a recurrence can also be defined as an offset from the
-:term:`initial cycle point`, e.g. ``+P5/P3`` means repeat every third cycle
-starting 5 cycles *after* the initial cycle point.
+.. ifnotslides::
 
+   By default recurrences start at the :term:`initial cycle point`, however it
+   is possible to make them start at an arbitrary cycle point. This is done by
+   writing the cycle point and the recurrence separated by a forward slash
+   (``/``), e.g. ``5/P3`` means repeat every third cycle starting *from* cycle
+   number 5.
+
+   The start point of a recurrence can also be defined as an offset from the
+   :term:`initial cycle point`, e.g. ``+P5/P3`` means repeat every third cycle
+   starting 5 cycles *after* the initial cycle point.
+
+.. ifslides::
+
+   ``5/P3``
+      Repeat every third cycle starting *from* cycle number 5.
+   ``+P5/P3``
+      Repeat every third cycle starting 5 cycles *after* the initial cycle
+      point.
+
+   .. nextslide::
+
+   .. rubric:: In this practical we will take the :term:`suite <Cylc suite>`
+      we wrote in the previous section and turn it into a
+      :term:`cycling suite <cycling>`.
+
+   Next section: :ref:`tutorial-datetime-cycling`
 
 .. practical::
 
