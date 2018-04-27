@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""The following options can be specified in the
-:rose:conf:`rose_ana[ana:ANALYSIS_CLASS]` section a :rose:app:`rose_ana`
-application or in the :rose:conf:`rose.conf[rose-ana]` section of the site/user
-configuration:
+"""The following options can be specified in:
+
+* :rose:conf:`rose.conf[rose-ana]`
+* :rose:conf:`rose_ana[ana:ANALYSIS_CLASS]`
 
 .. describe:: Options
 
