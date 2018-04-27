@@ -829,6 +829,7 @@ class RoseAutoDirective(Directive):
         except config.ConfigSyntaxError:
             LOGGER.error(
                 'Syntax error in Rose configuration file "%s".' % filename)
+            raise
 
         nodes = []
         nodes.append(addnodes.highlightlang(lang='rose', linenothreshold=20))
