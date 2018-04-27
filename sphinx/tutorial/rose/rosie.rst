@@ -7,19 +7,20 @@ Rosie
 =====
 
 Rosie is a tool for managing Rose suite configurations which is included in
-Rose.
-The purpose of Rosie is to facilitate suite development, management and
+Rose. The purpose of Rosie is to facilitate suite development, management and
 collaboration.
 Rosie:
 
 * Adds version control to Rose suite configurations.
 * Updates a database to keep track of Rose suite configurations.
 
-.. warning::
-   
-   This tutorial does not require specific FCM knowledge but basic version
-   control awareness is important. For more information on FCM version
-   control see the `FCM User Guide`_.
+.. ifnotslides::
+
+   .. warning::
+      
+      This tutorial does not require specific FCM knowledge but basic version
+      control awareness is important. For more information on FCM version
+      control see the `FCM User Guide`_.
 
 
 Rosie Suites
@@ -28,13 +29,24 @@ Rosie Suites
 .. _working copy: http://svnbook.red-bean.com/en/1.7/svn.basic.in-action.html#svn.basic.in-action.wc
 
 A Rosie suite is a Rose suite configuration which is managed by the Rosie
-system. Rosie suites can be created by the command:
+system.
+
+.. ifnotslides::
+
+   Rosie suites can be created by the command:
 
 :ref:`command-rosie-create`
    Create a new suite or copy an existing one.
 
-By default Rosie creates the `working copy`_ (local copy) of new suites in the
-``~/roses`` directory though Rosie working copies can be created elsewhere.
+.. ifnotslides::
+
+   By default Rosie creates the `working copy`_ (local copy) of new suites in
+   the ``~/roses`` directory though Rosie working copies can be created
+   elsewhere.
+
+.. notslides::
+
+   Working copy installed in ``~/roses``.
 
 
 Version Control
@@ -43,17 +55,21 @@ Version Control
 In Rosie suites the :term:`suite directory` is added to `version control`_
 using `FCM`_.
 
-FCM is a `subversion <SVN>`_ (SVN) wrapper which provides a standard working
-practice for SVN projects. FCM implements all of the SVN commands as well as
-additional functionality. See the `FCM User Guide`_ for more information.
+.. ifnotslides::
+
+   FCM is a `subversion <SVN>`_ (SVN) wrapper which provides a standard working
+   practice for SVN projects. FCM implements all of the SVN commands as well as
+   additional functionality. See the `FCM User Guide`_ for more information.
 
 
 Suite Naming
 ------------
 
-Each Rosie suite is assigned a unique name made up of a *prefix* followed by a
-hyphen and then an *identifier* made up of two characters and three
-numbers, e.g:
+.. ifnotslides::
+
+   Each Rosie suite is assigned a unique name made up of a *prefix* followed by
+   a hyphen and then an *identifier* made up of two characters and three
+   numbers, e.g:
 
 .. graph:: Example
    :align: center
@@ -74,30 +90,39 @@ numbers, e.g:
    b1 -- b2
    c1 -- c2
 
-The prefix denotes the repository in which the suite is located. Prefixes are
-site specific and are configured by the
-:rose:conf:`rose.conf[rosie-id]prefix-location.PREFIX` setting.
+.. ifnotslides::
 
-Within the Rose user community the ``u`` prefix is typically configured to
-point at the `SRS`_ repository.
+   The prefix denotes the repository in which the suite is located. Prefixes are
+   site specific and are configured by the
+   :rose:conf:`rose.conf[rosie-id]prefix-location.PREFIX` setting.
+
+   Within the Rose user community the ``u`` prefix is typically configured to
+   point at the `SRS`_ repository.
+
+.. ifslides::
+
+   :rose:conf:`rose.conf[rosie-id]prefix-location.PREFIX`
+
+   ``u`` = SRS
 
 
 The :rose:file:`rose-suite.info` File
 -------------------------------------
 
-All Rosie suites require a :rose:file:`rose-suite.info` file. This file provides information about the suite for use in the suite management and version control
-systems. The :rose:file:`rose-suite.info` file uses the
-:ref:`Rose Configuration Format <tutorial-rose-configurations>`.
-The main settings are:
+.. ifnotslides::
+
+   All Rosie suites require a :rose:file:`rose-suite.info` file. This file
+   provides information about the suite for use in the suite management and
+   version control systems. The :rose:file:`rose-suite.info` file uses the
+   :ref:`Rose Configuration Format <tutorial-rose-configurations>`.
+   The main settings are:
 
 ``title``
    A short title for the suite.
 ``owner``
    The user who has control over the suite (i.e. their username).
 ``project``
-   .. TODO - add in description.
-
-   ???
+   The project to which this suite belongs (can be an arbitrary name).
 ``access-list``
    An optional list of users who have permission to commit to the trunk of the
    suite.
@@ -116,8 +141,12 @@ Rosie provides commands for managing suites, including:
    Searches the suite database (using information from suite's
    :rose:file:`rose-suite.info` files).
 
-Rosie also provides a GUI called :ref:`command-rosie-go` which incorporates
-the functionality of the above commands.
+.. nextslide::
+
+.. ifnotslides::
+
+   Rosie also provides a GUI called :ref:`command-rosie-go` which incorporates
+   the functionality of the above commands.
 
 .. figure:: img/rosie-go-annotated.png
    :align: center
@@ -127,6 +156,17 @@ the functionality of the above commands.
    Screenshot of the rosie go GUI.
 
 .. TODO - migrate the old "Rose User Guide: Rosie Go" page?
+
+.. nextslide::
+
+.. ifslides::
+
+   .. rubric:: In this practical we will add the
+      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      from the :ref:`previous practical <suites-practical>` to a rosie
+      repository, make some changes, and commit them to the repository.
+
+   Next section: :ref:`tutorial-rose-summary`
 
 
 .. practical::

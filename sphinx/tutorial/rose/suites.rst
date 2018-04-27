@@ -1,6 +1,9 @@
 .. include:: ../../hyperlinks.rst
    :start-line: 1
 
+
+.. _tutorial-rose-suites:
+
 Rose Suite Configurations
 =========================
 
@@ -21,21 +24,33 @@ A Rose suite configuration is a Cylc :term:`suite directory` containing a
 .. NOTE - The rose-suite.info is not mentioned here as it is really a rosie
           feature.
 
-The :rose:file:`rose-suite.conf` file is written in the same
-:ref:`format <tutorial-rose-configurations>` as the :rose:file:`rose-app.conf`
-file. Its main configuration sections are:
+.. ifnotslides::
 
-:rose:conf:`rose-suite.conf[env]`
-   Environment variables for use by the whole suite.
-:rose:conf:`rose-suite.conf[jinja2:suite.rc]`
-   `Jinja2`_ variables for use in the ``suite.rc`` file.
-:rose:conf:`rose-suite.conf[file:NAME]`
-   Files and resources to be installed in the :term:`run directory` when the
-   suite is run.
+   The :rose:file:`rose-suite.conf` file is written in the same
+   :ref:`format <tutorial-rose-configurations>` as the
+   :rose:file:`rose-app.conf` file. Its main configuration sections are:
 
-In the following example the environment variable ``GREETING`` and the
-Jinja2 variable ``WORLD`` are both set in the :rose:file:`rose-suite.conf`
-file. These variables can then be used in the ``suite.rc`` file:
+   :rose:conf:`rose-suite.conf[env]`
+      Environment variables for use by the whole suite.
+   :rose:conf:`rose-suite.conf[jinja2:suite.rc]`
+      `Jinja2`_ variables for use in the ``suite.rc`` file.
+   :rose:conf:`rose-suite.conf[file:NAME]`
+      Files and resources to be installed in the :term:`run directory` when the
+      suite is run.
+
+.. ifslides::
+
+   * :rose:conf:`rose-suite.conf[env]`
+   * :rose:conf:`rose-suite.conf[jinja2:suite.rc]`
+   * :rose:conf:`rose-suite.conf[file:NAME]`
+
+.. nextslide::
+
+.. ifnotslides::
+
+   In the following example the environment variable ``GREETING`` and the
+   Jinja2 variable ``WORLD`` are both set in the :rose:file:`rose-suite.conf`
+   file. These variables can then be used in the ``suite.rc`` file:
 
 .. code-block:: rose
    :caption: rose-suite.conf
@@ -70,16 +85,29 @@ Suite Directory Vs Run Directory
    The directory in which the suite runs. The ``work``, ``share`` and ``log``
    directories live here.
 
-Throughout the :ref:`Cylc Tutorial` we wrote suites in the ``cylc-run``
-directory. As Cylc runs suites in the ``cylc-run`` directory the
-:term:`suite directory` is also the :term:`run directory` i.e. the suite runs
-in the same directory in which it is written.
+.. ifnotslides::
 
-With Rose we develop suites in a separate directory to the one in which they
-run meaning that the :term:`suite directory` is different from the
-:term:`run directory`. This helps keep the suite separate from its output and
-means that you can safely work on a suite and its resources whilst it is
-running.
+   Throughout the :ref:`Cylc Tutorial` we wrote suites in the ``cylc-run``
+   directory. As Cylc runs suites in the ``cylc-run`` directory the
+   :term:`suite directory` is also the :term:`run directory` i.e. the suite runs
+   in the same directory in which it is written.
+
+   With Rose we develop suites in a separate directory to the one in which they
+   run meaning that the :term:`suite directory` is different from the
+   :term:`run directory`. This helps keep the suite separate from its output and
+   means that you can safely work on a suite and its resources whilst it is
+   running.
+
+.. nextslide::
+
+.. ifslides::
+
+   Cylc
+      * :term:`suite directory` = ``~/cylc-run/<suite>``
+      * :term:`run directory` = ``~/cylc-run/<suite>``
+   Rose
+      * :term:`suite directory` = ``/path/to/<suite>``
+      * :term:`run directory` = ``~/cylc-run/<suite>``
 
 .. note::
 
@@ -93,13 +121,21 @@ running.
 Running Rose Suite Configurations
 ---------------------------------
 
-Rose :ref:`Application Configurations <Application Configuration>` are run using
-:ref:`command-rose-app-run`, Rose Suite Configurations are run using
-:ref:`command-rose-suite-run`.
+.. ifnotslides::
+
+   Rose :ref:`Application Configurations <Application Configuration>` are
+   run using :ref:`command-rose-app-run`, Rose Suite Configurations are
+   run using :ref:`command-rose-suite-run`.
+
+   When a suite configuration is run:
+
+.. ifslides::
+
+   .. code-block:: bash
+
+      rose suite-run
 
 .. _rose-suite-run-stages:
-
-When a suite configuration is run:
 
 #. The :term:`suite directory` is copied into the ``cylc-run`` directory where
    it becomes the :term:`run directory`.
@@ -109,6 +145,8 @@ When a suite configuration is run:
 #. The Cylc suite is validated.
 #. The Cylc suite is run.
 #. The Cylc GUI is launched.
+
+.. nextslide::
 
 .. _rose-suite-installation-diagram:
 
@@ -163,44 +201,72 @@ When a suite configuration is run:
     install_files -> files_run_dir
     bin_suite_dir -> bin_run_dir
 
-Like :ref:`command-rose-app-run`, :ref:`command-rose-suite-run` will look for a
-configuration to run in the current directory. The command can be run
-from other locations using the ``-C`` argument::
+.. nextslide::
 
-   rose suite-run -C /path/to/suite/configuration/
+.. ifnotslides::
 
-The ``--local-install-only`` command line option will cause the suite
-to be installed (though only on your local machine, not on any job hosts) and
-validated but not run (i.e. :ref:`steps 1-4 <rose-suite-run-stages>`).
+   Like :ref:`command-rose-app-run`, :ref:`command-rose-suite-run` will look
+   for a configuration to run in the current directory. The command can be run
+   from other locations using the ``-C`` argument::
+
+      rose suite-run -C /path/to/suite/configuration/
+
+   The ``--local-install-only`` command line option will cause the suite
+   to be installed (though only on your local machine, not on any job hosts) and
+   validated but not run (i.e. :ref:`steps 1-4 <rose-suite-run-stages>`).
+
+.. ifslides::
+
+   .. code-block:: bash
+
+      rose suite-run
+      rose suite-run -C /path/to/suite/configuration/
+      rose suite-run --local-install-only
 
 
 Start, Stop, Restart
 --------------------
 
-Under Rose, suites will run using the name of the suite directory. For instance
-if you run :ref:`command-rose-suite-run` on a suite in the directory
-``~/foo/bar`` then it will run with the name ``bar``.
+.. ifnotslides::
 
-The name can be overridden using the ``--name`` option i.e:
+   Under Rose, suites will run using the name of the suite directory. For
+   instance if you run :ref:`command-rose-suite-run` on a suite in the directory
+   ``~/foo/bar`` then it will run with the name ``bar``.
+
+   The name can be overridden using the ``--name`` option i.e:
 
 .. code-block:: sub
 
    rose suite-run --name <SUITE_NAME>
 
-:ref:`Starting Suites`
-   Suites must be run using the :ref:`command-rose-suite-run` command which
-   in turn calls the ``cylc run`` command.
-:ref:`Stopping Suites`
-   Suites can be stopped using the ``cylc stop <SUITE_NAME>`` command,
-   as for regular Cylc suites.
-:ref:`Restarting Suites`
-   There are two options for restarting:
+.. ifnotslides::
 
-   * To pick up where the suite left off use :ref:`command-rose-suite-restart`.
-     No changes will be made to the run directory. *This is usually the
-     recommended option.*
-   * To restart in a way that picks up changes made in the suite directory,
-     use the ``--restart`` option to the :ref:`command-rose-suite-run` command.
+   :ref:`Starting Suites`
+      Suites must be run using the :ref:`command-rose-suite-run` command which
+      in turn calls the ``cylc run`` command.
+   :ref:`Stopping Suites`
+      Suites can be stopped using the ``cylc stop <SUITE_NAME>`` command,
+      as for regular Cylc suites.
+   :ref:`Restarting Suites`
+      There are two options for restarting:
+
+      * To pick up where the suite left off use
+        :ref:`command-rose-suite-restart`.
+        No changes will be made to the run directory. *This is usually the
+        recommended option.*
+      * To restart in a way that picks up changes made in the suite directory,
+        use the ``--restart`` option to the :ref:`command-rose-suite-run`
+        command.
+
+.. ifslides::
+
+   Starting Suites
+      ``rose suite-run`` which in turn calls ``cylc run``
+   Stopping Suites
+      ``cylc stop <SUITE_NAME>``
+   Restarting Suites
+      * ``rose suite-restart`` (just restart)
+      * ``rose suite-run --restart`` (re-install and restart)
 
 See the :ref:`Cheat Sheet` for more information.
 
@@ -213,6 +279,7 @@ See the :ref:`Cheat Sheet` for more information.
    directory will *not* be removed from the run directory. To force
    :ref:`command-rose-suite-run` to perform a complete rebuild, use the
    ``--new`` option.
+
 
 .. _suites-practical:
 
@@ -364,25 +431,41 @@ See the :ref:`Cheat Sheet` for more information.
 Rose Applications In Rose Suite Configurations
 ----------------------------------------------
 
-In Cylc suites, Rose applications are placed in an ``app/`` directory which
-is copied across to the :term:`run directory` with the rest of the suite by
-:ref:`command-rose-suite-run` when the suite configuration is run.
+.. ifnotslides::
 
-When we run Rose applications from within Cylc suites we use the
-:ref:`command-rose-task-run` command rather than the
-:ref:`command-rose-app-run` command.
+   In Cylc suites, Rose applications are placed in an ``app/`` directory which
+   is copied across to the :term:`run directory` with the rest of the suite by
+   :ref:`command-rose-suite-run` when the suite configuration is run.
 
-When run, :ref:`command-rose-task-run` searches for an application with the same
-name as the Cylc task in the ``app/`` directory.
+   When we run Rose applications from within Cylc suites we use the
+   :ref:`command-rose-task-run` command rather than the
+   :ref:`command-rose-app-run` command.
 
-The :ref:`command-rose-task-run` command also interfaces with Cylc to provide
-a few useful environment variables (see the
-:ref:`command-line reference <command-rose-task-run>` for details). The
-application will run in the :term:`work directory`, just like for a
-regular Cylc task.
+   When run, :ref:`command-rose-task-run` searches for an application with the
+   same name as the Cylc task in the ``app/`` directory.
 
-In this example the ``hello`` task will run the application located in
-``app/hello/``:
+   The :ref:`command-rose-task-run` command also interfaces with Cylc to provide
+   a few useful environment variables (see the
+   :ref:`command-line reference <command-rose-task-run>` for details). The
+   application will run in the :term:`work directory`, just like for a
+   regular Cylc task.
+
+   In this example the ``hello`` task will run the application located in
+   ``app/hello/``:
+
+.. ifslides::
+
+   * :ref:`command-rose-app-run` - run an application standalone.
+   * :ref:`command-rose-task-run` - run an application from a cylc task.
+
+   The ``app/`` directory
+     * Installed by :ref:`command-rose-suite-run`.
+     * :ref:`command-rose-task-run` searches for applications here.
+
+   :ref:`command-rose-task-run` runs applications in :term:`work directory`
+   the same as for a cylc :term:`task`.
+
+.. nextslide::
 
 .. code-block:: cylc
    :caption: suite.rc
@@ -397,10 +480,14 @@ In this example the ``hello`` task will run the application located in
    [command]
    default=echo "Hello World!"
 
-The name of the application to run can be overridden using the ``--app-key``
-command-line option or the :envvar:`ROSE_TASK_APP` environment variable. For
-example the ``greetings`` :term:`task` will run the ``hello`` :term:`app <Rose
-app>` in the task defined below.
+.. nextslide::
+
+.. ifnotslides::
+
+   The name of the application to run can be overridden using the ``--app-key``
+   command-line option or the :envvar:`ROSE_TASK_APP` environment variable. For
+   example the ``greetings`` :term:`task` will run the ``hello``
+   :term:`app <Rose app>` in the task defined below.
 
 .. code-block:: cylc
    :caption: suite.rc
@@ -409,14 +496,20 @@ app>` in the task defined below.
        [[greetings]]
            script = rose task-run --app-key hello
 
+.. ifslides::
+
+   Or alternatively using :envvar:`ROSE_TASK_APP`.
+
 
 Rose Bush
 ---------
 
 .. TODO - move this into the Cylc tutorial with the upcomming Cylc "nameless".
 
-Rose provides a utility for viewing the status and logs of Cylc suites called
-Rose Bush. Rose Bush displays suite information in web pages.
+.. ifnotslides::
+
+   Rose provides a utility for viewing the status and logs of Cylc suites called
+   Rose Bush. Rose Bush displays suite information in web pages.
 
 .. figure:: img/rose-bush.png
    :alt: Rose Bush screenshot
@@ -424,12 +517,32 @@ Rose Bush. Rose Bush displays suite information in web pages.
 
    Screenshot of a Rose Bush web page.
 
-If a Rose Bush server is provided at your site, you can open the Rose Bush
-page for a suite by running the :ref:`command-rose-suite-log` command
-in the suite directory.
+.. ifnotslides::
 
-Otherwise an add-hoc web server can be set up using the
-:ref:`command-rose-bush` ``start`` command argument.
+   If a Rose Bush server is provided at your site, you can open the Rose Bush
+   page for a suite by running the :ref:`command-rose-suite-log` command
+   in the suite directory.
+
+   Otherwise an add-hoc web server can be set up using the
+   :ref:`command-rose-bush` ``start`` command argument.
+
+.. ifslides::
+
+   * :ref:`command-rose-suite-log`
+   * :ref:`command-rose-bush` ``start``
+
+   .. nextslide::
+
+   .. rubric:: In this tutorial we will create a Rose Suite Configuration for
+      the
+      :ref:`weather-forecasting suite<tutorial-datetime-cycling-practical>`.
+
+   .. rubric:: In this practical we will take the ``forecast`` Rose application
+      that we developed in the :ref:`Metadata Tutorial <tutorial-rose-metadata>`
+      and integrate it into the :ref:`weather-forecasting suite
+      <tutorial-datetime-cycling-practical>`.
+
+   Next section: :ref:`tutorial-rosie`
 
 
 .. practical::
