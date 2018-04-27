@@ -24,22 +24,23 @@ import ast
 from getpass import getpass
 import os
 import re
+import shlex
+import sys
+from urlparse import urlparse
+
 import rose.config
 from rose.env import env_var_process
 from rose.popen import RosePopener
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
-import shlex
-import sys
-from urlparse import urlparse
 
 import socket
 try:
     from gi import require_version, pygtkcompat
-    require_version('Gtk', '3.0')
+    require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
     require_version('Secret', '1.0')
-    from gi.repository import Gtk, Secret
-    gi_flag = True  # Refer to correct 'GTK+' (version 2 or 3) going forward
+    from gi.repository import Secret
+    gi_flag = True
 except ImportError:
     gi_flag = False
 try:
@@ -255,50 +256,46 @@ class LibsecretStore(object):
     @classmethod
     def usable(cls):
         """Can this store be used?"""
-        if gi_flag:
-            return True
-        else:
-            return False
+        return bool(gi_flag)
 
     def __init__(self):
-        self.attributes = {
-            "user": Secret.SchemaAttributeType.STRING,
-            "protocol": Secret.SchemaAttributeType.STRING,
-            "server": Secret.SchemaAttributeType.STRING,
+        self.template = {
+            "protocol": scheme,
+            "server": host,
+            "user": username
         }
+        # Attributes must be explicitly defined; not managed by the schema
+        self.attributes = dict((key, Secret.SchemaAttributeType.STRING) for
+                               key in self.template)
         self.schema = Secret.Schema.new(
             "org.rosie.disco.Store", Secret.SchemaFlags.NONE, self.attributes)
 
     def clear_password(self, scheme, host, username):
         """Remove the password from the cache."""
         try:
-            if (scheme, host, username) in self.attributes:
-                key, value = self.attributes[(scheme, host, username)]
-                Secret.password_clear(self.schema, (key, value), None,
-                                      Secret.password_clear_finish())
+            if all(attr in self.attributes.values for attr in
+                    self.template.values):
+                Secret.password_clear_sync(self.schema, self.template, None)
         except Secret.SECRET_ERROR_NO_SUCH_OBJECT:
             pass
 
     def find_password(self, scheme, host, username):
         """Return the password of username@root."""
         try:
-            key, value = self.attributes[(scheme, host, username)]
-            password = Secret.password_lookup(self.schema, (key, value), None,
-                                              Secret.password_lookup_finish())
+            password = Secret.password_lookup_sync(self.schema, self.template,
+                                                   None)
         except Secret.SECRET_ERROR_PROTOCOL:
             return
-        if password == "NULL":
+        if password is None:
             raise Secret.SECRET_ERROR_NO_SUCH_OBJECT
-            return
         return password
 
     def store_password(self, scheme, host, username, password):
         """Return the password of username@root."""
         self.clear_password(scheme, host, username)
-        new_attr = {"user": username, "protocol": scheme, "server": host}
         try:
-            Secret.password_store(
-                self.schema, new_attr, Secret.COLLECTION_DEFAULT, host,
+            Secret.password_store_sync(
+                self.schema, self.template, Secret.COLLECTION_DEFAULT, host,
                 password, None)
         except (Secret.SECRET_ERROR_NO_SUCH_OBJECT,
                 Secret.SECRET_ERROR_PROTOCOL):
