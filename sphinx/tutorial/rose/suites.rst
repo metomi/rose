@@ -129,12 +129,6 @@ Running Rose Suite Configurations
 
    When a suite configuration is run:
 
-.. ifslides::
-
-   .. code-block:: bash
-
-      rose suite-run
-
 .. _rose-suite-run-stages:
 
 #. The :term:`suite directory` is copied into the ``cylc-run`` directory where
@@ -279,6 +273,18 @@ See the :ref:`Cheat Sheet` for more information.
    directory will *not* be removed from the run directory. To force
    :ref:`command-rose-suite-run` to perform a complete rebuild, use the
    ``--new`` option.
+
+.. nextslide::
+
+.. ifslides::
+
+   .. rubric:: In this tutorial we will create a Rose Suite Configuration for
+      the
+      :ref:`weather-forecasting suite<tutorial-datetime-cycling-practical>`.
+
+   Next Steps:
+
+   * Read through the :ref:`Cheat Sheet`
 
 
 .. _suites-practical:
@@ -532,10 +538,6 @@ Rose Bush
    * :ref:`command-rose-bush` ``start``
 
    .. nextslide::
-
-   .. rubric:: In this tutorial we will create a Rose Suite Configuration for
-      the
-      :ref:`weather-forecasting suite<tutorial-datetime-cycling-practical>`.
 
    .. rubric:: In this practical we will take the ``forecast`` Rose application
       that we developed in the :ref:`Metadata Tutorial <tutorial-rose-metadata>`

@@ -50,9 +50,15 @@ Rose Configuration Format
    `INI`_ file format. *Like* the file format for :ref:`Cylc suites
    <Cylc file format>`:
 
+.. ifslides::
+
+   .. rubric:: Like the ``suite.rc`` format:
+
 * Comments start with a ``#`` character.
 * Settings are written as ``key=value`` pairs.
 * Sections are written inside square brackets i.e. ``[section-name]``
+
+.. nextslide::
 
 .. ifnotslides::
 
@@ -61,7 +67,7 @@ Rose Configuration Format
 
 .. ifslides::
 
-   Unlike the :ref:`suite.rc format <Cylc file format>`:
+   .. rubric:: Unlike the ``suite.rc`` format:
 
 * Sections cannot be nested.
 * Settings should not be indented.
