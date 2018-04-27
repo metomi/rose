@@ -323,6 +323,12 @@ method-path=/path/1 /path2
 # Turns on the :ref:`Rose Ana Comparison Database
 # <The Rose Ana Comparison Database>`.
 kgo-database=.true.
+# Limits the number of lines printed when using the
+# :py:mod:`rose.apps.ana_builtin.grepper` analysis class.
+grepper-report-limit=42
+# Causes the :py:mod:`rose.apps.ana_builtin.grepper` class to pass
+# if all files to be compared are missing.
+skip-if-all-files-missing=.true.
 
 
 # Configuration related to the database of the Rosie web service server.

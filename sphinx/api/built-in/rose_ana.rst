@@ -25,7 +25,7 @@ load firstly in the ``ana`` subdirectory of the ``rose-ana`` app, then in
 the ``ana`` subdirectory of the top-most suite directory. Any
 additional directories to search (for example a site-wide central
 directory) may be specified by setting the
-:rose:conf:`rose_ana[rose-ana]method-path` variable. Finally the
+:rose:conf:`rose.conf[rose-ana]method-path` variable. Finally the
 ``ana_builtins`` subdirectory of the Rose installation itself contains
 any built-in comparisons.
 
@@ -78,11 +78,22 @@ details.
 
 .. rose:app:: rose_ana
 
-   .. rose:conf:: rose-ana
+   .. rose:conf:: ana:config
 
-      .. rose:conf:: method-path
+      .. rose:conf:: grepper-report-limit
 
-         Specify additional search paths for analysis modules.
+         Limits the number of lines printed when using the
+         :py:mod:`rose.apps.ana_builtin.grepper` analysis class.
+
+      .. rose:conf:: skip-if-all-files-missing
+
+         Causes the :py:mod:`rose.apps.ana_builtin.grepper` class to pass
+         if all files to be compared are missing.
+
+      .. rose:conf:: kgo-database
+
+         Turns on the :ref:`Rose Ana Comparison Database
+         <The Rose Ana Comparison Database>`.
 
    .. rose:conf:: ana:ANALYSIS_CLASS
 
