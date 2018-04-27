@@ -1,32 +1,49 @@
 .. include:: ../../hyperlinks.rst
    :start-line: 1
 
+
+.. _tutorial-rose-applications:
+
 Rose Applications
 =================
 
-The Cylc ``suite.rc`` file allows us to define environment variables for use by
-:term:`tasks <task>` e.g:
+.. ifnotslides::
 
-.. code-block:: cylc
+   The Cylc ``suite.rc`` file allows us to define environment variables for
+   use by :term:`tasks <task>` e.g:
 
-   [runtime]
-       [[hello_world]]
-           script = echo "Hello ${WORLD}!"
-           [[[environment]]]
-               WORLD = Earth
+.. slide:: Cylc Task Environment
+   :level: 2
+   :inline-contents: True
 
-As a task grows in complexity it could require:
+   .. code-block:: cylc
 
-* More environment variables.
-* Input files.
-* Scripts and libraries.
+      [runtime]
+          [[hello_world]]
+              script = echo "Hello ${WORLD}!"
+              [[[environment]]]
+                  WORLD = Earth
 
-A Rose application or "Rose app" is a runnable :term:`Rose configuration` which
-executes a defined commmand.
+.. slide:: Cylc Task Environment
+   :level: 2
+   :inline-contents: True
 
-Rose applications provide a convenient way to encapsulate all of this
-configuration, storing it all in one place to make it easier to handle and
-maintain.
+   As a task grows in complexity it could require:
+
+   * More environment variables.
+   * Input files.
+   * Scripts and libraries.
+
+.. slide:: Cylc Task Environment
+   :level: 2
+   :inline-contents: True
+
+   A Rose application or "Rose app" is a runnable :term:`Rose configuration`
+   which executes a defined commmand.
+
+   Rose applications provide a convenient way to encapsulate all of this
+   configuration, storing it all in one place to make it easier to handle and
+   maintain.
 
 
 .. _Application Configuration:
@@ -34,29 +51,49 @@ maintain.
 Application Configuration
 -------------------------
 
-An application configuration is a directory containing a
-:rose:file:`rose-app.conf` file. Application configurations are also refered to
-as "applications" or "apps".
+.. ifnotslides::
 
-The command to execute when the application is run is defined using the
-:rose:conf:`rose-app.conf[command]default` setting e.g:
+   An application configuration is a directory containing a
+   :rose:file:`rose-app.conf` file. Application configurations are also
+   refered to as "applications" or "apps".
+
+   The command to execute when the application is run is defined using the
+   :rose:conf:`rose-app.conf[command]default` setting e.g:
+
+.. ifslides::
+
+   Specify the command to execute:
 
 .. code-block:: rose
 
    [command]
    default=echo "Hello ${WORLD}!"
 
-Environment variables are specified inside the :rose:conf:`rose-app.conf[env]`
-section e.g:
+.. ifnotslides::
+
+   Environment variables are specified inside the
+   :rose:conf:`rose-app.conf[env]` section e.g:
+
+.. ifslides::
+
+   Specify environment variables:
 
 .. code-block:: rose
 
    [env]
    WORLD=Earth
 
-Scripts and executables can be placed in a ``bin/`` directory. They will be
-automatically added to the ``PATH`` environment variable when the application
-is run, e.g.:
+.. nextslide::
+
+.. ifnotslides::
+
+   Scripts and executables can be placed in a ``bin/`` directory. They will be
+   automatically added to the ``PATH`` environment variable when the application
+   is run, e.g.:
+
+.. ifslides::
+
+   The ``bin/`` directory:
 
 .. code-block:: bash
    :caption: bin/hello
@@ -82,15 +119,27 @@ An application can be run using the :ref:`command-rose-app-run` command:
    $ rose app-run -q  # -q for quiet output
    Hello Earth!
 
-The Rose application will by default run in the current directory so it is a
-good idea to run it outside of the :term:`application directory` to keep run
-files separate, using the  ``-C`` option to provide the path to the
-application:
+.. ifnotslides::
+
+   The Rose application will by default run in the current directory so it is a
+   good idea to run it outside of the :term:`application directory` to keep run
+   files separate, using the  ``-C`` option to provide the path to the
+   application:
 
 .. code-block:: console
 
    $ rose app-run -q -C path/to/application
    Hello Earth!
+
+.. nextslide::
+
+.. ifslides::
+
+   .. rubric:: In this practical we will convert the ``forecast`` task from the
+      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      into a Rose application.
+
+   Next section: :ref:`tutorial-rose-metadata`
 
 
 .. _rose-applications-practical:

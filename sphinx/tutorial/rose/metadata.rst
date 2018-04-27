@@ -3,33 +3,47 @@
 Rose Metadata
 =============
 
-Metadata can be used to provide information about settings in Rose
-configurations. It is used for:
+.. ifnotslides::
+
+   Metadata can be used to provide information about settings in Rose
+   configurations.
+
+It is used for:
 
 * Documenting settings.
 * Performing automatic checking (e.g. type checking).
 * Formatting the :ref:`command-rose-config-edit` GUI.
 
-Metadata can be used to ensure that configurations are valid before they are
-run and to assist those who edit the configurations.
+.. ifnotslides::
+
+   Metadata can be used to ensure that configurations are valid before they are
+   run and to assist those who edit the configurations.
 
 
 The Metadata Format
 -------------------
 
-Metadata is written in a :rose:file:`rose-meta.conf` file. This file can either
-be stored inside a Rose configuration in a ``meta/`` directory, or elsewhere
-outside of the configuration.
+.. ifnotslides::
 
-The :rose:file:`rose-meta.conf` file uses the standard 
-:ref:`Rose configuration format <tutorial-rose-configurations>`.
+   Metadata is written in a :rose:file:`rose-meta.conf` file. This file can
+   either be stored inside a Rose configuration in a ``meta/`` directory, or
+   elsewhere outside of the configuration.
 
-The metadata for a setting is written in a section named ``[section=setting]``
-where ``setting`` is the name of the setting and ``section`` is the section to
-which the setting belongs (left blank if the setting does not belong to
-a section).
+.. ifslides::
 
-For example, take the following application configuration:
+   ``meta/rose-meta.conf`` (or elsewhere outside of the configuration)
+
+.. ifnotslides::
+
+   The :rose:file:`rose-meta.conf` file uses the standard 
+   :ref:`Rose configuration format <tutorial-rose-configurations>`.
+
+   The metadata for a setting is written in a section named
+   ``[section=setting]`` where ``setting`` is the name of the setting and
+   ``section`` is the section to which the setting belongs (left blank if the
+   setting does not belong to a section).
+
+   For example, take the following application configuration:
 
 .. code-block:: rose
    :caption: rose-app.conf
@@ -40,8 +54,12 @@ For example, take the following application configuration:
    [env]
    WORLD=Earth
 
-If we were to write metadata for the ``WORLD`` environment variable we
-would create a section called ``[env=WORLD]``.
+.. nextslide::
+
+.. ifnotslides::
+
+   If we were to write metadata for the ``WORLD`` environment variable we
+   would create a section called ``[env=WORLD]``.
 
 .. code-block:: rose
    :caption: meta/rose-meta.conf
@@ -56,43 +74,68 @@ This example gives the ``WORLD`` variable a title and a list of allowed values.
 Metadata Commands
 -----------------
 
-The :ref:`command-rose-metadata-check` command can be used to check that
-metadata is valid::
+.. ifnotslides::
 
-   rose metadata-check -C meta/
+   The :ref:`command-rose-metadata-check` command can be used to check that
+   metadata is valid:
 
-The configuration can be tested against the metadata using the
-:ref:`command-rose-macro` command::
+.. code-block:: console
 
-   rose macro -V
+   $ rose metadata-check -C meta/
 
-For example, if we were to change the value of ``WORLD`` to ``Pluto``
-``rose macro -V`` would return the following error message:
+.. ifnotslides::
 
-.. code-block:: none
+   The configuration can be tested against the metadata using the ``-V`` option
+   of the :ref:`command-rose-macro` command.
 
+.. ifnotslides::
+
+   For example, if we were to change the value of ``WORLD`` to ``Pluto``
+   ``rose macro -V`` would return the following error message:
+
+.. code-block:: console
+
+   $ rose macro -V
    Value Pluto not in allowed values ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']
 
 
 Metadata Items
 --------------
 
-There are many metadata items, some of the most commonly-used ones being:
+.. ifnotslides::
 
-``title``
-   Assign a title to a setting.
-``description``
-   Attach a short description to a setting.
-``type``
-   Specify the data type a setting expects, e.g. ``type=integer``.
-``length``
-   Specify the length of comma-separated lists, e.g. ``length=:`` for a
-   limitless list.
-``range``
-   Specify numerical bounds for the value of a setting, e.g. ``range=1, 10``
-   for a value between 1 and 10.
+   There are many metadata items, some of the most commonly-used ones being:
 
-For a full list of metadata items, see :rose:conf:`rose-meta.conf[SETTING]`.
+   ``title``
+      Assign a title to a setting.
+   ``description``
+      Attach a short description to a setting.
+   ``type``
+      Specify the data type a setting expects, e.g. ``type=integer``.
+   ``length``
+      Specify the length of comma-separated lists, e.g. ``length=:`` for a
+      limitless list.
+   ``range``
+      Specify numerical bounds for the value of a setting, e.g. ``range=1, 10``
+      for a value between 1 and 10.
+
+   For a full list of metadata items, see :rose:conf:`rose-meta.conf[SETTING]`.
+
+.. ifslides::
+
+   * title
+   * description
+   * type
+   * length
+   * range
+
+   .. nextslide::
+
+   .. rubric:: In this practical we will write metadata for the
+      ``application-tutorial`` app we wrote in the
+      :ref:`Rose application practical <rose-applications-practical>`.
+
+   Next section: :ref:`tutorial-rose-suites`
 
 
 .. practical::
