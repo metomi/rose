@@ -42,4 +42,4 @@ jobs:
             rose test-battery -v --state=save,failed -j 5)
         - script: >
             rose make-docs --venv --dev clean strict linkcheck doctest &&
-            rose make-docs --venv --dev html
+            rose make-docs --venv --dev html slides
