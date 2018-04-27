@@ -79,6 +79,10 @@ Metadata Commands
    The :ref:`command-rose-metadata-check` command can be used to check that
    metadata is valid:
 
+.. ifslides::
+
+   .. rubric:: Validating metadata:
+
 .. code-block:: console
 
    $ rose metadata-check -C meta/
@@ -88,10 +92,11 @@ Metadata Commands
    The configuration can be tested against the metadata using the ``-V`` option
    of the :ref:`command-rose-macro` command.
 
-.. ifnotslides::
+.. ifslides::
 
-   For example, if we were to change the value of ``WORLD`` to ``Pluto``
-   ``rose macro -V`` would return the following error message:
+   .. rubric:: Validating configurations:
+
+For example, if we were to change the value of ``WORLD`` to ``Pluto``:
 
 .. code-block:: console
 
