@@ -318,8 +318,7 @@ Suite Files
 
 .. ifnotslides::
 
-   Along with the :term:`work directory` and :term:`job log directory`, Cylc
-   generates other files and directories when it runs a suite, namely:
+   Cylc generates other files and directories when it runs a suite, namely:
 
    ``log/``
       Directory containing log files, including:
@@ -340,6 +339,8 @@ Suite Files
    ``share/``
       The :term:`share directory` is a place where :term:`tasks <task>` can
       write files which are intended to be shared within that cycle.
+   ``work/``
+      A directory hierarchy containing tasks :term:`work directory`.
 
 .. ifslides::
 
@@ -349,6 +350,7 @@ Suite Files
       * ``log/suite``
    * ``suite.rc.processed``
    * ``share/``
+   * ``work/``
 
    .. nextslide::
 
@@ -484,7 +486,7 @@ Suite Files
       * Try pressing the "Pause" button which is found in the top left-hand
         corner of the GUI.
 
-      * Try right-clicking on a task. From the context menu you could try:
+      * Try right-clicking on a task. From the right-click menu you could try:
 
         * "Trigger (run now)"
         * "Reset State"

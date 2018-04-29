@@ -142,7 +142,7 @@ This would result in:
            [[[T00/PT3H]]]
                graph = """
    {% for station in stations %}
-                  get_observations_{{station}} => gather_observations
+                  get_observations_{{station}} => consolidate_observations
    {% endfor %}
                """
 

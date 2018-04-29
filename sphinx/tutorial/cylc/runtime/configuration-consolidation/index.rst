@@ -68,10 +68,10 @@ Consolidating Configuration
           [[dependencies]]
               [[[T00/PT3H]]]
                   graph = """
-                      get_observations_belmullet => gather_observations
-                      get_observations_camborne => gather_observations
-                      get_observations_heathrow => gather_observations
-                      get_observations_shetland => gather_observations
+                      get_observations_belmullet => consolidate_observations
+                      get_observations_camborne => consolidate_observations
+                      get_observations_heathrow => consolidate_observations
+                      get_observations_shetland => consolidate_observations
                   """
 
 .. nextslide::

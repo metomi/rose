@@ -91,22 +91,22 @@ Runtime
            [[[environment]]]
                API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
 
-   [[get_observations_heathrow]]
-       inherit = GET_OBSERVATIONS
-       [[[environment]]]
-           SITE_ID = 3772
-   [[get_observations_camborne]]
-       inherit = GET_OBSERVATIONS
-       [[[environment]]]
-           SITE_ID = 3808
-   [[get_observations_shetland]]
-       inherit = GET_OBSERVATIONS
-       [[[environment]]]
-           SITE_ID = 3005
-   [[get_observations_belmullet]]
-       inherit = GET_OBSERVATIONS
-       [[[environment]]]
-           SITE_ID = 3976
+       [[get_observations_heathrow]]
+           inherit = GET_OBSERVATIONS
+           [[[environment]]]
+               SITE_ID = 3772
+       [[get_observations_camborne]]
+           inherit = GET_OBSERVATIONS
+           [[[environment]]]
+               SITE_ID = 3808
+       [[get_observations_shetland]]
+           inherit = GET_OBSERVATIONS
+           [[[environment]]]
+               SITE_ID = 3005
+       [[get_observations_belmullet]]
+           inherit = GET_OBSERVATIONS
+           [[[environment]]]
+               SITE_ID = 3976
 
 
 Graphing
@@ -118,21 +118,21 @@ Graphing
 
 .. code-block:: cylc-graph
 
-   GET_OBSERVATIONS:succeed-all => gather_observations
+   GET_OBSERVATIONS:succeed-all => consolidate_observations
 
 .. ifnotslides::
 
    The ``:succeed-all`` is a special :term:`qualifier` which in this example
-   means that the ``gather_observations`` task will run once *all* of the
+   means that the ``consolidate_observations`` task will run once *all* of the
    members of the ``GET_OBSERVATIONS`` family have succeeded. This is
    equivalent to:
 
 .. code-block:: cylc-graph
 
-   get_observations_heathrow => gather_observations
-   get_observations_camborne => gather_observations
-   get_observations_shetland => gather_observations
-   get_observations_belmullet => gather_observations
+   get_observations_heathrow => consolidate_observations
+   get_observations_camborne => consolidate_observations
+   get_observations_shetland => consolidate_observations
+   get_observations_belmullet => consolidate_observations
 
 .. ifnotslides::
 
@@ -249,7 +249,7 @@ Families and ``cylc graph``
 
       .. code-block:: none
 
-         PYTHONPATH="$CYLC_SUITE_DEF_PATH/python_modules:$PYTHONPATH"
+         PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH"
          RESOLUTION = 0.2
          DOMAIN = -12,48,5,61  # Do not change!
 
@@ -265,7 +265,7 @@ Families and ``cylc graph``
          +    [[root]]
          +        [[[environment]]]
          +            # Add the `python` directory to the PYTHONPATH.
-         +            PYTHONPATH="$CYLC_SUITE_DEF_PATH/python_modules:$PYTHONPATH"
+         +            PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH"
          +            # The dimensions of each grid cell in degrees.
          +            RESOLUTION = 0.2
          +            # The area to generate forecasts for (lng1, lat1, lng2, lat2).

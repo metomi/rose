@@ -168,7 +168,7 @@ Parameters can be either words or integers:
       [[dependencies]]
           [[[T00/PT3H]]]
               graph = """
-                  get_observations<station> => gather_observations
+                  get_observations<station> => consolidate_observations
               """
    [runtime]
        [[get_observations<station>]]

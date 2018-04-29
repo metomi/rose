@@ -183,21 +183,23 @@ Recurrence Formats
    When using durations, beware that a change in the initial cycle point
    might produce different results for the recurrences.
 
-   For example if you set the initial cycle point to ``2000-01-01T00`` the
-   recurrence ``P1D`` would yield:
+   .. ifnotslides::
 
-   ``2000-01-01T00``, ``2000-01-02T00``, ``2000-01-03T00``, ...
+      For example if you set the initial cycle point to ``2000-01-01T00`` the
+      recurrence ``P1D`` would yield:
 
-   If, however, the initial cycle point was changed from midnight to midday
-   (``2000-01-01T12``), the same recurrence would instead yield:
+      ``2000-01-01T00``, ``2000-01-02T00``, ``2000-01-03T00``, ...
 
-   ``2000-01-01T12``, ``2000-01-02T12``, ``2000-01-03T12``, ...
+      If, however, the initial cycle point was changed from midnight to midday
+      (``2000-01-01T12``), the same recurrence would instead yield:
 
-   This can easily be adjusted. Both of the following recurrences induce a
-   start on the first midnight *after* the initial cycle point.
+      ``2000-01-01T12``, ``2000-01-02T12``, ``2000-01-03T12``, ...
 
-   * ``T00/P1D``
-   * ``T00``
+      This can easily be adjusted. Both of the following recurrences induce a
+      start on the first midnight *after* the initial cycle point.
+
+      * ``T00/P1D``
+      * ``T00``
 
 The Initial & Final Cycle Points
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -415,7 +417,7 @@ Putting It All Together
          mkdir ~/cylc-run/datetime-cycling
          cd ~/cylc-run/datetime-cycling
 
-       Create a ``suite.rc`` file and paste the following code into it:
+      Create a ``suite.rc`` file and paste the following code into it:
 
       .. code-block:: cylc
 

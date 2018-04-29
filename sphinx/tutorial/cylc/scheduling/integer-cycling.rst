@@ -207,23 +207,27 @@ Inter-Cycle Dependencies
    "pur.3" -> "mak.3" -> "bak.3" -> "sel.3"
    "pre.3" -> "bak.3" -> "cle.3"
 
-Adding this dependency "strings together" the cycles, forcing them to run in
-order. We refer to dependencies between cycles as
-:term:`inter-cycle dependencies<inter-cycle dependency>`.
+.. nextslide::
 
-In the dependency the ``[-P1]`` suffix tells Cylc that we are referring to a
-task in the previous cycle. Equally ``[-P2]`` would refer to a task two cycles
-ago.
+.. ifnotslides::
 
-Note that the ``purchase_ingredients`` task has no arrows pointing at it
-meaning that it has no dependencies. Consequently the ``purchase_ingredients``
-tasks will all run straight away. This could cause our bakery to run into
-cash-flow problems as they would be purchasing ingredients well in advance
-of using them.
+   Adding this dependency "strings together" the cycles, forcing them to run in
+   order. We refer to dependencies between cycles as
+   :term:`inter-cycle dependencies<inter-cycle dependency>`.
 
-To solve this, but still make sure that they never run out of
-ingredients, the bakery wants to purchase ingredients two batches ahead.
-This can be achieved by adding the following dependency:
+   In the dependency the ``[-P1]`` suffix tells Cylc that we are referring to a
+   task in the previous cycle. Equally ``[-P2]`` would refer to a task two
+   cycles ago.
+
+   Note that the ``purchase_ingredients`` task has no arrows pointing at it
+   meaning that it has no dependencies. Consequently the ``purchase_ingredients``
+   tasks will all run straight away. This could cause our bakery to run into
+   cash-flow problems as they would be purchasing ingredients well in advance
+   of using them.
+
+   To solve this, but still make sure that they never run out of
+   ingredients, the bakery wants to purchase ingredients two batches ahead.
+   This can be achieved by adding the following dependency:
 
 .. code-block:: diff
 
@@ -239,8 +243,12 @@ This can be achieved by adding the following dependency:
    +                sell_bread[-P2] => purchase_ingredients
                 """
 
-This dependency means that the ``purchase_ingredients`` task will run after the
-``sell_bread`` task two cycles before.
+.. nextslide::
+
+.. ifnotslides::
+
+   This dependency means that the ``purchase_ingredients`` task will run after
+   the ``sell_bread`` task two cycles before.
 
 .. note::
 
