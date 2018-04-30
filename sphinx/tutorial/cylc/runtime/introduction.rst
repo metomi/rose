@@ -117,7 +117,7 @@ Running A Suite
 
    Next we can run the suite using the ``cylc run`` command.
 
-.. code-block:: bash
+.. code-block:: sub
 
    cylc run <name>
 

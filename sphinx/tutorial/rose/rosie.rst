@@ -213,7 +213,7 @@ Rosie provides commands for managing suites, including:
 
       .. code-block:: sub
 
-         cd ~/roses/<suite>
+         cd ~/roses/<name>
 
    #. **Add Files To The Suite.**
 
@@ -293,15 +293,15 @@ Rosie provides commands for managing suites, including:
 
       .. code-block:: sub
 
-         rosie checkout <suite>
+         rosie checkout <name>
 
       Test this by deleting the working copy then checking out a new one:
 
       .. code-block:: sub
 
          cd ~/roses
-         rm -rf <suite>
-         rosie checkout <suite>
+         rm -rf <name>
+         rosie checkout <name>
 
 .. TODO - introduce practical extension / mention what useful for (or similar).
 

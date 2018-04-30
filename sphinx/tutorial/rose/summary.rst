@@ -151,7 +151,7 @@ Suite Commands
    rose suite-run --local-install-only
 
    # run cylc graph using the installed version of the suite.
-   cylc graph <suite>
+   cylc graph <name>
 
 
 Rose Utilities

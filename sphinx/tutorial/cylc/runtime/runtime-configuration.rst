@@ -224,12 +224,12 @@ Start, Stop, Restart
 
    .. code-block:: sub
 
-      cylc run <suite>
-      cylc stop <suite>
-      cylc restart <suite>
+      cylc run <name>
+      cylc stop <name>
+      cylc restart <name>
 
-      cylc stop <suite> --kill
-      cylc stop <suite> --now --now
+      cylc stop <name> --kill
+      cylc stop <name> --now --now
 
    .. nextslide::
 
