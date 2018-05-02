@@ -14,3 +14,4 @@ system.
    auto-cli-api
    autodoc
    domains
+   slides
