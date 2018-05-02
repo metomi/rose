@@ -180,8 +180,3 @@ pseudoxml:
 	$(SPHINXBUILD) -b pseudoxml $(ALLSPHINXOPTS) $(BUILDDIR)/pseudoxml
 	@echo
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
-
-strict:
-	$(SPHINXBUILD) -aEW -b dummy $(ALLSPHINXOPTS) $(BUILDDIR)
-	@echo
-	@echo "Dummy build finished."

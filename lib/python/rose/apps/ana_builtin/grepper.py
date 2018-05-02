@@ -228,7 +228,8 @@ class SingleCommandPattern(SingleCommandStatus):
         kgo_file:
             Same as previous task.
         pattern:
-            The regular expression to search for in the stdout from the command.
+            The regular expression to search for in the stdout from the
+            command.
 
     """
 

@@ -34,22 +34,28 @@ So far we have covered:
 
     subgraph cluster_1 {
         label = "Cylc Suite"
-        fontsize="20"
-        fontcolor="#5050aa"
-        labelloc="r"
-        "suite.rc" [fontsize="18", fontname="mono", fontcolor"black"]
+        fontsize = "20"
+        fontcolor = "#5050aa"
+        labelloc = "r"
+        "suite.rc" [fontsize="18",
+                    fontname="mono",
+                    fontcolor="black"]
         "rcinfo" [label="Defines the workflow\nin terms of tasks\nand dependencies"]
         "suite.rc" -- "rcinfo"
 
         subgraph cluster_2 {
             label = "Rose Suite Configuration"
-            "rose-suite.conf" [fontsize="18", fontname="mono", fontcolor"black"]
+            "rose-suite.conf" [fontsize="18",
+                               fontname="mono",
+                               fontcolor="black"]
             "confinfo" [label="Defines Jinja2 variables for\nthe suite.rc and environment\nvariables for use throughout\nthe suite"]
             "rose-suite.conf" -- "confinfo"
 
             subgraph cluster_3 {
                 label = "Rosie Suite"
-                "rose-suite.info" [fontsize="18", fontname="mono", fontcolor"black"]
+                "rose-suite.info" [fontsize="18",
+                                   fontname="mono",
+                                   fontcolor="black"]
                 "infoinfo" [label="Contains basic information\nabout the suite used\nby Rosie for searching\nand version control purposes"]
                 "rose-suite.info" -- "infoinfo"
             }

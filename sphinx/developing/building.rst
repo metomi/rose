@@ -8,6 +8,9 @@ Building & Testing
 The documentation is built by the :ref:`command-rose-make-docs` command. Its
 arguments are provided to the sphinx makefile in order.
 
+Build using the ``--strict`` argument before committing changes, this forces a
+re-build and will fail if any warnings are raised.
+
 Whenever making changes to the sphinx infrastructure use a clean build e.g:
 
 .. code-block:: bash
@@ -16,8 +19,6 @@ Whenever making changes to the sphinx infrastructure use a clean build e.g:
 
 The following builders are useful for development:
 
-``strict``
-   Perform a dummy build - fail if any warnings are raised.
 ``linkcheck``
    Check external links (internal links are checked by a regular build).
 ``doctest``
