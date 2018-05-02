@@ -34,11 +34,11 @@ the evaluation of the expression, e.g:
 
 .. code-block:: css+jinja
 
-   foo {{ foo }} foo
+   There are {{ foo }} methods for consolidating the suite.rc file
 
 Would result in::
 
-   foo 3 foo
+   There are 3 methods for consolidating the suite.rc file
 
 .. nextslide::
 
@@ -47,16 +47,16 @@ Loops are written with ``for`` statements, e.g:
 .. code-block:: css+jinja
 
    {% for x in range(foo) %}
-      foo {{ x }}
+      {{ x }}
    {% endfor %}
 
 Would result in:
 
 .. code-block:: none
 
-      foo 0
-      foo 1
-      foo 2
+      0
+      1
+      2
 
 .. nextslide::
 
