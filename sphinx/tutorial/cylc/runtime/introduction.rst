@@ -18,7 +18,7 @@ Introduction
    ``[runtime]`` section which determines what runs, as well as where and how
    it runs.
 
-.. slides::
+.. ifslides::
 
    ``[scheduling]``
       Defines the workflow in terms of :term:`tasks <task>` and

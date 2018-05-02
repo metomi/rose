@@ -44,7 +44,7 @@ system.
    the ``~/roses`` directory though Rosie working copies can be created
    elsewhere.
 
-.. notslides::
+.. ifnotslides::
 
    Working copy installed in ``~/roses``.
 
