@@ -22,7 +22,8 @@ Cylc Parameters
 
    [cylc]
        [[parameters]]
-           param = foo, bar, baz
+           world = Mercury, Venus, Earth
+
 
 .. ifnotslides::
 
@@ -33,9 +34,9 @@ Cylc Parameters
 
    [scheduling]
        [[dependencies]]
-           graph = start => task<param> => end
+           graph = start => hello<world> => end
    [runtime]
-       [[task<param>]]
+       [[hello<world>]]
            script = echo 'Hello World!'
 
 .. nextslide::
@@ -49,13 +50,17 @@ Cylc Parameters
 
    [scheduling]
        [[dependencies]]
-           graph = start => (task_foo & task_bar & task_baz) => end
+           graph = """
+               start => hello_Mercury => end
+               start => hello_Venus => end
+               start => hello_Earth => end
+           """
    [runtime]
-       [[task_foo]]
+       [[hello_Mercury]]
            script = echo 'Hello World!'
-       [[task_bar]]
+       [[hello_Venus]]
            script = echo 'Hello World!'
-       [[task_baz]]
+       [[hello_Earth]]
            script = echo 'Hello World!'
 
 .. nextslide::
@@ -67,8 +72,8 @@ Cylc Parameters
 .. code-block:: cylc
 
    [runtime]
-       [[task<param=baz>]]
-           script = 'Do something special for baz!'
+       [[hello<world=Earth>]]
+           script = echo 'Greetings Earth!'
 
 
 Environment Variables
@@ -78,14 +83,13 @@ Environment Variables
 
    The name of the parameter is provided to the job as an environment variable
    called ``CYLC_TASK_PARAM_<parameter>`` where ``<parameter>`` is the name of
-   the parameter (in the present case ``param``):
+   the parameter (in the present case ``world``):
 
 .. code-block:: cylc
 
    [runtime]
-       [[task<param=bar>]]
-           # This is equivalent to `echo 'bar'`
-           script = echo $CYLC_TASK_PARAM_param
+       [[hello<world>]]
+           script = echo "Hello ${CYLC_TASK_PARAM_world}!"
 
 
 Parameter Types
@@ -100,14 +104,6 @@ Parameters can be either words or integers:
            foo = 1..5
            bar = 1..5..2
            baz = pub, qux, bol
-
-   [scheduling]
-       [[dependencies]]
-           graph = """
-               task<foo>
-               task<bar>
-               task<baz>
-           """
 
 .. nextslide::
 
@@ -128,8 +124,7 @@ Parameters can be either words or integers:
    .. ifnotslides::
 
       When using integer parameters, to prevent confusion, Cylc prefixes the
-      parameter value with the parameter name. For example, the above code is
-      equivalent to:
+      parameter value with the parameter name. For example:
 
    .. ifslides::
 
@@ -140,16 +135,12 @@ Parameters can be either words or integers:
       [scheduling]
           [[dependencies]]
               graph = """
-                  task_foo1
-                  task_foo2
-                  task_foo3
-                  task_foo4
-                  task_foo5
-
+                  # task<bar> would result in:
                   task_bar1
                   task_bar3
                   task_bar5
 
+                  # task<baz> would result in:
                   task_pub
                   task_qux
                   task_bol
