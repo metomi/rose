@@ -28,6 +28,7 @@
 #-------------------------------------------------------------------------------
 # Generate list of tests.
 TEST_KEYS=('')
+TUT_DIRS=('')
 TESTS=('')
 TUTORIALS_PATH="${ROSE_HOME}/etc/tutorial"
 for tutorial in $(ls -1 "${TUTORIALS_PATH}"); do
@@ -39,9 +40,7 @@ for tutorial in $(ls -1 "${TUTORIALS_PATH}"); do
     fi
     if [[ -f "${validate_file}" ]]; then
         # Tutorial has a validate file - load tests.
-        DIR=$(sed 's/\//\\\//g' <<< "${tutorial_path}")
-        CMD='sed '"'"'s/$TUT_DIR/'"${DIR}"'/g'"' "'"'"${validate_file}"'"'
-        IFS=$'\n' command eval 'TUT_TESTS=($('"${CMD}"'))'
+        IFS=$'\n' TUT_TESTS=($(<"${validate_file}"))
         if [[ ${#TUT_TESTS[@]} == 0 ]]; then
             # Tutorial has an empty validate file - skip.
             continue
@@ -50,20 +49,24 @@ for tutorial in $(ls -1 "${TUTORIALS_PATH}"); do
         # Test names are TUTORIAL_NAME-TEST_NUMBER.
         for IND in $(seq 0 $(( ${#TUT_TESTS[@]} - 1 ))); do
             TEST_KEYS+=( "${tutorial}-$IND" )
+            TUT_DIRS+=( "$tutorial_path" )
         done
     else
         # Tutorial has no validate file - run cylc validate.
         TESTS+=('cylc validate "'"${tutorial_path}/suite.rc"'"')
         TEST_KEYS+=("${tutorial}-0")
+        TUT_DIRS+=( "$tutorial_path" )
         continue
     fi
 done
 tests $(( ( ${#TESTS[@]} - 1 ) * 2 ))
 #-------------------------------------------------------------------------------
 # Run the tests.
+export TEST_DIR
 for IND in $(seq 1 $(( ${#TEST_KEYS[@]} - 1 ))); do
     TEST_KEY="${TEST_KEY_BASE}-${TEST_KEYS[$IND]}"
-    run_pass "${TEST_KEY}" eval "${TESTS[$IND]}"
+    export TUT_DIR="${TUT_DIRS[$IND]}"
+    run_pass "${TEST_KEY}" bash -c "${TESTS[$IND]}"
     file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" /dev/null
 done
 #-------------------------------------------------------------------------------
