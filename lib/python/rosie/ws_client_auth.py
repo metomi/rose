@@ -38,7 +38,7 @@ import socket
 try:
     from gi import require_version, pygtkcompat
     require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
-    require_version('Secret', '1.0')
+    require_version('Secret', '1')
     from gi.repository import Secret
     gi_flag = True
 except ImportError:
@@ -259,46 +259,36 @@ class LibsecretStore(object):
         return bool(gi_flag)
 
     def __init__(self):
-        self.template = {
-            "protocol": scheme,
-            "server": host,
-            "user": username
-        }
         # Attributes must be explicitly defined; not managed by the schema
+        self.category = ("protocol", "server", "user")
         self.attributes = dict((key, Secret.SchemaAttributeType.STRING) for
-                               key in self.template)
+                               key in self.category)
         self.schema = Secret.Schema.new(
             "org.rosie.disco.Store", Secret.SchemaFlags.NONE, self.attributes)
 
     def clear_password(self, scheme, host, username):
         """Remove the password from the cache."""
-        try:
-            if all(attr in self.attributes.values for attr in
-                    self.template.values):
-                Secret.password_clear_sync(self.schema, self.template, None)
-        except Secret.SECRET_ERROR_NO_SUCH_OBJECT:
-            pass
+        template = dict(zip(self.category, (scheme, host, username)))
+        Secret.password_clear_sync(self.schema, template, None)
 
     def find_password(self, scheme, host, username):
         """Return the password of username@root."""
+        template = dict(zip(self.category, (scheme, host, username)))
         try:
-            password = Secret.password_lookup_sync(self.schema, self.template,
-                                                   None)
+            password = Secret.password_lookup_sync(self.schema, template, None)
         except Secret.SECRET_ERROR_PROTOCOL:
             return
-        if password is None:
-            raise Secret.SECRET_ERROR_NO_SUCH_OBJECT
         return password
 
     def store_password(self, scheme, host, username, password):
         """Return the password of username@root."""
+        template = dict(zip(self.category, (scheme, host, username)))
         self.clear_password(scheme, host, username)
         try:
             Secret.password_store_sync(
-                self.schema, self.template, Secret.COLLECTION_DEFAULT, host,
+                self.schema, template, Secret.COLLECTION_DEFAULT, host,
                 password, None)
-        except (Secret.SECRET_ERROR_NO_SUCH_OBJECT,
-                Secret.SECRET_ERROR_PROTOCOL):
+        except Secret.SECRET_ERROR_PROTOCOL:
             pass
 
 
