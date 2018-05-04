@@ -79,9 +79,12 @@ Consolidating Configuration
 Cylc offers three ways of consolidating configurations to help improve the
 structure of a suite and avoid duplication.
 
-* Families
-* Jinja2
-* Parameterisation
+.. toctree::
+   :maxdepth: 1
+
+   families
+   jinja2
+   parameters
 
 
 The ``cylc get-config`` Command
@@ -145,12 +148,9 @@ The Three Approaches
    could use them to simplify the suite from the previous tutorial. *Work
    through them in order!*
 
-.. toctree::
-   :maxdepth: 1
-
-   families
-   jinja2
-   parameters
+* :ref:`families <tutorial-cylc-families>`
+* :ref:`jinja2 <tutorial-cylc-jinja2>`
+* :ref:`parameters <tutorial-cylc-parameterisation>`
 
 
 .. _cylc-tutorial-consolidation-conclusion:
