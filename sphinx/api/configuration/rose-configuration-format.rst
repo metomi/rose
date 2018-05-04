@@ -255,12 +255,3 @@ defined in the main and optional configurations. E.g.:
 
    # Switch off [env]BAZ
    rose task-run -D '[env]!BAZ='
-
-
-.. toctree::
-   :name: configuration-toctree
-   :caption: More Information
-   :maxdepth: 1
-   :glob:
-
-   *
