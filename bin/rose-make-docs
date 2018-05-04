@@ -33,8 +33,10 @@
 #     --dev
 #         Development mode, don't remove virtualenv after build.
 #     --strict
-#         Disable cashe forcing a complete re-build and turn warnings into
+#         Disable cache forcing a complete re-build and turn warnings into
 #         errors.
+#     --debug
+#         Run `make` with the --debug option.
 #
 # BUILD
 #     The format(s) to build the documentation in - default html.
@@ -105,6 +107,7 @@ fi
 VENV_MODE=false
 FORCE=false
 DEV_MODE=false
+DEBUG=''
 BUILDS=''
 SPHINXOPTS=''
 while [[ $# -gt 0 ]]; do
@@ -123,6 +126,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --strict)
             SPHINXOPTS='SPHINXOPTS=-aEW'
+            shift
+            ;;
+        --debug)
+            DEBUG='--debug'
             shift
             ;;
         *)
@@ -192,7 +199,11 @@ if ! rose-check-software --doc >/dev/null; then
 fi
 
 # Run sphinx make.
-make -C "${SPHINX_PATH}" ${BUILDS} "${SPHINXOPTS}"
+if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINXOPTS}; then
+    RET=0
+else
+    RET=1
+fi
 
 # Remove virtualenv if used and if we are not in development mode.
 if "${USING_VENV}"; then
@@ -200,3 +211,5 @@ if "${USING_VENV}"; then
         venv-destroy
     fi 
 fi
+
+exit ${RET}
