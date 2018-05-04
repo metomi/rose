@@ -146,9 +146,6 @@ its output (note that you can close the Cylc GUI at this point)::
 
    rose suite-log
 
-.. TODO - Make sure that this is consistent with advice given in the Rose
-   tutorial when written.
-
 .. note::
 
    You can quickly get to the relevant page by running

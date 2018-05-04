@@ -650,9 +650,7 @@ Rose Bush
       Remember, in Rose configuration files:
 
       * Spaces are not used around the equals (``=``) operator.
-      * Environment variables should not be quoted.
-
-      .. TODO -- what what, point this out earlier!
+      * Ensure the environment variables are not quoted.
 
       The ``[env]`` section of your :rose:file:`rose-app.conf` file should now
       look like this:
