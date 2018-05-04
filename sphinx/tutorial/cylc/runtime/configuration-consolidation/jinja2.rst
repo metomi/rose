@@ -156,7 +156,8 @@ This would result in:
            script = get-observations
            [[[environment]]]
                SITE_ID = {{ id }}
-               API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+               API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
    {% endfor %}
 
 .. nextslide::
@@ -182,14 +183,15 @@ This would result in:
       ``get_observations`` and ``get_rainfall`` tasks. Rather than writing it
       out multiple times we will use Jinja2 to centralise this configuration.
 
-      At the top of the ``suite.rc`` file add the Jinja2 shebang line and set
-      the ``API_KEY`` variable:
+      At the top of the ``suite.rc`` file add the Jinja2 shebang line. Then
+      copy the value of the ``API_KEY`` environment variable and use it to
+      define an ``API_KEY`` Jinja2 variable:
 
       .. code-block:: cylc
 
          #!Jinja2
 
-         {% set API_KEY = 'd6bfeab3-3489-4990-a604-44acac4d2dfb' %}
+         {% set API_KEY = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' %}
 
       Next replace the key, where it appears in the suite, with
       ``{{ API_KEY }}``:
@@ -201,34 +203,33 @@ This would result in:
                   script = get-observations
                   [[[environment]]]
                       SITE_ID = 3772
-         -            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+         -            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          +            API_KEY = {{ API_KEY }}
               [[get_observations_camborne]]
                   script = get-observations
                   [[[environment]]]
                       SITE_ID = 3808
-         -            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+         -            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          +            API_KEY = {{ API_KEY }}
               [[get_observations_shetland]]
                   script = get-observations
                   [[[environment]]]
                      SITE_ID = 3005
-         -            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+         -            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          +            API_KEY = {{ API_KEY }}
               [[get_observations_belmullet]]
                   script = get-observations
                   [[[environment]]]
                       SITE_ID = 3976
-         -            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+         -            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          +            API_KEY = {{ API_KEY }}
              [[get_rainfall]]
                  script = get-rainfall
                  [[[environment]]]
                      # The key required to get weather data from the DataPoint service.
                      # To use archived data comment this line out.
-         -            API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+         -            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          +            API_KEY = {{ API_KEY }}
 
       Check the result with ``cylc get-config``. The Jinja2 will be processed
       so you should not see any difference after making these changes.
-

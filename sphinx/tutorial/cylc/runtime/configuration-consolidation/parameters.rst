@@ -165,7 +165,7 @@ Parameters can be either words or integers:
        [[get_observations<station>]]
            script = get-observations
            [[[environment]]]
-               API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+               API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
        [[get_observations<station=belmullet>]]
            [[[environment]]]

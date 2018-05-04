@@ -22,22 +22,22 @@ Consolidating Configuration
               script = get-observations
               [[[environment]]]
                   SITE_ID = 3772
-                  API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                  API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           [[get_observations_camborne]]
               script = get-observations
               [[[environment]]]
                   SITE_ID = 3808
-                  API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                  API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           [[get_observations_shetland]]
               script = get-observations
               [[[environment]]]
                   SITE_ID = 3005
-                  API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                  API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           [[get_observations_belmullet]]
               script = get-observations
               [[[environment]]]
                   SITE_ID = 3976
-                  API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                  API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 .. ifnotslides::
 
