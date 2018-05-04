@@ -330,7 +330,15 @@ Parameters can be either words or integers:
                      station = belmullet, camborne, heathrow, shetland
             +        site = exeter, edinburgh
 
-         Next we parameterise the task:
+         Next we parameterise the task in the graph:
+
+         .. code-block:: diff
+
+
+            -get_rainfall => forecast => post_process_exeter
+            +get_rainfall => forecast => post_process<site>
+
+         And also the runtime:
 
          .. code-block:: diff
 
