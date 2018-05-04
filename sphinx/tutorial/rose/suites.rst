@@ -647,8 +647,6 @@ Rose Bush
       specified if necessary. Remove the lines from the ``suite.rc`` file
       when you are done.
 
-      .. TODO - remove triple quotes in Cylc tutorial
-
       Remember, in Rose configuration files:
 
       * Spaces are not used around the equals (``=``) operator.
