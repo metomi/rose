@@ -1,3 +1,6 @@
+.. include:: ../../../hyperlinks.rst
+   :start-line: 1
+
 .. _nowcasting: https://www.metoffice.gov.uk/learning/science/hours-ahead/nowcasting
 
 .. _tutorial-datetime-cycling:
@@ -176,30 +179,67 @@ Recurrence Formats
    * ``+PT1H/T00``: every day starting on the first midnight after the point one
      hour after the initial cycle point.
 
+Durations And The Initial Cycle Point
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When using durations, beware that a change in the initial cycle point
+might produce different results for the recurrences.
+
 .. nextslide::
 
-.. warning::
+.. list-table::
+   :class: grid-table
 
-   When using durations, beware that a change in the initial cycle point
-   might produce different results for the recurrences.
+   * - .. code-block:: cylc
+          :emphasize-lines: 2
 
-   .. ifnotslides::
+          [scheduling]
+              initial cycle point = 2000-01-01T00
+              [[dependencies]]
+                  [[[P1D]]]
+                      graph = foo[-P1D] => foo
 
-      For example if you set the initial cycle point to ``2000-01-01T00`` the
-      recurrence ``P1D`` would yield:
+     - .. code-block:: cylc
+          :emphasize-lines: 2
 
-      ``2000-01-01T00``, ``2000-01-02T00``, ``2000-01-03T00``, ...
+          [scheduling]
+              initial cycle point = 2000-01-01T12
+              [[dependencies]]
+                  [[[P1D]]]
+                      graph = foo[-P1D] => foo
 
-      If, however, the initial cycle point was changed from midnight to midday
-      (``2000-01-01T12``), the same recurrence would instead yield:
+   * - .. digraph:: Example
+          :align: center
 
-      ``2000-01-01T12``, ``2000-01-02T12``, ``2000-01-03T12``, ...
+          size = "3,3"
 
-      This can easily be adjusted. Both of the following recurrences induce a
-      start on the first midnight *after* the initial cycle point.
+          "foo.1" [label="foo\n2000-01-01T00"]
+          "foo.2" [label="foo\n2000-01-02T00"]
+          "foo.3" [label="foo\n2000-01-03T00"]
 
-      * ``T00/P1D``
-      * ``T00``
+          "foo.1" -> "foo.2" -> "foo.3"
+
+     - .. digraph:: Example
+          :align: center
+
+          size = "3,3"
+
+          "foo.1" [label="foo\n2000-01-01T12"]
+          "foo.2" [label="foo\n2000-01-02T12"]
+          "foo.3" [label="foo\n2000-01-03T12"]
+
+          "foo.1" -> "foo.2" -> "foo.3"
+
+.. nextslide::
+
+We could write the recurrence "every midnight" independent from the initial
+cycle point by:
+
+* Use an `inferred recurrence`_ instead (i.e. ``T00``).
+* Overriding the recurrence start point (i.e. ``T00/P1D``)
+* Using the ``[scheduling]initial cycle point constraints`` setting to
+  constrain the initial cycle point (e.g. to a particular time of day). See
+  the `Cylc User Guide`_ for details.
 
 The Initial & Final Cycle Points
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

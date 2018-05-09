@@ -342,7 +342,8 @@ Suite Files
       The :term:`share directory` is a place where :term:`tasks <task>` can
       write files which are intended to be shared within that cycle.
    ``work/``
-      A directory hierarchy containing tasks :term:`work directory`.
+      A directory hierarchy containing task's :term:`work directories
+      <work directory>`.
 
 .. ifslides::
 
