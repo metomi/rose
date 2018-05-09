@@ -86,6 +86,7 @@ fi
 # Copy files.
 echo -n "Copying tutorial files to ${DIRECTORY} ... "
 rose_init 'rose_log'
+mkdir -p "$(dirname "${DIRECTORY}")"
 if run rsync -rLptgoD "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}" \
     --exclude='.validate'; then
     for file in $(find "${DIRECTORY}" -type f); do
