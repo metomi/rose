@@ -45,6 +45,16 @@ def _col_keys(table):
     return [c.key for c in table.c]
 
 
+class RosieDatabaseCreateError(Exception):
+
+    """Exception raised when a database cannot be created and therefore cannot
+       be opened or connected to; attempt to connect to an empty file."""
+
+    def __str__(self):
+
+        return "%s: failed to create DB." % self.args
+
+
 class DAO(object):
 
     """Retrieves data from the suite database.
@@ -73,9 +83,14 @@ class DAO(object):
     def _connect(self):
         """Connect to the database file."""
         self.db_engine = al.create_engine(self.db_url)
-        self.db_connection = self.db_engine.connect()
         self.db_metadata = al.MetaData(self.db_engine)
         self.results = None
+
+        try:
+            self.db_connection = self.db_engine.connect()
+        except al.exc.OperationalError as exc:
+            raise RosieDatabaseCreateError(self.db_url)
+
         self.tables = {}
         for name in [LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME,
                      OPTIONAL_TABLE_NAME]:
