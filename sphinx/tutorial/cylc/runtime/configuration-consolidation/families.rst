@@ -23,7 +23,7 @@ Runtime
 
       script = get-observations
       [[[environment]]]
-          API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+          API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
    We define a family as a new task consisting of the common configuration. By
    convention families are named in upper case:
@@ -33,7 +33,7 @@ Runtime
    [[GET_OBSERVATIONS]]
        script = get-observations
        [[[environment]]]
-           API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+           API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 .. ifnotslides::
 
@@ -57,7 +57,7 @@ Runtime
    [[get_observations_heathrow]]
        script = get-observations
        [[[environment]]]
-           API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+           API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
            SITE_ID = 3772
 
 .. nextslide::
@@ -89,24 +89,24 @@ Runtime
        [[GET_OBSERVATIONS]]
            script = get-observations
            [[[environment]]]
-               API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+               API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-   [[get_observations_heathrow]]
-       inherit = GET_OBSERVATIONS
-       [[[environment]]]
-           SITE_ID = 3772
-   [[get_observations_camborne]]
-       inherit = GET_OBSERVATIONS
-       [[[environment]]]
-           SITE_ID = 3808
-   [[get_observations_shetland]]
-       inherit = GET_OBSERVATIONS
-       [[[environment]]]
-           SITE_ID = 3005
-   [[get_observations_belmullet]]
-       inherit = GET_OBSERVATIONS
-       [[[environment]]]
-           SITE_ID = 3976
+       [[get_observations_heathrow]]
+           inherit = GET_OBSERVATIONS
+           [[[environment]]]
+               SITE_ID = 3772
+       [[get_observations_camborne]]
+           inherit = GET_OBSERVATIONS
+           [[[environment]]]
+               SITE_ID = 3808
+       [[get_observations_shetland]]
+           inherit = GET_OBSERVATIONS
+           [[[environment]]]
+               SITE_ID = 3005
+       [[get_observations_belmullet]]
+           inherit = GET_OBSERVATIONS
+           [[[environment]]]
+               SITE_ID = 3976
 
 
 Graphing
@@ -118,21 +118,21 @@ Graphing
 
 .. code-block:: cylc-graph
 
-   GET_OBSERVATIONS:succeed-all => gather_observations
+   GET_OBSERVATIONS:succeed-all => consolidate_observations
 
 .. ifnotslides::
 
    The ``:succeed-all`` is a special :term:`qualifier` which in this example
-   means that the ``gather_observations`` task will run once *all* of the
+   means that the ``consolidate_observations`` task will run once *all* of the
    members of the ``GET_OBSERVATIONS`` family have succeeded. This is
    equivalent to:
 
 .. code-block:: cylc-graph
 
-   get_observations_heathrow => gather_observations
-   get_observations_camborne => gather_observations
-   get_observations_shetland => gather_observations
-   get_observations_belmullet => gather_observations
+   get_observations_heathrow => consolidate_observations
+   get_observations_camborne => consolidate_observations
+   get_observations_shetland => consolidate_observations
+   get_observations_belmullet => consolidate_observations
 
 .. ifnotslides::
 
@@ -249,7 +249,7 @@ Families and ``cylc graph``
 
       .. code-block:: none
 
-         PYTHONPATH="$CYLC_SUITE_DEF_PATH/python_modules:$PYTHONPATH"
+         PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH"
          RESOLUTION = 0.2
          DOMAIN = -12,48,5,61  # Do not change!
 
@@ -265,7 +265,7 @@ Families and ``cylc graph``
          +    [[root]]
          +        [[[environment]]]
          +            # Add the `python` directory to the PYTHONPATH.
-         +            PYTHONPATH="$CYLC_SUITE_DEF_PATH/python_modules:$PYTHONPATH"
+         +            PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH"
          +            # The dimensions of each grid cell in degrees.
          +            RESOLUTION = 0.2
          +            # The area to generate forecasts for (lng1, lat1, lng2, lat2).
@@ -288,7 +288,7 @@ Families and ``cylc graph``
                [[[environment]]]
                    # The key required to get weather data from the DataPoint service.
                    # To use archived data comment this line out.
-                   API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                   API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          -         # Add the `python` directory to the PYTHONPATH.
          -         PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -         # The dimensions of each grid cell in degrees.
@@ -299,22 +299,24 @@ Families and ``cylc graph``
            [[forecast]]
                script = forecast 60 5  # Generate 5 forecasts at 60 minute intervals.
                [[[environment]]]
+         -          # Add the `python` directory to the PYTHONPATH.
+         -          PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+         -          # The dimensions of each grid cell in degrees.
+         -          RESOLUTION = 0.2
+         -          # The area to generate forecasts for (lng1, lat1, lng2, lat2)
+         -          DOMAIN = -12,48,5,61  # Do not change!
+                   # The path to the files containing wind data (the {variables} will
+                   # get substituted in the forecast script).
+                   WIND_FILE_TEMPLATE = $CYLC_SUITE_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
                    # List of cycle points to process wind data from.
-                   WIND_CYCLES = """
-                       $CYLC_TASK_CYCLE_POINT                # The current cycle point.
-                       $(cylc cyclepoint --offset-hours=-3)  # The point 3 hours ago.
-                       $(cylc cyclepoint --offset-hours=-6)  # The point 6 hours ago.
-                   """
-                   # The cyclepoint 3 hours before the present one.
-                   PT3H = $(cylc cyclepoint --offset-hours=-3)
-                   # The cyclepoint 6 hours before the present one.
-                   PT6H = $(cylc cyclepoint --offset-hours=-6)
-         -         # Add the `python` directory to the PYTHONPATH.
-         -         PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
-         -         # The dimensions of each grid cell in degrees.
-         -         RESOLUTION = 0.2
-         -         # The area to generate forecasts for (lng1, lat1, lng2, lat2).
-         -         DOMAIN = -12,48,5,61  # Do not change!
+                   WIND_CYCLES = 0, -3, -6
+
+                   # The path to the rainfall file.
+                   RAINFALL_FILE = $CYLC_SUITE_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
+                   # Create the html map file in the task's log directory.
+                   MAP_FILE = "${CYLC_TASK_LOG_ROOT}-map.html"
+                   # The path to the template file used to generate the html map.
+                   MAP_TEMPLATE = "$CYLC_SUITE_RUN_DIR/lib/template/map.html"
 
            [[post_process_exeter]]
                # Generate a forecast for Exeter 60 minutes into the future.

@@ -55,6 +55,7 @@ applications. :ref:`What Is Cylc? <Cylc-introduction>`
    :maxdepth: 1
    :glob:
 
+   api/configuration/index
    api/*
 
 

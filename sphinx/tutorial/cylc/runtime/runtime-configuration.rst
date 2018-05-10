@@ -224,12 +224,12 @@ Start, Stop, Restart
 
    .. code-block:: sub
 
-      cylc run <suite>
-      cylc stop <suite>
-      cylc restart <suite>
+      cylc run <name>
+      cylc stop <name>
+      cylc restart <name>
 
-      cylc stop <suite> --kill
-      cylc stop <suite> --now --now
+      cylc stop <name> --kill
+      cylc stop <name> --now --now
 
    .. nextslide::
 
@@ -310,7 +310,12 @@ Start, Stop, Restart
 
       .. TODO: Add instructions for offline configuration
 
-      Add the following lines to the bottom of the ``suite.rc`` file.
+      Generate a Datapoint API key::
+
+         rose tutorial api-key
+
+      Add the following lines to the bottom of the ``suite.rc`` file replacing
+      ``xxx...`` with your API key:
 
       .. code-block:: cylc
 
@@ -319,7 +324,8 @@ Start, Stop, Restart
                  script = get-observations
                  [[[environment]]]
                      SITE_ID = 3772
-                     API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                     API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
 
       Add three more ``get_observations`` tasks for each of the remaining
       weather stations.
@@ -339,22 +345,22 @@ Start, Stop, Restart
                     script = get-observations
                     [[[environment]]]
                         SITE_ID = 3772
-                        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                        API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
                 [[get_observations_camborne]]
                     script = get-observations
                     [[[environment]]]
                         SITE_ID = 3808
-                        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                        API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
                 [[get_observations_shetland]]
                     script = get-observations
                     [[[environment]]]
                         SITE_ID = 3005
-                        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                        API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
                 [[get_observations_belmullet]]
                     script = get-observations
                     [[[environment]]]
                         SITE_ID = 3976
-                        API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                        API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
       Check the ``suite.rc`` file is valid by running the command:
 

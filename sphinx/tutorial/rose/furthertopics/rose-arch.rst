@@ -167,7 +167,7 @@ Change to the ``$ROSE_DATA/ARCHVING/`` directory of the suite i.e:
 
 .. code-block:: sub
 
-   cd ~/cylc-run/<SUITE_ID>/share/data/ARCHIVING/
+   cd ~/cylc-run/<name>/share/data/ARCHIVING/
 
 List the directory by typing::
 

@@ -22,22 +22,22 @@ Consolidating Configuration
               script = get-observations
               [[[environment]]]
                   SITE_ID = 3772
-                  API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                  API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           [[get_observations_camborne]]
               script = get-observations
               [[[environment]]]
                   SITE_ID = 3808
-                  API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                  API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           [[get_observations_shetland]]
               script = get-observations
               [[[environment]]]
                   SITE_ID = 3005
-                  API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                  API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
           [[get_observations_belmullet]]
               script = get-observations
               [[[environment]]]
                   SITE_ID = 3976
-                  API_KEY = d6bfeab3-3489-4990-a604-44acac4d2dfb
+                  API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 .. ifnotslides::
 
@@ -68,10 +68,10 @@ Consolidating Configuration
           [[dependencies]]
               [[[T00/PT3H]]]
                   graph = """
-                      get_observations_belmullet => gather_observations
-                      get_observations_camborne => gather_observations
-                      get_observations_heathrow => gather_observations
-                      get_observations_shetland => gather_observations
+                      get_observations_belmullet => consolidate_observations
+                      get_observations_camborne => consolidate_observations
+                      get_observations_heathrow => consolidate_observations
+                      get_observations_shetland => consolidate_observations
                   """
 
 .. nextslide::
@@ -79,9 +79,12 @@ Consolidating Configuration
 Cylc offers three ways of consolidating configurations to help improve the
 structure of a suite and avoid duplication.
 
-* Families
-* Jinja2
-* Parameterisation
+.. toctree::
+   :maxdepth: 1
+
+   families
+   jinja2
+   parameters
 
 
 The ``cylc get-config`` Command
@@ -145,12 +148,9 @@ The Three Approaches
    could use them to simplify the suite from the previous tutorial. *Work
    through them in order!*
 
-.. toctree::
-   :maxdepth: 1
-
-   families
-   jinja2
-   parameters
+* :ref:`families <tutorial-cylc-families>`
+* :ref:`jinja2 <tutorial-cylc-jinja2>`
+* :ref:`parameters <tutorial-cylc-parameterisation>`
 
 
 .. _cylc-tutorial-consolidation-conclusion:

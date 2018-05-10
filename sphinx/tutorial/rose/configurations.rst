@@ -91,6 +91,12 @@ For example:
 
 .. nextslide::
 
+.. hint::
+
+   In Rose configuration files settings do not normally require quotation.
+
+.. nextslide::
+
 Throughout this tutorial we will refer to settings in the following format:
 
 * ``file`` - will refer to a Rose configuration *file*.
@@ -127,5 +133,3 @@ Why Use Rose Configurations?
    Next section: :ref:`tutorial-rose-applications`
 
 .. TODO - add rose edit screenshot.
-
-.. TODO - rename rose config-edit to rose edit.

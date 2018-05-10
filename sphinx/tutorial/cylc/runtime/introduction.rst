@@ -18,7 +18,7 @@ Introduction
    ``[runtime]`` section which determines what runs, as well as where and how
    it runs.
 
-.. slides::
+.. ifslides::
 
    ``[scheduling]``
       Defines the workflow in terms of :term:`tasks <task>` and
@@ -95,57 +95,6 @@ We can also call other scripts or executables in this way, e.g:
        [[hello_world]]
            script = hello_world
 
-
-Running A Suite
----------------
-
-.. ifnotslides::
-
-   It is a good idea to check a suite for errors before running it.
-   Cylc provides a command which automatically checks for any obvious
-   configuration issues called ``cylc validate``, run via:
-
-.. code-block:: sub
-
-   cylc validate <path/to/suite>
-
-.. ifnotslides::
-
-   Here ``<path/to/suite>`` is the path to the suite's location within the
-   filesystem (so if we create a suite in ``~/cylc-run/foo`` we would put
-   ``~/cylc-run/foo/suite.rc``).
-
-   Next we can run the suite using the ``cylc run`` command.
-
-.. code-block:: bash
-
-   cylc run <name>
-
-.. ifnotslides::
-
-   The ``name`` is the name of the :term:`suite directory` (i.e. ``<name>``
-   would be ``foo`` in the above example).
-
-.. note::
-
-   In this tutorial we are writing our suites in the ``cylc-run`` directory.
-
-   It is possible to write them elsewhere on the system. If we do so we
-   must register the suite with Cylc before use.
-
-   We do this using the ``cylc reg`` command which we supply with a name which
-   will be used to refer to the suite in place of the path i.e:
-
-   .. code-block:: sub
-
-      cylc reg <name> <path/to/suite>
-      cylc validate <name>
-      cylc run <name>
-
-   The ``cylc reg`` command will create a directory for the suite in the
-   ``cylc-run`` directory meaning that we will have separate
-   :term:`suite directories <suite directory>` and
-   :term:`run directories <run directory>`.
 
 .. _tutorial-tasks-and-jobs:
 
@@ -313,13 +262,65 @@ Where Do All The Files Go?
          :align: center
          :scale: 75%
 
-Suite Files
-^^^^^^^^^^^
+
+Running A Suite
+---------------
 
 .. ifnotslides::
 
-   Along with the :term:`work directory` and :term:`job log directory`, Cylc
-   generates other files and directories when it runs a suite, namely:
+   It is a good idea to check a suite for errors before running it.
+   Cylc provides a command which automatically checks for any obvious
+   configuration issues called ``cylc validate``, run via:
+
+.. code-block:: sub
+
+   cylc validate <path/to/suite>
+
+.. ifnotslides::
+
+   Here ``<path/to/suite>`` is the path to the suite's location within the
+   filesystem (so if we create a suite in ``~/cylc-run/foo`` we would put
+   ``~/cylc-run/foo/suite.rc``).
+
+   Next we can run the suite using the ``cylc run`` command.
+
+.. code-block:: sub
+
+   cylc run <name>
+
+.. ifnotslides::
+
+   The ``name`` is the name of the :term:`suite directory` (i.e. ``<name>``
+   would be ``foo`` in the above example).
+
+.. note::
+
+   In this tutorial we are writing our suites in the ``cylc-run`` directory.
+
+   It is possible to write them elsewhere on the system. If we do so we
+   must register the suite with Cylc before use.
+
+   We do this using the ``cylc reg`` command which we supply with a name which
+   will be used to refer to the suite in place of the path i.e:
+
+   .. code-block:: sub
+
+      cylc reg <name> <path/to/suite>
+      cylc validate <name>
+      cylc run <name>
+
+   The ``cylc reg`` command will create a directory for the suite in the
+   ``cylc-run`` directory meaning that we will have separate
+   :term:`suite directories <suite directory>` and
+   :term:`run directories <run directory>`.
+
+
+Suite Files
+-----------
+
+.. ifnotslides::
+
+   Cylc generates files and directories when it runs a suite, namely:
 
    ``log/``
       Directory containing log files, including:
@@ -340,6 +341,9 @@ Suite Files
    ``share/``
       The :term:`share directory` is a place where :term:`tasks <task>` can
       write files which are intended to be shared within that cycle.
+   ``work/``
+      A directory hierarchy containing task's :term:`work directories
+      <work directory>`.
 
 .. ifslides::
 
@@ -349,6 +353,7 @@ Suite Files
       * ``log/suite``
    * ``suite.rc.processed``
    * ``share/``
+   * ``work/``
 
    .. nextslide::
 
@@ -484,7 +489,7 @@ Suite Files
       * Try pressing the "Pause" button which is found in the top left-hand
         corner of the GUI.
 
-      * Try right-clicking on a task. From the context menu you could try:
+      * Try right-clicking on a task. From the right-click menu you could try:
 
         * "Trigger (run now)"
         * "Reset State"
