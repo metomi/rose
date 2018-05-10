@@ -1,0 +1,1 @@
+rose config --file $TUT_DIR/rose-app.conf

@@ -1,0 +1,6 @@
+{# This file serves to correct undesirable behaviour of the sphinx rtd theme. #}
+
+{% extends "!layout.html" %}
+
+{% set css_files = css_files + ['_static/css/rtd-theme-fix.css', '_static/pygments.css'] %}
+{% set script_files = script_files + ['_static/js/rtd-theme-extensions.js'] %}

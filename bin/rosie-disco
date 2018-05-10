@@ -29,7 +29,7 @@
 # DESCRIPTION
 #     Start/stop ad-hoc Rosie suite discovery web service server.
 #
-#     For "rosie disco start", if PORT is not specified, use port 8080.
+#     For `rosie disco start`, if `PORT` is not specified, use port 8080.
 #
 # OPTIONS
 #     --non-interactive, --yes, -y

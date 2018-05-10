@@ -3,24 +3,6 @@
 Licences for non-Rose works included in this distribution can be
 found in the licences/ directory.
 
-doc/jquery.min.js,
-lib/html/static/js/jquery.min.js:
-* Unmodified external software library.
-
-doc/S5/:
-* Slightly modified version of S5, in the public domain.
-  See meyerweb.com/eric/tools/s5/.
-
-doc/google-code-prettify/,
-lib/html/static/css/prettify.css,
-lib/html/static/js/lang-???,
-lib/html/static/js/prettify-???:
-* External software library, licensed under the Apache License 2.0.
-  See http://code.google.com/p/google-code-prettify/.
-  Minor modification made to:
-  * `doc/google-code-prettify/prettify.css`
-  * `lib/html/static/css/prettify.css`
-
 doc/rose-icon.png,
 etc/images/rose-icon.png,
 etc/images/rose-icon.svg,
@@ -88,3 +70,7 @@ lib/html/static/js/moment.min.js:
 lib/python/isodatetime/:
 * Unmodified external software library released under the LGPL license.
   See <https://github.com/metomi/isodatetime>
+
+etc/tutorial/cylc/python/png.py:
+* Unmodified externam software library released under the MIT licence.
+  see <https://github.com/drj11/pypng>

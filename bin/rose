@@ -44,7 +44,7 @@ rose_init
 get_alias() {
     local NAME=$1
     local ALIAS=$(sed '/^#/d' $ROSE_HOME_BIN/$ROSE_NS-$NAME || true)
-    if [[ $(wc -l <<<"$ALIAS" | tr -d '[:space:]') == 1 ]] \
+    if [[ $(wc -l <<<"$ALIAS") == 1 ]] \
         && grep -q "^exec \$(dirname \$0)/$ROSE_NS-.* \"\$@\"\$" <<<"$ALIAS"
     then
         ALIAS=${ALIAS#"exec \$(dirname \$0)/$ROSE_NS-"}
@@ -150,6 +150,33 @@ help|h|?|--help|-h)
 version|--version|-V)
     print_version
     exit
+    :;;
+doc)
+    PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
+    PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
+    ROSE_UTIL=$UTIL
+    export PATH PYTHONPATH ROSE_UTIL
+    let ns_len=${#ROSE_NS}+2
+    for U in $(cd $ROSE_HOME_BIN && ls $ROSE_NS-*); do
+        NAME=$(sed "s/^$ROSE_NS-\\(.*\\)\$/\1/" <<<$U)
+        ALIAS=$(get_alias $NAME)
+        if [[ -n $ALIAS ]]; then
+            echo '=================================================='
+            echo "${ROSE_NS} ${NAME} -> ${ROSE_NS} ${ALIAS}"
+            echo '=================================================='
+            echo
+        else
+
+            echo '=================================================='
+            echo "$ROSE_NS $NAME"
+            echo '=================================================='
+            echo
+            PAGER=cat
+            help_util $(cut -c "${ns_len}-" <<<"${U}")
+            echo
+        fi
+    done
+    exit 0
     :;;
 esac
 

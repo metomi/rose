@@ -17,6 +17,29 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
+"""The following options can be specified in:
+
+* :rose:conf:`rose.conf[rose-ana]`
+* :rose:conf:`rose_ana[ana:config]`
+
+.. describe:: Options
+
+    grepper-report-limit:
+        A numerical value giving the maximum number of informational output
+        lines to print for each comparison. This is intended for cases where
+        for example a pattern-matching comparison is expected to match many
+        thousands of occurences in the given files; it may not be desirable
+        to print the results of every comparison. After the given number of
+        lines are printed a special message indicating that the rest of the
+        output is truncated will be produced.
+    skip-if-all-files-missing:
+        Can be set to ``.true.`` or ``.false.``; if active, any comparison
+        done on files by ``grepper`` will be skipped if all of those files
+        are non-existent. In this case the task will return as "skipped"
+        rather than passed/failed.
+
+"""
+
 import os
 import re
 from rose import TYPE_LOGICAL_VALUE_TRUE
@@ -24,7 +47,23 @@ from rose.apps.rose_ana import AnalysisTask
 
 
 class SingleCommandStatus(AnalysisTask):
-    """Run a single command and pass/fail based on its exit status."""
+    """Run a shell command, passing or failing depending on the exit
+       status of that command.
+
+       Options:
+           files (optional):
+               A newline-separated list of filenames which may appear
+               in the command.
+           command:
+               The command to run; if it contains Python style
+               format specifiers these will be expanded using the list of
+               files above (if provided).
+           kgo_file:
+               If the list of files above was provided gives the
+               (0-based) index of the file holding the "kgo" or "control"
+               output for use with the comparisons database (if active).
+    """
+
     def run_analysis(self):
         """Main analysis routine called from rose_ana."""
         self.process_opt_files()
@@ -180,11 +219,20 @@ class SingleCommandStatus(AnalysisTask):
 
 
 class SingleCommandPattern(SingleCommandStatus):
-    """
-    Run a single command and then pass/fail depending on the presence of a
+    """Run a single command and then pass/fail depending on the presence of a
     particular expression in that command's standard output.
 
+    Options:
+        files (optional):
+            Same as previous task. command - same as previous task.
+        kgo_file:
+            Same as previous task.
+        pattern:
+            The regular expression to search for in the stdout from the
+            command.
+
     """
+
     def run_analysis(self):
         """Main analysis routine called from rose_ana."""
         # Note that this is identical to the above class, only it has the
@@ -233,11 +281,28 @@ class SingleCommandPattern(SingleCommandStatus):
 
 
 class FilePattern(SingleCommandPattern):
-    """
-    Check for occurences of a particular expression or value within the
+    """Check for occurences of a particular expression or value within the
     contents of two or more files.
 
+    Options:
+        files (optional):
+            Same as previous tasks.
+        kgo_file:
+            Same as previous tasks.
+        pattern:
+            The regular expression to search for in the files. The
+            expression should include one or more capture groups; each
+            of these will be compared between the files any time the
+            pattern occurs.
+        tolerance (optional):
+            By default the above comparisons will be compared exactly,
+            but if this argument is specified they will be converted to
+            float values and compared according to the given tolerance.
+            If this tolerance ends in % it will be interpreted as a
+            relative tolerance (otherwise absolute).
+
     """
+
     def run_analysis(self):
         """Main analysis routine called from rose_ana."""
         self.process_opt_files()
@@ -400,11 +465,24 @@ class FilePattern(SingleCommandPattern):
 
 
 class FileCommandPattern(FilePattern):
-    """
-    Check for occurences of a particular expression or value in the standard
+    """Check for occurences of a particular expression or value in the standard
     output from a command applied to two or more files.
 
+    Options:
+        files (optional):
+            Same as previous tasks.
+        kgo_file:
+            Same as previous tasks.
+        pattern:
+            Same as previous tasks.
+        tolerance (optional):
+            Same as previous tasks.
+        command:
+            The command to run; it should contain a Python style format
+            specifier to be expanded using the list of files above.
+
     """
+
     def run_analysis(self):
         """Main analysis routine called from rose_ana."""
         # Note that this is identical to the above class, only it has the

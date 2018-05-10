@@ -29,7 +29,7 @@
 # DESCRIPTION
 #     Start/stop ad-hoc Rose Bush web service server.
 #
-#     For "rose bush start", if PORT is not specified, use port 8080.
+#     For `rose bush start`, if `PORT` is not specified, use port 8080.
 #
 #     Rose Bush is a web service for browsing users' Rose suite logs via an
 #     HTTP interface.

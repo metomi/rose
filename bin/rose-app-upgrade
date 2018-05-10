@@ -3,7 +3,7 @@
 # (C) Crown copyright Met Office. All rights reserved.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-app-upgrade
+#     rose app-upgrade
 #
 # SYNOPSIS
 #     rose app-upgrade [OPTIONS] [VERSION]
@@ -12,8 +12,9 @@
 #     Upgrade an application configuration using metadata upgrade macros.
 #
 #     Alternatively, show the available upgrade/downgrade versions:
-#         "=" indicates the current version.
-#         "*" indicates the default version to change to.
+#
+#     * `=` indicates the current version.
+#     * `*` indicates the default version to change to.
 #
 #     If an application contains optional configurations, loop through
 #     each one, combine with the main, upgrade it, and re-create it as
@@ -23,11 +24,11 @@
 #     --all-versions, -a
 #         Use all tagged versions.
 #     --config=DIR, -C DIR
-#         Use configuration in DIR instead of $PWD.
+#         Use configuration in `DIR` instead of `$PWD`.
 #     --downgrade, -d
 #         Downgrade the version instead of upgrade.
 #     --meta-path=PATH, -M PATH
-#         Prepend PATH to the metadata search path. (look here first).
+#         Prepend `PATH` to the metadata search path. (look here first).
 #         This option can be used repeatedly to load multiple paths.
 #     --non-interactive, --yes, -y
 #         Switch off interactive prompting.
@@ -39,12 +40,12 @@
 # ARGUMENTS
 #     VERSION
 #         A version to change to. If no version is specified, show available
-#         versions. If --non-interactive is used, use the latest version
-#         available. If --non-interactive and --downgrade are used, use
+#         versions. If `--non-interactive` is used, use the latest version
+#         available. If `--non-interactive` and `--downgrade` are used, use
 #         the earliest version available.
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_META_PATH
-#         Prepend $ROSE_META_PATH to the metadata search path.
+#         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
 exec python -m rose.upgrade "$@"

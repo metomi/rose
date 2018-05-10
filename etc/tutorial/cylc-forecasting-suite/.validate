@@ -1,0 +1,3 @@
+cylc validate "$TUT_DIR" -v -v --icp=2000
+rose tutorial "$(basename $TUT_DIR)" "${TEST_DIR}/cylc-forecasting-suite"
+cylc run "${TEST_DIR}/cylc-forecasting-suite" $(rose date --utc --offset -PT7H --format CCYY-MM-DDThh:00Z) --no-detach --until $(rose date --utc --offset -PT1H --format CCYY-MM-DDThh:00Z) 2>&1 >/dev/null | grep '\[post_process_exeter..*\] -(current:running)> succeeded at .*'

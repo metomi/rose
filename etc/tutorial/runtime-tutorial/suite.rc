@@ -1,0 +1,32 @@
+[cylc]
+    UTC mode = True
+
+[scheduling]
+    # TODO - set the initial cycle point.
+    # TODO - set the final cycle point.
+    [[dependencies]]
+        [[[PT3H]]]
+            # Repeat every three hours starting at the initial cycle point.
+            graph = """
+                get_observations_belmullet => consolidate_observations
+                get_observations_camborne => consolidate_observations
+                get_observations_heathrow => consolidate_observations
+                get_observations_shetland => consolidate_observations
+            """
+
+        [[[+PT6H/PT6H]]]
+            # Repeat every six hours starting six hours after the initial
+            # cycle point.
+            graph = """
+                consolidate_observations => forecast
+                consolidate_observations[-PT3H] => forecast
+                consolidate_observations[-PT6H] => forecast
+                get_rainfall => forecast => post_process_exeter
+            """
+
+        [[[+PT12H/PT6H]]]
+            # Repeat every six hours starting twelve hours after the initial
+            # cycle point.
+            graph = """
+                forecast[-PT6H] => forecast
+            """

@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+# NAME
+#     rose make-docs
+#
+# SYNOPSIS
+#     rose make-docs [OPTIONS] [BUILD...]
+#
+# DESCRIPTION
+#     Build the rose documentation in the requested `BUILD` format(s).
+#
+# OPTIONS
+#     --venv
+#         Build virtualenv for temporarilly installing python dependencies
+#         if necessary.
+#     --dev
+#         Development mode, don't remove virtualenv after build.
+#     --strict
+#         Disable cache forcing a complete re-build and turn warnings into
+#         errors.
+#     --debug
+#         Run `make` with the --debug option.
+#
+# BUILD
+#     The format(s) to build the documentation in - default html.
+#     Avaliable formats are listed in the sphinx documentation
+#     (http://www.sphinx-doc.org/en/stable/builders.html).
+#     The most commonly used formats are:
+#
+#     `html`
+#         For building standalone HTML files.
+#     `singlehtml`
+#         For building a single page HTML document.
+#     `latexpdf`
+#         For building PDF documentation.
+#     `clean`
+#         Removes all builds (rose make-docs clean <build> will force a
+#         complete re-build).
+#
+# DEVELOPMENT BUILDS
+#     For development purposes use the following BUILDs:
+#
+#     `doctest`
+#         Runs any doctest examples present in documented python modules.
+#     `linkcheck`
+#         Checks external links.
+#
+#-----------------------------------------------------------------------------
+set -e
+set -o pipefail
+
+# Move into rose directory
+cd "$(dirname $0)/../"
+
+VENV_PATH='venv'  # Path for virtualenv.
+USING_VENV=false  # Set to `true` when the virtualenv is being used.
+SPHINX_PATH=sphinx  # Path to the sphinx directory.
+
+venv-activate () {
+    USING_VENV=true
+    . "${VENV_PATH}/bin/activate"
+}
+
+venv-install () {
+    venv-destroy
+    virtualenv --python=python2.7 "${VENV_PATH}"
+    venv-activate
+    pip install sphinx
+    pip install sphinx_rtd_theme
+    pip install sphinxcontrib-httpdomain
+    pip install hieroglyph
+}
+
+venv-deactivate () {
+    deactivate >/dev/null 2>&1 || true
+}
+
+venv-destroy () {
+    venv-deactivate
+    rm -rf "${VENV_PATH}"
+}
+
+if which virtualenv >/dev/null 2>&1; then
+    VENV_COMPLIANT=true
+else
+    VENV_COMPLIANT=false
+fi
+
+# Parse command line args.
+VENV_MODE=false
+FORCE=false
+DEV_MODE=false
+DEBUG=''
+BUILDS=''
+SPHINXOPTS=''
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --venv)
+            VENV_MODE=true
+            shift
+            ;;
+        --dev)
+            DEV_MODE=true
+            shift
+            ;;
+        --force)
+            FORCE=true
+            shift
+            ;;
+        --strict)
+            SPHINXOPTS='SPHINXOPTS=-aEW'
+            shift
+            ;;
+        --debug)
+            DEBUG='--debug'
+            shift
+            ;;
+        *)
+            BUILDS="${BUILDS} $1"
+            shift
+            ;;
+    esac
+done
+if [[ -z "${BUILDS}" ]]; then
+    BUILDS='html'
+fi
+
+# Use virtualenv if present and requested or if we are in development mode.
+if "${DEV_MODE}" || "${VENV_MODE}"; then
+    if ! "${VENV_COMPLIANT}"; then
+        echo 'The virtualenv command is required for the --venv option.'
+        exit 1
+    fi
+    if [[ -d "${VENV_PATH}" ]]; then
+        venv-activate
+    fi
+fi
+
+# Check core (sphinx) builder.
+if ! rose-check-software --doc >/dev/null; then
+    if "${VENV_MODE}"; then
+        venv-install
+    elif ! "${FORCE}"; then
+        echo "$(rose check-software --doc)"
+        echo "$(python -c 'import sphinxcontrib.httpdomain')"
+        echo 'Software required by the rose documentation builder is not'
+        echo 'present (run `rose check-software --doc` for details).'
+
+        if ! "${VENV_COMPLIANT}"; then
+            echo
+            echo 'Unable to build documentation.'
+            echo
+            echo 'To override the dependency checking logic and force the '
+            echo 'docs to build use the "--force" option.'
+            exit 1
+        fi
+
+        echo
+        echo 'The documentation can still be built by installing dependencies'
+        echo 'in a python virtual enironment (virtualenv). This environment'
+        echo "will be created in rose/${VENV_PATH} and will be removed after"
+        echo 'use. To keep the virtualenv for future builds run this command'
+        echo 'with the "--dev" option.'
+        echo
+        echo 'Else to override the dependency checking logic and force the docs'
+        echo 'to build use the "--force" option.'
+        echo
+        while read -p 'Proceed using a virtualenv (y/n)? ' usr; do
+            case "${usr}" in
+                [Yy])
+                    venv-install
+                    break
+                    ;;
+                [Nn])
+                    echo
+                    echo 'Unable to build documentation.'
+                    exit 1
+                    ;;
+            esac
+        done
+    fi
+fi
+
+# Run sphinx make.
+if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINXOPTS}; then
+    RET=0
+else
+    RET=1
+fi
+
+# Remove virtualenv if used and if we are not in development mode.
+if "${USING_VENV}"; then
+    if ! "${DEV_MODE}"; then
+        venv-destroy
+    fi 
+fi
+
+exit ${RET}

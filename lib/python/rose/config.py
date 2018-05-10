@@ -245,11 +245,11 @@ class ConfigNode(object):
         Yields:
             tuple - (keys, sub_node)
                 - keys (list) - A list defining a hierarchy of node.value
-                     'keys'. If a sub-node is at the top level, and does not
-                     contain any node children, a null string will be
-                     prepended to the returned keylist.
+                  'keys'. If a sub-node is at the top level, and does not
+                  contain any node children, a null string will be
+                  prepended to the returned keylist.
                 - sub_node (ConfigNode) - The config node at the position of
-                     keys.
+                  keys.
 
         Examples:
             >>> config_node = ConfigNode()
@@ -422,8 +422,6 @@ class ConfigNode(object):
         return getattr(self.get(keys, no_ignore=True), "value", default)
 
     def set(self, keys=None, value=None, state=None, comments=None):
-        # TODO: Are keys=[''] really skipped?
-        # TODO: Should comments be a list?
         """Set node properties at the position of keys, if any.
 
         Arguments:
@@ -577,7 +575,7 @@ class ConfigNode(object):
             self.unset(keys=removed_key)
 
     def __add__(self, config_diff):
-        """Apply a ConfigNodeDiff or ConfigNode to self and return new node.
+        """Return a new node by applying a node or diff to self.
 
         Create a new node by applying either a ConfigNodeDiff or ConfigNode
         instance to this ConfigNode.
@@ -789,7 +787,6 @@ class ConfigNodeDiff(object):
         return node
 
     def set_added_setting(self, keys, data):
-        # TODO: type(comments) == str ?
         """Set a config setting to be "added" in this ConfigNodeDiff.
 
         Args:
@@ -818,7 +815,6 @@ class ConfigNodeDiff(object):
         self._data[self.KEY_ADDED][keys] = data
 
     def set_modified_setting(self, keys, old_data, data):
-        # TODO: Really?
         """Set a config setting to be "modified" in this ConfigNodeDiff.
 
         If a property in both the old_data and data (new data) are both set to
@@ -1541,13 +1537,13 @@ class ConfigSyntaxError(Exception):
 
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,
          env_escape_ok=False):
-    """See ConfigDumper.dump for detail."""
+    """Shorthand for :py:func:`ConfigDumper.dump`."""
     return ConfigDumper()(root, target, sort_sections, sort_option_items,
                           env_escape_ok)
 
 
 def load(source, root=None):
-    """See ConfigLoader.load for detail."""
+    """Shorthand for :py:func:`ConfigLoader.load`."""
     return ConfigLoader()(source, root)
 
 

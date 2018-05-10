@@ -270,11 +270,11 @@ class MacroBase(object):
         """Load the resource according to the path of the calling macro.
 
         The returned path will be based on the macro location under
-        lib/python in the metadata directory.
+        ``lib/python`` in the metadata directory.
 
-        If the calling macro is lib/python/macro/levels.py,
-        and the filename is 'rules.json', the returned path will be
-        etc/macro/levels/rules.json.
+        If the calling macro is ``lib/python/macro/levels.py``,
+        and the filename is ``rules.json``, the returned path will be
+        ``etc/macro/levels/rules.json``.
 
         Args:
             filename (str): The filename of the resource to request the path

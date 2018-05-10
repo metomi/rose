@@ -27,19 +27,20 @@
 # DESCRIPTION
 #     Create a new suite, and optionally copy items from an existing one.
 #
-#     Assign an ID and create the directory structure in the central repository
-#     for a new suite.
+#     Assign an `ID` and create the directory structure in the central
+#     repository for a new suite.
 #
 #     The location of the repository for the new suite is determined in order
 #     of preference:
-#         1. "--prefix=PREFIX" option
-#         2. prefix of the "FROM-ID"
-#         3. "[rosie-id]prefix-default" option in the site/user configuration.
 #
-#     If FROM-ID is specified, copy items from the existing suite FROM-ID when
-#     the suite is created. It is worth noting that revision history of the
-#     copied items can only be preserved if FROM-ID is in the same repository
-#     of the new suite.
+#     1. `--prefix=PREFIX` option
+#     2. prefix of the `FROM-ID`
+#     3. `[rosie-id]prefix-default` option in the site/user configuration.
+#
+#     If `FROM-ID` is specified, copy items from the existing suite `FROM-ID`
+#     when the suite is created. It is worth noting that revision history of
+#     the copied items can only be preserved if `FROM-ID` is in the same
+#     repository of the new suite.
 #
 #     The syntax of the FROM-ID is PREFIX-xxNNN[/BRANCH][@REV] (e.g. my-su173,
 #     my-su173/trunk, my-su173/trunk@HEAD). If REV is not specified, the last
@@ -48,8 +49,8 @@
 #
 # OPTIONS
 #     --info-file=FILE
-#         Specify a FILE containing the discovery information for the
-#         new suite. If FILE is -, read from STDIN. The default behaviour
+#         Specify a `FILE` containing the discovery information for the
+#         new suite. If `FILE` is `-`, read from STDIN. The default behaviour
 #         is to open an editor to add suite discovery information.
 #     --meta-suite
 #         (Admin-only) Create the special suite in the repository
