@@ -212,7 +212,7 @@ def get_grid_coordinates(lng, lat, domain, resolution):
 
 class SurfaceFitter(object):
     """A 2D interpolation for random points.
-    
+
     A standin for scipy.interpolate.interp2d
 
     Args:

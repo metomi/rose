@@ -20,7 +20,7 @@
 """An extension providing pygments lexers for suite.rc files and Cylc graph
 strings."""
 
-from pygments.lexer import RegexLexer, bygroups, include, words
+from pygments.lexer import RegexLexer, bygroups, include
 from pygments.token import (Name, Comment, Text, Operator, String,
                             Punctuation, Error, Keyword)
 
