@@ -5,6 +5,30 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2018-Q2?)
+
+Rose release 54. This release is expected to be used with:
+* [cylc-7.6.1](https://github.com/cylc/cylc/releases/tag/7.6.1), and
+* [fcm-2017.10.0](https://github.com/metomi/fcm/releases/tag/2017.10.0).
+
+### Noteworthy Changes
+
+[#2184](https://github.com/metomi/rose/pull/2184):
+Rose User Guide: overhaul.
+* New Cylc and Rose tutorial.
+* New API reference.
+* New style.
+
+[#2163](https://github.com/metomi/rose/pull/2163):
+rose suite-run: new option `--validate-suite-only` to validate suite only
+without installing the suite.
+
+[#2151](https://github.com/metomi/rose/pull/2151):
+Rose Bush: suites list, cycles list, task jobs list, and broadcast lists pages
+now refresh automatically every 2 minutes.
+
+--------------------------------------------------------------------------------
+
 ## 2018.02.0 (2018-02-07)
 
 Rose release 53. This release is expected to be used with:
