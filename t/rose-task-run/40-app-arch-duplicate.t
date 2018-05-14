@@ -31,10 +31,9 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --no-gcontrol --host=localhost -- --no-detach
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}"
-cat "${SUITE_RUN_DIR}/log/job/1/archive_fail_duplicate/NN/job.err" >&2
 file_grep "${TEST_KEY}" 'duplicate archive target: "foo"' \
     "${SUITE_RUN_DIR}/log/job/1/archive_fail_duplicate/NN/job.err"
 #-------------------------------------------------------------------------------

@@ -112,22 +112,23 @@
 #-------------------------------------------------------------------------------
 set -eu
 
-SIGNALS="EXIT INT"
-FINALLY() {
-    for S in $SIGNALS; do
-        trap '' $S
-    done
-    if [[ -n ${TEST_DIR:-} ]]; then
+test_finally() {
+    trap '' 'EXIT'
+    trap '' 'INT'
+    if [[ -n "${TEST_DIR:-}" ]]; then
         cd ~
-        rm -rf $TEST_DIR
+        rm -rf "${TEST_DIR}"
     fi
-    if [[ -n ${TEST_SMTPD_PID:-} ]]; then
-        kill $TEST_SMTPD_PID
+    if [[ -n "${TEST_SMTPD_PID:-}" ]]; then
+        kill "${TEST_SMTPD_PID}"
+    fi
+    # Allow custom clean up
+    if declare -F 'my_test_finally' 1>'/dev/null' 2>&1; then
+        my_test_finally "$@"
     fi
 }
-for S in $SIGNALS; do
-    trap "FINALLY $S" $S
-done
+trap 'test_finally EXIT' 'EXIT'
+trap 'test_finally INT' 'INT'
 
 TEST_NUMBER=0
 

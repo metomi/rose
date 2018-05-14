@@ -33,14 +33,10 @@ set -e
 JOB_HOST=$(rose host-select -q $JOB_HOST)
 JOB_HOST_TEST_DIR=$(ssh -oBatchMode=yes $JOB_HOST 'TMPDIR=$HOME mktemp -d')
 JOB_HOST_TEST_DIR=$(tail -1 <<<"$JOB_HOST_TEST_DIR")
-MY_FINALLY() {
-    FINALLY "$@"
+my_test_finally() {
     ssh -oBatchMode=yes $JOB_HOST \
         "bash -l -c 'rm -r $JOB_HOST_TEST_DIR'" 1>/dev/null 2>&1
 }
-for S in $SIGNALS; do
-    trap "MY_FINALLY $S" $S
-done
 #-------------------------------------------------------------------------------
 # mode=auto, source is a file
 mkdir hello
