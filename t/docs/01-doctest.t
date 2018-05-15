@@ -19,9 +19,9 @@
 #-------------------------------------------------------------------------------
 # Run doctests in sphinx extensions.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
+. "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
-if ! rose check-software-docs; then
+if ! rose check-software-docs 2>'/dev/null'; then
     skip_all "Software dependencies for documentation not met."
 fi
 #-------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ TERM=  # Nasty solution to prevent control chars being printed in python output.
 for file in ${FILES[@]}; do
     TEST_KEY="${TEST_KEY_BASE}-$(basename ${file})"
     run_pass "${TEST_KEY}" python -m doctest "${file}"
-    file_cmp "${TEST_KEY}-err" "${TEST_KEY}.out" /dev/null
+    file_cmp "${TEST_KEY}-err" "${TEST_KEY}.out" '/dev/null'
 done
 #-------------------------------------------------------------------------------
 exit

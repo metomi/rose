@@ -260,5 +260,5 @@ file_grep "${TEST_KEY}.out" 'HTTP/.* 403 Forbidden' "${TEST_KEY}.out"
 #-------------------------------------------------------------------------------
 # Tidy up
 rose_ws_kill
-rm -fr "${SUITE_DIR}" "${SUITE_DIR2}" 2>'/dev/null'
+rm -fr "${SUITE_DIR}" "${SUITE_DIR2}" "${IMG_SUITE_DIR}" 2>'/dev/null'
 exit 0
