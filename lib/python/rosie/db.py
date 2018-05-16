@@ -45,13 +45,18 @@ def _col_keys(table):
     return [c.key for c in table.c]
 
 
-class RosieDatabaseConnectError(Exception):
+class RosieDatabaseConnectError(al.exc.OperationalError):
 
-    """Exception raised when a database cannot be connected to."""
+    """Exception raised when unable to establish a database connection."""
+
+    def __init__(self, bad_db_url, message):
+        self.bad_db_url = bad_db_url
+        self.message = message
+        super(RosieDatabaseConnectError, self).__init__(
+            self.message, "None", self.bad_db_url)
 
     def __str__(self):
-
-        return "%s: failed to connect to DB." % self.args
+        return "Failed to connect to DB '%s'." % self.bad_db_url
 
 
 class DAO(object):
@@ -87,8 +92,8 @@ class DAO(object):
 
         try:
             self.db_connection = self.db_engine.connect()
-        except al.exc.OperationalError:
-            raise RosieDatabaseConnectError(self.db_url)
+        except al.exc.OperationalError as exc:
+            raise RosieDatabaseConnectError(self.db_url, exc)
 
         self.tables = {}
         for name in [LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME,
