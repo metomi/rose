@@ -37,6 +37,9 @@
 #         errors.
 #     --debug
 #         Run `make` with the --debug option.
+#     --default-version=VERSION
+#         By default the current version is symlinked as the default version,
+#         provide an alternative version to override this.
 #
 # BUILD
 #     The format(s) to build the documentation in - default html.
@@ -51,8 +54,8 @@
 #     `latexpdf`
 #         For building PDF documentation.
 #     `clean`
-#         Removes all builds (rose make-docs clean <build> will force a
-#         complete re-build).
+#         Removes all built documentation for the current rose version.
+#         (use `rm -rf doc` to remove all documentation).
 #
 # DEVELOPMENT BUILDS
 #     For development purposes use the following BUILDs:
@@ -65,13 +68,81 @@
 #-----------------------------------------------------------------------------
 set -e
 set -o pipefail
+shopt -s extglob
 
 # Move into rose directory
-cd "$(dirname $0)/../"
+cd "$(dirname "$0")/../"
 
-VENV_PATH='venv'  # Path for virtualenv.
-USING_VENV=false  # Set to `true` when the virtualenv is being used.
-SPHINX_PATH=sphinx  # Path to the sphinx directory.
+# Path for virtualenv.
+VENV_PATH='venv'
+# Set to `true` when the virtualenv is being used.
+USING_VENV=false
+# Path to the sphinx directory.
+SPHINX_PATH=sphinx
+# pick up official rose version
+. "${ROSE_HOME}/rose-version"
+# documentation root output directory
+DOCS_DIR="${ROSE_HOME}/doc"
+# documentation output directory for this version
+BUILD_DIR="${DOCS_DIR}/${ROSE_VERSION}"
+# glob for documented rose versions
+DOC_VERSIONS=!(*.html|.git|doc|versions.json|"${DEFAULT_ALIAS}")
+# glob for documentation formats within a rose version
+DOC_FORMATS=!(*.html|doctrees)
+
+# is the virtualenv command available
+if which virtualenv >/dev/null 2>&1; then
+    VENV_COMPLIANT=true
+else
+    VENV_COMPLIANT=false
+fi
+
+# Parse command line args.
+VENV_MODE=false
+FORCE=false
+DEV_MODE=false
+DEBUG=''
+BUILDS=''
+SPHINX_OPTS=''
+DEFAULT_ALIAS='doc'
+DEFAULT_VERSION=
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --venv)
+            VENV_MODE=true
+            shift
+            ;;
+        --dev)
+            DEV_MODE=true
+            shift
+            ;;
+        --force)
+            FORCE=true
+            shift
+            ;;
+        --strict)
+            SPHINX_OPTS='SPHINX_OPTS=-aEW'
+            shift
+            ;;
+        --debug)
+            DEBUG='--debug'
+            shift
+            ;;
+        --default-version)
+            DEFAULT_VERSION="$2"
+            shift
+            shift
+            ;;
+        *)
+            BUILDS="${BUILDS} $1"
+            shift
+            ;;
+    esac
+done
+if [[ -z "${BUILDS}" ]]; then
+    BUILDS='html'
+fi
+
 
 venv-activate () {
     USING_VENV=true
@@ -97,50 +168,53 @@ venv-destroy () {
     rm -rf "${VENV_PATH}"
 }
 
-if which virtualenv >/dev/null 2>&1; then
-    VENV_COMPLIANT=true
-else
-    VENV_COMPLIANT=false
-fi
+json_list () {
+    # write out a bash array as a JSON list
+    echo -n "[\"$(local IFS=','; echo "$*" | sed 's/,/", "/g';)\"]"
+}
 
-# Parse command line args.
-VENV_MODE=false
-FORCE=false
-DEV_MODE=false
-DEBUG=''
-BUILDS=''
-SPHINXOPTS=''
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --venv)
-            VENV_MODE=true
-            shift
-            ;;
-        --dev)
-            DEV_MODE=true
-            shift
-            ;;
-        --force)
-            FORCE=true
-            shift
-            ;;
-        --strict)
-            SPHINXOPTS='SPHINXOPTS=-aEW'
-            shift
-            ;;
-        --debug)
-            DEBUG='--debug'
-            shift
-            ;;
-        *)
-            BUILDS="${BUILDS} $1"
-            shift
-            ;;
-    esac
-done
-if [[ -z "${BUILDS}" ]]; then
-    BUILDS='html'
-fi
+version_file () {
+    # output the dictionary {"version": ["build", ...]} in JSON format
+    DOCS_DIR="$1"
+    DEFAULT_ALIAS="$2"
+
+    echo '{'
+    # scrape filesystem for list of rose versions which have built docs
+    VERSIONS=( $(cd "${DOCS_DIR}"; echo $DOC_VERSIONS) )
+    for version in "${VERSIONS[@]}"; do
+        # scrape filesystem to get list of formats this version is available in
+        formats=( $(cd "${DOCS_DIR}/${version}"; echo $DOC_FORMATS) )
+        list="    \"${version}\": $(json_list ${formats})"
+        if [[ $version == "${VERSIONS[$(( ${#VERSIONS[@]} - 1 ))]}" ]]; then
+            # JSON doesn't permit a comma after the last item in a collection
+            echo "${list}"
+        else
+            echo "${list},"
+        fi
+    done
+    echo '}'
+}
+
+html_redirect () {
+    # write an html file to $2 which auto-redirects to the relative path $1
+    SRC="$1"
+    DEST="$2"
+
+    cat >"$2" << __HTML__
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rose Documentation</title>
+        <meta http-equiv="REFRESH" content="0;url=$1">
+    </head>
+    <body>
+        <p>If not automatically redirected, please click
+        <a href="$1">Rose Documentation</a>.</p>
+    </body>
+</html>
+__HTML__
+}
+
 
 # Use virtualenv if present and requested or if we are in development mode.
 if "${DEV_MODE}" || "${VENV_MODE}"; then
@@ -174,7 +248,7 @@ if ! rose-check-software --doc >/dev/null; then
 
         echo
         echo 'The documentation can still be built by installing dependencies'
-        echo 'in a python virtual enironment (virtualenv). This environment'
+        echo 'in a python virtual environment (virtualenv). This environment'
         echo "will be created in rose/${VENV_PATH} and will be removed after"
         echo 'use. To keep the virtualenv for future builds run this command'
         echo 'with the "--dev" option.'
@@ -198,9 +272,25 @@ if ! rose-check-software --doc >/dev/null; then
     fi
 fi
 
-# Run sphinx make.
-if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINXOPTS}; then
+# makefile argument to set the output directory for this build
+SPHINX_OPTS="${SPHINX_OPTS} BUILDDIR=${DOCS_DIR}/${ROSE_VERSION}"
+
+# run sphinx-build
+if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINX_OPTS}; then
     RET=0
+    # output file containing details of all versions and formats the
+    # documentation has been built in (locally) for the version / format
+    # switching pane
+    version_file "${DOCS_DIR}" "${DEFAULT_ALIAS}" > "${DOCS_DIR}/versions.json"
+    # symlink this version as the default
+    (
+        cd "${DOCS_DIR}"
+        rm "${DEFAULT_ALIAS}" 2>/dev/null || true
+        ln -s "${DEFAULT_VERSION:-$ROSE_VERSION}" "${DEFAULT_ALIAS}"
+    )
+    # symlink landing pages
+    html_redirect "${DEFAULT_ALIAS}/html/index.html" 'doc/index.html'
+    html_redirect "html/index.html" "doc/${ROSE_VERSION}/index.html"
 else
     RET=1
 fi
