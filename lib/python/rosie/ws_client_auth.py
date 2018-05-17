@@ -40,11 +40,11 @@ try:
     require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
     require_version('Secret', '1')
     from gi.repository import Secret
-    gi_flag = True
+    GI_FLAG = True
 except ImportError:
-    gi_flag = False
+    GI_FLAG = False
 try:
-    if gi_flag:
+    if GI_FLAG:
         pygtkcompat.enable()
         pygtkcompat.enable_gtk(version='3.0')
     import gtk
@@ -256,7 +256,7 @@ class LibsecretStore(object):
     @classmethod
     def usable(cls):
         """Can this store be used?"""
-        return bool(gi_flag)
+        return bool(GI_FLAG)
 
     def __init__(self):
         # Attributes must be explicitly defined; not managed by the schema
