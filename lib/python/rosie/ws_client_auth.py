@@ -22,22 +22,35 @@
 
 import ast
 from getpass import getpass
-try:
-    import gnomekeyring
-    import gtk
-except (ImportError, RuntimeError):
-    pass
 import os
 import re
+import shlex
+import sys
+from urlparse import urlparse
+
 import rose.config
 from rose.env import env_var_process
 from rose.popen import RosePopener
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
-import shlex
+
 import socket
-import sys
-from urlparse import urlparse
+try:
+    from gi import require_version, pygtkcompat
+    require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
+    require_version('Secret', '1')
+    from gi.repository import Secret
+    GI_FLAG = True
+except ImportError:
+    GI_FLAG = False
+try:
+    if GI_FLAG:
+        pygtkcompat.enable()
+        pygtkcompat.enable_gtk(version='3.0')
+    import gtk
+    import gnomekeyring
+except (ImportError, RuntimeError):
+    pass
 
 
 class UndefinedRosiePrefixWS(Exception):
@@ -236,16 +249,60 @@ class GPGAgentStore(object):
         pass
 
 
+class LibsecretStore(object):
+
+    """Password management with libsecret."""
+
+    @classmethod
+    def usable(cls):
+        """Can this store be used?"""
+        return bool(GI_FLAG)
+
+    def __init__(self):
+        # Attributes must be explicitly defined; not managed by the schema
+        self.category = ("protocol", "server", "user")
+        self.attributes = dict((key, Secret.SchemaAttributeType.STRING) for
+                               key in self.category)
+        self.schema = Secret.Schema.new(
+            "org.rosie.disco.Store", Secret.SchemaFlags.NONE, self.attributes)
+
+    def clear_password(self, scheme, host, username):
+        """Remove the password from the cache."""
+        template = dict(zip(self.category, (scheme, host, username)))
+        Secret.password_clear_sync(self.schema, template, None)
+
+    def find_password(self, scheme, host, username):
+        """Return the password of username@root."""
+        template = dict(zip(self.category, (scheme, host, username)))
+        try:
+            password = Secret.password_lookup_sync(self.schema, template, None)
+        except Secret.SECRET_ERROR_PROTOCOL:
+            return
+        return password
+
+    def store_password(self, scheme, host, username, password):
+        """Return the password of username@root."""
+        template = dict(zip(self.category, (scheme, host, username)))
+        self.clear_password(scheme, host, username)
+        try:
+            Secret.password_store_sync(
+                self.schema, template, Secret.COLLECTION_DEFAULT, host,
+                password, None)
+        except Secret.SECRET_ERROR_PROTOCOL:
+            pass
+
+
 class RosieWSClientAuthManager(object):
 
     """Manage authentication info for a Rosie web service client."""
 
     ST_UNC = "UNC"  # Item is unchanged
     ST_MOD = "MOD"  # Item is modified
-    PASSWORD_STORES_STR = "gpgagent gnomekeyring"
+    PASSWORD_STORES_STR = "gpgagent gnomekeyring libsecret"
     PASSWORD_STORE_CLASSES = {
         "gpgagent": GPGAgentStore,
         "gnomekeyring": GnomekeyringStore,
+        "libsecret": LibsecretStore,
     }
     PROMPT_USERNAME = "Username for %(prefix)r - %(root)r: "
     PROMPT_PASSWORD = "Password for %(username)s at %(prefix)r - %(root)r: "
