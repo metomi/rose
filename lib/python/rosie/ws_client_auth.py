@@ -41,7 +41,7 @@ try:
     require_version('Secret', '1')
     from gi.repository import Secret
     GI_FLAG = True
-except ImportError:
+except (ImportError, ValueError):
     GI_FLAG = False
 try:
     if GI_FLAG:
