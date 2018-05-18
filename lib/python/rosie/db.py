@@ -45,6 +45,20 @@ def _col_keys(table):
     return [c.key for c in table.c]
 
 
+class RosieDatabaseConnectError(al.exc.OperationalError):
+
+    """Exception raised when unable to establish a database connection."""
+
+    def __init__(self, bad_db_url, message):
+        self.bad_db_url = bad_db_url
+        self.message = message
+        super(RosieDatabaseConnectError, self).__init__(
+            self.message, "None", self.bad_db_url)
+
+    def __str__(self):
+        return "Failed to connect to DB '%s'." % self.bad_db_url
+
+
 class DAO(object):
 
     """Retrieves data from the suite database.
@@ -73,9 +87,14 @@ class DAO(object):
     def _connect(self):
         """Connect to the database file."""
         self.db_engine = al.create_engine(self.db_url)
-        self.db_connection = self.db_engine.connect()
         self.db_metadata = al.MetaData(self.db_engine)
         self.results = None
+
+        try:
+            self.db_connection = self.db_engine.connect()
+        except al.exc.OperationalError as exc:
+            raise RosieDatabaseConnectError(self.db_url, exc)
+
         self.tables = {}
         for name in [LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME,
                      OPTIONAL_TABLE_NAME]:

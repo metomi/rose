@@ -112,6 +112,8 @@ class RosieDiscoService(object):
         except (KeyError, AttributeError, jinja2.exceptions.TemplateError):
             import traceback
             traceback.print_exc()
+        except rosie.db.RosieDatabaseConnectError as exc:
+            raise cherrypy.HTTPError(404, str(exc))
 
     @cherrypy.expose
     def hello(self, format=None):
