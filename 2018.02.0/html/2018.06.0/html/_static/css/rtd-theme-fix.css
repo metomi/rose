@@ -1,0 +1,112 @@
+/* Correct the behaviour of the read the docs theme which greedily overides
+ * sphinx's `pygments_style` option by placing its own syntax in the
+ * stylesheet - https://github.com/rtfd/sphinx_rtd_theme/issues/166 */
+.highlight * {
+    color: black;
+    font-weight: normal;
+    font-style: normal;
+    background-color: transparent;
+}
+
+/* Correct the behaviour of nested admonitions. Sometimes the admonition-header
+ * inherits its parents styling. */
+.rst-content .error .admonition-title, .rst-content .danger .admonition-title {
+    background: red
+}
+.rst-content .warning .admonition-title,
+.rst-content .caution .admonition-title,
+.rst-content .attention .admonition-title {
+    background: orange
+}
+
+/* Enable theme handling of pilcrow symbols for code-block captions and
+ * admonitions. */
+.rst-content p.admonition-title .pull-left.headerlink,
+.rst-content div.code-block-caption .pull-left.headerlink {
+    margin-right:.3em
+}
+.rst-content p.admonition-title .pull-right.headerlink,
+.rst-content div.code-block-caption .pull-right.headerlink {
+    margin-left:.3em
+}
+.rst-content p.admonition-title .headerlink:before,
+.rst-content div.code-block-caption .headerlink:before {
+    font-family:"FontAwesome";
+    display:inline-block;
+    font-style:normal;
+    font-weight:normal;
+    line-height:1;
+    text-decoration:inherit;
+    font-size:14px;
+    vertical-align:-15%
+    -webkit-font-smoothing:antialiased
+}
+.rst-content p.admonition-title .headerlink:after,
+.rst-content div.code-block-caption .headerlink:after {
+    visibility:visible;
+    content:"";
+    font-family:FontAwesome;
+    display:inline-block;
+    color:#2980B9
+}
+.rst-content p.admonition-title:hover .headerlink,
+.rst-content div.code-block-caption:hover .headerlink {
+    display:inline-block
+}
+.rst-content p.admonition-title .headerlink,
+.rst-content div.code-block-caption .headerlink {
+    font:normal normal normal 14px/1 FontAwesome;
+    text-rendering:auto;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    display:none;
+    visibility:hidden;
+    font-size:14px;
+    color:#fcfcfc;
+    text-decoration:inherit
+}
+
+/* Fix the lack of space underneath lists inside admonitions. */
+.rst-content div.admonition ul,
+.rst-content div.admonition ol > li {
+    padding-bottom: 0.5em;
+}
+
+/* Add warning symbol before deprecated items. */
+.deprecated p:before {
+    font-family:FontAwesome;
+    content:"\f071  ";
+    color: rgb(200, 90, 70);
+}
+
+.deprecated p span.versionmodified{
+    font-weight: bold;
+}
+
+/* Implement grid-table class for plain style grid layouts. */
+.grid-table {
+    width: 100% !important;
+    border: 0 !important; /* Remove table border. */
+}
+.grid-table tbody tr td:first-child {
+    padding-left: 0 !important; /* Grid flush with the left-hand content edge. */
+}
+.grid-table tbody tr td:last-child {
+    padding-right: 0 !important; /* Grid flush with the right-hand edge */
+}
+.grid-table tbody tr td {
+    background-color: rgba(255,255,255,0) !important;
+    border: 0 !important;  /* Remove cell border. */
+    vertical-align: top !important;  /* All content should float to the top. */
+}
+
+/* Tables handle their own margin, this prevents getting a double margin. */
+.grid-table div.highlight {
+    margin-bottom: 0;
+}
+
+/* Place code-block captions in italics. */
+.code-block-caption {
+    font-style: italic;
+    color: #808080;
+}

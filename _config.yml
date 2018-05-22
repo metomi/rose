@@ -1,0 +1,15 @@
+# This file configures the Jekyll static web builder (https://jekyllrb.com/) as
+# used by Github Pages.
+
+# Jekyll treats directories beginning with underscores as having special meaning
+# and omits them from the build. This can be overridden by manually including
+# directories using "include".
+# https://help.github.com/articles/files-that-start-with-an-underscore-are-missing/
+# NOTE: Only the directory name should be specified not the full path.
+include: [
+    "_downloads",
+    "_images",
+    "_modules",
+    "_sources",
+    "_static"
+]

@@ -1,0 +1,7 @@
+*.py[co]
+*.swp
+etc/rose.conf
+etc/opt
+lib/bash/rose_init_site
+doc
+venv

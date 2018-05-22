@@ -1,0 +1,171 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Tutorial &mdash; Rose Documentation 2018.05.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/rtd-theme-fix.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.05.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/rtd-theme-extensions.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.05.0 documentation" href="../../index.html" />
+    <link rel="next" title="Rose Configurations" href="configurations.html" />
+    <link rel="prev" title="Suicide Triggers" href="../cylc/furthertopics/suicide-triggers.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-tutorial">
+
+<h1>Rose Tutorial<a class="headerlink" href="../../../html/tutorial/rose/index.html#rose-tutorial" title="View HTML">§</a></h1>
+
+<p>Rose is a system for creating, editing and running Rose configurations.</p>
+<p>Rose also contains other optional tools for:</p>
+<ul class="simple">
+<li>Version control.</li>
+<li>Suite discovery and management.</li>
+<li>Validating and tranforming Rose configurations.</li>
+<li>Interfacing with Cylc.</li>
+</ul>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="configurations.html">Rose Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configurations.html#id1">Rose Configurations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configurations.html#rose-configuration-format">Rose Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configurations.html#id2">Rose Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configurations.html#id3">Rose Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configurations.html#id4">Rose Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configurations.html#id5">Rose Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configurations.html#why-use-rose-configurations">Why Use Rose Configurations?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configurations.html#id6">Why Use Rose Configurations?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Rose Applications</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications.html#application-configuration">Application Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications.html#id4">Application Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications.html#running-rose-applications">Running Rose Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications.html#id5">Running Rose Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Rose Metadata</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#the-metadata-format">The Metadata Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#id3">The Metadata Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#metadata-commands">Metadata Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#metadata-items">Metadata Items</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#id4">Metadata Items</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="suites.html">Rose Suite Configurations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#configuration-format">Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#id8">Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#suite-directory-vs-run-directory">Suite Directory Vs Run Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#id9">Suite Directory Vs Run Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#running-rose-suite-configurations">Running Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#id10">Running Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#id11">Running Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#start-stop-restart">Start, Stop, Restart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#id12">Start, Stop, Restart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#rose-applications-in-rose-suite-configurations">Rose Applications In Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#id13">Rose Applications In Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#id14">Rose Applications In Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#rose-bush">Rose Bush</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suites.html#id15">Rose Bush</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosie.html">Rosie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosie.html#rosie-suites">Rosie Suites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosie.html#version-control">Version Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosie.html#suite-naming">Suite Naming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosie.html#the-rose-suite-info-file">The <code class="docutils literal notranslate"><span class="pre">rose-suite.info</span></code> File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosie.html#managing-suites">Managing Suites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosie.html#id2">Managing Suites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosie.html#id3">Managing Suites</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="summary.html">Summary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="summary.html#suite-structure">Suite Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary.html#suite-commands">Suite Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary.html#id1">Suite Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary.html#id2">Suite Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary.html#rose-utilities">Rose Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary.html#rose-built-in-applications">Rose Built-In Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="furthertopics/index.html">Further Topics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/command-keys.html">Command Keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/date-time-manipulation.html">Date and Time Manipulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/failif-warnif.html">Fail-If, Warn-If</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/macro-development.html">Custom Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/optional-configurations.html">Optional Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/polling.html">Polling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/rose-arch.html">Rose Arch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/rose-bunch.html">Rose Bunch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/rose-stem.html">Rose Stem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/trigger.html">Trigger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/upgrading.html">Upgrading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/upgrading-macro-development.html">Upgrading Macro Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/widget-development.html">Widget Development</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

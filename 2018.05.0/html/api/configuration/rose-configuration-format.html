@@ -1,0 +1,525 @@
+
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Rose Configuration Format &mdash; Rose Documentation 2018.05.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/rtd-theme-fix.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Rose Documentation 2018.05.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Rose Configuration" href="index.html"/>
+        <link rel="next" title="File Creation Mode" href="file-creation.html"/>
+        <link rel="prev" title="Configuration Metadata" href="metadata.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Rose Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2018.05.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/cylc/index.html">Cylc Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cheat-sheet.html">Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Rose Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="application.html">Application Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suite.html">Suite Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="site-and-user.html">Site And User Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html">Configuration Metadata</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Rose Configuration Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#goals">Goals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-configuration">Optional Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#optional-configurations-and-metadata">Optional Configurations and Metadata</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#import-configuration">Import Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#re-define-configuration-at-run-time">Re-define Configuration at Run Time</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="file-creation.html">File Creation Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">Rose Configuration API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-gtk-library.html">Rose GTK library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../terms.html">Rose Terms Of Use</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rose Documentation</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Rose Configuration</a> &raquo;</li>
+        
+      <li>Rose Configuration Format</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="rose-configuration-format">
+<span id="id1"></span><h1>Rose Configuration Format<a class="headerlink" href="#rose-configuration-format" title="Permalink to this headline">¶</a></h1>
+<p>A configuration in Rose is normally represented by a directory with the
+following:</p>
+<ul class="simple">
+<li>a configuration file in a modified <a class="reference external" href="https://en.wikipedia.org/wiki/INI_file">INI</a> format.</li>
+<li>(optionally) files containing data that cannot easily be represented by the
+INI format.</li>
+</ul>
+<p>We have added the following conventions into the Rose configuration format:</p>
+<ol class="arabic">
+<li><p class="first">The file name is normally called <code class="docutils literal notranslate"><span class="pre">rose*.conf</span></code>, e.g. <a class="reference internal" href="site-and-user.html#rose:file:rose.conf" title="rose:file:rose.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose.conf</span></code></a>,
+<a class="reference internal" href="application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a>, <a class="reference internal" href="metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a>, etc.</p>
+</li>
+<li><p class="first">Only a hash <code class="docutils literal notranslate"><span class="pre">#</span></code> in the beginning of a line starts a comment. Empty lines
+and lines with only white spaces are ignored. There is no support for
+trailing comments. Comments are normally ignored when a configuration file
+is loaded. However, some comments are loaded if the following conditions
+are met:</p>
+<ul class="simple">
+<li>Comment lines at the beginning of a configuration file up to but not
+including the 1st blank line or the 1st setting are comment lines
+associated with the file. They will re-appear at the top of the file
+when it is re-dumped.</li>
+<li>Comment lines between a blank line and the next setting, and the
+comment lines between the previous setting and the next setting are
+comments associated with the next setting. The comment lines associated
+with a setting will re-appear before the setting when the file is
+re-dumped.</li>
+</ul>
+</li>
+<li><p class="first">Only the equal sign <code class="docutils literal notranslate"><span class="pre">=</span></code> is used to delimit a key-value pair - because the
+colon <code class="docutils literal notranslate"><span class="pre">:</span></code> may be used in keys of namelist declarations.</p>
+</li>
+<li><p class="first">A key-value pair declaration does not have to live under a section
+declaration. Such a declaration lives directly under the <em>root</em> level.</p>
+</li>
+<li><p class="first">Key-value pair declarations following a line with only <code class="docutils literal notranslate"><span class="pre">[]</span></code> are placed
+directly under the root level.</p>
+</li>
+<li><p class="first">Declarations are case sensitive. When dealing with case-insensitive
+inputs such as Fortran logicals or numbers in scientific notation,
+lowercase values should be used.</p>
+</li>
+<li><p class="first">When writing namelist inputs, keys should be lowercase.</p>
+</li>
+<li><p class="first">Declarations start at column 1. Continuations start at column &gt;1.</p>
+<ul class="simple">
+<li>Each line is stripped of leading and trailing spaces.</li>
+<li>A newline <code class="docutils literal notranslate"><span class="pre">\n</span></code> character is prefixed to each continuation line.</li>
+<li>If a continuation line has a leading equal sign <code class="docutils literal notranslate"><span class="pre">=</span></code> character, it is
+stripped from the line. This is useful for retaining leading white
+spaces in a continuation line.</li>
+</ul>
+</li>
+<li><p class="first">A single exclamation <code class="docutils literal notranslate"><span class="pre">!</span></code> or a double exclamation <code class="docutils literal notranslate"><span class="pre">!!</span></code> in front of a
+section (i.e. <code class="docutils literal notranslate"><span class="pre">[!SECTION]</span></code>) or key=value pair (i.e. <code class="docutils literal notranslate"><span class="pre">!key=value</span></code>)
+denotes an ignored setting.</p>
+<ul class="simple">
+<li>E.g. It will be ignored in run time but may be used by other Rose
+utilities.</li>
+<li>A single exclamation denotes a user-ignored setting.</li>
+<li>A double exclamation denotes a program-ignored setting. E.g.
+<a class="reference internal" href="../command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> may use a double exclamation to switch
+off a setting according to the setting metadata.</li>
+</ul>
+</li>
+<li><p class="first">The open square bracket (<code class="docutils literal notranslate"><span class="pre">[</span></code>) and close square bracket (<code class="docutils literal notranslate"><span class="pre">]</span></code>) characters
+cannot be used within a section declaration. E.g.
+<code class="docutils literal notranslate"><span class="pre">[[hello]</span></code>, <code class="docutils literal notranslate"><span class="pre">[hello]]</span></code>, <code class="docutils literal notranslate"><span class="pre">[hello</span> <span class="pre">[world]</span> <span class="pre">and</span> <span class="pre">beyond]</span></code> should all be
+errors on parsing.</p>
+</li>
+<li><p class="first">If a section is declared twice in a file, the later section will append
+settings to the earlier one. If the same key in the same section is
+declared twice, the later value will override the earlier one. This logic
+applies to the state of a setting as well.</p>
+</li>
+<li><p class="first">Once the file is parsed, declaration ordering is insignificant.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Do not assume order of environment variables.</p>
+</div>
+</li>
+<li><p class="first">Values of settings accept syntax such as <code class="docutils literal notranslate"><span class="pre">$NAME</span></code> or <code class="docutils literal notranslate"><span class="pre">${NAME}</span></code> for
+environment variable substitution.</p>
+</li>
+</ol>
+<p>E.g.</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is line 1 of the comment for this file.</span>
+<span class="c1"># This is line 2 of the comment for this file.</span>
+
+<span class="c1"># This comment will be ignored.</span>
+
+<span class="c1"># This is a comment for section-1.</span>
+<span class="nt">[section-1]</span>
+<span class="c1"># This is a comment for key-1.</span>
+<span class="nv">key-1</span><span class="o">=</span><span class="s">value 1</span>
+<span class="c1"># This comment will be ignored.</span>
+
+<span class="c1"># This is line 1 of the comment for key-2.</span>
+<span class="c1"># This is line 2 of the comment for key-2.</span>
+<span class="nv">key-2</span><span class="o">=</span><span class="s">value 2 line 1</span>
+      <span class="s">value 2 line 2</span>
+<span class="c1"># This is a comment for key-3.</span>
+<span class="nv">key-3</span><span class="o">=</span><span class="s">value 3 line 1</span>
+     <span class="o">=</span><span class="s">    value 3 line 2 has leading identation.</span>
+     <span class="o">=</span>
+     <span class="o">=</span><span class="s">    value 3 line 3 is blank. This is line 4.</span>
+
+<span class="c1"># section-2 is user-ignored.</span>
+<span class="c">[!section-2]</span>
+<span class="c">key-4=value 4</span>
+<span class="c1"># ...</span>
+
+<span class="nt">[section-3]</span>
+<span class="c1"># key-5 is program ignored.</span>
+<span class="cp">!!key-5=value 5</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this document, the shorthand <code class="docutils literal notranslate"><span class="pre">SECTION=KEY=VALUE</span></code> is used to represent a
+<code class="docutils literal notranslate"><span class="pre">KEY=VALUE</span></code> pair in a <code class="docutils literal notranslate"><span class="pre">[SECTION]</span></code> of an INI format file.</p>
+</div>
+<div class="section" id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h2>
+<p>Suite configurations should be portable between users (at least at the same
+site). E.g.: another user should be able to run the same suite:</p>
+<ul class="simple">
+<li>without making ANY changes to it.</li>
+<li>without having to add/modify things in their <code class="docutils literal notranslate"><span class="pre">$HOME/.profile</span></code>.</li>
+</ul>
+<p>Input configurations should be programming language neutral.</p>
+<ul class="simple">
+<li>Any processing logic should be application/version independent, generic and
+future-proof.</li>
+<li>Data structure should be represented in formats easily understood and
+manipulatable by a human and a computer.</li>
+</ul>
+<p>The life cycles of application configurations in a suite may differ from that
+of the suite.</p>
+<ul class="simple">
+<li>The configuration of an application may be independent of the suite.</li>
+<li>The configuration of an application should be portable between suitable
+suites.</li>
+</ul>
+<p>The configurations are independent of the utilities. For example, the
+configuration metadata for the suite and application configurations will
+drive the Rose config editor GUI, but will not be bound or restricted by it.</p>
+</div>
+<div class="section" id="optional-configuration">
+<span id="id2"></span><h2>Optional Configuration<a class="headerlink" href="#optional-configuration" title="Permalink to this headline">¶</a></h2>
+<p>In a Rose configuration directory, we can add an <code class="docutils literal notranslate"><span class="pre">opt/</span></code> sub-directory for
+optional configuration files. Optional configuration files contain additional
+configuration, which can be selected at run time to override the configuration
+in the main <code class="docutils literal notranslate"><span class="pre">rose-${TYPE}.conf</span></code> file. The name of each optional configuration
+should follow the syntax <code class="docutils literal notranslate"><span class="pre">rose-${TYPE}-${KEY}.conf</span></code>, where <code class="docutils literal notranslate"><span class="pre">${KEY}</span></code> is a
+short name to describe the override functionality of the optional
+configuration file.</p>
+<p>A root level <code class="docutils literal notranslate"><span class="pre">opts=KEY</span> <span class="pre">...</span></code> setting in the main configuration will tell the
+run time program to load the relevant optional configurations in the <code class="docutils literal notranslate"><span class="pre">opt/</span></code>
+sub-directory at run time. Individual Rose utilities may also read optional
+configuration keys from environment variables and/or command line options.</p>
+<p>Where multiple <code class="docutils literal notranslate"><span class="pre">$KEY</span></code> settings are given, the optional configurations are
+applied in that order - for example, a setting:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">opts</span><span class="o">=</span><span class="s">ketchup mayonnaise</span>
+</pre></div>
+</div>
+<p>implies loading the optional configuration <code class="docutils literal notranslate"><span class="pre">rose-app-ketchup.conf</span></code> and then
+the optional configuration <code class="docutils literal notranslate"><span class="pre">rose-app-mayonnaise.conf</span></code>, which may override
+the previous one.</p>
+<p>By default, a Rose command will fail if an optional configuration file is
+missing. However, if you put the optional configuration key in brackets,
+then the optional configuration file is allowed to be missing. E.g.:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">opts</span><span class="o">=</span><span class="s">ketchup (mayonnaise)</span>
+</pre></div>
+</div>
+<p>In the above example, <code class="docutils literal notranslate"><span class="pre">rose-app-mayonnaise.conf</span></code> can be missing.</p>
+<p>Some Rose utilities (e.g. <a class="reference internal" href="../command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>,
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>, <a class="reference internal" href="../command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a>, etc) allow
+optional configurations to be selected at run time using:</p>
+<ol class="arabic simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">ROSE_APP_OPT_CONF_KEYS</span></code> Environment variables.</li>
+<li>The command line options <code class="docutils literal notranslate"><span class="pre">--opt-conf-key=KEY</span></code> or <code class="docutils literal notranslate"><span class="pre">-O</span> <span class="pre">KEY</span></code>.</li>
+</ol>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">See reference of individual commands for detail.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">By default optional configurations must exist else an error will
+be raised. To specify an optional configuration which may be missing write
+the name of the configuration inside parenthesis (e.g. <code class="docutils literal notranslate"><span class="pre">(foo)</span></code>).</p>
+</div>
+<div class="section" id="optional-configurations-and-metadata">
+<h3>Optional Configurations and Metadata<a class="headerlink" href="#optional-configurations-and-metadata" title="Permalink to this headline">¶</a></h3>
+<p>Metadata utilities such as <a class="reference internal" href="../command-reference.html#command-rose-app-upgrade"><span class="std std-ref">rose app-upgrade</span></a> and
+<a class="reference internal" href="../command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a> treat each
+main + optional configuration as a separate entity to be transformed,
+upgraded, or validated. Use cases with more than one optional configuration
+are not handled.</p>
+<p>When transforming or upgrading, each optional configuration is treated
+separately and re-created after the transform as a functional difference
+from the main upgraded configuration.</p>
+<p>The logic for transforming or upgrading a main configuration <code class="docutils literal notranslate"><span class="pre">C</span></code> with
+optional configurations <code class="docutils literal notranslate"><span class="pre">O1</span></code> and <code class="docutils literal notranslate"><span class="pre">O2</span></code> into a new main configuration <code class="docutils literal notranslate"><span class="pre">Ct</span></code>
+and new optional configurations <code class="docutils literal notranslate"><span class="pre">O1t</span></code> and <code class="docutils literal notranslate"><span class="pre">O2t</span></code> can be represented like
+this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>C =&gt; Ct
+C + O1 =&gt; C1t
+C + O2 =&gt; C2t
+O1t = C1t - Ct
+O2t = C2t - Ct
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="import-configuration">
+<h2>Import Configuration<a class="headerlink" href="#import-configuration" title="Permalink to this headline">¶</a></h2>
+<p>A root level <code class="docutils literal notranslate"><span class="pre">import=PATH1</span> <span class="pre">PATH2...</span></code> setting in the main configuration will
+tell Rose utilities to search for configurations at <code class="docutils literal notranslate"><span class="pre">PATH1</span></code>, <code class="docutils literal notranslate"><span class="pre">PATH2</span></code> (and
+so on) and inherit configuration and files from them if found.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">At the moment, use of this is only encouraged for configuration metadata.</p>
+</div>
+</div>
+<div class="section" id="re-define-configuration-at-run-time">
+<h2>Re-define Configuration at Run Time<a class="headerlink" href="#re-define-configuration-at-run-time" title="Permalink to this headline">¶</a></h2>
+<p>Some Rose utilities (e.g. <a class="reference internal" href="../command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>,
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>, <a class="reference internal" href="../command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a>, etc) allow you
+to re-define configuration settings at run time using the
+<code class="docutils literal notranslate"><span class="pre">--define=[SECTION]NAME=VALUE</span></code> or <code class="docutils literal notranslate"><span class="pre">-D</span> <span class="pre">[SECTION]NAME=VALUE</span></code> options on
+the command line. This would add new settings or override any settings
+defined in the main and optional configurations. E.g.:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set [env]FOO=foo, and [env]BAR=bar</span>
+<span class="c1"># (Overriding any original settings of [env]FOO or [env]BAR)</span>
+rose task-run -D <span class="s1">&#39;[env]FOO=foo&#39;</span> -D <span class="s1">&#39;[env]BAR=bar&#39;</span>
+
+<span class="c1"># Switch off [env]BAZ</span>
+rose task-run -D <span class="s1">&#39;[env]!BAZ=&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="file-creation.html" class="btn btn-neutral float-right" title="File Creation Mode" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="metadata.html" class="btn btn-neutral" title="Configuration Metadata" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright : British Crown Copyright 2012-8 Met Office. See Terms of Use. This document is released under the Open Government Licence.
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'2018.05.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+      <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../../_static/js/rtd-theme-extensions.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
