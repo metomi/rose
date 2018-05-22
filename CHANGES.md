@@ -8,7 +8,7 @@ for a full listing of issues for each release.
 ## Next Release (2018-Q2?)
 
 Rose release 54. This release is expected to be used with:
-* [cylc-7.6.1](https://github.com/cylc/cylc/releases/tag/7.6.1), and
+* [cylc-7.7.0](https://github.com/cylc/cylc/releases/tag/7.7.0), and
 * [fcm-2017.10.0](https://github.com/metomi/fcm/releases/tag/2017.10.0).
 
 ### Noteworthy Changes
@@ -18,6 +18,13 @@ Rose User Guide: overhaul.
 * New Cylc and Rose tutorial.
 * New API reference.
 * New style.
+
+[#2171](https://github.com/metomi/rose/pull/2171):
+rosie discovery clients now support Gnome libsecret for password caching.
+
+[#2167](https://github.com/metomi/rose/pull/2167):
+Rose Bush: file view: further limit on what can be served within a suite
+directory.
 
 [#2163](https://github.com/metomi/rose/pull/2163):
 rose suite-run: new option `--validate-suite-only` to validate suite only
