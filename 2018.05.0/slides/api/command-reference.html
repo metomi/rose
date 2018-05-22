@@ -37,6 +37,7 @@
     <script type="text/javascript" src="../_static/js/spoiler.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/rtd-theme-extensions.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
     <script type="text/javascript" src="../_static/common.js"></script>
     
     <script type="text/javascript" src="../_static/slides.js"></script>
@@ -909,6 +910,9 @@ if necessary.</dd>
 errors.</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--debug</span></code></dt>
 <dd>Run <code class="docutils literal notranslate"><span class="pre">make</span></code> with the –debug option.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--default-version=VERSION</span></code></dt>
+<dd>By default the current version is symlinked as the default version,
+provide an alternative version to override this.</dd>
 </dl>
 <p><strong>BUILD</strong></p>
 <p>The format(s) to build the documentation in - default html.
@@ -923,8 +927,8 @@ The most commonly used formats are:</p>
 <dt><code class="docutils literal notranslate"><span class="pre">latexpdf</span></code></dt>
 <dd>For building PDF documentation.</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">clean</span></code></dt>
-<dd>Removes all builds (rose make-docs clean &lt;build&gt; will force a
-complete re-build).</dd>
+<dd>Removes all built documentation for the current rose version.
+(use <code class="docutils literal notranslate"><span class="pre">rm</span> <span class="pre">-rf</span> <span class="pre">doc</span></code> to remove all documentation).</dd>
 </dl>
 <p><strong>DEVELOPMENT BUILDS</strong></p>
 <p>For development purposes use the following BUILDs:</p>

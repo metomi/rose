@@ -994,6 +994,9 @@ if necessary.</dd>
 errors.</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--debug</span></code></dt>
 <dd>Run <code class="docutils literal notranslate"><span class="pre">make</span></code> with the –debug option.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--default-version=VERSION</span></code></dt>
+<dd>By default the current version is symlinked as the default version,
+provide an alternative version to override this.</dd>
 </dl>
 <p><strong>BUILD</strong></p>
 <p>The format(s) to build the documentation in - default html.
@@ -1008,8 +1011,8 @@ The most commonly used formats are:</p>
 <dt><code class="docutils literal notranslate"><span class="pre">latexpdf</span></code></dt>
 <dd>For building PDF documentation.</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">clean</span></code></dt>
-<dd>Removes all builds (rose make-docs clean &lt;build&gt; will force a
-complete re-build).</dd>
+<dd>Removes all built documentation for the current rose version.
+(use <code class="docutils literal notranslate"><span class="pre">rm</span> <span class="pre">-rf</span> <span class="pre">doc</span></code> to remove all documentation).</dd>
 </dl>
 <p><strong>DEVELOPMENT BUILDS</strong></p>
 <p>For development purposes use the following BUILDs:</p>
@@ -2330,7 +2333,44 @@ e.g. <code class="docutils literal notranslate"><span class="pre">--user=~bob</s
 
   </div>
   
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2018.05.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
 
+        // path to a root file in the current version of the documentation
+        version_path = "../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2018.05.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/command-reference";
+    </script>
+  </div>
+</div>
 
   
 
@@ -2351,6 +2391,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">--user=~bob</s
       <script type="text/javascript" src="../_static/js/spoiler.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       <script type="text/javascript" src="../_static/js/rtd-theme-extensions.js"></script>
+      <script type="text/javascript" src="../_static/js/versioning.js"></script>
 
   
 
