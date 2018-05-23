@@ -5,7 +5,7 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2018-Q2?)
+## 2018.05.0 (2018-05-22)
 
 Rose release 54. This release is expected to be used with:
 * [cylc-7.7.0](https://github.com/cylc/cylc/releases/tag/7.7.0), and
