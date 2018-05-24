@@ -86,7 +86,7 @@ DOCS_DIR="${ROSE_HOME}/doc"
 # documentation output directory for this version
 BUILD_DIR="${DOCS_DIR}/${ROSE_VERSION}"
 # glob for documented rose versions
-DOC_VERSIONS=!(*.html|.git|doc|versions.json|"${DEFAULT_ALIAS}")
+DOC_VERSIONS=!(*.html|.git|doc|versions.json|"${DEFAULT_ALIAS}"|CHANGES.md|404.md|_config.yml)
 # glob for documentation formats within a rose version
 DOC_FORMATS=!(*.html|doctrees)
 
@@ -183,7 +183,7 @@ version_file () {
     for version in "${VERSIONS[@]}"; do
         # scrape filesystem to get list of formats this version is available in
         formats=( $(cd "${DOCS_DIR}/${version}"; echo $DOC_FORMATS) )
-        list="    \"${version}\": $(json_list ${formats})"
+        list="    \"${version}\": $(json_list ${formats[@]})"
         if [[ $version == "${VERSIONS[$(( ${#VERSIONS[@]} - 1 ))]}" ]]; then
             # JSON doesn't permit a comma after the last item in a collection
             echo "${list}"
@@ -291,8 +291,8 @@ if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINX_OPTS}; then
     html_redirect "${DEFAULT_ALIAS}/html/index.html" 'doc/index.html'
     html_redirect "html/index.html" "doc/${ROSE_VERSION}/index.html"
     # support legacy doc/rose.html url
-    mkdir 'doc/doc' || true
-    html_redirect "doc/${DEFAULT_ALIAS}/index.html" "doc/doc/rose.html"
+    mkdir 'doc/doc' 2>/dev/null || true
+    html_redirect "html/index.html" "doc/${ROSE_VERSION}/rose.html"
 else
     RET=1
 fi

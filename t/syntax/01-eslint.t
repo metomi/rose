@@ -27,7 +27,7 @@ tests 3
 
 TEST_KEY="${TEST_KEY_BASE}-docs"
 run_pass "${TEST_KEY}" eslint --env browser --env jquery --env es6 \
-    --parser-options=ecmaVersion:6 sphinx/_static/
+    --parser-options=ecmaVersion:6 sphinx/_static/js
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <'/dev/null'
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
 
