@@ -176,7 +176,6 @@ json_list () {
 version_file () {
     # output the dictionary {"version": ["build", ...]} in JSON format
     DOCS_DIR="$1"
-    DEFAULT_ALIAS="$2"
 
     echo '{'
     # scrape filesystem for list of rose versions which have built docs
@@ -281,7 +280,7 @@ if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINX_OPTS}; then
     # output file containing details of all versions and formats the
     # documentation has been built in (locally) for the version / format
     # switching pane
-    version_file "${DOCS_DIR}" "${DEFAULT_ALIAS}" > "${DOCS_DIR}/versions.json"
+    version_file "${DOCS_DIR}" > "${DOCS_DIR}/versions.json"
     # symlink this version as the default
     (
         cd "${DOCS_DIR}"
@@ -291,6 +290,9 @@ if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINX_OPTS}; then
     # symlink landing pages
     html_redirect "${DEFAULT_ALIAS}/html/index.html" 'doc/index.html'
     html_redirect "html/index.html" "doc/${ROSE_VERSION}/index.html"
+    # support legacy doc/rose.html url
+    mkdir 'doc/doc' || true
+    html_redirect "doc/${DEFAULT_ALIAS}/index.html" "doc/doc/rose.html"
 else
     RET=1
 fi
