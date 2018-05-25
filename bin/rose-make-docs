@@ -121,7 +121,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --strict)
-            SPHINX_OPTS='SPHINX_OPTS=-aEW'
+            SPHINX_OPTS='SPHINXOPTS=-aEW'
             shift
             ;;
         --debug)
