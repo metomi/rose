@@ -26,6 +26,7 @@ import sys
 import rose.config
 import rose.config_tree
 import rose.formats.namelist
+from rose.gtk import INTERACTIVE_ENABLED
 import rose.macro
 import rose.macros
 import rose.opt_parse
@@ -208,25 +209,19 @@ def _check_widget(value, module_files=None, meta_dir=None):
 
     Ignore if no DISPLAY in environment and GTK widget requires display.
     """
+    if not INTERACTIVE_ENABLED:
+        # gtk 2.0 not available, skip check.
+        return
+
     if module_files is None:
         module_files = _get_module_files(meta_dir)
     if not module_files:
         return
     widget_name = value.split()[0]
     try:
-        import pygtk
-        pygtk.require('2.0')
-    except ImportError:
-        # gtk 2.0 not available, skip check.
-        return
-    try:
         widget = rose.resource.import_object(
             widget_name, module_files, _import_err_handler)
     except Exception as exc:
-        # Ignore if there is no display for GTK widget
-        if (isinstance(exc, RuntimeError) and not os.getenv('DISPLAY') and
-                exc.args == ('could not open display',)):
-            return
         return INVALID_IMPORT.format(widget_name, type(exc).__name__, exc)
     if widget is None:
         return INVALID_OBJECT.format(value)
