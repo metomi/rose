@@ -1255,8 +1255,9 @@ would be evaluated as:
    'b' == 'c'
 
 Should you wish to make use of the array length in an expression you can
-make use of the ``len`` function, which behaves in the same manner as its
-Python and Fortran equivalents to return the array length. For example:
+make use of the ``len`` function, which behaves in the same manner as the
+Python ``len`` and Fortran ``size`` equivalents to return the array length.
+For example:
 
 .. code-block:: none
 
