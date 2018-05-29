@@ -148,11 +148,14 @@ class ResourceLocator(object):
             return os.path.basename(sys.argv[0])
 
     def get_version(self, ignore_environment=False):
-        """Return ROSE_VERSION.
+        """return the current rose_version number.
+
+        By default pass through the value of the ``ROSE_VERSION`` environment
+        variable.
 
         Args:
-            ignore_environment (bool): Ignore the value of the ROSE_VERSION
-                environment variable if present.
+            ignore_environment (bool): Return the value extracted from the
+                ``rose-version`` file.
         """
         version = None
         if not ignore_environment:
