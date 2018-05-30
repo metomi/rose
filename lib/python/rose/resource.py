@@ -147,10 +147,20 @@ class ResourceLocator(object):
         except KeyError:
             return os.path.basename(sys.argv[0])
 
-    def get_version(self):
-        """Return ROSE_VERSION."""
-        version = os.getenv("ROSE_VERSION")
-        if version is None:
+    def get_version(self, ignore_environment=False):
+        """return the current rose_version number.
+
+        By default pass through the value of the ``ROSE_VERSION`` environment
+        variable.
+
+        Args:
+            ignore_environment (bool): Return the value extracted from the
+                ``rose-version`` file.
+        """
+        version = None
+        if not ignore_environment:
+            version = os.getenv("ROSE_VERSION")
+        if not version:
             for line in open(self.get_util_home("rose-version")):
                 if line.startswith("ROSE_VERSION="):
                     value = line.replace("ROSE_VERSION=", "")

@@ -1,0 +1,81 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-8 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+set -eu
+shopt -s extglob
+
+cd "$(dirname "$BASH_SOURCE")/../"
+
+REMOTE='origin'
+TEMP_DOCS_LABEL='doc-build-dir'
+DOCUMENTATION_FILES=!(doc|404.md|CHANGES.md|"$TEMP_DOCS_LABEL"|_config.yml)
+
+. ./rose-version
+if [[ -z $ROSE_VERSION ]]; then
+    exit 1
+fi
+
+initial_deployment () {  # Create a new gh-pages branch from scratch.
+    # start with a blank doc directory
+    git clean -xf doc
+
+    # build the documentation
+    rose make-docs html slides
+
+    # create the gh-pages branch
+    git branch -D gh-pages || true
+    git checkout --orphan gh-pages
+
+    # move docs to the top level and delete everything else
+    git rm -rf $DOCUMENTATION_FILES     # remove tracked files
+    git clean -xf $DOCUMENTATION_FILES  # remove untracked files
+    mv doc "$TEMP_DOCS_LABEL"  # permit the alias "doc"
+    mv "$TEMP_DOCS_LABEL"/* .
+    git clean -xf "$TEMP_DOCS_LABEL"
+    git add * -f
+
+    # commit and push
+    git commit -m "${ROSE_VERSION}"
+    # git push "${REMOTE}" gh-pages
+}
+
+
+subsequent_deployment () {  # Add new version to documentation.
+    # update gh-pages branch
+    git pull "${REMOTE}" gh-pages -f
+    git clean -xf doc
+
+    # copy gh-pahes branch to a temporary directory
+    TMP_DOCS_DIR="$(mktemp -d)"
+    git archive 'gh-pages' | (cd "${TMP_DOCS_DIR}" && tar -xf -)
+
+    # append new documentation to the temporary directory
+    ln -s "$TMP_DOCS_DIR" doc
+    rose make-docs html slides
+
+    # apply changes to gh-pages branch
+    git checkout gh-pages
+    rsync -av "${TMP_DOCS_DIR}/" .  # NOTE: the trailing slash is required
+    rm -rf "${TMP_DOCS_DIR}"
+    git add * -f
+
+    # commit and push
+    git commit -m "${ROSE_VERSION}"
+    # git push "${REMOTE}" gh-pages
+}

@@ -31,23 +31,26 @@ sys.path.append(os.path.abspath('ext'))
 
 # Register extensions.
 extensions = [
+    # sphinx built-in extensions
     'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
+    'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
     'sphinx.ext.mathjax',
-    'minicylc',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
+    # sphinx user community extensions
+    'hieroglyph',
+    'sphinxcontrib.httpdomain',
+    # custom project extensions (located in ext/)
+    'auto_cli_doc',
     'cylc_lang',
+    'minicylc',
+    'practical',
     'rose_lang',
     'rose_domain',
-    'sub_lang',
-    'practical',
-    'auto_cli_doc',
     'script_include',
-    'sphinxcontrib.httpdomain',
-    'hieroglyph'
+    'sub_lang'
 ]
 
 # Slide (hieroglyph) settings.
@@ -78,9 +81,9 @@ copyright = (': British Crown Copyright 2012-8 Met Office. See Terms of Use. '
 
 # The full version for the project you're documenting, acts as replacement for
 # |version|.
-release = ResourceLocator().get_version()
+release = ResourceLocator().get_version(ignore_environment=True)
 # The short X.Y version, acts as replacement for |release|.
-version = release.split('-')[0]
+version = release
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
