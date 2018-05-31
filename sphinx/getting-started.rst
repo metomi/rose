@@ -97,8 +97,7 @@ See the "Installation" and "User Config File" sections of the
 
 .. warning::
 
-   DO NOT modify the following Cylc settings as they are incompatible with
-   Rose:
+   Do not modify the default values of the following cylc settings:
    
    * ``[hosts][HOST]run directory``
    * ``[hosts][HOST]work directory``
