@@ -111,8 +111,8 @@ htmlhelp_basename = 'rose-doc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-    'papersize': 'a4paper'
-    # 'preamble': '',  # Additional stuff for the LaTeX preamble.
+    'papersize': 'a4paper',
+    'maxlistdepth': 10  # Prevent "Too Deeply Nested" errors.
 }
 
 # (source start file, target name, title,
