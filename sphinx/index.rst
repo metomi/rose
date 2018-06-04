@@ -40,9 +40,10 @@ applications. :ref:`What Is Cylc? <Cylc-introduction>`
 .. toctree::
    :caption: User Guide
    :name: tutorial-toc
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation
+   getting-started
    tutorial/cylc/index
    tutorial/rose/index
    cheat-sheet
