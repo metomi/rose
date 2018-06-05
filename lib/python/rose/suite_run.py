@@ -24,6 +24,7 @@ from datetime import datetime
 from fnmatch import fnmatchcase
 from glob import glob
 import os
+import pipes
 from rose.config import ConfigDumper, ConfigLoader, ConfigNode
 from rose.env import env_var_process
 from rose.host_select import HostSelector
@@ -398,7 +399,7 @@ class SuiteRunner(Runner):
                 value = self._run_conf(key, host=host, conf_tree=conf_tree)
                 if value is not None:
                     val = self.popen.list_to_shell_str([str(value)])
-                    shcommand += ",%s=%s" % (key, val)
+                    shcommand += ",%s=%s" % (key, pipes.quote(val))
                     locs_conf.set([auth, key], value)
             command.append(shcommand)
             proc = self.popen.run_bg(*command)
