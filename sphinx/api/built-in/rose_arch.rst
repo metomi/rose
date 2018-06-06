@@ -35,7 +35,6 @@ Invocation
 In automatic selection mode, this built-in application will be invoked
 automatically if a task has a name that starts with ``rose_arch*``.
 
-
 Example
 -------
 
@@ -51,8 +50,13 @@ Example
    [arch:world.out]
    source=hello/world.out
 
-   # Auto gzip
+   # Auto gzip (compression inferred from target extension)
+   [arch:planet.gz]
+   source=hello/planet.out
+
+   # Manual gzip (rose does not recognise the .out.gz extension)
    [arch:planet.out.gz]
+   compress=gz
    source=hello/planet.out
 
    # Archive files matched by a glob to a directory
@@ -94,8 +98,6 @@ Example
    rename-format=hello/%(cycle)s-%(name_head)s%(name_tail)s
    rename-parser=^(?P<name_head>stuff)ing(?P<name_tail>-.*)$
    source=stuffing-*.txt
-
-   # ...
 
 
 Output
