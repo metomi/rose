@@ -110,3 +110,22 @@
     font-style: italic;
     color: #808080;
 }
+
+/* Block an element from being included in text selections. */
+.noselect {
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+/* Extension to Pygments to insert the "added" and "unchanged" characters in
+ * a "diff" code block using CSS so that they aren't included when coppied as
+ * text. */
+.highlight-diff .gi:before {
+    content: '+';
+}
+.highlight-diff .gn:before {
+    content: ' ';
+}
