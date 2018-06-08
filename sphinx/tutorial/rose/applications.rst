@@ -177,12 +177,10 @@ An application can be run using the :ref:`command-rose-app-run` command:
       application directory.
 
       Copy the ``forecast`` script and ``util.py`` library into the ``bin/``
-      directory by running::
+      directory where they will be automatically added to the ``PATH`` when
+      the application is run::
 
          rose tutorial forecast-script bin
-
-      These files will be automatically added to the ``PATH`` when the
-      application is run.
 
       Copy the HTML template into the ``file/`` directory by running::
 

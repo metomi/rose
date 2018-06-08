@@ -21,7 +21,7 @@
 #     rose config-edit
 #
 # SYNOPSIS
-#     rose-config-edit [OPTIONS]... [PAGE_PATH]...
+#     rose config-edit [OPTIONS]... [PAGE_PATH]...
 #
 # DESCRIPTION
 #     Launch the GTK+ GUI to edit a suite or application configuration.

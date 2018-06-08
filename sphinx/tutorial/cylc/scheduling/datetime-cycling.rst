@@ -145,12 +145,19 @@ Inferred Recurrence
    front. For example, if the year is omitted then the recurrence can be
    inferred to be annual. E.G:
 
-* ``01-01T00``: every year on the 1st of January.
-* ``01T00``: every month on the first of the month.
-* ``T00``: every day at midnight.
-* ``T-00``: every hour at zero minutes past (every hour on the hour).
-  *Note that the* ``-`` *character takes the place of the hour digits*
-  *as we may not omit components after the* ``T`` *character.*
+.. code-block:: sub
+
+   2000-01-01T00   # Datetime - midnight on the 1st of January 2000.
+
+        01-01T00   # Every year on the 1st of January.
+           01T00   # Every month on the first of the month.
+             T00   # Every day at midnight.
+             T-00  # Every hour at zero minutes past (every hour on the hour).
+
+.. note::
+
+   To omit hours from a date time we must place a ``-`` after the
+   ``T`` character.
 
 Recurrence Formats
 ^^^^^^^^^^^^^^^^^^
