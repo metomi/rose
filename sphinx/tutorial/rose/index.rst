@@ -3,7 +3,11 @@
 Rose Tutorial
 =============
 
-Rose is a system for creating, editing and running Rose configurations.
+Rose is a system for writing, editing and running application configurations.
+
+.. image:: ../../img/rose-logo.png
+   :width: 250px
+   :align: center
 
 Rose also contains other optional tools for:
 
@@ -15,7 +19,7 @@ Rose also contains other optional tools for:
 
 .. toctree::
    :caption: Contents
-   :maxdepth: 2
+   :maxdepth: 1
 
    configurations
    applications
