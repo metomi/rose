@@ -3,7 +3,7 @@
 Rose Tutorial
 =============
 
-Rose is a system for writing, editing and running application configurations.
+Rose is a toolkit for writing, editing and running application configurations.
 
 .. image:: ../../img/rose-logo.png
    :width: 250px
