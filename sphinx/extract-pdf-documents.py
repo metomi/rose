@@ -24,6 +24,7 @@
 
 """
 
+import errno
 import os
 import shutil
 import sys
@@ -37,7 +38,15 @@ except IndexError:
     sys.exit('usage: extract-pdf-documents BUILD_DIR')
 LATEX_DIR = os.path.join(BUILD_DIR, 'latex')
 PDF_DIR = os.path.join(BUILD_DIR, 'pdf')
-os.mkdir(PDF_DIR)
+try:
+    os.mkdir(PDF_DIR)
+except OSError as exc:
+    if exc.errno == errno.EEXIST:
+        # directory exists -> no further action required
+        pass
+    else:
+        # meaningful os error -> raise
+        raise
 
 # the index html file
 html = (
