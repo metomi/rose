@@ -261,6 +261,37 @@ def namespace_from_tokens(tokens):
     return ret
 
 
+TOKEN_ORDER = [
+    ('rose:file', 'rose:file'),
+    ('rose:app', 'rose:app'),
+    ('rose:conf-section', 'rose:conf'),
+    ('rose:conf', 'rose:conf')
+]
+
+def tokens_from_ref_context(ref_context):
+    """Extract a list of tokens from a ref_context dictionary.
+
+    Examples:
+        >>> tokens_from_ref_context({'rose:conf-section': '[bar]',
+        ...                          'rose:conf': 'baz',
+        ...                          'rose:file': 'foo'})
+        [('rose:file', 'foo'), ('rose:conf', '[bar]'), ('rose:conf', 'baz')]
+        >>> tokens_from_ref_context({'rose:conf-section': '[bar]',
+        ...                          'rose:conf': 'baz',
+        ...                          'rose:app': 'foo'})
+        [('rose:app', 'foo'), ('rose:conf', '[bar]'), ('rose:conf', 'baz')]
+    """
+    # Generate context namespace from ref_context.
+    ret = [(v, ref_context[k]) for k, v in TOKEN_ORDER if k in ref_context]
+    # Remove any duplicate items (happens for conf-sections where you
+    # may get {'rose:conf-section': '[foo]', 'rose:conf': '[foo]'}.
+    last = None
+    for item in list(ret):
+        if last is not None and item == last:
+            ret.remove(item)
+        last = item
+    return ret
+
 class RoseDirective(ObjectDescription):
     """Base class for implementing Rose objects.
 
@@ -627,8 +658,10 @@ class RoseXRefRole(XRefRole):
     This should be minimal."""
 
     def process_link(self, env, refnode, has_explicit_title, title, target):
-        if not has_explicit_title:
-            pass
+        # copy ref_context to the refnode so that we can access it in
+        # resolve_xref. Note that walking through the node tree to extract
+        # ref_context items appears only to work in the HTML buider.
+        refnode['ref_context'] = dict(env.ref_context)
         return title, target
 
 
@@ -706,24 +739,6 @@ class RoseDomain(Domain):
         for refname, (docname, type_) in list(self.data['objects'].items()):
             yield refname, refname, type_, docname, refname, 1
 
-    @staticmethod
-    def get_context_namespace(node):
-        """Extract the namespace from a content node.
-
-        Walks up the node hierarchy from the current node collecting
-        ref_context information as it does. See ``RoseDirective.run`` for
-        information on how this context comes to reside in the node.
-        """
-        context_namespace = []
-        while hasattr(node, 'parent'):
-            if hasattr(node, 'ref_context'):
-                # Each ref_context dict should contain only one entry (for
-                # now).
-                context_namespace.append(node.ref_context.items()[0])
-            node = node.parent
-        context_namespace.reverse()
-        return context_namespace
-
     def resolve_xref(self, env, fromdocname, builder, typ, target, node,
                      contnode):
         """Associate a reference with a documented object.
@@ -770,7 +785,7 @@ class RoseDomain(Domain):
                 namespace = 'rose:%s:%s' % (typ, target)
             else:
                 # Target is not a root config - path is relative.
-                context_namespace = self.get_context_namespace(node)
+                context_namespace = tokens_from_ref_context(node['ref_context'])
                 if not context_namespace:
                     LOGGER.warning(
                         'Relative reference requires local context ' +
