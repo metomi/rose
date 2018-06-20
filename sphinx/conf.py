@@ -120,6 +120,10 @@ latex_elements = {
 latex_documents = [
     ('index', 'rose-documentation.tex', 'Rose Documentation',
      'Metomi', 'manual'),
+    ('tutorial/cylc/index', 'cylc-tutorial.tex', 'Cylc Tutorial',
+     'Metomi', 'manual'),
+    ('tutorial/rose/index', 'rose-tutorial.tex', 'Rose Tutorial',
+     'Metomi', 'manual'),
 ]
 latex_logo = 'img/rose-logo.png'
 # If true, show page references after internal links.
