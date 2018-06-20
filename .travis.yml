@@ -41,4 +41,4 @@ jobs:
             (echo -e "\n\nRerunning Failed Tests...\n\n";
             rose test-battery -v --state=save,failed -j 5)
         - script: >
-            rose make-docs --venv --dev --strict clean linkcheck doctest html slides
+            rose make-docs --venv --dev --strict clean linkcheck doctest html slides latexpdf
