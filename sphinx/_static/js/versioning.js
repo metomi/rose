@@ -31,7 +31,7 @@ $(document).ready(function() {
                        '/';
                 if (['html', 'slides'].indexOf(builder_for_version) >= 0) {
                     // format has compatible document structure
-                    href += current_page_name;
+                    href += current_page_name + '.html';
                 } else {
                     // structure different, link to the index.html page
                     href += 'index.html';
