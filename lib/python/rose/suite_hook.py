@@ -73,7 +73,9 @@ class RoseSuiteHook(object):
         # Send email notification if required
         email_exc = None
         if should_mail:
-            text = ""
+            text = (
+                "OBSOLETE: rose suite-hook will be REMOVED in due course.\n"
+                "Use cylc's built-in event mail functionality instead.\n\n")
             if task_id:
                 text += "Task: %s\n" % task_id
             if hook_message:
