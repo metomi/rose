@@ -36,6 +36,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
+    'sphinx.ext.imgconverter',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
@@ -110,8 +111,8 @@ htmlhelp_basename = 'rose-doc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-    'papersize': 'a4paper'
-    # 'preamble': '',  # Additional stuff for the LaTeX preamble.
+    'papersize': 'a4paper',
+    'maxlistdepth': 10  # Prevent "Too Deeply Nested" errors.
 }
 
 # (source start file, target name, title,
@@ -119,8 +120,12 @@ latex_elements = {
 latex_documents = [
     ('index', 'rose-documentation.tex', 'Rose Documentation',
      'Metomi', 'manual'),
+    ('tutorial/cylc/index', 'cylc-tutorial.tex', 'Cylc Tutorial',
+     'Metomi', 'manual'),
+    ('tutorial/rose/index', 'rose-tutorial.tex', 'Rose Tutorial',
+     'Metomi', 'manual'),
 ]
-# latex_logo = None
+latex_logo = 'img/rose-logo.png'
 # If true, show page references after internal links.
 latex_show_pagerefs = True
 # If true, show URL addresses after external links.

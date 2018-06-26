@@ -25,12 +25,22 @@ $(document).ready(function() {
             // construct format selector
             var bui = ele.append($('<dl />'));
             $(bui).append($('<dt />').append('Formats'));
+            var href;
             for (let builder_for_version of versions[current_version].sort()) {
+                href = root_dir + current_version + '/' + builder_for_version +
+                       '/';
+                if (['html', 'slides'].indexOf(builder_for_version) >= 0) {
+                    // format has compatible document structure
+                    href += current_page_name + '.html';
+                } else {
+                    // structure different, link to the index.html page
+                    href += 'index.html';
+                }
+
+
                 $(bui).append($('<dd />')
                     .append($('<a />')
-                        .attr({'href': root_dir + current_version + '/' +
-                                       builder_for_version + '/' +
-                                       current_page_name})
+                        .attr({'href': href})
                         .append(builder_for_version)
                     )
                 );
