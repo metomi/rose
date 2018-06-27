@@ -5,6 +5,29 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2018.06.0 (2018-06-27)
+
+Rose release 55. This release is expected to be used with:
+* [cylc-7.7.1](https://github.com/cylc/cylc/releases/tag/7.7.1), and
+* [fcm-2017.10.0](https://github.com/metomi/fcm/releases/tag/2017.10.0).
+
+### Noteworthy Changes
+
+[#2201](https://github.com/metomi/rose/pull/2201),
+[#2200](https://github.com/metomi/rose/pull/2200),
+[#2199](https://github.com/metomi/rose/pull/2199),
+[#2196](https://github.com/metomi/rose/pull/2196),
+[#2195](https://github.com/metomi/rose/pull/2195),
+[#2193](https://github.com/metomi/rose/pull/2193),
+[#2191](https://github.com/metomi/rose/pull/2191),
+[#2190](https://github.com/metomi/rose/pull/2190):
+Rose User Guide: misc fixes and improvements.
+
+[#2194](https://github.com/metomi/rose/pull/2194):
+rose suite-run: improve handling of `root-dir` settings on remote machine.
+
+--------------------------------------------------------------------------------
+
 ## 2018.05.0 (2018-05-22)
 
 Rose release 54. This release is expected to be used with:
