@@ -1,0 +1,156 @@
+#!/bin/bash
+
+set -eu
+set -o xtrace  # for ease of debugging travis builds
+shopt -s extglob
+
+
+export PATH="${PWD}/bin:${HOME}/fcm-master/bin:${HOME}/cylc-master/bin:$PATH"
+
+TMP_DOCS_DIR="${TMPDIR:-/var/tmp}/temp-docs-dir"
+DOCUMENTATION_FILES=!(doc|404*|CHANGES.md|_config.yml)
+GITHUB_REPO="https://github.com/${TRAVIS_REPO_SLUG}"
+
+
+install() {
+    args=("$@")
+
+    # package managers
+    sudo apt-get -q update
+    sudo apt-get install -qy python-pip
+
+    # Cylc
+    if grep 'cylc' <<< "${args[@]}"; then
+        # install Cylc
+        wget 'https://github.com/cylc/cylc/archive/master.tar.gz' -O \
+            '/tmp/cylc-master.tar.gz'
+        tar -xvf '/tmp/cylc-master.tar.gz' -C "${HOME}"
+        make -C "${HOME}/cylc-master" 'version'
+
+        # install Cylc dependencies
+        sudo apt-get -qy install at python-jinja2 heirloom-mailx
+        pip install -q pyopenssl cherrypy requests Jinja2
+
+        # configure SSH
+        ssh-keygen -t 'rsa' -f "${HOME}/.ssh/id_rsa" -N '' -q
+        cat "${HOME}/.ssh/id_rsa.pub" >>"${HOME}/.ssh/authorized_keys"
+        ssh-keyscan -t 'rsa' 'localhost' >>"${HOME}/.ssh/known_hosts"
+    fi
+
+    # FCM
+    if grep 'fcm' <<< "${args[@]}"; then
+        # install Subversion
+        sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
+            `lsb_release -cs` \
+            svn19" >> /etc/apt/sources.list.d/subversion19.list'
+        sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- | \
+            sudo apt-key add -
+        sudo apt-get -qy install subversion
+
+        # install FCM
+        wget 'https://github.com/metomi/fcm/archive/master.tar.gz' -O \
+            '/tmp/fcm-master.tar.gz'
+        tar -xvf '/tmp/fcm-master.tar.gz' -C "${HOME}"
+
+        # install FCM dependencies
+        sudo apt-get -qy install build-essential gfortran libxml-parser-perl \
+            libconfig-inifiles-perl libdbi-perl libdbd-sqlite3-perl
+    fi
+
+    # Rose - full installation + testing dependencies
+    if grep 'rose' <<< "${args[@]}"; then
+        sudo apt-get -qy install python-jinja2 python-sqlalchemy pcregrep
+        pip install -q cherrypy requests sqlalchemy pycodestyle Jinja2
+    fi
+
+    # Graphviz
+    if grep -E '(rose|cylc|docs)' <<< "${args[@]}"; then
+        sudo apt-get install -qy python-dev graphviz libgraphviz-dev
+        pip install -q pygraphviz \
+            --install-option="--include-path=/usr/include/graphviz" \
+            --install-option="--library-path=/usr/lib/graphviz/"
+    fi
+
+    # LaTeX
+    if grep 'docs' <<< "${args[@]}"; then
+        # NOTE: Rose installs its own Python dependencies in a virtualenv via
+        # the `rose make-docs` command.
+
+        # non-Python dependencies for building PDF documentation
+        sudo apt-get -qy install latexmk texlive texlive-generic-extra \
+            texlive-latex-extra texlive-fonts-recommended
+    fi
+}
+
+test-battery () {
+    # run the standard rose test battery
+    rose test-battery --state=save -j 5 || (
+        echo -e "\n\nRerunning Failed Tests...\n\n"
+        rose test-battery -v --state=save,failed -j 5
+    )
+}
+
+test-docs () {
+    # run rose documentation tests
+    rose make-docs --venv --dev --strict clean linkcheck doctest \
+        --default-version none
+    git clean -xf .
+}
+
+prepare-docs-branch () {
+    # prepare to build documentation on top of the upstream/gh-pages branch
+
+    # symlink doc/ to a temporary directory to build the docs in
+    mkdir "$TMP_DOCS_DIR"
+    rm -rf 'doc' || true
+    ln -s "$TMP_DOCS_DIR" 'doc'
+
+    # archive the upstream/gh-pages branch to the temporary directory
+    git remote add upstream "${GITHUB_REPO}.git"
+    git fetch upstream gh-pages
+    git archive 'upstream/gh-pages' | (cd "${TMP_DOCS_DIR}"; tar -xf '-')
+}
+
+build-docs () {
+    # build the rose documentation in the standard output formats
+
+    # if we are not building the most recent tag then leave the default
+    # docs version (symlinked from the web root) unchanged
+    LATEST_TAG="$(git ls-remote --tags "${GITHUB_REPO}" | \
+        awk '{print $2}' | \
+        grep -E 'refs/tags/[^\{\}]+$' | \
+        cut -d '/' -f 3 | \
+        sort | \
+        tail -n 1)"
+    if [[ "${LATEST_TAG}" != "${TRAVIS_TAG}" ]]; then
+        DEFAULT_VERSION="--default-version none"
+    fi
+
+    # build the documentation
+    if ! rose make-docs --venv --dev --strict clean html slides pdf \
+            ${DEFAULT_VERSION:-} >out 2>&1; then
+        # output is a bit long, only output it if the docs fail to build
+        cat out
+        exit 1
+    fi
+
+    # remove left-overs including any doctrees created by Sphinx
+    rm -rf 'doc/'*'/doctrees'
+    git clean -xf $DOCUMENTATION_FILES
+}
+
+deploy-docs () {
+    # produce a gh-pages branch ready for docs deployment
+    git checkout -B 'gh-pages' 'upstream/gh-pages'
+    rsync -aqv "${TMP_DOCS_DIR}/" .
+    git add -f ./*
+    git commit -q -m "${TRAVIS_TAG}"
+
+    # push gh-pages branch to GitHub where it will be auto-deployed to ghpages
+    set +o xtrace  # prevent leakage of the GH_TOKEN env var
+    git push "https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git" \
+        'gh-pages' 2>&1 | sed "s/$GH_TOKEN/\$GH_TOKEN/g"
+}
+
+
+"$@"

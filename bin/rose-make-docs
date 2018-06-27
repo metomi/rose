@@ -40,6 +40,7 @@
 #     --default-version=VERSION
 #         By default the current version is symlinked as the default version,
 #         provide an alternative version to override this.
+#         If set to 'none' then the default version will remain unchanged.
 #
 # BUILD
 #     The format(s) to build the documentation in - default html.
@@ -282,11 +283,13 @@ if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINX_OPTS}; then
     # switching pane
     version_file "${DOCS_DIR}" > "${DOCS_DIR}/versions.json"
     # symlink this version as the default
-    (
-        cd "${DOCS_DIR}"
-        rm "${DEFAULT_ALIAS}" 2>/dev/null || true
-        ln -s "${DEFAULT_VERSION:-$ROSE_VERSION}" "${DEFAULT_ALIAS}"
-    )
+    if [[ "${DEFAULT_VERSION}" != 'none' ]]; then
+        (
+            cd "${DOCS_DIR}"
+            rm "${DEFAULT_ALIAS}" 2>/dev/null || true
+            ln -s "${DEFAULT_VERSION:-$ROSE_VERSION}" "${DEFAULT_ALIAS}"
+        )
+    fi
     # symlink landing pages
     html_redirect "${DEFAULT_ALIAS}/html/index.html" 'doc/index.html'
     html_redirect "html/index.html" "doc/${ROSE_VERSION}/index.html"
