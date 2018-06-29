@@ -597,7 +597,7 @@ Recurrence Sections
                             baz => qux
                             baz[-P1] => foo  # (2)
                         """
-                    [[[+P2/P2]]]
+                    [[[2/P2]]]
                         graph = """
                             qux[-P1] => foo  # (3)
                         """
