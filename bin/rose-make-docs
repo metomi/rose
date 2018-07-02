@@ -86,7 +86,6 @@ DOCS_DIR="${ROSE_HOME}/doc"
 # documentation output directory for this version
 BUILD_DIR="${DOCS_DIR}/${ROSE_VERSION}"
 # glob for documented rose versions
-DOC_VERSIONS=!(*.html|.git|doc|versions.json|"${DEFAULT_ALIAS}"|CHANGES.md|404.md|_config.yml)
 # glob for documentation formats within a rose version
 DOC_FORMATS=!(*.html|doctrees)
 
@@ -142,6 +141,7 @@ done
 if [[ -z "${BUILDS}" ]]; then
     BUILDS='html'
 fi
+DOC_VERSIONS=!(*.html|doc|versions.json|"${DEFAULT_ALIAS}"|CHANGES.md|404.md|_config.yml)
 
 
 venv-activate () {

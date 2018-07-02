@@ -16,7 +16,7 @@ $(document).ready(function() {
                     .append($('<a />')
                         .attr({'href': root_dir + version + '/' +
                                        current_builder + '/' +
-                                       current_page_name})
+                                       current_page_name + '.html'})
                         .append(version)
                     )
                 );
