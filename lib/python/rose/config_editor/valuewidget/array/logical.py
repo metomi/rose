@@ -43,11 +43,19 @@ class LogicalArrayValueWidget(gtk.HBox):
         self.max_length = metadata[rose.META_PROP_LENGTH]
         value_array = rose.variable.array_split(value)
         if metadata.get(rose.META_PROP_TYPE) == "boolean":
+            # boolean -> true/false
             self.allowed_values = [rose.TYPE_BOOLEAN_VALUE_FALSE,
                                    rose.TYPE_BOOLEAN_VALUE_TRUE]
             self.label_dict = dict(zip(self.allowed_values,
                                        self.allowed_values))
+        elif metadata.get(rose.META_PROP_TYPE) == "python_boolean":
+            # python_boolean -> True/False
+            self.allowed_values = [rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
+                                   rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE]
+            self.label_dict = dict(zip(self.allowed_values,
+                                       self.allowed_values))
         else:
+            # logical -> .true./.false.
             self.allowed_values = [rose.TYPE_LOGICAL_VALUE_FALSE,
                                    rose.TYPE_LOGICAL_VALUE_TRUE]
             self.label_dict = {
@@ -55,6 +63,7 @@ class LogicalArrayValueWidget(gtk.HBox):
                 rose.TYPE_LOGICAL_FALSE_TITLE,
                 rose.TYPE_LOGICAL_VALUE_TRUE:
                 rose.TYPE_LOGICAL_TRUE_TITLE}
+
 
         imgs = [(gtk.STOCK_MEDIA_STOP, gtk.ICON_SIZE_MENU),
                 (gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)]
