@@ -37,6 +37,10 @@ import text
 import valuehints
 
 
+NON_TEXT_TYPES = ('boolean', 'integer', 'logical', 'python_boolean',
+                  'python_list', 'real', 'spaced_list')
+
+
 class ValueWidgetHook(object):
 
     """Provides hook functions for valuewidgets."""
@@ -64,33 +68,48 @@ class ValueWidgetHook(object):
 
 
 def chooser(value, metadata, error):
-    """Select an appropriate widget class based on the arguments."""
+    """Select an appropriate widget class based on the arguments.
+
+    Note: rose edit overrides this logic if a widget is hard coded.
+
+    """
     m_type = metadata.get(rose.META_PROP_TYPE)
     m_values = metadata.get(rose.META_PROP_VALUES)
     m_length = metadata.get(rose.META_PROP_LENGTH)
     m_hint = metadata.get(rose.META_PROP_VALUE_HINTS)
-    if not (m_values is not None and m_length is None):
-        if rose.env.contains_env_var(value):
-            return text.RawValueWidget
-    if (m_type is None and m_values is None and m_length is None and
-            m_hint is None):
-        if value and "\n" in value:
+    contains_env = rose.env.contains_env_var(value)
+    is_list = m_length is not None or isinstance(m_type, list)
+
+    # determine widget by presence of environment variables
+    if contains_env and (not m_type or m_type in NON_TEXT_TYPES or is_list):
+        # it is not safe to display the widget as intended due to an env var
+        if '\n' in value:
             return text.TextMultilineValueWidget
-        return text.RawValueWidget
-    if (m_values is None and m_length is None and m_hint is None and
-       m_type in ['logical', 'boolean', 'python_boolean']):
-        return booltoggle.BoolToggleValueWidget
-    if m_length is None:
-        if rose.env.contains_env_var(value) and value not in m_values:
+        else:
             return text.RawValueWidget
-        if m_values is not None and len(m_values) <= 4:
-            return radiobuttons.RadioButtonsValueWidget
-        if m_values is not None and len(m_values) > 4:
-            return combobox.ComboBoxValueWidget
-    elif not isinstance(m_type, list):
-        if m_type in ['logical', 'boolean']:
+
+    # determine widget by metadata length
+    if is_list:
+        if isinstance(m_type, list):
+            # irregular array
+            return array.mixed.MixedArrayValueWidget
+        elif m_type in ['logical', 'boolean', 'python_boolean']:
+            # regular array (boolean)
             return array.logical.LogicalArrayValueWidget
-        return array.entry.EntryArrayValueWidget
+        else:
+            # regular array (generic)
+            return array.entry.EntryArrayValueWidget
+
+    # determine widget by metadata values
+    if m_values is not None:
+        if len(m_values) <= 4:
+            # short list
+            return radiobuttons.RadioButtonsValueWidget
+        else:
+            # long list
+            return combobox.ComboBoxValueWidget
+
+    # determine widget by metadata type
     if m_type == 'integer':
         return intspin.IntSpinButtonValueWidget
     if m_type == 'meta':
@@ -103,8 +122,15 @@ def chooser(value, metadata, error):
         return array.python_list.PythonListValueWidget
     if m_type == "spaced_list" and not error:
         return array.spaced_list.SpacedListValueWidget
-    if isinstance(m_type, list):
-        return array.mixed.MixedArrayValueWidget
+    if m_type in ['logical', 'boolean', 'python_boolean']:
+        return booltoggle.BoolToggleValueWidget
+
+    # determine widget by metadata hint
     if m_hint is not None:
         return valuehints.HintsValueWidget
-    return text.RawValueWidget
+
+    # fall back to a text widget
+    if '\n' in value:
+        return text.TextMultilineValueWidget
+    else:
+        return text.RawValueWidget
