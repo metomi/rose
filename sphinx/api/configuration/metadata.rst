@@ -297,6 +297,11 @@ The metadata options for a configuration fall into four categories:
 
            *usage*: only in derived types
 
+         str_multi
+           *description*: for strings containing newline characters.
+
+           *usage*: plain text strings
+
          spaced_list
            *description*: used to signify a space separated list such as
            ``"Foo" 50 False``.
