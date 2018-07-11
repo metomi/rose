@@ -64,7 +64,6 @@ class LogicalArrayValueWidget(gtk.HBox):
                 rose.TYPE_LOGICAL_VALUE_TRUE:
                 rose.TYPE_LOGICAL_TRUE_TITLE}
 
-
         imgs = [(gtk.STOCK_MEDIA_STOP, gtk.ICON_SIZE_MENU),
                 (gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)]
         self.make_log_image = lambda i: gtk.image_new_from_stock(*imgs[i])
