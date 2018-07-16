@@ -193,6 +193,4 @@ configurations.
   :ref:`command-rose-suite-run` or the :envvar:`ROSE_SUITE_OPT_CONF_KEYS`
   environment variable.
 * Metadata configurations can also have optional configurations, typically
-  included via the ``opts`` top-level setting.
-
-.. TODO - opts? this is not documented!
+  included via the :rose:conf:`rose-app.conf|opts` top-level setting.
