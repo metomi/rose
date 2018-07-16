@@ -369,8 +369,3 @@ replacing the groupname with the desired task. Rose Stem should then
 automatically pick up the working copy and run the requested tests on it.
 
 Next see the :ref:`Rose Stem Tutorial`
-
-.. toctree::
-   :hidden:
-
-   rose-stem/tutorial.rst

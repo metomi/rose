@@ -1,6 +1,5 @@
-.. include:: ../../../../hyperlinks.rst
+.. include:: ../../../hyperlinks.rst
    :start-line: 1
-
 
 .. _Rose Stem Tutorial:
 
