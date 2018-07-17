@@ -74,6 +74,14 @@ E.g. The application configuration directory may look like:
 
       See also :ref:`Rose Built-In Applications`.
 
+   .. rose:conf:: opts
+
+      Hardcode an optional configuration to be used by the application. It is
+      generally better to specify optional configurations using the
+      :envvar:`ROSE_APP_OPT_CONF_KEYS` environment variable or
+      ``--opt-conf-key`` argument both of which work with
+      :ref:`command-rose-app-run` and :ref:`command-rose-task-run`.
+
    .. rose:conf:: command
 
       Specify the command(s) to run.
