@@ -37,6 +37,14 @@ A suite directory may contain the following:
    The suite install configuration file :rose:file:`rose-suite.conf` should
    contain the information on how to install the suite.
 
+   .. rose:conf:: opts
+
+      Hardcode an optional configuration to be used by the suite. It is
+      generally better to specify optional configurations using the
+      :envvar:`ROSE_SUITE_OPT_CONF_KEYS` environment variable or
+      ``--opt-conf-key`` argument both of which work with
+      :ref:`command-rose-suite-run`.
+
    .. rose:conf:: env
 
       Specify the environment variables to export to the suite daemon. The
