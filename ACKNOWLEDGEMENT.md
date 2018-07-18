@@ -72,5 +72,5 @@ lib/python/isodatetime/:
   See <https://github.com/metomi/isodatetime>
 
 etc/tutorial/cylc/python/png.py:
-* Unmodified externam software library released under the MIT licence.
+* Unmodified external software library released under the MIT licence.
   see <https://github.com/drj11/pypng>
