@@ -3,5 +3,6 @@ directory from "etc/opt.example/" to "etc/opt/". Add optional configuration
 files with names such as "rose-key1.conf", "rose-key2.conf", etc. In
 "etc/rose.conf", add "opts=key1 key2" to switch on the optional configurations.
 
-See http://metomi.github.io/rose/doc/rose-configuration.html#opts for
-information on optional configuration.
+See
+http://metomi.github.io/rose/doc/html/api/configuration/rose-configuration-format.html#optional-configuration
+for information on optional configurations.

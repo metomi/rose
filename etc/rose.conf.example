@@ -18,7 +18,7 @@ meta-path=DIR1[:DIR2[:...]]
 # :default: *file://${ROSE_HOME}/doc/*
 #
 # URL to Rose documentation.
-rose-doc=http://metomi.github.io/rose/doc/
+rose-doc=http://metomi.github.io/rose/
 
 
 # Configuration of external commands.

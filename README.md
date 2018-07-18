@@ -6,7 +6,7 @@
 
 Rose: a framework for managing and running meteorological suites.
 
-[Installation](http://metomi.github.io/rose/doc/rose-install.html) |
+[Installation](http://metomi.github.io/rose/doc/html/installation.html) |
 [User Guide](http://metomi.github.io/rose/) |
 [How to Contribute](CONTRIBUTING.md)
 
@@ -31,7 +31,7 @@ Rose documentation is licensed under the British Open Government
 Licence. See doc/rose-terms-of-use.html and
 <http://www.nationalarchives.gov.uk/doc/open-government-licence/>
 
-See <http://metomi.github.io/rose/doc/rose-terms-of-use.html>.
+See <http://metomi.github.io/rose/doc/html/terms.html>.
 
 ## Acknowledgement for non-Rose Work
 
