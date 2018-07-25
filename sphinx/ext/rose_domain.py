@@ -138,6 +138,11 @@ OPT_ARG_REGEX = re.compile(  # Regex for splitting domains and arguments
     r'(?:[^=]+)?)'       # Configuration setting.
     r'(?:=(.*))?$'       # Argument.
 )
+CROSS_DOMAIN_REGEX = re.compile(  # Catch leading target from inter-sphinx ref.
+    r'^([\w\-]+)'  # inter-sphinx mapping
+    r':'            # colon divider
+    r'([\w\-].*)$'  # rose object reference
+)
 
 
 def tokenise_namespace(namespace):
@@ -735,9 +740,80 @@ class RoseDomain(Domain):
                 del self.data['objects'][fullname]
 
     def get_objects(self):
-        """Iterates through documented items in the Rose domain."""
-        for refname, (docname, type_) in list(self.data['objects'].items()):
-            yield refname, refname, type_, docname, refname, 1
+        """Iterates through documented items in the Rose domain.
+
+        This method is used to generate the Rose component of the inventory
+        file which in turn is used to cross-reference objects between sphinx
+        projects (via inter-sphinx).
+
+        See ``sphinx.util.inventory.InventoryFile.dump``.
+
+        Note:
+            The Rose domain does things a little bit differently in this area
+            to the Python domain as all Rose objects are stored in a single
+            flat dictionary whereas Python objects are stored in a nested one
+            and are namespaced accordingly.
+
+        Yields:
+            tuple - (name, dispname, type, docname, anchor, priority)
+               - name - The Rose object reference minus the ``:rose:type:``
+                 stuff.
+               - dispname - For searching / linking.
+               - type - The Rose object type i.e. ``file``, ``app``, ``conf``.
+               - docname - The path to the file where the object is documented
+                 (without extension).
+               - anchor - URL fragment for locating object on the page.
+               - priority - Hardwired to 1.
+
+        """
+        for obj_name, (doc_name, _) in list(self.data['objects'].items()):
+            # obj_name -> The full object reference to the rose object
+             #            e.g. `:rose:file:rose-app.conf`.
+            # doc_name -> The path to the document containing the rose object.
+            try:
+                # Split the obj_name into it's constituent components:
+                # 1. domain - i.e. `rose`.
+                # 2. type - i.e. `file`, `app`, `conf`.
+                # 3. ref_name - The remainder of the reference.
+                _, type_, ref_name = obj_name.split(':', 2)
+            except ValueError:
+                LOGGER.warning('Could not parse object reference for "%s"'
+                               % ref_name)
+                continue
+            yield ref_name, ref_name, type_, doc_name, obj_name, 1
+
+    @staticmethod
+    def validate_external_xref(env, typ, target, node, intersphinx_mapping):
+        """Check that the cross-reference is valid else log a warning.
+
+        Args:
+            intersphinx_mapping (str): A key from the Sphinx configuration of
+                the same name.
+
+        Returns:
+            bool: True if valid.
+
+        """
+        try:
+            # Get the inter-sphinx mapping.
+            cross_target = env.config.intersphinx_mapping[
+                intersphinx_mapping][0]
+        except KeyError:
+            LOGGER.warning('Could not find inter-sphinx mapping for "%s"'
+                           % intersphinx_mapping)
+            return False
+        except AttributeError:
+            LOGGER.warning('inter-sphinx required for cross-project '
+                           'references.')
+            return False
+        try:
+            # Test that there is a rose object in that mapping.
+            env.intersphinx_cache[cross_target][2]['rose:%s' % typ][target]
+        except (IndexError, KeyError, ValueError):
+            LOGGER.warning('No Ref for "rose:%s:`%s:%s`"'
+                           % (typ, intersphinx_mapping, target), location=node)
+            return False
+        return True
 
     def resolve_xref(self, env, fromdocname, builder, typ, target, node,
                      contnode):
@@ -762,6 +838,17 @@ class RoseDomain(Domain):
         """
         # If target has a trailing argument ignore it.
         target = OPT_ARG_REGEX.search(target).groups()[0]
+
+        # Handle inter-sphinx cross-references
+        match = CROSS_DOMAIN_REGEX.match(target)
+        if match:
+            # This is a cross-reference to a Rose object in another Sphinx
+            # project (via inter-sphinx).
+            intersphinx_mapping, target = match.groups()
+            self.validate_external_xref(env, typ, target, node,
+                                        intersphinx_mapping)
+            # The reference itself is handled somewhere else.
+            return
 
         # Determine the namespace of the object being referenced.
         if typ in ['app', 'file']:
