@@ -102,6 +102,22 @@ Example:
 
                    ..            ^ relative reference
 
+Referencing Objects Via Intersphinx:
+    Reference Rose objects as you would any other e.g:
+
+    .. code-block:: rst
+
+       :rose:file:`intersphinx-mapping:rose-app.conf`
+
+    A quick way to get the object reference is to extract if from the URL.
+    For example in the following URL:
+
+    .. code-block:: none
+
+        doc-root/api/configuration/application.html#rose:file:rose-app.conf
+
+    The reference is ``rose:file:rose-app.conf``.
+
 """
 
 import re
