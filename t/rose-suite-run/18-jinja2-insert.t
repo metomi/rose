@@ -37,6 +37,9 @@ bar="barley drink"
 __ROSE_SUITE_CONF__
 cat >"$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
 #!jinja2
+{# Rose Configuration Insertion: Init #}
+# Anything here is to be replaced
+{# Rose Configuration Insertion: Done #}
 {% set egg="egg sandwich" %}
 {% set ham="hamburger" %}
 [cylc]

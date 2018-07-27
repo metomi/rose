@@ -32,8 +32,11 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
     """Processor for [jinja2:FILE] sections in a runtime configuration."""
 
     SCHEME = "jinja2"
-    MSG_DONE = "{# Rose Configuration Insertion: Done #}\n"
-    MSG_INIT = "{# Rose Configuration Insertion: Init #}\n"
+    ASSIGN_TEMPL = "{%% set %s=%s %%}\n"
+    COMMENT_TEMPL = "{# %s #}\n"
+    SCHEME_TEMPL = "#!%s\n"
+    MSG_DONE = "Rose Configuration Insertion: Done"
+    MSG_INIT = "Rose Configuration Insertion: Init"
 
     def process(self, conf_tree, item, orig_keys=None, orig_value=None, **_):
         """Process [jinja2:*] in "conf_tree.node"."""
@@ -46,9 +49,12 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             source = os.path.join(conf_tree.files[target], target)
             if not os.access(source, os.F_OK | os.R_OK):
                 continue
+            scheme_line = self.SCHEME_TEMPL % self.SCHEME
+            msg_init_line = self.COMMENT_TEMPL % self.MSG_INIT
+            msg_done_line = self.COMMENT_TEMPL % self.MSG_DONE
             tmp_file = NamedTemporaryFile()
-            tmp_file.write("#!" + self.SCHEME + "\n")
-            tmp_file.write(self.MSG_INIT)
+            tmp_file.write(scheme_line)
+            tmp_file.write(msg_init_line)
             for key, node in sorted(s_node.value.items()):
                 if node.is_ignored():
                     continue
@@ -56,18 +62,18 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                     value = env_var_process(node.value)
                 except UnboundEnvironmentVariableError as exc:
                     raise ConfigProcessError([s_key, key], node.value, exc)
-                tmp_file.write("{%% set %s=%s %%}\n" % (key, value))
-            tmp_file.write(self.MSG_DONE)
+                tmp_file.write(self.ASSIGN_TEMPL % (key, value))
+            tmp_file.write(msg_done_line)
             line_n = 0
             is_in_old_insert = False
             for line in open(source):
                 line_n += 1
-                if line_n == 1 and line.rstrip().lower() == "#!" + self.SCHEME:
+                if line_n == 1 and line == scheme_line:
                     continue
-                elif line_n == 2 and line == self.MSG_INIT:
+                elif line_n == 2 and line == msg_init_line:
                     is_in_old_insert = True
                     continue
-                elif is_in_old_insert and line == self.MSG_DONE:
+                elif is_in_old_insert and line == msg_done_line:
                     is_in_old_insert = False
                     continue
                 elif is_in_old_insert:
