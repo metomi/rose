@@ -34,6 +34,8 @@ A Rose suite configuration is a Cylc :term:`suite directory` containing a
       Environment variables for use by the whole suite.
    :rose:conf:`rose-suite.conf[jinja2:suite.rc]`
       `Jinja2`_ variables for use in the ``suite.rc`` file.
+   :rose:conf:`rose-suite.conf[empy:suite.rc]`
+      `EmPy`_ variables for use in the ``suite.rc`` file.
    :rose:conf:`rose-suite.conf[file:NAME]`
       Files and resources to be installed in the :term:`run directory` when the
       suite is run.

@@ -12,6 +12,7 @@
 .. _Cylc: http://cylc.github.io/cylc/
 .. _Cylc User Guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
 .. _Cylc Suite Design Guide: http://cylc.github.io/cylc/doc/suite-design-guide.pdf
+.. _EmPy: http://www.alcyone.com/software/empy/
 .. _FCM: https://metomi.github.io/fcm/doc/
 .. _FCM User Guide: http://metomi.github.io/fcm/doc/user_guide/
 .. _INI: https://en.wikipedia.org/wiki/INI_file
