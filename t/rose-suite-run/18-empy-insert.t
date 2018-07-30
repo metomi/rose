@@ -56,14 +56,13 @@ CYLC_VERSION=$(cylc --version)
 ROSE_ORIG_HOST=$(hostname)
 ROSE_VERSION=$(rose --version | cut -d' ' -f2)
 for I in $(seq 1 $N_TESTS); do
-    rose suite-run -C$SUITE_RUN_DIR --name=$NAME -l -q --debug -S baz=True || break
+    rose suite-run -C$SUITE_RUN_DIR --name=$NAME -l -q --debug -S "!bar" -S baz=True || break
     file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
 #!empy
 @# Rose Configuration Insertion: Init
 @{ CYLC_VERSION="$CYLC_VERSION" }@
 @{ ROSE_ORIG_HOST="$ROSE_ORIG_HOST" }@
 @{ ROSE_VERSION="$ROSE_VERSION" }@
-@{ bar="barley drink" }@
 @{ baz=True }@
 @{ foo="food store" }@
 @# Rose Configuration Insertion: Done

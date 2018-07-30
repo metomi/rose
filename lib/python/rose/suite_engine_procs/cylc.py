@@ -204,9 +204,9 @@ class CylcProcessor(SuiteEngineProcessor):
             pass
         return []
 
-    def get_suite_templating_scheme(self):
+    def get_suite_templating_scheme(self, suite_dir):
         """Return name of suite templating engine."""
-        with open(self.SUITE_CONF) as suite_conf:
+        with open(os.path.join(suite_dir, self.SUITE_CONF)) as suite_conf:
             line = suite_conf.readline()
         if line.startswith('#!'):
             scheme = line[2:].strip().lower()

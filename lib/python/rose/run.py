@@ -97,7 +97,6 @@ class Runner(object):
     CONF_NAME = None
     NAME = None
     OPTIONS = []
-    REC_OPT_DEFINE = re.compile(r"\A(?:\[([^\]]+)\])?([^=]+)?(?:=(.*))?\Z")
 
     def __init__(self, event_handler=None, popen=None, config_pm=None,
                  fs_util=None, suite_engine_proc=None):
@@ -160,24 +159,9 @@ class Runner(object):
                                                opt_keys=opt_conf_keys)
 
         # Optional defines
-        # N.B. In theory, we should write the values in "opts.defines" to
-        # "conf_tree.node" directly. However, the values in "opts.defines" may
-        # contain "ignore" flags. Rather than replicating the logic for parsing
-        # ignore flags in here, it is actually easier to write the values in
-        # "opts.defines" to a file and pass it to the loader to parse it.
         if opts.defines:
-            source = TemporaryFile()
-            for define in opts.defines:
-                sect, key, value = self.REC_OPT_DEFINE.match(define).groups()
-                if sect is None:
-                    sect = ""
-                if value is None:
-                    value = ""
-                source.write("[%s]\n" % sect)
-                if key is not None:
-                    source.write("%s=%s\n" % (key, value))
-            source.seek(0)
-            self.conf_tree_loader.node_loader.load(source, conf_tree.node)
+            self.conf_tree_loader.node_loader.load_defines(opts.defines,
+                                                           conf_tree.node)
         return conf_tree
 
     def run(self, opts, args):

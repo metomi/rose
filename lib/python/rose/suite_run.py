@@ -138,16 +138,6 @@ class SuiteRunner(Runner):
             self.fs_util.chdir(opts.conf_dir)
         opts.conf_dir = os.getcwd()
 
-        templ_scheme = self.suite_engine_proc.get_suite_templating_scheme()
-        suite_section = "%s:%s" % (templ_scheme,
-                                   self.suite_engine_proc.SUITE_CONF)
-
-        if opts.defines_suite:
-            if not opts.defines:
-                opts.defines = []
-            for define in opts.defines_suite:
-                opts.defines.append("[" + suite_section + "]" + define)
-
         # --remote=KEY=VALUE,...
         if opts.remote:
             # opts.name always set for remote.
@@ -159,6 +149,16 @@ class SuiteRunner(Runner):
         suite_name = opts.name
         if not opts.name:
             suite_name = os.path.basename(os.getcwd())
+        suite_dir = conf_tree.files.get(self.suite_engine_proc.SUITE_CONF, '.')
+        templ_scheme = self.suite_engine_proc.get_suite_templating_scheme(
+            suite_dir)
+        suite_section = (templ_scheme + ':' +
+                         self.suite_engine_proc.SUITE_CONF)
+
+        extra_defines = []
+        if opts.defines_suite:
+            for define in opts.defines_suite:
+                extra_defines.append("[" + suite_section + "]" + define)
 
         # Automatic Rose constants
         # ROSE_ORIG_HOST: originating host
@@ -174,10 +174,11 @@ class SuiteRunner(Runner):
                 ["env", suite_engine_key])
         else:
             suite_engine_version = self.suite_engine_proc.get_version()
-        auto_items = {"ROSE_ORIG_HOST": self.host_selector.get_local_host(),
-                      "ROSE_VERSION": ResourceLocator.default().get_version(),
-                      suite_engine_key: suite_engine_version}
-        for key, val in auto_items.items():
+        auto_items = [
+            (suite_engine_key, suite_engine_version),
+            ("ROSE_ORIG_HOST", self.host_selector.get_local_host()),
+            ("ROSE_VERSION", ResourceLocator.default().get_version())]
+        for key, val in auto_items:
             requested_value = conf_tree.node.get_value(["env", key])
             if requested_value:
                 if key == "ROSE_VERSION" and val != requested_value:
@@ -187,7 +188,11 @@ class SuiteRunner(Runner):
             else:
                 conf_tree.node.set(["env", key], val,
                                    state=conf_tree.node.STATE_NORMAL)
-            conf_tree.node.set([suite_section, key], '"' + val + '"')
+            extra_defines.append('[%s]%s="%s"' % (suite_section, key, val))
+
+        # Pass automatic Rose constants as suite defines
+        self.conf_tree_loader.node_loader.load_defines(extra_defines,
+                                                       conf_tree.node)
 
         # See if suite is running or not
         hosts = []

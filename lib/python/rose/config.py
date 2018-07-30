@@ -96,7 +96,7 @@ import re
 from rose.env import env_var_escape
 import shlex
 import sys
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryFile
 
 
 CHAR_ASSIGN = "="
@@ -1161,6 +1161,7 @@ class ConfigLoader(object):
 
     RE_SECTION = re.compile(
         r"^(?P<head>\s*\[(?P<state>!?!?))(?P<section>.*)\]\s*$")
+    RE_OPT_DEFINE = re.compile(r"\A(?:\[([^\]]+)\])?([^=]+)?(?:=(.*))?\Z")
     TYPE_SECTION = "TYPE_SECTION"
     TYPE_OPTION = "TYPE_OPTION"
     UNKNOWN_NAME = "<???>"
@@ -1306,6 +1307,37 @@ class ConfigLoader(object):
         if return_config_map:
             return node, config_map
         return node
+
+    def load_defines(self, defines, node=None):
+        """Read configuration from .
+
+        Arguments:
+            defines (list): A list of [SECTION]KEY=VALUE items.
+            node (ConfigNode - optional): A ConfigNode object if specified,
+                otherwise one is created.
+
+        Returns:
+            ConfigNode: A new ConfigNode object.
+        """
+        # N.B. In theory, we should write the values in "defines" to
+        # "node" directly. However, the values in "defines" may contain
+        # "ignore" flags. Rather than replicating the logic for parsing
+        # ignore flags, it is actually easier to write the values in
+        # "defines" to a file and pass it to the loader to parse it.
+        source = TemporaryFile()
+        for define in defines:
+            sect, key, value = self.RE_OPT_DEFINE.match(define).groups()
+            if sect is None:
+                sect = ""
+            if value is None:
+                value = ""
+            source.write("[%s]\n" % sect)
+            if key is not None:
+                source.write("%s=%s\n" % (key, value))
+        source.seek(0)
+        self.load(source, node)
+        return node
+
 
     def load(self, source, node=None, default_comments=None):
         """Read a source configuration file.
