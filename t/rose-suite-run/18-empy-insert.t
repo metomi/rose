@@ -21,6 +21,7 @@
 # variable declarations to "suite.rc" do not get repeated.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+python -c 'import em' 2>/dev/null || skip_all '"em" not installed'
 
 #-------------------------------------------------------------------------------
 N_TESTS=3
@@ -31,14 +32,17 @@ TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 cat >$SUITE_RUN_DIR/rose-suite.conf <<__ROSE_SUITE_CONF__
-[jinja2:suite.rc]
+[empy:suite.rc]
 foo="food store"
 bar="barley drink"
 __ROSE_SUITE_CONF__
 cat >"$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
-#!jinja2
-{% set egg="egg sandwich" %}
-{% set ham="hamburger" %}
+#!empy
+@# Rose Configuration Insertion: Init
+# Anything here is to be replaced
+@# Rose Configuration Insertion: Done
+@{ egg="egg sandwich" }@
+@{ ham="hamburger" }@
 [cylc]
 UTC mode=True
 [scheduling]
@@ -52,18 +56,19 @@ CYLC_VERSION=$(cylc --version)
 ROSE_ORIG_HOST=$(hostname)
 ROSE_VERSION=$(rose --version | cut -d' ' -f2)
 for I in $(seq 1 $N_TESTS); do
-    rose suite-run -C$SUITE_RUN_DIR --name=$NAME -l -q --debug || break
+    rose suite-run -C$SUITE_RUN_DIR --name=$NAME -l -q --debug -S baz=True || break
     file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
-#!jinja2
-{# Rose Configuration Insertion: Init #}
-{% set CYLC_VERSION="$CYLC_VERSION" %}
-{% set ROSE_ORIG_HOST="$ROSE_ORIG_HOST" %}
-{% set ROSE_VERSION="$ROSE_VERSION" %}
-{% set bar="barley drink" %}
-{% set foo="food store" %}
-{# Rose Configuration Insertion: Done #}
-{% set egg="egg sandwich" %}
-{% set ham="hamburger" %}
+#!empy
+@# Rose Configuration Insertion: Init
+@{ CYLC_VERSION="$CYLC_VERSION" }@
+@{ ROSE_ORIG_HOST="$ROSE_ORIG_HOST" }@
+@{ ROSE_VERSION="$ROSE_VERSION" }@
+@{ bar="barley drink" }@
+@{ baz=True }@
+@{ foo="food store" }@
+@# Rose Configuration Insertion: Done
+@{ egg="egg sandwich" }@
+@{ ham="hamburger" }@
 [cylc]
 UTC mode=True
 [scheduling]

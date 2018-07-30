@@ -56,6 +56,7 @@ class CylcProcessor(SuiteEngineProcessor):
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     SUITE_NAME_ENV = "CYLC_SUITE_NAME"
+    SUITE_DEFAULT_TEMPLATING_SCHEME = "jinja2"
     SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
 
@@ -202,6 +203,15 @@ class CylcProcessor(SuiteEngineProcessor):
         except (IOError, ValueError):
             pass
         return []
+
+    def get_suite_templating_scheme(self):
+        """Return name of suite templating engine."""
+        with open(self.SUITE_CONF) as suite_conf:
+            line = suite_conf.readline()
+        if line.startswith('#!'):
+            scheme = line[2:].strip().lower()
+            return scheme
+        return self.SUITE_DEFAULT_TEMPLATING_SCHEME
 
     def get_task_auth(self, suite_name, task_name):
         """

@@ -558,6 +558,10 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
+    def get_suite_templating_scheme(self):
+        """Return name of suite templating engine."""
+        raise NotImplementedError()
+
     def get_version(self):
         """Return the version string of the suite engine."""
         raise NotImplementedError()

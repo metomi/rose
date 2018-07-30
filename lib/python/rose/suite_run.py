@@ -138,8 +138,11 @@ class SuiteRunner(Runner):
             self.fs_util.chdir(opts.conf_dir)
         opts.conf_dir = os.getcwd()
 
+        templ_scheme = self.suite_engine_proc.get_suite_templating_scheme()
+        suite_section = "%s:%s" % (templ_scheme,
+                                   self.suite_engine_proc.SUITE_CONF)
+
         if opts.defines_suite:
-            suite_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
             if not opts.defines:
                 opts.defines = []
             for define in opts.defines_suite:
@@ -161,7 +164,6 @@ class SuiteRunner(Runner):
         # ROSE_ORIG_HOST: originating host
         # ROSE_VERSION: Rose version (not retained in run_mode=="reload")
         # Suite engine version
-        jinja2_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
         my_rose_version = ResourceLocator.default().get_version()
         suite_engine_key = self.suite_engine_proc.get_version_env_name()
         if opts.run_mode in ["reload", "restart"]:
@@ -185,7 +187,7 @@ class SuiteRunner(Runner):
             else:
                 conf_tree.node.set(["env", key], val,
                                    state=conf_tree.node.STATE_NORMAL)
-            conf_tree.node.set([jinja2_section, key], '"' + val + '"')
+            conf_tree.node.set([suite_section, key], '"' + val + '"')
 
         # See if suite is running or not
         hosts = []
@@ -290,7 +292,7 @@ class SuiteRunner(Runner):
                         any(fnmatchcase(os.sep + rel_path, exclude)
                             for exclude in self.SYNC_EXCLUDES) or
                         conf_tree.node.get(
-                            ["jinja2:" + rel_path]) is not None):
+                            [templ_scheme + ":" + rel_path]) is not None):
                     continue
                 # No sub-directories, very slow otherwise
                 if os.sep in rel_path:
@@ -314,7 +316,7 @@ class SuiteRunner(Runner):
                            no_overwrite_mode=opts.no_overwrite_mode)
 
             # Process Jinja2 configuration
-            self.config_pm(conf_tree, "jinja2")
+            self.config_pm(conf_tree, templ_scheme)
 
             # Ask suite engine to parse suite configuration
             # and determine if it is up to date (unchanged)
@@ -503,10 +505,11 @@ class SuiteRunner(Runner):
                 continue
             for line in node_value.strip().splitlines():
                 pattern, value = line.strip().split("=", 1)
-                if pattern.startswith("jinja2:"):
+                if (pattern.startswith("jinja2:") or
+                        pattern.startswith("empy:")):
                     section, name = pattern.rsplit(":", 1)
                     p_node = conf.get([section, name], no_ignore=True)
-                    # Values in "jinja2:*" section are quoted.
+                    # Values in "jinja2:*" and "empy:*" sections are quoted.
                     pattern = ast.literal_eval(p_node.value)
                 if fnmatchcase(host, pattern):
                     return value.strip()
