@@ -21,7 +21,7 @@
 # variable declarations to "suite.rc" do not get repeated.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-if ! cylc check-software | grep '^Python:em.*([^-]*)$' >/dev/null; then
+if ! cylc check-software 2>/dev/null | grep '^Python:EmPy.*([^-]*)$' >/dev/null; then
     skip_all '"EmPy" not installed'
 fi
 #-------------------------------------------------------------------------------
