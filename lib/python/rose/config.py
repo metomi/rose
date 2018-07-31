@@ -1338,7 +1338,6 @@ class ConfigLoader(object):
         node = self.load(source, node)
         return node
 
-
     def load(self, source, node=None, default_comments=None):
         """Read a source configuration file.
 
