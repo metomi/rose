@@ -49,12 +49,12 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             source = os.path.join(conf_tree.files[target], target)
             if not os.access(source, os.F_OK | os.R_OK):
                 continue
-            scheme_line = self.SCHEME_TEMPL % self.SCHEME
-            msg_init_line = self.COMMENT_TEMPL % self.MSG_INIT
-            msg_done_line = self.COMMENT_TEMPL % self.MSG_DONE
+            scheme_ln = self.SCHEME_TEMPL % self.SCHEME
+            msg_init_ln = self.COMMENT_TEMPL % self.MSG_INIT
+            msg_done_ln = self.COMMENT_TEMPL % self.MSG_DONE
             tmp_file = NamedTemporaryFile()
-            tmp_file.write(scheme_line)
-            tmp_file.write(msg_init_line)
+            tmp_file.write(scheme_ln)
+            tmp_file.write(msg_init_ln)
             for key, node in sorted(s_node.value.items()):
                 if node.is_ignored():
                     continue
@@ -63,17 +63,17 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                 except UnboundEnvironmentVariableError as exc:
                     raise ConfigProcessError([s_key, key], node.value, exc)
                 tmp_file.write(self.ASSIGN_TEMPL % (key, value))
-            tmp_file.write(msg_done_line)
+            tmp_file.write(msg_done_ln)
             line_n = 0
             is_in_old_insert = False
             for line in open(source):
                 line_n += 1
-                if line_n == 1 and line == scheme_line:
+                if line_n == 1 and line.strip().lower() == scheme_ln.strip():
                     continue
-                elif line_n == 2 and line == msg_init_line:
+                elif line_n == 2 and line == msg_init_ln:
                     is_in_old_insert = True
                     continue
-                elif is_in_old_insert and line == msg_done_line:
+                elif is_in_old_insert and line == msg_done_ln:
                     is_in_old_insert = False
                     continue
                 elif is_in_old_insert:

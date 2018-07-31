@@ -29,7 +29,6 @@ from rose.reporter import Event
 from rose.suite_engine_proc import SuiteEngineProcessor
 import shlex
 import shutil
-from tempfile import TemporaryFile
 from uuid import uuid4
 
 

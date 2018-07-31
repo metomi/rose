@@ -21,8 +21,9 @@
 # variable declarations to "suite.rc" do not get repeated.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-python -c 'import em' 2>/dev/null || skip_all '"em" not installed'
-
+if ! cylc check-software | grep '^Python:em.*([^-]*)$' >/dev/null; then
+    skip_all '"EmPy" not installed'
+fi
 #-------------------------------------------------------------------------------
 N_TESTS=3
 tests $N_TESTS

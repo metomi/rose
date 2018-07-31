@@ -1335,7 +1335,7 @@ class ConfigLoader(object):
             if key is not None:
                 source.write("%s=%s\n" % (key, value))
         source.seek(0)
-        self.load(source, node)
+        node = self.load(source, node)
         return node
 
 

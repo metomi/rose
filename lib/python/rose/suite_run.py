@@ -149,9 +149,17 @@ class SuiteRunner(Runner):
         suite_name = opts.name
         if not opts.name:
             suite_name = os.path.basename(os.getcwd())
-        suite_dir = conf_tree.files.get(self.suite_engine_proc.SUITE_CONF, '.')
-        templ_scheme = self.suite_engine_proc.get_suite_templating_scheme(
-            suite_dir)
+
+        # Check suite.rc #! line for template scheme
+        templ_scheme = "jinja2"
+        if self.suite_engine_proc.SUITE_CONF in conf_tree.files:
+            suiterc_path = os.path.join(
+                conf_tree.files[self.suite_engine_proc.SUITE_CONF],
+                self.suite_engine_proc.SUITE_CONF)
+            with open(suiterc_path) as fh:
+                line = fh.readline()
+                if line.startswith("#!"):
+                    templ_scheme = line[2:].strip().lower()
         suite_section = (templ_scheme + ':' +
                          self.suite_engine_proc.SUITE_CONF)
 
