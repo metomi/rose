@@ -39,7 +39,8 @@ class RunConfigLoadEvent(Event):
     LEVEL = Event.V
 
     def __str__(self):
-        conf_dir, conf_name, opt_conf_keys, opt_defines = self.args
+        (conf_dir, conf_name, opt_conf_keys, opt_defines,
+            opt_defines_suite) = self.args
         ret = "Configuration: %s/\n" % (conf_dir)
         ret += "    file: %s\n" % (conf_name)
         for opt_conf_key in opt_conf_keys:
@@ -47,6 +48,9 @@ class RunConfigLoadEvent(Event):
         if opt_defines:
             for opt_define in opt_defines:
                 ret += "    optional define: %s\n" % (opt_define)
+        if opt_defines_suite:
+            for opt_define_suite in opt_defines_suite:
+                ret += "    optional suite define: %s\n" % (opt_define_suite)
         return ret
 
 
@@ -152,7 +156,8 @@ class Runner(object):
             opt_conf_keys += opts.opt_conf_keys
 
         self.handle_event(RunConfigLoadEvent(
-            conf_dir, conf_name, opt_conf_keys, opts.defines))
+            conf_dir, conf_name, opt_conf_keys, opts.defines,
+            getattr(opts, 'defines_suite', [])))
 
         conf_tree = self.conf_tree_loader.load(conf_dir, conf_name,
                                                opt_keys=opt_conf_keys)
