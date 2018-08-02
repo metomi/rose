@@ -19,7 +19,13 @@
 # -----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
-import Queue
+try:
+    # Python 3
+    import queue as Queue
+    unicode = str
+except ImportError:
+    # Python 2
+    import Queue
 
 import multiprocessing
 import sys
@@ -153,7 +159,7 @@ class Reporter(object):
         if level is None:
             level = self.DEFAULT
         msg = None
-        for key, context in self.contexts.items():
+        for key, context in list(self.contexts.items()):
             if context.is_closed():
                 self.contexts.pop(key)  # remove contexts with closed handles
                 continue

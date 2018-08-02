@@ -49,17 +49,6 @@ def tr_case(string, case_mode=None):
         return string
 
 
-def _sort_config_key(key_1, key_2):
-    match_1 = RE_NAME_INDEX.match(key_1)
-    match_2 = RE_NAME_INDEX.match(key_2)
-    if match_1 and match_2:
-        name_1, index_1 = match_1.groups()
-        name_2, index_2 = match_2.groups()
-        if name_1.lower() == name_2.lower():
-            return cmp(int(index_1), int(index_2))
-    return cmp(key_1.lower(), key_2.lower())
-
-
 def namelist_dump(args=None, output_file=None, case_mode=None):
     """Convert Fortran namelist file to a Rose configuration."""
     # Input and output options
@@ -123,10 +112,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
                 config.set([section, lhs], obj.get_rhs_as_string())
 
     # Config: write results
-    rose.config.dump(config, output_file,
-                     sort_sections=_sort_config_key,
-                     sort_option_items=_sort_config_key,
-                     env_escape_ok=True)
+    rose.config.dump(config, output_file, env_escape_ok=True)
     output_file.close()
 
 
