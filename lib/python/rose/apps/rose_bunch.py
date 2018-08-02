@@ -34,6 +34,13 @@ import rose.job_runner
 from rose.reporter import Event
 
 
+class CommandNotDefinedError(Exception):
+    """An exception raised when no command to run is defiend."""
+
+    def __str__(self):
+        return "command to run not defined"
+
+
 class AbortEvent(Event):
     """An event raised when a task failure will stop further task running"""
 
@@ -152,14 +159,16 @@ class RoseBunchApp(BuiltinApp):
         for key, val in multi_args.items():
             multi_args[key].value = rose.env.env_var_process(val.value)
 
-        self.command_format = rose.env.env_var_process(
+        self.format = True
+        self.command = rose.env.env_var_process(
             conf_tree.node.get_value([self.BUNCH_SECTION, "command-format"]))
 
-        if not self.command_format:
-            raise CompulsoryConfigValueError([self.BUNCH_SECTION,
-                                             "command-format"],
-                                             None,
-                                             KeyError("command-format"))
+        if not self.command:
+            self.format = False
+            self.command = app_runner.get_command(conf_tree, opts, args)
+
+        if not self.command:
+            raise CommandNotDefinedError()
 
         # Set up command-instances if needed
         instances = conf_tree.node.get_value([self.BUNCH_SECTION,
@@ -198,6 +207,12 @@ class RoseBunchApp(BuiltinApp):
                                    [self.ARGS_SECTION, "command-instances"]),
                                    "reserved keyword")
 
+        if conf_tree.node.get_value([self.ARGS_SECTION, "COMMAND_INSTANCES"]):
+            raise ConfigValueError([self.ARGS_SECTION, "COMMAND_INSTANCES"],
+                                   conf_tree.node.get_value(
+                                   [self.ARGS_SECTION, "COMMAND_INSTANCES"]),
+                                   "reserved keyword")
+
         if instances and arglength != len(instances):
             raise ConfigValueError([self.BUNCH_SECTION, "command-instances"],
                                    instances, "inconsistent arg lengths")
@@ -217,11 +232,14 @@ class RoseBunchApp(BuiltinApp):
 
         commands = {}
         for index, name in enumerate(self.invocation_names):
-            invocation = RoseBunchCmd(name, self.command_format, index)
+            invocation = RoseBunchCmd(name, self.command, self.format, index)
             for key, vals in sorted(multi_args.items()):
                 invocation.argsdict[key] = shlex.split(vals.value)[index]
             if instances:
-                invocation.argsdict["command-instances"] = instances[index]
+                if self.format:
+                    invocation.argsdict["command-instances"] = instances[index]
+                else:
+                    invocation.argsdict["COMMAND_INSTANCES"] = str(instances[index])
             commands[name] = invocation
 
         procs = {}
@@ -264,6 +282,8 @@ class RoseBunchApp(BuiltinApp):
                 cmd_stderr = log_format % command.get_err_file()
                 prefix = command.get_log_prefix()
                 bunch_environ = os.environ
+                if not command.format:
+                    bunch_environ.update(command.argsdict)
                 bunch_environ['ROSE_BUNCH_LOG_PREFIX'] = prefix
 
                 if self.dao:
@@ -310,8 +330,9 @@ class RoseBunchCmd(object):
 
     OUTPUT_TEMPLATE = "bunch.%s.%s"
 
-    def __init__(self, name, command, index):
-        self.command_format = command
+    def __init__(self, name, command, format, index):
+        self.command = command
+        self.format = format
         self.argsdict = {}
         self.name = str(name)
         self.index = index
@@ -319,7 +340,9 @@ class RoseBunchCmd(object):
     def get_command(self):
         """Return the command that will be run"""
 
-        return self.command_format % self.argsdict
+        if self.format:
+            return self.command % self.argsdict
+        return self.command
 
     def get_out_file(self):
         """Return output file name"""
