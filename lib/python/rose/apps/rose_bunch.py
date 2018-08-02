@@ -27,8 +27,7 @@ from time import sleep
 
 from rose.app_run import (
     BuiltinApp,
-    ConfigValueError,
-    CompulsoryConfigValueError)
+    ConfigValueError)
 from rose.popen import RosePopenError
 import rose.job_runner
 from rose.reporter import Event
@@ -156,15 +155,19 @@ class RoseBunchApp(BuiltinApp):
             self.incremental = rose.env.env_var_process(self.incremental)
 
         multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
+        bunch_args_names = []
+        bunch_args_values = []
         for key, val in multi_args.items():
-            multi_args[key].value = rose.env.env_var_process(val.value)
+            bunch_args_names.append(key)
+            bunch_args_values.append(
+                shlex.split(rose.env.env_var_process(val.value)))
 
-        self.format = True
+        self.isformatted = True
         self.command = rose.env.env_var_process(
             conf_tree.node.get_value([self.BUNCH_SECTION, "command-format"]))
 
         if not self.command:
-            self.format = False
+            self.isformatted = False
             self.command = app_runner.get_command(conf_tree, opts, args)
 
         if not self.command:
@@ -188,18 +191,16 @@ class RoseBunchApp(BuiltinApp):
             if instances:
                 arglength = len(instances)
             else:
-                item, val = sorted(multi_args.items())[0]
-                arglength = len(shlex.split(val.value))
+                arglength = len(bunch_args_values[0])
             self.invocation_names = range(0, arglength)
         else:
             arglength = len(self.invocation_names)
 
-        for item, val in sorted(multi_args.items()):
-            if len(shlex.split(val.value)) != arglength:
-                raise ConfigValueError([self.ARGS_SECTION, item],
-                                       conf_tree.node.get_value(
-                                       [self.ARGS_SECTION, item]),
-                                       "inconsistent arg lengths")
+        if any(len(item) != arglength for item in bunch_args_values):
+            raise ConfigValueError([self.ARGS_SECTION, item],
+                                   conf_tree.node.get_value(
+                                   [self.ARGS_SECTION, item]),
+                                   "inconsistent arg lengths")
 
         if conf_tree.node.get_value([self.ARGS_SECTION, "command-instances"]):
             raise ConfigValueError([self.ARGS_SECTION, "command-instances"],
@@ -231,16 +232,17 @@ class RoseBunchApp(BuiltinApp):
             self.dao = None
 
         commands = {}
-        for index, name in enumerate(self.invocation_names):
-            invocation = RoseBunchCmd(name, self.command, self.format, index)
-            for key, vals in sorted(multi_args.items()):
-                invocation.argsdict[key] = shlex.split(vals.value)[index]
+        for vals in zip(range(arglength), self.invocation_names,
+                        *bunch_args_values):
+            index, name, bunch_args_vals = vals[0], vals[1], vals[2:]
+            argsdict = dict(zip(bunch_args_names, bunch_args_vals))
             if instances:
-                if self.format:
-                    invocation.argsdict["command-instances"] = instances[index]
+                if self.isformatted:
+                    argsdict["command-instances"] = instances[index]
                 else:
-                    invocation.argsdict["COMMAND_INSTANCES"] = str(instances[index])
-            commands[name] = invocation
+                    argsdict["COMMAND_INSTANCES"] = str(instances[index])
+            commands[name] = RoseBunchCmd(name, self.command, argsdict,
+                                          self.isformatted)
 
         procs = {}
         if 'ROSE_TASK_LOG_DIR' in os.environ:
@@ -282,7 +284,7 @@ class RoseBunchApp(BuiltinApp):
                 cmd_stderr = log_format % command.get_err_file()
                 prefix = command.get_log_prefix()
                 bunch_environ = os.environ
-                if not command.format:
+                if not command.isformatted:
                     bunch_environ.update(command.argsdict)
                 bunch_environ['ROSE_BUNCH_LOG_PREFIX'] = prefix
 
@@ -330,17 +332,16 @@ class RoseBunchCmd(object):
 
     OUTPUT_TEMPLATE = "bunch.%s.%s"
 
-    def __init__(self, name, command, format, index):
-        self.command = command
-        self.format = format
-        self.argsdict = {}
+    def __init__(self, name, command, argsdict, isformatted):
         self.name = str(name)
-        self.index = index
+        self.command = command
+        self.argsdict = argsdict
+        self.isformatted = isformatted
 
     def get_command(self):
         """Return the command that will be run"""
 
-        if self.format:
+        if self.isformatted:
             return self.command % self.argsdict
         return self.command
 

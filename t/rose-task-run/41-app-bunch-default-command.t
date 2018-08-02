@@ -27,12 +27,11 @@ tests 26
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir= 'rose-test-battery.XXXXXX')
-SUITE_RUN_DIR=$HOME/cylc-run/rose-test-battery.$TEST_KEY_BASE
+SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost --new -- --no-detach --debug
+    --no-gcontrol --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 CYCLE=20100101T0000Z
 LOG_DIR="$SUITE_RUN_DIR/log/job/$CYCLE"
@@ -85,6 +84,5 @@ for TASK in buncher_default buncher_import; do
 #-------------------------------------------------------------------------------
 done
 #-------------------------------------------------------------------------------
-
-#rose suite-clean -q -y $NAME
+rose suite-clean -q -y $NAME
 exit 0
