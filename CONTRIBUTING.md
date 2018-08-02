@@ -39,6 +39,7 @@ below:
 * Jon Seddon (Met Office, UK)
 * Harry Shepherd (Met Office, UK)
 * Matt Shin (Met Office, UK)
+* Tomasz Trzeciak (Met Office, UK)
 * Stuart Whitehouse (Met Office, UK)
 * Steve Wardle (Met Office, UK)
 * Scott Wales (ARC Centre of Excellence for Climate Systems Science, Australia)
