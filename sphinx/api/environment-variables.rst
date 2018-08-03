@@ -2,6 +2,14 @@ Rose Environment Variables
 ==========================
 
 
+.. envvar:: COMMAND_INSTANCES
+
+   Description
+      Environment variable provided to Rose Bunch instances at runtime to
+      identify the command instance being run.
+   Provided At Runtime By
+      * Rose Bunch
+
 .. envvar:: NPROC
 
    Description

@@ -49,8 +49,8 @@ Configuration
 
 The application is normally configured in the
 :rose:conf:`rose_bunch[bunch]` and :rose:conf:`rose_bunch[bunch-args]`
-sections of the :rose:file:`rose-app.conf` file, but `rose_bunch[command]`
-can be optionally used too, see below for details.
+sections of the :rose:file:`rose-app.conf` file, but
+:rose:conf:`rose-app.conf[command]` can be used too, see below for details.
 
 .. rose:app:: rose_bunch
 
@@ -75,10 +75,10 @@ can be optionally used too, see below for details.
          instances of a command they want to run. This generates the values
          used by the ``%(command-instances)s`` value in command-format.
          If `[bunch]command-format` is not specified then the command instance
-         is passed as the ``COMMAND_INSTANCES`` environment variable instead.
-         Useful for cases where the only difference between invocations
-         would be an index number e.g. ensemble members. Note indexes
-         start at ``0``.
+         is passed as the :envvar:`COMMAND_INSTANCES` environment variable
+         instead. This is useful for cases where the only difference between
+         invocations would be an index number e.g. ensemble members. Note
+         indexes start at ``0``.
 
       .. rose:conf:: pool-size=N
 
@@ -130,8 +130,8 @@ can be optionally used too, see below for details.
    .. rose:conf:: bunch-args
 
       This section is used to specify the various combinations of args to be
-      passed to the :rose:conf:`rose-app.conf[command]` specified under
-      :rose:conf:`[bunch]command-format`.
+      passed to the command specified under :rose:conf:`[bunch]command-format`,
+      if defined, or :rose:conf:`rose-app.conf[command]` otherwise.
 
       .. rose:conf:: argname=val1 val2 ...
 

@@ -154,14 +154,6 @@ class RoseBunchApp(BuiltinApp):
         if self.incremental:
             self.incremental = rose.env.env_var_process(self.incremental)
 
-        multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
-        bunch_args_names = []
-        bunch_args_values = []
-        for key, val in multi_args.items():
-            bunch_args_names.append(key)
-            bunch_args_values.append(
-                shlex.split(rose.env.env_var_process(val.value)))
-
         self.isformatted = True
         self.command = rose.env.env_var_process(
             conf_tree.node.get_value([self.BUNCH_SECTION, "command-format"]))
@@ -186,6 +178,15 @@ class RoseBunchApp(BuiltinApp):
                                        instances,
                                        "not an integer value")
 
+        # Argument lists
+        multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
+        bunch_args_names = []
+        bunch_args_values = []
+        for key, val in multi_args.items():
+            bunch_args_names.append(key)
+            bunch_args_values.append(
+                shlex.split(rose.env.env_var_process(val.value)))
+
         # Validate runlists
         if not self.invocation_names:
             if instances:
@@ -196,11 +197,12 @@ class RoseBunchApp(BuiltinApp):
         else:
             arglength = len(self.invocation_names)
 
-        if any(len(item) != arglength for item in bunch_args_values):
-            raise ConfigValueError([self.ARGS_SECTION, item],
-                                   conf_tree.node.get_value(
-                                   [self.ARGS_SECTION, item]),
-                                   "inconsistent arg lengths")
+        for item, vals in zip(bunch_args_names, bunch_args_values):
+            if len(vals) != arglength:
+                raise ConfigValueError([self.ARGS_SECTION, item],
+                                       conf_tree.node.get_value(
+                                       [self.ARGS_SECTION, item]),
+                                       "inconsistent arg lengths")
 
         if conf_tree.node.get_value([self.ARGS_SECTION, "command-instances"]):
             raise ConfigValueError([self.ARGS_SECTION, "command-instances"],
