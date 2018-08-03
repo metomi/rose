@@ -1309,7 +1309,7 @@ class ConfigLoader(object):
         return node
 
     def load_defines(self, defines, node=None):
-        """Read configuration from .
+        """Read configuration from a list of command line defines.
 
         Arguments:
             defines (list): A list of [SECTION]KEY=VALUE items.
