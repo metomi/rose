@@ -349,6 +349,8 @@ class AppRunner(Runner):
         app_mode = conf_tree.node.get_value(["mode"])
         if app_mode is None:
             app_mode = opts.app_mode
+        if app_mode is None:
+            app_mode = os.getenv("ROSE_APP_MODE")
         if app_mode in [None, "command"]:
             return self._command(conf_tree, opts, args)
         else:

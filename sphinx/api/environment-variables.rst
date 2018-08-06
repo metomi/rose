@@ -25,6 +25,14 @@ Rose Environment Variables
       * :ref:`command-rose-app-run`
       * :ref:`command-rose-task-run`
 
+.. envvar:: ROSE_APP_MODE
+
+   Description
+      Can be set to define which built-in app to run.
+   Used By
+      * :ref:`command-rose-app-run`
+      * :ref:`command-rose-task-run`
+
 .. envvar:: ROSE_APP_OPT_CONF_KEYS
 
    Description
