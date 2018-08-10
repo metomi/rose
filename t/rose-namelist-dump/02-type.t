@@ -66,11 +66,11 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 source=namelist:name
 
 [namelist:name]
+array_element(-100:-10,-2:10,6:720)=1
+array_element(-10,-2)=1
+array_element(-2:)=1
 array_element(-1)=1
 array_element(-1,0)=1
-array_element(-10,-2)=1
-array_element(-100:-10,-2:10,6:720)=1
-array_element(-2:)=1
 array_element(0,0)=1
 array_element(0:)=1
 array_element(1)=1

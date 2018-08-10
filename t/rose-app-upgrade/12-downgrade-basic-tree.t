@@ -629,10 +629,10 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [D] Downgrade_0.2-0.1: changes: 6
     env=A=5
         Added with value '5'
-    namelist:something=foo=bar
-        Added with value 'bar'
     namelist:qwerty=None=None
         Added
+    namelist:something=foo=bar
+        Added with value 'bar'
     env=B=5
         Removed
     namelist:new=spam=eggs

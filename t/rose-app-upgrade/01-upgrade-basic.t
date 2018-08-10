@@ -749,11 +749,11 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Added with value 'eggs'
     env=A=4
         Removed
-    namelist:something=foo=bar
-        Removed
     namelist:qwerty=uiop=asdf
         Removed
     namelist:qwerty=None=
+        Removed
+    namelist:something=foo=bar
         Removed
     =meta=test-app-upgrade/0.2
         Upgraded from 0.1 to 0.2
