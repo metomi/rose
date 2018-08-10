@@ -49,7 +49,8 @@ Configuration
 
 The application is normally configured in the
 :rose:conf:`rose_bunch[bunch]` and :rose:conf:`rose_bunch[bunch-args]`
-sections of the :rose:file:`rose-app.conf` file.
+sections of the :rose:file:`rose-app.conf` file, but
+:rose:conf:`rose-app.conf[command]` can be used too, see below for details.
 
 .. rose:app:: rose_bunch
 
@@ -57,23 +58,27 @@ sections of the :rose:file:`rose-app.conf` file.
 
       .. rose:conf:: command-format=FORMAT
 
-         :compulsory: True
-
          A Pythonic ``printf``-style format string to construct the commands
          to run. Insert placeholders ``%(argname)s`` for substitution of the
          arguments specified under :rose:conf:`[bunch-args]` to the invoked
          command. The placeholder ``%(command-instances)s`` is reserved for
          inserting an automatically generated index for the command
-         invocation when using the command-instances setting.
+         invocation when using the command-instances setting. If not specified
+         then the command to run is determined following the ``mode=command``
+         logic, see :ref:`command-rose-app-run` for details, and arguments
+         are made accessible to the command as environment variables.
+
 
       .. rose:conf:: command-instances=N
 
          Allows the user to specify an integer value for the number of
          instances of a command they want to run. This generates the values
          used by the ``%(command-instances)s`` value in command-format.
-         Useful for cases where the only difference between invocations
-         would be an index number e.g. ensemble members. Note indexes
-         start at ``0``.
+         If `[bunch]command-format` is not specified then the command instance
+         is passed as the :envvar:`COMMAND_INSTANCES` environment variable
+         instead. This is useful for cases where the only difference between
+         invocations would be an index number e.g. ensemble members. Note
+         indexes start at ``0``.
 
       .. rose:conf:: pool-size=N
 
@@ -125,15 +130,16 @@ sections of the :rose:file:`rose-app.conf` file.
    .. rose:conf:: bunch-args
 
       This section is used to specify the various combinations of args to be
-      passed to the :rose:conf:`rose-app.conf[command]` specified under
-      :rose:conf:`[bunch]command-format`.
+      passed to the command specified under :rose:conf:`[bunch]command-format`,
+      if defined, or :rose:conf:`rose-app.conf[command]` otherwise.
 
       .. rose:conf:: argname=val1 val2 ...
 
          Allows defining named lists of argument values to pass to
-         :rose:conf:`[bunch]command-format`. Multiple named sets of
-         arguments can be defined. Each argname can be referenced in the
-         using ``%(argname)s``. The only disallowed name is
-         ``command-instances``, which is reserved for the
-         auto-generated list of instances when the
+         the commands being run. Multiple named sets of arguments can be
+         defined. Each `argname` can be referenced  using ``%(argname)s`` in
+         :rose:conf:`[bunch]command-format`, if specified, or ``${argname}``
+         environment variable otherwise. The only disallowed names are
+         ``command-instances`` and ``COMMAND_INSTANCES``, which are reserved
+         for the auto-generated list of instances when the
          :rose:conf:`[bunch]command-instances=N` option is used.

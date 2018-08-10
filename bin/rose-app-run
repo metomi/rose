@@ -78,6 +78,8 @@
 # ENVIRONMENT VARIABLES
 #     optional ROSE_APP_COMMAND_KEY
 #         Switch to a particular command specified in `[command]KEY`.
+#     optional ROSE_APP_MODE
+#         Specifies a builtin application to run.
 #     optional ROSE_APP_OPT_CONF_KEYS
 #         Each `KEY` in this space delimited list switches on an optional
 #         configuration. The configurations are applied first-to-last.

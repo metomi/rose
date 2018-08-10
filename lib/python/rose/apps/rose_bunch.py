@@ -27,11 +27,17 @@ from time import sleep
 
 from rose.app_run import (
     BuiltinApp,
-    ConfigValueError,
-    CompulsoryConfigValueError)
+    ConfigValueError)
 from rose.popen import RosePopenError
 import rose.job_runner
 from rose.reporter import Event
+
+
+class CommandNotDefinedError(Exception):
+    """An exception raised when no command to run is defiend."""
+
+    def __str__(self):
+        return "command to run not defined"
 
 
 class AbortEvent(Event):
@@ -148,18 +154,16 @@ class RoseBunchApp(BuiltinApp):
         if self.incremental:
             self.incremental = rose.env.env_var_process(self.incremental)
 
-        multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
-        for key, val in multi_args.items():
-            multi_args[key].value = rose.env.env_var_process(val.value)
-
-        self.command_format = rose.env.env_var_process(
+        self.isformatted = True
+        self.command = rose.env.env_var_process(
             conf_tree.node.get_value([self.BUNCH_SECTION, "command-format"]))
 
-        if not self.command_format:
-            raise CompulsoryConfigValueError([self.BUNCH_SECTION,
-                                             "command-format"],
-                                             None,
-                                             KeyError("command-format"))
+        if not self.command:
+            self.isformatted = False
+            self.command = app_runner.get_command(conf_tree, opts, args)
+
+        if not self.command:
+            raise CommandNotDefinedError()
 
         # Set up command-instances if needed
         instances = conf_tree.node.get_value([self.BUNCH_SECTION,
@@ -174,19 +178,27 @@ class RoseBunchApp(BuiltinApp):
                                        instances,
                                        "not an integer value")
 
+        # Argument lists
+        multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
+        bunch_args_names = []
+        bunch_args_values = []
+        for key, val in multi_args.items():
+            bunch_args_names.append(key)
+            bunch_args_values.append(
+                shlex.split(rose.env.env_var_process(val.value)))
+
         # Validate runlists
         if not self.invocation_names:
             if instances:
                 arglength = len(instances)
             else:
-                item, val = sorted(multi_args.items())[0]
-                arglength = len(shlex.split(val.value))
+                arglength = len(bunch_args_values[0])
             self.invocation_names = range(0, arglength)
         else:
             arglength = len(self.invocation_names)
 
-        for item, val in sorted(multi_args.items()):
-            if len(shlex.split(val.value)) != arglength:
+        for item, vals in zip(bunch_args_names, bunch_args_values):
+            if len(vals) != arglength:
                 raise ConfigValueError([self.ARGS_SECTION, item],
                                        conf_tree.node.get_value(
                                        [self.ARGS_SECTION, item]),
@@ -196,6 +208,12 @@ class RoseBunchApp(BuiltinApp):
             raise ConfigValueError([self.ARGS_SECTION, "command-instances"],
                                    conf_tree.node.get_value(
                                    [self.ARGS_SECTION, "command-instances"]),
+                                   "reserved keyword")
+
+        if conf_tree.node.get_value([self.ARGS_SECTION, "COMMAND_INSTANCES"]):
+            raise ConfigValueError([self.ARGS_SECTION, "COMMAND_INSTANCES"],
+                                   conf_tree.node.get_value(
+                                   [self.ARGS_SECTION, "COMMAND_INSTANCES"]),
                                    "reserved keyword")
 
         if instances and arglength != len(instances):
@@ -216,13 +234,17 @@ class RoseBunchApp(BuiltinApp):
             self.dao = None
 
         commands = {}
-        for index, name in enumerate(self.invocation_names):
-            invocation = RoseBunchCmd(name, self.command_format, index)
-            for key, vals in sorted(multi_args.items()):
-                invocation.argsdict[key] = shlex.split(vals.value)[index]
+        for vals in zip(range(arglength), self.invocation_names,
+                        *bunch_args_values):
+            index, name, bunch_args_vals = vals[0], vals[1], vals[2:]
+            argsdict = dict(zip(bunch_args_names, bunch_args_vals))
             if instances:
-                invocation.argsdict["command-instances"] = instances[index]
-            commands[name] = invocation
+                if self.isformatted:
+                    argsdict["command-instances"] = instances[index]
+                else:
+                    argsdict["COMMAND_INSTANCES"] = str(instances[index])
+            commands[name] = RoseBunchCmd(name, self.command, argsdict,
+                                          self.isformatted)
 
         procs = {}
         if 'ROSE_TASK_LOG_DIR' in os.environ:
@@ -264,6 +286,8 @@ class RoseBunchApp(BuiltinApp):
                 cmd_stderr = log_format % command.get_err_file()
                 prefix = command.get_log_prefix()
                 bunch_environ = os.environ
+                if not command.isformatted:
+                    bunch_environ.update(command.argsdict)
                 bunch_environ['ROSE_BUNCH_LOG_PREFIX'] = prefix
 
                 if self.dao:
@@ -310,16 +334,18 @@ class RoseBunchCmd(object):
 
     OUTPUT_TEMPLATE = "bunch.%s.%s"
 
-    def __init__(self, name, command, index):
-        self.command_format = command
-        self.argsdict = {}
+    def __init__(self, name, command, argsdict, isformatted):
         self.name = str(name)
-        self.index = index
+        self.command = command
+        self.argsdict = argsdict
+        self.isformatted = isformatted
 
     def get_command(self):
         """Return the command that will be run"""
 
-        return self.command_format % self.argsdict
+        if self.isformatted:
+            return self.command % self.argsdict
+        return self.command
 
     def get_out_file(self):
         """Return output file name"""

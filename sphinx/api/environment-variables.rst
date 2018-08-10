@@ -2,6 +2,14 @@ Rose Environment Variables
 ==========================
 
 
+.. envvar:: COMMAND_INSTANCES
+
+   Description
+      Environment variable provided to Rose Bunch instances at runtime to
+      identify the command instance being run.
+   Provided At Runtime By
+      * Rose Bunch
+
 .. envvar:: NPROC
 
    Description
@@ -13,6 +21,14 @@ Rose Environment Variables
 
    Description
       Can be set to define which command in an app config to use.
+   Used By
+      * :ref:`command-rose-app-run`
+      * :ref:`command-rose-task-run`
+
+.. envvar:: ROSE_APP_MODE
+
+   Description
+      Can be set to define which built-in app to run.
    Used By
       * :ref:`command-rose-app-run`
       * :ref:`command-rose-task-run`

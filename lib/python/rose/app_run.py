@@ -349,6 +349,8 @@ class AppRunner(Runner):
         app_mode = conf_tree.node.get_value(["mode"])
         if app_mode is None:
             app_mode = opts.app_mode
+        if app_mode is None:
+            app_mode = os.getenv("ROSE_APP_MODE")
         if app_mode in [None, "command"]:
             return self._command(conf_tree, opts, args)
         else:
@@ -357,6 +359,20 @@ class AppRunner(Runner):
                 raise UnknownBuiltinAppError(app_mode)
             return builtin_app.run(self, conf_tree, opts, args, uuid,
                                    work_files)
+
+    def get_command(self, conf_tree, opts, args):
+        """Get command to run."""
+        command = self.popen.list_to_shell_str(args)
+        if not command:
+            names = [opts.command_key, os.getenv("ROSE_APP_COMMAND_KEY"),
+                     os.getenv("ROSE_TASK_NAME"), "default"]
+            for name in names:
+                if not name:
+                    continue
+                command = conf_tree.node.get_value(["command", name])
+                if command is not None:
+                    break
+        return command
 
     def _prep(self, conf_tree, opts):
         """Prepare to run the application."""
@@ -429,20 +445,10 @@ class AppRunner(Runner):
 
     def _command(self, conf_tree, opts, args):
         """Run the command."""
-
-        command = self.popen.list_to_shell_str(args)
+        command = self.get_command(conf_tree, opts, args)
         if not command:
-            names = [opts.command_key, os.getenv("ROSE_APP_COMMAND_KEY"),
-                     os.getenv("ROSE_TASK_NAME"), "default"]
-            for name in names:
-                if not name:
-                    continue
-                command = conf_tree.node.get_value(["command", name])
-                if command is not None:
-                    break
-            else:
-                self.handle_event(CommandNotDefinedEvent())
-                return
+            self.handle_event(CommandNotDefinedEvent())
+            return
         if os.access("STDIN", os.F_OK | os.R_OK):
             command += " <STDIN"
         self.handle_event("command: %s" % command)
