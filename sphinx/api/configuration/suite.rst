@@ -81,6 +81,16 @@ A suite directory may contain the following:
          The assignment will be inserted after the ``#!jinja2`` line of the
          installed ``suite.rc`` file.
 
+   .. rose:conf:: empy:suite.rc
+
+      .. rose:conf:: KEY=VALUE
+
+         Define a `EmPy`_ variable ``KEY`` with the value ``VALUE`` for use
+         in the ``suite.rc`` file.
+
+         The assignment will be inserted after the ``#!empy`` line of the
+         installed ``suite.rc`` file.
+
    .. rose:conf:: [file:NAME]
 
       Specify a file/directory to be installed. ``NAME`` should be a path
