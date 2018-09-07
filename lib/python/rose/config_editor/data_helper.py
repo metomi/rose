@@ -433,9 +433,9 @@ class ConfigDataHelper(object):
                     var_id = var.metadata["id"]
                     section = self.util.get_section_option_from_id(var_id)[0]
                     sect_data = config_data.sections.get_sect(section)
-                    for key in sect_data.ignored_reason:
-                        variable_statuses.setdefault(key, 0)
-                        variable_statuses[key] += 1
+                    for key2 in sect_data.ignored_reason:
+                        variable_statuses.setdefault(key2, 0)
+                        variable_statuses[key2] += 1
                 else:
                     variable_statuses.setdefault(key, 0)
                     variable_statuses[key] += 1

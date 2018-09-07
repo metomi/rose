@@ -281,8 +281,8 @@ class DAO(object):
                 if level > len(levels) - 1:
                     levels.append([])
                 levels[level].append([])
-            for i in range(level + 1):
-                levels[i][-1].append(item)
+            for j in range(level + 1):
+                levels[j][-1].append(item)
             if item == ")":
                 level -= 1
         for i in range(len(levels) - 1, -1, -1):

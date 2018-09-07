@@ -252,13 +252,13 @@ class RosePruneApp(BuiltinApp):
                 cycle_set.add(cycle)
                 if cycle_args:
                     cycle_strs = {"cycle": cycle}
-                    for key, cycle_format in cycle_formats.items():
+                    for cycle_key, cycle_format in cycle_formats.items():
                         if self._get_cycling_mode() == "integer":
-                            cycle_strs[key] = cycle_format % int(cycle)
+                            cycle_strs[cycle_key] = cycle_format % int(cycle)
                         else:  # date time cycling
                             cycle_point = (
                                 app_runner.date_time_oper.date_parse(cycle)[0])
-                            cycle_strs[key] = (
+                            cycle_strs[cycle_key] = (
                                 app_runner.date_time_oper.date_format(
                                     cycle_format, cycle_point))
                     for tail_glob in shlex.split(cycle_args.pop()):
