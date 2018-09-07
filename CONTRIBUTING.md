@@ -44,6 +44,7 @@ below:
 * Steve Wardle (Met Office, UK)
 * Scott Wales (ARC Centre of Excellence for Climate Systems Science, Australia)
 * Thomas Coleman (Bureau of Meteorology, Australia)
+* Bruno P. Kinoshita (National Institute of Water and Atmospheric Research, New Zealand)
 
 (All contributors are identifiable with email addresses in the version control
 logs or otherwise.)
