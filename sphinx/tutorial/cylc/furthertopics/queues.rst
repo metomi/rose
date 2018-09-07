@@ -53,7 +53,7 @@ You will now have a ``suite.rc`` file that looks like this:
 .. note::
 
    In graph sections backslash (``\``) is a line continuation character i.e. the
-   following two examples are equilivalent:
+   following two examples are equivalent:
 
    .. code-block:: cylc
 

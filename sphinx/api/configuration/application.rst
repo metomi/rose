@@ -94,7 +94,7 @@ E.g. The application configuration directory may look like:
 
       .. rose:conf:: ALTERNATE=COMMAND
 
-         Specify an alternate command refered to by the name ``ALTERNATE``
+         Specify an alternate command referred to by the name ``ALTERNATE``
          which can be selected at runtime.
 
          See the :ref:`rose-tutorial-command-keys` tutorial.

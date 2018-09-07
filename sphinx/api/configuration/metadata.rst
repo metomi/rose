@@ -1016,7 +1016,7 @@ will be given.
 
 .. note::
    If a hierarchical structure for the metadata is being used,
-   the ``HEAD`` tag must be specified explictly.
+   the ``HEAD`` tag must be specified explicitly.
 
 When to create named versions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

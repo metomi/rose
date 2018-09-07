@@ -332,7 +332,7 @@ comparisons (TABLE)
 
    comp_task (TEXT)
       The comparison task name - by convention this is usually the
-      comparison section name from the app defintion (including the
+      comparison section name from the app definition (including the
       part inside the brackets).
    kgo_file (TEXT)
       The full path to the file specified as the KGO file in

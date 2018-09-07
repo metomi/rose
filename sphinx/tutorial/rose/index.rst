@@ -13,7 +13,7 @@ Rose also contains other optional tools for:
 
 * Version control.
 * Suite discovery and management.
-* Validating and tranforming Rose configurations.
+* Validating and transforming Rose configurations.
 * Interfacing with Cylc.
 
 

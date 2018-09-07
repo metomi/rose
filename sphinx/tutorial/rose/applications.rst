@@ -39,7 +39,7 @@ Rose Applications
    :inline-contents: True
 
    A Rose application or "Rose app" is a runnable :term:`Rose configuration`
-   which executes a defined commmand.
+   which executes a defined command.
 
    Rose applications provide a convenient way to encapsulate all of this
    configuration, storing it all in one place to make it easier to handle and
@@ -55,7 +55,7 @@ Application Configuration
 
    An application configuration is a directory containing a
    :rose:file:`rose-app.conf` file. Application configurations are also
-   refered to as "applications" or "apps".
+   referred to as "applications" or "apps".
 
    The command to execute when the application is run is defined using the
    :rose:conf:`rose-app.conf[command]default` setting e.g:

@@ -163,7 +163,7 @@ tasks.
 Results Of "Archiving"
 ----------------------
 
-Change to the ``$ROSE_DATA/ARCHVING/`` directory of the suite i.e:
+Change to the ``$ROSE_DATA/ARCHIVING/`` directory of the suite i.e:
 
 .. code-block:: sub
 
@@ -206,7 +206,7 @@ The following should be returned:
 
    These were all of the files in the ``$ROSE_DATA/`` directory.
 
-Change diectory to ``ARCHIVING/rename/`` and list the files::
+Change directory to ``ARCHIVING/rename/`` and list the files::
 
    cd ..
    cd rename
@@ -226,7 +226,7 @@ These are the renamed files.
 Most users will have their own system or location that they wish to archive
 their data to. Here the example shown uses `rsync`_ and `scp`_.
 Please refer your own site specific archiving solutions and seek site
-specfic advice.
+specific advice.
 
 
 Arch Settings
