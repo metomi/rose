@@ -300,4 +300,4 @@ option.
 Further Reading
 ---------------
 
-For more informaiton see :ref:`Metadata`.
+For more information see :ref:`Metadata`.

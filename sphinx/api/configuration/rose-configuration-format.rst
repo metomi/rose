@@ -99,7 +99,7 @@ E.g.
          value 2 line 2
    # This is a comment for key-3.
    key-3=value 3 line 1
-        =    value 3 line 2 has leading identation.
+        =    value 3 line 2 has leading indentation.
         =
         =    value 3 line 3 is blank. This is line 4.
 

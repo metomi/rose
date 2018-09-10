@@ -59,7 +59,7 @@ A suite directory may contain the following:
 
       .. rose:conf:: KEY=VALUE
 
-         Define an environemt variable ``KEY`` with the value ``VALUE``.
+         Define an environment variable ``KEY`` with the value ``VALUE``.
 
       .. rose:conf:: ROSE_VERSION=ROSE_VERSION_NUMBER
 

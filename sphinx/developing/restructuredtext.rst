@@ -78,7 +78,7 @@ flush with the directive or element which started them e.g:
        Bar
        Baz
 
-* Numbered lists use three space indenation:
+* Numbered lists use three space indentation:
 
   .. code-block:: rst
 

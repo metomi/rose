@@ -89,7 +89,7 @@ We can call ``cylc broadcast`` from within a task's script. This effectively
 provides the ability for tasks to communicate between themselves.
 
 It is almost always better for tasks to communicate using files but there are
-some niche situations where comminicating via ``cylc broadcast`` is justified.
+some niche situations where communicating via ``cylc broadcast`` is justified.
 This tutorial walks you through using ``cylc broadcast`` to communicate between
 tasks.
 

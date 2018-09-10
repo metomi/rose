@@ -115,11 +115,11 @@ root directory to install file targets with a relative path:
             * :rose:conf:`source=` - If source is undefined create an empty
               file.
             * :rose:conf:`source=path` - If source is a single path to a file
-              or directory then the path will be coppied to the target path.
+              or directory then the path will be copied to the target path.
             * :rose:conf:`source=file1 file2 ...` - If the source is a list of
               files then the files will be concatenated in the target path.
             * :rose:conf:`source=dir1 dir2 ...` - If the source is a list of
-              directories then the directories will be transfered to the target
+              directories then the directories will be transferred to the target
               path using ``rsync``.
 
          :opt mkdir: Creates an empty directory (:rose:conf:`source` must be a
