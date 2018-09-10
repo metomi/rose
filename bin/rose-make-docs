@@ -37,7 +37,7 @@
 #         errors.
 #     --debug
 #         Run `make` with the --debug option.
-#     --default-version=VERSION
+#     --default-version VERSION
 #         By default the current version is symlinked as the default version,
 #         provide an alternative version to override this.
 #         If set to 'none' then the default version will remain unchanged.

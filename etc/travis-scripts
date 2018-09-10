@@ -143,7 +143,7 @@ build-docs () {
     if ! rose make-docs --venv --dev --strict clean html slides pdf \
             ${DEFAULT_VERSION:-} >out 2>&1; then
         # output is a bit long, only output it if the docs fail to build
-        cat out >2
+        cat out >&2
         exit 1
     fi
 
