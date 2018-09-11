@@ -18,8 +18,10 @@ before_install:
     - ssh-keygen -t 'rsa' -f "${HOME}/.ssh/id_rsa" -N '' -q
     - cat "${HOME}/.ssh/id_rsa.pub" >>"${HOME}/.ssh/authorized_keys"
     - ssh-keyscan -t 'rsa' 'localhost' >>"${HOME}/.ssh/known_hosts"
+    # Coverage dependencies
+    - pip install coverage pytest-cov
 
-install: 
+install:
     - >
         sudo apt-get install -y at build-essential gfortran heirloom-mailx
         python-pip python-dev graphviz libgraphviz-dev python-jinja2
@@ -33,14 +35,19 @@ install:
     - sudo apt-get update
     - sudo apt-get install -y subversion
 
-script: skip
+script:
+    - export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
+    # ./bin/rose will change PYTHONPATH, so we cannot rely on that for sitecustomize.py
+    # but instead we can move the sitecustomize.py to the place used as PYTHONPATH
+    - cp "${TRAVIS_BUILD_DIR}/.travis/sitecustomize.py" ./lib/python
+    - export PYTHONPATH="${TRAVIS_BUILD_DIR}/.travis"
+    - coverage run .travis/cover.py
+    - rm ./lib/python/sitecustomize.py
 
-jobs:
-    include:
-        - stage: test
-        - script: >
-            rose test-battery --state=save -j 5 ||
-            (echo -e "\n\nRerunning Failed Tests...\n\n";
-            rose test-battery -v --state=save,failed -j 5)
-        - script: >
-            rose make-docs --venv --dev --strict clean linkcheck doctest html slides latexpdf
+after_script:
+    - rose make-docs --venv --dev --strict clean linkcheck doctest html slides latexpdf
+
+after_success:
+    - coverage combine --append
+    - coverage xml --ignore-errors
+    - bash <(curl -s https://codecov.io/bash)
