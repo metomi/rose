@@ -378,7 +378,7 @@ class EntryArrayValueWidget(gtk.HBox):
         """Remove the last selected or the last entry."""
         if (self.last_selected_src is not None and
                 self.last_selected_src in self.entries):
-            entry = self.entries.remove(self.last_selected_src)
+            entry = self.entries.pop(self.last_selected_src)
             self.last_selected_src = None
         else:
             entry = self.entries.pop()
