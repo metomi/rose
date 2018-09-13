@@ -95,6 +95,14 @@ We can also call other scripts or executables in this way, e.g:
        [[hello_world]]
            script = hello_world
 
+.. tip::
+
+   In the above example we run our custom executable by supplying just its
+   name to the ``script`` setting. This only works because we set up
+   the file so it can be executed in this way on the command line.
+
+   This is not the case in general. The ``script`` setting is for
+   *bash instructions*, not the name of a file to run.
 
 .. _tutorial-tasks-and-jobs:
 
