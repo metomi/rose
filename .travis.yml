@@ -21,7 +21,7 @@ before_install:
 install: 
     - >
         sudo apt-get install -y at build-essential gfortran heirloom-mailx
-        pcregrep python-pip python-dev graphviz libgraphviz-dev python-jinja2
+        python-pip python-dev graphviz libgraphviz-dev python-jinja2
         python-sqlalchemy libxml-parser-perl libconfig-inifiles-perl
         libdbi-perl libdbd-sqlite3-perl latexmk texlive
         texlive-generic-extra texlive-latex-extra texlive-fonts-recommended
