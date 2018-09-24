@@ -231,14 +231,24 @@ file_grep() {
 }
 
 file_pcregrep() {
-    local TEST_KEY=$1
-    local PATTERN=$2
-    local FILE=$3
-    if pcregrep -M "$PATTERN" $FILE; then
-        pass $TEST_KEY
+    local TEST_KEY="$1"
+    local PATTERN="$2"
+    local FILE="$3"
+    if _pcregrep "${PATTERN}" "${FILE}"; then
+        pass "${TEST_KEY}"
         return
     fi
-    fail $TEST_KEY
+    fail "${TEST_KEY}"
+}
+
+_pcregrep() {
+    python - "$@" <<'__PYTHON__'
+import re
+import sys
+
+pattern, filename = sys.argv[1:3]
+sys.exit(int(not re.search(pattern, open(filename).read(), re.M | re.S)))
+__PYTHON__
 }
 
 file_grep_fail() {
