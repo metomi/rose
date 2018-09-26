@@ -142,7 +142,7 @@ class SingleCommandStatus(AnalysisTask):
         for ifile, fname in enumerate(files):
             self.reporter(
                 "File {0}: {1}".format(ifile + 1,
-                                       os.path.realpath(files[ifile])))
+                                       os.path.abspath(files[ifile])))
         self.files = files
 
     def process_opt_kgo(self):
@@ -213,8 +213,8 @@ class SingleCommandStatus(AnalysisTask):
                     continue
                 self.kgo_db.enter_comparison(
                     self.options["full_task_name"],
-                    os.path.realpath(kgo_file),
-                    os.path.realpath(suite_file),
+                    os.path.abspath(kgo_file),
+                    os.path.abspath(suite_file),
                     ["FAIL", " OK "][self.passed], "Compared using grepper")
 
 
