@@ -62,6 +62,7 @@ done
 tests $(( ( ${#TESTS[@]} - 1 ) * 2 ))
 #-------------------------------------------------------------------------------
 # Run the tests.
+export CYLC_CONF_PATH=
 export TEST_DIR
 for IND in $(seq 1 $(( ${#TEST_KEYS[@]} - 1 ))); do
     TEST_KEY="${TEST_KEY_BASE}-${TEST_KEYS[$IND]}"

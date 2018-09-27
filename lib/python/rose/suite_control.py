@@ -17,17 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Launch suite engine's control commands from the correct suite host."""
+"""Launch suite engine's control commands."""
 
 import os
-import rose.config
 from rose.fs_util import FileSystemUtil
-from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener
 from rose.reporter import Reporter
 from rose.suite_engine_proc import SuiteEngineProcessor
-from rose.suite_scan import SuiteScanner
 import sys
 
 
@@ -35,42 +31,19 @@ YES = "y"
 PROMPT = "Really %s %s at %s? [" + YES + " or n (default)] "
 
 
-class SuiteNotRunningError(Exception):
-
-    """An exception raised when a suite is not running."""
-
-    def __str__(self):
-        return "%s: does not appear to be running" % (self.args)
-
-
 class SuiteControl(object):
     """Launch suite engine's control commands from the correct suite host."""
 
-    def __init__(self, event_handler=None, popen=None, suite_engine_proc=None,
-                 host_selector=None):
+    def __init__(self, event_handler=None):
         self.event_handler = event_handler
-        if popen is None:
-            popen = RosePopener(event_handler)
-        self.popen = popen
-        if suite_engine_proc is None:
-            suite_engine_proc = SuiteEngineProcessor.get_processor(
-                event_handler=event_handler, popen=popen)
-        self.suite_engine_proc = suite_engine_proc
-        if host_selector is None:
-            host_selector = HostSelector(event_handler, popen)
-        self.host_selector = host_selector
+        self.suite_engine_proc = SuiteEngineProcessor.get_processor(
+            event_handler=event_handler)
 
-    def handle_event(self, *args, **kwargs):
-        """Call self.event_handler if it is callable."""
-        if callable(self.event_handler):
-            return self.event_handler(*args, **kwargs)
-
-    def gcontrol(self, suite_name, host=None, confirm=None, stderr=None,
+    def gcontrol(self, suite_name, confirm=None, stderr=None,
                  stdout=None, *args):
         """Launch suite engine's control GUI.
 
         suite_name: name of the suite.
-        host: a host where the suite is running.
         args: extra arguments for the suite engine's gcontrol command.
 
         N.B. "confirm", "stderr" and "stdout" are not used. They are included
@@ -78,24 +51,13 @@ class SuiteControl(object):
         method.
 
         """
-        engine_version = self._get_engine_version(suite_name)
-        if host:
-            host_names = [host]
-        else:
-            host_names = self.suite_engine_proc.get_suite_run_hosts(
-                None, suite_name)
-        if not host_names:
-            raise SuiteNotRunningError(suite_name)
-        for host_name in host_names:
-            self.suite_engine_proc.gcontrol(
-                suite_name, host_name, engine_version, args)
+        self.suite_engine_proc.gcontrol(suite_name, args)
 
-    def shutdown(self, suite_name, host=None, confirm=None, stderr=None,
+    def shutdown(self, suite_name, confirm=None, stderr=None,
                  stdout=None, *args):
         """Shutdown the suite.
 
         suite_name: the name of the suite.
-        host: a host where the suite is running.
         confirm: If specified, must be a callable with the interface
                   b = confirm("shutdown", suite_name, host). This method will
                   only issue the shutdown command to suite_name at host if b is
@@ -105,28 +67,8 @@ class SuiteControl(object):
         args: extra arguments for the suite engine's shutdown command.
 
         """
-        engine_version = self._get_engine_version(suite_name)
-        if host:
-            host_names = [host]
-        else:
-            host_names = self.suite_engine_proc.get_suite_run_hosts(
-                None, suite_name)
-        if not host_names:
-            raise SuiteNotRunningError(suite_name)
-        for host_name in host_names:
-            if confirm is None or confirm("shutdown", suite_name, host_name):
-                self.suite_engine_proc.shutdown(
-                    suite_name, host_name,
-                    engine_version, args, stderr, stdout)
-
-    def _get_engine_version(self, suite_name):
-        """Return the suite engine version for starting the suite."""
-        conf_path = self.suite_engine_proc.get_suite_dir(
-            suite_name, "log", "rose-suite-run.conf")
-        if os.access(conf_path, os.F_OK | os.R_OK):
-            conf = rose.config.load(conf_path)
-            key = self.suite_engine_proc.get_version_env_name()
-            return conf.get_value(["env", key])
+        if confirm is None or confirm("shutdown", suite_name, host_name):
+            self.suite_engine_proc.shutdown(suite_name, args, stderr, stdout)
 
 
 class SuiteNotFoundError(Exception):
@@ -167,7 +109,7 @@ def main():
     argv = sys.argv[1:]
     method_name = argv.pop(0)
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("all", "host", "name", "non_interactive")
+    opt_parser.add_my_options("all", "name", "non_interactive")
     opts, args = opt_parser.parse_args(argv)
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_control = SuiteControl(event_handler=event_handler)
@@ -176,10 +118,10 @@ def main():
     suite_names = []
     if not opts.non_interactive:
         confirm = prompt
-    if opts.all:
-        suite_scanner = SuiteScanner(event_handler=event_handler)
-        results = suite_scanner.scan()[0]
-        suite_names = [result.name for result in results]
+    if opts.all and method_name == 'gcontrol':
+        suite_control.suite_engine_proc.gscan(args)
+    elif opts.all:
+        suite_names = suite_control.suite_engine_proc.get_running_suites()
     else:
         if opts.name:
             suite_names.append(opts.name)
@@ -193,12 +135,11 @@ def main():
 
     if opts.debug_mode:
         for sname in suite_names:
-            method(sname, opts.host, confirm, sys.stderr, sys.stdout, *args)
+            method(sname, confirm, sys.stderr, sys.stdout, *args)
     else:
         for sname in suite_names:
             try:
-                method(sname, opts.host, confirm, sys.stderr, sys.stdout,
-                       *args)
+                method(sname, confirm, sys.stderr, sys.stdout, *args)
             except Exception as exc:
                 event_handler(exc)
                 sys.exit(1)

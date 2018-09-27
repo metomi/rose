@@ -17,33 +17,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-run" in $HOME/cylc-run to ensure that insertion of jinja2
-# variable declarations to "suite.rc" do not get repeated.
+# Test "rose suite-run" with "site=SITE" setting in site/user conf.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
-if ! cylc check-software 2>/dev/null | grep '^Python:EmPy.*([^-]*)$' >/dev/null; then
-    skip_all '"EmPy" not installed'
-fi
-#-------------------------------------------------------------------------------
+. "$(dirname "$0")/test_header"
+
 N_TESTS=3
-tests $N_TESTS
-export ROSE_CONF_PATH=
+tests "${N_TESTS}"
+#-------------------------------------------------------------------------------
+export ROSE_CONF_PATH="${PWD}/conf"
+export ROOT_DIR_WORK="${PWD}"
+mkdir -p 'conf'
+cat >'conf/rose.conf' <<'__CONF__'
+site=my-site
+__CONF__
+
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-cat >$SUITE_RUN_DIR/rose-suite.conf <<__ROSE_SUITE_CONF__
-[empy:suite.rc]
-foo="food store"
-bar="barley drink"
-__ROSE_SUITE_CONF__
-cat >"$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
-#!empy
-@# Rose Configuration Insertion: Init
-# Anything here is to be replaced
-@# Rose Configuration Insertion: Done
-@{ egg="egg sandwich" }@
-@{ ham="hamburger" }@
+touch "${SUITE_RUN_DIR}/rose-suite.conf"
+cat >"$SUITE_RUN_DIR/suite.rc" <<'__SUITE_RC__'
+#!jinja2
 [cylc]
 UTC mode=True
 [scheduling]
@@ -52,23 +46,26 @@ graph=x
 [runtime]
 [[x]]
 __SUITE_RC__
-NAME=$(basename $SUITE_RUN_DIR)
-CYLC_VERSION=$(cylc --version)
-ROSE_ORIG_HOST=$(hostname)
-ROSE_VERSION=$(rose --version | cut -d' ' -f2)
-for I in $(seq 1 $N_TESTS); do
-    rose suite-run -C$SUITE_RUN_DIR --name=$NAME -l -q --debug -S "!bar" -S baz=True || break
-    file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
-#!empy
-@# Rose Configuration Insertion: Init
-@{ CYLC_VERSION="$CYLC_VERSION" }@
-@{ ROSE_ORIG_HOST="$ROSE_ORIG_HOST" }@
-@{ ROSE_VERSION="$ROSE_VERSION" }@
-@{ baz=True }@
-@{ foo="food store" }@
-@# Rose Configuration Insertion: Done
-@{ egg="egg sandwich" }@
-@{ ham="hamburger" }@
+NAME="$(basename "${SUITE_RUN_DIR}")"
+CYLC_VERSION="$(cylc --version)"
+ROSE_ORIG_HOST="$(hostname)"
+ROSE_VERSION="$(rose --version | cut -d' ' -f2)"
+for I in $(seq 1 "${N_TESTS}"); do
+    rose suite-run -C"${SUITE_RUN_DIR}" --name="${NAME}" -l -q --debug || break
+    file_cmp "${TEST_KEY}-${I}" "${SUITE_RUN_DIR}/suite.rc" <<__SUITE_RC__
+#!jinja2
+{# Rose Configuration Insertion: Init #}
+{% set CYLC_VERSION="${CYLC_VERSION}" %}
+{% set ROSE_ORIG_HOST="${ROSE_ORIG_HOST}" %}
+{% set ROSE_SITE="my-site" %}
+{% set ROSE_VERSION="${ROSE_VERSION}" %}
+[cylc]
+    [[environment]]
+        CYLC_VERSION=${CYLC_VERSION}
+        ROSE_ORIG_HOST=${ROSE_ORIG_HOST}
+        ROSE_SITE=my-site
+        ROSE_VERSION=${ROSE_VERSION}
+{# Rose Configuration Insertion: Done #}
 [cylc]
 UTC mode=True
 [scheduling]
@@ -79,5 +76,5 @@ graph=x
 __SUITE_RC__
 done
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME --debug
-exit 0
+rose suite-clean -q -y "${NAME}"
+exit

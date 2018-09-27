@@ -41,11 +41,16 @@ timeout 60 bash -c \
     "while ! test -e '${HOME}/cylc-run/${NAME}/.service/contact'; do sleep 1; done"
 sed -i "s/host = localhost/host = ${JOB_HOST}/" 'suite.rc'
 
-run_pass "${TEST_KEY_BASE}" \
+TEST_KEY="${TEST_KEY_BASE}"
+run_pass "${TEST_KEY}" \
     rose suite-run --debug --reload --name="${NAME}" --no-gcontrol \
     -S "HOST=\"${JOB_HOST}\""
-run_pass "${TEST_KEY_BASE}.out" \
-    grep -q -F "[INFO] ${NAME}: will reload on localhost" "${TEST_KEY_BASE}.out"
+sed -n '/\(delete\|install\): suite\.rc/p' \
+    "${TEST_KEY}.out" >"${TEST_KEY}.out.edited"
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.edited" <<'__OUT__'
+[INFO] delete: suite.rc
+[INFO] install: suite.rc
+__OUT__
 
 cylc release "${NAME}"
 

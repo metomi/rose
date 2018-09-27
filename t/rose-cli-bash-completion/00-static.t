@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 209
+tests 201
 setup
 #-------------------------------------------------------------------------------
 # Source the script.
@@ -705,60 +705,6 @@ run
 __REPLY__
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#-------------------------------------------------------------------------------
-# List option arguments for "rose suite-shutdown --host= ".
-TEST_KEY=$TEST_KEY_BASE-rose-suite-shutdown-host
-cat >rose.conf <<'__CONF__'
-[rose-host-select]
-group{quark}=up down strange charm bottom top
-
-[rose-suite-run]
-hosts=quark
-__CONF__
-export ROSE_CONF_PATH=$PWD
-COMP_WORDS=( rose suite-shutdown --host = "" )
-COMP_CWORD=4
-COMPREPLY=
-run_pass "$TEST_KEY" _rose
-compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
-up
-down
-strange
-charm
-bottom
-top
-__REPLY__
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-unset ROSE_CONF_PATH
-teardown
-#-------------------------------------------------------------------------------
-# List option arguments for "rose suite-stop --host= ".
-TEST_KEY=$TEST_KEY_BASE-rose-suite-stop-host
-setup
-cat >rose.conf <<'__CONF__'
-[rose-host-select]
-group{quark}=up down strange charm bottom top
-
-[rose-suite-run]
-hosts=quark
-__CONF__
-export ROSE_CONF_PATH=$PWD
-COMP_WORDS=( rose suite-stop --host = "" )
-COMP_CWORD=4
-COMPREPLY=
-run_pass "$TEST_KEY" _rose
-compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
-up
-down
-strange
-charm
-bottom
-top
-__REPLY__
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-unset ROSE_CONF_PATH
 teardown
 #-------------------------------------------------------------------------------
 # List option arguments for "rose task-run --app-mode=".

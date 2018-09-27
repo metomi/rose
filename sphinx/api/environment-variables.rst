@@ -228,6 +228,13 @@ Rose Environment Variables
    Provided By
       * :ref:`command-rose-suite-run`
 
+.. envvar:: ROSE_SITE
+
+   Description
+      The value of :rose:conf:`rose.conf|site` setting.
+   Provided By
+      * :ref:`command-rose-suite-run`
+
 .. envvar:: ROSE_SUITE_DIR
 
    Description

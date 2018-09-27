@@ -41,11 +41,10 @@ rose suite-run --debug -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
 
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" rose suite-restart \
-    --debug --name="${NAME}" --host="${HOST}" --no-gcontrol \
+    -v -v --debug --name="${NAME}" --host="${HOST}" --no-gcontrol \
     -- --no-detach --debug
 file_grep "${TEST_KEY}.out" \
-    "\\[INFO\\] ${NAME}: will restart on ${HOST}" \
-    "${TEST_KEY}.out"
+    "cylc restart --host=${HOST} ${NAME} --no-detach --debug" "${TEST_KEY}.out"
 # N.B. This relies on output from "cylc restart"
 file_grep "${TEST_KEY}.log" \
     "\\[jobs-submit cmd\\] cylc jobs-submit --debug -- ${SUITE_RUN_DIR}/log/job 1/t2/01" \

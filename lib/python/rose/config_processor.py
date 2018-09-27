@@ -79,17 +79,20 @@ class ConfigProcessorBase(object):
         if self.SCHEME is not None:
             self.PREFIX = self.SCHEME + ":"
 
-    def process(self, conf_tree, item, orig_keys=None, orig_value=None):
+    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
+                **kwargs):
         """Sub-class should override this method.
 
-        conf_tree:
-            The relevant rose.config_tree.ConfigTree object with the full
-            configuration.
-        item: The current configuration item to process.
-        orig_keys:
-            The keys for locating the originating setting in conf_tree in a
-            recursive processing. None implies a top level call.
-        orig_value: The value of orig_keys in conf_tree.
+        Arguments:
+            conf_tree:
+                The relevant rose.config_tree.ConfigTree object with the full
+                configuration.
+            item: The current configuration item to process.
+            orig_keys:
+                The keys for locating the originating setting in conf_tree in a
+                recursive processing. None implies a top level call.
+            orig_value: The value of orig_keys in conf_tree.
+            **kwargs: Extra keyword arguments that may be useful.
         """
         pass
 

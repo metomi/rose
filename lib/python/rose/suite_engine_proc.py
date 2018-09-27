@@ -62,30 +62,6 @@ class WebBrowserEvent(Event):
         return "%s %s" % self.args
 
 
-class SuiteScanResult(Event):
-
-    """Information on where a suite is running.
-
-    name: suite name
-    location: can be one of: "user@host:port", location of port file, etc
-
-    """
-
-    LEVEL = 0
-
-    def __init__(self, name, location):
-        Event.__init__(self, name, location)
-        self.name = name
-        self.location = location
-
-    def __cmp__(self, other):
-        return (cmp(self.name, other.name) or
-                cmp(self.location, other.location))
-
-    def __str__(self):
-        return "%s %s\n" % (self.name, self.location)
-
-
 class BaseCycleOffset(object):
 
     """Represent a cycle time offset."""
@@ -197,6 +173,14 @@ class SuiteEngineGlobalConfCompatError(Exception):
                 (engine, key, value))
 
 
+class SuiteNotRunningError(Exception):
+
+    """An exception raised when a suite is not running."""
+
+    def __str__(self):
+        return "%s: does not appear to be running" % (self.args)
+
+
 class SuiteStillRunningError(Exception):
 
     """An exception raised when a suite is still running."""
@@ -206,23 +190,6 @@ class SuiteStillRunningError(Exception):
     def __str__(self):
         suite_name, extras = self.args
         return self.FMT_HEAD % {"suite_name": suite_name} + "".join(extras)
-
-
-class SuiteHostConnectError(Exception):
-    """Cannot connect to the suite host."""
-
-    TMPL = "%s: cannot connect to some suite hosts, try again later.\n"
-    TMPL_HOST = "* %s\n"
-
-    def __str__(self):
-        suite_name, user_name, host_names = self.args
-        ret = self.TMPL % suite_name
-        for host_name in host_names:
-            auth = host_name
-            if user_name:
-                auth = user_name + "@" + host_name
-            ret += self.TMPL_HOST % auth
-        return ret
 
 
 class CycleOffsetError(ValueError):
@@ -397,6 +364,13 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
+    def get_suite_contact(self, suite_name):
+        """Return suite contact information for a user suite.
+
+        Return (dict): suite contact information.
+        """
+        raise NotImplementedError()
+
     def get_suite_dir(self, suite_name, *paths):
         """Return the path to the suite running directory.
 
@@ -412,10 +386,6 @@ class SuiteEngineProcessor(object):
         paths -- if specified, are added to the end of the path.
 
         """
-        raise NotImplementedError()
-
-    def get_suite_run_hosts(self, user_name, suite_name):
-        """Return host(s) where suite_name is running."""
         raise NotImplementedError()
 
     def get_suite_log_url(self, user_name, suite_name):
@@ -571,8 +541,12 @@ class SuiteEngineProcessor(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
-        """Launch control GUI for a suite_name running at a host."""
+    def gcontrol(self, suite_name, args=None):
+        """Launch control GUI for a suite_name."""
+        raise NotImplementedError()
+
+    def gscan(self, args=None):
+        """Launch suites scan GUI."""
         raise NotImplementedError()
 
     def is_suite_registered(self, suite_name):
@@ -625,25 +599,11 @@ class SuiteEngineProcessor(object):
         """Return (cycle, task, submit_num, ext) for a job log rel path."""
         raise NotImplementedError()
 
-    def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
-            args=None):
+    def run(self, suite_name, host=None, run_mode=None, args=None):
         """Start a suite (in a specified host)."""
         raise NotImplementedError()
 
-    def scan(self, host_names=None, timeout=TIMEOUT):
-        """Scan for running suites (in hosts).
-
-        Return (suite_scan_results, exceptions) where
-        suite_scan_results is a list of SuiteScanResult instances and
-        exceptions is a list of exceptions resulting from any failed scans
-
-        Default timeout for SSH and "cylc scan" command is 5 seconds.
-
-        """
-        raise NotImplementedError()
-
-    def shutdown(self, suite_name, host=None, engine_version=None, args=None,
-                 stderr=None, stdout=None):
+    def shutdown(self, suite_name, args=None, stderr=None, stdout=None):
         """Shut down the suite."""
         raise NotImplementedError()
 

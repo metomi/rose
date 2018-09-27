@@ -190,6 +190,33 @@ class RosePopener(object):
             raise RosePopenError(args, 1, "", str(exc))
         return proc
 
+    def run_nohup_gui(self, cmd):
+        """Launch+detach a GUI command with nohup.
+
+        Launch the GUI command with `nohup bash -c 'exec ...'` redirecting
+        standard input and outputs from and to `/dev/null`, and setting it to
+        become a process group leader. Equivalent to a double fork.
+
+        Arguments:
+            cmd (str): command string of the GUI.
+
+        Return (subprocess.Popen):
+            Return the process object for the "nohup" command.
+            Return None if no DISPLAY is set.
+        """
+        if 'DISPLAY' not in os.environ:
+            return
+        return self.run_bg(
+            r'nohup',
+            r'bash',
+            r'-c',
+            r'exec ' + cmd + r' <"/dev/null" >"/dev/null" 2>&1',
+            preexec_fn=os.setpgrp,
+            stdin=open(os.devnull),
+            stdout=open(os.devnull, "wb"),
+            stderr=open(os.devnull, "wb"),
+        )
+
     def run_ok(self, *args, **kwargs):
         """Same as RosePopener.run, but raise RosePopenError if ret_code != 1.
 
