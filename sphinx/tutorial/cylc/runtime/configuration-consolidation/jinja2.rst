@@ -132,7 +132,7 @@ This would result in:
 
    #!Jinja2
 
-   {% set stations = {'belmullet: 3976,
+   {% set stations = {'belmullet': 3976,
                       'camborne': 3808,
                       'heathrow': 3772,
                       'shetland': 3005} %}
