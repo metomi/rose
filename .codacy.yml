@@ -1,0 +1,10 @@
+# exclude un-modified external software from Codacy analysis
+exclude_paths:
+  - lib/html/static/css/bootstrap-*
+  - lib/html/static/js/bootstrap.min.js
+  - lib/html/static/css/jquery.dataTables*
+  - lib/html/static/js/jquery.dataTables*
+  - lib/html/static/js/livestamp.min.js
+  - lib/html/static/js/moment.min.js
+  - lib/python/isodatetime/
+  - etc/tutorial/cylc/python/png.py
