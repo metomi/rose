@@ -383,6 +383,44 @@ Open the ``cylc gui`` and run the suite. You should see that if the
 are replaced by the ``eat_cake`` task.
 
 
+Comparing "Regular" and "Suicide" Triggers
+------------------------------------------
+
+In Cylc "regular" and "suicide" triggers both work in the same way. For example
+the following graph lines implicitly combine using an ``&`` operator:
+
+.. highlight:: cylc-graph
+
+.. list-table::
+   :class: grid-table
+
+   * - ::
+
+           foo => pub
+           bar => pub
+     - ::
+
+           foo & bar => pub
+
+Suicide triggers combine in the same way:
+
+.. list-table::
+   :class: grid-table
+
+   * - ::
+
+           foo => !pub
+           bar => !pub
+     - ::
+
+           foo & bar => !pub
+
+.. highlight:: python
+
+This means that suicide triggers are treated as "invisible tasks" rather than
+as "events". Suicide triggers can have pre-requisites just like a normal task.
+
+
 Variations
 ----------
 
@@ -554,19 +592,18 @@ the task ``showdown`` produces one of three possible custom outputs, ``good``,
 
    [scheduling]
        [[dependencies]]
-           [[[R1]]]
-               graph = """
-                   # In the "good" case run "good" but not "bad" or "ugly".
-                   showdown:good => good & ! bad & ! ugly
+            graph = """
+                # The "regular" dependencies
+                showdown:good => good
+                showdown:bad => bad
+                showdown:ugly => ugly
+                good | bad | ugly => fin
 
-                   # In the "bad" case run "bad" but not "good" or "ugly".
-                   showdown:bad => bad & ! good & ! ugly
-
-                   # In the "ugly" case run "ugly" but not "good" or "bad".
-                   showdown:ugly => ugly & ! good & ! bad
-
-                   good | bad | ugly => fin
-               """
+                # The "suicide" dependencies for each case
+                showdown:good | showdown:bad => ! ugly
+                showdown:bad | showdown:ugly => ! good
+                showdown:ugly | showdown:good => ! bad
+            """
    [runtime]
        [[root]]
            script = sleep 1
