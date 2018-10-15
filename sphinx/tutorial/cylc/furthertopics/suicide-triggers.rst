@@ -599,7 +599,7 @@ the task ``showdown`` produces one of three possible custom outputs, ``good``,
                 showdown:ugly => ugly
                 good | bad | ugly => fin
 
-                # The "suicide" dependencis for each case
+                # The "suicide" dependencies for each case
                 showdown:good | showdown:bad => ! ugly
                 showdown:bad | showdown:ugly => ! good
                 showdown:ugly | showdown:good => ! bad
