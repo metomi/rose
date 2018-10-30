@@ -39,6 +39,7 @@ run_pass "${TEST_KEY_BASE}" \
     "${ROSE_HOME}/lib/python/isodatetime" \
     "${ROSE_HOME}/lib/python/rose" \
     "${ROSE_HOME}/lib/python/rosie" \
+    "${ROSE_HOME}/sphinx/ext" \
     "${ROSE_HOME}/sphinx/conf.py"
 file_cmp "${TEST_KEY_BASE}.out" "${TEST_KEY_BASE}.out" <'/dev/null'
 file_cmp "${TEST_KEY_BASE}.err" "${TEST_KEY_BASE}.err" <'/dev/null'
