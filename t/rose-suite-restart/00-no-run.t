@@ -45,8 +45,7 @@ head -1 "${TEST_KEY}.err" >"${TEST_KEY}.err.head"
 file_cmp "${TEST_KEY}.err.head" "${TEST_KEY}.err.head" <<__ERR__
 [FAIL] cylc restart ${NAME} --no-detach --debug # return-code=1, stderr=
 __ERR__
-file_grep "${TEST_KEY}.err.grep" \
-    "No such file or directory: '${HOME}/cylc-run/${NAME}/suite.rc'" \
+file_grep "${TEST_KEY}.err.grep" "ERROR: no suite.rc in ${HOME}/cylc-run/${NAME}" \
     "${TEST_KEY}.err"
 rm -fr "${HOME}/cylc-run/${NAME}"
 #-------------------------------------------------------------------------------

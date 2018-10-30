@@ -62,12 +62,15 @@ done
 tests $(( ( ${#TESTS[@]} - 1 ) * 2 ))
 #-------------------------------------------------------------------------------
 # Run the tests.
-export TEST_DIR
+export REG_BASE=$(mktemp -d --tmpdir="${HOME}/cylc-run" |xargs basename)
 for IND in $(seq 1 $(( ${#TEST_KEYS[@]} - 1 ))); do
     TEST_KEY="${TEST_KEY_BASE}-${TEST_KEYS[$IND]}"
     export TUT_DIR="${TUT_DIRS[$IND]}"
+    export CYLC_RUN_DIR="${HOME}/cylc-run/"
+    export REG="${REG_BASE}/$(basename $TUT_DIR)"
     run_pass "${TEST_KEY}" bash -c "${TESTS[$IND]}"
     file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" /dev/null
 done
+rm -rf "${HOME}/cylc-run/${REG_BASE}"
 #-------------------------------------------------------------------------------
-exit 0
+exit

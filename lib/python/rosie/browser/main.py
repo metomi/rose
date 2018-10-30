@@ -49,9 +49,10 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopenError
 import rose.reporter
 from rose.resource import ResourceLocator, ResourceError
-from rose.suite_control import SuiteControl, SuiteNotRunningError
+from rose.suite_control import SuiteControl
 from rose.suite_engine_proc import (
-    NoSuiteLogError, SuiteEngineProcessor, WebBrowserEvent)
+    NoSuiteLogError, SuiteEngineProcessor, WebBrowserEvent,
+    SuiteNotRunningError)
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.status
