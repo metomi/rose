@@ -38,8 +38,22 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
     MSG_DONE = "Rose Configuration Insertion: Done"
     MSG_INIT = "Rose Configuration Insertion: Init"
 
-    def process(self, conf_tree, item, orig_keys=None, orig_value=None, **_):
-        """Process [jinja2:*] in "conf_tree.node"."""
+    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
+                **kwargs):
+        """Process [jinja2:*] in "conf_tree.node".
+
+        Arguments:
+            conf_tree:
+                The relevant rose.config_tree.ConfigTree object with the full
+                configuration.
+            item: The current configuration item to process.
+            orig_keys:
+                The keys for locating the originating setting in conf_tree in a
+                recursive processing. None implies a top level call.
+            orig_value: The value of orig_keys in conf_tree.
+            **kwargs:
+                environ (dict): suite level environment variables.
+        """
         for s_key, s_node in sorted(conf_tree.node.value.items()):
             if (s_node.is_ignored() or
                     not s_key.startswith(self.PREFIX) or
@@ -63,6 +77,12 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                 except UnboundEnvironmentVariableError as exc:
                     raise ConfigProcessError([s_key, key], node.value, exc)
                 tmp_file.write(self.ASSIGN_TEMPL % (key, value))
+            environ = kwargs.get("environ")
+            if environ:
+                tmp_file.write('[cylc]\n')
+                tmp_file.write('    [[environment]]\n')
+                for key, value in sorted(environ.items()):
+                    tmp_file.write('        %s=%s\n' % (key, value))
             tmp_file.write(msg_done_ln)
             line_n = 0
             is_in_old_insert = False

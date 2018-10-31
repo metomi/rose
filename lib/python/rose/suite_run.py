@@ -35,8 +35,6 @@ from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
 from rose.run_source_vc import write_source_vc_info
 from rose.suite_clean import SuiteRunCleaner
-from rose.suite_control import SuiteNotRunningError
-import shlex
 import shutil
 import sys
 from tempfile import TemporaryFile, mkdtemp
@@ -58,14 +56,6 @@ class SkipReloadEvent(Event):
 
     def __str__(self):
         return "%s: reload complete. \"%s\" unchanged" % self.args
-
-
-class SuiteHostSelectEvent(Event):
-
-    """An event raised to report the host for running a suite."""
-
-    def __str__(self):
-        return "%s: will %s on %s" % self.args
 
 
 class SuiteLogArchiveEvent(Event):
@@ -182,10 +172,12 @@ class SuiteRunner(Runner):
                 ["env", suite_engine_key])
         else:
             suite_engine_version = self.suite_engine_proc.get_version()
+        resloc = ResourceLocator.default()
         auto_items = [
             (suite_engine_key, suite_engine_version),
             ("ROSE_ORIG_HOST", self.host_selector.get_local_host()),
-            ("ROSE_VERSION", ResourceLocator.default().get_version())]
+            ("ROSE_SITE", resloc.get_conf().get_value(['site'], '')),
+            ("ROSE_VERSION", resloc.get_version())]
         for key, val in auto_items:
             requested_value = conf_tree.node.get_value(["env", key])
             if requested_value:
@@ -203,15 +195,9 @@ class SuiteRunner(Runner):
                                                        conf_tree.node)
 
         # See if suite is running or not
-        hosts = []
-        if opts.host:
-            hosts.append(opts.host)
         if opts.run_mode == "reload":
-            suite_run_hosts = self.suite_engine_proc.get_suite_run_hosts(
-                None, suite_name)
-            if not suite_run_hosts:
-                raise SuiteNotRunningError(suite_name)
-            hosts = suite_run_hosts
+            # Check suite is running
+            self.suite_engine_proc.get_suite_contact(suite_name)
         else:
             self.suite_engine_proc.check_suite_not_running(suite_name)
 
@@ -222,6 +208,9 @@ class SuiteRunner(Runner):
         # created in validate only mode is cleaned up. Exceptions are not
         # caught here
         try:
+            # Process Environment Variables
+            environ = self.config_pm(conf_tree, "env")
+
             if opts.validate_suite_only_mode:
                 temp_dir = mkdtemp()
                 suite_dir = os.path.join(temp_dir, suite_dir_rel)
@@ -295,9 +284,6 @@ class SuiteRunner(Runner):
                 self.event_handler.contexts[uuid].handle = log_file
                 temp_log_file.close()
 
-            # Process Environment Variables
-            environ = self.config_pm(conf_tree, "env")
-
             # Process Files
             cwd = os.getcwd()
             for rel_path, conf_dir in conf_tree.files.items():
@@ -328,14 +314,15 @@ class SuiteRunner(Runner):
             self.config_pm(conf_tree, "file",
                            no_overwrite_mode=opts.no_overwrite_mode)
 
-            # Process Jinja2 configuration
-            self.config_pm(conf_tree, templ_scheme)
+            # Process suite configuration template header
+            # (e.g. Jinja2:suite.rc, EmPy:suite.rc)
+            self.config_pm(conf_tree, templ_scheme, environ=environ)
 
             # Ask suite engine to parse suite configuration
             # and determine if it is up to date (unchanged)
             if opts.validate_suite_only_mode:
                 suite_conf_unchanged = self.suite_engine_proc.cmp_suite_conf(
-                    suite_dir, opts.run_mode, opts.strict_mode,
+                    suite_dir, None, opts.strict_mode,
                     debug_mode=True)
             else:
                 suite_conf_unchanged = self.suite_engine_proc.cmp_suite_conf(
@@ -366,7 +353,6 @@ class SuiteRunner(Runner):
             work_files.append(uuid_file)
 
         # Install items to user@host
-        conf = ResourceLocator.default().get_conf()
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
         proc_queue = []  # [[proc, command, "ssh"|"rsync", auth], ...]
         for auth in sorted(auths):
@@ -459,28 +445,7 @@ class SuiteRunner(Runner):
 
         # Start the suite
         self.fs_util.chdir("log")
-        ret = 0
-        # FIXME: should sync files to suite host?
-        if opts.run_mode != "reload":
-            if opts.host:
-                hosts = [opts.host]
-            else:
-                names = shlex.split(
-                    conf.get_value(["rose-suite-run", "hosts"], ""))
-                if names:
-                    hosts += names
-
-        if (hosts and len(hosts) == 1 and
-                self.host_selector.is_local_host(hosts[0])):
-            host = "localhost"
-        elif hosts:
-            host = self.host_selector(hosts)[0][0]
-        else:
-            host = "localhost"
-        self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
-        # FIXME: values in environ were expanded in the localhost
-        self.suite_engine_proc.run(
-            suite_name, host, environ, opts.run_mode, args)
+        self.suite_engine_proc.run(suite_name, opts.host, opts.run_mode, args)
 
         # Disconnect log file handle, so monitoring tool command will no longer
         # be associated with the log file.
@@ -489,10 +454,10 @@ class SuiteRunner(Runner):
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
-        if os.getenv("DISPLAY") and host and opts.gcontrol_mode:
-            self.suite_engine_proc.gcontrol(suite_name, host)
+        if opts.gcontrol_mode and opts.run_mode != "reload":
+            self.suite_engine_proc.gcontrol(suite_name)
 
-        return ret
+        return 0
 
     @classmethod
     def _run_conf(

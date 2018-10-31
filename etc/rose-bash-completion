@@ -318,22 +318,10 @@ _rose_suite_run__run() {
     COMPREPLY=( $(compgen -W "reload restart run" -- $1) )
 }
 
-_rose_suite_shutdown__host() {
-    local hosts
-    hosts=$(rose config rose-suite-run hosts 2>/dev/null)
-    hosts=$(__rose_get_expanded_hosts $hosts)
-    COMPREPLY=( $(compgen -W "$hosts" -- $1) )
-}
-
 _rose_suite_shutdown__name() {
     local names
     names=$(cylc print -xy 2>/dev/null)
     COMPREPLY=( $(compgen -W "$names" -- $1) )
-}
-
-_rose_suite_stop__host() {
-    _rose_suite_shutdown__host "$@"
-    return $?
 }
 
 _rose_suite_stop__name() {

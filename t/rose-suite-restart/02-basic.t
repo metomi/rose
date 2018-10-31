@@ -20,7 +20,7 @@
 # Test "rose suite-restart", basic usage.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-tests 3
+tests 2
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
@@ -34,9 +34,6 @@ TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
     rose suite-restart --debug --name="${NAME}" --no-gcontrol \
     -- --no-detach --debug
-file_grep "${TEST_KEY}.out" \
-    "\\[INFO\\] ${NAME}: will restart on localhost" \
-    "${TEST_KEY}.out"
 # N.B. This relies on output from "cylc restart"
 file_grep "${TEST_KEY}.log" \
     "\\[jobs-submit cmd\\] cylc jobs-submit --debug -- ${SUITE_RUN_DIR}/log/job 1/t2/01" \

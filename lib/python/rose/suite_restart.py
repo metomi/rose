@@ -23,18 +23,11 @@ import os
 import sys
 import traceback
 
-from rose.config import ConfigLoader, ConfigSyntaxError
-from rose.config_processor import ConfigProcessorsManager
-from rose.config_tree import ConfigTree
-from rose.fs_util import FileSystemUtil
-from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
+from rose.popen import RosePopenError
 from rose.reporter import Reporter
-from rose.resource import ResourceLocator
 from rose.suite_control import get_suite_name, SuiteNotFoundError
 from rose.suite_engine_proc import SuiteEngineProcessor
-from rose.suite_run import SuiteHostSelectEvent
 
 
 class SuiteRestarter(object):
@@ -43,15 +36,8 @@ class SuiteRestarter(object):
 
     def __init__(self, event_handler=None):
         self.event_handler = event_handler
-        self.popen = RosePopener(self.event_handler)
-        self.fs_util = FileSystemUtil(self.event_handler)
-        self.config_pm = ConfigProcessorsManager(
-            self.event_handler, self.popen, self.fs_util)
-        self.host_selector = HostSelector(self.event_handler, self.popen)
         self.suite_engine_proc = SuiteEngineProcessor.get_processor(
-            event_handler=self.event_handler,
-            popen=self.popen,
-            fs_util=self.fs_util)
+            event_handler=self.event_handler)
 
     def handle_event(self, *args, **kwargs):
         """Handle event."""
@@ -74,42 +60,13 @@ class SuiteRestarter(object):
         # Ensure suite is not running
         self.suite_engine_proc.check_suite_not_running(suite_name)
 
-        # Determine suite host to restart suite
-        if host:
-            hosts = [host]
-        else:
-            hosts = []
-            val = ResourceLocator.default().get_conf().get_value(
-                ["rose-suite-run", "hosts"], "localhost")
-            for known_host in val.split():
-                if known_host not in hosts:
-                    hosts.append(known_host)
-
-        if hosts == ["localhost"]:
-            host = hosts[0]
-        else:
-            host = self.host_selector(hosts)[0][0]
-        self.handle_event(SuiteHostSelectEvent(suite_name, "restart", host))
-
-        # Suite host environment
-        run_conf_file_name = self.suite_engine_proc.get_suite_dir(
-            suite_name, "log", "rose-suite-run.conf")
-        try:
-            run_conf = ConfigLoader().load(run_conf_file_name)
-        except (ConfigSyntaxError, IOError):
-            environ = None
-        else:
-            run_conf_tree = ConfigTree()
-            run_conf_tree.node = run_conf
-            environ = self.config_pm(run_conf_tree, "env")
-
         # Restart the suite
-        self.suite_engine_proc.run(suite_name, host, environ, "restart", args)
+        self.suite_engine_proc.run(suite_name, host, "restart", args)
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
-        if os.getenv("DISPLAY") and host and gcontrol_mode:
-            self.suite_engine_proc.gcontrol(suite_name, host)
+        if gcontrol_mode:
+            self.suite_engine_proc.gcontrol(suite_name)
 
         return
 

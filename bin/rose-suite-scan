@@ -21,18 +21,9 @@
 #     rose suite-scan
 #
 # SYNOPSIS
-#     rose suite-scan [HOST ...]
+#     rose suite-scan [...]
 #
 # DESCRIPTION
-#     Scan for running suites.
-#
-#     If no HOST specified, use `[rose-suite-run] hosts` setting in site / user
-#     configuration. If no configuration defined, use `localhost`.
-#
-# OPTIONS
-#     --quiet, -q
-#         Decrement verbosity.
-#     --verbose, -v
-#         Increment verbosity.
+#     Run `cylc scan [...]`.
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_scan "$@"
+exec cylc scan "$@"

@@ -19,6 +19,8 @@ meta-path=DIR1[:DIR2[:...]]
 #
 # URL to Rose documentation.
 rose-doc=http://metomi.github.io/rose/
+# Site name, used by suite configuration for portability.
+site=SITE-NAME
 
 
 # Configuration of external commands.

@@ -25,19 +25,19 @@ import os
 import pwd
 import re
 from random import shuffle
-from rose.fs_util import FileSystemEvent
-from rose.popen import RosePopenError
-from rose.reporter import Event, Reporter
-from rose.suite_engine_proc import (
-    SuiteEngineProcessor, SuiteScanResult,
-    SuiteEngineGlobalConfCompatError, SuiteStillRunningError, TaskProps)
-import signal
 import socket
 import sqlite3
 import tarfile
 from tempfile import mkstemp
-from time import sleep, time
+from time import sleep
 from uuid import uuid4
+
+from rose.fs_util import FileSystemEvent
+from rose.popen import RosePopenError
+from rose.reporter import Event, Reporter
+from rose.suite_engine_proc import (
+    SuiteEngineProcessor, SuiteEngineGlobalConfCompatError,
+    SuiteNotRunningError, SuiteStillRunningError, TaskProps)
 
 
 _PORT_SCAN = "port-scan"
@@ -87,16 +87,16 @@ class CylcProcessor(SuiteEngineProcessor):
         Raise:
             SuiteStillRunningError: if suite is still running.
         """
-        fname = self.get_suite_dir(suite_name, ".service", "contact")
         try:
-            lines_str = open(fname).read()
-        except IOError:
+            contact_info = self.get_suite_contact(suite_name)
+        except SuiteNotRunningError:
             return  # No contact file, suite not running
         else:
+            fname = self.get_suite_dir(suite_name, ".service", "contact")
             extras = ["Contact info from: \"%s\"\n" % fname]
-            for line in lines_str.splitlines(True):  # splitlines keep ends
-                if line.split("=")[0] in self.CONTACT_KEYS:
-                    extras.append("    %s" % line)
+            for key, value in sorted(contact_info.items()):
+                if key in self.CONTACT_KEYS:
+                    extras.append("    %s=%s\n" % (key, value))
             extras.append("Try \"cylc stop '%s'\" first?" % suite_name)
             raise SuiteStillRunningError(suite_name, extras)
 
@@ -130,19 +130,50 @@ class CylcProcessor(SuiteEngineProcessor):
         finally:
             os.unlink(new_suite_rc_processed)
 
-    def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
-        """Launch control GUI for a suite_name running at a host."""
-        if not self.is_suite_registered(suite_name):
-            raise SuiteNotRegisteredError(suite_name)
-        if not host:
-            host = "localhost"
-        environ = dict(os.environ)
-        if engine_version:
-            environ.update({self.get_version_env_name(): engine_version})
-        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1 &"
-        args_str = self.popen.list_to_shell_str(args)
-        self.popen(fmt % (host, suite_name, args_str, os.devnull),
-                   env=environ, shell=True)
+    def gcontrol(self, suite_name, args=None):
+        """Launch control GUI for a suite_name."""
+        return self.popen.run_nohup_gui(
+            r'env CYLC_VERSION=%s cylc gui %s %s' % (
+                self.get_suite_contact(suite_name).get('CYLC_VERSION', ''),
+                suite_name,
+                self.popen.list_to_shell_str(args),
+            )
+        )
+
+    def gscan(self, args=None):
+        """Launch suites scan GUI."""
+        return self.popen.run_nohup_gui(
+            r'cylc gscan %s' % (self.popen.list_to_shell_str(args),))
+
+    def get_running_suites(self):
+        """Return a list containing the names of running suites."""
+        rootd = os.path.join(os.path.expanduser('~'), self.SUITE_DIR_REL_ROOT)
+        sub_names = ['.service', 'log', 'share', 'work', self.SUITE_CONF]
+        items = []
+        for dirpath, dnames, fnames in os.walk(rootd, followlinks=True):
+            if dirpath != rootd and any(
+                    name in dnames + fnames for name in sub_names):
+                dnames[:] = []
+            else:
+                continue
+            if os.path.exists(os.path.join(dirpath, '.service', 'contact')):
+                items.append(os.path.relpath(dirpath, rootd))
+        return items
+
+    def get_suite_contact(self, suite_name):
+        """Return suite contact information for a user suite.
+
+        Return (dict): suite contact information.
+        """
+        try:
+            ret = {}
+            for line in open(
+                    self.get_suite_dir(suite_name, ".service", "contact")):
+                key, value = [item.strip() for item in line.split("=", 1)]
+                ret[key] = value
+            return ret
+        except (IOError, ValueError):
+            raise SuiteNotRunningError(suite_name)
 
     @classmethod
     def get_suite_dir_rel(cls, suite_name, *paths):
@@ -178,30 +209,6 @@ class CylcProcessor(SuiteEngineProcessor):
                     auths.append(auth)
         self._db_close(suite_name)
         return auths
-
-    def get_suite_run_hosts(self, user_name, suite_name):
-        """Return a list of host(s) where suite_name has running processes."""
-        if user_name is None:
-            user_name = pwd.getpwuid(os.getuid()).pw_name
-        else:
-            try:
-                pwd.getpwnam(user_name)
-            except KeyError:  # invalid user name
-                return []
-
-        # Get suite host name from:
-        # * ~USERID/cylc-run/SUITE/.service/contact
-        file_path = os.path.join(
-            os.path.expanduser("~" + user_name),
-            self.get_suite_dir_rel(suite_name, ".service", "contact"))
-        try:
-            for line in open(file_path):
-                key, value = [item.strip() for item in line.split("=", 1)]
-                if key == "CYLC_SUITE_HOST":
-                    return [value]
-        except (IOError, ValueError):
-            pass
-        return []
 
     def get_task_auth(self, suite_name, task_name):
         """
@@ -512,121 +519,49 @@ class CylcProcessor(SuiteEngineProcessor):
             hook_event, suite, task, hook_message = args
         return [suite, task, hook_event, hook_message]
 
-    def run(self, suite_name, host=None, host_environ=None, run_mode=None,
-            args=None):
+    def run(self, suite_name, host=None, run_mode=None, args=None):
         """Invoke "cylc run" (in a specified host).
 
         The current working directory is assumed to be the suite log directory.
 
         suite_name: the name of the suite.
         host: the host to run the suite. "localhost" if None.
-        host_environ: a dict of environment variables to export in host.
         run_mode: call "cylc restart|reload" instead of "cylc run".
         args: arguments to pass to "cylc run".
 
         """
-
-        # Check that "host" is not the localhost
-        if host and self.host_selector.is_local_host(host):
-            host = None
-
-        # Invoke "cylc run" or "cylc restart"
-        if run_mode not in ["reload", "restart", "run"]:
-            run_mode = "run"
-        opt_force = ""
-        if run_mode == "reload":
-            opt_force = " --force"
-        # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
-        # that the log will be redirected back via "ssh" to the localhost.
-        bash_cmd = r"cylc %s%s %s %s" % (
-            run_mode, opt_force, suite_name,
-            self.popen.list_to_shell_str(args))
-        if host:
-            bash_cmd_prefix = "set -eu\ncd\n"
-            log_dir = self.get_suite_dir_rel(suite_name, "log")
-            bash_cmd_prefix += "mkdir -p %s\n" % log_dir
-            bash_cmd_prefix += "cd %s\n" % log_dir
-            if host_environ:
-                for key, value in host_environ.items():
-                    val = self.popen.list_to_shell_str([value])
-                    bash_cmd_prefix += "%s=%s\n" % (key, val)
-                    bash_cmd_prefix += "export %s\n" % (key)
-            ssh_cmd = self.popen.get_cmd("ssh", host, "bash", "--login")
-            out, err = self.popen(*ssh_cmd, stdin=(bash_cmd_prefix + bash_cmd))
-        else:
-            out, err = self.popen(bash_cmd, shell=True)
+        if run_mode not in ['reload', 'restart', 'run']:
+            run_mode = 'run'
+        cmd = ['cylc', run_mode]
+        if run_mode == 'reload':
+            cmd.append('--force')
+        if host and not self.host_selector.is_local_host(host):
+            cmd.append('--host=%s' % host)
+        cmd.append(suite_name)
+        cmd += args
+        out, err = self.popen(*cmd)
         if err:
             self.handle_event(err, kind=Event.KIND_ERR)
         if out:
             self.handle_event(out)
 
-    def scan(self, hosts=None, timeout=None):
-        """Scan for running suites (in hosts).
-
-        Return (suite_scan_results, exceptions) where
-        suite_scan_results is a list of SuiteScanResult instances and
-        exceptions is a list of exceptions resulting from any failed scans
-
-        Default timeout for SSH and "cylc scan" command is 5 seconds.
-
-        """
-        if not hosts:
-            hosts = ["localhost"]
-        if timeout is None:
-            timeout = self.TIMEOUT
-        cmd = ["cylc", "scan", "--comms-timeout=%s" % timeout] + list(hosts)
-        proc = self.popen.run_bg(*cmd)
-        results = {}
-        exceptions = []
-        end_time = time() + timeout
-        while time() < end_time:
-            sleep(0.1)
-            ret_code = proc.poll()
-            if ret_code is None:
-                continue
-            if ret_code == 0:
-                for line in proc.communicate()[0].splitlines():
-                    name, location = line.split()
-                    host = location.split("@")[1].split(":")[0]
-                    results[(name, host, _PORT_SCAN)] = SuiteScanResult(
-                        name, location)
-            else:
-                out, err = proc.communicate()
-                exceptions.append(RosePopenError(cmd, ret_code, out, err))
-            proc = None
-            break
-        # Timed out, kill remaining processes
-        if proc is not None:
-            try:
-                os.killpg(proc.pid, signal.SIGTERM)
-            except OSError:
-                pass
-            else:
-                ret_code = proc.wait()
-                out, err = proc.communicate()
-                exceptions.append(RosePopenError(cmd, ret_code, out, err))
-        return (sorted(results.values()), exceptions)
-
-    def shutdown(self, suite_name, host=None, engine_version=None, args=None,
-                 stderr=None, stdout=None):
+    def shutdown(self, suite_name, args=None, stderr=None, stdout=None):
         """Shut down the suite.
 
         suite_name -- the name of the suite.
-        host -- a host where the suite is running.
-        engine_version -- if specified, use this version of Cylc.
         stderr -- A file handle for stderr, if relevant for suite engine.
         stdout -- A file handle for stdout, if relevant for suite engine.
         args -- extra arguments for "cylc shutdown".
 
         """
+        contact_info = self.get_suite_contact(suite_name)
+        if not contact_info:
+            raise SuiteNotRunningError(suite_name)
+        environ = dict(os.environ)
+        environ.update({'CYLC_VERSION': contact_info['CYLC_VERSION']})
         command = ["cylc", "shutdown", suite_name, "--force"]
-        if host:
-            command += ["--host=%s" % host]
         if args:
             command += args
-        environ = dict(os.environ)
-        if engine_version:
-            environ.update({self.get_version_env_name(): engine_version})
         self.popen.run_simple(
             *command, env=environ, stderr=stderr, stdout=stdout)
 
@@ -635,17 +570,10 @@ class CylcProcessor(SuiteEngineProcessor):
         if self.daos.get(suite_name) is not None:
             self.daos[suite_name].close()
 
-    def _db_exec(self, suite_name, stmt, stmt_args=None, commit=False):
+    def _db_exec(self, suite_name, stmt, stmt_args=None):
         """Execute a query on a named database connection."""
         daos = self._db_init(suite_name)
-        return daos.execute(stmt, stmt_args, commit)
-
-    def _db_has_table(self, suite_name, table_name):
-        """Return True if table_name exists in the suite database."""
-        cursor = self._db_exec(
-            suite_name,
-            "SELECT name FROM sqlite_master WHERE name==?", [table_name])
-        return (cursor and cursor.fetchone() is not None)
+        return daos.execute(stmt, stmt_args)
 
     def _db_init(self, suite_name):
         """Initialise a named database connection."""
@@ -719,11 +647,6 @@ class CylcSuiteDAO(object):
         self.cursor = None
         self.conn = None
 
-    def commit(self):
-        """Commit any changes to current connection."""
-        if self.conn is not None:
-            self.conn.commit()
-
     def connect(self, is_new=False):
         """Connect to the DB. Set the cursor. Return the connection."""
         if self.cursor is not None:
@@ -743,7 +666,7 @@ class CylcSuiteDAO(object):
                 break
         return self.conn
 
-    def execute(self, stmt, stmt_args=None, commit=False):
+    def execute(self, stmt, stmt_args=None):
         """Execute a statement. Return the cursor."""
         if stmt_args is None:
             stmt_args = []
@@ -763,13 +686,4 @@ class CylcSuiteDAO(object):
                 break
         if self.cursor is None:
             return []
-        if commit:
-            self.commit()
         return self.cursor
-
-
-class SuiteNotRegisteredError(Exception):
-
-    """An exception raised when a suite is not registered."""
-    def __str__(self):
-        return "%s: not a registered suite." % self.args[0]

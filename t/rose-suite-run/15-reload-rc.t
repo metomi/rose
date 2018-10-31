@@ -36,12 +36,11 @@ cat >src/rose-suite.conf <<'__CONF__'
 ROSE_TASK_RUN_ARGS="-O earth"
 __CONF__
 run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
-sed -n '/\(delete\|install\): suite\.rc/p; /will reload on localhost/p' \
-    "$TEST_KEY.out" >"$TEST_KEY.out.tail"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
+sed -n '/\(delete\|install\): suite\.rc/p' "${TEST_KEY}.out" \
+    >"${TEST_KEY}.out.edited"
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.edited" <<'__OUT__'
 [INFO] delete: suite.rc
 [INFO] install: suite.rc
-[INFO] $NAME: will reload on localhost
 __OUT__
 poll ! grep -q \
     -e 'RELOADING.TASK.DEFINITION.FOR.t1\.20130101T0000Z' \

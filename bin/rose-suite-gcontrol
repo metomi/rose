@@ -41,8 +41,6 @@
 # OPTIONS
 #     --all
 #         Open a suite control GUI for each running suite.
-#     --host=HOST
-#         Specify a host.
 #     --name=SUITE-NAME
 #         Specify the suite name.
 #     --quiet, -q

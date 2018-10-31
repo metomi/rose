@@ -53,14 +53,21 @@ ROSE_ORIG_HOST=$(hostname)
 ROSE_VERSION=$(rose --version | cut -d' ' -f2)
 for I in $(seq 1 $N_TESTS); do
     rose suite-run -C$SUITE_RUN_DIR --name=$NAME -l -q --debug || break
-    file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
+    file_cmp "${TEST_KEY}-${I}" "$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
 #!jinja2
 {# Rose Configuration Insertion: Init #}
 {% set CYLC_VERSION="$CYLC_VERSION" %}
 {% set ROSE_ORIG_HOST="$ROSE_ORIG_HOST" %}
+{% set ROSE_SITE="" %}
 {% set ROSE_VERSION="$ROSE_VERSION" %}
 {% set bar="barley drink" %}
 {% set foo="food store" %}
+[cylc]
+    [[environment]]
+        CYLC_VERSION=${CYLC_VERSION}
+        ROSE_ORIG_HOST=${ROSE_ORIG_HOST}
+        ROSE_SITE=
+        ROSE_VERSION=${ROSE_VERSION}
 {# Rose Configuration Insertion: Done #}
 {% set egg="egg sandwich" %}
 {% set ham="hamburger" %}
