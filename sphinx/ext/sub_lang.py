@@ -31,7 +31,7 @@ class SubstitutionLexer(RegexLexer):
 
     tokens = {
         'root': [
-            ('\<[^\>]+\>', String),
+            (r'\<[^\>]+\>', String),
             ('#.*', Comment),
             ('.', Text)
         ]
