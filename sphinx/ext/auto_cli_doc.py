@@ -181,7 +181,7 @@ def format_literals(text, references_to_match=None, ref_template='%s'):
         else:
             pre_char = '\n'
         if pre_char != ' ' and pre_char != '\n':
-            repl += '\ '
+            repl += '\\ '
 
         body = match.group()[1:-1]
         if body in references_to_match:
@@ -194,7 +194,7 @@ def format_literals(text, references_to_match=None, ref_template='%s'):
         else:
             post_char = ''
         if post_char not in [' ', '\n']:
-            repl += '\ '
+            repl += '\\ '
 
         text = text[:start] + repl + text[end:]
 

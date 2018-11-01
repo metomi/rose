@@ -289,6 +289,7 @@ TOKEN_ORDER = [
     ('rose:conf', 'rose:conf')
 ]
 
+
 def tokens_from_ref_context(ref_context):
     """Extract a list of tokens from a ref_context dictionary.
 
@@ -312,6 +313,7 @@ def tokens_from_ref_context(ref_context):
             ret.remove(item)
         last = item
     return ret
+
 
 class RoseDirective(ObjectDescription):
     """Base class for implementing Rose objects.
@@ -784,7 +786,7 @@ class RoseDomain(Domain):
         """
         for obj_name, (doc_name, _) in list(self.data['objects'].items()):
             # obj_name -> The full object reference to the rose object
-             #            e.g. `:rose:file:rose-app.conf`.
+            #            e.g. `:rose:file:rose-app.conf`.
             # doc_name -> The path to the document containing the rose object.
             try:
                 # Split the obj_name into it's constituent components:
@@ -888,7 +890,8 @@ class RoseDomain(Domain):
                 namespace = 'rose:%s:%s' % (typ, target)
             else:
                 # Target is not a root config - path is relative.
-                context_namespace = tokens_from_ref_context(node['ref_context'])
+                context_namespace = tokens_from_ref_context(
+                    node['ref_context'])
                 if not context_namespace:
                     LOGGER.warning(
                         'Relative reference requires local context ' +
