@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
-if ! rose check-software-docs 2>'/dev/null'; then
+if ! rose check-software --docs 2>'/dev/null'; then
     skip_all "Software dependencies for documentation not met."
 fi
 #-------------------------------------------------------------------------------
