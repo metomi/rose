@@ -640,7 +640,7 @@ task to suicide trigger.
       fontcolor = "orange"
       style = "dashed"
       labelloc = "b"
-      baz
+      pub
    }
 
    foo -> bar -> baz
