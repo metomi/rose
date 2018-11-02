@@ -1,0 +1,12 @@
+name: rose-docs
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=2.7
+  - sphinx=1.7.9
+  - requests
+  - sphinx_rtd_theme
+  - sphinxcontrib-httpdomain
+  - pip:
+    - hieroglyph

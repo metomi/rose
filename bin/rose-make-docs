@@ -65,6 +65,30 @@
 #     `linkcheck`
 #         Checks external links.
 #
+# SOFTWARE ENVIRONMENT
+#     The software dependencies can be found by running the command::
+#
+#        $ rose check-software --docs
+#
+#     Rose provides two ways of installing the Python dependencies for the Rose
+#     documentation builder:
+#
+#     Virtual Environment:
+#         Rose will automatically build a Python virtual environment
+#         when the --venv flag is used with this command. The virtual
+#         environment will be created in rose/venv and will be destroyed
+#         after use. Use the --dev flag to prevent the environment being
+#         destroyed for future use. Example::
+#
+#            $ rose make-docs --venv --dev html  # create and keep a virtualenv
+#
+#     Conda
+#         An environment file for creating a conda env can be found in
+#         etc/rose-docs-env.yaml. Example usage::
+#
+#            $ conda env create -f etc/rose-docs-env.yaml  # create conda env
+#            $ source activate rose-docs  # activate conda env
+#            $ rose make-docs html  # make docs as normal
 #-----------------------------------------------------------------------------
 set -e
 set -o pipefail
@@ -74,7 +98,7 @@ shopt -s extglob
 cd "$(dirname "$0")/../"
 
 # Path for virtualenv.
-VENV_PATH='venv'
+VENV_PATH='venv'  # Note: update above docs when changing this value
 # Set to `true` when the virtualenv is being used.
 USING_VENV=false
 # Path to the sphinx directory.
@@ -233,43 +257,13 @@ if ! rose-check-software --doc >/dev/null; then
     if "${VENV_MODE}"; then
         venv-install
     elif ! "${FORCE}"; then
-        echo "$(rose check-software --doc)"
-        echo "$(python -c 'import sphinxcontrib.httpdomain')"
-        echo 'Software required by the rose documentation builder is not'
-        echo 'present (run `rose check-software --doc` for details).'
+        echo 'Software required by the rose documentation builder is not
+present (run `rose check-software --doc` for details).
 
-        if ! "${VENV_COMPLIANT}"; then
-            echo
-            echo 'Unable to build documentation.'
-            echo
-            echo 'To override the dependency checking logic and force the '
-            echo 'docs to build use the "--force" option.'
-            exit 1
-        fi
-
-        echo
-        echo 'The documentation can still be built by installing dependencies'
-        echo 'in a python virtual environment (virtualenv). This environment'
-        echo "will be created in rose/${VENV_PATH} and will be removed after"
-        echo 'use. To keep the virtualenv for future builds run this command'
-        echo 'with the "--dev" option.'
-        echo
-        echo 'Else to override the dependency checking logic and force the docs'
-        echo 'to build use the "--force" option.'
-        echo
-        while read -p 'Proceed using a virtualenv (y/n)? ' usr; do
-            case "${usr}" in
-                [Yy])
-                    venv-install
-                    break
-                    ;;
-                [Nn])
-                    echo
-                    echo 'Unable to build documentation.'
-                    exit 1
-                    ;;
-            esac
-        done
+For information on building a Python environment for the Rose documentation
+builder see the "Software Dependencies" section of the help page for this
+command.' >&2
+        exit 1
     fi
 fi
 
