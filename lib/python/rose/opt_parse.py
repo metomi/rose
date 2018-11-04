@@ -328,6 +328,11 @@ class RoseOptionParser(OptionParser):
             {"action": "store",
              "metavar": "NAME",
              "help": "Specify the suite name."}],
+        "run_dir": [
+            ["--run-dir"],
+            {"action": "store",
+             "metavar": "DIR",
+             "help": "Suite run directory."}],
         "new_mode": [
             ["--new", "-N"],
             {"action": "store_true",

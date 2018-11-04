@@ -67,6 +67,25 @@ class CylcProcessor(SuiteEngineProcessor):
         self.host = None
         self.user = None
 
+    def get_suite_run_dir(self, suite_name, host, user):
+        """Get suite run directory on given host.
+
+        Should be absolute (may contain remote $USER - known on suite host), or
+        relative to home (where home is the default ssh landing point)
+        """
+        try:
+            out = self.popen(
+                "cylc", "get-global-config", "-i",
+                "[hosts][%s]run directory" % host)[0]
+        except RosePopenError:
+            out = self.SUITE_DIR_REL_ROOT
+        run_d = out.splitlines()[0]
+        # TODO - DOCUMENT ONLY '$USER' is replaced in 'run directory'
+        # (env vars would have to be evaluated on the remote host).
+        # (can be done for rose-suite-run remote, but not rsync!).
+        run_d = run_d.replace('$USER', user)
+        return "%s/%s" % (run_d, suite_name)
+
     def check_global_conf_compat(self):
         """Raise exception on incompatible Cylc global configuration."""
         expected = os.path.join("~", self.SUITE_DIR_REL_ROOT)

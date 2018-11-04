@@ -84,6 +84,7 @@ class SuiteRunner(Runner):
         "log_keep",
         "log_name",
         "name",
+        "run_dir",
         "new_mode",
         "no_overwrite_mode",
         "opt_conf_keys",
@@ -132,7 +133,6 @@ class SuiteRunner(Runner):
         if opts.remote:
             # opts.name always set for remote.
             return self._run_remote(opts, opts.name)
-
         conf_tree = self.config_load(opts)
         self.fs_util.chdir(conf_tree.conf_dirs[0])
 
@@ -216,6 +216,7 @@ class SuiteRunner(Runner):
                 suite_dir = os.path.join(temp_dir, suite_dir_rel)
                 os.makedirs(suite_dir, 0o0700)
             else:
+                # TODO - LOCALHOST ONLY (leave as ~?)
                 suite_dir = os.path.join(
                     os.path.expanduser("~"), suite_dir_rel)
 
@@ -358,7 +359,9 @@ class SuiteRunner(Runner):
         for auth in sorted(auths):
             host = auth
             if "@" in auth:
-                host = auth.split("@", 1)[1]
+                user, host = auth.split("@", 1)
+            else:
+                user = os.environ['USER']
             # Remote shell
             command = self.popen.get_cmd("ssh", "-n", auth)
             # Provide ROSE_VERSION and CYLC_VERSION in the environment
@@ -374,7 +377,9 @@ class SuiteRunner(Runner):
                 "remote-rose-bin", host=host, conf_tree=conf_tree,
                 default="rose")
             # Build remote "rose suite-run" command
-            shcommand += " %s suite-run -vv -n %s" % (rose_bin, suite_name)
+            shcommand += " %s suite-run -vv -n %s --run-dir=%s" % (
+                rose_bin, suite_name, self.suite_engine_proc.get_suite_run_dir(
+                    suite_name, host, user))
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:
@@ -429,7 +434,14 @@ class SuiteRunner(Runner):
                 filters = {"excludes": [], "includes": []}
                 for name in ["", "log/", "share/", "share/cycle/", "work/"]:
                     filters["excludes"].append(name + uuid)
-                target = auth + ":" + suite_dir_rel
+                host = auth
+                if "@" in auth:
+                    user, host = auth.split("@", 1)
+                else:
+                    user = os.environ['USER']
+                target = (auth + ":" +
+                          self.suite_engine_proc.get_suite_run_dir(
+                              suite_name, host, user))
                 cmd = self._get_cmd_rsync(target, **filters)
                 proc_queue.append(
                     [self.popen.run_bg(*cmd), cmd, "rsync", auth])
@@ -496,15 +508,19 @@ class SuiteRunner(Runner):
     def _run_init_dir(self, opts, suite_name, conf_tree=None, r_opts=None,
                       locs_conf=None):
         """Create the suite's directory."""
-        suite_dir_rel = self._suite_dir_rel(suite_name)
-        home = os.path.expanduser("~")
+        if opts.run_dir:
+            suite_dir_home = opts.run_dir
+        else:
+            suite_dir_rel = self._suite_dir_rel(suite_name)
+            home = os.path.expanduser("~")
+            suite_dir_home = os.path.join(home, suite_dir_rel)
+        # TODO - CONSIDER root-dir etc.
         suite_dir_root = self._run_conf("root-dir", conf_tree=conf_tree,
                                         r_opts=r_opts)
         if suite_dir_root:
             if locs_conf is not None:
                 locs_conf.set(["localhost", "root-dir"], suite_dir_root)
             suite_dir_root = env_var_process(suite_dir_root)
-        suite_dir_home = os.path.join(home, suite_dir_rel)
         if (suite_dir_root and
                 os.path.realpath(home) != os.path.realpath(suite_dir_root)):
             suite_dir_real = os.path.join(suite_dir_root, suite_dir_rel)
@@ -637,7 +653,7 @@ class SuiteRunner(Runner):
             self.fs_util.delete(suite_dir_rel)
         if opts.run_mode == "run" or not os.path.exists(suite_dir_rel):
             self._run_init_dir(opts, suite_name, r_opts=r_opts)
-        os.chdir(suite_dir_rel)
+        os.chdir(opts.run_dir)
         for name in ["share", "share/cycle", "work"]:
             uuid_file = os.path.join(name, r_opts["uuid"])
             if os.path.exists(uuid_file):
