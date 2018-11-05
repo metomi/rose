@@ -380,10 +380,10 @@ class SuiteRunner(Runner):
             # Build remote "rose suite-run" command
             shcommand += " %s suite-run -vv -n %s" % (rose_bin, suite_name)
             shcommand += " --run-dir=%s --work-dir=%s" % (
-                self.suite_engine_proc.get_suite_run_dir(
-                    suite_name, host, user),
-                self.suite_engine_proc.get_suite_work_dir(
-                    suite_name, host, user))
+                self.suite_engine_proc.get_suite_run_work_dir(
+                    "run", suite_name, host, user),
+                self.suite_engine_proc.get_suite_run_work_dir(
+                    "work", suite_name, host, user))
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:
@@ -444,8 +444,8 @@ class SuiteRunner(Runner):
                 else:
                     user = os.environ['USER']
                 target = (auth + ":" +
-                          self.suite_engine_proc.get_suite_run_dir(
-                              suite_name, host, user))
+                          self.suite_engine_proc.get_suite_run_work_dir(
+                              "run", suite_name, host, user))
                 cmd = self._get_cmd_rsync(target, **filters)
                 proc_queue.append(
                     [self.popen.run_bg(*cmd), cmd, "rsync", auth])
