@@ -85,6 +85,7 @@ class SuiteRunner(Runner):
         "log_name",
         "name",
         "run_dir",
+        "work_dir",
         "new_mode",
         "no_overwrite_mode",
         "opt_conf_keys",
@@ -377,8 +378,11 @@ class SuiteRunner(Runner):
                 "remote-rose-bin", host=host, conf_tree=conf_tree,
                 default="rose")
             # Build remote "rose suite-run" command
-            shcommand += " %s suite-run -vv -n %s --run-dir=%s" % (
-                rose_bin, suite_name, self.suite_engine_proc.get_suite_run_dir(
+            shcommand += " %s suite-run -vv -n %s" % (rose_bin, suite_name)
+            shcommand += " --run-dir=%s --work-dir=%s" % (
+                self.suite_engine_proc.get_suite_run_dir(
+                    suite_name, host, user),
+                self.suite_engine_proc.get_suite_work_dir(
                     suite_name, host, user))
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
@@ -656,13 +660,17 @@ class SuiteRunner(Runner):
             self.fs_util.delete(suite_dir_rel)
         if opts.run_mode == "run" or not os.path.exists(suite_dir_rel):
             self._run_init_dir(opts, suite_name, r_opts=r_opts)
-        os.chdir(opts.run_dir)
+        # make work and share dirs relative to work_dir
+        self.fs_util.makedirs(opts.work_dir)
+        os.chdir(opts.work_dir)
         for name in ["share", "share/cycle", "work"]:
             uuid_file = os.path.join(name, r_opts["uuid"])
             if os.path.exists(uuid_file):
                 self.handle_event(name + "/" + r_opts["uuid"] + "\n", level=0)
             else:
                 self._run_init_dir_work(opts, suite_name, name, r_opts=r_opts)
+        # make log dirs relative to run_dir
+        os.chdir(opts.run_dir)
         if not opts.install_only_mode:
             uuid_file = os.path.join("log", r_opts["uuid"])
             if os.path.exists(uuid_file):

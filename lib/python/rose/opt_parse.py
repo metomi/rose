@@ -333,6 +333,11 @@ class RoseOptionParser(OptionParser):
             {"action": "store",
              "metavar": "DIR",
              "help": "Suite run directory."}],
+        "work_dir": [
+            ["--work-dir"],
+            {"action": "store",
+             "metavar": "DIR",
+             "help": "Suite work and share directory."}],
         "new_mode": [
             ["--new", "-N"],
             {"action": "store_true",
