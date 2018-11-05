@@ -514,7 +514,6 @@ class SuiteRunner(Runner):
             suite_dir_rel = self._suite_dir_rel(suite_name)
             home = os.path.expanduser("~")
             suite_dir_home = os.path.join(home, suite_dir_rel)
-        # TODO - CONSIDER root-dir etc.
         suite_dir_root = self._run_conf("root-dir", conf_tree=conf_tree,
                                         r_opts=r_opts)
         if suite_dir_root:
@@ -522,8 +521,12 @@ class SuiteRunner(Runner):
                 locs_conf.set(["localhost", "root-dir"], suite_dir_root)
             suite_dir_root = env_var_process(suite_dir_root)
         if (suite_dir_root and
-                os.path.realpath(home) != os.path.realpath(suite_dir_root)):
-            suite_dir_real = os.path.join(suite_dir_root, suite_dir_rel)
+                os.path.realpath(suite_dir_home) != 
+                os.path.realpath(suite_dir_root)):
+            if opts.run_dir:
+                suite_dir_real = os.path.join(suite_dir_root, suite_name)
+            else:
+                suite_dir_real = os.path.join(suite_dir_root, suite_dir_rel)
             self.fs_util.makedirs(suite_dir_real)
             self.fs_util.symlink(suite_dir_real, suite_dir_home,
                                  opts.no_overwrite_mode)
