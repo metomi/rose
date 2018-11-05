@@ -115,6 +115,16 @@ class SuiteRunner(Runner):
             host_selector=self.host_selector,
             suite_engine_proc=self.suite_engine_proc)
 
+    @staticmethod
+    def _auth_split(auth):
+        """Return (user, host) from "[user@]host", defaulting to $USER."""
+        host = auth
+        if "@" in auth:
+            user, host = auth.split("@", 1)
+        else:
+            user = os.environ['USER']
+        return (user, host)
+
     def run_impl(self, opts, args, uuid, work_files):
         # Log file, temporary
         if hasattr(self.event_handler, "contexts"):
@@ -358,11 +368,7 @@ class SuiteRunner(Runner):
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
         proc_queue = []  # [[proc, command, "ssh"|"rsync", auth], ...]
         for auth in sorted(auths):
-            host = auth
-            if "@" in auth:
-                user, host = auth.split("@", 1)
-            else:
-                user = os.environ['USER']
+            user, host = self._auth_split(auth)
             # Remote shell
             command = self.popen.get_cmd("ssh", "-n", auth)
             # Provide ROSE_VERSION and CYLC_VERSION in the environment
@@ -438,11 +444,7 @@ class SuiteRunner(Runner):
                 filters = {"excludes": [], "includes": []}
                 for name in ["", "log/", "share/", "share/cycle/", "work/"]:
                     filters["excludes"].append(name + uuid)
-                host = auth
-                if "@" in auth:
-                    user, host = auth.split("@", 1)
-                else:
-                    user = os.environ['USER']
+                user, host = self._auth_split(auth)
                 target = (auth + ":" +
                           self.suite_engine_proc.get_suite_run_work_dir(
                               "run", suite_name, host, user))
