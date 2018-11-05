@@ -525,7 +525,7 @@ class SuiteRunner(Runner):
                 locs_conf.set(["localhost", "root-dir"], suite_dir_root)
             suite_dir_root = env_var_process(suite_dir_root)
         if (suite_dir_root and
-                os.path.realpath(suite_dir_home) != 
+                os.path.realpath(suite_dir_home) !=
                 os.path.realpath(suite_dir_root)):
             if opts.run_dir:
                 suite_dir_real = os.path.join(suite_dir_root, suite_name)
@@ -618,10 +618,10 @@ class SuiteRunner(Runner):
             if locs_conf is not None:
                 locs_conf.set(["localhost", key], item_root)
             item_root = env_var_process(item_root)
-            if (opts.work_dir and name == "work" or 
+            if (opts.work_dir and name == "work" or
                     opts.run_dir and name == "share"):
                 suite_dir_rel = suite_name
-            else: 
+            else:
                 suite_dir_rel = self._suite_dir_rel(suite_name)
             if os.path.isabs(item_root):
                 item_path_source = os.path.join(item_root, suite_dir_rel, name)
