@@ -19,6 +19,23 @@
 # -----------------------------------------------------------------------------
 """The authentication manager for the Rosie web service client."""
 
+# This try/except loop attempts to load the 'Secret' object. Running on
+# systems with GTK+ >=v3 this should work: Sytems on GTK <v3 will not load
+# this module.
+try:
+    from gi import require_version, pygtkcompat
+    require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
+    require_version('Secret', '1')
+    from gi.repository import Secret
+    GI_FLAG = True
+except (ImportError, ValueError):
+    GI_FLAG = False
+    pass
+try:
+    import gtk
+    import gnomekeyring
+except (ImportError, RuntimeError):
+    pass
 
 import ast
 from getpass import getpass
@@ -35,26 +52,9 @@ from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 
 import socket
-try:
-    from gi import require_version, pygtkcompat
-    require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
-    require_version('Secret', '1')
-    from gi.repository import Secret
-    GI_FLAG = True
-except (ImportError, ValueError):
-    GI_FLAG = False
-try:
-    if GI_FLAG:
-        pygtkcompat.enable()
-        pygtkcompat.enable_gtk(version='3.0')
-    import gtk
-    import gnomekeyring
-except (ImportError, RuntimeError):
-    pass
 
 
 class UndefinedRosiePrefixWS(Exception):
-
     """Raised if a prefix has no config."""
 
     def __str__(self):

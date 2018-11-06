@@ -19,6 +19,16 @@
 # -----------------------------------------------------------------------------
 """Implement "rosie go"."""
 
+# This try/except loop attempts to load the 'Secret' object. Running on systems
+# with GTK+ >=v3 this should work.
+try:
+    from gi import require_version, pygtkcompat
+    require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
+    require_version('Secret', '1')
+    from gi.repository import Secret
+except ImportError:
+    pass
+
 import ast
 import os
 import pwd
@@ -33,8 +43,16 @@ import webbrowser
 
 import pygtk
 pygtk.require("2.0")
+# This try/except loop attempts to load the 'GObject' object. Running on
+# systems with GTK+ >=v3 this should work: Sytems on GTK <v3 will load the
+# older 'gobject' instead.
+try:
+    from gi.repository import GObject
+except ImportError:
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        import gobject
 import gtk
-import gobject
 
 import rose.config_editor
 import rose.config_editor.main
