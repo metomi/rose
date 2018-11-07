@@ -43,7 +43,7 @@ class RawValueWidget(gtk.HBox):
         self.hook = hook
         self.entry = gtk.Entry()
         insensitive_colour = gtk.Style().bg[0]
-        self.entry.modify_bg(gtk.STATE_INSENSITIVE, insensitive_colour)
+        #self.entry.modify_bg(gtk.STATE_INSENSITIVE, insensitive_colour)
         self.normal_colour = gtk.Style().fg[gtk.STATE_NORMAL]
         if rose.env.contains_env_var(self.value):
             self.entry.modify_text(gtk.STATE_NORMAL, ENV_COLOUR)

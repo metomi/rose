@@ -59,8 +59,8 @@ class QuotedTextValueWidget(gtk.HBox):
         self.hook = hook
         self.entry = gtk.Entry()
         insensitive_colour = gtk.Style().bg[0]
-        self.entry.modify_bg(gtk.STATE_INSENSITIVE,
-                             insensitive_colour)
+#         self.entry.modify_bg(gtk.STATE_INSENSITIVE,
+#                              insensitive_colour)
         self.in_error = not self.type_checker(self.value)
         self.set_entry_text()
         self.entry.connect("button-release-event",

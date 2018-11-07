@@ -66,9 +66,9 @@ class ComboBoxValueWidget(gtk.HBox):
         comboboxentry.show()
         self.pack_start(comboboxentry, False, False, 0)
         self.grab_focus = lambda: self.hook.get_focus(comboboxentry)
-        self.set_contains_error = (lambda e:
-                                   comboboxentry.modify_bg(gtk.STATE_NORMAL,
-                                                           self.bad_colour))
+#         self.set_contains_error = (lambda e:
+#                                    comboboxentry.modify_bg(gtk.STATE_NORMAL,
+#                                                            self.bad_colour))
 
     def setter(self, widget):
         index = widget.get_active()
