@@ -30,7 +30,7 @@ from rose.app_run import (
 from rose.checksum import get_checksum, get_checksum_func
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.popen import RosePopenError
-from rose.reporter import Event
+from rose.reporter import Event, Reporter
 from rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sqlite3
@@ -104,7 +104,10 @@ class RoseArchApp(BuiltinApp):
         dao = RoseArchDAO()
         suite_name = os.getenv("ROSE_SUITE_NAME")
         if not suite_name:
-            return
+            app_runner.handle_event(
+                'rose_arch must be run under rose task-run.',
+                level=Reporter.FAIL, kind=Reporter.KIND_ERR)
+            return 1
         suite_dir = app_runner.suite_engine_proc.get_suite_dir(suite_name)
         cwd = os.getcwd()
         app_runner.fs_util.chdir(suite_dir)
