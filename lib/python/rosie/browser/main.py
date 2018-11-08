@@ -31,10 +31,32 @@ from urlparse import urlparse
 import warnings
 import webbrowser
 
+# This try/except loop attempts to load the 'Secret' object. Running on systems
+# with GTK+ >=v3 this should work.
+try:
+    from gi import require_version, pygtkcompat
+    require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
+    require_version('Secret', '1')
+    from gi.repository import Secret
+    del Secret
+    del pygtkcompat
+except ImportError:
+    pass
+
 import pygtk
 pygtk.require("2.0")
-import gtk
-import gobject
+# This try/except loop attempts to load the 'GObject' object. Running on
+# systems with GTK+ >=v3 this should work: Systems on GTK <v3 will load the
+# older 'gobject' instead.
+try:
+    from gi.repository import GObject
+    del GObject
+except ImportError:
+    import gobject
+
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
+    import gtk
 
 import rose.config_editor
 import rose.config_editor.main
