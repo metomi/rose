@@ -42,7 +42,7 @@ Example
 
    # General settings
    [arch]
-   command-format=foo put %(target)s %(sources)s
+   command-format=foo put %(sources)s %(target)s
    source-prefix=$ROSE_DATAC/
    target-prefix=foo://hello/
 
