@@ -4,8 +4,14 @@
 =============
 
 This built-in application provides a generic solution to configure
-site-specific archiving of suite files. It is designed to work under
+site-specific archiving of suite files for use with
 :ref:`command-rose-task-run`.
+
+.. note::
+
+   :rose:app:`rose_arch` is designed to work with suite files so runs under
+   :ref:`command-rose-task-run`. It cannot run under
+   :ref:`command-rose-app-run`.
 
 The application is normally configured in a :rose:file:`rose-app.conf`. Global
 settings may be specified in an :rose:conf:`rose_arch[arch]`
