@@ -209,7 +209,8 @@ class MacroBase(object):
 
         There is a special keyword argument called ``optional_config_name``
         which is set to the name of the optional configuration a macro is
-        running under, or ``None`` if no optional configuration is being used.
+        running on, or ``None`` if only the default configuration is being
+        used.
 
         >>> def report(self, config, meta_config=None,
         ...            optional_config_name=None):
