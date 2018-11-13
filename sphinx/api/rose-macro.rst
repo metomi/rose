@@ -208,8 +208,8 @@ On running your macro the user will be prompted to supply values for these
 arguments or accept the default values.
 
 There is a special keyword argument called ``optional_config_name`` which is
-set to the name of the optional configuration the macro is being run by, or
-``None`` if no optional configurations are being used.
+set to the name of the optional configuration the macro is being run on, or
+``None`` if only the default configuration is being used.
 
 .. note::
    Python keyword arguments require default values (``=None`` in this
