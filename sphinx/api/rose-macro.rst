@@ -75,6 +75,9 @@ configuration that provides information about the configuration items.
 
    See also :ref:`config-api`.
 
+Validator / Reporter Macros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A validator macro should look like:
 
 .. code-block:: python
@@ -130,6 +133,9 @@ to :py:meth:`self.add_report`, ``is_warning``, like so:
                    "Could be 'sed'",
                    is_warning=True)
 
+Transformer Macros
+^^^^^^^^^^^^^^^^^^
+
 A transformer macro should look like:
 
 .. code-block:: python
@@ -184,6 +190,9 @@ as validator and transform macros but does not require a return value.
        with open('report/file', 'r') as report_file:
            report_file.write(str(config.get(["namelist:snowflakes"])))
 
+Optional Arguments
+^^^^^^^^^^^^^^^^^^
+
 Macros also support the use of keyword arguments, giving you the ability to
 have the user specify some input or override to your macro. For example a
 transformer macro could be written as follows to allow the user to input
@@ -195,14 +204,16 @@ transformer macro could be written as follows to allow the user to input
        """Some transformer macro"""
        return
 
-.. note::
-   The extra arguments require default values (``=None`` in this
-   example) and that you should add error handling for the input
-   accordingly.
-
 On running your macro the user will be prompted to supply values for these
 arguments or accept the default values.
 
+There is a special keyword argument called ``optional_config_name`` which is
+set to the name of the optional configuration the macro is being run on, or
+``None`` if only the default configuration is being used.
+
+.. note::
+   Python keyword arguments require default values (``=None`` in this
+   example). You should add error handling for the input accordingly.
 
 .. _api-rose-macro-base:
 

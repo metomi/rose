@@ -199,6 +199,25 @@ class MacroBase(object):
         ...    def report(self, config, meta_config=None):
         ...        # Perform some analysis of the config but return nothing.
         ...        pass
+
+        Keyword arguments can be used, ``rose macro`` will prompt the user to
+        provide values for these arguments when the macro is run.
+
+        >>> def validate(self, config, meta_config=None, answer=None):
+        ...     # User will be prompted to provide a value for "answer".
+        ...     return self.reports
+
+        There is a special keyword argument called ``optional_config_name``
+        which is set to the name of the optional configuration a macro is
+        running on, or ``None`` if only the default configuration is being
+        used.
+
+        >>> def report(self, config, meta_config=None,
+        ...            optional_config_name=None):
+        ...     if optional_config_name:
+        ...         print('Macro is being run using the "%s" '
+        ...               'optional configuration' % optional_config_name)
+
     """
 
     def __init__(self):
