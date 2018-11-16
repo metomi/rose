@@ -118,6 +118,7 @@ FOO0="{'cycle': '20000101T0000Z', 'name': 'foo0', 'submit_num': 1}"
 FOO0_JOB='log/job/20000101T0000Z/foo0/01/job'
 FOO1="{'cycle': '20000101T0000Z', 'name': 'foo1', 'submit_num': 1}"
 FOO1_JOB='log/job/20000101T0000Z/foo1/01/job'
+LOCALHOST="$(hostname -f)"
 rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('rose_version',), '$(rose version | cut -d' ' -f 2)']" \
     "[('title',), 'Rose Bush']" \
@@ -138,7 +139,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('states', 'is_failed',), False]" \
     "[('of_n_entries',), 2]" \
     "[('entries', ${FOO0}, 'task_status',), 'succeeded']" \
-    "[('entries', ${FOO0}, 'host',), 'localhost']" \
+    "[('entries', ${FOO0}, 'host',), '${LOCALHOST}']" \
     "[('entries', ${FOO0}, 'submit_method',), 'background']" \
     "[('entries', ${FOO0}, 'logs', 'job', 'path'), '${FOO0_JOB}']" \
     "[('entries', ${FOO0}, 'logs', 'job.err', 'path'), '${FOO0_JOB}.err']" \
@@ -162,7 +163,7 @@ rose_ws_json_greps "${TEST_KEY}.out" "${TEST_KEY}.out" \
     "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.trace.*.html', '32'), 'job.trace.32.html']" \
     "[('entries', ${FOO0}, 'seq_logs_indexes', 'job.trace.*.html', '256'), 'job.trace.256.html']" \
     "[('entries', ${FOO1}, 'task_status',), 'succeeded']" \
-    "[('entries', ${FOO1}, 'host',), 'localhost']" \
+    "[('entries', ${FOO1}, 'host',), '${LOCALHOST}']" \
     "[('entries', ${FOO1}, 'submit_method',), 'background']" \
     "[('entries', ${FOO1}, 'logs', 'job', 'path'), '${FOO1_JOB}']" \
     "[('entries', ${FOO1}, 'logs', 'job.err', 'path'), '${FOO1_JOB}.err']" \
