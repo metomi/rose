@@ -76,4 +76,4 @@
 #     optional ROSE_META_PATH
 #         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
-exec python -m rose.macro "$@"
+exec python2 -m rose.macro "$@"

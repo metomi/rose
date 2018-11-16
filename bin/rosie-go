@@ -67,5 +67,5 @@
 #     * `rosie lookup`
 #     * `rosie ls`
 #-------------------------------------------------------------------------------
-exec python -m rosie.browser.main "$@"
+exec python2 -m rosie.browser.main "$@"
 

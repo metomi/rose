@@ -32,7 +32,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade apple fig HEAD
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 
@@ -100,7 +100,7 @@ TEST_KEY=$TEST_KEY_BASE-broken-import
 # Overwrite versions.py with something with a broken import
 rm "../rose-meta/test-app-upgrade/versions.pyc"
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 import rose.upgrade

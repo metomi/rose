@@ -90,7 +90,7 @@ Open ``planet.py`` in a text editor and paste in the following code:
 
 .. code-block:: python
 
-   #!/usr/bin/env python
+   #!/usr/bin/env python2
    # -*- coding: utf-8 -*-
 
    import re
@@ -207,7 +207,7 @@ Your final macro should look like this:
 
 .. code-block:: python
 
-   #!/usr/bin/env python
+   #!/usr/bin/env python2
    # -*- coding: utf-8 -*-
 
    import re
