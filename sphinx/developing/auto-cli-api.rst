@@ -44,7 +44,7 @@ underlying reStructuredText try:
 
 .. code-block:: bash
 
-   python ext/auto-api-doc.py
+   python2 ext/auto-api-doc.py
 
 
 reStructuredText Markup
