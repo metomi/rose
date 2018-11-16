@@ -23,6 +23,6 @@
 tests 2
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}"
-run_pass "${TEST_KEY}" python -m doctest "${ROSE_HOME}/lib/python/rose/bush.py"
+run_pass "${TEST_KEY}" python2 -m doctest "${ROSE_HOME}/lib/python/rose/bush.py"
 sed -i /1034h/d "${TEST_KEY}.out"  # Remove some nasty unicode output.
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" /dev/null

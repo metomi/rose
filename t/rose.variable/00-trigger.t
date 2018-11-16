@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 init </dev/null
 rm config/rose-app.conf
-TEST_PARSER="python $TEST_SOURCE_DIR/$TEST_KEY_BASE.py"
+TEST_PARSER="python2 $TEST_SOURCE_DIR/$TEST_KEY_BASE.py"
 #-------------------------------------------------------------------------------
 tests 24
 #-------------------------------------------------------------------------------
