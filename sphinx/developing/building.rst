@@ -31,5 +31,5 @@ The following builders are useful for development:
 The :ref:`command-rose-test-battery` runs:
 
 * pep8 on the python extensions (``sphinx/ext``).
-* ``python -m doctest <file>`` for python extensions (``sphinx/ext``).
+* ``python2 -m doctest <file>`` for python extensions (``sphinx/ext``).
 * eslint on any static javascript files (``sphinx/static/js``).

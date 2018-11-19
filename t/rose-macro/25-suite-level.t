@@ -59,7 +59,7 @@ values=valid-title
 __META_CONF__
 touch $TEST_DIR/$TEST_SUITE/meta/lib/python/macros/__init__.py
 cat >$TEST_DIR/$TEST_SUITE/meta/lib/python/macros/suite.py <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 import rose.macro
@@ -97,7 +97,7 @@ type=integer
 __META_CONF__
 touch $TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/__init__.py
 cat >$TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/foo.py <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 import rose.macro
@@ -133,7 +133,7 @@ type=integer
 __META_CONF__
 touch $TEST_DIR/$TEST_SUITE/app/bar/meta/lib/python/macros/__init__.py
 cat >$TEST_DIR/$TEST_SUITE/app/bar/meta/lib/python/macros/bar.py <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 import rose.macro

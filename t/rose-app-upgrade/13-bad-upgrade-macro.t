@@ -36,7 +36,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 import rose.upgrade

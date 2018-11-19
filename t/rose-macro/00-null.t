@@ -166,7 +166,7 @@ init_meta <<'__META_CONFIG__'
 macro=report.Test
 __META_CONFIG__
 init_macro report.py <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 import rose.macro
 class Test(rose.macro.MacroBase):

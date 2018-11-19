@@ -34,7 +34,7 @@ __CONFIG__
 setup
 init_meta test_tree/test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test_tree/test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 
@@ -388,7 +388,7 @@ __CONFIG__
 setup
 init_meta test_tree/test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test_tree/test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 
@@ -449,7 +449,7 @@ __CONFIG__
 setup
 init_meta test_tree/test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test_tree/test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 
@@ -569,7 +569,7 @@ __CONFIG__
 setup
 init_meta test_tree/test-app-upgrade 0.1 0.2
 init_macro test_tree/test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 

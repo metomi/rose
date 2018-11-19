@@ -45,7 +45,7 @@ door_paint_job=boring
 __OPT_CONFIG__
 init_meta </dev/null
 init_macro modify.py <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) Crown copyright Met Office. All rights reserved.

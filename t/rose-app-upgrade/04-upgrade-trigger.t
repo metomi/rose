@@ -40,7 +40,7 @@ trigger=env=Z: 3
 [env=Z]
 __META__
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 

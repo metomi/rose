@@ -20,9 +20,9 @@
 # Test rosie.db parsing.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-TEST_PARSER="python $TEST_SOURCE_DIR/$TEST_KEY_BASE.py"
+TEST_PARSER="python2 $TEST_SOURCE_DIR/$TEST_KEY_BASE.py"
 #-------------------------------------------------------------------------------
-if ! python -c 'import sqlalchemy' 2>/dev/null; then
+if ! python2 -c 'import sqlalchemy' 2>/dev/null; then
     skip_all '"sqlalchemy" not installed'
 fi
 tests 21
