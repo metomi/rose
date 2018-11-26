@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# (C) British Crown Copyright 2012-8 Met Office.
+# Copyright (C) 2012-2018 British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose,a framework for scientific suites.
 #

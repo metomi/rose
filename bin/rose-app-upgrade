@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
-# (C) Crown copyright Met Office. All rights reserved.
+# Copyright (C) 2012-2018 British Crown (Met Office) & Contributors.
 #-------------------------------------------------------------------------------
 # NAME
 #     rose app-upgrade
