@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# (C) British Crown Copyright 2012-8 Met Office.
+# Copyright (C) 2012-2018 British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -45,7 +45,7 @@ init_macro add.py <<'__MACRO__'
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
-# (C) Crown copyright Met Office. All rights reserved.
+# Copyright (C) 2012-2018 British Crown (Met Office) & Contributors.
 #-----------------------------------------------------------------------------
 
 import rose.macro

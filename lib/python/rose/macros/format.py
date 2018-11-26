@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# (C) Crown copyright Met Office. All rights reserved.
+# Copyright (C) 2012-2018 British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 
 import inspect
