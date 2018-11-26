@@ -98,8 +98,16 @@ class IntSpinButtonValueWidget(gtk.HBox):
         return spin_button
 
     def setter(self, widget):
-        if isinstance(widget, gtk.Entry):
-            if widget.get_text != self.value:
+        """Callback on widget value change."""
+        if hasattr(widget, 'get_value_as_int'):
+            new_value = str(widget.get_value_as_int())
+            if new_value != self.value:
+                self.value = new_value
+                self.set_value(self.value)
+                widget.set_tooltip_text(None)
+        elif hasattr(widget, 'get_text'):
+            # Compat for very old GTK - if gtk.SpinButton does not exist
+            if widget.get_text() != self.value:
                 self.value = widget.get_text()
                 self.set_value(self.value)
                 if (not widget.get_text().isdigit() or
@@ -108,10 +116,4 @@ class IntSpinButtonValueWidget(gtk.HBox):
                     self.warning_img.show()
                 else:
                     self.warning_img.hide()
-        else:
-            if str(widget.get_value_as_int()) != self.value:
-                self.value = str(widget.get_value_as_int())
-                self.set_value(self.value)
-                widget.set_tooltip_text(None)
-
         return False
