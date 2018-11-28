@@ -14,7 +14,8 @@ Rose release 56. This release is expected to be used with:
 ### Noteworthy Changes
 
 [#2256](https://github.com/metomi/rose/pull/2256):
-rose_arch: now fails gracefully if run under `rose app-run`.
+rose_arch: now fails gracefully if run under `rose app-run` as opposed to run
+under `rose task-run`.
 
 [#2254](https://github.com/metomi/rose/pull/2254):
 rosie go: fix authentication caching issue on Gnome Shell desktops.
@@ -38,7 +39,7 @@ Rose-Cylc realignment part 1:
 rose_ana: fix grepper path functions.
 
 [#2234](https://github.com/metomi/rose/pull/2234):
-Use same logic as same to identify host names of current host.
+Use same logic as Cylc to to identify host names of current host.
 
 [#2218](https://github.com/metomi/rose/pull/2218):
 rose_bunch: `command-format` setting is now optional.
@@ -48,7 +49,7 @@ rose-suite.conf: adds support for EmPy suite variables `[empy:suite.rc]`,
 compliments [cylc/cylc#2734](https://github.com/cylc/cylc/pull/2734).
 
 [#2207](https://github.com/metomi/rose/pull/2207):
-Rose Configruation Metadata: improve handling of environment variable
+Rose Configuration Metadata: improve handling of environment variable
 substitution in quoted string types.
 
 ### Other Changes
