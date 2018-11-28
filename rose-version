@@ -16,4 +16,4 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-ROSE_VERSION="2018.06.0"
+ROSE_VERSION="2018.11.0"

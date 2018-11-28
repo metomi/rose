@@ -5,10 +5,68 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2018.11.0 (2018-11-28)
+
+Rose release 56. This release is expected to be used with:
+* [cylc-7.8.0](https://github.com/cylc/cylc/releases/tag/7.8.0), and
+* [fcm-2017.10.0](https://github.com/metomi/fcm/releases/tag/2017.10.0).
+
+### Noteworthy Changes
+
+[#2256](https://github.com/metomi/rose/pull/2256):
+rose_arch: now fails gracefully if run under `rose app-run`.
+
+[#2254](https://github.com/metomi/rose/pull/2254):
+rosie go: fix authentication caching issue on Gnome Shell desktops.
+
+[#2239](https://github.com/metomi/rose/pull/2239):
+Rose-Cylc realignment part 1:
+* The `--host=HOST` option for most Rose-wrapped-Cylc commands should now be
+  redundant.
+* Rose will now use the suite contact file to determine whether a suite is
+  running or not.
+* rose suite-gcontrol --all: will now launch `cylc gscan` (instead of launching
+  many `cylc gui` which can cause a machine to run out of resource if the user
+  is running a large number of suites).
+* rose suite-scan: will now invoke `cylc scan` directly.
+* On launching a suite, `rose suite-run` will now write (Rose) automatic and
+  custom environment variables to head of `suite.rc`.
+* New `ROSE_SITE` environment/jinja2 suite variable + `site=SITE` setting -
+  useful for site portable suites.
+
+[#2237](https://github.com/metomi/rose/pull/2237):
+rose_ana: fix grepper path functions.
+
+[#2234](https://github.com/metomi/rose/pull/2234):
+Use same logic as same to identify host names of current host.
+
+[#2218](https://github.com/metomi/rose/pull/2218):
+rose_bunch: `command-format` setting is now optional.
+
+[#2217](https://github.com/metomi/rose/pull/2217):
+rose-suite.conf: adds support for EmPy suite variables `[empy:suite.rc]`,
+compliments [cylc/cylc#2734](https://github.com/cylc/cylc/pull/2734).
+
+[#2207](https://github.com/metomi/rose/pull/2207):
+Rose Configruation Metadata: improve handling of environment variable
+substitution in quoted string types.
+
+### Other Changes
+
+Rose Bush is being rebranded *Cylc Review* under the Cylc project. We have not
+yet removed Rose Bush logic from the Rose project, but it will no longer be
+maintained. We encourage sites and users to migrate to *Cylc Review* soon.
+
+Lots of improvements and fixes to documentation.
+
+Launch programs with `python2` instead of `python`.
+
+--------------------------------------------------------------------------------
+
 ## 2018.06.0 (2018-06-27)
 
 Rose release 55. This release is expected to be used with:
-* [cylc-7.7.1](https://github.com/cylc/cylc/releases/tag/7.7.1), and
+* [cylc-7.7.2](https://github.com/cylc/cylc/releases/tag/7.7.2), and
 * [fcm-2017.10.0](https://github.com/metomi/fcm/releases/tag/2017.10.0).
 
 ### Noteworthy Changes
