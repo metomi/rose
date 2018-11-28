@@ -1,0 +1,645 @@
+
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction &mdash; Rose Documentation 2018.11.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Runtime Configuration" href="runtime-configuration.html" />
+    <link rel="prev" title="Runtime" href="index.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Rose Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2018.11.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Cylc Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scheduling/index.html">Scheduling</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Runtime</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-task-section">The Task Section</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-script-setting">The <code class="docutils literal notranslate"><span class="pre">script</span></code> Setting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tasks-and-jobs">Tasks And Jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-cylc-gui">The Cylc GUI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#where-do-all-the-files-go">Where Do All The Files Go?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#running-a-suite">Running A Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#suite-files">Suite Files</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="runtime-configuration.html">Runtime Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration-consolidation/index.html">Consolidating Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../furthertopics/index.html">Further Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cheat-sheet.html">Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-gtk-library.html">Rose GTK library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../terms.html">Rose Terms Of Use</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rose Documentation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Cylc Tutorial</a> &raquo;</li>
+        
+          <li><a href="index.html">Runtime</a> &raquo;</li>
+        
+      <li>Introduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction">
+<span id="tutorial-cylc-runtime-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>So far we have been working with the <code class="docutils literal notranslate"><span class="pre">[scheduling]</span></code> section. This is where
+the workflow is defined in terms of <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">tasks</span></a> and
+<a class="reference internal" href="../../../glossary.html#term-dependency"><span class="xref std std-term">dependencies</span></a>.</p>
+<p>In order to make the workflow runnable we must associate tasks with scripts
+or binaries to be executed when the task runs. This means working with the
+<code class="docutils literal notranslate"><span class="pre">[runtime]</span></code> section which determines what runs, as well as where and how
+it runs.</p>
+<div class="section" id="the-task-section">
+<h2>The Task Section<a class="headerlink" href="#the-task-section" title="Permalink to this headline">¶</a></h2>
+<p>The runtime settings for each task are stored in a sub-section of the
+<code class="docutils literal notranslate"><span class="pre">[runtime]</span></code> section. E.g. for a task called <code class="docutils literal notranslate"><span class="pre">hello_world</span></code> we would write
+settings inside the following section:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_world]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-script-setting">
+<h2>The <code class="docutils literal notranslate"><span class="pre">script</span></code> Setting<a class="headerlink" href="#the-script-setting" title="Permalink to this headline">¶</a></h2>
+<p>We tell Cylc <em>what</em> to execute when a task is run using the <code class="docutils literal notranslate"><span class="pre">script</span></code>
+setting.</p>
+<p>This setting is interpreted as a bash script. The following example defines a
+task called <code class="docutils literal notranslate"><span class="pre">hello_world</span></code> which writes <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World!</span></code> to stdout upon
+execution.</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_world]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> echo &#39;Hello World!&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you do not set the <code class="docutils literal notranslate"><span class="pre">script</span></code> for a task then nothing will be run.</p>
+</div>
+<p>We can also call other scripts or executables in this way, e.g:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_world]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> ~/foo/bar/baz/hello_world</span>
+</pre></div>
+</div>
+<p>It is often a good idea to keep our scripts within the Cylc suite directory
+tree rather than leaving them somewhere else on the system. If you create a
+<code class="docutils literal notranslate"><span class="pre">bin</span></code> sub-directory within the <a class="reference internal" href="../../../glossary.html#term-suite-directory"><span class="xref std std-term">suite directory</span></a> this directory will
+be added to the path when tasks run, e.g:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">bin/hello_world</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/bash</span>
+<span class="nb">echo</span> <span class="s1">&#39;Hello World!&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">suite.rc</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_world]]</span>
+<span class="hll">        <span class="nv">script </span><span class="o">=</span><span class="s"> hello_world</span>
+</span></pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="tasks-and-jobs">
+<span id="tutorial-tasks-and-jobs"></span><h2>Tasks And Jobs<a class="headerlink" href="#tasks-and-jobs" title="Permalink to this headline">¶</a></h2>
+<p>When a <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">task</span></a> is “Run” it creates a <a class="reference internal" href="../../../glossary.html#term-job"><span class="xref std std-term">job</span></a>. The job is a bash
+file containing the script you have told the task to run along with
+configuration specifications and a system for trapping errors. It is the
+<a class="reference internal" href="../../../glossary.html#term-job"><span class="xref std std-term">job</span></a> which actually gets executed and not the task itself. This
+“job file” is called the <a class="reference internal" href="../../../glossary.html#term-job-script"><span class="xref std std-term">job script</span></a>.</p>
+<p>During its life a typical <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">task</span></a> goes through the following states:</p>
+<dl class="docutils">
+<dt>Waiting</dt>
+<dd><a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">Tasks</span></a> wait for their dependencies to be satisfied before
+running. In the meantime they are in the “Waiting” state.</dd>
+<dt>Submitted</dt>
+<dd>When a <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">task’s</span></a> dependencies have been met it is ready for
+submission. During this phase the <a class="reference internal" href="../../../glossary.html#term-job-script"><span class="xref std std-term">job script</span></a> is created.
+The <a class="reference internal" href="../../../glossary.html#term-job"><span class="xref std std-term">job</span></a> is then submitted to the specified batch system.
+There is more about this in the <a class="reference internal" href="runtime-configuration.html#tutorial-batch-system"><span class="std std-ref">next section</span></a>.</dd>
+<dt>Running</dt>
+<dd>A <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">task</span></a> is in the “Running” state as soon as the <a class="reference internal" href="../../../glossary.html#term-job"><span class="xref std std-term">job</span></a> is
+executed.</dd>
+<dt>Succeeded</dt>
+<dd>If the <a class="reference internal" href="../../../glossary.html#term-job"><span class="xref std std-term">job</span></a> submitted by a <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">task</span></a> has successfully
+completed (i.e. there is zero return code) then it is said to have
+succeeded.</dd>
+</dl>
+<p>These descriptions, and a few more (e.g. failed), are called the
+<a class="reference internal" href="../../../glossary.html#term-task-state"><span class="xref std std-term">task states</span></a>.</p>
+</div>
+<div class="section" id="the-cylc-gui">
+<h2>The Cylc GUI<a class="headerlink" href="#the-cylc-gui" title="Permalink to this headline">¶</a></h2>
+<p>To help you to keep track of a running suite Cylc has a graphical user
+interface (the Cylc GUI) which can be used for monitoring and
+interaction.</p>
+<p>The Cylc GUI looks quite like <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code> but the tasks are colour-coded
+to represent their state, as in the following diagram.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-e3b464661c1bd6a51d19c6503650836b607e66b5.svg" type="image/svg+xml">
+            <p class="warning">digraph example {
+Waiting [color=&quot;#88c6ff&quot;]
+Running [style=&quot;filled&quot; color=&quot;#00c410&quot;]
+Succeeded [style=&quot;filled&quot; color=&quot;#ada5a5&quot;]
+}</p></object>
+</div>
+<div class="minicylc" style="text-align: center;" data-dependencies=" a => b => c// b => d => f// e => f" data-theme="default" ><div align="center" class="align-center"><object data="../../../_images/graphviz-aaf274da7ed97ad65ca720c422f0cf5aed454ae2.svg" type="image/svg+xml">
+            <p class="warning">digraph Mini_Cylc {
+b -&gt; c
+e -&gt; f
+b -&gt; d
+a -&gt; b
+d -&gt; f
+c
+f
+}</p></object>
+</div>
+</div><p>This is the “graph view”. The Cylc GUI has two other views called “tree” and
+“dot”.</p>
+<div class="figure align-center" id="id3" style="width: 75%">
+<img alt="../../../_images/cylc-gui-graph.png" src="../../../_images/cylc-gui-graph.png" />
+<p class="caption"><span class="caption-text">Screenshot of the Cylc GUI in “Graph View” mode.</span></p>
+</div>
+<div class="figure align-center" id="id4" style="width: 75%">
+<img alt="../../../_images/cylc-gui-tree.png" src="../../../_images/cylc-gui-tree.png" />
+<p class="caption"><span class="caption-text">Screenshot of the Cylc GUI in “Tree View” mode.</span></p>
+</div>
+<div class="figure align-center" id="id5" style="width: 75%">
+<img alt="../../../_images/cylc-gui-dot.png" src="../../../_images/cylc-gui-dot.png" />
+<p class="caption"><span class="caption-text">Screenshot of the Cylc GUI in “Dot View” mode.</span></p>
+</div>
+</div>
+<div class="section" id="where-do-all-the-files-go">
+<h2>Where Do All The Files Go?<a class="headerlink" href="#where-do-all-the-files-go" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-work-directory">
+<h3>The Work Directory<a class="headerlink" href="#the-work-directory" title="Permalink to this headline">¶</a></h3>
+<p>When a <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">task</span></a> is run Cylc creates a directory for the <a class="reference internal" href="../../../glossary.html#term-job"><span class="xref std std-term">job</span></a> to
+run in. This is called the <a class="reference internal" href="../../../glossary.html#term-work-directory"><span class="xref std std-term">work directory</span></a>.</p>
+<p>By default the work directory is located in a directory structure
+under the relevant <a class="reference internal" href="../../../glossary.html#term-cycle-point"><span class="xref std std-term">cycle point</span></a> and <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">task</span></a> name:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>~/cylc-run/<span class="s">&lt;suite-name&gt;</span>/work/<span class="s">&lt;cycle-point&gt;</span>/<span class="s">&lt;task-name&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-job-log-directory">
+<h3>The Job Log Directory<a class="headerlink" href="#the-job-log-directory" title="Permalink to this headline">¶</a></h3>
+<p>When a task is run Cylc generates a <a class="reference internal" href="../../../glossary.html#term-job-script"><span class="xref std std-term">job script</span></a> which is stored in the
+<a class="reference internal" href="../../../glossary.html#term-job-log-directory"><span class="xref std std-term">job log directory</span></a> as the file <code class="docutils literal notranslate"><span class="pre">job</span></code>.</p>
+<p>When the <a class="reference internal" href="../../../glossary.html#term-job-script"><span class="xref std std-term">job script</span></a> is executed the stdout and stderr are redirected
+into the <code class="docutils literal notranslate"><span class="pre">job.out</span></code> and <code class="docutils literal notranslate"><span class="pre">job.err</span></code> files which are also stored in the
+<a class="reference internal" href="../../../glossary.html#term-job-log-directory"><span class="xref std std-term">job log directory</span></a>.</p>
+<p>The <a class="reference internal" href="../../../glossary.html#term-job-log-directory"><span class="xref std std-term">job log directory</span></a> lives in a directory structure under the
+<a class="reference internal" href="../../../glossary.html#term-cycle-point"><span class="xref std std-term">cycle point</span></a>, <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">task</span></a> name and <a class="reference internal" href="../../../glossary.html#term-job-submission-number"><span class="xref std std-term">job submission number</span></a>:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>~/cylc-run/<span class="s">&lt;suite-name&gt;</span>/log/job/<span class="s">&lt;cycle-point&gt;</span>/<span class="s">&lt;task-name&gt;</span>/<span class="s">&lt;job-submission-num&gt;</span>/
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../../../glossary.html#term-job-submission-number"><span class="xref std std-term">job submission number</span></a> starts at 1 and increments by 1 each time
+a task is re-run.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>If a task has run and is still visible in the Cylc GUI you can view its
+<a class="reference internal" href="../../../glossary.html#term-job-log"><span class="xref std std-term">job log files</span></a> by right-clicking on the task and
+selecting “View”.</p>
+<a class="last reference internal image-reference" href="../../../_images/cylc-gui-view-log.png"><img alt="../../../_images/cylc-gui-view-log.png" class="align-center" src="../../../_images/cylc-gui-view-log.png" style="width: 345.0px; height: 174.0px;" /></a>
+</div>
+</div>
+</div>
+<div class="section" id="running-a-suite">
+<h2>Running A Suite<a class="headerlink" href="#running-a-suite" title="Permalink to this headline">¶</a></h2>
+<p>It is a good idea to check a suite for errors before running it.
+Cylc provides a command which automatically checks for any obvious
+configuration issues called <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">validate</span></code>, run via:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc validate <span class="s">&lt;path/to/suite&gt;</span>
+</pre></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">&lt;path/to/suite&gt;</span></code> is the path to the suite’s location within the
+filesystem (so if we create a suite in <code class="docutils literal notranslate"><span class="pre">~/cylc-run/foo</span></code> we would put
+<code class="docutils literal notranslate"><span class="pre">~/cylc-run/foo/suite.rc</span></code>).</p>
+<p>Next we can run the suite using the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">run</span></code> command.</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc run <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">name</span></code> is the name of the <a class="reference internal" href="../../../glossary.html#term-suite-directory"><span class="xref std std-term">suite directory</span></a> (i.e. <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code>
+would be <code class="docutils literal notranslate"><span class="pre">foo</span></code> in the above example).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In this tutorial we are writing our suites in the <code class="docutils literal notranslate"><span class="pre">cylc-run</span></code> directory.</p>
+<p>It is possible to write them elsewhere on the system. If we do so we
+must register the suite with Cylc before use.</p>
+<p>We do this using the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">reg</span></code> command which we supply with a name which
+will be used to refer to the suite in place of the path i.e:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc reg <span class="s">&lt;name&gt;</span> <span class="s">&lt;path/to/suite&gt;</span>
+cylc validate <span class="s">&lt;name&gt;</span>
+cylc run <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">reg</span></code> command will create a directory for the suite in the
+<code class="docutils literal notranslate"><span class="pre">cylc-run</span></code> directory meaning that we will have separate
+<a class="reference internal" href="../../../glossary.html#term-suite-directory"><span class="xref std std-term">suite directories</span></a> and
+<a class="reference internal" href="../../../glossary.html#term-run-directory"><span class="xref std std-term">run directories</span></a>.</p>
+</div>
+</div>
+<div class="section" id="suite-files">
+<h2>Suite Files<a class="headerlink" href="#suite-files" title="Permalink to this headline">¶</a></h2>
+<p>Cylc generates files and directories when it runs a suite, namely:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">log/</span></code></dt>
+<dd><p class="first">Directory containing log files, including:</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">log/db</span></code></dt>
+<dd>The database which Cylc uses to record the state of the suite;</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">log/job</span></code></dt>
+<dd>The directory where the <a class="reference internal" href="../../../glossary.html#term-job-log"><span class="xref std std-term">job log files</span></a> live;</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">log/suite</span></code></dt>
+<dd>The directory where the <a class="reference internal" href="../../../glossary.html#term-suite-log"><span class="xref std std-term">suite log files</span></a> live.
+These files are written by Cylc as the suite is run and are useful for
+debugging purposes in the event of error.</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">suite.rc.processed</span></code></dt>
+<dd>A copy of the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file made after any <a class="reference external" href="http://jinja.pocoo.org/">Jinja2</a> has been
+processed - we will cover this in the
+<a class="reference internal" href="configuration-consolidation/index.html#tutorial-cylc-consolidating-configuration"><span class="std std-ref">Consolidating Configuration</span></a> section.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">share/</span></code></dt>
+<dd>The <a class="reference internal" href="../../../glossary.html#term-share-directory"><span class="xref std std-term">share directory</span></a> is a place where <a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">tasks</span></a> can
+write files which are intended to be shared within that cycle.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">work/</span></code></dt>
+<dd>A directory hierarchy containing task’s <a class="reference internal" href="../../../glossary.html#term-work-directory"><span class="xref std std-term">work directories</span></a>.</dd>
+</dl>
+<div class="note admonition">
+<p class="first admonition-title">Practical</p>
+<p class="rubric">In this practical we will add some scripts to, and run, the
+<a class="reference internal" href="../scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather forecasting suite</span></a>
+from the <a class="reference internal" href="../scheduling/index.html#tutorial-scheduling"><span class="std std-ref">scheduling tutorial</span></a>.</p>
+<ol class="last arabic">
+<li><p class="first"><strong>Create A New Suite.</strong></p>
+<p>The following command will copy some files for us to work with into
+a new suite called <code class="docutils literal notranslate"><span class="pre">runtime-introduction</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose tutorial runtime-introduction
+<span class="nb">cd</span> ~/cylc-run/runtime-introduction
+</pre></div>
+</div>
+<p>In this directory we have the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file from the
+<a class="reference internal" href="../scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather forecasting suite</span></a>
+with some runtime configuration added to it.</p>
+<p>There is also a script called <code class="docutils literal notranslate"><span class="pre">get-observations</span></code> located in the bin
+directory.</p>
+<p>Take a look at the <code class="docutils literal notranslate"><span class="pre">[runtime]</span></code> section in the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file.</p>
+</li>
+<li><p class="first"><strong>Run The Suite.</strong></p>
+<p>First validate the suite by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc validate .
+</pre></div>
+</div>
+<p>Open the Cylc GUI (in the background) by running the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc gui runtime-introduction <span class="p">&amp;</span>
+</pre></div>
+</div>
+<p>Finally run the suite by executing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc run runtime-introduction
+</pre></div>
+</div>
+<p>The tasks will start to run - you should see them going through the
+“Waiting”, “Running” and “Succeeded” states.</p>
+<p>When the suite reaches the final cycle point and all tasks have succeeded
+it will shutdown automatically and the GUI will go blank.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>You can also run a suite from the Cylc GUI by pressing the “play”
+button.</p>
+<img alt="../../../_images/gcylc-play.png" class="align-center" src="../../../_images/gcylc-play.png" />
+<p>A box will appear. Ensure that “Cold Start” is selected then press
+“Start”.</p>
+<img alt="../../../_images/cylc-gui-suite-start.png" class="last align-center" src="../../../_images/cylc-gui-suite-start.png" />
+</div>
+</li>
+<li><p class="first"><strong>Inspect A Job Log.</strong></p>
+<p>Try opening the file <code class="docutils literal notranslate"><span class="pre">job.out</span></code> for one of the
+<code class="docutils literal notranslate"><span class="pre">get_observations</span></code> jobs in a text editor. The file will be
+located within the <a class="reference internal" href="../../../glossary.html#term-job-log-directory"><span class="xref std std-term">job log directory</span></a>:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>log/job/<span class="s">&lt;cycle-point&gt;</span>/get_observations_heathrow/01/job.out
+</pre></div>
+</div>
+<p>You should see something like this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Suite    : runtime-introduction
+Task Job : 20000101T0000Z/get_observations_heathrow/01 (try 1)
+User@Host: username@hostname
+
+Guessing Weather Conditions
+Writing Out Wind Data
+1970-01-01T00:00:00Z NORMAL - started
+2038-01-19T03:14:08Z NORMAL - succeeded
+</pre></div>
+</div>
+<ul class="simple">
+<li>The first three lines are information which Cylc has written to the file
+to provide information about the job.</li>
+<li>The last two lines were also written by cylc. They provide timestamps
+marking the stages in the job’s life.</li>
+<li>The lines in the middle are the stdout of the job itself.</li>
+</ul>
+</li>
+<li><p class="first"><strong>Inspect A Work Directory.</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">get_rainfall</span></code> task should create a file called <code class="docutils literal notranslate"><span class="pre">rainfall</span></code> in its
+<a class="reference internal" href="../../../glossary.html#term-work-directory"><span class="xref std std-term">work directory</span></a>. Try opening this file, recalling that the
+format of the relevant path from within the work directory will be:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>work/<span class="s">&lt;cycle-point&gt;</span>/get_rainfall/rainfall
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">get_rainfall</span></code> task only runs every third cycle.</p>
+</div>
+</li>
+<li><p class="first"><strong>Extension: Explore The Cylc GUI</strong></p>
+<ul>
+<li><p class="first">Try re-running the suite.</p>
+</li>
+<li><p class="first">Try changing the current view(s).</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>You can do this from the “View” menu or from the toolbar:</p>
+<a class="last reference internal image-reference" href="../../../_images/cylc-gui-view-selector.png"><img alt="../../../_images/cylc-gui-view-selector.png" class="align-center" src="../../../_images/cylc-gui-view-selector.png" style="width: 389.25px; height: 27.0px;" /></a>
+</div>
+</li>
+<li><p class="first">Try pressing the “Pause” button which is found in the top left-hand
+corner of the GUI.</p>
+</li>
+<li><p class="first">Try right-clicking on a task. From the right-click menu you could try:</p>
+<ul class="simple">
+<li>“Trigger (run now)”</li>
+<li>“Reset State”</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="runtime-configuration.html" class="btn btn-neutral float-right" title="Runtime Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Runtime" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright : Copyright (C) 2012-2018 British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2018.11.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2018.11.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "tutorial/cylc/runtime/introduction";
+    </script>
+  </div>
+</div>
+
+  
+
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'2018.11.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+        <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+        <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
