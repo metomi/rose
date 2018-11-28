@@ -20,6 +20,7 @@
 """Builtin application: rose_bunch: run multiple commands in parallel."""
 
 
+import itertools
 import os
 import shlex
 import sqlite3
@@ -119,6 +120,11 @@ class RoseBunchApp(BuiltinApp):
     PREFIX_OK = "[OK] "
     PREFIX_PASS = "[PASS] "
     PREFIX_NOTRUN = "[SKIP] "
+    DEFAULT_ARGUMENT_MODE = "Default"
+    ACCEPTED_ARGUMENT_MODES = [DEFAULT_ARGUMENT_MODE,
+                               "izip",
+                               "izip_longest",
+                               "product"]
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """ Run multiple instances of a command using sets of specified args"""
@@ -186,6 +192,31 @@ class RoseBunchApp(BuiltinApp):
             bunch_args_names.append(key)
             bunch_args_values.append(
                 shlex.split(rose.env.env_var_process(val.value)))
+
+        # Update the argument values based on the argument-mode
+        argument_mode = conf_tree.node.get_value([self.BUNCH_SECTION,
+                                                  "argument-mode"],
+                                                 self.DEFAULT_ARGUMENT_MODE)
+        if argument_mode == self.DEFAULT_ARGUMENT_MODE:
+            pass
+        elif argument_mode in self.ACCEPTED_ARGUMENT_MODES:
+            _itertools_cmd = getattr(itertools, argument_mode)
+            if argument_mode == "izip_longest":
+                _permutations = _itertools_cmd(*bunch_args_values,
+                                               fillvalue="")
+            else:
+                _permutations = _itertools_cmd(*bunch_args_values)
+
+            # Reconstruct the bunch_args_values
+            _permutations = list(_permutations)
+            for index, _ in enumerate(bunch_args_values):
+                bunch_args_values[index] = [v[index] for v in _permutations]
+        else:
+            raise ConfigValueError([self.BUNCH_SECTION,
+                                    "argument-mode"],
+                                   argument_mode,
+                                   "must be one of %s" %
+                                   self.ACCEPTED_ARGUMENT_MODES)
 
         # Validate runlists
         if not self.invocation_names:

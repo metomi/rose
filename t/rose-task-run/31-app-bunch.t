@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 51
+tests 67
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -162,6 +162,60 @@ for KEY in $(seq 0 3); do
     file_grep $TEST_KEY_PREFIX-ok-$KEY \
         "ROSE_BUNCH_LOG_PREFIX: $KEY" $FILE_DIR/bunch.$KEY.out
 done
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP shortens all bunch-args
+#-------------------------------------------------------------------------------
+APP=bunch_argument_mode_izip
+#-------------------------------------------------------------------------------
+TEST_KEY_PREFIX=argument_mode_izip
+FILE=$LOG_DIR/$APP/01/job.out
+ARG1=1
+ARG2=a
+ARG3=9
+file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* echo arg1: $ARG1 - arg2: $ARG2 - arg3: $ARG3"\
+    "$FILE"
+file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* TOTAL: 1" \
+    "$FILE"
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP_LONGEST lengthens all bunch-args
+#-------------------------------------------------------------------------------
+APP=bunch_argument_mode_izip_longest
+#-------------------------------------------------------------------------------
+TEST_KEY_PREFIX=argument_mode_izip_longest
+FILE=$LOG_DIR/$APP/01/job.out
+for VALUES in 1,a,9 2,,23 3,, 4,,; do
+    IFS=, read -r -a ARGS <<< "$VALUES"
+    file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
+        "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* echo arg1: ${ARGS[0]:-} - arg2: ${ARGS[1]:-} - arg3: ${ARGS[2]:-}"\
+        "$FILE"
+done
+file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* TOTAL: 4" \
+    "$FILE"
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Testing ROSE_BUNCH_ARGUMENT_MODE_PRODUCT updates all bunch-args
+#-------------------------------------------------------------------------------
+APP=bunch_argument_mode_product
+#-------------------------------------------------------------------------------
+TEST_KEY_PREFIX=argument_mode_product
+FILE=$LOG_DIR/$APP/01/job.out
+for ARG1 in 1 2 3 4; do
+    for ARG2 in a; do
+        for ARG3 in 9 23; do
+            file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
+                "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* echo arg1: $ARG1 - arg2: $ARG2 - arg3: $ARG3"\
+                "$FILE"
+        done
+    done
+done
+file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
+    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* TOTAL: 8" \
+    "$FILE"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0
