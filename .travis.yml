@@ -35,19 +35,22 @@ install:
     - sudo apt-get update
     - sudo apt-get install -y subversion
 
-script:
-    - export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
-    # ./bin/rose will change PYTHONPATH, so we cannot rely on that for sitecustomize.py
-    # but instead we can move the sitecustomize.py to the place used as PYTHONPATH
-    - cp "${TRAVIS_BUILD_DIR}/.travis/sitecustomize.py" ./lib/python
-    - export PYTHONPATH="${TRAVIS_BUILD_DIR}/.travis"
-    - coverage run .travis/cover.py
-    - rm ./lib/python/sitecustomize.py
-
-after_script:
-    - rose make-docs --venv --dev --strict clean linkcheck doctest html slides latexpdf
-
 after_success:
     - coverage combine --append
     - coverage xml --ignore-errors
     - bash <(curl -s https://codecov.io/bash)
+
+jobs:
+    include:
+    - name: "Test Battery"
+      script:
+      - export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
+      # ./bin/rose will change PYTHONPATH, so we cannot rely on that for sitecustomize.py
+      # but instead we can move the sitecustomize.py to the place used as PYTHONPATH
+      - cp "${TRAVIS_BUILD_DIR}/.travis/sitecustomize.py" ./lib/python
+      - export PYTHONPATH="${TRAVIS_BUILD_DIR}/.travis"
+      - coverage run .travis/cover.py
+      - rm ./lib/python/sitecustomize.py
+    - name: "Documentation"
+      script:
+        - rose make-docs --venv --dev --strict clean linkcheck doctest html slides latexpdf
