@@ -465,8 +465,8 @@ class FilePattern(SingleCommandPattern):
 
 
 class FileCommandPattern(FilePattern):
-    """Check for occurrences of a particular expression or value in the standard
-    output from a command applied to two or more files.
+    """Check for occurrences of a particular expression or value in the
+    standard output from a command applied to two or more files.
 
     Options:
         files (optional):
