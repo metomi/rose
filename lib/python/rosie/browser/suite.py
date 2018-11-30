@@ -100,7 +100,7 @@ class SuiteDirector():
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            rosie.browser.ERROR_PERMISSIONS +
                                            "\n\n" + str(exc))
-            except LocalCopyStatusError:
+            except LocalCopyStatusError as exc:
                 rose.gtk.dialog.run_dialog(
                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
