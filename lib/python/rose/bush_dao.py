@@ -162,7 +162,7 @@ class RoseBushDAO(object):
     def get_suite_job_entries(
             self, user_name, suite_name, cycles, tasks, task_status,
             job_status, order, limit, offset):
-        """Query suite runtime databsae to return a listing of task jobs.
+        """Query suite runtime database to return a listing of task jobs.
 
         user -- A string containing a valid user ID
         suite -- A string containing a valid suite ID

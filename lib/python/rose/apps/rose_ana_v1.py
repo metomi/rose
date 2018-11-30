@@ -73,7 +73,7 @@ class KGODatabase(object):
         return self.conn
 
     def create(self):
-        "If the databaste doesn't exist, create it."
+        "If the database doesn't exist, create it."
         conn = self.get_conn()
         # This SQL command ensures a "comparisons" table exists in the database
         # and then populates it with a series of columns (which in this case

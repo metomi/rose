@@ -28,7 +28,7 @@
         A numerical value giving the maximum number of informational output
         lines to print for each comparison. This is intended for cases where
         for example a pattern-matching comparison is expected to match many
-        thousands of occurences in the given files; it may not be desirable
+        thousands of occurrences in the given files; it may not be desirable
         to print the results of every comparison. After the given number of
         lines are printed a special message indicating that the rest of the
         output is truncated will be produced.
@@ -90,7 +90,7 @@ class SingleCommandStatus(AnalysisTask):
                 # Note that by exiting early this task counts as failed
                 return
 
-        # The command may contain format subsitution characters, which will
+        # The command may contain format substitution characters, which will
         # receive any filenames passed to the app.
         self.command = self.command.format(*self.files)
         returncode, stdout, stderr = self.run_command(self.command)
@@ -270,7 +270,7 @@ class SingleCommandPattern(SingleCommandStatus):
                 # Note that by exiting early this task counts as failed
                 return
 
-        # The command may contain format subsitution characters, which will
+        # The command may contain format substitution characters, which will
         # receive any filenames passed to the app.
         self.command = self.command.format(*self.files)
         returncode, stdout, stderr = self.run_command(self.command)
@@ -281,7 +281,7 @@ class SingleCommandPattern(SingleCommandStatus):
 
 
 class FilePattern(SingleCommandPattern):
-    """Check for occurences of a particular expression or value within the
+    """Check for occurrences of a particular expression or value within the
     contents of two or more files.
 
     Options:
@@ -382,7 +382,7 @@ class FilePattern(SingleCommandPattern):
 
                     if failed:
                         msg = ("Mismatch in group {0} of pattern for "
-                               "occurence {1} in files")
+                               "occurrence {1} in files")
                         prefix = "[FAIL] "
                         self.reporter(
                             msg.format(imatch + 1, igroup + 1), prefix=prefix)
@@ -393,7 +393,7 @@ class FilePattern(SingleCommandPattern):
                                       prefix=prefix)
 
                     else:
-                        msg = ("Group {0} of pattern for occurence {1} in "
+                        msg = ("Group {0} of pattern for occurrence {1} in "
                                "files matches")
                         self.reporter(
                             msg.format(imatch + 1, igroup + 1),
@@ -465,7 +465,7 @@ class FilePattern(SingleCommandPattern):
 
 
 class FileCommandPattern(FilePattern):
-    """Check for occurences of a particular expression or value in the standard
+    """Check for occurrences of a particular expression or value in the standard
     output from a command applied to two or more files.
 
     Options:

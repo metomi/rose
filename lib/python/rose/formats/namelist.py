@@ -48,7 +48,7 @@ RE_LOGICAL = r"(?i)\.(?:true|false)\."
 REC_LOGICAL = _rec(r"\A(?:" + RE_LOGICAL + r")\Z")
 RE_CHARACTER = r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\""
 REC_CHARACTER = _rec(r"\A(?:" + RE_CHARACTER + r")\Z")
-# Matches a complex literal, capture real and imaginery parts
+# Matches a complex literal, capture real and imaginary parts
 RE_COMPLEX_R_I = (
     r"\(\s*(" + RE_REAL + r")\s*" + RE_SEP + r"\s*(" + RE_REAL + r")\s*\)")
 REC_COMPLEX_R_I = _rec(RE_COMPLEX_R_I)
