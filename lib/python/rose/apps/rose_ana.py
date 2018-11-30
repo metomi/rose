@@ -202,7 +202,7 @@ class AnalysisTask(object):
     def run_analysis(self):
         """
         Will be called to start the analysis code; this method should be
-        overidden by the user's class to perform the desired analysis.
+        overridden by the user's class to perform the desired analysis.
 
         """
         msg = "Abstract analysis task class should never be called directly"

@@ -80,7 +80,7 @@ class MetadataTable(object):
         self.previous = table
 
     def remove_row(self, widget):
-        """ To be called uppon 'remove' button press. """
+        """ To be called upon 'remove' button press. """
         self.paths.remove(widget.data)
         self.draw_table()
 

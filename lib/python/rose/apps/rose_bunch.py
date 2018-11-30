@@ -34,7 +34,7 @@ from rose.reporter import Event
 
 
 class CommandNotDefinedError(Exception):
-    """An exception raised when no command to run is defiend."""
+    """An exception raised when no command to run is defined."""
 
     def __str__(self):
         return "command to run not defined"
@@ -121,7 +121,7 @@ class RoseBunchApp(BuiltinApp):
     PREFIX_NOTRUN = "[SKIP] "
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
-        """ Run multiple instaces of a command using sets of specified args"""
+        """ Run multiple instances of a command using sets of specified args"""
 
         # Counts for reporting purposes
         run_ok = 0

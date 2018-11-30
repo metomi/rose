@@ -253,7 +253,7 @@ class RoseBushService(object):
             "duration_queue_desc", "duration_queue_asc",
             "duration_run_desc", "duration_run_asc",
             "duration_queue_run_desc", "duration_queue_run_asc"
-        per_page -- Number of entries to display per page (defualt=32)
+        per_page -- Number of entries to display per page (default=32)
         no_fuzzy_time -- Don't display fuzzy time if this is True.
         form -- Specify return format. If None, display HTML page. If "json",
                 return a JSON data structure.
@@ -605,7 +605,7 @@ class RoseBushService(object):
                         continue
                     start, end = match.span()
                 else:
-                    # ERROR: un-reccognised search_mode
+                    # ERROR: un-recognised search_mode
                     break
                 # if line matches search string include in results
                 results.append([line[:start], line[start:end],
@@ -769,7 +769,7 @@ class RoseBushService(object):
 
     @classmethod
     def _check_file_path(cls, path):
-        """Raise HTTP 403 error if the path is not indended to be served.
+        """Raise HTTP 403 error if the path is not intended to be served.
 
         Examples:
             >>> RoseBushService._check_file_path('.service/contact')

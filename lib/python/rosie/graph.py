@@ -63,7 +63,7 @@ class PrintSuiteDetails(rose.reporter.Event):
 def get_suite_data(prefix, properties=None):
     """Retrieve a dictionary containing the contents of RosieWS
 
-    Adds in any extra requested properites
+    Adds in any extra requested properties
 
     """
 
