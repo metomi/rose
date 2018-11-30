@@ -122,7 +122,7 @@ from being run):
 
 Doctests are performed in the doc/sphinx directory and any files created will
 have to be `tidied up
-<http://www.sphinx-doc.org/en/1.5.1/ext/doctest.html#directive-testcleanup>`_.
+<https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html#directive-testcleanup>`_.
 
 See `doctest <https://docs.python.org/3.3/library/doctest.html>`_ for more
 details.
