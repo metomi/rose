@@ -402,7 +402,6 @@ class MacroBaseRoseEdit(MacroBase):
             return names
         else:
             return [v.name for v in config_data["variables"].get(section, [])]
-        return []
 
     def _get_config_has_id(self, config_data, id_):
         """Return whether the config_data contains the id_."""
