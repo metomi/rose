@@ -5,3 +5,9 @@ etc/opt
 lib/bash/rose_init_site
 doc
 venv
+
+# coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
