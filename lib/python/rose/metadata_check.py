@@ -26,7 +26,6 @@ import sys
 import rose.config
 import rose.config_tree
 import rose.formats.namelist
-from rose.gtk import INTERACTIVE_ENABLED
 import rose.macro
 import rose.macros
 import rose.opt_parse
@@ -206,13 +205,7 @@ def _check_value_hints(hints_value):
 
 def _check_widget(value, module_files=None, meta_dir=None):
     """Check widget setting is OK.
-
-    Ignore if no DISPLAY in environment and GTK widget requires display.
     """
-    if not INTERACTIVE_ENABLED:
-        # gtk 2.0 not available, skip check.
-        return
-
     if module_files is None:
         module_files = _get_module_files(meta_dir)
     if not module_files:

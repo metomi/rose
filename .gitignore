@@ -11,3 +11,5 @@ venv
 .coverage.*
 coverage.xml
 htmlcov/
+
+lib/python/isodatetime
