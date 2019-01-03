@@ -1,0 +1,248 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Retries &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Suicide Triggers" href="suicide-triggers.html" />
+    <link rel="prev" title="Queues" href="queues.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="retries">
+
+<h1>Retries<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/retries.html#retries" title="View HTML">§</a></h1>
+
+<p>Retries allow us to automatically re-submit tasks which have failed due to
+failure in submission or execution.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="purpose">
+
+<h2>Purpose<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/retries.html#purpose" title="View HTML">§</a></h2>
+
+<p>Retries can be useful for tasks that may occasionally fail due to external
+events, and are routinely fixable when they do - an example would be a task
+that is dependent on a system that experiences temporary outages.</p>
+<p>If a task fails, the Cylc retry mechanism can resubmit it after a
+pre-determined delay. An environment variable, <code class="docutils literal notranslate"><span class="pre">$CYLC_TASK_TRY_NUMBER</span></code>
+is incremented and passed into the task - this means you can write your
+task script so that it changes behaviour accordingly.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/retries.html#example" title="View HTML">§</a></h2>
+
+<a class="reference internal image-reference" href="https://upload.wikimedia.org/wikipedia/commons/7/73/Double-six-dice.jpg"><img alt="Two dice both showing the number six" class="align-right" src="https://upload.wikimedia.org/wikipedia/commons/7/73/Double-six-dice.jpg" style="width: 200px;" /></a>
+<p>Create a new suite by running the following commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">retries</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cd</span> <span class="n">retries</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>You will now have a suite with a <code class="docutils literal notranslate"><span class="pre">roll_doubles</span></code> task which simulates
+trying to roll doubles using two dice:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[cylc]</span>
+    <span class="nv">UTC mode </span><span class="o">=</span><span class="s"> True</span> <span class="c1"># Ignore DST</span>
+
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">start</span> <span class="o">=&gt;</span> <span class="kd">roll_doubles</span> <span class="o">=&gt;</span> <span class="kd">win</span>
+
+<span class="nt">[runtime]</span>
+    <span class="nt">[[start]]</span>
+    <span class="nt">[[win]]</span>
+    <span class="nt">[[roll_doubles]]</span>
+        <span class="nv">script </span><span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">sleep 10</span>
+<span class="s2">RANDOM=$$</span>  <span class="c1"># Seed $RANDOM</span><span class="s2"></span>
+<span class="s2">DIE_1=$((RANDOM%6 + 1))</span>
+<span class="s2">DIE_2=$((RANDOM%6 + 1))</span>
+<span class="s2">echo &quot;Rolled $DIE_1 and $DIE_2...&quot;</span>
+<span class="s2">if (($DIE_1 == $DIE_2)); then</span>
+<span class="s2">   echo &quot;doubles!&quot;</span>
+<span class="s2">else</span>
+<span class="s2">   exit 1</span>
+<span class="s2">fi</span>
+<span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="running-without-retries">
+
+<h2>Running Without Retries<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/retries.html#running-without-retries" title="View HTML">§</a></h2>
+
+<p>Let’s see what happens when we run the suite as it is. Open the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">gui</span> <span class="n">retries</span><span class="o">-</span><span class="n">tutorial</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>Then run the suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">run</span> <span class="n">retries</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>Unless you’re lucky, the suite should fail at the roll_doubles task.</p>
+<p>Stop the suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">stop</span> <span class="n">retries</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="configuring-retries">
+
+<h2>Configuring Retries<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/retries.html#configuring-retries" title="View HTML">§</a></h2>
+
+<p>We need to tell Cylc to retry it a few times - replace the line
+<code class="docutils literal notranslate"><span class="pre">[[roll_doubles]]</span></code> in the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file with:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[roll_doubles]]</span>
+    <span class="nt">[[[job]]]</span>
+        <span class="nv">execution retry delays </span><span class="o">=</span><span class="s"> 5*PT6S</span>
+</pre></div>
+</div>
+<p>This means that if the <code class="docutils literal notranslate"><span class="pre">roll_doubles</span></code> task fails, Cylc expects to
+retry running it 5 times before finally failing. Each retry will have
+a delay of 6 seconds.</p>
+<p>We can apply multiple retry periods with the <code class="docutils literal notranslate"><span class="pre">execution</span> <span class="pre">retry</span> <span class="pre">delays</span></code> setting
+by separating them with commas, for example the following line would tell Cylc
+to retry a task four times, once after 15 seconds, then once after 10 minutes,
+then once after one hour then once after three hours.</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">execution retry delays </span><span class="o">=</span><span class="s"> PT15S, PT10M, PT1H, PT3H</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="running-with-retries">
+
+<h2>Running With Retries<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/retries.html#running-with-retries" title="View HTML">§</a></h2>
+
+<p>If you closed it, re-open the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">gui</span> <span class="n">retries</span><span class="o">-</span><span class="n">tutorial</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>Re-run the suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">run</span> <span class="n">retries</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>What you should see is Cylc retrying the <code class="docutils literal notranslate"><span class="pre">roll_doubles</span></code> task. Hopefully,
+it will succeed (there is only about a about a 1 in 3 chance of every task
+failing) and the suite will continue.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="altering-behaviour">
+
+<h2>Altering Behaviour<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/retries.html#altering-behaviour" title="View HTML">§</a></h2>
+
+<p>We can alter the behaviour of the task based on the number of retries, using
+<code class="docutils literal notranslate"><span class="pre">$CYLC_TASK_TRY_NUMBER</span></code>.</p>
+<p>Change the <code class="docutils literal notranslate"><span class="pre">script</span></code> setting for the <code class="docutils literal notranslate"><span class="pre">roll_doubles</span></code> task to this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>sleep 10
+RANDOM=$$  # Seed $RANDOM
+DIE_1=$((RANDOM%6 + 1))
+DIE_2=$((RANDOM%6 + 1))
+echo &quot;Rolled $DIE_1 and $DIE_2...&quot;
+if (($DIE_1 == $DIE_2)); then
+    echo &quot;doubles!&quot;
+elif (($CYLC_TASK_TRY_NUMBER &gt;= 2)); then
+    echo &quot;look over there! ...&quot;
+    echo &quot;doubles!&quot;  # Cheat!
+else
+    exit 1
+fi
+</pre></div>
+</div>
+<p>If your suite is still running, stop it, then run it again.</p>
+<p>This time, the task should definitely succeed before the third retry.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="further-reading">
+
+<h2>Further Reading<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/retries.html#further-reading" title="View HTML">§</a></h2>
+
+<p>For more information see the <a class="reference external" href="http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide">Cylc User Guide</a>.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

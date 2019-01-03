@@ -1,0 +1,618 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Upgrading Macro Development &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Widget Development" href="widget-development.html" />
+    <link rel="prev" title="Upgrading" href="upgrading.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="upgrading-macro-development">
+
+<h1>Upgrading Macro Development<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#upgrading-macro-development" title="View HTML">§</a></h1>
+
+<p>Upgrade macros are used to upgrade <a class="reference internal" href="../../../glossary.html#term-rose-app"><span class="xref std std-term">Rose apps</span></a> to newer
+metadata versions. They are intended to keep application configurations in
+sync with changes to application inputs e.g. from new code releases.</p>
+<p>You should already be familiar with using <a class="reference internal" href="../../../api/command-reference.html#command-rose-app-upgrade"><span class="std std-ref">rose app-upgrade</span></a> (see
+the <a class="reference internal" href="upgrading.html#tutorial-rose-upgrade-macros"><span class="std std-ref">Upgrading tutorial</span></a> and the concepts
+in the reference material).</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#example" title="View HTML">§</a></h2>
+
+<a class="reference internal image-reference" href="http://upload.wikimedia.org/wikipedia/commons/b/b9/Proa1.jpg"><img alt="http://upload.wikimedia.org/wikipedia/commons/b/b9/Proa1.jpg" class="align-right" src="http://upload.wikimedia.org/wikipedia/commons/b/b9/Proa1.jpg" style="width: 250px;" /></a>
+<p>In this example, we’ll be upgrading a boat on a desert island.</p>
+<p>Create a Rose application called <code class="docutils literal notranslate"><span class="pre">make-boat-app</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">make</span><span class="o">-</span><span class="n">boat</span><span class="o">-</span><span class="n">app</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">make</span><span class="o">-</span><span class="n">boat</span><span class="o">-</span><span class="n">app</span>
+</pre></div>
+</div>
+<p>Create a <code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code> file with the following content:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">make-boat/0.1</span>
+
+<span class="nt">[namelist:materials]</span>
+<span class="nv">hollow_tree_trunks</span><span class="o">=</span><span class="s">1</span>
+<span class="nv">paddling_twigs</span><span class="o">=</span><span class="s">1</span>
+</pre></div>
+</div>
+<p>You now have a Rose application configuration that configures our simple boat
+(a dugout canoe). It references a meta flag (for which metadata is unlikely to
+already exist), made up of a category (<code class="docutils literal notranslate"><span class="pre">make-boat</span></code>) at a particular
+version (<code class="docutils literal notranslate"><span class="pre">0.1</span></code>). The meta flag is used by Rose to locate a configuration
+metadata directory.</p>
+<p>Make sure you’re using <code class="docutils literal notranslate"><span class="pre">make-boat</span></code> and not <code class="docutils literal notranslate"><span class="pre">make_boat</span></code> - the hyphen
+makes all the difference!</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The version in the meta flag doesn’t have to be numeric - it could be
+<code class="docutils literal notranslate"><span class="pre">vn0.1</span></code> or <code class="docutils literal notranslate"><span class="pre">alpha</span></code> or <code class="docutils literal notranslate"><span class="pre">Crafty-Canoe</span></code>.</p>
+</div>
+<p>We need to create some metadata to make this work.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example-metadata">
+
+<h2>Example Metadata<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#example-metadata" title="View HTML">§</a></h2>
+
+<p>We need a <code class="docutils literal notranslate"><span class="pre">rose-meta/</span></code> directory somewhere, to store our metadata -
+for the purposes of this tutorial it’s easiest to put in in your homespace,
+but the location does not matter.</p>
+<p>Create a <code class="docutils literal notranslate"><span class="pre">rose-meta/make-boat/</span></code> directory in your homespace:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">meta</span><span class="o">/</span><span class="n">make</span><span class="o">-</span><span class="n">boat</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>This is the category (also called command) directory for the metadata,
+which will hold sub-directories for actual configuration metadata
+versions (each containing a <a class="reference internal" href="../../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file, etc).</p>
+<p>N.B. Configuration metadata would normally be managed by whoever manages
+Rose installation at your site.</p>
+<p>We know we need some metadata for the <code class="docutils literal notranslate"><span class="pre">0.1</span></code> version, so create a
+<code class="docutils literal notranslate"><span class="pre">0.1/</span></code> subdirectory under <code class="docutils literal notranslate"><span class="pre">rose-meta/make-boat/</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">meta</span><span class="o">/</span><span class="n">make</span><span class="o">-</span><span class="n">boat</span><span class="o">/</span><span class="mf">0.1</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>We’ll need a <a class="reference internal" href="../../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file there too, so create an empty
+one in the new directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">touch</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">meta</span><span class="o">/</span><span class="n">make</span><span class="o">-</span><span class="n">boat</span><span class="o">/</span><span class="mf">0.1</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">meta</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>We can safely say that our two namelist inputs are essential for the
+construction and testing of the boat, so we can paste the following into
+the newly created <a class="reference internal" href="../../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[namelist:materials=hollow_tree_trunks]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">1</span>
+
+<span class="nt">[namelist:materials=paddling_twigs]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">range</span><span class="o">=</span><span class="s">1:</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+</pre></div>
+</div>
+<p>So far, we have a normal application configuration which references
+some metadata, somewhere, for a category at a certain version.</p>
+<p>Let’s make another version to upgrade to.</p>
+<p>The next version of our boat will have <a class="reference external" href="https://en.wikipedia.org/wiki/Outrigger_canoe">outriggers</a> to make it more
+stable. Some of the inputs in our application configuration will need
+to change.</p>
+<p>Our application configuration might need to look something like this,
+after any upgrade (don’t change it yet!):</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">make-boat/0.2</span>
+
+<span class="nt">[namelist:materials]</span>
+<span class="nv">hollow_tree_trunks</span><span class="o">=</span><span class="s">1</span>
+<span class="nv">misc_branches</span><span class="o">=</span><span class="s">4</span>
+<span class="nv">outrigger_tree_trunks</span><span class="o">=</span><span class="s">2</span>
+<span class="nv">paddling_branches</span><span class="o">=</span><span class="s">1</span>
+</pre></div>
+</div>
+<p>It looks like we’ve added the inputs <code class="docutils literal notranslate"><span class="pre">misc_branches</span></code>,
+<code class="docutils literal notranslate"><span class="pre">outrigger_tree_trunks</span></code> and <code class="docutils literal notranslate"><span class="pre">paddling_branches</span></code>. <code class="docutils literal notranslate"><span class="pre">paddling_twigs</span></code>
+is now no longer there (now redundant), so we can remove it from the
+configuration when we upgrade.</p>
+<p>Let’s create the new metadata version, to document what we need and
+don’t need.</p>
+<p>Create a new subdirectory under <code class="docutils literal notranslate"><span class="pre">make-boat/</span></code> called <code class="docutils literal notranslate"><span class="pre">0.2/</span></code> containing
+a <a class="reference internal" href="../../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file that looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[namelist:materials=hollow_tree_trunks]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">1</span>
+
+<span class="nt">[namelist:materials=misc_branches]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">range</span><span class="o">=</span><span class="s">4:</span>
+
+<span class="nt">[namelist:materials=paddling_branches]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">range</span><span class="o">=</span><span class="s">1:</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+
+<span class="nt">[namelist:materials=outrigger_tree_trunks]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">2</span>
+</pre></div>
+</div>
+<p>You can check that everything is OK so far by changing directory to the
+<code class="docutils literal notranslate"><span class="pre">make-boat/</span></code> directory and running <code class="docutils literal notranslate"><span class="pre">find</span></code> - it should look
+something like:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.
+./0.1
+./0.1/rose-meta.conf
+./0.2
+./0.2/rose-meta.conf
+</pre></div>
+</div>
+<p>We now want to automate the process of updating our app config from
+<code class="docutils literal notranslate"><span class="pre">make-boat/0.1</span></code> to the new <code class="docutils literal notranslate"><span class="pre">make-boat/0.2</span></code> version.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="versions-py">
+
+<h2><code class="docutils literal notranslate"><span class="pre">versions.py</span></code><a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#versions-py" title="View HTML">§</a></h2>
+
+<p>Upgrade macros are invoked through a Python module, <code class="docutils literal notranslate"><span class="pre">versions.py</span></code>,
+that doesn’t live with any particular version metadata - it should be
+present at the root of the category directory.</p>
+<p>Create a new file <code class="docutils literal notranslate"><span class="pre">versions.py</span></code> under <code class="docutils literal notranslate"><span class="pre">make-boat/</span></code>
+(<code class="docutils literal notranslate"><span class="pre">~/rose-meta/make-boat/versions.py</span></code>). We’ll add a macro to it in a
+little bit.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="upgrade-macros-explained">
+
+<h3>Upgrade Macros Explained<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#upgrade-macros-explained" title="View HTML">§</a></h3>
+
+<p>Upgrade macros are Python objects with a <code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;0.1&quot;</span></code>)
+and an <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;0.2&quot;</span></code>). The <code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> is the ‘start’
+version (if upgrading) and the <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code> is the ‘destination’ version.</p>
+<p>When a user requests an upgrade for their configuration (e.g. by running
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-app-upgrade"><span class="std std-ref">rose app-upgrade</span></a>), the <code class="docutils literal notranslate"><span class="pre">versions.py</span></code> file will be searched
+for a macro whose <code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> matches the <code class="docutils literal notranslate"><span class="pre">meta=...</span></code> version.</p>
+<p>For example, for our <code class="docutils literal notranslate"><span class="pre">meta=make-boat/0.1</span></code> flag, we’d need a macro whose
+<code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> was <code class="docutils literal notranslate"><span class="pre">&quot;0.1&quot;</span></code>.</p>
+<p>When a particular upgrade macro is run, the version in the app
+configuration will be changed from <code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> to <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code> (e.g.
+<code class="docutils literal notranslate"><span class="pre">meta=make-boat/0.1</span></code> to <code class="docutils literal notranslate"><span class="pre">meta=make-boat/0.2</span></code>), as well as making
+other changes to the configuration if needed, like adding/removing the
+right variables.</p>
+<p>If the user wanted to upgrade across multiple versions - e.g. <code class="docutils literal notranslate"><span class="pre">0.1</span></code> to
+<code class="docutils literal notranslate"><span class="pre">0.4</span></code> - there would need to be a chain of objects whose <code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code>
+was equal to the last <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code>, ending in an <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code> of
+<code class="docutils literal notranslate"><span class="pre">0.4</span></code>.</p>
+<p>We’ll cover multiple version upgrading later in the tutorial.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="upgrade-macro-skeleton">
+
+<h3>Upgrade Macro Skeleton<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#upgrade-macro-skeleton" title="View HTML">§</a></h3>
+
+<p>Upgrade macros are bits of Python code that essentially look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Upgrade272to273</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">upgrade</span><span class="o">.</span><span class="n">MacroUpgrade</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Upgrade from 27.2 to 27.3.&quot;&quot;&quot;</span>
+
+    <span class="n">BEFORE_TAG</span> <span class="o">=</span> <span class="s2">&quot;27.2&quot;</span>
+    <span class="n">AFTER_TAG</span> <span class="o">=</span> <span class="s2">&quot;27.3&quot;</span>
+
+    <span class="k">def</span> <span class="nf">upgrade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Upgrade the application configuration (config).&quot;&quot;&quot;</span>
+        <span class="c1"># Some code doing something to config goes here.</span>
+        <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>They are sub-classes of a particular class,
+<a class="reference internal" href="../../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade" title="rose.upgrade.MacroUpgrade"><code class="xref py py-class docutils literal notranslate"><span class="pre">rose.upgrade.MacroUpgrade</span></code></a>,
+which means that some of the Python functionality is done ‘under the hood’
+to make things easier.</p>
+<p>You shouldn’t need to know very much Python to get most things done.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="example-upgrade-macro">
+
+<h3>Example Upgrade Macro<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#example-upgrade-macro" title="View HTML">§</a></h3>
+
+<p>Paste the following into your <code class="docutils literal notranslate"><span class="pre">versions.py</span></code> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rose.upgrade</span>
+
+
+<span class="k">class</span> <span class="nc">MyFirstUpgradeMacro</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">upgrade</span><span class="o">.</span><span class="n">MacroUpgrade</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Upgrade from 0.1 (Canonical Canoe) to 0.2 (Outrageous Outrigger).&quot;&quot;&quot;</span>
+
+    <span class="n">BEFORE_TAG</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+    <span class="n">AFTER_TAG</span> <span class="o">=</span> <span class="s2">&quot;0.2&quot;</span>
+
+    <span class="k">def</span> <span class="nf">upgrade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Upgrade the boat!&quot;&quot;&quot;</span>
+        <span class="c1"># Some code doing something to config goes here.</span>
+        <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>This is already a functional upgrade macro - although it won’t do anything.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The name of the class (<code class="docutils literal notranslate"><span class="pre">MyFirstUpgradeMacro</span></code>) doesn’t need to
+be related to the versions - the only identifiers that matter are the
+<code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> and the <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code>.</p>
+</div>
+<p>We need to get the macro to do the following:</p>
+<ul class="simple">
+<li>add the option <code class="docutils literal notranslate"><span class="pre">namelist:materials=misc_branches</span></code></li>
+<li>add the option <code class="docutils literal notranslate"><span class="pre">namelist:materials=outrigger_tree_trunks</span></code></li>
+<li>add the option <code class="docutils literal notranslate"><span class="pre">namelist:materials=paddling_branches</span></code></li>
+<li>remove the option <code class="docutils literal notranslate"><span class="pre">namelist:materials=paddling_twigs</span></code></li>
+</ul>
+<p>We can use the <a class="reference internal" href="../../../api/rose-upgrader-macros.html#rose-upgr-macros"><span class="std std-ref">Rose Upgrade Macro API</span></a> provided to express this in Python code.
+Replace the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">Some</span> <span class="pre">code</span> <span class="pre">doing</span> <span class="pre">something...</span></code> line with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;misc_branches&quot;</span><span class="p">],</span> <span class="s2">&quot;4&quot;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span>
+         <span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;outrigger_tree_trunks&quot;</span><span class="p">],</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span>
+         <span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;paddling_branches&quot;</span><span class="p">],</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">remove_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;paddling_twigs&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>This changes the app configuration (<code class="docutils literal notranslate"><span class="pre">config</span></code>) in the way we want, and
+(behind the scenes) adds some things to the <code class="docutils literal notranslate"><span class="pre">self.reports</span></code> list
+mentioned in the <code class="docutils literal notranslate"><span class="pre">return</span> <span class="pre">config,</span> <span class="pre">self.reports</span></code> line.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When we add options like <code class="docutils literal notranslate"><span class="pre">misc_branches</span></code>, we must specify default values
+to assign to them.</p>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Values should always be specified as strings e.g. (<code class="docutils literal notranslate"><span class="pre">&quot;1&quot;</span></code> rather than
+<code class="docutils literal notranslate"><span class="pre">1</span></code>).</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="customising-the-output">
+
+<h3>Customising the Output<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#customising-the-output" title="View HTML">§</a></h3>
+
+<p>The methods <code class="docutils literal notranslate"><span class="pre">self.add_setting</span></code> and <code class="docutils literal notranslate"><span class="pre">self.remove_setting</span></code> will provide
+a default message to the user about the change (e.g.
+<code class="docutils literal notranslate"><span class="pre">&quot;Added</span> <span class="pre">X</span> <span class="pre">with</span> <span class="pre">value</span> <span class="pre">Y&quot;</span></code>), but you can customise them to add your own
+using the info ‘keyword argument’ like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;outrigger_tree_trunks&quot;</span><span class="p">],</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
+    <span class="n">info</span><span class="o">=</span><span class="s2">&quot;This makes it into a trimaran!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you want to, try adding your own messages.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="running-rose-app-upgrade">
+
+<h3>Running <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">app-upgrade</span></code><a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#running-rose-app-upgrade" title="View HTML">§</a></h3>
+
+<p>Our upgrade macro will now work - change directory to the application
+directory and run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">meta</span><span class="o">-</span><span class="n">path</span><span class="o">=~/</span><span class="n">rose</span><span class="o">-</span><span class="n">meta</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>This should display some information about the current and available
+versions - see the help by running <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">help</span> <span class="pre">app-upgrade</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">--meta-path</span></code> equals the path to the <code class="docutils literal notranslate"><span class="pre">rose-meta/</span></code> directory you
+created - as this path isn’t configured in the site/user configuration,
+we need to set it manually. This won’t normally be the case for users,
+if the metadata is centrally managed.</p>
+<p>Let’s upgrade to <code class="docutils literal notranslate"><span class="pre">0.2</span></code>. Run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">meta</span><span class="o">-</span><span class="n">path</span><span class="o">=~/</span><span class="n">rose</span><span class="o">-</span><span class="n">meta</span><span class="o">/</span> <span class="mf">0.2</span>
+</pre></div>
+</div>
+<p>This should provide you with a summary of changes (including any custom
+messages you may have added) and prompt you to accept them. Accept them
+and have a look at the app config file - it should have been changed
+accordingly.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="using-patch-configurations">
+
+<h3>Using Patch Configurations<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#using-patch-configurations" title="View HTML">§</a></h3>
+
+<p>For relatively straightforward changes like the one above, we can
+configure a macro to apply patches to the configuration without having
+to write setting-specific Python code.</p>
+<p>We’ll add a rudder option for our <code class="docutils literal notranslate"><span class="pre">0.3</span></code> version, with a
+<code class="docutils literal notranslate"><span class="pre">namelist:materials=l_rudder_branch</span></code>.</p>
+<p>Create a <code class="docutils literal notranslate"><span class="pre">0.3</span></code> directory in the same way that you created the <code class="docutils literal notranslate"><span class="pre">0.1</span></code>
+and <code class="docutils literal notranslate"><span class="pre">0.2</span></code> metadata directories. Add a <a class="reference internal" href="../../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file that
+looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[namelist:materials=hollow_tree_trunks]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">1</span>
+
+<span class="nt">[namelist:materials=l_rudder_branch]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">logical</span>
+
+<span class="nt">[namelist:materials=misc_branches]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+<span class="nv">range</span><span class="o">=</span><span class="s">4:</span>
+
+<span class="nt">[namelist:materials=outrigger_tree_trunks]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">2</span>
+
+<span class="nt">[namelist:materials=paddling_branches]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">range</span><span class="o">=</span><span class="s">1:</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+</pre></div>
+</div>
+<p>We need to write another macro in <code class="docutils literal notranslate"><span class="pre">versions.py</span></code> - append the following
+code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MySecondUpgradeMacro</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">upgrade</span><span class="o">.</span><span class="n">MacroUpgrade</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Upgrade from 0.2 (Outrageous Outrigger) to 0.3 (Amazing Ama).&quot;&quot;&quot;</span>
+
+    <span class="n">BEFORE_TAG</span> <span class="o">=</span> <span class="s2">&quot;0.2&quot;</span>
+    <span class="n">AFTER_TAG</span> <span class="o">=</span> <span class="s2">&quot;0.3&quot;</span>
+
+    <span class="k">def</span> <span class="nf">upgrade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Upgrade the boat!&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">act_from_files</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">self.act_from_files</span></code> line tells the macro to look for patch
+configuration files - two files called <code class="docutils literal notranslate"><span class="pre">rose-macro-add.conf</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rose-macro-remove.conf</span></code>, under an <code class="docutils literal notranslate"><span class="pre">etc/BEFORE_TAG/</span></code> subdirectory -
+in our case, <code class="docutils literal notranslate"><span class="pre">~/rose-meta/make-boat/etc/0.2/</span></code>.</p>
+<p>Whatever is found in <code class="docutils literal notranslate"><span class="pre">rose-macro-add.conf</span></code> will be added to the
+configuration, and whatever is found in <code class="docutils literal notranslate"><span class="pre">rose-macro-remove.conf</span></code> will
+be removed. If the files don’t exist, nothing will happen.</p>
+<p>Let’s configure what we want to happen. Create a directory
+<code class="docutils literal notranslate"><span class="pre">~/rose-meta/make-boat/etc/0.2/</span></code>, containing a <code class="docutils literal notranslate"><span class="pre">rose-macro-add.conf</span></code>
+file that looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[namelist:materials]</span>
+<span class="nv">l_rudder_branch</span><span class="o">=</span><span class="s">.true.</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If a <code class="docutils literal notranslate"><span class="pre">rose-macro-add.conf</span></code> setting is already defined, the
+value of <code class="docutils literal notranslate"><span class="pre">l_rudder_branch</span></code> will not be overwritten. In our case, we
+don’t need a <code class="docutils literal notranslate"><span class="pre">rose-macro-remove.conf</span></code> file.</p>
+</div>
+<p>Go ahead and upgrade the app configuration to <code class="docutils literal notranslate"><span class="pre">0.3</span></code>, as you did before.</p>
+<p>The <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> should now contain the new option,
+<code class="docutils literal notranslate"><span class="pre">l_rudder_branch</span></code>.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="more-complex-upgrade-macros">
+
+<h3>More Complex Upgrade Macros<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#more-complex-upgrade-macros" title="View HTML">§</a></h3>
+
+<p>The <a class="reference internal" href="../../../api/rose-upgrader-macros.html#rose-upgr-macros"><span class="std std-ref">Rose Upgrade Macro API</span></a> gives us quite a bit of power without having to
+write too much Python.</p>
+<p>For our <code class="docutils literal notranslate"><span class="pre">1.0</span></code> release we want to make some improvements to out sailing
+equipment:</p>
+<ul class="simple">
+<li>We want to increase the number of <code class="docutils literal notranslate"><span class="pre">misc_branches</span></code> to be at least 6.</li>
+<li>We want to add a <code class="docutils literal notranslate"><span class="pre">sail_canvas_sq_m</span></code> option.</li>
+</ul>
+<p>We may want to issue a warning for a deprecated option
+(<code class="docutils literal notranslate"><span class="pre">paddle_branches</span></code>) so that the user can decide whether to remove it.</p>
+<p>Create the file <code class="docutils literal notranslate"><span class="pre">~/rose-meta/make-boat/1.0/rose-meta.conf</span></code>
+and paste in the following configuration:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[namelist:materials=hollow_tree_trunks]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">1</span>
+
+<span class="nt">[namelist:materials=l_rudder_branch]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">logical</span>
+
+<span class="nt">[namelist:materials=misc_branches]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">range</span><span class="o">=</span><span class="s">6:</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+
+<span class="nt">[namelist:materials=outrigger_tree_trunks]</span>
+<span class="nv">compulsory</span><span class="o">=</span><span class="s">true</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">2</span>
+
+<span class="nt">[namelist:materials=paddling_branches]</span>
+<span class="nv">range</span><span class="o">=</span><span class="s">0:</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+<span class="nv">warn-if</span><span class="o">=</span><span class="s">True # Deprecated - real sailors don&#39;t use engines</span>
+
+<span class="nt">[namelist:materials=sail_canvas_sq_m]</span>
+<span class="nv">range</span><span class="o">=</span><span class="s">4:</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">real</span>
+</pre></div>
+</div>
+<p>We need to write a macro that reflects these changes.</p>
+<p>We need to start with appending the following code to <code class="docutils literal notranslate"><span class="pre">versions.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyMoreComplexUpgradeMacro</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">upgrade</span><span class="o">.</span><span class="n">MacroUpgrade</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Upgrade from 0.3 (Amazing Ama) to 1.0 (Tremendous Trimaran).&quot;&quot;&quot;</span>
+
+    <span class="n">BEFORE_TAG</span> <span class="o">=</span> <span class="s2">&quot;0.3&quot;</span>
+    <span class="n">AFTER_TAG</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+
+    <span class="k">def</span> <span class="nf">upgrade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Upgrade the boat!&quot;&quot;&quot;</span>
+        <span class="c1"># Some code doing something to config goes here.</span>
+        <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>We already know how to add an option, so replace
+<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">Some</span> <span class="pre">code</span> <span class="pre">going</span> <span class="pre">here...</span></code> with
+<code class="docutils literal notranslate"><span class="pre">self.add_setting(config,</span> <span class="pre">[&quot;namelist:materials&quot;,</span> <span class="pre">&quot;sail_canvas_sq_m&quot;],</span> <span class="pre">&quot;5&quot;)</span></code></p>
+<p>To perform the check/change in the number of <code class="docutils literal notranslate"><span class="pre">misc_branches</span></code>, we can
+insert the following lines after the one we just added:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">branch_num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_setting_value</span><span class="p">(</span>
+       <span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;misc_branches&quot;</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">branch_num</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">branch_num</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">change_setting_value</span><span class="p">(</span>
+             <span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;misc_branches&quot;</span><span class="p">],</span> <span class="s2">&quot;6&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This extracts the value of <code class="docutils literal notranslate"><span class="pre">misc_branches</span></code> (as a string!) and if the
+value represents a positive integer that is less than 6, changes it to
+<code class="docutils literal notranslate"><span class="pre">&quot;6&quot;</span></code>. It’s good practice to guard against the possibility that a user
+might have set the value to a non-integer representation like <code class="docutils literal notranslate"><span class="pre">'many'</span></code>
+- if we don’t do this, the macro may crash out when running things like
+<code class="docutils literal notranslate"><span class="pre">float</span></code>.</p>
+<p>In a similar way, to flag a warning, insert:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">paddles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_setting_value</span><span class="p">(</span>
+               <span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;paddling_branches&quot;</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">paddles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="s2">&quot;namelist:materials&quot;</span><span class="p">,</span> <span class="s2">&quot;paddling_branches&quot;</span><span class="p">,</span>
+                    <span class="n">paddles</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="s2">&quot;Deprecated - probably not needed.&quot;</span><span class="p">,</span>
+                    <span class="n">is_warning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This calls <code class="docutils literal notranslate"><span class="pre">self.add_report</span></code> if the option <code class="docutils literal notranslate"><span class="pre">paddling_branches</span></code> is
+present. This is a method that notifies the user of actions and issues
+by appending things to the <code class="docutils literal notranslate"><span class="pre">self.reports</span></code> list which appears on the
+<code class="docutils literal notranslate"><span class="pre">return</span> <span class="pre">...</span></code> line.</p>
+<p>Run <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">app-upgrade</span> <span class="pre">--meta-path=~/rose-meta/</span> <span class="pre">1.0</span></code> to see the effect of
+your changes. You should see a warning message for
+<code class="docutils literal notranslate"><span class="pre">namelist:materials=paddling_branches</span></code> as well.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="upgrading-many-versions-at-once">
+
+<h3>Upgrading Many Versions at Once<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading-macro-development.html#upgrading-many-versions-at-once" title="View HTML">§</a></h3>
+
+<p>We’ve kept in step with the metadata by upgrading incrementally, but
+typically users will need to upgrade across multiple versions. When this
+happens, the relevant macros will be applied in turn, and their changes
+and issues aggregated.</p>
+<p>Turn back the clock by reverting your application configuration to look
+like it was at <code class="docutils literal notranslate"><span class="pre">0.1</span></code>:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">make-boat/0.1</span>
+
+<span class="nt">[namelist:materials]</span>
+<span class="nv">hollow_tree_trunks</span><span class="o">=</span><span class="s">1</span>
+<span class="nv">paddling_twigs</span><span class="o">=</span><span class="s">1</span>
+</pre></div>
+</div>
+<p>Run <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">app-upgrade</span> <span class="pre">--meta-path=~/rose-meta/</span></code> in the application
+directory. You should see that the version has been downgraded to 0.1,
+the available versions to upgrade to should also be listed - let’s
+choose <code class="docutils literal notranslate"><span class="pre">1.0</span></code>. Run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">meta</span><span class="o">-</span><span class="n">path</span><span class="o">=~/</span><span class="n">rose</span><span class="o">-</span><span class="n">meta</span><span class="o">/</span> <span class="mf">1.0</span>
+</pre></div>
+</div>
+<p>This should aggregate all the changes that our macros make - if you
+accept the changes, it will upgrade all the way to the <code class="docutils literal notranslate"><span class="pre">1.0</span></code> version we
+had before.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>See also:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../../../api/rose-upgrader-macros.html#rose-upgr-macros"><span class="std std-ref">Rose Upgrade Macro API</span></a></li>
+<li><a class="reference internal" href="../../../api/rose-macro.html#api-rose-macro"><span class="std std-ref">Rose Macro API</span></a></li>
+</ul>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Jinja2 &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="Consolidating Configuration" href="index.html" />
+    <link rel="next" title="Parameterised Tasks" href="parameters.html" />
+    <link rel="prev" title="Families" href="families.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="jinja2">
+
+<h1>Jinja2<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#jinja2" title="View HTML">§</a></h1>
+
+<p><a class="reference internal" href="#jinja2">Jinja2</a> is a templating language often used in web design with some
+similarities to python. It can be used to make a suite definition more
+dynamic.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-jinja2-language">
+
+<h2>The Jinja2 Language<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#the-jinja2-language" title="View HTML">§</a></h2>
+
+<p>In Jinja2 statements are wrapped with <code class="docutils literal notranslate"><span class="pre">{%</span></code> characters, i.e:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{% ... %}
+</pre></div>
+</div>
+<p>Variables are initiated using the <code class="docutils literal notranslate"><span class="pre">set</span></code> statement, e.g:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">set</span> <span class="nv">foo</span> <span class="o">=</span> <span class="m">3</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>The Jinja2 Language<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#id1" title="View HTML">§</a></h2>
+
+<p>Expressions wrapped with <code class="docutils literal notranslate"><span class="pre">{{</span></code> characters will be replaced with the value of
+the evaluation of the expression, e.g:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">There</span> <span class="nt">are</span> <span class="cp">{{</span> <span class="nv">foo</span> <span class="cp">}}</span> <span class="nt">methods</span> <span class="nt">for</span> <span class="nt">consolidating</span> <span class="nt">the</span> <span class="nt">suite</span><span class="p">.</span><span class="nc">rc</span> <span class="nt">file</span>
+</pre></div>
+</div>
+<p>Would result in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">There</span> <span class="n">are</span> <span class="mi">3</span> <span class="n">methods</span> <span class="k">for</span> <span class="n">consolidating</span> <span class="n">the</span> <span class="n">suite</span><span class="o">.</span><span class="n">rc</span> <span class="n">file</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>The Jinja2 Language<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#id2" title="View HTML">§</a></h2>
+
+<p>Loops are written with <code class="docutils literal notranslate"><span class="pre">for</span></code> statements, e.g:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">x</span> <span class="k">in</span> <span class="nv">range</span><span class="o">(</span><span class="nv">foo</span><span class="o">)</span> <span class="cp">%}</span>
+   <span class="cp">{{</span> <span class="nv">x</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Would result in:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>0
+1
+2
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>The Jinja2 Language<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#id3" title="View HTML">§</a></h2>
+
+<p>To enable Jinja2 in the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file, add the following <a class="reference external" href="https://en.wikipedia.org/wiki/Shebang_(Unix)">shebang</a> to the
+top of the file:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="ch">#!Jinja2</span>
+</pre></div>
+</div>
+<p>For more information see the <a class="reference external" href="http://jinja.pocoo.org/docs">Jinja2 Tutorial</a>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#example" title="View HTML">§</a></h2>
+
+<p>To consolidate the configuration for the <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> tasks we could
+define a dictionary of station and ID pairs:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">set</span> <span class="nv">stations</span> <span class="o">=</span> <span class="o">{</span><span class="s1">&#39;belmullet&#39;</span><span class="o">:</span> <span class="m">3976</span><span class="o">,</span>
+                   <span class="s1">&#39;camborne&#39;</span><span class="o">:</span> <span class="m">3808</span><span class="o">,</span>
+                   <span class="s1">&#39;heathrow&#39;</span><span class="o">:</span> <span class="m">3772</span><span class="o">,</span>
+                   <span class="s1">&#39;shetland&#39;</span><span class="o">:</span> <span class="m">3005</span><span class="o">}</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id4">
+
+<h2>Example<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#id4" title="View HTML">§</a></h2>
+
+<p>We could then loop over the stations like so:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">station</span> <span class="k">in</span> <span class="nv">stations</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">station</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>After processing, this would result in:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>belmullet
+camborne
+heathrow
+shetland
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id5">
+
+<h2>Example<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#id5" title="View HTML">§</a></h2>
+
+<p>We could also loop over both the stations and corresponding IDs like so:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">station</span><span class="o">,</span> <span class="nv">id</span> <span class="k">in</span> <span class="nv">stations.items</span><span class="o">()</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">station</span> <span class="cp">}}</span> <span class="nt">-</span> <span class="cp">{{</span> <span class="nv">id</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>This would result in:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>belmullet - 3976
+camborne - 3808
+heathrow - 3772
+shetland - 3005
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id6">
+
+<h2>Example<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#id6" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="ch">#!Jinja2</span>
+
+<span class="cp">{% set stations = {&#39;belmullet: 3976,</span>
+<span class="cp">                   &#39;camborne&#39;: 3808,</span>
+<span class="cp">                   &#39;heathrow&#39;: 3772,</span>
+<span class="cp">                   &#39;shetland&#39;: 3005} %}</span>
+
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nt">[[[T00/PT3H]]]</span>
+            <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="cp">{% for station in stations %}</span>
+               <span class="kd">get_observations_</span><span class="cp">{{station}}</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+<span class="cp">{% endfor %}</span>
+            <span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id7">
+
+<h2>Example<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#id7" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+<span class="cp">{% for station, id in stations.items() %}</span>
+    <span class="nt">[[get_observations_</span><span class="cp">{{station}}</span><span class="nt">]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> </span><span class="cp">{{ id }}</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+
+<span class="cp">{% endfor %}</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id8">
+
+<h2>Example<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#id8" title="View HTML">§</a></h2>
+
+<p class="rubric">This practical continues on from the
+<a class="reference internal" href="families.html#cylc-tutorial-families-practical"><span class="std std-ref">families practical</span></a>.</p>
+<p>Next section: <a class="reference internal" href="parameters.html#tutorial-cylc-parameterisation"><span class="std std-ref">Parameterised Tasks</span></a></p>
+<div class="note admonition" id="cylc-tutorial-jinja2-practical">
+<p class="first admonition-title">Practical<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/jinja2.html#cylc-tutorial-jinja2-practical" title="View HTML">§</a></p>
+<p class="rubric">This practical continues on from the
+<a class="reference internal" href="families.html#cylc-tutorial-families-practical"><span class="std std-ref">families practical</span></a>.</p>
+<ol class="last arabic" start="3">
+<li><p class="first"><strong>Use Jinja2 To Avoid Duplication.</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">API_KEY</span></code> environment variable is used by both the
+<code class="docutils literal notranslate"><span class="pre">get_observations</span></code> and <code class="docutils literal notranslate"><span class="pre">get_rainfall</span></code> tasks. Rather than writing it
+out multiple times we will use Jinja2 to centralise this configuration.</p>
+<p>At the top of the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file add the Jinja2 shebang line. Then
+copy the value of the <code class="docutils literal notranslate"><span class="pre">API_KEY</span></code> environment variable and use it to
+define an <code class="docutils literal notranslate"><span class="pre">API_KEY</span></code> Jinja2 variable:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="ch">#!Jinja2</span>
+
+<span class="cp">{% set API_KEY = &#39;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&#39; %}</span>
+</pre></div>
+</div>
+<p>Next replace the key, where it appears in the suite, with
+<code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">API_KEY</span> <span class="pre">}}</span></code>:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span> [runtime]
+     [[get_observations_heathrow]]
+         script = get-observations
+         [[[environment]]]
+             SITE_ID = 3772
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+     [[get_observations_camborne]]
+         script = get-observations
+         [[[environment]]]
+             SITE_ID = 3808
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+     [[get_observations_shetland]]
+         script = get-observations
+         [[[environment]]]
+            SITE_ID = 3005
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+     [[get_observations_belmullet]]
+         script = get-observations
+         [[[environment]]]
+             SITE_ID = 3976
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+    [[get_rainfall]]
+        script = get-rainfall
+        [[[environment]]]
+            # The key required to get weather data from the DataPoint service.
+            # To use archived data comment this line out.
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+</pre></div>
+</div>
+<p>Check the result with <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code>. The Jinja2 will be processed
+so you should not see any difference after making these changes.</p>
+</li>
+</ol>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

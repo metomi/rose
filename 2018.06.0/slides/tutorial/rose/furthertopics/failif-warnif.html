@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fail-If, Warn-If &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Custom Macros" href="macro-development.html" />
+    <link rel="prev" title="Date and Time Manipulation" href="date-time-manipulation.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="fail-if-warn-if">
+
+<h1>Fail-If, Warn-If<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/failif-warnif.html#fail-if-warn-if" title="View HTML">§</a></h1>
+
+<p>Basic validation can be achieved using metadata settings such as <code class="docutils literal notranslate"><span class="pre">type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">range</span></code>. The <code class="docutils literal notranslate"><span class="pre">fail-if</span></code> and <code class="docutils literal notranslate"><span class="pre">warn-if</span></code> metadata settings are scriptable
+enabling more advanced validation. They evaluate logical expressions,
+flagging warnings if they return false.</p>
+<p><code class="docutils literal notranslate"><span class="pre">fail-if</span></code> and <code class="docutils literal notranslate"><span class="pre">warn-if</span></code> can be run on the command line using
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a> or on-demand in the <a class="reference internal" href="../../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a>
+GUI.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Simple metadata settings such as <code class="docutils literal notranslate"><span class="pre">range</span></code> can be evaluated on-the-fly when
+a value changes. As <code class="docutils literal notranslate"><span class="pre">fail-if</span></code> and <code class="docutils literal notranslate"><span class="pre">warn-if</span></code> can take longer to evaluate
+they must be done on-demand in the <a class="reference internal" href="../../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI or
+on the command line.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="syntax">
+
+<h2>Syntax<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/failif-warnif.html#syntax" title="View HTML">§</a></h2>
+
+<p>The syntax is Pythonic, and relies on <a class="reference external" href="http://jinja.pocoo.org/">Jinja2</a> to actually evaluate
+relationships between values, after some initial pre-processing.</p>
+<p>You can reference setting values by using their IDs - for example:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">fail-if</span><span class="o">=</span><span class="s">namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume;</span>
+</pre></div>
+</div>
+<p>You can also use <code class="docutils literal notranslate"><span class="pre">this</span></code> as a shorthand for the current (metadata section)
+ID - e.g.:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[namelist:coffee=daily_amount]</span>
+<span class="nv">fail-if</span><span class="o">=</span><span class="s">this &lt; namelist:coffee=daily_min or this &gt;= namelist:coffee=daily_max;</span>
+</pre></div>
+</div>
+<p>There is also shorthand for arrays, which we’ll demonstrate later.</p>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">;</span></code> at the end is optional when we only have one expression
+(it’s a delimiter), but it’s better style to keep it.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/failif-warnif.html#example" title="View HTML">§</a></h2>
+
+<p>We’ll use the example of a rocket launch.</p>
+<p>Create a new application called <code class="docutils literal notranslate"><span class="pre">failif-warnif</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">rose</span> <span class="n">tutorial</span> <span class="n">failif</span><span class="o">-</span><span class="n">warnif</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">failif</span><span class="o">-</span><span class="n">warnif</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">failif</span><span class="o">-</span><span class="n">warnif</span>
+</pre></div>
+</div>
+<p>You will now have a new Rose app with a <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> that
+looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">launch.exe</span>
+
+<span class="nt">[env]</span>
+<span class="nv">ORBITAL_SPEED_MS</span><span class="o">=</span><span class="s">1683.0</span>
+
+<span class="nt">[file:rocket_settings.nl]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">namelist:rocket</span>
+
+<span class="nt">[namelist:rocket]</span>
+<span class="nv">battery_levels</span><span class="o">=</span><span class="s">80, 60</span>
+<span class="nv">total_weight_kg</span><span class="o">=</span><span class="s">4700.0</span>
+<span class="nv">fuelless_weight_kg</span><span class="o">=</span><span class="s">2353.0</span>
+<span class="nv">specific_impulse_s</span><span class="o">=</span><span class="s">311.0</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="http://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apollo16LM.jpg/533px-Apollo16LM.jpg"><img alt="Apollo 11 Lunar Module, returning from the surface of the Moon" class="align-right" src="http://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apollo16LM.jpg/533px-Apollo16LM.jpg" style="width: 250px;" /></a>
+<p>This app configuration controls the liftoff of a particular rocket -
+in our case, the Lunar Module (Apollo Program spacecraft).</p>
+<p>There is also metadata in the <code class="docutils literal notranslate"><span class="pre">meta/rose-meta.conf</span></code> file which provides the
+application inputs with descriptions, help text and type information.</p>
+<p>Try running <a class="reference internal" href="../../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> in the app directory. You should
+be able to navigate between the pages and view the help and description for the
+settings.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="fail-if">
+
+<h2><code class="docutils literal notranslate"><span class="pre">fail-if</span></code><a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/failif-warnif.html#fail-if" title="View HTML">§</a></h2>
+
+<p>If the ratio of rocket fuel to total weight is too high, or the efficiency
+of the rocket (specific impulse) is too low, the Lunar Module will never
+make it off the Moon.</p>
+<p>We want to be able to flag an error based on a combination of the rocket
+settings and the necessary orbital velocity (<code class="docutils literal notranslate"><span class="pre">env=ORBITAL_VELOCITY_MS</span></code>).
+We need to set some <code class="docutils literal notranslate"><span class="pre">fail-if</span></code> metadata on one of these settings - as
+it’s evaluated on-demand, it doesn’t matter which one we choose.</p>
+<p>Open the <code class="docutils literal notranslate"><span class="pre">meta/rose-meta.conf</span></code> file in a text editor.</p>
+<p>Add the following line to the metadata section
+<code class="docutils literal notranslate"><span class="pre">[namelist:rocket=total_weight_kg]</span></code>:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">fail-if</span><span class="o">=</span><span class="s">this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s));</span>
+</pre></div>
+</div>
+<p>This states the relationship between these settings (a rearrangement
+of the <a class="reference external" href="https://en.wikipedia.org/wiki/Tsiolkovsky_rocket_equation">Tsiolkovsky rocket equation</a>). The rocket must have a
+sufficient ratio of fuel to rocket mass, with a sufficiently fast
+exhaust velocity (<code class="docutils literal notranslate"><span class="pre">=9.8</span> <span class="pre">*</span> <span class="pre">namelist:rocket=specific_impulse_s</span></code>)
+to get to the orbital speed <code class="docutils literal notranslate"><span class="pre">env=ORBITAL_SPEED_MS</span></code>.</p>
+<p>Save the metadata file and then reload the config editor metadata
+(<span class="menuselection">Metadata -&gt; Refresh Metadata</span>).</p>
+<p>You now need to ask Rose to evaluate the <code class="docutils literal notranslate"><span class="pre">fail-if</span></code> condition, as
+it’s an on-demand process.</p>
+<p>Either press the toolbar button <span class="guilabel">Check fail-if …</span> or click
+the menu item <span class="menuselection">Metadata ‣ Check fail-if, warn-if</span>.</p>
+<p>Hopefully, this should not flag any errors, as these are the Apollo
+mission parameters! A success message will appear in the bottom
+right-hand corner of the window.</p>
+<p>Try adding a few more moonrocks. Add <code class="docutils literal notranslate"><span class="pre">1000</span></code> to the values
+of <code class="docutils literal notranslate"><span class="pre">total_weight_kg</span></code> and <code class="docutils literal notranslate"><span class="pre">fuelless_weight_kg</span></code>.</p>
+<p>Re-run the check by clicking
+<span class="menuselection">Metadata ‣ Check fail-if, warn-if</span>. An error
+dialog will appear, and the <code class="docutils literal notranslate"><span class="pre">total_weight_kg</span></code> setting will have
+an error flag.</p>
+<p>However, neither of these are very informative, other than quoting
+the metadata.</p>
+<p>Change the <code class="docutils literal notranslate"><span class="pre">fail-if</span></code> line to:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">fail-if</span><span class="o">=</span><span class="s">this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s));  # Fuel mass ratio or specific impulse too low to achieve orbit.</span>
+</pre></div>
+</div>
+<p>If you reload the metadata and run the check again, the error
+message will include the helpful text.</p>
+<p>You can also check the <code class="docutils literal notranslate"><span class="pre">fail-if</span></code> metadata by running
+<code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">macro</span> <span class="pre">--validate</span></code> or <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">macro</span> <span class="pre">-V</span></code> in a terminal,
+inside the app directory. Try saving the configuration in a failed
+state, and then run the command.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="warn-if">
+
+<h2><code class="docutils literal notranslate"><span class="pre">warn-if</span></code><a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/failif-warnif.html#warn-if" title="View HTML">§</a></h2>
+
+<p>The <code class="docutils literal notranslate"><span class="pre">warn-if</span></code> metadata setting is exactly the same as <code class="docutils literal notranslate"><span class="pre">fail-if</span></code>,
+but is used to report non-critical concerns.</p>
+<p>Let’s try adding something for <code class="docutils literal notranslate"><span class="pre">namelist:rocket=battery_levels</span></code>.</p>
+<p>Open the metadata file <code class="docutils literal notranslate"><span class="pre">meta/rose-meta.conf</span></code> in a text editor,
+and add this line to the <code class="docutils literal notranslate"><span class="pre">[namelist:rocket=battery_levels]</span></code> section:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">warn-if</span><span class="o">=</span><span class="s">namelist:rocket=battery_levels(1) &lt; 75 or namelist:rocket=battery_levels(2) &lt; 75;</span>
+</pre></div>
+</div>
+<p>This uses a special syntax for referencing the individual array
+elements in <code class="docutils literal notranslate"><span class="pre">battery_levels</span></code>.</p>
+<p>If the first array element value and/or the second array element
+value of <code class="docutils literal notranslate"><span class="pre">battery_levels</span></code> is less than 75% full, a warning will
+be produced when the check is run.</p>
+<p>We already know the shorthand syntax <code class="docutils literal notranslate"><span class="pre">this</span></code>, so rephrase the metadata to:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">warn-if</span><span class="o">=</span><span class="s">this(1) &lt; 75 or this(2) &lt; 75;</span>
+</pre></div>
+</div>
+<p>Save the metadata file and then reload the config editor metadata.
+Click <span class="menuselection">Metadata ‣ Check fail-if, warn-if</span> - a
+warning should now appear for the <code class="docutils literal notranslate"><span class="pre">battery_levels</span></code> option.</p>
+<p>For large arrays, it can sometimes be convenient to use whole-array
+operations - the <code class="docutils literal notranslate"><span class="pre">fail-if</span></code> and <code class="docutils literal notranslate"><span class="pre">warn-if</span></code> syntax includes <code class="docutils literal notranslate"><span class="pre">any()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">all()</span></code>.</p>
+<p>We can change the <code class="docutils literal notranslate"><span class="pre">warn-if</span></code> setting to:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">warn-if</span><span class="o">=</span><span class="s">any(this &lt; 75);</span>
+</pre></div>
+</div>
+<p>which will flag a warning if any <code class="docutils literal notranslate"><span class="pre">battery_levels</span></code> array element
+values are less than 75.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="multiple-expressions">
+
+<h2>Multiple Expressions<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/failif-warnif.html#multiple-expressions" title="View HTML">§</a></h2>
+
+<p>In both <code class="docutils literal notranslate"><span class="pre">fail-if</span></code> and <code class="docutils literal notranslate"><span class="pre">warn-if</span></code>, expressions can be chained
+using the Python operator <code class="docutils literal notranslate"><span class="pre">or</span></code>, or you can separate them to give
+clearer error/warning messages. Using our <code class="docutils literal notranslate"><span class="pre">battery_levels</span></code> example
+again, change the setting to:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">warn-if</span><span class="o">=</span><span class="s">any(this &lt; 75);</span>
+       <span class="o">=</span><span class="s">all(this &gt; 95);</span>
+</pre></div>
+</div>
+<p>This will produce a warning if any elements are less than 75, and a
+separate warning if all elements are greater than 95 (we don’t
+want to cook the batteries!).</p>
+<p>You can add separate helper messages for each expression:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">warn-if</span><span class="o">=</span><span class="s">any(this &lt; 75);   # Battery level low</span>
+       <span class="o">=</span><span class="s">all(this &gt; 95);   # Don&#39;t over-charge!</span>
+</pre></div>
+</div>
+<p>Try adding the above lines to the metadata, saving and playing
+about with the array numbers in the config editor and re-running
+the <code class="docutils literal notranslate"><span class="pre">fail-if</span></code>/<code class="docutils literal notranslate"><span class="pre">warn-if</span></code> check.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">For more information, see <a class="reference internal" href="../../../api/configuration/metadata.html#conf-meta"><span class="std std-ref">Configuration Metadata</span></a>.</p>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

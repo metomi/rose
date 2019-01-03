@@ -1,0 +1,674 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rose.apps.rose_ana &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <h1>Source code for rose.apps.rose_ana</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># (C) British Crown Copyright 2012-8 Met Office.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Rose, a framework for meteorological suites.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Rose. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Builtin application: &quot;rose ana&quot;, a comparison engine for Rose.&quot;&quot;&quot;</span>
+
+
+<span class="c1"># Standard Python modules</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">fcntl</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+
+<span class="c1"># Rose modules</span>
+<span class="kn">from</span> <span class="nn">rose</span> <span class="k">import</span> <span class="n">TYPE_LOGICAL_VALUE_TRUE</span>
+<span class="kn">from</span> <span class="nn">rose.reporter</span> <span class="k">import</span> <span class="n">Reporter</span>
+<span class="kn">from</span> <span class="nn">rose.resource</span> <span class="k">import</span> <span class="n">ResourceLocator</span>
+<span class="kn">from</span> <span class="nn">rose.app_run</span> <span class="k">import</span> <span class="n">BuiltinApp</span>
+<span class="kn">from</span> <span class="nn">rose.env</span> <span class="k">import</span> <span class="n">env_var_process</span>
+
+
+<span class="k">class</span> <span class="nc">KGODatabase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    KGO Database object, stores comparison information for rose_ana apps.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This SQL command ensures a &quot;comparisons&quot; table exists in the database</span>
+    <span class="c1"># and then populates it with a series of columns (which in this case</span>
+    <span class="c1"># are all storing strings/text). The primary key is the comparison name</span>
+    <span class="c1"># (as it must uniquely identify each row)</span>
+    <span class="n">CREATE_COMPARISON_TABLE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        CREATE TABLE IF NOT EXISTS comparisons (</span>
+<span class="s2">        comp_task TEXT,</span>
+<span class="s2">        kgo_file TEXT,</span>
+<span class="s2">        suite_file TEXT,</span>
+<span class="s2">        status TEXT,</span>
+<span class="s2">        comparison TEXT,</span>
+<span class="s2">        PRIMARY KEY(comp_task))</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="c1"># This SQL command ensures a &quot;tasks&quot; table exists in the database</span>
+    <span class="c1"># and then populates it with a pair of columns (the task name and</span>
+    <span class="c1"># a completion status indicator). The primary key is the task name</span>
+    <span class="c1"># (as it must uniquely identify each row)</span>
+    <span class="n">CREATE_TASKS_TABLE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        CREATE TABLE IF NOT EXISTS tasks (</span>
+<span class="s2">        task_name TEXT,</span>
+<span class="s2">        completed INT,</span>
+<span class="s2">        PRIMARY KEY(task_name))</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># Task statuses</span>
+    <span class="n">TASK_STATUS_RUNNING</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">TASK_STATUS_SUCCEEDED</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Initialise the object.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statement_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="s2">&quot;task_name not set&quot;</span>
+
+    <span class="k">def</span> <span class="nf">enter_comparison</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">comp_task</span><span class="p">,</span> <span class="n">kgo_file</span><span class="p">,</span> <span class="n">suite_file</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">comparison</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a command to insert a new comparison entry to the database.&quot;&quot;&quot;</span>
+        <span class="c1"># This SQL command indicates that a single &quot;row&quot; is to be entered into</span>
+        <span class="c1"># the &quot;comparisons&quot; table</span>
+        <span class="n">sql_statement</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)&quot;</span><span class="p">)</span>
+        <span class="c1"># Prepend the task_name onto each entry, to try and ensure it is</span>
+        <span class="c1"># unique (the individual comparison names may not be, but the rose</span>
+        <span class="c1"># task name + the comparison task name should)</span>
+        <span class="n">sql_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">+</span> <span class="s2">&quot; - &quot;</span> <span class="o">+</span> <span class="n">comp_task</span><span class="p">,</span>
+                    <span class="n">kgo_file</span><span class="p">,</span> <span class="n">suite_file</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">comparison</span><span class="p">]</span>
+        <span class="c1"># Add the command and arguments to the buffer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statement_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sql_statement</span><span class="p">,</span> <span class="n">sql_args</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">enter_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a command to insert a new task entry to the database.&quot;&quot;&quot;</span>
+        <span class="c1"># This SQL command indicates that a single &quot;row&quot; is to be entered into</span>
+        <span class="c1"># the &quot;tasks&quot; table</span>
+        <span class="n">sql_statement</span> <span class="o">=</span> <span class="s2">&quot;INSERT OR REPLACE INTO tasks VALUES (?, ?)&quot;</span>
+        <span class="n">sql_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">task_name</span><span class="p">,</span> <span class="n">status</span><span class="p">]</span>
+        <span class="c1"># Add the command and arguments to the buffer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statement_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sql_statement</span><span class="p">,</span> <span class="n">sql_args</span><span class="p">))</span>
+        <span class="c1"># Save the name for use in any comparisons later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="n">task_name</span>
+
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">database_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lockfile</span><span class="p">,</span> <span class="n">reporter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Context manager which obtains an exclusive file-based lock.&quot;&quot;&quot;</span>
+        <span class="n">lock</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">lockfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="n">fcntl</span><span class="o">.</span><span class="n">flock</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_EX</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reporter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Acquired DB lock at: &quot;</span> <span class="o">+</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">())</span>
+        <span class="n">lock</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="n">reporter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Writing to KGO Database...&quot;</span><span class="p">)</span>
+        <span class="k">yield</span>
+        <span class="n">fcntl</span><span class="o">.</span><span class="n">flock</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_UN</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reporter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Released DB lock at: &quot;</span> <span class="o">+</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">())</span>
+        <span class="n">lock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">buffer_to_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reporter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Flush the buffer; executing all the commands in one transaction.&quot;&quot;&quot;</span>
+        <span class="c1"># If the buffer is empty, there isn&#39;t anything to do</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statement_buffer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># Otherwise locate the database</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ROSE_SUITE_DIR&quot;</span><span class="p">),</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;rose-ana-comparisons.db&quot;</span><span class="p">)</span>
+        <span class="n">lock_name</span> <span class="o">=</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s2">&quot;.lock&quot;</span>
+
+        <span class="k">if</span> <span class="n">reporter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">statement</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement_buffer</span><span class="p">:</span>
+                <span class="n">reporter</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">statement</span><span class="p">),</span> <span class="n">level</span><span class="o">=</span><span class="n">reporter</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+
+        <span class="c1"># Acquire a file lock to ensure exclusive access, then connect to the</span>
+        <span class="c1"># database and commit each command from the buffer</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">database_lock</span><span class="p">(</span><span class="n">lock_name</span><span class="p">,</span> <span class="n">reporter</span><span class="p">):</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
+            <span class="c1"># Ensure that the tables exist</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CREATE_COMPARISON_TABLE</span><span class="p">)</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CREATE_TASKS_TABLE</span><span class="p">)</span>
+            <span class="c1"># Apply each command from the buffer</span>
+            <span class="k">for</span> <span class="n">statement</span><span class="p">,</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement_buffer</span><span class="p">:</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">statement</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+            <span class="c1"># Finalise the database</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="c1"># Empty the buffer in case it gets re-used</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statement_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="AnalysisTask"><a class="viewcode-back" href="../../../tutorial/rose/furthertopics/rose-stem.html#rose.apps.rose_ana.AnalysisTask">[docs]</a><span class="k">class</span> <span class="nc">AnalysisTask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for an analysis task.</span>
+
+<span class="sd">    All custom user tasks should inherit from this class and override</span>
+<span class="sd">    the ``run_analysis`` method to perform whatever analysis is required.</span>
+
+<span class="sd">    This class provides the following attributes:</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        self.config:</span>
+<span class="sd">            A dictionary containing any Rose Ana configuration options.</span>
+<span class="sd">        self.reporter:</span>
+<span class="sd">            A reference to the :py:class:`rose.reporter.Reporter` instance used</span>
+<span class="sd">            by the parent app (for printing to stderr/stdout).</span>
+<span class="sd">        self.kgo_db:</span>
+<span class="sd">            A reference to the KGO database object created by the parent app</span>
+<span class="sd">            (for adding entries to the database).</span>
+<span class="sd">        self.popen:</span>
+<span class="sd">            A reference to the :py:class:`rose.popen.RosePopener` instance</span>
+<span class="sd">            used by the parent app (for spawning subprocesses).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_app</span><span class="p">,</span> <span class="n">task_options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise the analysis task, storing the user specified options</span>
+<span class="sd">        dictionary and a few references to useful objects from the parent app.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">task_options</span>
+
+        <span class="c1"># This attribute gives access to the parent task; but it is only</span>
+        <span class="c1"># included for backwards compatibility and will be remove in the</span>
+        <span class="c1"># future (please instead use the other attributes below!)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent_app</span>
+
+        <span class="c1"># Attributes to access some helpful/relevant parts of the parent</span>
+        <span class="c1"># task environment for printing, running tasks, etc.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">parent_app</span><span class="o">.</span><span class="n">ana_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span> <span class="o">=</span> <span class="n">parent_app</span><span class="o">.</span><span class="n">reporter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span> <span class="o">=</span> <span class="n">parent_app</span><span class="o">.</span><span class="n">kgo_db</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">popen</span> <span class="o">=</span> <span class="n">parent_app</span><span class="o">.</span><span class="n">app_runner</span><span class="o">.</span><span class="n">popen</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">passed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skipped</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">run_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Will be called to start the analysis code; this method should be</span>
+<span class="sd">        overidden by the user&#39;s class to perform the desired analysis.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Abstract analysis task class should never be called directly&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">process_opt_unhandled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Options should be removed from the options dictionary as they are</span>
+<span class="sd">        processed; this method may then be called to catch and unknown options</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unhandled</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">option</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;full_task_name&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">]:</span>
+                <span class="n">unhandled</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unhandled</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Options provided but not understood for this &quot;</span>
+                   <span class="s2">&quot;analysis type: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unhandled</span><span class="p">))</span></div>
+
+
+<span class="k">class</span> <span class="nc">RoseAnaApp</span><span class="p">(</span><span class="n">BuiltinApp</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Run rosa ana as an application.&quot;&quot;&quot;</span>
+
+    <span class="n">SCHEME</span> <span class="o">=</span> <span class="s2">&quot;rose_ana&quot;</span>
+    <span class="n">_prefix_pass</span> <span class="o">=</span> <span class="s2">&quot;[ OK ] &quot;</span>
+    <span class="n">_prefix_skip</span> <span class="o">=</span> <span class="s2">&quot;[SKIP] &quot;</span>
+    <span class="n">_prefix_fail</span> <span class="o">=</span> <span class="s2">&quot;[FAIL] &quot;</span>
+    <span class="n">_printbar_width</span> <span class="o">=</span> <span class="mi">80</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_runner</span><span class="p">,</span> <span class="n">conf_tree</span><span class="p">,</span> <span class="n">opts</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">work_files</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement the &quot;rose ana&quot; command&quot;&quot;&quot;</span>
+        <span class="c1"># Initialise properties which will be needed later.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task</span> <span class="o">=</span> <span class="n">app_runner</span><span class="o">.</span><span class="n">suite_engine_proc</span><span class="o">.</span><span class="n">get_task_props</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task</span><span class="o">.</span><span class="n">task_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="n">opts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">conf_tree</span><span class="o">.</span><span class="n">node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app_runner</span> <span class="o">=</span> <span class="n">app_runner</span>
+
+        <span class="c1"># Attach to the main rose config (for retrieving settings from things</span>
+        <span class="c1"># like the user&#39;s ~/.metomi/rose.conf)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rose_conf</span> <span class="o">=</span> <span class="n">ResourceLocator</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">get_conf</span><span class="p">()</span>
+
+        <span class="c1"># Attach to a reporter instance for sending messages.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_reporter</span><span class="p">(</span><span class="n">app_runner</span><span class="o">.</span><span class="n">event_handler</span><span class="p">)</span>
+
+        <span class="c1"># As part of the introduction of a re-written rose_ana, backwards</span>
+        <span class="c1"># compatibility is maintained here by detecting the lack of the</span>
+        <span class="c1"># newer syntax in the app config and falling back to the old version</span>
+        <span class="c1"># of the rose_ana app (renamed to rose_ana_v1)</span>
+        <span class="c1"># **Once the old behaviour is removed the below block can be too**.</span>
+        <span class="n">new_style_app</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ana:&quot;</span><span class="p">):</span>
+                <span class="n">new_style_app</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_style_app</span><span class="p">:</span>
+            <span class="c1"># Use the previous app by instantiating and calling it explicitly</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;!!WARNING!! - Detected old style rose_ana app; &quot;</span>
+                          <span class="s2">&quot;Using previous rose_ana version...&quot;</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">rose.apps.rose_ana_v1</span> <span class="k">import</span> <span class="n">RoseAnaV1App</span>
+            <span class="n">old_app</span> <span class="o">=</span> <span class="n">RoseAnaV1App</span><span class="p">(</span><span class="n">manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">old_app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="n">app_runner</span><span class="p">,</span> <span class="n">conf_tree</span><span class="p">,</span> <span class="n">opts</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">work_files</span><span class="p">)</span>
+
+        <span class="c1"># Load any rose_ana specific configuration settings either from the</span>
+        <span class="c1"># site defaults or the user&#39;s personal config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_global_ana_config</span><span class="p">()</span>
+
+        <span class="c1"># If the user&#39;s config indicates that it should be used - attach</span>
+        <span class="c1"># to the KGO database instance in case it is needed later.</span>
+        <span class="n">use_kgo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ana_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kgo-database&quot;</span><span class="p">,</span> <span class="s2">&quot;.false.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">use_kgo</span> <span class="o">==</span> <span class="n">TYPE_LOGICAL_VALUE_TRUE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span> <span class="o">=</span> <span class="n">KGODatabase</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span><span class="o">.</span><span class="n">enter_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_name</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span><span class="o">.</span><span class="n">TASK_STATUS_RUNNING</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">titlebar</span><span class="p">(</span><span class="s2">&quot;Initialising KGO database&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span><span class="o">.</span><span class="n">buffer_to_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">titlebar</span><span class="p">(</span><span class="s2">&quot;Launching rose_ana&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Load available methods for analysis and the tasks in the app.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_analysis_modules</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_analysis_methods</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_tasks</span><span class="p">()</span>
+
+        <span class="n">number_of_failures</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">number_of_skips</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">task_error</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">summary_status</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">itask</span><span class="p">,</span> <span class="n">task</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis_tasks</span><span class="p">):</span>
+            <span class="c1"># Report the name of the task and a banner line to aid readability.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">titlebar</span><span class="p">(</span><span class="s2">&quot;Running task #</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">itask</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Method: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;full_task_name&quot;</span><span class="p">]))</span>
+
+            <span class="c1"># Since the run_analysis method is out of rose&#39;s control in many</span>
+            <span class="c1"># cases the safest thing to do is a blanket try/except; since we</span>
+            <span class="c1"># have no way of knowing what exceptions might be raised.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">run_analysis</span><span class="p">()</span>
+                <span class="c1"># In the case that the task didn&#39;t raise any exception,</span>
+                <span class="c1"># we can now check whether it passed or failed.</span>
+                <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">passed</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Task #</span><span class="si">{0}</span><span class="s2"> passed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">itask</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">summary_status</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> (</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">msg</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;full_task_name&quot;</span><span class="p">]),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_prefix_pass</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix_pass</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">skipped</span><span class="p">:</span>
+                    <span class="n">number_of_skips</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Task #</span><span class="si">{0}</span><span class="s2"> skipped by method&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">itask</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">summary_status</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> (</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">msg</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;full_task_name&quot;</span><span class="p">]),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_prefix_skip</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix_skip</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">number_of_failures</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Task #</span><span class="si">{0}</span><span class="s2"> did not pass&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">itask</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">summary_status</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> (</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">msg</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;full_task_name&quot;</span><span class="p">]),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_prefix_fail</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix_fail</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c1"># If an exception was raised, print a traceback and treat it</span>
+                <span class="c1"># as a failure.</span>
+                <span class="n">task_error</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">number_of_failures</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Task #</span><span class="si">{0}</span><span class="s2"> encountered an error&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">itask</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">summary_status</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> (</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">msg</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;full_task_name&quot;</span><span class="p">]),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_prefix_fail</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span> <span class="o">+</span> <span class="s2">&quot; (see stderr)&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix_fail</span><span class="p">)</span>
+                <span class="n">exception</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix_fail</span><span class="p">,</span>
+                              <span class="n">kind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">KIND_ERR</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix_fail</span><span class="p">,</span>
+                              <span class="n">kind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">KIND_ERR</span><span class="p">)</span>
+
+        <span class="c1"># The KGO database (if needed by the task) also stores its status - to</span>
+        <span class="c1"># indicate whether there was some unexpected exception above.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">task_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span><span class="o">.</span><span class="n">enter_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_name</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span><span class="o">.</span><span class="n">TASK_STATUS_SUCCEEDED</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">titlebar</span><span class="p">(</span><span class="s2">&quot;Updating KGO database&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span><span class="o">.</span><span class="n">buffer_to_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">)</span>
+
+        <span class="c1"># Summarise the results of the tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">titlebar</span><span class="p">(</span><span class="s2">&quot;Summary&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">summary_status</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+
+        <span class="c1"># And a final 1-line summary</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">summary_status</span><span class="p">)</span>
+        <span class="n">plural</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span>
+
+        <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prefix_pass</span>
+        <span class="n">passed</span> <span class="o">=</span> <span class="n">total</span> <span class="o">-</span> <span class="n">number_of_failures</span> <span class="o">-</span> <span class="n">number_of_skips</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> Task</span><span class="si">{1}</span><span class="s2"> Passed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">passed</span><span class="p">,</span> <span class="n">plural</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">passed</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">number_of_failures</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;, </span><span class="si">{0}</span><span class="s2"> Task</span><span class="si">{1}</span><span class="s2"> Failed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">number_of_failures</span><span class="p">,</span> <span class="n">plural</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">number_of_failures</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">))</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prefix_fail</span>
+
+        <span class="k">if</span> <span class="n">number_of_skips</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;, </span><span class="si">{0}</span><span class="s2"> Task</span><span class="si">{1}</span><span class="s2"> Skipped&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">number_of_skips</span><span class="p">,</span> <span class="n">plural</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">number_of_skips</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">))</span>
+
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; (of </span><span class="si">{0}</span><span class="s2"> processed)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">titlebar</span><span class="p">(</span><span class="s2">&quot;Final status&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">titlebar</span><span class="p">(</span><span class="s2">&quot;Completed rose_ana&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Finally if there were legitimate test failures raise an exception</span>
+        <span class="c1"># so that the task is caught by cylc as failed.  Also fail if it looks</span>
+        <span class="c1"># like every single task has been skipped</span>
+        <span class="k">if</span> <span class="n">number_of_failures</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">number_of_skips</span> <span class="o">==</span> <span class="n">total</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TestsFailedException</span><span class="p">(</span><span class="n">number_of_failures</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">titlebar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">sidebarlen</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_printbar_width</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1}</span><span class="s2"> </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;*&quot;</span> <span class="o">*</span> <span class="n">sidebarlen</span><span class="p">,</span> <span class="n">title</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_get_global_ana_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves all rose_ana config options; these could be from the</span>
+<span class="sd">        site&#39;s settings or the user&#39;s personal settings.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ana_config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">user_config</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rose_conf</span><span class="o">.</span><span class="n">get_value</span><span class="p">([</span><span class="s2">&quot;rose-ana&quot;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">user_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">user_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ana_config</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_init_reporter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reporter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Attach a reporter instance to the class.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reporter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span> <span class="o">=</span> <span class="n">Reporter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">quietness</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span> <span class="o">=</span> <span class="n">reporter</span>
+
+    <span class="k">def</span> <span class="nf">_load_analysis_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Populate the list of modules containing analysis methods.&quot;&quot;&quot;</span>
+        <span class="c1"># Find the possible paths that could contain modules</span>
+        <span class="n">method_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_method_paths</span><span class="p">()</span>
+
+        <span class="c1"># Report the paths that were found</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Method module search-paths:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">method_paths</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot; * </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">method_paths</span><span class="p">:</span>
+            <span class="c1"># Add the method path to the start of the sys.path</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;*.py&quot;</span><span class="p">)):</span>
+                <span class="c1"># Find python files and attempt to import them; if a module</span>
+                <span class="c1"># fails to import report it but don&#39;t crash (the module may</span>
+                <span class="c1"># not actually be needed by this task)</span>
+                <span class="n">module_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">__import__</span><span class="p">(</span><span class="n">module_name</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                    <span class="c1"># Note: We intentionally don&#39;t re-raise the exception</span>
+                    <span class="c1"># here, as we want to avoid a single mistake in a user</span>
+                    <span class="c1"># supplied method bringing down the entire task</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Failed to import module: </span><span class="si">{0}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[WARN] &quot;</span><span class="p">,</span>
+                                  <span class="n">kind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">KIND_ERR</span><span class="p">)</span>
+                    <span class="n">exception</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">exception</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[WARN]   &quot;</span><span class="p">,</span>
+                                      <span class="n">kind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">KIND_ERR</span><span class="p">)</span>
+
+            <span class="c1"># Remove the method path from the sys.path</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="c1"># Report the modules which were loaded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Method modules loaded:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot; * </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_load_analysis_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Populate the list of analysis methods.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="n">module_name</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="n">method_classes</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">method_class_name</span><span class="p">,</span> <span class="n">method_class</span> <span class="ow">in</span> <span class="n">method_classes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">method_class</span><span class="p">,</span> <span class="s2">&quot;run_analysis&quot;</span><span class="p">):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">module_name</span><span class="p">,</span> <span class="n">method_class_name</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">method_class</span>
+
+        <span class="c1"># Report the methods which were loaded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Methods available:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot; * </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_load_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Populate the list of analysis tasks from the app config.&quot;&quot;&quot;</span>
+        <span class="c1"># Fill a dictionary of tasks and extract their options and values</span>
+        <span class="c1"># - skipping any which are user/trigger-ignored</span>
+        <span class="n">_tasks</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ana:&quot;</span><span class="p">):</span>
+                <span class="c1"># Capture the options only and save them to the tasks dict</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+
+                    <span class="c1"># The app may define a section containing rose_ana config</span>
+                    <span class="c1"># settings; add these to the config dictionary (if any of</span>
+                    <span class="c1"># the names match existing config options from the global</span>
+                    <span class="c1"># config it will be overwritten)</span>
+                    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ana_config</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">_tasks</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="c1"># If the value contains newlines, split it into a list</span>
+                    <span class="c1"># and either way remove any quotation marks and process</span>
+                    <span class="c1"># any environment variables</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">env_var_process</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                    <span class="n">values</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">ival</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+                        <span class="n">values</span><span class="p">[</span><span class="n">ival</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^((?:&#39;|</span><span class="se">\&quot;</span><span class="s2">)*)(.*)(\1)$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\2&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+                    <span class="c1"># If the user passed a blank curled-braces expression</span>
+                    <span class="c1"># it should be expanded to contain each of the arguments</span>
+                    <span class="c1"># passed to rose_ana</span>
+                    <span class="n">new_values</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                                    <span class="n">new_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">new_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">new_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="n">values</span> <span class="o">=</span> <span class="n">new_values</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">_tasks</span><span class="p">[</span><span class="n">task</span><span class="p">][</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">values</span>
+
+        <span class="c1"># Can now populate the output task list with analysis objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_tasks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_tasks</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">_tasks</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">options</span><span class="p">[</span><span class="s2">&quot;full_task_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="c1"># Create an analysis object for each task, passing through</span>
+            <span class="c1"># all options given to the section in the app, the given name</span>
+            <span class="c1"># starts with the comparison type and then optionally a</span>
+            <span class="c1"># name/description, extract this here</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?P&lt;atype&gt;[\w\.]+)(?:\((?P&lt;descr&gt;.*)\)|)&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;descr&quot;</span><span class="p">)</span>
+                <span class="n">atype</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;atype&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Assuming this analysis task has been loaded by the app, create</span>
+            <span class="c1"># an instance of the task, passing the options to it</span>
+            <span class="k">if</span> <span class="n">atype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">analysis_tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="p">[</span><span class="n">atype</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If the analysis type isn&#39;t matched by one of the loaded</span>
+                <span class="c1"># methods, report the error and return a placeholder</span>
+                <span class="c1"># in its place (so that this tasks&#39; main method can show</span>
+                <span class="c1"># the task as &quot;failed&quot;)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unrecognised analysis type: </span><span class="si">{0}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">atype</span><span class="p">),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[FAIL]   &quot;</span><span class="p">)</span>
+                <span class="c1"># Create a simple object to return - when the run_analysis</span>
+                <span class="c1"># method is called by the main loop it will simply raise</span>
+                <span class="c1"># an exception, triggering the &quot;error&quot; trap</span>
+
+                <span class="k">class</span> <span class="nc">Dummy</span><span class="p">(</span><span class="n">AnalysisTask</span><span class="p">):</span>
+                    <span class="k">def</span> <span class="nf">run_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">atype</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">analysis_tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Dummy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_get_method_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a listing of paths for analysis methods.&quot;&quot;&quot;</span>
+        <span class="c1"># Setup the return list - the order of preference is earliest-first,</span>
+        <span class="c1"># allowing methods to be overridden if sharing the same namespace</span>
+        <span class="n">method_paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># The app may defines an &quot;ana&quot; directory specific to the app</span>
+        <span class="n">app_dir_var</span> <span class="o">=</span> <span class="s2">&quot;ROSE_TASK_APP&quot;</span>
+        <span class="n">suite_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ROSE_SUITE_DIR&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">app_dir_var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">app_dir_var</span> <span class="o">=</span> <span class="s2">&quot;ROSE_TASK_NAME&quot;</span>
+        <span class="n">app_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">suite_dir</span><span class="p">,</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">app_dir_var</span><span class="p">],</span> <span class="s2">&quot;ana&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">app_dir</span><span class="p">):</span>
+            <span class="n">method_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">app_dir</span><span class="p">)</span>
+
+        <span class="c1"># The suite can have an &quot;ana&quot; directory which the apps may use</span>
+        <span class="n">ana_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">suite_dir</span><span class="p">,</span> <span class="s2">&quot;ana&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ana_dir</span><span class="p">):</span>
+            <span class="n">method_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ana_dir</span><span class="p">)</span>
+
+        <span class="c1"># The rose config can specify a directory for site-specific methods</span>
+        <span class="n">config_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rose_conf</span><span class="o">.</span><span class="n">get_value</span><span class="p">([</span><span class="s2">&quot;rose-ana&quot;</span><span class="p">,</span> <span class="s2">&quot;method-path&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">config_paths</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">config_dir</span> <span class="ow">in</span> <span class="n">config_paths</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_dir</span><span class="p">):</span>
+                    <span class="n">method_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config_dir</span><span class="p">)</span>
+
+        <span class="c1"># Finally there are some built-in methods within Rose itself</span>
+        <span class="n">method_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;ana_builtin&quot;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">method_paths</span>
+
+
+<span class="k">class</span> <span class="nc">TestsFailedException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Exception raised if any rose-ana comparisons fail.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_failed</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">failed</span> <span class="o">=</span> <span class="n">num_failed</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> test</span><span class="si">{1}</span><span class="s2"> did not pass&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">msg</span>
+
+    <span class="fm">__str__</span> <span class="o">=</span> <span class="fm">__repr__</span>
+</pre></div>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

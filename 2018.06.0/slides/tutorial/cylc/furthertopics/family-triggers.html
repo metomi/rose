@@ -1,0 +1,287 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Family Triggers &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Inheritance" href="inheritance.html" />
+    <link rel="prev" title="Broadcast" href="broadcast.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="family-triggers">
+
+<h1>Family Triggers<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/family-triggers.html#family-triggers" title="View HTML">§</a></h1>
+
+<p>To reduce duplication in the <a class="reference internal" href="../../../glossary.html#term-graph"><span class="xref std std-term">graph</span></a> is is possible to write
+<a class="reference internal" href="../../../glossary.html#term-dependency"><span class="xref std std-term">dependencies</span></a> using collections of tasks called
+<a class="reference internal" href="../../../glossary.html#term-family"><span class="xref std std-term">families</span></a>).</p>
+<p>This tutorial walks you through writing such dependencies using family
+<a class="reference internal" href="../../../glossary.html#term-task-trigger"><span class="xref std std-term">triggers</span></a>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="explanation">
+
+<h2>Explanation<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/family-triggers.html#explanation" title="View HTML">§</a></h2>
+
+<p>Dependencies between tasks can be written using a <a class="reference internal" href="../../../glossary.html#term-qualifier"><span class="xref std std-term">qualifier</span></a> to describe
+the <a class="reference internal" href="../../../glossary.html#term-task-state"><span class="xref std std-term">task state</span></a> that the dependency refers to (e.g. <code class="docutils literal notranslate"><span class="pre">succeed</span></code>
+<code class="docutils literal notranslate"><span class="pre">fail</span></code>, etc). If a dependency does not use a qualifier then it is assumed
+that the dependency refers to the <code class="docutils literal notranslate"><span class="pre">succeed</span></code> state e.g:</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">bake_bread</span> <span class="o">=&gt;</span> <span class="kd">sell_bread</span>          <span class="c1"># sell_bread is dependent on bake_bread succeeding.</span>
+<span class="kd">bake_bread</span><span class="c">:</span><span class="kd">succeed</span> <span class="o">=&gt;</span> <span class="kd">sell_bread</span>  <span class="c1"># sell_bread is dependent on bake_bread succeeding.</span>
+<span class="kd">sell_bread</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="kd">through_away</span>   <span class="c1"># through_away is dependent on sell_bread failing.</span>
+</pre></div>
+</div>
+<p>The left-hand side of a <a class="reference internal" href="../../../glossary.html#term-dependency"><span class="xref std std-term">dependency</span></a> (e.g. <code class="docutils literal notranslate"><span class="pre">sell_bread:fail</span></code>) is
+referred to as the <a class="reference internal" href="../../../glossary.html#term-task-trigger"><span class="xref std std-term">trigger</span></a>.</p>
+<p>When we write a trigger involving a family, special qualifiers are required
+to specify whether the dependency is concerned with <em>all</em> or <em>any</em> of the tasks
+in that family reaching the desired <a class="reference internal" href="../../../glossary.html#term-task-state"><span class="xref std std-term">state</span></a> e.g:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">succeed-all</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">succeed-any</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">fail-all</span></code></li>
+</ul>
+<p>Such <a class="reference internal" href="../../../glossary.html#term-task-trigger"><span class="xref std std-term">triggers</span></a> are referred to as
+<a class="reference internal" href="../../../glossary.html#term-family-trigger"><span class="xref std std-term">family triggers</span></a></p>
+<p>Foo <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> bar</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/family-triggers.html#example" title="View HTML">§</a></h2>
+
+<p>Create a new suite called <code class="docutils literal notranslate"><span class="pre">tutorial-family-triggers</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">tutorial</span><span class="o">-</span><span class="n">family</span><span class="o">-</span><span class="n">triggers</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">tutorial</span><span class="o">-</span><span class="n">family</span><span class="o">-</span><span class="n">triggers</span>
+</pre></div>
+</div>
+<p>Paste the following configuration into the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[cylc]</span>
+    <span class="nv">UTC mode </span><span class="o">=</span><span class="s"> True</span> <span class="c1"># Ignore DST</span>
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">visit_mine</span> <span class="o">=&gt;</span> <span class="kd">MINERS</span>
+<span class="nt">[runtime]</span>
+    <span class="nt">[[visit_mine]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 5; echo &#39;off to work we go&#39;</span>
+
+    <span class="nt">[[MINERS]]</span>
+        <span class="nv">script </span><span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">sleep 5;</span>
+<span class="s2">if (($RANDOM % 2)); then</span>
+<span class="s2">    echo &#39;Diamonds!&#39;; true;</span>
+<span class="s2">else</span>
+<span class="s2">    echo &#39;Nothing...&#39;; false;</span>
+<span class="s2">fi</span>
+<span class="s2">&quot;&quot;&quot;</span>
+    <span class="nt">[[doc, grumpy, sleepy, happy, bashful, sneezy, dopey]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> MINERS</span>
+</pre></div>
+</div>
+<p>You have now created a suite that:</p>
+<ul class="simple">
+<li>Has a <code class="docutils literal notranslate"><span class="pre">visit_mine</span></code> task that sleeps for 5 seconds then outputs a
+message.</li>
+<li>Contains a <code class="docutils literal notranslate"><span class="pre">MINERS</span></code> family with a command in it that randomly succeeds
+or fails.</li>
+<li>Has 7 tasks that inherit from the <code class="docutils literal notranslate"><span class="pre">MINERS</span></code> family.</li>
+</ul>
+<p>Open the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> then run the suite by pressing the “play” button
+(top left hand corner) then clicking <span class="guilabel">Start</span>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">gui</span> <span class="n">tutorial</span><span class="o">-</span><span class="n">family</span><span class="o">-</span><span class="n">triggers</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>You should see the <code class="docutils literal notranslate"><span class="pre">visit_mine</span></code> task run, then trigger the members of the
+<code class="docutils literal notranslate"><span class="pre">MINERS</span></code> family. Note that some of the <code class="docutils literal notranslate"><span class="pre">MINERS</span></code> tasks may fail so you
+will need to stop your suite using the “stop” button in the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> in
+order to allow it to shutdown.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="family-triggering-success">
+
+<h2>Family Triggering: Success<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/family-triggers.html#family-triggering-success" title="View HTML">§</a></h2>
+
+<p>As you will have noticed by watching the suite run, some of the tasks in the
+<code class="docutils literal notranslate"><span class="pre">MINERS</span></code> family succeed and some fail.</p>
+<p>We would like to add a task to sell any diamonds we find, but wait for all
+the miners to report back first so we only make the one trip.</p>
+<p>We can address this by using <em>family triggers</em>. In particular, we are going
+to use the <code class="docutils literal notranslate"><span class="pre">finish-all</span></code> trigger to check for all members of the <code class="docutils literal notranslate"><span class="pre">MINERS</span></code>
+family finishing, and the <code class="docutils literal notranslate"><span class="pre">succeed-any</span></code> trigger to check for any of the
+tasks in the <code class="docutils literal notranslate"><span class="pre">MINERS</span></code> family succeeding.</p>
+<p>Open your <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file and change the <code class="docutils literal notranslate"><span class="pre">[[dependencies]]</span></code> to look like
+this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[dependencies]]</span>
+    <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="kd">visit_mine</span> <span class="o">=&gt;</span> <span class="kd">MINERS</span>
+               <span class="kd">MINERS</span><span class="c">:</span><span class="kd">finish</span><span class="c">-</span><span class="kd">all</span> <span class="o">&amp;</span> <span class="kd">MINERS</span><span class="c">:</span><span class="kd">succeed</span><span class="c">-</span><span class="kd">any</span> <span class="o">=&gt;</span> <span class="kd">sell_diamonds</span><span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Then, add the following task to the <code class="docutils literal notranslate"><span class="pre">[runtime]</span></code> section:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[sell_diamonds]]</span>
+   <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 5</span>
+</pre></div>
+</div>
+<p>These changes add a <code class="docutils literal notranslate"><span class="pre">sell_diamonds</span></code> task to the suite which is run once
+all the <code class="docutils literal notranslate"><span class="pre">MINERS</span></code> tasks have finished and if any of them have succeeded.</p>
+<p>Save your changes and run your suite. You should see the new
+<code class="docutils literal notranslate"><span class="pre">sell_diamonds</span></code> task being run once all the miners have finished and at
+least one of them has succeeded. As before, stop your suite using the “stop”
+button in the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="family-triggering-failure">
+
+<h2>Family Triggering: Failure<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/family-triggers.html#family-triggering-failure" title="View HTML">§</a></h2>
+
+<p>Cylc also allows us to trigger off failure of tasks in a particular family.</p>
+<p>We would like to add another task to close down unproductive mineshafts once
+all the miners have reported back and had time to discuss their findings.</p>
+<p>To do this we will make use of family triggers in a similar manner to before.</p>
+<p>Open your <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file and change the <code class="docutils literal notranslate"><span class="pre">[[dependencies]]</span></code> to look like
+this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[dependencies]]</span>
+    <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="kd">visit_mine</span> <span class="o">=&gt;</span> <span class="kd">MINERS</span>
+               <span class="kd">MINERS</span><span class="c">:</span><span class="kd">finish</span><span class="c">-</span><span class="kd">all</span> <span class="o">&amp;</span> <span class="kd">MINERS</span><span class="c">:</span><span class="kd">succeed</span><span class="c">-</span><span class="kd">any</span> <span class="o">=&gt;</span> <span class="kd">sell_diamonds</span>
+               <span class="kd">MINERS</span><span class="c">:</span><span class="kd">finish</span><span class="c">-</span><span class="kd">all</span> <span class="o">&amp;</span> <span class="kd">MINERS</span><span class="c">:</span><span class="kd">fail</span><span class="c">-</span><span class="kd">any</span> <span class="o">=&gt;</span> <span class="kd">close_shafts</span>
+               <span class="kd">close_shafts</span> <span class="o">=&gt;</span> <span class="o">!</span><span class="kd">MINERS</span>
+               <span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Alter the <code class="docutils literal notranslate"><span class="pre">[[sell_diamonds]]</span></code> section to look like this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[close_shafts, sell_diamonds]]</span>
+    <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 5</span>
+</pre></div>
+</div>
+<p>These changes add a <code class="docutils literal notranslate"><span class="pre">close_shafts</span></code> task which is run once all the
+<code class="docutils literal notranslate"><span class="pre">MINERS</span></code> tasks have finished and any of them have failed. On completion
+it applies a <em>suicide trigger</em> to the <code class="docutils literal notranslate"><span class="pre">MINERS</span></code> family in order to allow
+the suite to shutdown.</p>
+<p>Save your changes and run your suite. You should see the new
+<code class="docutils literal notranslate"><span class="pre">close_shafts</span></code> run should any of the <code class="docutils literal notranslate"><span class="pre">MINERS</span></code> tasks be in the failed
+state once they have all finished.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">See the <a class="reference internal" href="suicide-triggers.html#tut-cylc-suicide-triggers"><span class="std std-ref">Suicide Triggers</span></a> tutorial for handling task
+failures.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="different-triggers">
+
+<h2>Different Triggers<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/family-triggers.html#different-triggers" title="View HTML">§</a></h2>
+
+<p>Other family <a class="reference internal" href="../../../glossary.html#term-qualifier"><span class="xref std std-term">qualifiers</span></a> beyond those covered in the
+example are also available.</p>
+<p>The following types of “all” qualifier are available:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">:start-all</span></code> - all the tasks in the family have started</li>
+<li><code class="docutils literal notranslate"><span class="pre">:succeed-all</span></code> - all the tasks in the family have succeeded</li>
+<li><code class="docutils literal notranslate"><span class="pre">:fail-all</span></code> - all the tasks in the family have failed</li>
+<li><code class="docutils literal notranslate"><span class="pre">:finish-all</span></code> - all the tasks in the family have finished</li>
+</ul>
+<p>The following types of “any” qualifier are available:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">:start-any</span></code> - at least one task in the family has started</li>
+<li><code class="docutils literal notranslate"><span class="pre">:succeed-any</span></code> - at least one task in the family has succeeded</li>
+<li><code class="docutils literal notranslate"><span class="pre">:fail-any</span></code> - at least one task in the family has failed</li>
+<li><code class="docutils literal notranslate"><span class="pre">:finish-any</span></code> - at least one task in the family has finished</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="summary">
+
+<h2>Summary<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/family-triggers.html#summary" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li>Family triggers allow you to write dependencies for collections of tasks.</li>
+<li>Like <a class="reference internal" href="../../../glossary.html#term-task-trigger"><span class="xref std std-term">task triggers</span></a>, family triggers can be based on
+success, failure, starting and finishing of tasks in a family.</li>
+<li>Family triggers can trigger off either <em>all</em> or <em>any</em> of the tasks in a
+family.</li>
+</ul>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

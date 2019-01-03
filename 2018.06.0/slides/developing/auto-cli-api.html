@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Auto CLI API &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="auto-cli-api">
+
+<h1>Auto CLI API<a class="headerlink" href="../../html/developing/auto-cli-api.html#auto-cli-api" title="View HTML">§</a></h1>
+
+<p>The Rose command line API is auto-documented by the extension <code class="docutils literal notranslate"><span class="pre">auto-cli-api</span></code>.</p>
+<p>This translates the Rose CLI help into reStructuredText. To keep the CLI docs
+clean they are written in a plain format which has some reStructuredText
+features built in.</p>
+<p>Commands can be referenced throughout the documentation by prefixing their name
+with <code class="docutils literal notranslate"><span class="pre">command</span></code> e.g for <a class="reference internal" href="../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a>:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="na">:ref:</span><span class="nv">`command-rose-date`</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="basic-help-page">
+
+<h2>Basic Help Page<a class="headerlink" href="../../html/developing/auto-cli-api.html#basic-help-page" title="View HTML">§</a></h2>
+
+<p>Help pages are written in sections with content indented four spaces after
+section headings. Sections are separated by a single blank line.</p>
+<p>The following sections are compulsory:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">NAME</span></code> - This section is required but ignored by auto CLI API.</li>
+<li><code class="docutils literal notranslate"><span class="pre">SYNOPSIS</span></code> - Rendered as a code-block with bash syntax.</li>
+<li><code class="docutils literal notranslate"><span class="pre">DESCRIPTION</span></code> - Freeform reStructuredText section.</li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NAME
+    foo
+
+SYNOPSIS
+    foo &lt;foo&gt;
+
+DESCRIPTION
+    Foo bar baz.
+</pre></div>
+</div>
+<p>The reference is generated when the documentation is built. To see the
+underlying reStructuredText try:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python ext/auto-api-doc.py
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="restructuredtext-markup">
+
+<h2>reStructuredText Markup<a class="headerlink" href="../../html/developing/auto-cli-api.html#restructuredtext-markup" title="View HTML">§</a></h2>
+
+<p>The following reStructuredText markup elements are supported:</p>
+<ul>
+<li><p class="first">Bullet Lists</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="m">*</span> Foo
+<span class="m">*</span> Bar
+<span class="m">*</span> Baz
+</pre></div>
+</div>
+</li>
+<li><p class="first">Enumerated Lists</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="m">1.</span> Foo
+<span class="m">2.</span> Bar
+<span class="m">3.</span> Baz
+</pre></div>
+</div>
+</li>
+<li><p class="first">Definition Lists</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>foo
+   Foo foo foo.
+bar
+   Bar bar bar.
+baz
+   Baz baz baz.
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In freeform reStructuredText blocks any valid markup <em>(except that
+involving backquotes)</em> can be used. To maintain clarity in CLI mode only the
+above is recommended.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="custom-markup">
+
+<h2>Custom Markup<a class="headerlink" href="../../html/developing/auto-cli-api.html#custom-markup" title="View HTML">§</a></h2>
+
+<p>The following reStructuredText markup elements have been mutated for the
+plain text format:</p>
+<ul>
+<li><p class="first">Literals</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>foo `bar` baz
+foo`bar`baz
+</pre></div>
+</div>
+<p>Which are translated as:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>foo <span class="s">``bar``</span> baz
+foo\ <span class="s">``bar``\ baz</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Admonitions</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NOTE: Foo foo foo.
+</pre></div>
+</div>
+<p>Which are translated as:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">note</span><span class="p">::</span> Foo foo foo.
+</pre></div>
+</div>
+</li>
+<li><p class="first">References</p>
+<p>Any recognised commands written in back quotes will result in references
+within the CLI API documentation.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>See also `rose app-run`.
+</pre></div>
+</div>
+</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="argument-option-sections">
+
+<h2>Argument/Option Sections<a class="headerlink" href="../../html/developing/auto-cli-api.html#argument-option-sections" title="View HTML">§</a></h2>
+
+<p>The following help sections will be interpreted as argument/option lists:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">OPTIONS</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ARGUMENTS</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ENVIRONMENT</span> <span class="pre">VARIABLES</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">JINJA2</span> <span class="pre">VARIABLES</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">CONFIGURATION</span></code></li>
+</ul>
+<p>Such sections are written in the format:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ARGUMENTS
+    Optional description line, only `inline markup` permitted.
+
+    --option
+       Description goes here.
+    --another-option=VALUE, -a VALUE
+       Description here.
+
+       * Markup is permitted.
+       * Provided the indentation level is correct.
+
+    --further-option
+       Note new-lines are not required unless a markup block is used (e.g.
+       the bullet point list in the previous section).
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="code-sections">
+
+<h2>Code Sections<a class="headerlink" href="../../html/developing/auto-cli-api.html#code-sections" title="View HTML">§</a></h2>
+
+<p>The following sections will be interpreted as plain-text with bash syntax.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">SYNOPSIS</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">EXAMPLES</span></code></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="user-defined-sections">
+
+<h2>User-Defined Sections<a class="headerlink" href="../../html/developing/auto-cli-api.html#user-defined-sections" title="View HTML">§</a></h2>
+
+<p>Any user-defined sections will be interpreted as free-form reStructuredText.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

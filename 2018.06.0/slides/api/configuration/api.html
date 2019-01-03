@@ -1,0 +1,1324 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Configuration API &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Configuration" href="index.html" />
+    <link rel="next" title="Command Reference" href="../command-reference.html" />
+    <link rel="prev" title="File Creation Mode" href="file-creation.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-configuration-api">
+
+<h1>Rose Configuration API<a class="headerlink" href="../../../html/api/configuration/api.html#rose-configuration-api" title="View HTML">§</a></h1>
+
+
+
+
+
+</article>
+<article class="slide level-2" id="cli">
+
+<h2>CLI<a class="headerlink" href="../../../html/api/configuration/api.html#cli" title="View HTML">§</a></h2>
+
+<p>The <a class="reference internal" href="../command-reference.html#command-rose-config"><span class="std std-ref">rose config</span></a> command provides a command line tool for
+reading, processing and dumping files written in the <a class="reference internal" href="rose-configuration-format.html#rose-configuration-format"><span class="std std-ref">Rose Configuration Format</span></a>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">echo</span> -e <span class="s2">&quot;</span>
+<span class="gp">&gt;</span><span class="s2"> [foo]</span>
+<span class="gp">&gt;</span><span class="s2"> bar=baz</span>
+<span class="gp">&gt;</span><span class="s2"> &quot;</span> &gt; rose.conf
+
+<span class="gp">$</span> rose config foo --file rose.conf
+<span class="go">bar=baz</span>
+</pre></div>
+</div>
+<p>For more information see the <a class="reference internal" href="../command-reference.html#command-rose-config"><span class="std std-ref">rose config</span></a> command line reference.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="python">
+
+<h2>Python<a class="headerlink" href="../../../html/api/configuration/api.html#python" title="View HTML">§</a></h2>
+
+<p>Rose provides a Python API for loading, processing, editing and dumping Rose
+configurations via the <a class="reference internal" href="#module-rose.config" title="rose.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.config</span></code></a> module located within the Rose
+Python library.</p>
+<span class="target" id="module-rose.config"></span><p>Simple INI-style configuration data model, loader and dumper.</p>
+<dl class="docutils">
+<dt>Synopsis:</dt>
+<dd><div class="first highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">bar=Bar</span>
+<span class="gp">... </span><span class="s1">!baz=Baz</span>
+<span class="gp">... </span><span class="s1">     &#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load in a config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_node</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigSyntaxError</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="c1"># Handle exception.</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Retrieve config settings.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set new config settings.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;new&#39;</span><span class="p">],</span> <span class="s1">&#39;New&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Overwrite existing config settings.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_NORMAL</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">value</span><span class="o">=</span><span class="s1">&#39;NewBaz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write out config to a file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dump</span><span class="p">(</span><span class="n">config_node</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+<span class="go">[foo]</span>
+<span class="go">bar=Bar</span>
+<span class="go">baz=NewBaz</span>
+<span class="go">new=New</span>
+</pre></div>
+</div>
+</dd>
+<dt>Classes:</dt>
+<dd><table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rose.config.ConfigNode</span></code></a>([value,&nbsp;state,&nbsp;comments])</td>
+<td>Represent a node in a configuration file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rose.config.ConfigNodeDiff" title="rose.config.ConfigNodeDiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rose.config.ConfigNodeDiff</span></code></a>()</td>
+<td>Represent differences between two ConfigNode instances.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#rose.config.ConfigDumper" title="rose.config.ConfigDumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rose.config.ConfigDumper</span></code></a>([char_assign])</td>
+<td>Dumper of a ConfigNode object in Rose INI format.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rose.config.ConfigLoader" title="rose.config.ConfigLoader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rose.config.ConfigLoader</span></code></a>([char_assign,&nbsp;…])</td>
+<td>Loader of an INI format configuration into a ConfigNode object.</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Functions:</dt>
+<dd><table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#rose.config.load" title="rose.config.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rose.config.load</span></code></a>(source[,&nbsp;root])</td>
+<td>Shorthand for <a class="reference internal" href="#rose.config.ConfigLoader.load" title="rose.config.ConfigLoader.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">ConfigLoader.load()</span></code></a>.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rose.config.dump" title="rose.config.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rose.config.dump</span></code></a>(root[,&nbsp;target,&nbsp;…])</td>
+<td>Shorthand for <a class="reference internal" href="#rose.config.ConfigDumper.dump" title="rose.config.ConfigDumper.dump"><code class="xref py py-func docutils literal notranslate"><span class="pre">ConfigDumper.dump()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Limitations:</dt>
+<dd><ul class="first last simple">
+<li>The loader does not handle trailing comments.</li>
+</ul>
+</dd>
+<dt>What about the standard library ConfigParser? Well, it is problematic:</dt>
+<dd><ul class="first last simple">
+<li>The comment character and style is hard-coded.</li>
+<li>The assignment character is hard-coded.</li>
+<li>A duplicated section header causes an exception to be raised.</li>
+<li>Option keys are transformed to lower case by default.</li>
+<li>It is far too complicated and confusing.</li>
+</ul>
+</dd>
+</dl>
+<dl class="class">
+<dt id="rose.config.ConfigDumper">
+<em class="property">class </em><code class="descclassname">rose.config.</code><code class="descname">ConfigDumper</code><span class="sig-paren">(</span><em>char_assign='='</em><span class="sig-paren">)</span></dt>
+<dd><p>Dumper of a ConfigNode object in Rose INI format.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Baz&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Currently ignored!&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dumper</span> <span class="o">=</span> <span class="n">ConfigDumper</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dumper</span><span class="p">(</span><span class="n">config_node</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+<span class="go">[foo]</span>
+<span class="go">bar=Bar</span>
+<span class="go">#Currently ignored!</span>
+<span class="go">!baz=Baz</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="rose.config.ConfigDumper.dump">
+<code class="descname">dump</code><span class="sig-paren">(</span><em>root</em>, <em>target=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w'&gt;</em>, <em>sort_sections=None</em>, <em>sort_option_items=None</em>, <em>env_escape_ok=False</em>, <em>concat_mode=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Format a ConfigNode object and write result to target.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root</strong> (<a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>ConfigNode</em></a>) – The root config node.</li>
+<li><strong>target</strong> (<em>str/file</em>) – An open file handle or a string containing a
+file path. If not specified, the result is written to
+sys.stdout.</li>
+<li><strong>sort_sections</strong> (<em>fcn - optional</em>) – An optional argument that should be
+a function for sorting a list of section keys.</li>
+<li><strong>sort_option_items</strong> (<em>fcn - optional</em>) – An optional argument that
+should be a function for sorting a list of option (key, value)
+tuples in string values.</li>
+<li><strong>env_escape_ok</strong> (<em>bool - optional</em>) – An optional argument to indicate
+that $NAME and ${NAME} syntax in values should be escaped.</li>
+<li><strong>concat_mode</strong> (<em>bool - optional</em>) – Switch on concatenation mode. If
+True, add [] before root level options.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rose.config.ConfigLoader">
+<em class="property">class </em><code class="descclassname">rose.config.</code><code class="descname">ConfigLoader</code><span class="sig-paren">(</span><em>char_assign='='</em>, <em>char_comment='#'</em><span class="sig-paren">)</span></dt>
+<dd><p>Loader of an INI format configuration into a ConfigNode object.</p>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">!bar=Bar</span>
+<span class="gp">... </span><span class="s1">baz=Baz</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_node</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigSyntaxError</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">raise</span>  <span class="c1"># Handle exception.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">{&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}</span>
+</pre></div>
+</div>
+<dl class="staticmethod">
+<dt id="rose.config.ConfigLoader.can_miss_opt_conf_key">
+<em class="property">static </em><code class="descname">can_miss_opt_conf_key</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span></dt>
+<dd><p>Return KEY if key is a string like “(KEY)”, None otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigLoader.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>source</em>, <em>node=None</em>, <em>default_comments=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Read a source configuration file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>source</strong> (<em>str</em>) – An open file handle or a string for a file path.</li>
+<li><strong>node</strong> (<a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>ConfigNode</em></a>) – A ConfigNode object if specified, otherwise
+created.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new ConfigNode object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode">ConfigNode</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create example config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1"># Some comment</span>
+<span class="gp">... </span><span class="s1">!bar=Bar</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_node</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigSyntaxError</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">raise</span>  <span class="c1"># Handle exception.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">{&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [&#39; Some comment&#39;], &#39;value&#39;: &#39;Bar&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigLoader.load_with_opts">
+<code class="descname">load_with_opts</code><span class="sig-paren">(</span><em>source</em>, <em>node=None</em>, <em>more_keys=None</em>, <em>used_keys=None</em>, <em>return_config_map=False</em>, <em>mark_opt_confs=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Read a source configuration file with optional configurations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>source</strong> (<em>str</em>) – A file path.</li>
+<li><strong>node</strong> (<em>ConfigNode - optional</em>) – A ConfigNode object if specified,
+otherwise one is created.</li>
+<li><strong>more_keys</strong> (<em>list - optional</em>) – A list of additional optional
+configuration names. If source is “rose-${TYPE}.conf”, the
+file of each name should be “opt/rose-${TYPE}-${NAME}.conf”.</li>
+<li><strong>used_keys</strong> (<em>list - optional</em>) – If defined, it should be a list for
+this method to  append to. The key of each successfully loaded
+optional configuration will be appended to the list (unless the
+key is already in the list). Missing optional configurations
+that are specified in more_keys will not raise an error.
+If not defined, any missing optional configuration will
+trigger an OSError.</li>
+<li><strong>mark_opt_configs</strong> (<em>bool - optional</em>) – if True, add comments above any
+settings which have been loaded from an optional config.</li>
+<li><strong>return_config_map</strong> (<em>bool - optional</em>) – If True, construct and return
+a dict (config_map) containing config names vs their uncombined
+nodes. Optional configurations use their opt keys as keys, and
+the main configuration uses ‘None’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>node or (node, config_map):</dt>
+<dd><ul class="first last simple">
+<li>node - The loaded configuration as a ConfigNode.</li>
+<li>config_map - A dictionary containing opt_conf_key: ConfigNode
+pairs. Only returned if return_config_map is True.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">bar=Bar</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write optional config file (foo).</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s1">&#39;opt&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;opt/config-foo.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">opt_config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">opt_config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">bar=Baz</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="p">,</span> <span class="n">config_map</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_with_opts</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="n">more_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">return_config_map</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">&#39;Baz&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">original_config_node</span> <span class="o">=</span> <span class="n">config_map</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original_config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">&#39;Bar&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optional_config_node</span> <span class="o">=</span> <span class="n">config_map</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optional_config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">&#39;Baz&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rose.config.ConfigNode">
+<em class="property">class </em><code class="descclassname">rose.config.</code><code class="descname">ConfigNode</code><span class="sig-paren">(</span><em>value=None</em>, <em>state=''</em>, <em>comments=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Represent a node in a configuration file.</p>
+<dl class="docutils">
+<dt>Nodes are stored hierarchically, for instance the following config</dt>
+<dd>[foo]
+bar = Bar</dd>
+</dl>
+<p>When loaded by ConfigNode.load(file) would result in three levels of
+ConfigNodes, the first representing “root” (i.e. the top level of the
+config), one representing the config section “foo” and one representing the
+setting “bar”.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a new ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add sub-nodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Baz&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> 
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="go"> &#39;value&#39;: {&#39;foo&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="go">                   &#39;value&#39;: {&#39;baz&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="go">                                     &#39;value&#39;: &#39;Baz&#39;},</span>
+<span class="go">                             &#39;bar&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="go">                                     &#39;value&#39;: &#39;Bar&#39;}}}}}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set the state of a node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the value of the node at a position.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">])</span>
+<span class="go">&#39;Baz&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Walk over the hierarchical structure of a node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Walk over the config skipping ignored sections.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add two ConfigNode instances to create a new &quot;merged&quot; node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">another_config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">another_config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;New&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_config_node</span> <span class="o">=</span> <span class="n">config_node</span> <span class="o">+</span> <span class="n">another_config_node</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">new_config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;], [&#39;foo&#39;, &#39;bar&#39;], [&#39;&#39;, &#39;new&#39;]]</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="rose.config.ConfigNode.STATE_NORMAL">
+<code class="descname">STATE_NORMAL</code><em class="property"> = ''</em></dt>
+<dd><p>The default state of a ConfigNode.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose.config.ConfigNode.STATE_SYST_IGNORED">
+<code class="descname">STATE_SYST_IGNORED</code><em class="property"> = '!!'</em></dt>
+<dd><p>ConfigNode state if a metadata opperation has logically ignored the
+config.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose.config.ConfigNode.STATE_USER_IGNORED">
+<code class="descname">STATE_USER_IGNORED</code><em class="property"> = '!'</em></dt>
+<dd><p>ConfigNode state if it has been specifically ignored in the config.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNode.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>config_diff</em><span class="sig-paren">)</span></dt>
+<dd><p>Apply a ConfigNodeDiff object to self.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_diff</strong> (<a class="reference internal" href="#rose.config.ConfigNodeDiff" title="rose.config.ConfigNodeDiff"><em>ConfigNodeDiff</em></a>) – A diff to apply to this ConfigNode.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNodeDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="n">data</span><span class="o">=</span><span class="s1">&#39;Baz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply ConfigNodeDiff to ConfigNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNode.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>keys=None</em>, <em>no_ignore=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Return a node at the position of keys, if any.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>list</em><em>, </em><em>optional</em>) – A list defining a hierarchy of
+node.value ‘keys’. If an entry in keys is the null
+string, it is skipped.</li>
+<li><strong>no_ignore</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True any ignored nodes will
+not be returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The config node located at the position of keys or
+None.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode">ConfigNode</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="s1">&#39;Baz&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># A ConfigNode containing sub-nodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span> 
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="go"> &#39;value&#39;: {&#39;baz&#39;: {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Baz&#39;},</span>
+<span class="go">           &#39;bar&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}}}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># A bottom level sub-node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Skip ignored nodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNode.get_filter">
+<code class="descname">get_filter</code><span class="sig-paren">(</span><em>no_ignore</em><span class="sig-paren">)</span></dt>
+<dd><p>Return this ConfigNode unless no_ignore and node is ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>no_ignore</strong> (<em>bool</em>) – If True only return this node if it is not
+ignored.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">This ConfigNode unless no_ignore and node is ignored.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode">ConfigNode</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: 42}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: 42}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">{&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [], &#39;value&#39;: 42}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">config_node</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNode.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><em>keys=None</em>, <em>default=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Return the value of a normal node at the position of keys, if any.</p>
+<p>If the node does not exist or is ignored, return None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>list</em><em>, </em><em>optional</em>) – A list defining a hierarchy of node.value
+‘keys’. If an entry in keys is the null string, it is skipped.</li>
+<li><strong>default</strong> (<em>obj</em><em>, </em><em>optional</em>) – Return default if the value is not set.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The value of this ConfigNode at the position of keys or
+default if not set.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">obj</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get value without specifying keys returns the value of the</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># root ConfigNode (which in this case is a dict of its</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># sub-nodes).</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> 
+<span class="go">{&#39;foo&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="go">         &#39;value&#39;: {&#39;bar&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="go">                           &#39;value&#39;: &#39;Bar&#39;}}}}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Intermediate level ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="go">{&#39;bar&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Bottom level ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">&#39;Bar&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># If there is no node located at the position of keys or if</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># that node is unset then the default value is returned.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                      <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNode.is_ignored">
+<code class="descname">is_ignored</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return True if current node is in the “ignored” state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNode.set">
+<code class="descname">set</code><span class="sig-paren">(</span><em>keys=None</em>, <em>value=None</em>, <em>state=None</em>, <em>comments=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Set node properties at the position of keys, if any.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+If an entry in keys is the null string, it is skipped.</li>
+<li><strong>value</strong> (<em>obj</em>) – The node.value property to set at this position.</li>
+<li><strong>state</strong> (<em>str</em>) – The node.state property to set at this position.
+If None, the node.state property is unchanged.</li>
+<li><strong>comments</strong> (<em>str</em>) – The node.comments property to set at this position.
+If None, the node.comments property is unchanged.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This config node.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode">ConfigNode</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: {}}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add a sub-node at the position &#39;foo&#39; with the comment &#39;Info&#39;.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;Info&#39;</span><span class="p">)</span>
+<span class="gp">... </span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="go"> &#39;value&#39;: {&#39;foo&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: &#39;Info&#39;, &#39;value&#39;: {}}}}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set the value for the sub-node at the position</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># &#39;foo&#39; to &#39;Foo&#39;.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Foo&#39;</span><span class="p">)</span>
+<span class="gp">... </span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: {&#39;foo&#39;: {&#39;state&#39;: &#39;&#39;,</span>
+<span class="go"> &#39;comments&#39;: &#39;Info&#39;, &#39;value&#39;: &#39;Foo&#39;}}}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set the value of the ConfigNode to True, this overwrites all</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># sub-nodes!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: True}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNode.unset">
+<code class="descname">unset</code><span class="sig-paren">(</span><em>keys=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Remove a node at the position of keys, if any.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+If an entry in keys is the null string, it is skipped.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The ConfigNode instance that was removed, else None.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode">ConfigNode</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Foo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Unset without providing any keys does nothing.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">config_node</span><span class="o">.</span><span class="n">unset</span><span class="p">()</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Unset with invalid keys does nothing.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">config_node</span><span class="o">.</span><span class="n">unset</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Unset with valid keys removes the node from the node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">unset</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Foo&#39;}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: {}}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNode.walk">
+<code class="descname">walk</code><span class="sig-paren">(</span><em>keys=None</em>, <em>no_ignore=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Return all keylist - sub-node pairs below keys.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+If an entry in keys is the null string, it is skipped.</li>
+<li><strong>no_ignore</strong> (<em>bool</em>) – If True any ignored nodes will be skipped.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><dl class="first last docutils">
+<dt>tuple - (keys, sub_node)</dt>
+<dd><ul class="first last simple">
+<li>keys (list) - A list defining a hierarchy of node.value
+‘keys’. If a sub-node is at the top level, and does not
+contain any node children, a null string will be
+prepended to the returned keylist.</li>
+<li>sub_node (ConfigNode) - The config node at the position of
+keys.</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="s1">&#39;Baz&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Walk over the full hierarchy.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Walk over one branch of the hierarchy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])]</span>
+<span class="go">[[&#39;foo&#39;, &#39;bar&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Skip over ignored nodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Invalid/non-existent keys.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;elephant&#39;</span><span class="p">])]</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rose.config.ConfigNodeDiff">
+<em class="property">class </em><code class="descclassname">rose.config.</code><code class="descname">ConfigNodeDiff</code></dt>
+<dd><p>Represent differences between two ConfigNode instances.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a new ConfigNodeDiff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a new ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Baz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply the diff to the node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span>
+<span class="gp">... </span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[([&#39;&#39;, &#39;baz&#39;], &#39;Baz&#39;), ([&#39;&#39;, &#39;bar&#39;], &#39;Bar&#39;)]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNodeDiff by comparing two ConfigNodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">another_config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">another_config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;NewBar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">another_config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;New&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_from_configs</span><span class="p">(</span><span class="n">config_node</span><span class="p">,</span>
+<span class="gp">... </span>                                  <span class="n">another_config_node</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;&#39;, &#39;new&#39;), (&#39;New&#39;, &#39;&#39;, []))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[((&#39;&#39;, &#39;baz&#39;), (&#39;Baz&#39;, &#39;&#39;, []))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_modified</span><span class="p">()</span>
+<span class="go">[((&#39;&#39;, &#39;bar&#39;), ((&#39;Bar&#39;, &#39;&#39;, []), (&#39;NewBar&#39;, &#39;&#39;, [])))]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Inverse a ConfigNodeDiff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span> <span class="o">=</span> <span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_reversed</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;&#39;, &#39;baz&#39;), (&#39;Baz&#39;, &#39;&#39;, []))]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.delete_removed">
+<code class="descname">delete_removed</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Deletes all ‘removed’ keys from this ConfigNodeDiff.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">delete_removed</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.get_added">
+<code class="descname">get_added</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return a list of tuples of added keys with their data.</p>
+<p>The data is a tuple of value, state, comments, where value is
+set to None for sections.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>A list of the form [(keys, data), …]</dt>
+<dd><ul class="first last simple">
+<li>keys - The position of an added setting.</li>
+<li>data - Tuple of the form (value, state, comments) of the
+properties of the added setting.</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), (&#39;Foo&#39;, None, None))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.get_all_keys">
+<code class="descname">get_all_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return all keys affected by this ConfigNodeDiff.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list containing any keys affected by this diff as tuples,
+e.g. (‘foo’, ‘bar’).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_all_keys</span><span class="p">()</span>
+<span class="go">[(&#39;bar&#39;,), (&#39;foo&#39;,)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.get_as_opt_config">
+<code class="descname">get_as_opt_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return a ConfigNode such that main + new_node = main + diff.</p>
+<p>Add all the added settings, add all the modified settings,
+add all the removed settings as user-ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A new ConfigNode instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode">ConfigNode</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_as_opt_config</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">())</span> 
+<span class="go">[([&#39;&#39;, &#39;bar&#39;], {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}),</span>
+<span class="go"> ([&#39;&#39;, &#39;foo&#39;], {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Foo&#39;})]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.get_modified">
+<code class="descname">get_modified</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return a dict of altered keys with before and after data.</p>
+<p>The data is a list of two tuples (before and after) of value,
+state, comments, where value is set to None for sections.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>A list of the form [(keys, data), …]:</dt>
+<dd><ul class="first last simple">
+<li>keys - The position of an added setting.</li>
+<li>data - Tuple of the form (value, state, comments) for the
+properties of the setting before the modification.</li>
+<li>old_data - The same tuple as data but representing the
+properties of the setting after the modification.</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_modified_setting</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;New Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_modified</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), ((&#39;Foo&#39;, None, None), (&#39;New Foo&#39;, None, None)))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.get_removed">
+<code class="descname">get_removed</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return a dict of removed keys with their data.</p>
+<p>The data is a tuple of value, state, comments, where value is
+set to None for sections.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li>keys - The position of an added setting.</li>
+<li>data - Tuple of the form (value, state, comments) of the
+properties of the removed setting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list - A list of the form [(keys, data), ..]</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), (&#39;foo&#39;, None, None))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.get_reversed">
+<code class="descname">get_reversed</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return an inverse (add-&gt;remove, etc) copy of this ConfigNodeDiff.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A new ConfigNodeDiff instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#rose.config.ConfigNodeDiff" title="rose.config.ConfigNodeDiff">ConfigNodeDiff</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNodeDiff instance.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate reversed diff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span> <span class="o">=</span> <span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_reversed</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;bar&#39;,), (&#39;bar&#39;, None, None))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), (&#39;foo&#39;, None, None))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.set_added_setting">
+<code class="descname">set_added_setting</code><span class="sig-paren">(</span><em>keys</em>, <em>data</em><span class="sig-paren">)</span></dt>
+<dd><p>Set a config setting to be “added” in this ConfigNodeDiff.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>keys</strong> (<em>list/tuple</em>) – The position of the setting to add.</li>
+<li><strong>data</strong> (<em>obj</em><em>, </em><em>str</em><em>, </em><em>str</em>) – A tuple (value, state, comments) for the
+setting to add.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">,</span> <span class="s1">&#39;Some Info&#39;</span><span class="p">,))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">())</span> 
+<span class="go">[([&#39;&#39;, &#39;bar&#39;], {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: &#39;Some Info&#39;,</span>
+<span class="go">                &#39;value&#39;: &#39;Bar&#39;}),</span>
+<span class="go"> ([&#39;&#39;, &#39;foo&#39;], {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Foo&#39;})]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.set_from_configs">
+<code class="descname">set_from_configs</code><span class="sig-paren">(</span><em>config_node_1</em>, <em>config_node_2</em><span class="sig-paren">)</span></dt>
+<dd><p>Create diff data from two ConfigNode instances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config_node_1</strong> (<a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>ConfigNode</em></a>) – The node for which to base the diff
+off of.</li>
+<li><strong>config_node_2</strong> (<a class="reference internal" href="#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>ConfigNode</em></a>) – The “new” node the changes of which
+this diff will “apply”.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create two ConfigNode instances to compare.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_1</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node_1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_2</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node_2</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNodeDiff instance.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_from_configs</span><span class="p">(</span><span class="n">config_node_1</span><span class="p">,</span> <span class="n">config_node_2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;bar&#39;,), (None, &#39;&#39;, []))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), (None, &#39;&#39;, []))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.set_modified_setting">
+<code class="descname">set_modified_setting</code><span class="sig-paren">(</span><em>keys</em>, <em>old_data</em>, <em>data</em><span class="sig-paren">)</span></dt>
+<dd><p>Set a config setting to be “modified” in this ConfigNodeDiff.</p>
+<p>If a property in both the old_data and data (new data) are both set to
+None then no change will be made to any pre-existing value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>keys</strong> (<em>list/tuple</em>) – The position of the setting to add.</li>
+<li><strong>old_data</strong> (<em>obj</em><em>, </em><em>str</em><em>, </em><em>str</em>) – A tuple (value, state, comments) for
+the “current” properties of the setting to modify.</li>
+<li><strong>data</strong> (<em>obj</em><em>, </em><em>str</em><em>, </em><em>str</em>) – A tuple (value, state, comments) for “new”
+properties to change this setting to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNodeDiff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_modified_setting</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;New Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;Some Info&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply the ConfigNodeDiff to the ConfigNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: &#39;Some Info&#39;, &#39;value&#39;: &#39;New Foo&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.config.ConfigNodeDiff.set_removed_setting">
+<code class="descname">set_removed_setting</code><span class="sig-paren">(</span><em>keys</em>, <em>data</em><span class="sig-paren">)</span></dt>
+<dd><p>Set a config setting to be “removed” in this ConfigNodeDiff.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>keys</strong> (<em>list</em>) – The position of the setting to add.</li>
+<li><strong>data</strong> (<em>obj</em><em>, </em><em>str</em><em>, </em><em>str</em>) – A tuple (value, state, comments) of the
+properties for the setting to remove.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNodeDiff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;Some Info&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply the ConfigNodeDiff to the ConfigNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="rose.config.ConfigSyntaxError">
+<em class="property">exception </em><code class="descclassname">rose.config.</code><code class="descname">ConfigSyntaxError</code><span class="sig-paren">(</span><em>code</em>, <em>file_name</em>, <em>line_num</em>, <em>col_num</em>, <em>line</em><span class="sig-paren">)</span></dt>
+<dd><p>Exception raised for syntax error loading a configuration file.</p>
+<dl class="attribute">
+<dt id="rose.config.ConfigSyntaxError.exc.code">
+<code class="descclassname">exc.</code><code class="descname">code</code></dt>
+<dd><p>Error code. Can be one of:
+ConfigSyntaxError.BAD_CHAR (bad characters in a name)
+ConfigSyntaxError.BAD_SYNTAX (general syntax error)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose.config.ConfigSyntaxError.exc.file_name">
+<code class="descclassname">exc.</code><code class="descname">file_name</code></dt>
+<dd><p>The name of the file that triggers the error.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose.config.ConfigSyntaxError.exc.line_num">
+<code class="descclassname">exc.</code><code class="descname">line_num</code></dt>
+<dd><p>The line number (from 1) in the file with the error.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose.config.ConfigSyntaxError.exc.col_num">
+<code class="descclassname">exc.</code><code class="descname">col_num</code></dt>
+<dd><p>The column number (from 0) in the line with the error.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose.config.ConfigSyntaxError.exc.line">
+<code class="descclassname">exc.</code><code class="descname">line</code></dt>
+<dd><p>The content of the line that contains the error.</p>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[foo][foo]&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigSyntaxError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span> <span class="s1">&#39;Error (</span><span class="si">%s</span><span class="s1">) in file &quot;</span><span class="si">%s</span><span class="s1">&quot; at </span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+<span class="gp">... </span>        <span class="n">exc</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">exc</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="n">exc</span><span class="o">.</span><span class="n">line_num</span><span class="p">,</span> <span class="n">exc</span><span class="o">.</span><span class="n">col_num</span><span class="p">)</span>
+<span class="go">Error (BAD_CHAR) in file &quot;...&quot; at 1:5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="rose.config.dump">
+<code class="descclassname">rose.config.</code><code class="descname">dump</code><span class="sig-paren">(</span><em>root</em>, <em>target=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w'&gt;</em>, <em>sort_sections=None</em>, <em>sort_option_items=None</em>, <em>env_escape_ok=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Shorthand for <a class="reference internal" href="#rose.config.ConfigDumper.dump" title="rose.config.ConfigDumper.dump"><code class="xref py py-func docutils literal notranslate"><span class="pre">ConfigDumper.dump()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rose.config.load">
+<code class="descclassname">rose.config.</code><code class="descname">load</code><span class="sig-paren">(</span><em>source</em>, <em>root=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Shorthand for <a class="reference internal" href="#rose.config.ConfigLoader.load" title="rose.config.ConfigLoader.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">ConfigLoader.load()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rose.config.sort_element">
+<code class="descclassname">rose.config.</code><code class="descname">sort_element</code><span class="sig-paren">(</span><em>elem_1</em>, <em>elem_2</em><span class="sig-paren">)</span></dt>
+<dd><p>Sort pieces of text, numerically if possible.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rose.config.sort_settings">
+<code class="descclassname">rose.config.</code><code class="descname">sort_settings</code><span class="sig-paren">(</span><em>setting_1</em>, <em>setting_2</em><span class="sig-paren">)</span></dt>
+<dd><p>Sort sections and options, by numeric element if possible.</p>
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

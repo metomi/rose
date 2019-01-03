@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fcm_make &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Built-In Applications" href="../rose-built-in-applications.html" />
+    <link rel="next" title="rose_ana" href="rose_ana.html" />
+    <link rel="prev" title="Rose Built-In Applications" href="../rose-built-in-applications.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="fcm-make">
+
+<h1><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code><a class="headerlink" href="../../../html/api/built-in/fcm_make.html#fcm-make" title="View HTML">§</a></h1>
+
+<p>An application for running the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> application expects a file <code class="docutils literal notranslate"><span class="pre">file/fcm-make.cfg</span></code> in
+its application configuration. It runs <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> using this
+configuration file.</p>
+<p>You can configure these applications with environment variables or
+settings in <code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code>. (Settings in <code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code>
+override their equivalent environment variables.)</p>
+<p>By default the <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directories of builds will be prepended to
+the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable by <a class="reference internal" href="../command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a>
+and/or <a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> commands run by subsequent
+tasks in the suite.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../html/api/built-in/fcm_make.html#example" title="View HTML">§</a></h2>
+
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">fcm_make</span>
+<span class="nv">mode</span><span class="o">=</span><span class="s">fcm_make</span>
+<span class="nv">opt.jobs</span><span class="o">=</span><span class="s">8</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="invocation">
+
+<h2>Invocation<a class="headerlink" href="../../../html/api/built-in/fcm_make.html#invocation" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li>If a task’s name contains the string <code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> then
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> will run this built-in application
+automatically.</li>
+<li>If a task’s name contains the string <code class="docutils literal notranslate"><span class="pre">fcm_make2*</span></code> and it does not
+have its own application configuration then
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> will attempt to associate it with
+the corresponding <code class="docutils literal notranslate"><span class="pre">fcm_make*</span></code> application configuration.</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="rose-configuration-api">
+
+<h2>Rose Configuration API<a class="headerlink" href="../../../html/api/built-in/fcm_make.html#rose-configuration-api" title="View HTML">§</a></h2>
+
+<dl class="app">
+<dt id="rose:app:fcm_make">
+<em class="property">Rose App </em><code class="descname">fcm_make</code></dt>
+<dd><dl class="conf">
+<dt id="rose:conf:fcm_make|args">
+<em class="property">Config </em><code class="descname">args</code><em class="property">= ARG ...</em></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Env Var:</th><td class="field-body"><span class="target" id="index-0"></span><a class="reference internal" href="../environment-variables.html#envvar-ROSE_TASK_OPTIONS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_TASK_OPTIONS</span></code></a></td>
+</tr>
+</tbody>
+</table>
+<p>For passing extra options and arguments to the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|dest-orig">
+<em class="property">Config </em><code class="descname">dest-orig</code><em class="property">= PATH</em></dt>
+<dd><p>Specify the path to the destination of the original make. This
+is normally specified as a relative path under <code class="docutils literal notranslate"><span class="pre">$ROSE_SUITE_DIR/</span></code>.
+The default is <code class="docutils literal notranslate"><span class="pre">share/$ROSE_TASK_NAME</span></code>. If
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> is invoked in <code class="docutils literal notranslate"><span class="pre">--new</span></code> mode, the
+application will remove this directory before running <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span> <span class="pre">--new</span></code>.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|dest-cont">
+<em class="property">Config </em><code class="descname">dest-cont</code><em class="property">= PATH</em></dt>
+<dd><p>Specify the path to the destination of the continuation make. This
+is normally specified as a relative path under <code class="docutils literal notranslate"><span class="pre">$ROSE_SUITE_DIR/</span></code>.
+The default is to use the same location as
+<a class="reference internal" href="#rose:conf:fcm_make|dest-orig" title="rose:conf:fcm_make|dest-orig"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">fcm_make|dest-orig</span></code></a>. If <a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>
+is invoked in <code class="docutils literal notranslate"><span class="pre">--new</span></code> mode, the application will remove this
+directory before running <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span> <span class="pre">--new</span></code>. (If this location is
+in the same physical location of the destination of the original
+make, you should only invoke <a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> <code class="docutils literal notranslate"><span class="pre">--new</span></code>
+on the original make. Otherwise, contents generated by the original
+make will be wiped clean before the continuation make begins.)</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|fast-dest-root-orig">
+<em class="property">Config </em><code class="descname">fast-dest-root-orig</code><em class="property">= PATH</em></dt>
+<dd><p>Specify the path to an existing location that can be used as a
+fast working directory for the original make. If this is specified,
+the <code class="docutils literal notranslate"><span class="pre">fcm</span></code> make command will be invoked in a temporary directory
+under this location before being copied back to the actual destination.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|fast-dest-root-cont">
+<em class="property">Config </em><code class="descname">fast-dest-root-cont</code><em class="property">= PATH</em></dt>
+<dd><p>Specify the path to an existing location that can be used as a fast
+working directory for the continuation make. If this is specified,
+the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command will be invoked in a temporary directory
+under this location before being copied back to the actual destination.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|make-name-orig">
+<em class="property">Config </em><code class="descname">make-name-orig</code><em class="property">= NAME</em></dt>
+<dd><p>Specify the context name of the original make. The default is a
+null string. You can specify an alternate context name if this
+is undesirable. The <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command will be invoked with the
+<code class="docutils literal notranslate"><span class="pre">--name=NAME</span></code> option of <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code>.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|make-name-cont">
+<em class="property">Config </em><code class="descname">make-name-cont</code><em class="property">= NAME</em></dt>
+<dd><p>Specify the context name of the continuation make. If the default
+<code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> → <code class="docutils literal notranslate"><span class="pre">fcm_make2</span></code> mapping is used, the context name of
+the continuation make will be set to <code class="docutils literal notranslate"><span class="pre">2</span></code>. You can specify an alternate
+context name if this is undesirable. The continuation command will
+be invoked with the <code class="docutils literal notranslate"><span class="pre">--name=NAME</span></code> option of <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code>.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|mirror-step">
+<em class="property">Config </em><code class="descname">mirror-step</code><em class="property">= STEP-NAME</em></dt>
+<dd><p>Specify the name of the mirror step, if not mirror. The application
+will normally look for a matching task in the suite (e.g.
+<code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> → <code class="docutils literal notranslate"><span class="pre">fcm_make2</span></code>) which will continue the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code>
+command at a remote <code class="docutils literal notranslate"><span class="pre">HOST</span></code>. If such a task is found, it will add
+the configuration
+<code class="docutils literal notranslate"><span class="pre">mirror.target=HOST:cylc-run/$ROSE_SUITE_NAME/share/$ROSE_TASK_NAME</span></code>
+as an argument to the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command to substitute the mirror
+target. To switch off this feature, set <code class="docutils literal notranslate"><span class="pre">STEP-NAME</span></code> to a null
+string, i.e. <code class="docutils literal notranslate"><span class="pre">mirror-step=</span></code>.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|opt.jobs">
+<em class="property">Config </em><code class="descname">opt.jobs</code><em class="property">= N</em></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Env Var:</th><td class="field-body"><span class="target" id="index-1"></span><a class="reference internal" href="../environment-variables.html#envvar-ROSE_TASK_N_JOBS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_TASK_N_JOBS</span></code></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Default:</th><td class="field-body">4</td>
+</tr>
+</tbody>
+</table>
+<p>This can be used to control the number of processes <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code>
+would use in parallel.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|orig-cont-map">
+<em class="property">Config </em><code class="descname">orig-cont-map</code><em class="property">= ORIG-NAME:CONT-NAME</em></dt>
+<dd><p>This setting allows you to override the default <code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> →
+<code class="docutils literal notranslate"><span class="pre">fcm_make2</span></code> mapping between the names of the original and the
+continuation tasks in the suite.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:fcm_make|use-pwd">
+<em class="property">Config </em><code class="descname">use-pwd</code><em class="property">= true</em></dt>
+<dd><p>By default, the application changes the working directory to
+<code class="docutils literal notranslate"><span class="pre">$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</span></code>. This option will stop
+this, and the working directory is the normal working directory of
+the task.</p>
+</dd></dl>
+
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,197 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Date and Time Manipulation &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Fail-If, Warn-If" href="failif-warnif.html" />
+    <link rel="prev" title="Command Keys" href="command-keys.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="date-and-time-manipulation">
+
+<h1>Date and Time Manipulation<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/date-time-manipulation.html#date-and-time-manipulation" title="View HTML">§</a></h1>
+
+<p><a class="reference internal" href="../../../glossary.html#term-datetime-cycling"><span class="xref std std-term">Datetime cycling</span></a> suites inevitably involve
+performing some form of datetime arithmetic. In the
+<a class="reference internal" href="../../cylc/scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather forecasting suite</span></a> we wrote
+in the Cylc tutorial this arithmetic was done using the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">cyclepoint</span></code>
+command. For example we calculated the cycle point three hours before the
+present cycle using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">cyclepoint</span> <span class="o">--</span><span class="n">offset</span><span class="o">-</span><span class="n">hours</span><span class="o">=-</span><span class="mi">3</span>
+</pre></div>
+</div>
+<p>Rose provides the <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> command which provides functionality
+beyond <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">cyclepoint</span></code> as well as the <span class="target" id="index-0"></span><a class="reference internal" href="../../../api/environment-variables.html#envvar-ROSE_DATAC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code></a> environment
+variable which provides an easy way to get the path of the <code class="docutils literal notranslate"><span class="pre">share/cycle</span></code>
+directory.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-rose-date-command">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span></code> Command<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/date-time-manipulation.html#the-rose-date-command" title="View HTML">§</a></h2>
+
+<p>The <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> command provides functionality for:</p>
+<ul>
+<li><p class="first">Parsing and formatting datetimes e.g:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose date <span class="s1">&#39;12-31-2000&#39;</span> --parse-format<span class="o">=</span><span class="s1">&#39;%m-%d-%Y&#39;</span>
+<span class="go">12-31-2000</span>
+<span class="gp">$</span> rose date <span class="s1">&#39;12-31-2000&#39;</span> --parse-format<span class="o">=</span><span class="s1">&#39;%m-%d-%Y&#39;</span> --format<span class="o">=</span><span class="s1">&#39;DD-MM-CCYY&#39;</span>
+<span class="go">31-12-2000</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Adding offsets to datetimes e.g:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose date <span class="s1">&#39;2000-01-01T0000Z&#39;</span> --offset <span class="s1">&#39;+P1M&#39;</span>
+<span class="go">2000-02-01T0000Z</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Calculating the duration between two datetimes e.g:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose date <span class="s1">&#39;2000&#39;</span> <span class="s1">&#39;2001&#39;</span>  <span class="c1"># Note - 2000 was a leap year!</span>
+<span class="go">P366D</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>See the <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> command reference for more information.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="using-rose-date-in-a-suite">
+
+<h2>Using <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span></code> In A Suite<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/date-time-manipulation.html#using-rose-date-in-a-suite" title="View HTML">§</a></h2>
+
+<p>In datetime cycling suites <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> can work with the
+cyclepoint using the <code class="docutils literal notranslate"><span class="pre">CYLC_TASK_CYCLE_POINT</span></code> environment variable:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_america]]</span>
+        <span class="nv">script = rose date $CYLC_TASK_CYCLE_POINT --format</span><span class="o">=</span><span class="s">&#39;MM-DD-CCYY&#39;</span>
+</pre></div>
+</div>
+<p>Alternatively, if you are providing the standard Rose task environment using
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> then <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> can use the <code class="docutils literal notranslate"><span class="pre">-c</span></code>
+option to pick up the cycle point:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_america]]</span>
+        <span class="nv">env-script </span><span class="o">=</span><span class="s"> eval $(rose task-env)</span>
+        <span class="nv">script = rose date -c --format</span><span class="o">=</span><span class="s">&#39;MM-DD-CCYY&#39;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-rose-datac-environment-variable">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code> Environment Variable<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/date-time-manipulation.html#the-rose-datac-environment-variable" title="View HTML">§</a></h2>
+
+<p>There are two locations where task output is likely to be located:</p>
+<dl class="docutils">
+<dt>The work directory</dt>
+<dd><p class="first">Each task is executed within its <a class="reference internal" href="../../../glossary.html#term-work-directory"><span class="xref std std-term">work directory</span></a> which is located in:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="s">&lt;run directory&gt;</span>/work/<span class="s">&lt;cycle&gt;</span>/<span class="s">&lt;task-name&gt;</span>
+</pre></div>
+</div>
+<p class="last">The path to a task’s work directory can be obtained from the
+<code class="docutils literal notranslate"><span class="pre">CYLC_TASK_WORK_DIR</span></code> environment variable.</p>
+</dd>
+<dt>The share directory</dt>
+<dd><p class="first">The <a class="reference internal" href="../../../glossary.html#term-share-directory"><span class="xref std std-term">share directory</span></a> serves the purpose of providing a storage place
+for any files which need to be shared between different tasks.</p>
+<p>Within the share directory data is typically stored within cycle
+subdirectories i.e:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="s">&lt;run directory&gt;</span>/share/<span class="s">&lt;cycle&gt;</span>
+</pre></div>
+</div>
+<p>These are called the <code class="docutils literal notranslate"><span class="pre">share/cycle</span></code> directories.</p>
+<p>The path to the root of the share directory is provided by the
+<code class="docutils literal notranslate"><span class="pre">CYLC_SUITE_SHARE_DIR</span></code> environment variable so the path to the cycle
+subdirectory would be:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;$CYLC_SUITE_SHARE_DIR/$CYLC_SUITE_CYCLE_POINT&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>The <a class="reference internal" href="../../../api/command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> command provides the environment variable
+<span class="target" id="index-1"></span><a class="reference internal" href="../../../api/environment-variables.html#envvar-ROSE_DATAC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code></a> which is a more convenient way to obtain the path of the
+<code class="docutils literal notranslate"><span class="pre">share/cycle</span></code> directory.</p>
+<p>To get the path to a previous (or a future) <code class="docutils literal notranslate"><span class="pre">share/cycle</span></code> directory we can
+provide an offset to <a class="reference internal" href="../../../api/command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> e.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">task</span><span class="o">-</span><span class="n">env</span> <span class="o">--</span><span class="n">cycle</span><span class="o">-</span><span class="n">offset</span><span class="o">=</span><span class="n">PT1H</span>
+</pre></div>
+</div>
+<p>The path is then made available as the <code class="docutils literal notranslate"><span class="pre">ROSE_DATACPT1H</span></code> environment variable.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

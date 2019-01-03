@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sphinx Domains &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="sphinx-domains">
+
+<h1>Sphinx Domains<a class="headerlink" href="../../html/developing/domains.html#sphinx-domains" title="View HTML">§</a></h1>
+
+<p>Sphinx includes a system for documenting objects in a structured way via
+<a class="reference external" href="http://www.sphinx-doc.org/en/stable/domains.html">domains</a>. For example to document a Python function one might do:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:function</span><span class="p">::</span> answer()
+
+   <span class="nc">:return:</span> <span class="nf">int The ultimate answer to life, the universe and everything.</span>
+
+   Return 42.
+</pre></div>
+</div>
+<p>This is what the <code class="docutils literal notranslate"><span class="pre">sphinx.ext.autodoc</span></code> system does (e.g. <code class="docutils literal notranslate"><span class="pre">autofunction</span></code>)
+for you automatically.</p>
+<p>For documenting Rose components an extension adding a Rose domain has been
+added.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="rose-domain">
+
+<h2>Rose Domain<a class="headerlink" href="../../html/developing/domains.html#rose-domain" title="View HTML">§</a></h2>
+
+<span class="target" id="module-rose_domain"></span><p>The Rose domain is for documenting Rose configurations and built-in
+applications.</p>
+<dl class="docutils">
+<dt>Rose Objects:</dt>
+<dd><p class="first">The Rose domain supports the following object types:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">rose:app</span></code> - Rose Applications.</li>
+<li><code class="docutils literal notranslate"><span class="pre">rose:file</span></code> - Root Rose configurations.</li>
+<li><code class="docutils literal notranslate"><span class="pre">rose:conf</span></code> - Rose configurations. Nest them to create configuration
+sections.</li>
+</ul>
+<p class="last">See the corresponding directives for more information on each object type.</p>
+</dd>
+<dt>Reference Syntax:</dt>
+<dd><p class="first">Once documented, objects can be referenced using the following syntax:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:rose:CONFIG-FILE[parent-section]child-config
+:rose:CONFIG-FILE|top-level-config
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">CONFIG-FILE</span></code> is:</p>
+<ul class="last simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">APP-NAME</span></code> for applications (e.g. <code class="docutils literal notranslate"><span class="pre">fcm_make</span></code>).</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">FILE-NAME</span></code> for configuration files (e.g. <code class="docutils literal notranslate"><span class="pre">rose.conf</span></code>).</li>
+</ul>
+</dd>
+<dt>Referencing From RST Files:</dt>
+<dd><p class="first">To reference a Rose object add the object <code class="docutils literal notranslate"><span class="pre">TYPE</span></code> into the domain
+(e.g. <code class="docutils literal notranslate"><span class="pre">conf</span></code> or <code class="docutils literal notranslate"><span class="pre">app</span></code>).</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="na">:rose:TYPE:</span><span class="nv">`CONFIG-FILE[parent-section]child-config`</span>
+</pre></div>
+</div>
+<p>e.g:</p>
+<div class="last highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="m">*</span> <span class="na">:rose:app:</span><span class="nv">`fcm_make`</span>
+<span class="m">*</span> <span class="na">:rose:conf:</span><span class="nv">`fcm_make.args`</span>
+</pre></div>
+</div>
+</dd>
+<dt>Autodocumentation:</dt>
+<dd><p class="first">Documentation can be auto-built from RST formatted comments in Rose
+configuration files using the <code class="docutils literal notranslate"><span class="pre">autoconfig</span></code> directive.</p>
+<p class="last">Note that due to the implementation of <a class="reference internal" href="../api/configuration/api.html#module-rose.config" title="rose.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.config</span></code></a> the
+autodocumenter will represent empty sections as top level configuration
+nodes.</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rose:file</span><span class="p">::</span> rose-suite.conf
+
+   The config file used for configuring suite level settings.
+
+<span class="p">   ..</span> <span class="ow">rose:conf</span><span class="p">::</span> jinja2:suite.rc
+
+      A section for specifying Jinja2 settings for use in the
+      <span class="s">``suite.rc``</span> file.
+
+      Note that one ommits the square brackets for config sections. If
+      <span class="nc">:rose:conf:</span> <span class="nf">contains other :rose:conf:&#39;s then it is implicitly a</span>
+      section and the brackets are added automatically. If you wish to
+      document a section which contains no settings write it using
+      square brackets.
+
+<span class="p">      ..</span> <span class="ow">rose:conf</span><span class="p">::</span> ROSE_VERSION
+
+         provide the intended Rose version to the suite.
+
+<span class="p">         ..</span> <span class="ow">deprecated</span><span class="p">::</span> 6.1.0
+
+            No longer required, this context is now provided internally.
+
+<span class="p">      ..</span> <span class="ow">rose:conf</span><span class="p">::</span> CYLC_VERSION
+
+         provide the intended Rose version to the suite.
+
+<span class="p">         ..</span> <span class="ow">deprecated</span><span class="p">::</span> 6.1.0
+
+            See <span class="na">:rose:conf:</span><span class="nv">`ROSE_VERSION`</span>.
+
+<span class="cp">            ..            ^ relative reference</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="rose_domain.RoseDirective">
+<em class="property">class </em><code class="descclassname">rose_domain.</code><code class="descname">RoseDirective</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Base class for implementing Rose objects.</p>
+<dl class="docutils">
+<dt>Subclasses must provide:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">NAME</span></code></li>
+</ul>
+</dd>
+<dt>Subclasses can provide:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">LABEL</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ARGUMENT_SEPARATOR</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">ARGUMENT_REGEX</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ALT_FORM_SEPARATOR</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ALT_FORM_TEMPLATE</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">doc_field_types</span></code> - List of <code class="docutils literal notranslate"><span class="pre">Field</span></code> objects for object
+parameters.</li>
+<li><code class="docutils literal notranslate"><span class="pre">run()</span></code> - For adding special rev_context variables via
+<code class="docutils literal notranslate"><span class="pre">add_rev_context</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">handle_signature()</span></code> - For changing the display of objects.</li>
+<li><code class="docutils literal notranslate"><span class="pre">custom_name_template</span></code> - String template accepting one string
+format argument for custom formatting the node name (e.g. <code class="docutils literal notranslate"><span class="pre">'[%s]'</span></code>
+for conf sections).</li>
+</ul>
+</dd>
+<dt>ref_context Variables:</dt>
+<dd><p class="first">Sphinx domains use <code class="docutils literal notranslate"><span class="pre">ref_context</span></code> variables to determine the
+relationship between objects. E.g. for a Rose app the <code class="docutils literal notranslate"><span class="pre">rose:app</span></code>
+variable is set to the name of the app. This variable will be made
+available to all children which is how they determine that they belong
+to the app.</p>
+<ul class="last simple">
+<li>Variables set in <code class="docutils literal notranslate"><span class="pre">run()</span></code> are available to this object along with
+all of its children.</li>
+<li>Variables set in <code class="docutils literal notranslate"><span class="pre">before_content()</span></code> are only available to children.</li>
+<li>All variables set via <code class="docutils literal notranslate"><span class="pre">add_ref_context()</span></code> will be automatically
+removed in <code class="docutils literal notranslate"><span class="pre">after_content()</span></code> to prevent leaking scope.</li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="rose_domain.RoseDirective.ALT_FORM_SEPARATOR">
+<code class="descname">ALT_FORM_SEPARATOR</code><em class="property"> = '&amp;'</em></dt>
+<dd><p>String for splitting alternate names.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose_domain.RoseDirective.ALT_FORM_TEMPLATE">
+<code class="descname">ALT_FORM_TEMPLATE</code><em class="property"> = '(alternate: %s)'</em></dt>
+<dd><p>String template for writing out alternate names. Takes one string format
+argument.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose_domain.RoseDirective.ARGUMENT_SEPARATOR">
+<code class="descname">ARGUMENT_SEPARATOR</code><em class="property"> = None</em></dt>
+<dd><p>String for separating the configuration name and argument.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose_domain.RoseDirective.LABEL">
+<code class="descname">LABEL</code><em class="property"> = ''</em></dt>
+<dd><p>Label to prepend to objects.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rose_domain.RoseDirective.NAME">
+<code class="descname">NAME</code><em class="property"> = None</em></dt>
+<dd><p>The Rose domain this directive implements, see RoseDomain.directives</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rose_domain.RoseAppDirective">
+<em class="property">class </em><code class="descclassname">rose_domain.</code><code class="descname">RoseAppDirective</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Directive for documenting Rose apps.</p>
+<p class="rubric">Example</p>
+<p>Click <span class="guilabel">source</span> to view source code.</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rose:app</span><span class="p">::</span> foo
+
+   An app called <span class="s">``foo``</span>.
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="rose_domain.RoseFileDirective">
+<em class="property">class </em><code class="descclassname">rose_domain.</code><code class="descname">RoseFileDirective</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Directive for documenting Rose files.</p>
+<p class="rubric">Example</p>
+<p>Click <span class="guilabel">source</span> to view source code.</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rose:file</span><span class="p">::</span> foo
+
+   An configuration file called <span class="s">``foo``</span>.
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="rose_domain.RoseConfigDirective">
+<em class="property">class </em><code class="descclassname">rose_domain.</code><code class="descname">RoseConfigDirective</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Directive for documenting config sections.</p>
+<dl class="docutils">
+<dt>Optional Attributes:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">envvar</span></code> - Associate an environment variable with this
+configuration option.</li>
+<li><code class="docutils literal notranslate"><span class="pre">compulsory</span></code> - Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> for compulsory settings, omit this
+field for optional settings.</li>
+</ul>
+</dd>
+<dt>Additional ref_context:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">rose:conf-section</span></code> - Set for parent configurations, is available
+to any child nodes.</li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Click <span class="guilabel">source</span> to view source code.</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rose:conf</span><span class="p">::</span> foo
+
+   <span class="nc">:default:</span> <span class="nf">foo</span>
+   <span class="nc">:opt argtype foo:</span> <span class="nf">Description of option ``foo``.</span>
+   <span class="nc">:opt bar:</span> <span class="nf">Description of bar</span>
+
+   A setting called <span class="s">``foo``</span>.
+
+<span class="p">..</span> <span class="ow">rose:conf</span><span class="p">::</span> bar
+
+   A section called <span class="s">``bar``</span>.
+
+<span class="p">   ..</span> <span class="ow">rose:conf</span><span class="p">::</span> baz
+
+      <span class="nc">:compulsory:</span> <span class="nf">True</span>
+      <span class="nc">:env:</span> <span class="nf">AN_ASSOCIATED_ENVIRONMENT_VARIABLE</span>
+
+      A config called <span class="s">``[bar]baz``</span>.
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="rose_domain.RoseAutoDirective">
+<em class="property">class </em><code class="descclassname">rose_domain.</code><code class="descname">RoseAutoDirective</code><span class="sig-paren">(</span><em>name</em>, <em>arguments</em>, <em>options</em>, <em>content</em>, <em>lineno</em>, <em>content_offset</em>, <em>block_text</em>, <em>state</em>, <em>state_machine</em><span class="sig-paren">)</span></dt>
+<dd><p>Directive for autodocumenting Rose configuration files.</p>
+<p>Uses RST formatted comments in Rose configuration files using
+<a class="reference internal" href="../api/configuration/api.html#module-rose.config" title="rose.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.config</span></code></a>.</p>
+<p>Note the directive only documents config objects not the file itself.</p>
+<p class="rubric">Example</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="cp">.. rose:file: foo.conf</span>
+
+<span class="cp">   .. autoconfig:: path/to/foo.conf</span>
+</pre></div>
+</div>
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Optional Configurations &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Polling" href="polling.html" />
+    <link rel="prev" title="Custom Macros" href="macro-development.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="optional-configurations">
+
+<h1>Optional Configurations<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/optional-configurations.html#optional-configurations" title="View HTML">§</a></h1>
+
+<p>Optional configurations are configuration files which can add or overwrite
+the default configuration. They can be used with <a class="reference internal" href="../../../api/command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a>
+for <a class="reference internal" href="../../../glossary.html#term-rose-application-configuration"><span class="xref std std-term">Rose application configurations</span></a>
+and <a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> for
+<a class="reference internal" href="../../../glossary.html#term-rose-suite-configuration"><span class="xref std std-term">Rose suite configurations</span></a>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/optional-configurations.html#example" title="View HTML">§</a></h2>
+
+<a class="reference internal image-reference" href="https://upload.wikimedia.org/wikipedia/commons/a/ae/StrawberrySundae.jpg"><img alt="Ice Cream" class="align-right" src="https://upload.wikimedia.org/wikipedia/commons/a/ae/StrawberrySundae.jpg" style="width: 250px;" /></a>
+<p>Create a new <a class="reference internal" href="../../../glossary.html#term-rose-app"><span class="xref std std-term">Rose app</span></a> called <code class="docutils literal notranslate"><span class="pre">rose-opt-conf-tutorial</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">opt</span><span class="o">-</span><span class="n">conf</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">opt</span><span class="o">-</span><span class="n">conf</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>Create a <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file with the following contents:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">echo &quot;I&#39;d like to order a $FLAVOUR ice cream in a $CONE_TYPE&quot; \</span>
+       <span class="o">=</span><span class="s">&quot;with $TOPPING.&quot;</span>
+
+<span class="nt">[env]</span>
+<span class="nv">CONE_TYPE</span><span class="o">=</span><span class="s">regular-cone</span>
+<span class="nv">FLAVOUR</span><span class="o">=</span><span class="s">vanilla</span>
+<span class="nv">TOPPING</span><span class="o">=</span><span class="s">no toppings</span>
+</pre></div>
+</div>
+<p>Test the app by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">run</span> <span class="o">-</span><span class="n">q</span>
+</pre></div>
+</div>
+<p>You should see the following output:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>I&#39;d like to order a vanilla ice cream in a regular-cone with no toppings.
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="adding-optional-configurations">
+
+<h2>Adding Optional Configurations<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/optional-configurations.html#adding-optional-configurations" title="View HTML">§</a></h2>
+
+<p>Optional configurations are stored in the <code class="docutils literal notranslate"><span class="pre">opt</span></code> directory and are named the
+same as the default configuration file but with the name of the optional
+configuration before the <code class="docutils literal notranslate"><span class="pre">.conf</span></code> extension i.e:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>app/
+ |-- rose-app.conf
+ `-- opt/
+      `-- rose-app-<span class="s">&lt;optional-configuration-name&gt;</span>.conf
+</pre></div>
+</div>
+<p>Next we will create a new optional configuration for chocolate ice cream. The
+configuration will be called <code class="docutils literal notranslate"><span class="pre">chocolate</span></code>.</p>
+<p>Create an <code class="docutils literal notranslate"><span class="pre">opt</span></code> directory containing a <code class="docutils literal notranslate"><span class="pre">rose-app-chocolate.conf</span></code> file
+containing the following configuration:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="nv">FLAVOUR</span><span class="o">=</span><span class="s">chocolate</span>
+</pre></div>
+</div>
+<p>Next we need to tell <a class="reference internal" href="../../../api/command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a> to use the <code class="docutils literal notranslate"><span class="pre">chocolate</span></code>
+optional configuration. We can do this in one of two ways:</p>
+<ol class="arabic simple">
+<li>Using the <code class="docutils literal notranslate"><span class="pre">--opt-conf-key</span></code> option.</li>
+<li>Using the <span class="target" id="index-0"></span><a class="reference internal" href="../../../api/environment-variables.html#envvar-ROSE_APP_OPT_CONF_KEYS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_APP_OPT_CONF_KEYS</span></code></a> environment variable.</li>
+</ol>
+<p>Run the app using the <code class="docutils literal notranslate"><span class="pre">chocolate</span></code> optional configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">run</span> <span class="o">-</span><span class="n">q</span> <span class="o">--</span><span class="n">opt</span><span class="o">-</span><span class="n">conf</span><span class="o">-</span><span class="n">key</span><span class="o">=</span><span class="n">chocolate</span>
+</pre></div>
+</div>
+<p>You should see the following output:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>I&#39;d like to order a chocolate ice cream in a regular-cone with no toppings.
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">chocolate</span></code> optional configuration has overwritten the <code class="docutils literal notranslate"><span class="pre">FLAVOUR</span></code>
+environment variable from the <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="using-multiple-optional-configurations">
+
+<h2>Using Multiple Optional Configurations<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/optional-configurations.html#using-multiple-optional-configurations" title="View HTML">§</a></h2>
+
+<p>It is possible to use multiple optional configurations at the same time.</p>
+<p>Create a new optional configuration called <code class="docutils literal notranslate"><span class="pre">flake</span></code> containing the following
+configuration:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="nv">TOPPING</span><span class="o">=</span><span class="s">one chocolate flake</span>
+</pre></div>
+</div>
+<p>Run the app using both the <code class="docutils literal notranslate"><span class="pre">chocolate</span></code> and <code class="docutils literal notranslate"><span class="pre">flake</span></code> optional configurations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">run</span> <span class="o">-</span><span class="n">q</span> <span class="o">--</span><span class="n">opt</span><span class="o">-</span><span class="n">conf</span><span class="o">-</span><span class="n">key</span><span class="o">=</span><span class="n">chocolate</span> <span class="o">--</span><span class="n">opt</span><span class="o">-</span><span class="n">conf</span><span class="o">-</span><span class="n">key</span><span class="o">=</span><span class="n">flake</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">FLAVOUR</span></code> environment variable will be overwritten by the <code class="docutils literal notranslate"><span class="pre">chocolate</span></code>
+configuration and the <code class="docutils literal notranslate"><span class="pre">TOPPING</span></code> variable by the <code class="docutils literal notranslate"><span class="pre">flake</span></code> configuration.</p>
+<p>Next create a new optional configuration called <code class="docutils literal notranslate"><span class="pre">fudge-sundae</span></code> containing the
+following lines:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="nv">FLAVOUR</span><span class="o">=</span><span class="s">fudge</span>
+<span class="nv">CONE_TYPE</span><span class="o">=</span><span class="s">tub</span>
+<span class="nv">TOPPINGS</span><span class="o">=</span><span class="s">nuts</span>
+</pre></div>
+</div>
+<p>Run the app using both the <code class="docutils literal notranslate"><span class="pre">chocolate</span></code> and <code class="docutils literal notranslate"><span class="pre">fudge-sundae</span></code> optional
+configurations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">run</span> <span class="o">-</span><span class="n">q</span> <span class="o">--</span><span class="n">opt</span><span class="o">-</span><span class="n">conf</span><span class="o">-</span><span class="n">key</span><span class="o">=</span><span class="n">fudge</span><span class="o">-</span><span class="n">sundae</span> <span class="o">--</span><span class="n">opt</span><span class="o">-</span><span class="n">conf</span><span class="o">-</span><span class="n">key</span><span class="o">=</span><span class="n">chocolate</span>
+</pre></div>
+</div>
+<p>You should see the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>I&#39;d like to order a chocolate icecream in a tub with nuts.
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">chocolate</span></code> configuration has overwritten the <code class="docutils literal notranslate"><span class="pre">FLAVOUR</span></code> environment
+variable from the <code class="docutils literal notranslate"><span class="pre">fudge</span> <span class="pre">sundae</span></code> configuration. This is because optional
+configurations as applied first to last so in this case the <code class="docutils literal notranslate"><span class="pre">chocolate</span></code>
+configuration was loaded last.</p>
+<p>To see how the optional configurations would be applied use the
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-config"><span class="std std-ref">rose config</span></a> command providing the configuration files in the
+order they would be loaded:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">config</span> <span class="o">--</span><span class="n">file</span> <span class="n">rose</span><span class="o">-</span><span class="n">app</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">file</span> <span class="n">opt</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">app</span><span class="o">-</span><span class="n">fudge</span><span class="o">-</span><span class="n">sundae</span> <span class="o">--</span><span class="n">file</span> <span class="n">chocolate</span>
+</pre></div>
+</div>
+<p>You should see:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">echo &quot;I&#39;d like to order a $FLAVOUR icecream in a $CONE_TYPE&quot; \</span>
+       <span class="o">=</span><span class="s">&quot;with $TOPPING toppings&quot;</span>
+
+<span class="nt">[env]</span>
+<span class="nv">CONE_TYPE</span><span class="o">=</span><span class="s">tub</span>
+<span class="nv">FLAVOUR</span><span class="o">=</span><span class="s">chocolate</span>
+<span class="nv">TOPPING</span><span class="o">=</span><span class="s">nuts</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Optional configurations specified using the <span class="target" id="index-1"></span><a class="reference internal" href="../../../api/environment-variables.html#envvar-ROSE_APP_OPT_CONF_KEYS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_APP_OPT_CONF_KEYS</span></code></a>
+environment variable are loaded before those specified using the
+<code class="docutils literal notranslate"><span class="pre">--opt-conf-key</span></code> command line option.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="using-optional-configurations-by-default">
+
+<h2>Using Optional Configurations By Default<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/optional-configurations.html#using-optional-configurations-by-default" title="View HTML">§</a></h2>
+
+<p>Optional configurations can be switched on by default using the <code class="docutils literal notranslate"><span class="pre">opt</span></code> setting.</p>
+<p>Add the following line at the top of the <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">opts</span><span class="o">=</span><span class="s">chocolate</span>
+</pre></div>
+</div>
+<p>Now the <code class="docutils literal notranslate"><span class="pre">chocolate</span></code> optional configuration will <em>always</em> be turned on. For this
+reason its generally better to use the <code class="docutils literal notranslate"><span class="pre">--opt-conf-key</span></code> setting or
+<span class="target" id="index-2"></span><a class="reference internal" href="../../../api/environment-variables.html#envvar-ROSE_APP_OPT_CONF_KEYS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_APP_OPT_CONF_KEYS</span></code></a> environment variable instead.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="other-optional-configurations">
+
+<h2>Other Optional Configurations<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/optional-configurations.html#other-optional-configurations" title="View HTML">§</a></h2>
+
+<p>All Rose configurations can have optional configurations, not just application
+configurations.</p>
+<ul class="simple">
+<li>Suites can have optional configurations that override
+<a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> settings, controlled through
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>. Optional suite configurations
+can be used either using the <code class="docutils literal notranslate"><span class="pre">--opt-conf-key</span></code> option with
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> or the <span class="target" id="index-3"></span><a class="reference internal" href="../../../api/environment-variables.html#envvar-ROSE_SUITE_OPT_CONF_KEYS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_SUITE_OPT_CONF_KEYS</span></code></a>
+environment variable.</li>
+<li>Metadata configurations can also have optional configurations, typically
+included via the <code class="docutils literal notranslate"><span class="pre">opts</span></code> top-level setting.</li>
+</ul>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

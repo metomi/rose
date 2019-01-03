@@ -1,0 +1,399 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Stem Tutorial &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="Rose Stem" href="../rose-stem.html" />
+    <link rel="next" title="Trigger" href="../trigger.html" />
+    <link rel="prev" title="Rose Stem" href="../rose-stem.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-stem-tutorial">
+
+<h1>Rose Stem Tutorial<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#rose-stem-tutorial" title="View HTML">§</a></h1>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Before proceeding you should already be familiar with the <a class="reference internal" href="../rose-stem.html#rose-stem"><span class="std std-ref">Rose Stem</span></a>
+section.</p>
+</div>
+<a class="reference internal image-reference" href="http://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Cassini_Saturn_Orbit_Insertion.jpg/320px-Cassini_Saturn_Orbit_Insertion.jpg"><img alt="Artist's Impression of Cassini entering Saturn orbit" class="align-right" src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Cassini_Saturn_Orbit_Insertion.jpg/320px-Cassini_Saturn_Orbit_Insertion.jpg" style="width: 300px;" /></a>
+<p>This tutorial will walk you through creating a simple example of the
+Rose Stem testing system which will involve piloting a spaceship
+through space.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="getting-started">
+
+<h2>Getting Started<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#getting-started" title="View HTML">§</a></h2>
+
+<p>We will start the Rose Stem tutorial by setting up an <a class="reference external" href="https://metomi.github.io/fcm/doc/">FCM</a> repository
+called <code class="docutils literal notranslate"><span class="pre">SPACESHIP</span></code> to store the code and test suite in.</p>
+<p>Usually you would add a Rose Stem suite to an existing repository with
+the <a class="reference external" href="https://metomi.github.io/fcm/doc/user_guide/code_management.html#svn_basic_keywords">keyword</a> already set up to test the accompanying source code. For the
+purposes of this tutorial we will create a new one.</p>
+<p>Type the follow to create a temporary repository (you can safely delete
+it after finishing this tutorial):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>mkdir -p ~/rose-tutorial
+svnadmin create ~/rose-tutorial/spaceship_repos
+(cd $(mktemp -d); mkdir -p trunk/src; svn import -m &quot;&quot; . file://$HOME/rose-tutorial/spaceship_repos)
+</pre></div>
+</div>
+<p>We then need to link the project name <code class="docutils literal notranslate"><span class="pre">SPACESHIP</span></code> with this project.
+Creating the file and directory if they do not exist
+add the following line to the file <code class="docutils literal notranslate"><span class="pre">$HOME/.metomi/fcm/keyword.cfg</span></code>:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">location{primary}[spaceship] </span><span class="o">=</span> <span class="s">file:///home/user/rose-tutorial/spaceship_repos</span>
+</pre></div>
+</div>
+<p>Make sure the path on the right-hand side matches the location you
+specified in the <code class="docutils literal notranslate"><span class="pre">svnadmin</span></code> command.</p>
+<p>Now you can checkout a working copy of your repository by typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">spaceship_working_copy</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">spaceship_working_copy</span>
+<span class="n">fcm</span> <span class="n">checkout</span> <span class="n">fcm</span><span class="p">:</span><span class="n">spaceship_tr</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>Finally populate your working copy by running (answering <code class="docutils literal notranslate"><span class="pre">y</span></code> to the prompt):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">rose</span><span class="o">-</span><span class="n">stem</span> <span class="o">.</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="spaceship-command-f90">
+
+<h2><code class="docutils literal notranslate"><span class="pre">spaceship_command.f90</span></code><a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#spaceship-command-f90" title="View HTML">§</a></h2>
+
+<p>Our Fortran program is <code class="docutils literal notranslate"><span class="pre">spaceship_command.f90</span></code>, which reads in an
+initial position and spaceship mass from one namelist, and a series
+of commands to apply thrust in three-dimensional space. It then uses
+Newtonian mechanics to calculate a final position.</p>
+<p>You will find it in the <code class="docutils literal notranslate"><span class="pre">src</span></code> directory. Have a look at it and see
+what it does.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-spaceship-app">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">spaceship</span></code> app<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#the-spaceship-app" title="View HTML">§</a></h2>
+
+<p>Create a new Rose app called <code class="docutils literal notranslate"><span class="pre">spaceship</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="n">rose</span><span class="o">-</span><span class="n">stem</span><span class="o">/</span><span class="n">app</span><span class="o">/</span><span class="n">spaceship</span>
+</pre></div>
+</div>
+<p>Paste the following configuration into a <a class="reference internal" href="../../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file within
+that directory:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">spaceship_command.exe</span>
+
+<span class="nt">[file:spaceship.NL]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">namelist:spaceship</span>
+
+<span class="nt">[file:command.NL]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">namelist:command</span>
+
+<span class="nt">[namelist:spaceship]</span>
+<span class="nv">mass</span><span class="o">=</span><span class="s">2.0</span>
+<span class="nv">position</span><span class="o">=</span><span class="s">0.0,0.0,0.0</span>
+
+<span class="nt">[namelist:command]</span>
+<span class="nv">thrust(1,:) </span><span class="o">=</span>  <span class="s">1.0,  0.0, 0.0, 1.0,  0.0, -1.0, -1.0, 0.0, 0.0,  0.0</span>
+<span class="nv">thrust(2,:) </span><span class="o">=</span>  <span class="s">0.0, -2.0, 0.0, 1.0,  1.0,  0.5, -1.0, 1.5, 0.0, -1.0</span>
+<span class="nv">thrust(3,:) </span><span class="o">=</span>  <span class="s">0.0,  1.0, 0.0, 1.0, -1.0,  1.0, -1.5, 0.0, 0.0, -0.5</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-fcm-make-app">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">fcm-make</span></code> app<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#the-fcm-make-app" title="View HTML">§</a></h2>
+
+<p>We now need to provide the instructions for <a class="reference internal" href="../../../../api/built-in/fcm_make.html#rose:app:fcm_make" title="rose:app:fcm_make"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">fcm_make</span></code></a> to build the
+Fortran executable.</p>
+<p>Create a new app called <code class="docutils literal notranslate"><span class="pre">fcm_make_spaceship</span></code> with an empty
+<a class="reference internal" href="../../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file.</p>
+<p>Inside this app create a subdirectory called <code class="docutils literal notranslate"><span class="pre">file</span></code> and paste the following
+into the <code class="docutils literal notranslate"><span class="pre">fcm-make.cfg</span></code> file within that directory:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">steps</span> <span class="o">=</span> <span class="s">build</span>
+<span class="na">build.source</span> <span class="o">=</span> <span class="s">$SOURCE_SPACESHIP/src</span>
+<span class="na">build.target{task}</span> <span class="o">=</span> <span class="s">link</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">$SOURCE_SPACESHIP</span></code> environment variable will be set using the
+Jinja2 variable of the same name which is provided by Rose Stem.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-suite-rc-file">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#the-suite-rc-file" title="View HTML">§</a></h2>
+
+<p>Next we will look at the <code class="docutils literal notranslate"><span class="pre">rose-stem/suite.rc</span></code> file.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file starts off with <code class="docutils literal notranslate"><span class="pre">UTC</span> <span class="pre">mode</span> <span class="pre">=</span> <span class="pre">True</span></code>, which you
+should already be <a class="reference internal" href="../../../cylc/scheduling/datetime-cycling.html#tutorial-cylc-datetime-utc"><span class="std std-ref">familiar with</span></a>.
+The next part is a Jinja2 block which links the group names the user
+can specify with the <a class="reference internal" href="../../../../glossary.html#term-graph"><span class="xref std std-term">graph</span></a> for that group. In this
+case, the group <code class="docutils literal notranslate"><span class="pre">command_spaceship</span></code> gives you the graph:</p>
+<div align="center" class="align-center"><object data="../../../../_images/graphviz-d18daa29061a38edb91a06fceae32a94a8bb0aae.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+fcm_make_spaceship -&gt; spaceship -&gt; rose_ana_position
+}</p></object>
+</div>
+<p>This variable <code class="docutils literal notranslate"><span class="pre">name_graphs</span></code> is used later to generate the graph when
+the suite is run. The Jinja2 variable <code class="docutils literal notranslate"><span class="pre">groups</span></code> is next. This enables you
+to set shortcuts to a list of groups, in this case specifying <code class="docutils literal notranslate"><span class="pre">all</span></code> on the
+command line will run the tasks associated with both <code class="docutils literal notranslate"><span class="pre">command_spaceship</span></code>
+and <code class="docutils literal notranslate"><span class="pre">fire_lasers</span></code>.</p>
+<p>The scheduling section contains the Jinja2 code to use the information we
+have already set to generate the graph based on what the user
+requested on the command line.</p>
+<p>The runtime section should be familiar. Note, however, that the
+<code class="docutils literal notranslate"><span class="pre">fcm_make_spaceship</span></code> task sets the environment variable
+<code class="docutils literal notranslate"><span class="pre">SOURCE_SPACESHIP</span></code> from the Jinja2 variable of the same name. This
+is how the variables passed with <code class="docutils literal notranslate"><span class="pre">--source</span></code> on the command line are
+passed to <code class="docutils literal notranslate"><span class="pre">fcm-make</span></code>, which then uses these environment variables in
+its own configuration files.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-rose-suite-conf-file">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#the-rose-suite-conf-file" title="View HTML">§</a></h2>
+
+<p>The suites associated with Rose Stem require a version number
+indicating the version of the <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">stem</span></code> command with which they
+are compatible. This is specified in the <a class="reference internal" href="../../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file,
+together with the default values of <code class="docutils literal notranslate"><span class="pre">RUN_NAMES</span></code> and <code class="docutils literal notranslate"><span class="pre">SOURCE_SPACESHIP</span></code>.
+Paste the following into your <a class="reference internal" href="../../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">ROSE_STEM_VERSION</span><span class="o">=</span><span class="s">1</span>
+
+<span class="nt">[jinja2:suite.rc]</span>
+<span class="nv">RUN_NAMES</span><span class="o">=</span><span class="s">[]</span>
+<span class="nv">SOURCE_SPACESHIP</span><span class="o">=</span><span class="s">&#39;fcm:spaceship_tr@head&#39;</span>
+</pre></div>
+</div>
+<p>Both of the Jinja2 variables will be overridden by the user when they
+execute <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">stem</span></code> on the command line.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-rose-ana-position-app">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">rose_ana_position</span></code> app<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#the-rose-ana-position-app" title="View HTML">§</a></h2>
+
+<p>The final component is a <a class="reference internal" href="../../../../api/built-in/rose_ana.html#rose:app:rose_ana" title="rose:app:rose_ana"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_ana</span></code></a> app to test whether the position
+of our spaceship matches the correct output.</p>
+<p>Create an app named <code class="docutils literal notranslate"><span class="pre">rose_ana_position</span></code> and paste the following into its
+<a class="reference internal" href="../../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file.</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[ana:grepper.FilePattern(Check X position at each timestep)]</span>
+<span class="nv">pattern</span><span class="o">=</span><span class="s">&#39;^\s*Position:\s*(.*?)\s*,&#39;</span>
+<span class="nv">files</span><span class="o">=</span><span class="s">/home/user/spaceship/kgo.txt</span>
+     <span class="o">=</span><span class="s">../spaceship/output.txt</span>
+
+<span class="nt">[ana:grepper.FilePattern(Check Y position at each timestep)]</span>
+<span class="nv">pattern</span><span class="o">=</span><span class="s">&#39;^\s*Position:.*?,\s*(.*?)\s*,&#39;</span>
+<span class="nv">files</span><span class="o">=</span><span class="s">/home/user/spaceship/kgo.txt</span>
+     <span class="o">=</span><span class="s">../spaceship/output.txt</span>
+
+<span class="nt">[ana:grepper.FilePattern(Check Z position at each timestep)]</span>
+<span class="nv">pattern</span><span class="o">=</span><span class="s">&#39;^\s*Position:.*,\s*(.*)\s*$&#39;</span>
+<span class="nv">files</span><span class="o">=</span><span class="s">/home/user/spaceship/kgo.txt</span>
+     <span class="o">=</span><span class="s">../spaceship/output.txt</span>
+</pre></div>
+</div>
+<p>This will check that the positions reported by the program match those
+within the known good output file.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="known-good-output">
+
+<h2>Known Good Output<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#known-good-output" title="View HTML">§</a></h2>
+
+<p>In the root of the working copy is a file called <code class="docutils literal notranslate"><span class="pre">kgo.txt</span></code>.</p>
+<p>The known good output should be the result of a control run. Rose Ana
+will compare the answers from this file (obtained using the extract and
+comparison methods in the <a class="reference internal" href="../../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file) with the results
+from the user’s code change.</p>
+<p>Replace the <code class="docutils literal notranslate"><span class="pre">/home/user/spaceship</span></code> paths in the <code class="docutils literal notranslate"><span class="pre">rose_ana_position</span></code>
+app with the path to this file.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="adding-the-suite-to-version-control">
+
+<h2>Adding the suite to version control<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#adding-the-suite-to-version-control" title="View HTML">§</a></h2>
+
+<p>Before running the suite we need to make sure that all the files and
+directories we have created are known to the version control system.</p>
+<p>Add all the new files you’ve created using <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">add</span> <span class="pre">-c</span></code> <em>(answer yes
+to the prompts)</em>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="running-the-test-suite">
+
+<h2>Running the test suite<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#running-the-test-suite" title="View HTML">§</a></h2>
+
+<p>We should now be able to run the test suite. Simply type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">stem</span> <span class="o">--</span><span class="n">group</span><span class="o">=</span><span class="n">command_spaceship</span>
+</pre></div>
+</div>
+<p>anywhere in your working copy (the <code class="docutils literal notranslate"><span class="pre">--source</span></code> argument defaults to <code class="docutils literal notranslate"><span class="pre">.</span></code>
+so it should automatically pick up your working copy as the source).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If your site uses a Cylc server, and your home directory is not shared
+with the Cylc server, you will need to add the option:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">host</span><span class="o">=</span><span class="n">localhost</span>
+</pre></div>
+</div>
+</div>
+<p>We use <code class="docutils literal notranslate"><span class="pre">--group</span></code> in preference to <code class="docutils literal notranslate"><span class="pre">--task</span></code> in this suite (both are
+synonymous) as we specify a group of tasks set up in the Jinja2 variable
+<code class="docutils literal notranslate"><span class="pre">name_graphs</span></code>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="a-failing-test">
+
+<h2>A failing test<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#a-failing-test" title="View HTML">§</a></h2>
+
+<p>Now edit the file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span><span class="o">-</span><span class="n">stem</span><span class="o">/</span><span class="n">app</span><span class="o">/</span><span class="n">spaceship</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">app</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>and change one of the thrusts, then rerun <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">stem</span></code>. You will find the
+<code class="docutils literal notranslate"><span class="pre">rose_ana_position</span></code> task fails, as the results have changed.</p>
+<p>Try modifying the Fortran source code - for example, changing the direction
+in which thrust is applied (by changing the acceleration to be subtracted
+from the velocity rather than added). Again, rerun <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">stem</span></code>, and see
+the failure.</p>
+<p>In this way, you can monitor whether the behaviour of code is changed by
+any of the code alterations you have made.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="further-exercises">
+
+<h2>Further Exercises<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#further-exercises" title="View HTML">§</a></h2>
+
+<p>If you wish, you can try extending the suite to include the <code class="docutils literal notranslate"><span class="pre">fire_lasers</span></code>
+group of tasks which was in the list of groups in the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file.
+Using the same technique as we’ve just demonstrated for piloting the
+spaceship, you should be able to aim and fire the ship’s weapons.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="automatic-options">
+
+<h2>Automatic Options<a class="headerlink" href="../../../../../html/tutorial/rose/furthertopics/rose-stem/tutorial.html#automatic-options" title="View HTML">§</a></h2>
+
+<p>It is possible to automatically add options to <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">stem</span></code> using the
+<a class="reference internal" href="../../../../api/configuration/site-and-user.html#rose:conf:rose.conf[rose-stem]automatic-options" title="rose:conf:rose.conf[rose-stem]automatic-options"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose.conf[rose-stem]automatic-options</span></code></a> variable in the
+<a class="reference internal" href="../../../../api/configuration/site-and-user.html#site-and-user-configuration"><span class="std std-ref">Site And User Configuration</span></a> file.
+This takes the syntax of key-value pairs on a single
+line, and is functionally equivalent to adding them using the <code class="docutils literal notranslate"><span class="pre">-S</span></code>
+option on the <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">stem</span></code> command line. For example:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[rose-stem]</span>
+<span class="nv">automatic-options</span><span class="o">=</span><span class="s">GRAVITY=newtonian PLANET=jupiter</span>
+</pre></div>
+</div>
+<p>sets the variable <code class="docutils literal notranslate"><span class="pre">GRAVITY</span></code> to have the value <code class="docutils literal notranslate"><span class="pre">newtonian</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">PLANET</span></code> to be <code class="docutils literal notranslate"><span class="pre">jupiter</span></code>. These can then be used in the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code>
+file as Jinja2 variables.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Consolidating Configuration &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="Runtime" href="../index.html" />
+    <link rel="next" title="Families" href="families.html" />
+    <link rel="prev" title="Runtime Configuration" href="../runtime-configuration.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="consolidating-configuration">
+
+<h1>Consolidating Configuration<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/index.html#consolidating-configuration" title="View HTML">§</a></h1>
+
+
+
+
+
+</article>
+<article class="admonition-weather-forecasting-suite slide level-2">
+
+<h2>Weather Forecasting Suite</h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[get_observations_heathrow]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3772</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+    <span class="nt">[[get_observations_camborne]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3808</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+    <span class="nt">[[get_observations_shetland]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3005</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+    <span class="nt">[[get_observations_belmullet]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3976</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="admonition-weather-forecasting-suite slide level-2">
+
+<h2>Weather Forecasting Suite</h2>
+
+<p>Repetition</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">script</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">API_KEY</span></code></li>
+</ul>
+
+
+
+
+</article>
+<article class="admonition-weather-forecasting-suite slide level-2">
+
+<h2>Weather Forecasting Suite</h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nt">[[[T00/PT3H]]]</span>
+            <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+                <span class="kd">get_observations_belmullet</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+                <span class="kd">get_observations_camborne</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+                <span class="kd">get_observations_heathrow</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+                <span class="kd">get_observations_shetland</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+            <span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-1" id="id1">
+
+<h1>Consolidating Configuration<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/index.html#id1" title="View HTML">§</a></h1>
+
+<p>Cylc offers three ways of consolidating configurations to help improve the
+structure of a suite and avoid duplication.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="families.html">Families</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jinja2.html">Jinja2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameterised Tasks</a></li>
+</ul>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-cylc-get-config-command">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code> Command<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/index.html#the-cylc-get-config-command" title="View HTML">§</a></h2>
+
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc get-config <span class="s">&lt;path&gt;</span> --sparse
+</pre></div>
+</div>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># Print the contents of the [scheduling] section.</span>
+cylc get-config <span class="s">&lt;path&gt;</span> --sparse -i &#39;[scheduling]&#39;
+<span class="c"># Print the contents of the get_observations_heathrow task.</span>
+cylc get-config <span class="s">&lt;path&gt;</span> --sparse -i &#39;[runtime][get_observations_heathrow]&#39;
+<span class="c"># Print the value of the script setting in the get_observations_heathrow task</span>
+cylc get-config <span class="s">&lt;path&gt;</span> --sparse -i &#39;[runtime][get_observations_heathrow]script&#39;
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code> Command<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/index.html#id2" title="View HTML">§</a></h2>
+
+<p>Note that <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code> doesn’t expand families or parameterisations
+in the <a class="reference internal" href="../../../../glossary.html#term-graph"><span class="xref std std-term">graph</span></a>. Use <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code> to visualise these.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-three-approaches">
+
+<h2>The Three Approaches<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/index.html#the-three-approaches" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li><a class="reference internal" href="families.html#tutorial-cylc-families"><span class="std std-ref">families</span></a></li>
+<li><a class="reference internal" href="jinja2.html#tutorial-cylc-jinja2"><span class="std std-ref">jinja2</span></a></li>
+<li><a class="reference internal" href="parameters.html#tutorial-cylc-parameterisation"><span class="std std-ref">parameters</span></a></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="which-approach-to-use">
+
+<h2>Which Approach To Use<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/index.html#which-approach-to-use" title="View HTML">§</a></h2>
+
+<p>As a rule of thumb each method works best for:</p>
+<dl class="docutils">
+<dt>Families</dt>
+<dd>Collecting tasks into broad groups.</dd>
+<dt>Jinja2</dt>
+<dd>Configuration settings which apply to the entire suite.</dd>
+<dt>Parameterisation</dt>
+<dd>Tasks which are similar.</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Which Approach To Use<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/index.html#id3" title="View HTML">§</a></h2>
+
+<p>Next section: <a class="reference internal" href="../../../rose/configurations.html#tutorial-rose-configurations"><span class="std std-ref">Rose Tutorial</span></a></p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

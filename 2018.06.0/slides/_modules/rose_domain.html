@@ -1,0 +1,978 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rose_domain &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <h1>Source code for rose_domain</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># (C) British Crown Copyright 2012-8 Met Office.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Rose, a framework for meteorological suites.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Rose. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;The Rose domain is for documenting Rose configurations and built-in</span>
+<span class="sd">applications.</span>
+
+<span class="sd">Rose Objects:</span>
+<span class="sd">    The Rose domain supports the following object types:</span>
+
+<span class="sd">    * ``rose:app`` - Rose Applications.</span>
+<span class="sd">    * ``rose:file`` - Root Rose configurations.</span>
+<span class="sd">    * ``rose:conf`` - Rose configurations. Nest them to create configuration</span>
+<span class="sd">      sections.</span>
+
+<span class="sd">    See the corresponding directives for more information on each object type.</span>
+
+<span class="sd">Reference Syntax:</span>
+<span class="sd">    Once documented, objects can be referenced using the following syntax:</span>
+
+<span class="sd">    .. code-block:: none</span>
+
+<span class="sd">        :rose:CONFIG-FILE[parent-section]child-config</span>
+<span class="sd">        :rose:CONFIG-FILE|top-level-config</span>
+
+<span class="sd">    Where ``CONFIG-FILE`` is:</span>
+
+<span class="sd">    * The ``APP-NAME`` for applications (e.g. ``fcm_make``).</span>
+<span class="sd">    * The ``FILE-NAME`` for configuration files (e.g. ``rose.conf``).</span>
+
+<span class="sd">Referencing From RST Files:</span>
+<span class="sd">    To reference a Rose object add the object ``TYPE`` into the domain</span>
+<span class="sd">    (e.g. ``conf`` or ``app``).</span>
+
+<span class="sd">    .. code-block:: rst</span>
+
+<span class="sd">       :rose:TYPE:`CONFIG-FILE[parent-section]child-config`</span>
+
+<span class="sd">    e.g:</span>
+
+<span class="sd">    .. code-block:: rst</span>
+
+<span class="sd">       * :rose:app:`fcm_make`</span>
+<span class="sd">       * :rose:conf:`fcm_make.args`</span>
+
+<span class="sd">Autodocumentation:</span>
+<span class="sd">    Documentation can be auto-built from RST formatted comments in Rose</span>
+<span class="sd">    configuration files using the ``autoconfig`` directive.</span>
+
+<span class="sd">    Note that due to the implementation of :py:mod:`rose.config` the</span>
+<span class="sd">    autodocumenter will represent empty sections as top level configuration</span>
+<span class="sd">    nodes.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    .. code-block:: rst</span>
+
+<span class="sd">       .. rose:file:: rose-suite.conf</span>
+
+<span class="sd">          The config file used for configuring suite level settings.</span>
+
+<span class="sd">          .. rose:conf:: jinja2:suite.rc</span>
+
+<span class="sd">             A section for specifying Jinja2 settings for use in the</span>
+<span class="sd">             ``suite.rc`` file.</span>
+
+<span class="sd">             Note that one ommits the square brackets for config sections. If</span>
+<span class="sd">             :rose:conf: contains other :rose:conf:&#39;s then it is implicitly a</span>
+<span class="sd">             section and the brackets are added automatically. If you wish to</span>
+<span class="sd">             document a section which contains no settings write it using</span>
+<span class="sd">             square brackets.</span>
+
+<span class="sd">             .. rose:conf:: ROSE_VERSION</span>
+
+<span class="sd">                provide the intended Rose version to the suite.</span>
+
+<span class="sd">                .. deprecated:: 6.1.0</span>
+
+<span class="sd">                   No longer required, this context is now provided internally.</span>
+
+<span class="sd">             .. rose:conf:: CYLC_VERSION</span>
+
+<span class="sd">                provide the intended Rose version to the suite.</span>
+
+<span class="sd">                .. deprecated:: 6.1.0</span>
+
+<span class="sd">                   See :rose:conf:`ROSE_VERSION`.</span>
+
+<span class="sd">                   ..            ^ relative reference</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">docutils.nodes</span> <span class="k">import</span> <span class="n">block_quote</span>
+<span class="kn">from</span> <span class="nn">docutils.parsers.rst</span> <span class="k">import</span> <span class="n">Directive</span>
+<span class="kn">from</span> <span class="nn">docutils.statemachine</span> <span class="k">import</span> <span class="n">StringList</span>
+
+<span class="kn">from</span> <span class="nn">sphinx</span> <span class="k">import</span> <span class="n">addnodes</span>
+<span class="kn">from</span> <span class="nn">sphinx.directives</span> <span class="k">import</span> <span class="n">ObjectDescription</span>
+<span class="kn">from</span> <span class="nn">sphinx.domains</span> <span class="k">import</span> <span class="n">Domain</span><span class="p">,</span> <span class="n">ObjType</span>
+<span class="kn">from</span> <span class="nn">sphinx.roles</span> <span class="k">import</span> <span class="n">XRefRole</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.nodes</span> <span class="k">import</span> <span class="n">make_refnode</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.docfields</span> <span class="k">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">TypedField</span>
+
+<span class="kn">from</span> <span class="nn">rose</span> <span class="k">import</span> <span class="n">config</span>
+
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">ROSE_DOMAIN_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>  <span class="c1"># Regex for a fully qualified Rose domain.</span>
+    <span class="sa">r</span><span class="s1">&#39;rose:(\w+):&#39;</span>    <span class="c1"># Rose domain prefix + object type.</span>
+    <span class="sa">r</span><span class="s1">&#39;([^\|\[ \n]+)&#39;</span>  <span class="c1"># Configuration file.</span>
+    <span class="sa">r</span><span class="s1">&#39;(\[.*\])?&#39;</span>      <span class="c1"># Configuration section.</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:\|?(.*))?&#39;</span>   <span class="c1"># Configuration setting.</span>
+<span class="p">)</span>
+<span class="n">SECTION_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>  <span class="c1"># Regex for splitting sections and settings.</span>
+    <span class="sa">r</span><span class="s1">&#39;(\[.*\])(.*)&#39;</span>
+<span class="p">)</span>
+<span class="n">OPT_ARG_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>  <span class="c1"># Regex for splitting domains and arguments</span>
+    <span class="sa">r</span><span class="s1">&#39;(^(?:[^\[\|=]+)?&#39;</span>  <span class="c1"># Configuration file.</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:\[[^\]]+\])?&#39;</span>   <span class="c1"># Configuration section.</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:[^=]+)?)&#39;</span>       <span class="c1"># Configuration setting.</span>
+    <span class="sa">r</span><span class="s1">&#39;(?:=(.*))?$&#39;</span>       <span class="c1"># Argument.</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">tokenise_namespace</span><span class="p">(</span><span class="n">namespace</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a namespace string into a list of tokens.</span>
+
+<span class="sd">    Tokens are (domain, name) tuples.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        # Partial namespaces.</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:conf:foo&#39;)</span>
+<span class="sd">        [(&#39;rose:conf&#39;, &#39;foo&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:conf:[foo]&#39;)</span>
+<span class="sd">        [(&#39;rose:conf&#39;, &#39;[foo]&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:conf:[foo]bar&#39;)</span>
+<span class="sd">        [(&#39;rose:conf&#39;, &#39;[foo]&#39;), (&#39;rose:conf&#39;, &#39;bar&#39;)]</span>
+
+<span class="sd">        # Full namespaces.</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:app:foo&#39;)</span>
+<span class="sd">        [(&#39;rose:app&#39;, &#39;foo&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:file:foo.conf&#39;)</span>
+<span class="sd">        [(&#39;rose:file&#39;, &#39;foo.conf&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:conf:foo|bar&#39;)</span>
+<span class="sd">        [(&#39;rose:app&#39;, &#39;foo&#39;), (&#39;rose:conf&#39;, &#39;bar&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:conf:foo[bar]&#39;)</span>
+<span class="sd">        [(&#39;rose:app&#39;, &#39;foo&#39;), (&#39;rose:conf&#39;, &#39;[bar]&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:conf:foo[bar]baz&#39;)</span>
+<span class="sd">        [(&#39;rose:app&#39;, &#39;foo&#39;), (&#39;rose:conf&#39;, &#39;[bar]&#39;), (&#39;rose:conf&#39;, &#39;baz&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; tokenise_namespace(&#39;rose:conf:foo.conf[bar:pub]baz&#39;</span>
+<span class="sd">        ... ) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [(&#39;rose:file&#39;, &#39;foo.conf&#39;), (&#39;rose:conf&#39;, &#39;[bar:pub]&#39;),</span>
+<span class="sd">        (&#39;rose:conf&#39;, &#39;baz&#39;)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">ROSE_DOMAIN_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+
+    <span class="n">domain</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">namespace</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">:])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+        <span class="c1"># Namespace is only partial, return it as a single configuration token.</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">setting</span> <span class="o">=</span> <span class="n">SECTION_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;rose:conf&#39;</span><span class="p">,</span> <span class="n">section</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">setting</span><span class="p">:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;rose:conf&#39;</span><span class="p">,</span> <span class="n">setting</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="n">typ</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">,</span> <span class="n">conf_section</span><span class="p">,</span> <span class="n">setting</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">typ</span> <span class="o">==</span> <span class="s1">&#39;conf&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">conf_section</span> <span class="ow">or</span> <span class="n">setting</span><span class="p">):</span>
+        <span class="c1"># Namespace is only partial, return it as a single configuration token.</span>
+        <span class="k">return</span> <span class="p">[((</span><span class="s1">&#39;rose:conf&#39;</span><span class="p">),</span> <span class="n">domain</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">typ</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;app&#39;</span><span class="p">]:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;rose:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">typ</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">conf_file</span><span class="p">:</span>
+        <span class="c1"># Must be a Rose config file.</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;rose:file&#39;</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Must be a Rose application.</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;rose:app&#39;</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">conf_section</span><span class="p">:</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;rose:conf&#39;</span><span class="p">,</span> <span class="n">conf_section</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">setting</span><span class="p">:</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;rose:conf&#39;</span><span class="p">,</span> <span class="n">setting</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">ret</span>
+
+
+<span class="k">def</span> <span class="nf">namespace_from_tokens</span><span class="p">(</span><span class="n">tokens</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a list of tokens into a string namespace.</span>
+
+<span class="sd">    Tokens are (domain, name) tuples.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">       &gt;&gt;&gt; namespace_from_tokens([(&#39;rose:app&#39;, &#39;foo&#39;)])</span>
+<span class="sd">       &#39;rose:app:foo&#39;</span>
+<span class="sd">       &gt;&gt;&gt; namespace_from_tokens([(&#39;rose:file&#39;, &#39;foo&#39;)])</span>
+<span class="sd">       &#39;rose:file:foo&#39;</span>
+<span class="sd">       &gt;&gt;&gt; namespace_from_tokens([(&#39;rose:app&#39;, &#39;foo&#39;), (&#39;rose:conf&#39;, &#39;bar&#39;)])</span>
+<span class="sd">       &#39;rose:conf:foo|bar&#39;</span>
+<span class="sd">       &gt;&gt;&gt; namespace_from_tokens([(&#39;rose:app&#39;, &#39;foo&#39;), (&#39;rose:conf&#39;, &#39;[bar]&#39;)])</span>
+<span class="sd">       &#39;rose:conf:foo[bar]&#39;</span>
+<span class="sd">       &gt;&gt;&gt; namespace_from_tokens([(&#39;rose:app&#39;, &#39;foo&#39;), (&#39;rose:conf&#39;, &#39;[bar]&#39;),</span>
+<span class="sd">       ...                        (&#39;rose:conf&#39;, &#39;baz&#39;)])</span>
+<span class="sd">       &#39;rose:conf:foo[bar]baz&#39;</span>
+<span class="sd">       &gt;&gt;&gt; namespace_from_tokens([(&#39;rose:file&#39;, &#39;foo.conf&#39;),</span>
+<span class="sd">       ...                        (&#39;rose:conf&#39;, &#39;[bar]&#39;),</span>
+<span class="sd">       ...                        (&#39;rose:conf&#39;, &#39;baz&#39;)])</span>
+<span class="sd">       &#39;rose:conf:foo.conf[bar]baz&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span>
+    <span class="n">previous_domain</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+        <span class="c1"># Root level configuration files.</span>
+        <span class="k">if</span> <span class="n">domain</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rose:app&#39;</span><span class="p">,</span> <span class="s1">&#39;rose:file&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">previous_domain</span><span class="p">:</span>
+                <span class="c1"># App must be a root domain.</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Invalid tokens &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">tokens</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">+=</span> <span class="n">name</span>
+
+        <span class="c1"># Rose configuration.</span>
+        <span class="k">elif</span> <span class="n">domain</span> <span class="o">==</span> <span class="s1">&#39;rose:conf&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">previous_domain</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rose:app&#39;</span><span class="p">,</span> <span class="s1">&#39;rose:file&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">):</span>
+                    <span class="c1"># section requires no separator</span>
+                    <span class="n">ret</span> <span class="o">+=</span> <span class="n">name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Setting requires `|` separator.</span>
+                    <span class="n">ret</span> <span class="o">+=</span> <span class="s1">&#39;|</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span>
+            <span class="k">elif</span> <span class="n">previous_domain</span> <span class="o">==</span> <span class="s1">&#39;rose:conf&#39;</span><span class="p">:</span>
+                <span class="c1"># Setting requires no separator if following a section.</span>
+                <span class="n">ret</span> <span class="o">+=</span> <span class="n">name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Invalid tokens &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">tokens</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Invalid tokens &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">tokens</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">previous_domain</span> <span class="o">=</span> <span class="n">domain</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+
+<span class="n">TOKEN_ORDER</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;rose:file&#39;</span><span class="p">,</span> <span class="s1">&#39;rose:file&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;rose:app&#39;</span><span class="p">,</span> <span class="s1">&#39;rose:app&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;rose:conf-section&#39;</span><span class="p">,</span> <span class="s1">&#39;rose:conf&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;rose:conf&#39;</span><span class="p">,</span> <span class="s1">&#39;rose:conf&#39;</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">tokens_from_ref_context</span><span class="p">(</span><span class="n">ref_context</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract a list of tokens from a ref_context dictionary.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; tokens_from_ref_context({&#39;rose:conf-section&#39;: &#39;[bar]&#39;,</span>
+<span class="sd">        ...                          &#39;rose:conf&#39;: &#39;baz&#39;,</span>
+<span class="sd">        ...                          &#39;rose:file&#39;: &#39;foo&#39;})</span>
+<span class="sd">        [(&#39;rose:file&#39;, &#39;foo&#39;), (&#39;rose:conf&#39;, &#39;[bar]&#39;), (&#39;rose:conf&#39;, &#39;baz&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; tokens_from_ref_context({&#39;rose:conf-section&#39;: &#39;[bar]&#39;,</span>
+<span class="sd">        ...                          &#39;rose:conf&#39;: &#39;baz&#39;,</span>
+<span class="sd">        ...                          &#39;rose:app&#39;: &#39;foo&#39;})</span>
+<span class="sd">        [(&#39;rose:app&#39;, &#39;foo&#39;), (&#39;rose:conf&#39;, &#39;[bar]&#39;), (&#39;rose:conf&#39;, &#39;baz&#39;)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Generate context namespace from ref_context.</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="p">[(</span><span class="n">v</span><span class="p">,</span> <span class="n">ref_context</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">TOKEN_ORDER</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ref_context</span><span class="p">]</span>
+    <span class="c1"># Remove any duplicate items (happens for conf-sections where you</span>
+    <span class="c1"># may get {&#39;rose:conf-section&#39;: &#39;[foo]&#39;, &#39;rose:conf&#39;: &#39;[foo]&#39;}.</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">ret</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">last</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">item</span> <span class="o">==</span> <span class="n">last</span><span class="p">:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">item</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+<div class="viewcode-block" id="RoseDirective"><a class="viewcode-back" href="../developing/domains.html#rose_domain.RoseDirective">[docs]</a><span class="k">class</span> <span class="nc">RoseDirective</span><span class="p">(</span><span class="n">ObjectDescription</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for implementing Rose objects.</span>
+
+<span class="sd">    Subclasses must provide:</span>
+<span class="sd">        - ``NAME``</span>
+
+<span class="sd">    Subclasses can provide:</span>
+<span class="sd">        - ``LABEL``</span>
+<span class="sd">        - ``ARGUMENT_SEPARATOR`` &amp; ``ARGUMENT_REGEX``</span>
+<span class="sd">        - ``ALT_FORM_SEPARATOR``</span>
+<span class="sd">        - ``ALT_FORM_TEMPLATE``</span>
+<span class="sd">        - ``doc_field_types`` - List of ``Field`` objects for object</span>
+<span class="sd">          parameters.</span>
+<span class="sd">        - ``run()`` - For adding special rev_context variables via</span>
+<span class="sd">          ``add_rev_context``.</span>
+<span class="sd">        - ``handle_signature()`` - For changing the display of objects.</span>
+<span class="sd">        - ``custom_name_template`` - String template accepting one string</span>
+<span class="sd">          format argument for custom formatting the node name (e.g. ``&#39;[%s]&#39;``</span>
+<span class="sd">          for conf sections).</span>
+
+<span class="sd">    ref_context Variables:</span>
+<span class="sd">        Sphinx domains use ``ref_context`` variables to determine the</span>
+<span class="sd">        relationship between objects. E.g. for a Rose app the ``rose:app``</span>
+<span class="sd">        variable is set to the name of the app. This variable will be made</span>
+<span class="sd">        available to all children which is how they determine that they belong</span>
+<span class="sd">        to the app.</span>
+
+<span class="sd">        * Variables set in ``run()`` are available to this object along with</span>
+<span class="sd">          all of its children.</span>
+<span class="sd">        * Variables set in ``before_content()`` are only available to children.</span>
+<span class="sd">        * All variables set via ``add_ref_context()`` will be automatically</span>
+<span class="sd">          removed in ``after_content()`` to prevent leaking scope.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">allow_nesting</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="sd">&quot;&quot;&quot;Override in settings which are permitted to be nested (e.g. &#39;conf&#39;).&quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;The Rose domain this directive implements, see RoseDomain.directives&quot;&quot;&quot;</span>
+    <span class="n">LABEL</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Label to prepend to objects.&quot;&quot;&quot;</span>
+    <span class="n">ARGUMENT_SEPARATOR</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;String for separating the configuration name and argument.&quot;&quot;&quot;</span>
+    <span class="n">ARGUMENT_REGEX</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;Regex for splitting the directive name and argument.&quot;&quot;&quot;</span>
+    <span class="n">ALT_FORM_SEPARATOR</span> <span class="o">=</span> <span class="s1">&#39;&amp;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;String for splitting alternate names.&quot;&quot;&quot;</span>
+    <span class="n">ALT_FORM_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;(alternate: </span><span class="si">%s</span><span class="s1">)&#39;</span>
+    <span class="sd">&quot;&quot;&quot;String template for writing out alternate names. Takes one string format</span>
+<span class="sd">    argument.&quot;&quot;&quot;</span>
+
+    <span class="n">ROSE_CONTEXT</span> <span class="o">=</span> <span class="s1">&#39;rose:</span><span class="si">%s</span><span class="s1">&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Prefix for all Rose ref_context variables.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_context_to_remove</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Cannot do this in run().</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registered_children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ObjectDescription</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Automatically generate the &quot;rose:NAME&quot; ref_context variable.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_ref_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+        <span class="n">index_node</span><span class="p">,</span> <span class="n">cont_node</span> <span class="o">=</span> <span class="n">ObjectDescription</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Add a marker on the output node so we can determine the context</span>
+        <span class="c1"># namespace later (see RoseDomain.resolve_xref).</span>
+        <span class="n">context_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROSE_CONTEXT</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">NAME</span>
+        <span class="n">cont_node</span><span class="o">.</span><span class="n">ref_context</span> <span class="o">=</span> <span class="p">{</span><span class="n">context_var</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())[</span><span class="mi">0</span><span class="p">]}</span>
+
+        <span class="c1"># Add children if initialised via python - see RoseAutoDirective.</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">block_quote</span><span class="p">()</span>  <span class="c1"># Create indented section.</span>
+        <span class="k">for</span> <span class="n">child_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_children</span><span class="p">:</span>
+            <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_node</span><span class="p">)</span>  <span class="c1"># Add child node to indented section.</span>
+        <span class="n">cont_node</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>  <span class="c1"># Add indented section to this node.</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">index_node</span><span class="p">,</span> <span class="n">cont_node</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">register_subnode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subnode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register a sub-configuration when creating Rose objects with Python.</span>
+
+<span class="sd">        Special method for the RoseDirective to facilitate building Rose domain</span>
+<span class="sd">        objects using the Python API rather than RST.</span>
+
+<span class="sd">        See :py:meth:`RoseAutoDirective.run` for usage example.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registered_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subnode</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_ref_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a new ``ref_context`` variable.</span>
+
+<span class="sd">        * The variable will be set to the name of the object.</span>
+<span class="sd">        * The variable will be automatically removed in ``after_content()``</span>
+<span class="sd">          to prevent leaking scope.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): The name for the new variable without the ``rose:``</span>
+<span class="sd">                prefix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ref_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">ref_context</span>
+        <span class="n">context_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROSE_CONTEXT</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="n">ref_context</span><span class="p">[</span><span class="n">context_var</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_context_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">remove_ref_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove a ``ref_context`` variable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): The name of the variable to remove without the</span>
+<span class="sd">                ``rose:`` prefix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ref_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">ref_context</span>
+        <span class="n">context_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROSE_CONTEXT</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="k">if</span> <span class="n">ref_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">context_var</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">del</span> <span class="n">ref_context</span><span class="p">[</span><span class="n">context_var</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_ref_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of a ``ref_context`` variable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): The name of the variable without the ``rose:`` prefix.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            The value of the context variable, if set via ``add_ref_context()``</span>
+<span class="sd">            this will be the name of the object which set it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ref_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">ref_context</span>
+        <span class="k">return</span> <span class="n">ref_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROSE_CONTEXT</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">after_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method is called after child objects have been processed.</span>
+
+<span class="sd">        There is also the ``before_content()`` method which is called during</span>
+<span class="sd">        ``run()`` before child objects have been processed but after the</span>
+<span class="sd">        current object has been processed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">child_node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registered_children</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">registered_children</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">child_node</span><span class="o">.</span><span class="n">run</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">context_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_context_to_remove</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_ref_context</span><span class="p">(</span><span class="n">context_var</span><span class="p">)</span>
+        <span class="n">ObjectDescription</span><span class="o">.</span><span class="n">after_content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">process_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform standard pre-processing of a node name.</span>
+
+<span class="sd">        * Process argument strings (e.g. ``bar`` in ``foo=bar``).</span>
+<span class="sd">        * Process alternate forms (e.g. ``bar`` in ``foo &amp; bar``).</span>
+<span class="sd">        * Process custom name templates.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            tuple - (name, argument, alt_forms)</span>
+<span class="sd">                - name (str) - The processed name with everything else</span>
+<span class="sd">                  stripped.</span>
+<span class="sd">                - argument (str) - Any specified argument string else &#39;&#39;.</span>
+<span class="sd">                - alt_forms (list) - List of strings containing alternate names</span>
+<span class="sd">                  for the node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alt_forms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ALT_FORM_SEPARATOR</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ALT_FORM_SEPARATOR</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">alt_forms</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+
+        <span class="c1"># Separate argument strings (e.g. foo=FOO).</span>
+        <span class="n">argument</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ARGUMENT_REGEX</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">argument</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ARGUMENT_REGEX</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Apply custom name template if specified.</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;custom_name_template&#39;</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_name_template</span> <span class="o">%</span> <span class="n">name</span>
+
+        <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">argument</span><span class="p">,</span> <span class="n">alt_forms</span>
+
+    <span class="k">def</span> <span class="nf">handle_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">signode</span><span class="p">,</span> <span class="n">display_text</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method determines the appearance of the object.</span>
+
+<span class="sd">        Overloaded Args:</span>
+<span class="sd">            display_test: Used for overriding the object name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Override sig with display_text if provided.</span>
+        <span class="k">if</span> <span class="n">display_text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">display_text</span> <span class="o">=</span> <span class="n">sig</span>
+
+        <span class="n">display_text</span><span class="p">,</span> <span class="n">argument</span><span class="p">,</span> <span class="n">alt_forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_name</span><span class="p">(</span><span class="n">display_text</span><span class="p">)</span>
+
+        <span class="c1"># Add a label before the name of the object.</span>
+        <span class="n">signode</span> <span class="o">+=</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">desc_annotation</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">LABEL</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Add the object name.</span>
+        <span class="n">signode</span> <span class="o">+=</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">desc_name</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">display_text</span><span class="p">)</span>
+        <span class="c1"># Add arguments.</span>
+        <span class="k">if</span> <span class="n">argument</span><span class="p">:</span>
+            <span class="n">argument</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ARGUMENT_SEPARATOR</span><span class="p">,</span> <span class="n">argument</span><span class="p">)</span>
+            <span class="n">signode</span> <span class="o">+=</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">desc_annotation</span><span class="p">(</span><span class="n">argument</span><span class="p">,</span> <span class="n">argument</span><span class="p">)</span>
+        <span class="c1"># Add alternate object names.</span>
+        <span class="k">if</span> <span class="n">alt_forms</span><span class="p">:</span>
+            <span class="n">signode</span> <span class="o">+=</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">desc_annotation</span><span class="p">(</span>
+                <span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ALT_FORM_TEMPLATE</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">alt_forms</span><span class="p">)),)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">signode</span><span class="p">[</span><span class="s1">&#39;fullname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">needs_arglist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">add_target_and_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_cls</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">signode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method handles namespacing.&quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_name</span><span class="p">(</span><span class="n">name_cls</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Get the current context in tokenised form.</span>
+        <span class="n">context_tokens</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ref_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">ref_context</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;app&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;conf-section&#39;</span><span class="p">,</span> <span class="s1">&#39;conf&#39;</span><span class="p">]:</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROSE_CONTEXT</span> <span class="o">%</span> <span class="n">key</span>
+            <span class="k">if</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">ref_context</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">ref_context</span><span class="p">[</span><span class="n">token</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;conf-section&#39;</span><span class="p">:</span>
+                    <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROSE_CONTEXT</span> <span class="o">%</span> <span class="s1">&#39;conf&#39;</span>
+                <span class="n">new_token</span> <span class="o">=</span> <span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">new_token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context_tokens</span><span class="p">:</span>
+                    <span class="n">context_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_token</span><span class="p">)</span>
+
+        <span class="c1"># Add a token representing the current node.</span>
+        <span class="n">new_token</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROSE_CONTEXT</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context_tokens</span><span class="p">:</span>
+            <span class="n">context_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_token</span><span class="p">)</span>
+
+        <span class="c1"># Generate a namespace from the tokens.</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace_from_tokens</span><span class="p">(</span><span class="n">context_tokens</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Invalid namespace for Rose object &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">namespace</span><span class="p">,</span>
+                         <span class="n">location</span><span class="o">=</span><span class="n">signode</span><span class="p">)</span>
+
+        <span class="c1"># Register this namespace.</span>
+        <span class="n">signode</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">domaindata</span><span class="p">[</span><span class="s1">&#39;rose&#39;</span><span class="p">][</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="n">namespace</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">docname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_index_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modname</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+
+<div class="viewcode-block" id="RoseAppDirective"><a class="viewcode-back" href="../developing/domains.html#rose_domain.RoseAppDirective">[docs]</a><span class="k">class</span> <span class="nc">RoseAppDirective</span><span class="p">(</span><span class="n">RoseDirective</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Directive for documenting Rose apps.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">        Click :guilabel:`source` to view source code.</span>
+
+<span class="sd">        .. code-block:: rst</span>
+
+<span class="sd">           .. rose:app:: foo</span>
+
+<span class="sd">              An app called ``foo``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;app&#39;</span>
+    <span class="n">LABEL</span> <span class="o">=</span> <span class="s1">&#39;Rose App&#39;</span></div>
+
+
+<div class="viewcode-block" id="RoseFileDirective"><a class="viewcode-back" href="../developing/domains.html#rose_domain.RoseFileDirective">[docs]</a><span class="k">class</span> <span class="nc">RoseFileDirective</span><span class="p">(</span><span class="n">RoseDirective</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Directive for documenting Rose files.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">        Click :guilabel:`source` to view source code.</span>
+
+<span class="sd">        .. code-block:: rst</span>
+
+<span class="sd">           .. rose:file:: foo</span>
+
+<span class="sd">              An configuration file called ``foo``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
+    <span class="n">LABEL</span> <span class="o">=</span> <span class="s1">&#39;Rose Configuration&#39;</span></div>
+
+
+<div class="viewcode-block" id="RoseConfigDirective"><a class="viewcode-back" href="../developing/domains.html#rose_domain.RoseConfigDirective">[docs]</a><span class="k">class</span> <span class="nc">RoseConfigDirective</span><span class="p">(</span><span class="n">RoseDirective</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Directive for documenting config sections.</span>
+
+<span class="sd">    Optional Attributes:</span>
+<span class="sd">        * ``envvar`` - Associate an environment variable with this</span>
+<span class="sd">          configuration option.</span>
+<span class="sd">        * ``compulsory`` - Set to ``True`` for compulsory settings, omit this</span>
+<span class="sd">          field for optional settings.</span>
+
+<span class="sd">    Additional ref_context:</span>
+<span class="sd">        * ``rose:conf-section`` - Set for parent configurations, is available</span>
+<span class="sd">          to any child nodes.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">        Click :guilabel:`source` to view source code.</span>
+
+<span class="sd">        .. code-block:: rst</span>
+
+<span class="sd">           .. rose:conf:: foo</span>
+
+<span class="sd">              :default: foo</span>
+<span class="sd">              :opt argtype foo: Description of option ``foo``.</span>
+<span class="sd">              :opt bar: Description of bar</span>
+
+<span class="sd">              A setting called ``foo``.</span>
+
+<span class="sd">           .. rose:conf:: bar</span>
+
+<span class="sd">              A section called ``bar``.</span>
+
+<span class="sd">              .. rose:conf:: baz</span>
+
+<span class="sd">                 :compulsory: True</span>
+<span class="sd">                 :env: AN_ASSOCIATED_ENVIRONMENT_VARIABLE</span>
+
+<span class="sd">                 A config called ``[bar]baz``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;conf&#39;</span>
+    <span class="n">LABEL</span> <span class="o">=</span> <span class="s1">&#39;Config&#39;</span>
+    <span class="n">SECTION_REF_CONTEXT</span> <span class="o">=</span> <span class="s1">&#39;conf-section&#39;</span>
+    <span class="n">ARGUMENT_REGEX</span> <span class="o">=</span> <span class="n">OPT_ARG_REGEX</span>
+    <span class="n">ARGUMENT_SEPARATOR</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
+
+    <span class="c1"># Add custom fields.</span>
+    <span class="n">doc_field_types</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># NOTE: The field label must be sort to avoid causing a line break.</span>
+        <span class="n">Field</span><span class="p">(</span><span class="s1">&#39;envvar&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Env Var&#39;</span><span class="p">,</span> <span class="n">has_arg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,),</span>
+              <span class="n">bodyrolename</span><span class="o">=</span><span class="s1">&#39;obj&#39;</span><span class="p">),</span>
+        <span class="n">Field</span><span class="p">(</span><span class="s1">&#39;compulsory&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Compulsory&#39;</span><span class="p">,</span> <span class="n">has_arg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;compulsory&#39;</span><span class="p">,)),</span>
+        <span class="n">Field</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="n">has_arg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,)),</span>
+        <span class="n">TypedField</span><span class="p">(</span><span class="s1">&#39;option&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Options&#39;</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;opt&#39;</span><span class="p">,),</span>
+                   <span class="n">typerolename</span><span class="o">=</span><span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="n">typenames</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;paramtype&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">),</span>
+                   <span class="n">can_collapse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Overridden to add the :rose:conf-section: ``ref_context`` variable</span>
+<span class="sd">        for nested sections.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_children</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="s1">&#39;.. rose:conf::&#39;</span> <span class="ow">in</span> <span class="n">line</span> <span class="k">for</span>
+                                           <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">):</span>
+            <span class="c1"># This configuration contains other configurations i.e. it is a</span>
+            <span class="c1"># configuration section. Apply a custom_name_template so that it is</span>
+            <span class="c1"># written inside square brackets.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">custom_name_template</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+            <span class="c1"># Sections cannot be written with argument examples.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ARGUMENT_SEPARATOR</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ARGUMENT_REGEX</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># Add a ref_context variable to mark this node as a config section.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_ref_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SECTION_REF_CONTEXT</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">RoseDirective</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">RoseXRefRole</span><span class="p">(</span><span class="n">XRefRole</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handle references to Rose objects.</span>
+
+<span class="sd">    This should be minimal.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">process_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">refnode</span><span class="p">,</span> <span class="n">has_explicit_title</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="c1"># copy ref_context to the refnode so that we can access it in</span>
+        <span class="c1"># resolve_xref. Note that walking through the node tree to extract</span>
+        <span class="c1"># ref_context items appears only to work in the HTML buider.</span>
+        <span class="n">refnode</span><span class="p">[</span><span class="s1">&#39;ref_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">ref_context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">title</span><span class="p">,</span> <span class="n">target</span>
+
+
+<span class="k">class</span> <span class="nc">RoseDomain</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sphinx extension to add the ability to document Rose objects.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">        Click :guilabel:`source` to view source code.</span>
+
+<span class="sd">        .. code-block:: rst</span>
+
+<span class="sd">           .. rose:app: foo</span>
+
+<span class="sd">              An app called ``foo``.</span>
+
+<span class="sd">              .. rose:conf: bar</span>
+
+<span class="sd">                 A setting called ``bar`` for the app ``foo``.</span>
+
+<span class="sd">              .. rose:conf: baz</span>
+
+<span class="sd">                 A config section called ``baz`` for the app ``foo``.</span>
+
+<span class="sd">                 .. rose:conf: pub</span>
+
+<span class="sd">                    A config setting called ``[baz]pub`` for the app ``foo``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;rose&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Prefix for Rose domain (used by sphinx).&quot;&quot;&quot;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Rose&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Display label for the Rose domain (used by sphinx).&quot;&quot;&quot;</span>
+
+    <span class="n">object_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;app&#39;</span><span class="p">:</span> <span class="n">ObjType</span><span class="p">(</span><span class="s1">&#39;app&#39;</span><span class="p">,</span> <span class="s1">&#39;app&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="n">ObjType</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;conf&#39;</span><span class="p">:</span> <span class="n">ObjType</span><span class="p">(</span><span class="s1">&#39;conf&#39;</span><span class="p">,</span> <span class="s1">&#39;conf&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;List of object types, this should mirror ``directives``.&quot;&quot;&quot;</span>
+
+    <span class="n">directives</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;app&#39;</span><span class="p">:</span> <span class="n">RoseAppDirective</span><span class="p">,</span>
+        <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="n">RoseFileDirective</span><span class="p">,</span>
+        <span class="s1">&#39;conf&#39;</span><span class="p">:</span> <span class="n">RoseConfigDirective</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;List of domains associated with prefixes (e.g. ``app`` becomes the</span>
+<span class="sd">    ``rose:app`` domain.&quot;&quot;&quot;</span>
+
+    <span class="n">roles</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;app&#39;</span><span class="p">:</span> <span class="n">RoseXRefRole</span><span class="p">(),</span>
+        <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="n">RoseXRefRole</span><span class="p">(),</span>
+        <span class="s1">&#39;conf&#39;</span><span class="p">:</span> <span class="n">RoseXRefRole</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;Sphinx text roles associated with the domain. Text roles are required</span>
+<span class="sd">    for referencing objects. There should be one role for each item in</span>
+<span class="sd">    ``object_types``&quot;&quot;&quot;</span>
+
+    <span class="n">initial_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">{}</span>  <span class="c1"># path: (docname, synopsis)</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;This sets ``self.data`` on initialisation.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">clear_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes documented items from  the Rose domain.</span>
+
+<span class="sd">        Not sure why, but apparently necessary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">fullname</span><span class="p">,</span> <span class="p">(</span><span class="n">pkg_docname</span><span class="p">,</span> <span class="n">_l</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">pkg_docname</span> <span class="o">==</span> <span class="n">docname</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="n">fullname</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterates through documented items in the Rose domain.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">refname</span><span class="p">,</span> <span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">type_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">yield</span> <span class="n">refname</span><span class="p">,</span> <span class="n">refname</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">refname</span><span class="p">,</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">resolve_xref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">fromdocname</span><span class="p">,</span> <span class="n">builder</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span>
+                     <span class="n">contnode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Associate a reference with a documented object.</span>
+
+<span class="sd">        The important parameters are:</span>
+<span class="sd">            typ (str): The object type - see ``RoseDomain.object_types``.</span>
+<span class="sd">            target (str): The rest of the reference as written in the rst.</span>
+
+<span class="sd">        This implementation simplifies things by storing objects under their</span>
+<span class="sd">        namespace which is the same syntax used to reference the objects i.e:</span>
+
+<span class="sd">        .. rose:app: Foo</span>
+
+<span class="sd">        Creates the entry ``self.data[&#39;objects&#39;][&#39;rose:app:foo&#39;]``.</span>
+
+<span class="sd">        Which can be referenced in rst by:</span>
+
+<span class="sd">        .. code-block:: rst</span>
+
+<span class="sd">           :rose:app:`foo`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If target has a trailing argument ignore it.</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">OPT_ARG_REGEX</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Determine the namespace of the object being referenced.</span>
+        <span class="k">if</span> <span class="n">typ</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;app&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">]:</span>
+            <span class="c1"># Object is a root rose config - path is absolute.</span>
+            <span class="n">namespace</span> <span class="o">=</span> <span class="s1">&#39;rose:</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">typ</span> <span class="o">==</span> <span class="s1">&#39;obj&#39;</span><span class="p">:</span>
+            <span class="c1"># Object is an &#39;obj&#39; e.g. an environment variable, &#39;obj&#39;s are not</span>
+            <span class="c1"># referenceable (yet).</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">typ</span> <span class="o">==</span> <span class="s1">&#39;conf&#39;</span><span class="p">:</span>
+            <span class="n">relative_to_conf</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">):</span>
+                <span class="c1"># Target is relative to the context conf_file.</span>
+                <span class="n">relative_to_conf</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># Get the referenced namespace in tokenised form.</span>
+            <span class="n">reference_namespace</span> <span class="o">=</span> <span class="n">tokenise_namespace</span><span class="p">(</span>
+                <span class="s1">&#39;rose:</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">reference_namespace</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rose:app&#39;</span><span class="p">,</span> <span class="s1">&#39;rose:file&#39;</span><span class="p">]:</span>
+                <span class="c1"># Target is a root rose config - path is absolute.</span>
+                <span class="n">namespace</span> <span class="o">=</span> <span class="s1">&#39;rose:</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Target is not a root config - path is relative.</span>
+                <span class="n">context_namespace</span> <span class="o">=</span> <span class="n">tokens_from_ref_context</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;ref_context&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">context_namespace</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s1">&#39;Relative reference requires local context &#39;</span> <span class="o">+</span>
+                        <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">location</span><span class="o">=</span><span class="n">node</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="k">if</span> <span class="n">relative_to_conf</span><span class="p">:</span>
+                    <span class="c1"># Target is relative to the context conf_file.</span>
+                    <span class="n">namespace_tokens</span> <span class="o">=</span> <span class="p">(</span><span class="n">context_namespace</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+                                        <span class="n">reference_namespace</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Target is relative to the current namespace.</span>
+                    <span class="n">namespace_tokens</span> <span class="o">=</span> <span class="p">(</span><span class="n">context_namespace</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+                                        <span class="n">reference_namespace</span><span class="p">)</span>
+                <span class="c1"># Convert the tokenised namespace into a string namespace.</span>
+                <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace_from_tokens</span><span class="p">(</span><span class="n">namespace_tokens</span><span class="p">)</span>
+
+        <span class="c1"># Lookup the object from the namespace.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="n">namespace</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># No reference exists for &quot;object_name&quot;.</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No Ref for &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Create a link pointing at the object.</span>
+        <span class="k">return</span> <span class="n">make_refnode</span><span class="p">(</span><span class="n">builder</span><span class="p">,</span> <span class="n">fromdocname</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">namespace</span><span class="p">,</span>
+                            <span class="n">contnode</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RoseAutoDirective"><a class="viewcode-back" href="../developing/domains.html#rose_domain.RoseAutoDirective">[docs]</a><span class="k">class</span> <span class="nc">RoseAutoDirective</span><span class="p">(</span><span class="n">Directive</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Directive for autodocumenting Rose configuration files.</span>
+
+<span class="sd">    Uses RST formatted comments in Rose configuration files using</span>
+<span class="sd">    :py:mod:`rose.config`.</span>
+
+<span class="sd">    Note the directive only documents config objects not the file itself.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">        .. code-block:: rst</span>
+
+<span class="sd">           .. rose:file: foo.conf</span>
+
+<span class="sd">              .. autoconfig:: path/to/foo.conf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">option_spec</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">required_arguments</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">domain</span> <span class="o">=</span> <span class="s1">&#39;rose&#39;</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Load rose configuration.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">config</span><span class="o">.</span><span class="n">ConfigSyntaxError</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;Syntax error in Rose configuration file &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">addnodes</span><span class="o">.</span><span class="n">highlightlang</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;rose&#39;</span><span class="p">,</span> <span class="n">linenothreshold</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+
+        <span class="c1"># Append file level comments if present.</span>
+        <span class="k">if</span> <span class="n">conf</span><span class="o">.</span><span class="n">comments</span><span class="p">:</span>
+            <span class="n">contentnode</span> <span class="o">=</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">desc_content</span><span class="p">()</span>
+            <span class="n">contentnode</span><span class="o">.</span><span class="n">document</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">document</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">nested_parse</span><span class="p">(</span>
+                <span class="n">StringList</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">comments</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">content_offset</span><span class="p">,</span>
+                <span class="n">contentnode</span>
+            <span class="p">)</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contentnode</span><span class="p">)</span>
+
+        <span class="c1"># Append configurations.</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">block_quote</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">conf_node</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">walk</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf_node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="c1"># Configuration setting - &quot;name=arg&quot;.</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">conf_node</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Configuration section - &quot;name&quot;</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># Prepare directive object.</span>
+            <span class="n">directive</span> <span class="o">=</span> <span class="n">RoseConfigDirective</span><span class="p">(</span>
+                <span class="s1">&#39;rose:conf&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">name</span><span class="p">],</span>
+                <span class="p">{},</span>
+                <span class="n">StringList</span><span class="p">(</span><span class="n">conf_node</span><span class="o">.</span><span class="n">comments</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lineno</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">content_offset</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">block_text</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf_node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="c1"># Configuration section.</span>
+                <span class="k">if</span> <span class="n">section</span><span class="p">:</span>
+                    <span class="n">node</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">run</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="n">directive</span>
+            <span class="k">elif</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="c1"># Sub-configuration.</span>
+                <span class="n">section</span><span class="o">.</span><span class="n">register_subnode</span><span class="p">(</span><span class="n">directive</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Top-level configuration</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">directive</span><span class="o">.</span><span class="n">run</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">section</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">run</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">addnodes</span><span class="o">.</span><span class="n">highlightlang</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">,</span> <span class="n">linenothreshold</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">nodes</span></div>
+
+
+<span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_domain</span><span class="p">(</span><span class="n">RoseDomain</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_directive</span><span class="p">(</span><span class="s1">&#39;autoconfig&#39;</span><span class="p">,</span> <span class="n">RoseAutoDirective</span><span class="p">)</span>
+</pre></div>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

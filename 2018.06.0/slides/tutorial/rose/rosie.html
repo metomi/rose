@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rosie &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Tutorial" href="index.html" />
+    <link rel="next" title="Summary" href="summary.html" />
+    <link rel="prev" title="Rose Suite Configurations" href="suites.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rosie">
+
+<h1>Rosie<a class="headerlink" href="../../../html/tutorial/rose/rosie.html#rosie" title="View HTML">§</a></h1>
+
+<p>Rosie is a tool for managing Rose suite configurations which is included in
+Rose. The purpose of Rosie is to facilitate suite development, management and
+collaboration.
+Rosie:</p>
+<ul class="simple">
+<li>Adds version control to Rose suite configurations.</li>
+<li>Updates a database to keep track of Rose suite configurations.</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="rosie-suites">
+
+<h2>Rosie Suites<a class="headerlink" href="../../../html/tutorial/rose/rosie.html#rosie-suites" title="View HTML">§</a></h2>
+
+<p>A Rosie suite is a Rose suite configuration which is managed by the Rosie
+system.</p>
+<dl class="docutils">
+<dt><a class="reference internal" href="../../api/command-reference.html#command-rosie-create"><span class="std std-ref">rosie create</span></a></dt>
+<dd>Create a new suite or copy an existing one.</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-2" id="version-control">
+
+<h2>Version Control<a class="headerlink" href="../../../html/tutorial/rose/rosie.html#version-control" title="View HTML">§</a></h2>
+
+<p>In Rosie suites the <a class="reference internal" href="../../glossary.html#term-suite-directory"><span class="xref std std-term">suite directory</span></a> is added to <a class="reference internal" href="#version-control">version control</a>
+using <a class="reference external" href="https://metomi.github.io/fcm/doc/">FCM</a>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="suite-naming">
+
+<h2>Suite Naming<a class="headerlink" href="../../../html/tutorial/rose/rosie.html#suite-naming" title="View HTML">§</a></h2>
+
+<div align="center" class="align-center"><object data="../../_images/graphviz-6f6a268b3dde3e0485cb04cbb89f291239340d73.svg" type="image/svg+xml">
+            <p class="warning">graph Example {
+ranksep=0
+
+node [shape=&quot;plaintext&quot;, fontsize=&quot;11&quot;]
+edge [style=&quot;invis&quot;]
+
+a1 [label=&quot;u&quot;, fontsize=20]
+a2 [label=&quot;Prefix&quot;, fontcolor=&quot;#707070&quot;]
+b1 [label=&quot;-&quot;, fontsize=20]
+b2 [label=&quot;&quot;, fontcolor=&quot;#707070&quot;]
+c1 [label=&quot;aa001&quot;, fontsize=20]
+c2 [label=&quot;Unique Identifier&quot;, fontcolor=&quot;#707070&quot;]
+
+a1 -- a2
+b1 -- b2
+c1 -- c2
+}</p></object>
+</div>
+<p><a class="reference internal" href="../../api/configuration/site-and-user.html#rose:conf:rose.conf[rosie-id]prefix-location.PREFIX" title="rose:conf:rose.conf[rosie-id]prefix-location.PREFIX"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose.conf[rosie-id]prefix-location.PREFIX</span></code></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">u</span></code> = SRS</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-rose-suite-info-file">
+
+<h2>The <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> File<a class="headerlink" href="../../../html/tutorial/rose/rosie.html#the-rose-suite-info-file" title="View HTML">§</a></h2>
+
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">title</span></code></dt>
+<dd>A short title for the suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">owner</span></code></dt>
+<dd>The user who has control over the suite (i.e. their username).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">project</span></code></dt>
+<dd>The project to which this suite belongs (can be an arbitrary name).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">access-list</span></code></dt>
+<dd>An optional list of users who have permission to commit to the trunk of the
+suite.</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-2" id="managing-suites">
+
+<h2>Managing Suites<a class="headerlink" href="../../../html/tutorial/rose/rosie.html#managing-suites" title="View HTML">§</a></h2>
+
+<p>Rosie provides commands for managing suites, including:</p>
+<dl class="docutils">
+<dt><a class="reference internal" href="../../api/command-reference.html#command-rosie-checkout"><span class="std std-ref">rosie checkout</span></a></dt>
+<dd>Creates a local copy of a suite.</dd>
+<dt><a class="reference internal" href="../../api/command-reference.html#command-rosie-ls"><span class="std std-ref">rosie ls</span></a></dt>
+<dd>Lists all locally checked-out suites.</dd>
+<dt><a class="reference internal" href="../../api/command-reference.html#command-rosie-lookup"><span class="std std-ref">rosie lookup</span></a></dt>
+<dd>Searches the suite database (using information from suite’s
+<a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> files).</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Managing Suites<a class="headerlink" href="../../../html/tutorial/rose/rosie.html#id2" title="View HTML">§</a></h2>
+
+<div class="figure align-center" id="id1">
+<a class="reference internal image-reference" href="../../_images/rosie-go-annotated.png"><img alt="rosie go GUI" src="../../_images/rosie-go-annotated.png" style="width: 450px;" /></a>
+<p class="caption"><span class="caption-text">Screenshot of the rosie go GUI.</span></p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Managing Suites<a class="headerlink" href="../../../html/tutorial/rose/rosie.html#id3" title="View HTML">§</a></h2>
+
+<p class="rubric">In this practical we will add the
+<a class="reference internal" href="../cylc/scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather-forecasting suite</span></a>
+from the <a class="reference internal" href="suites.html#suites-practical"><span class="std std-ref">previous practical</span></a> to a rosie
+repository, make some changes, and commit them to the repository.</p>
+<p>Next section: <a class="reference internal" href="summary.html#tutorial-rose-summary"><span class="std std-ref">Summary</span></a></p>
+<div class="note admonition">
+<p class="first admonition-title">Practical</p>
+<p class="rubric">In this practical we will add the
+<a class="reference internal" href="../cylc/scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather-forecasting suite</span></a>
+from the <a class="reference internal" href="suites.html#suites-practical"><span class="std std-ref">previous practical</span></a> to a rosie
+repository, make some changes, and commit them to the repository.</p>
+<div class="tip admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For brevity this practical uses the abbreviated version of SVN commands,
+e.g. <code class="docutils literal notranslate"><span class="pre">svn</span> <span class="pre">st</span></code> is the abbreviated form of <code class="docutils literal notranslate"><span class="pre">svn</span> <span class="pre">status</span></code>.
+FCM supports both the full and abbreviated names.</p>
+</div>
+<ol class="last arabic">
+<li><p class="first"><strong>Create A New Rosie Suite.</strong></p>
+<p>First, create a blank Rosie suite in an appropriate repository.
+You will probably want to use a “testing” repository if one is available
+to you.</p>
+<p>You can specify the repository to use with the <code class="docutils literal notranslate"><span class="pre">--prefix</span></code> command-line
+option. For instance to use the (internal) Met Office Testing Repository
+supply the command line argument <code class="docutils literal notranslate"><span class="pre">--prefix=mot</span></code>.</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>rosie create --prefix=<span class="s">&lt;prefix&gt;</span>
+</pre></div>
+</div>
+<p>You will then be presented with a <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> file open
+in a text editor. For the <code class="docutils literal notranslate"><span class="pre">title</span></code> field type “Dummy Weather Forecasting
+Suite” and for the <code class="docutils literal notranslate"><span class="pre">project</span></code> enter “tutorial”. Save the file and close
+the editor.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If the text editor does not appear you may have to press enter on the
+keyboard.</p>
+</div>
+<p>Rosie will create the new suite in the <code class="docutils literal notranslate"><span class="pre">~/roses</span></code> directory and the
+exact location will appear in the command output. Move into the suite
+directory:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cd ~/roses/<span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Add Files To The Suite.</strong></p>
+<p>Add the files from the Weather Forecasting Suite by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">rose</span><span class="o">-</span><span class="n">weather</span><span class="o">-</span><span class="n">forecasting</span><span class="o">-</span><span class="n">suite</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>We now need to add these files to version control. First check the SVN
+status by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">st</span>
+</pre></div>
+</div>
+<p>You should see a list of files with the <code class="docutils literal notranslate"><span class="pre">?</span></code> symbol next to them,
+as well as <code class="file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> with an <code class="docutils literal notranslate"><span class="pre">M</span></code> symbol beside it. <code class="docutils literal notranslate"><span class="pre">?</span></code>
+means the files marked are untracked (not version controlled), whereas
+<code class="docutils literal notranslate"><span class="pre">M</span></code> indicates files which have been modified. Add all untracked files
+to version control by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">add</span> <span class="o">--</span><span class="n">check</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>Answer yes (“y”) where prompted. Now check the status again:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">st</span>
+</pre></div>
+</div>
+<p>You should see a list of files with the <code class="docutils literal notranslate"><span class="pre">A</span></code> character, meaning “added”,
+next to them. Finally commit the changes by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">ci</span>
+</pre></div>
+</div>
+<p>A text editor will open. Add a message for your commit, save the file and
+close the editor. You will then be prompted as to whether you want to
+make the commit. Answer yes.</p>
+<p>You have now added the Weather Forecasting Suite to version control. Open
+the Trac browser to see your suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">browse</span>
+</pre></div>
+</div>
+<p>A web browser window will open, showing the Trac page for your Rosie
+suite.</p>
+</li>
+<li><p class="first"><strong>Find The Suite In Rosie Go.</strong></p>
+<p>Open the <a class="reference internal" href="../../api/command-reference.html#command-rosie-go"><span class="std std-ref">rosie go</span></a> GUI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rosie</span> <span class="n">go</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>Open the advanced search options by clicking the add (<span class="guilabel">+</span>)
+button in the top right-hand corner of the window.</p>
+<p>Search for suites which you have authored by selecting <span class="guilabel">author</span>
+and filling in your username in the right-hand box:</p>
+<img alt="rosie go advanced search for author screenshot" class="align-center" src="../../_images/rosie-go-author-search.png" />
+<p>Press <span class="guilabel">Search</span>. You should see your suite appear with a home
+icon next to it, meaning that you have a local copy checked out.</p>
+<p>Right-click on the suite and then click <span class="guilabel">Info</span>. You should
+see the information defined in the <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> file.</p>
+<div class="tip admonition">
+<p class="first admonition-title">Help</p>
+<p class="last">If your suite does not show up, select the menu item
+<span class="menuselection">Edit ‣ Data Source</span> and ensure the repository you
+committed to is checked.</p>
+</div>
+</li>
+<li><p class="first"><strong>Checkout The Suite.</strong></p>
+<p>Now that the suite is in the Rosie repository a working copy can be
+checked out on any machine with access to the repository by executing:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>rosie checkout <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+<p>Test this by deleting the working copy then checking out a new one:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cd ~/roses
+rm -rf <span class="s">&lt;name&gt;</span>
+rosie checkout <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="note spoiler admonition">
+<p class="first admonition-title">Practical Extension</p>
+<ol class="last arabic">
+<li><p class="first"><strong>Make Changes In A Branch.</strong></p>
+<p>Next we will make a change to the suite. Rather than making this change
+in the “trunk” (referred to as “master” in git terminology) we will
+work in a new “branch”.</p>
+<p>Create a new branch called “configuration-change” by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">bc</span> <span class="n">configuration</span><span class="o">-</span><span class="n">change</span>
+</pre></div>
+</div>
+<p>Provide a brief commit message of your choosing when prompted and enter
+yes (“y”).</p>
+<p>You can list all branches by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">bls</span>
+</pre></div>
+</div>
+<p>Switch to your new branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">sw</span> <span class="n">configuration</span><span class="o">-</span><span class="n">change</span>
+</pre></div>
+</div>
+<p>Next, either using the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI or a text
+editor, change the <code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code> setting in the
+<a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file to <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p>
+<p>Check the status of the project:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">st</span>
+</pre></div>
+</div>
+<p>You should see the <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file with a <code class="docutils literal notranslate"><span class="pre">M</span></code>,
+meaning modified, next to it. Commit the change by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">ci</span>
+</pre></div>
+</div>
+<p>Again you will need to provide a commit message and answer yes to the
+prompt.</p>
+</li>
+<li><p class="first"><strong>Merge The Branch.</strong></p>
+<p>Switch back to the trunk then merge your change branch into the trunk:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">sw</span> <span class="n">trunk</span>
+<span class="n">fcm</span> <span class="n">merge</span> <span class="n">configuration</span><span class="o">-</span><span class="n">change</span>
+</pre></div>
+</div>
+<p>Check the status (you should see the <code class="docutils literal notranslate"><span class="pre">M</span></code> symbol next to the
+<a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file) then commit the merge:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">st</span>
+<span class="n">fcm</span> <span class="n">ci</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

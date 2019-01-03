@@ -1,0 +1,248 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Polling &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Rose Arch" href="rose-arch.html" />
+    <link rel="prev" title="Optional Configurations" href="optional-configurations.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="polling">
+
+<h1>Polling<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/polling.html#polling" title="View HTML">§</a></h1>
+
+<p>Polling allows you to check for some condition to be met prior to running the
+main command in an app without the need for additional entries in the
+dependencies graph.</p>
+<p>For example, you might want to run a polling command to check for the
+existence of a particular file before running the main command which
+requires said file.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/polling.html#example" title="View HTML">§</a></h2>
+
+<p>Create a new Rose suite configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">polling</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">polling</span>
+</pre></div>
+</div>
+<p>Create a blank <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> and a <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code>
+file that looks like this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[cylc]</span>
+    <span class="nv">UTC mode </span><span class="o">=</span><span class="s"> True</span> <span class="c1"># Ignore DST</span>
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="kd">compose_letter</span> <span class="o">=&gt;</span> <span class="kd">send_letter</span>
+                   <span class="kd">bob</span> <span class="o">=&gt;</span> <span class="kd">read_letter</span><span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>This is a simple suite which consists of the following:</p>
+<ul class="simple">
+<li>A <code class="docutils literal notranslate"><span class="pre">compose_letter</span></code> task.</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">send_letter</span></code> task which is run once the letter is composed.</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">bob</span></code> task which we will be using to poll with.</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">read_letter</span></code> task which will run once the polling task is complete.</li>
+</ul>
+<p>It will need some runtime. Add the following to your <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 10</span>
+    <span class="nt">[[compose_letter]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 5; echo &#39;writing a letter to Bob...&#39;</span>
+    <span class="nt">[[send_letter]]</span>
+        <span class="nv">env-script </span><span class="o">=</span><span class="s"> eval `rose task-env`</span>
+        <span class="nv">script </span><span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                 sleep 5</span>
+<span class="s2">                 echo &#39;Hello Bob&#39; &gt; $ROSE_DATA/letter.txt</span>
+<span class="s2">                 sleep 10</span>
+<span class="s2">                 &quot;&quot;&quot;</span>
+
+    <span class="nt">[[bob]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rose task-run</span>
+    <span class="nt">[[read_letter]]</span>
+        <span class="nv">env-script </span><span class="o">=</span><span class="s"> eval `rose task-env`</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 5; cat $ROSE_DATA/letter.txt</span>
+        <span class="nv">post-script </span><span class="o">=</span><span class="s"> rm $ROSE_DATA/letter.txt</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="adding-polling">
+
+<h2>Adding Polling<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/polling.html#adding-polling" title="View HTML">§</a></h2>
+
+<p>In the suite directory create an <code class="docutils literal notranslate"><span class="pre">app</span></code> directory.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">app</span></code> directory create a directory called <code class="docutils literal notranslate"><span class="pre">bob</span></code>.</p>
+<p>In the newly-created <code class="docutils literal notranslate"><span class="pre">bob</span></code> directory, create a <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a>
+file.</p>
+<p>Edit the <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file to look like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[poll]</span>
+<span class="nv">delays</span><span class="o">=</span><span class="s">10*PT5S</span>
+<span class="nv">test</span><span class="o">=</span><span class="s">test -e $ROSE_DATA/letter.txt</span>
+
+<span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">echo &#39;Ooh, a letter!&#39;</span>
+</pre></div>
+</div>
+<p>We now have an app that does the following:</p>
+<ul class="simple">
+<li>Has a polling <code class="docutils literal notranslate"><span class="pre">test</span></code> that checks for the existence of a file.</li>
+<li>Polls up to 10 times with 5 second delays between each attempt.</li>
+<li>Prints a message once the polling test succeeds.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The ordering of the <code class="docutils literal notranslate"><span class="pre">[poll]</span></code> and <code class="docutils literal notranslate"><span class="pre">[command]</span></code> sections is not important.
+In practice, it may be preferable to have the <code class="docutils literal notranslate"><span class="pre">[command]</span></code> section at
+the top as that should contain the main command(s) being run by the app.</p>
+</div>
+<p>Save your changes and run the suite using <a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>.</p>
+<p>The suite should now run.</p>
+<p>Notice that <code class="docutils literal notranslate"><span class="pre">bob</span></code> finishes and triggers <code class="docutils literal notranslate"><span class="pre">read_letter</span></code> before
+<code class="docutils literal notranslate"><span class="pre">send_letter</span></code> has completed. This is because the polling condition has
+been met, allowing the main command in <code class="docutils literal notranslate"><span class="pre">bob</span></code> to be run.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="improving-the-polling">
+
+<h2>Improving The Polling<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/polling.html#improving-the-polling" title="View HTML">§</a></h2>
+
+<p>At present we have specified our own routine for testing for the existence
+of a particular file using the <code class="docutils literal notranslate"><span class="pre">test</span></code> option. However, Rose provides a
+simpler method for doing this.</p>
+<p>Edit the <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> in your <code class="docutils literal notranslate"><span class="pre">bob</span></code> app to look like the
+following:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[poll]</span>
+<span class="nv">delays</span><span class="o">=</span><span class="s">10*PT5S</span>
+<span class="nv">all-files</span><span class="o">=</span><span class="s">$ROSE_DATA/letter.txt</span>
+
+<span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">echo &#39;Ooh, a letter!&#39;</span>
+</pre></div>
+</div>
+<p>Polling is now making use of the <code class="docutils literal notranslate"><span class="pre">all-files</span></code> option, which allows you to
+specify a list of files to check the existence of. Save your changes and
+run the suite to confirm it still works.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="available-polling-types">
+
+<h2>Available Polling Types<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/polling.html#available-polling-types" title="View HTML">§</a></h2>
+
+<p>Test and all-files are just two of the available polling options:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">all-files</span></code></dt>
+<dd>Tests if all of the files in a list exist.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">any-files</span></code></dt>
+<dd>Tests if any of the files in a list exist.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">file-test</span></code></dt>
+<dd>Changes the test used to evaluate the <code class="docutils literal notranslate"><span class="pre">any-files</span></code> and <code class="docutils literal notranslate"><span class="pre">all-files</span></code> lists
+to a shell script to be run on each file (e.g. <code class="docutils literal notranslate"><span class="pre">grep</span></code>). Passes if the
+command exits with a zero return code.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">test</span></code></dt>
+<dd>Tests using a shell script, passes if the command exits with a zero return
+code. <em>Note this is separate from the</em> <code class="docutils literal notranslate"><span class="pre">all-files</span></code>, <code class="docutils literal notranslate"><span class="pre">any-files</span></code> <em>testing
+logic.</em></dd>
+</dl>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">For more details see <a class="reference internal" href="../../../api/configuration/application.html#rose-applications"><span class="std std-ref">Application Configuration</span></a>.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="possible-uses-for-polling">
+
+<h2>Possible Uses For Polling<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/polling.html#possible-uses-for-polling" title="View HTML">§</a></h2>
+
+<p>Depending on your needs, possible uses for polling might include:</p>
+<ul class="simple">
+<li>Checking for required output from a long-running task rather than waiting
+for the task to complete.</li>
+<li>Monitoring output from another suite.</li>
+<li>Checking if a file has required content before using it.</li>
+</ul>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

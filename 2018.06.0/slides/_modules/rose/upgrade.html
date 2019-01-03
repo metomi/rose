@@ -1,0 +1,885 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rose.upgrade &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <h1>Source code for rose.upgrade</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># (C) British Crown Copyright 2012-8 Met Office.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Rose, a framework for meteorological suites.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Rose. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Module that contains upgrade macro functionality.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">rose.config</span>
+<span class="kn">import</span> <span class="nn">rose.macro</span>
+<span class="kn">import</span> <span class="nn">rose.macros.trigger</span>
+<span class="kn">import</span> <span class="nn">rose.reporter</span>
+
+
+<span class="n">BEST_VERSION_MARKER</span> <span class="o">=</span> <span class="s2">&quot;* &quot;</span>
+<span class="n">CURRENT_VERSION_MARKER</span> <span class="o">=</span> <span class="s2">&quot;= &quot;</span>
+<span class="n">ERROR_NO_VALID_VERSIONS</span> <span class="o">=</span> <span class="s2">&quot;No versions available.&quot;</span>
+<span class="n">ERROR_UPGRADE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: invalid version.&quot;</span>
+<span class="n">INFO_DOWNGRADED</span> <span class="o">=</span> <span class="s2">&quot;Downgraded from </span><span class="si">{0}</span><span class="s2"> to </span><span class="si">{1}</span><span class="s2">&quot;</span>
+<span class="n">INFO_UPGRADED</span> <span class="o">=</span> <span class="s2">&quot;Upgraded from </span><span class="si">{0}</span><span class="s2"> to </span><span class="si">{1}</span><span class="s2">&quot;</span>
+<span class="n">MACRO_UPGRADE_MODULE</span> <span class="o">=</span> <span class="s2">&quot;versions&quot;</span>
+<span class="n">MACRO_UPGRADE_MODULE_PATH</span> <span class="o">=</span> <span class="n">MACRO_UPGRADE_MODULE</span> <span class="o">+</span> <span class="s2">&quot;.py&quot;</span>
+<span class="n">MACRO_UPGRADE_RESOURCE_DIR</span> <span class="o">=</span> <span class="s2">&quot;etc&quot;</span>
+<span class="n">MACRO_UPGRADE_RESOURCE_FILE_ADD</span> <span class="o">=</span> <span class="s2">&quot;rose-macro-add.conf&quot;</span>
+<span class="n">MACRO_UPGRADE_RESOURCE_FILE_REMOVE</span> <span class="o">=</span> <span class="s2">&quot;rose-macro-remove.conf&quot;</span>
+<span class="n">MACRO_UPGRADE_TRIGGER_NAME</span> <span class="o">=</span> <span class="s2">&quot;UpgradeTriggerFixing&quot;</span>
+<span class="n">NAME_DOWNGRADE</span> <span class="o">=</span> <span class="s2">&quot;Downgrade_</span><span class="si">{0}</span><span class="s2">-</span><span class="si">{1}</span><span class="s2">&quot;</span>
+<span class="n">NAME_UPGRADE</span> <span class="o">=</span> <span class="s2">&quot;Upgrade_</span><span class="si">{0}</span><span class="s2">-</span><span class="si">{1}</span><span class="s2">&quot;</span>
+<span class="n">SAME_UPGRADE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: already at this version.&quot;</span>
+
+<span class="n">DOWNGRADE_METHOD</span> <span class="o">=</span> <span class="s2">&quot;downgrade&quot;</span>
+<span class="n">UPGRADE_METHOD</span> <span class="o">=</span> <span class="s2">&quot;upgrade&quot;</span>
+
+<span class="n">IGNORE_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_NORMAL</span><span class="p">:</span> <span class="s2">&quot;enabled&quot;</span><span class="p">,</span>
+              <span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">:</span> <span class="s2">&quot;user-ignored&quot;</span><span class="p">,</span>
+              <span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_SYST_IGNORED</span><span class="p">:</span> <span class="s2">&quot;trig-ignored&quot;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">UpgradeVersionError</span><span class="p">(</span><span class="ne">NameError</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Raise this error when an incorrect upgrade version is selected.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ERROR_UPGRADE_VERSION</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<span class="k">class</span> <span class="nc">UpgradeVersionSame</span><span class="p">(</span><span class="ne">NameError</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Raise this error when an incorrect upgrade version is selected.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SAME_UPGRADE_VERSION</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="MacroUpgrade"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade">[docs]</a><span class="k">class</span> <span class="nc">MacroUpgrade</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MacroBase</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Class derived from MacroBase to aid upgrade functionality.&quot;&quot;&quot;</span>
+
+    <span class="n">BEFORE_TAG</span> <span class="o">=</span> <span class="s2">&quot;Before&quot;</span>
+    <span class="n">ERROR_RENAME_OPT_TO_SECT</span> <span class="o">=</span> <span class="s2">&quot;Error: cannot rename </span><span class="si">{0}</span><span class="s2">=</span><span class="si">{1}</span><span class="s2"> to </span><span class="si">{2}</span><span class="s2">&quot;</span>
+    <span class="n">ERROR_RENAME_SECT_TO_OPT</span> <span class="o">=</span> <span class="s2">&quot;Error: cannot rename </span><span class="si">{0}</span><span class="s2"> to </span><span class="si">{1}</span><span class="s2">=</span><span class="si">{2}</span><span class="s2">&quot;</span>
+    <span class="n">INFO_ADDED_SECT</span> <span class="o">=</span> <span class="s2">&quot;Added&quot;</span>
+    <span class="n">INFO_ADDED_VAR</span> <span class="o">=</span> <span class="s2">&quot;Added with value </span><span class="si">{0}</span><span class="s2">&quot;</span>
+    <span class="n">INFO_CHANGED_VAR</span> <span class="o">=</span> <span class="s2">&quot;Value: </span><span class="si">{0}</span><span class="s2"> -&gt; </span><span class="si">{1}</span><span class="s2">&quot;</span>
+    <span class="n">INFO_STATE</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> -&gt; </span><span class="si">{1}</span><span class="s2">&quot;</span>
+    <span class="n">INFO_REMOVED</span> <span class="o">=</span> <span class="s2">&quot;Removed&quot;</span>
+    <span class="n">INFO_RENAMED_SECT</span> <span class="o">=</span> <span class="s2">&quot;Renamed </span><span class="si">{0}</span><span class="s2"> -&gt; </span><span class="si">{1}</span><span class="s2">&quot;</span>
+    <span class="n">INFO_RENAMED_VAR</span> <span class="o">=</span> <span class="s2">&quot;Renamed </span><span class="si">{0}</span><span class="s2">=</span><span class="si">{1}</span><span class="s2"> -&gt; </span><span class="si">{2}</span><span class="s2">=</span><span class="si">{3}</span><span class="s2">&quot;</span>
+    <span class="n">WARNING_ADD_CLASH</span> <span class="o">=</span> <span class="s2">&quot;Warning: cannot add </span><span class="si">{0}</span><span class="s2">: clash with </span><span class="si">{1}</span><span class="s2">&quot;</span>
+    <span class="n">UPGRADE_RESOURCE_DIR</span> <span class="o">=</span> <span class="n">MACRO_UPGRADE_RESOURCE_DIR</span>
+
+<div class="viewcode-block" id="MacroUpgrade.act_from_files"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade.act_from_files">[docs]</a>    <span class="k">def</span> <span class="nf">act_from_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">downgrade</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse a change configuration into actions.</span>
+
+<span class="sd">        Searches for:</span>
+
+<span class="sd">        * ``etc/VERSION/rose-macro-add.conf`` (settings to be added)</span>
+<span class="sd">        * ``etc/VERSION/rose-macro-remove.conf`` (settings to be removed)</span>
+
+<span class="sd">        Where ``VERSION`` is equal to ``self.BEFORE_TAG``.</span>
+
+<span class="sd">        If settings are defined in either file, and changes can be made, the</span>
+<span class="sd">        ``self.reports`` will be updated automatically.</span>
+
+<span class="sd">        Note that ``act_from_files`` can be used in combination with other</span>
+<span class="sd">        methods as part of the same upgrade.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (rose.config.ConfigNode): The application configuration.</span>
+<span class="sd">            downgrade (bool): True if downgrading.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_config_resources</span><span class="p">()</span>
+        <span class="n">add_config</span> <span class="o">=</span> <span class="n">res_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MACRO_UPGRADE_RESOURCE_FILE_ADD</span><span class="p">)</span>
+        <span class="n">rem_config</span> <span class="o">=</span> <span class="n">res_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MACRO_UPGRADE_RESOURCE_FILE_REMOVE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">add_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">add_config</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigNode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rem_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rem_config</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigNode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">downgrade</span><span class="p">:</span>
+            <span class="n">add_config</span><span class="p">,</span> <span class="n">rem_config</span> <span class="o">=</span> <span class="n">rem_config</span><span class="p">,</span> <span class="n">add_config</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">add_config</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+            <span class="n">section</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">option</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">option</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+                             <span class="n">state</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">comments</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">rem_config</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+            <span class="n">section</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">option</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">option</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_config_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get macro configuration resources.&quot;&quot;&quot;</span>
+        <span class="n">macro_file</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+        <span class="n">this_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">macro_file</span><span class="p">))</span>
+        <span class="n">res_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">UPGRADE_RESOURCE_DIR</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">BEFORE_TAG</span><span class="p">)</span>
+        <span class="n">add_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_dir</span><span class="p">,</span> <span class="n">MACRO_UPGRADE_RESOURCE_FILE_ADD</span><span class="p">)</span>
+        <span class="n">rem_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_dir</span><span class="p">,</span> <span class="n">MACRO_UPGRADE_RESOURCE_FILE_REMOVE</span><span class="p">)</span>
+        <span class="n">file_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">file_map</span><span class="p">[</span><span class="n">MACRO_UPGRADE_RESOURCE_FILE_ADD</span><span class="p">]</span> <span class="o">=</span> <span class="n">add_path</span>
+        <span class="n">file_map</span><span class="p">[</span><span class="n">MACRO_UPGRADE_RESOURCE_FILE_REMOVE</span><span class="p">]</span> <span class="o">=</span> <span class="n">rem_path</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">file_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">file_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">file_map</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">file_map</span>
+
+<div class="viewcode-block" id="MacroUpgrade.add_setting"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade.add_setting">[docs]</a>    <span class="k">def</span> <span class="nf">add_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">forced</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a setting to the configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (rose.config.ConfigNode): The application configuration.</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                A section will be a list of one keys, an option will have two.</span>
+<span class="sd">            value (string - optional): String denoting the new setting value.</span>
+<span class="sd">                Required for options but not for settings.</span>
+<span class="sd">            forced (bool - optional)</span>
+<span class="sd">                If True override value if the setting already exists.</span>
+<span class="sd">            state (str - optional):</span>
+<span class="sd">                The state of the new setting - should be one of the</span>
+<span class="sd">                ``rose.config.ConfigNode`` states e.g.</span>
+<span class="sd">                ``rose.config.ConfigNode.STATE_USER_IGNORED``. Defaults to</span>
+<span class="sd">                ``rose.config.ConfigNode.STATE_NORMAL``.</span>
+<span class="sd">            comments (list - optional): List of comment lines (strings) for</span>
+<span class="sd">                the new setting or ``None``.</span>
+<span class="sd">            info (string - optional): A short string containing no new lines,</span>
+<span class="sd">                describing the addition of the setting.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_section_option_from_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">id_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_from_section_option</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INFO_ADDED_SECT</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INFO_ADDED_VAR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="c1"># Search for existing conflicting settings.</span>
+        <span class="n">conflict_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">found_setting</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get_value</span><span class="p">():</span>
+                <span class="n">existing_section</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">existing_section</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">existing_base_section</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">REC_ID_STRIP</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">existing_section</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># For section &#39;foo&#39;, look for &#39;foo&#39;, &#39;foo{bar}&#39;, &#39;foo(1)&#39;.</span>
+                    <span class="n">found_setting</span> <span class="o">=</span> <span class="p">(</span><span class="n">existing_section</span> <span class="o">==</span> <span class="n">section</span> <span class="ow">or</span>
+                                     <span class="n">existing_base_section</span> <span class="o">==</span> <span class="n">section</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># For &#39;foo=bar&#39;, don&#39;t allow sections &#39;foo(1)&#39;, &#39;foo{bar}&#39;.</span>
+                    <span class="n">found_setting</span> <span class="o">=</span> <span class="p">(</span><span class="n">existing_section</span> <span class="o">!=</span> <span class="n">section</span> <span class="ow">and</span>
+                                     <span class="n">existing_base_section</span> <span class="o">==</span> <span class="n">section</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">found_setting</span><span class="p">:</span>
+                    <span class="n">conflict_id</span> <span class="o">=</span> <span class="n">existing_section</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">walk</span><span class="p">([</span><span class="n">existing_section</span><span class="p">]):</span>
+                        <span class="n">existing_option</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">existing_base_option</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">REC_ID_STRIP_DUPL</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                                <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">existing_option</span><span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="c1"># For option &#39;foo&#39;, look for &#39;foo&#39;, &#39;foo(1)&#39;.</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">existing_section</span> <span class="o">==</span> <span class="n">section</span> <span class="ow">and</span>
+                                <span class="p">(</span><span class="n">existing_option</span> <span class="o">==</span> <span class="n">option</span> <span class="ow">or</span>
+                                 <span class="n">existing_base_option</span> <span class="o">==</span> <span class="n">option</span><span class="p">)):</span>
+                            <span class="n">found_setting</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">conflict_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_from_section_option</span><span class="p">(</span>
+                                <span class="n">existing_section</span><span class="p">,</span> <span class="n">existing_option</span><span class="p">)</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="n">found_setting</span><span class="p">:</span>
+                        <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">found_setting</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">conflict_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># If already added, quit, unless &quot;forced&quot;.</span>
+        <span class="k">if</span> <span class="n">found_setting</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">forced</span> <span class="ow">and</span> <span class="p">(</span><span class="n">conflict_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">id_</span> <span class="o">==</span> <span class="n">conflict_id</span><span class="p">):</span>
+                <span class="c1"># If forced, override settings for an identical id.</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_setting_value</span><span class="p">(</span>
+                    <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">conflict_id</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span>
+                    <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">WARNING_ADD_CLASH</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">conflict_id</span><span class="p">),</span>
+                    <span class="n">is_warning</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Add parent section if missing.</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">section</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="n">section</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;New value </span><span class="si">{0}</span><span class="s2"> for </span><span class="si">{1}</span><span class="s2"> is not a string&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">id_</span><span class="p">))</span>
+
+        <span class="c1"># Set (add) the section/option.</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span>
+                   <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MacroUpgrade.change_setting_value"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade.change_setting_value">[docs]</a>    <span class="k">def</span> <span class="nf">change_setting_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">forced</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">comments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Change a setting (option) value in the configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (rose.config.ConfigNode): The application configuration.</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                A section will be a list of one keys, an option will have two.</span>
+<span class="sd">            value (string): The new value. Required for options, can be</span>
+<span class="sd">                ``None`` for sections.</span>
+<span class="sd">            forced (bool): Create the setting if it is not present in config.</span>
+<span class="sd">            comments (list - optional): List of comment lines (strings) for</span>
+<span class="sd">                the new setting or ``None``.</span>
+<span class="sd">            info (string - optional): A short string containing no new lines,</span>
+<span class="sd">                describing the addition of the setting.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_section_option_from_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">id_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_from_section_option</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">forced</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+                                        <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="n">info</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Not valid for value change: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INFO_CHANGED_VAR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;New value </span><span class="si">{0}</span><span class="s2"> for </span><span class="si">{1}</span><span class="s2"> is not a string&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">id_</span><span class="p">))</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">comments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="n">comments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MacroUpgrade.get_setting_value"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade.get_setting_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_setting_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of a setting or ``None`` if not set.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (rose.config.ConfigNode): The application configuration.</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                A section will be a list of one keys, an option will have two.</span>
+<span class="sd">            no_ignore (bool - optional): If ``True`` return ``None`` if the</span>
+<span class="sd">                setting is ignored (else return the value).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object - The setting value or ``None`` if not defined.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_section_option_from_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">],</span> <span class="n">no_ignore</span><span class="o">=</span><span class="n">no_ignore</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">])</span><span class="o">.</span><span class="n">value</span></div>
+
+<div class="viewcode-block" id="MacroUpgrade.remove_setting"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade.remove_setting">[docs]</a>    <span class="k">def</span> <span class="nf">remove_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove a setting from the configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (rose.config.ConfigNode): The application configuration.</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                A section will be a list of one keys, an option will have two.</span>
+<span class="sd">            info (string - optional): A short string containing no new lines,</span>
+<span class="sd">                describing the addition of the setting.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_section_option_from_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">section</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">option_node_pairs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">walk</span><span class="p">([</span><span class="n">section</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">opt_keys</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">option_node_pairs</span><span class="p">:</span>
+                <span class="n">opt</span> <span class="o">=</span> <span class="n">opt_keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remove_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="n">section</span><span class="p">,</span> <span class="n">opt</span><span class="p">],</span> <span class="n">info</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">],</span> <span class="n">info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MacroUpgrade.rename_setting"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade.rename_setting">[docs]</a>    <span class="k">def</span> <span class="nf">rename_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">new_keys</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rename a setting in the configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (rose.config.ConfigNode): The application configuration.</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                A section will be a list of one keys, an option will have two.</span>
+<span class="sd">            new_keys (list): The new hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">            info (string - optional): A short string containing no new lines,</span>
+<span class="sd">                describing the addition of the setting.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_section_option_from_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">new_section</span><span class="p">,</span> <span class="n">new_option</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_section_option_from_keys</span><span class="p">(</span><span class="n">new_keys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">new_option</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ERROR_RENAME_SECT_TO_OPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">section</span><span class="p">,</span> <span class="n">new_section</span><span class="p">,</span> <span class="n">new_option</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">new_option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ERROR_RENAME_OPT_TO_SECT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">new_section</span><span class="p">))</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INFO_RENAMED_SECT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">new_section</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INFO_RENAMED_VAR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span>
+                                                    <span class="n">new_section</span><span class="p">,</span> <span class="n">new_option</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">new_section</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="n">new_section</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="n">new_section</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">forced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">state</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">comments</span><span class="p">,</span>
+                             <span class="n">info</span><span class="o">=</span><span class="n">info</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">option_keys</span><span class="p">,</span> <span class="n">opt_node</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">walk</span><span class="p">([</span><span class="n">section</span><span class="p">]):</span>
+                <span class="n">renamed_option</span> <span class="o">=</span> <span class="n">option_keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="n">new_section</span><span class="p">,</span> <span class="n">renamed_option</span><span class="p">],</span>
+                                 <span class="n">value</span><span class="o">=</span><span class="n">opt_node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">forced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">state</span><span class="o">=</span><span class="n">opt_node</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                 <span class="n">comments</span><span class="o">=</span><span class="n">opt_node</span><span class="o">.</span><span class="n">comments</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">new_keys</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">forced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">state</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">comments</span><span class="p">,</span>
+                             <span class="n">info</span><span class="o">=</span><span class="n">info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MacroUpgrade.enable_setting"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade.enable_setting">[docs]</a>    <span class="k">def</span> <span class="nf">enable_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Enable a setting in the configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (rose.config.ConfigNode): The application configuration.</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                A section will be a list of one keys, an option will have two.</span>
+<span class="sd">            info (string - optional): A short string containing no new lines,</span>
+<span class="sd">                describing the addition of the setting.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            False - if the setting&#39;s state is not changed else ``None``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">),</span>
+                                    <span class="n">info</span><span class="o">=</span><span class="n">info</span><span class="p">,</span>
+                                    <span class="n">state</span><span class="o">=</span><span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_NORMAL</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MacroUpgrade.ignore_setting"><a class="viewcode-back" href="../../api/rose-upgrader-macros.html#rose.upgrade.MacroUpgrade.ignore_setting">[docs]</a>    <span class="k">def</span> <span class="nf">ignore_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">state</span><span class="o">=</span><span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;User-ignore a setting in the configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (rose.config.ConfigNode): The application configuration.</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                A section will be a list of one keys, an option will have two.</span>
+<span class="sd">            info (string - optional): A short string containing no new lines,</span>
+<span class="sd">                describing the addition of the setting.</span>
+<span class="sd">            state (string - optional): A ``rose.config.ConfigNode`` state.</span>
+<span class="sd">                ``STATE_USER_IGNORED`` by default.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            False - if the setting&#39;s state is not changed else ``None``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">),</span>
+                                    <span class="n">info</span><span class="o">=</span><span class="n">info</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_ignore_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the ignored state of a setting, if it exists.&quot;&quot;&quot;</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_section_option_from_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">info_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INFO_STATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">IGNORE_MAP</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">state</span><span class="p">],</span>
+                                           <span class="n">IGNORE_MAP</span><span class="p">[</span><span class="n">state</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">info_text</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_remove_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove a setting from the configuration, if it exists.&quot;&quot;&quot;</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_section_option_from_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INFO_REMOVED</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">unset</span><span class="p">([</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">])</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_section_option_from_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">keys</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">])[:</span><span class="mi">2</span><span class="p">]</span></div>
+
+
+<span class="k">class</span> <span class="nc">MacroUpgradeManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Manage the upgrades.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_config</span><span class="p">,</span> <span class="n">downgrade</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app_config</span> <span class="o">=</span> <span class="n">app_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span> <span class="o">=</span> <span class="n">downgrade</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_version</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">named_tags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">opt_node</span> <span class="o">=</span> <span class="n">app_config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">rose</span><span class="o">.</span><span class="n">CONFIG_SECT_TOP</span><span class="p">,</span>
+                                   <span class="n">rose</span><span class="o">.</span><span class="n">CONFIG_OPT_META_TYPE</span><span class="p">],</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">tag_items</span> <span class="o">=</span> <span class="n">opt_node</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tag_items</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag_items</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="s2">&quot;HEAD&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta_flag_no_tag</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tag_items</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_module</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reports</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_tag</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_all_tags</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">load_all_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load an ordered list of the available upgrade macros.&quot;&quot;&quot;</span>
+        <span class="n">meta_path</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">load_meta_path</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app_config</span><span class="p">,</span> <span class="n">is_upgrade</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">meta_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">ERROR_LOAD_CONF_META_NODE</span><span class="p">)</span>
+        <span class="n">meta_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">meta_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">named_tags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">meta_path</span><span class="p">):</span>
+            <span class="n">node_meta</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">meta_path</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">rose</span><span class="o">.</span><span class="n">META_CONFIG_NAME</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">node_meta</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">named_tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_module</span> <span class="o">=</span> <span class="n">get_meta_upgrade_module</span><span class="p">(</span><span class="n">meta_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># No versions.py.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_version_macros</span><span class="p">([])</span>
+            <span class="k">return</span>
+        <span class="n">macro_info_tuples</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">get_macro_class_methods</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">version_module</span><span class="p">])</span>
+        <span class="n">version_macros</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span><span class="p">:</span>
+            <span class="n">grade_method</span> <span class="o">=</span> <span class="n">DOWNGRADE_METHOD</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">grade_method</span> <span class="o">=</span> <span class="n">UPGRADE_METHOD</span>
+        <span class="k">for</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">macro_info_tuples</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">grade_method</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">version_module</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="n">module_name</span><span class="p">:</span>
+                        <span class="n">macro_inst</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)()</span>
+                        <span class="n">version_macros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">macro_inst</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_version_macros</span><span class="p">(</span><span class="n">version_macros</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">only_named</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return relevant tags, reversed order for downgrades.&quot;&quot;&quot;</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">AFTER_TAG</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span><span class="p">:</span>
+            <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">BEFORE_TAG</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">only_named</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tags</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">named_tags</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">tags</span>
+
+    <span class="k">def</span> <span class="nf">get_new_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">only_named</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Obtain the default upgrade version.&quot;&quot;&quot;</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tags</span><span class="p">(</span><span class="n">only_named</span><span class="o">=</span><span class="n">only_named</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tags</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">tags</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">set_new_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the new tag for upgrading/downgrading to.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_tag</span> <span class="o">=</span> <span class="n">tag</span>
+
+    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve the display name for this.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">NAME_DOWNGRADE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_tag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">NAME_UPGRADE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_tag</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_macros</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the list of upgrade macros to be applied.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span><span class="p">:</span>
+            <span class="n">prev_tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">AFTER_TAG</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">]</span>
+            <span class="n">next_tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">BEFORE_TAG</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prev_tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">BEFORE_TAG</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">]</span>
+            <span class="n">next_tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">AFTER_TAG</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">start_index</span> <span class="o">=</span> <span class="n">prev_tags</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">end_index</span> <span class="o">=</span> <span class="n">next_tags</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_tag</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span> <span class="n">end_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opt_non_interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">custom_inspector</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform a configuration by looping over upgrade macros.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reports</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">macro</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_macros</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="n">macro</span><span class="o">.</span><span class="n">downgrade</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="n">macro</span><span class="o">.</span><span class="n">upgrade</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">opt_non_interactive</span><span class="p">:</span>
+                <span class="n">arglist</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getargspec</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">args</span>
+                <span class="n">defaultlist</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getargspec</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">defaults</span>
+                <span class="n">optionals</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">while</span> <span class="n">defaultlist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">defaultlist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">arglist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;self&quot;</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;meta_config&quot;</span><span class="p">]:</span>
+                        <span class="n">optionals</span><span class="p">[</span><span class="n">arglist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultlist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">arglist</span> <span class="o">=</span> <span class="n">arglist</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">defaultlist</span> <span class="o">=</span> <span class="n">defaultlist</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+                <span class="k">if</span> <span class="n">optionals</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">custom_inspector</span><span class="p">:</span>
+                        <span class="n">res</span> <span class="o">=</span> <span class="n">custom_inspector</span><span class="p">(</span><span class="n">optionals</span><span class="p">,</span> <span class="s2">&quot;upgrade_macro&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">res</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">get_user_values</span><span class="p">(</span><span class="n">optionals</span><span class="p">)</span>
+            <span class="n">upgrade_macro_result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="p">,</span> <span class="o">**</span><span class="n">res</span><span class="p">)</span>
+            <span class="n">config</span><span class="p">,</span> <span class="n">i_changes</span> <span class="o">=</span> <span class="n">upgrade_macro_result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reports</span> <span class="o">+=</span> <span class="n">i_changes</span>
+        <span class="n">opt_node</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">rose</span><span class="o">.</span><span class="n">CONFIG_SECT_TOP</span><span class="p">,</span>
+                               <span class="n">rose</span><span class="o">.</span><span class="n">CONFIG_OPT_META_TYPE</span><span class="p">],</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">new_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_flag_no_tag</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_tag</span>
+        <span class="n">opt_node</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">INFO_DOWNGRADED</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_tag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">INFO_UPGRADED</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_tag</span><span class="p">)</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MacroReport</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">CONFIG_SECT_TOP</span><span class="p">,</span>
+                                        <span class="n">rose</span><span class="o">.</span><span class="n">CONFIG_OPT_META_TYPE</span><span class="p">,</span>
+                                        <span class="n">new_value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reports</span> <span class="o">+=</span> <span class="p">[</span><span class="n">report</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+
+    <span class="k">def</span> <span class="nf">_check_can_downgrade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_instance</span><span class="p">):</span>
+        <span class="c1"># Check whether a macro instance supports a downgrade transform.</span>
+        <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">macro_instance</span><span class="p">,</span> <span class="n">DOWNGRADE_METHOD</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_upgrade_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mac1</span><span class="p">,</span> <span class="n">mac2</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">mac1</span><span class="o">.</span><span class="n">BEFORE_TAG</span> <span class="o">==</span> <span class="n">mac2</span><span class="o">.</span><span class="n">AFTER_TAG</span><span class="p">)</span> <span class="o">-</span>
+                <span class="p">(</span><span class="n">mac2</span><span class="o">.</span><span class="n">BEFORE_TAG</span> <span class="o">==</span> <span class="n">mac1</span><span class="o">.</span><span class="n">AFTER_TAG</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_load_version_macros</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_insts</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">macro</span> <span class="ow">in</span> <span class="n">macro_insts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span> <span class="ow">and</span> <span class="n">macro</span><span class="o">.</span><span class="n">AFTER_TAG</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span> <span class="o">=</span> <span class="p">[</span><span class="n">macro</span><span class="p">]</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span> <span class="ow">and</span> <span class="n">macro</span><span class="o">.</span><span class="n">BEFORE_TAG</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span> <span class="o">=</span> <span class="p">[</span><span class="n">macro</span><span class="p">]</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">:</span>
+            <span class="c1"># Try to figure out the latest upgrade version.</span>
+            <span class="n">macro_insts</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_upgrade_sort</span><span class="p">)</span>
+            <span class="n">next_taglist</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">AFTER_TAG</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">macro_insts</span><span class="p">]</span>
+            <span class="n">temp_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">macro_insts</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">macro</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">temp_list</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="k">if</span> <span class="n">macro</span><span class="o">.</span><span class="n">BEFORE_TAG</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">next_taglist</span><span class="p">:</span>
+                    <span class="c1"># Disconnected macro.</span>
+                    <span class="n">temp_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">macro</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">temp_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span> <span class="o">=</span> <span class="p">[</span><span class="n">temp_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">while</span> <span class="n">macro_insts</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">macro</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">macro_insts</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span> <span class="ow">and</span>
+                        <span class="n">macro</span><span class="o">.</span><span class="n">AFTER_TAG</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">BEFORE_TAG</span><span class="p">):</span>
+                    <span class="n">macro_insts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">macro</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">macro</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">downgrade</span> <span class="ow">and</span>
+                        <span class="n">macro</span><span class="o">.</span><span class="n">BEFORE_TAG</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">AFTER_TAG</span><span class="p">):</span>
+                    <span class="n">macro_insts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">macro</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">version_macros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">macro</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># No more macros found.</span>
+                <span class="k">break</span>
+
+
+<span class="k">def</span> <span class="nf">get_meta_upgrade_module</span><span class="p">(</span><span class="n">meta_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Import and return the versions.py module for a given meta_path.</span>
+
+<span class="sd">    The meta_path should not contain a version, just the category.</span>
+<span class="sd">    For example, it should be &#39;/some/path/to/rose-meta/my-command&#39;</span>
+<span class="sd">    rather than &#39;/some/path/to/my-command/vn9.1&#39;.</span>
+
+<span class="sd">    Let ImportErrors bubble up so they can be reported.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">meta_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">meta_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">meta_path</span><span class="p">,</span> <span class="n">MACRO_UPGRADE_MODULE_PATH</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">meta_path</span><span class="p">)</span>
+    <span class="n">version_module</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">meta_path</span><span class="p">,</span> <span class="s2">&quot;__init__.py&quot;</span><span class="p">)):</span>
+        <span class="c1"># The category directory is a package.</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">meta_path</span><span class="p">))</span>
+        <span class="n">category_package</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+        <span class="n">version_module</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">category_package</span><span class="p">,</span> <span class="n">MACRO_UPGRADE_MODULE</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">meta_path</span><span class="p">)</span>
+        <span class="n">version_module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">MACRO_UPGRADE_MODULE</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">version_module</span>
+
+
+<span class="k">def</span> <span class="nf">parse_upgrade_args</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse options/arguments for rose macro and upgrade.&quot;&quot;&quot;</span>
+    <span class="n">opt_parser</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">RoseOptionParser</span><span class="p">()</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;conf_dir&quot;</span><span class="p">,</span> <span class="s2">&quot;meta_path&quot;</span><span class="p">,</span> <span class="s2">&quot;non_interactive&quot;</span><span class="p">,</span> <span class="s2">&quot;output_dir&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;downgrade&quot;</span><span class="p">,</span> <span class="s2">&quot;all_versions&quot;</span><span class="p">]</span>
+    <span class="n">opt_parser</span><span class="o">.</span><span class="n">add_my_options</span><span class="p">(</span><span class="o">*</span><span class="n">options</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">argv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">opt_parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">opt_parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">opt_parser</span><span class="o">.</span><span class="n">get_usage</span><span class="p">())</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ROSE_HOME&quot;</span><span class="p">))</span>
+    <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">add_opt_meta_paths</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">meta_path</span><span class="p">)</span>
+    <span class="n">config_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">)</span>
+    <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">,</span>
+                                    <span class="n">rose</span><span class="o">.</span><span class="n">SUB_CONFIG_NAME</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)):</span>
+        <span class="n">rose</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">Reporter</span><span class="p">()(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">ERROR_LOAD_CONFIG_DIR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">),</span>
+            <span class="n">kind</span><span class="o">=</span><span class="n">rose</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">Reporter</span><span class="o">.</span><span class="n">KIND_ERR</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">rose</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">Reporter</span><span class="o">.</span><span class="n">FAIL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">load_conf_from_file</span><span class="p">(</span>
+            <span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">,</span> <span class="n">config_file_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;upgrade&quot;</span><span class="p">)</span> <span class="o">+</span>
+        <span class="p">(</span><span class="n">config_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">opts</span><span class="p">,)</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Run rose upgrade.&quot;&quot;&quot;</span>
+    <span class="n">return_objects</span> <span class="o">=</span> <span class="n">parse_upgrade_args</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">return_objects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">app_config</span><span class="p">,</span> <span class="n">config_map</span><span class="p">,</span> <span class="n">meta_config</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">opts</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">return_objects</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">)</span>
+    <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">opts</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">-</span> <span class="n">opts</span><span class="o">.</span><span class="n">quietness</span>
+    <span class="n">reporter</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">Reporter</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span>
+    <span class="n">meta_opt_node</span> <span class="o">=</span> <span class="n">app_config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">rose</span><span class="o">.</span><span class="n">CONFIG_SECT_TOP</span><span class="p">,</span>
+                                    <span class="n">rose</span><span class="o">.</span><span class="n">CONFIG_OPT_META_TYPE</span><span class="p">],</span>
+                                   <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">meta_opt_node</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta_opt_node</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">reporter</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MetaConfigFlagMissingError</span><span class="p">())</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">upgrade_manager</span> <span class="o">=</span> <span class="n">MacroUpgradeManager</span><span class="p">(</span><span class="n">app_config</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">downgrade</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">reporter</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">need_all_versions</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">all_versions</span> <span class="ow">or</span> <span class="n">args</span>
+    <span class="n">ok_versions</span> <span class="o">=</span> <span class="n">upgrade_manager</span><span class="o">.</span><span class="n">get_tags</span><span class="p">(</span><span class="n">only_named</span><span class="o">=</span><span class="ow">not</span> <span class="n">need_all_versions</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+        <span class="n">user_choice</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">best_mark</span> <span class="o">=</span> <span class="n">BEST_VERSION_MARKER</span>
+        <span class="n">curr_mark</span> <span class="o">=</span> <span class="n">CURRENT_VERSION_MARKER</span>
+        <span class="n">all_versions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">curr_mark</span><span class="p">)</span> <span class="o">+</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ok_versions</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">downgrade</span><span class="p">:</span>
+            <span class="n">all_versions</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">all_versions</span><span class="p">:</span>
+                <span class="n">all_versions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_mark</span> <span class="o">+</span> <span class="n">all_versions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+            <span class="n">all_versions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_mark</span> <span class="o">+</span> <span class="n">upgrade_manager</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">all_versions</span><span class="p">:</span>
+                <span class="n">all_versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_mark</span> <span class="o">+</span> <span class="n">all_versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+            <span class="n">all_versions</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">curr_mark</span> <span class="o">+</span> <span class="n">upgrade_manager</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">all_versions</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">user_choice</span> <span class="o">==</span> <span class="n">upgrade_manager</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+        <span class="n">reporter</span><span class="p">(</span><span class="n">UpgradeVersionSame</span><span class="p">(</span><span class="n">user_choice</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">user_choice</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ok_versions</span><span class="p">:</span>
+        <span class="n">reporter</span><span class="p">(</span><span class="n">UpgradeVersionError</span><span class="p">(</span><span class="n">user_choice</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">upgrade_manager</span><span class="o">.</span><span class="n">set_new_tag</span><span class="p">(</span><span class="n">user_choice</span><span class="p">)</span>
+    <span class="n">combined_config_map</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">combine_opt_config_map</span><span class="p">(</span><span class="n">config_map</span><span class="p">)</span>
+    <span class="n">macro_function</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">conf</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">conf_key</span><span class="p">:</span> <span class="n">upgrade_manager</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="n">conf</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">non_interactive</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">method_id</span> <span class="o">=</span> <span class="n">UPGRADE_METHOD</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">downgrade</span><span class="p">:</span>
+        <span class="n">method_id</span> <span class="o">=</span> <span class="n">DOWNGRADE_METHOD</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">macro_id</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MACRO_OUTPUT_ID</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method_id</span><span class="p">,</span>
+                                                 <span class="n">upgrade_manager</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+    <span class="n">new_config_map</span><span class="p">,</span> <span class="n">changes_map</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">apply_macro_to_config_map</span><span class="p">(</span>
+        <span class="n">combined_config_map</span><span class="p">,</span> <span class="n">meta_config</span><span class="p">,</span> <span class="n">macro_function</span><span class="p">,</span> <span class="n">macro_name</span><span class="o">=</span><span class="n">macro_id</span><span class="p">)</span>
+    <span class="n">has_changes</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">handle_transform</span><span class="p">(</span><span class="n">config_map</span><span class="p">,</span> <span class="n">new_config_map</span><span class="p">,</span>
+                                              <span class="n">changes_map</span><span class="p">,</span> <span class="n">macro_id</span><span class="p">,</span>
+                                              <span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
+                                              <span class="n">opts</span><span class="o">.</span><span class="n">non_interactive</span><span class="p">,</span> <span class="n">reporter</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_changes</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">new_meta_config</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">load_meta_config</span><span class="p">(</span>
+        <span class="n">new_config_map</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">directory</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">,</span>
+        <span class="n">config_type</span><span class="o">=</span><span class="n">rose</span><span class="o">.</span><span class="n">SUB_CONFIG_NAME</span><span class="p">,</span>
+        <span class="n">ignore_meta_error</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">config_map</span> <span class="o">=</span> <span class="n">new_config_map</span>
+    <span class="n">combined_config_map</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">combine_opt_config_map</span><span class="p">(</span><span class="n">config_map</span><span class="p">)</span>
+    <span class="n">macro_function</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">conf</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">conf_key</span><span class="p">:</span>
+        <span class="n">rose</span><span class="o">.</span><span class="n">macros</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">TriggerMacro</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">new_config_map</span><span class="p">,</span> <span class="n">changes_map</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">apply_macro_to_config_map</span><span class="p">(</span>
+        <span class="n">combined_config_map</span><span class="p">,</span> <span class="n">new_meta_config</span><span class="p">,</span> <span class="n">macro_function</span><span class="p">,</span>
+        <span class="n">macro_name</span><span class="o">=</span><span class="n">macro_id</span><span class="p">)</span>
+    <span class="n">trig_macro_id</span> <span class="o">=</span> <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MACRO_OUTPUT_ID</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">TRANSFORM_METHOD</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">MACRO_UPGRADE_TRIGGER_NAME</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">changes_map</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">handle_transform</span><span class="p">(</span><span class="n">config_map</span><span class="p">,</span> <span class="n">new_config_map</span><span class="p">,</span>
+                                    <span class="n">changes_map</span><span class="p">,</span> <span class="n">trig_macro_id</span><span class="p">,</span>
+                                    <span class="n">opts</span><span class="o">.</span><span class="n">conf_dir</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
+                                    <span class="n">opts</span><span class="o">.</span><span class="n">non_interactive</span><span class="p">,</span> <span class="n">reporter</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">add_meta_paths</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

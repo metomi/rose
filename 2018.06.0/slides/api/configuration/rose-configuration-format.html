@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Configuration Format &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Configuration" href="index.html" />
+    <link rel="next" title="File Creation Mode" href="file-creation.html" />
+    <link rel="prev" title="Configuration Metadata" href="metadata.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-configuration-format">
+
+<h1>Rose Configuration Format<a class="headerlink" href="../../../html/api/configuration/rose-configuration-format.html#rose-configuration-format" title="View HTML">§</a></h1>
+
+<p>A configuration in Rose is normally represented by a directory with the
+following:</p>
+<ul class="simple">
+<li>a configuration file in a modified <a class="reference external" href="https://en.wikipedia.org/wiki/INI_file">INI</a> format.</li>
+<li>(optionally) files containing data that cannot easily be represented by the
+INI format.</li>
+</ul>
+<p>We have added the following conventions into the Rose configuration format:</p>
+<ol class="arabic">
+<li><p class="first">The file name is normally called <code class="docutils literal notranslate"><span class="pre">rose*.conf</span></code>, e.g. <a class="reference internal" href="site-and-user.html#rose:file:rose.conf" title="rose:file:rose.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose.conf</span></code></a>,
+<a class="reference internal" href="application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a>, <a class="reference internal" href="metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a>, etc.</p>
+</li>
+<li><p class="first">Only a hash <code class="docutils literal notranslate"><span class="pre">#</span></code> in the beginning of a line starts a comment. Empty lines
+and lines with only white spaces are ignored. There is no support for
+trailing comments. Comments are normally ignored when a configuration file
+is loaded. However, some comments are loaded if the following conditions
+are met:</p>
+<ul class="simple">
+<li>Comment lines at the beginning of a configuration file up to but not
+including the 1st blank line or the 1st setting are comment lines
+associated with the file. They will re-appear at the top of the file
+when it is re-dumped.</li>
+<li>Comment lines between a blank line and the next setting, and the
+comment lines between the previous setting and the next setting are
+comments associated with the next setting. The comment lines associated
+with a setting will re-appear before the setting when the file is
+re-dumped.</li>
+</ul>
+</li>
+<li><p class="first">Only the equal sign <code class="docutils literal notranslate"><span class="pre">=</span></code> is used to delimit a key-value pair - because the
+colon <code class="docutils literal notranslate"><span class="pre">:</span></code> may be used in keys of namelist declarations.</p>
+</li>
+<li><p class="first">A key-value pair declaration does not have to live under a section
+declaration. Such a declaration lives directly under the <em>root</em> level.</p>
+</li>
+<li><p class="first">Key-value pair declarations following a line with only <code class="docutils literal notranslate"><span class="pre">[]</span></code> are placed
+directly under the root level.</p>
+</li>
+<li><p class="first">Declarations are case sensitive. When dealing with case-insensitive
+inputs such as Fortran logicals or numbers in scientific notation,
+lowercase values should be used.</p>
+</li>
+<li><p class="first">When writing namelist inputs, keys should be lowercase.</p>
+</li>
+<li><p class="first">Declarations start at column 1. Continuations start at column &gt;1.</p>
+<ul class="simple">
+<li>Each line is stripped of leading and trailing spaces.</li>
+<li>A newline <code class="docutils literal notranslate"><span class="pre">\n</span></code> character is prefixed to each continuation line.</li>
+<li>If a continuation line has a leading equal sign <code class="docutils literal notranslate"><span class="pre">=</span></code> character, it is
+stripped from the line. This is useful for retaining leading white
+spaces in a continuation line.</li>
+</ul>
+</li>
+<li><p class="first">A single exclamation <code class="docutils literal notranslate"><span class="pre">!</span></code> or a double exclamation <code class="docutils literal notranslate"><span class="pre">!!</span></code> in front of a
+section (i.e. <code class="docutils literal notranslate"><span class="pre">[!SECTION]</span></code>) or key=value pair (i.e. <code class="docutils literal notranslate"><span class="pre">!key=value</span></code>)
+denotes an ignored setting.</p>
+<ul class="simple">
+<li>E.g. It will be ignored in run time but may be used by other Rose
+utilities.</li>
+<li>A single exclamation denotes a user-ignored setting.</li>
+<li>A double exclamation denotes a program-ignored setting. E.g.
+<a class="reference internal" href="../command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> may use a double exclamation to switch
+off a setting according to the setting metadata.</li>
+</ul>
+</li>
+<li><p class="first">The open square bracket (<code class="docutils literal notranslate"><span class="pre">[</span></code>) and close square bracket (<code class="docutils literal notranslate"><span class="pre">]</span></code>) characters
+cannot be used within a section declaration. E.g.
+<code class="docutils literal notranslate"><span class="pre">[[hello]</span></code>, <code class="docutils literal notranslate"><span class="pre">[hello]]</span></code>, <code class="docutils literal notranslate"><span class="pre">[hello</span> <span class="pre">[world]</span> <span class="pre">and</span> <span class="pre">beyond]</span></code> should all be
+errors on parsing.</p>
+</li>
+<li><p class="first">If a section is declared twice in a file, the later section will append
+settings to the earlier one. If the same key in the same section is
+declared twice, the later value will override the earlier one. This logic
+applies to the state of a setting as well.</p>
+</li>
+<li><p class="first">Once the file is parsed, declaration ordering is insignificant.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Do not assume order of environment variables.</p>
+</div>
+</li>
+<li><p class="first">Values of settings accept syntax such as <code class="docutils literal notranslate"><span class="pre">$NAME</span></code> or <code class="docutils literal notranslate"><span class="pre">${NAME}</span></code> for
+environment variable substitution.</p>
+</li>
+</ol>
+<p>E.g.</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is line 1 of the comment for this file.</span>
+<span class="c1"># This is line 2 of the comment for this file.</span>
+
+<span class="c1"># This comment will be ignored.</span>
+
+<span class="c1"># This is a comment for section-1.</span>
+<span class="nt">[section-1]</span>
+<span class="c1"># This is a comment for key-1.</span>
+<span class="nv">key-1</span><span class="o">=</span><span class="s">value 1</span>
+<span class="c1"># This comment will be ignored.</span>
+
+<span class="c1"># This is line 1 of the comment for key-2.</span>
+<span class="c1"># This is line 2 of the comment for key-2.</span>
+<span class="nv">key-2</span><span class="o">=</span><span class="s">value 2 line 1</span>
+      <span class="s">value 2 line 2</span>
+<span class="c1"># This is a comment for key-3.</span>
+<span class="nv">key-3</span><span class="o">=</span><span class="s">value 3 line 1</span>
+     <span class="o">=</span><span class="s">    value 3 line 2 has leading identation.</span>
+     <span class="o">=</span>
+     <span class="o">=</span><span class="s">    value 3 line 3 is blank. This is line 4.</span>
+
+<span class="c1"># section-2 is user-ignored.</span>
+<span class="c">[!section-2]</span>
+<span class="c">key-4=value 4</span>
+<span class="c1"># ...</span>
+
+<span class="nt">[section-3]</span>
+<span class="c1"># key-5 is program ignored.</span>
+<span class="cp">!!key-5=value 5</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this document, the shorthand <code class="docutils literal notranslate"><span class="pre">SECTION=KEY=VALUE</span></code> is used to represent a
+<code class="docutils literal notranslate"><span class="pre">KEY=VALUE</span></code> pair in a <code class="docutils literal notranslate"><span class="pre">[SECTION]</span></code> of an INI format file.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="goals">
+
+<h2>Goals<a class="headerlink" href="../../../html/api/configuration/rose-configuration-format.html#goals" title="View HTML">§</a></h2>
+
+<p>Suite configurations should be portable between users (at least at the same
+site). E.g.: another user should be able to run the same suite:</p>
+<ul class="simple">
+<li>without making ANY changes to it.</li>
+<li>without having to add/modify things in their <code class="docutils literal notranslate"><span class="pre">$HOME/.profile</span></code>.</li>
+</ul>
+<p>Input configurations should be programming language neutral.</p>
+<ul class="simple">
+<li>Any processing logic should be application/version independent, generic and
+future-proof.</li>
+<li>Data structure should be represented in formats easily understood and
+manipulatable by a human and a computer.</li>
+</ul>
+<p>The life cycles of application configurations in a suite may differ from that
+of the suite.</p>
+<ul class="simple">
+<li>The configuration of an application may be independent of the suite.</li>
+<li>The configuration of an application should be portable between suitable
+suites.</li>
+</ul>
+<p>The configurations are independent of the utilities. For example, the
+configuration metadata for the suite and application configurations will
+drive the Rose config editor GUI, but will not be bound or restricted by it.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="optional-configuration">
+
+<h2>Optional Configuration<a class="headerlink" href="../../../html/api/configuration/rose-configuration-format.html#optional-configuration" title="View HTML">§</a></h2>
+
+<p>In a Rose configuration directory, we can add an <code class="docutils literal notranslate"><span class="pre">opt/</span></code> sub-directory for
+optional configuration files. Optional configuration files contain additional
+configuration, which can be selected at run time to override the configuration
+in the main <code class="docutils literal notranslate"><span class="pre">rose-${TYPE}.conf</span></code> file. The name of each optional configuration
+should follow the syntax <code class="docutils literal notranslate"><span class="pre">rose-${TYPE}-${KEY}.conf</span></code>, where <code class="docutils literal notranslate"><span class="pre">${KEY}</span></code> is a
+short name to describe the override functionality of the optional
+configuration file.</p>
+<p>A root level <code class="docutils literal notranslate"><span class="pre">opts=KEY</span> <span class="pre">...</span></code> setting in the main configuration will tell the
+run time program to load the relevant optional configurations in the <code class="docutils literal notranslate"><span class="pre">opt/</span></code>
+sub-directory at run time. Individual Rose utilities may also read optional
+configuration keys from environment variables and/or command line options.</p>
+<p>Where multiple <code class="docutils literal notranslate"><span class="pre">$KEY</span></code> settings are given, the optional configurations are
+applied in that order - for example, a setting:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">opts</span><span class="o">=</span><span class="s">ketchup mayonnaise</span>
+</pre></div>
+</div>
+<p>implies loading the optional configuration <code class="docutils literal notranslate"><span class="pre">rose-app-ketchup.conf</span></code> and then
+the optional configuration <code class="docutils literal notranslate"><span class="pre">rose-app-mayonnaise.conf</span></code>, which may override
+the previous one.</p>
+<p>By default, a Rose command will fail if an optional configuration file is
+missing. However, if you put the optional configuration key in brackets,
+then the optional configuration file is allowed to be missing. E.g.:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">opts</span><span class="o">=</span><span class="s">ketchup (mayonnaise)</span>
+</pre></div>
+</div>
+<p>In the above example, <code class="docutils literal notranslate"><span class="pre">rose-app-mayonnaise.conf</span></code> can be missing.</p>
+<p>Some Rose utilities (e.g. <a class="reference internal" href="../command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>,
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>, <a class="reference internal" href="../command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a>, etc) allow
+optional configurations to be selected at run time using:</p>
+<ol class="arabic simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">ROSE_APP_OPT_CONF_KEYS</span></code> Environment variables.</li>
+<li>The command line options <code class="docutils literal notranslate"><span class="pre">--opt-conf-key=KEY</span></code> or <code class="docutils literal notranslate"><span class="pre">-O</span> <span class="pre">KEY</span></code>.</li>
+</ol>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">See reference of individual commands for detail.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">By default optional configurations must exist else an error will
+be raised. To specify an optional configuration which may be missing write
+the name of the configuration inside parenthesis (e.g. <code class="docutils literal notranslate"><span class="pre">(foo)</span></code>).</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="optional-configurations-and-metadata">
+
+<h3>Optional Configurations and Metadata<a class="headerlink" href="../../../html/api/configuration/rose-configuration-format.html#optional-configurations-and-metadata" title="View HTML">§</a></h3>
+
+<p>Metadata utilities such as <a class="reference internal" href="../command-reference.html#command-rose-app-upgrade"><span class="std std-ref">rose app-upgrade</span></a> and
+<a class="reference internal" href="../command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a> treat each
+main + optional configuration as a separate entity to be transformed,
+upgraded, or validated. Use cases with more than one optional configuration
+are not handled.</p>
+<p>When transforming or upgrading, each optional configuration is treated
+separately and re-created after the transform as a functional difference
+from the main upgraded configuration.</p>
+<p>The logic for transforming or upgrading a main configuration <code class="docutils literal notranslate"><span class="pre">C</span></code> with
+optional configurations <code class="docutils literal notranslate"><span class="pre">O1</span></code> and <code class="docutils literal notranslate"><span class="pre">O2</span></code> into a new main configuration <code class="docutils literal notranslate"><span class="pre">Ct</span></code>
+and new optional configurations <code class="docutils literal notranslate"><span class="pre">O1t</span></code> and <code class="docutils literal notranslate"><span class="pre">O2t</span></code> can be represented like
+this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>C =&gt; Ct
+C + O1 =&gt; C1t
+C + O2 =&gt; C2t
+O1t = C1t - Ct
+O2t = C2t - Ct
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="import-configuration">
+
+<h2>Import Configuration<a class="headerlink" href="../../../html/api/configuration/rose-configuration-format.html#import-configuration" title="View HTML">§</a></h2>
+
+<p>A root level <code class="docutils literal notranslate"><span class="pre">import=PATH1</span> <span class="pre">PATH2...</span></code> setting in the main configuration will
+tell Rose utilities to search for configurations at <code class="docutils literal notranslate"><span class="pre">PATH1</span></code>, <code class="docutils literal notranslate"><span class="pre">PATH2</span></code> (and
+so on) and inherit configuration and files from them if found.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">At the moment, use of this is only encouraged for configuration metadata.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="re-define-configuration-at-run-time">
+
+<h2>Re-define Configuration at Run Time<a class="headerlink" href="../../../html/api/configuration/rose-configuration-format.html#re-define-configuration-at-run-time" title="View HTML">§</a></h2>
+
+<p>Some Rose utilities (e.g. <a class="reference internal" href="../command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>,
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>, <a class="reference internal" href="../command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a>, etc) allow you
+to re-define configuration settings at run time using the
+<code class="docutils literal notranslate"><span class="pre">--define=[SECTION]NAME=VALUE</span></code> or <code class="docutils literal notranslate"><span class="pre">-D</span> <span class="pre">[SECTION]NAME=VALUE</span></code> options on
+the command line. This would add new settings or override any settings
+defined in the main and optional configurations. E.g.:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set [env]FOO=foo, and [env]BAR=bar</span>
+<span class="c1"># (Overriding any original settings of [env]FOO or [env]BAR)</span>
+rose task-run -D <span class="s1">&#39;[env]FOO=foo&#39;</span> -D <span class="s1">&#39;[env]BAR=bar&#39;</span>
+
+<span class="c1"># Switch off [env]BAZ</span>
+rose task-run -D <span class="s1">&#39;[env]!BAZ=&#39;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

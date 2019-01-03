@@ -1,0 +1,177 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Queues &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Retries" href="retries.html" />
+    <link rel="prev" title="Inheritance" href="inheritance.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="queues">
+
+<h1>Queues<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/queues.html#queues" title="View HTML">§</a></h1>
+
+<p>Queues are used to put a limit on the number of tasks that will be active at
+any one time, even if their dependencies are satisfied. This avoids swamping
+systems with too many tasks at once.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/queues.html#example" title="View HTML">§</a></h2>
+
+<p>In this example, our suite manages a particularly understaffed restaurant.</p>
+<p>Create a new suite called <code class="docutils literal notranslate"><span class="pre">queues-tutorial</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">queues</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">queues</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>You will now have a <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file that looks like this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+            <span class="kd">open_restaurant</span> <span class="o">=&gt;</span> <span class="kd">steak1</span> <span class="o">&amp;</span> <span class="kd">steak2</span> <span class="o">&amp;</span> <span class="kd">pasta1</span> <span class="o">&amp;</span> <span class="kd">pasta2</span> <span class="o">&amp;</span> <span class="kd">pasta3</span> <span class="o">&amp;</span> <span class="c">\</span>
+                               <span class="kd">pizza1</span> <span class="o">&amp;</span> <span class="kd">pizza2</span> <span class="o">&amp;</span> <span class="kd">pizza3</span> <span class="o">&amp;</span> <span class="kd">pizza4</span>
+            <span class="kd">steak1</span> <span class="o">=&gt;</span> <span class="kd">ice_cream1</span>
+            <span class="kd">steak2</span> <span class="o">=&gt;</span> <span class="kd">cheesecake1</span>
+            <span class="kd">pasta1</span> <span class="o">=&gt;</span> <span class="kd">ice_cream2</span>
+            <span class="kd">pasta2</span> <span class="o">=&gt;</span> <span class="kd">sticky_toffee1</span>
+            <span class="kd">pasta3</span> <span class="o">=&gt;</span> <span class="kd">cheesecake2</span>
+            <span class="kd">pizza1</span> <span class="o">=&gt;</span> <span class="kd">ice_cream3</span>
+            <span class="kd">pizza2</span> <span class="o">=&gt;</span> <span class="kd">ice_cream4</span>
+            <span class="kd">pizza3</span> <span class="o">=&gt;</span> <span class="kd">sticky_toffee2</span>
+            <span class="kd">pizza4</span> <span class="o">=&gt;</span> <span class="kd">ice_cream5</span>
+        <span class="s2">&quot;&quot;&quot;</span>
+
+<span class="nt">[runtime]</span>
+    <span class="nt">[[open_restaurant]]</span>
+    <span class="nt">[[MAINS]]</span>
+    <span class="nt">[[DESSERT]]</span>
+    <span class="nt">[[steak1,steak2,pasta1,pasta2,pasta3,pizza1,pizza2,pizza3,pizza4]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> MAINS</span>
+    <span class="nt">[[ice_cream1,ice_cream2,ice_cream3,ice_cream4,ice_cream5]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> DESSERT</span>
+    <span class="nt">[[cheesecake1,cheesecake2,sticky_toffee1,sticky_toffee2]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> DESSERT</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In graph sections backslash (<code class="docutils literal notranslate"><span class="pre">\</span></code>) is a line continuation character i.e. the
+following two examples are equilivalent:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">foo </span><span class="o">=</span><span class="s">&gt; bar &amp; \</span>
+<span class="s">       baz</span>
+</pre></div>
+</div>
+<div class="last highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">foo </span><span class="o">=</span><span class="s">&gt; bar &amp; baz</span>
+</pre></div>
+</div>
+</div>
+<p>Open the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> then run the suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">gui</span> <span class="n">queues</span><span class="o">-</span><span class="n">tutorial</span> <span class="o">&amp;</span>
+<span class="n">cylc</span> <span class="n">run</span> <span class="n">queues</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>You will see that all the <code class="docutils literal notranslate"><span class="pre">steak</span></code>, <code class="docutils literal notranslate"><span class="pre">pasta</span></code>, and <code class="docutils literal notranslate"><span class="pre">pizza</span></code> tasks are run
+at once, swiftly followed by all the <code class="docutils literal notranslate"><span class="pre">ice_cream</span></code>, <code class="docutils literal notranslate"><span class="pre">cheesecake</span></code>,
+<code class="docutils literal notranslate"><span class="pre">sticky_toffee</span></code> tasks as the customers order from the dessert menu.</p>
+<p>This will overwhelm our restaurant staff! The chef responsible for <code class="docutils literal notranslate"><span class="pre">MAINS</span></code>
+can only handle 3 tasks at any given time, and the <code class="docutils literal notranslate"><span class="pre">DESSERT</span></code> chef can only
+handle 2.</p>
+<p>We need to add some queues. Add a <code class="docutils literal notranslate"><span class="pre">[queues]</span></code> section to the <code class="docutils literal notranslate"><span class="pre">[scheduling]</span></code>
+section like so:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nt">[[queues]]</span>
+        <span class="nt">[[[mains_chef_queue]]]</span>
+            <span class="nv">limit </span><span class="o">=</span><span class="s"> 3</span>  <span class="c1"># Only 3 mains dishes at one time.</span>
+            <span class="nv">members </span><span class="o">=</span><span class="s"> MAINS</span>
+        <span class="nt">[[[dessert_chef_queue]]]</span>
+            <span class="nv">limit </span><span class="o">=</span><span class="s"> 2</span>  <span class="c1"># Only 2 dessert dishes at one time.</span>
+            <span class="nv">members </span><span class="o">=</span><span class="s"> DESSERT</span>
+</pre></div>
+</div>
+<p>Re-open the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> if you have closed it and re-run the suite.</p>
+<p>You should see that there are now never more than 3 active <code class="docutils literal notranslate"><span class="pre">MAINS</span></code> tasks
+running and never more than 2 active <code class="docutils literal notranslate"><span class="pre">DESSERT</span></code> tasks running.</p>
+<p>The customers will obviously have to wait!</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="further-reading">
+
+<h2>Further Reading<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/queues.html#further-reading" title="View HTML">§</a></h2>
+
+<p>For more information, see the <a class="reference external" href="http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide">Cylc User Guide</a>.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

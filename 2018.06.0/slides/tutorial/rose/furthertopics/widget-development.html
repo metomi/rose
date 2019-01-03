@@ -1,0 +1,230 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Widget Development &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Cheat Sheet" href="../../../cheat-sheet.html" />
+    <link rel="prev" title="Upgrading Macro Development" href="upgrading-macro-development.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="widget-development">
+
+<h1>Widget Development<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/widget-development.html#widget-development" title="View HTML">§</a></h1>
+
+<p>The <a class="reference internal" href="../../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI displays configurations using built-in
+widgets. For more complex requirements <a class="reference internal" href="../../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> supports
+custom widgets as plugins.</p>
+<p>In this tutorial we will write a custom widget which offers typing suggestions
+when entering usernames.</p>
+<a class="reference internal image-reference" href="../../../_images/rose-edit-custom-widget.png"><img alt="../../../_images/rose-edit-custom-widget.png" class="align-center" src="../../../_images/rose-edit-custom-widget.png" style="width: 450px;" /></a>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you find yourself needing to write a custom widget, please contact the
+Rose team for guidance.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/widget-development.html#example" title="View HTML">§</a></h2>
+
+<p>Create a new Rose app by running the following command replacing
+<code class="docutils literal notranslate"><span class="pre">DIRECTORY</span></code> with the path in which to create the suite:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>rose tutorial widget <span class="s">&lt;DIRECTORY&gt;</span>
+cd <span class="s">&lt;DIRECTORY&gt;</span>
+</pre></div>
+</div>
+<p>You will now have a Rose app which contains the following files:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="s">&lt;DIRECTORY&gt;</span>/
+|-- meta/
+|   `-- lib/
+|       `-- python/
+|           `-- widget/
+|               |-- __init__.py
+|               `-- username.py
+`-- rose-app.conf
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file defines an environment variable called
+<code class="docutils literal notranslate"><span class="pre">USER</span></code>:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="nv">USER</span><span class="o">=</span><span class="s">fred</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file is empty - the presence of this file declares the
+<code class="docutils literal notranslate"><span class="pre">widget</span></code> directory as a <a class="reference external" href="https://docs.python.org/3/tutorial/modules.html#packages">python package</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">username.py</span></code> file is where we will write our widget.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="initial-code">
+
+<h3>Initial Code<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/widget-development.html#initial-code" title="View HTML">§</a></h3>
+
+<p>We will start with a slimmed-down copy of the class
+<code class="xref py py-class docutils literal notranslate"><span class="pre">rose.config_editor.valuewidget.text.RawValueWidget</span></code> which you will
+find in the file <code class="docutils literal notranslate"><span class="pre">username.py</span></code>. It contains all the API calls you would
+normally ever need.</p>
+<p>We are now going to extend the widget to be more useful.</p>
+<p>Add a line importing the <code class="docutils literal notranslate"><span class="pre">pwd</span></code> package at the top of the file:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gi">+ import pwd</span>
+
+ import gobject
+ import pygtk
+ pygtk.require(&#39;2.0&#39;)
+ import gtk
+</pre></div>
+</div>
+<p>This adds the Python library that we’ll use in a minute.</p>
+<p>Now we need to create a predictive text model by adding some data to our
+<code class="docutils literal notranslate"><span class="pre">gtk.Entry</span></code> text widget.</p>
+<p>We need to write our method <code class="docutils literal notranslate"><span class="pre">_set_completion</span></code>, and put it in the main body
+of the class. This will retrieve usernames from the <code class="docutils literal notranslate"><span class="pre">pwd.getpwall()</span></code>
+function and store them so they can be used by the text widget <code class="docutils literal notranslate"><span class="pre">self.entry</span></code>.</p>
+<p>Add the following method to the <code class="docutils literal notranslate"><span class="pre">UsernameValueWidget</span></code> class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_set_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># Return a predictive text model.</span>
+    <span class="n">completion</span> <span class="o">=</span> <span class="n">gtk</span><span class="o">.</span><span class="n">EntryCompletion</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">gtk</span><span class="o">.</span><span class="n">ListStore</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">username</span> <span class="ow">in</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">pw_name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pwd</span><span class="o">.</span><span class="n">getpwall</span><span class="p">()]:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">username</span><span class="p">])</span>
+    <span class="n">completion</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">completion</span><span class="o">.</span><span class="n">set_text_column</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">completion</span><span class="o">.</span><span class="n">set_inline_completion</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">set_completion</span><span class="p">(</span><span class="n">completion</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We need to make sure this method gets called at the right time, so we add
+the following line to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span>  self.entry.show()
+<span class="gi">+ gobject.idle_add(self._set_completion)</span>
+  self.pack_start(self.entry, expand=True, fill=True,
+                  padding=0)
+</pre></div>
+</div>
+<p>We could just call <code class="docutils literal notranslate"><span class="pre">self._set_completion()</span></code> there, but this would hang the
+config editor while the database is retrieved.</p>
+<p>Instead, we’ve told GTK to fetch the predictive text model when it’s next idle
+(<code class="docutils literal notranslate"><span class="pre">gobject.idle_add</span></code>). This means it will be run after it finishes loading
+the page, and will be more-or-less invisible to the user. This is a better
+way to launch something that may take a second or two. If it took any longer,
+we’d probably want to use a separate process.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="referencing-the-widget">
+
+<h3>Referencing the Widget<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/widget-development.html#referencing-the-widget" title="View HTML">§</a></h3>
+
+<p>Now we need to refer to it in the metadata to make use of it.</p>
+<p>Create the file <code class="docutils literal notranslate"><span class="pre">meta/rose-meta.conf</span></code> and paste the following configuration
+into it:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env=USER]</span>
+<span class="nv">widget[rose-config-edit]</span><span class="o">=</span><span class="s">username.UsernameValueWidget</span>
+</pre></div>
+</div>
+<p>This means that we’ve set our widget up for the option <code class="docutils literal notranslate"><span class="pre">USER</span></code>
+under the section <span class="guilabel">env</span>. It will now be used as the widget for this
+variable’s value.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="results">
+
+<h3>Results<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/widget-development.html#results" title="View HTML">§</a></h3>
+
+<p>Try opening up the config editor in the application directory (where the
+<a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> is) by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">config</span><span class="o">-</span><span class="n">edit</span>
+</pre></div>
+</div>
+<p>Navigate to the <span class="guilabel">env</span> page. You should see your widget on
+the page! As you type, it should provide helpful
+auto-completion of usernames. Try typing your own username.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="further-reading">
+
+<h2>Further Reading<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/widget-development.html#further-reading" title="View HTML">§</a></h2>
+
+<p>For more information, see <a class="reference internal" href="../../../api/rose-gtk-library.html#api-gtk"><span class="std std-ref">Rose GTK library</span></a> and the <a class="reference external" href="http://www.pygtk.org/">PyGTK</a> web page.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

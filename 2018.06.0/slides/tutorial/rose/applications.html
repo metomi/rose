@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Applications &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Tutorial" href="index.html" />
+    <link rel="next" title="Rose Metadata" href="metadata.html" />
+    <link rel="prev" title="Rose Configurations" href="configurations.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-applications">
+
+<h1>Rose Applications<a class="headerlink" href="../../../html/tutorial/rose/applications.html#rose-applications" title="View HTML">§</a></h1>
+
+
+
+
+
+</article>
+<article class="admonition-cylc-task-environment slide level-2">
+
+<h2>Cylc Task Environment</h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_world]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> echo &quot;Hello ${WORLD}!&quot;</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">WORLD </span><span class="o">=</span><span class="s"> Earth</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="admonition-cylc-task-environment slide level-2">
+
+<h2>Cylc Task Environment</h2>
+
+<p>As a task grows in complexity it could require:</p>
+<ul class="simple">
+<li>More environment variables.</li>
+<li>Input files.</li>
+<li>Scripts and libraries.</li>
+</ul>
+
+
+
+
+</article>
+<article class="admonition-cylc-task-environment slide level-2">
+
+<h2>Cylc Task Environment</h2>
+
+<p>A Rose application or “Rose app” is a runnable <a class="reference internal" href="../../glossary.html#term-rose-configuration"><span class="xref std std-term">Rose configuration</span></a>
+which executes a defined commmand.</p>
+<p>Rose applications provide a convenient way to encapsulate all of this
+configuration, storing it all in one place to make it easier to handle and
+maintain.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="application-configuration">
+
+<h2>Application Configuration<a class="headerlink" href="../../../html/tutorial/rose/applications.html#application-configuration" title="View HTML">§</a></h2>
+
+<p>Specify the command to execute:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">echo &quot;Hello ${WORLD}!&quot;</span>
+</pre></div>
+</div>
+<p>Specify environment variables:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="nv">WORLD</span><span class="o">=</span><span class="s">Earth</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id4">
+
+<h2>Application Configuration<a class="headerlink" href="../../../html/tutorial/rose/applications.html#id4" title="View HTML">§</a></h2>
+
+<p>The <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directory:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">bin/hello</span></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;Hello </span><span class="si">${</span><span class="nv">WORLD</span><span class="si">}</span><span class="s2">!&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">rose-app.conf</span></div>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">hello</span>
+</pre></div>
+</div>
+</div>
+<p>Any static input files can be placed in the <code class="docutils literal notranslate"><span class="pre">file/</span></code> directory.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="running-rose-applications">
+
+<h2>Running Rose Applications<a class="headerlink" href="../../../html/tutorial/rose/applications.html#running-rose-applications" title="View HTML">§</a></h2>
+
+<p>An application can be run using the <a class="reference internal" href="../../api/command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a> command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose app-run -q  <span class="c1"># -q for quiet output</span>
+<span class="go">Hello Earth!</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose app-run -q -C path/to/application
+<span class="go">Hello Earth!</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id5">
+
+<h2>Running Rose Applications<a class="headerlink" href="../../../html/tutorial/rose/applications.html#id5" title="View HTML">§</a></h2>
+
+<p class="rubric">In this practical we will convert the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> task from the
+<a class="reference internal" href="../cylc/scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather-forecasting suite</span></a>
+into a Rose application.</p>
+<p>Next section: <a class="reference internal" href="metadata.html#tutorial-rose-metadata"><span class="std std-ref">Rose Metadata</span></a></p>
+<div class="note admonition" id="rose-applications-practical">
+<p class="first admonition-title">Practical<a class="headerlink" href="../../../html/tutorial/rose/applications.html#rose-applications-practical" title="View HTML">§</a></p>
+<p class="rubric">In this practical we will convert the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> task from the
+<a class="reference internal" href="../cylc/scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather-forecasting suite</span></a>
+into a Rose application.</p>
+<p>Create a directory on your filesystem called <code class="docutils literal notranslate"><span class="pre">rose-tutorial</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<ol class="last arabic">
+<li><p class="first"><strong>Create a Rose application</strong></p>
+<p>Create a new directory called <code class="docutils literal notranslate"><span class="pre">application-tutorial</span></code>, this is to be our
+<a class="reference internal" href="../../glossary.html#term-application-directory"><span class="xref std std-term">application directory</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">application</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cd</span> <span class="n">application</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Move the required resources into the</strong> <code class="docutils literal notranslate"><span class="pre">application-tutorial</span></code>
+<strong>application.</strong></p>
+<p>The application requires three resources:</p>
+<ul class="simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">bin/forecast</span></code> script.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">lib/python/util.py</span></code> Python library.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">lib/template/map.html</span></code> HTML template.</li>
+</ul>
+<p>Rather than leaving these resources scattered throughout the
+<a class="reference internal" href="../../glossary.html#term-suite-directory"><span class="xref std std-term">suite directory</span></a> we can encapsulate them into the
+application directory.</p>
+<p>Copy the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> script and <code class="docutils literal notranslate"><span class="pre">util.py</span></code> library into the <code class="docutils literal notranslate"><span class="pre">bin/</span></code>
+directory where they will be automatically added to the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> when
+the application is run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">forecast</span><span class="o">-</span><span class="n">script</span> <span class="nb">bin</span>
+</pre></div>
+</div>
+<p>Copy the HTML template into the <code class="docutils literal notranslate"><span class="pre">file/</span></code> directory by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="nb">map</span><span class="o">-</span><span class="n">template</span> <span class="n">file</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Create the</strong> <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> <strong>file.</strong></p>
+<p>The <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file needs to define the command to run.
+Create a <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file directly inside the
+<a class="reference internal" href="../../glossary.html#term-application-directory"><span class="xref std std-term">application directory</span></a> containing the following:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">forecast $INTERVAL $N_FORECASTS</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">INTERVAL</span></code> and <code class="docutils literal notranslate"><span class="pre">N_FORECASTS</span></code> environment variables need to be
+defined. To do this add a <a class="reference internal" href="../../api/configuration/application.html#rose:conf:rose-app.conf[env]" title="rose:conf:rose-app.conf[env]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[env]</span></code></a> section
+to the file:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="c1"># The interval between forecasts.</span>
+<span class="nv">INTERVAL</span><span class="o">=</span><span class="s">60</span>
+<span class="c1"># The number of forecasts to run.</span>
+<span class="nv">N_FORECASTS</span><span class="o">=</span><span class="s">5</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Copy the test data.</strong></p>
+<p>For now we will run the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> application using some sample data
+so that we can run it outside of the weather forecasting suite.</p>
+<p>The test data was gathered in November 2017.</p>
+<p>Copy the test data files into the <code class="docutils literal notranslate"><span class="pre">file/</span></code> directory by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">test</span><span class="o">-</span><span class="n">data</span> <span class="n">file</span><span class="o">/</span><span class="n">test</span><span class="o">-</span><span class="n">data</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Move environment variables defined in the</strong> <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> <strong>file.</strong></p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">[runtime][forecast][environment]</span></code> section of the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code>
+file in the
+<a class="reference internal" href="../cylc/scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather-forecasting suite</span></a>
+we set a few environment variables:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">WIND_FILE_TEMPLATE</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">WIND_CYCLES</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">RAINFALL_FILE</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">MAP_FILE</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">MAP_TEMPLATE</span></code></li>
+</ul>
+<p>We will now move these into the application. This way, all of the
+configuration specific to the application live within it.</p>
+<p>Add the following lines to the <a class="reference internal" href="../../api/configuration/application.html#rose:conf:rose-app.conf[env]" title="rose:conf:rose-app.conf[env]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[env]</span></code></a> section:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="c1"># The weighting to give to the wind file from each WIND_CYCLE</span>
+<span class="c1"># (comma separated list, values should add up to 1).</span>
+<span class="nv">WEIGHTING</span><span class="o">=</span><span class="s">1</span>
+<span class="c1"># Comma separated list of cycle points to get wind data from.</span>
+<span class="nv">WIND_CYCLES</span><span class="o">=</span><span class="s">0</span>
+<span class="c1"># Path to the wind files. {cycle}, {xy} will get filled in by the</span>
+<span class="c1"># forecast script.</span>
+<span class="nv">WIND_FILE_TEMPLATE</span><span class="o">=</span><span class="s">test-data/wind_{cycle}_{xy}.csv</span>
+<span class="c1"># Path to the rainfall file.</span>
+<span class="nv">RAINFALL_FILE</span><span class="o">=</span><span class="s">test-data/rainfall.csv</span>
+<span class="c1"># The path to create the HTML map in.</span>
+<span class="nv">MAP_FILE</span><span class="o">=</span><span class="s">map.html</span>
+<span class="c1"># The path to the HTML map template file.</span>
+<span class="nv">MAP_TEMPLATE</span><span class="o">=</span><span class="s">map-template.html</span>
+</pre></div>
+</div>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">WIND_FILE_TEMPLATE</span></code> and <code class="docutils literal notranslate"><span class="pre">RAINFALL_FILE</span></code> environment
+variables are pointing at files in the <code class="docutils literal notranslate"><span class="pre">test-data</span></code> directory.</p>
+<p>To make this application work outside of the weather forecasting suite
+we will also need to
+provide the <code class="docutils literal notranslate"><span class="pre">DOMAIN</span></code> and <code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code> environment variables defined
+in the <code class="docutils literal notranslate"><span class="pre">[runtime][root][environment]</span></code> section of the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code>
+file as well as the <code class="docutils literal notranslate"><span class="pre">CYLC_TASK_CYCLE_POINT</span></code> environment variable
+provided by Cylc when it runs a task.</p>
+<p>Add the following lines to the <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a>:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="c1"># The date when the test data was gathered.</span>
+<span class="nv">CYLC_TASK_CYCLE_POINT</span><span class="o">=</span><span class="s">20171101T0000Z</span>
+<span class="c1"># The dimensions of each grid cell in degrees.</span>
+<span class="nv">RESOLUTION</span><span class="o">=</span><span class="s">0.2</span>
+<span class="c1"># The area to generate forecasts for (lng1, lat1, lng2, lat2).</span>
+<span class="nv">DOMAIN</span><span class="o">=</span><span class="s">-12,48,5,61</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Run the application.</strong></p>
+<p>All of the scripts, libraries, files and environment variables required
+to make a forecast are now provided inside this application directory.</p>
+<p>We should now be able to run the application.</p>
+<p><a class="reference internal" href="../../api/command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a> will run an application in the current
+directory so it is a good idea to move somewhere else before calling
+the command. Create a directory and run the application in it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">run</span>
+<span class="n">cd</span> <span class="n">run</span>
+<span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">run</span> <span class="o">-</span><span class="n">C</span> <span class="o">../</span>
+</pre></div>
+</div>
+<p>The application should run successfully, leaving behind some files. Try
+opening the <code class="docutils literal notranslate"><span class="pre">map.html</span></code> file in a web browser.</p>
+</li>
+</ol>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

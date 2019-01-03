@@ -1,0 +1,239 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>File Creation Mode &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Configuration" href="index.html" />
+    <link rel="next" title="Rose Configuration API" href="api.html" />
+    <link rel="prev" title="Rose Configuration Format" href="rose-configuration-format.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="file-creation-mode">
+
+<h1>File Creation Mode<a class="headerlink" href="../../../html/api/configuration/file-creation.html#file-creation-mode" title="View HTML">§</a></h1>
+
+<p>The application launcher will use the following logic to determine the
+root directory to install file targets with a relative path:</p>
+<ol class="arabic simple">
+<li>If the setting <a class="reference internal" href="application.html#rose:conf:rose-app.conf|file-install-root" title="rose:conf:rose-app.conf|file-install-root"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf|file-install-root=PATH</span></code></a> is
+specified in the application configuration file, its value will be used.</li>
+<li>If the environment variable <span class="target" id="index-0"></span><a class="reference internal" href="../environment-variables.html#envvar-ROSE_FILE_INSTALL_ROOT"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_FILE_INSTALL_ROOT</span></code></a> is
+specified, its value will be used.</li>
+<li>Otherwise, the working directory of the task will be used.</li>
+</ol>
+<dl class="file">
+<dt id="rose:file:*">
+<em class="property">Rose Configuration </em><code class="descname">*</code></dt>
+<dd><dl class="conf">
+<dt id="rose:conf:*|schemes">
+<em class="property">Config </em><code class="descname">schemes</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fs</strong> – The file system scheme. If a URI looks like an existing path
+in the file system, this scheme will be used.</li>
+<li><strong>namelist</strong> – The namelist scheme. Refer to <code class="docutils literal notranslate"><span class="pre">namelist:NAME</span></code>
+sections in the configuration file.</li>
+<li><strong>svn</strong> – The Subversion scheme. The location is a Subversion URL or
+an FCM location keyword. A URI with these schemes <code class="docutils literal notranslate"><span class="pre">svn</span></code>,
+<code class="docutils literal notranslate"><span class="pre">svn+ssh</span></code> and <code class="docutils literal notranslate"><span class="pre">fcm</span></code> are automatically recognised.</li>
+<li><strong>rsync</strong> – This scheme is useful for pulling a file or directory from
+a remote host using <code class="docutils literal notranslate"><span class="pre">rsync</span></code> via <code class="docutils literal notranslate"><span class="pre">ssh</span></code>. A URI should have the
+form <code class="docutils literal notranslate"><span class="pre">HOST:PATH</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Rose will automatically attempt to detect the type of a source
+(i.e. file, directory, URL), however, the name of the source can
+sometimes be ambiguous. E.g. A URL with a <code class="docutils literal notranslate"><span class="pre">http</span></code> scheme can be a
+path in a version control system, or a path to a plain file. The
+<a class="reference internal" href="#rose:conf:*|schemes" title="rose:conf:*|schemes"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">schemes</span></code></a> setting can be used to help the system to do
+the right thing. The syntax is as follows:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">schemes</span><span class="o">=</span><span class="s">PATTERN-1=SCHEME-1</span>
+       <span class="o">=</span><span class="s">PATTERN-2=SCHEME-2</span>
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">schemes</span><span class="o">=</span><span class="s">hpc*:*=rsync</span>
+       <span class="o">=</span><span class="s">http://host/svn-repos/*=svn</span>
+
+<span class="nt">[file:foo.txt]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">hpc1:/path/to/foo.txt</span>
+
+<span class="nt">[file:bar.txt]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">http://host/svn-repos/path/to/bar.txt</span>
+</pre></div>
+</div>
+<p>In the above example, a URI matching the pattern <code class="docutils literal notranslate"><span class="pre">hpc*:*</span></code> would use the
+<code class="docutils literal notranslate"><span class="pre">rsync</span></code> scheme to pull the source to the current host, and a URI
+matching the pattern <code class="docutils literal notranslate"><span class="pre">http://host/svn-repos/*</span></code> would use the
+<code class="docutils literal notranslate"><span class="pre">svn</span></code> scheme. For all other URIs, the system will try to make an
+intelligent guess.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The system will always match a URI in the order as specified by the
+setting to avoid ambiguity.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the <code class="docutils literal notranslate"><span class="pre">rsync</span></code> scheme is used you can use the <a class="reference external" href="http://man.openbsd.org/ssh_config#User">User</a> setting in
+<code class="docutils literal notranslate"><span class="pre">~/.ssh/config</span></code> to specify the user ID for logging into <code class="docutils literal notranslate"><span class="pre">HOST</span></code>
+if required.</p>
+</div>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:*[file:TARGET]">
+<em class="property">Config </em><code class="descname">[file:TARGET]</code></dt>
+<dd><dl class="conf">
+<dt id="rose:conf:*[file:TARGET]source">
+<em class="property">Config </em><code class="descname">source</code><em class="property">= SOURCE</em><em class="property">(alternate: source=(SOURCE))</em></dt>
+<dd><p>A space delimited list of sources for generating this file. A
+source can be the path to a regular file or directory in the
+file system (globbing is also supported - e.g. using <code class="docutils literal notranslate"><span class="pre">&quot;\*.conf&quot;</span></code>
+to mean all <code class="docutils literal notranslate"><span class="pre">.conf</span></code> files), or it may be a URI to a resource. If
+a source is a URI, it may point to a section with a supported
+scheme in the current configuration, e.g. a
+<code class="docutils literal notranslate"><span class="pre">namelist:NAME</span></code> section. Otherwise the URI must be in a
+supported scheme or be given sufficient information for the system to
+determine its scheme, e.g. via the <a class="reference internal" href="#rose:conf:*|schemes" title="rose:conf:*|schemes"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">*|schemes</span></code></a> setting.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Normally, a source that does not exist would trigger an error in run
+time. However, it may be useful to have an optional source for a file
+sometimes. In which case, the syntax <a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source=(SOURCE)</span></code></a>
+can be used to specify an optional source. E.g.
+<code class="docutils literal notranslate"><span class="pre">source=namelist:foo</span> <span class="pre">(namelist:bar)</span></code> would allow
+<code class="docutils literal notranslate"><span class="pre">namelist:bar</span></code> to be missing or ignored without an error.</p>
+</div>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:*[file:TARGET]checksum">
+<em class="property">Config </em><code class="descname">checksum</code></dt>
+<dd><p>The expected MD5 checksum of the target. If specified, the file
+generation will fail if the actual checksum of the target does not
+match with this setting. This setting is only meaningful if
+<code class="docutils literal notranslate"><span class="pre">TARGET</span></code> is a regular file or a symbolic link to a regular file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">An empty value for checksum tells the system to report the target
+checksum in verbose mode.</p>
+</div>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:*[file:TARGET]mode">
+<em class="property">Config </em><code class="descname">mode</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Default:</th><td class="field-body"><p class="first">auto</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Options:</th><td class="field-body"><ul class="first last simple">
+<li><strong>auto</strong> – <p>Automatically determine action based on the value of
+<a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source</span></code></a>.</p>
+<ul>
+<li><a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source=</span></code></a> - If source is undefined create an empty
+file.</li>
+<li><a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source=path</span></code></a> - If source is a single path to a file
+or directory then the path will be coppied to the target path.</li>
+<li><a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source=file1</span> <span class="pre">file2</span> <span class="pre">...</span></code></a> - If the source is a list of
+files then the files will be concatenated in the target path.</li>
+<li><a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source=dir1</span> <span class="pre">dir2</span> <span class="pre">...</span></code></a> - If the source is a list of
+directories then the directories will be transfered to the target
+path using <code class="docutils literal notranslate"><span class="pre">rsync</span></code>.</li>
+</ul>
+</li>
+<li><strong>mkdir</strong> – Creates an empty directory (<a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source</span></code></a> must be a
+single path).</li>
+<li><strong>symlink</strong> – Creates a symlink to the provided source, the
+source <em>does not</em> have to exist when the symlink is created (
+<a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source</span></code></a> must be a single path).</li>
+<li><strong>symlink+</strong> – Creates a symlink to the provided source, the source
+<em>must</em> exist when the symlink is created (<a class="reference internal" href="#rose:conf:*[file:TARGET]source" title="rose:conf:*[file:TARGET]source"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">source</span></code></a>
+must be a single path).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,113 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Built-In Applications &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" />
+    <link rel="next" title="fcm_make" href="built-in/fcm_make.html" />
+    <link rel="prev" title="Rose Bash Library" href="rose-bash-library.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-built-in-applications">
+
+<h1>Rose Built-In Applications<a class="headerlink" href="../../html/api/rose-built-in-applications.html#rose-built-in-applications" title="View HTML">§</a></h1>
+
+<p>Rose contains a few built-in applications providing common functionality.</p>
+<p>These applications can be run using <a class="reference internal" href="command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> or
+<a class="reference internal" href="command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a>.</p>
+<p>To use a built-in application, add the <a class="reference internal" href="configuration/application.html#rose:conf:rose-app.conf|mode" title="rose:conf:rose-app.conf|mode"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf|mode=KEY</span></code></a>
+setting in the application configuration, where <code class="docutils literal notranslate"><span class="pre">KEY</span></code> is the name of the
+built-in application. For example to use the <a class="reference internal" href="built-in/rose_prune.html#rose:app:rose_prune" title="rose:app:rose_prune"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_prune</span></code></a> built-in
+application:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">rose-app.conf</span></div>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">mode</span><span class="o">=</span><span class="s">rose_prune</span>
+<span class="c1"># There may also be metadata which can be picked up using the `meta` setting.</span>
+<span class="nv">meta</span><span class="o">=</span><span class="s">rose_prune</span>
+</pre></div>
+</div>
+</div>
+<p>A built-in application would normally behave very much like running an
+external command. The key differences are normally that:</p>
+<ul class="simple">
+<li>A built-in application may use a different working directory to a Rose
+application.</li>
+<li>A built-in application will run some pre-defined commands or logic
+instead of a command defined in the application configuration.</li>
+</ul>
+<div class="toctree-wrapper compound" id="built-in-toc">
+<p class="caption"><span class="caption-text">Built-in applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="built-in/fcm_make.html"><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="built-in/rose_ana.html"><code class="docutils literal notranslate"><span class="pre">rose_ana</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="built-in/rose_arch.html"><code class="docutils literal notranslate"><span class="pre">rose_arch</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="built-in/rose_bunch.html"><code class="docutils literal notranslate"><span class="pre">rose_bunch</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="built-in/rose_prune.html"><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code></a></li>
+</ul>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

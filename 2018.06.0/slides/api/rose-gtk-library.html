@@ -1,0 +1,584 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose GTK library &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" />
+    <link rel="next" title="Rose Macro API" href="rose-macro.html" />
+    <link rel="prev" title="rose_prune" href="built-in/rose_prune.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-gtk-library">
+
+<h1>Rose GTK library<a class="headerlink" href="../../html/api/rose-gtk-library.html#rose-gtk-library" title="View HTML">§</a></h1>
+
+<p>The Rose/Rosie GUIs (such as the config editor) are written using the Python
+bindings for the GTK GUI toolkit (<a class="reference external" href="http://www.pygtk.org/">PyGTK</a>). You can write your own custom GTK
+widgets and use them within Rose. They should live with the metadata under
+the <code class="docutils literal notranslate"><span class="pre">lib/python/widget/</span></code> directory.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="value-widgets">
+
+<h2>Value Widgets<a class="headerlink" href="../../html/api/rose-gtk-library.html#value-widgets" title="View HTML">§</a></h2>
+
+<p>Value widgets are used for operating on the values of settings. In the config
+editor, they appear next to the menu button and name label. There are builtin
+value widgets in Rose such as text entry boxes, radio buttons, and drop-down
+menus. These are chosen by the config editor based on metadata - for example,
+if a setting has an integer type, the value widget will be a spin button.</p>
+<p>The config editor supports adding user-defined custom widgets which replace
+the default widgets. These have the same API, but live in the metadata
+directories rather than the Rose source code.</p>
+<p>For example, you may wish to add widgets that deal with dates (e.g. using
+something based on a <a class="reference external" href="https://developer.gnome.org/pygtk/stable/class-gtkcalendar.html">calendar</a> widget) or use a <a class="reference external" href="http://www.pygtk.org/pygtk2tutorial/sec-RangeWidgetEample.html">slider</a> widget for
+numbers. You may even want something that uses an image-based interface
+such as a latitude-longitude chooser based on a map.</p>
+<p>Normally, widgets will be placed within the metadata directory for the suite
+or application. Widgets going into the Rose core should be added to the
+<code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/valuewidget/</span></code> directory in a Rose
+distribution.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="example">
+
+<h3>Example<a class="headerlink" href="../../html/api/rose-gtk-library.html#example" title="View HTML">§</a></h3>
+
+<p>See the <a class="reference internal" href="../tutorial/rose/furthertopics/widget-development.html#widget-dev"><span class="std std-ref">Advanced Tutorial</span></a>.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="api-reference">
+
+<h3>API Reference<a class="headerlink" href="../../html/api/rose-gtk-library.html#api-reference" title="View HTML">§</a></h3>
+
+<p>All value widgets, custom or core, use the same API. This means that a good
+practical reference is the set of existing value widgets in the package
+<code class="docutils literal notranslate"><span class="pre">rose.config_editor.valuewidget</span></code>.</p>
+<p>The procedure for implementing a custom value widget is as follows:</p>
+<p>Assign a <code class="docutils literal notranslate"><span class="pre">widget[rose-config-edit]</span></code> attribute to the relevant variable in the
+metadata configuration, e.g.</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[namelist:VerifConNL/ScalarAreaCodes]</span>
+<span class="nv">widget[rose-config-edit]</span><span class="o">=</span><span class="s">module_name.AreaCodeChooser</span>
+</pre></div>
+</div>
+<p>where the widget class lives in the module <code class="docutils literal notranslate"><span class="pre">module_name</span></code> under
+<code class="docutils literal notranslate"><span class="pre">lib/python/widget/</span></code> in the metadata directory for the application or suite.
+Modules are imported by the config editor on demand.</p>
+<p>This class should have a constructor of the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AreaCodeChooser</span><span class="p">(</span><span class="n">gtk</span><span class="o">.</span><span class="n">HBox</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">set_value</span><span class="p">,</span> <span class="n">hook</span><span class="p">,</span> <span class="n">arg_str</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>with the following arguments:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">value</span></code></dt>
+<dd>a string that represents the value that the widget should display.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">metadata</span></code></dt>
+<dd><p class="first">a map or dictionary of configuration metadata properties for this value,
+such as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;This is used to count something&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You may not need to use this information.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">set_value</span></code></dt>
+<dd><p class="first">a function that should be called with a new string value of this widget,
+e.g.</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">set_value</span><span class="p">(</span><span class="s2">&quot;20&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hook</span></code></dt>
+<dd>An instance of a class <code class="docutils literal notranslate"><span class="pre">rose.config_editor.valuewidget.ValueWidgetHook</span></code>
+containing callback functions that you should connect some of your widgets
+to.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">arg_str</span></code></dt>
+<dd><p class="first">a keyword argument that stores extra text given to the <code class="docutils literal notranslate"><span class="pre">widget</span></code> option
+in the metadata, if any:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">widget[rose-config-edit]</span><span class="o">=</span><span class="s">modulename.ClassName arg1 arg2 arg3 ...</span>
+</pre></div>
+</div>
+<p>would give a <code class="docutils literal notranslate"><span class="pre">arg_str</span></code> of <code class="docutils literal notranslate"><span class="pre">&quot;arg1</span> <span class="pre">arg2</span> <span class="pre">arg3</span> <span class="pre">...&quot;</span></code>. This could help
+configure your widget - for example, for a table based widget, you might
+give the column names:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">widget[rose-config-edit]</span><span class="o">=</span><span class="s">table.TableValueWidget NAME ID WEIGHTING</span>
+</pre></div>
+</div>
+<p class="last">This means that you can write a generic widget and then configure it for
+different cases.</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">hook</span></code> contains some callback functions that you should implement:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">hook.get_focus(widget)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></dt>
+<dd><p class="first">which you should connect your top-level widget (<code class="docutils literal notranslate"><span class="pre">self</span></code>) to as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">grab_focus</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">hook</span><span class="o">.</span><span class="n">get_focus</span><span class="p">(</span><span class="n">my_favourite_focus_widget</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or define a method in your class</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">grab_focus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Override the focus method, so we can scroll to a particular widget.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">hook</span><span class="o">.</span><span class="n">get_focus</span><span class="p">(</span><span class="n">my_favourite_focus_widget</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">which allows the correct widget (<code class="docutils literal notranslate"><span class="pre">my_favourite_focus_widget</span></code>) in your
+container to receive the focus such as a gtk.Entry
+(<code class="docutils literal notranslate"><span class="pre">my_favourite_focus_widget</span></code>) and will also trigger a scroll action on
+a config editor page. This is important to implement to get the proper
+global find functionality.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hook.trigger_scroll(widget)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></dt>
+<dd><p class="first">accessed by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hook</span><span class="o">.</span><span class="n">trigger_scroll</span><span class="p">(</span><span class="n">my_favourite_focus_widget</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This should be connected to the <code class="docutils literal notranslate"><span class="pre">focus-in-event</span></code> GTK signal of your
+top-level widget (<code class="docutils literal notranslate"><span class="pre">self</span></code>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;focus-in-event&#39;</span><span class="p">,</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">trigger_scroll</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">This also is used to trigger a config editor page scroll to your widget.</p>
+</dd>
+</dl>
+<p>You may implement the following optional methods for your widget, which help
+to preserve cursor position when a widget is refreshed:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">set_focus_index(focus_index)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></dt>
+<dd><p class="first">A method that takes a number as an argument, which is the current cursor
+position relative to the characters in the variable value:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">set_focus_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">focus_index</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set the cursor position to focus_index.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">focus_index</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For example, a <code class="docutils literal notranslate"><span class="pre">focus_index</span></code> of <code class="docutils literal notranslate"><span class="pre">0</span></code> means that your widget should set
+the cursor position to the beginning of the value. A <code class="docutils literal notranslate"><span class="pre">focus_index</span></code> of
+<code class="docutils literal notranslate"><span class="pre">4</span></code> for a variable value of <code class="docutils literal notranslate"><span class="pre">Operational</span></code> means that the cursor should
+be placed between the <code class="docutils literal notranslate"><span class="pre">r</span></code> and the <code class="docutils literal notranslate"><span class="pre">a</span></code>.</p>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This has no real meaning or importance for widgets that don’t display
+editable text. If you do not supply this method, the config editor will
+attempt to do the right thing anyway.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">get_focus_index()</span> <span class="pre">-&gt;</span> <span class="pre">focus_index</span></code></dt>
+<dd><p class="first">A method that takes no arguments and returns a number which is the
+current cursor position relative to the characters in the variable value:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_focus_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the cursor position.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This has no real meaning or importance for widgets that don’t display
+editable text. If you do not supply this method, the config editor will
+guess the cursor position anyway, based on the last change to the
+variable value.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">handle_type_error(is_in_error)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></dt>
+<dd><p class="first">The default behaviour when a variable error is added or removed is to
+re-instantiate the widget (refresh and redraw it). This can be overridden
+by defining this method in your value widget class. It takes a boolean
+<code class="docutils literal notranslate"><span class="pre">is_in_error</span></code> which is <code class="docutils literal notranslate"><span class="pre">True</span></code> if there is a value (type) error and
+<code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">handle_type_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_in_error</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Change behaviour based on whether the variable is_in_error.&quot;&quot;&quot;</span>
+    <span class="n">icon_id</span> <span class="o">=</span> <span class="n">gtk</span><span class="o">.</span><span class="n">STOCK_DIALOG_ERROR</span> <span class="k">if</span> <span class="n">is_in_error</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">set_icon_from_stock</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">gtk</span><span class="o">.</span><span class="n">STOCK_DIALOG_ERROR</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For example, this is used in a built-in widget for the quoted string
+types <code class="docutils literal notranslate"><span class="pre">string</span></code> and <code class="docutils literal notranslate"><span class="pre">character</span></code>. The quotes around the text are
+normally hidden, but the <code class="docutils literal notranslate"><span class="pre">handle_type_error</span></code> shows them if there is an
+error. The method also keeps the keyboard focus, which is the main purpose.</p>
+<div class="last admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">You may not have much need for this method, as the default error
+flagging and cursor focus handling is normally sufficient.</p>
+</div>
+</dd>
+</dl>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">All the existing variable value widgets are implemented using this
+API, so a good resource is the modules within the
+<code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/valuewidget</span></code> package.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="config-editor-custom-pages">
+
+<h2>Config Editor Custom Pages<a class="headerlink" href="../../html/api/rose-gtk-library.html#config-editor-custom-pages" title="View HTML">§</a></h2>
+
+<p>A ‘page’ in the config editor is the container inside a tab or detached tab
+that (by default) contains a table of variable widgets. The config editor
+allows custom ‘pages’ to be defined that may or may not use the standard
+set of variable widgets (menu button, name, value widget). This allows any
+presentation of the underlying variable information.</p>
+<p>For example, you may wish to present the variables in a more structured,
+two-dimensional form rather than as a simple list. You may want to strip
+down or add to the information presented by default - e.g. hiding names or
+embedding widgets within a block of help text.</p>
+<p>You may even wish to do something off-the-wall such as an <a class="reference external" href="https://github.com/jrfonseca/xdot.py">xdot-based</a>
+widget set!</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="id1">
+
+<h3>API Reference<a class="headerlink" href="../../html/api/rose-gtk-library.html#id1" title="View HTML">§</a></h3>
+
+<p>The procedure for generating a custom page widget is as follows:</p>
+<p>Assign a <code class="docutils literal notranslate"><span class="pre">widget</span></code> option to the relevant namespace in the metadata
+configuration, e.g.</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[ns:namelist/STASHNUM]</span>
+<span class="nv">widget[rose-config-edit]</span><span class="o">=</span><span class="s">module_name.MyGreatBigTable</span>
+</pre></div>
+</div>
+<p>The widget class should have a constructor of the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyGreatBigTable</span><span class="p">(</span><span class="n">gtk</span><span class="o">.</span><span class="n">Table</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">real_variable_list</span><span class="p">,</span> <span class="n">missing_variable_list</span><span class="p">,</span>
+                 <span class="n">variable_functions_inst</span><span class="p">,</span> <span class="n">show_modes_dict</span><span class="p">,</span>
+                 <span class="n">arg_str</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>The class can inherit from any <code class="docutils literal notranslate"><span class="pre">gtk.Container</span></code>-derived class.</p>
+<p>The constructor arguments are</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">real_variable_list</span></code></dt>
+<dd>a list of the Variable objects (<code class="docutils literal notranslate"><span class="pre">x.name</span></code>, <code class="docutils literal notranslate"><span class="pre">x.value</span></code>, <code class="docutils literal notranslate"><span class="pre">x.metadata</span></code>,
+etc from the <code class="docutils literal notranslate"><span class="pre">rose.variable</span></code> module). These are the objects you will
+need to generate your widgets around.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">missing_variable_list</span></code></dt>
+<dd>a list of ‘missing’ Variable objects that could be added to the container.
+You will only need to worry about these if you plan to show them by
+implementing the <code class="docutils literal notranslate"><span class="pre">'View</span> <span class="pre">Latent'</span></code> menu functionality that we’ll discuss
+further on.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">variable_functions_inst</span></code></dt>
+<dd>an instance of the class
+<code class="docutils literal notranslate"><span class="pre">rose.config_editor.ops.variable.VariableOperations</span></code>. This contains
+methods to operate on the variables. These will update the
+undo stack and take care of any errors. These methods are the only ways that
+you should write to the variable states or values. For documentation, see
+the module <code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/ops/variable.py</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">show_modes_dict</span></code></dt>
+<dd><p class="first">a dictionary that looks like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">show_modes_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;latent&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;ignored&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                   <span class="s1">&#39;user-ignored&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                   <span class="s1">&#39;flag:optional&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;flag:no-meta&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>which could be ignored for most custom pages, as you need. The meaning of
+the different keys in a non-custom page is:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">'latent'</span></code></dt>
+<dd>False means don’t display widgets for variables in the metadata or
+that have been deleted (the <code class="docutils literal notranslate"><span class="pre">variable_list.ghosts</span></code> variables)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">'fixed'</span></code></dt>
+<dd>False means don’t display widgets for variables if they only have
+one value set in the metadata <code class="docutils literal notranslate"><span class="pre">values</span></code> option.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">'ignored'</span></code></dt>
+<dd>False means don’t display widgets for variables if they’re
+ignored (in the configuration, but commented out).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">'user-ignored'</span></code></dt>
+<dd>(If <code class="docutils literal notranslate"><span class="pre">ignored</span></code> is False) False means don’t display widgets for
+user-ignored variables. True means always show user-ignored variables.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">'title'</span></code></dt>
+<dd>Short for ‘View with no title’, False means show the title of a
+variable, True means show the variable name instead.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">'flag:optional'</span></code></dt>
+<dd>True means indicate if a variable is <code class="docutils literal notranslate"><span class="pre">optional</span></code>, and False means do
+not show an indicator.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">'flag:no-meta'</span></code></dt>
+<dd>True means indicate if a variable has any metadata content, and
+False means do not show an indicator.</dd>
+</dl>
+<p>If you wish to implement actions based on changes in these properties
+(e.g. displaying and hiding fixed variables depending on the ‘fixed’
+setting), the custom page widget should expose a method named
+<code class="docutils literal notranslate"><span class="pre">'show_mode_change'</span></code> followed by the key. However, <code class="docutils literal notranslate"><span class="pre">'ignored'</span></code> is
+handled separately (more below). These methods should take a single
+boolean that indicates the display status. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">show_fixed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">should_show</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">The argument <code class="docutils literal notranslate"><span class="pre">should_show</span></code> is a boolean. If True, fixed variables should
+be shown. If False, they should be hidden by your custom container.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">arg_str</span></code></dt>
+<dd><p class="first">a keyword argument that stores extra text given to the <code class="docutils literal notranslate"><span class="pre">widget</span></code> option
+in the metadata, if any:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">widget[rose-config-edit] </span><span class="o">=</span> <span class="s">modulename.ClassName arg1 arg2 arg3 ...</span>
+</pre></div>
+</div>
+<p>would give a <code class="docutils literal notranslate"><span class="pre">arg_str</span></code> of <code class="docutils literal notranslate"><span class="pre">&quot;arg1</span> <span class="pre">arg2</span> <span class="pre">arg3</span> <span class="pre">...&quot;</span></code>. This could help
+configure your widget - for example, for a table based widget, you might
+give the column names:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">widget[rose-config-edit] </span><span class="o">=</span> <span class="s">table.TableValueWidget NAME ID WEIGHTING</span>
+</pre></div>
+</div>
+<p class="last">This means that you can write a generic widget and then configure it
+for different cases.</p>
+</dd>
+</dl>
+<p>Refreshing the whole page in order to display a small change to a variable
+(the default) can be undesirable. To deal with this, custom page widgets can
+optionally expose some variable-change specific methods that do this
+themselves. These take a single <code class="docutils literal notranslate"><span class="pre">rose.variable.Variable</span></code> instance as an
+argument.</p>
+<dl class="method">
+<dt id="add_variable_widget">
+<code class="descname">add_variable_widget</code><span class="sig-paren">(</span><em>self</em>, <em>variable</em><span class="sig-paren">)</span> &#x2192; None</dt>
+<dd><p>Will be called when a variable is created.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="reload_variable_widget">
+<code class="descname">reload_variable_widget</code><span class="sig-paren">(</span><em>self</em>, <em>variable</em><span class="sig-paren">)</span> &#x2192; None</dt>
+<dd><p>Will be called when a variable’s status is changed, e.g. it goes into
+an error state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="remove_variable_widget">
+<code class="descname">remove_variable_widget</code><span class="sig-paren">(</span><em>self</em>, <em>variable</em><span class="sig-paren">)</span> &#x2192; None</dt>
+<dd><p>Will be called when a variable is removed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="update_ignored">
+<code class="descname">update_ignored</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span> &#x2192; None</dt>
+<dd><p>Will be called to allow you to update ignored widget display, if (for
+example) you show/hide ignored variables. If you don’t have any custom
+behaviour for ignored variables, it’s worth writing a method that does
+nothing - e.g. one that contains just <code class="docutils literal notranslate"><span class="pre">pass</span></code>).</p>
+</dd></dl>
+
+<p>If you take the step of using your own variable widgets, rather than the
+<code class="docutils literal notranslate"><span class="pre">VariableWidget</span></code> class in <code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/variable.py</span></code>
+(the default for normal config-edit pages), each variable-specific widget
+should have an attribute <code class="docutils literal notranslate"><span class="pre">variable</span></code> set to their <code class="docutils literal notranslate"><span class="pre">rose.variable.Variable</span></code>
+instance. You can implement ‘ignored’ status display by giving the widget a
+method <code class="docutils literal notranslate"><span class="pre">set_ignored</span></code> which takes no arguments. This should examine the
+<code class="docutils literal notranslate"><span class="pre">ignored_reason</span></code> dictionary attribute of the widget’s <code class="docutils literal notranslate"><span class="pre">variable</span></code>
+instance - the variable is ignored if this is not empty. If the variable is
+ignored, the widget should indicate this e.g. by greying out part of it.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">All existing page widgets use this API, so a good resource is the
+modules in <code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/pagewidget/</span></code>.</p>
+</div>
+<p>Generally speaking, a visible change, click, or key press in the custom page
+widget should make instant changes to variable value(s), and the value that
+the user sees. Pages are treated as temporary, superficial views of variable
+data, and changes are always assumed to be made directly to the main copy
+of the configuration in memory (this is automatic when the
+<code class="docutils literal notranslate"><span class="pre">rose.config_editor.ops.variable.VariableOperations</span></code> methods are used, as
+they should be). Closing the page shouldn’t change, or lose, any data!
+The custom class should return a gtk object to be packed into the page
+framework, so it’s best to subclass from an existing gtk Container type
+such as <code class="docutils literal notranslate"><span class="pre">gtk.VBox</span></code> (or <code class="docutils literal notranslate"><span class="pre">gtk.Table</span></code>, in the example above).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In line with the general philosophy, metadata should not be critical to
+page operations - it should be capable of displaying variables even when
+they have no or very little metadata, and still make sense if some
+variables are missing or new.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="config-editor-custom-sub-panels">
+
+<h2>Config Editor Custom Sub Panels<a class="headerlink" href="../../html/api/rose-gtk-library.html#config-editor-custom-sub-panels" title="View HTML">§</a></h2>
+
+<p>A ‘sub panel’ or ‘summary panel’ in the config editor is a panel that
+appears at the bottom of a page and is intended to display some summarised
+information about sub-pages (sub-namespaces) underneath the page. For
+example, the top-level file page, by default, has a sub panel to
+summarise the individual file sections.</p>
+<p>Any actual data belonging to the page will appear above the sub panel in a
+separate representation.</p>
+<p>Sub panels are capable of using quite a lot of functionality such as
+modifying the sections and options in the sub-pages directly.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="id2">
+
+<h3>API Reference<a class="headerlink" href="../../html/api/rose-gtk-library.html#id2" title="View HTML">§</a></h3>
+
+<p>The procedure for generating a custom sub panel widget is as follows:</p>
+<p>Assign a <code class="docutils literal notranslate"><span class="pre">widget[rose-config-edit:sub-ns]</span></code> option to the relevant
+namespace in the metadata configuration, e.g.</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[ns:namelist/all_the_foo_namelists]</span>
+<span class="nv">widget[rose-config-edit:sub-ns]</span><span class="o">=</span><span class="s">module_name.MySubPanelForFoos</span>
+</pre></div>
+</div>
+<p>Note that because the actual data on the page has a separate representation,
+you need to write <code class="docutils literal notranslate"><span class="pre">[rose-config-edit:sub-ns]</span></code> rather than just
+<code class="docutils literal notranslate"><span class="pre">[rose-config-edit]</span></code>.</p>
+<p>The widget class should have a constructor of the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MySubPanelForFoos</span><span class="p">(</span><span class="n">gtk</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_dict</span><span class="p">,</span> <span class="n">variable_dict</span><span class="p">,</span>
+                 <span class="n">section_functions_inst</span><span class="p">,</span> <span class="n">variable_functions_inst</span><span class="p">,</span>
+                 <span class="n">search_for_id_function</span><span class="p">,</span> <span class="n">sub_functions_inst</span><span class="p">,</span>
+                 <span class="n">is_duplicate_boolean</span><span class="p">,</span> <span class="n">arg_str</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>The class can inherit from any <code class="docutils literal notranslate"><span class="pre">gtk.Container</span></code>-derived class.</p>
+<p>The constructor arguments are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">section_dict</span></code></dt>
+<dd>a dictionary (map, hash) of section name keys and section data object
+values (instances of the <code class="docutils literal notranslate"><span class="pre">rose.section.Section</span></code> class). These contain
+some of the data such as section ignored status and comments that you may
+want to present. These objects can usually be used by the
+<code class="docutils literal notranslate"><span class="pre">section_functions_inst</span></code> methods as arguments - for example, passed in
+in order to ignore or enable a section.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">variable_dict</span></code></dt>
+<dd>a dictionary (map, hash) of section name keys and lists of variable data
+objects (instances of the <code class="docutils literal notranslate"><span class="pre">rose.variable.Variable</span></code> class). These contain
+useful information for the variable (option) such as state, value, and
+comments. Like section data objects, these can usually be used as arguments
+to the <code class="docutils literal notranslate"><span class="pre">variable_functions_inst</span></code> methods to accomplish things like
+changing a variable value or adding or removing a variable.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">section_functions_inst</span></code></dt>
+<dd>an instance of the class rose.config_editor.ops.section.SectionOperations.
+This contains methods to operate on the variables. These will update the
+undo stack and take care of any errors. Together with
+<code class="docutils literal notranslate"><span class="pre">sub_functions_inst</span></code>, these methods are the only ways that you should
+write to the section states or other attributes. For documentation, see the
+module <code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/ops/section.py</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">variable_functions_inst</span></code></dt>
+<dd>an instance of the class
+<code class="docutils literal notranslate"><span class="pre">rose.config_editor.ops.variable.VariableOperations</span></code>.
+This contains methods to operate on the variables. These will update the
+undo stack and take care of any errors. These methods are the only ways
+that you should write to the variable states or values. For documentation,
+see the module <code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/ops/variable.py</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">search_for_id_function</span></code></dt>
+<dd>a function that accepts a setting id (a section name, or a variable id)
+as an argument and asks the config editor to navigate to the page for that
+setting. You could use this to allow a click on a section name in your widget
+to launch the page for the section.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sub_functions_inst</span></code></dt>
+<dd>an instance of the class
+<code class="docutils literal notranslate"><span class="pre">rose.config_editor.ops.group.SubDataOperations</span></code>. This contains some
+convenience methods specifically for sub panels, such as operating on many
+sections at once in an optimised way. For documentation, see the module
+<code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/ops/group.py</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">is_duplicate_boolean</span></code></dt>
+<dd>a boolean that denotes whether or not the sub-namespaces in the summary
+data consist only of duplicate sections (e.g. only <code class="docutils literal notranslate"><span class="pre">namelist:foo(1)</span></code>,
+<code class="docutils literal notranslate"><span class="pre">namelist:foo(2)</span></code>, …). For example, this could be used by your widget to
+decide whether to implement a “Copy section” user option.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">arg_str</span></code></dt>
+<dd><p class="first">a keyword argument that stores extra text given to the <code class="docutils literal notranslate"><span class="pre">widget</span></code> option
+in the metadata, if any - e.g.:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">widget[rose-config-edit:sub-ns] </span><span class="o">=</span> <span class="s">modulename.ClassName arg1 arg2 arg3 ...</span>
+</pre></div>
+</div>
+<p class="last">would give a <code class="docutils literal notranslate"><span class="pre">arg_str</span></code> of <code class="docutils literal notranslate"><span class="pre">&quot;arg1</span> <span class="pre">arg2</span> <span class="pre">arg3</span> <span class="pre">...&quot;</span></code>. You can use this to
+help configure your widget.</p>
+</dd>
+</dl>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">All existing sub panel widgets use this API, so a good resource is the
+modules in <code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/panelwidget/</span></code>.</p>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

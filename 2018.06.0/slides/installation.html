@@ -1,0 +1,621 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/metomi.js"></script>
+    <script type="text/javascript" src="_static/js/versioning.js"></script>
+    <script type="text/javascript" src="_static/common.js"></script>
+    
+    <script type="text/javascript" src="_static/slides.js"></script>
+    <script type="text/javascript" src="_static/sync.js"></script>
+    <script type="text/javascript" src="_static/controller.js"></script>
+    <script type="text/javascript" src="_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="index.html" />
+    <link rel="next" title="Getting Started" href="getting-started.html" />
+    <link rel="prev" title="Rose Documentation" href="index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="installation">
+
+<h1>Installation<a class="headerlink" href="../html/installation.html#installation" title="View HTML">§</a></h1>
+
+<p>The source code for Rose is available via <a class="reference external" href="https://github.com/metomi/rose">GitHub</a>, code
+releases are available in <code class="docutils literal notranslate"><span class="pre">zip</span></code> and <code class="docutils literal notranslate"><span class="pre">tar.gz</span></code> <a class="reference external" href="https://github.com/metomi/rose/tags">archives</a>.</p>
+<ol class="arabic simple">
+<li>Un-pack the archive file into an appropriate location on your system.</li>
+<li>Add the <code class="docutils literal notranslate"><span class="pre">rose/bin/</span></code> directory into your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable.</li>
+<li>Check system compatibility by running <a class="reference internal" href="api/command-reference.html#command-rose-check-software"><span class="std std-ref">rose check-software</span></a>.</li>
+</ol>
+
+
+
+
+</article>
+<article class="slide level-2" id="system-requirements">
+
+<h2>System Requirements<a class="headerlink" href="../html/installation.html#system-requirements" title="View HTML">§</a></h2>
+
+<p>Rose runs on Unix/Linux systems and is known to run on RHEL6 and a number of
+systems including those documented under <a class="reference external" href="https://github.com/metomi/metomi-vms">metomi-vms</a>.</p>
+<p>System compatibility can be tested using the <a class="reference internal" href="api/command-reference.html#command-rose-check-software"><span class="std std-ref">rose check-software</span></a>
+command.</p>
+<dl class="docutils">
+<dt>Required Software</dt>
+<dd><ul class="first last simple">
+<li>python - <em>2.6.6+, &lt;3</em></li>
+<li>cylc</li>
+<li>py:pygtk - <em>2.12+</em></li>
+<li>py:jinja2</li>
+</ul>
+</dd>
+<dt>Rose Bush</dt>
+<dd><ul class="first last simple">
+<li>py:cherrypy</li>
+</ul>
+</dd>
+<dt>Rosie</dt>
+<dd><ul class="first last simple">
+<li>py:cherrypy</li>
+<li>py:requests - <em>2.2.1+</em></li>
+<li>py:sqlalchemy - <em>0.6.9+</em></li>
+<li>svn - <em>1.8+</em></li>
+<li>fcm</li>
+<li>perl - <em>5.10.1+</em></li>
+</ul>
+</dd>
+<dt>Documentation Builder</dt>
+<dd><ul class="first last simple">
+<li>python - <em>2.7+, &lt;3</em></li>
+<li>graphviz-dot</li>
+<li>tex</li>
+<li>pdflatex</li>
+<li>py:sphinx - <em>1.5.3+</em></li>
+<li>py:sphinx_rtd_theme - <em>0.2.4+</em></li>
+<li>py:sphinxcontrib.httpdomain</li>
+<li>py:hieroglyph</li>
+</ul>
+</dd>
+<dt>Documentation Builder - PDF Dependencies</dt>
+<dd><ul class="first last simple">
+<li>latexmk</li>
+</ul>
+</dd>
+<dt>Documentation Builder - Linkcheck Dependencies</dt>
+<dd><ul class="first last simple">
+<li>py:requests</li>
+</ul>
+</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-2" id="host-requirements">
+
+<h2>Host Requirements<a class="headerlink" href="../html/installation.html#host-requirements" title="View HTML">§</a></h2>
+
+<p>Whilst you can install and use Rose &amp; Cylc on a single host (i.e. machine),
+most installations are likely to be more complex. There are five types of
+installation:</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="hosts-for-running-cylc-suites">
+
+<h3>Hosts For Running Cylc Suites<a class="headerlink" href="../html/installation.html#hosts-for-running-cylc-suites" title="View HTML">§</a></h3>
+
+<p>Each user can just run their suites on the host where they issue the
+<a class="reference internal" href="api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> command. However, the local host may not meet the
+necessary requirements for connectivity (to the hosts running the tasks)
+or for availability (the host needs to remain up for the duration of
+the suite). Therefore, Rose can be configured to run the suites on
+remote hosts. If multiple hosts are available, by default the host with
+the lowest system load average will be used.</p>
+<dl class="docutils">
+<dt>Installation requirements:</dt>
+<dd><ul class="first last simple">
+<li>Rose, Cylc, Bash, Python, jinja2.</li>
+<li>Subversion &amp; FCM <em>(only if you want</em> <a class="reference internal" href="api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> <em>to
+install files from Subversion using FCM keywords).</em></li>
+</ul>
+</dd>
+<dt>Connectivity requirements:</dt>
+<dd><ul class="first last simple">
+<li>Must be able to submit tasks to the hosts which run the suite tasks,
+either directly or via SSH access to another host.</li>
+</ul>
+</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-3" id="hosts-for-running-tasks-in-suites">
+
+<h3>Hosts For Running Tasks In Suites<a class="headerlink" href="../html/installation.html#hosts-for-running-tasks-in-suites" title="View HTML">§</a></h3>
+
+<dl class="docutils">
+<dt>Installation requirements:</dt>
+<dd><ul class="first last simple">
+<li>Rose, Cylc, Bash, Python.</li>
+<li>Subversion &amp; FCM <em>only if you want to use the Rose install utility
+to install files from Subversion using FCM keywords</em>.</li>
+</ul>
+</dd>
+<dt>Connectivity requirements:</dt>
+<dd><ul class="first last simple">
+<li>Must be able to communicate back to the hosts running the Cylc suites
+via HTTPS (preferred), HTTP or SSH.</li>
+</ul>
+</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-3" id="hosts-for-running-user-interactive-tools">
+
+<h3>Hosts For Running User Interactive Tools<a class="headerlink" href="../html/installation.html#hosts-for-running-user-interactive-tools" title="View HTML">§</a></h3>
+
+<dl class="docutils">
+<dt>Installation requirements:</dt>
+<dd><ul class="first last simple">
+<li>Rose, Cylc, Bash, Python, requests, Subversion, FCM,
+Pygraphviz (+ graphviz), PyGTK (+ GTK).</li>
+</ul>
+</dd>
+<dt>Connectivity requirements:</dt>
+<dd><ul class="first last simple">
+<li>Must have HTTP access to the hosts running the Rosie web service.</li>
+<li>Must have access to the Rosie Subversion repositories via the
+appropriate protocol.</li>
+<li>Must have HTTP and SSH access to the hosts running the Cylc suites.</li>
+<li>Must share user accounts and <code class="docutils literal notranslate"><span class="pre">$HOME</span></code> directories with the hosts running
+the Cylc suites.</li>
+</ul>
+</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-3" id="hosts-for-running-rose-bush">
+
+<h3>Hosts For Running Rose Bush<a class="headerlink" href="../html/installation.html#hosts-for-running-rose-bush" title="View HTML">§</a></h3>
+
+<dl class="docutils">
+<dt>Installation requirements:</dt>
+<dd><ul class="first last simple">
+<li>Rose, Bash, Python, cherrypy, jinja2.</li>
+</ul>
+</dd>
+<dt>Connectivity requirements:</dt>
+<dd><ul class="first last simple">
+<li>Must be able to access the home directories of users’ Cylc run directories.</li>
+</ul>
+</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-3" id="hosts-for-rosie-subversion-repositories-and-the-rosie-web-services">
+
+<h3>Hosts For Rosie Subversion Repositories And The Rosie Web Services<a class="headerlink" href="../html/installation.html#hosts-for-rosie-subversion-repositories-and-the-rosie-web-services" title="View HTML">§</a></h3>
+
+<p>Typically you will only need a single host but you can have multiple
+repositories on different hosts if you require this.</p>
+<dl class="docutils">
+<dt>Installation requirements:</dt>
+<dd><ul class="first last simple">
+<li>Rose, Bash, Python, cherrypy, jinja2, sqlalchemy, Subversion.</li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>This section has assumed that you wish to use Rose &amp; Cylc (including
+their respective GUIs) and use Rosie to store your suites. However,
+there are many ways of using Rose. For instance:</p>
+<ul class="last simple">
+<li>You can use Rose without using cylc.</li>
+<li>You can use Rose &amp; Cylc but not use Rosie.</li>
+<li>You can use Rose &amp; Cylc from the command line without using their GUIs.</li>
+</ul>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="configuring-rose">
+
+<h2>Configuring Rose<a class="headerlink" href="../html/installation.html#configuring-rose" title="View HTML">§</a></h2>
+
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">lib/bash/rose_init_site</span></code></dt>
+<dd><p class="first">If you do not have root access to install the required Python libraries,
+you may need to edit this file to ensure Python libraries are included
+in the <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> environment variable. For example, if you have
+installed some essential Python libraries in your <code class="docutils literal notranslate"><span class="pre">HOME</span></code> directory,
+you can add a <code class="docutils literal notranslate"><span class="pre">lib/bash/rose_init_site</span></code> file with the following
+contents:</p>
+<div class="last highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Essential Python libraries installed under</span>
+<span class="c1"># &quot;/home/daisy/usr/lib/python2.6/site-packages/&quot;</span>
+<span class="k">if</span> <span class="o">[[</span> -n <span class="s2">&quot;</span><span class="si">${</span><span class="nv">PYTHONPATH</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/home/daisy/usr/lib/python2.6/site-packages:</span><span class="si">${</span><span class="nv">PYTHONPATH</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="k">else</span>
+    <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/home/daisy/usr/lib/python2.6/site-packages&quot;</span>
+<span class="k">fi</span>
+<span class="nb">export</span> PYTHONPATH
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">etc/rose.conf</span></code></dt>
+<dd>You should add/edit this file to meet the requirement of your site.
+Examples can be found at the <code class="docutils literal notranslate"><span class="pre">etc/rose.conf.example</span></code> file in your
+Rose distribution. See also <a class="reference internal" href="api/configuration/site-and-user.html#rose:file:rose.conf" title="rose:file:rose.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose.conf</span></code></a> in the API reference.</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-2" id="configuring-rosie-client">
+
+<h2>Configuring Rosie Client<a class="headerlink" href="../html/installation.html#configuring-rosie-client" title="View HTML">§</a></h2>
+
+<p>Rosie is an optional suite storage and discovery system.</p>
+<p>Rosie stores suites using Subversion repositories, with databases behind
+a web interface for suite discovery and lookup.</p>
+<p>If users at your site are able to access Rosie services on the Internet
+or if someone else has already configured Rosie services at your site,
+all you need to do is configure the client to talk to the servers.
+Refer to the <a class="reference internal" href="#configuring-a-rosie-server">Configuring a Rosie Server</a> section if you need to
+configure a Rosie server for your site.</p>
+<p>To set up the Rosie client for the site, add/modify the
+<a class="reference internal" href="api/configuration/site-and-user.html#rose:conf:rose.conf[rosie-id]" title="rose:conf:rose.conf[rosie-id]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose.conf[rosie-id]</span></code></a> E.g.:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[rosie-id]</span>
+<span class="nv">prefix-default</span><span class="o">=</span><span class="s">x</span>
+<span class="nv">prefixes-ws-default</span><span class="o">=</span><span class="s">x myorg</span>
+
+<span class="nv">prefix-location.x</span><span class="o">=</span><span class="s">https://somehost.on.the.internet/svn/roses-x</span>
+<span class="nv">prefix-web.x</span><span class="o">=</span><span class="s">https://somehost.on.the.internet/trac/roses-x/intertrac/source:</span>
+<span class="nv">prefix-ws.x</span><span class="o">=</span><span class="s">https://somehost.on.the.internet/rosie/x</span>
+
+<span class="nv">prefix-location.myorg</span><span class="o">=</span><span class="s">svn://myhost.myorg/roses-myorg</span>
+<span class="nv">prefix-web.myorg</span><span class="o">=</span><span class="s">http://myhost.myorg/trac/roses-myorg/intertrac/source:</span>
+<span class="nv">prefix-ws.myorg</span><span class="o">=</span><span class="s">http://myhost.myorg/rosie/myorg</span>
+</pre></div>
+</div>
+<p>Check the following:</p>
+<ol class="arabic">
+<li><p class="first">You can access the Rosie Subversion repository without being prompted
+for a username and a password. This may require configuring Subversion
+to cache your authentication information with a keyring.</p>
+<p><em>(See Subversion Book &gt; Advanced Topics &gt; Network Model &gt; Client
+Credentials for a discussion on how to do this.)</em></p>
+</li>
+<li><p class="first">The Rosie web service is up and running and you can access the Rosie
+web service from your computer. E.g. if the Rosie web service is
+hosted at <code class="docutils literal notranslate"><span class="pre">https://somehost.on.the.internet/rosie/x</span></code>, you can check
+that you have access by typing the following on the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">I</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">somehost</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">the</span><span class="o">.</span><span class="n">internet</span><span class="o">/</span><span class="n">rosie</span><span class="o">/</span><span class="n">x</span>
+</pre></div>
+</div>
+<p>It should return a HTTP code 200. If you are prompted for a username
+and a password, you may need to have access to a keyring to cache
+the authentication information.</p>
+</li>
+<li><p class="first">You can access the Rosie web service using the Rosie client. E.g.
+using the above configuration for the prefix <code class="docutils literal notranslate"><span class="pre">x</span></code>, type the
+following on the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rosie</span> <span class="n">hello</span> <span class="o">--</span><span class="n">prefix</span><span class="o">=</span><span class="n">x</span>
+</pre></div>
+</div>
+<p>It should return a greeting, e.g. <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">user</span></code>.</p>
+</li>
+</ol>
+
+
+
+
+</article>
+<article class="slide level-2" id="deploying-configuration-metadata">
+
+<h2>Deploying Configuration Metadata<a class="headerlink" href="../html/installation.html#deploying-configuration-metadata" title="View HTML">§</a></h2>
+
+<p>You may want to deploy <a class="reference internal" href="api/configuration/metadata.html#conf-meta"><span class="std std-ref">Configuration Metadata</span></a> for projects using Rose
+in a globally readable location at your site, so that they can be
+easily accessed by users when using Rose utilities such as
+<a class="reference internal" href="api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> or <a class="reference internal" href="api/command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a>.</p>
+<p>If the source tree of a project is version controlled under a
+trusted Subversion repository, it is possible to automatically deploy
+their configuration metadata. Assuming that the projects follow our
+recommendation and store Rose configuration metadata under the
+<code class="docutils literal notranslate"><span class="pre">rose-meta/</span></code> directory of their source tree, you can:</p>
+<ul class="simple">
+<li>Check out a working copy for each sub-directory under the
+<code class="docutils literal notranslate"><span class="pre">rose-meta/</span></code> directory.</li>
+<li>Set up a crontab job to regularly update the working copies.</li>
+</ul>
+<p>For example, suppose you want to deploy Rose <a class="reference internal" href="api/configuration/metadata.html#metadata"><span class="std std-ref">Configuration Metadata</span></a>
+under <code class="docutils literal notranslate"><span class="pre">/etc/rose-meta/</span></code> at your site. You can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Deployment location
+DEST=&#39;/etc/rose-meta&#39;
+cd &quot;${DEST}&quot;
+
+# Assume only Rose metadata configuration directories under &quot;rose-meta/&quot;
+URL1=&#39;https://somehost/foo/main/trunk/rose-meta&#39;
+URL2=&#39;https://anotherhost/bar/main/trunk/rose-meta&#39;
+# ...
+
+# Checkout a working copy for each metadata configuration directory
+for URL in &quot;${URL1}&quot; &quot;${URL2}&quot;; do
+  for NAME in $(svn ls &quot;${URL}&quot;); do
+      svn checkout -q &quot;${URL}/${NAME}&quot;
+  done
+done
+
+# Set up a crontab job to update the working copies, e.g. every 10 minutes
+crontab -l || true &gt;&#39;crontab.tmp&#39;
+{
+  echo &#39;# Update Rose configuration metadata every 10 minutes&#39;
+  echo &quot;*/10 * * * * svn update -q ${DEST}/*&quot;
+} &gt;&gt;&#39;crontab.tmp&#39;
+crontab &#39;crontab.tmp&#39;
+rm &#39;crontab.tmp&#39;
+
+# Finally add the root level &quot;meta-path&quot; setting to site&#39;s &quot;rose.conf&quot;
+# E.g. if Rose is installed under &quot;/opt/rose/&quot;:
+{
+  echo &#39;[]&#39;
+  echo &quot;meta-path=${DEST}&quot;
+} &gt;&gt;&#39;/opt/rose/etc/rose.conf&#39;
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">See also <a class="reference internal" href="api/configuration/metadata.html#app-meta-loc"><span class="std std-ref">Appendix: Metadata Location</span></a>.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="configuring-rose-bush">
+
+<h2>Configuring Rose Bush<a class="headerlink" href="../html/installation.html#configuring-rose-bush" title="View HTML">§</a></h2>
+
+<p>Rose Bush provides an intranet web service at your site for users to
+view their suite logs using a web browser. Depending on settings at
+your site, you may or may not be able to set up this service.</p>
+<p>You can start an ad-hoc Rose Bush web server by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">setsid</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">rose</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">rose</span> <span class="n">bush</span> <span class="n">start</span> <span class="mi">0</span><span class="o">&lt;/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span> <span class="mi">1</span><span class="o">&gt;/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>You will find the access and error logs under <code class="docutils literal notranslate"><span class="pre">~/.metomi/rose-bush*</span></code>.</p>
+<p>Alternatively you can run the Rose Bush web service under Apache
+<code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code>. To do this you will need to set up an Apache module
+configuration file (typically in <code class="docutils literal notranslate"><span class="pre">/etc/httpd/conf.d/rose-wsgi.conf</span></code>)
+containing the following (with the paths set appropriately):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WSGIPythonPath</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">rose</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python</span>
+<span class="n">WSGIScriptAlias</span> <span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">bush</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">rose</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">rose</span><span class="o">/</span><span class="n">bush</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Use the Apache log at e.g. <code class="docutils literal notranslate"><span class="pre">/var/log/httpd/</span></code> to debug problems.
+See also <a class="reference internal" href="#configuring-a-rosie-server">Configuring a Rosie Server</a>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="configuring-a-rosie-server">
+
+<h2>Configuring a Rosie Server<a class="headerlink" href="../html/installation.html#configuring-a-rosie-server" title="View HTML">§</a></h2>
+
+<p>You should only need to configure and run your own Rosie service if you do
+not have access to Rosie services on the Internet, or if you need a
+private Rosie service for your site. Depending on settings at your
+site, you may or may not be able to set up this service.</p>
+<p>You will need to select a machine to host the Subversion repositories.
+This machine will also host the web server and databases.</p>
+<p>Login to your host, create one or more <a class="reference external" href="https://en.wikipedia.org/wiki/Apache_Subversion#FSFS">Subversion FSFS</a> repositories.</p>
+<p>If you want to use FCM for your version control, you should set a
+special property on the repository to allow branching and merging
+with FCM in the Rosie convention. For example, if your repository
+is served from <code class="docutils literal notranslate"><span class="pre">HOST_AND_PATH</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">myhost001/svn-repos</span></code>) with
+given repository base name <code class="docutils literal notranslate"><span class="pre">NAME</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">roses_foo</span></code>), change into a
+new directory and enter the following commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">svn</span> <span class="n">co</span> <span class="o">-</span><span class="n">q</span> <span class="s2">&quot;svn://$</span><span class="si">{HOST_AND_PATH}</span><span class="s2">/$</span><span class="si">{NAME}</span><span class="s2">/&quot;</span>
+<span class="n">svn</span> <span class="n">ps</span> <span class="n">fcm</span><span class="p">:</span><span class="n">layout</span> <span class="o">-</span><span class="n">F</span> <span class="o">-</span> <span class="s2">&quot;$</span><span class="si">{NAME}</span><span class="s2">&quot;</span> <span class="o">&lt;&lt;</span><span class="s1">&#39;__FCM_LAYOUT__&#39;</span>
+<span class="n">depth</span><span class="o">-</span><span class="n">project</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">depth</span><span class="o">-</span><span class="n">branch</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">depth</span><span class="o">-</span><span class="n">tag</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nb">dir</span><span class="o">-</span><span class="n">trunk</span> <span class="o">=</span> <span class="n">trunk</span>
+<span class="nb">dir</span><span class="o">-</span><span class="n">branch</span> <span class="o">=</span>
+<span class="nb">dir</span><span class="o">-</span><span class="n">tag</span> <span class="o">=</span>
+<span class="n">level</span><span class="o">-</span><span class="n">owner</span><span class="o">-</span><span class="n">branch</span> <span class="o">=</span>
+<span class="n">level</span><span class="o">-</span><span class="n">owner</span><span class="o">-</span><span class="n">tag</span> <span class="o">=</span>
+<span class="n">template</span><span class="o">-</span><span class="n">branch</span> <span class="o">=</span>
+<span class="n">template</span><span class="o">-</span><span class="n">tag</span> <span class="o">=</span>
+<span class="n">__FCM_LAYOUT__</span>
+<span class="n">svn</span> <span class="n">ci</span> <span class="o">-</span><span class="n">m</span> <span class="s1">&#39;fcm:layout: defined.&#39;</span> <span class="s2">&quot;$</span><span class="si">{NAME}</span><span class="s2">&quot;</span>
+<span class="n">rm</span> <span class="o">-</span><span class="n">fr</span> <span class="s2">&quot;$</span><span class="si">{NAME}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Add the following hook scripts to the repository:</p>
+<ul>
+<li><p class="first">pre-commit:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c">#!/bin/bash</span>
+exec <span class="s">&lt;path-to-rose&gt;</span>/sbin/rosa svn-pre-commit &quot;$@&quot;
+</pre></div>
+</div>
+</li>
+<li><p class="first">post-commit:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c">#!/bin/bash</span>
+exec <span class="s">&lt;path-to-rose&gt;</span>/sbin/rosa svn-post-commit &quot;$@&quot;
+</pre></div>
+</div>
+</li>
+</ul>
+<p>You should replace <code class="docutils literal notranslate"><span class="pre">/path/to/rose/</span></code> with the location of your Rose
+installation.</p>
+<p>Make sure the hook scripts are executable.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rosa</span> <span class="pre">svn-post-commit</span></code> command in the <code class="docutils literal notranslate"><span class="pre">post-commit</span></code> hook is used
+to populate a database with the suite discovery information as suites
+are committed to the repository. Edit the <a class="reference internal" href="api/configuration/site-and-user.html#rose:conf:rose.conf[rosie-db]" title="rose:conf:rose.conf[rosie-db]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose.conf[rosie-db]</span></code></a>
+settings to point to your host machine and provide relevant
+paths such as the location for your repository and database.</p>
+<p>Once you have done that, create the Rosie database by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">rose</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">rosa</span> <span class="n">db</span><span class="o">-</span><span class="n">create</span>
+</pre></div>
+</div>
+<p>Make sure that the account that runs the repository hooks has read/write
+access to the database and database directory.</p>
+<p>You can test that everything is working using the built-in web server.
+Edit the <a class="reference internal" href="api/configuration/site-and-user.html#rose:conf:rose.conf[rosie-disco]" title="rose:conf:rose.conf[rosie-disco]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose.conf[rosie-disco]</span></code></a> settings to configure
+the web server’s log directory and port number. Start the web server
+by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">setsid</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">rose</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">rosie</span> <span class="n">disco</span> <span class="n">start</span> <span class="mi">0</span><span class="o">&lt;/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span> <span class="mi">1</span><span class="o">&lt;/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>Check that the server is up and running using <code class="docutils literal notranslate"><span class="pre">curl</span></code> or a local
+web browser. E.g. If you have configured the server’s port to be 1234,
+you can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">I</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">1234</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>It should return a HTTP code 200.</p>
+<p>Alternatively you can run the Rosie web service under Apache <code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code>.
+To do this you will need to set up an Apache module configuration file
+(typically in <code class="docutils literal notranslate"><span class="pre">/etc/httpd/conf.d/rose-wsgi.conf</span></code>) containing the
+following (with the paths set appropriately):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WSGIPythonPath</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">rose</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python</span>
+<span class="n">WSGIScriptAlias</span> <span class="o">/</span><span class="n">rosie</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">rose</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">rosie</span><span class="o">/</span><span class="n">ws</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Use the Apache log at e.g. <code class="docutils literal notranslate"><span class="pre">/var/log/httpd/</span></code> to debug problems.
+See also <a class="reference internal" href="#configuring-rose-bush">Configuring Rose Bush</a>.</p>
+<p>Hopefully, you should now have a working Rosie service server. Configure
+the client settings by editing the <a class="reference internal" href="api/configuration/site-and-user.html#rose:conf:rose.conf[rosie-id]" title="rose:conf:rose.conf[rosie-id]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose.conf[rosie-id]</span></code></a>
+settings. If you are using the built-in web server, you
+should ensure that you include the port number in the URL. E.g.:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[rosie-id]</span>
+<span class="nv">prefix-ws.foo</span><span class="o">=</span><span class="s">http://127.0.0.1:1234/foo</span>
+</pre></div>
+</div>
+<p>You should now be able to talk to the Rosie web service server via
+the Rosie web service client. Test by doing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rosie</span> <span class="n">hello</span>
+</pre></div>
+</div>
+<p>To test that everything is connecting together, create your first
+suite in the repository by doing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rosie</span> <span class="n">create</span>
+</pre></div>
+</div>
+<p>which will create the first suite in your repository, with an ID
+ending in <code class="docutils literal notranslate"><span class="pre">aa000</span></code> - e.g. <code class="docutils literal notranslate"><span class="pre">foo-aa000</span></code>. Locate it by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rosie</span> <span class="n">lookup</span> <span class="mi">000</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-special-suite">
+
+<h3><code class="docutils literal notranslate"><span class="pre">ROSIE</span></code> special suite<a class="headerlink" href="../html/installation.html#rosie-special-suite" title="View HTML">§</a></h3>
+
+<p>You can define a special suite in each Rosie repository that provides
+some additional repository-specific data and metadata. The suite
+ID will end with <code class="docutils literal notranslate"><span class="pre">ROSIE</span></code> - e.g. <code class="docutils literal notranslate"><span class="pre">foo-ROSIE</span></code>.</p>
+<p>This can be created by running <code class="docutils literal notranslate"><span class="pre">rosie</span> <span class="pre">create</span> <span class="pre">--meta-suite</span></code>.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="creating-a-known-keys-file">
+
+<h3>Creating a Known Keys File<a class="headerlink" href="../html/installation.html#creating-a-known-keys-file" title="View HTML">§</a></h3>
+
+<p>You can extend the list of search keys used in the Rosie discovery
+interfaces (such as <code class="docutils literal notranslate"><span class="pre">rosie</span> <span class="pre">go</span></code>). Create a text file at the root
+of a Rosie suite working copy called <code class="docutils literal notranslate"><span class="pre">rosie-keys</span></code>.</p>
+<p>Add a space-delimited list of search keys into the file - for example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sub-project experiment model
+</pre></div>
+</div>
+<p>Run <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">add</span> <span class="pre">-c</span></code> and <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">commit</span></code>. After the commit, these will be
+added to the list of Rosie interface search keys.</p>
+<p>You can continue to modify the list by changing the file contents and
+committing.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

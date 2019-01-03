@@ -1,0 +1,97 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Bash Library &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" />
+    <link rel="next" title="Rose Built-In Applications" href="rose-built-in-applications.html" />
+    <link rel="prev" title="Rose Environment Variables" href="environment-variables.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-bash-library">
+
+<h1>Rose Bash Library<a class="headerlink" href="../../html/api/rose-bash-library.html#rose-bash-library" title="View HTML">§</a></h1>
+
+<p>The Rose bash library lives in <code class="docutils literal notranslate"><span class="pre">lib/bash/</span></code>. To import a module, load the file
+into your script. E.g. To load <code class="docutils literal notranslate"><span class="pre">rose_usage</span></code>, you would do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>. $ROSE_HOME/lib/bash/rose_usage
+</pre></div>
+</div>
+<p>The modules are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">rose_init</span></code></dt>
+<dd>Called by <code class="docutils literal notranslate"><span class="pre">rose</span></code> on initialisation. This is not meant to be for general
+use.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rose_log</span></code></dt>
+<dd>Provide functions to print log messages.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rose_usage</span></code></dt>
+<dd>If your script has a header similar to the ones used by a <code class="docutils literal notranslate"><span class="pre">rose</span></code> command
+line utility, you can use this function to print the synopsis section of
+the script header.</dd>
+</dl>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

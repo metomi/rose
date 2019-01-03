@@ -1,0 +1,193 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Autodoc &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="autodoc">
+
+<h1>Autodoc<a class="headerlink" href="../../html/developing/autodoc.html#autodoc" title="View HTML">§</a></h1>
+
+<p>The built-in extension <code class="docutils literal notranslate"><span class="pre">sphinx.ext.autodoc</span></code> provides functionality for
+generating API documentation from source code.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="writing-docstrings">
+
+<h2>Writing Docstrings<a class="headerlink" href="../../html/developing/autodoc.html#writing-docstrings" title="View HTML">§</a></h2>
+
+<p>This documentation uses <code class="docutils literal notranslate"><span class="pre">sphinx.ext.napoleon</span></code> to pre-process docstrings
+allowing them to be written in plain text as opposed to reStructuredText.</p>
+<p>Napoleon accepts docstrings in one of two formats:</p>
+<ul class="simple">
+<li><a class="reference external" href="GoogleDocstrings">Google</a>  - <a class="reference external" href="http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html">Napoleon Google Example</a></li>
+<li><a class="reference external" href="NumpyDocstrings">Numpy</a>  - <a class="reference external" href="http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html">Napoleon Numpy Example</a></li>
+</ul>
+<p>For Rose docstrings please stick to the <strong>Google</strong> convention.
+Some quick examples:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Some_Class</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Some summary.</span>
+
+<span class="sd">    Note __init__ methods are not autodocumented, specify constructor</span>
+<span class="sd">    parameters in the class docstring.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        param1 (type): Description.</span>
+<span class="sd">        param2 (type): Really really really really really really</span>
+<span class="sd">            long description.</span>
+<span class="sd">        kwarg (type - optional): Description.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># Blank line.</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">,</span> <span class="n">kwarg</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">some_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">):</span>
+       <span class="sd">&quot;&quot;&quot;Some summary.</span>
+
+<span class="sd">       Args:</span>
+<span class="sd">           param1 (str/int): Argument can be of multiple types.</span>
+<span class="sd">           param2 (obj): Argument can have many types.</span>
+
+<span class="sd">       Yields:</span>
+<span class="sd">           type: Some description, note that unlike the argument lines,</span>
+<span class="sd">           continuation lines in yields/returns sections are not indented.</span>
+
+<span class="sd">       &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">some_function_with_multiple_return_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Some summary.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">           &gt;&gt;&gt; # Some doctest code.</span>
+<span class="sd">           &gt;&gt;&gt; Some_Class().some_function_with_multiple_return_values()</span>
+<span class="sd">           (&#39;param1&#39;, &#39;param2&#39;)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple - (param1, param2)</span>
+<span class="sd">                - param1 (str) - If a function returns a tuple you can if</span>
+<span class="sd">                  desired list the components of the tuple like this.</span>
+<span class="sd">                - param2 (str) - Something else.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;param1&#39;</span><span class="p">,</span> <span class="s1">&#39;param2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="writing-doctests">
+
+<h2>Writing Doctests<a class="headerlink" href="../../html/developing/autodoc.html#writing-doctests" title="View HTML">§</a></h2>
+
+<p>Examples [in docstrings] written in  <a class="reference external" href="https://docs.python.org/2/library/doctest.html">doctest format</a> will appear nicely
+formatted in the API docs, as an added bonus they are testable (<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">doc</span>
+<span class="pre">doctest</span></code>, incorporated in the <a class="reference internal" href="../api/command-reference.html#command-rose-test-battery"><span class="std std-ref">rose test-battery</span></a>).</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">&gt;&gt;&gt;</span></code> for statements and <code class="docutils literal notranslate"><span class="pre">...</span></code> for continuation lines. Any return
+values will have to be provided and should sit on the next newline.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">rose.config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rose</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigNode</span><span class="p">()</span>
+<span class="go">{&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: {}}</span>
+</pre></div>
+</div>
+<p>If return values are not known in advance use ellipses:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s1">&#39;here&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="s1">&#39;there&#39;</span>
+<span class="go">here ... there</span>
+</pre></div>
+</div>
+<p>If return values are lengthy use <code class="docutils literal notranslate"><span class="pre">NORMALIZE_WHITESPACE</span></code> (see source code for
+this page):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> 
+<span class="go">[1,</span>
+<span class="go">2,</span>
+<span class="go">3]</span>
+</pre></div>
+</div>
+<p>Note that you can ONLY break a line on a comma i.e. this wont work (note the
+<code class="docutils literal notranslate"><span class="pre">+SKIP</span></code> directive [in the source code for this page] prevents this doctest
+from being run):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">{}}}</span> 
+<span class="go">{&#39;a&#39;:</span>
+<span class="go">  {&#39;b&#39;: {}</span>
+<span class="go">}}</span>
+</pre></div>
+</div>
+<p>Doctests are performed in the doc/sphinx directory and any files created will
+have to be <a class="reference external" href="http://www.sphinx-doc.org/en/1.5.1/ext/doctest.html#directive-testcleanup">tidied up</a>.</p>
+<p>See <a class="reference external" href="https://docs.python.org/3.3/library/doctest.html">doctest</a> for more
+details.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Runtime Configuration &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Runtime" href="index.html" />
+    <link rel="next" title="Consolidating Configuration" href="configuration-consolidation/index.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="runtime-configuration">
+
+<h1>Runtime Configuration<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#runtime-configuration" title="View HTML">§</a></h1>
+
+<p>In the last section we associated tasks with scripts and ran a simple suite. In
+this section we will look at how we can configure these tasks.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="environment-variables">
+
+<h2>Environment Variables<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#environment-variables" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[countdown]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> seq $START_NUMBER</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">START_NUMBER </span><span class="o">=</span><span class="s"> 5</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">CYLC_SUITE_RUN_DIR</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">CYLC_TASK_WORK_DIR</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">CYLC_TASK_CYCLE_POINT</span></code></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="job-submission">
+
+<h2>Job Submission<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#job-submission" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_computehost]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> echo &quot;Hello Compute Host&quot;</span>
+        <span class="nt">[[[remote]]]</span>
+            <span class="nv">host </span><span class="o">=</span><span class="s"> computehost</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Job Submission<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#id1" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li>at</li>
+<li>loadleveler</li>
+<li>lsf</li>
+<li>pbs</li>
+<li>sge</li>
+<li>slurm</li>
+<li>moab</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Job Submission<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#id2" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[big_task]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> big-executable</span>
+
+        <span class="c1"># Submit to the host &quot;big-computer&quot;.</span>
+        <span class="nt">[[[remote]]]</span>
+            <span class="nv">host </span><span class="o">=</span><span class="s"> big-computer</span>
+
+        <span class="c1"># Submit the job using the &quot;slurm&quot; batch system.</span>
+        <span class="nt">[[[job]]]</span>
+            <span class="nv">batch system </span><span class="o">=</span><span class="s"> slurm</span>
+
+        <span class="c1"># Inform &quot;slurm&quot; that this job requires 500MB of RAM and 4 CPUs.</span>
+        <span class="nt">[[[directives]]]</span>
+            <span class="nv">--mem </span><span class="o">=</span><span class="s"> 500</span>
+            <span class="nv">--ntasks </span><span class="o">=</span><span class="s"> 4</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="timeouts">
+
+<h2>Timeouts<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#timeouts" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[some_task]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> some-executable</span>
+        <span class="nt">[[[job]]]</span>
+            <span class="nv">execution time limit </span><span class="o">=</span><span class="s"> PT15M</span>  <span class="c1"># 15 minutes.</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="retries">
+
+<h2>Retries<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#retries" title="View HTML">§</a></h2>
+
+<p>Sometimes jobs fail. This can be caused by two factors:</p>
+<ul class="simple">
+<li>Something going wrong with the job’s execution e.g:<ul>
+<li>A bug;</li>
+<li>A system error;</li>
+<li>The job hitting the <code class="docutils literal notranslate"><span class="pre">execution</span> <span class="pre">time</span> <span class="pre">limit</span></code>.</li>
+</ul>
+</li>
+<li>Something going wrong with the job submission e.g:<ul>
+<li>A network problem;</li>
+<li>The <a class="reference internal" href="../../../glossary.html#term-job-host"><span class="xref std std-term">job host</span></a> becoming unavailable or overloaded;</li>
+<li>An issue with the directives.</li>
+</ul>
+</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Retries<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#id3" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[some-task]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> some-script</span>
+        <span class="nt">[[[job]]]</span>
+            <span class="c1"># In the event of execution failure, retry a maximum</span>
+            <span class="c1"># of three times every 15 minutes.</span>
+            <span class="nv">execution retry delays </span><span class="o">=</span><span class="s"> 3*PT15M</span>
+            <span class="c1"># In the event of submission failure, retry a maximum</span>
+            <span class="c1"># of two times every ten minutes and then every 30</span>
+            <span class="c1"># minutes thereafter.</span>
+            <span class="nv">submission retry delays </span><span class="o">=</span><span class="s"> 2*PT10M, PT30M</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="start-stop-restart">
+
+<h2>Start, Stop, Restart<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#start-stop-restart" title="View HTML">§</a></h2>
+
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc run <span class="s">&lt;name&gt;</span>
+cylc stop <span class="s">&lt;name&gt;</span>
+cylc restart <span class="s">&lt;name&gt;</span>
+
+cylc stop <span class="s">&lt;name&gt;</span> --kill
+cylc stop <span class="s">&lt;name&gt;</span> --now --now
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id4">
+
+<h2>Start, Stop, Restart<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#id4" title="View HTML">§</a></h2>
+
+<p class="rubric">In this practical we will add runtime configuration to the
+<a class="reference internal" href="../scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather-forecasting suite</span></a>
+from the <a class="reference internal" href="../scheduling/index.html#tutorial-scheduling"><span class="std std-ref">scheduling tutorial</span></a>.</p>
+<p>Next section: <a class="reference internal" href="configuration-consolidation/index.html#tutorial-cylc-consolidating-configuration"><span class="std std-ref">Consolidating Configuration</span></a></p>
+<div class="note admonition" id="tutorial-cylc-runtime-forecasting-suite">
+<p class="first admonition-title">Practical<a class="headerlink" href="../../../../html/tutorial/cylc/runtime/runtime-configuration.html#tutorial-cylc-runtime-forecasting-suite" title="View HTML">§</a></p>
+<p class="rubric">In this practical we will add runtime configuration to the
+<a class="reference internal" href="../scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical"><span class="std std-ref">weather-forecasting suite</span></a>
+from the <a class="reference internal" href="../scheduling/index.html#tutorial-scheduling"><span class="std std-ref">scheduling tutorial</span></a>.</p>
+<ol class="arabic">
+<li><p class="first"><strong>Create A New Suite.</strong></p>
+<p>Create a new suite by running the command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose tutorial runtime-tutorial
+<span class="nb">cd</span> ~/cylc-run/runtime-tutorial
+</pre></div>
+</div>
+<p>You will now have a copy of the weather-forecasting suite along with some
+executables and python modules.</p>
+</li>
+</ol>
+<ol class="last arabic" id="tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points">
+<li><p class="first"><strong>Set The Initial And Final Cycle Points.</strong></p>
+<p>First we will set the initial and final cycle points (see the
+<a class="reference internal" href="../scheduling/datetime-cycling.html#tutorial-iso8601-datetimes"><span class="std std-ref">datetime tutorial</span></a> for help with
+writing ISO8601 datetimes):</p>
+<ul class="simple">
+<li>The <a class="reference internal" href="../../../glossary.html#term-final-cycle-point"><span class="xref std std-term">final cycle point</span></a> should be set to the time one hour ago
+from the present time (with minutes and seconds ignored), <em>e.g. if the
+current time is 9:45 UTC then the final cycle point should be at
+8:00 UTC.</em></li>
+<li>The <a class="reference internal" href="../../../glossary.html#term-initial-cycle-point"><span class="xref std std-term">initial cycle point</span></a> should be the final cycle point minus
+six hours.</li>
+</ul>
+<div class="tip admonition">
+<p class="first admonition-title">Reminder</p>
+<p class="last">Remember that we are working in UTC mode (the <code class="docutils literal notranslate"><span class="pre">+00</span></code> time zone).
+Datetimes should end with a <code class="docutils literal notranslate"><span class="pre">Z</span></code> character to reflect this.</p>
+</div>
+<div class="spoiler warning admonition">
+<p class="first admonition-title">Solution</p>
+<p>You can check your answers by running the following commands
+(hyphens and colons optional but can’t be mixed):</p>
+<dl class="last docutils">
+<dt>For the initial cycle point:</dt>
+<dd><p class="first last"><code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span> <span class="pre">--utc</span> <span class="pre">--offset</span> <span class="pre">-PT7H</span> <span class="pre">--format</span> <span class="pre">CCYY-MM-DDThh:00Z</span></code></p>
+</dd>
+<dt>For the final cycle point:</dt>
+<dd><p class="first last"><code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span> <span class="pre">--utc</span> <span class="pre">--offset</span> <span class="pre">-PT1H</span> <span class="pre">--format</span> <span class="pre">CCYY-MM-DDThh:00Z</span></code></p>
+</dd>
+</dl>
+</div>
+<p>Run <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">validate</span></code> to check for any errors:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">validate</span> <span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Add Runtime Configuration For The</strong> <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> <strong>Tasks.</strong></p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory is a script called <code class="docutils literal notranslate"><span class="pre">get-observations</span></code>. This
+script gets weather data from the MetOffice <a class="reference external" href="https://www.metoffice.gov.uk/datapoint">DataPoint</a> service.
+It requires two environment variables:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">SITE_ID</span></code>:</dt>
+<dd><p class="first last">A four digit numerical code which is used to identify a
+weather station, e.g. <code class="docutils literal notranslate"><span class="pre">3772</span></code> is Heathrow Airport.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">API_KEY</span></code>:</dt>
+<dd><p class="first last">An authentication key required for access to the service.</p>
+</dd>
+</dl>
+<p>Generate a Datapoint API key:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">api</span><span class="o">-</span><span class="n">key</span>
+</pre></div>
+</div>
+<p>Add the following lines to the bottom of the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file replacing
+<code class="docutils literal notranslate"><span class="pre">xxx...</span></code> with your API key:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[get_observations_heathrow]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3772</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+</pre></div>
+</div>
+<p>Add three more <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> tasks for each of the remaining
+weather stations.</p>
+<p>You will need the codes for the other three weather stations, which are:</p>
+<ul class="simple">
+<li>Camborne - <code class="docutils literal notranslate"><span class="pre">3808</span></code></li>
+<li>Shetland - <code class="docutils literal notranslate"><span class="pre">3005</span></code></li>
+<li>Belmullet - <code class="docutils literal notranslate"><span class="pre">3976</span></code></li>
+</ul>
+<div class="spoiler warning admonition">
+<p class="first admonition-title">Solution</p>
+<div class="last highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[get_observations_heathrow]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3772</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+    <span class="nt">[[get_observations_camborne]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3808</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+    <span class="nt">[[get_observations_shetland]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3005</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+    <span class="nt">[[get_observations_belmullet]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3976</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+</pre></div>
+</div>
+</div>
+<p>Check the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file is valid by running the command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc validate .
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Test The</strong> <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> <strong>Tasks.</strong></p>
+<p>Next we will test the <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> tasks.</p>
+<p>Open the Cylc GUI by running the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc gui runtime-tutorial <span class="p">&amp;</span>
+</pre></div>
+</div>
+<p>Run the suite either by pressing the play button in the Cylc GUI or by
+running the command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc run runtime-tutorial
+</pre></div>
+</div>
+<p>If all goes well the suite will startup and the tasks will run and
+succeed. Note that the tasks which do not have a <code class="docutils literal notranslate"><span class="pre">[runtime]</span></code> section
+will still run though they will not do anything as they do not call any
+scripts.</p>
+<p>Once the suite has reached the final cycle point and all tasks have
+succeeded the suite will automatically shutdown.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">get-observations</span></code> script produces a file called <code class="docutils literal notranslate"><span class="pre">wind.csv</span></code> which
+specifies the wind speed and direction. This file is written in the task’s
+<a class="reference internal" href="../../../glossary.html#term-work-directory"><span class="xref std std-term">work directory</span></a>.</p>
+<p>Try and open one of the <code class="docutils literal notranslate"><span class="pre">wind.csv</span></code> files. Note that the path to the
+<a class="reference internal" href="../../../glossary.html#term-work-directory"><span class="xref std std-term">work directory</span></a> is:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>work/<span class="s">&lt;cycle-point&gt;</span>/<span class="s">&lt;task-name&gt;</span>
+</pre></div>
+</div>
+<p>You should find a file containing four numbers:</p>
+<ul class="simple">
+<li>The longitude of the weather station;</li>
+<li>The latitude of the weather station;</li>
+<li>The wind direction (<em>the direction the wind is blowing towards</em>)
+in degrees;</li>
+<li>The wind speed in miles per hour.</li>
+</ul>
+<div class="spoiler hint admonition">
+<p class="first admonition-title">Hint</p>
+<p>If you run <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">work</span></code> you should see a
+list of cycles. Pick one of them and open the file:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">work</span><span class="o">/&lt;</span><span class="n">cycle</span><span class="o">-</span><span class="n">point</span><span class="o">&gt;/</span><span class="n">get_observations_heathrow</span><span class="o">/</span><span class="n">wind</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+</div>
+</li>
+<li><p class="first"><strong>Add runtime configuration for the other tasks.</strong></p>
+<p>The runtime configuration for the remaining tasks has been written out
+for you in the <code class="docutils literal notranslate"><span class="pre">runtime</span></code> file which you will find in the
+<a class="reference internal" href="../../../glossary.html#term-suite-directory"><span class="xref std std-term">suite directory</span></a>. Copy the code in the <code class="docutils literal notranslate"><span class="pre">runtime</span></code> file to the
+bottom of the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file.</p>
+<p>Check the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file is valid by running the command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc validate .
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Run The Suite.</strong></p>
+<p>Open the Cylc GUI (if not already open) and run the suite.</p>
+<div class="spoiler hint admonition">
+<p class="first admonition-title">Hint</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc gui runtime-tutorial <span class="p">&amp;</span>
+</pre></div>
+</div>
+<p>Run the suite either by:</p>
+<ul class="last simple">
+<li>Pressing the play button in the Cylc GUI. Then, ensuring that
+“Cold Start” is selected within the dialogue window, pressing the
+“Start” button.</li>
+<li>Running the command <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">run</span> <span class="pre">runtime-tutorial</span></code>.</li>
+</ul>
+</div>
+</li>
+<li><p class="first"><strong>View The Forecast Summary.</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">post_process_exeter</span></code> task will produce a one-line summary of the
+weather in Exeter, as forecast two hours ahead of time. This summary can
+be found in the <code class="docutils literal notranslate"><span class="pre">summary.txt</span></code> file in the <a class="reference internal" href="../../../glossary.html#term-work-directory"><span class="xref std std-term">work directory</span></a>.</p>
+<p>Try opening the summary file - it will be in the last cycle. The path to
+the <a class="reference internal" href="../../../glossary.html#term-work-directory"><span class="xref std std-term">work directory</span></a> is:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>work/<span class="s">&lt;cycle-point&gt;</span>/<span class="s">&lt;task-name&gt;</span>
+</pre></div>
+</div>
+<div class="spoiler hint admonition">
+<p class="first admonition-title">Hint</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">cycle-point</span></code> - this will be the last cycle of the suite,
+i.e. the final cycle point.</li>
+<li><code class="docutils literal notranslate"><span class="pre">task-name</span></code> - set this to “post_process_exeter”.</li>
+</ul>
+</div>
+</li>
+<li><p class="first"><strong>View The Rainfall Data.</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">forecast</span></code> task will produce a html page where the rainfall
+data is rendered on a map. This html file is called <code class="docutils literal notranslate"><span class="pre">job-map.html</span></code> and
+is saved alongside the <a class="reference internal" href="../../../glossary.html#term-job-log"><span class="xref std std-term">job log</span></a>.</p>
+<p>Try opening this file in a web browser, e.g via:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>firefox <span class="s">&lt;filename&gt;</span> &amp;
+</pre></div>
+</div>
+<p>The path to the <a class="reference internal" href="../../../glossary.html#term-job-log-directory"><span class="xref std std-term">job log directory</span></a> is:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>log/job/<span class="s">&lt;cycle-point&gt;</span>/<span class="s">&lt;task-name&gt;</span>/<span class="s">&lt;submission-number&gt;</span>
+</pre></div>
+</div>
+<div class="spoiler hint admonition">
+<p class="first admonition-title">Hint</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">cycle-point</span></code> - this will be the last cycle of the suite,
+i.e. the final cycle point.</li>
+<li><code class="docutils literal notranslate"><span class="pre">task-name</span></code> - set this to “forecast”.</li>
+<li><code class="docutils literal notranslate"><span class="pre">submission-number</span></code> - set this to “01”.</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

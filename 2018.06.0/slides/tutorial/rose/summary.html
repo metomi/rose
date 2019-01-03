@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Summary &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Tutorial" href="index.html" />
+    <link rel="next" title="Further Topics" href="furthertopics/index.html" />
+    <link rel="prev" title="Rosie" href="rosie.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="summary">
+
+<h1>Summary<a class="headerlink" href="../../../html/tutorial/rose/summary.html#summary" title="View HTML">§</a></h1>
+
+
+
+
+
+</article>
+<article class="slide level-2" id="suite-structure">
+
+<h2>Suite Structure<a class="headerlink" href="../../../html/tutorial/rose/summary.html#suite-structure" title="View HTML">§</a></h2>
+
+<p>So far we have covered:</p>
+<ul class="simple">
+<li>Cylc suites.</li>
+<li>Rose suite configurations.</li>
+<li>Rosie suites.</li>
+</ul>
+<div align="center" class="align-center"><object data="../../_images/graphviz-6646ffc91875dc98cdf78bb047973b928c8de0b8.svg" type="image/svg+xml">
+            <p class="warning">graph Example {
+ ranksep = 0
+ size = &quot;7, 5&quot;
+
+ node [shape=&quot;plaintext&quot;, fontcolor=&quot;#606060&quot;]
+ edge [style=&quot;invis&quot;]
+
+ subgraph cluster_1 {
+     label = &quot;Cylc Suite&quot;
+     fontsize = &quot;20&quot;
+     fontcolor = &quot;#5050aa&quot;
+     labelloc = &quot;r&quot;
+     &quot;suite.rc&quot; [fontsize=&quot;18&quot;,
+                 fontname=&quot;mono&quot;,
+                 fontcolor=&quot;black&quot;]
+     &quot;rcinfo&quot; [label=&quot;Defines the workflow\nin terms of tasks\nand dependencies&quot;]
+     &quot;suite.rc&quot; -- &quot;rcinfo&quot;
+
+     subgraph cluster_2 {
+         label = &quot;Rose Suite Configuration&quot;
+         &quot;rose-suite.conf&quot; [fontsize=&quot;18&quot;,
+                            fontname=&quot;mono&quot;,
+                            fontcolor=&quot;black&quot;]
+         &quot;confinfo&quot; [label=&quot;Defines Jinja2 variables for\nthe suite.rc and environment\nvariables for use throughout\nthe suite&quot;]
+         &quot;rose-suite.conf&quot; -- &quot;confinfo&quot;
+
+         subgraph cluster_3 {
+             label = &quot;Rosie Suite&quot;
+             &quot;rose-suite.info&quot; [fontsize=&quot;18&quot;,
+                                fontname=&quot;mono&quot;,
+                                fontcolor=&quot;black&quot;]
+             &quot;infoinfo&quot; [label=&quot;Contains basic information\nabout the suite used\nby Rosie for searching\nand version control purposes&quot;]
+             &quot;rose-suite.info&quot; -- &quot;infoinfo&quot;
+         }
+     }
+ }
+}</p></object>
+</div>
+<ul class="simple">
+<li><a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a></li>
+<li><a class="reference internal" href="../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="suite-commands">
+
+<h2>Suite Commands<a class="headerlink" href="../../../html/tutorial/rose/summary.html#suite-commands" title="View HTML">§</a></h2>
+
+<p class="rubric">We have learned the following Cylc commands:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">validate</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">run</span></code></li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">stop</span></code></dt>
+<dd><ul class="first last">
+<li><code class="docutils literal notranslate"><span class="pre">--kill</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">--now</span> <span class="pre">--now</span></code></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">restart</span></code></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Suite Commands<a class="headerlink" href="../../../html/tutorial/rose/summary.html#id1" title="View HTML">§</a></h2>
+
+<p class="rubric">We have learned the following Rose commands:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../../api/command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a></li>
+<li><a class="reference internal" href="../../api/command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a></li>
+<li><a class="reference internal" href="../../api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a></li>
+<li><a class="reference internal" href="../../api/command-reference.html#command-rose-suite-restart"><span class="std std-ref">rose suite-restart</span></a></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Suite Commands<a class="headerlink" href="../../../html/tutorial/rose/summary.html#id2" title="View HTML">§</a></h2>
+
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># install the suite on the local host only - don&#39;t run it.</span>
+rose suite-run --local-install-only
+
+<span class="c"># run cylc graph using the installed version of the suite.</span>
+cylc graph <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="rose-utilities">
+
+<h2>Rose Utilities<a class="headerlink" href="../../../html/tutorial/rose/summary.html#rose-utilities" title="View HTML">§</a></h2>
+
+<p>Rose contains some utilities to make life easier:</p>
+<p><code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span></code></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose date <span class="m">2000</span> --offset <span class="s1">&#39;+P1Y1M1D&#39;</span>
+<span class="go">2001-02-02T0000Z</span>
+
+<span class="gp">$</span> rose date <span class="nv">$CYLC_TASK_CYCLE_POINT</span> --format <span class="s1">&#39;The month is %B.&#39;</span>
+<span class="go">The month is April.</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">host-select</span></code></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose host-select mycluster
+<span class="go">computer2</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="rose-built-in-applications">
+
+<h2>Rose Built-In Applications<a class="headerlink" href="../../../html/tutorial/rose/summary.html#rose-built-in-applications" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li><a class="reference internal" href="../../api/built-in/fcm_make.html#rose:app:fcm_make" title="rose:app:fcm_make"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">fcm_make</span></code></a></li>
+<li><a class="reference internal" href="../../api/built-in/rose_ana.html#rose:app:rose_ana" title="rose:app:rose_ana"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_ana</span></code></a></li>
+<li><a class="reference internal" href="../../api/built-in/rose_arch.html#rose:app:rose_arch" title="rose:app:rose_arch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_arch</span></code></a></li>
+<li><a class="reference internal" href="../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a></li>
+<li><a class="reference internal" href="../../api/built-in/rose_prune.html#rose:app:rose_prune" title="rose:app:rose_prune"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_prune</span></code></a></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="next-steps">
+
+<h2>Next Steps<a class="headerlink" href="../../../html/tutorial/rose/summary.html#next-steps" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li><a class="reference internal" href="furthertopics/index.html#rose-further-topics"><span class="std std-ref">Further Topics</span></a></li>
+<li><a class="reference internal" href="../../cheat-sheet.html#cheat-sheet"><span class="std std-ref">Cheat Sheet</span></a></li>
+<li><a class="reference internal" href="../../api/command-reference.html#command-reference"><span class="std std-ref">Command Reference</span></a></li>
+<li><a class="reference internal" href="../../api/configuration/index.html#rose-configuration"><span class="std std-ref">Rose Configuration</span></a></li>
+<li><a class="reference external" href="http://cylc.github.io/cylc/doc/suite-design-guide.pdf">Cylc Suite Design Guide</a></li>
+</ul>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rose_ana &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Built-In Applications" href="../rose-built-in-applications.html" />
+    <link rel="next" title="rose_arch" href="rose_arch.html" />
+    <link rel="prev" title="fcm_make" href="fcm_make.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-ana">
+
+<h1><code class="docutils literal notranslate"><span class="pre">rose_ana</span></code><a class="headerlink" href="../../../html/api/built-in/rose_ana.html#rose-ana" title="View HTML">§</a></h1>
+
+<p>This built-in application runs the <code class="docutils literal notranslate"><span class="pre">rose-ana</span></code> analysis engine.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rose-ana</span></code> performs various configurable analysis steps. For example
+a common usage is to compare two files and report whether they differ
+or not. It can write the details of any comparisons it runs to a
+database in the suite’s log directory to assist with any automated
+updating of control data.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="invocation">
+
+<h2>Invocation<a class="headerlink" href="../../../html/api/built-in/rose_ana.html#invocation" title="View HTML">§</a></h2>
+
+<p>In automatic selection mode, this built-in application will be
+invoked automatically if a task has a name that starts with <code class="docutils literal notranslate"><span class="pre">rose_ana*</span></code>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="analysis-modules">
+
+<h2>Analysis Modules<a class="headerlink" href="../../../html/api/built-in/rose_ana.html#analysis-modules" title="View HTML">§</a></h2>
+
+<p>The built-in application will search for suitable analysis modules to
+load firstly in the <code class="docutils literal notranslate"><span class="pre">ana</span></code> subdirectory of the <code class="docutils literal notranslate"><span class="pre">rose-ana</span></code> app, then in
+the <code class="docutils literal notranslate"><span class="pre">ana</span></code> subdirectory of the top-most suite directory. Any
+additional directories to search (for example a site-wide central
+directory) may be specified by setting the
+<a class="reference internal" href="../configuration/site-and-user.html#rose:conf:rose.conf[rose-ana]method-path" title="rose:conf:rose.conf[rose-ana]method-path"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose.conf[rose-ana]method-path</span></code></a> variable. Finally the
+<code class="docutils literal notranslate"><span class="pre">ana_builtins</span></code> subdirectory of the Rose installation itself contains
+any built-in comparisons.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="configuration">
+
+<h2>Configuration<a class="headerlink" href="../../../html/api/built-in/rose_ana.html#configuration" title="View HTML">§</a></h2>
+
+<p>The application configuration should contain configuration sections which
+describe an analysis step. These sections must follow a particular format:</p>
+<ul class="simple">
+<li>the name must begin with <code class="docutils literal notranslate"><span class="pre">ana:</span></code>. This is required for <code class="docutils literal notranslate"><span class="pre">rose-ana</span></code> to
+recognise it as a valid section.</li>
+<li>the next part gives the name of the class within one of the analysis
+modules, including namespace information; for example to use the built-in
+<code class="docutils literal notranslate"><span class="pre">FilePattern</span></code> class from the <code class="docutils literal notranslate"><span class="pre">grepper</span></code> module you would provide the
+name <code class="docutils literal notranslate"><span class="pre">grepper.FilePattern</span></code>.</li>
+<li>finally an expression within parentheses which may contain any string;
+this should be used to make comparisons using the same class unique, but
+can otherwise simply act as a description or note.</li>
+</ul>
+<p>The content within each of these sections consists of a series of key-value
+option pairs, just like other standard Rose apps. However the availability
+of options for a given section is specified and controlled by the <em>class</em>
+rather than the meta-data. This makes it easy to provide your own analysis
+modules without requiring changes to Rose itself.</p>
+<p>Therefore you should consult the documentation or source code of the
+analysis module you wish to use for details of which options it supports.
+Additionally, some special treatment is applied to all options depending
+on what they contain:</p>
+<dl class="docutils">
+<dt>Environment Variables</dt>
+<dd>If the option contains any words prefixed by <code class="docutils literal notranslate"><span class="pre">$</span></code>
+they will be substituted for the equivalent environment variable, if one
+is available.</dd>
+<dt>Lists</dt>
+<dd>If the option contains newlines it will be returned as a list of
+strings automatically.</dd>
+<dt>Argument substitution</dt>
+<dd>If the option contains one or more pairs of braces (<code class="docutils literal notranslate"><span class="pre">{}</span></code>) the option
+will be returned multiple times with the parentheses substituted once for
+each argument passed to <a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a></dd>
+</dl>
+<p>The app may also define a configuration section, <code class="docutils literal notranslate"><span class="pre">[ana:config]</span></code>, whose
+key-value pairs define app-wide settings that are passed through to the
+analysis classes. In the same way that the task options are dependent on
+the class definition, interpretation of the <code class="docutils literal notranslate"><span class="pre">config</span></code> options is done by the
+class(es), so their documentation or source code should be consulted for
+details.</p>
+<dl class="app">
+<dt id="rose:app:rose_ana">
+<em class="property">Rose App </em><code class="descname">rose_ana</code></dt>
+<dd><dl class="conf">
+<dt id="rose:conf:rose_ana[ana:config]">
+<em class="property">Config </em><code class="descname">[ana:config]</code></dt>
+<dd><dl class="conf">
+<dt id="rose:conf:rose_ana[ana:config]grepper-report-limit">
+<em class="property">Config </em><code class="descname">grepper-report-limit</code></dt>
+<dd><p>Limits the number of lines printed when using the
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.apps.ana_builtin.grepper</span></code> analysis class.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose_ana[ana:config]skip-if-all-files-missing">
+<em class="property">Config </em><code class="descname">skip-if-all-files-missing</code></dt>
+<dd><p>Causes the <code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.apps.ana_builtin.grepper</span></code> class to pass
+if all files to be compared are missing.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose_ana[ana:config]kgo-database">
+<em class="property">Config </em><code class="descname">kgo-database</code></dt>
+<dd><p>Turns on the <a class="reference internal" href="../../tutorial/rose/furthertopics/rose-stem.html#the-rose-ana-comparison-database"><span class="std std-ref">Rose Ana Comparison Database</span></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose_ana[ana:ANALYSIS_CLASS]">
+<em class="property">Config </em><code class="descname">[ana:ANALYSIS_CLASS]</code></dt>
+<dd><p>Define a new analysis step. <code class="docutils literal notranslate"><span class="pre">ANALYSIS_CLASS</span></code> is the name of
+the analysis class e.g. <code class="docutils literal notranslate"><span class="pre">grepper.FilePattern</span></code>.</p>
+<dl class="conf">
+<dt id="rose:conf:rose_ana[ana:ANALYSIS_CLASS]KEY">
+<em class="property">Config </em><code class="descname">KEY</code><em class="property">= VALUE</em></dt>
+<dd><p>Define an argument to <code class="docutils literal notranslate"><span class="pre">ANALYSIS_CLASS</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+
+
+
+
+</article>
+<article class="slide level-2" id="analysis-classes">
+
+<h2>Analysis Classes<a class="headerlink" href="../../../html/api/built-in/rose_ana.html#analysis-classes" title="View HTML">§</a></h2>
+
+<p>There is one built-in module of analysis classes called <code class="docutils literal notranslate"><span class="pre">grepper</span></code>.</p>
+<dl class="class">
+<dt id="rose.apps.ana_builtin.grepper.FileCommandPattern">
+<em class="property">class </em><code class="descclassname">rose.apps.ana_builtin.grepper.</code><code class="descname">FileCommandPattern</code><span class="sig-paren">(</span><em>parent_app</em>, <em>task_options</em><span class="sig-paren">)</span></dt>
+<dd><p>Check for occurences of a particular expression or value in the standard
+output from a command applied to two or more files.</p>
+<dl class="docutils">
+<dt>Options:</dt>
+<dd><dl class="first last docutils">
+<dt>files (optional):</dt>
+<dd>Same as previous tasks.</dd>
+<dt>kgo_file:</dt>
+<dd>Same as previous tasks.</dd>
+<dt>pattern:</dt>
+<dd>Same as previous tasks.</dd>
+<dt>tolerance (optional):</dt>
+<dd>Same as previous tasks.</dd>
+<dt>command:</dt>
+<dd>The command to run; it should contain a Python style format
+specifier to be expanded using the list of files above.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="rose.apps.ana_builtin.grepper.FilePattern">
+<em class="property">class </em><code class="descclassname">rose.apps.ana_builtin.grepper.</code><code class="descname">FilePattern</code><span class="sig-paren">(</span><em>parent_app</em>, <em>task_options</em><span class="sig-paren">)</span></dt>
+<dd><p>Check for occurences of a particular expression or value within the
+contents of two or more files.</p>
+<dl class="docutils">
+<dt>Options:</dt>
+<dd><dl class="first last docutils">
+<dt>files (optional):</dt>
+<dd>Same as previous tasks.</dd>
+<dt>kgo_file:</dt>
+<dd>Same as previous tasks.</dd>
+<dt>pattern:</dt>
+<dd>The regular expression to search for in the files. The
+expression should include one or more capture groups; each
+of these will be compared between the files any time the
+pattern occurs.</dd>
+<dt>tolerance (optional):</dt>
+<dd>By default the above comparisons will be compared exactly,
+but if this argument is specified they will be converted to
+float values and compared according to the given tolerance.
+If this tolerance ends in % it will be interpreted as a
+relative tolerance (otherwise absolute).</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="rose.apps.ana_builtin.grepper.SingleCommandPattern">
+<em class="property">class </em><code class="descclassname">rose.apps.ana_builtin.grepper.</code><code class="descname">SingleCommandPattern</code><span class="sig-paren">(</span><em>parent_app</em>, <em>task_options</em><span class="sig-paren">)</span></dt>
+<dd><p>Run a single command and then pass/fail depending on the presence of a
+particular expression in that command’s standard output.</p>
+<dl class="docutils">
+<dt>Options:</dt>
+<dd><dl class="first last docutils">
+<dt>files (optional):</dt>
+<dd>Same as previous task. command - same as previous task.</dd>
+<dt>kgo_file:</dt>
+<dd>Same as previous task.</dd>
+<dt>pattern:</dt>
+<dd>The regular expression to search for in the stdout from the
+command.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="rose.apps.ana_builtin.grepper.SingleCommandStatus">
+<em class="property">class </em><code class="descclassname">rose.apps.ana_builtin.grepper.</code><code class="descname">SingleCommandStatus</code><span class="sig-paren">(</span><em>parent_app</em>, <em>task_options</em><span class="sig-paren">)</span></dt>
+<dd><p>Run a shell command, passing or failing depending on the exit
+status of that command.</p>
+<dl class="docutils">
+<dt>Options:</dt>
+<dd><dl class="first last docutils">
+<dt>files (optional):</dt>
+<dd>A newline-separated list of filenames which may appear
+in the command.</dd>
+<dt>command:</dt>
+<dd>The command to run; if it contains Python style
+format specifiers these will be expanded using the list of
+files above (if provided).</dd>
+<dt>kgo_file:</dt>
+<dd>If the list of files above was provided gives the
+(0-based) index of the file holding the “kgo” or “control”
+output for use with the comparisons database (if active).</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

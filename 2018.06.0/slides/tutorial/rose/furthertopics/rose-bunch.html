@@ -1,0 +1,316 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Bunch &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Rose Stem" href="rose-stem.html" />
+    <link rel="prev" title="Rose Arch" href="rose-arch.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-bunch">
+
+<h1>Rose Bunch<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-bunch.html#rose-bunch" title="View HTML">§</a></h1>
+
+<p><a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> is a built-in <a class="reference internal" href="../../../glossary.html#term-rose-app"><span class="xref std std-term">Rose app</span></a> which allows multiple
+variants of a command to be run under a single job.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="purpose">
+
+<h2>Purpose<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-bunch.html#purpose" title="View HTML">§</a></h2>
+
+<p>Often, we want to run many instances of a command that differ only slightly
+from each other at the same time - an example would be where a command is
+run repeatedly with only its arguments changing.</p>
+<p>Rather than creating multiple apps or
+<a class="reference internal" href="optional-configurations.html#rose-tutorial-optional-configurations"><span class="std std-ref">optional configs</span></a> to change
+the way a command is to be run, we can instead use the built-in
+<a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> application to run multiple command variants, in
+parallel, under a single job as defined by an application configuration.</p>
+<p>Note, however, that for “embarrassingly parallel” code it would be better to
+alter the code rather than use <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> to handle this for you.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>It is important to note that when running your <code class="docutils literal notranslate"><span class="pre">rose_bunch</span></code>
+<a class="reference internal" href="../../../glossary.html#term-rose-app"><span class="xref std std-term">app</span></a> under load balancing systems such as PBS or Slurm,
+you will need to set resource requests to reflect the resources required
+by running multiple commands at once.</p>
+<p class="last">For example, if a single command would require 1GB memory and the app is
+configured to run up to 4 commands at once then 4GB of memory should be
+requested.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-bunch.html#example" title="View HTML">§</a></h2>
+
+<p>In this example we are going to create a suite that simulates the handling of
+landing planes at an airport. For a given plane the process of landing and
+unloading is the same: land, taxi to the terminal, unload passengers and get
+clear. We can refer to this as the “landing” routine. What differs between
+landings is the plane type, number of passengers carried and the resulting
+timings for each stage of the landing process.</p>
+<p>Create a new Rose suite configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">bunch</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">bunch</span>
+</pre></div>
+</div>
+<p>Create a blank <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> and a <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code>
+file that looks like this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[cylc]</span>
+    <span class="nv">UTC mode </span><span class="o">=</span><span class="s"> True</span> <span class="c1"># Ignore DST</span>
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">lander</span>
+<span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rose task-run</span>
+    <span class="nt">[[lander]]</span>
+</pre></div>
+</div>
+<p>In the suite directory create an <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">app</span>
+</pre></div>
+</div>
+<p>In the app directory create a <code class="docutils literal notranslate"><span class="pre">lander/</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">app</span>
+<span class="n">mkdir</span> <span class="n">lander</span>
+</pre></div>
+</div>
+<p>In the <code class="docutils literal notranslate"><span class="pre">app/lander/</span></code> directory create a <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file
+using your editor of choice and paste the following lines into it:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">mode</span><span class="o">=</span><span class="s">rose_bunch</span>
+
+<span class="nt">[bunch]</span>
+<span class="nv">command-format</span><span class="o">=</span><span class="s">land %(class)s %(passengers)s</span>
+
+<span class="nt">[bunch-args]</span>
+<span class="nv">class</span><span class="o">=</span><span class="s">airbus concorde airbus cessna</span>
+<span class="nv">passengers</span><span class="o">=</span><span class="s">40 20 30 2</span>
+</pre></div>
+</div>
+<p>This configuration will run a <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> task that calls multiple
+instances of the <code class="docutils literal notranslate"><span class="pre">land</span></code> command, supplying arguments to each instance
+from the <code class="docutils literal notranslate"><span class="pre">class</span></code> and <code class="docutils literal notranslate"><span class="pre">passengers</span></code> entries under
+<a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:conf:rose_bunch[bunch-args]" title="rose:conf:rose_bunch[bunch-args]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch-args]</span></code></a>.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">app/lander/</span></code> directory create a <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="nb">bin</span>
+</pre></div>
+</div>
+<p>Using your editor of choice, create a file named <code class="docutils literal notranslate"><span class="pre">land</span></code> under the <code class="docutils literal notranslate"><span class="pre">bin</span></code>
+directory and paste in these lines:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#!/bin/bash
+
+CLASS=$1
+PASSENGERS=$2
+
+# Get settings
+case $CLASS in
+    airbus) LANDTIME=30; UNLOADRATE=8;;
+    cessna) LANDTIME=20; UNLOADRATE=2;;
+    concorde) LANDTIME=10; UNLOADRATE=4;;
+esac
+
+echo &quot;[ $(rose date) ] $CLASS carrying $PASSENGERS passengers incoming&quot;
+
+# Land plane
+echo &quot;[ $(rose date) ] Approaching runway&quot;
+sleep $LANDTIME
+echo &quot;[ $(rose date) ] On the tarmac&quot;
+
+# Unload passengers
+sleep $(($PASSENGERS / $UNLOADRATE))
+echo &quot;[ $(rose date) ] Unloaded&quot;
+
+# Clear terminal
+sleep 10
+echo &quot;[ $(rose date) ] Clear of terminal&quot;
+</pre></div>
+</div>
+<p>This script captures the landing routine and expects two arguments: the plane
+type (its class) and the number of passengers it is carrying.</p>
+<p>Finally, make the new <code class="docutils literal notranslate"><span class="pre">land</span></code> file executable by navigating into the <code class="docutils literal notranslate"><span class="pre">bin</span></code>
+directory of the lander app and running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="n">land</span>
+</pre></div>
+</div>
+<p>Navigate to the top directory of your suite (where the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> and
+<a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> files can be found) and run
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>.</p>
+<p>Your suite should run, launch the Cylc GUI and successfully run the <code class="docutils literal notranslate"><span class="pre">lander</span></code>
+app.</p>
+<p>Once the suite has finished running and has shutdown, open Rose Bush to view
+its output (note that you can close the Cylc GUI at this point):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">suite</span><span class="o">-</span><span class="n">log</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can quickly get to the relevant page by running
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-log"><span class="std std-ref">rose suite-log</span></a> from within the <a class="reference internal" href="../../../glossary.html#term-suite-directory"><span class="xref std std-term">suite directory</span></a>.</p>
+</div>
+<p>In the Rose Bush jobs page for your suite you should be presented with a
+page containing a single row for the <code class="docutils literal notranslate"><span class="pre">lander</span></code> task, from which you can
+access its output. In that row you should see something like this:</p>
+<img alt="Rose Bush view of output" class="align-center" src="../../../_images/rose-bunch-bush-page.png" />
+<p>In the Rose Bush entry you should see that the usual links are present for
+the task such as <code class="docutils literal notranslate"><span class="pre">job.out</span></code>, <code class="docutils literal notranslate"><span class="pre">job.status</span></code> etc. with the addition of
+two drop-down boxes: one for <code class="docutils literal notranslate"><span class="pre">bunch.*.err</span></code> and one for <code class="docutils literal notranslate"><span class="pre">bunch.*.out</span></code>.
+Rather than mixing the outputs from the multiple command invocations being
+run at once, <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> directs their output to individual output
+files. So, for example, the output from running the command with the first set
+of parameters can be found in the <code class="docutils literal notranslate"><span class="pre">bunch.0.out</span></code> file, the second set in the
+<code class="docutils literal notranslate"><span class="pre">bunch.1.out</span></code> file etc. Examine these output files now to confirm that all
+four of the args combinations have been run and produced output.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="naming-invocations">
+
+<h2>Naming Invocations<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-bunch.html#naming-invocations" title="View HTML">§</a></h2>
+
+<p>While the different invocations of the command have their own output directed
+to indexed files, it can sometimes be difficult to quickly identify which file
+to look in for output. To aid this, <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> supports naming
+command instances via the <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:conf:rose_bunch[bunch]names" title="rose:conf:rose_bunch[bunch]names"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch]names=</span></code></a> option.</p>
+<p>Open your app config (under <code class="docutils literal notranslate"><span class="pre">app/lander/rose-app.conf</span></code>) and add the
+following line under the <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:conf:rose_bunch[bunch]" title="rose:conf:rose_bunch[bunch]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch]</span></code></a> section:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">names</span><span class="o">=</span><span class="s">BA123 Emirates345 BA007 PC456</span>
+</pre></div>
+</div>
+<p>Re-run your suite and, once it has finished, open up Rose Bush and examine the
+job listing. In the drop-down <code class="docutils literal notranslate"><span class="pre">bunch.*.err</span></code> and <code class="docutils literal notranslate"><span class="pre">bunch.*.out</span></code> boxes you
+should now see entries for the names you’ve configured rather than the
+<code class="docutils literal notranslate"><span class="pre">bunch.0.out</span> <span class="pre">...</span> <span class="pre">bunch.3.out</span></code> entries previously present.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="limiting-concurrent-invocations">
+
+<h2>Limiting Concurrent Invocations<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-bunch.html#limiting-concurrent-invocations" title="View HTML">§</a></h2>
+
+<p>In some situations we may need to limit the number of concurrently running
+command invocations - often as a result of resource limitations. Rather than
+batching up jobs into sets of <em>N</em> simultaneously running commands,
+<a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a>
+apps can be configured to run as many commands as possible within some limit
+i.e. while <em>N</em> commands are running, if one of them finishes, don’t wait for the
+remaining <em>N</em>-1 jobs to finish before running the (<em>N</em>+1)th one.</p>
+<p>In the case of our simulated airport we will pretend we only have two runways
+available at a time on which our planes can land. As such we need to limit the
+number of planes landing. We do this using the
+<a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:conf:rose_bunch[bunch]pool-size" title="rose:conf:rose_bunch[bunch]pool-size"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch]pool-size=</span></code></a> configuration option of the
+<a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> app.</p>
+<p>Open your app config (under <code class="docutils literal notranslate"><span class="pre">app/lander/rose-app.conf</span></code>) and add the
+following line to the <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:conf:rose_bunch[bunch]" title="rose:conf:rose_bunch[bunch]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch]</span></code></a> section:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">pool-size</span><span class="o">=</span><span class="s">2</span>
+</pre></div>
+</div>
+<p>Run your suite again. Notice that this time round it takes longer for the task
+to run as it has been limited in the number of command variants it can run
+simultaneously. You can see the individual commands being started by viewing
+the task stdout in the Cylc GUI by right-clicking on the task and selecting
+<span class="guilabel">View</span> then <span class="guilabel">job stdout</span>. As an example, when the
+<code class="docutils literal notranslate"><span class="pre">BA007</span></code> invocation starts running you should see the line:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[INFO] BA007: added to pool
+</pre></div>
+</div>
+<p>appear in the job output after a while whereas, when running without a
+<a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:conf:rose_bunch[bunch]pool-size" title="rose:conf:rose_bunch[bunch]pool-size"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch]pool-size</span></code></a>, the line will appear pretty quickly.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="summary">
+
+<h2>Summary<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-bunch.html#summary" title="View HTML">§</a></h2>
+
+<p>In this tutorial we have learnt how to configure a <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> app
+to run a set of command variants under one job. We have learnt how to name the
+individual variants for convenience in examining the logs and how to limit
+the number of concurrently running commands.</p>
+<p>Further options are listed in the <a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:app:rose_bunch" title="rose:app:rose_bunch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_bunch</span></code></a> documentation. These
+include configuring how to proceed following failure of an individual command
+invocation (<a class="reference internal" href="../../../api/built-in/rose_bunch.html#rose:conf:rose_bunch[bunch]fail-mode" title="rose:conf:rose_bunch[bunch]fail-mode"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch]fail-mode=</span></code></a>), automatically
+generating <em>N</em> command instances and enabling/disabling the app’s incremental
+mode.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Cheat Sheet &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/metomi.js"></script>
+    <script type="text/javascript" src="_static/js/versioning.js"></script>
+    <script type="text/javascript" src="_static/common.js"></script>
+    
+    <script type="text/javascript" src="_static/slides.js"></script>
+    <script type="text/javascript" src="_static/sync.js"></script>
+    <script type="text/javascript" src="_static/controller.js"></script>
+    <script type="text/javascript" src="_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="index.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Widget Development" href="tutorial/rose/furthertopics/widget-development.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="cheat-sheet">
+
+<h1>Cheat Sheet<a class="headerlink" href="../html/cheat-sheet.html#cheat-sheet" title="View HTML">§</a></h1>
+
+<p>This page outlines how to perform suite operations for “pure” <a class="reference internal" href="glossary.html#term-cylc-suite"><span class="xref std std-term">Cylc
+suites</span></a> (<em>the Cylc way</em>) and those using <a class="reference internal" href="glossary.html#term-rose-suite-configuration"><span class="xref std std-term">Rose suite
+configurations</span></a> (<em>the Rose way</em>).</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="running-interacting-with-suites">
+
+<h2>Running/Interacting With Suites<a class="headerlink" href="../html/cheat-sheet.html#running-interacting-with-suites" title="View HTML">§</a></h2>
+
+
+
+
+
+</article>
+<article class="slide level-3" id="id2">
+
+<h3>Starting Suites<a class="headerlink" href="../html/cheat-sheet.html#id2" title="View HTML">§</a></h3>
+
+<table border="1" class="grid-table docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><p class="first last rubric">The Cylc Way</p>
+</td>
+<td><p class="first last rubric">The Rose way</p>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc validate <span class="s">&lt;name&gt;</span>
+cylc run <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># run the suite in the current directory:</span>
+rose suite-run
+
+<span class="c"># run a suite in another directory:</span>
+rose suite-run -C <span class="s">&lt;path&gt;</span>
+
+<span class="c"># run using a custom name:</span>
+rose suite-run --name <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+</article>
+<article class="slide level-3" id="stopping-suites">
+
+<h3>Stopping Suites<a class="headerlink" href="../html/cheat-sheet.html#stopping-suites" title="View HTML">§</a></h3>
+
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># Wait for running/submitted tasks to finish then shut down the suite:</span>
+cylc stop <span class="s">&lt;name&gt;</span>
+
+<span class="c"># Kill all running/submitted tasks then shut down the suite:</span>
+cylc stop <span class="s">&lt;name&gt;</span> --kill
+
+<span class="c"># Shut down the suite now leaving any running/submitted tasks behind.</span>
+<span class="c"># If the suite is restarted Cylc will &quot;re-connect&quot; with these jobs,</span>
+<span class="c"># continuing where it left off:</span>
+cylc stop <span class="s">&lt;name&gt;</span> --now --now
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="restarting-suites-from-stopped">
+
+<h3>Restarting Suites (From Stopped)<a class="headerlink" href="../html/cheat-sheet.html#restarting-suites-from-stopped" title="View HTML">§</a></h3>
+
+<p>Pick up a suite where it left off after a shutdown. Cylc will “re-connect” with
+any jobs from the previous run.</p>
+<table border="1" class="grid-table docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><p class="first last rubric">The Cylc Way</p>
+</td>
+<td><p class="first last rubric">The Rose Way</p>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc restart <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># Restart the suite from the run</span>
+<span class="c"># directory (recommended):</span>
+rose suite-restart
+
+<span class="c"># Re-install the suite from the suite</span>
+<span class="c"># directory then restart:</span>
+rose suite-run --restart
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+</article>
+<article class="slide level-3" id="restarting-suites-from-running">
+
+<h3>Restarting Suites (From Running)<a class="headerlink" href="../html/cheat-sheet.html#restarting-suites-from-running" title="View HTML">§</a></h3>
+
+<p><em>This might be needed, for instance, to upgrade a running suite to a
+newer version of Cylc.</em></p>
+<p>Stop a suite leaving all running/submitted jobs unchanged, then restart the
+suite without making any changes to the <a class="reference internal" href="glossary.html#term-run-directory"><span class="xref std std-term">run directory</span></a>. Cylc will
+“re-connect” with any jobs from the previous run.</p>
+<table border="1" class="grid-table docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><p class="first last rubric">The Cylc Way</p>
+</td>
+<td><p class="first last rubric">The Rose Way</p>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc stop <span class="s">&lt;name&gt;</span> --now --now
+cylc restart <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc stop <span class="s">&lt;name&gt;</span> --now --now
+rose suite-restart
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+</article>
+<article class="slide level-3" id="reloading-suites">
+
+<h3>Reloading Suites<a class="headerlink" href="../html/cheat-sheet.html#reloading-suites" title="View HTML">§</a></h3>
+
+<p>Change the configuration of a running suite.</p>
+<table border="1" class="grid-table docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><p class="first last rubric">The Cylc Way</p>
+</td>
+<td><p class="first last rubric">The Rose Way</p>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc reload <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># Re-install the suite run directory then</span>
+<span class="c"># perform `cylc reload`:</span>
+rose suite-run --reload
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+</article>
+<article class="slide level-2" id="scanning-inspecting-suites">
+
+<h2>Scanning/Inspecting Suites<a class="headerlink" href="../html/cheat-sheet.html#scanning-inspecting-suites" title="View HTML">§</a></h2>
+
+
+
+
+
+</article>
+<article class="slide level-3" id="list-running-suites">
+
+<h3>List Running Suites<a class="headerlink" href="../html/cheat-sheet.html#list-running-suites" title="View HTML">§</a></h3>
+
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># On the command line:</span>
+cylc scan
+
+<span class="c"># Via a GUI:</span>
+cylc gscan
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="visualise-a-running-suite">
+
+<h3>Visualise A Running Suite<a class="headerlink" href="../html/cheat-sheet.html#visualise-a-running-suite" title="View HTML">§</a></h3>
+
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc gui <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="visualise-a-suite-s-graph">
+
+<h3>Visualise A Suite’s <a class="reference internal" href="glossary.html#term-graph"><span class="xref std std-term">Graph</span></a><a class="headerlink" href="../html/cheat-sheet.html#visualise-a-suite-s-graph" title="View HTML">§</a></h3>
+
+<table border="1" class="grid-table docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><p class="first last rubric">The Cylc Way</p>
+</td>
+<td><p class="first last rubric">The Rose Way</p>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># No special steps required.</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># Only if the suite is not running:</span>
+rose suite-run -l
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc graph <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="view-a-suite-s-suite-rc-configuration">
+
+<h3>View A Suite’s <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> Configuration<a class="headerlink" href="../html/cheat-sheet.html#view-a-suite-s-suite-rc-configuration" title="View HTML">§</a></h3>
+
+<table border="1" class="grid-table docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><p class="first last rubric">The Cylc Way</p>
+</td>
+<td><p class="first last rubric">The Rose Way</p>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># No special steps required.</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="c"># Only if the suite is not running:</span>
+rose suite-run -l
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cylc get-config --sparse <span class="s">&lt;name or path-to-suite&gt;</span>
+
+<span class="c"># View the &quot;full&quot; configuration with defaults included:</span>
+cylc get-config <span class="s">&lt;name or path-to-suite&gt;</span>
+
+<span class="c"># View a specific configuration item (e.g. &quot;[scheduling]initial cycle point&quot;):</span>
+cylc get-config <span class="s">&lt;name or path-to-suite&gt;</span> -i <span class="s">&lt;item&gt;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

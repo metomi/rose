@@ -1,0 +1,178 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Command Keys &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Date and Time Manipulation" href="date-time-manipulation.html" />
+    <link rel="prev" title="Further Topics" href="index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="command-keys">
+
+<h1>Command Keys<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/command-keys.html#command-keys" title="View HTML">§</a></h1>
+
+<p>This tutorial walks you through using command keys.</p>
+<p>Command keys allow you to specify and run different commands for a
+<a class="reference internal" href="../../../glossary.html#term-rose-app"><span class="xref std std-term">Rose app</span></a>.</p>
+<p>They work just like the default command for an app but have to be specified
+explicitly as an option of <a class="reference internal" href="../../../api/command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/command-keys.html#example" title="View HTML">§</a></h2>
+
+<p>Create a new Rose suite configuration called <code class="docutils literal notranslate"><span class="pre">command-keys</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">command</span><span class="o">-</span><span class="n">keys</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">command</span><span class="o">-</span><span class="n">keys</span>
+</pre></div>
+</div>
+<p>Create a blank <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> and a <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file that
+looks like this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[cylc]</span>
+    <span class="nv">UTC mode </span><span class="o">=</span><span class="s"> True</span> <span class="c1"># Ignore DST</span>
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">gather_ingredients</span> <span class="o">=&gt;</span> <span class="kd">breadmaker</span>
+
+<span class="nt">[runtime]</span>
+    <span class="nt">[[gather_ingredients]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 10; echo &#39;Done&#39;</span>
+    <span class="nt">[[breadmaker]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rose task-run</span>
+</pre></div>
+</div>
+<p>In your suite directory create an <code class="docutils literal notranslate"><span class="pre">app</span></code> directory.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">app</span></code> directory create a new directory called <code class="docutils literal notranslate"><span class="pre">breadmaker</span></code>.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">breadmaker</span></code> directory create a <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file that
+looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">sleep 10; echo &#39;fresh bread&#39;</span>
+</pre></div>
+</div>
+<p>This sets up a simple suite that contains the following:</p>
+<ul class="simple">
+<li>A <code class="docutils literal notranslate"><span class="pre">breadmaker</span></code> app</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">gather_ingredients</span></code> task</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">breadmaker</span></code> task that runs the <code class="docutils literal notranslate"><span class="pre">breadmaker</span></code> app</li>
+</ul>
+<p>Save your changes then run the suite using <a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>.</p>
+<p>Once it has finished use <a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-log"><span class="std std-ref">rose suite-log</span></a> to view the suite log.
+In the page that appears, click the “out” link for the breadmaker task. In the
+page you are taken to you should see a line saying “fresh bread”.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="adding-alternative-commands">
+
+<h2>Adding Alternative Commands<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/command-keys.html#adding-alternative-commands" title="View HTML">§</a></h2>
+
+<p>Open the <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file and edit to look like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">sleep 10; echo &#39;fresh bread&#39;</span>
+<span class="nv">make_dough</span><span class="o">=</span><span class="s">sleep 8; echo &#39;dough for later&#39;</span>
+<span class="nv">timed_bread</span><span class="o">=</span><span class="s">sleep 15; echo &#39;fresh bread when you want it&#39;</span>
+</pre></div>
+</div>
+<p>Save your changes and open up your <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file. Alter the
+<code class="docutils literal notranslate"><span class="pre">[[breadmaker]]</span></code> task to look like this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[breadmaker]]</span>
+    <span class="nv">script=rose task-run --command-key</span><span class="o">=</span><span class="s">make_dough</span>
+</pre></div>
+</div>
+<p>Save your changes and run the suite. If you inspect the output from the
+breadmaker task you should see the line “dough for later”.</p>
+<p>Edit the script for the <code class="docutils literal notranslate"><span class="pre">[[breadmaker]]</span></code> task to change the command key to
+<code class="docutils literal notranslate"><span class="pre">timed_bread</span></code>. Run the suite and confirm the timed_bread command has been
+run.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="summary">
+
+<h2>Summary<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/command-keys.html#summary" title="View HTML">§</a></h2>
+
+<p>You have successfully made use of command keys to run alternate commands in
+an app.</p>
+<p>Possible uses of command keys might be:</p>
+<ul class="simple">
+<li>Running an app in different modes of verbosity</li>
+<li>Running an app in different configurations</li>
+<li>Specifying different options to an app</li>
+<li>During suite development to aid in debugging an app</li>
+</ul>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

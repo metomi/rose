@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trigger &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Upgrading" href="upgrading.html" />
+    <link rel="prev" title="Rose Stem Tutorial" href="rose-stem/tutorial.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="trigger">
+
+<h1>Trigger<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#trigger" title="View HTML">§</a></h1>
+
+<p>The <code class="docutils literal notranslate"><span class="pre">trigger</span></code> metadata item can be used to cut down the amount of irrelevant
+settings presented to the user in the <a class="reference internal" href="../../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI by
+hiding any settings which are not relevant based on the value or state of other
+settings.</p>
+<p>Irrelevant (<code class="docutils literal notranslate"><span class="pre">ignored</span></code> or <code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code>) settings do not get
+included in output files at runtime. In effect, they are commented
+out (<code class="docutils literal notranslate"><span class="pre">!</span></code> or <code class="docutils literal notranslate"><span class="pre">!!</span></code> prefix in Rose configurations).</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#example" title="View HTML">§</a></h2>
+
+<p>In this example, we’ll be ordering pizza.</p>
+<p>Create a new Rose application called <code class="docutils literal notranslate"><span class="pre">trigger</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">trigger</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">trigger</span>
+</pre></div>
+</div>
+<p>Create a <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file that looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">order.exe</span>
+
+<span class="nt">[env]</span>
+<span class="nv">BUDGET</span><span class="o">=</span><span class="s">10</span>
+
+<span class="nt">[file:order.nl]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">namelist:pizza_order namelist:side_order</span>
+
+<span class="nt">[namelist:pizza_order]</span>
+<span class="nv">extra_chicken</span><span class="o">=</span><span class="s">.false.</span>
+<span class="nv">pepperoni_multiple</span><span class="o">=</span><span class="s">1</span>
+<span class="nv">no_mushrooms</span><span class="o">=</span><span class="s">.false.</span>
+<span class="nv">pizza_type</span><span class="o">=</span><span class="s">&#39;Veggie Supreme&#39;</span>
+<span class="nv">truffle</span><span class="o">=</span><span class="s">&#39;none&#39;</span>
+
+<span class="nt">[namelist:side_order]</span>
+<span class="nv">garlic_bread</span><span class="o">=</span><span class="s">.false.</span>
+<span class="nv">soft_drink</span><span class="o">=</span><span class="s">.false.</span>
+</pre></div>
+</div>
+<p>We’ll add some metadata to make it nice. Create a <code class="docutils literal notranslate"><span class="pre">meta/</span></code>
+sub-directory with a <a class="reference internal" href="../../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file that looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+
+<span class="nt">[env=BUDGET]</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+
+<span class="nt">[file:order.nl]</span>
+
+<span class="nt">[namelist:pizza_order]</span>
+
+<span class="nt">[namelist:pizza_order=extra_chicken]</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">logical</span>
+
+<span class="nt">[namelist:pizza_order=pepperoni_multiple]</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">1,2,3</span>
+
+<span class="nt">[namelist:pizza_order=no_mushrooms]</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">logical</span>
+
+<span class="nt">[namelist:pizza_order=pizza_type]</span>
+<span class="nv">sort-key</span><span class="o">=</span><span class="s">00-type</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">&#39;Veggie Supreme&#39;, &#39;Pepperoni&#39;, &#39;BBQ Chicken&#39;</span>
+
+<span class="nt">[namelist:pizza_order=truffle]</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">&#39;none&#39;, &#39;white&#39;, &#39;black&#39;</span>
+
+<span class="nt">[namelist:side_order]</span>
+
+<span class="nt">[namelist:side_order=garlic_bread]</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">logical</span>
+
+<span class="nt">[namelist:side_order=soft_drink]</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">logical</span>
+</pre></div>
+</div>
+<p>Once you’ve done that, run <a class="reference internal" href="../../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> in the application
+directory and navigate around the pages.</p>
+<p>There are quite a lot of settings that are only relevant in certain
+contexts - for example, <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=extra_chicken</span></code> is
+pretty irrelevant if we’re ordering a <code class="docutils literal notranslate"><span class="pre">'Veggie</span> <span class="pre">Supreme'</span></code>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="adding-triggers">
+
+<h2>Adding Triggers<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#adding-triggers" title="View HTML">§</a></h2>
+
+<p>Let’s add some trigger information.</p>
+<p>In the <a class="reference internal" href="../../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file, under
+<code class="docutils literal notranslate"><span class="pre">[namelist:pizza_order=pizza_type]</span></code>, add:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">trigger=namelist:pizza_order</span><span class="o">=</span><span class="s">extra_chicken: &#39;BBQ Chicken&#39;;</span>
+        <span class="nv">namelist:pizza_order</span><span class="o">=</span><span class="s">pepperoni_multiple: &#39;Pepperoni&#39;, &#39;BBQ Chicken&#39;;</span>
+</pre></div>
+</div>
+<p>This states which values of <code class="docutils literal notranslate"><span class="pre">pizza_type</span></code> are relevant for which
+settings. This means that <code class="docutils literal notranslate"><span class="pre">extra_chicken</span></code> is only relevant when
+<code class="docutils literal notranslate"><span class="pre">pizza_type</span></code> is <code class="docutils literal notranslate"><span class="pre">'BBQ</span> <span class="pre">Chicken'</span></code> - otherwise, it should be in
+an ignored state. <code class="docutils literal notranslate"><span class="pre">pepperoni_multiple</span></code> is relevant for more than
+one value of <code class="docutils literal notranslate"><span class="pre">pizza_type</span></code>.</p>
+<p>We should also make sure we don’t order over our budget, especially
+by splashing out on truffles. Add the following to <code class="docutils literal notranslate"><span class="pre">[env=BUDGET]</span></code>:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">trigger=namelist:pizza_order</span><span class="o">=</span><span class="s">truffle: this &gt; 25;</span>
+        <span class="nv">namelist:side_order: this &gt;</span><span class="o">=</span><span class="s"> 10;</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../../../api/configuration/metadata.html#app-meta-mini-lang"><span class="std std-ref">Metadata Mini-Language</span></a> for details on this syntax.</p>
+<p>What we’ve done here is use a small subset of the Rose configuration
+metadata logical syntax to specify a range of allowed values (the
+<code class="docutils literal notranslate"><span class="pre">this</span> <span class="pre">&gt;</span> <span class="pre">25</span></code> part). Here, <code class="docutils literal notranslate"><span class="pre">this</span></code> is a placeholder for the value of
+<code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code>; the expression syntax is essentially Pythonic.</p>
+<p>We’ve also specified a section <code class="docutils literal notranslate"><span class="pre">namelist:side_order</span></code> in the trigger,
+which is perfectly valid - this means that the whole section and its
+options will be ignored when the value of <code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code> is below 10.
+The truffle option will be ignored unless <code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code> is more than
+25.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="fixing-trigger-errors">
+
+<h2>Fixing Trigger Errors<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#fixing-trigger-errors" title="View HTML">§</a></h2>
+
+<p>If we load the config editor (or reload the metadata) again, we
+should get some trigger errors. These essentially say that some of
+our settings are in the wrong state now - in our case, they should
+be <code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code>.</p>
+<p>You can fix them on the command line by running <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">macro</span> <span class="pre">--fix</span></code>
+or <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">macro</span> <span class="pre">-F</span></code> in the app directory (one level up from the
+meta directory) - this is what you would do if you were working with
+a text editor and made changes to values.</p>
+<p>Similarly, you can run “Autofix” in the config editor. You can do this
+in three ways:</p>
+<ul class="simple">
+<li>By clicking the <span class="menuselection">Metadata ‣ Autofix all configurations</span>
+menu.</li>
+<li>Using the <span class="guilabel">Auto-fix</span> toolbar button.</li>
+<li>Or via the right-click menu for the root page in the left-hand tree panel,
+in this case <code class="docutils literal notranslate"><span class="pre">pizza_order</span></code>.</li>
+</ul>
+<p>Run “Autofix” in one of the above ways.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="results">
+
+<h3>Results<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#results" title="View HTML">§</a></h3>
+
+<p>If you accept the changes, the state of these settings will be corrected
+- if you go to the page, you’ll see that they’ve vanished! They’re
+actually just commented out, and viewable via the menu
+<span class="menuselection">View ‣ View All Ignored Variables</span>.</p>
+<p>Try altering the values of <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=pizza_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code> with <span class="menuselection">View ‣ View All Ignored Variables</span>
+on and off. This should enable and <code class="docutils literal notranslate"><span class="pre">trigger-ignore</span></code> different settings.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code> is below 10, the <code class="docutils literal notranslate"><span class="pre">namelist:side_order</span></code> section will
+be <code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code>, and the <code class="docutils literal notranslate"><span class="pre">garlic_bread</span></code> and <code class="docutils literal notranslate"><span class="pre">soft_drink</span></code> will
+be <code class="docutils literal notranslate"><span class="pre">section-ignored</span></code> - ignored because their parent section is ignored.</p>
+<p>You can get more information about why an option is ignored in the config
+editor by hovering over its ignored flag, or looking at the option’s menu
+button <code class="docutils literal notranslate"><span class="pre">Info</span></code> entry.</p>
+<p>Setting ids mentioned in the <code class="docutils literal notranslate"><span class="pre">Info</span></code> dialog are usually clickable links, so
+you can go directly to the relevant id.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="multiple-inheritance">
+
+<h2>Multiple Inheritance<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#multiple-inheritance" title="View HTML">§</a></h2>
+
+<p>More than one setting can decide whether something is relevant. In that
+case, the subject is relevant only if all the parents agree that it is -
+an AND relationship.</p>
+<p>For example, we already have one trigger for
+<code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=truffle</span></code> (<code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code>) - but it should also only
+be relevant when <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=no_mushrooms</span></code> is <code class="docutils literal notranslate"><span class="pre">.false.</span></code>.</p>
+<p>Open the metadata file in a text editor, and add the following to the
+<code class="docutils literal notranslate"><span class="pre">[namelist:pizza_order=no_mushrooms]</span></code> metadata section:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">trigger=namelist:pizza_order</span><span class="o">=</span><span class="s">truffle: .false.</span>
+</pre></div>
+</div>
+<p>This means that the <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=truffle</span></code> option will only
+be enabled when <code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code> is greater than 25 (our older trigger)
+and <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=no_mushrooms</span></code> is <code class="docutils literal notranslate"><span class="pre">.false.</span></code>.</p>
+<p>Save the metadata file and reload the metadata in the config editor, and
+test it for yourself.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="cascading-triggering">
+
+<h2>Cascading Triggering<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#cascading-triggering" title="View HTML">§</a></h2>
+
+<p>Triggering is not just based on values - if a setting is missing or
+<code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code>, any settings that it triggers will be
+<code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code> by default i.e. triggers can
+act in a cascade - A triggers B triggers C.</p>
+<p>We can see this by replacing the <code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code> trigger with:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">trigger=namelist:pizza_order</span><span class="o">=</span><span class="s">truffle: this &gt; 25;</span>
+        <span class="nv">namelist:side_order: this &gt;</span><span class="o">=</span><span class="s"> 10;</span>
+        <span class="nv">namelist:pizza_order=pizza_type: this &gt;</span><span class="o">=</span><span class="s"> 5;</span>
+</pre></div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code> is less than 5, <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=pizza_type</span></code>
+will be <code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code>. This means that all of its triggered
+settings like <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=extra_chicken</span></code> are irrelevant and
+will also be <code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code>.</p>
+<p>We need to add <code class="docutils literal notranslate"><span class="pre">no_mushrooms</span></code> to the <code class="docutils literal notranslate"><span class="pre">[namelist:pizza_order=pizza_type]</span></code>
+section so that it is <code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code> when no pizza can be ordered -
+replace the <code class="docutils literal notranslate"><span class="pre">[namelist:pizza_order=pizza_type]</span></code> trigger with:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">trigger=namelist:pizza_order</span><span class="o">=</span><span class="s">extra_chicken: &#39;BBQ Chicken&#39;;</span>
+        <span class="nv">namelist:pizza_order</span><span class="o">=</span><span class="s">pepperoni_multiple: &#39;Pepperoni&#39;, &#39;BBQ Chicken&#39;;</span>
+        <span class="nv">namelist:pizza_order</span><span class="o">=</span><span class="s">no_mushrooms;</span>
+</pre></div>
+</div>
+<p>Save, reload, and try changing <code class="docutils literal notranslate"><span class="pre">env=BUDGET</span></code> below 5 to see what it does
+to the options in <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order</span></code>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="triggering-based-on-state">
+
+<h2>Triggering Based On State<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#triggering-based-on-state" title="View HTML">§</a></h2>
+
+<p>There’s also another way to express a trigger - you don’t have to express
+a value or range of values in a trigger expression.</p>
+<p>Quite often you only want a setting to be <code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code> or enabled
+purely based on the availability of another setting - whether it is present
+and whether it is <code class="docutils literal notranslate"><span class="pre">trigger-ignored</span></code>. You might not care what particular
+value it has.</p>
+<p>This can be expressed by adding a trigger but omitting the value part of
+the syntax. Let’s add an option that we can use.</p>
+<p>Add a new variable in the metadata by adding these lines to the metadata
+file:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[namelist:pizza_order=dip_type]</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">&#39;Garlic&#39;,&#39;Sour Cream&#39;,&#39;Salsa&#39;,&#39;Brown Sauce&#39;,&#39;Mustard&#39;</span>
+</pre></div>
+</div>
+<p>We should add a trigger expression as well - replace the
+<code class="docutils literal notranslate"><span class="pre">[namelist:pizza_order=pizza_type]</span></code> trigger with:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">trigger=namelist:pizza_order</span><span class="o">=</span><span class="s">extra_chicken: &#39;BBQ Chicken&#39;;</span>
+        <span class="nv">namelist:pizza_order</span><span class="o">=</span><span class="s">pepperoni_multiple: &#39;Pepperoni&#39;, &#39;BBQ Chicken&#39;;</span>
+        <span class="nv">namelist:pizza_order</span><span class="o">=</span><span class="s">no_mushrooms;</span>
+        <span class="nv">namelist:pizza_order</span><span class="o">=</span><span class="s">dip_type;</span>
+</pre></div>
+</div>
+<p>This means that <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=dip_type</span></code> is dependent on
+<code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=pizza_type</span></code>, and will only be ignored when that
+is ignored - but the value of <code class="docutils literal notranslate"><span class="pre">pizza_type</span></code> doesn’t matter to it.</p>
+<p>Save the file and reload the metadata in the config editor. We’ll need to
+add the <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=dip_type</span></code> to use it properly - you can do
+this from the <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order</span></code> page via:</p>
+<ul class="simple">
+<li>The <span class="guilabel">Add</span> toolbar button.</li>
+<li>The right-click page menu.</li>
+<li>The <span class="menuselection">View ‣ View Latent Variables</span> menu.</li>
+</ul>
+<p>After enabling the view, you should see <code class="docutils literal notranslate"><span class="pre">dip_type</span></code> appear as an option
+that could be added. It will already have the correct triggered state (the
+same state as <code class="docutils literal notranslate"><span class="pre">namelist:pizza_order=pizza_type</span></code>) - verify for yourself
+that this works! You can then just add it via the menu button for the
+option.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="further-reading">
+
+<h2>Further Reading<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/trigger.html#further-reading" title="View HTML">§</a></h2>
+
+<p>For more informaiton see <a class="reference internal" href="../../../api/configuration/metadata.html#metadata"><span class="std std-ref">Configuration Metadata</span></a>.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

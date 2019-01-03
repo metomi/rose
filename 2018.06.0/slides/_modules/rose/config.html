@@ -1,0 +1,1644 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rose.config &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <h1>Source code for rose.config</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># (C) British Crown Copyright 2012-8 Met Office.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Rose, a framework for meteorological suites.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Rose. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Simple INI-style configuration data model, loader and dumper.</span>
+
+<span class="sd">.. testsetup:: *</span>
+
+<span class="sd">    import os</span>
+<span class="sd">    from rose.config import *</span>
+
+<span class="sd">.. testcleanup:: rose.config</span>
+
+<span class="sd">    try:</span>
+<span class="sd">        os.remove(&#39;config.conf&#39;)</span>
+<span class="sd">    except OSError:</span>
+<span class="sd">        pass</span>
+
+<span class="sd">Synopsis:</span>
+<span class="sd">    &gt;&gt;&gt; # Create a config file.</span>
+<span class="sd">    &gt;&gt;&gt; with open(&#39;config.conf&#39;, &#39;w+&#39;) as config_file:</span>
+<span class="sd">    ...     config_file.write(&#39;&#39;&#39;</span>
+<span class="sd">    ... [foo]</span>
+<span class="sd">    ... bar=Bar</span>
+<span class="sd">    ... !baz=Baz</span>
+<span class="sd">    ...      &#39;&#39;&#39;)</span>
+
+<span class="sd">    &gt;&gt;&gt; # Load in a config file.</span>
+<span class="sd">    &gt;&gt;&gt; try:</span>
+<span class="sd">    ...     config_node = load(&#39;config.conf&#39;)</span>
+<span class="sd">    ... except ConfigSyntaxError:</span>
+<span class="sd">    ...     # Handle exception.</span>
+<span class="sd">    ...     pass</span>
+
+<span class="sd">    &gt;&gt;&gt; # Retrieve config settings.</span>
+<span class="sd">    &gt;&gt;&gt; config_node.get([&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="sd">    {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}</span>
+
+<span class="sd">    &gt;&gt;&gt; # Set new config settings.</span>
+<span class="sd">    &gt;&gt;&gt; _ = config_node.set([&#39;foo&#39;, &#39;new&#39;], &#39;New&#39;)</span>
+
+<span class="sd">    &gt;&gt;&gt; # Overwrite existing config settings.</span>
+<span class="sd">    &gt;&gt;&gt; _ = config_node.set([&#39;foo&#39;, &#39;baz&#39;], state=ConfigNode.STATE_NORMAL,</span>
+<span class="sd">    ...                     value=&#39;NewBaz&#39;)</span>
+
+<span class="sd">    &gt;&gt;&gt; # Write out config to a file.</span>
+<span class="sd">    &gt;&gt;&gt; dump(config_node, sys.stdout)</span>
+<span class="sd">    [foo]</span>
+<span class="sd">    bar=Bar</span>
+<span class="sd">    baz=NewBaz</span>
+<span class="sd">    new=New</span>
+
+
+<span class="sd">Classes:</span>
+<span class="sd">    .. autosummary::</span>
+<span class="sd">        rose.config.ConfigNode</span>
+<span class="sd">        rose.config.ConfigNodeDiff</span>
+<span class="sd">        rose.config.ConfigDumper</span>
+<span class="sd">        rose.config.ConfigLoader</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">    .. autosummary::</span>
+<span class="sd">       rose.config.load</span>
+<span class="sd">       rose.config.dump</span>
+
+<span class="sd">Limitations:</span>
+<span class="sd">    - The loader does not handle trailing comments.</span>
+
+<span class="sd">What about the standard library ConfigParser? Well, it is problematic:</span>
+<span class="sd">    - The comment character and style is hard-coded.</span>
+<span class="sd">    - The assignment character is hard-coded.</span>
+<span class="sd">    - A duplicated section header causes an exception to be raised.</span>
+<span class="sd">    - Option keys are transformed to lower case by default.</span>
+<span class="sd">    - It is far too complicated and confusing.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">rose.env</span> <span class="k">import</span> <span class="n">env_var_escape</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">NamedTemporaryFile</span>
+
+
+<span class="n">CHAR_ASSIGN</span> <span class="o">=</span> <span class="s2">&quot;=&quot;</span>
+<span class="n">CHAR_COMMENT</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span>
+<span class="n">CHAR_SECTION_OPEN</span> <span class="o">=</span> <span class="s2">&quot;[&quot;</span>
+<span class="n">CHAR_SECTION_CLOSE</span> <span class="o">=</span> <span class="s2">&quot;]&quot;</span>
+
+<span class="n">OPT_CONFIG_DIR</span> <span class="o">=</span> <span class="s2">&quot;opt&quot;</span>
+<span class="n">REC_SETTING_ELEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(.+?)\(([^)]+)\)$&quot;</span><span class="p">)</span>
+
+<span class="n">STATE_SECT_IGNORED</span> <span class="o">=</span> <span class="s2">&quot;^&quot;</span>
+
+<span class="n">OPT_CONFIG_SETTING_COMMENT</span> <span class="o">=</span> <span class="s2">&quot; setting from opt config </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span>
+
+
+<div class="viewcode-block" id="ConfigNode"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode">[docs]</a><span class="k">class</span> <span class="nc">ConfigNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Represent a node in a configuration file.</span>
+
+<span class="sd">    Nodes are stored hierarchically, for instance the following config</span>
+<span class="sd">        [foo]</span>
+<span class="sd">        bar = Bar</span>
+
+<span class="sd">    When loaded by ConfigNode.load(file) would result in three levels of</span>
+<span class="sd">    ConfigNodes, the first representing &quot;root&quot; (i.e. the top level of the</span>
+<span class="sd">    config), one representing the config section &quot;foo&quot; and one representing the</span>
+<span class="sd">    setting &quot;bar&quot;.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; # Create a new ConfigNode.</span>
+<span class="sd">        &gt;&gt;&gt; config_node = ConfigNode()</span>
+
+<span class="sd">        &gt;&gt;&gt; # Add sub-nodes.</span>
+<span class="sd">        &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;, &#39;bar&#39;], value=&#39;Bar&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;, &#39;baz&#39;], value=&#39;Baz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; config_node # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="sd">         &#39;value&#39;: {&#39;foo&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="sd">                           &#39;value&#39;: {&#39;baz&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="sd">                                             &#39;value&#39;: &#39;Baz&#39;},</span>
+<span class="sd">                                     &#39;bar&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="sd">                                             &#39;value&#39;: &#39;Bar&#39;}}}}}</span>
+
+<span class="sd">        &gt;&gt;&gt; # Set the state of a node.</span>
+<span class="sd">        &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;, &#39;bar&#39;],</span>
+<span class="sd">        ...                     state=ConfigNode.STATE_USER_IGNORED)</span>
+
+<span class="sd">        &gt;&gt;&gt; # Get the value of the node at a position.</span>
+<span class="sd">        &gt;&gt;&gt; config_node.get_value(keys=[&#39;foo&#39;, &#39;baz&#39;])</span>
+<span class="sd">        &#39;Baz&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; # Walk over the hierarchical structure of a node.</span>
+<span class="sd">        &gt;&gt;&gt; [keys for keys, sub_node in config_node.walk()]</span>
+<span class="sd">        [[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+
+<span class="sd">        &gt;&gt;&gt; # Walk over the config skipping ignored sections.</span>
+<span class="sd">        &gt;&gt;&gt; [keys for keys, sub_node in config_node.walk(no_ignore=True)]</span>
+<span class="sd">        [[&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+
+<span class="sd">        &gt;&gt;&gt; # Add two ConfigNode instances to create a new &quot;merged&quot; node.</span>
+<span class="sd">        &gt;&gt;&gt; another_config_node = ConfigNode()</span>
+<span class="sd">        &gt;&gt;&gt; _ = another_config_node.set(keys=[&#39;new&#39;], value=&#39;New&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; new_config_node = config_node + another_config_node</span>
+<span class="sd">        &gt;&gt;&gt; [keys for keys, sub_node in new_config_node.walk()]</span>
+<span class="sd">        [[&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;], [&#39;foo&#39;, &#39;bar&#39;], [&#39;&#39;, &#39;new&#39;]]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;STATE_NORMAL&quot;</span><span class="p">,</span> <span class="s2">&quot;STATE_USER_IGNORED&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;STATE_SYST_IGNORED&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;comments&quot;</span><span class="p">]</span>
+
+    <span class="n">STATE_NORMAL</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;The default state of a ConfigNode.&quot;&quot;&quot;</span>
+    <span class="n">STATE_USER_IGNORED</span> <span class="o">=</span> <span class="s2">&quot;!&quot;</span>
+    <span class="sd">&quot;&quot;&quot;ConfigNode state if it has been specifically ignored in the config.&quot;&quot;&quot;</span>
+    <span class="n">STATE_SYST_IGNORED</span> <span class="o">=</span> <span class="s2">&quot;!!&quot;</span>
+    <span class="sd">&quot;&quot;&quot;ConfigNode state if a metadata opperation has logically ignored the</span>
+<span class="sd">    config.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">STATE_NORMAL</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">comments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">comments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="n">comments</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                    <span class="s2">&quot;comments&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">comments</span><span class="p">})</span>
+
+    <span class="fm">__str__</span> <span class="o">=</span> <span class="fm">__repr__</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">key</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">keys_1</span><span class="p">,</span> <span class="n">node_1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">node_2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys_1</span><span class="p">,</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">node_1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">node_2</span><span class="p">)</span> <span class="ow">or</span>
+                        <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node_1</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span>
+                         <span class="n">node_1</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">node_2</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span>
+                        <span class="n">node_1</span><span class="o">.</span><span class="n">comments</span> <span class="o">!=</span> <span class="n">node_2</span><span class="o">.</span><span class="n">comments</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">keys_2</span><span class="p">,</span> <span class="n">node_2</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys_2</span><span class="p">,</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># Should handle &quot;other is None&quot;</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConfigNode.is_ignored"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode.is_ignored">[docs]</a>    <span class="k">def</span> <span class="nf">is_ignored</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if current node is in the &quot;ignored&quot; state.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATE_NORMAL</span></div>
+
+<div class="viewcode-block" id="ConfigNode.walk"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode.walk">[docs]</a>    <span class="k">def</span> <span class="nf">walk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return all keylist - sub-node pairs below keys.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                If an entry in keys is the null string, it is skipped.</span>
+<span class="sd">            no_ignore (bool): If True any ignored nodes will be skipped.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            tuple - (keys, sub_node)</span>
+<span class="sd">                - keys (list) - A list defining a hierarchy of node.value</span>
+<span class="sd">                  &#39;keys&#39;. If a sub-node is at the top level, and does not</span>
+<span class="sd">                  contain any node children, a null string will be</span>
+<span class="sd">                  prepended to the returned keylist.</span>
+<span class="sd">                - sub_node (ConfigNode) - The config node at the position of</span>
+<span class="sd">                  keys.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set([&#39;foo&#39;, &#39;bar&#39;], &#39;Bar&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set([&#39;foo&#39;, &#39;baz&#39;], &#39;Baz&#39;,</span>
+<span class="sd">            ...                     state=ConfigNode.STATE_USER_IGNORED)</span>
+
+<span class="sd">            &gt;&gt;&gt; # Walk over the full hierarchy.</span>
+<span class="sd">            &gt;&gt;&gt; [keys for keys, sub_node in config_node.walk()]</span>
+<span class="sd">            [[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+
+<span class="sd">            &gt;&gt;&gt; # Walk over one branch of the hierarchy</span>
+<span class="sd">            &gt;&gt;&gt; [keys for keys, sub_node in config_node.walk(keys=[&#39;foo&#39;])]</span>
+<span class="sd">            [[&#39;foo&#39;, &#39;bar&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+
+<span class="sd">            &gt;&gt;&gt; # Skip over ignored nodes.</span>
+<span class="sd">            &gt;&gt;&gt; [keys for keys, sub_node in config_node.walk(no_ignore=True)]</span>
+<span class="sd">            [[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+
+<span class="sd">            &gt;&gt;&gt; # Invalid/non-existent keys.</span>
+<span class="sd">            &gt;&gt;&gt; [keys for keys, sub_node in config_node.walk(</span>
+<span class="sd">            ...     keys=[&#39;elephant&#39;])]</span>
+<span class="sd">            []</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">start_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">no_ignore</span><span class="p">)</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[(</span><span class="n">keys</span><span class="p">,</span> <span class="n">start_node</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">start_node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="n">node_keys</span><span class="p">,</span> <span class="n">node</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">child_keys</span> <span class="o">=</span> <span class="n">node_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">subnode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">child_keys</span><span class="p">,</span> <span class="n">no_ignore</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">subnode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">stack</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">child_keys</span><span class="p">,</span> <span class="n">subnode</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">node_keys</span> <span class="o">==</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">null_node_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">node_keys</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">null_node_keys</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">node_keys</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigNode.get"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a node at the position of keys, if any.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keys (list, optional): A list defining a hierarchy of</span>
+<span class="sd">                node.value &#39;keys&#39;. If an entry in keys is the null</span>
+<span class="sd">                string, it is skipped.</span>
+<span class="sd">            no_ignore (bool, optional): If True any ignored nodes will</span>
+<span class="sd">                not be returned.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ConfigNode: The config node located at the position of keys or</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set([&#39;foo&#39;, &#39;bar&#39;], &#39;Bar&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set([&#39;foo&#39;, &#39;baz&#39;], &#39;Baz&#39;,</span>
+<span class="sd">            ...     state=ConfigNode.STATE_USER_IGNORED)</span>
+
+<span class="sd">            &gt;&gt;&gt; # A ConfigNode containing sub-nodes.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get(keys=[&#39;foo&#39;]) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="sd">             &#39;value&#39;: {&#39;baz&#39;: {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Baz&#39;},</span>
+<span class="sd">                       &#39;bar&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}}}</span>
+
+<span class="sd">            &gt;&gt;&gt; # A bottom level sub-node.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get(keys=[&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}</span>
+
+<span class="sd">            &gt;&gt;&gt; # Skip ignored nodes.</span>
+<span class="sd">            &gt;&gt;&gt; print config_node.get(keys=[&#39;foo&#39;, &#39;baz&#39;], no_ignore=True)</span>
+<span class="sd">            None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">no_ignore</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">keys</span> <span class="ow">and</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">no_ignore</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">node</span></div>
+
+<div class="viewcode-block" id="ConfigNode.get_filter"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode.get_filter">[docs]</a>    <span class="k">def</span> <span class="nf">get_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_ignore</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return this ConfigNode unless no_ignore and node is ignored.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            no_ignore (bool): If True only return this node if it is not</span>
+<span class="sd">                ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ConfigNode: This ConfigNode unless no_ignore and node is ignored.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode(value=42)</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get_filter(False)</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: 42}</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get_filter(True)</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: 42}</span>
+
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode(value=42,</span>
+<span class="sd">            ...                      state=ConfigNode.STATE_USER_IGNORED)</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get_filter(False)</span>
+<span class="sd">            {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [], &#39;value&#39;: 42}</span>
+<span class="sd">            &gt;&gt;&gt; print config_node.get_filter(True)</span>
+<span class="sd">            None</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">no_ignore</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ConfigNode.get_value"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of a normal node at the position of keys, if any.</span>
+
+<span class="sd">        If the node does not exist or is ignored, return None.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keys (list, optional): A list defining a hierarchy of node.value</span>
+<span class="sd">                &#39;keys&#39;. If an entry in keys is the null string, it is skipped.</span>
+<span class="sd">            default (obj, optional): Return default if the value is not set.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            obj: The value of this ConfigNode at the position of keys or</span>
+<span class="sd">            default if not set.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode(value=42)</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set([&#39;foo&#39;], &#39;foo&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set([&#39;foo&#39;, &#39;bar&#39;], &#39;Bar&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; # Get value without specifying keys returns the value of the</span>
+<span class="sd">            &gt;&gt;&gt; # root ConfigNode (which in this case is a dict of its</span>
+<span class="sd">            &gt;&gt;&gt; # sub-nodes).</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get_value() # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            {&#39;foo&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="sd">                     &#39;value&#39;: {&#39;bar&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="sd">                                       &#39;value&#39;: &#39;Bar&#39;}}}}</span>
+
+<span class="sd">            &gt;&gt;&gt; # Intermediate level ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get_value(keys=[&#39;foo&#39;])</span>
+<span class="sd">            {&#39;bar&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}}</span>
+
+<span class="sd">            &gt;&gt;&gt; # Bottom level ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get_value(keys=[&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="sd">            &#39;Bar&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; # If there is no node located at the position of keys or if</span>
+<span class="sd">            &gt;&gt;&gt; # that node is unset then the default value is returned.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get_value(keys=[&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;],</span>
+<span class="sd">            ...                       default=True)</span>
+<span class="sd">            True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigNode.set"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set node properties at the position of keys, if any.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                If an entry in keys is the null string, it is skipped.</span>
+<span class="sd">            value (obj): The node.value property to set at this position.</span>
+<span class="sd">            state (str): The node.state property to set at this position.</span>
+<span class="sd">                If None, the node.state property is unchanged.</span>
+<span class="sd">            comments (str): The node.comments property to set at this position.</span>
+<span class="sd">                If None, the node.comments property is unchanged.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ConfigNode: This config node.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; config_node</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: {}}</span>
+
+<span class="sd">            &gt;&gt;&gt; # Add a sub-node at the position &#39;foo&#39; with the comment &#39;Info&#39;.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.set(keys=[&#39;foo&#39;], comments=&#39;Info&#39;)</span>
+<span class="sd">            ... # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [],</span>
+<span class="sd">             &#39;value&#39;: {&#39;foo&#39;: {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: &#39;Info&#39;, &#39;value&#39;: {}}}}</span>
+
+<span class="sd">            &gt;&gt;&gt; # Set the value for the sub-node at the position</span>
+<span class="sd">            &gt;&gt;&gt; # &#39;foo&#39; to &#39;Foo&#39;.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.set(keys=[&#39;foo&#39;], value=&#39;Foo&#39;)</span>
+<span class="sd">            ... # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: {&#39;foo&#39;: {&#39;state&#39;: &#39;&#39;,</span>
+<span class="sd">             &#39;comments&#39;: &#39;Info&#39;, &#39;value&#39;: &#39;Foo&#39;}}}</span>
+
+<span class="sd">            &gt;&gt;&gt; # Set the value of the ConfigNode to True, this overwrites all</span>
+<span class="sd">            &gt;&gt;&gt; # sub-nodes!</span>
+<span class="sd">            &gt;&gt;&gt; config_node.set(keys=[&#39;&#39;], value=True)</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: True}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">while</span> <span class="n">keys</span> <span class="ow">and</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="k">if</span> <span class="n">comments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="n">comments</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ConfigNode.unset"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode.unset">[docs]</a>    <span class="k">def</span> <span class="nf">unset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove a node at the position of keys, if any.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keys (list): A list defining a hierarchy of node.value &#39;keys&#39;.</span>
+<span class="sd">                If an entry in keys is the null string, it is skipped.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ConfigNode: The ConfigNode instance that was removed, else None.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;], value=&#39;Foo&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; # Unset without providing any keys does nothing.</span>
+<span class="sd">            &gt;&gt;&gt; print config_node.unset()</span>
+<span class="sd">            None</span>
+
+<span class="sd">            &gt;&gt;&gt; # Unset with invalid keys does nothing.</span>
+<span class="sd">            &gt;&gt;&gt; print config_node.unset(keys=[&#39;bar&#39;])</span>
+<span class="sd">            None</span>
+
+<span class="sd">            &gt;&gt;&gt; # Unset with valid keys removes the node from the node.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.unset(keys=[&#39;foo&#39;])</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Foo&#39;}</span>
+
+<span class="sd">            &gt;&gt;&gt; config_node</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: {}}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">keys</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ConfigNode.add"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNode.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_diff</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply a ConfigNodeDiff object to self.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config_diff (ConfigNodeDiff): A diff to apply to this ConfigNode.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create ConfigNode</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;, &#39;bar&#39;], value=&#39;Bar&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; [keys for keys, sub_node in config_node.walk()]</span>
+<span class="sd">            [[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+
+<span class="sd">            &gt;&gt;&gt; # Create ConfigNodeDiff</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting(keys=[&#39;foo&#39;, &#39;baz&#39;],</span>
+<span class="sd">            ...                                    data=&#39;Baz&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; # Apply ConfigNodeDiff to ConfigNode</span>
+<span class="sd">            &gt;&gt;&gt; config_node.add(config_node_diff)</span>
+<span class="sd">            &gt;&gt;&gt; [keys for keys, sub_node in config_node.walk()]</span>
+<span class="sd">            [[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">added_key</span><span class="p">,</span> <span class="n">added_data</span> <span class="ow">in</span> <span class="n">config_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">():</span>
+            <span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">added_data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">added_key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span>
+                     <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">modified_key</span><span class="p">,</span> <span class="n">modified_data</span> <span class="ow">in</span> <span class="n">config_diff</span><span class="o">.</span><span class="n">get_modified</span><span class="p">():</span>
+            <span class="c1"># Should we check that the original data matches what we have?</span>
+            <span class="n">orig_value</span> <span class="o">=</span> <span class="n">modified_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">modified_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">orig_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># A section - be careful not to change an existing node value.</span>
+                <span class="n">subnode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">modified_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">subnode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+                        <span class="n">keys</span><span class="o">=</span><span class="n">modified_key</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">subnode</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+                    <span class="n">subnode</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="n">comments</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">modified_key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span>
+                         <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">removed_key</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">config_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unset</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">removed_key</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_diff</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a new node by applying a node or diff to self.</span>
+
+<span class="sd">        Create a new node by applying either a ConfigNodeDiff or ConfigNode</span>
+<span class="sd">        instance to this ConfigNode.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            config_diff - Either a ConfigNodeDiff or a ConfigNode.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            node - The new ConfigNode.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Add one ConfigNode to another ConfigNode</span>
+<span class="sd">            &gt;&gt;&gt; config_node_1 = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_1.set(keys=[&#39;foo&#39;], value=&#39;Foo&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; config_node_2 = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_2.set(keys=[&#39;bar&#39;], value=&#39;Bar&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; new_config_node = config_node_1 + config_node_2</span>
+<span class="sd">            &gt;&gt;&gt; [keys for keys, sub_node in new_config_node.walk()]</span>
+<span class="sd">            [[&#39;&#39;, &#39;bar&#39;], [&#39;&#39;, &#39;foo&#39;]]</span>
+
+<span class="sd">            &gt;&gt;&gt; # Add a ConfigNodeDiff to a ConfigNode</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting(keys=[&#39;baz&#39;], data=&#39;Baz&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; new_config_node = config_node_1 + config_node_diff</span>
+<span class="sd">            &gt;&gt;&gt; [keys for keys, sub_node in new_config_node.walk()]</span>
+<span class="sd">            [[&#39;&#39;, &#39;baz&#39;], [&#39;&#39;, &#39;foo&#39;]]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_diff</span><span class="p">,</span> <span class="n">ConfigNode</span><span class="p">):</span>
+            <span class="n">config_node</span> <span class="o">=</span> <span class="n">config_diff</span>
+            <span class="n">config_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+            <span class="n">config_diff</span><span class="o">.</span><span class="n">set_from_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_node</span><span class="p">)</span>
+            <span class="n">config_diff</span><span class="o">.</span><span class="n">delete_removed</span><span class="p">()</span>  <span class="c1"># Don&#39;t delete anything.</span>
+        <span class="n">new_node</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">new_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_diff</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_node</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_config_node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Produce a ConfigNodeDiff from another ConfigNode.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            other_config_node - The ConfigNode to be applied to this ConfigNode</span>
+<span class="sd">                to produce the ConfigNodeDiff.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            config_diff - A ConfigNodeDiff instance.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create a ConfigNodeDiff from two ConfigNodes</span>
+<span class="sd">            &gt;&gt;&gt; config_node_1 = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_1.set(keys=[&#39;foo&#39;], value=&#39;Foo&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; config_node_2 = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_2.set(keys=[&#39;bar&#39;], value=&#39;Bar&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = config_node_1 - config_node_2</span>
+
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_added()</span>
+<span class="sd">            [((&#39;&#39;, &#39;foo&#39;), (&#39;Foo&#39;, &#39;&#39;, []))]</span>
+
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_removed()</span>
+<span class="sd">            [((&#39;&#39;, &#39;bar&#39;), (&#39;Bar&#39;, &#39;&#39;, []))]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+        <span class="n">diff</span><span class="o">.</span><span class="n">set_from_configs</span><span class="p">(</span><span class="n">other_config_node</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">diff</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Avoid pickling the STATE constants within a deepcopy.</span>
+
+<span class="sd">        This avoids a read-only error and allows __slots__ compatibility.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;comments&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">comments</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read in the results of __getstate__.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;comments&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ConfigNodeDiff"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff">[docs]</a><span class="k">class</span> <span class="nc">ConfigNodeDiff</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Represent differences between two ConfigNode instances.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create a new ConfigNodeDiff.</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting(keys=[&#39;bar&#39;],</span>
+<span class="sd">            ...                                    data=(&#39;Bar&#39;, None, None,))</span>
+
+<span class="sd">            &gt;&gt;&gt; # Create a new ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set(keys=[&#39;baz&#39;], value=&#39;Baz&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; # Apply the diff to the node.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.add(config_node_diff)</span>
+<span class="sd">            &gt;&gt;&gt; [(keys, sub_node.get_value()) for keys, sub_node in</span>
+<span class="sd">            ...  config_node.walk()]</span>
+<span class="sd">            [([&#39;&#39;, &#39;baz&#39;], &#39;Baz&#39;), ([&#39;&#39;, &#39;bar&#39;], &#39;Bar&#39;)]</span>
+
+<span class="sd">            &gt;&gt;&gt; # Create a ConfigNodeDiff by comparing two ConfigNodes.</span>
+<span class="sd">            &gt;&gt;&gt; another_config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = another_config_node.set(keys=[&#39;bar&#39;], value=&#39;NewBar&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; _ = another_config_node.set(keys=[&#39;new&#39;], value=&#39;New&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_from_configs(config_node,</span>
+<span class="sd">            ...                                   another_config_node)</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_added()</span>
+<span class="sd">            [((&#39;&#39;, &#39;new&#39;), (&#39;New&#39;, &#39;&#39;, []))]</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_removed()</span>
+<span class="sd">            [((&#39;&#39;, &#39;baz&#39;), (&#39;Baz&#39;, &#39;&#39;, []))]</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_modified()</span>
+<span class="sd">            [((&#39;&#39;, &#39;bar&#39;), ((&#39;Bar&#39;, &#39;&#39;, []), (&#39;NewBar&#39;, &#39;&#39;, [])))]</span>
+
+<span class="sd">            &gt;&gt;&gt; # Inverse a ConfigNodeDiff.</span>
+<span class="sd">            &gt;&gt;&gt; reversed_diff = config_node_diff.get_reversed()</span>
+<span class="sd">            &gt;&gt;&gt; reversed_diff.get_added()</span>
+<span class="sd">            [((&#39;&#39;, &#39;baz&#39;), (&#39;Baz&#39;, &#39;&#39;, []))]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">KEY_ADDED</span> <span class="o">=</span> <span class="s2">&quot;added&quot;</span>
+    <span class="n">KEY_MODIFIED</span> <span class="o">=</span> <span class="s2">&quot;modified&quot;</span>
+    <span class="n">KEY_REMOVED</span> <span class="o">=</span> <span class="s2">&quot;removed&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_ADDED</span><span class="p">:</span> <span class="p">{},</span> <span class="bp">self</span><span class="o">.</span><span class="n">KEY_REMOVED</span><span class="p">:</span> <span class="p">{},</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">KEY_MODIFIED</span><span class="p">:</span> <span class="p">{}}</span>
+
+<div class="viewcode-block" id="ConfigNodeDiff.set_from_configs"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.set_from_configs">[docs]</a>    <span class="k">def</span> <span class="nf">set_from_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_node_1</span><span class="p">,</span> <span class="n">config_node_2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create diff data from two ConfigNode instances.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config_node_1 (ConfigNode): The node for which to base the diff</span>
+<span class="sd">                off of.</span>
+<span class="sd">            config_node_2 (ConfigNode): The &quot;new&quot; node the changes of which</span>
+<span class="sd">                this diff will &quot;apply&quot;.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; # Create two ConfigNode instances to compare.</span>
+<span class="sd">            &gt;&gt;&gt; config_node_1 = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node_1.set(keys=[&#39;foo&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; config_node_2 = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node_2.set(keys=[&#39;bar&#39;])</span>
+
+<span class="sd">            &gt;&gt;&gt; # Create a ConfigNodeDiff instance.</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_from_configs(config_node_1, config_node_2)</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_added()</span>
+<span class="sd">            [((&#39;bar&#39;,), (None, &#39;&#39;, []))]</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_removed()</span>
+<span class="sd">            [((&#39;foo&#39;,), (None, &#39;&#39;, []))]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">settings_1</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">settings_2</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">config_node</span><span class="p">,</span> <span class="n">settings</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">config_node_1</span><span class="p">,</span> <span class="n">settings_1</span><span class="p">),</span>
+                                      <span class="p">(</span><span class="n">config_node_2</span><span class="p">,</span> <span class="n">settings_2</span><span class="p">)]:</span>
+            <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">settings</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">keys</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">comments</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">settings_2</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">settings_1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">settings_2</span><span class="p">[</span><span class="n">keys</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">settings_1</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">settings_2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">settings_1</span><span class="p">[</span><span class="n">keys</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">settings_1</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">settings_2</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">settings_1</span><span class="p">[</span><span class="n">keys</span><span class="p">]</span> <span class="o">!=</span> <span class="n">settings_2</span><span class="p">[</span><span class="n">keys</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_modified_setting</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">settings_1</span><span class="p">[</span><span class="n">keys</span><span class="p">],</span>
+                                          <span class="n">settings_2</span><span class="p">[</span><span class="n">keys</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.get_as_opt_config"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.get_as_opt_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_as_opt_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a ConfigNode such that main + new_node = main + diff.</span>
+
+<span class="sd">        Add all the added settings, add all the modified settings,</span>
+<span class="sd">        add all the removed settings as user-ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ConfigNode: A new ConfigNode instance.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting([&#39;foo&#39;],</span>
+<span class="sd">            ...                                    (&#39;Foo&#39;, None, None,))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_removed_setting([&#39;bar&#39;],</span>
+<span class="sd">            ...                                      (&#39;Bar&#39;, None, None,))</span>
+<span class="sd">            &gt;&gt;&gt; config_node = config_node_diff.get_as_opt_config()</span>
+<span class="sd">            &gt;&gt;&gt; list(config_node.walk()) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            [([&#39;&#39;, &#39;bar&#39;], {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}),</span>
+<span class="sd">             ([&#39;&#39;, &#39;foo&#39;], {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Foo&#39;})]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">old_and_new_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_modified</span><span class="p">():</span>
+            <span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">old_and_new_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_added</span><span class="p">():</span>
+            <span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">info</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_removed</span><span class="p">():</span>
+            <span class="c1"># Need to add as user-ignored.</span>
+            <span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">info</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">,</span>
+                     <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.set_added_setting"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.set_added_setting">[docs]</a>    <span class="k">def</span> <span class="nf">set_added_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a config setting to be &quot;added&quot; in this ConfigNodeDiff.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keys (list/tuple): The position of the setting to add.</span>
+<span class="sd">            data (obj, str, str): A tuple (value, state, comments) for the</span>
+<span class="sd">                setting to add.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting([&#39;foo&#39;],</span>
+<span class="sd">            ...                                    (&#39;Foo&#39;, None, None,))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting(</span>
+<span class="sd">            ...     [&#39;bar&#39;],</span>
+<span class="sd">            ...     (&#39;Bar&#39;, ConfigNode.STATE_USER_IGNORED, &#39;Some Info&#39;,))</span>
+
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; config_node.add(config_node_diff)</span>
+
+<span class="sd">            &gt;&gt;&gt; list(config_node.walk()) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            [([&#39;&#39;, &#39;bar&#39;], {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: &#39;Some Info&#39;,</span>
+<span class="sd">                            &#39;value&#39;: &#39;Bar&#39;}),</span>
+<span class="sd">             ([&#39;&#39;, &#39;foo&#39;], {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Foo&#39;})]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_ADDED</span><span class="p">][</span><span class="n">keys</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.set_modified_setting"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.set_modified_setting">[docs]</a>    <span class="k">def</span> <span class="nf">set_modified_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">old_data</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a config setting to be &quot;modified&quot; in this ConfigNodeDiff.</span>
+
+<span class="sd">        If a property in both the old_data and data (new data) are both set to</span>
+<span class="sd">        None then no change will be made to any pre-existing value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keys (list/tuple): The position of the setting to add.</span>
+<span class="sd">            old_data (obj, str, str): A tuple (value, state, comments) for</span>
+<span class="sd">                the &quot;current&quot; properties of the setting to modify.</span>
+<span class="sd">            data (obj, str, str): A tuple (value, state, comments) for &quot;new&quot;</span>
+<span class="sd">                properties to change this setting to.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create a ConfigNodeDiff.</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_modified_setting(</span>
+<span class="sd">            ...     [&#39;foo&#39;], (&#39;Foo&#39;, None, None), (&#39;New Foo&#39;, None, None))</span>
+
+<span class="sd">            &gt;&gt;&gt; # Create a ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;], value=&#39;Foo&#39;,</span>
+<span class="sd">            ...                     comments=&#39;Some Info&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; # Apply the ConfigNodeDiff to the ConfigNode</span>
+<span class="sd">            &gt;&gt;&gt; config_node.add(config_node_diff)</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get(keys=[&#39;foo&#39;])</span>
+<span class="sd">            {&#39;state&#39;: &#39;&#39;, &#39;comments&#39;: &#39;Some Info&#39;, &#39;value&#39;: &#39;New Foo&#39;}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_MODIFIED</span><span class="p">][</span><span class="n">keys</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">old_data</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.set_removed_setting"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.set_removed_setting">[docs]</a>    <span class="k">def</span> <span class="nf">set_removed_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a config setting to be &quot;removed&quot; in this ConfigNodeDiff.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            keys (list): The position of the setting to add.</span>
+<span class="sd">            data (obj, str, str): A tuple (value, state, comments) of the</span>
+<span class="sd">                properties for the setting to remove.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; # Create a ConfigNodeDiff.</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_removed_setting([&#39;foo&#39;], (&#39;X&#39;, &#39;Y&#39;, &#39;Z&#39;))</span>
+
+<span class="sd">            &gt;&gt;&gt; # Create a ConfigNode.</span>
+<span class="sd">            &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">            &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;], value=&#39;Foo&#39;,</span>
+<span class="sd">            ...                     comments=&#39;Some Info&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; # Apply the ConfigNodeDiff to the ConfigNode</span>
+<span class="sd">            &gt;&gt;&gt; config_node.add(config_node_diff)</span>
+<span class="sd">            &gt;&gt;&gt; print config_node.get(keys=[&#39;foo&#39;])</span>
+<span class="sd">            None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_REMOVED</span><span class="p">][</span><span class="n">keys</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.get_added"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.get_added">[docs]</a>    <span class="k">def</span> <span class="nf">get_added</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of tuples of added keys with their data.</span>
+
+<span class="sd">        The data is a tuple of value, state, comments, where value is</span>
+<span class="sd">        set to None for sections.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of the form [(keys, data), ...]</span>
+<span class="sd">                - keys - The position of an added setting.</span>
+<span class="sd">                - data - Tuple of the form (value, state, comments) of the</span>
+<span class="sd">                  properties of the added setting.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting([&#39;foo&#39;],</span>
+<span class="sd">            ...                                    (&#39;Foo&#39;, None, None))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_added()</span>
+<span class="sd">            [((&#39;foo&#39;,), (&#39;Foo&#39;, None, None))]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_ADDED</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.get_modified"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.get_modified">[docs]</a>    <span class="k">def</span> <span class="nf">get_modified</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a dict of altered keys with before and after data.</span>
+
+<span class="sd">        The data is a list of two tuples (before and after) of value,</span>
+<span class="sd">        state, comments, where value is set to None for sections.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of the form [(keys, data), ...]:</span>
+<span class="sd">                - keys - The position of an added setting.</span>
+<span class="sd">                - data - Tuple of the form (value, state, comments) for the</span>
+<span class="sd">                  properties of the setting before the modification.</span>
+<span class="sd">                - old_data - The same tuple as data but representing the</span>
+<span class="sd">                  properties of the setting after the modification.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_modified_setting(</span>
+<span class="sd">            ...     [&#39;foo&#39;], (&#39;Foo&#39;, None, None), (&#39;New Foo&#39;, None, None))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_modified()</span>
+<span class="sd">            [((&#39;foo&#39;,), ((&#39;Foo&#39;, None, None), (&#39;New Foo&#39;, None, None)))]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_MODIFIED</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.get_removed"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.get_removed">[docs]</a>    <span class="k">def</span> <span class="nf">get_removed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a dict of removed keys with their data.</span>
+
+<span class="sd">        The data is a tuple of value, state, comments, where value is</span>
+<span class="sd">        set to None for sections.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list - A list of the form [(keys, data), ...]:</span>
+<span class="sd">                - keys - The position of an added setting.</span>
+<span class="sd">                - data - Tuple of the form (value, state, comments) of the</span>
+<span class="sd">                  properties of the removed setting.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_removed_setting(keys=[&#39;foo&#39;],</span>
+<span class="sd">            ...                                      data=(&#39;foo&#39;, None, None))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_removed()</span>
+<span class="sd">            [((&#39;foo&#39;,), (&#39;foo&#39;, None, None))]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_REMOVED</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.get_all_keys"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.get_all_keys">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return all keys affected by this ConfigNodeDiff.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list containing any keys affected by this diff as tuples,</span>
+<span class="sd">            e.g. (&#39;foo&#39;, &#39;bar&#39;).</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting([&#39;foo&#39;],(&#39;foo&#39;, None, None))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_removed_setting([&#39;bar&#39;],</span>
+<span class="sd">            ...                                      (&#39;bar&#39;, None, None))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_all_keys()</span>
+<span class="sd">            [(&#39;bar&#39;,), (&#39;foo&#39;,)]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_ADDED</span><span class="p">])</span> <span class="o">|</span>
+            <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_MODIFIED</span><span class="p">])</span> <span class="o">|</span>
+            <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_REMOVED</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.get_reversed"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.get_reversed">[docs]</a>    <span class="k">def</span> <span class="nf">get_reversed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an inverse (add-&gt;remove, etc) copy of this ConfigNodeDiff.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ConfigNodeDiff: A new ConfigNodeDiff instance.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create ConfigNodeDiff instance.</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_added_setting([&#39;foo&#39;],(&#39;foo&#39;, None, None))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_removed_setting([&#39;bar&#39;],</span>
+<span class="sd">            ...                                      (&#39;bar&#39;, None, None))</span>
+
+<span class="sd">            &gt;&gt;&gt; # Generate reversed diff.</span>
+<span class="sd">            &gt;&gt;&gt; reversed_diff = config_node_diff.get_reversed()</span>
+<span class="sd">            &gt;&gt;&gt; reversed_diff.get_added()</span>
+<span class="sd">            [((&#39;bar&#39;,), (&#39;bar&#39;, None, None))]</span>
+<span class="sd">            &gt;&gt;&gt; reversed_diff.get_removed()</span>
+<span class="sd">            [((&#39;foo&#39;,), (&#39;foo&#39;, None, None))]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rev_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_removed</span><span class="p">():</span>
+            <span class="n">rev_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_modified</span><span class="p">():</span>
+            <span class="n">rev_diff</span><span class="o">.</span><span class="n">set_modified_setting</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_added</span><span class="p">():</span>
+            <span class="n">rev_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rev_diff</span></div>
+
+<div class="viewcode-block" id="ConfigNodeDiff.delete_removed"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigNodeDiff.delete_removed">[docs]</a>    <span class="k">def</span> <span class="nf">delete_removed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deletes all &#39;removed&#39; keys from this ConfigNodeDiff.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff = ConfigNodeDiff()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.set_removed_setting([&#39;foo&#39;],</span>
+<span class="sd">            ...                                      (&#39;foo&#39;, None, None))</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.delete_removed()</span>
+<span class="sd">            &gt;&gt;&gt; config_node_diff.get_removed()</span>
+<span class="sd">            []</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_REMOVED</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div></div>
+
+
+<div class="viewcode-block" id="ConfigDumper"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigDumper">[docs]</a><span class="k">class</span> <span class="nc">ConfigDumper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Dumper of a ConfigNode object in Rose INI format.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; config_node = ConfigNode()</span>
+<span class="sd">        &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;, &#39;bar&#39;], value=&#39;Bar&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; _ = config_node.set(keys=[&#39;foo&#39;, &#39;baz&#39;], value=&#39;Baz&#39;,</span>
+<span class="sd">        ...                     comments=[&#39;Currently ignored!&#39;],</span>
+<span class="sd">        ...                     state=ConfigNode.STATE_USER_IGNORED)</span>
+<span class="sd">        &gt;&gt;&gt; dumper = ConfigDumper()</span>
+<span class="sd">        &gt;&gt;&gt; dumper(config_node, sys.stdout)</span>
+<span class="sd">        [foo]</span>
+<span class="sd">        bar=Bar</span>
+<span class="sd">        #Currently ignored!</span>
+<span class="sd">        !baz=Baz</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_assign</span><span class="o">=</span><span class="n">CHAR_ASSIGN</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise the configuration dumper utility.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        char_assign -- the character to use to delimit a key=value assignment.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">char_assign</span> <span class="o">=</span> <span class="n">char_assign</span>
+
+<div class="viewcode-block" id="ConfigDumper.dump"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigDumper.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">sort_sections</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">sort_option_items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">env_escape_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">concat_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Format a ConfigNode object and write result to target.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            root (ConfigNode): The root config node.</span>
+<span class="sd">            target (str/file): An open file handle or a string containing a</span>
+<span class="sd">                file path. If not specified, the result is written to</span>
+<span class="sd">                sys.stdout.</span>
+<span class="sd">            sort_sections (fcn - optional): An optional argument that should be</span>
+<span class="sd">                a function for sorting a list of section keys.</span>
+<span class="sd">            sort_option_items (fcn - optional): An optional argument that</span>
+<span class="sd">                should be a function for sorting a list of option (key, value)</span>
+<span class="sd">                tuples in string values.</span>
+<span class="sd">            env_escape_ok (bool - optional): An optional argument to indicate</span>
+<span class="sd">                that $NAME and ${NAME} syntax in values should be escaped.</span>
+<span class="sd">            concat_mode (bool - optional): Switch on concatenation mode. If</span>
+<span class="sd">                True, add [] before root level options.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sort_sections</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sort_sections</span> <span class="o">=</span> <span class="n">sort_settings</span>
+        <span class="k">if</span> <span class="n">sort_option_items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sort_option_items</span> <span class="o">=</span> <span class="n">sort_settings</span>
+        <span class="n">handle</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">):</span>
+            <span class="n">target_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">target_dir</span><span class="p">:</span>
+                <span class="n">target_dir</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">target_dir</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">target_dir</span><span class="p">)</span>
+            <span class="n">handle</span> <span class="o">=</span> <span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">target</span><span class="p">),</span>
+                                        <span class="nb">dir</span><span class="o">=</span><span class="n">target_dir</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">blank</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">root</span><span class="o">.</span><span class="n">comments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">comments</span><span class="p">:</span>
+                <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comment_format</span><span class="p">(</span><span class="n">comment</span><span class="p">))</span>
+            <span class="n">blank</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">root_keys</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">root_keys</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">sort_sections</span><span class="p">)</span>
+        <span class="n">root_option_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">section_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">root_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">root_option_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">section_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">root_option_keys</span><span class="p">:</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">blank</span><span class="p">)</span>
+            <span class="n">blank</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">concat_mode</span><span class="p">:</span>
+                <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">CHAR_SECTION_OPEN</span> <span class="o">+</span> <span class="n">CHAR_SECTION_CLOSE</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">root_option_keys</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_string_node_dump</span><span class="p">(</span>
+                    <span class="n">key</span><span class="p">,</span> <span class="n">root</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">handle</span><span class="p">,</span> <span class="n">env_escape_ok</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">section_key</span> <span class="ow">in</span> <span class="n">section_keys</span><span class="p">:</span>
+            <span class="n">section_node</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">section_key</span><span class="p">]</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">blank</span><span class="p">)</span>
+            <span class="n">blank</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">section_node</span><span class="o">.</span><span class="n">comments</span><span class="p">:</span>
+                <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comment_format</span><span class="p">(</span><span class="n">comment</span><span class="p">))</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(open)s%(state)s%(key)s%(close)s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">{</span>
+                <span class="s2">&quot;open&quot;</span><span class="p">:</span> <span class="n">CHAR_SECTION_OPEN</span><span class="p">,</span>
+                <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">section_node</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">section_key</span><span class="p">,</span>
+                <span class="s2">&quot;close&quot;</span><span class="p">:</span> <span class="n">CHAR_SECTION_CLOSE</span><span class="p">})</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">section_node</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">sort_option_items</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">section_node</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_string_node_dump</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">env_escape_ok</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+                <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">st_mode</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></div>
+
+    <span class="fm">__call__</span> <span class="o">=</span> <span class="n">dump</span>
+
+    <span class="k">def</span> <span class="nf">_string_node_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">env_escape_ok</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper for self.dump().</span>
+
+<span class="sd">        Return text representation of a string node.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">state</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">comments</span><span class="p">:</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comment_format</span><span class="p">(</span><span class="n">comment</span><span class="p">))</span>
+        <span class="n">value0</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">env_escape_ok</span><span class="p">:</span>
+            <span class="n">value0</span> <span class="o">=</span> <span class="n">env_var_escape</span><span class="p">(</span><span class="n">value0</span><span class="p">)</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">state</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_assign</span> <span class="o">+</span> <span class="n">value0</span><span class="p">)</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">values</span><span class="p">:</span>
+            <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span> <span class="o">+</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">env_escape_ok</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">env_var_escape</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_assign</span> <span class="o">+</span> <span class="n">value</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_comment_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">comment</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return text representation of a configuration comment.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;#</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">comment</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigLoader"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigLoader">[docs]</a><span class="k">class</span> <span class="nc">ConfigLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Loader of an INI format configuration into a ConfigNode object.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; with open(&#39;config.conf&#39;, &#39;w+&#39;) as config_file:</span>
+<span class="sd">        ...     config_file.write(&#39;&#39;&#39;</span>
+<span class="sd">        ... [foo]</span>
+<span class="sd">        ... !bar=Bar</span>
+<span class="sd">        ... baz=Baz</span>
+<span class="sd">        ...     &#39;&#39;&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; loader = ConfigLoader()</span>
+<span class="sd">        &gt;&gt;&gt; try:</span>
+<span class="sd">        ...     config_node = loader.load(&#39;config.conf&#39;)</span>
+<span class="sd">        ... except ConfigSyntaxError:</span>
+<span class="sd">        ...     raise  # Handle exception.</span>
+<span class="sd">        &gt;&gt;&gt; config_node.get(keys=[&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="sd">        {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [], &#39;value&#39;: &#39;Bar&#39;}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">RE_SECTION</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s2">&quot;^(?P&lt;head&gt;\s*\[(?P&lt;state&gt;!?!?))(?P&lt;section&gt;.*)\]\s*$&quot;</span><span class="p">)</span>
+    <span class="n">TYPE_SECTION</span> <span class="o">=</span> <span class="s2">&quot;TYPE_SECTION&quot;</span>
+    <span class="n">TYPE_OPTION</span> <span class="o">=</span> <span class="s2">&quot;TYPE_OPTION&quot;</span>
+    <span class="n">UNKNOWN_NAME</span> <span class="o">=</span> <span class="s2">&quot;&lt;???&gt;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_assign</span><span class="o">=</span><span class="n">CHAR_ASSIGN</span><span class="p">,</span> <span class="n">char_comment</span><span class="o">=</span><span class="n">CHAR_COMMENT</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise the configuration utility.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        char_comment -- the character to indicate the start of a</span>
+<span class="sd">        comment.</span>
+<span class="sd">        char_assign -- the character to use to delimit a key=value</span>
+<span class="sd">        assignment.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">char_assign</span> <span class="o">=</span> <span class="n">char_assign</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">char_comment</span> <span class="o">=</span> <span class="n">char_comment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_option</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;^(?P&lt;state&gt;!?!?)(?P&lt;option&gt;[^\s&quot;</span> <span class="o">+</span>
+            <span class="n">char_assign</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;]+)\s*&quot;</span> <span class="o">+</span>
+            <span class="n">char_assign</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\s*(?P&lt;value&gt;.*)$&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConfigLoader.can_miss_opt_conf_key"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigLoader.can_miss_opt_conf_key">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">can_miss_opt_conf_key</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return KEY if key is a string like &quot;(KEY)&quot;, None otherwise.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span></div>
+
+<div class="viewcode-block" id="ConfigLoader.load_with_opts"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigLoader.load_with_opts">[docs]</a>    <span class="k">def</span> <span class="nf">load_with_opts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">more_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">used_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_config_map</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">mark_opt_confs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read a source configuration file with optional configurations.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            source (str): A file path.</span>
+<span class="sd">            node (ConfigNode - optional): A ConfigNode object if specified,</span>
+<span class="sd">                otherwise one is created.</span>
+<span class="sd">            more_keys (list - optional): A list of additional optional</span>
+<span class="sd">                configuration names. If source is &quot;rose-${TYPE}.conf&quot;, the</span>
+<span class="sd">                file of each name should be &quot;opt/rose-${TYPE}-${NAME}.conf&quot;.</span>
+<span class="sd">            used_keys (list - optional): If defined, it should be a list for</span>
+<span class="sd">                this method to  append to. The key of each successfully loaded</span>
+<span class="sd">                optional configuration will be appended to the list (unless the</span>
+<span class="sd">                key is already in the list). Missing optional configurations</span>
+<span class="sd">                that are specified in more_keys will not raise an error.</span>
+<span class="sd">                If not defined, any missing optional configuration will</span>
+<span class="sd">                trigger an OSError.</span>
+<span class="sd">            mark_opt_configs (bool - optional): if True, add comments above any</span>
+<span class="sd">                settings which have been loaded from an optional config.</span>
+<span class="sd">            return_config_map (bool - optional): If True, construct and return</span>
+<span class="sd">                a dict (config_map) containing config names vs their uncombined</span>
+<span class="sd">                nodes. Optional configurations use their opt keys as keys, and</span>
+<span class="sd">                the main configuration uses &#39;None&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: node or (node, config_map):</span>
+<span class="sd">                - node - The loaded configuration as a ConfigNode.</span>
+<span class="sd">                - config_map - A dictionary containing opt_conf_key: ConfigNode</span>
+<span class="sd">                  pairs. Only returned if return_config_map is True.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            .. testcleanup:: rose.config.ConfigLoader.load_with_opts</span>
+
+<span class="sd">                try:</span>
+<span class="sd">                    os.remove(&#39;config.conf&#39;)</span>
+<span class="sd">                    os.remove(&#39;opt/config-foo.conf&#39;)</span>
+<span class="sd">                    os.rmdir(&#39;opt&#39;)</span>
+<span class="sd">                except OSError:</span>
+<span class="sd">                    pass</span>
+
+<span class="sd">            &gt;&gt;&gt; # Write config file.</span>
+<span class="sd">            &gt;&gt;&gt; with open(&#39;config.conf&#39;, &#39;w+&#39;) as config_file:</span>
+<span class="sd">            ...     config_file.write(&#39;&#39;&#39;</span>
+<span class="sd">            ... [foo]</span>
+<span class="sd">            ... bar=Bar</span>
+<span class="sd">            ...     &#39;&#39;&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; # Write optional config file (foo).</span>
+<span class="sd">            &gt;&gt;&gt; os.mkdir(&#39;opt&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; with open(&#39;opt/config-foo.conf&#39;, &#39;w+&#39;) as opt_config_file:</span>
+<span class="sd">            ...     opt_config_file.write(&#39;&#39;&#39;</span>
+<span class="sd">            ... [foo]</span>
+<span class="sd">            ... bar=Baz</span>
+<span class="sd">            ...     &#39;&#39;&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; loader = ConfigLoader()</span>
+<span class="sd">            &gt;&gt;&gt; config_node, config_map = loader.load_with_opts(</span>
+<span class="sd">            ...     &#39;config.conf&#39;, more_keys=[&#39;foo&#39;], return_config_map=True)</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get_value(keys=[&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="sd">            &#39;Baz&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; original_config_node = config_map[None]</span>
+<span class="sd">            &gt;&gt;&gt; original_config_node.get_value(keys=[&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="sd">            &#39;Bar&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; optional_config_node = config_map[&#39;foo&#39;]</span>
+<span class="sd">            &gt;&gt;&gt; optional_config_node.get_value(keys=[&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="sd">            &#39;Baz&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_config_map</span><span class="p">:</span>
+            <span class="n">config_map</span> <span class="o">=</span> <span class="p">{</span><span class="kc">None</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">node</span><span class="p">)}</span>
+        <span class="n">opt_conf_keys_node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">unset</span><span class="p">([</span><span class="s2">&quot;opts&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">opt_conf_keys_node</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">opt_conf_keys_node</span><span class="o">.</span><span class="n">is_ignored</span><span class="p">():</span>
+            <span class="n">opt_conf_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">opt_conf_keys</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">opt_conf_keys_node</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">more_keys</span><span class="p">:</span>
+            <span class="n">opt_conf_keys</span> <span class="o">+=</span> <span class="n">more_keys</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">opt_conf_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">return_config_map</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">node</span><span class="p">,</span> <span class="n">config_map</span>
+            <span class="k">return</span> <span class="n">node</span>
+        <span class="n">source_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">source_root</span><span class="p">,</span> <span class="n">source_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">source</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">opt_conf_key</span> <span class="ow">in</span> <span class="n">opt_conf_keys</span><span class="p">:</span>
+            <span class="n">can_miss_opt_conf_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_miss_opt_conf_key</span><span class="p">(</span><span class="n">opt_conf_key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">can_miss_opt_conf_key</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">can_miss_opt_conf_key</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">opt_conf_key</span>
+            <span class="n">opt_conf_file_name_base</span> <span class="o">=</span> <span class="n">source_root</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="n">source_ext</span>
+            <span class="n">opt_conf_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">source_dir</span><span class="p">,</span> <span class="n">OPT_CONFIG_DIR</span><span class="p">,</span> <span class="n">opt_conf_file_name_base</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mark_opt_confs</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">opt_conf_file_name</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">default_comments</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">OPT_CONFIG_SETTING_COMMENT</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="n">key</span><span class="p">,</span> <span class="n">opt_conf_file_name</span><span class="p">,)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">opt_conf_file_name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">can_miss_opt_conf_key</span> <span class="ow">or</span> <span class="p">(</span>
+                        <span class="n">used_keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">opt_conf_key</span> <span class="ow">in</span> <span class="n">more_keys</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">raise</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">used_keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">used_keys</span><span class="p">:</span>
+                    <span class="n">used_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">return_config_map</span><span class="p">:</span>
+                    <span class="n">config_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">opt_conf_file_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_config_map</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">node</span><span class="p">,</span> <span class="n">config_map</span>
+        <span class="k">return</span> <span class="n">node</span></div>
+
+<div class="viewcode-block" id="ConfigLoader.load"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigLoader.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_comments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read a source configuration file.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            source (str): An open file handle or a string for a file path.</span>
+<span class="sd">            node (ConfigNode): A ConfigNode object if specified, otherwise</span>
+<span class="sd">                created.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ConfigNode: A new ConfigNode object.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # Create example config file.</span>
+<span class="sd">            &gt;&gt;&gt; with open(&#39;config.conf&#39;, &#39;w+&#39;) as config_file:</span>
+<span class="sd">            ...     config_file.write(&#39;&#39;&#39;</span>
+<span class="sd">            ... [foo]</span>
+<span class="sd">            ... # Some comment</span>
+<span class="sd">            ... !bar=Bar</span>
+<span class="sd">            ...     &#39;&#39;&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; # Load config file.</span>
+<span class="sd">            &gt;&gt;&gt; loader = ConfigLoader()</span>
+<span class="sd">            &gt;&gt;&gt; try:</span>
+<span class="sd">            ...     config_node = loader.load(&#39;config.conf&#39;)</span>
+<span class="sd">            ... except ConfigSyntaxError:</span>
+<span class="sd">            ...     raise  # Handle exception.</span>
+<span class="sd">            &gt;&gt;&gt; config_node.get(keys=[&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="sd">            {&#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [&#39; Some comment&#39;], &#39;value&#39;: &#39;Bar&#39;}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+        <span class="n">handle</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_and_name</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Currently position under root node</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Type of current node, section or option?</span>
+        <span class="n">comments</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Comments associated with next node</span>
+        <span class="n">line_num</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Note: &quot;for line in handle:&quot; hangs for sys.stdin</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">line_num</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># White space and comments</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+                <span class="n">comments</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_comment</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">comments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">node</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comment_strip</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">comments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comment_strip</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="c1"># Handle option continuation.</span>
+            <span class="k">if</span> <span class="n">type_</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_OPTION</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="p">[:])</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">value_cont</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">value_cont</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_assign</span><span class="p">):</span>
+                    <span class="n">value_cont</span> <span class="o">=</span> <span class="n">value_cont</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="p">[:],</span> <span class="n">value</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">value_cont</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="c1"># Match a section header?</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RE_SECTION</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">head</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="s2">&quot;section&quot;</span><span class="p">,</span> <span class="s2">&quot;state&quot;</span><span class="p">)</span>
+                <span class="n">bad_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_section_value</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">bad_index</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ConfigSyntaxError</span><span class="p">(</span>
+                        <span class="n">ConfigSyntaxError</span><span class="o">.</span><span class="n">BAD_CHAR</span><span class="p">,</span>
+                        <span class="n">file_name</span><span class="p">,</span> <span class="n">line_num</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span> <span class="o">+</span> <span class="n">bad_index</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="c1"># Find position under root node</span>
+                <span class="k">if</span> <span class="n">type_</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_OPTION</span><span class="p">:</span>
+                    <span class="n">keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">keys</span><span class="p">:</span>
+                    <span class="n">keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">section</span><span class="p">:</span>
+                    <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                    <span class="n">type_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_SECTION</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">type_</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">section_node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="p">[:])</span>
+                <span class="k">if</span> <span class="n">section_node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="p">[:],</span> <span class="p">{},</span> <span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">section_node</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+                    <span class="k">if</span> <span class="n">comments</span><span class="p">:</span>
+                        <span class="n">section_node</span><span class="o">.</span><span class="n">comments</span> <span class="o">+=</span> <span class="n">comments</span>
+                <span class="n">comments</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">continue</span>
+            <span class="c1"># Match the start of an option setting?</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_option</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ConfigSyntaxError</span><span class="p">(</span>
+                    <span class="n">ConfigSyntaxError</span><span class="o">.</span><span class="n">BAD_SYNTAX</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">line_num</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;option&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;state&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">type_</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_OPTION</span><span class="p">:</span>
+                <span class="n">keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+            <span class="n">type_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_OPTION</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">comments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">default_comments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">comments</span> <span class="o">+=</span> <span class="n">default_comments</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="p">[:],</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">state</span><span class="p">,</span> <span class="n">comments</span><span class="p">)</span>
+            <span class="n">comments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">node</span></div>
+
+    <span class="fm">__call__</span> <span class="o">=</span> <span class="n">load</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_check_section_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check value of section title for bad braces.&quot;&quot;&quot;</span>
+        <span class="c1"># Square braces</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">CHAR_SECTION_OPEN</span><span class="p">,</span> <span class="n">CHAR_SECTION_CLOSE</span><span class="p">:</span>
+            <span class="n">bad_index</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">bad_index</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">bad_index</span>
+        <span class="c1"># Don&#39;t check string with environment variable substitution syntax</span>
+        <span class="k">if</span> <span class="s2">&quot;${&quot;</span> <span class="ow">in</span> <span class="n">section</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1"># Check only section values with schemes</span>
+        <span class="n">scheme</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1"># Check brackets and curly braces</span>
+        <span class="n">index_of</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">()&quot;</span><span class="p">:</span>
+            <span class="n">index_of</span><span class="p">[</span><span class="n">char</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># 2nd occurrence of char</span>
+                    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">scheme</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">index_of</span><span class="p">[</span><span class="n">char</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+                    <span class="n">pos</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">for</span> <span class="n">sym_open</span><span class="p">,</span> <span class="n">sym_close</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;()&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">index_of</span><span class="p">[</span><span class="n">sym_close</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">index_of</span><span class="p">[</span><span class="n">sym_open</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">index_of</span><span class="p">[</span><span class="n">sym_close</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># has open, but no close</span>
+                <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">index_of</span><span class="p">[</span><span class="n">sym_open</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span>
+                    <span class="n">index_of</span><span class="p">[</span><span class="n">sym_close</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">index_of</span><span class="p">[</span><span class="n">sym_open</span><span class="p">]):</span>
+                <span class="c1"># has close, but no open</span>
+                <span class="c1"># or close before open</span>
+                <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">scheme</span><span class="p">)</span> <span class="o">+</span> <span class="n">index_of</span><span class="p">[</span><span class="n">sym_close</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="c1"># Curly braces should be placed before brackets</span>
+        <span class="k">if</span> <span class="n">index_of</span><span class="p">[</span><span class="s2">&quot;(&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index_of</span><span class="p">[</span><span class="s2">&quot;{&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">index_of</span><span class="p">[</span><span class="s2">&quot;(&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">scheme</span><span class="p">)</span> <span class="o">+</span> <span class="n">index_of</span><span class="p">[</span><span class="s2">&quot;{&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">index_of</span><span class="p">[</span><span class="s2">&quot;}&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">index_of</span><span class="p">[</span><span class="s2">&quot;(&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">scheme</span><span class="p">)</span> <span class="o">+</span> <span class="n">index_of</span><span class="p">[</span><span class="s2">&quot;(&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_comment_strip</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Strip comment character and whitespace from a comment.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">def</span> <span class="nf">_get_file_and_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return file handle and file name of &quot;file_&quot;.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file_</span><span class="p">,</span> <span class="s2">&quot;readline&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNKNOWN_NAME</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_</span><span class="p">)</span>
+            <span class="n">file_</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">file_</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigSyntaxError"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.ConfigSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">ConfigSyntaxError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Exception raised for syntax error loading a configuration file.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        exc.code: Error code. Can be one of:</span>
+<span class="sd">            ConfigSyntaxError.BAD_CHAR (bad characters in a name)</span>
+<span class="sd">            ConfigSyntaxError.BAD_SYNTAX (general syntax error)</span>
+<span class="sd">        exc.file_name: The name of the file that triggers the error.</span>
+<span class="sd">        exc.line_num: The line number (from 1) in the file with the error.</span>
+<span class="sd">        exc.col_num: The column number (from 0) in the line with the error.</span>
+<span class="sd">        exc.line: The content of the line that contains the error.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; with open(&#39;config.conf&#39;, &#39;w+&#39;) as config_file:</span>
+<span class="sd">        ...     config_file.write(&#39;[foo][foo]&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; loader = ConfigLoader()</span>
+<span class="sd">        &gt;&gt;&gt; try:</span>
+<span class="sd">        ...     loader.load(&#39;config.conf&#39;)</span>
+<span class="sd">        ... except ConfigSyntaxError as exc:</span>
+<span class="sd">        ...     print &#39;Error (%s) in file &quot;%s&quot; at %s:%s&#39; % (</span>
+<span class="sd">        ...         exc.code, exc.file_name, exc.line_num, exc.col_num)</span>
+<span class="sd">        Error (BAD_CHAR) in file &quot;...&quot; at 1:5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">BAD_CHAR</span> <span class="o">=</span> <span class="s2">&quot;BAD_CHAR&quot;</span>
+    <span class="n">BAD_SYNTAX</span> <span class="o">=</span> <span class="s2">&quot;BAD_SYNTAX&quot;</span>
+
+    <span class="n">MESSAGES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">BAD_CHAR</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;unexpected character or end of value&quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="n">BAD_SYNTAX</span><span class="p">:</span> <span class="s1">&#39;&#39;&#39;expecting &quot;[SECTION]&quot; or &quot;KEY=VALUE&quot;&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">line_num</span><span class="p">,</span> <span class="n">col_num</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">line_num</span><span class="p">,</span> <span class="n">col_num</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_num</span> <span class="o">=</span> <span class="n">line_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">col_num</span> <span class="o">=</span> <span class="n">col_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span> <span class="n">line</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%d</span><span class="s2">): </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s%s</span><span class="s2">^&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">line_num</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MESSAGES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">,</span>
+            <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_num</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dump"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.dump">[docs]</a><span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">sort_sections</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sort_option_items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+         <span class="n">env_escape_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shorthand for :py:func:`ConfigDumper.dump`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ConfigDumper</span><span class="p">()(</span><span class="n">root</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">sort_sections</span><span class="p">,</span> <span class="n">sort_option_items</span><span class="p">,</span>
+                          <span class="n">env_escape_ok</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shorthand for :py:func:`ConfigLoader.load`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ConfigLoader</span><span class="p">()(</span><span class="n">source</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sort_element"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.sort_element">[docs]</a><span class="k">def</span> <span class="nf">sort_element</span><span class="p">(</span><span class="n">elem_1</span><span class="p">,</span> <span class="n">elem_2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sort pieces of text, numerically if possible.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">elem_1</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">elem_2</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">elem_1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">elem_2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">elem_2</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="n">elem_1</span><span class="p">,</span> <span class="n">elem_2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sort_settings"><a class="viewcode-back" href="../../api/configuration/api.html#rose.config.sort_settings">[docs]</a><span class="k">def</span> <span class="nf">sort_settings</span><span class="p">(</span><span class="n">setting_1</span><span class="p">,</span> <span class="n">setting_2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sort sections and options, by numeric element if possible.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setting_1</span><span class="p">,</span> <span class="n">basestring</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setting_2</span><span class="p">,</span> <span class="n">basestring</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="n">setting_1</span><span class="p">,</span> <span class="n">setting_2</span><span class="p">)</span>
+    <span class="n">match_1</span> <span class="o">=</span> <span class="n">REC_SETTING_ELEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">setting_1</span><span class="p">)</span>
+    <span class="n">match_2</span> <span class="o">=</span> <span class="n">REC_SETTING_ELEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">setting_2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match_1</span> <span class="ow">and</span> <span class="n">match_2</span><span class="p">:</span>
+        <span class="n">text_1</span><span class="p">,</span> <span class="n">num_1</span> <span class="o">=</span> <span class="n">match_1</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="n">text_2</span><span class="p">,</span> <span class="n">num_2</span> <span class="o">=</span> <span class="n">match_2</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">text_1</span> <span class="o">==</span> <span class="n">text_2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sort_element</span><span class="p">(</span><span class="n">num_1</span><span class="p">,</span> <span class="n">num_2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="n">setting_1</span><span class="p">,</span> <span class="n">setting_2</span><span class="p">)</span></div>
+</pre></div>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

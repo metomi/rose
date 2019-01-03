@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Further Scheduling &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Scheduling" href="index.html" />
+    <link rel="next" title="Runtime" href="../runtime/index.html" />
+    <link rel="prev" title="Date-Time Cycling" href="datetime-cycling.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="further-scheduling">
+
+<h1>Further Scheduling<a class="headerlink" href="../../../../html/tutorial/cylc/scheduling/further-scheduling.html#further-scheduling" title="View HTML">§</a></h1>
+
+<p>In this section we will quickly run through some of the more advanced features
+of Cylc’s scheduling logic.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="qualifiers">
+
+<h2>Qualifiers<a class="headerlink" href="../../../../html/tutorial/cylc/scheduling/further-scheduling.html#qualifiers" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">foo</span> <span class="o">=&gt;</span> <span class="kd">bar</span>
+<span class="kd">foo</span><span class="c">:</span><span class="kd">succeed</span> <span class="o">=&gt;</span> <span class="kd">bar</span>
+<span class="kd">foo</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="kd">bar</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">:start</span></code></dt>
+<dd>When the task has started running.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">:fail</span></code></dt>
+<dd>When the task finishes if it fails (produces non-zero return code).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">:finish</span></code></dt>
+<dd>When the task has completed (either succeeded or failed).</dd>
+</dl>
+
+
+
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Qualifiers<a class="headerlink" href="../../../../html/tutorial/cylc/scheduling/further-scheduling.html#id1" title="View HTML">§</a></h2>
+
+<p>It is also possible to create your own custom <a class="reference internal" href="../../../glossary.html#term-qualifier"><span class="xref std std-term">qualifiers</span></a>
+to handle events within your code (custom outputs).</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="clock-triggers">
+
+<h2>Clock Triggers<a class="headerlink" href="../../../../html/tutorial/cylc/scheduling/further-scheduling.html#clock-triggers" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nv">initial cycle point </span><span class="o">=</span><span class="s"> 2000-01-01T00Z</span>
+    <span class="nt">[[special tasks]]</span>
+        <span class="nv">clock-trigger </span><span class="o">=</span><span class="s"> daily(-PT1H)</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nt">[[[T12]]]</span>
+             <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">daily</span>  <span class="c1"># &quot;daily&quot; will run, at the earliest, one hour</span>
+                            <span class="c1"># before midday.</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">See the <a class="reference internal" href="../furthertopics/clock-triggered-tasks.html#tutorial-cylc-clock-trigger"><span class="std std-ref">Clock Triggered Tasks</span></a> tutorial for more information.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="alternative-calendars">
+
+<h2>Alternative Calendars<a class="headerlink" href="../../../../html/tutorial/cylc/scheduling/further-scheduling.html#alternative-calendars" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nv">cycling mode </span><span class="o">=</span><span class="s"> 360day</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Alternative Calendars<a class="headerlink" href="../../../../html/tutorial/cylc/scheduling/further-scheduling.html#id2" title="View HTML">§</a></h2>
+
+<p>Next section: <a class="reference internal" href="../runtime/introduction.html#tutorial-cylc-runtime-introduction"><span class="std std-ref">Runtime Introduction</span></a></p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

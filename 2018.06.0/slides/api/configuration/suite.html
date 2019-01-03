@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Suite Configuration &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Configuration" href="index.html" />
+    <link rel="next" title="Site And User Configuration" href="site-and-user.html" />
+    <link rel="prev" title="Application Configuration" href="application.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="suite-configuration">
+
+<h1>Suite Configuration<a class="headerlink" href="../../../html/api/configuration/suite.html#suite-configuration" title="View HTML">§</a></h1>
+
+<p>The configuration and functionality of a suite will usually be covered by
+the use of <a class="reference external" href="http://cylc.github.io/cylc/">Cylc</a>. In which case, most of the suite configuration will live
+in the Cylc <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file. Otherwise, a suite is just a directory of
+files.</p>
+<p>A suite directory may contain the following:</p>
+<ul class="simple">
+<li>A file called <a class="reference internal" href="#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a>, a configuration file in the
+modified INI format described above. It stores the information on how to
+install the suite. See <a class="reference internal" href="#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> for detail.</li>
+<li>A file called <a class="reference internal" href="#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a>, a configuration file in the
+modified INI format described above. It describes the suite’s purpose and
+identity, e.g. the title, the description, the owner, the access control
+list, and other information. Apart from a few standard fields, a suite is
+free to store any information in this file. See <a class="reference internal" href="#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a>
+for detail.</li>
+<li>An <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory of application configurations used by the suite.</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directory of scripts and utilities used by the suite.</li>
+<li>An <code class="docutils literal notranslate"><span class="pre">etc/</span></code> directory of other configurations and resources used the suite.
+E.g. <a class="reference internal" href="../built-in/fcm_make.html#rose:app:fcm_make" title="rose:app:fcm_make"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">fcm_make</span></code></a> configurations.</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">meta/</span></code> directory containing the suite’s configuration metadata.</li>
+<li><code class="docutils literal notranslate"><span class="pre">opt/</span></code> directory. For detail, see <a class="reference internal" href="rose-configuration-format.html#optional-configuration"><span class="std std-ref">Optional Configuration</span></a>.</li>
+<li>Other items, as long as they do not clash with the scheduler’s working
+directories. E.g. for a Cylc suite, <code class="docutils literal notranslate"><span class="pre">log*/</span></code>, <code class="docutils literal notranslate"><span class="pre">share/</span></code>, <code class="docutils literal notranslate"><span class="pre">state/</span></code> and
+<code class="docutils literal notranslate"><span class="pre">work/</span></code> should be avoided.</li>
+</ul>
+<dl class="file">
+<dt id="rose:file:rose-suite.conf">
+<em class="property">Rose Configuration </em><code class="descname">rose-suite.conf</code></dt>
+<dd><p>The suite install configuration file <a class="reference internal" href="#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> should
+contain the information on how to install the suite.</p>
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf[env]">
+<em class="property">Config </em><code class="descname">[env]</code></dt>
+<dd><p>Specify the environment variables to export to the suite daemon. The
+usual <code class="docutils literal notranslate"><span class="pre">$NAME</span></code> or <code class="docutils literal notranslate"><span class="pre">${NAME}</span></code> syntax can be used in values to reference
+environment variables that are already defined before the suite runner is
+invoked. However, it is unsafe to reference other environment variables
+defined in this section. If the value of an environment variable setting
+begins with a  tilde <code class="docutils literal notranslate"><span class="pre">~</span></code>, all of the characters preceding the first
+slash <code class="docutils literal notranslate"><span class="pre">/</span></code> are considered a <em>tilde-prefix</em>. Where possible, a
+tilde-prefix is replaced with the home  directory associated with the
+specified login name at run time.</p>
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf[env]KEY">
+<em class="property">Config </em><code class="descname">KEY</code><em class="property">= VALUE</em></dt>
+<dd><p>Define an environemt variable <code class="docutils literal notranslate"><span class="pre">KEY</span></code> with the value <code class="docutils literal notranslate"><span class="pre">VALUE</span></code>.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf[env]ROSE_VERSION">
+<em class="property">Config </em><code class="descname">ROSE_VERSION</code><em class="property">= ROSE_VERSION_NUMBER</em></dt>
+<dd><p>If specified, the version of Rose that starts the suite
+run must match the specified version.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf[env]CYLC_VERSION">
+<em class="property">Config </em><code class="descname">CYLC_VERSION</code><em class="property">= CYLC_VERSION_NUMBER</em></dt>
+<dd><p>If specified for a Cylc suite, the Rose suite runner
+will attempt to use this version of cylc.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf[jinja2:suite.rc]">
+<em class="property">Config </em><code class="descname">[jinja2:suite.rc]</code></dt>
+<dd><dl class="conf">
+<dt id="rose:conf:rose-suite.conf[jinja2:suite.rc]KEY">
+<em class="property">Config </em><code class="descname">KEY</code><em class="property">= VALUE</em></dt>
+<dd><p>Define a <a class="reference external" href="http://jinja.pocoo.org/">Jinja2</a> variable <code class="docutils literal notranslate"><span class="pre">KEY</span></code> with the value <code class="docutils literal notranslate"><span class="pre">VALUE</span></code> for use
+in the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file.</p>
+<p>The assignment will be inserted after the <code class="docutils literal notranslate"><span class="pre">#!jinja2</span></code> line of the
+installed <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf[file:NAME]">
+<em class="property">Config </em><code class="descname">[file:NAME]</code></dt>
+<dd><p>Specify a file/directory to be installed. <code class="docutils literal notranslate"><span class="pre">NAME</span></code> should be a path
+relative to the run time <code class="docutils literal notranslate"><span class="pre">$PWD</span></code>.</p>
+<p>E.g. <code class="docutils literal notranslate"><span class="pre">file:app/APP=source=LOCATION</span></code>.</p>
+<p>For a list of configuration options and details on each see
+<a class="reference internal" href="file-creation.html#rose:conf:*[file:TARGET]" title="rose:conf:*[file:TARGET]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">*[file:TARGET]</span></code></a>.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf|meta">
+<em class="property">Config </em><code class="descname">meta</code></dt>
+<dd><p>Specify the configuration metadata for the suite. The section may be
+used by various Rose utilities, such as the config editor GUI. It can be
+used to specify the suite type.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf|root-dir">
+<em class="property">Config </em><code class="descname">root-dir</code><em class="property">= LIST</em></dt>
+<dd><p>A new line delimited list of <code class="docutils literal notranslate"><span class="pre">PATTERN=DIR</span></code> pairs. The <code class="docutils literal notranslate"><span class="pre">PATTERN</span></code>
+should be a glob-like pattern for matching a host name. The <code class="docutils literal notranslate"><span class="pre">DIR</span></code>
+should be the root directory to install a suite run directory. E.g.:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">root-dir</span><span class="o">=</span><span class="s">hpc*=$WORKDIR</span>
+        <span class="o">=</span><span class="s">*=$DATADIR</span>
+</pre></div>
+</div>
+<p>In this example, <a class="reference internal" href="../command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> of a suite with name
+<code class="docutils literal notranslate"><span class="pre">$NAME</span></code> will create <code class="docutils literal notranslate"><span class="pre">~/cylc-run/$NAME</span></code> as a symbolic link to
+<code class="docutils literal notranslate"><span class="pre">$DATADIR/cylc-run/$NAME/</span></code> on any machine, except those with their
+hostnames matching <code class="docutils literal notranslate"><span class="pre">hpc*</span></code>. In which case, it will create
+<code class="docutils literal notranslate"><span class="pre">~/cylc-run/$NAME</span></code> as a symbolic link to <code class="docutils literal notranslate"><span class="pre">$WORKDIR/cylc-run/$NAME/</span></code>.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf|root-dir{share}">
+<em class="property">Config </em><code class="descname">root-dir{share}</code><em class="property">= LIST</em></dt>
+<dd><p>A new line delimited list of <code class="docutils literal notranslate"><span class="pre">PATTERN=DIR</span></code> pairs. The <code class="docutils literal notranslate"><span class="pre">PATTERN</span></code> should
+be a glob-like pattern for matching a host name. The <code class="docutils literal notranslate"><span class="pre">DIR</span></code> should be the
+root directory where the suite’s <code class="docutils literal notranslate"><span class="pre">share/</span></code> directory should be created.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf|root-dir{share/cycle}">
+<em class="property">Config </em><code class="descname">root-dir{share/cycle}</code><em class="property">= LIST</em></dt>
+<dd><p>A new line delimited list of <code class="docutils literal notranslate"><span class="pre">PATTERN=DIR</span></code> pairs. The <code class="docutils literal notranslate"><span class="pre">PATTERN</span></code> should
+be a glob-like pattern for matching a host name. The <code class="docutils literal notranslate"><span class="pre">DIR</span></code> should be the
+root directory where the suite’s <code class="docutils literal notranslate"><span class="pre">share/cycle/</span></code> directory should be
+be created.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf|root-dir{work}">
+<em class="property">Config </em><code class="descname">root-dir{work}</code><em class="property">= LIST</em></dt>
+<dd><p>A new line delimited list of <code class="docutils literal notranslate"><span class="pre">PATTERN=DIR</span></code> pairs. The <code class="docutils literal notranslate"><span class="pre">PATTERN</span></code> should
+be a glob-like pattern for matching a host name. The <code class="docutils literal notranslate"><span class="pre">DIR</span></code> should be the
+root directory where the suite’s <code class="docutils literal notranslate"><span class="pre">work/</span></code> directory for tasks should be
+created.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf|root-dir-share">
+<em class="property">Config </em><code class="descname">root-dir-share</code><em class="property">= LIST</em></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2015.04: </span>Equivalent to <a class="reference internal" href="#rose:conf:rose-suite.conf|root-dir{share}" title="rose:conf:rose-suite.conf|root-dir{share}"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">root-dir{share}=LIST</span></code></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.conf|root-dir-work">
+<em class="property">Config </em><code class="descname">root-dir-work</code><em class="property">= LIST</em></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2015.04: </span>Equivalent to <a class="reference internal" href="#rose:conf:rose-suite.conf|root-dir{work}" title="rose:conf:rose-suite.conf|root-dir{work}"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">root-dir{work}=LIST</span></code></a>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="file">
+<dt id="rose:file:rose-suite.info">
+<em class="property">Rose Configuration </em><code class="descname">rose-suite.info</code></dt>
+<dd><p>The suite information file <a class="reference internal" href="#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> should contain the
+information on identify and the purpose of the suite. It has no sections,
+only <code class="docutils literal notranslate"><span class="pre">KEY=VALUE</span></code> pairs. The <code class="docutils literal notranslate"><span class="pre">owner</span></code>, <code class="docutils literal notranslate"><span class="pre">project</span></code> and <code class="docutils literal notranslate"><span class="pre">title</span></code> settings
+are compulsory. Otherwise, any <code class="docutils literal notranslate"><span class="pre">KEY=VALUE</span></code> pairs can appear in this
+file. If the name of a <code class="docutils literal notranslate"><span class="pre">KEY</span></code> ends with <code class="docutils literal notranslate"><span class="pre">-list</span></code>, the value is expected
+to be a space-delimited list. The following keys are known to have special
+meanings:</p>
+<dl class="conf">
+<dt id="rose:conf:rose-suite.info|owner">
+<em class="property">Config </em><code class="descname">owner</code></dt>
+<dd><p>Specify the user ID of the owner of the suite. The owner has full commit
+access to the suite. Only the owner can delete the suite, pass the suite’s
+ownership to someone else or change the <a class="reference internal" href="#rose:conf:rose-suite.info|access-list" title="rose:conf:rose-suite.info|access-list"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">access-list</span></code></a>.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.info|project">
+<em class="property">Config </em><code class="descname">project</code></dt>
+<dd><p>Specify the name of the project associated with the suite.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.info|title">
+<em class="property">Config </em><code class="descname">title</code></dt>
+<dd><p>Specify a short title of the suite.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.info|access-list">
+<em class="property">Config </em><code class="descname">access-list</code></dt>
+<dd><p>Specify a list of users with commit access to trunk of the suite. A
+<code class="docutils literal notranslate"><span class="pre">*</span></code> in the list means that anyone can commit to the trunk of the
+suite. Setting this blank or omitting the setting means that nobody
+apart from the owner can commit to the trunk. Only the suite owner can
+change the access list.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.info|description">
+<em class="property">Config </em><code class="descname">description</code></dt>
+<dd><p>Specify a long description of the suite.</p>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose-suite.info|sub-project">
+<em class="property">Config </em><code class="descname">sub-project</code></dt>
+<dd><p>Specify a sub-division of <a class="reference internal" href="#rose:conf:rose-suite.info|project" title="rose:conf:rose-suite.info|project"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">project</span></code></a>, if applicable.</p>
+</dd></dl>
+
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

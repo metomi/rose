@@ -1,0 +1,462 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Macro API &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" />
+    <link rel="next" title="Rose Upgrade Macro API" href="rose-upgrader-macros.html" />
+    <link rel="prev" title="Rose GTK library" href="rose-gtk-library.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-macro-api">
+
+<h1>Rose Macro API<a class="headerlink" href="../../html/api/rose-macro.html#rose-macro-api" title="View HTML">§</a></h1>
+
+<p>Rose macros manipulate or check configurations, often based on their
+metadata. There are four types of macros:</p>
+<dl class="docutils">
+<dt>Checkers (validators)</dt>
+<dd>Check a configuration, perhaps using metadata.</dd>
+<dt>Changers (transformers)</dt>
+<dd>Change a configuration e.g. adding/removing options.</dd>
+<dt>Upgraders</dt>
+<dd>Special transformer macros for upgrading and downgrading configurations
+(covered in the <a class="reference internal" href="rose-upgrader-macros.html#rose-upgr-macros"><span class="std std-ref">Upgrade Macro API</span></a>).</dd>
+<dt>Reporters</dt>
+<dd>output information about a configuration.</dd>
+</dl>
+<p>They can be run within <a class="reference internal" href="command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> or via
+<a class="reference internal" href="command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This section covers validator, transformer and reporter macros. For upgrader
+macros see <a class="reference internal" href="rose-upgrader-macros.html#rose-upgr-macros"><span class="std std-ref">Upgrade Macro API</span></a>.</p>
+</div>
+<p>There are built-in Rose macros that handle standard behaviour such as trigger
+changing and type checking.</p>
+<p>Macros use a Python API, and should be written in Python, unless you are
+doing something very fancy. In the absence of a Python house style, it’s
+usual to follow the standard Python style guidance (<a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP8</a>, <a class="reference external" href="https://www.python.org/dev/peps/pep-0257/">PEP257</a>).</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">You should avoid writing validator macros if the checking can be expressed
+via <a class="reference internal" href="configuration/metadata.html#metadata-values"><span class="std std-ref">metadata</span></a>.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="location">
+
+<h2>Location<a class="headerlink" href="../../html/api/rose-macro.html#location" title="View HTML">§</a></h2>
+
+<p>A module containing macros should be stored under a directory
+<code class="docutils literal notranslate"><span class="pre">lib/python/macros/</span></code> in the metadata for a configuration. This directory
+should be a Python package.</p>
+<p>When developing macros for Rose internals, macros should be placed in the
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.macros</span></code> package in the Rose Python library. They should be
+referenced by the <code class="docutils literal notranslate"><span class="pre">lib/python/rose/macros/__init__.py</span></code> classes and a call to
+them can be added in the <code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/main.py</span></code> module if
+they need to be run implicitly by the config editor.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="writing-macros">
+
+<h2>Writing Macros<a class="headerlink" href="../../html/api/rose-macro.html#writing-macros" title="View HTML">§</a></h2>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For basic usage see the <a class="reference internal" href="../tutorial/rose/furthertopics/macro-development.html#macro-dev"><span class="std std-ref">macro tutorial</span></a>.</p>
+</div>
+<p>Validator, transformer and reporter macros are Python classes which subclass
+from <a class="reference internal" href="#rose.macro.MacroBase" title="rose.macro.MacroBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rose.macro.MacroBase</span></code></a> (<a class="reference internal" href="#api-rose-macro-base"><span class="std std-ref">API</span></a>).</p>
+<p>These macros implement their behaviours by providing a <code class="docutils literal notranslate"><span class="pre">validate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">transform</span></code> or <code class="docutils literal notranslate"><span class="pre">report</span></code> method. A macro can contain any combination of
+these methods so, for example, a macro might be both a validator and a
+transformer.</p>
+<p>These methods should accept two <a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">rose.config.ConfigNode</span></code></a>
+instances as arguments - one is the configuration, and one is the metadata
+configuration that provides information about the configuration items.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">See also <a class="reference internal" href="configuration/api.html#config-api"><span class="std std-ref">Python</span></a>.</p>
+</div>
+<p>A validator macro should look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rose.macro</span>
+
+<span class="k">class</span> <span class="nc">SomeValidator</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MacroBase</span><span class="p">):</span>
+
+<span class="sd">&quot;&quot;&quot;This does some kind of check.&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># Some check on config appends to self.reports using self.add_report</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>The returned list should be a list of <a class="reference internal" href="#rose.macro.MacroReport" title="rose.macro.MacroReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">rose.macro.MacroReport</span></code></a> objects
+containing the section, option, value, and warning strings (info) for each
+setting that is in error. These are initialised behind the scenes by calling the
+inherited method <a class="reference internal" href="#rose.macro.MacroBase.add_report" title="rose.macro.MacroBase.add_report"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rose.macro.MacroBase.add_report()</span></code></a> via
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">self.add_report()</span></code>. This has the form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">is_warning</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>This means that you should call it with the relevant section first, then the
+relevant option, then the relevant value, then the relevant error message,
+and optionally a warning flag that we’ll discuss later. If the setting is a
+section, the option should be <code class="docutils literal notranslate"><span class="pre">None</span></code> and the value None. For example,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">editor_value</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="s2">&quot;MY_FAVOURITE_STREAM_EDITOR&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="n">editor_value</span> <span class="o">!=</span> <span class="s2">&quot;sed&quot;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span>                         <span class="c1"># Section</span>
+                        <span class="s2">&quot;MY_FAVOURITE_STREAM_EDITOR&quot;</span><span class="p">,</span>  <span class="c1"># Option</span>
+                        <span class="n">editor_value</span><span class="p">,</span>                  <span class="c1"># Value</span>
+                        <span class="s2">&quot;Should be &#39;sed&#39;!&quot;</span><span class="p">)</span>            <span class="c1"># Message</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>Validator macros have the option to give warnings, which do not count as
+formal errors in the Rose config editor GUI. These should be used when
+something <em>may</em> be wrong, such as warning when using an
+advanced-developer-only option. They are invoked by passing a 5th argument
+to <code class="xref py py-meth docutils literal notranslate"><span class="pre">self.add_report()</span></code>, <code class="docutils literal notranslate"><span class="pre">is_warning</span></code>, like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;MY_FAVOURITE_STREAM_EDITOR&quot;</span><span class="p">,</span>
+                <span class="n">editor_value</span><span class="p">,</span>
+                <span class="s2">&quot;Could be &#39;sed&#39;&quot;</span><span class="p">,</span>
+                <span class="n">is_warning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A transformer macro should look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rose.macro</span>
+
+<span class="k">class</span> <span class="nc">SomeTransformer</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MacroBase</span><span class="p">):</span>
+
+<span class="sd">&quot;&quot;&quot;This does some kind of change to the config.&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># Some operation on config which calls self.add_report for each change.</span>
+    <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>The returned list should be a list of 4-tuples containing the section,
+option, value, and information strings for each setting that was changed
+(e.g. added, removed, value changed). If the setting is a section, the
+option should be <code class="docutils literal notranslate"><span class="pre">None</span></code> and the value None. If an option was removed,
+the value should be the old value - otherwise it should be the new one
+(added/changed). For example,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add some more snow control.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="n">list_of_changes</span><span class="p">,</span>
+                        <span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                        <span class="s2">&quot;Updated snow handling in time for Christmas&quot;</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">,</span> <span class="s2">&quot;l_unique&quot;</span><span class="p">],</span> <span class="s2">&quot;.true.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">,</span> <span class="s2">&quot;l_unique&quot;</span><span class="p">,</span> <span class="s2">&quot;.true.&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;So far, anyway.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>The current working directory within a macro is always the configuration’s
+directory. This makes it easy to access non-<code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code> files (e.g.
+in the <code class="docutils literal notranslate"><span class="pre">file/</span></code> subdirectory).</p>
+<p>There are also reporter macros which can be used where you need to output
+some information about a configuration. A reporter macro takes the same form
+as validator and transform macros but does not require a return value.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Write some information about the configuration to a report file.</span>
+
+<span class="sd">    Note: report methods do not have a return value.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;report/file&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">report_file</span><span class="p">:</span>
+        <span class="n">report_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">])))</span>
+</pre></div>
+</div>
+<p>Macros also support the use of keyword arguments, giving you the ability to
+have the user specify some input or override to your macro. For example a
+transformer macro could be written as follows to allow the user to input
+<code class="docutils literal notranslate"><span class="pre">some_value</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">some_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Some transformer macro&quot;&quot;&quot;</span>
+    <span class="k">return</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The extra arguments require default values (<code class="docutils literal notranslate"><span class="pre">=None</span></code> in this
+example) and that you should add error handling for the input
+accordingly.</p>
+</div>
+<p>On running your macro the user will be prompted to supply values for these
+arguments or accept the default values.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="module-rose.macro">
+
+<h2>Python API<a class="headerlink" href="../../html/api/rose-macro.html#module-rose.macro" title="View HTML">§</a></h2>
+
+<p>Module to list or run available custom macros for a configuration.</p>
+<p>It also stores macro base classes and macro library functions.</p>
+<dl class="class">
+<dt id="rose.macro.MacroBase">
+<em class="property">class </em><code class="descclassname">rose.macro.</code><code class="descname">MacroBase</code></dt>
+<dd><p>Base class for macros for validating or transforming configurations.</p>
+<dl class="docutils">
+<dt>Synopsis:</dt>
+<dd><div class="first last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">rose.macro</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SomeValidator</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MacroBase</span><span class="p">):</span>
+<span class="gp">...</span>
+<span class="gp">... </span>   <span class="sd">&#39;&#39;&#39;Important: Add a docstring for your macro like this.</span>
+<span class="gp">...</span><span class="sd"></span>
+<span class="gp">... </span><span class="sd">   A macro class should implement one of the following methods:</span>
+<span class="gp">...</span><span class="sd"></span>
+<span class="gp">... </span><span class="sd">   &#39;&#39;&#39;</span>
+<span class="gp">...</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="c1"># Some check on config appends to self.reports using</span>
+<span class="gp">... </span>       <span class="c1"># self.add_report.</span>
+<span class="gp">... </span>       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+<span class="gp">...</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="c1"># Some operation on config which calls self.add_report</span>
+<span class="gp">... </span>       <span class="c1"># for each change.</span>
+<span class="gp">... </span>       <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+<span class="gp">...</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="c1"># Perform some analysis of the config but return nothing.</span>
+<span class="gp">... </span>       <span class="k">pass</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="rose.macro.MacroBase.add_report">
+<code class="descname">add_report</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Add a rose.macro.MacroReport.</p>
+<p>See <a class="reference internal" href="#rose.macro.MacroReport" title="rose.macro.MacroReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">rose.macro.MacroReport</span></code></a> for details of arguments.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># An example validator macro which adds a report to the setting</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># env=MY_FAVOURITE_STREAM_EDITOR.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">My_Macro</span><span class="p">(</span><span class="n">MacroBase</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">editor_value</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="s1">&#39;MY_FAVOURITE_STREAM_EDITOR&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">value</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="n">editor_value</span> <span class="o">!=</span> <span class="s1">&#39;sed&#39;</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span>
+<span class="gp">... </span>                <span class="s1">&#39;env&#39;</span><span class="p">,</span>                         <span class="c1"># Section</span>
+<span class="gp">... </span>                <span class="s1">&#39;MY_FAVOURITE_STREAM_EDITOR&#39;</span><span class="p">,</span>  <span class="c1"># Option</span>
+<span class="gp">... </span>                <span class="n">editor_value</span><span class="p">,</span>                  <span class="c1"># Value</span>
+<span class="gp">... </span>                <span class="s1">&#39;Should be &quot;sed&quot;!&#39;</span><span class="p">)</span>            <span class="c1"># Message</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.macro.MacroBase.get_metadata_for_config_id">
+<code class="descname">get_metadata_for_config_id</code><span class="sig-paren">(</span><em>setting_id</em>, <em>meta_config</em><span class="sig-paren">)</span></dt>
+<dd><p>Return a dict of metadata properties and values for a setting id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>setting_id</strong> (<em>str</em>) – The name of the setting to extract metadata for.</li>
+<li><strong>meta_config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – Config node containing the
+metadata to extract from.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dictionary containing metadata options.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a rose app.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;rose-app.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">app_config</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">app_config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">bar=2</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s1">&#39;meta&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;meta/rose-meta.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">meta_config</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">meta_config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo=bar]</span>
+<span class="gp">... </span><span class="s1">values = 1,2,3</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load config.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_conf</span><span class="p">,</span> <span class="n">config_map</span><span class="p">,</span> <span class="n">meta_config</span> <span class="o">=</span> <span class="n">load_conf_from_file</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;rose-app.conf&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Extract metadata for foo=bar.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_metadata_for_config_id</span><span class="p">(</span><span class="s1">&#39;foo=bar&#39;</span><span class="p">,</span> <span class="n">meta_config</span><span class="p">)</span>
+<span class="go">{&#39;values&#39;: &#39;1,2,3&#39;, &#39;id&#39;: &#39;foo=bar&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.macro.MacroBase.get_resource_path">
+<code class="descname">get_resource_path</code><span class="sig-paren">(</span><em>filename=''</em><span class="sig-paren">)</span></dt>
+<dd><p>Load the resource according to the path of the calling macro.</p>
+<p>The returned path will be based on the macro location under
+<code class="docutils literal notranslate"><span class="pre">lib/python</span></code> in the metadata directory.</p>
+<p>If the calling macro is <code class="docutils literal notranslate"><span class="pre">lib/python/macro/levels.py</span></code>,
+and the filename is <code class="docutils literal notranslate"><span class="pre">rules.json</span></code>, the returned path will be
+<code class="docutils literal notranslate"><span class="pre">etc/macro/levels/rules.json</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – The filename of the resource to request the path
+to.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The path to the requested resource.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.macro.MacroBase.pretty_format_config">
+<code class="descname">pretty_format_config</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span></dt>
+<dd><p>Standardise the keys and values of a config node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The config node to convert.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.macro.MacroBase.standard_format_config">
+<code class="descname">standard_format_config</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span></dt>
+<dd><p>Standardise any degenerate representations e.g. namelist repeats.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The config node to convert.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rose.macro.MacroReport">
+<em class="property">class </em><code class="descclassname">rose.macro.</code><code class="descname">MacroReport</code><span class="sig-paren">(</span><em>section=None</em>, <em>option=None</em>, <em>value=None</em>, <em>info=None</em>, <em>is_warning=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Class to hold information about a macro issue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>section</strong> (<em>str</em>) – The name of the section to attach this report to.</li>
+<li><strong>option</strong> (<em>str</em>) – The name of the option (within the section) to
+attach this report to.</li>
+<li><strong>value</strong> (<em>obj</em>) – The value of the configuration associated with this
+report.</li>
+<li><strong>info</strong> (<em>str</em>) – Text information describing the nature of the report.</li>
+<li><strong>is_warning</strong> (<em>bool</em>) – If True then this report will be logged as a
+warning.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">MacroReport</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="s1">&#39;WORLD&#39;</span><span class="p">,</span> <span class="s1">&#39;Earth&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="s1">&#39;World changed to Earth&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

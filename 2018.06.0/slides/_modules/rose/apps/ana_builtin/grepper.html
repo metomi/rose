@@ -1,0 +1,585 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rose.apps.ana_builtin.grepper &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <h1>Source code for rose.apps.ana_builtin.grepper</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># (C) British Crown Copyright 2012-8 Met Office.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Rose, a framework for meteorological suites.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Rose. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;The following options can be specified in:</span>
+
+<span class="sd">* :rose:conf:`rose.conf[rose-ana]`</span>
+<span class="sd">* :rose:conf:`rose_ana[ana:config]`</span>
+
+<span class="sd">.. describe:: Options</span>
+
+<span class="sd">    grepper-report-limit:</span>
+<span class="sd">        A numerical value giving the maximum number of informational output</span>
+<span class="sd">        lines to print for each comparison. This is intended for cases where</span>
+<span class="sd">        for example a pattern-matching comparison is expected to match many</span>
+<span class="sd">        thousands of occurences in the given files; it may not be desirable</span>
+<span class="sd">        to print the results of every comparison. After the given number of</span>
+<span class="sd">        lines are printed a special message indicating that the rest of the</span>
+<span class="sd">        output is truncated will be produced.</span>
+<span class="sd">    skip-if-all-files-missing:</span>
+<span class="sd">        Can be set to ``.true.`` or ``.false.``; if active, any comparison</span>
+<span class="sd">        done on files by ``grepper`` will be skipped if all of those files</span>
+<span class="sd">        are non-existent. In this case the task will return as &quot;skipped&quot;</span>
+<span class="sd">        rather than passed/failed.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">rose</span> <span class="k">import</span> <span class="n">TYPE_LOGICAL_VALUE_TRUE</span>
+<span class="kn">from</span> <span class="nn">rose.apps.rose_ana</span> <span class="k">import</span> <span class="n">AnalysisTask</span>
+
+
+<div class="viewcode-block" id="SingleCommandStatus"><a class="viewcode-back" href="../../../../tutorial/rose/furthertopics/rose-stem.html#rose.apps.ana_builtin.grepper.SingleCommandStatus">[docs]</a><span class="k">class</span> <span class="nc">SingleCommandStatus</span><span class="p">(</span><span class="n">AnalysisTask</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run a shell command, passing or failing depending on the exit</span>
+<span class="sd">       status of that command.</span>
+
+<span class="sd">       Options:</span>
+<span class="sd">           files (optional):</span>
+<span class="sd">               A newline-separated list of filenames which may appear</span>
+<span class="sd">               in the command.</span>
+<span class="sd">           command:</span>
+<span class="sd">               The command to run; if it contains Python style</span>
+<span class="sd">               format specifiers these will be expanded using the list of</span>
+<span class="sd">               files above (if provided).</span>
+<span class="sd">           kgo_file:</span>
+<span class="sd">               If the list of files above was provided gives the</span>
+<span class="sd">               (0-based) index of the file holding the &quot;kgo&quot; or &quot;control&quot;</span>
+<span class="sd">               output for use with the comparisons database (if active).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">run_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Main analysis routine called from rose_ana.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_files</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_kgo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_command</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_unhandled</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_config_opts</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_for_skip</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_command_and_check</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_kgo</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">run_command_and_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run the command and return based on the output.&quot;&quot;&quot;</span>
+        <span class="c1"># If the user has specified a KGO file, but it is missing, exit early</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kgo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kgo_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kgo</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">kgo_file</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                    <span class="s2">&quot;KGO File (file </span><span class="si">{0}</span><span class="s2">) appears to be missing&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kgo</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[FAIL] &quot;</span><span class="p">)</span>
+                <span class="c1"># Note that by exiting early this task counts as failed</span>
+                <span class="k">return</span>
+
+        <span class="c1"># The command may contain format subsitution characters, which will</span>
+        <span class="c1"># receive any filenames passed to the app.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
+        <span class="n">returncode</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[INFO] &quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">passed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;STDOUT:&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[FAIL] &quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[FAIL] &quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;STDERR:&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[FAIL] &quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[FAIL] &quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">check_for_skip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If the user&#39;s config options specified that the task should be</span>
+<span class="sd">        ignored if all of its files were missing, set skipped attribute here.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_if_missing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">skipped</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                    <span class="s2">&quot;All file arguments are missing, skipping task since &quot;</span>
+                    <span class="s2">&quot;&#39;skip-if-all-files-missing&#39; is &#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">TYPE_LOGICAL_VALUE_TRUE</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped</span>
+
+    <span class="k">def</span> <span class="nf">get_config_opts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process any configuration options.&quot;&quot;&quot;</span>
+        <span class="n">report_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;grepper-report-limit&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_report_lines</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">report_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">report_limit</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_report_lines</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">report_limit</span><span class="p">)</span>
+
+        <span class="n">skip_missing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;skip-if-all-files-missing&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_if_missing</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">skip_missing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="n">skip_missing</span> <span class="o">==</span> <span class="n">TYPE_LOGICAL_VALUE_TRUE</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">skip_if_missing</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">process_opt_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process the files option; a list of one or more filenames.&quot;&quot;&quot;</span>
+        <span class="c1"># Get the file list from the options dictionary</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;files&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Make sure it appears as a sensible list</span>
+        <span class="k">if</span> <span class="n">files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span>
+        <span class="c1"># Report the filenames (with paths)</span>
+        <span class="k">for</span> <span class="n">ifile</span><span class="p">,</span> <span class="n">fname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                <span class="s2">&quot;File </span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ifile</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                       <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="n">ifile</span><span class="p">])))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="n">files</span>
+
+    <span class="k">def</span> <span class="nf">process_opt_kgo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the KGO option; an index indicating which file (if any) is</span>
+<span class="sd">        the KGO (Known Good Output) - this may be needed later to assist in</span>
+<span class="sd">        updating of test results.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the kgo index from the options dictionary</span>
+        <span class="n">kgo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kgo_file&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Parse the kgo index</span>
+        <span class="k">if</span> <span class="n">kgo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kgo</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">kgo</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">kgo</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">kgo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kgo</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">kgo</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;KGO index cannot be greater than number of files&quot;</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;KGO index not recognised; must be a digit or blank&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kgo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;KGO is file </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kgo</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;No KGO files are present&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kgo</span> <span class="o">=</span> <span class="n">kgo</span>
+
+    <span class="k">def</span> <span class="nf">process_opt_command</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the command option; this is the (shell) command that will</span>
+<span class="sd">        be run for this task.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the command from the options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;command&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Command: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Command not specified&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Simple command runner; returns output error and return code.&quot;&quot;&quot;</span>
+        <span class="n">retcode</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">popen</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">retcode</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span>
+
+    <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the content of a given file as a list of lines.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ifile</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">ifile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+    <span class="k">def</span> <span class="nf">update_kgo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the KGO database with the status of any files marked by the</span>
+<span class="sd">        kgo_file option (i.e. whether they have passed/failed the test.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kgo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Identify the KGO file from its index</span>
+            <span class="n">kgo_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kgo</span><span class="p">]</span>
+            <span class="c1"># Now find the other file/s (this is presently designed to expect</span>
+            <span class="c1"># there to be 1 KGO and 1 non-KGO file</span>
+            <span class="k">for</span> <span class="n">ifile</span><span class="p">,</span> <span class="n">suite_file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ifile</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">kgo</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">kgo_db</span><span class="o">.</span><span class="n">enter_comparison</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;full_task_name&quot;</span><span class="p">],</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">kgo_file</span><span class="p">),</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">suite_file</span><span class="p">),</span>
+                    <span class="p">[</span><span class="s2">&quot;FAIL&quot;</span><span class="p">,</span> <span class="s2">&quot; OK &quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">passed</span><span class="p">],</span> <span class="s2">&quot;Compared using grepper&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SingleCommandPattern"><a class="viewcode-back" href="../../../../tutorial/rose/furthertopics/rose-stem.html#rose.apps.ana_builtin.grepper.SingleCommandPattern">[docs]</a><span class="k">class</span> <span class="nc">SingleCommandPattern</span><span class="p">(</span><span class="n">SingleCommandStatus</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run a single command and then pass/fail depending on the presence of a</span>
+<span class="sd">    particular expression in that command&#39;s standard output.</span>
+
+<span class="sd">    Options:</span>
+<span class="sd">        files (optional):</span>
+<span class="sd">            Same as previous task. command - same as previous task.</span>
+<span class="sd">        kgo_file:</span>
+<span class="sd">            Same as previous task.</span>
+<span class="sd">        pattern:</span>
+<span class="sd">            The regular expression to search for in the stdout from the</span>
+<span class="sd">            command.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">run_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Main analysis routine called from rose_ana.&quot;&quot;&quot;</span>
+        <span class="c1"># Note that this is identical to the above class, only it has the</span>
+        <span class="c1"># additional pattern option; so call back to the parent class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_pattern</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SingleCommandPattern</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_analysis</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">process_opt_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the pattern option; a regular expression which will be</span>
+<span class="sd">        checked against the command output.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the pattern from the options dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;pattern&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;Pattern: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Must specify a pattern&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_command_and_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the command and check for the presence of the pattern in its</span>
+<span class="sd">        standard output.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If the user has specified a KGO file, but it is missing, exit early</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kgo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kgo_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kgo</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">kgo_file</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                    <span class="s2">&quot;KGO File (file </span><span class="si">{0}</span><span class="s2">) appears to be missing&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kgo</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[FAIL] &quot;</span><span class="p">)</span>
+                <span class="c1"># Note that by exiting early this task counts as failed</span>
+                <span class="k">return</span>
+
+        <span class="c1"># The command may contain format subsitution characters, which will</span>
+        <span class="c1"># receive any filenames passed to the app.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
+        <span class="n">returncode</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">)</span>
+
+        <span class="n">search</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span> <span class="n">stdout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">passed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="FilePattern"><a class="viewcode-back" href="../../../../tutorial/rose/furthertopics/rose-stem.html#rose.apps.ana_builtin.grepper.FilePattern">[docs]</a><span class="k">class</span> <span class="nc">FilePattern</span><span class="p">(</span><span class="n">SingleCommandPattern</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check for occurences of a particular expression or value within the</span>
+<span class="sd">    contents of two or more files.</span>
+
+<span class="sd">    Options:</span>
+<span class="sd">        files (optional):</span>
+<span class="sd">            Same as previous tasks.</span>
+<span class="sd">        kgo_file:</span>
+<span class="sd">            Same as previous tasks.</span>
+<span class="sd">        pattern:</span>
+<span class="sd">            The regular expression to search for in the files. The</span>
+<span class="sd">            expression should include one or more capture groups; each</span>
+<span class="sd">            of these will be compared between the files any time the</span>
+<span class="sd">            pattern occurs.</span>
+<span class="sd">        tolerance (optional):</span>
+<span class="sd">            By default the above comparisons will be compared exactly,</span>
+<span class="sd">            but if this argument is specified they will be converted to</span>
+<span class="sd">            float values and compared according to the given tolerance.</span>
+<span class="sd">            If this tolerance ends in % it will be interpreted as a</span>
+<span class="sd">            relative tolerance (otherwise absolute).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">run_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Main analysis routine called from rose_ana.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_files</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_kgo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_pattern</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_tolerance</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_unhandled</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_config_opts</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_for_skip</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1"># If the user has specified a KGO file, but it is missing, exit early</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kgo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kgo_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kgo</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">kgo_file</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                    <span class="s2">&quot;KGO File (file </span><span class="si">{0}</span><span class="s2">) appears to be missing&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kgo</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;[FAIL] &quot;</span><span class="p">)</span>
+                <span class="c1"># Note that by exiting early this task counts as failed</span>
+                <span class="k">return</span>
+
+        <span class="c1"># Generate the groupings - the pattern can match multiple times</span>
+        <span class="n">matched_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_for_matches</span><span class="p">()</span>
+
+        <span class="c1"># Check that the number of matchings found is equal in all files</span>
+        <span class="n">group_lens</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="k">for</span> <span class="n">groups</span> <span class="ow">in</span> <span class="n">matched_groups</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">igroup</span><span class="p">,</span> <span class="n">group_len</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">group_lens</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">if</span> <span class="n">group_len</span> <span class="o">!=</span> <span class="n">group_lens</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;File (</span><span class="si">{0}</span><span class="s2">) matches pattern </span><span class="si">{1}</span><span class="s2"> times, but File (</span><span class="si">{2}</span><span class="s2">) &quot;</span>
+                       <span class="s2">&quot;matches it </span><span class="si">{3}</span><span class="s2"> times, cannot test&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">group_lens</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">igroup</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">group_len</span><span class="p">))</span>
+
+        <span class="c1"># Compare the result of each matching</span>
+        <span class="n">passed</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
+        <span class="n">comparison_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">failure_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">igroup</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">group_lens</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">ref_group</span> <span class="o">=</span> <span class="n">matched_groups</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">igroup</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">ifile</span><span class="p">,</span> <span class="n">fname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="n">group</span> <span class="o">=</span> <span class="n">matched_groups</span><span class="p">[</span><span class="n">fname</span><span class="p">][</span><span class="n">igroup</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">imatch</span><span class="p">,</span> <span class="p">(</span><span class="n">match1</span><span class="p">,</span> <span class="n">match2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                        <span class="nb">zip</span><span class="p">(</span><span class="n">ref_group</span><span class="p">,</span> <span class="n">group</span><span class="p">)):</span>
+                    <span class="c1"># If a tolerance was given, the matches must be numbers</span>
+                    <span class="n">failed</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">comparison_total</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">match1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">match1</span><span class="p">)</span>
+                            <span class="n">match2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">match2</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Cannot do tolerance comparison, groups &quot;</span>
+                                   <span class="s2">&quot;matched by pattern are not reals&quot;</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_tol</span><span class="p">:</span>
+                            <span class="n">lower</span> <span class="o">=</span> <span class="n">match2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span>
+                            <span class="n">upper</span> <span class="o">=</span> <span class="n">match2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">lower</span> <span class="o">=</span> <span class="n">match2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span>
+                            <span class="n">upper</span> <span class="o">=</span> <span class="n">match2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">lower</span> <span class="o">&lt;=</span> <span class="n">match1</span> <span class="o">&lt;=</span> <span class="n">upper</span><span class="p">:</span>
+                            <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">elif</span> <span class="n">match1</span> <span class="o">!=</span> <span class="n">match2</span><span class="p">:</span>
+                        <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>
+
+                    <span class="c1"># Update the state of the current file if it failed above</span>
+                    <span class="k">if</span> <span class="n">failed</span><span class="p">:</span>
+                        <span class="n">passed</span><span class="p">[</span><span class="n">ifile</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="n">failure_total</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1"># Now move on to report the output of the comparison (if</span>
+                    <span class="c1"># the user&#39;s config limits the amount of output skip this)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_report_lines</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                            <span class="n">comparison_total</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_report_lines</span><span class="p">):</span>
+                        <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="n">failed</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Mismatch in group </span><span class="si">{0}</span><span class="s2"> of pattern for &quot;</span>
+                               <span class="s2">&quot;occurence </span><span class="si">{1}</span><span class="s2"> in files&quot;</span><span class="p">)</span>
+                        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;[FAIL] &quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                            <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">imatch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">igroup</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;File </span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">match1</span><span class="p">),</span>
+                                      <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ifile</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">match2</span><span class="p">),</span>
+                                      <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Group </span><span class="si">{0}</span><span class="s2"> of pattern for occurence </span><span class="si">{1}</span><span class="s2"> in &quot;</span>
+                               <span class="s2">&quot;files matches&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                            <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">imatch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">igroup</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Value: </span><span class="si">{0}</span><span class="s2">&quot;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">match1</span><span class="p">),</span>
+                                          <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;File </span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">match1</span><span class="p">),</span>
+                                          <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ifile</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">match2</span><span class="p">),</span>
+                                          <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+
+        <span class="c1"># If not all comparisons were printed, note it here</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_report_lines</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="n">comparison_total</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_report_lines</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="s2">&quot;... Some output omitted due to limit ...&quot;</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Performed </span><span class="si">{0}</span><span class="s2"> comparison</span><span class="si">{1}</span><span class="s2">, with </span><span class="si">{2}</span><span class="s2"> failure</span><span class="si">{3}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">comparison_total</span><span class="p">,</span>
+                                 <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comparison_total</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">),</span>
+                                 <span class="n">failure_total</span><span class="p">,</span>
+                                 <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">failure_total</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">)))</span>
+
+        <span class="c1"># If everything passed - the task did too</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">passed</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">passed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_kgo</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">process_opt_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the tolerance option; a value given either an absolute or</span>
+<span class="sd">        relative tolerance which a numeric value must lie within.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the tolerance from the options dictionary</span>
+        <span class="n">tolerance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tolerance&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Convert the tolerance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relative_tol</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Determine what type of tolerance it is and set the flag</span>
+            <span class="k">if</span> <span class="n">tolerance</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relative_tol</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">tolerance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tolerance</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                    <span class="s2">&quot;Relative (%) tolerance: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tolerance</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tolerance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tolerance</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reporter</span><span class="p">(</span>
+                    <span class="s2">&quot;Absolute tolerance: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tolerance</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span>
+
+    <span class="k">def</span> <span class="nf">search_for_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search the contents of the files for the patterns; returning a</span>
+<span class="sd">        dictionary whose keys are the file-names and whose values are</span>
+<span class="sd">        lists of the groupings (one for each occurrence)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matched_groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+            <span class="n">matched_groups</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+                <span class="n">search</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
+                    <span class="n">matched_groups</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">matched_groups</span></div>
+
+
+<div class="viewcode-block" id="FileCommandPattern"><a class="viewcode-back" href="../../../../tutorial/rose/furthertopics/rose-stem.html#rose.apps.ana_builtin.grepper.FileCommandPattern">[docs]</a><span class="k">class</span> <span class="nc">FileCommandPattern</span><span class="p">(</span><span class="n">FilePattern</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check for occurences of a particular expression or value in the standard</span>
+<span class="sd">    output from a command applied to two or more files.</span>
+
+<span class="sd">    Options:</span>
+<span class="sd">        files (optional):</span>
+<span class="sd">            Same as previous tasks.</span>
+<span class="sd">        kgo_file:</span>
+<span class="sd">            Same as previous tasks.</span>
+<span class="sd">        pattern:</span>
+<span class="sd">            Same as previous tasks.</span>
+<span class="sd">        tolerance (optional):</span>
+<span class="sd">            Same as previous tasks.</span>
+<span class="sd">        command:</span>
+<span class="sd">            The command to run; it should contain a Python style format</span>
+<span class="sd">            specifier to be expanded using the list of files above.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">run_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Main analysis routine called from rose_ana.&quot;&quot;&quot;</span>
+        <span class="c1"># Note that this is identical to the above class, only it has the</span>
+        <span class="c1"># additional command option; so call back to the parent class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_opt_command</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FileCommandPattern</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_analysis</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">search_for_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the command on each file then search its output for the pattern;</span>
+<span class="sd">        returning a dictionary whose keys are the file-names and whose values</span>
+<span class="sd">        are lists of the groupings (one for each occurrence).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matched_groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+            <span class="n">matched_groups</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="n">returncode</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                    <span class="n">search</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
+                        <span class="n">matched_groups</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Command failed, stderr: </span><span class="si">{0}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stderr</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">matched_groups</span></div>
+</pre></div>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

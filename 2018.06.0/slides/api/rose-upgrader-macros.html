@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Upgrade Macro API &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" />
+    <link rel="next" title="Rosie Web API" href="rosie-web.html" />
+    <link rel="prev" title="Rose Macro API" href="rose-macro.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-upgrade-macro-api">
+
+<h1>Rose Upgrade Macro API<a class="headerlink" href="../../html/api/rose-upgrader-macros.html#rose-upgrade-macro-api" title="View HTML">§</a></h1>
+
+<p>Rose upgrade macros are used to upgrade application configurations between
+metadata versions. They are classes, very similar to
+<a class="reference internal" href="rose-macro.html#api-rose-macro"><span class="std std-ref">transformer macros</span></a>, but with a few differences:</p>
+<ul class="simple">
+<li>An <code class="docutils literal notranslate"><span class="pre">upgrade</span></code> method instead of a <code class="docutils literal notranslate"><span class="pre">transform</span></code> method</li>
+<li>An optional <code class="docutils literal notranslate"><span class="pre">downgrade</span></code> method, identical in API to the <code class="docutils literal notranslate"><span class="pre">upgrade</span></code>
+method, but intended for performing the reverse operation</li>
+<li>A more helpful API via <a class="reference internal" href="#rose.upgrade.MacroUpgrade" title="rose.upgrade.MacroUpgrade"><code class="xref py py-class docutils literal notranslate"><span class="pre">rose.upgrade.MacroUpgrade</span></code></a> methods</li>
+<li><code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> and <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code> attributes - the version of metadata they
+apply to (<code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code>) and the version they upgrade to (<code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code>)</li>
+</ul>
+<p>An example upgrade macro might look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Upgrade272to273</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">upgrade</span><span class="o">.</span><span class="n">MacroUpgrade</span><span class="p">):</span>
+
+<span class="sd">&quot;&quot;&quot;Upgrade from 27.2 to 27.3.&quot;&quot;&quot;</span>
+
+<span class="n">BEFORE_TAG</span> <span class="o">=</span> <span class="s2">&quot;27.2&quot;</span>
+<span class="n">AFTER_TAG</span> <span class="o">=</span> <span class="s2">&quot;27.3&quot;</span>
+
+<span class="k">def</span> <span class="nf">upgrade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="s2">&quot;NEW_VARIABLE&quot;</span><span class="p">],</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">remove_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:old_things&quot;</span><span class="p">,</span> <span class="s2">&quot;OLD_VARIABLE&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The class name is unimportant - the <code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> and <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code>
+identify the macro.</p>
+</div>
+<p>Metadata versions are usually structured in a <code class="docutils literal notranslate"><span class="pre">rose-meta/CATEGORY/VERSION/</span></code>
+hierarchy - where <code class="docutils literal notranslate"><span class="pre">CATEGORY</span></code> denotes the type or family of application
+(sometimes it is the command used), and <code class="docutils literal notranslate"><span class="pre">VERSION</span></code> is the particular version
+e.g. <code class="docutils literal notranslate"><span class="pre">27.2</span></code> or <code class="docutils literal notranslate"><span class="pre">HEAD</span></code>.</p>
+<p>Upgrade macros live under the <code class="docutils literal notranslate"><span class="pre">CATEGORY</span></code> directory in a <code class="docutils literal notranslate"><span class="pre">versions.py</span></code>
+file - <code class="docutils literal notranslate"><span class="pre">rose-meta/CATEGORY/versions.py</span></code>.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If you have many upgrade macros, you may want to separate them into
+different modules in the same directory. You can then import from those
+in <code class="docutils literal notranslate"><span class="pre">versions.py</span></code>, so that they are still exposed in that module. You’ll
+need to make your directory a package by creating an <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file,
+which should contain the line <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">versions</span></code>. To avoid conflict with
+other <code class="docutils literal notranslate"><span class="pre">CATEGORY</span></code> upgrade modules (or other Python modules), please name
+these very modules carefully or use absolute or package level imports like
+this: <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">.versionXX_YY</span> <span class="pre">import</span> <span class="pre">FooBar</span></code>.</p>
+</div>
+<p>Upgrade macros are subclasses of <a class="reference internal" href="#rose.upgrade.MacroUpgrade" title="rose.upgrade.MacroUpgrade"><code class="xref py py-class docutils literal notranslate"><span class="pre">rose.upgrade.MacroUpgrade</span></code></a>. They
+have all the functionality of the <a class="reference internal" href="rose-macro.html#api-rose-macro"><span class="std std-ref">transformer macros</span></a>.</p>
+<dl class="class">
+<dt id="rose.upgrade.MacroUpgrade">
+<em class="property">class </em><code class="descclassname">rose.upgrade.</code><code class="descname">MacroUpgrade</code></dt>
+<dd><p>Class derived from MacroBase to aid upgrade functionality.</p>
+<dl class="method">
+<dt id="rose.upgrade.MacroUpgrade.act_from_files">
+<code class="descname">act_from_files</code><span class="sig-paren">(</span><em>config</em>, <em>downgrade=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Parse a change configuration into actions.</p>
+<p>Searches for:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">etc/VERSION/rose-macro-add.conf</span></code> (settings to be added)</li>
+<li><code class="docutils literal notranslate"><span class="pre">etc/VERSION/rose-macro-remove.conf</span></code> (settings to be removed)</li>
+</ul>
+<p>Where <code class="docutils literal notranslate"><span class="pre">VERSION</span></code> is equal to <code class="docutils literal notranslate"><span class="pre">self.BEFORE_TAG</span></code>.</p>
+<p>If settings are defined in either file, and changes can be made, the
+<code class="docutils literal notranslate"><span class="pre">self.reports</span></code> will be updated automatically.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">act_from_files</span></code> can be used in combination with other
+methods as part of the same upgrade.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The application configuration.</li>
+<li><strong>downgrade</strong> (<em>bool</em>) – True if downgrading.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.upgrade.MacroUpgrade.add_setting">
+<code class="descname">add_setting</code><span class="sig-paren">(</span><em>config</em>, <em>keys</em>, <em>value=None</em>, <em>forced=False</em>, <em>state=None</em>, <em>comments=None</em>, <em>info=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Add a setting to the configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The application configuration.</li>
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</li>
+<li><strong>value</strong> (<em>string - optional</em>) – String denoting the new setting value.
+Required for options but not for settings.</li>
+<li><strong>forced</strong> (<em>bool - optional</em>) – If True override value if the setting already exists.</li>
+<li><strong>state</strong> (<em>str - optional</em>) – The state of the new setting - should be one of the
+<code class="docutils literal notranslate"><span class="pre">rose.config.ConfigNode</span></code> states e.g.
+<code class="docutils literal notranslate"><span class="pre">rose.config.ConfigNode.STATE_USER_IGNORED</span></code>. Defaults to
+<code class="docutils literal notranslate"><span class="pre">rose.config.ConfigNode.STATE_NORMAL</span></code>.</li>
+<li><strong>comments</strong> (<em>list - optional</em>) – List of comment lines (strings) for
+the new setting or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</li>
+<li><strong>info</strong> (<em>string - optional</em>) – A short string containing no new lines,
+describing the addition of the setting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.upgrade.MacroUpgrade.change_setting_value">
+<code class="descname">change_setting_value</code><span class="sig-paren">(</span><em>config</em>, <em>keys</em>, <em>value</em>, <em>forced=False</em>, <em>comments=None</em>, <em>info=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Change a setting (option) value in the configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The application configuration.</li>
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</li>
+<li><strong>value</strong> (<em>string</em>) – The new value. Required for options, can be
+<code class="docutils literal notranslate"><span class="pre">None</span></code> for sections.</li>
+<li><strong>forced</strong> (<em>bool</em>) – Create the setting if it is not present in config.</li>
+<li><strong>comments</strong> (<em>list - optional</em>) – List of comment lines (strings) for
+the new setting or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</li>
+<li><strong>info</strong> (<em>string - optional</em>) – A short string containing no new lines,
+describing the addition of the setting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.upgrade.MacroUpgrade.enable_setting">
+<code class="descname">enable_setting</code><span class="sig-paren">(</span><em>config</em>, <em>keys</em>, <em>info=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Enable a setting in the configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The application configuration.</li>
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</li>
+<li><strong>info</strong> (<em>string - optional</em>) – A short string containing no new lines,
+describing the addition of the setting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">False - if the setting’s state is not changed else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.upgrade.MacroUpgrade.get_setting_value">
+<code class="descname">get_setting_value</code><span class="sig-paren">(</span><em>config</em>, <em>keys</em>, <em>no_ignore=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Return the value of a setting or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The application configuration.</li>
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</li>
+<li><strong>no_ignore</strong> (<em>bool - optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the
+setting is ignored (else return the value).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">object - The setting value or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not defined.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.upgrade.MacroUpgrade.ignore_setting">
+<code class="descname">ignore_setting</code><span class="sig-paren">(</span><em>config</em>, <em>keys</em>, <em>info=None</em>, <em>state='!'</em><span class="sig-paren">)</span></dt>
+<dd><p>User-ignore a setting in the configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The application configuration.</li>
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</li>
+<li><strong>info</strong> (<em>string - optional</em>) – A short string containing no new lines,
+describing the addition of the setting.</li>
+<li><strong>state</strong> (<em>string - optional</em>) – A <code class="docutils literal notranslate"><span class="pre">rose.config.ConfigNode</span></code> state.
+<code class="docutils literal notranslate"><span class="pre">STATE_USER_IGNORED</span></code> by default.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">False - if the setting’s state is not changed else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.upgrade.MacroUpgrade.remove_setting">
+<code class="descname">remove_setting</code><span class="sig-paren">(</span><em>config</em>, <em>keys</em>, <em>info=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Remove a setting from the configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The application configuration.</li>
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</li>
+<li><strong>info</strong> (<em>string - optional</em>) – A short string containing no new lines,
+describing the addition of the setting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rose.upgrade.MacroUpgrade.rename_setting">
+<code class="descname">rename_setting</code><span class="sig-paren">(</span><em>config</em>, <em>keys</em>, <em>new_keys</em>, <em>info=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Rename a setting in the configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="configuration/api.html#rose.config.ConfigNode" title="rose.config.ConfigNode"><em>rose.config.ConfigNode</em></a>) – The application configuration.</li>
+<li><strong>keys</strong> (<em>list</em>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</li>
+<li><strong>new_keys</strong> (<em>list</em>) – The new hierarchy of node.value ‘keys’.</li>
+<li><strong>info</strong> (<em>string - optional</em>) – A short string containing no new lines,
+describing the addition of the setting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

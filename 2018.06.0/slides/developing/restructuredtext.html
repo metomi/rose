@@ -1,0 +1,175 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>reStructuredText &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="restructuredtext">
+
+<h1>reStructuredText<a class="headerlink" href="../../html/developing/restructuredtext.html#restructuredtext" title="View HTML">§</a></h1>
+
+
+
+
+
+</article>
+<article class="slide level-2" id="reference">
+
+<h2>Reference<a class="headerlink" href="../../html/developing/restructuredtext.html#reference" title="View HTML">§</a></h2>
+
+<p>For reference material see:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html">reStructuredText Markup Specification</a></li>
+<li><a class="reference external" href="http://www.sphinx-doc.org/en/stable/rest.html">Sphinx Markup Documentation</a></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="headings">
+
+<h2>Headings<a class="headerlink" href="../../html/developing/restructuredtext.html#headings" title="View HTML">§</a></h2>
+
+<p>Headings are text lines which are underlined. The underline character can be
+any of:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>! &quot; # $ % &amp; &#39; ( ) * + , - . / : ; &lt; = &gt; ? @ [ \ ] ^ _ ` { | } ~
+</pre></div>
+</div>
+<p>Different characters are used to define different document levels e.g. section,
+sub-section, etc. reStructuredText doesn’t actually care which character you
+use for each role, it infers precedence from the order of appearance.</p>
+<p>For consistency this documentation has been written in the standard-ish manner
+with:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="gh">Heading</span>
+<span class="gh">=======</span>
+
+<span class="gh">Sub Heading</span>
+<span class="gh">-----------</span>
+
+<span class="gh">Sub-Sub Heading</span>
+<span class="gh">^^^^^^^^^^^^^^^</span>
+
+<span class="gh">Totally Irrelevant Heading</span>
+<span class="gh">&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>For consistency:</p>
+<ul class="simple">
+<li>Top level headings always appear at the top of the document (only one per
+document).</li>
+<li>First level headings are preceded by two blank lines and followed by one.</li>
+<li>Lower level headings are preceded and followed by a single blank line.</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="indention">
+
+<h2>Indention<a class="headerlink" href="../../html/developing/restructuredtext.html#indention" title="View HTML">§</a></h2>
+
+<p>reStructuredText uses adaptive indentation so that following lines are
+flush with the directive or element which started them e.g:</p>
+<ul>
+<li><p class="first">Directives are followed by three space indentation:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">note</span><span class="p">::</span>
+
+   Foo
+   Bar
+   Baz
+</pre></div>
+</div>
+</li>
+<li><p class="first">Bullet Lists use two space indentation:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="m">*</span> Foo
+  Bar
+  Baz
+</pre></div>
+</div>
+</li>
+<li><p class="first">Numbered lists use three space indenation:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="m">#.</span> Foo
+   Bar
+
+<span class="m">1.</span> Bar
+   Pub
+</pre></div>
+</div>
+</li>
+</ul>
+<p>For consistency with directives three space indentation is used with
+definition lists:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>Item
+   Description.
+</pre></div>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

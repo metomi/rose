@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Configurations &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Tutorial" href="index.html" />
+    <link rel="next" title="Rose Applications" href="applications.html" />
+    <link rel="prev" title="Rose Tutorial" href="index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <blockquote>
+<div></div></blockquote>
+
+<article class="slide level-1" id="rose-configurations">
+
+<h1>Rose Configurations<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#rose-configurations" title="View HTML">§</a></h1>
+
+<p><a class="reference internal" href="../../glossary.html#term-rose-configuration"><span class="xref std std-term">Rose configurations</span></a> are directories containing a
+Rose configuration file along with other optional assets which define
+behaviours such as:</p>
+<ul class="simple">
+<li>Execution.</li>
+<li>File installation.</li>
+<li>Environment variables.</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-1" id="id1">
+
+<h1>Rose Configurations<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#id1" title="View HTML">§</a></h1>
+
+<p>The two rose configurations for use with Cylc:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../../glossary.html#term-rose-application-configuration"><span class="xref std std-term">Rose application configuration</span></a></li>
+<li><a class="reference internal" href="../../glossary.html#term-rose-suite-configuration"><span class="xref std std-term">Rose suite configuration</span></a></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="rose-configuration-format">
+
+<h2>Rose Configuration Format<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#rose-configuration-format" title="View HTML">§</a></h2>
+
+<p class="rubric">Like the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> format:</p>
+<ul class="simple">
+<li>Comments start with a <code class="docutils literal notranslate"><span class="pre">#</span></code> character.</li>
+<li>Settings are written as <code class="docutils literal notranslate"><span class="pre">key=value</span></code> pairs.</li>
+<li>Sections are written inside square brackets i.e. <code class="docutils literal notranslate"><span class="pre">[section-name]</span></code></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Rose Configuration Format<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#id2" title="View HTML">§</a></h2>
+
+<p class="rubric">Unlike the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> format:</p>
+<ul class="simple">
+<li>Sections cannot be nested.</li>
+<li>Settings should not be indented.</li>
+<li>Comments must start on a new line (i.e. you cannot have inline comments).</li>
+<li>There should not be spaces around the <code class="docutils literal notranslate"><span class="pre">=</span></code> operator in a <code class="docutils literal notranslate"><span class="pre">key=value</span></code> pair.</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Rose Configuration Format<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#id3" title="View HTML">§</a></h2>
+
+<p>For example:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="c1"># Comment.</span>
+<span class="nv">setting</span><span class="o">=</span><span class="s">value</span>
+
+<span class="nt">[section]</span>
+<span class="nv">key</span><span class="o">=</span><span class="s">value</span>
+<span class="nv">multi-line-setting</span><span class="o">=</span><span class="s">multi</span>
+                  <span class="o">=</span><span class="s">line</span>
+                  <span class="o">=</span><span class="s">value</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id4">
+
+<h2>Rose Configuration Format<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#id4" title="View HTML">§</a></h2>
+
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p class="last">In Rose configuration files settings do not normally require quotation.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id5">
+
+<h2>Rose Configuration Format<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#id5" title="View HTML">§</a></h2>
+
+<p>Throughout this tutorial we will refer to settings in the following format:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">file</span></code> - will refer to a Rose configuration <em>file</em>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">file|setting</span></code> - will refer to a <em>setting</em> in a Rose configuration file.</li>
+<li><code class="docutils literal notranslate"><span class="pre">file[section]</span></code> - will refer to a <em>section</em> in a Rose configuration file.</li>
+<li><code class="docutils literal notranslate"><span class="pre">file[section]setting</span></code> - will refer to a <em>setting in a section</em> in a Rose
+configuration file.</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="why-use-rose-configurations">
+
+<h2>Why Use Rose Configurations?<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#why-use-rose-configurations" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li>Encapsulation</li>
+<li>Validation</li>
+<li>Editing</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="id6">
+
+<h2>Why Use Rose Configurations?<a class="headerlink" href="../../../html/tutorial/rose/configurations.html#id6" title="View HTML">§</a></h2>
+
+<p>Next section: <a class="reference internal" href="applications.html#tutorial-rose-applications"><span class="std std-ref">Rose Applications</span></a></p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

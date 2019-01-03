@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Families &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="Consolidating Configuration" href="index.html" />
+    <link rel="next" title="Jinja2" href="jinja2.html" />
+    <link rel="prev" title="Consolidating Configuration" href="index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="families">
+
+<h1>Families<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#families" title="View HTML">§</a></h1>
+
+<p><a class="reference internal" href="../../../../glossary.html#term-family"><span class="xref std std-term">Families</span></a> provide a way of grouping tasks together so they can
+be treated as one.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="runtime">
+
+<h2>Runtime<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#runtime" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[GET_OBSERVATIONS]]</span>
+    <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+    <span class="nt">[[[environment]]]</span>
+        <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+</pre></div>
+</div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[get_observations_heathrow]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> GET_OBSERVATIONS</span>
+    <span class="nt">[[[environment]]]</span>
+        <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3772</span>
+</pre></div>
+</div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[get_observations_heathrow]]</span>
+    <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+    <span class="nt">[[[environment]]]</span>
+        <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+        <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3772</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id1">
+
+<h2>Runtime<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#id1" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[get_observations_heathrow]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> GET_OBSERVATIONS</span>
+    <span class="nt">[[[environment]]]</span>
+<span class="hll">        <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> special-api-key</span>
+</span>        <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3772</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id2">
+
+<h2>Runtime<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#id2" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[GET_OBSERVATIONS]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+
+    <span class="nt">[[get_observations_heathrow]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> GET_OBSERVATIONS</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3772</span>
+    <span class="nt">[[get_observations_camborne]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> GET_OBSERVATIONS</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3808</span>
+    <span class="nt">[[get_observations_shetland]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> GET_OBSERVATIONS</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3005</span>
+    <span class="nt">[[get_observations_belmullet]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> GET_OBSERVATIONS</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3976</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="graphing">
+
+<h2>Graphing<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#graphing" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">GET_OBSERVATIONS</span><span class="c">:</span><span class="kd">succeed</span><span class="c">-</span><span class="kd">all</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+</pre></div>
+</div>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">get_observations_heathrow</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+<span class="kd">get_observations_camborne</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+<span class="kd">get_observations_shetland</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+<span class="kd">get_observations_belmullet</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">succeed-all</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">succeed-any</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">finish-all</span></code></li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-root-family">
+
+<h2>The <code class="docutils literal notranslate"><span class="pre">root</span></code> Family<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#the-root-family" title="View HTML">§</a></h2>
+
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">FOO </span><span class="o">=</span><span class="s"> foo</span>
+    <span class="nt">[[bar]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> echo $FOO</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="families-and-cylc-graph">
+
+<h2>Families and <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code><a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#families-and-cylc-graph" title="View HTML">§</a></h2>
+
+<div align="center" class="align-center"><object data="../../../../_images/graphviz-3b205f8434a6746437b525855b090f29e2951e94.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+subgraph cluster_1 {
+   label = &quot;Grouped&quot;
+   &quot;foo.1&quot; [label=&quot;foo&quot;]
+   &quot;BAR.1&quot; [label=&quot;BAR&quot;, shape=&quot;doubleoctagon&quot;]
+}
+
+subgraph cluster_2 {
+   label = &quot;Un-Grouped&quot;
+   &quot;foo.2&quot; [label=&quot;foo&quot;]
+   &quot;bar.2&quot; [label=&quot;bar&quot;]
+   &quot;baz.2&quot; [label=&quot;baz&quot;]
+}
+
+&quot;foo.1&quot; -&gt; &quot;BAR.1&quot;
+&quot;foo.2&quot; -&gt; &quot;bar.2&quot;
+&quot;foo.2&quot; -&gt; &quot;baz.2&quot;
+}</p></object>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>Families and <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code><a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#id3" title="View HTML">§</a></h2>
+
+<p class="rubric">In this practical we will consolidate the configuration of the
+<a class="reference internal" href="../runtime-configuration.html#tutorial-cylc-runtime-forecasting-suite"><span class="std std-ref">weather-forecasting suite</span></a>
+from the previous section.</p>
+<p>Next section: <a class="reference internal" href="jinja2.html#tutorial-cylc-jinja2"><span class="std std-ref">Jinja2</span></a></p>
+<div class="note admonition" id="cylc-tutorial-families-practical">
+<p class="first admonition-title">Practical<a class="headerlink" href="../../../../../html/tutorial/cylc/runtime/configuration-consolidation/families.html#cylc-tutorial-families-practical" title="View HTML">§</a></p>
+<p class="rubric">In this practical we will consolidate the configuration of the
+<a class="reference internal" href="../runtime-configuration.html#tutorial-cylc-runtime-forecasting-suite"><span class="std std-ref">weather-forecasting suite</span></a>
+from the previous section.</p>
+<ol class="last arabic">
+<li><p class="first"><strong>Create A New Suite.</strong></p>
+<p>To make a new copy of the forecasting suite run the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose tutorial consolidation-tutorial
+<span class="nb">cd</span> ~/cylc-run/consolidation-tutorial
+</pre></div>
+</div>
+<p>Set the intial and final cycle points as you did in the
+<a class="reference internal" href="../runtime-configuration.html#tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points"><span class="std std-ref">previous tutorial</span></a>.</p>
+</li>
+<li><p class="first"><strong>Move Site-Wide Settings Into The</strong> <code class="docutils literal notranslate"><span class="pre">root</span></code> <strong>Family.</strong></p>
+<p>The following three environment variables are used by multiple tasks:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>PYTHONPATH=&quot;$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH&quot;
+RESOLUTION = 0.2
+DOMAIN = -12,48,5,61  # Do not change!
+</pre></div>
+</div>
+<p>Rather than manually adding them to each task individually we could put
+them in the <code class="docutils literal notranslate"><span class="pre">root</span></code> family, making them accessible to all tasks.</p>
+<p>Add a <code class="docutils literal notranslate"><span class="pre">root</span></code> section containing these three environment variables.
+Remove the variables from any other task’s <code class="docutils literal notranslate"><span class="pre">environment</span></code> sections:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span> [runtime]
+<span class="gi">+    [[root]]</span>
+<span class="gi">+        [[[environment]]]</span>
+<span class="gi">+            # Add the `python` directory to the PYTHONPATH.</span>
+<span class="gi">+            PYTHONPATH=&quot;$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH&quot;</span>
+<span class="gi">+            # The dimensions of each grid cell in degrees.</span>
+<span class="gi">+            RESOLUTION = 0.2</span>
+<span class="gi">+            # The area to generate forecasts for (lng1, lat1, lng2, lat2).</span>
+<span class="gi">+            DOMAIN = -12,48,5,61  # Do not change!</span>
+</pre></div>
+</div>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span> [[consolidate_observations]]
+     script = consolidate-observations
+<span class="gd">-    [[[environment]]]</span>
+<span class="gd">-        # Add the `python` directory to the PYTHONPATH.</span>
+<span class="gd">-        PYTHONPATH=&quot;$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH&quot;</span>
+<span class="gd">-        # The dimensions of each grid cell in degrees.</span>
+<span class="gd">-        RESOLUTION = 0.2</span>
+<span class="gd">-        # The area to generate forecasts for (lng1, lat1, lng2, lat2).</span>
+<span class="gd">-        DOMAIN = -12,48,5,61  # Do not change!</span>
+
+ [[get_rainfall]]
+     script = get-rainfall
+     [[[environment]]]
+         # The key required to get weather data from the DataPoint service.
+         # To use archived data comment this line out.
+         API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+<span class="gd">-        # Add the `python` directory to the PYTHONPATH.</span>
+<span class="gd">-        PYTHONPATH=&quot;$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH&quot;</span>
+<span class="gd">-        # The dimensions of each grid cell in degrees.</span>
+<span class="gd">-        RESOLUTION = 0.2</span>
+<span class="gd">-        # The area to generate forecasts for (lng1, lat1, lng2, lat2).</span>
+<span class="gd">-        DOMAIN = -12,48,5,61  # Do not change!</span>
+
+ [[forecast]]
+     script = forecast 60 5  # Generate 5 forecasts at 60 minute intervals.
+     [[[environment]]]
+<span class="gd">-        # Add the `python` directory to the PYTHONPATH.</span>
+<span class="gd">-        PYTHONPATH=&quot;$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH&quot;</span>
+<span class="gd">-        # The dimensions of each grid cell in degrees.</span>
+<span class="gd">-        RESOLUTION = 0.2</span>
+<span class="gd">-        # The area to generate forecasts for (lng1, lat1, lng2, lat2)</span>
+<span class="gd">-        DOMAIN = -12,48,5,61  # Do not change!</span>
+         # The path to the files containing wind data (the {variables} will
+         # get substituted in the forecast script).
+         WIND_FILE_TEMPLATE = $CYLC_SUITE_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
+         # List of cycle points to process wind data from.
+         WIND_CYCLES = 0, -3, -6
+
+         # The path to the rainfall file.
+         RAINFALL_FILE = $CYLC_SUITE_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
+         # Create the html map file in the task&#39;s log directory.
+         MAP_FILE = &quot;${CYLC_TASK_LOG_ROOT}-map.html&quot;
+         # The path to the template file used to generate the html map.
+         MAP_TEMPLATE = &quot;$CYLC_SUITE_RUN_DIR/lib/template/map.html&quot;
+
+ [[post_process_exeter]]
+     # Generate a forecast for Exeter 60 minutes into the future.
+     script = post-process exeter 60
+<span class="gd">-    [[[environment]]]</span>
+<span class="gd">-        # Add the `python` directory to the PYTHONPATH.</span>
+<span class="gd">-        PYTHONPATH=&quot;$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH&quot;</span>
+<span class="gd">-        # The dimensions of each grid cell in degrees.</span>
+<span class="gd">-        RESOLUTION = 0.2</span>
+<span class="gd">-        # The area to generate forecasts for (lng1, lat1, lng2, lat2).</span>
+<span class="gd">-        DOMAIN = -12,48,5,61  # Do not change!</span>
+</pre></div>
+</div>
+<p>To ensure that the environment variables are being inherited correctly
+by the tasks, inspect the <code class="docutils literal notranslate"><span class="pre">[runtime]</span></code> section using <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code>
+by running the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc get-config . --sparse -i <span class="s2">&quot;[runtime]&quot;</span>
+</pre></div>
+</div>
+<p>You should see the environment variables from the <code class="docutils literal notranslate"><span class="pre">[root]</span></code> section
+in the <code class="docutils literal notranslate"><span class="pre">[environment]</span></code> section for all tasks.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>You may find it easier to open the output of this command in a text
+editor, e.g:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">get</span><span class="o">-</span><span class="n">config</span> <span class="o">.</span> <span class="o">--</span><span class="n">sparse</span> <span class="o">-</span><span class="n">i</span> <span class="s2">&quot;[runtime]&quot;</span> <span class="o">|</span> <span class="n">gvim</span> <span class="o">-</span>
+</pre></div>
+</div>
+</div>
+</li>
+</ol>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

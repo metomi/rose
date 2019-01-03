@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Arch &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Rose Bunch" href="rose-bunch.html" />
+    <link rel="prev" title="Polling" href="polling.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-arch">
+
+<h1>Rose Arch<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-arch.html#rose-arch" title="View HTML">§</a></h1>
+
+<p><a class="reference internal" href="../../../api/built-in/rose_arch.html#rose:app:rose_arch" title="rose:app:rose_arch"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_arch</span></code></a> is a built-in <a class="reference internal" href="../../../glossary.html#term-rose-app"><span class="xref std std-term">Rose app</span></a> that provides a generic
+solution to the archiving of suite files.</p>
+<div class="hint admonition">
+<p class="first admonition-title">Good Practice</p>
+<p class="last">Only archive the minimum files needed at each cycle of your suite. Run
+the archiving task before any housekeeping in the graph.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-arch.html#example" title="View HTML">§</a></h2>
+
+<p>Create a new Rose suite configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">arch</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>Create a blank <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> and a <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code>
+file that looks like this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[cylc]</span>
+    <span class="nv">UTC mode </span><span class="o">=</span><span class="s"> True</span> <span class="c1"># Ignore DST</span>
+    <span class="nt">[[events]]</span>
+        <span class="nv">abort on timeout </span><span class="o">=</span><span class="s"> True</span>
+        <span class="nv">timeout </span><span class="o">=</span><span class="s"> PT1H</span>
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">make_files</span> <span class="o">=&gt;</span> <span class="kd">archive_files_rsync</span> <span class="o">=&gt;</span> <span class="kd">archive_files_scp</span>
+<span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nv">env-script </span><span class="o">=</span><span class="s"> eval $(rose task-env)</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rose task-run</span>
+
+    <span class="nt">[[make_files]]</span>
+        <span class="nv">script </span><span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            echo &#39;zip&#39; &gt;&gt; $ROSE_DATAC/file_zip</span>
+<span class="s2">            echo &#39;solo&#39; &gt;&gt; $ROSE_DATAC/file_solo</span>
+<span class="s2">            echo &#39;list1&#39; &gt;&gt; $ROSE_DATA/file_list1</span>
+<span class="s2">            echo &#39;list2&#39; &gt;&gt; $ROSE_DATA/file_list2</span>
+<span class="s2">            echo &#39;list3&#39; &gt;&gt; $ROSE_DATA/file_list3</span>
+<span class="s2">            mkdir -p $ROSE_DATA/ARCHIVING || true</span>
+<span class="s2">            mkdir -p $ROSE_DATA/ARCHIVING/rename || true</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="nt">[[archive_files_rsync]]</span>
+    <span class="nt">[[archive_files_scp]]</span>
+</pre></div>
+</div>
+<p>In the suite directory create an <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">app</span>
+</pre></div>
+</div>
+<p>In the app directory create an <code class="docutils literal notranslate"><span class="pre">archive_files_rsync/</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">app</span>
+<span class="n">mkdir</span> <span class="n">archive_files_rsync</span>
+</pre></div>
+</div>
+<p>In the <code class="docutils literal notranslate"><span class="pre">app/archive_files_rsync/</span></code> directory create a
+<a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file. This example uses <code class="docutils literal notranslate"><span class="pre">vi</span></code>, but please use your
+editor of choice:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">archive_files_rsync</span>
+<span class="n">vi</span> <span class="n">rose</span><span class="o">-</span><span class="n">app</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>Paste in the following lines:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">mode</span><span class="o">=</span><span class="s">rose_arch</span>
+
+<span class="nt">[env]</span>
+<span class="nv">ARCH_TARGET</span><span class="o">=</span><span class="s">$ROSE_DATA/ARCHIVING</span>
+
+<span class="nt">[arch]</span>
+<span class="nv">command-format</span><span class="o">=</span><span class="s">rsync -a %(sources)s %(target)s</span>
+<span class="nv">source-prefix</span><span class="o">=</span><span class="s">$ROSE_DATAC/</span>
+<span class="nv">target-prefix</span><span class="o">=</span><span class="s">$ARCH_TARGET/</span>
+<span class="nv">update-check</span><span class="o">=</span><span class="s">mtime+size</span>
+
+<span class="nt">[arch:solo.file]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">file_solo</span>
+
+<span class="nt">[arch:files]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">file_list1 file_list3</span>
+<span class="nv">source-prefix</span><span class="o">=</span><span class="s">$ROSE_DATA/</span>
+
+<span class="nt">[arch:dir]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">file*</span>
+<span class="nv">source-prefix</span><span class="o">=</span><span class="s">$ROSE_DATA/</span>
+
+<span class="nt">[arch:file_zipped.tar]</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">file_zip</span>
+</pre></div>
+</div>
+<p>Move to the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">..</span>
+<span class="n">ls</span>
+</pre></div>
+</div>
+<p>The following should be returned:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>archive_files_rsync
+</pre></div>
+</div>
+<p>Create an <code class="docutils literal notranslate"><span class="pre">archive_files_scp/</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">archive_files_scp</span>
+</pre></div>
+</div>
+<p>In the <code class="docutils literal notranslate"><span class="pre">archive_files_scp/</span></code> directory create a <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a>
+file. This example uses <code class="docutils literal notranslate"><span class="pre">vi</span></code>, but please use your editor of choice:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">archive_files_scp</span>
+<span class="n">vi</span> <span class="n">rose</span><span class="o">-</span><span class="n">app</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>Paste in the following lines:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">mode</span><span class="o">=</span><span class="s">rose_arch</span>
+
+<span class="nt">[env]</span>
+<span class="nv">ARCH_TARGET</span><span class="o">=</span><span class="s">$ROSE_DATA/ARCHIVING</span>
+
+<span class="nt">[arch]</span>
+<span class="nv">command-format</span><span class="o">=</span><span class="s">scp %(sources)s %(target)s</span>
+<span class="nv">source-prefix</span><span class="o">=</span><span class="s">$ROSE_DATA/</span>
+<span class="nv">target-prefix</span><span class="o">=</span><span class="s">$ARCH_TARGET/</span>
+<span class="nv">update-check</span><span class="o">=</span><span class="s">mtime+size</span>
+
+<span class="nt">[arch:rename/]</span>
+<span class="nv">rename-format</span><span class="o">=</span><span class="s">%(cycle)s_%(tag)s_%(name)s</span>
+<span class="nv">rename-parser</span><span class="o">=</span><span class="s">^.*list(?P&lt;tag&gt;.*)$</span>
+<span class="nv">source</span><span class="o">=</span><span class="s">file_list?</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="description">
+
+<h2>Description<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-arch.html#description" title="View HTML">§</a></h2>
+
+<p>You have now created a suite that defines three tasks:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">make_files</span></code></dt>
+<dd>Sets up the files and <code class="docutils literal notranslate"><span class="pre">ARCHIVING/</span></code> directory for <code class="docutils literal notranslate"><span class="pre">archive_files_rsync/</span></code>
+and <code class="docutils literal notranslate"><span class="pre">archive_files_scp/</span></code> to “archive”, move, data to.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">archive_files_rsync</span></code></dt>
+<dd>“Archives” (<code class="docutils literal notranslate"><span class="pre">rsync</span></code>’s) files to the <code class="docutils literal notranslate"><span class="pre">ARCHIVING/</span></code> folder in the
+<code class="docutils literal notranslate"><span class="pre">$ROSE_DATA/</span></code> directory.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">archive_files_scp</span></code></dt>
+<dd>“Archives” (<code class="docutils literal notranslate"><span class="pre">scp</span></code>’s) the renamed files and moves them to the <code class="docutils literal notranslate"><span class="pre">ARCHIVING/</span></code>
+folder in the <code class="docutils literal notranslate"><span class="pre">$ROSE_DATA/</span></code> directory.</dd>
+</dl>
+<p>Save your changes and run the suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">suite</span><span class="o">-</span><span class="n">run</span>
+</pre></div>
+</div>
+<p>View the suite output using <a class="reference internal" href="../../../api/command-reference.html#command-rose-suite-log"><span class="std std-ref">rose suite-log</span></a> and inspect the
+output of the <code class="docutils literal notranslate"><span class="pre">make_files</span></code>, <code class="docutils literal notranslate"><span class="pre">archive_files_rsync</span></code> and <code class="docutils literal notranslate"><span class="pre">archive_files_scp</span></code>
+tasks.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="results-of-archiving">
+
+<h2>Results Of “Archiving”<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-arch.html#results-of-archiving" title="View HTML">§</a></h2>
+
+<p>Change to the <code class="docutils literal notranslate"><span class="pre">$ROSE_DATA/ARCHVING/</span></code> directory of the suite i.e:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cd ~/cylc-run/<span class="s">&lt;name&gt;</span>/share/data/ARCHIVING/
+</pre></div>
+</div>
+<p>List the directory by typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ls</span>
+</pre></div>
+</div>
+<p>You should see the following returned:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dir  file_zipped.tar  files  rename  solo.file
+</pre></div>
+</div>
+<p>Change directory to <code class="docutils literal notranslate"><span class="pre">files/</span></code> and list the files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">files</span>
+<span class="n">ls</span>
+</pre></div>
+</div>
+<p>The following should be returned:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>file_list1  file_list3
+</pre></div>
+</div>
+<p>Change directory to <code class="docutils literal notranslate"><span class="pre">ARCHIVING/dir/</span></code> and list the files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">..</span>
+<span class="n">cd</span> <span class="nb">dir</span>
+<span class="n">ls</span>
+</pre></div>
+</div>
+<p>The following should be returned:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>file_list1  file_list2 file_list3
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">These were all of the files in the <code class="docutils literal notranslate"><span class="pre">$ROSE_DATA/</span></code> directory.</p>
+</div>
+<p>Change diectory to <code class="docutils literal notranslate"><span class="pre">ARCHIVING/rename/</span></code> and list the files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">..</span>
+<span class="n">cd</span> <span class="n">rename</span>
+<span class="n">ls</span>
+</pre></div>
+</div>
+<p>The following should be returned:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1_1_file_list1 1_2_file_list2 1_3_file_list3
+</pre></div>
+</div>
+<p>These are the renamed files.</p>
+<p>Most users will have their own system or location that they wish to archive
+their data to. Here the example shown uses <a class="reference external" href="https://linux.die.net/man/1/rsync">rsync</a> and <a class="reference external" href="https://www.lifewire.com/rcp-scp-ftp-commands-for-copying-files-3971107">scp</a>.
+Please refer your own site specific archiving solutions and seek site
+specfic advice.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="arch-settings">
+
+<h2>Arch Settings<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/rose-arch.html#arch-settings" title="View HTML">§</a></h2>
+
+<p>Some settings that can be used are described below. See the <a class="reference internal" href="../../../api/built-in/rose_arch.html#rose-arch"><span class="std std-ref">rose_arch</span></a>
+documentation for more information:</p>
+<p>Above <code class="docutils literal notranslate"><span class="pre">.tar</span></code> was used to compress the file. However, <code class="docutils literal notranslate"><span class="pre">compress=gzip</span></code>
+can also be used. Note either of these commands can be used to compress a
+file or a folder/directory.</p>
+<p>In the above example a regular expression ‘reg exp’ was used by the
+<code class="docutils literal notranslate"><span class="pre">rename-parser</span></code>, for example, <code class="docutils literal notranslate"><span class="pre">^.*list(?P&lt;tag&gt;.*)$</span></code>, where:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">^</span></code> = start of a string.</li>
+<li><code class="docutils literal notranslate"><span class="pre">$</span></code> = end of a string.</li>
+<li><code class="docutils literal notranslate"><span class="pre">.</span></code> = any character.</li>
+<li><code class="docutils literal notranslate"><span class="pre">*</span></code> = <a class="reference external" href="https://stackoverflow.com/questions/2301285/what-do-lazy-and-greedy-mean-in-the-context-of-regular-expressions">greedy</a> (all).</li>
+<li><code class="docutils literal notranslate"><span class="pre">?P&lt;NAME&gt;</span></code> = named group.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">arch</span></code> uses the <a class="reference external" href="https://docs.python.org/2/howto/regex.html">Python flavor</a> for regular expressions.</p>
+</div>
+<p>In the above example source was used to accept a list of glob patterns.
+For example, <code class="docutils literal notranslate"><span class="pre">file_list?</span></code> was used where the <code class="docutils literal notranslate"><span class="pre">?</span></code> relates to one unknown
+character.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">These examples are just some possible examples and not a full list.</p>
+</div>
+<p>As well as <a class="reference internal" href="../../../api/built-in/rose_arch.html#rose:conf:rose_arch[arch]" title="rose:conf:rose_arch[arch]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_arch[arch]</span></code></a> and <code class="docutils literal notranslate"><span class="pre">[arch:TARGET]</span></code> other options
+can be provided to the app, for example:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">[env]</span></code></dt>
+<dd><p class="first">Can be defined near the top of the app to allow an environment variable
+to be available to the <code class="docutils literal notranslate"><span class="pre">[arch:]</span></code> commands in the app.</p>
+<p class="last">Also see <a class="reference internal" href="../../../api/configuration/application.html#rose:conf:rose-app.conf[env]" title="rose:conf:rose-app.conf[env]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[env]</span></code></a> and the suite example above.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">[poll]</span></code></dt>
+<dd>Polling can be defined, and is often near the bottom of the app. This
+will allow the app to poll with a defined delay, e.g.
+<a class="reference internal" href="../../../api/configuration/application.html#rose:conf:rose-app.conf[poll]delays" title="rose:conf:rose-app.conf[poll]delays"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[poll]delays=5</span></code></a>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">[file:TARGET]</span></code></dt>
+<dd>This option allows the user to, for example, make the directory
+<code class="docutils literal notranslate"><span class="pre">TARGET</span></code>, e.g. <a class="reference internal" href="../../../api/configuration/file-creation.html#rose:conf:*[file:TARGET]mode" title="rose:conf:*[file:TARGET]mode"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">*[file:TARGET]mode=mkdir</span></code></a>.</dd>
+</dl>
+<p>For more information, see the <a class="reference internal" href="../../../api/built-in/rose_arch.html#rose-arch"><span class="std std-ref">rose_arch</span></a> documentation.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

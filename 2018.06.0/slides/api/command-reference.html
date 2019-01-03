@@ -1,0 +1,2453 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Command Reference &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" />
+    <link rel="next" title="Rose Environment Variables" href="environment-variables.html" />
+    <link rel="prev" title="Rose Configuration API" href="configuration/api.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="command-reference">
+
+<h1>Command Reference<a class="headerlink" href="../../html/api/command-reference.html#command-reference" title="View HTML">§</a></h1>
+
+
+
+
+
+</article>
+<article class="slide level-2" id="rose-commands">
+
+<h2>Rose Commands<a class="headerlink" href="../../html/api/command-reference.html#rose-commands" title="View HTML">§</a></h2>
+
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-app-run">
+
+<h3>rose app-run<a class="headerlink" href="../../html/api/command-reference.html#rose-app-run" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose app-run <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>--<span class="o">]</span> <span class="o">[</span>COMMAND ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Run an application according to its configuration.</p>
+<p>May run a builtin application (if the <code class="docutils literal notranslate"><span class="pre">mode</span></code> setting in the configuration
+specifies the name of a builtin application) or a command.</p>
+<p>Determine the command to run in this order:</p>
+<ol class="arabic simple">
+<li>If <code class="docutils literal notranslate"><span class="pre">COMMAND</span></code> is specified, invoke the command.</li>
+<li>If the <code class="docutils literal notranslate"><span class="pre">--command-key=KEY</span></code> option is defined, invoke the command
+specified in <code class="docutils literal notranslate"><span class="pre">[command]KEY</span></code>.</li>
+<li>If the <code class="docutils literal notranslate"><span class="pre">ROSE_APP_COMMAND_KEY</span></code> environment variable is set, the command
+specified in the <code class="docutils literal notranslate"><span class="pre">[command]KEY</span></code> setting in the application
+configuration whose <code class="docutils literal notranslate"><span class="pre">KEY</span></code> matches it is used.</li>
+<li>If the environment variable <code class="docutils literal notranslate"><span class="pre">ROSE_TASK_NAME</span></code> is defined and a setting
+in the <code class="docutils literal notranslate"><span class="pre">[command]</span></code> section has a key matching the value of the
+environment variable, then the value of the setting is used as the
+command.</li>
+<li>Invoke the command specified in <code class="docutils literal notranslate"><span class="pre">[command]default</span></code>.</li>
+</ol>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--app-mode=MODE</span></code></dt>
+<dd>Run a builtin application identified by <code class="docutils literal notranslate"><span class="pre">MODE</span></code>. The default <code class="docutils literal notranslate"><span class="pre">MODE</span></code> is
+<code class="docutils literal notranslate"><span class="pre">command</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd>Specify the configuration directory of the application.
+(default=<code class="docutils literal notranslate"><span class="pre">$PWD</span></code>)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--command-key=KEY,</span> <span class="pre">-c</span> <span class="pre">KEY</span></code></dt>
+<dd>Invoke the command specified in <code class="docutils literal notranslate"><span class="pre">[command]KEY</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--define=[SECTION]KEY=VALUE,</span> <span class="pre">-D</span> <span class="pre">[SECTION]KEY=VALUE</span></code></dt>
+<dd>Each of these overrides the <code class="docutils literal notranslate"><span class="pre">[SECTION]KEY</span></code> setting with a given
+<code class="docutils literal notranslate"><span class="pre">VALUE</span></code>.
+Can be used to disable a setting using the syntax
+<code class="docutils literal notranslate"><span class="pre">--define=[SECTION]!KEY</span></code> or even <code class="docutils literal notranslate"><span class="pre">--define=[!SECTION]</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--install-only,</span> <span class="pre">-i</span></code></dt>
+<dd>Install files only. Do not invoke the run.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--new,</span> <span class="pre">-N</span></code></dt>
+<dd>Remove all items in <code class="docutils literal notranslate"><span class="pre">$PWD</span></code> before doing anything. This option only
+works with the <code class="docutils literal notranslate"><span class="pre">--config=DIR</span></code> option and if <code class="docutils literal notranslate"><span class="pre">$PWD</span></code> is not <code class="docutils literal notranslate"><span class="pre">DIR</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-overwrite</span></code></dt>
+<dd>Do not overwrite existing files.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--opt-conf-key=KEY,</span> <span class="pre">-O</span> <span class="pre">KEY,</span> <span class="pre">--opt-conf-key='(KEY)',</span> <span class="pre">-O</span> <span class="pre">'(KEY)'</span></code></dt>
+<dd>Each of these switches on an optional configuration identified by
+<code class="docutils literal notranslate"><span class="pre">KEY</span></code>.
+The configurations are applied first-to-last. The <code class="docutils literal notranslate"><span class="pre">(KEY)</span></code> syntax
+denotes an optional configuration that can be missing. Otherwise, the
+optional configuration must exist.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_APP_COMMAND_KEY</span></code></dt>
+<dd>Switch to a particular command specified in <code class="docutils literal notranslate"><span class="pre">[command]KEY</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_APP_OPT_CONF_KEYS</span></code></dt>
+<dd>Each <code class="docutils literal notranslate"><span class="pre">KEY</span></code> in this space delimited list switches on an optional
+configuration. The configurations are applied first-to-last.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_FILE_INSTALL_ROOT</span></code></dt>
+<dd>If specified, change to the specified directory to install files.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-app-upgrade">
+
+<h3>rose app-upgrade<a class="headerlink" href="../../html/api/command-reference.html#rose-app-upgrade" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose app-upgrade <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>VERSION<span class="o">]</span>
+</pre></div>
+</div>
+<p>Upgrade an application configuration using metadata upgrade macros.</p>
+<p>Alternatively, show the available upgrade/downgrade versions:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">=</span></code> indicates the current version.</li>
+<li><code class="docutils literal notranslate"><span class="pre">*</span></code> indicates the default version to change to.</li>
+</ul>
+<p>If an application contains optional configurations, loop through
+each one, combine with the main, upgrade it, and re-create it as
+a diff vs the upgraded main configuration.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--all-versions,</span> <span class="pre">-a</span></code></dt>
+<dd>Use all tagged versions.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd>Use configuration in <code class="docutils literal notranslate"><span class="pre">DIR</span></code> instead of <code class="docutils literal notranslate"><span class="pre">$PWD</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--downgrade,</span> <span class="pre">-d</span></code></dt>
+<dd>Downgrade the version instead of upgrade.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--meta-path=PATH,</span> <span class="pre">-M</span> <span class="pre">PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">PATH</span></code> to the metadata search path. (look here first).
+This option can be used repeatedly to load multiple paths.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--non-interactive,</span> <span class="pre">--yes,</span> <span class="pre">-y</span></code></dt>
+<dd>Switch off interactive prompting.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--output=DIR,</span> <span class="pre">-O</span> <span class="pre">DIR</span></code></dt>
+<dd>The location of the output directory.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Reduce verbosity.</dd>
+</dl>
+<p><strong>ARGUMENTS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">VERSION</span></code></dt>
+<dd>A version to change to. If no version is specified, show available
+versions. If <code class="docutils literal notranslate"><span class="pre">--non-interactive</span></code> is used, use the latest version
+available. If <code class="docutils literal notranslate"><span class="pre">--non-interactive</span></code> and <code class="docutils literal notranslate"><span class="pre">--downgrade</span></code> are used, use
+the earliest version available.</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_META_PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">$ROSE_META_PATH</span></code> to the metadata search path.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-bush">
+
+<h3>rose bush<a class="headerlink" href="../../html/api/command-reference.html#rose-bush" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose bush start <span class="o">[</span>PORT<span class="o">]</span> <span class="c1"># start ad-hoc web service server (on PORT)</span>
+rose bush stop         <span class="c1"># stop ad-hoc web service server</span>
+rose bush stop -y      <span class="c1"># stop ad-hoc web service server w/o prompting</span>
+rose bush              <span class="c1"># print status of ad-hoc web service server</span>
+</pre></div>
+</div>
+<p>Start/stop ad-hoc Rose Bush web service server.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">bush</span> <span class="pre">start</span></code>, if <code class="docutils literal notranslate"><span class="pre">PORT</span></code> is not specified, use port 8080.</p>
+<p>Rose Bush is a web service for browsing users’ Rose suite logs via an
+HTTP interface.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--non-interactive,</span> <span class="pre">--yes,</span> <span class="pre">-y</span></code></dt>
+<dd>(For stop only.) Switch off interactive prompting (=answer yes to
+everything)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--service-root,</span> <span class="pre">-R</span></code></dt>
+<dd>(For start only.) Include web service name under root of URL.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-check-software">
+
+<h3>rose check-software<a class="headerlink" href="../../html/api/command-reference.html#rose-check-software" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose check-software <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p>Check software dependencies for the rose documentation builder.</p>
+<p><strong>OPTIONS</strong></p>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-config">
+
+<h3>rose config<a class="headerlink" href="../../html/api/command-reference.html#rose-config" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print the value of OPTION in SECTION.</span>
+rose config SECTION OPTION
+
+<span class="c1"># Print the value of OPTION in SECTION in FILE.</span>
+rose config --file<span class="o">=</span>FILE SECTION OPTION
+
+<span class="c1"># Print the value of OPTION in SECTION if exists, or VALUE otherwise.</span>
+rose config --default<span class="o">=</span>VALUE SECTION OPTION
+
+<span class="c1"># Print the OPTION=VALUE pairs in SECTION.</span>
+rose config SECTION
+
+<span class="c1"># Print the value of a top level OPTION.</span>
+rose config OPTION
+
+<span class="c1"># Print the OPTION keys in SECTION.</span>
+rose config --keys SECTION
+
+<span class="c1"># Print the SECTION keys.</span>
+rose config --keys
+
+<span class="c1"># Exit with 0 if OPTION exists in SECTION, or 1 otherwise.</span>
+rose config -q SECTION OPTION
+
+<span class="c1"># Exit with 0 if SECTION exists, or 1 otherwise.</span>
+rose config -q SECTION
+
+<span class="c1"># Combine the configurations in FILE1 and FILE2, and dump the result.</span>
+rose config --file<span class="o">=</span>FILE1 --file<span class="o">=</span>FILE2
+
+<span class="c1"># Print the value of OPTION in SECTION of the metadata associated with</span>
+<span class="c1"># the specified config FILE</span>
+rose config --file<span class="o">=</span>FILE --meta SECTION OPTION
+
+<span class="c1"># Print the value of a specified metadata KEY</span>
+rose config --meta-key<span class="o">=</span>KEY
+</pre></div>
+</div>
+<p>Parse and print rose configuration files.</p>
+<p>With no option and no argument, print the Rose site + user configuration.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--default</span></code></dt>
+<dd>Specify a default value.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--env-var-process,</span> <span class="pre">-E</span></code></dt>
+<dd>Process environment variable substitution. (Only works when returning
+a string value.)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--file=FILE,</span> <span class="pre">-f</span> <span class="pre">FILE</span></code></dt>
+<dd>Each of these specifies a configuration file. If none specified, read
+from <code class="docutils literal notranslate"><span class="pre">$THIS/../etc/rose.conf</span></code> and <code class="docutils literal notranslate"><span class="pre">$HOME/.metomi/rose.conf</span></code> (where
+<code class="docutils literal notranslate"><span class="pre">$THIS</span></code> is the location of this command).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--keys,</span> <span class="pre">-k</span></code></dt>
+<dd>If specified, only print the <code class="docutils literal notranslate"><span class="pre">SECTION</span></code> keys in the configuration file
+or the <code class="docutils literal notranslate"><span class="pre">OPTION</span></code> keys in a <code class="docutils literal notranslate"><span class="pre">SECTION</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--meta</span></code></dt>
+<dd>If specified, operate on the metadata associated with the
+configuration <code class="docutils literal notranslate"><span class="pre">FILE</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--meta-key=KEY</span></code></dt>
+<dd>If specified, prints the value of a specified metadata flag <code class="docutils literal notranslate"><span class="pre">KEY</span></code>.
+Cannot be used in conjunction with <code class="docutils literal notranslate"><span class="pre">--file=FILE</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-opts</span></code></dt>
+<dd>Do not load optional configurations.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--print-conf</span></code></dt>
+<dd>If specified, prints result as a Rose configuration file snippet.
+This allows the output to be concatenated into another Rose
+configuration file.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--print-ignored,</span> <span class="pre">-i</span></code></dt>
+<dd>If specified, the program will print ignored <code class="docutils literal notranslate"><span class="pre">!OPTION=VALUE</span></code> where
+relevant.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Exit with 0 if the specified <code class="docutils literal notranslate"><span class="pre">SECTION</span></code> and/or <code class="docutils literal notranslate"><span class="pre">OPTION</span></code> exist in the
+configuration, or 1 otherwise.</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_META_PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">$ROSE_META_PATH</span></code> to the metadata search path.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-config-diff">
+
+<h3>rose config-diff<a class="headerlink" href="../../html/api/command-reference.html#rose-config-diff" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Display the metadata-annotated diff between two Rose config files.</span>
+rose config-diff FILE1 FILE2
+
+<span class="c1"># Display the metadata-annotated diff between two Rose config dirs.</span>
+rose config-diff DIR1 DIR2
+
+<span class="c1"># Display the diff, ignoring particular setting patterns</span>
+rose config-diff --ignore<span class="o">=</span>namelist:foo FILE1 FILE2
+
+<span class="c1"># Display the diff with a particular diff tool</span>
+rose config-diff --diff-tool<span class="o">=</span>kdiff3 FILE1 FILE2
+
+<span class="c1"># Display the diff with some diff tool specific options/arguments</span>
+rose config-diff FILE1 FILE2 -- <span class="o">[</span>DIFF_OPTIONS<span class="o">]</span> <span class="o">[</span>DIFF_ARGUMENTS<span class="o">]</span>
+</pre></div>
+</div>
+<p>Display the metadata-annotated difference between two Rose config files.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--diff-tool=TOOL</span></code></dt>
+<dd>Specify an alternate diff tool like diffuse or kompare.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--graphical,</span> <span class="pre">-g</span></code></dt>
+<dd>Use a graphical diff tool.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--ignore=PATTERN,</span> <span class="pre">-i</span> <span class="pre">PATTERN</span></code></dt>
+<dd>Ignore settings that contain the regular expression <code class="docutils literal notranslate"><span class="pre">PATTERN</span></code> in
+their id. Can be specified more than once. <code class="docutils literal notranslate"><span class="pre">PATTERN</span></code> may also be a
+key used in site or user configuration which expands to a list of
+patterns. See <code class="docutils literal notranslate"><span class="pre">CONFIGURATION</span></code> below.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--meta-path=PATH,</span> <span class="pre">-M</span> <span class="pre">PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">PATH</span></code> to the metadata search path (look here first).
+This option can be used repeatedly to load multiple paths.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--opt-conf-key-1=KEY,</span> <span class="pre">--opt-conf-key-1='(KEY)'</span></code></dt>
+<dd>opt-conf-key for the file in the first argument.
+Each of these switches on an optional configuration identified by
+<code class="docutils literal notranslate"><span class="pre">KEY</span></code>. The configurations are applied first-to-last. The <code class="docutils literal notranslate"><span class="pre">(KEY)</span></code>
+syntax denotes an optional configuration that can be missing.
+Otherwise, the optional configuration must exist.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--opt-conf-key-2=KEY,</span> <span class="pre">--opt-conf-key-2='(KEY)'</span></code></dt>
+<dd><code class="docutils literal notranslate"><span class="pre">opt-conf-key</span></code> for the file in the second argument.
+Each of these switches on an optional configuration identified by
+<code class="docutils literal notranslate"><span class="pre">KEY</span></code>. The configurations are applied first-to-last. The <code class="docutils literal notranslate"><span class="pre">(KEY)</span></code>
+syntax denotes an optional configuration that can be missing.
+Otherwise, the optional configuration must exist.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--properties=PROPERTIES,</span> <span class="pre">-p</span> <span class="pre">PROPERTIES</span></code></dt>
+<dd>Only display these metadata properties. This should be a comma
+separated list of metadata options, such as title,description,help.</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_META_PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">$ROSE_META_PATH</span></code> to the metadata search path.</dd>
+</dl>
+<p><strong>ARGUMENTS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">PATH1,</span> <span class="pre">PATH2</span></code></dt>
+<dd>Two Rose configuration files or directories to compare.
+If the path is a directory, look underneath for a Rose configuration
+file. ‘-‘ for <code class="docutils literal notranslate"><span class="pre">PATH1</span></code> or <code class="docutils literal notranslate"><span class="pre">PATH2</span></code> denotes read in from standard input.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--</span></code></dt>
+<dd>Options and arguments after a <code class="docutils literal notranslate"><span class="pre">--</span></code> token are passed directly to the
+diff tool.</dd>
+</dl>
+<p><strong>CONFIGURATION</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">[external]diff-tool,</span> <span class="pre">[external]gdiff-tool</span></code></dt>
+<dd><p class="first">You can override the default non-graphical and graphical diff tools
+by setting e.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">external</span><span class="p">]</span>
+<span class="n">diff</span><span class="o">-</span><span class="n">tool</span><span class="o">=</span><span class="n">diff3</span>
+<span class="n">gdiff</span><span class="o">-</span><span class="n">tool</span><span class="o">=</span><span class="n">kompare</span>
+</pre></div>
+</div>
+<p class="last">in your site or user Rose configuration (<code class="docutils literal notranslate"><span class="pre">rose.conf</span></code>).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">[rose-config-diff]properties,</span> <span class="pre">[rose-config-diff]ignore{...}</span></code></dt>
+<dd><p class="first">You can override the default metadata properties to display by
+setting e.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">rose</span><span class="o">-</span><span class="n">config</span><span class="o">-</span><span class="n">diff</span><span class="p">]</span>
+<span class="n">properties</span><span class="o">=</span><span class="n">title</span><span class="p">,</span><span class="n">ns</span><span class="p">,</span><span class="n">description</span><span class="p">,</span><span class="n">help</span>
+</pre></div>
+</div>
+<p>in your site or user Rose configuration (<code class="docutils literal notranslate"><span class="pre">rose.conf</span></code>).
+You can also set shorthand ignore patterns by setting e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">rose</span><span class="o">-</span><span class="n">config</span><span class="o">-</span><span class="n">diff</span><span class="p">]</span>
+<span class="n">ignore</span><span class="p">{</span><span class="n">foo</span><span class="p">}</span><span class="o">=</span><span class="n">namelist</span><span class="p">:</span><span class="n">bar</span><span class="p">,</span><span class="n">namelist</span><span class="p">:</span><span class="n">baz</span>
+</pre></div>
+</div>
+<p>in the same location. This will allow you to run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">config</span><span class="o">-</span><span class="n">diff</span> <span class="o">--</span><span class="n">ignore</span><span class="o">=</span><span class="n">foo</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>instead of:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">config</span><span class="o">-</span><span class="n">diff</span> <span class="o">--</span><span class="n">ignore</span><span class="o">=</span><span class="n">namelist</span><span class="p">:</span><span class="n">bar</span> <span class="o">--</span><span class="n">ignore</span><span class="o">=</span><span class="n">namelist</span><span class="p">:</span><span class="n">baz</span> <span class="o">...</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-config-dump">
+
+<h3>rose config-dump<a class="headerlink" href="../../html/api/command-reference.html#rose-config-dump" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose config-dump
+rose config-dump -C /path/to/conf/dir
+rose config-dump -f /path/to/file1 -f /path/to/file2
+</pre></div>
+</div>
+<p>Re-dump Rose configuration files in the common format.</p>
+<p>Load and dump <code class="docutils literal notranslate"><span class="pre">&quot;rose-*.conf&quot;</span></code> files in place. Apply format-specific
+pretty-printing.</p>
+<p>By default, it recursively loads and dumps all <code class="docutils literal notranslate"><span class="pre">rose-*.conf</span></code> files in the
+current working directory.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd>Change directory to <code class="docutils literal notranslate"><span class="pre">DIR</span></code> before looking for configuration files.
+(default=<code class="docutils literal notranslate"><span class="pre">$PWD</span></code>)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--file=FILE,</span> <span class="pre">-f</span> <span class="pre">FILE</span></code></dt>
+<dd>Each of these specifies a configuration file. If <code class="docutils literal notranslate"><span class="pre">--config=DIR</span></code> is
+specified and <code class="docutils literal notranslate"><span class="pre">FILE</span></code> is a relative path, <code class="docutils literal notranslate"><span class="pre">FILE</span></code> is assumed to be
+relative to <code class="docutils literal notranslate"><span class="pre">DIR</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-pretty</span></code></dt>
+<dd>Do not apply format-specific pretty-printing.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity. Do not report modified files.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-config-edit">
+
+<h3>rose config-edit<a class="headerlink" href="../../html/api/command-reference.html#rose-config-edit" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose config-edit <span class="o">[</span>OPTIONS<span class="o">]</span>... <span class="o">[</span>PAGE_PATH<span class="o">]</span>...
+</pre></div>
+</div>
+<p>Launch the GTK+ GUI to edit a suite or application configuration.</p>
+<p>If a suite contains more than 10 applications then they will only be
+loaded after startup, on demand.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd><p class="first">A path to either:</p>
+<ol class="last arabic simple">
+<li>a directory containing a suite with a file named
+<code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> and a directory called <code class="docutils literal notranslate"><span class="pre">app</span></code> containing
+subdirectories with files named <code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code>,
+in the format specified in the Rose pages.</li>
+<li>a directory containing a single ‘application’ - a file named
+<code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code> and an optional subdirectory called <code class="docutils literal notranslate"><span class="pre">file</span></code>
+with other application files.</li>
+</ol>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--load-all-apps</span></code></dt>
+<dd>Force loading of all applications on startup.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--load-no-apps</span></code></dt>
+<dd>Load applications in the suite on demand.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--meta-path=PATH,</span> <span class="pre">-M</span> <span class="pre">PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">PATH</span></code> to the search path for metadata (look here first).
+This option can be used repeatedly to load multiple paths.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--new</span></code></dt>
+<dd>Launch, ignoring any configuration.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-metadata</span></code></dt>
+<dd>Launch with metadata switched off.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-warn=WARNING-TYPE</span></code></dt>
+<dd><p class="first">Suppress warnings of the provided type. <code class="docutils literal notranslate"><span class="pre">WARNING-TYPE</span></code> may be:</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">version</span></code></dt>
+<dd>Suppress “Could not find metadata for app/version, using app/HEAD”
+warnings.</dd>
+</dl>
+</dd>
+</dl>
+<p><strong>ARGUMENTS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">PAGE_PATH</span></code></dt>
+<dd><p class="first">One or more paths to open on load, pages may be full or partial
+namespaces e.g. <code class="docutils literal notranslate"><span class="pre">foo/bar/env</span></code> or <code class="docutils literal notranslate"><span class="pre">env</span></code>.</p>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Opens the shortest namespace that matches the provided string.</p>
+</div>
+</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_META_PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">$ROSE_META_PATH</span></code> to the metadata search path.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-date">
+
+<h3>rose date<a class="headerlink" href="../../html/api/command-reference.html#rose-date" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Print date time point</span>
+<span class="c1"># 1.1 Current date time with an optional offset</span>
+rose date <span class="o">[</span>--offset<span class="o">=</span>OFFSET<span class="o">]</span>
+rose date now <span class="o">[</span>--offset<span class="o">=</span>OFFSET<span class="o">]</span>
+rose date ref <span class="o">[</span>--offset<span class="o">=</span>OFFSET<span class="o">]</span>
+<span class="c1"># 1.2 Task cycle date time with an optional offset</span>
+<span class="c1">#     Assume: export ROSE_TASK_CYCLE_TIME=20371225T000000Z</span>
+rose date -c <span class="o">[</span>--offset<span class="o">=</span>OFFSET<span class="o">]</span>
+rose date -c ref <span class="o">[</span>--offset<span class="o">=</span>OFFSET<span class="o">]</span>
+<span class="c1"># 1.3 A specific date time with an optional offset</span>
+rose date 20380119T031407Z <span class="o">[</span>--offset<span class="o">=</span>OFFSET<span class="o">]</span>
+
+<span class="c1"># 2. Print duration</span>
+<span class="c1"># 2.1 Between now (+ OFFSET1) and a future date time (+ OFFSET2)</span>
+rose date now <span class="o">[</span>--offset1<span class="o">=</span>OFFSET1<span class="o">]</span> 20380119T031407Z <span class="o">[</span>--offset2<span class="o">=</span>OFFSET2<span class="o">]</span>
+<span class="c1"># 2.2 Between a date time in the past and now</span>
+rose date 19700101T000000Z now
+<span class="c1"># 2.3 Between task cycle time (+ OFFSET1) and a future date time</span>
+<span class="c1">#     Assume: export ROSE_TASK_CYCLE_TIME=20371225T000000Z</span>
+rose date -c ref <span class="o">[</span>--offset1<span class="o">=</span>OFFSET1<span class="o">]</span> 20380119T031407Z
+<span class="c1"># 2.4 Between task cycle time and now (+ OFFSET2)</span>
+<span class="c1">#     Assume: export ROSE_TASK_CYCLE_TIME=20371225T000000Z</span>
+rose date -c ref now <span class="o">[</span>--offset2<span class="o">=</span>OFFSET2<span class="o">]</span>
+<span class="c1"># 2.5 Between a date time in the past and the task cycle date time</span>
+<span class="c1">#     Assume: export ROSE_TASK_CYCLE_TIME=20371225T000000Z</span>
+rose date -c 19700101T000000Z ref
+<span class="c1"># 2.6 Between 2 specific date times</span>
+rose date 19700101T000000Z 20380119T031407Z
+
+<span class="c1"># 3.  Convert ISO8601 duration</span>
+<span class="c1"># 3.1 Into the total number of hours (H), minutes (M) or seconds (S)</span>
+<span class="c1">#     it represents, preceed negative durations with a double backslash</span>
+<span class="c1">#     (e.g. \\-PT1H)</span>
+rose date --as-total<span class="o">=</span>s PT1H
+</pre></div>
+</div>
+<p>Parse and print 1. a date time point or 2. a duration.</p>
+<ol class="arabic simple">
+<li>With 0 or 1 argument. Print the current or the specified date time
+point with an optional offset.</li>
+<li>With 2 arguments. Print the duration between the 2 arguments.</li>
+</ol>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--as-total=TIME_FORMAT</span></code></dt>
+<dd>Used to express an ISO8601 duration in the specified time format,
+hours <code class="docutils literal notranslate"><span class="pre">H</span></code>, minutes <code class="docutils literal notranslate"><span class="pre">M</span></code> or seconds <code class="docutils literal notranslate"><span class="pre">S</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--calendar=gregorian|360day|365day|366day</span></code></dt>
+<dd>Specify the calendar mode. See <code class="docutils literal notranslate"><span class="pre">CALENDAR</span> <span class="pre">MODE</span></code> below.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--offset1=OFFSET,</span> <span class="pre">--offset=OFFSET,</span> <span class="pre">-s</span> <span class="pre">OFFSET,</span> <span class="pre">-1</span> <span class="pre">OFFSET</span></code></dt>
+<dd>Specify 1 or more offsets to add to argument 1 or the current time.
+See <code class="docutils literal notranslate"><span class="pre">OFFSET</span> <span class="pre">FORMAT</span></code> below.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--offset2=OFFSET,</span> <span class="pre">-2</span> <span class="pre">OFFSET</span></code></dt>
+<dd>Specify 1 or more offsets to add to argument 2.
+See <code class="docutils literal notranslate"><span class="pre">OFFSET</span> <span class="pre">FORMAT</span></code> below.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--parse-format=FORMAT,</span> <span class="pre">-p</span> <span class="pre">FORMAT</span></code></dt>
+<dd>Specify a format for parsing <code class="docutils literal notranslate"><span class="pre">DATE-TIME</span></code>. See <code class="docutils literal notranslate"><span class="pre">PARSE</span> <span class="pre">FORMAT</span></code> below.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--print-format=FORMAT,</span> <span class="pre">--format=FORMAT,</span> <span class="pre">-f</span> <span class="pre">FORMAT</span></code></dt>
+<dd>Specify a format for printing the result. See <code class="docutils literal notranslate"><span class="pre">PRINT</span> <span class="pre">FORMAT</span></code> below.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--use-task-cycle-time,</span> <span class="pre">-c</span></code></dt>
+<dd>Use the value of the <code class="docutils literal notranslate"><span class="pre">ROSE_TASK_CYCLE_TIME</span></code> environment variable as
+the reference time instead of the current time.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--utc,</span> <span class="pre">-u</span></code></dt>
+<dd>Assume date time in UTC instead of local or other time zones.</dd>
+</dl>
+<p><strong>CALENDAR MODE</strong></p>
+<p>The calendar mode is determined (in order) by:</p>
+<ol class="arabic simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">--calendar=MODE</span></code> option.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">ROSE_CYCLING_MODE</span></code> environment variable.</li>
+<li>Default to “gregorian”.</li>
+</ol>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_CYCLING_MODE=gregorian|360day|365day|366day</span></code></dt>
+<dd>Specify the calendar mode.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_TASK_CYCLE_TIME</span></code></dt>
+<dd>Specify the current cycle time of a task in a suite. If the
+<code class="docutils literal notranslate"><span class="pre">--use-task-cycle-time</span></code> option is set, the value of this environment
+variable is used by the command as the reference time instead of the
+current time.</dd>
+</dl>
+<p><strong>OFFSET FORMAT</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">OFFSET</span></code> must follow the ISO 8601 duration representations such as
+<code class="docutils literal notranslate"><span class="pre">PnW</span></code> or <code class="docutils literal notranslate"><span class="pre">PnYnMnDTnHnMnS</span> <span class="pre">-</span> <span class="pre">P</span></code> followed by a series of <code class="docutils literal notranslate"><span class="pre">nU</span></code> where <code class="docutils literal notranslate"><span class="pre">U</span></code> is
+the unit (<code class="docutils literal notranslate"><span class="pre">Y</span></code>, <code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">D</span></code>, <code class="docutils literal notranslate"><span class="pre">H</span></code>, <code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>) and <code class="docutils literal notranslate"><span class="pre">n</span></code> is a positive integer,
+where <code class="docutils literal notranslate"><span class="pre">T</span></code> delimits the date series from the time series if any time units
+are used. <code class="docutils literal notranslate"><span class="pre">n</span></code> may also have a decimal (e.g. <code class="docutils literal notranslate"><span class="pre">PT5.5M</span></code>) part for a unit
+provided no smaller units are supplied. It is not necessary to
+specify zero values for units. If <code class="docutils literal notranslate"><span class="pre">OFFSET</span></code> is negative, prefix a <code class="docutils literal notranslate"><span class="pre">-</span></code>.
+For example:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">P6D</span></code> - 6 day offset</li>
+<li><code class="docutils literal notranslate"><span class="pre">PT6H</span></code> - 6 hour offset</li>
+<li><code class="docutils literal notranslate"><span class="pre">PT1M</span></code> - 1 minute offset</li>
+<li><code class="docutils literal notranslate"><span class="pre">-PT1M</span></code> - (negative) 1 minute offset</li>
+<li><code class="docutils literal notranslate"><span class="pre">P3M</span></code> - 3 month offset</li>
+<li><code class="docutils literal notranslate"><span class="pre">P2W</span></code> - 2 week offset (note no other units may be combined with weeks)</li>
+<li><code class="docutils literal notranslate"><span class="pre">P2DT5.5H</span></code> - 2 day, 5.5 hour offset</li>
+<li><code class="docutils literal notranslate"><span class="pre">-P2YT4S</span></code> - (negative) 2 year, 4 second offset</li>
+</ul>
+<p>The following deprecated syntax is supported:
+<code class="docutils literal notranslate"><span class="pre">OFFSET</span></code> in the form <code class="docutils literal notranslate"><span class="pre">nU</span></code> where <code class="docutils literal notranslate"><span class="pre">U</span></code> is the unit (<code class="docutils literal notranslate"><span class="pre">w</span></code> for weeks, <code class="docutils literal notranslate"><span class="pre">d</span></code> for
+days, <code class="docutils literal notranslate"><span class="pre">h</span></code> for hours, <code class="docutils literal notranslate"><span class="pre">m</span></code> for minutes and <code class="docutils literal notranslate"><span class="pre">s</span></code> for seconds) and <code class="docutils literal notranslate"><span class="pre">n</span></code> is a
+positive or negative integer.</p>
+<p><strong>PARSE FORMAT</strong></p>
+<p>The format for parsing a date time point should be compatible with the
+POSIX strptime template format (see the strptime command help), with the
+following subset supported across all date/time ranges:</p>
+<p><code class="docutils literal notranslate"><span class="pre">%F</span></code>, <code class="docutils literal notranslate"><span class="pre">%H</span></code>, <code class="docutils literal notranslate"><span class="pre">%M</span></code>, <code class="docutils literal notranslate"><span class="pre">%S</span></code>, <code class="docutils literal notranslate"><span class="pre">%Y</span></code>, <code class="docutils literal notranslate"><span class="pre">%d</span></code>, <code class="docutils literal notranslate"><span class="pre">%j</span></code>, <code class="docutils literal notranslate"><span class="pre">%m</span></code>, <code class="docutils literal notranslate"><span class="pre">%s</span></code>, <code class="docutils literal notranslate"><span class="pre">%z</span></code></p>
+<p>If not specified, the system will attempt to parse <code class="docutils literal notranslate"><span class="pre">DATE-TIME</span></code> using
+the following formats:</p>
+<ul class="simple">
+<li>ctime: <code class="docutils literal notranslate"><span class="pre">%a</span> <span class="pre">%b</span> <span class="pre">%d</span> <span class="pre">%H:%M:%S</span> <span class="pre">%Y</span></code></li>
+<li>Unix date: <code class="docutils literal notranslate"><span class="pre">%a</span> <span class="pre">%b</span> <span class="pre">%d</span> <span class="pre">%H:%M:%S</span> <span class="pre">%Z</span> <span class="pre">%Y</span></code></li>
+<li>Basic ISO8601: <code class="docutils literal notranslate"><span class="pre">%Y-%m-%dT%H:%M:%S</span></code>, <code class="docutils literal notranslate"><span class="pre">%Y%m%dT%H%M%S</span></code></li>
+<li>Cylc: <code class="docutils literal notranslate"><span class="pre">%Y%m%d%H</span></code></li>
+</ul>
+<p>If none of these match, the date time point will be parsed according to
+the full ISO 8601 date/time standard.</p>
+<p><strong>PRINT FORMAT</strong></p>
+<p>For printing a date time point, the print format will default to the same
+format as the parse format. Also supports the isodatetime library dump
+syntax for these operations which follows ISO 8601 example syntax - for
+example:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">CCYY-MM-DDThh:mm:ss</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">1955-11-05T09:28:00</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">CCYY</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">1955</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">CCYY-DDD</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">1955-309</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">CCYY-Www-D</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">1955-W44-6</span></code>.</li>
+</ul>
+<p>Usage of this ISO 8601-like syntax should be as ISO 8601-compliant
+as possible.</p>
+<p>Note that specifying an explicit timezone in this format (e.g.
+<code class="docutils literal notranslate"><span class="pre">CCYY-MM-DDThh:mm:ss+0100</span></code> or <code class="docutils literal notranslate"><span class="pre">CCYYDDDThhmmZ</span></code> will automatically
+adapt the date/time to that timezone i.e. apply the correct
+hour/minute UTC offset.</p>
+<p>For printing a duration, the following can be used in format
+statements:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">y</span></code>: years</li>
+<li><code class="docutils literal notranslate"><span class="pre">m</span></code>: months</li>
+<li><code class="docutils literal notranslate"><span class="pre">d</span></code>: days</li>
+<li><code class="docutils literal notranslate"><span class="pre">h</span></code>: hours</li>
+<li><code class="docutils literal notranslate"><span class="pre">M</span></code>: minutes</li>
+<li><code class="docutils literal notranslate"><span class="pre">s</span></code>: seconds</li>
+</ul>
+<p>For example, for a duration <code class="docutils literal notranslate"><span class="pre">P57DT12H</span></code> - <code class="docutils literal notranslate"><span class="pre">y,m,d,h</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">0,0,57,12</span></code></p>
+
+
+
+
+</article><hr class="docutils" />
+
+<article class="slide level-3" id="rose-edit">
+
+<h3>rose edit<a class="headerlink" href="../../html/api/command-reference.html#rose-edit" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-env-cat">
+
+<h3>rose env-cat<a class="headerlink" href="../../html/api/command-reference.html#rose-env-cat" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose env-cat <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>FILE ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Substitute environment variables in input files and print.</p>
+<p>If no argument is specified, read from STDIN. One <code class="docutils literal notranslate"><span class="pre">FILE</span></code> argument may be
+<code class="docutils literal notranslate"><span class="pre">-</span></code>, which means read from STDIN.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">match-mode=default</span></code>, the command will look for <code class="docutils literal notranslate"><span class="pre">$NAME</span></code> or <code class="docutils literal notranslate"><span class="pre">${NAME}</span></code>
+syntax and substitute them with the value of the environment variable
+<code class="docutils literal notranslate"><span class="pre">NAME</span></code>. A backslash in front of the syntax, e.g. <code class="docutils literal notranslate"><span class="pre">\$NAME</span></code> or <code class="docutils literal notranslate"><span class="pre">\${NAME}</span></code>
+will escape the substitution.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">match-mode=brace</span></code>, the command will look for <code class="docutils literal notranslate"><span class="pre">${NAME}</span></code> syntax only.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--match-mode=MODE,</span> <span class="pre">-m</span> <span class="pre">MODE</span></code></dt>
+<dd>Specify the match mode, which can be <code class="docutils literal notranslate"><span class="pre">brace</span></code> or <code class="docutils literal notranslate"><span class="pre">default</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--output=FILE,</span> <span class="pre">-o</span> <span class="pre">FILE</span></code></dt>
+<dd>Specify an output file. If no output file is specified or if <code class="docutils literal notranslate"><span class="pre">FILE</span></code>
+is <code class="docutils literal notranslate"><span class="pre">-</span></code>, write output to STDOUT.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--unbound=STRING,</span> <span class="pre">--undef=STRING</span></code></dt>
+<dd>The command will normally fail on unbound (or undefined) variables.
+If this option is specified, the command will substitute an unbound
+variable with the value of <code class="docutils literal notranslate"><span class="pre">STRING</span></code>, (which can be an empty string),
+instead of failing.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-host-select">
+
+<h3>rose host-select<a class="headerlink" href="../../html/api/command-reference.html#rose-host-select" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose host-select <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>GROUP/HOST ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Select a host from a set of groups or names by load, by free memory
+or by random.</p>
+<p>Use settings in <code class="docutils literal notranslate"><span class="pre">$ROSE_HOME/etc/rose.conf</span></code> and <code class="docutils literal notranslate"><span class="pre">$HOME/.metomi/rose.conf</span></code>
+to determine the ranking method.</p>
+<p>Print the selected host name.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--choice=N</span></code></dt>
+<dd>Choose from any of the top <code class="docutils literal notranslate"><span class="pre">N</span></code> hosts.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--debug</span></code></dt>
+<dd>Print stack trace on error.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--rank-method=METHOD[:METHOD-ARG]</span></code></dt>
+<dd><p class="first">Specify the method for ranking a list of hosts. The method can be:</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">load</span></code></dt>
+<dd><p class="first">Rank by average load as reported by <code class="docutils literal notranslate"><span class="pre">uptime</span></code> divided by number of
+virtual processors.</p>
+<p class="last">If <code class="docutils literal notranslate"><span class="pre">METHOD-ARG</span></code> is specified, it must be <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">5</span></code> or <code class="docutils literal notranslate"><span class="pre">15</span></code>. The
+default is to use the 15 minute load.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">fs</span></code></dt>
+<dd><p class="first">Rank by % usage of a file system as reported by <code class="docutils literal notranslate"><span class="pre">df</span></code>.</p>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">METHOD-ARG</span></code> must be a valid file system in all the given hosts
+and host groups. The default is to use the <code class="docutils literal notranslate"><span class="pre">~</span></code> directory.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mem</span></code></dt>
+<dd>Rank by largest amount of free memory. Uses <code class="docutils literal notranslate"><span class="pre">free</span> <span class="pre">-m</span></code> to return
+memory in Mb</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">random</span></code></dt>
+<dd>No ranking is used.</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--threshold=[METHOD[:METHOD-ARG]:]VALUE</span></code></dt>
+<dd>Each of these option specifies a numeric value of a threshold of which
+the hosts must either not exceed or must be greater than depending on
+the specified method . Accepts the same <code class="docutils literal notranslate"><span class="pre">METHOD</span></code> and <code class="docutils literal notranslate"><span class="pre">METHOD-ARG</span></code>
+(and the same defaults) as the <code class="docutils literal notranslate"><span class="pre">--rank-method=METHOD[:METHOD-ARG]</span></code>
+option. (Obviously, the <code class="docutils literal notranslate"><span class="pre">random</span></code> method does not make sense in this
+case.) <code class="docutils literal notranslate"><span class="pre">load</span></code> and <code class="docutils literal notranslate"><span class="pre">fs</span></code> must not exceed threshold while <code class="docutils literal notranslate"><span class="pre">mem</span></code>
+must be greater than threshold. A host not meeting a threshold
+condition will be excluded from the ranking list.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--timeout=FLOAT</span></code></dt>
+<dd>Set the timeout in seconds of SSH commands to hosts.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<p><strong>CONFIGURATION</strong></p>
+<p>The command reads its settings from the <code class="docutils literal notranslate"><span class="pre">[rose-host-select]</span></code> section in
+<code class="docutils literal notranslate"><span class="pre">$ROSE_HOME/etc/rose.conf</span></code> and <code class="docutils literal notranslate"><span class="pre">$HOME/.metomi/rose.conf</span></code>. All settings
+are optional. Type <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">config</span> <span class="pre">rose-host-select</span></code> to print settings.
+Valid settings are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">=</span> <span class="pre">GROUP/HOST</span> <span class="pre">...</span></code></dt>
+<dd>The default arguments to use for this command.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">group{NAME}</span> <span class="pre">=</span> <span class="pre">GROUP/HOST</span> <span class="pre">...</span></code></dt>
+<dd>Declare a named group of hosts.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">method{NAME}</span> <span class="pre">=</span> <span class="pre">METHOD[:METHOD-ARG]</span></code></dt>
+<dd>Declare the default ranking method for a group of hosts.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">thresholds{NAME}</span> <span class="pre">=</span> <span class="pre">[METHOD[:METHOD-ARG]:]VALUE</span> <span class="pre">...</span></code></dt>
+<dd>Declare the default threshold(s) for a group of hosts.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">timeout</span> <span class="pre">=</span> <span class="pre">FLOAT</span></code></dt>
+<dd>Set the timeout in seconds of SSH commands to hosts.
+(default=10.0)</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-macro">
+
+<h3>rose macro<a class="headerlink" href="../../html/api/command-reference.html#rose-macro" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose macro <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>MACRO_NAME ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>List or run macros associated with a suite or application.</p>
+<p>Macros are listed/run according to the config dir (<code class="docutils literal notranslate"><span class="pre">$PWD</span></code> unless
+<code class="docutils literal notranslate"><span class="pre">--config=DIR</span></code> is set):</p>
+<ul class="simple">
+<li>If the config dir is an app directory (or is within an app directory)
+macros will be listed/run for the <code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code> file of that app.</li>
+<li>Otherwise macros will be listed/run for the <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rose-suite.info</span></code> and (unless <code class="docutils literal notranslate"><span class="pre">--suite-only</span></code> is set) all
+<code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code> files.</li>
+</ul>
+<p>If a configuration contains optional configurations:</p>
+<ul class="simple">
+<li>For validator macros, validate the main configuration, then
+validate each main + optional configuration in turn.</li>
+<li>For transform macros, transform the main configuration, then
+transform each main + optional configuration, recreating each
+optional configuration as the diff vs the transformed main.</li>
+</ul>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd>Use configuration in <code class="docutils literal notranslate"><span class="pre">DIR</span></code> instead of <code class="docutils literal notranslate"><span class="pre">$PWD</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--fix,</span> <span class="pre">-F</span></code></dt>
+<dd>Prepend all internal transformer (fixer) macros to the argument
+list.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--meta-path=PATH,</span> <span class="pre">-M</span> <span class="pre">PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">PATH</span></code> to the metadata search path (look here first).
+This option can be used repeatedly to load multiple paths.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--non-interactive,</span> <span class="pre">--yes,</span> <span class="pre">-y</span></code></dt>
+<dd>Switch off interactive prompting (=answer yes to everything).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--output=DIR,</span> <span class="pre">-O</span> <span class="pre">DIR</span></code></dt>
+<dd>The location of the output directory. Only meaningful if
+there is at least one transformer in the argument list.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Reduce verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--suite-only</span></code></dt>
+<dd>Run only for suite level macros.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--transform,</span> <span class="pre">-T</span></code></dt>
+<dd>Prepend all transformer macros to the argument list.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--validate,</span> <span class="pre">-V</span></code></dt>
+<dd>Prepend all validator macros to the argument list.</dd>
+</dl>
+<p><strong>ARGUMENTS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">MACRO_NAME</span> <span class="pre">...</span></code></dt>
+<dd>A list of macro names to run. If no macro names are specified and
+<code class="docutils literal notranslate"><span class="pre">--fix</span></code>, <code class="docutils literal notranslate"><span class="pre">--validate</span></code> are not used, list all available macros.
+Otherwise, run the specified macro names.</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_META_PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">$ROSE_META_PATH</span></code> to the metadata search path.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-make-docs">
+
+<h3>rose make-docs<a class="headerlink" href="../../html/api/command-reference.html#rose-make-docs" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose make-docs <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>BUILD...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Build the rose documentation in the requested <code class="docutils literal notranslate"><span class="pre">BUILD</span></code> format(s).</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--venv</span></code></dt>
+<dd>Build virtualenv for temporarilly installing python dependencies
+if necessary.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--dev</span></code></dt>
+<dd>Development mode, don’t remove virtualenv after build.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--strict</span></code></dt>
+<dd>Disable cache forcing a complete re-build and turn warnings into
+errors.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--debug</span></code></dt>
+<dd>Run <code class="docutils literal notranslate"><span class="pre">make</span></code> with the –debug option.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--default-version=VERSION</span></code></dt>
+<dd>By default the current version is symlinked as the default version,
+provide an alternative version to override this.</dd>
+</dl>
+<p><strong>BUILD</strong></p>
+<p>The format(s) to build the documentation in - default html.
+Avaliable formats are listed in the sphinx documentation
+(<a class="reference external" href="http://www.sphinx-doc.org/en/stable/builders.html">http://www.sphinx-doc.org/en/stable/builders.html</a>).
+The most commonly used formats are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">html</span></code></dt>
+<dd>For building standalone HTML files.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">singlehtml</span></code></dt>
+<dd>For building a single page HTML document.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">latexpdf</span></code></dt>
+<dd>For building PDF documentation.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">clean</span></code></dt>
+<dd>Removes all built documentation for the current rose version.
+(use <code class="docutils literal notranslate"><span class="pre">rm</span> <span class="pre">-rf</span> <span class="pre">doc</span></code> to remove all documentation).</dd>
+</dl>
+<p><strong>DEVELOPMENT BUILDS</strong></p>
+<p>For development purposes use the following BUILDs:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">doctest</span></code></dt>
+<dd>Runs any doctest examples present in documented python modules.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">linkcheck</span></code></dt>
+<dd>Checks external links.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-metadata-check">
+
+<h3>rose metadata-check<a class="headerlink" href="../../html/api/command-reference.html#rose-metadata-check" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose metadata-check <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>ID ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Validate configuration metadata.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd>The directory containing the configuration metadata i.e.
+containing the <code class="docutils literal notranslate"><span class="pre">rose-meta.conf</span></code> file, amongst other things.
+If not specified, the current directory will be used.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--property=PROPERTY,</span> <span class="pre">-p</span> <span class="pre">PROPERTY</span></code></dt>
+<dd>Only check a certain property e.g. trigger. This can be
+specified more than once.</dd>
+</dl>
+<p><strong>ARGUMENTS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">ID</span></code></dt>
+<dd>One or more sections (configuration IDs) to check in the
+metadata e.g.<code class="docutils literal notranslate"><span class="pre">env=FOO</span></code> or <code class="docutils literal notranslate"><span class="pre">namelist:bar</span></code>. If specified, only
+this section will be checked.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-metadata-gen">
+
+<h3>rose metadata-gen<a class="headerlink" href="../../html/api/command-reference.html#rose-metadata-gen" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose metadata-gen <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span><span class="nv">PROPERTY</span><span class="o">=</span>VALUE ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Automatically generate metadata from an application or suite
+configuration. An aid for metadata development.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">May Contain Thorns.</p>
+</div>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--auto-type</span></code></dt>
+<dd>Add a ‘best guess’ for the <code class="docutils literal notranslate"><span class="pre">type</span></code> and <code class="docutils literal notranslate"><span class="pre">length</span></code> metadata.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd>The directory containing the application or suite
+configuration to read in. If not specified, the
+current directory will be used.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--output=DIR,</span> <span class="pre">-O</span> <span class="pre">DIR</span></code></dt>
+<dd>A directory to output the metadata to. If not specified,
+output to the application or suite metadata directory.</dd>
+</dl>
+<p><strong>ARGUMENTS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">PROPERTY[=VALUE]</span> <span class="pre">...</span></code></dt>
+<dd>One or more <code class="docutils literal notranslate"><span class="pre">key=value</span></code> pairs of properties to specify for
+every setting e.g. <code class="docutils literal notranslate"><span class="pre">compulsory=true</span></code>. If <code class="docutils literal notranslate"><span class="pre">=VALUE</span></code> is missing,
+the property will be set to a null string in each setting.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-metadata-graph">
+
+<h3>rose metadata-graph<a class="headerlink" href="../../html/api/command-reference.html#rose-metadata-graph" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose metadata-graph <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>SECTION ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Graph configuration metadata.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd>The directory containing either the configuration or
+the configuration metadata. If the configuration is
+given, the metadata will be looked up in the normal
+way (see also <code class="docutils literal notranslate"><span class="pre">--meta-path</span></code>, <code class="docutils literal notranslate"><span class="pre">ROSE_META_PATH</span></code>). If the
+configuration metadata is given, there will be no
+configuration data used in the graphing.
+If not specified, the current directory will be used.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--meta-path=PATH,</span> <span class="pre">-M</span> <span class="pre">PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">PATH</span></code> to the metadata search path (look here first).
+This option can be used repeatedly to load multiple paths.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--property=PROPERTY,</span> <span class="pre">-p</span> <span class="pre">PROPERTY</span></code></dt>
+<dd>Graph a certain property e.g. <code class="docutils literal notranslate"><span class="pre">trigger</span></code>. If specified,
+only this property will be graphed.</dd>
+</dl>
+<p><strong>ARGUMENTS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">SECTION</span></code></dt>
+<dd>One or more configuration sections to graph. If
+specified, only these sections will be checked.</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_META_PATH</span></code></dt>
+<dd>Prepend <code class="docutils literal notranslate"><span class="pre">$ROSE_META_PATH</span></code> to the metadata search path.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-mpi-launch">
+
+<h3>rose mpi-launch<a class="headerlink" href="../../html/api/command-reference.html#rose-mpi-launch" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">1</span>. rose mpi-launch -f FILE
+<span class="m">2</span>. rose mpi-launch
+<span class="m">3</span>. rose mpi-launch COMMAND <span class="o">[</span>ARGS ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Provide a portable way to launch an MPI command.</p>
+<ol class="arabic simple">
+<li>If <code class="docutils literal notranslate"><span class="pre">--command-file=FILE</span></code> (or <code class="docutils literal notranslate"><span class="pre">-f</span> <span class="pre">FILE</span></code>) is specified, <code class="docutils literal notranslate"><span class="pre">FILE</span></code> is
+assumed to be the command file to be submitted to the MPI launcher
+command.</li>
+<li>Alternatively, if <code class="docutils literal notranslate"><span class="pre">$PWD/rose-mpi-launch.rc</span></code> exists and
+<code class="docutils literal notranslate"><span class="pre">--command-file=FILE</span></code> (or <code class="docutils literal notranslate"><span class="pre">-f</span> <span class="pre">FILE</span></code>) is not specified, it is assumed
+to be the command file to be submitted to the MPI launcher command.</li>
+<li>In the final form, it will attempt to submit <code class="docutils literal notranslate"><span class="pre">COMMAND</span></code> with the MPI
+launcher command.</li>
+</ol>
+<p>In all cases, the remaining arguments will be appended to the command
+line of the launcher program.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--command-file=FILE,</span> <span class="pre">-f</span> <span class="pre">FILE</span></code></dt>
+<dd>Specify a command file for the MPI launcher.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--debug</span></code></dt>
+<dd>Switch on xtrace, i.e. <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">-x</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity. Print command on <code class="docutils literal notranslate"><span class="pre">-v</span></code> mode. Run <code class="docutils literal notranslate"><span class="pre">printenv</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ldd</span></code> on a binary executable, and <code class="docutils literal notranslate"><span class="pre">ulimit</span> <span class="pre">-a</span></code> on <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">-v</span></code> mode.</dd>
+</dl>
+<p><strong>CONFIGURATION</strong></p>
+<p>The command reads from the <code class="docutils literal notranslate"><span class="pre">[rose-mpi-launch]</span></code> section in
+<code class="docutils literal notranslate"><span class="pre">$ROSE_HOME/etc/rose.conf</span></code> and <code class="docutils literal notranslate"><span class="pre">$HOME/.metomi/rose.conf</span></code>.
+Valid settings are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">launcher-list=LIST</span></code></dt>
+<dd><p class="first">Specify a list of launcher commands.</p>
+<p>E.g:</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">launcher-list=poe</span> <span class="pre">mpiexec</span></code></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">launcher-fileopts.LAUNCHER=OPTION-TEMPLATE</span></code></dt>
+<dd><p class="first">Specify the options to a <code class="docutils literal notranslate"><span class="pre">LAUNCHER</span></code> for launching with a command file.
+The template string should contain <code class="docutils literal notranslate"><span class="pre">$ROSE_COMMAND_FILE</span></code> (or
+<code class="docutils literal notranslate"><span class="pre">${ROSE_COMMAND_FILE}</span></code>), which will be expanded to the path to the
+command file.</p>
+<p>E.g.:</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">launcher-fileopts.mpiexec=-f</span> <span class="pre">$ROSE_COMMAND_FILE</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">launcher-fileopts.poe=-cmdfile</span> <span class="pre">$ROSE_COMMAND_FILE</span></code></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">launcher-(pre|post)opts.LAUNCHER=OPTION-TEMPLATE</span></code></dt>
+<dd><p class="first">Specify the options to a <code class="docutils literal notranslate"><span class="pre">LAUNCHER</span></code> for launching with a command.
+<code class="docutils literal notranslate"><span class="pre">preopts</span></code> are options placed after the launcher command but before
+<code class="docutils literal notranslate"><span class="pre">COMMAND</span></code>. <code class="docutils literal notranslate"><span class="pre">postopts</span></code> are options placed after <code class="docutils literal notranslate"><span class="pre">COMMAND</span></code> but before
+the remaining arguments.</p>
+<p>E.g.:</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">launcher-preopts.mpiexec=-n</span> <span class="pre">$PROC</span></code></li>
+</ul>
+</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_LAUNCHER</span></code></dt>
+<dd>Specify the launcher program.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_LAUNCHER_LIST</span></code></dt>
+<dd>Override <code class="docutils literal notranslate"><span class="pre">launcher-list</span></code> setting in configuration.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_LAUNCHER_FILEOPTS</span></code></dt>
+<dd>Override <code class="docutils literal notranslate"><span class="pre">launcher-fileopts.LAUNCHER</span></code> setting for the selected
+<code class="docutils literal notranslate"><span class="pre">LAUNCHER</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_LAUNCHER_PREOPTS</span></code></dt>
+<dd>Override <code class="docutils literal notranslate"><span class="pre">launcher-preopts.LAUNCHER</span></code> setting for the selected
+<code class="docutils literal notranslate"><span class="pre">LAUNCHER</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_LAUNCHER_POSTOPTS</span></code></dt>
+<dd>Override <code class="docutils literal notranslate"><span class="pre">launcher-postopts.LAUNCHER</span></code> setting for the selected
+<code class="docutils literal notranslate"><span class="pre">LAUNCHER</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_LAUNCHER_ULIMIT_OPTS</span></code></dt>
+<dd>Only relevant when launching with a command. Tell launcher to run
+<code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">mpi-launch</span> <span class="pre">--inner</span> <span class="pre">$&#64;</span></code>. Specify the arguments to <code class="docutils literal notranslate"><span class="pre">ulimit</span></code>.
+E.g. Setting this variable to <code class="docutils literal notranslate"><span class="pre">-a</span> <span class="pre">-s</span> <span class="pre">unlimited</span> <span class="pre">-d</span> <span class="pre">unlimited</span> <span class="pre">-a</span></code>
+results in <code class="docutils literal notranslate"><span class="pre">ulimit</span> <span class="pre">-a;</span> <span class="pre">ulimit</span> <span class="pre">-s</span> <span class="pre">unlimited;</span> <span class="pre">ulimit</span> <span class="pre">-d</span> <span class="pre">unlimited;</span>
+<span class="pre">ulimit</span> <span class="pre">-a</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">NPROC</span></code></dt>
+<dd>Specify the number of processors to run on. Default is 1.</dd>
+</dl>
+<p><strong>DIAGNOSTICS</strong></p>
+<p>Return 0 on success, 1 or exit code of the launcher program on failure.</p>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-namelist-dump">
+
+<h3>rose namelist-dump<a class="headerlink" href="../../html/api/command-reference.html#rose-namelist-dump" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose-namelist-dump <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>FILE ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Convert namelist files into a Rose application configuration snippet.
+Each argument should be the path to an empty file or a file containing
+Fortran namelist groups. A <code class="docutils literal notranslate"><span class="pre">-</span></code> can be used once in the argument list to
+specify the standard input. If no argument is given, it assumes the
+standard input is specified. Where possible, use relative path for file
+names, as the file names appear as-specified in the generated
+configuration.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--case=MODE</span></code></dt>
+<dd>Output names in lower case (<code class="docutils literal notranslate"><span class="pre">MODE=&quot;upper&quot;</span></code>), upper case
+(<code class="docutils literal notranslate"><span class="pre">MODE=&quot;lower&quot;</span></code>)
+or unchanged (<code class="docutils literal notranslate"><span class="pre">default</span></code>).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--lower,</span> <span class="pre">-l</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--case=lower</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--output=FILE,</span> <span class="pre">-o</span> <span class="pre">FILE</span></code></dt>
+<dd>The name of the file for dumping the output. Default is <code class="docutils literal notranslate"><span class="pre">-</span></code>, i.e. the
+standard output.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-u,</span> <span class="pre">--upper</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--case=upper</span></code>.</dd>
+</dl>
+
+
+
+
+</article><hr class="docutils" />
+
+<article class="slide level-3" id="rose-sgc">
+
+<h3>rose sgc<a class="headerlink" href="../../html/api/command-reference.html#rose-sgc" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rose-suite-gcontrol"><span class="std std-ref">rose suite-gcontrol</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-slv">
+
+<h3>rose slv<a class="headerlink" href="../../html/api/command-reference.html#rose-slv" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rose-suite-log"><span class="std std-ref">rose suite-log</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-stem">
+
+<h3>rose stem<a class="headerlink" href="../../html/api/command-reference.html#rose-stem" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose stem <span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+</div>
+<p>Run a suitable suite with a specified set of source tree(s).</p>
+<p>Default values of some of these settings are suite-dependent, specified
+in the <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file.</p>
+<p><strong>EXAMPLES</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose stem --group<span class="o">=</span>developer
+rose stem --source<span class="o">=</span>/path/to/source --source<span class="o">=</span>/other/source --group<span class="o">=</span>mygroup
+rose stem --source<span class="o">=</span><span class="nv">foo</span><span class="o">=</span>/path/to/source --source<span class="o">=</span><span class="nv">bar</span><span class="o">=</span>fcm:bar_tr@head
+</pre></div>
+</div>
+<p><strong>OPTIONS</strong></p>
+<p>All options of <a class="reference internal" href="#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> are supported. Additional options are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--source=SOURCE,</span> <span class="pre">-s</span> <span class="pre">SOURCE,</span> <span class="pre">--source=PROJECT=SOURCE,</span> <span class="pre">-s</span> <span class="pre">PROJECT=SOURCE</span></code></dt>
+<dd>Specify a source tree to include in a rose-stem suite. The first
+source tree must be a working copy as the location of the suite and
+fcm-make config files are taken from it. Further source trees can be
+added with additional <code class="docutils literal notranslate"><span class="pre">--source</span></code> arguments. The project which is 
+associated with a given source is normally automatically determined
+using FCM, however the project can be specified by putting the 
+project name as the first part of this argument separated by an
+equals sign as in the third example above.
+Defaults to <code class="docutils literal notranslate"><span class="pre">.</span></code> if not specified.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--group=GROUP[,GROUP2[,...]],</span> <span class="pre">-g</span> <span class="pre">GROUP[,GROUP2[,...]]</span></code></dt>
+<dd>Specify a group name to run. Additional groups can be specified
+with further <code class="docutils literal notranslate"><span class="pre">--group</span></code> arguments. The suite will then convert the
+groups into a series of tasks to run..</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--task=TASK[,TASK2[,...]],</span> <span class="pre">-t</span> <span class="pre">TASK[,TASK2[,...]]</span></code></dt>
+<dd>Synonym for <code class="docutils literal notranslate"><span class="pre">--group</span></code>.</dd>
+</dl>
+<p><strong>JINJA2 VARIABLES</strong></p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">&lt;project&gt;</span></code> refers to the FCM keyword name of the repository in
+upper case.</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">HOST_SOURCE_&lt;project&gt;</span></code></dt>
+<dd>The complete list of source trees for a given project. Working copies
+in this list have their hostname prefixed, e.g. <code class="docutils literal notranslate"><span class="pre">host:/path/wc</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">HOST_SOURCE_&lt;project&gt;_BASE</span></code></dt>
+<dd>The base of the project specified on the command line. This is
+intended to specify the location of <code class="docutils literal notranslate"><span class="pre">fcm-make</span></code> config files. Working 
+copies in this list have their hostname prefixed.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">RUN_NAMES</span></code></dt>
+<dd>A list of groups to run in the rose-stem suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SOURCE_&lt;project&gt;</span></code></dt>
+<dd>The complete list of source trees for a given project. Unlike the 
+<code class="docutils literal notranslate"><span class="pre">HOST_</span></code> variable of similar name, paths to working copies do NOT 
+include the host name.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SOURCE_&lt;project&gt;_BASE</span></code></dt>
+<dd>The base of the project specified on the command line. This is
+intended to specify the location of <code class="docutils literal notranslate"><span class="pre">fcm-make</span></code> config files. Unlike 
+the <code class="docutils literal notranslate"><span class="pre">HOST_</span></code> variable of similar name, paths to working copies do NOT
+include the host name.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SOURCE_&lt;project&gt;_REV</span></code></dt>
+<dd>The revision of the project specified on the command line. This
+is intended to specify the revision of <code class="docutils literal notranslate"><span class="pre">fcm-make</span></code> config files.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-clean">
+
+<h3>rose suite-clean<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-clean" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose suite-clean <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>SUITE-NAME <span class="o">[</span>...<span class="o">]]</span>
+</pre></div>
+</div>
+<p>Remove items created by “rose suite-run”.</p>
+<p>If no argument is specified, use the base-name of <code class="docutils literal notranslate"><span class="pre">$PWD</span></code> as suite name.</p>
+<p>Correctly remove runtime directories created by <a class="reference internal" href="#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a>
+including those on remote job hosts.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--name=NAME,</span> <span class="pre">-n</span> <span class="pre">NAME</span></code></dt>
+<dd>Append <code class="docutils literal notranslate"><span class="pre">NAME</span></code> to the argument list.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--non-interactive,</span> <span class="pre">--yes,</span> <span class="pre">-y</span></code></dt>
+<dd>Switch off interactive prompting (=answer yes to everything)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--only=ITEM</span></code></dt>
+<dd>If one or more <code class="docutils literal notranslate"><span class="pre">--only=ITEM</span></code> option is specified, only files and/or
+directories matching an <code class="docutils literal notranslate"><span class="pre">ITEM</span></code> will be removed. An <code class="docutils literal notranslate"><span class="pre">ITEM</span></code> should be a
+glob pattern (bash extglob) for matching a relative path in the run
+directory of the suite(s).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<p><strong>DIAGNOSTICS</strong></p>
+<p>Return the difference between the number of arguments and number of
+successfully cleaned suites, i.e. 0 if all successful.</p>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-cmp-vc">
+
+<h3>rose suite-cmp-vc<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-cmp-vc" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose suite-cmp-vc NAME
+rose suite-cmp-vc --name<span class="o">=</span>NAME
+
+<span class="c1"># If CYLC_SUITE_NAME is exported, compare source info of the current</span>
+<span class="c1"># suite from within a suite task if no name is specified.</span>
+rose suite-cmp-vc
+</pre></div>
+</div>
+<p>Compare VCS information of a suite source between installation and now.</p>
+<p>Version control system information of a suite is installed under
+log/rose-suite-run.version file. This command attempts to regenerate the
+information from the recorded source, and compare the original file with
+the latest information.</p>
+<p>Return 0 if no difference. Print unified diff and return 1 if difference
+found. Return 2 on other errors.</p>
+<p><strong>ARGUMENTS</strong></p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--name=NAME,</span> <span class="pre">-n</span> <span class="pre">NAME</span></code></dt>
+<dd>Specify the suite NAME.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-gcontrol">
+
+<h3>rose suite-gcontrol<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-gcontrol" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose suite-gcontrol <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>--name<span class="o">=</span>SUITE-NAME<span class="o">]</span> <span class="o">[</span>-- EXTRA-ARGS ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Launch suite engine’s suite control GUI for a suite.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">--name=SUITE-NAME</span></code> is not specified, the name will be determined by
+locating a <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file in <code class="docutils literal notranslate"><span class="pre">$PWD</span></code> or its nearest parent
+directories. In a normal suite, the basename of the (nearest parent)
+directory containing the <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file is assumed to be the
+suite name. In a project containing a rose stem suite, the basename of
+the (nearest parent) directory containing the <code class="docutils literal notranslate"><span class="pre">rose-stem/rose-suite.conf</span></code>
+file is assumed to be the suite name.</p>
+<p>This wrapper is to deal with the use case where a suite may be running on
+dedicated servers at a site. The wrapper will make an attempt to detect
+where the suite is running or last run.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--all</span></code></dt>
+<dd>Open a suite control GUI for each running suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--host=HOST</span></code></dt>
+<dd>Specify a host.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--name=SUITE-NAME</span></code></dt>
+<dd>Specify the suite name.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-hook">
+
+<h3>rose suite-hook<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-hook" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Cylc interface</span>
+rose suite-hook <span class="o">[</span>OPTIONS<span class="o">]</span> EVENT SUITE MSG
+rose task-hook <span class="o">[</span>OPTIONS<span class="o">]</span> EVENT SUITE TASK_ID MSG
+</pre></div>
+</div>
+<p>Deprecated. Use cylc built-in event handlers instead.</p>
+<p>Provide a common event hook for cylc suites and tasks.</p>
+<ul class="simple">
+<li>(Task event only) Retrieve remote task logs back to server host.</li>
+<li>Email user if <code class="docutils literal notranslate"><span class="pre">--mail</span></code> specified.</li>
+<li>Shutdown suite if <code class="docutils literal notranslate"><span class="pre">--shutdown</span></code> specified.</li>
+</ul>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--debug</span></code></dt>
+<dd>Switch on debug mode.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--mail-cc=LIST</span></code></dt>
+<dd>Only useful if the <code class="docutils literal notranslate"><span class="pre">--mail</span></code> option is specified. Specify a
+comma separated list of additional addresses to email.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--mail</span></code></dt>
+<dd>Trigger an email notification to the user.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--retrieve-job-logs</span></code></dt>
+<dd>Retrieve remote task job logs.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--shutdown</span></code></dt>
+<dd>Trigger a shutdown of the suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+
+
+
+
+</article><hr class="docutils" />
+
+<article class="slide level-3" id="rose-suite-init">
+
+<h3>rose suite-init<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-init" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-log">
+
+<h3>rose suite-log<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-log" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">1</span>. rose suite-log <span class="o">[</span>--view<span class="o">]</span>
+<span class="m">2</span>. rose suite-log --update <span class="o">[</span>ITEM ...<span class="o">]</span>
+   rose suite-log --update <span class="s1">&#39;*&#39;</span> <span class="c1"># all task jobs</span>
+<span class="m">3</span>. rose suite-log --archive CYCLE ...
+   rose suite-log --archive <span class="s1">&#39;*&#39;</span> <span class="c1"># all cycles</span>
+</pre></div>
+</div>
+<p>View or update suite log.</p>
+<ol class="arabic simple">
+<li>Launch web browser to view suite log. If “rose bush” is not
+configured, the command will offer to start it.</li>
+<li>Pull back task job logs from any remote hosts for specified cycle
+times or task names or IDs.</li>
+<li>Archive (tar-gzip) job logs at the specified cycle time.</li>
+</ol>
+<p>If <code class="docutils literal notranslate"><span class="pre">--name=SUITE-NAME</span></code> is not specified, the name will be determined by
+locating a <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file in <code class="docutils literal notranslate"><span class="pre">$PWD</span></code> or its nearest parent
+directories. In a normal suite, the basename of the (nearest parent)
+directory containing the <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file is assumed to be the
+suite name. In a project containing a rose stem suite, the basename of
+the (nearest parent) directory containing the <code class="docutils literal notranslate"><span class="pre">rose-stem/rose-suite.conf</span></code>
+file is assumed to be the suite name.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--archive</span></code></dt>
+<dd>Archive (tar-gzip) job logs at specified cycle times. Implies
+<code class="docutils literal notranslate"><span class="pre">--update</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--force,</span> <span class="pre">-f</span></code></dt>
+<dd>Same as <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">suite-log</span> <span class="pre">--update</span> <span class="pre">'*'</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--name=SUITE-NAME,</span> <span class="pre">-n</span> <span class="pre">SUITE-NAME</span></code></dt>
+<dd>Specify the suite name, instead of using basename of <code class="docutils literal notranslate"><span class="pre">$PWD</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--prune-remote</span></code></dt>
+<dd>If specified, remove job logs from remote hosts after pulling them to
+suite host.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--tidy-remote</span></code></dt>
+<dd>Deprecated. Use <code class="docutils literal notranslate"><span class="pre">--prune-remote</span></code> instead.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--update,</span> <span class="pre">-U</span></code></dt>
+<dd>Update job logs for items specified in arguments.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--user=USER-NAME,</span> <span class="pre">-u</span> <span class="pre">USER-NAME</span></code></dt>
+<dd>View mode only. View logs of a suite of a different user.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--view</span></code></dt>
+<dd>Launch web browser to view suite log.</dd>
+</dl>
+
+
+
+
+</article><hr class="docutils" />
+
+<article class="slide level-3" id="rose-suite-log-view">
+
+<h3>rose suite-log-view<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-log-view" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rose-suite-log"><span class="std std-ref">rose suite-log</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-restart">
+
+<h3>rose suite-restart<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-restart" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose suite-restart <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[[</span>--<span class="o">]</span> CYLC-RESTART-ARGS<span class="o">]</span>
+
+<span class="c1"># Restart cylc suite with name equal to basename of $PWD.</span>
+rose suite-restart
+
+<span class="c1"># Restart cylc suite NAME</span>
+rose suite-restart --name<span class="o">=</span>NAME
+
+<span class="c1"># Restart cylc suite NAME with a given state dump</span>
+rose suite-restart --name<span class="o">=</span>NAME -- state.20141118T161121.195326Z
+
+<span class="c1"># Restart cylc suite NAME on given host</span>
+rose suite-restart --name<span class="o">=</span>NAME --host<span class="o">=</span>my-suite-host
+</pre></div>
+</div>
+<p>Restart a shutdown suite from its last known state without reinstalling
+it.</p>
+<p>If re-installation is required, use <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">suite-run</span> <span class="pre">--restart</span></code>.</p>
+<p><strong>ARGUMENTS</strong></p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--host=HOST</span></code></dt>
+<dd>Specify a host for restarting the suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--name=NAME,</span> <span class="pre">-n</span> <span class="pre">NAME</span></code></dt>
+<dd>Specify the suite <code class="docutils literal notranslate"><span class="pre">NAME</span></code> in cylc, instead of using the basename of
+the current working directory.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-gcontrol</span></code></dt>
+<dd>Do not run <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code>. Default is to run <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> if the suite is
+running and the <code class="docutils literal notranslate"><span class="pre">DISPLAY</span></code> environment variable is defined.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-run">
+
+<h3>rose suite-run<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-run" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose suite-run <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[[</span>--<span class="o">]</span> CYLC-RUN-ARGS<span class="o">]</span>
+
+<span class="c1"># Install and run a Cylc suite in $PWD.</span>
+rose suite-run
+
+<span class="c1"># As above, but start the suite in simulation mode.</span>
+rose suite-run -- --mode<span class="o">=</span>simulation
+
+<span class="c1"># Install and run the suite in $PWD, and register it as &quot;my.suite&quot;.</span>
+rose suite-run -n my.suite
+
+<span class="c1"># Install and run suite in &quot;/dir/to/my.suite&quot;.</span>
+<span class="c1"># Equivalent to (cd /dir/to/my.suite &amp;&amp; rose suite-run).</span>
+rose suite-run -C /dir/to/my.suite
+</pre></div>
+</div>
+<p>Install and run a Cylc suite.</p>
+<p>Install a suite (in <code class="docutils literal notranslate"><span class="pre">$PWD</span></code>), register it in Cylc using the basename of
+the configuration directory or the option specified in <code class="docutils literal notranslate"><span class="pre">--name=NAME</span></code>.
+Invoke <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">run</span></code> on it. Arguments (and options after <code class="docutils literal notranslate"><span class="pre">--</span></code>) are passed
+to <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">run</span></code>.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--config=DIR,</span> <span class="pre">-C</span> <span class="pre">DIR</span></code></dt>
+<dd>Specify the configuration directory of the suite. (default=<code class="docutils literal notranslate"><span class="pre">$PWD</span></code>)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--define=[SECTION]KEY=VALUE,</span> <span class="pre">-D</span> <span class="pre">[SECTION]KEY=VALUE</span></code></dt>
+<dd>Each of these overrides the <code class="docutils literal notranslate"><span class="pre">[SECTION]KEY</span></code> setting with a given
+<code class="docutils literal notranslate"><span class="pre">VALUE</span></code>. Can be used to disable a setting using the syntax
+<code class="docutils literal notranslate"><span class="pre">--define=[SECTION]!KEY</span></code> or even <code class="docutils literal notranslate"><span class="pre">--define=[!SECTION]</span></code>.
+See also <code class="docutils literal notranslate"><span class="pre">--define-suite</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--define-suite=KEY=VALUE,</span> <span class="pre">-S</span> <span class="pre">KEY=VALUE</span></code></dt>
+<dd>As <code class="docutils literal notranslate"><span class="pre">--define</span></code>, but with an implicit <code class="docutils literal notranslate"><span class="pre">[SECTION]</span></code> for suite variables.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--host=HOST</span></code></dt>
+<dd>Specify a host for running the suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--install-only,</span> <span class="pre">-i</span></code></dt>
+<dd>Install the suite. Do not run it. Implies <code class="docutils literal notranslate"><span class="pre">--no-gcontrol</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--local-install-only,</span> <span class="pre">-l</span></code></dt>
+<dd>Install the suite locally. Do not install to job hosts. Do not run
+it. Implies –no-gcontrol.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--validate-suite-only</span></code></dt>
+<dd>Install the suite in a temporary location. Do not setup any directories.
+Do not run any jobs. Implies –no-gcontrol. Overrides –install-only and
+–local-install-only.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--log-keep=DAYS</span></code></dt>
+<dd>Specify the number of days to keep log directories/archives.
+Do not housekeep if not specified. Named log directories (created by
+<code class="docutils literal notranslate"><span class="pre">--log-name=NAME</span></code> in previous runs) will not be housekept.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--log-name=NAME</span></code></dt>
+<dd>Specify a name for the log directory of the current run. If
+specified, it will create a symbolic link <code class="docutils literal notranslate"><span class="pre">log.NAME</span></code> to point to the
+log directory of the current run. Named log directories will not be
+automatically archived or housekept. Only works with <code class="docutils literal notranslate"><span class="pre">--run=run</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--name=NAME,</span> <span class="pre">-n</span> <span class="pre">NAME</span></code></dt>
+<dd>Specify the suite <code class="docutils literal notranslate"><span class="pre">NAME</span></code> in Cylc, instead of using the basename of
+the configuration directory.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--new,</span> <span class="pre">-N</span></code></dt>
+<dd>(Re-)create suite runtime locations. This option is equivalent to
+running <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">suite-clean</span> <span class="pre">-y</span> <span class="pre">&amp;&amp;</span> <span class="pre">rose</span> <span class="pre">suite-run</span></code> and will remove
+previous runs. Users may want to take extra care when using this
+option.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-gcontrol</span></code></dt>
+<dd>Do not run <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code>. Default is to run <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> if the suite is
+running and the <code class="docutils literal notranslate"><span class="pre">DISPLAY</span></code> environment variable is defined.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-log-archive</span></code></dt>
+<dd>Do not archive (tar-gzip) old log directories.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-overwrite</span></code></dt>
+<dd>Do not overwrite existing files.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-strict</span></code></dt>
+<dd>Do not validate (suite engine configuration) in strict mode.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--opt-conf-key=KEY,</span> <span class="pre">-O</span> <span class="pre">KEY,</span> <span class="pre">--opt-conf-key='(KEY)',</span> <span class="pre">-O</span> <span class="pre">'(KEY)'</span></code></dt>
+<dd>Each of these switches on an optional configuration identified by
+<code class="docutils literal notranslate"><span class="pre">KEY</span></code>. The configurations are applied first-to-last. The <code class="docutils literal notranslate"><span class="pre">(KEY)</span></code>
+syntax denotes an optional configuration that can be missing.
+Otherwise, the optional configuration must exist.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--reload</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--run=reload</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--restart</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--run=restart</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--run=reload|restart|run</span></code></dt>
+<dd>Invoke <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">reload|restart|run</span></code> according to this option.
+(default=<code class="docutils literal notranslate"><span class="pre">run</span></code>)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<p><a class="reference internal" href="#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> provides the following environment variables to the suite.</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_ORIG_HOST</span></code></dt>
+<dd>The name of the host where the <a class="reference internal" href="#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> command was invoked.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span> <span class="pre">ROSE_SUITE_OPT_CONF_KEYS</span></code></dt>
+<dd>Each <code class="docutils literal notranslate"><span class="pre">KEY</span></code> in this space delimited list switches on an optional
+configuration. The configurations are applied first-to-last.</dd>
+</dl>
+<p><strong>JINJA2 VARIABLES</strong></p>
+<p><a class="reference internal" href="#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> provides the following Jinja2 variables to the suite.</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_ORIG_HOST</span></code></dt>
+<dd>The name of the host where the <a class="reference internal" href="#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a> command was invoked.</dd>
+</dl>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">help</span> <span class="pre">gui</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">help</span> <span class="pre">register</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">help</span> <span class="pre">run</span></code></li>
+</ul>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-scan">
+
+<h3>rose suite-scan<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-scan" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose suite-scan <span class="o">[</span>HOST ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Scan for running suites.</p>
+<p>If no HOST specified, use <code class="docutils literal notranslate"><span class="pre">[rose-suite-run]</span> <span class="pre">hosts</span></code> setting in site / user
+configuration. If no configuration defined, use <code class="docutils literal notranslate"><span class="pre">localhost</span></code>.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-suite-shutdown">
+
+<h3>rose suite-shutdown<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-shutdown" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose suite-shutdown <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>--name<span class="o">=</span>SUITE-NAME<span class="o">]</span> <span class="o">[[</span>--<span class="o">]</span> EXTRA-ARGS ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Shutdown a running suite.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">--name=SUITE-NAME</span></code> is not specified, the name will be determined by
+locating a <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file in <code class="docutils literal notranslate"><span class="pre">$PWD</span></code> or its nearest parent
+directories. In a normal suite, the basename of the (nearest parent)
+directory containing the <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file is assumed to be the
+suite name. In a project containing a rose stem suite, the basename of
+the (nearest parent) directory containing the <code class="docutils literal notranslate"><span class="pre">rose-stem/rose-suite.conf</span></code>
+file is assumed to be the suite name.</p>
+<p>This wrapper also deals with the use case where a suite may be running on
+dedicated servers at a site. The wrapper will make an attempt to detect
+where the suite is running or last run.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--all</span></code></dt>
+<dd>Shutdown all running suites. You will be prompted to confirm shutting
+down each affected suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--host=HOST</span></code></dt>
+<dd>Specify a host.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--name=SUITE-NAME</span></code></dt>
+<dd>Specify the suite name.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--non-interactive,</span> <span class="pre">--yes,</span> <span class="pre">-y</span></code></dt>
+<dd>Switch off interactive prompting (=answer yes to everything)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--</span> <span class="pre">--EXTRA-ARGS</span></code></dt>
+<dd>See the cylc documentation, cylc shutdown for options and details on 
+<code class="docutils literal notranslate"><span class="pre">EXTRA-ARGS</span></code>.</dd>
+</dl>
+
+
+
+
+</article><hr class="docutils" />
+
+<article class="slide level-3" id="rose-suite-stop">
+
+<h3>rose suite-stop<a class="headerlink" href="../../html/api/command-reference.html#rose-suite-stop" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rose-suite-shutdown"><span class="std std-ref">rose suite-shutdown</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-task-env">
+
+<h3>rose task-env<a class="headerlink" href="../../html/api/command-reference.html#rose-task-env" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose task-env <span class="o">[</span>OPTIONS<span class="o">]</span>
+
+<span class="nb">eval</span> <span class="k">$(</span>rose task-env<span class="k">)</span>
+</pre></div>
+</div>
+<p>Provide an environment for cycling suite task.</p>
+<p>Print <code class="docutils literal notranslate"><span class="pre">KEY=VALUE</span></code> of the following to the STDOUT:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_SUITE_DIR</span></code></dt>
+<dd>The path to the root directory of the running suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_SUITE_DIR_REL</span></code></dt>
+<dd>The path to the root directory of the running suite relative to
+<code class="docutils literal notranslate"><span class="pre">$HOME</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_SUITE_NAME</span></code></dt>
+<dd>The name of the running suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_TASK_NAME</span></code></dt>
+<dd>The name of the suite task.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_TASK_CYCLE_TIME</span></code></dt>
+<dd>The cycle time of the suite task, if there is one.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_CYCLING_MODE</span></code></dt>
+<dd>The cycling mode of the running suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_TASK_LOG_ROOT</span></code></dt>
+<dd>The root path for log files of the suite task.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_DATA</span></code></dt>
+<dd>The path to the data directory of the running suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code></dt>
+<dd>The path to the data directory of this cycle
+time in the running suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_DATAC????</span></code></dt>
+<dd><p class="first">The path to the data directory of the cycle time with an offset
+relative to the current cycle time. <code class="docutils literal notranslate"><span class="pre">????</span></code> is a duration:</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">__</span></code> (double underscore) prefix denotes a cycle time in the
+future (because a minus sign cannot be used in an environment
+variable). Otherwise, it is a cycle time in the past.</p>
+<p>The rest should be either an ISO 8601 duration, such as:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">P2W</span></code> - 2 weeks</li>
+<li><code class="docutils literal notranslate"><span class="pre">PT12H</span></code> - 12 hours</li>
+<li><code class="docutils literal notranslate"><span class="pre">P1DT6H</span></code> - 1 day, 6 hours</li>
+<li><code class="docutils literal notranslate"><span class="pre">P4M</span></code> - 4 months</li>
+<li><code class="docutils literal notranslate"><span class="pre">PT5M</span></code> - 5 minutes</li>
+</ul>
+<p>Or, for the case of integer cycling suites:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">P1</span></code> - 1 cycle before the current cycle</li>
+<li><code class="docutils literal notranslate"><span class="pre">P5</span></code> - 5 cycles before the current cycle</li>
+</ul>
+<p>Deprecated syntax:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">nW</span></code> denotes <code class="docutils literal notranslate"><span class="pre">n</span></code> weeks.</li>
+<li><code class="docutils literal notranslate"><span class="pre">n</span></code> or <code class="docutils literal notranslate"><span class="pre">nD</span></code> denotes <code class="docutils literal notranslate"><span class="pre">n</span></code> days.</li>
+<li><code class="docutils literal notranslate"><span class="pre">Tn</span></code> or <code class="docutils literal notranslate"><span class="pre">TnH</span></code> denotes <code class="docutils literal notranslate"><span class="pre">n</span></code> hours.</li>
+<li><code class="docutils literal notranslate"><span class="pre">TnM</span></code> denotes <code class="docutils literal notranslate"><span class="pre">n</span></code> minutes.</li>
+<li><code class="docutils literal notranslate"><span class="pre">TnS</span></code> denotes <code class="docutils literal notranslate"><span class="pre">s</span></code> seconds.</li>
+</ul>
+<p>E.g. <code class="docutils literal notranslate"><span class="pre">ROSE_DATACPT6H</span></code> is the data directory of 6 hours before the
+current cycle time.</p>
+<p class="last">E.g. <code class="docutils literal notranslate"><span class="pre">ROSE_DATACP1D</span></code> and <code class="docutils literal notranslate"><span class="pre">ROSE_DATACPT24H</span></code> are both the data
+directory of 1 day before the current cycle time.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_ETC</span></code></dt>
+<dd>The path to the etc directory of the running suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_TASK_PREFIX</span></code></dt>
+<dd>The prefix in the task name.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_TASK_SUFFIX</span></code></dt>
+<dd>The suffix in the task name.</dd>
+</dl>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--cycle=TIME,</span> <span class="pre">-t</span> <span class="pre">TIME</span></code></dt>
+<dd>Specify the cycle time. If not defined, use the cycle time provided
+by the suite environment. <code class="docutils literal notranslate"><span class="pre">TIME</span></code> can be in an ISO date/time format,
+<code class="docutils literal notranslate"><span class="pre">CCYYMMDDhh</span></code> (deprecated) date/time format, or a <code class="docutils literal notranslate"><span class="pre">TIME-DELTA</span></code> string
+described in the <code class="docutils literal notranslate"><span class="pre">--cycle-offset=TIME-DELTA</span></code> option.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--cycle-offset=TIME-DELTA,</span> <span class="pre">-T</span> <span class="pre">TIME-DELTA</span></code></dt>
+<dd><p class="first">Specify one or more cycle offsets to determine what
+<code class="docutils literal notranslate"><span class="pre">ROSE_DATAC????</span></code> environment variables to export. The <code class="docutils literal notranslate"><span class="pre">TIME-DELTA</span></code>
+argument uses the syntax explained above in the <code class="docutils literal notranslate"><span class="pre">ROSE_DATAC????</span></code>
+environment variable.</p>
+<p>E.g. <code class="docutils literal notranslate"><span class="pre">--cycle-offset=PT3H</span> <span class="pre">--cycle-offset=PT6H</span></code> will tell
+<a class="reference internal" href="#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> to export <code class="docutils literal notranslate"><span class="pre">ROSE_DATACPT3H</span></code> and <code class="docutils literal notranslate"><span class="pre">ROSE_DATACPT6H</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The main usage of this option is to reference a cycle time in
+the past, so a positive offset is used to go backward in time,
+and a negative offset is used to go forward in time.</p>
+</div>
+<p class="last">E.g. <code class="docutils literal notranslate"><span class="pre">--cycle-offset=-PT3H</span></code> will tell <a class="reference internal" href="#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> to export
+<code class="docutils literal notranslate"><span class="pre">ROSE_DATAC__PT3H</span></code> for <code class="docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code> of 3 hours ahead of the current
+cycle time.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--path=[NAME=]PATTERN,</span> <span class="pre">-P</span> <span class="pre">[NAME=]PATTERN</span></code></dt>
+<dd>Each of these specify a glob pattern for paths to prepend to an
+environment variable called <code class="docutils literal notranslate"><span class="pre">NAME</span></code> (or <code class="docutils literal notranslate"><span class="pre">PATH</span></code> if <code class="docutils literal notranslate"><span class="pre">NAME</span></code> is not
+specified).
+If a relative path is given, it is relative to <code class="docutils literal notranslate"><span class="pre">$ROSE_SUITE_DIR</span></code>. An
+empty value resets the default and any previous <code class="docutils literal notranslate"><span class="pre">--path=PATTERN</span></code>
+settings.
+(Default for <code class="docutils literal notranslate"><span class="pre">PATH</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;share/fcm[_-]make*/*/bin&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;work/fcm[_-]make*/*/bin&quot;</span></code>)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--prefix-delim=DELIMITER</span></code></dt>
+<dd>Specify the delimiter used to determine the task name prefix.
+(Default=<code class="docutils literal notranslate"><span class="pre">_</span></code>)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--suffix-delim=DELIMITER</span></code></dt>
+<dd>Specify the delimiter used to determine the task name suffix.
+(Default=<code class="docutils literal notranslate"><span class="pre">_</span></code>)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<p><strong>USAGE IN SUITES</strong></p>
+<p>rose <code class="docutils literal notranslate"><span class="pre">task-env</span></code> can be used to make environment variables available to a
+suite by defining its <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> <code class="docutils literal notranslate"><span class="pre">env-script</span></code> option as
+<code class="docutils literal notranslate"><span class="pre">env-script</span> <span class="pre">=</span> <span class="pre">eval</span> <span class="pre">$(rose</span> <span class="pre">task-env)</span></code>.</p>
+
+
+
+
+</article><hr class="docutils" />
+
+<article class="slide level-3" id="rose-task-hook">
+
+<h3>rose task-hook<a class="headerlink" href="../../html/api/command-reference.html#rose-task-hook" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rose-suite-hook"><span class="std std-ref">rose suite-hook</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-task-run">
+
+<h3>rose task-run<a class="headerlink" href="../../html/api/command-reference.html#rose-task-run" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose task-run <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>--<span class="o">]</span> <span class="o">[</span>APP-COMMAND ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Provide an environment to run a suite task.</p>
+<p>Provides environment variables documented in <a class="reference internal" href="#command-rose-task-env"><span class="std std-ref">rose task-env</span></a>. It is worth
+noting that if the environment variables are already provided by
+<a class="reference internal" href="#command-rose-task-env"><span class="std std-ref">rose task-env</span></a>, this command will not override them.</p>
+<p>Normally, the suite task will select a Rose application configuration
+that has the same name as the task. This can be overridden by the
+<code class="docutils literal notranslate"><span class="pre">--app-key=KEY</span></code> option or the <code class="docutils literal notranslate"><span class="pre">ROSE_TASK_APP</span></code> environment variable.</p>
+<p><strong>OPTIONS</strong></p>
+<p>All options of <a class="reference internal" href="#command-rose-app-run"><span class="std std-ref">rose app-run</span></a> and <a class="reference internal" href="#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> are supported.
+Additional options are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--app-key=KEY</span></code></dt>
+<dd>Specify a named application configuration.</dd>
+</dl>
+<p><strong>ENVIRONMENT VARIABLES</strong></p>
+<p>All environment variables of <a class="reference internal" href="#command-rose-app-run"><span class="std std-ref">rose app-run</span></a> and <a class="reference internal" href="#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> are
+supported. All environment variables documented in <a class="reference internal" href="#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> are
+passed to the application <a class="reference internal" href="#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> runs.
+The following environment variables are used by <a class="reference internal" href="#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">ROSE_TASK_APP</span></code></dt>
+<dd>Specify a named application configuration.</dd>
+</dl>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><a class="reference internal" href="#command-rose-app-run"><span class="std std-ref">rose app-run</span></a></li>
+<li><a class="reference internal" href="#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></li>
+</ul>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-test-battery">
+
+<h3>rose test-battery<a class="headerlink" href="../../html/api/command-reference.html#rose-test-battery" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose test-battery
+</pre></div>
+</div>
+<p>Run Rose self tests.</p>
+<p>Change directory to Rose source tree, and runs this shell command:</p>
+<p><code class="docutils literal notranslate"><span class="pre">exec</span> <span class="pre">prove</span> <span class="pre">-j</span> <span class="pre">&quot;$NPROC&quot;</span> <span class="pre">-s</span> <span class="pre">-r</span> <span class="pre">&quot;${&#64;:-t}&quot;</span></code></p>
+<p>where <code class="docutils literal notranslate"><span class="pre">NPROC</span></code> is the number of processors on your computer (or the
+setting <code class="docutils literal notranslate"><span class="pre">[t]prove-options</span></code> in the site/user configuration file). If you
+do not want to run the full test suite, you can specify the names of
+individual test files or their containing directories as extra arguments.</p>
+<p><strong>EXAMPLES</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run the full test suite with the default options.</span>
+rose test-battery
+<span class="c1"># Run the full test suite with 12 processes.</span>
+rose test-battery -j <span class="m">12</span>
+<span class="c1"># Run only tests under &quot;t/rose-app-run/&quot; with 12 processes.</span>
+rose test-battery -j <span class="m">12</span> t/rose-app-run
+<span class="c1"># Run only &quot;t/rose-app-run/07-opt.t&quot; in verbose mode.</span>
+rose test-battery -v t/rose-app-run/07-opt.t
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">prove(1)</span></code></li>
+</ul>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rose-tutorial">
+
+<h3>rose tutorial<a class="headerlink" href="../../html/api/command-reference.html#rose-tutorial" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print list of available suites.</span>
+rose tutorial
+<span class="c1"># Copy SUITE to DIR (defaults to ~/cylc-run/SUITE).</span>
+rose tutorial SUITE <span class="o">[</span>DIR<span class="o">]</span>
+</pre></div>
+</div>
+<p>Make a copy of one of the tutorial SUITE in the cylc-run directory.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="rosie-commands">
+
+<h2>Rosie Commands<a class="headerlink" href="../../html/api/command-reference.html#rosie-commands" title="View HTML">§</a></h2>
+
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-checkout">
+
+<h3>rosie checkout<a class="headerlink" href="../../html/api/command-reference.html#rosie-checkout" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie checkout <span class="o">[</span>OPTIONS<span class="o">]</span> ID ...
+</pre></div>
+</div>
+<p>Checkout local copies of suites.</p>
+<p>For each <code class="docutils literal notranslate"><span class="pre">ID</span></code> in the argument list, checkout a working copy of the suite
+identified by <code class="docutils literal notranslate"><span class="pre">ID</span></code> to the standard location.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--force,</span> <span class="pre">-f</span></code></dt>
+<dd>If working copy for suite identified by <code class="docutils literal notranslate"><span class="pre">ID</span></code> already exists, remove
+it. Continue to the next <code class="docutils literal notranslate"><span class="pre">ID</span></code> if checkout of a suite fails.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+
+
+
+
+</article><hr class="docutils" />
+
+<article class="slide level-3" id="rosie-co">
+
+<h3>rosie co<a class="headerlink" href="../../html/api/command-reference.html#rosie-co" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rosie-checkout"><span class="std std-ref">rosie checkout</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-copy">
+
+<h3>rosie copy<a class="headerlink" href="../../html/api/command-reference.html#rosie-copy" title="View HTML">§</a></h3>
+
+<p>Alias - see <a class="reference internal" href="#command-rosie-create"><span class="std std-ref">rosie create</span></a></p>
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-create">
+
+<h3>rosie create<a class="headerlink" href="../../html/api/command-reference.html#rosie-create" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie create <span class="o">[</span>OPTIONS<span class="o">]</span>
+rosie copy <span class="o">[</span>OPTIONS<span class="o">]</span> FROM-ID
+</pre></div>
+</div>
+<p>Create a new suite, and optionally copy items from an existing one.</p>
+<p>Assign an <code class="docutils literal notranslate"><span class="pre">ID</span></code> and create the directory structure in the central
+repository for a new suite.</p>
+<p>The location of the repository for the new suite is determined in order
+of preference:</p>
+<ol class="arabic simple">
+<li><code class="docutils literal notranslate"><span class="pre">--prefix=PREFIX</span></code> option</li>
+<li>prefix of the <code class="docutils literal notranslate"><span class="pre">FROM-ID</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">[rosie-id]prefix-default</span></code> option in the site/user configuration.</li>
+</ol>
+<p>If <code class="docutils literal notranslate"><span class="pre">FROM-ID</span></code> is specified, copy items from the existing suite <code class="docutils literal notranslate"><span class="pre">FROM-ID</span></code>
+when the suite is created. It is worth noting that revision history of
+the copied items can only be preserved if <code class="docutils literal notranslate"><span class="pre">FROM-ID</span></code> is in the same
+repository of the new suite.</p>
+<p>The syntax of the FROM-ID is PREFIX-xxNNN[/BRANCH][&#64;REV] (e.g. my-su173,
+my-su173/trunk, <a class="reference external" href="mailto:my-su173/trunk&#37;&#52;&#48;HEAD">my-su173/trunk<span>&#64;</span>HEAD</a>). If REV is not specified, the last
+changed revision of the branch is used. If BRANCH is not specified,
+“trunk” is used.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--info-file=FILE</span></code></dt>
+<dd>Specify a <code class="docutils literal notranslate"><span class="pre">FILE</span></code> containing the discovery information for the
+new suite. If <code class="docutils literal notranslate"><span class="pre">FILE</span></code> is <code class="docutils literal notranslate"><span class="pre">-</span></code>, read from STDIN. The default behaviour
+is to open an editor to add suite discovery information.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--meta-suite</span></code></dt>
+<dd>(Admin-only) Create the special suite in the repository
+containing discovery metadata and known keys.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-checkout</span></code></dt>
+<dd>Do not checkout a working copy of the newly created suite.
+Default is to checkout.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--non-interactive,</span> <span class="pre">--yes,</span> <span class="pre">-y</span></code></dt>
+<dd>Switch off interactive prompting (=answer yes to everything)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--prefix=PREFIX</span></code></dt>
+<dd>Specify the prefix (i.e. the suite repository) to use.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--project=PROJECT</span></code></dt>
+<dd>Specify a project to check/query any available metadata.
+The default behaviour is to use no project and metadata.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-delete">
+
+<h3>rosie delete<a class="headerlink" href="../../html/api/command-reference.html#rosie-delete" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie delete <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>--<span class="o">]</span> <span class="o">[</span>ID ...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Delete suites.</p>
+<p>Check the standard working copy location for a checked out suite
+matching <code class="docutils literal notranslate"><span class="pre">ID</span></code> and remove it if there is no uncommitted change (or if
+<code class="docutils literal notranslate"><span class="pre">--force</span></code> is specified).</p>
+<p>Delete the suite directory structure from the HEAD of the central
+repository matching the <code class="docutils literal notranslate"><span class="pre">ID</span></code>.</p>
+<p>If no <code class="docutils literal notranslate"><span class="pre">ID</span></code> is specified and <code class="docutils literal notranslate"><span class="pre">$PWD</span></code> is a working copy of a suite, use the
+<code class="docutils literal notranslate"><span class="pre">ID</span></code> of the suite in the working copy.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--force,</span> <span class="pre">-f</span></code></dt>
+<dd>Remove working copies even if there are uncommitted changes.
+Continue with the next <code class="docutils literal notranslate"><span class="pre">ID</span></code> if delete of a suite fails.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--local-only</span></code></dt>
+<dd>Remove only the working copy of a suite.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--non-interactive,</span> <span class="pre">--yes,</span> <span class="pre">-y</span></code></dt>
+<dd>Switch off interactive prompting (=answer yes to everything)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Decrement verbosity.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Increment verbosity.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-disco">
+
+<h3>rosie disco<a class="headerlink" href="../../html/api/command-reference.html#rosie-disco" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie disco start <span class="o">[</span>PORT<span class="o">]</span> <span class="c1"># start ad-hoc web service server (on PORT)</span>
+rosie disco stop         <span class="c1"># stop ad-hoc web service server</span>
+rosie disco stop -y      <span class="c1"># stop ad-hoc web service server w/o prompting</span>
+rosie disco              <span class="c1"># print status of ad-hoc web service server</span>
+</pre></div>
+</div>
+<p>Start/stop ad-hoc Rosie suite discovery web service server.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">rosie</span> <span class="pre">disco</span> <span class="pre">start</span></code>, if <code class="docutils literal notranslate"><span class="pre">PORT</span></code> is not specified, use port 8080.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--non-interactive,</span> <span class="pre">--yes,</span> <span class="pre">-y</span></code></dt>
+<dd>(For stop only.) Switch off interactive prompting (=answer yes to
+everything)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--service-root,</span> <span class="pre">-R</span></code></dt>
+<dd>(For start only.) Include web service name under root of URL.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-go">
+
+<h3>rosie go<a class="headerlink" href="../../html/api/command-reference.html#rosie-go" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie go <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Launch the Rosie client GTK+ GUI.</p>
+<p>If arguments are specified, rosie go will perform an initial lookup based
+on the arguments, which can be an address, a query, or search words. See
+<a class="reference internal" href="#command-rosie-lookup"><span class="std std-ref">rosie lookup</span></a> for detail.</p>
+<p>Unless an option is used to specify the initial search type the argument
+is interpreted as follows:</p>
+<ul class="simple">
+<li>A string beginning with “http”: an address</li>
+<li>A string not beginning with “http”: search words</li>
+</ul>
+<p>An address URL may contain shell meta characters, so remember to put it
+in quotes.</p>
+<p>Search strings may contain SQL wildcard characters. E.g.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">%</span></code> (percent) is a substitute for zero or more characters.</li>
+<li><code class="docutils literal notranslate"><span class="pre">_</span></code> (underscore) is a substitute for a single character.</li>
+</ul>
+<p>If no argument is specified, rosie go will display a list of all your
+locally checked out suites.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--address-mode,</span> <span class="pre">--url,</span> <span class="pre">-A,</span> <span class="pre">-U</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--lookup-mode=address</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--all-revs</span></code></dt>
+<dd>Specify whether to search deleted suites and superceded suites.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--lookup-mode=MODE</span></code></dt>
+<dd>Specify the initial lookup mode. <code class="docutils literal notranslate"><span class="pre">MODE</span></code> can be <code class="docutils literal notranslate"><span class="pre">address</span></code>, <code class="docutils literal notranslate"><span class="pre">query</span></code> or
+<code class="docutils literal notranslate"><span class="pre">search</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--prefix=PREFIX</span></code></dt>
+<dd>Specify the name of a Rosie web service to use. This option can be
+used multiple times.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--query,</span> <span class="pre">-Q</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--lookup-mode=query</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--search,</span> <span class="pre">-S</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--lookup-mode=search</span></code>.</dd>
+</dl>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><a class="reference internal" href="#command-rosie-lookup"><span class="std std-ref">rosie lookup</span></a></li>
+<li><a class="reference internal" href="#command-rosie-ls"><span class="std std-ref">rosie ls</span></a></li>
+</ul>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-graph">
+
+<h3>rosie graph<a class="headerlink" href="../../html/api/command-reference.html#rosie-graph" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie graph <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>ID<span class="o">]</span>
+</pre></div>
+</div>
+<p>Graph suite copy ancestry.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--distance=DISTANCE,</span> <span class="pre">-d</span> <span class="pre">DISTANCE</span></code></dt>
+<dd>The maximum distance (graph depth) for suites related to <code class="docutils literal notranslate"><span class="pre">ID</span></code>
+to be plotted. For example, if the distance is 1, only the
+parents and children (but not siblings) of <code class="docutils literal notranslate"><span class="pre">ID</span></code> will be plotted.
+If not given, this is unlimited. Requires <code class="docutils literal notranslate"><span class="pre">ID</span></code> to be specified.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--output=FILE,</span> <span class="pre">-o</span> <span class="pre">FILE</span></code></dt>
+<dd>The name of the file for dumping the output. Otherwise,
+the output will go to a temporary file which will get
+tidied up. The extension of the filename determines the
+output format - see graphviz AGraph.draw documentation.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--prefix=PREFIX</span></code></dt>
+<dd>Display suites from only the specified web services.
+This option can be used multiple times.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--text</span></code></dt>
+<dd><p class="first">Print parent and child suites of a suite <code class="docutils literal notranslate"><span class="pre">ID</span></code>. For example, for a
+suite “bar” you may get results like:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">[parent]</span> <span class="pre">foo</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">[child1]</span> <span class="pre">baz</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">[child1]</span> <span class="pre">qux</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">[child2]</span> <span class="pre">quux</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">[child3]</span> <span class="pre">corge</span></code></li>
+</ul>
+<p class="last">where “foo” is the parent of “bar”, “baz” and “qux” its first
+generation children, “quux” its second generation child and “corge”
+its third generation child. Also supports use of the <code class="docutils literal notranslate"><span class="pre">--property</span></code>
+option for producing output. Requires <code class="docutils literal notranslate"><span class="pre">ID</span></code> to be specified.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--property=PROPERTY,</span> <span class="pre">-p</span> <span class="pre">PROPERTY</span></code></dt>
+<dd>Add a certain suite property to the node labels - e.g.
+owner or title. This option can be used multiple times.</dd>
+</dl>
+<p><strong>ARGUMENTS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">ID</span></code></dt>
+<dd>A suite id to graph. If given, only the suites that are
+connected to this id by copy history will be graphed.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-hello">
+
+<h3>rosie hello<a class="headerlink" href="../../html/api/command-reference.html#rosie-hello" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie hello <span class="o">[</span>--prefix<span class="o">=</span>PREIFX<span class="o">]</span>
+</pre></div>
+</div>
+<p>Set up connection to one or more Rosie web service servers.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--prefix=PREFIX</span></code></dt>
+<dd>Specify the name of one or more Rosie web service servers to use.
+This option can be used multiple times.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-id">
+
+<h3>rosie id<a class="headerlink" href="../../html/api/command-reference.html#rosie-id" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie id <span class="o">[</span>OPTIONS<span class="o">]</span>
+
+<span class="c1"># Print the repository URL of a given suite ID</span>
+rosie id --to-origin mo1-abc45
+
+<span class="c1"># Print the local location of a given suite ID</span>
+rosie id --to-local-copy mo1-abc45
+
+<span class="c1"># Print the output directory of a given suite ID</span>
+rosie id --to-output mo1-abc45
+
+<span class="c1"># Print the web URL of a given suite ID</span>
+rosie id --to-web mo1-abc45
+
+<span class="c1"># Print suite ID of working copy in $PWD</span>
+rosie id
+
+<span class="c1"># Print suite ID of working copy in a directory</span>
+rosie id /path/to/working/copy
+
+<span class="c1"># Print suite ID of a given URL</span>
+rosie id svn://fcm1/rose_mo1_svn/a/b/c/4/5
+
+<span class="c1"># Print latest suite ID in the default repository</span>
+rosie id --latest
+
+<span class="c1"># Print latest suite ID in the given repository</span>
+rosie id --latest mot
+
+<span class="c1"># Print next suite ID in the default repository</span>
+rosie id --next
+</pre></div>
+</div>
+<p>Utility for working with suite IDs.</p>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--latest</span></code></dt>
+<dd>Print the latest suite ID in the repository</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--to-local-copy</span></code></dt>
+<dd>Print the local location of a given suite ID</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--to-origin</span></code></dt>
+<dd>Print the repository URL of a given suite ID</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--to-output</span></code></dt>
+<dd>Print the output directory of a given suite ID</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--to-web</span></code></dt>
+<dd>Print the web URL of a given suite ID</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--next</span></code></dt>
+<dd>Print the next available suite ID in the repository</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-lookup">
+
+<h3>rosie lookup<a class="headerlink" href="../../html/api/command-reference.html#rosie-lookup" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie lookup <span class="o">[</span>OPTIONS<span class="o">]</span> LOOKUP-TEXT ...
+</pre></div>
+</div>
+<p>Find suites in the suite discovery database.</p>
+<p>Search for suites using an address, a query or search words and display
+the information of the matching suites.</p>
+<p>Unless an option is used to specify the initial search type the argument
+is interpreted as follows:</p>
+<ul class="simple">
+<li>A string beginning with “http”: an address</li>
+<li>A string not beginning with “http”: search words</li>
+</ul>
+<p>An address URL may contain shell meta characters, so remember to put it
+in quotes.</p>
+<p>The default output format includes a local working copy status field
+(<code class="docutils literal notranslate"><span class="pre">%local</span></code>) in the first column.</p>
+<ul class="simple">
+<li>A blank field means there is no related suite checked out.</li>
+<li><code class="docutils literal notranslate"><span class="pre">=</span></code> means that the suite is checked out at this branch and revision.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&lt;</span></code> means that the suite is checked out but at an older revision.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&gt;</span></code> means that the suite is checked out but at a newer revision.</li>
+<li><code class="docutils literal notranslate"><span class="pre">S</span></code> means that the suite is checked out but on a different branch.</li>
+<li><code class="docutils literal notranslate"><span class="pre">M</span></code> means that the suite is checked out and modified.</li>
+<li><code class="docutils literal notranslate"><span class="pre">X</span></code> means that the suite is checked out but is corrupted.</li>
+</ul>
+<p>Search strings may contain SQL wildcard characters. E.g:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">%</span></code> (percent) is a substitute for zero or more characters.</li>
+<li><code class="docutils literal notranslate"><span class="pre">_</span></code> (underscore) is a substitute for a single character.</li>
+</ul>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--address-mode,</span> <span class="pre">--url,</span> <span class="pre">-A,</span> <span class="pre">-U</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--lookup-mode=address</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--all-revs</span></code></dt>
+<dd>Specify whether to search deleted suites and superceded suites.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-headers,</span> <span class="pre">-H</span></code></dt>
+<dd>Do not print column headers.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--lookup-mode=MODE</span></code></dt>
+<dd>Specify the initial lookup mode. <code class="docutils literal notranslate"><span class="pre">MODE</span></code> can be <code class="docutils literal notranslate"><span class="pre">address</span></code>, <code class="docutils literal notranslate"><span class="pre">query</span></code> or
+<code class="docutils literal notranslate"><span class="pre">search</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--prefix=PREFIX</span></code></dt>
+<dd>Specify the name of a Rosie web service to use. This option can be
+used multiple times.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--print-format=FORMAT,</span> <span class="pre">--format=FORMAT,</span> <span class="pre">-f</span> <span class="pre">FORMAT</span></code></dt>
+<dd>Control the output format of the results using a string
+containing column names or properties preceded by <code class="docutils literal notranslate"><span class="pre">%</span></code>.
+For example: <code class="docutils literal notranslate"><span class="pre">rosie</span> <span class="pre">lookup</span> <span class="pre">daisy</span> <span class="pre">--format=&quot;%idx</span> <span class="pre">from</span> <span class="pre">%owner&quot;</span></code>
+might give: <code class="docutils literal notranslate"><span class="pre">abc01</span> <span class="pre">from</span> <span class="pre">daisy</span></code></dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--query,</span> <span class="pre">-Q</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--lookup-mode=query</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--format=&quot;%idx</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--reverse,</span> <span class="pre">-r</span></code></dt>
+<dd>Reverse sort order.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--search,</span> <span class="pre">-S</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--lookup-mode=search</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--sort=FIELD,</span> <span class="pre">-s</span> <span class="pre">FIELD</span></code></dt>
+<dd>Sort results by the field <code class="docutils literal notranslate"><span class="pre">FIELD</span></code> instead of revision.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Display full info for each returned suite.</dd>
+</dl>
+<hr class="docutils" />
+
+
+
+
+</article>
+<article class="slide level-3" id="rosie-ls">
+
+<h3>rosie ls<a class="headerlink" href="../../html/api/command-reference.html#rosie-ls" title="View HTML">§</a></h3>
+
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosie ls <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p>List the local suites.</p>
+<p>Search for locally checked out suites and print their details.</p>
+<p>The default format includes a local working copy status field (<code class="docutils literal notranslate"><span class="pre">%local</span></code>)
+in the first column.
+A blank field means there is no related suite checked out.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">=</span></code> means that the suite is checked out at this branch and revision.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&lt;</span></code> means that the suite is checked out but at an older revision.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&gt;</span></code> means that the suite is checked out but at a newer revision.</li>
+<li><code class="docutils literal notranslate"><span class="pre">S</span></code> means that the suite is checked out but on a different branch.</li>
+<li><code class="docutils literal notranslate"><span class="pre">M</span></code> means that the suite is checked out and modified.</li>
+<li><code class="docutils literal notranslate"><span class="pre">X</span></code> means that the suite is checked out but is corrupted.</li>
+</ul>
+<p><strong>OPTIONS</strong></p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">--prefix=PREFIX</span></code></dt>
+<dd>Display locally checked out suites from only the specified web
+services. This option can be used multiple times.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-headers,</span> <span class="pre">-H</span></code></dt>
+<dd>Do not print column headers.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--print-format=FORMAT,</span> <span class="pre">--format=FORMAT,</span> <span class="pre">-f</span> <span class="pre">FORMAT</span></code></dt>
+<dd>Control the output format of the results using a string
+containing column names or properties preceded by <code class="docutils literal notranslate"><span class="pre">%</span></code>.
+For example: <code class="docutils literal notranslate"><span class="pre">rosie</span> <span class="pre">ls</span> <span class="pre">--format=&quot;%idx</span> <span class="pre">from</span> <span class="pre">%owner&quot;</span></code>
+might give: <code class="docutils literal notranslate"><span class="pre">abc01</span> <span class="pre">from</span> <span class="pre">daisy</span></code></dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet,</span> <span class="pre">-q</span></code></dt>
+<dd>Shorthand for <code class="docutils literal notranslate"><span class="pre">--format=&quot;%idx&quot;</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--reverse,</span> <span class="pre">-r</span></code></dt>
+<dd>Reverse sort order.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--sort=FIELD,</span> <span class="pre">-s</span> <span class="pre">FIELD</span></code></dt>
+<dd>Sort results by the field <code class="docutils literal notranslate"><span class="pre">FIELD</span></code> instead of revision.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--user=~USERNAME,</span> <span class="pre">-u</span> <span class="pre">~USERNAME</span></code></dt>
+<dd>Specify another user whose roses directory you want to list
+e.g. <code class="docutils literal notranslate"><span class="pre">--user=~bob</span></code></dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose,</span> <span class="pre">-v</span></code></dt>
+<dd>Display full info for each returned suite.</dd>
+</dl>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,215 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Broadcast &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Family Triggers" href="family-triggers.html" />
+    <link rel="prev" title="Clock Triggered Tasks" href="clock-triggered-tasks.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="broadcast">
+
+<h1>Broadcast<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/broadcast.html#broadcast" title="View HTML">§</a></h1>
+
+<p>This tutorial walks you through using <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> which can be used
+to change <a class="reference internal" href="../runtime/index.html#tutorial-runtime"><span class="std std-ref">task runtime configuration</span></a> in a
+running suite, on-the-fly.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="purpose">
+
+<h2>Purpose<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/broadcast.html#purpose" title="View HTML">§</a></h2>
+
+<p><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> can be used to change any <code class="docutils literal notranslate"><span class="pre">[runtime]</span></code> setting whilst the
+suite is running.</p>
+<p>The standard use of <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> is to update the suite to an
+unexpected change in configuration, for example modifying the host a task
+runs on.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="standalone-example">
+
+<h2>Standalone Example<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/broadcast.html#standalone-example" title="View HTML">§</a></h2>
+
+<p>Create a new suite in the <code class="docutils literal notranslate"><span class="pre">cylc-run</span></code> directory called
+<code class="docutils literal notranslate"><span class="pre">tutorial-broadcast</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">tutorial</span><span class="o">-</span><span class="n">broadcast</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">tutorial</span><span class="o">-</span><span class="n">broadcast</span>
+</pre></div>
+</div>
+<p>Copy the following configuration into a <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nv">initial cycle point </span><span class="o">=</span><span class="s"> 1012</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nt">[[[R1]]]</span>
+            <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">wipe_log</span> <span class="o">=&gt;</span> <span class="kd">announce</span>
+        <span class="nt">[[[PT1H]]]</span>
+            <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">announce</span>[<span class="nb">-PT1H</span>] <span class="o">=&gt;</span> <span class="kd">announce</span>
+
+<span class="nt">[runtime]</span>
+    <span class="nt">[[wipe_log]]</span>
+        <span class="c1"># Delete any files in the suite&#39;s &quot;share&quot; directory.</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rm &quot;${CYLC_SUITE_SHARE_DIR}/knights&quot; || true</span>
+
+    <span class="nt">[[announce]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> echo &quot;${CYLC_TASK_CYCLE_POINT} - ${MESSAGE}&quot; &gt;&gt; &quot;${FILE}&quot;</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">WORD </span><span class="o">=</span><span class="s"> ni</span>
+            <span class="nv">MESSAGE </span><span class="o">=</span><span class="s"> We are the knights who say \&quot;${WORD}\&quot;!</span>
+            <span class="nv">FILE </span><span class="o">=</span><span class="s"> &quot;${CYLC_SUITE_SHARE_DIR}/knights&quot;</span>
+</pre></div>
+</div>
+<p>We now have a suite with an <code class="docutils literal notranslate"><span class="pre">announce</span></code> task which runs every hour, writing a
+message to a log file (<code class="docutils literal notranslate"><span class="pre">share/knights</span></code>) when it does so. For the first cycle
+the log entry will look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>10120101T0000Z - We are the knights who say &quot;ni&quot;!
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> command enables us to change runtime configuration
+whilst the suite is running. For instance we could change the value of the
+<code class="docutils literal notranslate"><span class="pre">WORD</span></code> environment variable using the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">broadcast</span> <span class="n">tutorial</span><span class="o">-</span><span class="n">broadcast</span> <span class="o">-</span><span class="n">n</span> <span class="n">announce</span> <span class="o">-</span><span class="n">s</span> <span class="s2">&quot;[environment]WORD=it&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">tutorial-broadcast</span></code> is the name of the suite.</li>
+<li><code class="docutils literal notranslate"><span class="pre">-n</span> <span class="pre">announce</span></code> tells Cylc we want to change the runtime configuration of the
+<code class="docutils literal notranslate"><span class="pre">announce</span></code> task.</li>
+<li><code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">&quot;[environment]WORD=it&quot;</span></code> changes the value of the <code class="docutils literal notranslate"><span class="pre">WORD</span></code> environment
+variable to <code class="docutils literal notranslate"><span class="pre">it</span></code>.</li>
+</ul>
+<p>Run the suite then try using the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> command to change the
+message:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">run</span> <span class="n">tutorial</span><span class="o">-</span><span class="n">broadcast</span>
+<span class="n">cylc</span> <span class="n">broadcast</span> <span class="n">tutorial</span><span class="o">-</span><span class="n">broadcast</span> <span class="o">-</span><span class="n">n</span> <span class="n">announce</span> <span class="o">-</span><span class="n">s</span> <span class="s2">&quot;[environment]WORD=it&quot;</span>
+</pre></div>
+</div>
+<p>Inspect the <code class="docutils literal notranslate"><span class="pre">share/knights</span></code> file, you should see the message change at
+certain points.</p>
+<p>Stop the suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">stop</span> <span class="n">tutorial</span><span class="o">-</span><span class="n">broadcast</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="in-situ-example">
+
+<h2>In-Situ Example<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/broadcast.html#in-situ-example" title="View HTML">§</a></h2>
+
+<p>We can call <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> from within a task’s script. This effectively
+provides the ability for tasks to communicate between themselves.</p>
+<p>It is almost always better for tasks to communicate using files but there are
+some niche situations where comminicating via <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> is justified.
+This tutorial walks you through using <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> to communicate between
+tasks.</p>
+<p>Add the following recurrence to the <code class="docutils literal notranslate"><span class="pre">dependencies</span></code> section:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[[PT3H]]]</span>
+    <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">announce</span>[<span class="nb">-PT1H</span>] <span class="o">=&gt;</span> <span class="kd">change_word</span> <span class="o">=&gt;</span> <span class="kd">announce</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">change_word</span></code> task runs the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">broadcast</span></code> command to randomly
+change the <code class="docutils literal notranslate"><span class="pre">WORD</span></code> environment variable used by the <code class="docutils literal notranslate"><span class="pre">announce</span></code> task.</p>
+<p>Add the following runtime configuration to the <code class="docutils literal notranslate"><span class="pre">runtime</span></code> section:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[change_word]]</span>
+    <span class="nv">script </span><span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+        <span class="c1"># Select random word.</span><span class="s2"></span>
+<span class="s2">        IFS=&#39;,&#39; read -r -a WORDS &lt;&lt;&lt; $WORDS</span>
+<span class="s2">        WORD=${WORDS[$(date +%s) % ${#WORDS[@]}]}</span>
+
+        <span class="c1"># Broadcast random word to the announce task.</span><span class="s2"></span>
+<span class="s2">        cylc broadcast $CYLC_SUITE_NAME -n announce -s &quot;[environment]WORD=${WORD}&quot;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="nt">[[[environment]]]</span>
+        <span class="nv">WORDS </span><span class="o">=</span><span class="s"> ni, it, ekke ekke ptang zoo boing</span>
+</pre></div>
+</div>
+<p>Run the suite and inspect the log. You should see the message change randomly
+after every third entry (because the <code class="docutils literal notranslate"><span class="pre">change_word</span></code> task runs every 3 hours)
+e.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>10120101T0000Z - We are the knights who say &quot;ni&quot;!
+10120101T0100Z - We are the knights who say &quot;ni&quot;!
+10120101T0200Z - We are the knights who say &quot;ni&quot;!
+10120101T0300Z - We are the knights who say &quot;ekke ekke ptang zoo boing!&quot;
+</pre></div>
+</div>
+<p>Stop the suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">stop</span> <span class="n">tutorial</span><span class="o">-</span><span class="n">broadcast</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

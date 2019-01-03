@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Upgrading &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Upgrading Macro Development" href="upgrading-macro-development.html" />
+    <link rel="prev" title="Trigger" href="trigger.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="upgrading">
+
+<h1>Upgrading<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading.html#upgrading" title="View HTML">§</a></h1>
+
+<p>As <a class="reference internal" href="../../../glossary.html#term-rose-app"><span class="xref std std-term">apps</span></a> are developed, newer metadata versions can be
+created each time the application inputs are changed, or just between major
+releases.</p>
+<p>This may mean, for example, that a new compulsory option is added or an
+old one is removed.</p>
+<p>Upgrade macros may be written to automatically apply these changes.</p>
+<p>Upgrade macros are used to upgrade <a class="reference internal" href="../../../glossary.html#term-rose-app"><span class="xref std std-term">Rose apps</span></a> to newer
+metadata versions. They are intended to keep application configurations in
+sync with changes to application inputs e.g. from new code releases.</p>
+<p>This part tutorial walks you through upgrading applications.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading.html#example" title="View HTML">§</a></h2>
+
+<p>Create a new Rose application called <code class="docutils literal notranslate"><span class="pre">garden</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">garden</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">garden</span>
+</pre></div>
+</div>
+<p>Create within it a <a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file that looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">rose-demo-upgrade/garden0.1</span>
+
+<span class="nt">[env]</span>
+<span class="nv">FOREST</span><span class="o">=</span><span class="s">true</span>
+
+<span class="nt">[namelist:features]</span>
+<span class="nv">rose_bushes</span><span class="o">=</span><span class="s">2</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">meta=...</span></code> line references a category (<code class="docutils literal notranslate"><span class="pre">rose-demo-upgrade</span></code>) at a
+particular version (<code class="docutils literal notranslate"><span class="pre">garden0.1</span></code>). It’s the version that we want to
+change.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="rose-app-upgrade">
+
+<h2><code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">app-upgrade</span></code><a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading.html#rose-app-upgrade" title="View HTML">§</a></h2>
+
+<p>Change directory to your new application directory. You can see the
+available upgrade versions for your new app config by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose app-upgrade
+</pre></div>
+</div>
+<p>This gives you a list of versions to upgrade to - see the help for more
+information (run <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">help</span> <span class="pre">app-upgrade</span></code>).</p>
+<p>There can often be more versions than you can see by just running
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-app-upgrade"><span class="std std-ref">rose app-upgrade</span></a>. They will not have formal metadata, and
+represent intermediary steps along the way between proper named versions. You
+can see all the possible versions by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose app-upgrade --all-versions
+</pre></div>
+</div>
+<p>You can upgrade directly to the latest (<code class="docutils literal notranslate"><span class="pre">garden0.9</span></code>) or to other
+versions - let’s choose <code class="docutils literal notranslate"><span class="pre">garden0.2</span></code> to start with. Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose app-upgrade garden0.2
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="upgrade-changes">
+
+<h2>Upgrade Changes<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading.html#upgrade-changes" title="View HTML">§</a></h2>
+
+<p>This will give you a list of changes that the upgrade will apply to your
+configuration. Accept it, and your application configuration will be
+upgraded, with a new option (<code class="docutils literal notranslate"><span class="pre">shrubberies</span></code>) and a new <code class="docutils literal notranslate"><span class="pre">meta=...</span></code>
+version of the metadata to point to. Have a look at the changed
+<a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> if you like.</p>
+<p>Try repeating this by upgrading to <code class="docutils literal notranslate"><span class="pre">garden0.3</span></code> in the same way.
+This time, you’ll get a warning - warnings are used to point out
+problems such as deprecated options when you upgrade.</p>
+<p>We can upgrade over many versions at once - for example, directly
+to <code class="docutils literal notranslate"><span class="pre">garden0.9</span></code> - and the changes between each version will be
+aggregated into a single list of changes.</p>
+<p>Try running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose app-upgrade garden0.9
+</pre></div>
+</div>
+<p>If you accept the changes, your app config will be upgraded through all
+the intermediary versions to the new one. Have a look at the
+<a class="reference internal" href="../../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file.</p>
+<p>If you run Rose <a class="reference internal" href="../../../api/command-reference.html#command-rose-app-upgrade"><span class="std std-ref">rose app-upgrade</span></a> with no arguments, you can see
+that you’re using the latest version.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="downgrading">
+
+<h2>Downgrading<a class="headerlink" href="../../../../html/tutorial/rose/furthertopics/upgrading.html#downgrading" title="View HTML">§</a></h2>
+
+<p>Some versions may support downgrading - the reverse operation to
+upgrading. You can see if this is supported by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rose app-upgrade --downgrade
+</pre></div>
+</div>
+<p>You can then use it to downgrade by running:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>rose app-upgrade --downgrade <span class="s">&lt;VERSION&gt;</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">VERSION</span></code> is a lower supported version. This time, some settings
+may be removed.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>See also:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../../../api/configuration/metadata.html#conf-meta"><span class="std std-ref">Configuration Metadata</span></a></li>
+<li><a class="reference internal" href="../../../api/rose-upgrader-macros.html#rose-upgr-macros"><span class="std std-ref">Rose Upgrade Macro API</span></a></li>
+</ul>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

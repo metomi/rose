@@ -1,0 +1,1487 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Site And User Configuration &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Configuration" href="index.html" />
+    <link rel="next" title="Configuration Metadata" href="metadata.html" />
+    <link rel="prev" title="Suite Configuration" href="suite.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="site-and-user-configuration">
+
+<h1>Site And User Configuration<a class="headerlink" href="../../../html/api/configuration/site-and-user.html#site-and-user-configuration" title="View HTML">§</a></h1>
+
+<p>Aspects of some Rose utilities can be configured per installation via the
+site configuration file and per user via the user configuration file. Any
+configuration in the site configuration overrides the default, and any
+configuration in the user configuration overrides the site configuration and
+the default. Rose expects these files to be in the modified INI format
+described in <a class="reference internal" href="rose-configuration-format.html#rose-configuration-format"><span class="std std-ref">Rose Configuration Format</span></a>. Rose utilities search for its
+site configuration at <code class="docutils literal notranslate"><span class="pre">$ROSE_HOME/etc/rose.conf</span></code> where
+<code class="docutils literal notranslate"><span class="pre">$ROSE_HOME/bin/rose</span></code> is the location of the <code class="docutils literal notranslate"><span class="pre">rose</span></code> command, and they
+search for the user configuration at <code class="docutils literal notranslate"><span class="pre">$HOME/.metomi/rose.conf</span></code> where
+<code class="docutils literal notranslate"><span class="pre">$HOME</span></code> is the home directory of the current user.</p>
+<p>You can also override many internal constants of
+<a class="reference internal" href="../command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> and
+<code class="docutils literal notranslate"><span class="pre">rosie</span> <span class="pre">go</span></code>. To change the keyboard shortcut of the <code class="docutils literal notranslate"><span class="pre">Find</span> <span class="pre">Next</span></code> action in
+the config editor to <code class="docutils literal notranslate"><span class="pre">F3</span></code>, put the following lines in your user config file,
+and the setting will apply the next time you run
+<a class="reference internal" href="../command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a>:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[rose-config-edit]</span>
+<span class="nv">accel-find-next</span><span class="o">=</span><span class="s">F3</span>
+</pre></div>
+</div>
+<dl class="file">
+<dt id="rose:file:rose.conf">
+<em class="property">Rose Configuration </em><code class="descname">rose.conf</code></dt>
+<dd><dd><blockquote>
+<div><p>The <a class="reference internal" href="#rose:file:rose.conf" title="rose:file:rose.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose.conf</span></code></a> file can be installed in:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">$ROSE_HOME/etc/</span></code> for <em>site</em> configuration.</li>
+<li><code class="docutils literal notranslate"><span class="pre">$HOME/.metomi/rose/</span></code> for <em>user</em> configuration.</li>
+</ul>
+</div></blockquote>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf|checksum-method">
+<em class="property">Config </em><code class="descname">checksum-method</code><em class="property">= md5|sha1|...</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">md5</td>
+</tr>
+</tbody>
+</table>
+<p>Default method for checksum calculation.
+Values can be any algorithm available from Python’s <code class="docutils literal notranslate"><span class="pre">hashlib</span></code>.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf|meta-path">
+<em class="property">Config </em><code class="descname">meta-path</code><em class="property">= DIR1[:DIR2[:...]]</em></dt>
+<dd><q>
+Paths to locate configuration metadata e.g. </q>
+<code class="docutils literal notranslate"><span class="pre">meta-path=/opt/rose-meta</span></code></q>
+.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf|rose-doc">
+<em class="property">Config </em><code class="descname">rose-doc</code><em class="property">= http://metomi.github.io/rose/doc/</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body"><em>file://${ROSE_HOME}/doc/</em></td>
+</tr>
+</tbody>
+</table>
+<p>URL to Rose documentation.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]">
+<em class="property">Config </em><code class="descname">[external]</code></dt>
+<dd><q>
+Configuration of external commands.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[external]diff_tool">
+<em class="property">Config </em><code class="descname">diff_tool</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">diff -u</td>
+</tr>
+</tbody>
+</table>
+<p>Launch diff tool.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]editor">
+<em class="property">Config </em><code class="descname">editor</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">vi</td>
+</tr>
+</tbody>
+</table>
+<p>Launch text editor.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]fs_browser">
+<em class="property">Config </em><code class="descname">fs_browser</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">nautilus</td>
+</tr>
+</tbody>
+</table>
+<p>Launch graphical file system browser.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]gdiff_tool">
+<em class="property">Config </em><code class="descname">gdiff_tool</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">gvimdiff</td>
+</tr>
+</tbody>
+</table>
+<p>Launch graphical diff tool.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]geditor">
+<em class="property">Config </em><code class="descname">geditor</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">gedit</td>
+</tr>
+</tbody>
+</table>
+<p>Launch graphical text editor.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]image_viewer">
+<em class="property">Config </em><code class="descname">image_viewer</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">eog</td>
+</tr>
+</tbody>
+</table>
+<p>Launch image viewer.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]rsync">
+<em class="property">Config </em><code class="descname">rsync</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">rsync -a –exclude=.* –timeout=1800 –rsh=’ssh -oBatchMode=yes’</td>
+</tr>
+</tbody>
+</table>
+<p>The <code class="docutils literal notranslate"><span class="pre">rsync</span></code> command.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]ssh">
+<em class="property">Config </em><code class="descname">ssh</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">ssh -oBatchMode=yes -oConnectTimeout=10</td>
+</tr>
+</tbody>
+</table>
+<p>The <code class="docutils literal notranslate"><span class="pre">ssh</span></code> command.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[external]terminal">
+<em class="property">Config </em><code class="descname">terminal</code><em class="property">= COMMAND</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">xterm</td>
+</tr>
+</tbody>
+</table>
+<p>Launch terminal.</p>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-ldap]">
+<em class="property">Config </em><code class="descname">[rosa-ldap]</code></dt>
+<dd><q>
+These LDAP settings are only relevant if
+</q>
+<a class="reference internal" href="#rose:conf:rose.conf[rosa-svn]user-tool" title="rose:conf:rose.conf[rosa-svn]user-tool"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">[rosa-svn]user-tool=ldap</span></code></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-ldap]attrs">
+<em class="property">Config </em><code class="descname">attrs</code><em class="property">= uid cn mail</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">uid cn mail</td>
+</tr>
+</tbody>
+</table>
+<p>The attributes for UID, common name and email in the LDAP directory.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-ldap]basedn">
+<em class="property">Config </em><code class="descname">basedn</code><em class="property">= BASEDN</em></dt>
+<dd><q>
+The base DN in the LDAP directory to search for users.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-ldap]binddn">
+<em class="property">Config </em><code class="descname">binddn</code><em class="property">= BINDDN</em></dt>
+<dd><q>
+The DN in the LDAP server to bind with to search the directory.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-ldap]filter-more">
+<em class="property">Config </em><code class="descname">filter-more</code></dt>
+<dd><q>
+If specified, use the value as extra </q>
+<code class="docutils literal notranslate"><span class="pre">(AND)</span></code></q>
+ filters to an LDAP search.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-ldap]password-file">
+<em class="property">Config </em><code class="descname">password-file</code></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">~/.ldappw</td>
+</tr>
+</tbody>
+</table>
+<p>The file containing the password to the LDAP server, if required.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-ldap]tls-ca-file">
+<em class="property">Config </em><code class="descname">tls-ca-file</code></dt>
+<dd><q>
+The location of the TLS CA certificate file.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-ldap]uri">
+<em class="property">Config </em><code class="descname">uri</code><em class="property">= URL</em></dt>
+<dd><q>
+The URI of the LDAP server e.g. </q>
+<code class="docutils literal notranslate"><span class="pre">ldap://my-ldap.my-domain</span></code></q>
+.</q>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-svn]">
+<em class="property">Config </em><code class="descname">[rosa-svn]</code></dt>
+<dd><q>
+Configuration for </q>
+<code class="docutils literal notranslate"><span class="pre">rosa</span> <span class="pre">svn-pre-commit</span></code></q>
+ and </q>
+<code class="docutils literal notranslate"><span class="pre">rosa</span> <span class="pre">svn-post-commit</span></code></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-svn]notification-from">
+<em class="property">Config </em><code class="descname">notification-from</code><em class="property">= EMAIL-ADDRESS</em></dt>
+<dd><q>
+Notification email address (for the “From:” field in notification emails).</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-svn]notify-who-on-trunk-commit">
+<em class="property">Config </em><code class="descname">notify-who-on-trunk-commit</code><em class="property">= ROLE1 ...</em></dt>
+<dd><blockquote>
+<div><p>List of user roles to notify on trunk commits. A user role can be:</p>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">author</span></code> for the author of the change.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">owner</span></code> for the owner of the affected suite.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">access-list</span></code> for the users in the <code class="docutils literal notranslate"><span class="pre">access-list</span></code> of the affected suite.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the author is not in the list, (s)he will not be notified regardless
+of his/her role as suite owner or author of the <code class="docutils literal notranslate"><span class="pre">access-list</span></code>.</p>
+</div>
+</li>
+</ul>
+<p>E.g.:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">notify-who-on-trunk-commit</span><span class="o">=</span><span class="s">author owner access-list</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-svn]super-users">
+<em class="property">Config </em><code class="descname">super-users</code><em class="property">= USER1 ...</em></dt>
+<dd><q>
+Space-separated list of admin users allowed to write to the trunk of any
+suite.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosa-svn]user-tool">
+<em class="property">Config </em><code class="descname">user-tool</code><em class="property">= ldap|passwd</em></dt>
+<dd><q>
+Tool to obtain user information. Either LDAP or Unix </q>
+<code class="docutils literal notranslate"><span class="pre">getpwnam</span></code></q>
+.</q>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-ana]">
+<em class="property">Config </em><code class="descname">[rose-ana]</code></dt>
+<dd><q>
+Configuration related to the built-in </q>
+<a class="reference internal" href="../built-in/rose_ana.html#rose:app:rose_ana" title="rose:app:rose_ana"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">rose_ana</span></code></a></q>
+ application.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-ana]grepper-report-limit">
+<em class="property">Config </em><code class="descname">grepper-report-limit</code><em class="property">= 42</em></dt>
+<dd><q>
+Limits the number of lines printed when using the
+</q>
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.apps.ana_builtin.grepper</span></code></q>
+ analysis class.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-ana]kgo-database">
+<em class="property">Config </em><code class="descname">kgo-database</code><em class="property">= .true.</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">.false.</td>
+</tr>
+</tbody>
+</table>
+<p>Turns on the <a class="reference internal" href="../../tutorial/rose/furthertopics/rose-stem.html#the-rose-ana-comparison-database"><span class="std std-ref">Rose Ana Comparison Database</span></a>.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-ana]method-path">
+<em class="property">Config </em><code class="descname">method-path</code><em class="property">= /path/1 /path2</em></dt>
+<dd><q>
+Items to prepend to the search path for user methods.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-ana]skip-if-all-files-missing">
+<em class="property">Config </em><code class="descname">skip-if-all-files-missing</code><em class="property">= .true.</em></dt>
+<dd><q>
+Causes the </q>
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.apps.ana_builtin.grepper</span></code></q>
+ class to pass
+if all files to be compared are missing.</q>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]">
+<em class="property">Config </em><code class="descname">[rose-bush]</code></dt>
+<dd><q>
+Configuration for Rose Bush server.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]cycles-per-page">
+<em class="property">Config </em><code class="descname">cycles-per-page</code><em class="property">= NUMBER</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">100</td>
+</tr>
+</tbody>
+</table>
+<p>Cycles list view: default number of cycles per page.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]host">
+<em class="property">Config </em><code class="descname">host</code><em class="property">= NAME</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">The server’s host name.</td>
+</tr>
+</tbody>
+</table>
+<p>An alternative host name.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]jobs-per-page">
+<em class="property">Config </em><code class="descname">jobs-per-page</code><em class="property">= NUMBER</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">15</td>
+</tr>
+</tbody>
+</table>
+<p>Job list view: default number of jobs per page.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]jobs-per-page-max">
+<em class="property">Config </em><code class="descname">jobs-per-page-max</code><em class="property">= NUMBER</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">300</td>
+</tr>
+</tbody>
+</table>
+<p>Job list view: maximum number of jobs per page.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]logo">
+<em class="property">Config </em><code class="descname">logo</code><em class="property">= HTML-IMG-ATTRIBUTE ...</em></dt>
+<dd><q>
+Image logo attributes, can be any HTML </q>
+<code class="docutils literal notranslate"><span class="pre">&lt;img/&gt;</span></code></q>
+ tag attributes
+e.g: </q>
+<code class="docutils literal notranslate"><span class="pre">logo=src=&quot;http://server/my-rose-bush-logo.png&quot;</span> <span class="pre">alt=&quot;My</span> <span class="pre">Rose</span> <span class="pre">Bush</span>
+<span class="pre">Logo&quot;</span></code></q>
+.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]suites-per-page">
+<em class="property">Config </em><code class="descname">suites-per-page</code><em class="property">= NUMBER</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">100</td>
+</tr>
+</tbody>
+</table>
+<p>Suites list view: default number of suites per page.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]title">
+<em class="property">Config </em><code class="descname">title</code><em class="property">= TITLE</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">“Rose Bush”</td>
+</tr>
+</tbody>
+</table>
+<p>An alternative service title.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-bush]view-size-max">
+<em class="property">Config </em><code class="descname">view-size-max</code><em class="property">= BYTES</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">10485760</td>
+</tr>
+</tbody>
+</table>
+<p>File view: maximum viewable file size in bytes.</p>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-config-diff]">
+<em class="property">Config </em><code class="descname">[rose-config-diff]</code></dt>
+<dd><q>
+Configuration specific to </q>
+<a class="reference internal" href="../command-reference.html#command-rose-config-diff"><span class="std std-ref">rose config-diff</span></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-config-diff]ignore{foo}">
+<em class="property">Config </em><code class="descname">ignore{foo}</code><em class="property">= REGEX</em></dt>
+<dd><q>
+Shorthand expressions for ignore-setting regular expressions
+e.g. </q>
+<code class="docutils literal notranslate"><span class="pre">^baz,bar,w[ib]ble</span></code></q>
+.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-config-diff]properties">
+<em class="property">Config </em><code class="descname">properties</code><em class="property">= title,ns,description,help</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">“title,ns,description,help”</td>
+</tr>
+</tbody>
+</table>
+<p>Metadata properties to use.</p>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-config-edit]">
+<em class="property">Config </em><code class="descname">[rose-config-edit]</code></dt>
+<dd><q>
+Configuration specific to </q>
+<a class="reference internal" href="../command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-config-edit]icon-path-scheduler">
+<em class="property">Config </em><code class="descname">icon-path-scheduler</code><em class="property">= PATH</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">/opt/cylc/images/icon.svg</td>
+</tr>
+</tbody>
+</table>
+<p>Path to an image containing the suite engine icon.
+See <code class="xref py py-mod docutils literal notranslate"><span class="pre">rose.config_editor</span></code> for detail.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-config-edit]project-url">
+<em class="property">Config </em><code class="descname">project-url</code><em class="property">= URL</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body"><a class="reference external" href="https://github.com/metomi/rose/">https://github.com/metomi/rose/</a></td>
+</tr>
+</tbody>
+</table>
+<p>Hyperlink to the Rose project page.</p>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-host-select]">
+<em class="property">Config </em><code class="descname">[rose-host-select]</code></dt>
+<dd><q>
+Configuration related to </q>
+<a class="reference internal" href="../command-reference.html#command-rose-host-select"><span class="std std-ref">rose host-select</span></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-host-select]default">
+<em class="property">Config </em><code class="descname">default</code><em class="property">= GROUP/HOST ...</em></dt>
+<dd><q>
+The default arguments to use for this command e.g. </q>
+<code class="docutils literal notranslate"><span class="pre">default=hpc</span></code></q>
+.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-host-select]group{NAME}">
+<em class="property">Config </em><code class="descname">group{NAME}</code><em class="property">= GROUP/HOST ...</em></dt>
+<dd><blockquote>
+<div><p>Declare a named group of hosts e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">group{rose-vm}</span><span class="o">=</span><span class="s">rose-vm0 rose-vm1 rose-vm2 rose-vm3</span>
+<span class="nv">group{hpc}</span><span class="o">=</span><span class="s">hpc1 hpc2</span>
+<span class="nv">group{hpc1}</span><span class="o">=</span><span class="s">hpc1a hpc1b hpc1c hpc1d</span>
+<span class="nv">group{hpc2}</span><span class="o">=</span><span class="s">hpc2a hpc2b hpc2c hpc2d</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-host-select]method{NAME}">
+<em class="property">Config </em><code class="descname">method{NAME}</code><em class="property">= METHOD[:METHOD-ARG]</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">load</td>
+</tr>
+</tbody>
+</table>
+<p>Declare the default ranking method for a group of hosts e.g.
+<code class="docutils literal notranslate"><span class="pre">method{hpc}=random</span></code>.
+For detail on the methods see <a class="reference internal" href="../command-reference.html#command-rose-host-select"><span class="std std-ref">rose host-select</span></a>.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-host-select]thresholds{NAME}">
+<em class="property">Config </em><code class="descname">thresholds{NAME}</code><em class="property">= [METHOD[:METHOD-ARG]:]VALUE ...</em></dt>
+<dd><blockquote>
+<div><p>Declare the default threshold(s) for a group of hosts e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">thresholds{hpc}</span><span class="o">=</span><span class="s">fs:/var/tmp:75 fs:/tmp:75</span>
+<span class="nv">thresholds{linux}</span><span class="o">=</span><span class="s">mem:8000</span>
+</pre></div>
+</div>
+<p>For detail on the methods see <a class="reference internal" href="../command-reference.html#command-rose-host-select"><span class="std std-ref">rose host-select</span></a>.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-host-select]timeout">
+<em class="property">Config </em><code class="descname">timeout</code><em class="property">= FLOAT</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">10.0</td>
+</tr>
+</tbody>
+</table>
+<p>Set the timeout in seconds of <code class="docutils literal notranslate"><span class="pre">ssh</span></code> commands to hosts.</p>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-mpi-launch]">
+<em class="property">Config </em><code class="descname">[rose-mpi-launch]</code></dt>
+<dd><q>
+Configuration related to </q>
+<a class="reference internal" href="../command-reference.html#command-rose-mpi-launch"><span class="std std-ref">rose mpi-launch</span></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-mpi-launch]launcher-fileopts.LAUNCHER">
+<em class="property">Config </em><code class="descname">launcher-fileopts.LAUNCHER</code><em class="property">= OPTION-TEMPLATE</em></dt>
+<dd><blockquote>
+<div><p>Specify the options to a <code class="docutils literal notranslate"><span class="pre">LAUNCHER</span></code> for launching with a command file.
+The template string should contain <code class="docutils literal notranslate"><span class="pre">$ROSE_COMMAND_FILE</span></code> (or
+<code class="docutils literal notranslate"><span class="pre">${ROSE_COMMAND_FILE}</span></code>), which will be expanded to the path to the
+command file. e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">launcher-fileopts.poe</span><span class="o">=</span><span class="s">-f $ROSE_COMMAND_FILE</span>
+<span class="nv">launcher-fileopts.mpiexec</span><span class="o">=</span><span class="s">-cmdfile $ROSE_COMMAND_FILE</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-mpi-launch]launcher-list">
+<em class="property">Config </em><code class="descname">launcher-list</code><em class="property">= LAUNCHER ...</em></dt>
+<dd><blockquote>
+<div><p>Specify a list of launcher commands e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">launcher-list</span><span class="o">=</span><span class="s">poe mpiexec</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-mpi-launch]launcher-postopts.LAUNCHER">
+<em class="property">Config </em><code class="descname">launcher-postopts.LAUNCHER</code><em class="property">= OPTIONS-TEMPLATE</em></dt>
+<dd><q>
+Specify the options to a </q>
+<code class="docutils literal notranslate"><span class="pre">LAUNCHER</span></code></q>
+ for launching with a command.
+</q>
+<code class="docutils literal notranslate"><span class="pre">postopts</span></code></q>
+ are options placed after </q>
+<code class="docutils literal notranslate"><span class="pre">COMMAND</span></code></q>
+ but before the
+remaining arguments.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-mpi-launch]launcher-preopts.LAUNCHER">
+<em class="property">Config </em><code class="descname">launcher-preopts.LAUNCHER</code><em class="property">= OPTIONS-TEMPLATE</em></dt>
+<dd><blockquote>
+<div><p>Specify the options to a <code class="docutils literal notranslate"><span class="pre">LAUNCHER</span></code> for launching with a command.
+<code class="docutils literal notranslate"><span class="pre">preopts</span></code> are options placed after the launcher command but before
+<code class="docutils literal notranslate"><span class="pre">COMMAND</span></code>. E.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">launcher-preopts.mpiexec</span><span class="o">=</span><span class="s">-n $NPROC</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-stem]">
+<em class="property">Config </em><code class="descname">[rose-stem]</code></dt>
+<dd><q>
+Configuration related to </q>
+<a class="reference internal" href="../command-reference.html#command-rose-stem"><span class="std std-ref">rose stem</span></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-stem]automatic-options">
+<em class="property">Config </em><code class="descname">automatic-options</code><em class="property">= VARIABLE=VALUE</em></dt>
+<dd><q>
+Automatic options. These are added as if the user added them with
+</q>
+<code class="docutils literal notranslate"><span class="pre">--define-suite</span></code></q>
+ on the command line and can be accessed as Jinja2
+variables in the </q>
+<code class="docutils literal notranslate"><span class="pre">suite.rc</span></code></q>
+ file. E.g </q>
+<code class="docutils literal notranslate"><span class="pre">automatic-options=TEA=earl_grey</span></code></q>
+
+would set the Jinja2 variable </q>
+<code class="docutils literal notranslate"><span class="pre">TEA</span></code></q>
+ to be </q>
+<code class="docutils literal notranslate"><span class="pre">earl_grey</span></code></q>
+.</q>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-log]">
+<em class="property">Config </em><code class="descname">[rose-suite-log]</code></dt>
+<dd><q>
+Configuration related to </q>
+<a class="reference internal" href="../command-reference.html#command-rose-suite-log"><span class="std std-ref">rose suite-log</span></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-log]rose-bush">
+<em class="property">Config </em><code class="descname">rose-bush</code><em class="property">= URL</em></dt>
+<dd><q>
+URL to the site’s Rose Bush web service.</q>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]">
+<em class="property">Config </em><code class="descname">[rose-suite-run]</code></dt>
+<dd><q>
+Configuration related to </q>
+<a class="reference internal" href="../command-reference.html#command-rose-suite-run"><span class="std std-ref">rose suite-run</span></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]hosts">
+<em class="property">Config </em><code class="descname">hosts</code><em class="property">= HOST-GROUP|HOST ...</em></dt>
+<dd><blockquote>
+<div><p>Hosts in the <a class="reference internal" href="#rose:conf:rose.conf[rose-host-select]" title="rose:conf:rose.conf[rose-host-select]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">[rose-host-select]</span></code></a> section that can be used to
+run a suite e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">hosts</span><span class="o">=</span><span class="s">rose-vm</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]remote-no-login-shell">
+<em class="property">Config </em><code class="descname">remote-no-login-shell</code><em class="property">= HOST-GLOB=true|false</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">false</td>
+</tr>
+</tbody>
+</table>
+<p>Don’t use login shell to invoke <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">suite-run</span> <span class="pre">--remote</span></code>
+where <code class="docutils literal notranslate"><span class="pre">HOST-GLOB</span></code> is a glob for matching host names e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">remote-no-login-shell</span><span class="o">=</span><span class="s">myhpc*=true</span>
+                      <span class="s">mycluster*=true</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]remote-rose-bin">
+<em class="property">Config </em><code class="descname">remote-rose-bin</code><em class="property">= HOST-GLOB=ROSE-BIN-PATH</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">rose</td>
+</tr>
+</tbody>
+</table>
+<p>Path to <code class="docutils literal notranslate"><span class="pre">rose</span></code> executable on remote hosts where:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">HOST-GLOB</span></code> is a glob for matching host names.</li>
+<li><code class="docutils literal notranslate"><span class="pre">ROSE-BIN-PATH</span></code> is the path to the <code class="docutils literal notranslate"><span class="pre">rose</span></code> executable.</li>
+</ul>
+<p>E.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">remote-rose-bin</span><span class="o">=</span><span class="s">myhpc*=/opt/rose/bin/rose</span>
+                <span class="s">mycluster*=/usr/local/bin/rose</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]root-dir">
+<em class="property">Config </em><code class="descname">root-dir</code><em class="property">= HOST-GLOB=$HOST-DIR</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">$HOME</td>
+</tr>
+</tbody>
+</table>
+<p>Root location of a suite run directory where:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">HOST-GLOB</span></code> is a glob for matching host names.</li>
+<li><code class="docutils literal notranslate"><span class="pre">HOST-DIR</span></code> is the value of the root location for matching hosts.</li>
+</ul>
+<p>E.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">root-dir</span><span class="o">=</span><span class="s">hpc*=$DATADIR</span>
+        <span class="o">=</span><span class="s">*=$HOME</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]root-dir{share/cycle}">
+<em class="property">Config </em><code class="descname">root-dir{share/cycle}</code><em class="property">= HOST-GLOB=$HOST-DIR</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">$HOME</td>
+</tr>
+</tbody>
+</table>
+<p>Root location of a suite run’s <code class="docutils literal notranslate"><span class="pre">share/cycle/</span></code> directory. Syntax is
+the same as <a class="reference internal" href="#rose:conf:rose.conf[rose-suite-run]root-dir" title="rose:conf:rose.conf[rose-suite-run]root-dir"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">root-dir</span></code></a>.
+Multiple pairs can be specified by a new-line separated list.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]root-dir{share}">
+<em class="property">Config </em><code class="descname">root-dir{share}</code><em class="property">= HOST-GLOB=$HOST-DIR</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">$HOME</td>
+</tr>
+</tbody>
+</table>
+<p>Root location of a suite run’s <code class="docutils literal notranslate"><span class="pre">share/</span></code> directory. Syntax is the same
+as <a class="reference internal" href="#rose:conf:rose.conf[rose-suite-run]root-dir" title="rose:conf:rose.conf[rose-suite-run]root-dir"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">root-dir</span></code></a>.
+Multiple pairs can be specified by a new-line separated list.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]root-dir{work}">
+<em class="property">Config </em><code class="descname">root-dir{work}</code><em class="property">= HOST-GLOB=$HOST-DIR</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">$HOME</td>
+</tr>
+</tbody>
+</table>
+<p>Root location of a suite run’s <code class="docutils literal notranslate"><span class="pre">work/</span></code> directory. Syntax is the same
+as <a class="reference internal" href="#rose:conf:rose.conf[rose-suite-run]root-dir" title="rose:conf:rose.conf[rose-suite-run]root-dir"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">root-dir</span></code></a>.
+Multiple pairs can be specified by a new-line separated list.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-suite-run]scan-hosts">
+<em class="property">Config </em><code class="descname">scan-hosts</code><em class="property">= HOST-GROUP|HOST ...</em></dt>
+<dd><blockquote>
+<div><p>Hosts in the <a class="reference internal" href="#rose:conf:rose.conf[rose-host-select]" title="rose:conf:rose.conf[rose-host-select]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">[rose-host-select]</span></code></a> section that can be scanned
+by rose utilities e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">scan-hosts</span><span class="o">=</span><span class="s">localhost rose-vm</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-task-run]">
+<em class="property">Config </em><code class="descname">[rose-task-run]</code></dt>
+<dd><q>
+Configuration related to </q>
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a></q>
+.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rose-task-run]path-prepend">
+<em class="property">Config </em><code class="descname">path-prepend</code><em class="property">= /path/1 /path/2</em></dt>
+<dd><q>
+Items to prepend to the </q>
+<code class="docutils literal notranslate"><span class="pre">PATH</span></code></q>
+ environment variable.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rose-task-run]path-prepend.PYTHONPATH">
+<em class="property">Config </em><code class="descname">path-prepend.PYTHONPATH</code></dt>
+<dd><q>
+Items to prepend to a PATH-like environment variable,
+e.g. </q>
+<code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code></q>
+.</q>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-db]">
+<em class="property">Config </em><code class="descname">[rosie-db]</code></dt>
+<dd><q>
+Configuration related to the database of the Rosie web service server.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-db]db.PREFIX">
+<em class="property">Config </em><code class="descname">db.PREFIX</code><em class="property">= URL</em></dt>
+<dd><blockquote>
+<div><p>The database location of a given repository prefix, from within the server
+e.g. to create/reference an SQLite DB at <code class="docutils literal notranslate"><span class="pre">/srv/rosie/foo-db.sqlite</span></code>:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">db.foo</span><span class="o">=</span><span class="s">sqlite:////srv/rosie/foo-db.sqlite</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-db]repos.PREFIX">
+<em class="property">Config </em><code class="descname">repos.PREFIX</code><em class="property">= DIR</em></dt>
+<dd><blockquote>
+<div><p>The path to the repository of a given prefix, from within the server
+e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">repos.foo</span><span class="o">=</span><span class="s">/srv/svn/foo</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-disco]">
+<em class="property">Config </em><code class="descname">[rosie-disco]</code></dt>
+<dd><q>
+Configuration related to the adhoc Rosie suite discovery service server.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-disco]host">
+<em class="property">Config </em><code class="descname">host</code><em class="property">= NAME</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">The server’s host name.</td>
+</tr>
+</tbody>
+</table>
+<p>An alternative host name.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-disco]title">
+<em class="property">Config </em><code class="descname">title</code><em class="property">= TITLE</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">“Rosie Suites Discovery”</td>
+</tr>
+</tbody>
+</table>
+<p>An alternative service title.</p>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-go]">
+<em class="property">Config </em><code class="descname">[rosie-go]</code></dt>
+<dd><q>
+Configuration related to the </q>
+<a class="reference internal" href="../command-reference.html#command-rosie-go"><span class="std std-ref">rosie go</span></a></q>
+ GUI.
+See </q>
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">rosie.browser</span></code></q>
+ for detail.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-go]icon-path-scheduler">
+<em class="property">Config </em><code class="descname">icon-path-scheduler</code></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">/opt/cylc/images/icon.svg</td>
+</tr>
+</tbody>
+</table>
+<p>Path to an image containing the suite engine icon.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-go]project-url">
+<em class="property">Config </em><code class="descname">project-url</code><em class="property">= https://host/rose/</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body"><a class="reference external" href="https://github.com/metomi/rose/">https://github.com/metomi/rose/</a></td>
+</tr>
+</tbody>
+</table>
+<p>Hyperlink to the Rose project page.</p>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]">
+<em class="property">Config </em><code class="descname">[rosie-id]</code></dt>
+<dd><q>
+Configuration related to Rosie client commands.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]local-copy-root">
+<em class="property">Config </em><code class="descname">local-copy-root</code><em class="property">= DIR</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">$HOME/roses</td>
+</tr>
+</tbody>
+</table>
+<p>Root directory of local (working) copies of suites e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">local-copy-root</span><span class="o">=</span><span class="s">$HOME/my-work/roses</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefix-default">
+<em class="property">Config </em><code class="descname">prefix-default</code><em class="property">= PREFIX</em></dt>
+<dd><q>
+The default ID prefix (an identifier for a Rosie repository/service).</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefix-https-ssl-cert.PREFIX">
+<em class="property">Config </em><code class="descname">prefix-https-ssl-cert.PREFIX</code><em class="property">= PATH</em></dt>
+<dd><blockquote>
+<div><p>For HTTPS requests, location(s) of certificate + private key files e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">prefix-https-ssl-cert.PREFIX</span><span class="o">=</span><span class="s">/path/to/server.pem</span>
+<span class="nv">prefix-https-ssl-cert.PREFIX</span><span class="o">=</span><span class="s">/path/to/server.crt /path/to/key</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefix-https-ssl-verify.PREFIX">
+<em class="property">Config </em><code class="descname">prefix-https-ssl-verify.PREFIX</code><em class="property">= True|False</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">True</td>
+</tr>
+</tbody>
+</table>
+<p>For HTTPS requests, verify SSL certificates.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefix-location.PREFIX">
+<em class="property">Config </em><code class="descname">prefix-location.PREFIX</code><em class="property">= URL</em></dt>
+<dd><blockquote>
+<div><p>URL of the repository of an ID prefix, with no trailing slash, e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">prefix-location.foo</span><span class="o">=</span><span class="s">svn://host/foo</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefix-password-store.PREFIX">
+<em class="property">Config </em><code class="descname">prefix-password-store.PREFIX</code><em class="property">= gpgagent|gnomekeyring</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">try gpgagent then gnomekeyring</td>
+</tr>
+</tbody>
+</table>
+<p>The password store to use.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefix-username.PREFIX">
+<em class="property">Config </em><code class="descname">prefix-username.PREFIX</code><em class="property">= USER-ID</em></dt>
+<dd><q>
+Default user name for services in prefix.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefix-web.PREFIX">
+<em class="property">Config </em><code class="descname">prefix-web.PREFIX</code><em class="property">= URL</em></dt>
+<dd><blockquote>
+<div><p>Source browser (e.g. Trac) URL of the repository of an ID prefix e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">prefix-web.foo</span><span class="o">=</span><span class="s">http://host/projects/foo/intertrac/source:</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefix-ws.PREFIX">
+<em class="property">Config </em><code class="descname">prefix-ws.PREFIX</code><em class="property">= URL</em></dt>
+<dd><blockquote>
+<div><p>Discovery service URL of an ID prefix e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">prefix-ws.foo</span><span class="o">=</span><span class="s">http://host:port/rosie/foo</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-id]prefixes-ws-default">
+<em class="property">Config </em><code class="descname">prefixes-ws-default</code><em class="property">= PREFIX ...</em></dt>
+<dd><q>
+List of default discovery services (space-delimited list of prefixes)
+that will be used by a Rosie discovery service client.</q>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-vc]">
+<em class="property">Config </em><code class="descname">[rosie-vc]</code></dt>
+<dd><q>
+Configuration related to the Rosie version control client.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[rosie-vc]access-list-default">
+<em class="property">Config </em><code class="descname">access-list-default</code><em class="property">= USER-ID ...</em></dt>
+<dd><blockquote>
+<div><p>Default access-list setting on suite creation, e.g. to grant access to all
+users by default:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">access-list-default</span><span class="o">=</span><span class="s">*</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]">
+<em class="property">Config </em><code class="descname">[t]</code></dt>
+<dd><q>
+Test battery configuration.</q>
+</dd><blockquote>
+<div><dl class="conf">
+<dt id="rose:conf:rose.conf[t]difftool">
+<em class="property">Config </em><code class="descname">difftool</code><em class="property">= COMMAND ...</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">diff -u</td>
+</tr>
+</tbody>
+</table>
+<p>Tool to compare two files when there are differences.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]host-groups">
+<em class="property">Config </em><code class="descname">host-groups</code><em class="property">= GROUP ...</em></dt>
+<dd><q>
+List of selectable host groups.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]job-host">
+<em class="property">Config </em><code class="descname">job-host</code><em class="property">= HOST</em></dt>
+<dd><q>
+A remote host that does not share its </q>
+<code class="docutils literal notranslate"><span class="pre">HOME</span></code></q>
+ directory with </q>
+<code class="docutils literal notranslate"><span class="pre">localhost</span></code></q>
+.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]job-host-fast-dest-root">
+<em class="property">Config </em><code class="descname">job-host-fast-dest-root</code><em class="property">= PATH</em></dt>
+<dd><blockquote>
+<div><p>A fast file system for working with small files in
+<a class="reference internal" href="#rose:conf:rose.conf[t]job-host" title="rose:conf:rose.conf[t]job-host"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">job-host</span></code></a> e.g:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">job-host-fast-dest-root</span><span class="o">=</span><span class="s">/var/tmp/$USER</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]job-host-with-share">
+<em class="property">Config </em><code class="descname">job-host-with-share</code><em class="property">= HOST</em></dt>
+<dd><q>
+A remote host that shares its </q>
+<code class="docutils literal notranslate"><span class="pre">HOME</span></code></q>
+ directory with </q>
+<code class="docutils literal notranslate"><span class="pre">localhost</span></code></q>
+.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]job-host-with-share-fast-dest-root">
+<em class="property">Config </em><code class="descname">job-host-with-share-fast-dest-root</code><em class="property">= PATH</em></dt>
+<dd><q>
+A fast file system for working with small files in
+</q>
+<a class="reference internal" href="#rose:conf:rose.conf[t]job-host-with-share" title="rose:conf:rose.conf[t]job-host-with-share"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">job-host-with-share</span></code></a></q>
+.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]job-hosts">
+<em class="property">Config </em><code class="descname">job-hosts</code><em class="property">= HOST1 HOST2</em></dt>
+<dd><q>
+Two non-local job hosts that may or may not share a file system.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]job-hosts-sharing-fs">
+<em class="property">Config </em><code class="descname">job-hosts-sharing-fs</code><em class="property">= HOST1 HOST2</em></dt>
+<dd><q>
+Two job hosts sharing a file system, but not with </q>
+<code class="docutils literal notranslate"><span class="pre">localhost</span></code></q>
+.</q>
+</dd></dl>
+
+<dl class="conf">
+<dt id="rose:conf:rose.conf[t]prove-options">
+<em class="property">Config </em><code class="descname">prove-options</code><em class="property">= PROVE-OPTIONS ...</em></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">default:</th><td class="field-body">-j9 -s</td>
+</tr>
+</tbody>
+</table>
+<p>Options for <code class="docutils literal notranslate"><span class="pre">prove</span></code> when calling <a class="reference internal" href="../command-reference.html#command-rose-test-battery"><span class="std std-ref">rose test-battery</span></a> with
+no arguments.
+Note that <code class="docutils literal notranslate"><span class="pre">-r</span> <span class="pre">t</span></code> is automatically added to the end of the command line.</p>
+</div></blockquote>
+</dd></dl>
+
+</div></blockquote>
+</dl>
+
+</div></blockquote>
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

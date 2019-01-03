@@ -1,0 +1,488 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rosie.ws_client &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  <h1>Source code for rosie.ws_client</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># (C) British Crown Copyright 2012-8 Met Office.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Rose, a framework for meteorological suites.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Rose. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Rosie web service client.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    RosieWSClient - sends requests, retrieves data from the web server</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Pool</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+
+<span class="kn">from</span> <span class="nn">rosie.suite_id</span> <span class="k">import</span> <span class="n">SuiteId</span>
+<span class="kn">from</span> <span class="nn">rosie.ws_client_auth</span> <span class="k">import</span> <span class="n">RosieWSClientAuthManager</span>
+<span class="kn">from</span> <span class="nn">rose.popen</span> <span class="k">import</span> <span class="n">RosePopener</span>
+<span class="kn">from</span> <span class="nn">rose.reporter</span> <span class="k">import</span> <span class="n">Reporter</span>
+<span class="kn">from</span> <span class="nn">rose.resource</span> <span class="k">import</span> <span class="n">ResourceLocator</span>
+
+
+<span class="k">class</span> <span class="nc">RosieWSClientConfError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Raised if no Rosie service server is configured.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;[rosie-id] settings not defined in site/user configuration.&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">RosieWSClientError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Raised if no data were retrieved from the server.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;: &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">])</span>
+
+
+<span class="k">class</span> <span class="nc">RosieWSClientQuerySplitError</span><span class="p">(</span><span class="n">RosieWSClientError</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Raised on query items syntax error.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Query syntax error: &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="RosieWSClient"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient">[docs]</a><span class="k">class</span> <span class="nc">RosieWSClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;A client for the Rosie web service.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefixes (list): List of prefix names as strings.</span>
+<span class="sd">            (run ``rose config rosie-id`` for more info).</span>
+<span class="sd">        prompt_func (function): Optional function for requesting user</span>
+<span class="sd">            credentials. Takes and returns the arguments username and password.</span>
+<span class="sd">        popen (rose.popen.RosePopener): Use initiated RosePopener instance</span>
+<span class="sd">            create a new one if ``None``.</span>
+<span class="sd">        event_handler (object): A callable object for reporting popen output,</span>
+<span class="sd">            see :py:class:`rose.reporter.Reporter`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">MAX_LOCAL_QUERIES</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">POLL_DELAY</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">REMOVABLE_PARAMS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;all_revs=0&quot;</span><span class="p">,</span> <span class="s2">&quot;format=json&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prompt_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">popen</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">event_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">event_handler</span><span class="p">:</span>
+            <span class="n">event_handler</span> <span class="o">=</span> <span class="n">Reporter</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">popen</span><span class="p">:</span>
+            <span class="n">popen</span> <span class="o">=</span> <span class="n">RosePopener</span><span class="p">(</span><span class="n">event_handler</span><span class="o">=</span><span class="n">event_handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span> <span class="o">=</span> <span class="n">event_handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">popen</span> <span class="o">=</span> <span class="n">popen</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_func</span> <span class="o">=</span> <span class="n">prompt_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unreachable_prefixes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_managers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="n">ResourceLocator</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">get_conf</span><span class="p">()</span>
+        <span class="n">conf_rosie_id</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;rosie-id&quot;</span><span class="p">],</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">conf_rosie_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RosieWSClientConfError</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">conf_rosie_id</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">is_ignored</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;prefix-ws.&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;prefix-ws.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">auth_managers</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span> <span class="o">=</span> <span class="n">RosieWSClientAuthManager</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="p">,</span> <span class="n">popen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">popen</span><span class="p">,</span> <span class="n">prompt_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_func</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">prefixes</span><span class="p">:</span>
+            <span class="n">prefixes_str</span> <span class="o">=</span> <span class="n">conf_rosie_id</span><span class="o">.</span><span class="n">get_value</span><span class="p">([</span><span class="s2">&quot;prefixes-ws-default&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">prefixes_str</span><span class="p">:</span>
+                <span class="n">prefixes</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">prefixes_str</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prefixes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_managers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_prefixes</span><span class="p">(</span><span class="n">prefixes</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RosieWSClient.set_prefixes"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.set_prefixes">[docs]</a>    <span class="k">def</span> <span class="nf">set_prefixes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefixes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replace the default prefixes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prefixes (list): List of prefix names as strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefixes</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span> <span class="o">!=</span> <span class="n">prefixes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span> <span class="o">=</span> <span class="n">prefixes</span>
+        <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_managers</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">auth_managers</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span> <span class="o">=</span> <span class="n">RosieWSClientAuthManager</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="p">,</span> <span class="n">popen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">popen</span><span class="p">,</span> <span class="n">prompt_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_func</span><span class="p">,</span>
+                <span class="n">event_handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">)</span>
+        <span class="c1"># Remove uncontactable prefixes from the list.</span>
+        <span class="n">ok_prefixes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hello</span><span class="p">(</span><span class="n">return_ok_prefixes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">prefixes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unreachable_prefixes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">ok_prefixes</span><span class="p">:</span>
+                <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">unreachable_prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span> <span class="o">=</span> <span class="n">prefixes</span></div>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">return_ok_prefixes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send an HTTP GET request to the known servers.</span>
+
+<span class="sd">        Return a list, each element is the result from a successful request to</span>
+<span class="sd">        a web server.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Gather the details of the requests to send</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_params</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="n">request_details</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span><span class="p">:</span>
+                <span class="n">auth_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_managers</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">auth_manager</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+                    <span class="n">request_details</span><span class="p">[</span><span class="n">url</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_request_detail</span><span class="p">(</span>
+                        <span class="n">url</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">auth_manager</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">request_details</span><span class="p">[</span><span class="n">url</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_request_detail</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span><span class="p">:</span>
+                <span class="n">auth_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_managers</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span>
+                <span class="n">full_url</span> <span class="o">=</span> <span class="n">auth_manager</span><span class="o">.</span><span class="n">root</span> <span class="o">+</span> <span class="n">url</span>
+                <span class="n">request_details</span><span class="p">[</span><span class="n">full_url</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_request_detail</span><span class="p">(</span>
+                    <span class="n">full_url</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">auth_manager</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request_details</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RosieWSClientError</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Process the requests in parallel</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">request_details</span><span class="p">))</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">request_detail</span> <span class="ow">in</span> <span class="n">request_details</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">url</span><span class="p">]</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span>
+                <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="p">[</span><span class="n">url</span><span class="p">],</span> <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;requests_kwargs&quot;</span><span class="p">])</span>
+        <span class="k">while</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+                    <span class="k">continue</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="k">except</span> <span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
+                        <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">MissingSchema</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">(</span>
+                        <span class="n">RosieWSClientError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">exc</span><span class="p">),</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">request_detail</span> <span class="o">=</span> <span class="n">request_details</span><span class="p">[</span><span class="n">url</span><span class="p">]</span>
+                <span class="c1"># Retry request once, if it fails with a 401</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">requests</span><span class="o">.</span><span class="n">codes</span><span class="p">[</span><span class="s2">&quot;unauthorized&quot;</span><span class="p">]</span> <span class="ow">and</span>
+                        <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;can_retry&quot;</span><span class="p">]):</span>
+                    <span class="n">requests_kwargs</span> <span class="o">=</span> <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;requests_kwargs&quot;</span><span class="p">]</span>
+                    <span class="n">auth_manager</span> <span class="o">=</span> <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;auth_manager&quot;</span><span class="p">]</span>
+                    <span class="n">prev_auth</span> <span class="o">=</span> <span class="n">requests_kwargs</span><span class="p">[</span><span class="s2">&quot;auth&quot;</span><span class="p">]</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">requests_kwargs</span><span class="p">[</span><span class="s2">&quot;auth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">auth_manager</span><span class="o">.</span><span class="n">get_auth</span><span class="p">(</span>
+                            <span class="n">is_retry</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                        <span class="n">error</span> <span class="o">=</span> <span class="n">RosieWSClientError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;can_retry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">results</span><span class="p">[</span><span class="n">url</span><span class="p">]</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span>
+                            <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="p">[</span><span class="n">url</span><span class="p">],</span> <span class="n">requests_kwargs</span><span class="p">)</span>
+                        <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;can_retry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">prev_auth</span> <span class="o">!=</span> <span class="n">requests_kwargs</span><span class="p">[</span><span class="s2">&quot;auth&quot;</span><span class="p">])</span>
+                    <span class="k">continue</span>
+                <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
+            <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">POLL_DELAY</span><span class="p">)</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+        <span class="c1"># Process and return the results</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">request_detail</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">request_details</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;auth_manager&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;auth_manager&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clear_password</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">(</span>
+                    <span class="n">RosieWSClientError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">),</span>
+                    <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;auth_manager&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;auth_manager&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">store_password</span><span class="p">()</span>
+            <span class="n">response_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_params</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">response_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">return_ok_prefixes</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">request_detail</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">response_data</span><span class="p">,</span> <span class="n">response_url</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">(</span>
+                    <span class="n">RosieWSClientError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">),</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RosieWSClientError</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_remove_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove removable parameters from url.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">removable_param</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">REMOVABLE_PARAMS</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;?&quot;</span> <span class="o">+</span> <span class="n">removable_param</span><span class="p">,</span> <span class="s2">&quot;?&quot;</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span> <span class="o">+</span> <span class="n">removable_param</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;?&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;?&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_create_request_detail</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">auth_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper for &quot;_get&quot;. Return a dict with request details.</span>
+
+<span class="sd">        The dict will be populated like this:</span>
+<span class="sd">        {</span>
+<span class="sd">            &quot;url&quot;: url,</span>
+<span class="sd">            &quot;prefix&quot;: prefix,</span>
+<span class="sd">            &quot;auth_manager&quot;: auth_manager,</span>
+<span class="sd">            &quot;can_retry&quot;: False,</span>
+<span class="sd">            &quot;requests_kwargs&quot;: requests_kwargs,</span>
+<span class="sd">            &quot;response&quot;: None,</span>
+<span class="sd">        }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span>
+        <span class="n">requests_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
+        <span class="n">can_retry</span> <span class="o">=</span> <span class="p">(</span><span class="n">auth_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">auth_manager</span><span class="p">:</span>
+            <span class="n">requests_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">auth_manager</span><span class="o">.</span><span class="n">requests_kwargs</span><span class="p">)</span>
+            <span class="n">requests_kwargs</span><span class="p">[</span><span class="s2">&quot;auth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">auth_manager</span><span class="o">.</span><span class="n">get_auth</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">requests_kwargs</span><span class="p">[</span><span class="s2">&quot;auth&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># None implies a failure to get auth, unlike &#39;()&#39;.</span>
+                <span class="n">can_retry</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">requests_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;auth_manager&quot;</span><span class="p">:</span> <span class="n">auth_manager</span><span class="p">,</span>
+            <span class="s2">&quot;can_retry&quot;</span><span class="p">:</span> <span class="n">can_retry</span><span class="p">,</span>
+            <span class="s2">&quot;requests_kwargs&quot;</span><span class="p">:</span> <span class="n">requests_kwargs</span><span class="p">,</span>
+            <span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="n">prefix</span><span class="p">,</span>
+            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">url</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_get_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return named keys from web services.&quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">datum</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">datum</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+<div class="viewcode-block" id="RosieWSClient.get_known_keys"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.get_known_keys">[docs]</a>    <span class="k">def</span> <span class="nf">get_known_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the known query keys.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_keys</span><span class="p">(</span><span class="s2">&quot;get_known_keys&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RosieWSClient.get_optional_keys"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.get_optional_keys">[docs]</a>    <span class="k">def</span> <span class="nf">get_optional_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the optional query keys.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_keys</span><span class="p">(</span><span class="s2">&quot;get_optional_keys&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RosieWSClient.get_query_operators"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.get_query_operators">[docs]</a>    <span class="k">def</span> <span class="nf">get_query_operators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the query operators.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_keys</span><span class="p">(</span><span class="s2">&quot;get_query_operators&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RosieWSClient.hello"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.hello">[docs]</a>    <span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_ok_prefixes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ask the server to say hello.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="n">return_ok_prefixes</span><span class="o">=</span><span class="n">return_ok_prefixes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RosieWSClient.query"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Query the Rosie database.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;query&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RosieWSClient.search"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search the Rosie database for a matching string.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RosieWSClient.address_lookup"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.address_lookup">[docs]</a>    <span class="k">def</span> <span class="nf">address_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Repeat a Rosie query or search by address.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;address&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RosieWSClient.query_local_copies"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.query_local_copies">[docs]</a>    <span class="k">def</span> <span class="nf">query_local_copies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns details of the local suites.</span>
+
+<span class="sd">        As if they had been obtained using a search or query.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">suite_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">suite_id</span> <span class="ow">in</span> <span class="n">SuiteId</span><span class="o">.</span><span class="n">get_checked_out_suite_ids</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">suite_id</span><span class="o">.</span><span class="n">prefix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span><span class="p">:</span>
+                <span class="n">suite_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">suite_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">suite_ids</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># Simple query</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">queued_suite_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">suite_ids</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">queued_suite_ids</span><span class="p">:</span>  <span class="c1"># Batch up queries</span>
+            <span class="n">q_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_LOCAL_QUERIES</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">queued_suite_ids</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">suite_id</span> <span class="o">=</span> <span class="n">queued_suite_ids</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">q_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;or ( idx eq </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">suite_id</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+                <span class="n">q_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;and branch eq </span><span class="si">%s</span><span class="s2"> )&quot;</span> <span class="o">%</span> <span class="n">suite_id</span><span class="o">.</span><span class="n">branch</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q_list</span><span class="p">):</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">result_idx_branches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">result_idx_branches</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">result</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;idx&quot;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;branch&quot;</span><span class="p">]))</span>
+
+        <span class="c1"># A branch may have been deleted - query with all_revs=1.</span>
+        <span class="c1"># We only want to use all_revs on demand as it&#39;s slow.</span>
+        <span class="n">queued_suite_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">suite_id</span> <span class="ow">in</span> <span class="n">suite_ids</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">suite_id</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">suite_id</span><span class="o">.</span><span class="n">branch</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result_idx_branches</span><span class="p">:</span>
+                <span class="n">queued_suite_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">suite_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">queued_suite_ids</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">results</span>
+        <span class="k">while</span> <span class="n">queued_suite_ids</span><span class="p">:</span>  <span class="c1"># Batch up queries</span>
+            <span class="n">q_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_LOCAL_QUERIES</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">queued_suite_ids</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">suite_id</span> <span class="o">=</span> <span class="n">queued_suite_ids</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">q_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;or ( idx eq </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">suite_id</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+                <span class="n">q_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;and branch eq </span><span class="si">%s</span><span class="s2"> )&quot;</span> <span class="o">%</span> <span class="n">suite_id</span><span class="o">.</span><span class="n">branch</span><span class="p">)</span>
+            <span class="n">more_results</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q_list</span><span class="p">,</span> <span class="n">all_revs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">more_results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">new_results</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">more_results</span><span class="p">:</span>
+                <span class="n">idx_branch</span> <span class="o">=</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;idx&quot;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;branch&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">idx_branch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_results</span> <span class="ow">or</span>
+                        <span class="n">result</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;revision&quot;</span><span class="p">]</span> <span class="o">&gt;</span>
+                        <span class="n">new_results</span><span class="p">[</span><span class="n">idx_branch</span><span class="p">][</span><span class="sa">u</span><span class="s2">&quot;revision&quot;</span><span class="p">]):</span>
+                    <span class="n">new_results</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">idx_branch</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">new_results</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="RosieWSClient.query_split"><a class="viewcode-back" href="../../api/rosie-web.html#rosie.ws_client.RosieWSClient.query_split">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">query_split</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split a list of arguments into a list of query items.&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;and&quot;</span><span class="p">,</span> <span class="s2">&quot;or&quot;</span><span class="p">]:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;and&quot;</span><span class="p">)</span>
+        <span class="n">q_list</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Query list</span>
+        <span class="n">q_item</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Individual query pieces list</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Number of open brackets</span>
+        <span class="k">while</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">arg_1</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">arg</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;and&quot;</span><span class="p">,</span> <span class="s2">&quot;or&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">arg_1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;and&quot;</span><span class="p">,</span> <span class="s2">&quot;or&quot;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">q_item</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="n">q_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q_item</span><span class="p">)</span>
+                    <span class="n">q_item</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">q_item</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">q_item</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RosieWSClientQuerySplitError</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+                <span class="n">q_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q_item</span><span class="p">)</span>
+                <span class="n">q_item</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">q_item</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="n">level</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;(&quot;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">])</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">level</span> <span class="o">-=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;)&quot;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">])</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">q_item</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">level</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span>
+            <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">q_item</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="k">for</span> <span class="n">q_item</span> <span class="ow">in</span> <span class="n">q_list</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="n">RosieWSClientQuerySplitError</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">q_list</span></div></div>
+</pre></div>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

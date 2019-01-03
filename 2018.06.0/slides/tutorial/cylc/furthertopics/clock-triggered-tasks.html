@@ -1,0 +1,243 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Clock Triggered Tasks &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Broadcast" href="broadcast.html" />
+    <link rel="prev" title="Further Topics" href="index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="clock-triggered-tasks">
+
+<h1>Clock Triggered Tasks<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/clock-triggered-tasks.html#clock-triggered-tasks" title="View HTML">§</a></h1>
+
+<p>In a <a class="reference internal" href="../../../glossary.html#term-datetime-cycling"><span class="xref std std-term">datetime cycling</span></a> suite the time represented by the
+<a class="reference internal" href="../../../glossary.html#term-cycle-point"><span class="xref std std-term">cycle points</span></a> bear no relation to the real-world time.
+Using clock-triggers we can make tasks wait until their cycle point time before
+running.</p>
+<p>Clock-triggering effectively enables us to tether the “cycle time” to the
+“real world time” which we refer to as the <a class="reference internal" href="../../../glossary.html#term-wall-clock-time"><span class="xref std std-term">wall-clock time</span></a>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="clock-triggering">
+
+<h2>Clock Triggering<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/clock-triggered-tasks.html#clock-triggering" title="View HTML">§</a></h2>
+
+<p>When clock-triggering tasks we can use different
+<a class="reference internal" href="../scheduling/datetime-cycling.html#tutorial-iso8601-durations"><span class="std std-ref">offsets</span></a> to the cycle time as follows:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">clock-trigger </span><span class="o">=</span><span class="s"> taskname(CYCLE_OFFSET)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Regardless of the offset used, the task still belongs to the cycle from
+which the offset has been applied.</p>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="example">
+
+<h2>Example<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/clock-triggered-tasks.html#example" title="View HTML">§</a></h2>
+
+<p>Our example suite will simulate a clock chiming on the hour.</p>
+<p>Within your <code class="docutils literal notranslate"><span class="pre">~/cylc-run</span></code> directory create a new directory called
+<code class="docutils literal notranslate"><span class="pre">clock-trigger</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">clock</span><span class="o">-</span><span class="n">trigger</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">clock</span><span class="o">-</span><span class="n">trigger</span>
+</pre></div>
+</div>
+<p>Paste the following code into a <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[cylc]</span>
+    <span class="nv">UTC mode </span><span class="o">=</span><span class="s"> True</span> <span class="c1"># Ignore DST</span>
+
+<span class="nt">[scheduling]</span>
+    <span class="nv">initial cycle point </span><span class="o">=</span><span class="s"> TODO</span>
+    <span class="nv">final cycle point </span><span class="o">=</span><span class="s"> +P1D</span> <span class="c1"># Run for one day</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nt">[[[PT1H]]]</span>
+            <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">bell</span>
+
+<span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nt">[[[events]]]</span>
+            <span class="nv">mail events </span><span class="o">=</span><span class="s"> failed</span>
+    <span class="nt">[[bell]]</span>
+        <span class="nv">env-script </span><span class="o">=</span><span class="s"> eval $(rose task-env)</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> printf &#39;bong%.0s\n&#39; $(seq 1 $(cylc cyclepoint --print-hour))</span>
+</pre></div>
+</div>
+<p>Change the initial cycle point to 00:00 this morning (e.g. if it was
+the first of January 2000 we would write <code class="docutils literal notranslate"><span class="pre">2000-01-01T00Z</span></code>).</p>
+<p>We now have a simple suite with a single task that prints “bong” a number
+of times equal to the (cycle point) hour.</p>
+<p>Run your suite using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">run</span> <span class="n">clock</span><span class="o">-</span><span class="n">trigger</span>
+</pre></div>
+</div>
+<p>Stop the suite after a few cycles using the <span class="guilabel">stop</span> button in the
+<code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code>. Notice how the tasks run as soon as possible rather than
+waiting for the actual time to be equal to the cycle point.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="clock-triggering-tasks">
+
+<h2>Clock-Triggering Tasks<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/clock-triggered-tasks.html#clock-triggering-tasks" title="View HTML">§</a></h2>
+
+<p>We want our clock to only ring in real-time rather than the simulated
+cycle time.</p>
+<p>To do this, add the following lines to the <code class="docutils literal notranslate"><span class="pre">[scheduling]</span></code> section of
+your <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code>:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[special tasks]]</span>
+    <span class="nv">clock-trigger </span><span class="o">=</span><span class="s"> bell(PT0M)</span>
+</pre></div>
+</div>
+<p>This tells the suite to clock trigger the <code class="docutils literal notranslate"><span class="pre">bell</span></code> task with a cycle
+offset of <code class="docutils literal notranslate"><span class="pre">0</span></code> hours.</p>
+<p>Save your changes and run your suite.</p>
+<p>Your suite should now be running the <code class="docutils literal notranslate"><span class="pre">bell</span></code> task in real-time. Any cycle times
+that have already passed (such as the one defined by <code class="docutils literal notranslate"><span class="pre">initial</span> <span class="pre">cycle</span> <span class="pre">time</span></code>)
+will be run as soon as possible, while those in the future will wait for that
+time to pass.</p>
+<p>At this point you may want to leave your suite running until the next hour
+has passed in order to confirm the clock triggering is working correctly.
+Once you are satisfied, stop your suite.</p>
+<p>By making the <code class="docutils literal notranslate"><span class="pre">bell</span></code> task a clock triggered task we have made it run in
+real-time. Thus, when the wall-clock time caught up with the cycle time, the
+<code class="docutils literal notranslate"><span class="pre">bell</span></code> task triggered.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="adding-more-clock-triggered-tasks">
+
+<h2>Adding More Clock-Triggered Tasks<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/clock-triggered-tasks.html#adding-more-clock-triggered-tasks" title="View HTML">§</a></h2>
+
+<p>We will now modify our suite to run tasks at quarter-past, half-past and
+quarter-to the hour.</p>
+<p>Open your <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> and modify the <code class="docutils literal notranslate"><span class="pre">[runtime]</span></code> section by adding the
+following:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[quarter_past, half_past, quarter_to]]</span>
+    <span class="nv">script </span><span class="o">=</span><span class="s"> echo &#39;chimes&#39;</span>
+</pre></div>
+</div>
+<p>Edit the <code class="docutils literal notranslate"><span class="pre">[[scheduling]]</span></code> section to read:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[special tasks]]</span>
+    <span class="nv">clock-trigger </span><span class="o">=</span><span class="s"> bell(PT0M), quarter_past(PT15M), half_past(PT30M), quarter_to(PT45M)</span>
+<span class="nt">[[dependencies]]</span>
+    <span class="nt">[[[PT1H]]]</span>
+        <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+            <span class="kd">bell</span>
+            <span class="kd">quarter_past</span>
+            <span class="kd">half_past</span>
+            <span class="kd">quarter_to</span>
+        <span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Note the different values used for the cycle offsets of the clock-trigger tasks.</p>
+<p>Save your changes and run your suite using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">run</span> <span class="n">clock</span><span class="o">-</span><span class="n">trigger</span> <span class="n">now</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">now</span></code> argument will run your suite using the current time for the
+initial cycle point.</p>
+</div>
+<p>Again, notice how the tasks trigger until the current time is reached.</p>
+<p>Leave your suite running for a while to confirm it is working as expected
+and then shut it down using the <span class="guilabel">stop</span> button in the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code>.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="summary">
+
+<h2>Summary<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/clock-triggered-tasks.html#summary" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li>Clock triggers are a type of <a class="reference internal" href="../../../glossary.html#term-dependency"><span class="xref std std-term">dependency</span></a> which cause
+<a class="reference internal" href="../../../glossary.html#term-task"><span class="xref std std-term">tasks</span></a> to wait for the <a class="reference internal" href="../../../glossary.html#term-wall-clock-time"><span class="xref std std-term">wall-clock time</span></a> to reach the
+<a class="reference internal" href="../../../glossary.html#term-cycle-point"><span class="xref std std-term">cycle point</span></a> time.</li>
+<li>A clock trigger applies only to a single task.</li>
+<li>Clock triggers can only be used in datetime cycling suites.</li>
+</ul>
+<p>For more information see the <a class="reference external" href="http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide">Cylc User Guide</a>.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

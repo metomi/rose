@@ -1,0 +1,667 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Inheritance &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Queues" href="queues.html" />
+    <link rel="prev" title="Family Triggers" href="family-triggers.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="inheritance">
+
+<h1>Inheritance<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/inheritance.html#inheritance" title="View HTML">§</a></h1>
+
+<p>We have seen in the <a class="reference internal" href="../runtime/configuration-consolidation/families.html#tutorial-cylc-families"><span class="std std-ref">runtime tutorial</span></a> how
+tasks can be grouped into families.</p>
+<p>In this tutorial we will look at nested families, inheritance order and
+multiple inheritance.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="inheritance-hierarchy">
+
+<h2>Inheritance Hierarchy<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/inheritance.html#inheritance-hierarchy" title="View HTML">§</a></h2>
+
+<p>Create a new suite by running the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">inheritance</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">inheritance</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>You will now have a <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file that defines two tasks each representing
+a different aircraft, the Airbus A380 jumbo jet and the Robson R44 helicopter:</p>
+<a class="reference internal image-reference" href="https://upload.wikimedia.org/wikipedia/commons/0/09/A6-EDY_A380_Emirates_31_jan_2013_jfk_%288442269364%29_%28cropped%29.jpg"><img alt="A380" src="https://upload.wikimedia.org/wikipedia/commons/0/09/A6-EDY_A380_Emirates_31_jan_2013_jfk_%288442269364%29_%28cropped%29.jpg" style="width: 49%;" /></a>
+<a class="reference internal image-reference" href="https://upload.wikimedia.org/wikipedia/commons/2/2f/Robinson-R44_1.jpg"><img alt="R44" src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Robinson-R44_1.jpg" style="width: 49%;" /></a>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span><span class="s"> </span><span class="o">=</span> <span class="kd">a380</span> <span class="o">&amp;</span> <span class="kd">r44</span>
+
+<span class="nt">[runtime]</span>
+    <span class="nt">[[VEHICLE]]</span>
+        <span class="nv">init-script </span><span class="o">=</span><span class="s"> echo &#39;Boarding&#39;</span>
+        <span class="nv">pre-script </span><span class="o">=</span><span class="s"> echo &#39;Departing&#39;</span>
+        <span class="nv">post-script </span><span class="o">=</span><span class="s"> echo &#39;Arriving&#39;</span>
+
+    <span class="nt">[[AIR_VEHICLE]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> VEHICLE</span>
+        <span class="nt">[[[meta]]]</span>
+            <span class="nv">description </span><span class="o">=</span><span class="s"> A vehicle which can fly.</span>
+    <span class="nt">[[AIRPLANE]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> AIR_VEHICLE</span>
+        <span class="nt">[[[meta]]]</span>
+            <span class="nv">description </span><span class="o">=</span><span class="s"> An air vehicle with fixed wings.</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">CAN_TAKE_OFF_VERTICALLY </span><span class="o">=</span><span class="s"> false</span>
+    <span class="nt">[[HELICOPTER]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> AIR_VEHICLE</span>
+        <span class="nt">[[[meta]]]</span>
+            <span class="nv">description </span><span class="o">=</span><span class="s"> An air vehicle with rotors.</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">CAN_TAKE_OFF_VERTICALLY </span><span class="o">=</span><span class="s"> true</span>
+
+    <span class="nt">[[a380]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> AIRPLANE</span>
+        <span class="nt">[[[meta]]]</span>
+            <span class="nv">title </span><span class="o">=</span><span class="s"> Airbus A380 Jumbo-Jet.</span>
+    <span class="nt">[[r44]]</span>
+        <span class="nv">inherit </span><span class="o">=</span><span class="s"> HELICOPTER</span>
+        <span class="nt">[[[meta]]]</span>
+            <span class="nv">title </span><span class="o">=</span><span class="s"> Robson R44 Helicopter.</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">[meta]</span></code> section is a freeform section where we can define metadata
+to be associated with a task, family or the suite itself.</p>
+<p class="last">This metadata should not be mistaken with Rose <a class="reference internal" href="../../../api/configuration/metadata.html#conf-meta"><span class="std std-ref">Configuration Metadata</span></a>.</p>
+</div>
+<div class="hint admonition">
+<p class="first admonition-title">Reminder</p>
+<p class="last">By convention we write family names in upper case (with the exception of the
+special <code class="docutils literal notranslate"><span class="pre">root</span></code> family) and task names in lower case.</p>
+</div>
+<p>These two tasks sit at the bottom of an inheritance tree. The <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code>
+command has an option (<code class="docutils literal notranslate"><span class="pre">-n</span></code>) for drawing such inheritance hierarchies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">graph</span> <span class="o">-</span><span class="n">n</span> <span class="o">.</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>Running this command will generate the following output:</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-9881ac4f012d6409284b33923824d5e94a8d095e.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+AIRPLANE  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+a380   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+AIRPLANE -&gt; a380   [color=royalblue];
+HELICOPTER   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+r44    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+HELICOPTER -&gt; r44  [color=royalblue];
+root   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+VEHICLE   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+root -&gt; VEHICLE    [color=royalblue];
+AIR_VEHICLE  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+VEHICLE -&gt; AIR_VEHICLE   [color=royalblue];
+AIR_VEHICLE -&gt; AIRPLANE  [color=royalblue];
+AIR_VEHICLE -&gt; HELICOPTER   [color=royalblue];
+}</p></object>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">root</span></code> family sits at the top of the inheritance tree as all
+tasks/families automatically inherit it:</p>
+</div>
+<p>Cylc handles inheritance by starting with the root family and working down the
+inheritance tree applying each section in turn.</p>
+<p>To see the resulting configuration for the <code class="docutils literal notranslate"><span class="pre">a380</span></code> task use the
+<code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">get</span><span class="o">-</span><span class="n">config</span> <span class="o">.</span> <span class="o">--</span><span class="n">sparse</span> <span class="o">-</span><span class="n">i</span> <span class="s2">&quot;[runtime][a380]&quot;</span>
+</pre></div>
+</div>
+<p>You should see some settings which have been inherited from the <code class="docutils literal notranslate"><span class="pre">VEHICLE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">AIRPLANE</span></code> families as well as a couple defined in the <code class="docutils literal notranslate"><span class="pre">a380</span></code> task.</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">init-script </span><span class="o">=</span><span class="s"> echo &#39;Boarding&#39;</span>                       <span class="c1"># Inherited from VEHICLE</span>
+<span class="nv">pre-script </span><span class="o">=</span><span class="s"> echo &#39;Departing&#39;</span>                       <span class="c1"># Inherited from VEHICLE</span>
+<span class="nv">post-script </span><span class="o">=</span><span class="s"> echo &#39;Arriving&#39;</span>                       <span class="c1"># Inherited from VEHICLE</span>
+<span class="nv">inherit </span><span class="o">=</span><span class="s"> AIRPLANE</span>                                  <span class="c1"># Defined in a380</span>
+<span class="nt">[[[meta]]]</span>
+    <span class="nv">description </span><span class="o">=</span><span class="s"> An air vehicle with fixed wings.</span>  <span class="c1"># Inherited from AIR_VEHICLE - overwritten by AIRPLANE</span>
+    <span class="nv">title </span><span class="o">=</span><span class="s"> Airbus A380 Jumbo-Jet.</span>                  <span class="c1"># Defined in a380</span>
+<span class="nt">[[[environment]]]</span>
+    <span class="nv">CAN_TAKE_OFF_VERTICALLY </span><span class="o">=</span><span class="s"> false</span>                 <span class="c1"># Inherited from AIRPLANE</span>
+</pre></div>
+</div>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">description</span></code> setting is defined in the <code class="docutils literal notranslate"><span class="pre">AIR_VEHICLE</span></code>
+family but is overwritten by the value specified in the <code class="docutils literal notranslate"><span class="pre">AIRPLANE</span></code> family.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="multiple-inheritance">
+
+<h2>Multiple Inheritance<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/inheritance.html#multiple-inheritance" title="View HTML">§</a></h2>
+
+<p>Next we want to add a vehicle called the V-22 Osprey to the suite. The V-22
+is a cross between a plane and a helicopter - it has wings but can take-off and
+land vertically.</p>
+<a class="reference internal image-reference" href="https://upload.wikimedia.org/wikipedia/commons/e/e3/MV-22_mcas_Miramar_2014.JPG"><img alt="https://upload.wikimedia.org/wikipedia/commons/e/e3/MV-22_mcas_Miramar_2014.JPG" class="align-center" src="https://upload.wikimedia.org/wikipedia/commons/e/e3/MV-22_mcas_Miramar_2014.JPG" style="width: 300px;" /></a>
+<p>As the V-22 can be thought of as both a plane and a helicopter we want it to
+inherit from both the <code class="docutils literal notranslate"><span class="pre">AIRPLANE</span></code> and <code class="docutils literal notranslate"><span class="pre">HELICOPTER</span></code> families. In Cylc we can
+inherit from multiple families by separating their names with commas:</p>
+<p>Add the following task to your <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file.</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[v22]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> AIRPLANE, HELICOPTER</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">title </span><span class="o">=</span><span class="s"> V-22 Osprey Military Aircraft.</span>
+</pre></div>
+</div>
+<p>Refresh your <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code> window or re-run the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code> command.</p>
+<p>The inheritance hierarchy should now look like this:</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-e73c0eedebda4879a22d9464b6c61c584df377a0.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+AIRPLANE  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+v22    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+AIRPLANE -&gt; v22    [color=royalblue];
+a380   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+AIRPLANE -&gt; a380   [color=royalblue];
+HELICOPTER   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+HELICOPTER -&gt; v22  [color=royalblue];
+r44    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+HELICOPTER -&gt; r44  [color=royalblue];
+root   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+VEHICLE   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+root -&gt; VEHICLE    [color=royalblue];
+AIR_VEHICLE  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+VEHICLE -&gt; AIR_VEHICLE   [color=royalblue];
+AIR_VEHICLE -&gt; AIRPLANE  [color=royalblue];
+AIR_VEHICLE -&gt; HELICOPTER   [color=royalblue];
+}</p></object>
+</div>
+<p>Inspect the configuration of the <code class="docutils literal notranslate"><span class="pre">v22</span></code> task using the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code>
+command.</p>
+<div class="spoiler warning admonition">
+<p class="first admonition-title">Hint</p>
+<div class="last highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc get-config . --sparse -i <span class="s2">&quot;[runtime][v22]&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>You should see that the <code class="docutils literal notranslate"><span class="pre">CAN_TASK_OFF_VERTICALLY</span></code> environment variable has
+been set to <code class="docutils literal notranslate"><span class="pre">false</span></code> which isn’t right. This is because of the order in which
+inheritance is applied.</p>
+<p>Cylc handles multiple-inheritance by applying each family from right to left.
+For the <code class="docutils literal notranslate"><span class="pre">v22</span></code> task we specified <code class="docutils literal notranslate"><span class="pre">inherit</span> <span class="pre">=</span> <span class="pre">AIRPLANE,</span> <span class="pre">HELICOPTER</span></code> so the
+<code class="docutils literal notranslate"><span class="pre">HELICOPTER</span></code> family will be applied first and the <code class="docutils literal notranslate"><span class="pre">AIRPLANE</span></code> family after.</p>
+<p>The inheritance order would be as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>root
+VEHICLE
+AIR_VEHICLE
+HELICOPTER   <span class="c1"># sets &quot;CAN_TAKE_OFF_VERTICALLY to &quot;true&quot;</span>
+AIRPLANE     <span class="c1"># sets &quot;CAN_TAKE_OFF_VERTICALLY to &quot;false&quot;</span>
+v22
+</pre></div>
+</div>
+<p>We could fix this problem by changing the order of inheritance:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">inherit </span><span class="o">=</span><span class="s"> HELICOPTER, AIRPLANE</span>
+</pre></div>
+</div>
+<p>Now the <code class="docutils literal notranslate"><span class="pre">HELICOPTER</span></code> family is applied second so its values will override any
+in the <code class="docutils literal notranslate"><span class="pre">AIRPLANE</span></code> family.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>root
+VEHICLE
+AIR_VEHICLE
+AIRPLANE     <span class="c1"># sets &quot;CAN_TAKE_OFF_VERTICALLY to &quot;false&quot;</span>
+HELICOPTER   <span class="c1"># sets &quot;CAN_TAKE_OFF_VERTICALLY to &quot;true&quot;</span>
+v22
+</pre></div>
+</div>
+<p>Inspect the configuration of the <code class="docutils literal notranslate"><span class="pre">v22</span></code> task using <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code> to
+confirm this.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="more-inheritance">
+
+<h2>More Inheritance<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/inheritance.html#more-inheritance" title="View HTML">§</a></h2>
+
+<p>We will now add some more families and tasks to the suite.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="engine-type">
+
+<h3>Engine Type<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/inheritance.html#engine-type" title="View HTML">§</a></h3>
+
+<p>Next we will define four families to represent three different types of engine.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-9b7a8abac8e0024f6feb7fc50ce20a2f84987b04.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+size = &quot;5,5&quot;
+
+ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled,
+    margin=&quot;0.3,0.055&quot;]
+TURBINE_ENGINE [color=royalblue, fillcolor=powderblue, shape=box,
+    style=filled, margin=&quot;0.3,0.055&quot;]
+INTERNAL_COMBUSTION_ENGINE [color=royalblue, fillcolor=powderblue,
+    shape=box, style=filled, margin=&quot;0.3,0.055&quot;]
+HUMAN_ENGINE [color=royalblue, fillcolor=powderblue, shape=box,
+    style=filled, margin=&quot;0.3,0.055&quot;]
+
+&quot;ENGINE&quot; -&gt; &quot;TURBINE_ENGINE&quot;
+&quot;ENGINE&quot; -&gt; &quot;INTERNAL_COMBUSTION_ENGINE&quot;
+&quot;ENGINE&quot; -&gt; &quot;HUMAN_ENGINE&quot;
+}</p></object>
+</div>
+<p>Each engine type should set an environment variable called <code class="docutils literal notranslate"><span class="pre">FUEL</span></code> which we
+will assign to the following values:</p>
+<ul class="simple">
+<li>Turbine - kerosene</li>
+<li>Internal Combustion - petrol</li>
+<li>Human - pizza</li>
+</ul>
+<p>Add lines to the <code class="docutils literal notranslate"><span class="pre">runtime</span></code> section to represent these four families.</p>
+<div class="spoiler warning admonition">
+<p class="first admonition-title">Solution</p>
+<div class="last highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[ENGINE]]</span>
+<span class="nt">[[TURBINE_ENGINE]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> ENGINE</span>
+    <span class="nt">[[[environment]]]</span>
+        <span class="nv">FUEL </span><span class="o">=</span><span class="s"> kerosene</span>
+<span class="nt">[[INTERNAL_COMBUSTION_ENGINE]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> ENGINE</span>
+    <span class="nt">[[[environment]]]</span>
+        <span class="nv">FUEL </span><span class="o">=</span><span class="s"> petrol</span>
+<span class="nt">[[HUMAN_ENGINE]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> ENGINE</span>
+    <span class="nt">[[[environment]]]</span>
+        <span class="nv">FUEL </span><span class="o">=</span><span class="s"> pizza</span>
+</pre></div>
+</div>
+</div>
+<p>We now need to make the three aircraft inherit from one of the three engines.
+The aircraft use the following types of engine:</p>
+<ul class="simple">
+<li>A380 - turbine</li>
+<li>R44 - internal combustion</li>
+<li>V22 - turbine</li>
+</ul>
+<p>Modify the three tasks so that they inherit from the relevant engine families.</p>
+<div class="spoiler warning admonition">
+<p class="first admonition-title">Solution</p>
+<div class="last highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[a380]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> AIRPLANE, TURBINE_ENGINE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">title </span><span class="o">=</span><span class="s"> Airbus A380 Jumbo-Jet.</span>
+<span class="nt">[[r44]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> HELICOPTER, INTERNAL_COMBUSTION_ENGINE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">title </span><span class="o">=</span><span class="s"> Robson R44 Helicopter.</span>
+<span class="nt">[[v22]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> AIRPLANE, HELICOPTER, TURBINE_ENGINE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">title </span><span class="o">=</span><span class="s"> V-22 Ofsprey Military Aircraft.</span>
+</pre></div>
+</div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="penny-farthing">
+
+<h3>Penny Farthing<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/inheritance.html#penny-farthing" title="View HTML">§</a></h3>
+
+<p>Next we want to add a new type of vehicle, an old-fashioned bicycle called a
+penny farthing.</p>
+<a class="reference internal image-reference" href="https://upload.wikimedia.org/wikipedia/commons/a/a7/Ordinary_bicycle01.jpg"><img alt="Penny Farthing Bicycle" class="align-center" src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Ordinary_bicycle01.jpg" style="width: 300px;" /></a>
+<p>To do this we will need to add two new families, <code class="docutils literal notranslate"><span class="pre">LAND_VEICHLE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">BICYCLE</span></code> as well as a new task, <code class="docutils literal notranslate"><span class="pre">penny_farthing</span></code> related in the
+following manner:</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-cd08f056be622f1310cb9706036ced5c88c12b0d.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+LAND_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box,
+    style=filled]
+BICYCLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+HUMAN_ENGINE [color=royalblue, fillcolor=powderblue, shape=box,
+    style=filled, margin=&quot;0.3,0.055&quot;]
+penny_farthing [color=royalblue, fillcolor=powderblue, shape=box,
+    style=filled, margin=&quot;0.3,0.055&quot;]
+VEHICLE -&gt; LAND_VEHICLE -&gt; BICYCLE -&gt; penny_farthing
+HUMAN_ENGINE -&gt; penny_farthing
+}</p></object>
+</div>
+<p>Add lines to the <code class="docutils literal notranslate"><span class="pre">runtime</span></code> section to represent the two new families and one
+task outlined above.</p>
+<p>Add a description (<code class="docutils literal notranslate"><span class="pre">[meta]description</span></code>) to the <code class="docutils literal notranslate"><span class="pre">LAND_VEHICLE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">BICYCLE</span></code> families and a title (<code class="docutils literal notranslate"><span class="pre">[meta]title</span></code>) to the <code class="docutils literal notranslate"><span class="pre">penny_farthing</span></code>
+task.</p>
+<div class="spoiler warning admonition">
+<p class="first admonition-title">Solution</p>
+<div class="last highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[LAND_VEHICLE]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> VEHICLE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">description </span><span class="o">=</span><span class="s"> A vehicle which can travel over the ground.</span>
+
+<span class="nt">[[BICYCLE]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> LAND_VEHICLE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">description </span><span class="o">=</span><span class="s"> A small two-wheeled vehicle.</span>
+
+<span class="nt">[[penny_farthing]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> BICYCLE, HUMAN_ENGINE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">title </span><span class="o">=</span><span class="s"> An old-fashioned bicycle.</span>
+</pre></div>
+</div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code> to inspect the configuration of the <code class="docutils literal notranslate"><span class="pre">penny_farthing</span></code>
+task we can see that it inherits settings from the <code class="docutils literal notranslate"><span class="pre">VEHICLE</span></code>,
+<code class="docutils literal notranslate"><span class="pre">BICYCLE</span></code> and <code class="docutils literal notranslate"><span class="pre">HUMAN_ENGINE</span></code> families.</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nv">inherit </span><span class="o">=</span><span class="s"> BICYCLE, HUMAN_ENGINE</span>
+<span class="nv">init-script </span><span class="o">=</span><span class="s"> echo &#39;Boarding&#39;</span>  <span class="c1"># Inherited from VEHICLE</span>
+<span class="nv">pre-script </span><span class="o">=</span><span class="s"> echo &#39;Departing&#39;</span>  <span class="c1"># Inherited from VEHICLE</span>
+<span class="nv">post-script </span><span class="o">=</span><span class="s"> echo &#39;Arriving&#39;</span>  <span class="c1"># Inherited from VEHICLE</span>
+<span class="nt">[[[environment]]]</span>
+    <span class="nv">FUEL </span><span class="o">=</span><span class="s"> pizza</span>               <span class="c1"># Inherited from HUMAN_ENGINE</span>
+<span class="nt">[[[meta]]]</span>
+    <span class="nv">description </span><span class="o">=</span><span class="s"> A small two-wheeled vehicle.</span>  <span class="c1"># Inherited from LAND_VEHICLE - overwritten by BICYCLE</span>
+    <span class="nv">title </span><span class="o">=</span><span class="s"> An old-fashioned bicycle.</span>           <span class="c1"># Defined in penny_farthing</span>
+</pre></div>
+</div>
+<div class="spoiler hint admonition">
+<p class="first admonition-title">Hint</p>
+<div class="last highlight-bash notranslate"><div class="highlight"><pre><span></span>cylc get-config . --sparse -i <span class="s2">&quot;[runtime]penny_farthing&quot;</span>
+</pre></div>
+</div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="hovercraft">
+
+<h3>Hovercraft<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/inheritance.html#hovercraft" title="View HTML">§</a></h3>
+
+<p>We will now add a hovercraft called the Hoverwork BHT130, better known to some
+as the Isle Of Wight Ferry.</p>
+<a class="reference internal image-reference" href="https://upload.wikimedia.org/wikipedia/commons/e/e7/Hovercraft_leaving_Ryde.JPG"><img alt="Hoverwork BHT130 Hovercraft" class="align-center" src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Hovercraft_leaving_Ryde.JPG" style="width: 300px;" /></a>
+<p>Hovercraft can move over both land and water and in some respects can be thought
+of as flying vehicles.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-33ca8c02974d5c2fa551c831420c8664eea7e1d8.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+size = &quot;7,5&quot;
+
+VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+AIR_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+LAND_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box,
+    style=filled]
+WATER_VEHICLE [color=royalblue, fillcolor=powderblue, shape=box,
+    style=filled]
+HOVERCRAFT [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+bht130 [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+ENGINE [color=royalblue, fillcolor=powderblue, shape=box, style=filled]
+INTERNAL_COMBUSTION_ENGINE [color=royalblue, fillcolor=powderblue,
+    shape=box, style=filled, margin=&quot;0.3,0.055&quot;]
+VEHICLE -&gt; AIR_VEHICLE -&gt; HOVERCRAFT
+VEHICLE -&gt; LAND_VEHICLE -&gt; HOVERCRAFT
+VEHICLE -&gt; WATER_VEHICLE -&gt; HOVERCRAFT
+HOVERCRAFT -&gt; bht130
+ENGINE -&gt; INTERNAL_COMBUSTION_ENGINE -&gt; bht130
+}</p></object>
+</div>
+<p>Write new families and one new task to represent the above structure.</p>
+<p>Add a description (<code class="docutils literal notranslate"><span class="pre">[meta]description</span></code>) to the <code class="docutils literal notranslate"><span class="pre">WATER_VEHICLE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">HOVERCRAFT</span></code> families and a title (<code class="docutils literal notranslate"><span class="pre">[meta]title</span></code>) to the <code class="docutils literal notranslate"><span class="pre">bht130</span></code> task.</p>
+<div class="spoiler warning admonition">
+<p class="first admonition-title">Solution</p>
+<div class="last highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[WATER_VEHICLE]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> VEHICLE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">description </span><span class="o">=</span><span class="s"> A vehicle which can travel over water.</span>
+
+<span class="nt">[[HOVERCRAFT]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> LAND_VEHICLE, AIR_VEHICLE, WATER_VEHICLE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">description </span><span class="o">=</span><span class="s"> A vehicle which can travel over ground, water and ice.</span>
+
+<span class="nt">[[bht130]]</span>
+    <span class="nv">inherit </span><span class="o">=</span><span class="s"> HOVERCRAFT, INTERNAL_COMBUSTION_ENGINE</span>
+    <span class="nt">[[[meta]]]</span>
+        <span class="nv">title </span><span class="o">=</span><span class="s"> Griffon Hoverwork BHT130 (Isle Of Whight Ferry).</span>
+</pre></div>
+</div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="finished-suite">
+
+<h2>Finished Suite<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/inheritance.html#finished-suite" title="View HTML">§</a></h2>
+
+<p>You should now have a suite with an inheritance hierarchy which looks like
+this:</p>
+<object data="../../../_images/graphviz-e317ea8339ec49d9a4a1026e59b2343b28129c84.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+size = &quot;7, 5&quot;
+
+root   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+ENGINE    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+root -&gt; ENGINE  [color=royalblue];
+VEHICLE   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+root -&gt; VEHICLE    [color=royalblue];
+INTERNAL_COMBUSTION_ENGINE  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled,
+   margin=&quot;0.3,0.055&quot;];
+ENGINE -&gt; INTERNAL_COMBUSTION_ENGINE    [color=royalblue];
+TURBINE_ENGINE  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled,
+   margin=&quot;0.3,0.055&quot;];
+ENGINE -&gt; TURBINE_ENGINE    [color=royalblue];
+HUMAN_ENGINE    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled,
+   margin=&quot;0.3,0.055&quot;];
+ENGINE -&gt; HUMAN_ENGINE   [color=royalblue];
+LAND_VEHICLE    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+VEHICLE -&gt; LAND_VEHICLE  [color=royalblue];
+WATER_VEHICLE   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+VEHICLE -&gt; WATER_VEHICLE    [color=royalblue];
+AIR_VEHICLE  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+VEHICLE -&gt; AIR_VEHICLE   [color=royalblue];
+r44    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+INTERNAL_COMBUSTION_ENGINE -&gt; r44    [color=royalblue];
+bht130    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+INTERNAL_COMBUSTION_ENGINE -&gt; bht130    [color=royalblue];
+v22    [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+TURBINE_ENGINE -&gt; v22    [color=royalblue];
+a380   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+TURBINE_ENGINE -&gt; a380   [color=royalblue];
+penny_farthing  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled,
+   margin=&quot;0.3,0.055&quot;];
+HUMAN_ENGINE -&gt; penny_farthing    [color=royalblue];
+AIRPLANE  [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+AIRPLANE -&gt; v22    [color=royalblue];
+AIRPLANE -&gt; a380   [color=royalblue];
+HELICOPTER   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+HELICOPTER -&gt; v22  [color=royalblue];
+HELICOPTER -&gt; r44  [color=royalblue];
+HOVERCRAFT   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+HOVERCRAFT -&gt; bht130  [color=royalblue];
+LAND_VEHICLE -&gt; HOVERCRAFT  [color=royalblue];
+BICYCLE   [color=royalblue,
+   fillcolor=powderblue,
+   shape=box,
+   style=filled];
+LAND_VEHICLE -&gt; BICYCLE  [color=royalblue];
+WATER_VEHICLE -&gt; HOVERCRAFT    [color=royalblue];
+AIR_VEHICLE -&gt; AIRPLANE  [color=royalblue];
+AIR_VEHICLE -&gt; HELICOPTER   [color=royalblue];
+AIR_VEHICLE -&gt; HOVERCRAFT   [color=royalblue];
+BICYCLE -&gt; penny_farthing   [color=royalblue];
+}</p></object>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

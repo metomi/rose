@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rosie Web API &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" />
+    <link rel="next" title="Rose Terms Of Use" href="../terms.html" />
+    <link rel="prev" title="Rose Upgrade Macro API" href="rose-upgrader-macros.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rosie-web-api">
+
+<h1>Rosie Web API<a class="headerlink" href="../../html/api/rosie-web.html#rosie-web-api" title="View HTML">§</a></h1>
+
+<p>This section explains how to use the Rosie web service API. All Rosie
+discovery services (e.g. <code class="docutils literal notranslate"><span class="pre">rosie</span> <span class="pre">search</span></code>, <code class="docutils literal notranslate"><span class="pre">rosie</span> <span class="pre">go</span></code>, web page) use a
+<a class="reference external" href="https://en.wikipedia.org/wiki/Representational_state_transfer">RESTful</a> API to interrogate a web server, which then interrogates an
+<a class="reference external" href="https://en.wikipedia.org/wiki/Relational_database_management_system">RDBMS</a>. Returned data is encoded in the <a class="reference external" href="http://www.json.org/">JSON</a> format.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="location">
+
+<h2>Location<a class="headerlink" href="../../html/api/rosie-web.html#location" title="View HTML">§</a></h2>
+
+<p>The URLs to access the web API of a Rosie web service (with a given prefix
+name) can be found in your Rose site configuration file as the value of
+<code class="docutils literal notranslate"><span class="pre">[rosie-id]prefix-ws.PREFIX_NAME</span></code>. To access the API for a given repository
+with prefix <code class="docutils literal notranslate"><span class="pre">PREFIX_NAME</span></code>, you must select a format (the only currently
+supported format is JSON) and use a url that looks like:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>http://host/<span class="s">&lt;PREFIX_NAME&gt;</span>/get_known_keys?format=json
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="rest-api">
+
+<h2>REST API<a class="headerlink" href="../../html/api/rosie-web.html#rest-api" title="View HTML">§</a></h2>
+
+<dl class="get">
+<dt id="get-(str-prefix)-get_known_keys">
+<code class="descname">GET </code><code class="descname"></code><span class="sig-paren">(</span><em class="property">str: </em><em>prefix</em><span class="sig-paren">)</span><code class="descname">/get_known_keys</code></dt>
+<dd><p>Return the main property names stored for suites (e.g. <code class="docutils literal notranslate"><span class="pre">idx</span></code>, <code class="docutils literal notranslate"><span class="pre">branch</span></code>,
+<code class="docutils literal notranslate"><span class="pre">owner</span></code>) plus any additional names specified in the site config.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>prefix</strong> (<em>str</em>) – Repository prefix.</li>
+<li><strong>format</strong> (<em>string</em>) – Desired return format (<code class="docutils literal notranslate"><span class="pre">json</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Example Request</dt>
+<dd><div class="first last highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">http://host/my_prefix/get_known/keys?format=json</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</pre></div>
+</div>
+</dd>
+<dt>Example Response</dt>
+<dd><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;access-list&quot;</span><span class="p">,</span> <span class="s2">&quot;idx&quot;</span><span class="p">,</span> <span class="s2">&quot;branch&quot;</span><span class="p">,</span> <span class="s2">&quot;owner&quot;</span><span class="p">,</span> <span class="s2">&quot;project&quot;</span><span class="p">,</span> <span class="s2">&quot;revision&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">,</span>  <span class="s2">&quot;title&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="get">
+<dt id="get-(str-prefix)-get_optional_keys">
+<code class="descname">GET </code><code class="descname"></code><span class="sig-paren">(</span><em class="property">str: </em><em>prefix</em><span class="sig-paren">)</span><code class="descname">/get_optional_keys</code></dt>
+<dd><p>Return all unique optional or user-defined property names given in suite
+discovery information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>prefix</strong> (<em>str</em>) – Repository prefix.</li>
+<li><strong>format</strong> (<em>string</em>) – Desired return format (<code class="docutils literal notranslate"><span class="pre">json</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Example Request</dt>
+<dd><div class="first last highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">http://host/my_prefix/get_optional_keys?format=json</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</pre></div>
+</div>
+</dd>
+<dt>Example Response</dt>
+<dd><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;access-list&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;endgame_status&quot;</span><span class="p">,</span> <span class="s2">&quot;operational_flag&quot;</span><span class="p">,</span> <span class="s2">&quot;tag-list&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="get">
+<dt id="get-(str-prefix)-get_query_operators">
+<code class="descname">GET </code><code class="descname"></code><span class="sig-paren">(</span><em class="property">str: </em><em>prefix</em><span class="sig-paren">)</span><code class="descname">/get_query_operators</code></dt>
+<dd><p>Returns all the SQL-like operators used to compare column values that you
+may use in <a class="reference internal" href="#get-(str-prefix)-query" title="GET (str:prefix)/query"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">(str:prefix)/query</span></code></a> (e.g. <code class="docutils literal notranslate"><span class="pre">eq</span></code>, <code class="docutils literal notranslate"><span class="pre">ne</span></code>, <code class="docutils literal notranslate"><span class="pre">contains</span></code>, <code class="docutils literal notranslate"><span class="pre">like</span></code>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>prefix</strong> (<em>str</em>) – Repository prefix.</li>
+<li><strong>format</strong> (<em>string</em>) – Desired return format (<code class="docutils literal notranslate"><span class="pre">json</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Example Request</dt>
+<dd><div class="first last highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">http://host/my_prefix/get_query_operators?format=json</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</pre></div>
+</div>
+</dd>
+<dt>Example Response</dt>
+<dd><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;eq&quot;</span><span class="p">,</span> <span class="s2">&quot;ge&quot;</span><span class="p">,</span> <span class="s2">&quot;gt&quot;</span><span class="p">,</span> <span class="s2">&quot;le&quot;</span><span class="p">,</span> <span class="s2">&quot;lt&quot;</span><span class="p">,</span> <span class="s2">&quot;ne&quot;</span><span class="p">,</span> <span class="s2">&quot;contains&quot;</span><span class="p">,</span> <span class="s2">&quot;endswith&quot;</span><span class="p">,</span> <span class="s2">&quot;ilike&quot;</span><span class="p">,</span> <span class="s2">&quot;like&quot;</span><span class="p">,</span> <span class="s2">&quot;match&quot;</span><span class="p">,</span> <span class="s2">&quot;startswith&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="get">
+<dt id="get-(str-prefix)-query">
+<code class="descname">GET </code><code class="descname"></code><span class="sig-paren">(</span><em class="property">str: </em><em>prefix</em><span class="sig-paren">)</span><code class="descname">/query</code></dt>
+<dd><p>Return a list of suites matching all search terms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>prefix</strong> (<em>str</em>) – Repository prefix.</li>
+<li><strong>query</strong> (<em>list</em>) – List of queries.</li>
+<li><strong>format</strong> (<em>string</em>) – Desired return format (<code class="docutils literal notranslate"><span class="pre">json</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>).</li>
+<li><strong>all_revs</strong> (<em>flag</em>) – Switch on searching older revisions of current suites
+and deleted suites.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Query Parameters:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><ul class="first last simple">
+<li><strong>CONJUNCTION</strong> (<em>str</em>) – <code class="docutils literal notranslate"><span class="pre">and</span></code> or <code class="docutils literal notranslate"><span class="pre">or</span></code>.</li>
+<li><strong>OPEN_GROUP</strong> (<em>str</em>) – optional, one or more <code class="docutils literal notranslate"><span class="pre">(</span></code>.</li>
+<li><strong>FIELD</strong> (<em>str</em>) – e.g. <code class="docutils literal notranslate"><span class="pre">idx</span></code> or <code class="docutils literal notranslate"><span class="pre">description</span></code>.</li>
+<li><strong>OPERATOR</strong> (<em>str</em>) – e.g. <code class="docutils literal notranslate"><span class="pre">contains</span></code> or <code class="docutils literal notranslate"><span class="pre">between</span></code>, one of
+the operators returned by <a class="reference internal" href="#get-(str-prefix)-get_query_operators" title="GET (str:prefix)/get_query_operators"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">(str:prefix)/get_query_operators</span></code></a>.</li>
+<li><strong>VALUE</strong> (<em>str</em>) – e.g. <code class="docutils literal notranslate"><span class="pre">euro4m</span></code> or <code class="docutils literal notranslate"><span class="pre">200</span></code>.</li>
+<li><strong>CLOSE_GROUP</strong> (<em>str</em>) – optional, one or more <code class="docutils literal notranslate"><span class="pre">)</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Query Format</dt>
+<dd><div class="first highlight-none notranslate"><div class="highlight"><pre><span></span>CONJUNCTION+[OPEN_GROUP+]FIELD+OPERATOR+VALUE[+CLOSE_GROUP]
+</pre></div>
+</div>
+<p>The first <code class="docutils literal notranslate"><span class="pre">CONJUNCTION</span></code> is technically superfluous. The <code class="docutils literal notranslate"><span class="pre">OPEN_GROUP</span></code>
+and <code class="docutils literal notranslate"><span class="pre">CLOSE_GROUP</span></code> do not have to be used.</p>
+<p class="last">Parentheses can be used in the query to group expressions.</p>
+</dd>
+<dt>Example Request</dt>
+<dd><p class="first">Return all current suites that have an <code class="docutils literal notranslate"><span class="pre">idx</span></code> that ends with 78 and also
+all suites that have the owner <code class="docutils literal notranslate"><span class="pre">bob</span></code>.</p>
+<div class="last highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">http://host/my_prefix/query?q=and+idx+endswith+78&amp;q=or+owner+eq+bob&amp;format=json</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</pre></div>
+</div>
+</dd>
+<dt>Example Response</dt>
+<dd><p class="first">Each suite is returned as an entry in a list - each entry is an
+associative array of property name-value pairs.</p>
+<div class="last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="nt">&quot;idx&quot;</span><span class="p">:</span> <span class="s2">&quot;mo1-aa078&quot;</span><span class="p">,</span> <span class="nt">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="nt">&quot;revision&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="nt">&quot;owner&quot;</span><span class="p">:</span> <span class="s2">&quot;fred&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;fred&#39;s project.&quot;</span><span class="p">,</span> <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;fred&#39;s awesome suite&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;M &quot;</span><span class="p">,</span> <span class="nt">&quot;access-list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fred&quot;</span><span class="p">,</span> <span class="s2">&quot;jack&quot;</span><span class="p">],</span> <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;awesome&quot;</span><span class="p">},</span>
+ <span class="p">{</span><span class="nt">&quot;idx&quot;</span><span class="p">:</span> <span class="s2">&quot;mo1-aa090&quot;</span><span class="p">,</span> <span class="nt">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="nt">&quot;revision&quot;</span><span class="p">:</span> <span class="mi">350</span><span class="p">,</span> <span class="nt">&quot;owner&quot;</span><span class="p">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;var&quot;</span><span class="p">,</span> <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A copy of var.vexcs.&quot;</span><span class="p">,</span> <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;M &quot;</span><span class="p">,</span>
+  <span class="nt">&quot;access-list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="nt">&quot;operational&quot;</span><span class="p">:</span> <span class="s2">&quot;Y&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="get">
+<dt id="get-(str-prefix)-search">
+<code class="descname">GET </code><code class="descname"></code><span class="sig-paren">(</span><em class="property">str: </em><em>prefix</em><span class="sig-paren">)</span><code class="descname">/search</code></dt>
+<dd><p>Return a list of suites matching one or more search terms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>prefix</strong> (<em>str</em>) – Repository prefix.</li>
+<li><strong>search</strong> (<em>list</em>) – List of queries in the same format as
+<a class="reference internal" href="#get-(str-prefix)-query" title="GET (str:prefix)/query"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">(str:prefix)/query</span></code></a></li>
+<li><strong>format</strong> (<em>string</em>) – Desired return format (<code class="docutils literal notranslate"><span class="pre">json</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>).</li>
+<li><strong>all_revs</strong> (<em>flag</em>) – Switch on searching older revisions of current suites
+and deleted suites.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Example Request</dt>
+<dd><p class="first">Return suites which match <code class="docutils literal notranslate"><span class="pre">var</span></code>, <code class="docutils literal notranslate"><span class="pre">bob</span></code> or <code class="docutils literal notranslate"><span class="pre">nowcast</span></code>.</p>
+<div class="last highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">http://host/my_prefix/search?var+bob+nowcast&amp;format=json</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</pre></div>
+</div>
+</dd>
+<dt>Example Response</dt>
+<dd><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="nt">&quot;idx&quot;</span><span class="p">:</span> <span class="s2">&quot;mo1-aa090&quot;</span><span class="p">,</span> <span class="nt">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="nt">&quot;revision&quot;</span><span class="p">:</span> <span class="mi">330</span><span class="p">,</span> <span class="nt">&quot;owner&quot;</span><span class="p">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;um&quot;</span><span class="p">,</span> <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A copy of um.alpra.&quot;</span><span class="p">,</span> <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;M &quot;</span><span class="p">,</span>
+  <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&#39;s UM suite&quot;</span><span class="p">},</span>
+ <span class="p">{</span><span class="nt">&quot;idx&quot;</span><span class="p">:</span> <span class="s2">&quot;mo1-aa092&quot;</span><span class="p">,</span> <span class="nt">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="nt">&quot;revision&quot;</span><span class="p">:</span> <span class="mi">340</span><span class="p">,</span> <span class="nt">&quot;owner&quot;</span><span class="p">:</span> <span class="s2">&quot;jim&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;var&quot;</span><span class="p">,</span> <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;6D Quantum VAR.&quot;</span><span class="p">,</span> <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;M &quot;</span><span class="p">,</span>
+  <span class="nt">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;NAE&quot;</span><span class="p">},</span>
+ <span class="p">{</span><span class="nt">&quot;idx&quot;</span><span class="p">:</span> <span class="s2">&quot;mo1-aa100&quot;</span><span class="p">,</span> <span class="nt">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="nt">&quot;revision&quot;</span><span class="p">:</span> <span class="mi">352</span><span class="p">,</span> <span class="nt">&quot;owner&quot;</span><span class="p">:</span> <span class="s2">&quot;ops_account&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;nowcast&quot;</span><span class="p">,</span> <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;The operational Nowcast suite&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;M &quot;</span><span class="p">,</span> <span class="nt">&quot;ensemble&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+
+
+
+
+</article>
+<article class="slide level-2" id="python-api">
+
+<h2>Python API<a class="headerlink" href="../../html/api/rosie-web.html#python-api" title="View HTML">§</a></h2>
+
+<p>The REST API maps onto the Python <code class="xref py py-class docutils literal notranslate"><span class="pre">RosieWSClient</span></code> back-end which can be
+used as a standalone Python API.</p>
+<dl class="class">
+<dt id="rosie.ws_client.RosieWSClient">
+<em class="property">class </em><code class="descclassname">rosie.ws_client.</code><code class="descname">RosieWSClient</code><span class="sig-paren">(</span><em>prefixes=None</em>, <em>prompt_func=None</em>, <em>popen=None</em>, <em>event_handler=None</em><span class="sig-paren">)</span></dt>
+<dd><p>A client for the Rosie web service.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>prefixes</strong> (<em>list</em>) – List of prefix names as strings.
+(run <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">config</span> <span class="pre">rosie-id</span></code> for more info).</li>
+<li><strong>prompt_func</strong> (<em>function</em>) – Optional function for requesting user
+credentials. Takes and returns the arguments username and password.</li>
+<li><strong>popen</strong> (<em>rose.popen.RosePopener</em>) – Use initiated RosePopener instance
+create a new one if <code class="docutils literal notranslate"><span class="pre">None</span></code>.</li>
+<li><strong>event_handler</strong> (<em>object</em>) – A callable object for reporting popen output,
+see <code class="xref py py-class docutils literal notranslate"><span class="pre">rose.reporter.Reporter</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.address_lookup">
+<code class="descname">address_lookup</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Repeat a Rosie query or search by address.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.get_known_keys">
+<code class="descname">get_known_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return the known query keys.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.get_optional_keys">
+<code class="descname">get_optional_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return the optional query keys.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.get_query_operators">
+<code class="descname">get_query_operators</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return the query operators.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.hello">
+<code class="descname">hello</code><span class="sig-paren">(</span><em>return_ok_prefixes=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Ask the server to say hello.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.query">
+<code class="descname">query</code><span class="sig-paren">(</span><em>q</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Query the Rosie database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.query_local_copies">
+<code class="descname">query_local_copies</code><span class="sig-paren">(</span><em>user=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Returns details of the local suites.</p>
+<p>As if they had been obtained using a search or query.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="rosie.ws_client.RosieWSClient.query_split">
+<em class="property">classmethod </em><code class="descname">query_split</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span></dt>
+<dd><p>Split a list of arguments into a list of query items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.search">
+<code class="descname">search</code><span class="sig-paren">(</span><em>s</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Search the Rosie database for a matching string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rosie.ws_client.RosieWSClient.set_prefixes">
+<code class="descname">set_prefixes</code><span class="sig-paren">(</span><em>prefixes</em><span class="sig-paren">)</span></dt>
+<dd><p>Replace the default prefixes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prefixes</strong> (<em>list</em>) – List of prefix names as strings.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

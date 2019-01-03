@@ -1,0 +1,717 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Suicide Triggers &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Further Topics" href="index.html" />
+    <link rel="next" title="Rose Tutorial" href="../../rose/index.html" />
+    <link rel="prev" title="Retries" href="retries.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="suicide-triggers">
+
+<h1>Suicide Triggers<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#suicide-triggers" title="View HTML">§</a></h1>
+
+<p>Suicide triggers allow us to remove a task from the suite’s graph whilst the
+suite is running.</p>
+<p>The main use of suicide triggers is for handling failures in the workflow.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="stalled-suites">
+
+<h2>Stalled Suites<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#stalled-suites" title="View HTML">§</a></h2>
+
+<p>Imagine a bakery which has a workflow that involves making cake.</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">make_cake_mixture</span> <span class="o">=&gt;</span> <span class="kd">bake_cake</span> <span class="o">=&gt;</span> <span class="kd">sell_cake</span>
+</pre></div>
+</div>
+<div class="minicylc" style="text-align: center;" data-dependencies="make_cake_mixture => bake_cake => sell_cake" data-theme="none" ><object data="../../../_images/graphviz-af9ebd95410513774ac2dcaec27f16432424798f.svg" type="image/svg+xml">
+            <p class="warning">digraph Mini_Cylc {
+bake_cake -&gt; sell_cake
+sell_cake
+make_cake_mixture -&gt; bake_cake
+}</p></object>
+</div><p>There is a 50% chance that the cake will turn out fine, and a 50% chance that
+it will get burnt. In the case that we burn the cake the workflow gets stuck.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-4965b687e58589ece52191fdb1b14b03b10a3963.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+make_cake_mixture [style=&quot;filled&quot; color=&quot;#ada5a5&quot;]
+bake_cake [style=&quot;filled&quot; color=&quot;#ff0000&quot; fontcolor=&quot;white&quot;]
+sell_cake [color=&quot;#88c6ff&quot;]
+
+make_cake_mixture -&gt; bake_cake -&gt; sell_cake
+}</p></object>
+</div>
+<p>In this event the <code class="docutils literal notranslate"><span class="pre">sell_cake</span></code> task will be unable to run as it depends on
+<code class="docutils literal notranslate"><span class="pre">bake_cake</span></code>. We would say that this suite has <a class="reference internal" href="../../../glossary.html#term-stalled-suite"><span class="xref std std-term">stalled</span></a>.
+When Cylc detects that a suite has stalled it sends you an email to let you
+know that the suite has got stuck and requires human intervention to proceed.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="handling-failures">
+
+<h2>Handling Failures<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#handling-failures" title="View HTML">§</a></h2>
+
+<p>In order to prevent the suite from entering a stalled state we need to handle
+the failure of the <code class="docutils literal notranslate"><span class="pre">bake_cake</span></code> task.</p>
+<p>At the bakery if they burn a cake they eat it and make another.</p>
+<p>The following diagram outlines this workflow with its two possible pathways,
+<code class="docutils literal notranslate"><span class="pre">:succeed</span></code> in the event that <code class="docutils literal notranslate"><span class="pre">bake_cake</span></code> is successful and <code class="docutils literal notranslate"><span class="pre">:fail</span></code>
+otherwise.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-224afa793500c9f9d4f740407d52d72ca41b9094.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+make_cake_mixture
+bake_cake
+
+subgraph cluster_1 {
+   label = &quot;:succeed&quot;
+   labelloc = &quot;b&quot;
+   color = &quot;green&quot;
+   fontcolor = &quot;green&quot;
+   style = &quot;dashed&quot;
+   sell_cake
+}
+
+subgraph cluster_2 {
+   label = &quot;:fail&quot;
+   labelloc = &quot;b&quot;
+   color = &quot;red&quot;
+   fontcolor = &quot;red&quot;
+   style = &quot;dashed&quot;
+   eat_cake
+}
+
+make_cake_mixture -&gt; bake_cake
+bake_cake -&gt; sell_cake
+bake_cake -&gt; eat_cake
+}</p></object>
+</div>
+<p>We can add this logic to our workflow using the <code class="docutils literal notranslate"><span class="pre">fail</span></code> <a class="reference internal" href="../../../glossary.html#term-qualifier"><span class="xref std std-term">qualifier</span></a>.</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">bake_cake</span> <span class="o">=&gt;</span> <span class="kd">sell_cake</span>
+<span class="kd">bake_cake</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="kd">eat_cake</span>
+</pre></div>
+</div>
+<div class="hint admonition">
+<p class="first admonition-title">Reminder</p>
+<p>If you don’t specify a qualifier Cylc assumes you mean <code class="docutils literal notranslate"><span class="pre">:succeed</span></code> so the
+following two lines are equivalent:</p>
+<div class="last highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">foo</span> <span class="o">=&gt;</span> <span class="kd">bar</span>
+<span class="kd">foo</span><span class="c">:</span><span class="kd">succeed</span> <span class="o">=&gt;</span> <span class="kd">bar</span>
+</pre></div>
+</div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="why-do-we-need-to-remove-tasks-from-the-graph">
+
+<h2>Why Do We Need To Remove Tasks From The Graph?<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#why-do-we-need-to-remove-tasks-from-the-graph" title="View HTML">§</a></h2>
+
+<p>Create a new suite called <code class="docutils literal notranslate"><span class="pre">suicide-triggers</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">suicide</span><span class="o">-</span><span class="n">triggers</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">suicide</span><span class="o">-</span><span class="n">triggers</span>
+</pre></div>
+</div>
+<p>Paste the following code into the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+   <span class="nv">cycling mode </span><span class="o">=</span><span class="s"> integer</span>
+   <span class="nv">initial cycle point </span><span class="o">=</span><span class="s"> 1</span>
+   <span class="nt">[[dependencies]]</span>
+       <span class="nt">[[[P1]]]</span>
+           <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+               <span class="kd">make_cake_mixture</span> <span class="o">=&gt;</span> <span class="kd">bake_cake</span> <span class="o">=&gt;</span> <span class="kd">sell_cake</span>
+               <span class="kd">bake_cake</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="kd">eat_cake</span>
+           <span class="s2">&quot;&quot;&quot;</span>
+<span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 2</span>
+    <span class="nt">[[bake_cake]]</span>
+        <span class="c1"># Random outcome 50% chance of success 50% chance of failure.</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 2; if (( $RANDOM % 2 )); then true; else false; fi</span>
+</pre></div>
+</div>
+<p>Open the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> and run the suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">gui</span> <span class="n">suicide</span><span class="o">-</span><span class="n">triggers</span> <span class="o">&amp;</span>
+<span class="n">cylc</span> <span class="n">run</span> <span class="n">suicide</span><span class="o">-</span><span class="n">triggers</span>
+</pre></div>
+</div>
+<p>The suite will run for three cycles then get stuck. You should see something
+similar to the diagram below. As the <code class="docutils literal notranslate"><span class="pre">bake_cake</span></code> task fails randomly what
+you see might differ slightly. You may receive a “suite stalled” email.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-8d47c685223f8b32d9fd9e19fcd10df7e2d6b948.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+size = &quot;7,5&quot;
+
+subgraph cluster_1 {
+   label = &quot;1&quot;
+   style = &quot;dashed&quot;
+   &quot;make_cake_mixture.1&quot; [
+      label=&quot;make_cake_mixture\n1&quot;,
+      style=&quot;filled&quot;,
+      color=&quot;#ada5a5&quot;]
+   &quot;bake_cake.1&quot; [
+      label=&quot;bake_cake\n1&quot;,
+      style=&quot;filled&quot;,
+      color=&quot;#ada5a5&quot;]
+   &quot;sell_cake.1&quot; [
+      label=&quot;sell_cake\n1&quot;,
+      style=&quot;filled&quot;,
+      color=&quot;#ada5a5&quot;]
+   &quot;eat_cake.1&quot; [
+      label=&quot;eat_cake\1&quot;,
+      color=&quot;#88c6ff&quot;]
+}
+
+subgraph cluster_2 {
+   label = &quot;2&quot;
+   style = &quot;dashed&quot;
+   &quot;make_cake_mixture.2&quot; [
+      label=&quot;make_cake_mixture\n2&quot;,
+      style=&quot;filled&quot;,
+      color=&quot;#ada5a5&quot;]
+   &quot;bake_cake.2&quot; [
+      label=&quot;bake_cake\n2&quot;,
+      style=&quot;filled&quot;,
+      color=&quot;#ff0000&quot;,
+      fontcolor=&quot;white&quot;]
+   &quot;sell_cake.2&quot; [
+      label=&quot;sell_cake\2&quot;,
+      color=&quot;#88c6ff&quot;]
+   &quot;eat_cake.2&quot; [
+      label=&quot;eat_cake\n2&quot;,
+      color=&quot;#888888&quot;,
+      fontcolor=&quot;#888888&quot;]
+}
+
+subgraph cluster_3 {
+   label = &quot;3&quot;
+   style = &quot;dashed&quot;
+   &quot;make_cake_mixture.3&quot; [
+      label=&quot;make_cake_mixture\n3&quot;,
+      style=&quot;filled&quot;,
+      color=&quot;#ada5a5&quot;]
+   &quot;bake_cake.3&quot; [
+      label=&quot;bake_cake\n3&quot;,
+      style=&quot;filled&quot;,
+      color=&quot;#ff0000&quot;,
+      fontcolor=&quot;white&quot;]
+   &quot;sell_cake.3&quot; [
+      label=&quot;sell_cake\n3&quot;,
+      color=&quot;#888888&quot;,
+      fontcolor=&quot;#888888&quot;]
+   &quot;eat_cake.3&quot; [
+      label=&quot;eat_cake\3&quot;,
+      color=&quot;#888888&quot;,
+      fontcolor=&quot;#888888&quot;]
+}
+
+&quot;make_cake_mixture.1&quot; -&gt; &quot;bake_cake.1&quot; -&gt; &quot;sell_cake.1&quot;
+&quot;bake_cake.1&quot; -&gt; &quot;eat_cake.1&quot;
+
+&quot;make_cake_mixture.2&quot; -&gt; &quot;bake_cake.2&quot; -&gt; &quot;sell_cake.2&quot;
+&quot;bake_cake.2&quot; -&gt; &quot;eat_cake.2&quot;
+
+&quot;make_cake_mixture.3&quot; -&gt; &quot;bake_cake.3&quot; -&gt; &quot;sell_cake.3&quot;
+&quot;bake_cake.3&quot; -&gt; &quot;eat_cake.3&quot;
+}</p></object>
+</div>
+<p>The reason the suite stalls is that, by default, Cylc will run a maximum of
+three cycles concurrently. As each cycle has at least one task which hasn’t
+either succeeded or failed Cylc cannot move onto the next cycle.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">For more information search <code class="docutils literal notranslate"><span class="pre">max</span> <span class="pre">active</span> <span class="pre">cycle</span> <span class="pre">points</span></code> in the
+<a class="reference external" href="http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide">Cylc User Guide</a>.</p>
+</div>
+<p>You will also notice that some of the tasks (e.g. <code class="docutils literal notranslate"><span class="pre">eat_cake</span></code> in cycle <code class="docutils literal notranslate"><span class="pre">2</span></code>
+in the above example) are drawn in a faded gray. This is because these tasks
+have not yet been run in earlier cycles and as such cannot run.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="removing-tasks-from-the-graph">
+
+<h2>Removing Tasks From The Graph<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#removing-tasks-from-the-graph" title="View HTML">§</a></h2>
+
+<p>In order to get around these problems and prevent the suite from stalling we
+must remove the tasks that are no longer needed. We do this using suicide
+triggers.</p>
+<p>A suicide trigger is written like a normal dependency but with an exclamation
+mark in-front of the task on the right-hand-side of the dependency meaning
+<em>“remove the following task from the graph at the current cycle point.”</em></p>
+<p>For example the following <a class="reference internal" href="../../../glossary.html#term-graph-string"><span class="xref std std-term">graph string</span></a> would remove the task <code class="docutils literal notranslate"><span class="pre">bar</span></code>
+from the graph if the task <code class="docutils literal notranslate"><span class="pre">foo</span></code> were to succeed.</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">foo</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">bar</span>
+</pre></div>
+</div>
+<p>There are three cases where we would need to remove a task in the cake-making
+example:</p>
+<ol class="arabic">
+<li><p class="first">If the <code class="docutils literal notranslate"><span class="pre">bake_cake</span></code> task succeeds we don’t need the <code class="docutils literal notranslate"><span class="pre">eat_cake</span></code> task so
+should remove it.</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">bake_cake</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">eat_cake</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If the <code class="docutils literal notranslate"><span class="pre">bake_cake</span></code> task fails we don’t need the <code class="docutils literal notranslate"><span class="pre">sell_cake</span></code> task so
+should remove it.</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">bake_cake</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">sell_cake</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If the <code class="docutils literal notranslate"><span class="pre">bake_cake</span></code> task fails then we will need to remove it else the
+suite will stall. We can do this after the <code class="docutils literal notranslate"><span class="pre">eat_cake</span></code> task has succeeded.</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">eat_cake</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">bake_cake</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Add the following three lines to the suite’s graph:</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">bake_cake</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">eat_cake</span>
+<span class="kd">bake_cake</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">sell_cake</span>
+<span class="kd">eat_cake</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">bake_cake</span>
+</pre></div>
+</div>
+<p>We can view suicide triggers in <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">graph</span></code> by un-selecting the
+<span class="guilabel">Ignore Suicide Triggers</span> button in the toolbar. Suicide triggers
+will then appear as dashed lines with circular endings. You should see
+something like this:</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-e950322ec94d26cbcfc5d62b9cc73fef9a93b240.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+make_cake_mixture -&gt; bake_cake
+bake_cake -&gt; sell_cake [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+bake_cake -&gt; eat_cake [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+eat_cake -&gt; bake_cake [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+}</p></object>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="downstream-dependencies">
+
+<h2>Downstream Dependencies<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#downstream-dependencies" title="View HTML">§</a></h2>
+
+<p>If we wanted to make the cycles run in order we might write an
+<a class="reference internal" href="../../../glossary.html#term-inter-cycle-dependency"><span class="xref std std-term">inter-cycle dependency</span></a> like this:</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">sell_cake</span>[<span class="nb">-P1</span>] <span class="o">=&gt;</span> <span class="kd">make_cake_mixture</span>
+</pre></div>
+</div>
+<p>In order to handle the event that the <code class="docutils literal notranslate"><span class="pre">sell_cake</span></code> task has been removed from
+the graph by a suicide trigger we can write our dependency with an or
+symbol <code class="docutils literal notranslate"><span class="pre">|</span></code> like so:</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">eat_cake</span>[<span class="nb">-P1</span>] <span class="o">|</span> <span class="kd">sell_cake</span>[<span class="nb">-P1</span>] <span class="o">=&gt;</span> <span class="kd">make_cake_mixture</span>
+</pre></div>
+</div>
+<p>Now the <code class="docutils literal notranslate"><span class="pre">make_cake_mixture</span></code> task from the next cycle will run after whichever
+of the <code class="docutils literal notranslate"><span class="pre">sell_cake</span></code> or <code class="docutils literal notranslate"><span class="pre">eat_cake</span></code> tasks is run.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-7fc68cfa9b565a83a6eb4616837ac79842ebf60a.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+subgraph cluster_1 {
+   style=&quot;dashed&quot;
+   label=&quot;1&quot;
+   &quot;make_cake_mixture.1&quot; [label=&quot;make_cake_mixture\n1&quot;]
+   &quot;bake_cake.1&quot; [label=&quot;bake_cake\n1&quot;]
+   &quot;make_cake_mixture.1&quot; -&gt; &quot;bake_cake.1&quot;
+   &quot;bake_cake.1&quot; -&gt; &quot;sell_cake.1&quot; [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+   &quot;bake_cake.1&quot; -&gt; &quot;eat_cake.1&quot; [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+   &quot;eat_cake.1&quot; -&gt; &quot;bake_cake.1&quot; [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+   subgraph cluster_a {
+      label = &quot;:fail&quot;
+      fontcolor = &quot;red&quot;
+      color = &quot;red&quot;
+      style = &quot;dashed&quot;
+      &quot;eat_cake.1&quot; [label=&quot;eat_cake\n1&quot; color=&quot;red&quot; fontcolor=&quot;red&quot;]
+   }
+   subgraph cluster_b {
+      label = &quot;:success&quot;
+      fontcolor = &quot;green&quot;
+      color = &quot;green&quot;
+      style = &quot;dashed&quot;
+      &quot;sell_cake.1&quot; [label=&quot;sell_cake\n1&quot; color=&quot;green&quot; fontcolor=&quot;green&quot;]
+   }
+}
+
+subgraph cluster_2 {
+   style=&quot;dashed&quot;
+   label=&quot;2&quot;
+   &quot;make_cake_mixture.2&quot; [label=&quot;make_cake_mixture\n2&quot;]
+   &quot;bake_cake.2&quot; [label=&quot;bake_cake\n2&quot;]
+   &quot;make_cake_mixture.2&quot; -&gt; &quot;bake_cake.2&quot;
+   &quot;bake_cake.2&quot; -&gt; &quot;sell_cake.2&quot; [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+   &quot;bake_cake.2&quot; -&gt; &quot;eat_cake.2&quot; [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+   &quot;eat_cake.2&quot; -&gt; &quot;bake_cake.2&quot; [style=&quot;dashed&quot; arrowhead=&quot;dot&quot;]
+   subgraph cluster_c {
+      label = &quot;:fail&quot;
+      fontcolor = &quot;red&quot;
+      color = &quot;red&quot;
+      style = &quot;dashed&quot;
+      &quot;eat_cake.2&quot; [label=&quot;eat_cake\n2&quot; color=&quot;red&quot; fontcolor=&quot;red&quot;]
+   }
+   subgraph cluster_d {
+      label = &quot;:success&quot;
+      fontcolor = &quot;green&quot;
+      color = &quot;green&quot;
+      style = &quot;dashed&quot;
+      &quot;sell_cake.2&quot; [label=&quot;sell_cake\n2&quot; color=&quot;green&quot; fontcolor=&quot;green&quot;]
+   }
+}
+
+&quot;eat_cake.1&quot; -&gt; &quot;make_cake_mixture.2&quot; [arrowhead=&quot;onormal&quot;]
+&quot;sell_cake.1&quot; -&gt; &quot;make_cake_mixture.2&quot; [arrowhead=&quot;onormal&quot;]
+}</p></object>
+</div>
+<p>Add the following <a class="reference internal" href="../../../glossary.html#term-graph-string"><span class="xref std std-term">graph string</span></a> to your suite.</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">eat_cake</span>[<span class="nb">-P1</span>] <span class="o">|</span> <span class="kd">sell_cake</span>[<span class="nb">-P1</span>] <span class="o">=&gt;</span> <span class="kd">make_cake_mixture</span>
+</pre></div>
+</div>
+<p>Open the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">gui</span></code> and run the suite. You should see that if the
+<code class="docutils literal notranslate"><span class="pre">bake_cake</span></code> task fails both it and the <code class="docutils literal notranslate"><span class="pre">sell_cake</span></code> task disappear and
+are replaced by the <code class="docutils literal notranslate"><span class="pre">eat_cake</span></code> task.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="variations">
+
+<h2>Variations<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#variations" title="View HTML">§</a></h2>
+
+<p>The following sections outline examples of how to use suicide triggers.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="recovery-task">
+
+<h3>Recovery Task<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#recovery-task" title="View HTML">§</a></h3>
+
+<p>A common use case where a <code class="docutils literal notranslate"><span class="pre">recover</span></code> task is used to handle a task failure.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-df65a29480d9f3d627cbe1b2f3b3dbbcdebe6058.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+subgraph cluster_1 {
+   label = &quot;:fail&quot;
+   color = &quot;red&quot;
+   fontcolor = &quot;red&quot;
+   style = &quot;dashed&quot;
+   recover
+}
+
+foo -&gt; bar
+bar -&gt; recover
+recover -&gt; baz [arrowhead=&quot;onormal&quot;]
+bar -&gt; baz [arrowhead=&quot;onormal&quot;]
+}</p></object>
+</div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+            <span class="c1"># Regular graph.</span>
+            <span class="kd">foo</span> <span class="o">=&gt;</span> <span class="kd">bar</span>
+
+            <span class="c1"># The fail case.</span>
+            <span class="kd">bar</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="kd">recover</span>
+
+            <span class="c1"># Remove the &quot;recover&quot; task in the success case.</span>
+            <span class="kd">bar</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">recover</span>
+
+            <span class="c1"># Remove the &quot;bar&quot; task in the fail case.</span>
+            <span class="kd">recover</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">bar</span>
+
+            <span class="c1"># Downstream dependencies.</span>
+            <span class="kd">bar</span> <span class="o">|</span> <span class="kd">recover</span> <span class="o">=&gt;</span> <span class="kd">baz</span>
+        <span class="s2">&quot;&quot;&quot;</span>
+<span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 1</span>
+    <span class="nt">[[bar]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> false</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="branched-workflow">
+
+<h3>Branched Workflow<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#branched-workflow" title="View HTML">§</a></h3>
+
+<p>A workflow where sub-graphs of tasks are to be run in the success and or fail
+cases.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-2a9debc0303d01b142eea724c9e4615d0c02c102.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+foo -&gt; bar
+bar -&gt; tar -&gt; par
+bar -&gt; jar -&gt; par
+bar -&gt; baz -&gt; jaz
+
+subgraph cluster_1 {
+   label = &quot;:success&quot;
+   fontcolor = &quot;green&quot;
+   color = &quot;green&quot;
+   style = &quot;dashed&quot;
+   tar
+   jar
+   par
+}
+
+subgraph cluster_2 {
+   label = &quot;:fail&quot;
+   fontcolor = &quot;red&quot;
+   color = &quot;red&quot;
+   style = &quot;dashed&quot;
+   baz
+   jaz
+}
+
+tar -&gt; pub [arrowhead=&quot;onormal&quot;]
+jaz -&gt; pub [arrowhead=&quot;onormal&quot;]
+}</p></object>
+</div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+            <span class="c1"># Regular graph.</span>
+            <span class="kd">foo</span> <span class="o">=&gt;</span> <span class="kd">bar</span>
+
+            <span class="c1"># Success case.</span>
+            <span class="kd">bar</span> <span class="o">=&gt;</span> <span class="kd">tar</span> <span class="o">&amp;</span> <span class="kd">jar</span>
+
+            <span class="c1"># Fail case.</span>
+            <span class="kd">bar</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="kd">baz</span> <span class="o">=&gt;</span> <span class="kd">jaz</span>
+
+            <span class="c1"># Remove tasks from the fail branch in the success case.</span>
+            <span class="kd">bar</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">baz</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">jaz</span>
+
+            <span class="c1"># Remove tasks from the success branch in the fail case.</span>
+            <span class="kd">bar</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">tar</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">jar</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">par</span>
+
+            <span class="c1"># Remove the bar task in the fail case.</span>
+            <span class="kd">baz</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">bar</span>
+
+            <span class="c1"># Downstream dependencies.</span>
+            <span class="kd">tar</span> <span class="o">|</span> <span class="kd">jaz</span> <span class="o">=&gt;</span> <span class="kd">pub</span>
+        <span class="s2">&quot;&quot;&quot;</span>
+<span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 1</span>
+    <span class="nt">[[bar]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> true</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="triggering-based-on-other-states">
+
+<h3>Triggering Based On Other States<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#triggering-based-on-other-states" title="View HTML">§</a></h3>
+
+<p>In these examples we have been using suicide triggers to handle task failure.
+The suicide trigger mechanism works with other qualifiers as well for example:</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">foo</span><span class="c">:</span><span class="kd">start</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">bar</span>
+</pre></div>
+</div>
+<p>Suicide triggers can also be used with custom outputs. In the following example
+the task <code class="docutils literal notranslate"><span class="pre">showdown</span></code> produces one of three possible custom outputs, <code class="docutils literal notranslate"><span class="pre">good</span></code>,
+<code class="docutils literal notranslate"><span class="pre">bad</span></code> or <code class="docutils literal notranslate"><span class="pre">ugly</span></code>.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-338cf59261bcff72f7528e17f0ce8e2b21a38af5.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+subgraph cluster_1 {
+   label = &quot;:good&quot;
+   color = &quot;green&quot;
+   fontcolor = &quot;green&quot;
+   style = &quot;dashed&quot;
+   good
+}
+subgraph cluster_2 {
+   label = &quot;:bad&quot;
+   color = &quot;red&quot;
+   fontcolor = &quot;red&quot;
+   style = &quot;dashed&quot;
+   bad
+}
+subgraph cluster_3 {
+   label = &quot;:ugly&quot;
+   color = &quot;purple&quot;
+   fontcolor = &quot;purple&quot;
+   style = &quot;dashed&quot;
+   ugly
+}
+showdown -&gt; good
+showdown -&gt; bad
+showdown -&gt; ugly
+good -&gt; fin [arrowhead=&quot;onormal&quot;]
+bad -&gt; fin [arrowhead=&quot;onormal&quot;]
+ugly -&gt; fin [arrowhead=&quot;onormal&quot;]
+}</p></object>
+</div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nt">[[[R1]]]</span>
+            <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+                <span class="c1"># In the &quot;good&quot; case run &quot;good&quot; but not &quot;bad&quot; or &quot;ugly&quot;.</span>
+                <span class="kd">showdown</span><span class="c">:</span><span class="kd">good</span> <span class="o">=&gt;</span> <span class="kd">good</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">bad</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">ugly</span>
+
+                <span class="c1"># In the &quot;bad&quot; case run &quot;bad&quot; but not &quot;good&quot; or &quot;ugly&quot;.</span>
+                <span class="kd">showdown</span><span class="c">:</span><span class="kd">bad</span> <span class="o">=&gt;</span> <span class="kd">bad</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">good</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">ugly</span>
+
+                <span class="c1"># In the &quot;ugly&quot; case run &quot;ugly&quot; but not &quot;good&quot; or &quot;bad&quot;.</span>
+                <span class="kd">showdown</span><span class="c">:</span><span class="kd">ugly</span> <span class="o">=&gt;</span> <span class="kd">ugly</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">good</span> <span class="o">&amp;</span> <span class="o">!</span> <span class="kd">bad</span>
+
+                <span class="kd">good</span> <span class="o">|</span> <span class="kd">bad</span> <span class="o">|</span> <span class="kd">ugly</span> <span class="o">=&gt;</span> <span class="kd">fin</span>
+            <span class="s2">&quot;&quot;&quot;</span>
+<span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 1</span>
+    <span class="nt">[[showdown]]</span>
+        <span class="c1"># Randomly return one of the three custom outputs.</span>
+        <span class="nv">script </span><span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            SEED=$RANDOM</span>
+<span class="s2">            if ! (( $SEED % 3 )); then</span>
+<span class="s2">                cylc message &#39;The-Good&#39;</span>
+<span class="s2">            elif ! (( ( $SEED + 1 ) % 3 )); then</span>
+<span class="s2">                cylc message &#39;The-Bad&#39;</span>
+<span class="s2">            else</span>
+<span class="s2">                cylc message &#39;The-Ugly&#39;</span>
+<span class="s2">            fi</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="nt">[[[outputs]]]</span>
+            <span class="c1"># Register the three custom outputs with cylc.</span>
+            <span class="nv">good </span><span class="o">=</span><span class="s"> &#39;The-Good&#39;</span>
+            <span class="nv">bad </span><span class="o">=</span><span class="s"> &#39;The-Bad&#39;</span>
+            <span class="nv">ugly </span><span class="o">=</span><span class="s"> &#39;The-Ugly&#39;</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="self-suiciding-task">
+
+<h3>Self-Suiciding Task<a class="headerlink" href="../../../../html/tutorial/cylc/furthertopics/suicide-triggers.html#self-suiciding-task" title="View HTML">§</a></h3>
+
+<p>An example of a workflow where there are no tasks which are dependent on the
+task to suicide trigger.</p>
+<div align="center" class="align-center"><object data="../../../_images/graphviz-998bf7ebeb2f9786bf00d45943cf43629058f6cc.svg" type="image/svg+xml">
+            <p class="warning">digraph Example {
+subgraph cluster_1 {
+   label = &quot;Faulty\nTask&quot;
+   color = &quot;orange&quot;
+   fontcolor = &quot;orange&quot;
+   style = &quot;dashed&quot;
+   labelloc = &quot;b&quot;
+   baz
+}
+
+foo -&gt; bar -&gt; baz
+bar -&gt; pub
+}</p></object>
+</div>
+<p>It is possible for a task to suicide trigger itself e.g:</p>
+<div class="highlight-cylc-graph notranslate"><div class="highlight"><pre><span></span><span class="kd">foo</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">foo</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is usually not recommended but in the case where there are no tasks
+dependent on the one to remove it is an acceptable approach.</p>
+</div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+            <span class="kd">foo</span> <span class="o">=&gt;</span> <span class="kd">bar</span> <span class="o">=&gt;</span> <span class="kd">baz</span>
+            <span class="kd">bar</span> <span class="o">=&gt;</span> <span class="kd">pub</span>
+
+            <span class="c1"># Remove the &quot;pub&quot; task in the event of failure.</span>
+            <span class="kd">pub</span><span class="c">:</span><span class="kd">fail</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="kd">pub</span>
+        <span class="s2">&quot;&quot;&quot;</span>
+<span class="nt">[runtime]</span>
+    <span class="nt">[[root]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> sleep 1</span>
+    <span class="nt">[[pub]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> false</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

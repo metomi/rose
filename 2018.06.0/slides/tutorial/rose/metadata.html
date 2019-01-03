@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rose Metadata &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../../_static/slides.js"></script>
+    <script type="text/javascript" src="../../_static/sync.js"></script>
+    <script type="text/javascript" src="../../_static/controller.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../../index.html" />
+    <link rel="up" title="Rose Tutorial" href="index.html" />
+    <link rel="next" title="Rose Suite Configurations" href="suites.html" />
+    <link rel="prev" title="Rose Applications" href="applications.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="rose-metadata">
+
+<h1>Rose Metadata<a class="headerlink" href="../../../html/tutorial/rose/metadata.html#rose-metadata" title="View HTML">§</a></h1>
+
+<p>It is used for:</p>
+<ul class="simple">
+<li>Documenting settings.</li>
+<li>Performing automatic checking (e.g. type checking).</li>
+<li>Formatting the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI.</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="the-metadata-format">
+
+<h2>The Metadata Format<a class="headerlink" href="../../../html/tutorial/rose/metadata.html#the-metadata-format" title="View HTML">§</a></h2>
+
+<p><code class="docutils literal notranslate"><span class="pre">meta/rose-meta.conf</span></code> (or elsewhere outside of the configuration)</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">rose-app.conf</span></div>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">echo &quot;Hello ${WORLD}.&quot;</span>
+
+<span class="nt">[env]</span>
+<span class="nv">WORLD</span><span class="o">=</span><span class="s">Earth</span>
+</pre></div>
+</div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="id3">
+
+<h2>The Metadata Format<a class="headerlink" href="../../../html/tutorial/rose/metadata.html#id3" title="View HTML">§</a></h2>
+
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">meta/rose-meta.conf</span></div>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env=WORLD]</span>
+<span class="nv">description</span><span class="o">=</span><span class="s">The name of the world to say hello to.</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune</span>
+</pre></div>
+</div>
+</div>
+<p>This example gives the <code class="docutils literal notranslate"><span class="pre">WORLD</span></code> variable a title and a list of allowed values.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="metadata-commands">
+
+<h2>Metadata Commands<a class="headerlink" href="../../../html/tutorial/rose/metadata.html#metadata-commands" title="View HTML">§</a></h2>
+
+<p class="rubric">Validating metadata:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose metadata-check -C meta/
+</pre></div>
+</div>
+<p class="rubric">Validating configurations:</p>
+<p>For example, if we were to change the value of <code class="docutils literal notranslate"><span class="pre">WORLD</span></code> to <code class="docutils literal notranslate"><span class="pre">Pluto</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> rose macro -V
+<span class="go">Value Pluto not in allowed values [&#39;Mercury&#39;, &#39;Venus&#39;, &#39;Earth&#39;, &#39;Mars&#39;, &#39;Jupiter&#39;, &#39;Saturn&#39;, &#39;Uranus&#39;, &#39;Neptune&#39;]</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="metadata-items">
+
+<h2>Metadata Items<a class="headerlink" href="../../../html/tutorial/rose/metadata.html#metadata-items" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li>title</li>
+<li>description</li>
+<li>type</li>
+<li>length</li>
+<li>range</li>
+</ul>
+
+
+
+
+</article>
+<article class="slide level-2" id="id4">
+
+<h2>Metadata Items<a class="headerlink" href="../../../html/tutorial/rose/metadata.html#id4" title="View HTML">§</a></h2>
+
+<p class="rubric">In this practical we will write metadata for the
+<code class="docutils literal notranslate"><span class="pre">application-tutorial</span></code> app we wrote in the
+<a class="reference internal" href="applications.html#rose-applications-practical"><span class="std std-ref">Rose application practical</span></a>.</p>
+<p>Next section: <a class="reference internal" href="suites.html#tutorial-rose-suites"><span class="std std-ref">Rose Suite Configurations</span></a></p>
+<div class="note admonition">
+<p class="first admonition-title">Practical</p>
+<p class="rubric">In this practical we will write metadata for the
+<code class="docutils literal notranslate"><span class="pre">application-tutorial</span></code> app we wrote in the
+<a class="reference internal" href="applications.html#rose-applications-practical"><span class="std std-ref">Rose application practical</span></a>.</p>
+<ol class="last arabic">
+<li><p class="first"><strong>Create a Rose application called</strong> <code class="docutils literal notranslate"><span class="pre">metadata-tutorial</span></code>.</p>
+<p>Create a new copy of the <code class="docutils literal notranslate"><span class="pre">application-tutorial</span></code> application by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">metadata</span><span class="o">-</span><span class="n">tutorial</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">metadata</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">rose</span><span class="o">-</span><span class="n">tutorial</span><span class="o">/</span><span class="n">metadata</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>View the application in</strong> <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a>.</p>
+<p>The <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> command opens a GUI which displays
+Rose configurations. Open the <code class="docutils literal notranslate"><span class="pre">metadata-tutorial</span></code> app:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">config</span><span class="o">-</span><span class="n">edit</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Note <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> searches for any Rose
+configuration in the current directory. Use the <code class="docutils literal notranslate"><span class="pre">-C</span></code> option
+to specify another directory.</p>
+</div>
+<p>In the panel on the left you will see the different sections of the
+<a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file.</p>
+<p>Click on <span class="guilabel">env</span>, where you will find all of the environment
+variables. Each setting will have a hash symbol (<code class="docutils literal notranslate"><span class="pre">#</span></code>) next to its name.
+These are the comments defined in the <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file.
+Hover the mouse over the hash to reveal the comment.</p>
+<p>Keep the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> window open as we will use it
+throughout the rest of this practical.</p>
+</li>
+<li><p class="first"><strong>Add descriptions.</strong></p>
+<p>Now we will start writing some metadata.</p>
+<p>Create a <code class="docutils literal notranslate"><span class="pre">meta/</span></code> directory containing a <a class="reference internal" href="../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a>
+file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">meta</span>
+<span class="n">touch</span> <span class="n">meta</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">meta</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>In the <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file there are comments associated with
+each setting. Take these comments out of the <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a>
+file and add them as descriptions in the metadata. As an example,
+for the <code class="docutils literal notranslate"><span class="pre">INTERVAL</span></code> environment variable you would create a metadata
+entry that looks like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env=INTERVAL]</span>
+<span class="nv">description</span><span class="o">=</span><span class="s">The interval between forecasts.</span>
+</pre></div>
+</div>
+<p>Longer settings can be split over multiple lines like so:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env=INTERVAL]</span>
+<span class="nv">description</span><span class="o">=</span><span class="s">The interval</span>
+           <span class="o">=</span><span class="s">between forecasts.</span>
+</pre></div>
+</div>
+<p>Once you have finished save your work and validate the metadata using
+<a class="reference internal" href="../../api/command-reference.html#command-rose-metadata-check"><span class="std std-ref">rose metadata-check</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">metadata</span><span class="o">-</span><span class="n">check</span> <span class="o">-</span><span class="n">C</span> <span class="n">meta</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>There should not be any errors so this check will silently pass.</p>
+<p>Next reload the metadata in the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> window
+using the <span class="menuselection">Metadata ‣ Refresh Metadata</span> menu item.
+The descriptions should now display under each environment variable.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If you don’t see the description for a setting it is possible that you
+misspelt the name of the setting in the section heading.</p>
+</div>
+</li>
+<li><p class="first"><strong>Indicate list settings and their length.</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">DOMAIN</span></code> and <code class="docutils literal notranslate"><span class="pre">WEIGHTING</span></code> settings both accept comma-separated
+lists of values. We can represent this in Rose metadata using the
+<a class="reference internal" href="../../api/configuration/metadata.html#rose:conf:rose-meta.conf[SETTING]length" title="rose:conf:rose-meta.conf[SETTING]length"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-meta.conf[SETTING]length</span></code></a> setting.</p>
+<p>To represent the <code class="docutils literal notranslate"><span class="pre">DOMAIN</span></code> setting as a list of four elements, add the
+following to the <code class="docutils literal notranslate"><span class="pre">[env=DOMAIN]</span></code> section:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">length</span><span class="o">=</span><span class="s">4</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">WEIGHTING</span></code> and <code class="docutils literal notranslate"><span class="pre">WIND_CYCLES</span></code> settings are different as we don’t
+know how many items they will contain. For flexible lists we use a colon,
+so add the following line to the <code class="docutils literal notranslate"><span class="pre">[env=WEIGHTING]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">[env=WIND_CYCLES]</span></code> sections:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">length</span><span class="o">=</span><span class="s">:</span>
+</pre></div>
+</div>
+<p>Validate the metadata:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">metadata</span><span class="o">-</span><span class="n">check</span> <span class="o">-</span><span class="n">C</span> <span class="n">meta</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>Refresh the metadata in the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> window by
+selecting <span class="menuselection">Metadata ‣ Refresh Metadata</span>.
+The three settings we have edited should now appear as lists.</p>
+</li>
+<li><p class="first"><strong>Specify data types.</strong></p>
+<p>Next we will add type information to the metadata.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">INTERVAL</span></code> setting accepts an integer value. Add the following line
+to the <code class="docutils literal notranslate"><span class="pre">[env=INTERVAL]</span></code> section to enforce this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+</pre></div>
+</div>
+<p>Validate the metadata and refresh the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a>
+window. The <code class="docutils literal notranslate"><span class="pre">INTERVAL</span></code> setting should now appear as an integer
+rather than a text field.</p>
+<p>In the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> window, try changing the value of
+<code class="docutils literal notranslate"><span class="pre">INTERVAL</span></code> to a string. It shouldn’t let you do so.</p>
+<p>Add similar <code class="docutils literal notranslate"><span class="pre">type</span></code> entries for the following settings:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><code class="docutils literal notranslate"><span class="pre">integer</span></code> settings</th>
+<th class="head"><code class="docutils literal notranslate"><span class="pre">real</span></code> (float) settings</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">INTERVAL</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">WEIGHTING</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">N_FORECASTS</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code></td>
+</tr>
+</tbody>
+</table>
+<p>Validate the metadata to check for errors.</p>
+<p>In the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> window try changing the value of
+<code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code> to a string. It should be marked as an error.</p>
+</li>
+<li><p class="first"><strong>Define sets of allowed values.</strong></p>
+<p>We will now add a new input to our application called <code class="docutils literal notranslate"><span class="pre">SPLINE_LEVEL</span></code>.
+This is a science setting used to determine the interpolation method
+used on the rainfall data. It accepts the following values:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">0</span></code> - for nearest member interpolation.</li>
+<li><code class="docutils literal notranslate"><span class="pre">1</span></code> - for linear interpolation.</li>
+</ul>
+<p>Add this setting to the <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="nv">SPLINE_LEVEL</span><span class="o">=</span><span class="s">0</span>
+</pre></div>
+</div>
+<p>We can ensure that users stick to allowed values using the <code class="docutils literal notranslate"><span class="pre">values</span></code>
+metadata item. Add the following to the <a class="reference internal" href="../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env=SPLINE_LEVEL]</span>
+<span class="nv">values</span><span class="o">=</span><span class="s">0,1</span>
+</pre></div>
+</div>
+<p>Validate the metadata.</p>
+<p>As we have made a change to the configuration (by editing the
+<a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file) we will need to close and reload
+the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI.
+The setting should appear as a button with only the options <code class="docutils literal notranslate"><span class="pre">0</span></code> and
+<code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>Unfortunately <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> are not particularly descriptive, so
+it might not be obvious that they mean “nearest” and “linear”
+respectively. The <a class="reference internal" href="../../api/configuration/metadata.html#rose:conf:rose-meta.conf[SETTING]value-titles" title="rose:conf:rose-meta.conf[SETTING]value-titles"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-meta.conf[SETTING]value-titles</span></code></a>
+metadata item can be used to add titles to such settings to make the
+values clearer.</p>
+<p>Add the following lines to the <code class="docutils literal notranslate"><span class="pre">[env=SPLINE_LEVEL]</span></code> section in the
+<a class="reference internal" href="../../api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">value-titles</span><span class="o">=</span><span class="s">Nearest,Linear</span>
+</pre></div>
+</div>
+<p>Validate the metadata and refresh the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a>
+window.
+The <code class="docutils literal notranslate"><span class="pre">SPLINE_LEVEL</span></code> options should now have titles which better convey
+the meaning of the options.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">The <a class="reference internal" href="../../api/configuration/metadata.html#rose:conf:rose-meta.conf[SETTING]value-hints" title="rose:conf:rose-meta.conf[SETTING]value-hints"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-meta.conf[SETTING]value-hints</span></code></a> metadata option
+can be used to provide a longer description of each option.</p>
+</div>
+</li>
+<li><p class="first"><strong>Validate with</strong> <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">macro</span></code>.</p>
+<p>On the command line <a class="reference internal" href="../../api/command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a> can be used to check that
+the configuration is compliant with the metadata.
+Try editing the <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file to introduce errors
+then validating the configuration by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">macro</span> <span class="o">-</span><span class="n">V</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

@@ -1,0 +1,201 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Slides &mdash; Rose Documentation 2018.06.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/css/metomi.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2018.06.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/metomi.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2018.06.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="slides">
+
+<h1>Slides<a class="headerlink" href="../../html/developing/slides.html#slides" title="View HTML">§</a></h1>
+
+<p>Slides are built using the <a class="reference external" href="http://docs.hieroglyph.io/en/latest/">Hieroglyph</a> extension.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="writing">
+
+<h2>Writing<a class="headerlink" href="../../html/developing/slides.html#writing" title="View HTML">§</a></h2>
+
+<p>Hieroglyph automatically builds slides using the document structure, i.e. each
+section gets put on a new slide. To break up long sections use <code class="docutils literal notranslate"><span class="pre">..</span>
+<span class="pre">nextslide::</span></code>. To control what content appears in the slides / regular output
+use switches like so:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>Content which appears both in slides and regular output.
+
+<span class="p">..</span> <span class="ow">ifnotslides</span><span class="p">::</span>
+
+   Content for the regular documentation only.
+
+<span class="p">..</span> <span class="ow">ifslides</span><span class="p">::</span>
+
+   Content for the slides only.
+</pre></div>
+</div>
+<p>In certain situations it may be necessary to manually build slides using the
+<code class="docutils literal notranslate"><span class="pre">slide</span></code> directive:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">slide</span><span class="p">::</span> Slide Title
+   <span class="nc">:level:</span> <span class="nf">1</span>
+   <span class="nc">:inline-contents:</span>
+
+   Level 1 means the slide has the same prominence as the title
+
+   inline-contents means that the content of this directive also appears in
+   the regular output.
+</pre></div>
+</div>
+<p>Hieroglyph interprets the <code class="docutils literal notranslate"><span class="pre">note</span></code> admonition as presenters notes. Or to be
+more technical Hieroglyph interprets anything with the <code class="docutils literal notranslate"><span class="pre">admonition</span></code> and
+<code class="docutils literal notranslate"><span class="pre">note</span></code> classes as a presenter note so you cannot get around it doing
+something like this:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">admonition</span><span class="p">::</span> Note
+   <span class="nc">:class:</span> <span class="nf">note</span>
+</pre></div>
+</div>
+<p>To make the content appear in the slides you can do something like this:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">admonition</span><span class="p">::</span> Note
+   <span class="nc">:class:</span> <span class="nf">tip</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="building">
+
+<h2>Building<a class="headerlink" href="../../html/developing/slides.html#building" title="View HTML">§</a></h2>
+
+<p>Build using the <code class="docutils literal notranslate"><span class="pre">slides</span></code> builder i.e:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">make</span><span class="o">-</span><span class="n">docs</span> <span class="n">slides</span>
+</pre></div>
+</div>
+<p>Note that if linking to the HTML version from within the slides you may be
+restricted to using either the single page HTML or directory HTML builders but
+not both.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="error">
+
+<h2>Error<a class="headerlink" href="../../html/developing/slides.html#error" title="View HTML">§</a></h2>
+
+<p>Hieroglyph loves cryptic errors.</p>
+
+
+
+
+</article>
+<article class="slide level-3" id="losing-ids-attribute">
+
+<h3>Losing “ids” Attribute<a class="headerlink" href="../../html/developing/slides.html#losing-ids-attribute" title="View HTML">§</a></h3>
+
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    &#39;Losing &quot;%s&quot; attribute: %s&#39; % (att, self[att])
+AssertionError: Losing &quot;ids&quot; attribute: [&#39;cylc-file-format&#39;]
+</pre></div>
+</div>
+<p>This is caused by a sphinx reference being broken by the <code class="docutils literal notranslate"><span class="pre">slide</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ifnotslides</span></code> or <code class="docutils literal notranslate"><span class="pre">ifslides</span></code> directives e.g:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="nt">_bar:</span>
+
+<span class="p">..</span> <span class="ow">ifnotslides</span><span class="p">::</span>
+
+   Foo
+
+Bar
+</pre></div>
+</div>
+<p>Fix by changing to:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">ifnotslides</span><span class="p">::</span>
+
+   Foo
+
+<span class="p">..</span> <span class="nt">_bar:</span>
+
+Bar
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-3" id="valueerror-text">
+
+<h3>ValueError: &lt;#text<a class="headerlink" href="../../html/developing/slides.html#valueerror-text" title="View HTML">§</a></h3>
+
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ValueError: &lt;#text: &quot;Special cases ARE special enough to break the rules&quot;&gt; is not in list
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">..nextslide</span></code> directive can be used a maximum of two times in a row.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>
