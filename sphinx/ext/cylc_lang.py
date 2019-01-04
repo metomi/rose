@@ -87,7 +87,10 @@ class CylcLexer(RegexLexer):
             (r'(.*)(\s+)?(=)',
                 bygroups(SETTING_TOKEN,
                          Text,
-                         Operator), 'setting')
+                         Operator), 'setting'),
+
+            # Include files
+            (r'(%include)( )(.*)', bygroups(Operator, Text, String))
         ],
 
         'heading': [
