@@ -33,6 +33,7 @@ class CylcLexer(RegexLexer):
     HEADING_TOKEN = Name.Tag
     SETTING_TOKEN = Name.Variable
     GRAPH_TASK_TOKEN = Keyword.Declaration
+    GRAPH_XTRIGGER_TOKEN = Keyword.Type
     PARAMETERISED_TASK_TOKEN = Name.Builtin
     EXTERNAL_SUITE_TOKEN = Name.Builtin.Pseudo
     INTERCYCLE_OFFSET_TOKEN = Name.Builtin
@@ -76,17 +77,15 @@ class CylcLexer(RegexLexer):
                          Operator), 'inline-graph'),
 
             # Multi-line settings:  key = """ ...
-            (r'(.*)(\s+)?(=)([\s+])?(\"\"\")',
+            (r'([^=\n]+)(=)([\s+])?(\"\"\")',
                 bygroups(SETTING_TOKEN,
-                         Text,
                          Operator,
                          Text,
                          String.Double), 'multiline-setting'),
 
             # Inline settings:  key = ...
-            (r'(.*)(\s+)?(=)',
+            (r'([^=\n]+)(=)',
                 bygroups(SETTING_TOKEN,
-                         Text,
                          Operator), 'setting'),
 
             # Include files
@@ -132,6 +131,7 @@ class CylcLexer(RegexLexer):
             include('comment'),
             include('inter-suite-trigger'),
             include('parameterisation'),
+            (r'@\w+', GRAPH_XTRIGGER_TOKEN),
             (r'\w+', GRAPH_TASK_TOKEN),
             (r'\s', Text),
             (r'=>', Operator),
