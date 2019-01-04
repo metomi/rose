@@ -34,6 +34,7 @@ class CylcLexer(RegexLexer):
     SETTING_TOKEN = Name.Variable
     GRAPH_TASK_TOKEN = Keyword.Declaration
     PARAMETERISED_TASK_TOKEN = Name.Builtin
+    EXTERNAL_SUITE_TOKEN = Name.Builtin.Pseudo
     INTERCYCLE_OFFSET_TOKEN = Name.Builtin
 
     # Pygments values.
@@ -126,6 +127,7 @@ class CylcLexer(RegexLexer):
         'graph': [
             include('jinja2-openers'),
             include('comment'),
+            include('inter-suite-trigger'),
             include('parameterisation'),
             (r'\w+', GRAPH_TASK_TOKEN),
             (r'\s', Text),
@@ -134,6 +136,16 @@ class CylcLexer(RegexLexer):
             (r'[\(\)]', Punctuation),
             (r'\[', Text, 'intercycle-offset'),
             (r'.', Comment)
+        ],
+
+        'inter-suite-trigger': [
+            (r'(\<)'
+             r'([^\>]+)'  # foreign suite
+             r'(::)'
+             r'([^\>]+)'  # foreign task
+             r'(\>)',
+             bygroups(Text, EXTERNAL_SUITE_TOKEN, Text,
+                      PARAMETERISED_TASK_TOKEN, Text)),
         ],
 
         # Parameterised syntax:  <foo=1>
