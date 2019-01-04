@@ -10,3 +10,4 @@ dependencies:
   - sphinxcontrib-httpdomain
   - pip:
     - hieroglyph
+    - sphinxcontrib-svg2pdfconverter

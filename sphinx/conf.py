@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
+import subprocess
 import sys
 import os
 
@@ -36,8 +37,6 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
-    'sphinx.ext.imgconverter',
-    'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     # sphinx user community extensions
@@ -53,6 +52,24 @@ extensions = [
     'script_include',
     'sub_lang'
 ]
+
+# Select best available SVG image converter.
+for svg_converter, extension in [
+        ('rsvg', 'sphinxcontrib.rsvgconverter'),
+        ('inkscape', 'sphinxcontrib.inkscapeconverter')]:
+    try:
+        subprocess.check_call(['which', svg_converter], stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+        __import__(extension)
+        extensions.append(extension)
+        break
+    except (subprocess.CalledProcessError, ImportError):
+        # converter or extension not available
+        pass
+else:
+    # no extensions or converters available, fall-back to default
+    # vector graphics will be converted to bitmaps in all documents
+    extensions.append('sphinx.ext.imgconverter')
 
 # Slide (hieroglyph) settings.
 slide_theme = 'single-level'

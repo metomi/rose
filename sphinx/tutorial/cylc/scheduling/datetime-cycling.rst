@@ -58,24 +58,9 @@ Date-Times
 
 .. Diagram of an iso8601 datetime's components.
 
-.. math::
-
-   \color{blue}{\overbrace{
-   \underbrace{\huge 1985}_{_{\text{Year}}}
-   {\huge\text{-}}
-   \underbrace{\huge 04}_{_{\text{Month}}}
-   {\huge\text{-}}
-   \underbrace{\huge 12}_{_{\text{Day}}}
-   }^{\text{Date Components}}}
-   \overbrace{\huge \text{T}}^{\text{Separator}}
-   \color{green}{\overbrace{
-   \underbrace{\huge 23}_{_{\text{Hour}}}
-   {\huge:}
-   \underbrace{\huge 20}_{_{\text{Minute}}}
-   {\huge:}
-   \underbrace{\huge 30}_{_{\text{Second}}}
-   \underbrace{\huge \text{Z}}_{_{\text{Time Zone}}}
-   }^{\text{Time Components}}}
+.. image:: ../img/iso8601-dates.svg
+   :width: 75%
+   :align: center
 
 .. nextslide::
 
