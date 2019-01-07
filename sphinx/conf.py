@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-import subprocess
 import sys
 import os
 
+from rose.popen import RosePopener
 from rose.resource import ResourceLocator
 
 # rose-documentation build configuration file, initial version created by
@@ -58,14 +58,14 @@ for svg_converter, extension in [
         ('rsvg', 'sphinxcontrib.rsvgconverter'),
         ('inkscape', 'sphinxcontrib.inkscapeconverter')]:
     try:
-        subprocess.check_call(['which', svg_converter], stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE)
+        assert RosePopener.which(svg_converter)
         __import__(extension)
-        extensions.append(extension)
-        break
-    except (subprocess.CalledProcessError, ImportError):
+    except (AssertionError, ImportError):
         # converter or extension not available
         pass
+    else:
+        extensions.append(extension)
+        break
 else:
     # no extensions or converters available, fall-back to default
     # vector graphics will be converted to bitmaps in all documents
