@@ -103,7 +103,7 @@ class CylcLexer(RegexLexer):
             (r'[\]]+', HEADING_TOKEN, '#pop'),
             include('preproc'),
             include('parameterisation'),
-            (r'.', HEADING_TOKEN),
+            (r'(\\\n|.)', HEADING_TOKEN),  # Allow line continuation chars.
         ],
 
         # Cylc comments.
