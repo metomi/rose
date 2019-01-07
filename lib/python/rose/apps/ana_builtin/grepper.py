@@ -157,19 +157,18 @@ class SingleCommandStatus(AnalysisTask):
         # Parse the kgo index
         if kgo is not None:
             if kgo.strip() == "":
+                self.reporter("No KGO files are present")
                 kgo = None
             elif kgo.isdigit():
                 kgo = int(kgo)
                 if int(kgo) > len(self.files):
                     msg = "KGO index cannot be greater than number of files"
                     raise ValueError(msg)
+                self.reporter("KGO is file {0}".format(kgo + 1))
             else:
-                msg = "KGO index not recognised; must be a digit or blank"
+                msg = ("KGO index not recognised; should be either a digit or "
+                       "left blank")
                 raise ValueError(msg)
-        if kgo is not None:
-            self.reporter("KGO is file {0}".format(kgo + 1))
-        else:
-            self.reporter("No KGO files are present")
         self.kgo = kgo
 
     def process_opt_command(self):
