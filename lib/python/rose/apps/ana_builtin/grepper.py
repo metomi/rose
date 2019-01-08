@@ -157,7 +157,6 @@ class SingleCommandStatus(AnalysisTask):
         # Parse the kgo index
         if kgo is not None:
             if kgo.strip() == "":
-                self.reporter("No KGO files are present")
                 kgo = None
             elif kgo.isdigit():
                 kgo = int(kgo)
