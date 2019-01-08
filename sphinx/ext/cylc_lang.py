@@ -22,7 +22,7 @@ strings."""
 
 from pygments.lexer import RegexLexer, bygroups, include
 from pygments.token import (Name, Comment, Text, Operator, String,
-                            Punctuation, Error, Keyword)
+                            Punctuation, Error, Keyword, Other)
 
 
 class CylcLexer(RegexLexer):
@@ -139,9 +139,10 @@ class CylcLexer(RegexLexer):
             include('parameterisation'),
             (r'@\w+', GRAPH_XTRIGGER_TOKEN),
             (r'\w+', GRAPH_TASK_TOKEN),
+            (r'\!\w+', Other),
             (r'\s', Text),
             (r'=>', Operator),
-            (r'[\&\|\!]', Operator),
+            (r'[\&\|]', Operator),
             (r'[\(\)]', Punctuation),
             (r'\[', Text, 'intercycle-offset'),
             (r'.', Comment)
