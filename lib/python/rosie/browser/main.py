@@ -40,7 +40,7 @@ try:
     from gi.repository import Secret
     del Secret
     del pygtkcompat
-except ImportError:
+except (ImportError, ValueError, AttributeError):
     pass
 
 import pygtk
