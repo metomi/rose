@@ -28,7 +28,7 @@ import sys
 
 
 YES = "y"
-PROMPT = "Really %s %s at %s? [" + YES + " or n (default)] "
+PROMPT = "Really %s %s? [" + YES + " or n (default)] "
 
 
 class SuiteControl(object):
@@ -67,7 +67,7 @@ class SuiteControl(object):
         args: extra arguments for the suite engine's shutdown command.
 
         """
-        if confirm is None or confirm("shutdown", suite_name, host_name):
+        if confirm is None or confirm("shutdown", suite_name):
             self.suite_engine_proc.shutdown(suite_name, args, stderr, stdout)
 
 
@@ -97,11 +97,9 @@ def get_suite_name(event_handler=None):
         conf_dir = up_dir
 
 
-def prompt(action, suite_name, host):
+def prompt(action, suite_name):
     """Prompt user to confirm action for suite_name at host."""
-    if not host:
-        host = "localhost"
-    return raw_input(PROMPT % (action, suite_name, host)).strip() in [YES]
+    return raw_input(PROMPT % (action, suite_name)).strip() in [YES]
 
 
 def main():
