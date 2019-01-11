@@ -249,7 +249,8 @@ class RosePopener(object):
         if stderr:
             self.handle_event(stderr, level=stderr_level)
 
-    def which(self, name):
+    @staticmethod
+    def which(name):
         """Search an executable file name in PATH, and return its full path.
 
         If name is an absolute path and is an executable file, return name.

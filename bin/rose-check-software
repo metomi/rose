@@ -315,8 +315,6 @@ def docs(check=check):
                outfile=2),
         check('graphviz-dot <dot>', command_template='-V',
                version_template='graphviz version ([^\s]+)', outfile=2),
-        check('tex', version_template=r'TeX ([^\s]+)'),
-        check('pdflatex', version_template=r'pdfTeX .*-.*-([^\s]+)'),
         # TODO remove Sphinx version dependency
         # https://github.com/nyergler/hieroglyph/issues/148
         check('py:sphinx', (1, 5, 3), (1, 8)),
@@ -325,8 +323,15 @@ def docs(check=check):
         check('py:hieroglyph')
     ])
 
+    check_all('Documentation Builder - Recommended Extras', [
+        check('rsvg', version_template=r'rsvg version (.*)'),
+        check('py:sphinxcontrib.svg2pdfconverter <sphinxcontrib.rsvgconverter>')
+    ])
+
     check_all('Documentation Builder - PDF Dependencies', [
-        check('latexmk', version_template=r'Version (.*)')
+        check('tex', version_template=r'TeX ([^\s]+)'),
+        check('latexmk', version_template=r'Version (.*)'),
+        check('pdflatex', version_template=r'pdfTeX .*-.*-([^\s]+)')
     ])
 
     check_all('Documentation Builder - Linkcheck Dependencies', [

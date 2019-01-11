@@ -20,6 +20,7 @@
 import sys
 import os
 
+from rose.popen import RosePopener
 from rose.resource import ResourceLocator
 
 # rose-documentation build configuration file, initial version created by
@@ -36,8 +37,6 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
-    'sphinx.ext.imgconverter',
-    'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     # sphinx user community extensions
@@ -53,6 +52,24 @@ extensions = [
     'script_include',
     'sub_lang'
 ]
+
+# Select best available SVG image converter.
+for svg_converter, extension in [
+        ('rsvg', 'sphinxcontrib.rsvgconverter'),
+        ('inkscape', 'sphinxcontrib.inkscapeconverter')]:
+    try:
+        assert RosePopener.which(svg_converter)
+        __import__(extension)
+    except (AssertionError, ImportError):
+        # converter or extension not available
+        pass
+    else:
+        extensions.append(extension)
+        break
+else:
+    # no extensions or converters available, fall-back to default
+    # vector graphics will be converted to bitmaps in all documents
+    extensions.append('sphinx.ext.imgconverter')
 
 # Slide (hieroglyph) settings.
 slide_theme = 'single-level'
