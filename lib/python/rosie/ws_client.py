@@ -171,27 +171,6 @@ class RosieWSClient(object):
         if not request_details:
             raise RosieWSClientError(method, kwargs)
 
-        # Filter security warnings from urllib3 on python <2.7.9. Obviously, we
-        # want to upgrade, but some sites have to run cylc on platforms with
-        # python <2.7.9. On those platforms, these warnings serve no purpose
-        # except to annoy or confuse users.
-        if sys.version_info < (2, 7, 9):
-            import warnings
-            try:
-                from requests.packages.urllib3.exceptions import (
-                    InsecurePlatformWarning)
-            except ImportError:
-                pass
-            else:
-                warnings.simplefilter("ignore", InsecurePlatformWarning)
-            try:
-                from requests.packages.urllib3.exceptions import (
-                    SNIMissingWarning)
-            except ImportError:
-                pass
-            else:
-                warnings.simplefilter("ignore", SNIMissingWarning)
-
         # Process the requests in parallel
         pool = Pool(len(request_details))
         results = {}

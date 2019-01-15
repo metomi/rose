@@ -68,7 +68,7 @@ class RosieWriteDAO(object):
         """Perform a delete on table key, using kwargs to select rows."""
         table = self._get_table(key)
         where = None
-        for col, value in kwargs.items():
+        for col, value in list(kwargs.items()):
             if where is None:
                 where = table.c[col] == value
             else:
@@ -132,7 +132,7 @@ class RosieSvnPostCommitHook(object):
         # Do nothing if prefix is not registered
         conf = ResourceLocator.default().get_conf()
         rosie_db_node = conf.get(["rosie-db"], no_ignore=True)
-        for key, node in rosie_db_node.value.items():
+        for key, node in list(rosie_db_node.value.items()):
             if node.is_ignored() or not key.startswith("repos."):
                 continue
             if os.path.realpath(repos) == os.path.realpath(node.value):
@@ -145,11 +145,11 @@ class RosieSvnPostCommitHook(object):
 
         # Date-time of this commit
         os.environ["TZ"] = "UTC"
-        date_time = self._svnlook("date", "-r", revision, repos)
-        date, dtime, _ = date_time.split(None, 2)
-        date = mktime(strptime(b" ".join([date, dtime, b"UTC"]).decode(),
-                      self.DATE_FMT))
-
+        date_time_str = self._svnlook("date", "-r", revision, repos)
+        date, dtime, _ = date_time_str.split(None, 2)
+        date = mktime(strptime(
+            " ".join([date.decode("ascii"), dtime.decode(), "UTC"]),
+            self.DATE_FMT))
         # Detail of changes
         changeset_attribs = {
             "repos": repos,
@@ -183,20 +183,20 @@ class RosieSvnPostCommitHook(object):
             # Column 2: tree status
             # Column 3: "+" sign denotes a copy history
             # Column 5+: path
-            path = changed_line[4:].strip()
-            path_status = changed_line[0]
-            if path.endswith(b"/") and path_status == "_":
+            path = changed_line[4:].strip().decode()
+            path_status = changed_line.decode()[0]
+            if path.endswith("/") and path_status == "_":
                 # Ignore property change on a directory
                 continue
             # Path must be (under) a valid suite branch, including the special
             # ROSIE suite
-            names = path.split(b"/", self.LEN_ID + 1)
+            names = path.split("/", self.LEN_ID + 1)
             if (len(names) < self.LEN_ID + 1 or (
-                    b"".join(names[0:self.LEN_ID]) != b"ROSIE" and
-                    any(name.decode() not in id_chars for name, id_chars in
+                    "".join(names[0:self.LEN_ID]) != "ROSIE" and
+                    any(name not in id_chars for name, id_chars in
                         zip(names, self.ID_CHARS_LIST)))):
                 continue
-            sid = b"".join(names[0:self.LEN_ID])
+            sid = "".join(names[0:self.LEN_ID])
             branch = names[self.LEN_ID]
             if branch:
                 # Change to a path in a suite branch
@@ -258,7 +258,7 @@ class RosieSvnPostCommitHook(object):
                     "tree", "-r", str(int(revision) - 1), "-N", repos, path)
                 # Include all branches of the suite in the deletion info
                 for tree_line in tree_out.splitlines()[1:]:
-                    del_branch = tree_line.strip().rstrip("/")
+                    del_branch = tree_line.strip().decode().rstrip("/")
                     branch_attribs_dict[(sid, del_branch)] = (
                         self._new_suite_branch_change(sid, del_branch, {
                             "old_info": self._load_info(
@@ -271,9 +271,7 @@ class RosieSvnPostCommitHook(object):
 
     def _load_info(self, repos, revision, sid, branch):
         """Load info file from branch_path in repos @revision."""
-        info_file_path = "%s/%s/%s" % ("/".join(str(sid)),
-                                       branch,
-                                       self.INFO_FILE)
+        info_file_path = "%s/%s/%s" % ("/".join(sid), branch, self.INFO_FILE)
         t_handle = TemporaryFile()
         try:
             t_handle.write(self._svnlook(
@@ -382,14 +380,16 @@ class RosieSvnPostCommitHook(object):
 
     def _update_info_db(self, dao, changeset_attribs, branch_attribs):
         """Update the suite info database for a suite branch."""
-        idx = changeset_attribs["prefix"] + "-" +\
-            branch_attribs["sid"].decode()
+        idx = changeset_attribs["prefix"] + "-" + branch_attribs["sid"]
         vc_attrs = {
             "idx": idx,
             "branch": branch_attribs["branch"],
             "revision": changeset_attribs["revision"]}
         for key in vc_attrs:
-            vc_attrs[key] = vc_attrs[key]
+            if isinstance(vc_attrs[key], bytes):
+                vc_attrs[key] = vc_attrs[key].decode("utf-8")
+            elif isinstance(vc_attrs[key], str):
+                vc_attrs[key] = vc_attrs[key].encode().decode("utf-8")
         # Latest table
         try:
             dao.delete(
@@ -420,10 +420,10 @@ class RosieSvnPostCommitHook(object):
         cols["status"] = (
             branch_attribs["status"] + branch_attribs["status_info_file"])
         for key in cols:
-            try:
+            if isinstance(cols[key], bytes):
                 cols[key] = cols[key].decode("utf-8")
-            except AttributeError:
-                pass
+            elif isinstance(cols[key], str):
+                cols[key] = cols[key].encode().decode("utf-8")
         dao.insert(MAIN_TABLE_NAME, **cols)
         # Optional table
         for name in branch_attribs[info_key].value:
@@ -433,8 +433,8 @@ class RosieSvnPostCommitHook(object):
             if value is None:  # setting may have ignore flag (!)
                 continue
             cols = dict(vc_attrs)
-            cols.update({
-                "name": name.decode("utf-8"), "value": value.decode("utf-8")})
+            cols.update({"name": name.encode().decode("utf-8"),
+                         "value": value.encode().decode("utf-8")})
             dao.insert(OPTIONAL_TABLE_NAME, **cols)
 
     def _update_known_keys(self, dao, changeset_attribs):
@@ -465,7 +465,7 @@ def main():
     except Exception as exc:
         report(exc)
         if opts.debug_mode:
-            traceback.print_exc()
+            traceback.print_exc(exc)
         sys.exit(1)
 
 

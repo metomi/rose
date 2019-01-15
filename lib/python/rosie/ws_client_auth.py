@@ -23,7 +23,6 @@
 # systems with GTK+ >=v3 this should work: Systems on GTK <v3 will not load
 # this module.
 import warnings
-import collections.abc
 try:
     from gi import require_version, pygtkcompat
     require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK

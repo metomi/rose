@@ -68,7 +68,7 @@ else
         NPROC=$(grep -ic processor /proc/cpuinfo)
     else
         NPROC=$(python3 -c \
-            'import multiprocessing; print multiprocessing.cpu_count()')
+            'import multiprocessing; print(multiprocessing.cpu_count())')
     fi
     exec prove -j "$NPROC" -s -r "${@:-t}"
 fi

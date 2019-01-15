@@ -31,7 +31,6 @@
 #     * load any FUNC specified in the argument list.
 #-------------------------------------------------------------------------------
 
-
 function rose_init() {
     set -eu
     ROSE_NS=$(basename $0)
