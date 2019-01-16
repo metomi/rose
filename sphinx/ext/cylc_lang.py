@@ -175,16 +175,26 @@ class CylcLexer(RegexLexer):
         ],
 
         # Task inter-cycle offset for graphing:  foo[-P1DT1M]
+        # Legal formats: POINT, POINT[+-]OFFSET, OFFSET
         'intercycle-offset': [
-            include('integer-duration'),
+            include('cycle-point'),
+            include('integer-duration'),  # matches a subset of iso8601
             include('iso8601-duration'),
             (r'[\^\$]', INTERCYCLE_OFFSET_TOKEN),
             (r'\]', Text, '#pop')
         ],
 
+        # generic Cylc cycle point:  2000
+        'cycle-point': [
+            # validating the cycle point as a regex [effectively] requires
+            # knowledge of the cycling mode so is not *really* possible,
+            # also validating iso8601 datetimes is horrible.
+            (r'[\+\-]?[\d\:\-T]+(Z)?\b', INTERCYCLE_OFFSET_TOKEN)
+        ],
+
         # An integer duration:  +P1
         'integer-duration': [
-            (r'[+-]P\d+(?![\w-])', INTERCYCLE_OFFSET_TOKEN)
+            (r'([+-])?P\d+(?![\w-])', INTERCYCLE_OFFSET_TOKEN)
         ],
 
         # An ISO8601 duration:  +P1DT1H
