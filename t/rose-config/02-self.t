@@ -20,5 +20,5 @@
 D=$(cd $(dirname $0) && pwd)
 . $D/test_header
 tests 1
-run_pass "$TEST_KEY_BASE" python2 $D/$TEST_KEY_BASE.py "$@"
+run_pass "$TEST_KEY_BASE" python3 $D/$TEST_KEY_BASE.py "$@"
 exit 0

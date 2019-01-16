@@ -1,5 +1,6 @@
-#!/bin/bash
-#-------------------------------------------------------------------------------
+
+# -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,13 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
-# Run doctests in the rose bush codebase.
-#-------------------------------------------------------------------------------
-. "$(dirname "$0")/test_header"
-tests 2
-#-------------------------------------------------------------------------------
-TEST_KEY="${TEST_KEY_BASE}"
-run_pass "${TEST_KEY}" python2 -m doctest "${ROSE_HOME}/lib/python/rose/bush.py"
-sed -i /1034h/d "${TEST_KEY}.out"  # Remove some nasty unicode output.
-file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" /dev/null
+# -----------------------------------------------------------------------------
+# Tests for rose.opt_parse.PY2
+
+import unittest

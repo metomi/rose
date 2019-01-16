@@ -47,8 +47,8 @@ class SpinnerValueWidget(gtk.HBox):
             tooltip_text = self.WARNING_MESSAGE.format(value,
                                                        int_value)
         my_adj = gtk.Adjustment(value=int_value,
-                                upper=sys.maxint,
-                                lower=-sys.maxint - 1,
+                                upper=sys.maxsize,
+                                lower=-sys.maxsize - 1,
                                 step_incr=1)
         spin_button = gtk.SpinButton(adjustment=my_adj, digits=0)
         spin_button.connect('focus-in-event',

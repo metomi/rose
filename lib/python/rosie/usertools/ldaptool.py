@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #
@@ -21,7 +21,7 @@
 
 try:
     import ldap
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     pass
 import os
 from rose.resource import ResourceLocator

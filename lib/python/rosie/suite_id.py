@@ -143,9 +143,9 @@ class SuiteId(object):
                 if i == 0:
                     return None
                 raise SuiteIdLatestError(prefix)
-            dirs = [line for line in out.splitlines() if line.endswith("/")]
+            dirs = [line for line in out.splitlines() if line.endswith(b"/")]
             # Note - 'R/O/S/I/E' sorts to top for lowercase initial idx letter
-            dir_url = dir_url + "/" + sorted(dirs)[-1].rstrip("/")
+            dir_url = dir_url + "/" + sorted(dirs)[-1].rstrip(b"/").decode()
 
         # FIXME: not sure why a closure for "state" does not work here?
         state = {"idx-sid": None, "stack": [], "try_text": False}
@@ -473,7 +473,7 @@ class SuiteId(object):
         sid_chars = list(self._get_sid())
         incr_next = True
         i = self.SID_LEN
-        alphabet = string.lowercase
+        alphabet = string.ascii_lowercase
         while incr_next and i:
             i -= 1
             incr_next = False
@@ -583,7 +583,7 @@ def main():
     except (NoSuiteLogError, SuiteIdError) as exc:
         report(exc)
         if opts.debug_mode:
-            traceback.print_exc(exc)
+            traceback.print_exc()
         sys.exit(1)
 
 

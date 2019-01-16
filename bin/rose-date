@@ -175,4 +175,4 @@
 #
 #     For example, for a duration `P57DT12H` - `y,m,d,h` -> `0,0,57,12`
 #-------------------------------------------------------------------------------
-exec python2 -m rose.date "$@"
+exec python3 -m rose.date "$@"

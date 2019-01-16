@@ -135,12 +135,12 @@ def main():
 
     if opts.keys_mode:
         try:
-            keys = root_node.get(args, opts.no_ignore).value.keys()
+            keys = list(root_node.get(args, opts.no_ignore).value.keys())
         except AttributeError:
             sys.exit(1)
         keys.sort()
         for key in keys:
-            print key
+            print(key)
         sys.exit()
 
     conf_dump = ConfigDumper()
@@ -155,7 +155,7 @@ def main():
             conf_dump(ConfigNode().set(args, node.value), concat_mode=True)
             sys.exit()
 
-        keys = node.value.keys()
+        keys = list(node.value.keys())
         keys.sort()
         for key in keys:
             node_of_key = node.get([key], opts.no_ignore)
@@ -164,10 +164,10 @@ def main():
                 state = node_of_key.state
                 string = "%s%s=%s" % (state, key, value)
                 lines = string.splitlines()
-                print lines[0]
+                print(lines[0])
                 i_equal = len(state + key) + 1
                 for line in lines[1:]:
-                    print " " * i_equal + line
+                    print(" " * i_equal + line)
         sys.exit()
 
     if node is None:
@@ -181,7 +181,7 @@ def main():
     if opts.print_conf_mode:
         conf_dump(ConfigNode().set(args, value), concat_mode=True)
     else:
-        print value
+        print(value)
     sys.exit()
 
 

@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-if ! python2 -c 'import pygtk' 2>/dev/null; then
+if ! python3 -c 'import pygtk' 2>/dev/null; then
     skip_all '"pygtk" not installed'
 fi
 tests 15

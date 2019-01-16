@@ -133,7 +133,7 @@ def main():
     except Exception as exc:
         runner.handle_event(exc)
         if opts.debug_mode:
-            traceback.print_exc(exc)
+            traceback.print_exc()
         if isinstance(exc, RosePopenError):
             sys.exit(exc.ret_code)
         else:

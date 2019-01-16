@@ -82,7 +82,7 @@ class RoseArchEvent(Event):
             ret_code_str)
         if target.status != target.ST_OLD:
             for source in sorted(target.sources.values(),
-                                 lambda s1, s2: cmp(s1.name, s2.name)):
+                                 key=lambda s: s.name):
                 ret += "\n%s\t%s (%s)" % (
                     target.status, source.name, source.orig_name)
         return ret

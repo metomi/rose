@@ -177,8 +177,8 @@ def plot_vector_grid(filename, x_grid, y_grid):
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-    except ImportError:
-        print 'Plotting diasbled'
+    except (ImportError, ModuleNotFoundError):
+        print('Plotting disabled')
         return
 
     fig = plt.figure()

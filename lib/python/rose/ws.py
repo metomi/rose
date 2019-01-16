@@ -83,7 +83,7 @@ def ws_cli(service_cls, *args, **kwargs):
             report("%s=%s\n" % (key, value), level=level)
         if (arg == "stop" and status.get("pid") and
                 (opts.non_interactive or
-                 raw_input("Stop server? y/n (default=n)") == "y")):
+                 input("Stop server? y/n (default=n)") == "y")):
             os.killpg(int(status["pid"]), signal.SIGTERM)
             # TODO: should check whether it is killed or not
 

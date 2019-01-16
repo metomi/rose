@@ -20,7 +20,7 @@
 # Basic tests for "rosie disco".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-if ! python2 -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
+if ! python3 -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all '"cherrypy" or "sqlalchemy" not installed'
 fi
 #-------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ file_grep "$TEST_KEY.out" 'HTTP/.* 200 OK' "$TEST_KEY.out"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo-get_query_operators
 run_pass "$TEST_KEY" curl ${URL_FOO}get_query_operators?format=json
-run_pass "$TEST_KEY.out" python2 - "$TEST_KEY.out" <<'__PYTHON__'
+run_pass "$TEST_KEY.out" python3 - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 d = sorted(json.load(open(sys.argv[1])))
 sys.exit(d != ["contains", "endswith", "eq", "ge", "gt", "ilike", "le",
@@ -70,7 +70,7 @@ __PYTHON__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo-get_known_keys
 run_pass "$TEST_KEY" curl ${URL_FOO}get_known_keys?format=json
-run_pass "$TEST_KEY.out" python2 - "$TEST_KEY.out" <<'__PYTHON__'
+run_pass "$TEST_KEY.out" python3 - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 d = sorted(json.load(open(sys.argv[1])))
 sys.exit(d != ["author", "branch", "date", "from_idx", "idx", "owner",
@@ -105,7 +105,7 @@ done
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo-search
 run_pass "$TEST_KEY" curl "${URL_FOO_S}s=apple&format=json"
-run_pass "$TEST_KEY-out" python2 - "$TEST_KEY.out" <<'__PYTHON__'
+run_pass "$TEST_KEY-out" python3 - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 expected_d = [{"idx": "foo-aa001",
                "title": "apple cider",
@@ -132,7 +132,7 @@ TEST_KEY=$TEST_KEY_BASE-curl-foo-query
 Q='q=project+eq+food&q=and+title+contains+apple'
 run_pass "$TEST_KEY" \
     curl "${URL_FOO_Q}${Q}&format=json"
-run_pass "$TEST_KEY-out" python2 - "$TEST_KEY.out" <<'__PYTHON__'
+run_pass "$TEST_KEY-out" python3 - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 expected_d = [{"idx": "foo-aa006",
                "title": "apple tart",
@@ -150,7 +150,7 @@ TEST_KEY=$TEST_KEY_BASE-curl-foo-query-all-revs
 Q='q=project+eq+food&q=and+title+contains+apple'
 run_pass "$TEST_KEY" \
     curl "${URL_FOO_Q}${Q}&all_revs=1&format=json"
-run_pass "$TEST_KEY-out" python2 - "$TEST_KEY.out" <<'__PYTHON__'
+run_pass "$TEST_KEY-out" python3 - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 expected_d = [{"idx": "foo-aa006",
                "title": "apple pie",
@@ -181,7 +181,7 @@ TEST_KEY=$TEST_KEY_BASE-curl-foo-query-brace
 Q='q=%28+owner+eq+rose&q=or+owner+eq+rosie+%29&q=and+project+eq+food'
 run_pass "$TEST_KEY" \
     curl "${URL_FOO_Q}${Q}&format=json"
-run_pass "$TEST_KEY-out" python2 - "$TEST_KEY.out" <<'__PYTHON__'
+run_pass "$TEST_KEY-out" python3 - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 expected_d = [{"idx": "foo-aa005",
                "title": "carrot cake",

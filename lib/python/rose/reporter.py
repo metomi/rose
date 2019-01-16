@@ -19,12 +19,13 @@
 # -----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
-import Queue
+import queue
 
 import multiprocessing
 import sys
 
 import time
+import collections
 
 
 class Reporter(object):
@@ -135,7 +136,7 @@ class Reporter(object):
         arguments and return its result instead.
 
         """
-        if callable(self.event_handler):
+        if isinstance(self.event_handler, collections.Callable):
             return self.event_handler(message, kind, level, prefix, clip)
 
         if isinstance(message, Event):
@@ -153,7 +154,7 @@ class Reporter(object):
         if level is None:
             level = self.DEFAULT
         msg = None
-        for key, context in self.contexts.items():
+        for key, context in list(self.contexts.items()):
             if context.is_closed():
                 self.contexts.pop(key)  # remove contexts with closed handles
                 continue
@@ -163,19 +164,19 @@ class Reporter(object):
                 continue
             if prefix is None:
                 prefix = context.get_prefix(kind, level)
-            elif callable(prefix):
+            elif isinstance(prefix, collections.Callable):
                 prefix = prefix(kind, level)
             if msg is None:
-                if callable(message):
+                if isinstance(message, collections.Callable):
                     msg = message()
                 else:
                     msg = message
 
                 try:
-                    msg = unicode(msg)
+                    msg = str(msg)
                 except UnicodeDecodeError:
                     try:
-                        msg = unicode(msg, 'utf-8')
+                        msg = str(msg, 'utf-8')
                     except TypeError:
                         msg = str(msg)
                     except UnicodeEncodeError:
@@ -240,7 +241,7 @@ class ReporterContext(object):
                 return self._tty_colour_err(Reporter.PREFIX_WARN)
             else:
                 return self._tty_colour_err(Reporter.PREFIX_FAIL)
-        if callable(self.prefix):
+        if isinstance(self.prefix, collections.Callable):
             return self.prefix(kind, level)
         else:
             return self.prefix
@@ -252,9 +253,11 @@ class ReporterContext(object):
     def write(self, message):
         """Write the message to the context's handle."""
         try:
-            return self.handle.write(message.encode("utf-8"))
-        except UnicodeDecodeError:
+            return self.handle.buffer.write(message.encode("utf-8"))
+        except TypeError:
             return self.handle.write(message)
+        except AttributeError:
+            return self.handle.write(message.encode('UTF-8'))
 
     def _tty_colour_err(self, str_):
         """Colour error string for terminal."""
@@ -312,7 +315,7 @@ class ReporterContextQueue(ReporterContext):
             message = self._messages_pending[0]
             try:
                 self.queue.put(message, block=False)
-            except Queue.Full:
+            except queue.Full:
                 break
             else:
                 del self._messages_pending[0]

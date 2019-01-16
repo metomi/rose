@@ -51,4 +51,4 @@
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python2 -m rose.suite_hook "$@"
+exec python3 -m rose.suite_hook "$@"

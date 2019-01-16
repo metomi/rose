@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #
@@ -127,7 +127,7 @@ class RosieSvnPreCommitHook(object):
             opt_txn = ["-t", txn]
         t_handle = tempfile.TemporaryFile()
         path = path_head + self.TRUNK_INFO_FILE
-        t_handle.write(self._svnlook("cat", repos, path, *opt_txn))
+        t_handle.write(self._svnlook("cat", repos, path, *opt_txn).encode())
         t_handle.seek(0)
         info_node = ConfigLoader()(t_handle)
         t_handle.close()
@@ -136,7 +136,10 @@ class RosieSvnPreCommitHook(object):
     def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
         command = ["svnlook"] + list(args)
-        return self.popen(*command, stderr=sys.stderr)[0]
+        data = self.popen(*command, stderr=sys.stderr)[0]
+        if isinstance(data, bytes):
+            data = data.decode()
+        return data
 
     def _verify_users(self, status, path, txn_owner, txn_access_list,
                       bad_changes):
@@ -369,7 +372,7 @@ def main():
     except Exception as exc:
         report(exc)
         if opts.debug_mode:
-            traceback.print_exc(exc)
+            traceback.print_exc()
         sys.exit(1)
 
 

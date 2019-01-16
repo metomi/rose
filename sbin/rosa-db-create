@@ -30,4 +30,4 @@
 #     determine the list of database files to create.
 #     Does not override existing database files.
 #-------------------------------------------------------------------------------
-exec python2 -m rosie.db_create "$@"
+exec python3 -m rosie.db_create "$@"

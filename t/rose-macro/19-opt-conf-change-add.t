@@ -42,7 +42,7 @@ door_paint_job=boring
 __CONFIG__
 init_meta </dev/null
 init_macro add.py <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.

@@ -36,10 +36,10 @@ from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
 from rosie.suite_id import SuiteId, SuiteIdOverflowError, SuiteIdPrefixError
 import shutil
-from StringIO import StringIO
+from io import StringIO
 import sys
 from tempfile import mkdtemp, mkstemp
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 CREATE_INFO_CONFIG_COMMENT = """
@@ -85,7 +85,7 @@ class LocalCopyStatusError(Exception):
         super(LocalCopyStatusError, self).__init__(id_, status)
 
     def __str__(self):
-        data = (str(self.id_), self.id_.to_local_copy(), self.status)
+        data = (str(self.id_), self.id_.to_local_copy(), self.status.decode())
         return "%s: %s: local copy has uncommitted changes:\n%s" % data
 
 
@@ -259,7 +259,6 @@ class RosieVCClient(object):
         """
         if from_id is not None and (not prefix or from_id.prefix == prefix):
             return self._copy1(info_config, from_id)
-
         dir_ = self._get_work_dir()
         try:
             # Create a temporary suite in the file system
@@ -348,7 +347,7 @@ class RosieVCClient(object):
                                                           from_id.branch,
                                                           from_id.revision)
             out_data = self.popen("svn", "cat", from_info_url)[0]
-            from_config = rose.config.load(StringIO(out_data))
+            from_config = rose.config.load(StringIO(out_data.decode()))
 
         res_loc = ResourceLocator.default()
         older_config = None
@@ -569,11 +568,12 @@ def create(argv):
                     continue
                 sect, key = node_keys
                 value = node.value
-                sect = sect.translate(None, "=")
+                sect = sect.replace("=", "")
                 if key == "copy-mode" and value == "clear":
                     info_config.set([sect], "")
                 if key == "copy-mode" and value == "never":
                     info_config.unset([sect])
+
         info_config = _edit_info_config(opts, client, info_config)
     else:
         file_ = opts.info_file
@@ -592,7 +592,7 @@ def create(argv):
                 prefix = SuiteId.get_prefix_default()
             question = PROMPT_CREATE % prefix
         try:
-            response = raw_input(question)
+            response = input(question)
         except EOFError:
             sys.exit(1)
         if response != YES:
@@ -621,7 +621,7 @@ def _validate_info_config(opts, client, info_config):
             if opts.non_interactive:
                 sys.exit(1)
             try:
-                response = raw_input(PROMPT_FIX_INFO_CONFIG)
+                response = input(PROMPT_FIX_INFO_CONFIG)
             except EOFError:
                 sys.exit(1)
             if response != YES:
@@ -670,7 +670,7 @@ def delete(argv):
     for arg in args:
         if interactive_mode:
             try:
-                response = raw_input(prompt % arg)
+                response = input(prompt % arg)
             except EOFError:
                 ret_code = 1
                 continue

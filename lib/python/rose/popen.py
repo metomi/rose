@@ -21,11 +21,13 @@
 
 import os
 import re
+import io
 from rose.reporter import Event
 from rose.resource import ResourceLocator
 import shlex
 from subprocess import Popen, PIPE
 import sys
+import collections
 
 
 class RosePopenError(Exception):
@@ -69,7 +71,7 @@ class RosePopenEvent(Event):
             ret = RosePopener.list_to_shell_str(self.command)
         if isinstance(self.stdin, str):
             ret += " <<'__STDIN__'\n" + self.stdin + "\n'__STDIN__'"
-        elif isinstance(self.stdin, file):
+        elif isinstance(self.stdin, io.IOBase):
             try:
                 # FIXME: Is this safe?
                 pos = self.stdin.tell()
@@ -110,7 +112,7 @@ class RosePopener(object):
 
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
-        if callable(self.event_handler):
+        if isinstance(self.event_handler, collections.Callable):
             return self.event_handler(*args, **kwargs)
 
     def get_cmd(self, key, *args):
@@ -225,6 +227,8 @@ class RosePopener(object):
         """
         ret_code, stdout, stderr = self.run(*args, **kwargs)
         if ret_code:
+            if type(stderr) == bytes:
+                stderr = stderr.decode()
             raise RosePopenError(
                 args, ret_code, stdout, stderr, kwargs.get("stdin"))
         return stdout, stderr
@@ -281,9 +285,18 @@ if __name__ == "__main__":
             try:
                 rose_popen.run(name)
             except RosePopenError as exc:
-                ose = OSError(errno.ENOENT, os.strerror(errno.ENOENT), name)
-                self.assertEqual(str(ose), exc.stderr)
+                ose = FileNotFoundError(errno.ENOENT,
+                                        os.strerror(errno.ENOENT),
+                                        name)
+                try:
+                    self.assertEqual(str(ose), exc.stderr)
+                except AssertionError:
+                    # This is horrible, but refers to a bug in some versions of
+                    # Python 2.6 - https://bugs.python.org/issue32490
+                    err_msg = ("[Errno 2] No such file or directory:"
+                               " 'bad-command': 'bad-command'")
+                    self.assertEqual(err_msg, exc.stderr)
             else:
-                self.fail("should return OSError")
+                self.fail("should return FileNotFoundError")
 
     unittest.main()

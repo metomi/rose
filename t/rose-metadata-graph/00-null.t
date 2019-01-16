@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
-python2 -c "import pygraphviz" 2>/dev/null || \
+python3 -c "import pygraphviz" 2>/dev/null || \
     skip_all '"pygraphviz" not installed'
 
 init </dev/null

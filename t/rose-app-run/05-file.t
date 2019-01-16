@@ -79,9 +79,9 @@ TEST_KEY=$TEST_KEY_BASE-v1
 test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config
 DIR=$(cd ..; pwd)
-python2 -c "import re, sys
-print ''.join(sorted(sys.stdin.readlines(),
-                     key=re.compile('hello(\d+)').findall)).rstrip()" \
+python3 -c "import re, sys
+print(''.join(sorted(sys.stdin.readlines(),
+                     key=re.compile('hello(\d+)').findall)).rstrip())" \
     <"$TEST_KEY.out" >"$TEST_KEY.sorted.out"
 file_cmp "$TEST_KEY.sorted.out" "$TEST_KEY.sorted.out" <<__CONTENT__
 [INFO] export PATH=$PATH
@@ -210,9 +210,9 @@ TEST_KEY=$TEST_KEY_BASE--install-only
 test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config --install-only
 DIR=$(cd ..; pwd)
-python2 -c "import re, sys
-print ''.join(sorted(sys.stdin.readlines(),
-                     key=re.compile('hello(\d+)').findall)).rstrip()" \
+python3 -c "import re, sys
+print(''.join(sorted(sys.stdin.readlines(),
+                     key=re.compile('hello(\d+)').findall)).rstrip())" \
     <"$TEST_KEY.out" >"$TEST_KEY.sorted.out"
 file_cmp "$TEST_KEY.sorted.out" "$TEST_KEY.sorted.out" <<__CONTENT__
 [INFO] export PATH=$PATH

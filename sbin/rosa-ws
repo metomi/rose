@@ -32,4 +32,4 @@
 #
 #     This command is deprecated. Use "rosie disco" instead.
 #-------------------------------------------------------------------------------
-exec python2 -m rosie.ws "$@"
+exec python3 -m rosie.ws "$@"

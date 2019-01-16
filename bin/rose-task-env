@@ -140,4 +140,4 @@
 #     `env-script = eval $(rose task-env)`.
 #
 #-------------------------------------------------------------------------------
-exec python2 -m rose.task_env "$@"
+exec python3 -m rose.task_env "$@"

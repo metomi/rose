@@ -237,7 +237,7 @@ class CompulsoryChanger(rose.macro.MacroBase):
             if report.info != checker.WARNING_COMPULSORY_USER_IGNORED:
                 missing_sect_opts.append((report.section, report.option))
         missing_sect_opts.sort()
-        missing_sect_opts.sort(lambda x, y: cmp(x[1], y[1]))
+        missing_sect_opts.sort(key=lambda x: str(x[1]))
         for sect, opt in missing_sect_opts:
             if opt is None:
                 config.set([sect])
@@ -249,7 +249,7 @@ class CompulsoryChanger(rose.macro.MacroBase):
             if report.info != checker.WARNING_COMPULSORY_USER_IGNORED:
                 missing_sect_opts.append((report.section, report.option))
         missing_sect_opts.sort()
-        missing_sect_opts.sort(lambda x, y: cmp(x[1], y[1]))
+        missing_sect_opts.sort(key=lambda x: x[1])
         for sect, opt in missing_sect_opts:
             if opt is None:
                 continue

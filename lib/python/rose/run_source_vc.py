@@ -22,6 +22,17 @@
 import os
 from rose.popen import RosePopener
 import sys
+import _io
+
+
+def _write_safely(msg, handle):
+    # Handle different combinations of handle and message types
+    if isinstance(handle, _io.BufferedWriter) and isinstance(msg, str):
+        handle.write(msg.encode('UTF-8'))
+    elif isinstance(handle, _io.StringIO) and isinstance(msg, bytes):
+        handle.write(msg.decode())
+    else:
+        handle.write(msg)
 
 
 def write_source_vc_info(run_source_dir, output=None, popen=None):
@@ -42,7 +53,8 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
         handle = output
     else:
         handle = open(output, "wb")
-    handle.write("%s\n" % run_source_dir)
+    msg = "%s\n" % run_source_dir
+    _write_safely(msg, handle)
     environ = dict(os.environ)
     environ["LANG"] = "C"
     for vcs, args_list in [
@@ -60,10 +72,11 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
                 cmd = [vcs] + args
                 ret_code, out, _ = popen.run(*cmd, env=environ)
                 if out:
-                    handle.write("#" * 80 + "\n")
-                    handle.write(("# %s\n" % popen.list_to_shell_str(cmd)))
-                    handle.write("#" * 80 + "\n")
-                    handle.write(out)
+                    _write_safely(("#" * 80 + "\n"), handle)
+                    _write_safely(("# %s\n" % popen.list_to_shell_str(cmd)),
+                                  handle)
+                    _write_safely(("#" * 80 + "\n"), handle)
+                    _write_safely(out, handle)
                 if ret_code:  # If cmd fails once, it will likely fail again
                     break
         finally:

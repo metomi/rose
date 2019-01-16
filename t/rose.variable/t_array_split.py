@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
@@ -27,7 +27,7 @@ from rose.variable import array_split
 
 def main():
     """CLI."""
-    print array_split(*sys.argv[1:])
+    print(array_split(*sys.argv[1:]))
 
 
 if __name__ == "__main__":

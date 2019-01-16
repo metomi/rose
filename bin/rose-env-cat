@@ -48,4 +48,4 @@
 #         variable with the value of `STRING`, (which can be an empty string),
 #         instead of failing.
 #-------------------------------------------------------------------------------
-exec python2 -m rose.env_cat "$@"
+exec python3 -m rose.env_cat "$@"

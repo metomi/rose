@@ -97,9 +97,11 @@ def get_suite_name(event_handler=None):
         conf_dir = up_dir
 
 
-def prompt(action, suite_name):
+def prompt(action, suite_name, host):
     """Prompt user to confirm action for suite_name at host."""
-    return raw_input(PROMPT % (action, suite_name)).strip() in [YES]
+    if not host:
+        host = "localhost"
+    return input(PROMPT % (action, suite_name, host)).strip() in [YES]
 
 
 def main():

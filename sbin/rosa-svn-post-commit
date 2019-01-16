@@ -26,4 +26,4 @@
 # DESCRIPTION
 #     Update the Rosie discovery database for an SVN changeset.
 #-------------------------------------------------------------------------------
-exec python2 -m rosie.svn_post_commit "$@"
+exec python3 -m rosie.svn_post_commit "$@"

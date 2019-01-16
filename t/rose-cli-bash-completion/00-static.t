@@ -273,7 +273,7 @@ SEMI_MAJOR_AXIS_M=4.2e8
 __CONFIG__
 init_upgrade_meta jupiter_moons io europa ganymede callisto
 init_upgrade_macro jupiter_moons <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 

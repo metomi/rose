@@ -62,4 +62,4 @@
 #         A suite id to graph. If given, only the suites that are
 #         connected to this id by copy history will be graphed.
 #-------------------------------------------------------------------------------
-exec python2 -m rosie.graph "$@"
+exec python3 -m rosie.graph "$@"

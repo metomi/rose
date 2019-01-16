@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
@@ -126,9 +126,9 @@ class _Test(object):
         """Print ok or not ok."""
         self.test_num += 1
         if cond:
-            print "ok %d - %s" % (self.test_num, key)
+            print("ok %d - %s" % (self.test_num, key))
         else:
-            print "not ok %d - %s" % (self.test_num, key)
+            print("not ok %d - %s" % (self.test_num, key))
 
     def test(self, key, actual, expect):
         """Assert equal."""
@@ -136,7 +136,7 @@ class _Test(object):
 
     def run(self):
         """Run tests."""
-        print self.test_plan
+        print(self.test_plan)
 
         # Test good cases
         self.base_names_of["O"] = []

@@ -30,6 +30,7 @@ from rose.suite_engine_proc import SuiteEngineProcessor
 import shlex
 import shutil
 from uuid import uuid4
+import collections
 
 
 class RunConfigLoadEvent(Event):
@@ -124,7 +125,7 @@ class Runner(object):
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
 
-        if callable(self.event_handler):
+        if isinstance(self.event_handler, collections.Callable):
             return self.event_handler(*args, **kwargs)
 
     def config_load(self, opts):

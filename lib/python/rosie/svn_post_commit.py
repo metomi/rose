@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #
@@ -41,7 +41,7 @@ import shlex
 from smtplib import SMTP
 import socket
 import sqlalchemy as al
-from StringIO import StringIO
+from io import StringIO
 import sys
 from tempfile import TemporaryFile
 from time import mktime, strptime
@@ -147,7 +147,8 @@ class RosieSvnPostCommitHook(object):
         os.environ["TZ"] = "UTC"
         date_time_str = self._svnlook("date", "-r", revision, repos)
         date, dtime, _ = date_time_str.split(None, 2)
-        date = mktime(strptime(" ".join([date, dtime, "UTC"]), self.DATE_FMT))
+        date = mktime(strptime(b" ".join([date, dtime, b"UTC"]).decode(),
+                      self.DATE_FMT))
 
         # Detail of changes
         changeset_attribs = {
@@ -184,18 +185,18 @@ class RosieSvnPostCommitHook(object):
             # Column 5+: path
             path = changed_line[4:].strip()
             path_status = changed_line[0]
-            if path.endswith("/") and path_status == "_":
+            if path.endswith(b"/") and path_status == "_":
                 # Ignore property change on a directory
                 continue
             # Path must be (under) a valid suite branch, including the special
             # ROSIE suite
-            names = path.split("/", self.LEN_ID + 1)
+            names = path.split(b"/", self.LEN_ID + 1)
             if (len(names) < self.LEN_ID + 1 or (
-                    "".join(names[0:self.LEN_ID]) != "ROSIE" and
-                    any(name not in id_chars for name, id_chars in
+                    b"".join(names[0:self.LEN_ID]) != b"ROSIE" and
+                    any(name.decode() not in id_chars for name, id_chars in
                         zip(names, self.ID_CHARS_LIST)))):
                 continue
-            sid = "".join(names[0:self.LEN_ID])
+            sid = b"".join(names[0:self.LEN_ID])
             branch = names[self.LEN_ID]
             if branch:
                 # Change to a path in a suite branch
@@ -270,7 +271,9 @@ class RosieSvnPostCommitHook(object):
 
     def _load_info(self, repos, revision, sid, branch):
         """Load info file from branch_path in repos @revision."""
-        info_file_path = "%s/%s/%s" % ("/".join(sid), branch, self.INFO_FILE)
+        info_file_path = "%s/%s/%s" % ("/".join(str(sid)),
+                                       branch,
+                                       self.INFO_FILE)
         t_handle = TemporaryFile()
         try:
             t_handle.write(self._svnlook(
@@ -379,13 +382,14 @@ class RosieSvnPostCommitHook(object):
 
     def _update_info_db(self, dao, changeset_attribs, branch_attribs):
         """Update the suite info database for a suite branch."""
-        idx = changeset_attribs["prefix"] + "-" + branch_attribs["sid"]
+        idx = changeset_attribs["prefix"] + "-" +\
+            branch_attribs["sid"].decode()
         vc_attrs = {
             "idx": idx,
             "branch": branch_attribs["branch"],
             "revision": changeset_attribs["revision"]}
         for key in vc_attrs:
-            vc_attrs[key] = vc_attrs[key].decode("utf-8")
+            vc_attrs[key] = vc_attrs[key]
         # Latest table
         try:
             dao.delete(
@@ -409,7 +413,7 @@ class RosieSvnPostCommitHook(object):
             "date": changeset_attribs["date"]})
         for name in ["owner", "project", "title"]:
             cols[name] = branch_attribs[info_key].get_value([name])
-        if branch_attribs["from_path"] and vc_attrs["branch"] == u"trunk":
+        if branch_attribs["from_path"] and vc_attrs["branch"] == "trunk":
             from_names = branch_attribs["from_path"].split("/")[:self.LEN_ID]
             cols["from_idx"] = (
                 changeset_attribs["prefix"] + "-" + "".join(from_names))
@@ -442,11 +446,11 @@ class RosieSvnPostCommitHook(object):
         keys_str = " ".join(shlex.split(keys_str)).decode("utf-8")
         if keys_str:
             try:
-                dao.insert(META_TABLE_NAME, name=u"known_keys", value=keys_str)
+                dao.insert(META_TABLE_NAME, name="known_keys", value=keys_str)
             except al.exc.IntegrityError:
                 dao.update(
-                    META_TABLE_NAME, (u"name",),
-                    name=u"known_keys", value=keys_str)
+                    META_TABLE_NAME, ("name",),
+                    name="known_keys", value=keys_str)
 
 
 def main():
@@ -461,7 +465,7 @@ def main():
     except Exception as exc:
         report(exc)
         if opts.debug_mode:
-            traceback.print_exc(exc)
+            traceback.print_exc()
         sys.exit(1)
 
 

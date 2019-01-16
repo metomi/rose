@@ -31,6 +31,7 @@ from rose.suite_engine_proc import SuiteEngineProcessor, SuiteStillRunningError
 import sys
 import traceback
 from uuid import uuid4
+from functools import cmp_to_key
 
 
 class SuiteRunCleaner(object):
@@ -78,7 +79,8 @@ class SuiteRunCleaner(object):
             items = only_items
         items.sort()
         uuid_str = str(uuid4())
-        for auth, node in sorted(locs_conf.value.items(), self._auth_node_cmp):
+        for auth, node in sorted(locs_conf.value.items(),
+                                 key=cmp_to_key(self._auth_node_cmp)):
             locs = []
             roots = set([""])
             for item in items:
@@ -150,7 +152,7 @@ class SuiteRunCleaner(object):
     @staticmethod
     def _auth_node_cmp(item1, item2):
         """Compare (auth1, node1) and (auth2, node2)."""
-        ret = cmp(item1, item2)
+        ret = (item1 > item2) - (item1 < item2)
         if ret:
             if item1[0] == "localhost":
                 return -1
@@ -175,7 +177,7 @@ def main():
     for arg in args:
         if not opts.non_interactive:
             try:
-                answer = raw_input("Clean %s? y/n (default n) " % arg)
+                answer = input("Clean %s? y/n (default n) " % arg)
             except EOFError:
                 sys.exit(1)
             if answer not in ["Y", "y"]:
@@ -191,7 +193,7 @@ def main():
         ) as exc:
             report(exc)
             if opts.debug_mode:
-                traceback.print_exc(exc)
+                traceback.print_exc()
         else:
             n_done += 1
     sys.exit(len(args) - n_done)  # Return 0 if everything done

@@ -138,7 +138,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2 0.3
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -174,7 +174,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2 0.3
 init_macro test-app-upgrade << '__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -210,7 +210,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2 0.3
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -246,7 +246,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2 0.3
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -273,7 +273,7 @@ setup
 # No named metadata version for 0.3.
 init_meta test-app-upgrade 0.1 0.2
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 

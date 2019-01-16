@@ -38,12 +38,12 @@ CONFIG_DIR=$(cd ../config && pwd -P)
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUTPUT__
-Current directory: $CONFIG_DIR
 [U] Upgrade_apple-fig: changes: 2
     namelist:add_sect_only=None=None
         Added
     =meta=test-app-upgrade/fig
         Upgraded from apple to fig
+Current directory: $CONFIG_DIR
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

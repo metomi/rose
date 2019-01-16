@@ -151,7 +151,7 @@ class KGODatabase(object):
         self.statement_buffer = []
 
 
-class AnalysisTask(object):
+class AnalysisTask(object, metaclass=abc.ABCMeta):
     """Base class for an analysis task.
 
     All custom user tasks should inherit from this class and override
@@ -173,7 +173,6 @@ class AnalysisTask(object):
             used by the parent app (for spawning subprocesses).
 
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, parent_app, task_options):
         """
@@ -432,7 +431,7 @@ class RoseAnaApp(BuiltinApp):
                     os.path.basename(filename))[0]
                 try:
                     self.modules.add(__import__(module_name))
-                except ImportError:
+                except (ImportError, ModuleNotFoundError):
                     # Note: We intentionally don't re-raise the exception
                     # here, as we want to avoid a single mistake in a user
                     # supplied method bringing down the entire task

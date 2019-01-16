@@ -96,7 +96,7 @@ class ValueChecker(rose.macro.MacroBase):
         sect, key = self._get_section_option_from_id(var_id)
         saved_metadata = copy.deepcopy(metadata)
         saved_metadata.pop('id')
-        for meta_key in saved_metadata.keys():
+        for meta_key in list(saved_metadata.keys()):
             if meta_key not in self.META_PROPS:
                 saved_metadata.pop(meta_key)
         goodness_id = (value, tuple(sorted(saved_metadata.items())))
@@ -108,7 +108,7 @@ class ValueChecker(rose.macro.MacroBase):
             return
         variable = rose.variable.Variable(key, value, metadata)
         metadata = variable.metadata
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             text = self.WARNING_NOT_STRING.format(repr(value))
             self.bad_value_meta_map[goodness_id] = text
             self.add_report(sect, key, value, text)
@@ -124,7 +124,7 @@ class ValueChecker(rose.macro.MacroBase):
                     num_elements = 1
         val_list = [value]
         type_list = metadata.get(rose.META_PROP_TYPE, '')
-        if isinstance(type_list, basestring):
+        if isinstance(type_list, str):
             type_list = [type_list]
         if num_elements != 1:
             val_list = rose.variable.array_split(value)
@@ -160,7 +160,7 @@ class ValueChecker(rose.macro.MacroBase):
                     break
         elif rose.META_PROP_TYPE in metadata:
             meta_type = metadata[rose.META_PROP_TYPE]
-            if (num_elements == 1 and isinstance(meta_type, basestring)):
+            if (num_elements == 1 and isinstance(meta_type, str)):
                 # A standard, non array variable.
                 for val in val_list:
                     try:
@@ -172,7 +172,7 @@ class ValueChecker(rose.macro.MacroBase):
 
             else:
                 # The variable is an array or a derived type array.
-                if isinstance(meta_type, basestring):
+                if isinstance(meta_type, str):
                     type_list = [meta_type]
                 else:
                     type_list = meta_type

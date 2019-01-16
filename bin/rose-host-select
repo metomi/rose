@@ -91,4 +91,4 @@
 #        Set the timeout in seconds of SSH commands to hosts.
 #        (default=10.0)
 #-------------------------------------------------------------------------------
-exec python2 -m rose.host_select "$@"
+exec python3 -m rose.host_select "$@"

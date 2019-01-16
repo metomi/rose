@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
@@ -24,4 +24,4 @@ import sys
 import rose.variable
 
 if __name__ == "__main__":
-    print rose.variable.parse_trigger_expression(sys.argv[1])
+    print(rose.variable.parse_trigger_expression(sys.argv[1]))

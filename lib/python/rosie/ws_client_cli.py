@@ -153,7 +153,7 @@ def lookup(argv):
                 args, all_revs=int(opts.all_revs))
     except RosieWSClientError as exc:
         if opts.debug_mode:
-            traceback.print_exc(exc)
+            traceback.print_exc()
         sys.exit(str(exc))
     for data, url in data_and_url_list:
         _display_maps(opts, ws_client, data, url)
@@ -224,7 +224,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
 
     if opts.sort is None or opts.sort not in all_keys:
         opts.sort = "revision"
-    dict_rows.sort(lambda x, y: cmp(x[opts.sort], y[opts.sort]))
+    dict_rows.sort(key=lambda x: x[opts.sort])
     if opts.reverse:
         dict_rows.reverse()
 
@@ -245,9 +245,9 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
         out = opts.print_format
         for key, value in dict_row.items():
             if "%" + key in out:
-                out = unicode(out).replace(
-                    u"%" + unicode(key), unicode(value), 1)
-        out = unicode(out.replace("%%", "%").expandtabs().rstrip())
+                out = str(out).replace(
+                    "%" + str(key), str(value), 1)
+        out = str(out.replace("%%", "%").expandtabs().rstrip())
 
         report(SuiteEvent(out.expandtabs() + "\n"), prefix="",
                clip=terminal_cols)

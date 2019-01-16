@@ -75,6 +75,14 @@ class CylcProcessor(SuiteEngineProcessor):
                     "[hosts][localhost]work directory"]:
             out = self.popen("cylc", "get-global-config", "-i", key)[0]
             lines = out.splitlines()
+            try:
+                lines = lines.decode()
+            except AttributeError:
+                pass
+            try:
+                lines[0] = lines[0].decode()
+            except AttributeError:
+                pass
             if lines and lines[0] != expected:
                 raise SuiteEngineGlobalConfCompatError(
                     self.SCHEME, key, lines[0])
@@ -251,9 +259,9 @@ class CylcProcessor(SuiteEngineProcessor):
             user, host = (None, None)
             items.pop(0)
             if items:
-                user = items.pop(0).replace("*", " ")
+                user = items.pop(0).decode().replace("*", " ")
             if items:
-                host = items.pop(0).replace("*", " ")
+                host = items.pop(0).decode().replace("*", " ")
             if host in actual_hosts:
                 host = str(actual_hosts[host])
                 auth = self._parse_user_host(user=user, host=host)

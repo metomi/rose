@@ -20,7 +20,7 @@
 """A handler of Subversion locations."""
 
 import os
-from urlparse import urlparse
+from urllib.parse import urlparse
 import xml.parsers.expat
 
 

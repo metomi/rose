@@ -97,6 +97,7 @@ from rose.env import env_var_escape
 import shlex
 import sys
 from tempfile import NamedTemporaryFile, TemporaryFile
+from functools import cmp_to_key
 
 
 CHAR_ASSIGN = "="
@@ -165,8 +166,7 @@ class ConfigNode(object):
 
     """
 
-    __slots__ = ["STATE_NORMAL", "STATE_USER_IGNORED",
-                 "STATE_SYST_IGNORED", "value", "state", "comments"]
+    __slots__ = ["value", "state", "comments"]
 
     STATE_NORMAL = ""
     """The default state of a ConfigNode."""
@@ -1062,15 +1062,16 @@ class ConfigDumper(object):
                 target_dir = "."
             if not os.path.isdir(target_dir):
                 os.makedirs(target_dir)
-            handle = NamedTemporaryFile(prefix=os.path.basename(target),
+            handle = NamedTemporaryFile(mode='w',
+                                        prefix=os.path.basename(target),
                                         dir=target_dir, delete=False)
         blank = ""
         if root.comments:
             for comment in root.comments:
-                handle.write(self._comment_format(comment))
+                self._write_safely(handle, self._comment_format(comment))
             blank = "\n"
-        root_keys = root.value.keys()
-        root_keys.sort(sort_sections)
+        root_keys = list(root.value.keys())
+        root_keys.sort(key=cmp_to_key(sort_sections))
         root_option_keys = []
         section_keys = []
         for key in root_keys:
@@ -1079,7 +1080,7 @@ class ConfigDumper(object):
             else:
                 section_keys.append(key)
         if root_option_keys:
-            handle.write(blank)
+            self._write_safely(handle, blank)
             blank = "\n"
             if concat_mode:
                 handle.write(CHAR_SECTION_OPEN + CHAR_SECTION_CLOSE + "\n")
@@ -1088,17 +1089,18 @@ class ConfigDumper(object):
                     key, root.value[key], handle, env_escape_ok)
         for section_key in section_keys:
             section_node = root.value[section_key]
-            handle.write(blank)
+            self._write_safely(handle, blank)
             blank = "\n"
             for comment in section_node.comments:
-                handle.write(self._comment_format(comment))
-            handle.write("%(open)s%(state)s%(key)s%(close)s\n" % {
-                "open": CHAR_SECTION_OPEN,
-                "state": section_node.state,
-                "key": section_key,
-                "close": CHAR_SECTION_CLOSE})
-            keys = section_node.value.keys()
-            keys.sort(sort_option_items)
+                self._write_safely(handle, self._comment_format(comment))
+            self._write_safely(
+                handle, "%(open)s%(state)s%(key)s%(close)s\n" % {
+                    "open": CHAR_SECTION_OPEN,
+                    "state": section_node.state,
+                    "key": section_key,
+                    "close": CHAR_SECTION_CLOSE})
+            keys = list(section_node.value.keys())
+            keys.sort(key=cmp_to_key(sort_option_items))
             for key in keys:
                 value = section_node.value[key]
                 self._string_node_dump(key, value, handle, env_escape_ok)
@@ -1118,25 +1120,38 @@ class ConfigDumper(object):
 
         """
         state = node.state
-        values = node.value.split("\n")
+        try:
+            values = node.value.decode().split("\n")
+        except AttributeError:
+            values = node.value.split("\n")
         for comment in node.comments:
-            handle.write(self._comment_format(comment))
+            self._write_safely(handle, self._comment_format(comment))
         value0 = values.pop(0)
         if env_escape_ok:
             value0 = env_var_escape(value0)
-        handle.write(state + key + self.char_assign + value0)
-        handle.write("\n")
+        self._write_safely(handle, state + key + self.char_assign + value0)
+        self._write_safely(handle, "\n")
         if values:
             indent = " " * len(state + key)
             for value in values:
                 if env_escape_ok:
                     value = env_var_escape(value)
-                handle.write(indent + self.char_assign + value + "\n")
+                self._write_safely(handle,
+                                   indent + self.char_assign + value + "\n")
 
     @classmethod
     def _comment_format(cls, comment):
         """Return text representation of a configuration comment."""
         return "#%s\n" % (comment)
+
+    @staticmethod
+    def _write_safely(handle, text):
+        try:
+            handle.write(text)
+        except TypeError:
+            handle.write(text.encode('UTF-8'))
+        except UnicodeEncodeError:
+            handle.buffer.write(text.encode('UTF-8'))
 
 
 class ConfigLoader(object):
@@ -1324,6 +1339,7 @@ class ConfigLoader(object):
         # "ignore" flags. Rather than replicating the logic for parsing
         # ignore flags, it is actually easier to write the values in
         # "defines" to a file and pass it to the loader to parse it.
+        # source = TemporaryFile(mode='w', encoding='UTF-8')
         source = TemporaryFile()
         for define in defines:
             sect, key, value = self.RE_OPT_DEFINE.match(define).groups()
@@ -1331,9 +1347,9 @@ class ConfigLoader(object):
                 sect = ""
             if value is None:
                 value = ""
-            source.write("[%s]\n" % sect)
+            source.write(("[%s]\n" % sect).encode())
             if key is not None:
-                source.write("%s=%s\n" % (key, value))
+                source.write(("%s=%s\n" % (key, value)).encode())
         source.seek(0)
         node = self.load(source, node)
         return node
@@ -1378,6 +1394,8 @@ class ConfigLoader(object):
         # Note: "for line in handle:" hangs for sys.stdin
         while True:
             line = handle.readline()
+            if isinstance(line, bytes):
+                line = line.decode(errors='ignore')
             if not line:
                 break
             line_num += 1
@@ -1511,7 +1529,7 @@ class ConfigLoader(object):
                 file_name = self.UNKNOWN_NAME
         else:
             file_name = os.path.abspath(file_)
-            file_ = open(file_name, "r")
+            file_ = open(file_name, "rb")
         return (file_, file_name)
 
 
@@ -1582,18 +1600,18 @@ def sort_element(elem_1, elem_2):
     """Sort pieces of text, numerically if possible."""
     if elem_1.isdigit():
         if elem_2.isdigit():
-            return cmp(int(elem_1), int(elem_2))
+            return (int(elem_1) > int(elem_2)) - (int(elem_1) < int(elem_2))
         return -1
     elif elem_2.isdigit():
         return 1
-    return cmp(elem_1, elem_2)
+    return (elem_1 > elem_2) - (elem_1 < elem_2)
 
 
 def sort_settings(setting_1, setting_2):
     """Sort sections and options, by numeric element if possible."""
-    if (not isinstance(setting_1, basestring) or
-            not isinstance(setting_2, basestring)):
-        return cmp(setting_1, setting_2)
+    if (not isinstance(setting_1, str) or
+            not isinstance(setting_2, str)):
+        return (setting_1 > setting_2) - (setting_1 < setting_2)
     match_1 = REC_SETTING_ELEMENT.match(setting_1)
     match_2 = REC_SETTING_ELEMENT.match(setting_2)
     if match_1 and match_2:
@@ -1601,4 +1619,4 @@ def sort_settings(setting_1, setting_2):
         text_2, num_2 = match_2.groups()
         if text_1 == text_2:
             return sort_element(num_1, num_2)
-    return cmp(setting_1, setting_2)
+    return (setting_1 > setting_2) - (setting_1 < setting_2)

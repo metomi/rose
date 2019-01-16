@@ -29,16 +29,13 @@ __CONFIG__
 setup
 init_meta defence blaster lightsaber HEAD
 init_macro defence <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .jedi import *
+from jedi import *
 __MACRO__
-cat >$TEST_DIR/rose-meta/$category/__init__.py <<'__MODULE__'
-import versions
-__MODULE__
 cat >$TEST_DIR/rose-meta/$category/jedi.py <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 

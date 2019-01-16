@@ -31,6 +31,7 @@ from rose.resource import ResourceLocator
 from rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 from rosie.svn_post_commit import RosieSvnPostCommitHook
+import collections
 
 
 class RosieDatabaseCreateEvent(Event):
@@ -110,7 +111,7 @@ class RosieDatabaseInitiator(object):
 
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
-        if callable(self.event_handler):
+        if isinstance(self.event_handler, collections.Callable):
             return self.event_handler(*args, **kwargs)
 
     def create(self, db_url):

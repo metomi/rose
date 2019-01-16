@@ -131,10 +131,10 @@ run_pass "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] desoggy.SpongeDeSoggifier
-    # De-soggifies the sponge.
 [T] rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
+[T] desoggy.SpongeDeSoggifier
+    # De-soggifies the sponge.
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

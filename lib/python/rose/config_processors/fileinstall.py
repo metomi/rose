@@ -34,10 +34,11 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 from shutil import rmtree
 import sqlite3
-from StringIO import StringIO
+from io import StringIO
 import sys
 from tempfile import mkdtemp
-from urlparse import urlparse
+from urllib.parse import urlparse
+import collections
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
@@ -67,7 +68,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # Find all the "file:*" nodes.
         nodes = {}
         if item == self.SCHEME:
-            for key, node in conf_tree.node.value.items():
+            for key, node in list(conf_tree.node.value.items()):
                 if node.is_ignored() or not key.startswith(self.PREFIX):
                     continue
                 nodes[key] = node
@@ -187,7 +188,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Its real name.
         # * The checksums of its paths.
         # * Whether it can be considered unchanged.
-        for source in sources.values():
+        for source in list(sources.values()):
             try:
                 for pattern, scheme in config_schemes:
                     if fnmatch(source.name, pattern):
@@ -220,7 +221,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Target exists, but does not have a database entry.
         # * Target exists, but does not match settings in database.
         # * Target exists, but a source cannot be considered unchanged.
-        for target in targets.values():
+        for target in list(targets.values()):
             if target.real_name:
                 target.is_out_of_date = (
                     not os.path.islink(target.name) or
@@ -230,7 +231,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     os.path.islink(target.name) or
                     not os.path.isdir(target.name))
             else:
-                # See if target is modified compared with previous record
                 if (os.path.exists(target.name) and
                         not os.path.islink(target.name)):
                     for path, checksum, access_mode in get_checksum(
@@ -245,6 +245,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     prev_target.mode != target.mode or
                     len(prev_target.paths) != len(target.paths))
                 if not target.is_out_of_date:
+                    prev_target.paths.sort()
                     for prev_path, path in zip(
                             prev_target.paths, target.paths):
                         if prev_path != path:
@@ -332,7 +333,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 rmtree(work_dir)
 
         # Target checksum compare and report
-        for target in targets.values():
+        for target in list(targets.values()):
             if (not target.is_out_of_date or
                     target.loc_type == target.TYPE_TREE):
                 continue
@@ -400,12 +401,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         self.manager.fs_util.delete(target.name)
                     handle = open(target.name, "wb")
                 f_bsize = os.statvfs(source.cache).f_bsize
-                source_handle = open(source.cache)
+                source_handle = open(source.cache, 'rb')
                 while True:
                     bytes_ = source_handle.read(f_bsize)
                     if not bytes_:
                         break
-                    handle.write(bytes_)
+                    try:
+                        handle.write(bytes_.encode())
+                    except AttributeError:
+                        handle.write(bytes_)
                 source_handle.close()
                 if mod_bits is None:
                     mod_bits = os.stat(source.cache).st_mode
@@ -434,7 +438,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 class ChecksumError(Exception):
     """An exception raised on an unmatched checksum."""
     def __str__(self):
-        return ("Unmatched checksum, expected=%s, actual=%s" % tuple(self))
+        return ("Unmatched checksum, expected=%s, actual=%s" % self.args)
 
 
 class ChecksumEvent(Event):
@@ -558,11 +562,14 @@ class LocSubPath(object):
         self.checksum = checksum
         self.access_mode = access_mode
 
-    def __cmp__(self, other):
+    def __lt__(self, other):
         return (
-            cmp(self.name, other.name) or
-            cmp(self.checksum, other.checksum) or
-            cmp(self.access_mode, other.access_mode))
+            (self.name > other.name) -
+            (self.name < other.name) or
+            (self.checksum > other.checksum) -
+            (self.checksum < other.checksum) or
+            (self.access_mode > other.access_mode) -
+            (self.access_mode < other.access_mode))
 
     def __eq__(self, other):
         return (
@@ -653,7 +660,7 @@ class LocDAO(object):
                         for dep_loc in loc.dep_locs:
                             data["dep_names"]["args_list"].append(
                                 [loc.name, dep_loc.name])
-                for table, datum in data.items():
+                for table, datum in list(data.items()):
                     if datum["args_list"]:
                         conn.executemany(
                             ("INSERT OR REPLACE INTO %s VALUES(%s)" %
@@ -706,7 +713,6 @@ class LocDAO(object):
             if loc.dep_locs is None:
                 loc.dep_locs = []
             loc.dep_locs.append(self.select(dep_name))
-
         return loc
 
 
@@ -735,7 +741,7 @@ class PullableLocHandlersManager(SchemeHandlersManager):
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler with given arguments if possible."""
-        if callable(self.event_handler):
+        if isinstance(self.event_handler, collections.Callable):
             return self.event_handler(*args, **kwargs)
 
     def parse(self, loc, conf_tree):

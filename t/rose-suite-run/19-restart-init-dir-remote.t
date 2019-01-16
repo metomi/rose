@@ -32,7 +32,7 @@ T_HOST=$(rose host-select -q $T_HOST)
 SSH='ssh -oBatchMode=yes'
 function ssh_mkdtemp() {
     local T_HOST=$1
-    $SSH $T_HOST python2 - <<'__PYTHON__'
+    $SSH $T_HOST python3 - <<'__PYTHON__'
 import os
 from tempfile import mkdtemp
 print mkdtemp(dir=os.path.expanduser("~"), prefix="rose-")

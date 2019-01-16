@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-if ! python2 -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
+if ! python3 -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all '"cherrypy" or "sqlalchemy" not installed'
 fi
 tests 15

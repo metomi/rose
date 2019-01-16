@@ -54,4 +54,4 @@
 #     * `rose app-run`
 #     * `rose task-env`
 #-------------------------------------------------------------------------------
-exec python2 -m rose.task_run "$@"
+exec python3 -m rose.task_run "$@"

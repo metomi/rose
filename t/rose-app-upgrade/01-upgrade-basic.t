@@ -34,7 +34,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2 0.3 0.4 0.5 1.0
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -470,7 +470,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -543,7 +543,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -621,7 +621,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.5
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -701,7 +701,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade 0.1 0.2
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -741,19 +741,19 @@ run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade_0.1-0.2: changes: 8
-    env=B=5
-        Added with value '5'
     namelist:new=None=None
         Added
     namelist:new=spam=eggs
         Added with value 'eggs'
-    env=A=4
-        Removed
+    env=B=5
+        Added with value '5'
     namelist:something=foo=bar
         Removed
     namelist:qwerty=uiop=asdf
         Removed
     namelist:qwerty=None=
+        Removed
+    env=A=4
         Removed
     =meta=test-app-upgrade/0.2
         Upgraded from 0.1 to 0.2

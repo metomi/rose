@@ -17,4 +17,4 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-exec python2 $ROSE_HOME/lib/python/rose/c3.py "$@"
+exec python3 $ROSE_HOME/lib/python/rose/c3.py "$@"

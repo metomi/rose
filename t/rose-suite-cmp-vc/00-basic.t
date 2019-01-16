@@ -36,10 +36,10 @@ RUND="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${RUND}")"
 rose suite-run -C './source' --debug -q --name="${NAME}" -l
 
-TEST_KEY="${TEST_KEY_BASE}-0"
+TEST_KEY="${TEST_KEY_BASE}-run-pass"
 run_pass "${TEST_KEY}" rose suite-cmp-vc "${NAME}"
 
-TEST_KEY="${TEST_KEY_BASE}-1"
+TEST_KEY="${TEST_KEY_BASE}-run-fail"
 sed -i 's/meow/miaow/' './source/suite.rc'
 run_fail "${TEST_KEY}" rose suite-cmp-vc "${NAME}"
 #-------------------------------------------------------------------------------

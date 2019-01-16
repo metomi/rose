@@ -46,4 +46,4 @@
 #        every setting e.g. `compulsory=true`. If `=VALUE` is missing,
 #        the property will be set to a null string in each setting.
 #-------------------------------------------------------------------------------
-exec python2 -m rose.metadata_gen "$@"
+exec python3 -m rose.metadata_gen "$@"

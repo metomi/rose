@@ -29,47 +29,47 @@ else
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-0"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' ''
+run_pass "${TEST_KEY}" python3 -m 't_array_split' ''
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<'[]'
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-0-space"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' '    '
+run_pass "${TEST_KEY}" python3 -m 't_array_split' '    '
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<'[]'
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-1"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' 'foo'
+run_pass "${TEST_KEY}" python3 -m 't_array_split' 'foo'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<"['foo']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-1-space"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' '  foo     '
+run_pass "${TEST_KEY}" python3 -m 't_array_split' '  foo     '
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<"['foo']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-2-null"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' 'foo,'
+run_pass "${TEST_KEY}" python3 -m 't_array_split' 'foo,'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<"['foo', '']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-2-escape"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' 'foo\,bar, baz'
+run_pass "${TEST_KEY}" python3 -m 't_array_split' 'foo\,bar, baz'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<"['foo\\\\,bar', 'baz']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-2-escape-remove"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' 'foo\,bar, baz' ',' 1
+run_pass "${TEST_KEY}" python3 -m 't_array_split' 'foo\,bar, baz' ',' 1
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<"['foo,bar', 'baz']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-3"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' 'foo,bar,baz'
+run_pass "${TEST_KEY}" python3 -m 't_array_split' 'foo,bar,baz'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<"['foo', 'bar', 'baz']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-3-space"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' '  foo, bar, baz'
+run_pass "${TEST_KEY}" python3 -m 't_array_split' '  foo, bar, baz'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<"['foo', 'bar', 'baz']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-3-only-delim-is-comma"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' 'foo, bar, baz' ','
+run_pass "${TEST_KEY}" python3 -m 't_array_split' 'foo, bar, baz' ','
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<<"['foo', 'bar', 'baz']"
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-4-complex"
-run_pass "${TEST_KEY}" python2 -m 't_array_split' \
+run_pass "${TEST_KEY}" python3 -m 't_array_split' \
     " \"rose's fault\", \"no, it isn't\", 'yes, it is', whatever"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<'__OUT__'
 ['"rose\'s fault"', '"no, it isn\'t"', "'yes, it is'", 'whatever']

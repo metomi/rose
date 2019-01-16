@@ -46,7 +46,7 @@ class RsyncLocHandler(object):
         try:
             proc = self.manager.popen.run_bg(*cmd)
             end_time = time() + self.TIMEOUT
-            while proc.poll() is None and time < end_time:
+            while proc.poll() is None and time() < end_time:
                 sleep(0.1)
             if proc.poll():
                 proc.kill()
@@ -61,14 +61,14 @@ class RsyncLocHandler(object):
         # Attempt to obtain the checksum(s) via "ssh"
         host, path = loc.name.split(":", 1)
         cmd = self.manager.popen.get_cmd(
-            "ssh", host, "python2", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
+            "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
         temp_file = TemporaryFile()
-        temp_file.write(r"""
+        temp_file.write(b"""
 import os
 import sys
 path, str_blob, str_tree = sys.argv[1:]
 if os.path.isdir(path):
-    print str_tree
+    print(str_tree)
     os.chdir(path)
     for dirpath, dirnames, filenames in os.walk(path):
         good_dirnames = []
@@ -76,18 +76,18 @@ if os.path.isdir(path):
             if not dirname.startswith("."):
                 good_dirnames.append(dirname)
                 name = os.path.join(dirpath, dirname)
-                print "-", "-", "-", name
+                print("-", "-", "-", name)
         dirnames[:] = good_dirnames
         for filename in filenames:
             if filename.startswith("."):
                 continue
             name = os.path.join(dirpath, filename)
             stat = os.stat(name)
-            print oct(stat.st_mode), stat.st_mtime, stat.st_size, name
+            print(oct(stat.st_mode), stat.st_mtime, stat.st_size, name)
 elif os.path.isfile(path):
-    print str_blob
+    print(str_blob)
     stat = os.stat(path)
-    print oct(stat.st_mode), stat.st_mtime, stat.st_size, path
+    print(oct(stat.st_mode), stat.st_mtime, stat.st_size, path)
 """)
         temp_file.seek(0)
         out = self.manager.popen(*cmd, stdin=temp_file)[0]

@@ -21,7 +21,7 @@
 
 from difflib import unified_diff
 import os
-from StringIO import StringIO
+from io import StringIO
 import sys
 import traceback
 
@@ -30,6 +30,7 @@ from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.run_source_vc import write_source_vc_info
 from rose.suite_engine_proc import SuiteEngineProcessor
+import collections
 
 
 class SuiteVCComparator(object):
@@ -68,7 +69,7 @@ class SuiteVCComparator(object):
 
     def handle_event(self, *args, **kwargs):
         """Handle event."""
-        if callable(self.event_handler):
+        if isinstance(self.event_handler, collections.Callable):
             self.event_handler(*args, **kwargs)
 
 
@@ -89,7 +90,7 @@ def main():
         sys.exit(2)
     try:
         lines = suite_vc_cmp.cmp_source_vc_info(suite_name=suite_name)
-    except (StandardError, RosePopenError) as exc:
+    except (Exception, RosePopenError) as exc:
         event_handler(exc)
         traceback.print_exc()
         sys.exit(2)

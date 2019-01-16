@@ -40,4 +40,4 @@
 #        metadata e.g.`env=FOO` or `namelist:bar`. If specified, only
 #        this section will be checked.
 #-------------------------------------------------------------------------------
-exec python2 -m rose.metadata_check "$@"
+exec python3 -m rose.metadata_check "$@"

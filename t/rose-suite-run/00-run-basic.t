@@ -31,7 +31,7 @@ else
 fi
 
 get_host_fqdn() {
-    python2 - "$@" <<'__PYTHON__'
+    python3 - "$@" <<'__PYTHON__'
 import socket
 import sys
 sys.stdout.write(socket.gethostbyname_ex(sys.argv[1])[0] + "\n")
