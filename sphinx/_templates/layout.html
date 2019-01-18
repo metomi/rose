@@ -1,7 +1,8 @@
-{# This file serves to correct undesirable behaviour of the sphinx rtd theme. #}
+{# Amend aspects of the sphinx rtd theme. #}
 
 {% extends "!layout.html" %}
 
+{# Correct undesirable behaviour of the sphinx rtd theme. #}
 {% set css_files = css_files + [
     '_static/css/metomi.css',
     '_static/pygments.css']
@@ -10,3 +11,18 @@
     '_static/js/metomi.js',
     '_static/js/versioning.js']
 %}
+
+{# Change some default colours of the sphinx rtd theme. #}
+{% block footer %} {{ super() }}
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+{% endblock %}

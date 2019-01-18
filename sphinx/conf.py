@@ -126,6 +126,12 @@ html_show_copyright = True
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'rose-doc'
 
+# Basic styling: add a favicon & replace sidebar heading title with Rose logo.
+html_theme_options = {
+    'logo_only': True,
+}
+html_logo = 'img/rose-logo-crop.png'
+html_favicon = 'img/rose-favicon.png'
 
 # -- Options for LaTeX output ---------------------------------------------
 
