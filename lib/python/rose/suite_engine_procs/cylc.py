@@ -115,7 +115,7 @@ class CylcProcessor(SuiteEngineProcessor):
             self.popen.run_simple("cylc", "register", suite_name, suite_dir)
         f_desc, new_suite_rc_processed = mkstemp()
         os.close(f_desc)
-        command = ["cylc", "validate", "-v", "-o", new_suite_rc_processed]
+        command = ["cylc", "validate", "-o", new_suite_rc_processed]
         if debug_mode:
             command.append("--debug")
         if strict_mode:
