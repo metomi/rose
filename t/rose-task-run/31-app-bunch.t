@@ -189,7 +189,7 @@ TEST_KEY_PREFIX=argument_mode_izip_longest
 FILE=$LOG_DIR/$APP/01/job.out
 for VALUES in 1,a,9 2,,23 3,, 4,,; do
     IFS=, read -r -a ARGS <<< "$VALUES"
-    file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
+    file_grep "$TEST_KEY_PREFIX-RUN-${ARGS[0]:-}-${ARGS[1]:-}-${ARGS[2]:-}" \
         "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* echo arg1: ${ARGS[0]:-} - arg2: ${ARGS[1]:-} - arg3: ${ARGS[2]:-}"\
         "$FILE"
 done
