@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - python=2.7
-  - sphinx=1.7.9
+  - sphinx
   - requests
   - sphinx_rtd_theme
   - sphinxcontrib-httpdomain

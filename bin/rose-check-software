@@ -317,7 +317,7 @@ def docs(check=check):
                version_template='graphviz version ([^\s]+)', outfile=2),
         # TODO remove Sphinx version dependency
         # https://github.com/nyergler/hieroglyph/issues/148
-        check('py:sphinx', (1, 5, 3), (1, 8)),
+        check('py:sphinx', (1, 5, 3)),
         check('py:sphinx_rtd_theme', (0, 2, 4)),
         check('py:sphinxcontrib.httpdomain'),
         check('py:hieroglyph')
