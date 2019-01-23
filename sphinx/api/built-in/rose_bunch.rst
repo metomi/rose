@@ -127,6 +127,21 @@ sections of the :rose:file:`rose-app.conf` file, but
          must be the same as the number of entries in each of the args to
          be used.
 
+      .. rose:conf:: argument-mode=Default|izip|izip_longest|product
+
+         :default: Default
+
+         .. _documentation: https://docs.python.org/2.7/library/itertools.html
+
+         If set to a value other than ``Default`` then the values for each
+         bunch-arg will be manipulated. ``izip`` will shrink all values so
+         all have the same length as the shortest bunch-arg. ``izip_longest``
+         will pad out values for each bunch-arg with an empty string so that
+         each bunch-arg is the same length as the longest one. ``product``
+         will expand all provided bunch-args to create each possible
+         combination. See the ``itertools`` `documentation`_ in Python for
+         more information.
+
    .. rose:conf:: bunch-args
 
       This section is used to specify the various combinations of args to be
