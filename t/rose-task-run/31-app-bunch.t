@@ -23,6 +23,13 @@
 #-------------------------------------------------------------------------------
 tests 67
 #-------------------------------------------------------------------------------
+# Define some constant patterns
+FAIL_PATTERN="\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
+INFO_PATTERN="\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
+OK_PATTERN="\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
+PASS_PATTERN="\[PASS\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
+SKIP_PATTERN="\[SKIP\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
+#-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
@@ -46,7 +53,7 @@ FILE=$LOG_DIR/$APP/NN/job.out
 for ARGVALUE in 0 1 2 3; do
     TEST_KEY=$TEST_KEY_PREFIX-$ARGVALUE
     file_grep $TEST_KEY \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* $ARGVALUE: added to pool"\
+    "$INFO_PATTERN $ARGVALUE: added to pool"\
      $FILE
 done
 #-------------------------------------------------------------------------------
@@ -66,12 +73,12 @@ APP=bunch_fail
 TEST_KEY_PREFIX=abort-on-fail
 FILE=$LOG_DIR/$APP/NN/job.out
 file_grep_fail $TEST_KEY_PREFIX-no-run \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* Adding command 2 to pool: banana" $FILE
+    "$INFO_PATTERN Adding command 2 to pool: banana" $FILE
 file_grep $TEST_KEY_PREFIX-skip \
-    "\[SKIP\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*  2: banana" $FILE
+    "$SKIP_PATTERN  2: banana" $FILE
 FILE=$LOG_DIR/$APP/NN/job.err
 file_grep $TEST_KEY_PREFIX-record-error \
-    "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 1 # return-code=1" $FILE
+    "$FAIL_PATTERN 1 # return-code=1" $FILE
 #-------------------------------------------------------------------------------
 # Testing incremental mode
 #-------------------------------------------------------------------------------
@@ -83,28 +90,28 @@ TEST_KEY_PREFIX=incremental
 #-------------------------------------------------------------------------------
 FILE=$LOG_DIR/$APP/01/job.err
 file_grep $TEST_KEY_PREFIX-record-error \
-    "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 1 # return-code=1" $FILE
+    "$FAIL_PATTERN 1 # return-code=1" $FILE
 FILE=$LOG_DIR/$APP/01/job.out
 file_grep $TEST_KEY_PREFIX-ran-0 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 0: added to pool" $FILE
+    "$INFO_PATTERN 0: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-ran-1 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 1: added to pool" $FILE
+    "$INFO_PATTERN 1: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-ran-2 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 2: added to pool" $FILE
+    "$INFO_PATTERN 2: added to pool" $FILE
 #-------------------------------------------------------------------------------
 # Second run files
 #-------------------------------------------------------------------------------
 FILE=$LOG_DIR/$APP/02/job.out
 file_grep_fail $TEST_KEY_PREFIX-not-ran-0 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 0: added to pool" $FILE
+    "$INFO_PATTERN 0: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-skip-0 \
-    "\[PASS\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*  0" $FILE
+    "$PASS_PATTERN  0" $FILE
 file_grep $TEST_KEY_PREFIX-reran-1 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 1: added to pool" $FILE
+    "$INFO_PATTERN 1: added to pool" $FILE
 file_grep_fail $TEST_KEY_PREFIX-not-ran-2 \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 2: added to pool" $FILE
+    "$INFO_PATTERN 2: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-skip-2 \
-    "\[PASS\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*  2" $FILE
+    "$PASS_PATTERN  2" $FILE
 #-------------------------------------------------------------------------------
 # Testing works ok with double digit population size
 #-------------------------------------------------------------------------------
@@ -113,7 +120,7 @@ APP=bunch_bigpop
 TEST_KEY_PREFIX=big-pop
 FILE=$LOG_DIR/$APP/01/job.out
 for INSTANCE in $(seq 0 14); do
-    file_grep $TEST_KEY_PREFIX-ran-$INSTANCE "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*  $INSTANCE" $FILE
+    file_grep $TEST_KEY_PREFIX-ran-$INSTANCE "$OK_PATTERN  $INSTANCE" $FILE
 done
 #-------------------------------------------------------------------------------
 # Testing names works ok
@@ -123,7 +130,7 @@ APP=bunch_names
 TEST_KEY_PREFIX=names
 FILE=$LOG_DIR/$APP/01/job.out
 for KEY in foo bar baz qux; do
-    file_grep $TEST_KEY_PREFIX-ran-$KEY "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*  $KEY" $FILE
+    file_grep $TEST_KEY_PREFIX-ran-$KEY "$OK_PATTERN  $KEY" $FILE
 done
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -136,14 +143,14 @@ FILE_PREFIX=$LOG_DIR/$APP/01/job
 #-------------------------------------------------------------------------------
 # First run files
 #-------------------------------------------------------------------------------
-file_grep $TEST_KEY_PREFIX-ran-0 "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*  0" $FILE_PREFIX.out
-file_grep $TEST_KEY_PREFIX-fail-1 "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 1" $FILE_PREFIX.err
-file_grep $TEST_KEY_PREFIX-ran-2 "\[OK\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*  2" $FILE_PREFIX.out
+file_grep $TEST_KEY_PREFIX-ran-0 "$OK_PATTERN  0" $FILE_PREFIX.out
+file_grep $TEST_KEY_PREFIX-fail-1 "$FAIL_PATTERN 1" $FILE_PREFIX.err
+file_grep $TEST_KEY_PREFIX-ran-2 "$OK_PATTERN  2" $FILE_PREFIX.out
 #-------------------------------------------------------------------------------
 # Second run files
 #-------------------------------------------------------------------------------
 FILE=$LOG_DIR/$APP/02/job.err
-file_grep $TEST_KEY_PREFIX-fail-1 "\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* 1" $FILE
+file_grep $TEST_KEY_PREFIX-fail-1 "$FAIL_PATTERN 1" $FILE
 #-------------------------------------------------------------------------------
 FILE_DIR=$LOG_DIR/$APP/01/
 for KEY in $(seq 0 2); do
@@ -170,14 +177,14 @@ APP=bunch_argument_mode_izip
 #-------------------------------------------------------------------------------
 TEST_KEY_PREFIX=argument_mode_izip
 FILE=$LOG_DIR/$APP/01/job.out
-ARG1=1
+ARG1=2
 ARG2=a
 ARG3=9
 file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* echo arg1: $ARG1 - arg2: $ARG2 - arg3: $ARG3"\
+    "$INFO_PATTERN echo arg1: $ARG1 - arg2: $ARG2 - arg3: $ARG3" \
     "$FILE"
 file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* TOTAL: 1" \
+    "$INFO_PATTERN TOTAL: 1" \
     "$FILE"
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -189,12 +196,14 @@ TEST_KEY_PREFIX=argument_mode_izip_longest
 FILE=$LOG_DIR/$APP/01/job.out
 for VALUES in 1,a,9 2,,23 3,, 4,,; do
     IFS=, read -r -a ARGS <<< "$VALUES"
+    EXPECTED_LINE="echo arg1: ${ARGS[0]:-} - arg2: ${ARGS[1]:-}"
+    EXPECTED_LINE="$EXPECTED_LINE - arg3: ${ARGS[2]:-}"
     file_grep "$TEST_KEY_PREFIX-RUN-${ARGS[0]:-}-${ARGS[1]:-}-${ARGS[2]:-}" \
-        "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* echo arg1: ${ARGS[0]:-} - arg2: ${ARGS[1]:-} - arg3: ${ARGS[2]:-}"\
+        "$INFO_PATTERN $EXPECTED_LINE" \
         "$FILE"
 done
 file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* TOTAL: 4" \
+    "$INFO_PATTERN TOTAL: 4" \
     "$FILE"
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -208,13 +217,13 @@ for ARG1 in 1 2 3 4; do
     for ARG2 in a; do
         for ARG3 in 9 23; do
             file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
-                "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* echo arg1: $ARG1 - arg2: $ARG2 - arg3: $ARG3"\
+                "$INFO_PATTERN echo arg1: $ARG1 - arg2: $ARG2 - arg3: $ARG3"\
                 "$FILE"
         done
     done
 done
 file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
-    "\[INFO\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* TOTAL: 8" \
+    "$INFO_PATTERN TOTAL: 8" \
     "$FILE"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
