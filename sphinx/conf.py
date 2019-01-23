@@ -43,6 +43,7 @@ extensions = [
     'hieroglyph',
     'sphinxcontrib.httpdomain',
     # custom project extensions (located in ext/)
+    'hieroglyph_patch',  # https://github.com/nyergler/hieroglyph/issues/148
     'auto_cli_doc',
     'cylc_lang',
     'minicylc',

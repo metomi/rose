@@ -177,12 +177,10 @@ venv-install () {
     venv-destroy
     virtualenv --python=python2.7 "${VENV_PATH}"
     venv-activate
-    # TODO remove Sphinx version dependency
-    # https://github.com/nyergler/hieroglyph/issues/148
-    pip install 'sphinx==1.7.9'
-    pip install sphinx_rtd_theme
-    pip install sphinxcontrib-httpdomain
-    pip install hieroglyph
+    pip install 'sphinx'
+    pip install 'sphinx_rtd_theme'
+    pip install 'sphinxcontrib-httpdomain'
+    pip install 'hieroglyph'
 }
 
 venv-deactivate () {
