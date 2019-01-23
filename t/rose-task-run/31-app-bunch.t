@@ -178,7 +178,7 @@ APP=bunch_argument_mode_izip
 #-------------------------------------------------------------------------------
 TEST_KEY_PREFIX=argument_mode_izip
 FILE=$LOG_DIR/$APP/01/job.out
-ARG1=2
+ARG1=1
 ARG2=a
 ARG3=9
 file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
