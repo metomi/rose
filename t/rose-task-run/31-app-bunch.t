@@ -171,7 +171,8 @@ for KEY in $(seq 0 3); do
 done
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
-# Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP shortens all bunch-args
+# Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP shortens all bunch-args to the length
+# of the shortest bunch-arg
 #-------------------------------------------------------------------------------
 APP=bunch_argument_mode_izip
 #-------------------------------------------------------------------------------
@@ -188,13 +189,20 @@ file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
     "$FILE"
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
-# Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP_LONGEST lengthens all bunch-args
+# Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP_LONGEST lengthens all bunch-args to
+# the length of the longest bunch-arg, padding any which are shorter with
+# empty arguments
 #-------------------------------------------------------------------------------
 APP=bunch_argument_mode_izip_longest
 #-------------------------------------------------------------------------------
 TEST_KEY_PREFIX=argument_mode_izip_longest
 FILE=$LOG_DIR/$APP/01/job.out
+# Four permutations should exist from the izip_longest bunch run
+# There are three arguments in bunch-args of varying length, so the expected
+# arguments are in comma separated values to show what each bunch-args values
+# are expected to become, where no value indicates an empty string
 for VALUES in 1,a,9 2,,23 3,, 4,,; do
+    # Split VALUES on ',' into an ARGS array to account for empty strings
     IFS=, read -r -a ARGS <<< "$VALUES"
     EXPECTED_LINE="echo arg1: ${ARGS[0]:-} - arg2: ${ARGS[1]:-}"
     EXPECTED_LINE="$EXPECTED_LINE - arg3: ${ARGS[2]:-}"
@@ -207,12 +215,15 @@ file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
     "$FILE"
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
-# Testing ROSE_BUNCH_ARGUMENT_MODE_PRODUCT updates all bunch-args
+# Testing ROSE_BUNCH_ARGUMENT_MODE_PRODUCT updates all bunch-args to be all
+# possible permutations for the provided bunch-args
 #-------------------------------------------------------------------------------
 APP=bunch_argument_mode_product
 #-------------------------------------------------------------------------------
 TEST_KEY_PREFIX=argument_mode_product
 FILE=$LOG_DIR/$APP/01/job.out
+# Product mode creates all permutations, so loop over all permutations and
+# check that they exist in the log output
 for ARG1 in 1 2 3 4; do
     for ARG2 in a; do
         for ARG3 in 9 23; do
