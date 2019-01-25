@@ -11,7 +11,7 @@
 
 .. _Cylc: http://cylc.github.io/cylc/
 .. _Cylc User Guide: http://cylc.github.io/cylc/documentation.html#the-cylc-user-guide
-.. _Cylc Suite Design Guide: http://cylc.github.io/cylc/doc/suite-design-guide.pdf
+.. _Cylc Suite Design Guide: http://cylc.github.io/cylc/doc/built-sphinx/suite-design-guide/suite-design-guide-master.html
 .. _EmPy: http://www.alcyone.com/software/empy/
 .. _FCM: https://metomi.github.io/fcm/doc/
 .. _FCM User Guide: http://metomi.github.io/fcm/doc/user_guide/
