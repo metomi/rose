@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Copyright (C) 2012-2018 British Crown (Met Office) & Contributors.
+# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -16,4 +16,4 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-ROSE_VERSION="2018.11.0"
+ROSE_VERSION="2019.01.0"
