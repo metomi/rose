@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/metomi/rose.svg?branch=master)](https://travis-ci.org/metomi/rose)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ad021a33e7a64b398f792305dd901795)](https://www.codacy.com/app/metomi/rose?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=metomi/rose&amp;utm_campaign=Badge_Grade)
 [![DOI](https://zenodo.org/badge/6223866.svg)](https://zenodo.org/badge/latestdoi/6223866)
+[![codecov](https://codecov.io/gh/metomi/rose/branch/master/graph/badge.svg)](https://codecov.io/gh/metomi/rose)
 
 Rose: a framework for managing and running meteorological suites.
 
@@ -12,7 +13,7 @@ Rose: a framework for managing and running meteorological suites.
 
 ## Copyright and Terms of Use
 
-Copyright (C) 2012-2018 British Crown (Met Office) &amp; Contributors
+Copyright (C) 2012-2019 British Crown (Met Office) &amp; Contributors
 
 Rose is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

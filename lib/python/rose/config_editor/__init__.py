@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright (C) 2012-2018 British Crown (Met Office) & Contributors.
+# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -710,7 +710,7 @@ META_PROP_WIDGET_SUB_NS = "widget[rose-config-edit:sub-ns]"
 
 # Miscellaneous
 COPYRIGHT = (
-    "Copyright (C) 2012-2018 British Crown (Met Office) & Contributors.")
+    "Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.")
 HELP_FILE = "rose-rug-config-edit.html"
 LAUNCH_COMMAND = "rose config-edit"
 LAUNCH_COMMAND_CONFIG = "rose config-edit -C"
