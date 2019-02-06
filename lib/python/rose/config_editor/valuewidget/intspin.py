@@ -48,15 +48,11 @@ class IntSpinButtonValueWidget(gtk.HBox):
             int_value = int(value)
         except (TypeError, ValueError):
             int_value = 0
-            tooltip_text = self.WARNING_MESSAGE.format(value,
-                                                       int_value)
+            tooltip_text = self.WARNING_MESSAGE.format(value, int_value)
 
-        if int_value > self.upper or int_value < self.lower:
-            acceptable = False
-        else:
-            acceptable = True
+        value_ok = self.lower <= int_value <= self.upper
 
-        if acceptable:
+        if value_ok:
             entry = self.make_spinner(int_value)
             signal = 'changed'
         else:
@@ -72,7 +68,7 @@ class IntSpinButtonValueWidget(gtk.HBox):
         self.pack_start(entry, False, False, 0)
 
         self.warning_img = gtk.Image()
-        if not acceptable:
+        if not value_ok:
             self.warning_img = gtk.Image()
             self.warning_img.set_from_stock(gtk.STOCK_DIALOG_WARNING,
                                             gtk.ICON_SIZE_MENU)
@@ -98,22 +94,25 @@ class IntSpinButtonValueWidget(gtk.HBox):
         return spin_button
 
     def setter(self, widget):
-        """Callback on widget value change."""
-        if hasattr(widget, 'get_value_as_int'):
-            new_value = str(widget.get_value_as_int())
-            if new_value != self.value:
-                self.value = new_value
+        """Callback on widget value change.
+
+        Note: 1. SpinButton's `.get_value_as_int` method is not reliable. It
+        returns the spin value but not the value of the text that is typed in
+        manually. 2. Calling `self.set_value` method with a value that cannot
+        be cast into an `int` may cause `Segmentation fault` on some version of
+        GTK, so we'll only call `self.set_value` for a value that can be cast
+        into an in-range `int` value.
+        """
+        text = widget.get_text()
+        if text != self.value:
+            self.value = text
+            try:
+                value_ok = self.lower <= int(text) <= self.upper
+            except ValueError:
+                value_ok = False
+            if value_ok:
                 self.set_value(self.value)
-                widget.set_tooltip_text(None)
-        elif hasattr(widget, 'get_text'):
-            # Compat for very old GTK - if gtk.SpinButton does not exist
-            if widget.get_text() != self.value:
-                self.value = widget.get_text()
-                self.set_value(self.value)
-                if (not widget.get_text().isdigit() or
-                        int(widget.get_text()) > self.upper or
-                        int(widget.get_text()) < self.lower):
-                    self.warning_img.show()
-                else:
-                    self.warning_img.hide()
+                self.warning_img.hide()
+            else:
+                self.warning_img.show()
         return False
