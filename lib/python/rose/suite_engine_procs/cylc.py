@@ -166,13 +166,18 @@ class CylcProcessor(SuiteEngineProcessor):
         Return (dict): suite contact information.
         """
         try:
+            # Note: low level directory open ensures that the file system
+            # containing the contact file is synchronised, e.g. in an NFS
+            # environment.
+            os.close(os.open(
+                self.get_suite_dir(suite_name, ".service"), os.O_DIRECTORY))
             ret = {}
             for line in open(
                     self.get_suite_dir(suite_name, ".service", "contact")):
                 key, value = [item.strip() for item in line.split("=", 1)]
                 ret[key] = value
             return ret
-        except (IOError, ValueError):
+        except (IOError, OSError, ValueError):
             raise SuiteNotRunningError(suite_name)
 
     @classmethod
