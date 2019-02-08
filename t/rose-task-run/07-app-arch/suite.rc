@@ -28,8 +28,8 @@ archive[-PT12H] => archive
 RC=0
 rose task-run --debug || RC=$?
 """
-        retry delays=PT1S
         [[[job]]]
+            execution retry delays=PT1S
             execution time limit=PT1M
     [[archive]]
         post-script="""
@@ -41,7 +41,8 @@ sqlite3 .rose-arch.db 'SELECT * FROM sources;' | sort
 """
     [[ARCHIVE_BAD]]
         script = """rose task-run || true; RC=$?"""
-        retry delays=P0Y
+        [[[job]]]
+            execution retry delays=P0Y
 {% for bad_num in bad_nums %}
     [[archive_bad_{{bad_num}}]]
         inherit=ARCHIVE_BAD

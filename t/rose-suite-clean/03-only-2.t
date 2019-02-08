@@ -46,6 +46,7 @@ if [[ -n $JOB_HOST ]]; then
     JOB_HOST=$(rose host-select -q $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
+export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')

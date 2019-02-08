@@ -1,6 +1,8 @@
 #!jinja2
 [cylc]
     UTC mode = True
+    [[events]]
+        abort on stalled = True
 [scheduling]
     [[dependencies]]
         graph = """

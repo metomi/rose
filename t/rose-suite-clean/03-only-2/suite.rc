@@ -1,6 +1,8 @@
 #!jinja2
 [cylc]
     UTC mode = True
+    [[events]]
+        abort on stalled = True
 [scheduling]
     initial cycle point = 2000
     final cycle point = 2020

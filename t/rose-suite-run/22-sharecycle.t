@@ -23,6 +23,7 @@
 
 tests 2
 #-------------------------------------------------------------------------------
+export CYLC_CONF_PATH=
 export ROSE_CONF_PATH="${PWD}/conf"
 export ROOT_DIR_WORK="${PWD}"
 mkdir -p 'conf'
