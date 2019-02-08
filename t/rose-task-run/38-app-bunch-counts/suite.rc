@@ -10,4 +10,5 @@
 [runtime]
     [[cutoff]]
         script = rose task-run
-        retry delays = 2*PT1S
+        [[[job]]]
+            execution retry delays = 2*PT1S

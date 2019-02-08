@@ -32,6 +32,7 @@ if ! gfortran --version 1>/dev/null 2>&1; then
 fi
 #-------------------------------------------------------------------------------
 tests 5
+export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
 mkdir 'fast'

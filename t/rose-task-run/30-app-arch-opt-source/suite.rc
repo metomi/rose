@@ -29,4 +29,5 @@ if ((${CYLC_TASK_TRY_NUMBER} > 1)); then
 fi
 rose task-run --debug
 """
-        retry delays = PT0S
+        [[[job]]]
+            execution retry delays = PT0S

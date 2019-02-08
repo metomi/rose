@@ -34,6 +34,7 @@ run_suite() {
 tests 2
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=$PWD/conf
+export CYLC_CONF_PATH=
 export ROOT_DIR_WORK=$PWD/work
 
 mkdir 'conf' 'work'

@@ -48,6 +48,7 @@ else
 fi
 
 # Run suite, create lots of directories
+export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 export ROSE_TEST_ROOT_DIR="${PWD}/root.d"
 set -e
