@@ -19,8 +19,6 @@
 # -----------------------------------------------------------------------------
 """An extension for auto-documenting command line interfaces."""
 
-from __future__ import print_function
-
 from collections import OrderedDict
 import re
 from subprocess import PIPE, check_output, CalledProcessError

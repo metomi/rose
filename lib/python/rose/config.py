@@ -1598,13 +1598,14 @@ def load(source, root=None):
 
 def sort_element(elem_1, elem_2):
     """Sort pieces of text, numerically if possible."""
-    if elem_1.isdigit():
-        if elem_2.isdigit():
-            return (int(elem_1) > int(elem_2)) - (int(elem_1) < int(elem_2))
+    if elem_1.isdigit() and elem_2.isdigit():
+        return (int(elem_1) > int(elem_2)) - (int(elem_1) < int(elem_2))
+    elif elem_1.isdigit():
         return -1
     elif elem_2.isdigit():
         return 1
-    return (elem_1 > elem_2) - (elem_1 < elem_2)
+    else:
+        return (elem_1 > elem_2) - (elem_1 < elem_2)
 
 
 def sort_settings(setting_1, setting_2):

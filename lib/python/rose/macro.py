@@ -1635,7 +1635,7 @@ def main():
         try:
             _, config_map, meta_config = load_conf_from_file(
                 conf_dir, config_file_path)
-        except Exception: # as exc:
+        except Exception:
             # traceback.print_exc()
             sys.exit(1)
 
