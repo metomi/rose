@@ -20,7 +20,6 @@
 """Shared utilities for app/suite/task run."""
 
 import os
-import re
 from rose.config_processor import ConfigProcessorsManager
 from rose.config_tree import ConfigTreeLoader
 from rose.fs_util import FileSystemUtil

@@ -19,8 +19,7 @@
 # -----------------------------------------------------------------------------
 """Return a list of values matching a regular expression."""
 
-from rose.apps.rose_ana_v1 import DataLengthError, data_from_regexp
-import re
+from rose.apps.rose_ana_v1 import data_from_regexp
 
 REGEXPS = {
     'um_wallclock': r"Maximum Elapsed Wallclock Time:\s*(\S+)",
