@@ -19,9 +19,7 @@
 # -----------------------------------------------------------------------------
 """A multiprocessing runner of jobs with dependencies."""
 
-from multiprocessing import Pool
 from rose.reporter import Event
-from time import sleep
 
 
 class JobEvent(Event):
@@ -59,7 +57,7 @@ class JobManager(object):
         """Return the next job that requires processing."""
         while self.ready_jobs:
             job = self.ready_jobs.pop()
-            for dep_key, dep_job in job.pending_for.copy().items():
+            for dep_key, dep_job in list(job.pending_for.items()):
                 if dep_job.state == dep_job.ST_DONE:
                     job.pending_for.pop(dep_key)
                     if job.name in dep_job.needed_by:

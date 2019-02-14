@@ -142,7 +142,7 @@ def _get_hexdigest(algorithm, source):
         bytes_ = handle.read(f_bsize)
         if not bytes_:
             break
-        if type(bytes_) == bytes:
+        if isinstance(bytes_, bytes):
             hashobj.update(bytes_)
         else:
             hashobj.update(bytes_.encode(encoding='UTF-8'))

@@ -20,6 +20,7 @@
 # Test "rosa svn-post-commit": Rosie WS DB update.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 if ! python3 -c 'import sqlalchemy' 2>/dev/null; then
     skip_all '"sqlalchemy" not installed'

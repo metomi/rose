@@ -22,6 +22,7 @@
 # host).
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 
 JOB_HOSTS="$(rose config --default= 't' 'job-hosts-sharing-fs')"
 JOB_HOST_1="$(awk '{print $1}' <<<"${JOB_HOSTS}")"

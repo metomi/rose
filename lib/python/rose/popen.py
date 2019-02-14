@@ -227,7 +227,7 @@ class RosePopener(object):
         """
         ret_code, stdout, stderr = self.run(*args, **kwargs)
         if ret_code:
-            if type(stderr) == bytes:
+            if isinstance(stderr, bytes):
                 stderr = stderr.decode()
             raise RosePopenError(
                 args, ret_code, stdout, stderr, kwargs.get("stdin"))

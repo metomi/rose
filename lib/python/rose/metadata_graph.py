@@ -26,6 +26,8 @@ import tempfile
 
 import pygraphviz  # Graphviz and pygraphviz need to be installed.
 
+from functools import cmp_to_key
+
 import rose.config
 import rose.config_tree
 import rose.external
@@ -123,7 +125,7 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
             if not allowed_sections or (
                     allowed_sections and section in allowed_sections):
                 ids.append(id_)
-    ids.sort(rose.config.sort_settings)
+    ids.sort(key=cmp_to_key(rose.config.sort_settings))
     for id_ in ids:
         section, option = rose.macro.get_section_option_from_id(id_)
         node_attrs = get_node_state_attrs(

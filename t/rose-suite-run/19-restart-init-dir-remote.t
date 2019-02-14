@@ -21,6 +21,7 @@
 # on remote host.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 
 T_HOST=$(rose config --default= t job-host)
 T_HOST_RUN_ROOT=$(rose config --default= t job-host-run-root)

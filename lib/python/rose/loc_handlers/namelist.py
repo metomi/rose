@@ -71,21 +71,21 @@ class NamelistLocHandler(object):
         sections = self.parse(loc, conf_tree)
         if loc.name.endswith("(:)"):
             sections.sort(key=cmp_to_key(rose.config.sort_settings))
-        handle = open(loc.cache, "wb")
-        for section in sections:
-            section_value = conf_tree.node.get_value([section])
-            group = RE_NAMELIST_GROUP.match(section).group(1)
-            nlg = "&" + group + "\n"
-            for key, node in sorted(section_value.items()):
-                if node.state:
-                    continue
-                try:
-                    value = env_var_process(node.value)
-                except UnboundEnvironmentVariableError as exc:
-                    raise ConfigProcessError([section, key], node.value, exc)
-                nlg += "%s=%s,\n" % (key, value)
-            nlg += "/" + "\n"
-            handle.write(nlg.encode(encoding='UTF-8'))
-            self.manager.handle_event(NamelistEvent(nlg))
-
-        handle.close()
+        with open(loc.cache, "wb") as handle:
+            for section in sections:
+                section_value = conf_tree.node.get_value([section])
+                group = RE_NAMELIST_GROUP.match(section).group(1)
+                nlg = "&" + group + "\n"
+                for key, node in sorted(section_value.items()):
+                    if node.state:
+                        continue
+                    try:
+                        value = env_var_process(node.value)
+                    except UnboundEnvironmentVariableError as exc:
+                        raise ConfigProcessError([section, key],
+                                                 node.value,
+                                                 exc)
+                    nlg += "%s=%s,\n" % (key, value)
+                nlg += "/" + "\n"
+                handle.write(nlg.encode('UTF-8'))
+                self.manager.handle_event(NamelistEvent(nlg))

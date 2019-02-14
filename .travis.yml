@@ -51,8 +51,13 @@ jobs:
       - cp "${TRAVIS_BUILD_DIR}/.travis/sitecustomize.py" ./lib/python
       - export PYTHONPATH="${TRAVIS_BUILD_DIR}/.travis"
       - coverage run .travis/cover.py
-      - PYTHONPATH=$PYTHONPATH:lib/python/ pytest lib/python/rose/
+      # Pytest fails if there are no tests.
+      # - PYTHONPATH=$PYTHONPATH:lib/python/ pytest lib/python/rose/tests/*
       - rm ./lib/python/sitecustomize.py
     - name: "Documentation"
       script:
-        - rose make-docs --venv --dev --strict clean linkcheck doctest html slides latexpdf
+        - pip install 'sphinx'
+        - pip install 'sphinx_rtd_theme'
+        - pip install 'sphinxcontrib-httpdomain'
+        - pip install 'hieroglyph'
+        - rose make-docs --strict clean linkcheck doctest html slides latexpdf

@@ -20,7 +20,9 @@
 # Basic tests for "rosie graph".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header_extra
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 . $(dirname $0)/test_header
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 if ! python3 -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all '"cherrypy" or "sqlalchemy" not installed'

@@ -20,6 +20,7 @@
 # Test "rose suite-clean", --only= mode and a localhost root-dir{*} setting.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 
 run_suite() {
     set -e

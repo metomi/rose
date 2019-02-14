@@ -21,6 +21,7 @@
 # variable declarations to "suite.rc" do not get repeated.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 if ! cylc check-software 2>/dev/null | grep '^Python:EmPy.*([^-]*)$' >/dev/null; then
     skip_all '"EmPy" not installed'
 fi

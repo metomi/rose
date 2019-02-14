@@ -33,7 +33,7 @@
 function rose_readlink_canonicalize() { # "readlink -f" is GNU extension
     readlink -f $1 2>/dev/null || python3 - $1 <<'__PYTHON__'
 import os, sys
-print os.path.realpath(sys.argv[1])
+print(os.path.realpath(sys.argv[1]))
 __PYTHON__
 }
 

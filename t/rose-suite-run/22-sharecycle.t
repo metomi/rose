@@ -20,6 +20,7 @@
 # Test "rose suite-run" installation of share/cycle/ sub-directory.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 
 tests 2
 #-------------------------------------------------------------------------------

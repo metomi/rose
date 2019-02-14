@@ -20,6 +20,7 @@
 # Test "rose suite-run", with and without site/user configurations.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 # Run the suite.
 if [[ "${TEST_KEY_BASE}" == *conf ]]; then

@@ -262,13 +262,13 @@ class MacroBase(object):
         Example:
             >>> # Create a rose app.
             >>> with open('rose-app.conf', 'w+') as app_config:
-            ...     app_config.write('''
+            ...     _ = app_config.write('''
             ... [foo]
             ... bar=2
             ...     ''')
             >>> os.mkdir('meta')
             >>> with open('meta/rose-meta.conf', 'w+') as meta_config:
-            ...     meta_config.write('''
+            ...     _ = meta_config.write('''
             ... [foo=bar]
             ... values = 1,2,3
             ...     ''')
@@ -751,7 +751,7 @@ def load_meta_macro_modules(meta_files, module_prefix=None):
             rose.reporter.Reporter()(
                 MacroLoadError(meta_file, traceback.format_exc()))
         sys.path.pop(0)
-    modules.sort(key=lambda x: str(x))
+    modules.sort(key=str)
     return modules
 
 
@@ -1018,13 +1018,13 @@ def get_metadata_for_config_id(setting_id, meta_config):
     Example:
         >>> # Create a rose app.
         >>> with open('rose-app.conf', 'w+') as app_config:
-        ...     app_config.write('''
+        ...     _ = app_config.write('''
         ... [foo]
         ... bar=2
         ...     ''')
         >>> os.mkdir('meta')
         >>> with open('meta/rose-meta.conf', 'w+') as meta_config:
-        ...     meta_config.write('''
+        ...     _ = meta_config.write('''
         ... [foo=bar]
         ... values = 1,2,3
         ...     ''')

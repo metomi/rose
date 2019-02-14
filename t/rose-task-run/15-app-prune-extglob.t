@@ -20,6 +20,7 @@
 # Test "rose_prune" built-in application, with bash extglob, using not glob.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
 tests 2
 
 export ROSE_CONF_PATH=

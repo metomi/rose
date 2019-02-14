@@ -423,7 +423,7 @@ def get_rose_command_reference(command_name):
     # Obtain help text.
     cmd = [command_name, 'doc']
     try:
-        stdout = check_output(cmd)
+        stdout = check_output(cmd).decode()
     except CalledProcessError:
         sys.exit(1)
 
