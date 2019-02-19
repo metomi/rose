@@ -237,7 +237,8 @@ class SuiteRunner(Runner):
             now_str = None
             if not opts.install_only_mode and not opts.local_install_only_mode:
                 now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-                self._run_init_dir_log(opts, now_str)
+                self._run_init_dir_log(opts, suite_name, conf_tree,
+                                       now_str=now_str, locs_conf=locs_conf)
             self.fs_util.makedirs("log/suite")
 
             # Rose configuration and version logs
@@ -392,6 +393,7 @@ class SuiteRunner(Runner):
                 shcommand += ",now-str=%s" % now_str
             host_confs = [
                 "root-dir",
+                "root-dir{log}",
                 "root-dir{share}",
                 "root-dir{share/cycle}",
                 "root-dir{work}"]
@@ -514,7 +516,8 @@ class SuiteRunner(Runner):
         else:
             self.fs_util.makedirs(suite_dir_home)
 
-    def _run_init_dir_log(self, opts, now_str=None):
+    def _run_init_dir_log(self, opts, suite_name, conf_tree=None, now_str=None,
+                          r_opts=None, locs_conf=None):
         """Create the suite's log/ directory. Housekeep, archive old ones."""
         # Do nothing in log append mode if log directory already exists
         if opts.run_mode in ["reload", "restart"] and os.path.isdir("log"):
@@ -522,19 +525,25 @@ class SuiteRunner(Runner):
 
         # Log directory of this run
         if now_str is None:
-            now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+            if r_opts is None:
+                now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+            else:
+                now_str = r_opts.get("now-str")
         now_log = "log." + now_str
-        self.fs_util.makedirs(now_log)
+        # Create suite log dir, possibly symlinked to root-dir{log}.
+        self._run_init_dir_work(opts, suite_name, "log", conf_tree, r_opts,
+                                locs_conf, act_name=now_log)
         self.fs_util.symlink(now_log, "log")
         now_log_name = getattr(opts, "log_name", None)
         if now_log_name:
-            self.fs_util.symlink(now_log, "log." + now_log_name)
+            self.fs_util.symlink(now_log, "log-" + now_log_name)
 
-        # Keep log for this run and named logs
-        logs = set(glob("log.*") + ["log"])
-        for log in list(logs):
+        # Keep log for this run.
+        logs = set(glob("log.*"))
+        logs.remove(now_log)
+        # Keep named logs.
+        for log in set(glob("log-*")):
             if os.path.islink(log):
-                logs.remove(log)
                 log_link = os.readlink(log)
                 if log_link in logs:
                     logs.remove(log_link)
@@ -568,9 +577,19 @@ class SuiteRunner(Runner):
             for log in list(logs):
                 if os.path.isfile(log):
                     continue
-                log_tar_gz = log + ".tar.gz"
+                # Tar up local log dirs, or tar up symlinked log dirs in-place
+                # and make a local symlink to the archive.
+                if os.path.islink(log):
+                    actl_log = os.readlink(log)
+                    log_tar_gz = os.path.join(os.path.dirname(actl_log),
+                                              log + ".tar.gz")
+                    log_tar_gz_link = log + ".tar.gz"
+                else:
+                    actl_log = log
+                    log_tar_gz = log + ".tar.gz"
+                    log_tar_gz_link = None
                 try:
-                    self.popen.run_simple("tar", "-czf", log_tar_gz, log)
+                    self.popen.run_simple("tar", "-czf", log_tar_gz, actl_log)
                 except RosePopenError:
                     try:
                         self.fs_util.delete(log_tar_gz)
@@ -579,10 +598,13 @@ class SuiteRunner(Runner):
                     raise
                 else:
                     self.handle_event(SuiteLogArchiveEvent(log_tar_gz, log))
+                    if log_tar_gz_link is not None:
+                        os.symlink(log_tar_gz, log_tar_gz_link)
+                        self.fs_util.delete(actl_log)
                     self.fs_util.delete(log)
 
     def _run_init_dir_work(self, opts, suite_name, name, conf_tree=None,
-                           r_opts=None, locs_conf=None):
+                           r_opts=None, locs_conf=None, act_name=None):
         """Create a named suite's directory."""
         item_path = os.path.realpath(name)
         item_path_source = item_path
@@ -591,6 +613,9 @@ class SuiteRunner(Runner):
         if item_root is None:  # backward compat
             item_root = self._run_conf(
                 "root-dir-" + name, conf_tree=conf_tree, r_opts=r_opts)
+        if act_name is not None:
+            # For root-dir{log}, actual dir name is log.<timestamp>.
+            name = act_name
         if item_root:
             if locs_conf is not None:
                 locs_conf.set(["localhost", key], item_root)
@@ -649,7 +674,7 @@ class SuiteRunner(Runner):
             if os.path.exists(uuid_file):
                 self.handle_event("log/" + r_opts["uuid"] + "\n", level=0)
             else:
-                self._run_init_dir_log(opts, r_opts.get("now-str"))
+                self._run_init_dir_log(opts, suite_name, r_opts=r_opts)
         self.fs_util.makedirs("log/suite")
 
     def _get_cmd_rsync(self, target, excludes=None, includes=None):
