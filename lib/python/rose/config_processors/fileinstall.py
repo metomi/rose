@@ -38,7 +38,7 @@ from io import StringIO
 import sys
 from tempfile import mkdtemp
 from urllib.parse import urlparse
-import collections
+import collections.abc
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
@@ -564,12 +564,9 @@ class LocSubPath(object):
 
     def __lt__(self, other):
         return (
-            (self.name > other.name) -
-            (self.name < other.name) or
-            (self.checksum > other.checksum) -
-            (self.checksum < other.checksum) or
-            (self.access_mode > other.access_mode) -
-            (self.access_mode < other.access_mode))
+            (self.name, self.checksum, self.access_mode)
+            < (other.name, other.checksum, other.access_mode)
+        )
 
     def __eq__(self, other):
         return (
@@ -741,7 +738,7 @@ class PullableLocHandlersManager(SchemeHandlersManager):
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler with given arguments if possible."""
-        if isinstance(self.event_handler, collections.Callable):
+        if isinstance(self.event_handler, collections.abc.Callable):
             return self.event_handler(*args, **kwargs)
 
     def parse(self, loc, conf_tree):

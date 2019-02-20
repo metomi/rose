@@ -20,7 +20,7 @@
 # Test "rose suite-run", should work whether "suite.rc" is writable or not.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 tests 1
 export ROSE_CONF_PATH=
 mkdir -p src

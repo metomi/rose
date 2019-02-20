@@ -20,7 +20,7 @@
 # Test "rose suite-run" with "site=SITE" setting in site/user conf.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 
 N_TESTS=3
 tests "${N_TESTS}"

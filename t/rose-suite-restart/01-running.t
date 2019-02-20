@@ -20,7 +20,7 @@
 # Test "rose suite-restart" on suites that are still running.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 tests 4
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=

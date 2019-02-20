@@ -63,7 +63,7 @@ class RsyncLocHandler(object):
         cmd = self.manager.popen.get_cmd(
             "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
         temp_file = TemporaryFile()
-        temp_file.write(b"""
+        temp_file.write(br"""
 import os
 import sys
 path, str_blob, str_tree = sys.argv[1:]

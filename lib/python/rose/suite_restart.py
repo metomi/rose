@@ -28,7 +28,7 @@ from rose.popen import RosePopenError
 from rose.reporter import Reporter
 from rose.suite_control import get_suite_name, SuiteNotFoundError
 from rose.suite_engine_proc import SuiteEngineProcessor
-import collections
+import collections.abc
 
 
 class SuiteRestarter(object):
@@ -42,7 +42,7 @@ class SuiteRestarter(object):
 
     def handle_event(self, *args, **kwargs):
         """Handle event."""
-        if isinstance(self.event_handler, collections.Callable):
+        if isinstance(self.event_handler, collections.abc.Callable):
             self.event_handler(*args, **kwargs)
 
     def restart(

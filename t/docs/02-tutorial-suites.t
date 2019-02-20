@@ -25,7 +25,7 @@
 # `etc/tutorial/NAME` directory.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "skipped: TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "skipped: @TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 # Generate list of tests.
 TEST_KEYS=('')

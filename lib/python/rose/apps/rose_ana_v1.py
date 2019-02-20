@@ -36,7 +36,7 @@ from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 from rose.app_run import BuiltinApp
-import collections
+import collections.abc
 
 WARN = -1
 PASS = 0
@@ -467,7 +467,7 @@ class Analyse(object):
                 att_name = "run"
                 if hasattr(
                     obj, att_name) and isinstance(getattr(obj, att_name),
-                                                  collections.Callable):
+                                                  collections.abc.Callable):
                     doc_string = obj.__doc__
                     user_methods.append((comparison_name, obj_name, att_name,
                                         doc_string))

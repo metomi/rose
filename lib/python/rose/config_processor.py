@@ -25,7 +25,7 @@ from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
 from rose.scheme_handler import SchemeHandlersManager
 import sys
-import collections
+import collections.abc
 
 
 class UnknownContentError(Exception):
@@ -115,7 +115,7 @@ class ConfigProcessorsManager(SchemeHandlersManager):
 
     def handle_event(self, *args, **kwargs):
         """Report an event."""
-        if isinstance(self.event_handler, collections.Callable):
+        if isinstance(self.event_handler, collections.abc.Callable):
             return self.event_handler(*args, **kwargs)
 
     def process(self, conf_tree, item, orig_keys=None, orig_value=None,

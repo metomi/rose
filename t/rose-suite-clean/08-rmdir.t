@@ -20,7 +20,7 @@
 # Test "rose suite-clean", normal mode.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 
 mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"

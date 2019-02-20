@@ -20,7 +20,7 @@
 # Test "rose prune" removal of logs
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 tests 10

@@ -24,7 +24,7 @@
 #      host, as well as "gfortran" being installed and available there.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'
 fi

@@ -20,7 +20,7 @@
 # Test "rose suite-run", multiple imports.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 tests 5
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=

@@ -27,7 +27,7 @@ from rose.resource import ResourceLocator
 import shlex
 from subprocess import Popen, PIPE
 import sys
-import collections
+import collections.abc
 
 
 class RosePopenError(Exception):
@@ -75,7 +75,8 @@ class RosePopenEvent(Event):
             try:
                 # FIXME: Is this safe?
                 pos = self.stdin.tell()
-                ret += " <<'__STDIN__'\n" + self.stdin.read() + "\n'__STDIN__'"
+                ret += " <<'__STDIN__'\n" +\
+                       self.stdin.read().decode() + "\n'__STDIN__'"
                 self.stdin.seek(pos)
             except IOError:
                 pass
@@ -112,7 +113,7 @@ class RosePopener(object):
 
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
-        if isinstance(self.event_handler, collections.Callable):
+        if isinstance(self.event_handler, collections.abc.Callable):
             return self.event_handler(*args, **kwargs)
 
     def get_cmd(self, key, *args):

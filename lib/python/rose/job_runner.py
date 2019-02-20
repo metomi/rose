@@ -180,6 +180,7 @@ class JobRunner(object):
         When a job is completed, calls
             self.job_processor.post_process_job(job_proxy, *args)
         """
+        # @TODO reimplement this with asyncio
         while job_manager.has_ready_jobs():
             job = job_manager.get_job()
             if not job:
@@ -202,35 +203,6 @@ class JobRunner(object):
             raise JobRunnerNotCompletedError(dead_jobs)
 
     __call__ = run
-
-
-def _job_run(job_processor, job_proxy, *args):
-    """Helper for JobRunner."""
-    event_handler = JobRunnerWorkerEventHandler()
-    job_processor.set_event_handler(event_handler)
-    try:
-        job_processor.process_job(job_proxy, *args)
-    except Exception as exc:
-        job_proxy.exc = exc
-    finally:
-        job_processor.set_event_handler(None)
-    return (job_proxy, event_handler.events)
-
-
-class JobRunnerWorkerEventHandler(object):
-    """Temporary event handler in a function run by a pool worker process.
-
-    Events are collected in the self.events which is a list of tuples
-    representing the arguments the report method in an instance of
-    rose.reporter.Reporter.
-
-    """
-    def __init__(self):
-        self.events = []
-
-    def __call__(self, message, kind=None, level=None, prefix=None,
-                 clip=None):
-        self.events.append((message, kind, level, prefix, clip))
 
 
 class JobRunnerNotCompletedError(Exception):

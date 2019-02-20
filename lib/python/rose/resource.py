@@ -23,10 +23,10 @@ Convenient functions for searching resource files.
 
 import os
 from rose.config import ConfigLoader, ConfigNode
-import imp
 import inspect
 import string
 import sys
+from importlib.machinery import SourceFileLoader
 
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
@@ -224,7 +224,7 @@ def import_object(import_string, from_files, error_handler,
         for filename in module_files:
             sys.path.insert(0, os.path.dirname(filename))
             try:
-                module = imp.load_source(as_name, filename)
+                module = SourceFileLoader(as_name, filename).load_module()
             except (ImportError, ModuleNotFoundError) as exc:
                 error_handler(exc)
             sys.path.pop(0)

@@ -20,7 +20,7 @@
 # Test "rose date calendar swapping".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 tests 20
 #-------------------------------------------------------------------------------

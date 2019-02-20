@@ -25,7 +25,7 @@ import multiprocessing
 import sys
 
 import time
-import collections
+import collections.abc
 
 
 class Reporter(object):
@@ -136,7 +136,7 @@ class Reporter(object):
         arguments and return its result instead.
 
         """
-        if isinstance(self.event_handler, collections.Callable):
+        if isinstance(self.event_handler, collections.abc.Callable):
             return self.event_handler(message, kind, level, prefix, clip)
 
         if isinstance(message, Event):
@@ -164,10 +164,10 @@ class Reporter(object):
                 continue
             if prefix is None:
                 prefix = context.get_prefix(kind, level)
-            elif isinstance(prefix, collections.Callable):
+            elif isinstance(prefix, collections.abc.Callable):
                 prefix = prefix(kind, level)
             if msg is None:
-                if isinstance(message, collections.Callable):
+                if isinstance(message, collections.abc.Callable):
                     msg = message()
                 else:
                     msg = message
@@ -241,7 +241,7 @@ class ReporterContext(object):
                 return self._tty_colour_err(Reporter.PREFIX_WARN)
             else:
                 return self._tty_colour_err(Reporter.PREFIX_FAIL)
-        if isinstance(self.prefix, collections.Callable):
+        if isinstance(self.prefix, collections.abc.Callable):
             return self.prefix(kind, level)
         else:
             return self.prefix

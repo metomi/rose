@@ -20,7 +20,7 @@
 # Test "rose task-env --path=DIR1" followed by "rose task-run --path=DIR2".
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 tests 2
 
 export ROSE_CONF_PATH=

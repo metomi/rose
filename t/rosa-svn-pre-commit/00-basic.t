@@ -20,7 +20,7 @@
 # Basic tests for "rosa svn-pre-commit".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 export ROSE_CONF_PATH=
 mkdir conf
 cat >conf/rose.conf <<'__ROSE_CONF__'

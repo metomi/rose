@@ -20,7 +20,7 @@
 # Test "rose suite-clean", while the suite is running.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "TEST-DISABLED: Awaiting App upgrade to Python3"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 
 #-------------------------------------------------------------------------------
 tests 7

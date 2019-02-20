@@ -32,7 +32,7 @@ from socket import (
 import sys
 from time import sleep, time
 import traceback
-import collections
+import collections.abc
 
 
 class NoHostError(Exception):
@@ -188,7 +188,7 @@ class HostSelector(object):
 
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
-        if isinstance(self.event_handler, collections.Callable):
+        if isinstance(self.event_handler, collections.abc.Callable):
             return self.event_handler(*args, **kwargs)
 
     def expand(self, names=None, rank_method=None, thresholds=None):

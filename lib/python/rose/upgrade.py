@@ -572,8 +572,8 @@ class MacroUpgradeManager(object):
                 func = macro.upgrade
             res = {}
             if not opt_non_interactive:
-                arglist = inspect.getargspec(func).args
-                defaultlist = inspect.getargspec(func).defaults
+                arglist = inspect.getfullargspec(func).args
+                defaultlist = inspect.getfullargspec(func).defaults
                 optionals = {}
                 while defaultlist is not None and len(defaultlist) > 0:
                     if arglist[-1] not in ["self", "config", "meta_config"]:

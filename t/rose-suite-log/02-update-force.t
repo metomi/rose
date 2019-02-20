@@ -21,7 +21,7 @@
 # Test "rose suite-log -U --prune-remote", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-
+skip_all "@TODO App Waiting on Python3 port"
 #-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')

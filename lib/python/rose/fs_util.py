@@ -23,7 +23,7 @@ import errno
 import os
 from rose.reporter import Event
 import shutil
-import collections
+import collections.abc
 
 
 class FileSystemEvent(Event):
@@ -65,7 +65,7 @@ class FileSystemUtil(object):
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
 
-        if isinstance(self.event_handler, collections.Callable):
+        if isinstance(self.event_handler, collections.abc.Callable):
             return self.event_handler(*args, **kwargs)
 
     def chdir(self, path):

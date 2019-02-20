@@ -24,7 +24,7 @@ from glob import glob
 import inspect
 import os
 import sys
-import collections
+import collections.abc
 
 
 class SchemeHandlersManager(object):
@@ -125,5 +125,5 @@ class SchemeHandlersManager(object):
         for handler in self.handlers.values():
             can_handle = getattr(handler, self.can_handle, None)
             if (isinstance(can_handle,
-                           collections.Callable) and can_handle(item)):
+                           collections.abc.Callable) and can_handle(item)):
                 return handler
