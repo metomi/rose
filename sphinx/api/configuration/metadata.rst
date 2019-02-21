@@ -345,7 +345,7 @@ The metadata options for a configuration fall into four categories:
          Define a comma ``,`` separated list of permitted values of a setting
          (or an element in the setting if it is an array). This metadata
          overrides the :rose:conf:`type`, :rose:conf:`range` and
-         :rose:conf`pattern` metadata.
+         :rose:conf:`pattern` metadata.
 
          For example, :ref:`command-rose-config-edit` may use this list to
          determine the widget

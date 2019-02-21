@@ -60,7 +60,7 @@ Configuration
       .. rose:conf:: cycle-format{key}=format
 
          Specify a key to a format string for use in conjunction with a
-         :rose:conf`prune{item-root}=cycle:globs` setting. For example, we may
+         :rose:conf:`prune{item-root}=cycle:globs` setting. For example, we may
          have something like ``cycle-format{cycle_year}=CCYY`` and
          ``prune{share}=-P1Y:xmas-present-%(cycle_year)s/``. In Cylc, if the
          current cycle point is ``20151201T0000Z``, it will clear out the
