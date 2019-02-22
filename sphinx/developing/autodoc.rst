@@ -9,8 +9,8 @@ Writing Docstrings
 
 .. _Google Docstrings: https://google.github.io/styleguide/pyguide.html?showone=Comments#Comments
 .. _Numpy Docstrings: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
-.. _Napoleon Google Example: http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
-.. _Napoleon Numpy Example: http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html
+.. _Napoleon Google Example: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
+.. _Napoleon Numpy Example: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html
 
 This documentation uses ``sphinx.ext.napoleon`` to pre-process docstrings
 allowing them to be written in plain text as opposed to reStructuredText.
