@@ -343,7 +343,8 @@ class SpacedListValueWidget(gtk.HBox):
         if (self.last_selected_src is not None and
                 self.last_selected_src in self.entries):
             text = self.last_selected_src.get_text()
-            entry = self.entries.pop(self.last_selected_src)
+            entry = self.entries.pop(
+                self.entries.index(self.last_selected_src))
             self.last_selected_src = None
         else:
             text = self.entries[-1].get_text()
