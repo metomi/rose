@@ -20,9 +20,8 @@
 # Test "rose date".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
-tests 113
+tests 104
 #-------------------------------------------------------------------------------
 # Produce the correct format for the current date/time.
 TEST_KEY=$TEST_KEY_BASE-current-format
@@ -201,57 +200,33 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-# Parse an date time with some offsets.
-TEST_KEY=$TEST_KEY_BASE-offsets
-run_pass "$TEST_KEY" rose date -s 18h -s 6d "2012-12-24T06:00:00"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-2012-12-31T00:00:00
-__OUT__
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#-------------------------------------------------------------------------------
 # Parse an ISO date time with some offsets.
 TEST_KEY=$TEST_KEY_BASE-offsets-iso
-run_pass "$TEST_KEY" rose date --debug -s PT18H -s P6D "2012-12-24T06:00:00"
+run_pass "$TEST_KEY" rose date -s PT18H -s P6D "2012-12-24T06:00:00"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 2012-12-31T00:00:00
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Parse a Cylc date time with some negative offsets.
-TEST_KEY=$TEST_KEY_BASE-offsets-neg
-run_pass "$TEST_KEY" rose date -s -6h -s -12d12h "2013010618"
+TEST_KEY=$TEST_KEY_BASE-offsets-negative
+run_pass "$TEST_KEY" rose date -s=-PT6H -s=-P12DT12H "20130106T18"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-2012122500
+20121225T00
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#-------------------------------------------------------------------------------
-# Parse a Cylc date time with some negative offsets.
-TEST_KEY=$TEST_KEY_BASE-offsets-neg-iso
-run_pass "$TEST_KEY" rose date -s -PT6H -s -P12DT12H "2013010618"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-2012122500
-__OUT__
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#-------------------------------------------------------------------------------
-# Bad offsets.
-TEST_KEY=$TEST_KEY_BASE-offsets-bad
-run_fail "$TEST_KEY" rose date -s junk "2013010618"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] junk: bad offset value
-__ERR__
 #-------------------------------------------------------------------------------
 # Bad offsets, ISO 8601.
 TEST_KEY=$TEST_KEY_BASE-offsets-bad-iso
-run_fail "$TEST_KEY" rose date -s Pjunk "2013010618"
+run_fail "$TEST_KEY" rose date -s Pjunk "20130106T18"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] Pjunk: bad offset value
+Pjunk: bad offset value
 __ERR__
 #-------------------------------------------------------------------------------
 # Parse a Cylc date and print in ISO format.
 TEST_KEY=$TEST_KEY_BASE-format-iso
-run_pass "$TEST_KEY" rose date --print-format="%Y%m%dT%H%M%S" "2012122515"
+run_pass "$TEST_KEY" rose date --print-format="%Y%m%dT%H%M%S" "20121225T15"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 20121225T150000
 __OUT__
@@ -259,24 +234,24 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Print format with offset.
 TEST_KEY=$TEST_KEY_BASE-format-and-offset
-run_pass "$TEST_KEY" rose date --offset=-3h -f "%y%m" "2012112515" --debug
+run_pass "$TEST_KEY" rose date --offset=-PT3H -f "%y%m" "20121125T15" 
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 1211
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-# Test -c option.
+# Test -c option
 TEST_KEY=$TEST_KEY_BASE-c
-ROSE_TASK_CYCLE_TIME=2012122500 \
+ROSE_TASK_CYCLE_TIME=20121225T0000Z \
     run_pass "$TEST_KEY" rose date -c
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-2012122500
+20121225T0000Z
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-# Test -c option, ISO 8601.
-TEST_KEY=$TEST_KEY_BASE-c-iso8601
-ROSE_TASK_CYCLE_TIME=20121225T0000Z \
+# Test -c option with ISODATETIMEREF
+TEST_KEY=$TEST_KEY_BASE-c-isodatetimeref
+ISODATETIMEREF=20121225T0000Z \
     run_pass "$TEST_KEY" rose date -c
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 20121225T0000Z
@@ -295,6 +270,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 # Test -c option, ROSE_TASK_CYCLE_TIME not defined.
 TEST_KEY=$TEST_KEY_BASE-c-undef
 unset ROSE_TASK_CYCLE_TIME
+unset ISODATETIMEREF
 run_fail "$TEST_KEY" rose date -c
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
@@ -317,7 +293,7 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-as-total-PT1S-m
 run_pass "$TEST_KEY" rose date --as-total=m PT1S
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-0.0166666666667
+0.016666666666666666
 __OUT__
 #-------------------------------------------------------------------------------
 # Test rose date --as-total=h P832DT23H12M45S
@@ -334,7 +310,7 @@ run_fail "$TEST_KEY" rose date --as-total=y PT1M
 # Test rose date --as-total=FORMAT for negative durations
 TEST_KEY=$TEST_KEY_BASE-as-total-negative
 run_pass "$TEST_KEY" rose date --as-total=S \\-PT1M1S
-file_cmp "TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 -61.0
 __OUT__
 #-------------------------------------------------------------------------------
@@ -346,8 +322,12 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 #-------------------------------------------------------------------------------
 # Test rose date --as-total=FORMAT for use case 2 with an offset
-TEST_KEY=$TEST_KEY_BASE-as-total-between-dates-with-offset
-run_pass "$TEST_KEY" rose date 2000-01-01T00:00:00 --offset=PT1H 2000-01-01T01:00:00 --as-total=s
+if python3 -c "import argparse; argparse.ArgumentParser.parse_intermixed_args"
+  TEST_KEY=$TEST_KEY_BASE-as-total-between-dates-with-offset
+  run_pass "$TEST_KEY" rose date 2000-01-01T00:00:00 --offset=PT1H   2000-01-01T01:00:00 --as-total=s
+else
+  run_pass "$TEST_KEY" rose date 2000-01-01T00:00:00  2000-01-01T01:00:00 --as-total=s --offset=PT1H
+fi
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 0.0
 __OUT__

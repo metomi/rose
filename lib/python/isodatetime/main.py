@@ -285,7 +285,10 @@ def main():
         ],
     ]:
         arg_parser.add_argument(*o_args, **o_kwargs)
-    args = arg_parser.parse_args()
+    if hasattr(arg_parser, 'parse_intermixed_args'):
+        args = arg_parser.parse_intermixed_args()
+    else:
+        args = arg_parser.parse_args()
     if args.version_mode:
         print(__version__)
         return

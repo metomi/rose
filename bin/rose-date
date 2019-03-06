@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 #-------------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #
@@ -90,13 +90,16 @@
 #     The calendar mode is determined (in order) by:
 #
 #     1. The `--calendar=MODE` option.
-#     2. The `ROSE_CYCLING_MODE` environment variable.
+#     2. The `ROSE_CYCLING_MODE` or `ISODATETIMECALENDAR` environment variable.
+#           (ROSE_CYCLING_MODE over-rides if both set)
 #     3. Default to "gregorian".
 #
 # ENVIRONMENT VARIABLES
-#     ROSE_CYCLING_MODE=gregorian|360day|365day|366day
+#     In both cases the ROSE.* variable will over-ride the ISODATETIME variable
+#     if both are set to ensure legacy behaviour for Rose.
+#     ROSE_CYCLING_MODE/ISODATETIMECALENDAR=gregorian|360day|365day|366day
 #         Specify the calendar mode. 
-#     ROSE_TASK_CYCLE_TIME
+#     ROSE_TASK_CYCLE_TIME/ISODATETIMEREF
 #         Specify the current cycle time of a task in a suite. If the
 #         `--use-task-cycle-time` option is set, the value of this environment
 #         variable is used by the command as the reference time instead of the
@@ -120,11 +123,6 @@
 #     * `P2W` - 2 week offset (note no other units may be combined with weeks)
 #     * `P2DT5.5H` - 2 day, 5.5 hour offset
 #     * `-P2YT4S` - (negative) 2 year, 4 second offset
-#
-#     The following deprecated syntax is supported:
-#     `OFFSET` in the form `nU` where `U` is the unit (`w` for weeks, `d` for
-#     days, `h` for hours, `m` for minutes and `s` for seconds) and `n` is a
-#     positive or negative integer.
 #
 # PARSE FORMAT
 #     The format for parsing a date time point should be compatible with the
@@ -175,4 +173,31 @@
 #
 #     For example, for a duration `P57DT12H` - `y,m,d,h` -> `0,0,57,12`
 #-------------------------------------------------------------------------------
-exec python3 -m rose.date "$@"
+# -*- coding: utf-8 -*-
+import re
+import sys
+import os
+
+from isodatetime.main import main
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+
+    # Handle Legacy Rose-date -c functionality
+    if '-c' in sys.argv or '--use-task-cycle-time' in sys.argv:
+        if os.getenv('ROSE_TASK_CYCLE_TIME'):
+            os.environ['ISODATETIMEREF'] = os.getenv('ROSE_TASK_CYCLE_TIME')
+        elif not os.getenv('ISODATETIMEREF'):
+            sys.exit("[FAIL] [UNDEFINED ENVIRONMENT VARIABLE] ROSE_TASK_CYCLE_TIME")
+
+        for opt in ('-c', '--use-task-cycle-time'):
+            while opt in sys.argv:
+                sys.argv.remove(opt)
+        if 'ref' not in sys.argv:
+            sys.argv.append('ref')
+
+    # Convert ROSE_CYCLING_MODE to ISODATETIMECALENDAR
+    if os.getenv('ROSE_CYCLING_MODE'):
+        os.environ['ISODATETIMECALENDAR'] = os.getenv('ROSE_CYCLING_MODE')
+
+    sys.exit(main())

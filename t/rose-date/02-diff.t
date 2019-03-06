@@ -20,7 +20,6 @@
 # Test "rose date" usage 2, print durations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 tests 12
 #-------------------------------------------------------------------------------
@@ -52,7 +51,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'P32D'
 #-------------------------------------------------------------------------------
 # Offset 3
 TEST_KEY=$TEST_KEY_BASE-offset3
-run_pass "$TEST_KEY" rose date 0000 0000 -s -PT2M -f y,m,d,h,M,s
+run_pass "$TEST_KEY" rose date 0000 0000 -s=-PT2M -f y,m,d,h,M,s
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'0,0,0,0,2,0'
 #-------------------------------------------------------------------------------
 exit 0
