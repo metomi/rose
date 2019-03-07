@@ -185,12 +185,12 @@ class GPGAgentStore(object):
                 raise GPGAgentStoreConnectionError(
                     "no $GPG_TTY env var and failed to extrapolate it")
             tty = os.ttyname(sys.stdin.fileno())
-        gpg_socket.send("OPTION putenv=GPG_TTY=%s\n" % tty)
+        gpg_socket.send(b"OPTION putenv=GPG_TTY=%s\n" % tty)
         cls._socket_receive(gpg_socket, b"^OK\n")
         for name in ("TERM", "LANG", "LC_ALL", "DISPLAY"):
             val = os.environ.get(name)
             if val is not None:
-                gpg_socket.send("OPTION putenv=%s=%s\n" % (name, val))
+                gpg_socket.send(b"OPTION putenv=%s=%s\n" % (name, val))
                 cls._socket_receive(gpg_socket, b"^OK\n")
         return gpg_socket
 

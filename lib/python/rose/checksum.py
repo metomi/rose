@@ -124,7 +124,19 @@ def guess_checksum_algorithm(checksum):
 
 
 def _get_hexdigest(algorithm, source):
-    """Load content of source into an hash object, and return its hexdigest."""
+    """Load content of source into an hash object, and return its hexdigest.
+
+    Args:
+        algorithm (str):
+            Hash algorithm as namespaced in hashlib.
+        source (str, file):
+            The item to hexdigest, can be:
+
+            * Path to a file (``str``).
+            * Path to a directory (``str``).
+            * A file object ``readable`` in bytes mode.
+
+    """
     if hasattr(source, "read"):
         handle = source
     else:
@@ -142,10 +154,7 @@ def _get_hexdigest(algorithm, source):
         bytes_ = handle.read(f_bsize)
         if not bytes_:
             break
-        if isinstance(bytes_, bytes):
-            hashobj.update(bytes_)
-        else:
-            hashobj.update(bytes_.encode(encoding='UTF-8'))
+        hashobj.update(bytes_)
     handle.close()
 
     return hashobj.hexdigest()

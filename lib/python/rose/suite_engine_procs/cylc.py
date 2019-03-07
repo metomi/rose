@@ -76,10 +76,6 @@ class CylcProcessor(SuiteEngineProcessor):
             out = self.popen("cylc", "get-global-config", "-i", key)[0]
             lines = out.splitlines()
             try:
-                lines = lines.decode()
-            except AttributeError:
-                pass
-            try:
                 lines[0] = lines[0].decode()
             except AttributeError:
                 pass

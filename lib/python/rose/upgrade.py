@@ -778,6 +778,7 @@ def main():
                                                  upgrade_manager.get_name())
     new_config_map, changes_map = rose.macro.apply_macro_to_config_map(
         combined_config_map, meta_config, macro_function, macro_name=macro_id)
+    sys.stdout.flush()  # Ensure text from macro output before next fn
     has_changes = rose.macro.handle_transform(config_map, new_config_map,
                                               changes_map, macro_id,
                                               opts.conf_dir, opts.output_dir,

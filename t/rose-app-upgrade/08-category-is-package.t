@@ -31,7 +31,9 @@ init_meta defence blaster lightsaber HEAD
 init_macro defence <<'__MACRO__'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import sys
 
+sys.path.append('../rose-meta/defence/')
 from jedi import *
 __MACRO__
 cat >$TEST_DIR/rose-meta/$category/jedi.py <<'__MACRO__'
@@ -57,6 +59,8 @@ class UpgradeAddLightSaber(rose.upgrade.MacroUpgrade):
         self.add_setting(config, ['env', 'COLOUR'], 'blue')
         return config, self.reports
 __MACRO__
+
+
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-simple
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \

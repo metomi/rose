@@ -34,7 +34,7 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 from shutil import rmtree
 import sqlite3
-from io import StringIO
+from io import BytesIO
 import sys
 from tempfile import mkdtemp
 from urllib.parse import urlparse
@@ -375,7 +375,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     def _source_pull(self, source, conf_tree, work_dir):
         """Pulls a source to its cache in the work directory."""
         source.cache = os.path.join(
-            work_dir, get_checksum_func()(StringIO(source.name)))
+            work_dir,
+            # checksum the source name (not it's contents).
+            # this is a cheap solution to provide a unique, repeatable
+            # and filesystem safe identifier for a source name (which could be
+            # a url).
+            get_checksum_func()(BytesIO(source.name.encode())))
         return self.loc_handlers_manager.pull(source, conf_tree)
 
     def _target_install(self, target, conf_tree, work_dir):

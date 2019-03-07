@@ -1341,7 +1341,6 @@ class ConfigLoader(object):
         # "ignore" flags. Rather than replicating the logic for parsing
         # ignore flags, it is actually easier to write the values in
         # "defines" to a file and pass it to the loader to parse it.
-        # source = TemporaryFile(mode='w', encoding='UTF-8')
         source = TemporaryFile()
         for define in defines:
             sect, key, value = self.RE_OPT_DEFINE.match(define).groups()

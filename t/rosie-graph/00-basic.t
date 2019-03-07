@@ -20,7 +20,6 @@
 # Basic tests for "rosie graph".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header_extra
-skip_all "@TODO: Awaiting App upgrade to Python3"
 . $(dirname $0)/test_header
 skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------

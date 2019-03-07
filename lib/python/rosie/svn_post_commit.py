@@ -145,8 +145,8 @@ class RosieSvnPostCommitHook(object):
 
         # Date-time of this commit
         os.environ["TZ"] = "UTC"
-        date_time_str = self._svnlook("date", "-r", revision, repos)
-        date, dtime, _ = date_time_str.split(None, 2)
+        date_time = self._svnlook("date", "-r", revision, repos)
+        date, dtime, _ = date_time.split(None, 2)
         date = mktime(strptime(b" ".join([date, dtime, b"UTC"]).decode(),
                       self.DATE_FMT))
 
