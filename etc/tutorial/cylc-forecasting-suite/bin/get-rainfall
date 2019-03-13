@@ -25,8 +25,8 @@ import os
 import shutil
 import urllib.request
 
+import PIL.Image
 from mecator import get_offset, get_scale, coord_to_pos, pos_to_coord
-from png import Reader
 import util
 
 
@@ -136,21 +136,20 @@ def process_rainfall_data(filename, resolution, domain):
         list - A 2D matrix of rainfall data.
 
     """
-    reader = Reader(open(filename, 'rb'))
-    data = reader.read()
-
-    scale = get_scale(domain, data[0])
-    offset = get_offset(domain, scale)
-
     rainfall = Rainfall(domain, resolution)
 
-    for itt_x in range(0, data[0]):
-        for itt_y in range(0, data[1]):
-            lng, lat = pos_to_coord(itt_x,
-                                    itt_y * (2. / 3.),  # Counter aspect ratio.
-                                    offset, scale)
-            datum = data[2][itt_y][itt_x * 4:(itt_x * 4) + 4]
-            rainfall.add(lng, lat, tuple(datum))
+    image = PIL.Image.open(filename)
+    scale = get_scale(domain, image.width)
+    offset = get_offset(domain, scale)
+
+    for itt_x in range(image.width):
+        for itt_y in range(image.height):
+            lng, lat = pos_to_coord(
+                itt_x,
+                itt_y * (2. / 3.),  # Counter aspect ratio.
+                offset, scale)
+            rainfall.add(lng, lat, image.getpixel((itt_x, itt_y)))
+
     return rainfall.compute_bins()
 
 
