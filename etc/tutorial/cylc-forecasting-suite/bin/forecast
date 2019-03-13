@@ -177,7 +177,7 @@ def get_cyclepoint(offset_hours):
     return Popen(
         ['cylc', 'cyclepoint', '--offset-hours', str(int(offset_hours))],
         stdout=PIPE
-    ).communicate()[0].strip()
+    ).communicate()[0].strip().decode()
 
 
 def main(forecast_interval, forecast_itterations):

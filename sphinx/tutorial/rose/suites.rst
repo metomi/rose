@@ -305,9 +305,6 @@ See the :ref:`Cheat Sheet` for more information.
          rose tutorial rose-suite-tutorial ~/rose-tutorial/rose-suite-tutorial
          cd ~/rose-tutorial/rose-suite-tutorial
 
-      Set the initial and final cycle points as in :ref:`previous tutorials
-      <tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points>`.
-
    #. **Create A Rose Suite Configuration.**
 
       Create a blank :rose:file:`rose-suite.conf` file::

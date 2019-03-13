@@ -2,8 +2,12 @@
     UTC mode = True
 
 [scheduling]
-    # TODO - set the initial cycle point.
-    # TODO - set the final cycle point.
+    # Start the suite 7 hours before now ignoring minutes and seconds
+    # * previous(T-00) takes the current time ignoring minutes and seconds.
+    # * - PT7H subtracts 7 hours from the time.
+    initial cycle point = previous(T-00) - PT7H
+    # Stop the suite 6 hours after the initial cycle point.
+    final cycle point = +PT6H
     [[dependencies]]
         [[[PT3H]]]
             # Repeat every three hours starting at the initial cycle point.

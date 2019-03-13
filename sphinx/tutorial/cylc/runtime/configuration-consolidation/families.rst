@@ -239,10 +239,6 @@ Families and ``cylc graph``
          rose tutorial consolidation-tutorial
          cd ~/cylc-run/consolidation-tutorial
 
-      Set the intial and final cycle points as you did in the
-      :ref:`previous tutorial
-      <tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points>`.
-
    2. **Move Site-Wide Settings Into The** ``root`` **Family.**
 
       The following three environment variables are used by multiple tasks:
