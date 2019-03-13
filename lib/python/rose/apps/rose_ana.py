@@ -42,6 +42,14 @@ from rose.app_run import BuiltinApp
 from rose.env import env_var_process
 
 
+def timestamp():
+    """
+    Return the time in a more concise form then time.asctime
+
+    """
+    return time.strftime("%H:%M:%S")
+
+
 class KGODatabase(object):
     """
     KGO Database object, stores comparison information for rose_ana apps.
@@ -112,14 +120,14 @@ class KGODatabase(object):
         lock = open(lockfile, "w")
         fcntl.flock(lock, fcntl.LOCK_EX)
         if reporter is not None:
-            reporter("Acquired DB lock at: " + time.asctime())
+            reporter("Acquired DB lock at: " + timestamp())
         lock.write("{0}".format(os.getpid()))
         if reporter is not None:
             reporter("Writing to KGO Database...")
         yield
         fcntl.flock(lock, fcntl.LOCK_UN)
         if reporter is not None:
-            reporter("Released DB lock at: " + time.asctime())
+            reporter("Released DB lock at: " + timestamp())
         lock.close()
 
     def buffer_to_db(self, reporter=None):
@@ -253,6 +261,8 @@ class TaskRunner(threading.Thread):
         self.app.titlebar("Running task #{0}".format(self.index + 1),
                           reporter)
         reporter("Method: {0}".format(self.task.options["full_task_name"]))
+        reporter("Thread ID {0} starting at {1}"
+                 .format(self.ident, timestamp()))
 
         # Since the run_analysis method is out of rose's control in many
         # cases the safest thing to do is a blanket try/except; since we
@@ -263,7 +273,7 @@ class TaskRunner(threading.Thread):
             # we can now check whether it passed or failed.
             if self.task.passed:
                 msg = "Task #{0} passed at {1}".format(self.index + 1,
-                                                       time.asctime())
+                                                       timestamp())
                 self.summary_status.append(("{0} ({1})".format(
                     msg, self.task.options["full_task_name"]),
                     self.app._prefix_pass))
@@ -278,7 +288,7 @@ class TaskRunner(threading.Thread):
             else:
                 self.failures = 1
                 msg = "Task #{0} did not pass at {1}".format(self.index + 1,
-                                                             time.asctime())
+                                                             timestamp())
                 self.summary_status.append(("{0} ({1})".format(
                     msg, self.task.options["full_task_name"]),
                     self.app._prefix_fail))
@@ -289,7 +299,7 @@ class TaskRunner(threading.Thread):
             self.task_error = True
             self.failures = 1
             msg = ("Task #{0} encountered an error at {1}"
-                   .format(self.index + 1, time.asctime()))
+                   .format(self.index + 1, timestamp()))
             self.summary_status.append(("{0} ({1})".format(
                 msg, self.task.options["full_task_name"]),
                 self.app._prefix_fail))
@@ -400,7 +410,7 @@ class RoseAnaApp(BuiltinApp):
                     # we can now check whether it passed or failed.
                     if task.passed:
                         msg = "Task #{0} passed at {1}".format(itask + 1,
-                                                               time.asctime())
+                                                               timestamp())
                         summary_status.append(("{0} ({1})".format(
                             msg, task.options["full_task_name"]),
                             self._prefix_pass))
@@ -415,7 +425,7 @@ class RoseAnaApp(BuiltinApp):
                     else:
                         number_of_failures += 1
                         msg = ("Task #{0} did not pass at {1}"
-                               .format(itask + 1, time.asctime()))
+                               .format(itask + 1, timestamp()))
                         summary_status.append(("{0} ({1})".format(
                             msg, task.options["full_task_name"]),
                             self._prefix_fail))
@@ -427,7 +437,7 @@ class RoseAnaApp(BuiltinApp):
                     task_error = True
                     number_of_failures += 1
                     msg = ("Task #{0} encountered an error at "
-                           .format(itask + 1, time.asctime()))
+                           .format(itask + 1, timestamp()))
                     summary_status.append(("{0} ({1})".format(
                         msg, task.options["full_task_name"]),
                         self._prefix_fail))
@@ -455,7 +465,7 @@ class RoseAnaApp(BuiltinApp):
                 if threading.active_count() < n_threads:
                     self.reporter(
                         "Starting thread for task {0} at {1}"
-                        .format(itask + 1, time.asctime()))
+                        .format(itask + 1, timestamp()))
                     threads[itask].start()
                     itask += 1
 
