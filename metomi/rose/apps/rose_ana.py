@@ -42,6 +42,14 @@ from metomi.rose.app_run import BuiltinApp
 from metomi.rose.env import env_var_process
 
 
+def timestamp():
+    """
+    Return the time in a more concise form then time.asctime
+
+    """
+    return time.strftime("%H:%M:%S")
+
+
 class KGODatabase(object):
     """
     KGO Database object, stores comparison information for metomi.rose_ana
@@ -113,14 +121,14 @@ class KGODatabase(object):
         lock = open(lockfile, "w")
         fcntl.flock(lock, fcntl.LOCK_EX)
         if reporter is not None:
-            reporter("Acquired DB lock at: " + time.asctime())
+            reporter("Acquired DB lock at: " + timestamp())
         lock.write("{0}".format(os.getpid()))
         if reporter is not None:
             reporter("Writing to KGO Database...")
         yield
         fcntl.flock(lock, fcntl.LOCK_UN)
         if reporter is not None:
-            reporter("Released DB lock at: " + time.asctime())
+            reporter("Released DB lock at: " + timestamp())
         lock.close()
 
     def buffer_to_db(self, reporter=None):
@@ -243,6 +251,7 @@ class TaskRunner(threading.Thread):
         # Create a temporary handler for the reporter class
         reporter = Reporter(self.app.opts.verbosity -
                             self.app.opts.quietness)
+
         def handler(message, kind, level, prefix, clip):
             self.reporter_args.append((message, kind, level, prefix, clip))
         reporter.event_handler = handler
@@ -252,6 +261,8 @@ class TaskRunner(threading.Thread):
         self.app.titlebar("Running task #{0}".format(self.index + 1),
                           reporter)
         reporter("Method: {0}".format(self.task.options["full_task_name"]))
+        reporter("Thread ID {0} starting at {1}"
+                 .format(self.ident, timestamp()))
 
         # Since the run_analysis method is out of rose's control in many
         # cases the safest thing to do is a blanket try/except; since we
@@ -261,7 +272,8 @@ class TaskRunner(threading.Thread):
             # In the case that the task didn't raise any exception,
             # we can now check whether it passed or failed.
             if self.task.passed:
-                msg = "Task #{0} passed".format(self.index + 1)
+                msg = "Task #{0} passed at {1}".format(self.index + 1,
+                                                       timestamp())
                 self.summary_status.append(("{0} ({1})".format(
                     msg, self.task.options["full_task_name"]),
                     self.app._prefix_pass))
@@ -275,18 +287,19 @@ class TaskRunner(threading.Thread):
                 reporter(msg, prefix=self.app._prefix_skip)
             else:
                 self.failures = 1
-                msg = "Task #{0} did not pass".format(self.index + 1)
+                msg = "Task #{0} did not pass at {1}".format(self.index + 1,
+                                                             timestamp())
                 self.summary_status.append(("{0} ({1})".format(
                     msg, self.task.options["full_task_name"]),
                     self.app._prefix_fail))
                 reporter(msg, prefix=self.app._prefix_fail)
-
         except Exception:
             # If an exception was raised, print a traceback and treat it
             # as a failure.
             self.task_error = True
             self.failures = 1
-            msg = "Task #{0} encountered an error".format(self.index + 1)
+            msg = ("Task #{0} encountered an error at {1}"
+                   .format(self.index + 1, timestamp()))
             self.summary_status.append(("{0} ({1})".format(
                 msg, self.task.options["full_task_name"]),
                 self.app._prefix_fail))
@@ -369,35 +382,115 @@ class RoseAnaApp(BuiltinApp):
         self._load_analysis_methods()
         self._load_tasks()
 
-        # Create threading objects for each comparison task
-        threads = []
-        for itask, task in enumerate(self.analysis_tasks):
-            threads.append(TaskRunner(self, itask, task))
+        # Get the number of desired threads from the ana config (if set).
+        # If this is not set or set to 1 then fall back to the old behaviour
+        # and don't use threads at all
+        n_threads = int(self.ana_config.get("threads", 1))
 
-        # Start the threads, ensuring no more than NPROC are running at once
-        # (this could be made into a user-settable option later)
-        NPROC = 4
-        itask = 0
-        while itask < len(threads):
-            if threading.active_count() < NPROC:
-                threads[itask].start()
-                itask += 1
+        if n_threads == 1:
+            self.reporter("Running in SERIAL mode")
+            # Single threaded case - run the tasks in serial
+            number_of_failures = 0
+            number_of_skips = 0
+            task_error = False
+            summary_status = []
+            for itask, task in enumerate(self.analysis_tasks):
+                # Report the name of the task and a banner line to aid
+                # readability
+                self.titlebar("Running task #{0}".format(itask + 1))
+                self.reporter(
+                    "Method: {0}".format(task.options["full_task_name"]))
 
-        # Gather up the results
-        number_of_failures = 0
-        number_of_skips = 0
-        task_error = False
-        summary_status = []
-        for thread in threads:
-            # If any threads haven't finished yet make sure to wait
-            thread.join()
-            number_of_failures += thread.failures
-            number_of_skips += thread.skips
-            task_error = (task_error or thread.task_error)
-            summary_status += thread.summary_status
-            # And print the output via the main reporter
-            for args in thread.reporter_args:
-                self.reporter(*args)
+                # Since the run_analysis method is out of rose's control in
+                # many cases the safest thing to do is a blanket try/except;
+                # since we have no way of knowing what exceptions might be
+                # raised.
+                try:
+                    task.run_analysis()
+                    # In the case that the task didn't raise any exception,
+                    # we can now check whether it passed or failed.
+                    if task.passed:
+                        msg = "Task #{0} passed at {1}".format(itask + 1,
+                                                               timestamp())
+                        summary_status.append(("{0} ({1})".format(
+                            msg, task.options["full_task_name"]),
+                            self._prefix_pass))
+                        self.reporter(msg, prefix=self._prefix_pass)
+                    elif task.skipped:
+                        number_of_skips += 1
+                        msg = "Task #{0} skipped by method".format(itask + 1)
+                        summary_status.append(("{0} ({1})".format(
+                            msg, task.options["full_task_name"]),
+                            self._prefix_skip))
+                        self.reporter(msg, prefix=self._prefix_skip)
+                    else:
+                        number_of_failures += 1
+                        msg = ("Task #{0} did not pass at {1}"
+                               .format(itask + 1, timestamp()))
+                        summary_status.append(("{0} ({1})".format(
+                            msg, task.options["full_task_name"]),
+                            self._prefix_fail))
+                        self.reporter(msg, prefix=self._prefix_fail)
+
+                except Exception:
+                    # If an exception was raised, print a traceback and treat
+                    # it as a failure.
+                    task_error = True
+                    number_of_failures += 1
+                    msg = ("Task #{0} encountered an error at "
+                           .format(itask + 1, timestamp()))
+                    summary_status.append(("{0} ({1})".format(
+                        msg, task.options["full_task_name"]),
+                        self._prefix_fail))
+                    self.reporter(msg + " (see stderr)",
+                                  prefix=self._prefix_fail)
+                    exception = traceback.format_exc()
+                    self.reporter(msg, prefix=self._prefix_fail,
+                                  kind=self.reporter.KIND_ERR)
+                    self.reporter(exception, prefix=self._prefix_fail,
+                                  kind=self.reporter.KIND_ERR)
+
+        elif n_threads > 1:
+            self.reporter("Running in THREADED mode, with {0} threads"
+                          .format(n_threads))
+            # Multithreaded case
+            # Create threading objects for each comparison task
+            threads = []
+            for itask, task in enumerate(self.analysis_tasks):
+                threads.append(TaskRunner(self, itask, task))
+
+            # Start threads within the set number of concurrent threads until
+            # all have been started
+            itask = 0
+            while itask < len(threads):
+                if threading.active_count() < n_threads:
+                    self.reporter(
+                        "Starting thread for task {0} at {1}"
+                        .format(itask + 1, timestamp()))
+                    threads[itask].start()
+                    itask += 1
+
+            # Gather up the results
+            number_of_failures = 0
+            number_of_skips = 0
+            task_error = False
+            summary_status = []
+            for thread in threads:
+                # If any threads haven't finished yet make sure to wait
+                thread.join()
+                number_of_failures += thread.failures
+                number_of_skips += thread.skips
+                task_error = (task_error or thread.task_error)
+                summary_status += thread.summary_status
+                # And print the output via the main reporter
+                for args in thread.reporter_args:
+                    self.reporter(*args)
+
+        else:
+            # Negative threads?
+            msg = "Number of threads given to rose_ana cannot be negative"
+            raise ValueError(msg)
+
         # The KGO database (if needed by the task) also stores its status - to
         # indicate whether there was some unexpected exception above.
         if self.kgo_db is not None and not task_error:
