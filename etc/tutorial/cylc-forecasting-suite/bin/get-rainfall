@@ -23,7 +23,7 @@ from datetime import datetime
 import math
 import os
 import shutil
-import urllib2
+import urllib.request
 
 from mecator import get_offset, get_scale, coord_to_pos, pos_to_coord
 from png import Reader
@@ -104,9 +104,10 @@ def get_datapoint_radar_image(filename, time, api_key):
     time = datetime.strptime(time, '%Y%m%dT%H%MZ'
                             ).strftime('%Y-%m-%dT%H:%M:%SZ')
     url = URL.format(time=time, api_key=api_key)
-    print 'Opening URL: %s' % url
-    with open(filename, 'w+') as png_file:
-        png_file.write(urllib2.urlopen(url).read())
+    print('Opening URL: %s' % url)
+    out = urllib.request.urlopen(url).read()
+    with open(filename, 'bw+') as png_file:
+        png_file.write(out)
 
 
 def get_archived_radar_image(filename, time):
@@ -135,7 +136,7 @@ def process_rainfall_data(filename, resolution, domain):
         list - A 2D matrix of rainfall data.
 
     """
-    reader = Reader(file(filename, 'r'))
+    reader = Reader(open(filename, 'rb'))
     data = reader.read()
 
     scale = get_scale(domain, data[0])
@@ -160,10 +161,10 @@ def main():
     api_key = os.environ.get('API_KEY')
 
     if api_key:
-        print 'Attempting to get weather data from the DataPoint service.'
+        print('Attempting to get weather data from the DataPoint service.')
         get_datapoint_radar_image('rainfall-radar.png', time, api_key)
     else:
-        print 'No API key provided, falling back to arhived data'
+        print('No API key provided, falling back to arhived data')
         get_archived_radar_image('rainfall-radar.png', time)
 
     data = process_rainfall_data('rainfall-radar.png', resolution, domain)
