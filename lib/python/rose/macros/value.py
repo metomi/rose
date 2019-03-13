@@ -96,7 +96,7 @@ class ValueChecker(rose.macro.MacroBase):
         sect, key = self._get_section_option_from_id(var_id)
         saved_metadata = copy.deepcopy(metadata)
         saved_metadata.pop('id')
-        for meta_key in list(saved_metadata.keys()):
+        for meta_key in list(saved_metadata):
             if meta_key not in self.META_PROPS:
                 saved_metadata.pop(meta_key)
         goodness_id = (value, tuple(sorted(saved_metadata.items())))

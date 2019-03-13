@@ -167,7 +167,7 @@ try:
     # filtering functions defined later in this file (see `class
     # pngfilters`).
     import cpngfilters as pngfilters
-except (ImportError, ModuleNotFoundError):
+except ModuleNotFoundError:
     pass
 
 

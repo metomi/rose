@@ -115,7 +115,7 @@ class ConfigProcessorsManager(SchemeHandlersManager):
 
     def handle_event(self, *args, **kwargs):
         """Report an event."""
-        if isinstance(self.event_handler, collections.abc.Callable):
+        if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
     def process(self, conf_tree, item, orig_keys=None, orig_value=None,

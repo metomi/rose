@@ -238,6 +238,8 @@ class MacroBase(object):
         id1 = self._get_id_from_section_option(rep1.section, rep1.option)
         id2 = self._get_id_from_section_option(rep2.section, rep2.option)
         if id1 == id2:
+            # This logic replicates output of the deprecated Python2 `cmp`
+            # builtin
             return (rep1.value > rep2.value) - (rep1.value < rep2.value)
         return rose.config.sort_settings(id1, id2)
 
@@ -766,13 +768,13 @@ def get_macro_class_methods(macro_modules):
                 continue
             for att_name in ALLOWED_MACRO_CLASS_METHODS:
                 if (hasattr(obj, att_name) and
-                        isinstance(getattr(obj, att_name),
-                                   collections.abc.Callable)):
+                        callable(getattr(obj, att_name))):
                     doc_string = obj.__doc__
                     macro_methods.append((macro_name, obj_name, att_name,
                                           doc_string))
     macro_methods.sort(key=lambda x: x[1])
     macro_methods.sort(key=lambda x: x[1])
+    # This logic replicates output of the deprecated Python2 `cmp` builtin
     macro_methods.sort(
         key=cmp_to_key(lambda x, y: (y[2] > x[2]) - (y[2] < x[2])))
     return macro_methods
@@ -1188,7 +1190,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
                 macro_config_problems_map.setdefault(macro, {})
                 problem_list.sort(key=cmp_to_key(report_sort))
                 macro_config_problems_map[macro][conf_key] = problem_list
-        problem_macros = list(macro_config_problems_map.keys())
+        problem_macros = list(macro_config_problems_map)
         problem_macros.sort()
         for macro_name in problem_macros:
             config_problems_map = macro_config_problems_map[macro_name]
@@ -1237,6 +1239,8 @@ def report_sort(report1, report2):
         opt1 = report1.option
         opt2 = report2.option
         if opt1 is None or opt2 is None:
+            # This logic replicates output of the deprecated Python2 `cmp`
+            # builtin
             return (str(opt1) > str(opt2)) - (str(opt1) < str(opt2))
         return rose.config.sort_settings(opt1, opt2)
     return rose.config.sort_settings(sect1, sect2)
@@ -1251,7 +1255,7 @@ def get_reports_as_text(config_reports_map, macro_id,
     config_issues_list = []
 
     main_reports = set(config_reports_map.get(None, []))
-    conf_keys = list(config_reports_map.keys())
+    conf_keys = list(config_reports_map)
     conf_keys = sorted(conf_keys, key=lambda x: x is not None)
     for conf_key in conf_keys:
         reports = config_reports_map[conf_key]

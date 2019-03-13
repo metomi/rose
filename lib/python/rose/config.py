@@ -1601,6 +1601,7 @@ def load(source, root=None):
 def sort_element(elem_1, elem_2):
     """Sort pieces of text, numerically if possible."""
     if elem_1.isdigit() and elem_2.isdigit():
+        # This logic replicates output of the deprecated Python2 `cmp` builtin
         return (int(elem_1) > int(elem_2)) - (int(elem_1) < int(elem_2))
     elif elem_1.isdigit():
         return -1
@@ -1614,6 +1615,7 @@ def sort_settings(setting_1, setting_2):
     """Sort sections and options, by numeric element if possible."""
     if (not isinstance(setting_1, str) or
             not isinstance(setting_2, str)):
+        # This logic replicates output of the deprecated Python2 `cmp` builtin
         return (setting_1 > setting_2) - (setting_1 < setting_2)
     match_1 = REC_SETTING_ELEMENT.match(setting_1)
     match_2 = REC_SETTING_ELEMENT.match(setting_2)
@@ -1622,4 +1624,5 @@ def sort_settings(setting_1, setting_2):
         text_2, num_2 = match_2.groups()
         if text_1 == text_2:
             return sort_element(num_1, num_2)
+    # This logic replicates output of the deprecated Python2 `cmp` builtin
     return (setting_1 > setting_2) - (setting_1 < setting_2)

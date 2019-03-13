@@ -453,7 +453,7 @@ class Analyse(object):
             sys.path.insert(0, os.path.abspath(directory))
             try:
                 modules.append(__import__(comparison_name))
-            except (ImportError, ModuleNotFoundError) as exc:
+            except ImportError as exc:
                 self.reporter(exc)
             sys.path.pop(0)
         modules.sort()
@@ -465,9 +465,7 @@ class Analyse(object):
             contents = inspect.getmembers(module, inspect.isclass)
             for obj_name, obj in contents:
                 att_name = "run"
-                if hasattr(
-                    obj, att_name) and isinstance(getattr(obj, att_name),
-                                                  collections.abc.Callable):
+                if hasattr(obj, att_name) and callable(getattr(obj, att_name)):
                     doc_string = obj.__doc__
                     user_methods.append((comparison_name, obj_name, att_name,
                                         doc_string))

@@ -135,7 +135,7 @@ def main():
 
     if opts.keys_mode:
         try:
-            keys = list(root_node.get(args, opts.no_ignore).value.keys())
+            keys = list(root_node.get(args, opts.no_ignore).value)
         except AttributeError:
             sys.exit(1)
         keys.sort()
@@ -155,7 +155,7 @@ def main():
             conf_dump(ConfigNode().set(args, node.value), concat_mode=True)
             sys.exit()
 
-        keys = list(node.value.keys())
+        keys = list(node.value)
         keys.sort()
         for key in keys:
             node_of_key = node.get([key], opts.no_ignore)

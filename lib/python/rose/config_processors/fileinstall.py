@@ -743,7 +743,7 @@ class PullableLocHandlersManager(SchemeHandlersManager):
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler with given arguments if possible."""
-        if isinstance(self.event_handler, collections.abc.Callable):
+        if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
     def parse(self, loc, conf_tree):

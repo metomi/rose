@@ -136,7 +136,7 @@ class Reporter(object):
         arguments and return its result instead.
 
         """
-        if isinstance(self.event_handler, collections.abc.Callable):
+        if callable(self.event_handler):
             return self.event_handler(message, kind, level, prefix, clip)
 
         if isinstance(message, Event):
@@ -164,10 +164,10 @@ class Reporter(object):
                 continue
             if prefix is None:
                 prefix = context.get_prefix(kind, level)
-            elif isinstance(prefix, collections.abc.Callable):
+            elif callable(prefix):
                 prefix = prefix(kind, level)
             if msg is None:
-                if isinstance(message, collections.abc.Callable):
+                if callable(message):
                     msg = message()
                 else:
                     msg = message

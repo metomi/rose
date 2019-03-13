@@ -137,8 +137,7 @@ class RosieSvnPreCommitHook(object):
         """Return the standard output from "svnlook"."""
         command = ["svnlook"] + list(args)
         data = self.popen(*command, stderr=sys.stderr)[0]
-        if isinstance(data, bytes):
-            data = data.decode()
+        data = data.decode()
         return data
 
     def _verify_users(self, status, path, txn_owner, txn_access_list,

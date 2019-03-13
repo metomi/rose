@@ -218,14 +218,14 @@ def import_object(import_string, from_files, error_handler,
         try:
             module = __import__(module_name, globals(), locals(),
                                 [], 0)
-        except (ImportError, ModuleNotFoundError) as exc:
+        except ImportError as exc:
             error_handler(exc)
     else:
         for filename in module_files:
             sys.path.insert(0, os.path.dirname(filename))
             try:
                 module = SourceFileLoader(as_name, filename).load_module()
-            except (ImportError, ModuleNotFoundError) as exc:
+            except ImportError as exc:
                 error_handler(exc)
             sys.path.pop(0)
     if module is None:

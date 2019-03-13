@@ -244,7 +244,7 @@ def metadata_check(meta_config, meta_dir=None,
     allowed_properties = get_allowed_metadata_properties()
     reports = []
     module_files = _get_module_files(meta_dir)
-    sections = list(meta_config.value.keys())
+    sections = list(meta_config.value)
     sections.sort(key=cmp_to_key(rose.config.sort_settings))
     for section in sections:
         node = meta_config.value[section]
@@ -269,7 +269,7 @@ def metadata_check(meta_config, meta_dir=None,
                 value = node.get_value([rose.META_PROP_LENGTH])
                 reports.append(rose.macro.MacroReport(
                     section, rose.META_PROP_LENGTH, value, info))
-        options = list(node.value.keys())
+        options = list(node.value)
         options.sort(key=cmp_to_key(rose.config.sort_settings))
         for option in options:
             opt_node = node.value[option]

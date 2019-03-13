@@ -152,6 +152,7 @@ class SuiteRunCleaner(object):
     @staticmethod
     def _auth_node_cmp(item1, item2):
         """Compare (auth1, node1) and (auth2, node2)."""
+        # This logic replicates output of the deprecated Python2 `cmp` builtin
         ret = (item1 > item2) - (item1 < item2)
         if ret:
             if item1[0] == "localhost":

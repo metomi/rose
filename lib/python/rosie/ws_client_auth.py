@@ -38,7 +38,7 @@ try:
         warnings.simplefilter('ignore')
         import gtk
     import gnomekeyring
-except (ImportError, ModuleNotFoundError):
+except ImportError:
     pass
 
 import ast
@@ -437,7 +437,7 @@ class RosieWSClientAuthManager(object):
         Prompt with zenity or raw_input/getpass.
 
         """
-        if (isinstance(self.prompt_func, collections.abc.Callable) and
+        if (callable(self.prompt_func) and
                 not hasattr(self.password_store, "prompt_password")):
             self.username, self.password = self.prompt_func(
                 self.username, self.password, is_retry)

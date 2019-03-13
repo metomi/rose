@@ -53,10 +53,10 @@ class NamelistLocHandler(object):
         loc.loc_type = loc.TYPE_BLOB
         if loc.name.endswith("(:)"):
             name = loc.name[0:-2]
-            sections = [k for k in list(conf_tree.node.value.keys())
+            sections = [k for k in list(conf_tree.node.value)
                         if k.startswith(name)]
         else:
-            sections = [k for k in list(conf_tree.node.value.keys())
+            sections = [k for k in list(conf_tree.node.value)
                         if k == loc.name]
         for section in list(sections):
             section_value = conf_tree.node.get_value([section])

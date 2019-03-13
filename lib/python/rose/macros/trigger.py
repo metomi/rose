@@ -333,11 +333,11 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
-        config_sections = config.value.keys()
-        meta_settings = [k for k in meta_config.value.keys()
+        config_sections = config.value
+        meta_settings = [k for k in meta_config.value
                          if not meta_config.value[k].is_ignored()]
         allowed_repetitions = {}
-        trigger_ids = list(self.trigger_family_lookup.keys())
+        trigger_ids = list(self.trigger_family_lookup)
         trigger_ids.sort()
         for var_id in trigger_ids:
             allowed_repetitions[var_id] = 0
@@ -348,7 +348,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         for start_id in trigger_ids:
             id_value_dict = self._get_family_dict(start_id, config,
                                                   meta_config)
-            triggered_ids = list(id_value_dict.keys())
+            triggered_ids = list(id_value_dict)
             triggered_ids.sort()
             if self._check_is_id_dupl(start_id, meta_config):
                 st_sect = self._get_section_option_from_id(start_id)[0]
@@ -387,8 +387,8 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                         return self._get_error_report_for_id(
                             child_id, config, self.ERROR_MISSING_METADATA)
                     if child_id in self.trigger_family_lookup:
-                        grandchildren = list((
-                            self.trigger_family_lookup[child_id].keys()))
+                        grandchildren = list(
+                            self.trigger_family_lookup[child_id])
                         grandchildren.sort()
                         stack.insert(1, (child_id, grandchildren))
                         if (id_list.count(child_id) + 1 >

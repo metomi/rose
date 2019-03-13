@@ -111,7 +111,7 @@ class RosieDatabaseInitiator(object):
 
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
-        if isinstance(self.event_handler, collections.abc.Callable):
+        if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
     def create(self, db_url):

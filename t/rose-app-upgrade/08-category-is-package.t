@@ -33,10 +33,10 @@ init_macro defence <<'__MACRO__'
 # -*- coding: utf-8 -*-
 import sys
 
-sys.path.append('../rose-meta/defence/')
-from jedi import *
+#sys.path.append('../rose-meta/defence/')
+from sith import *
 __MACRO__
-cat >$TEST_DIR/rose-meta/$category/jedi.py <<'__MACRO__'
+cat >$TEST_DIR/rose-meta/$category/sith.py <<'__MACRO__'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 

@@ -221,7 +221,7 @@ def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
     version_repr = dep_str(min_version, min_incompat_version)
     if version_repr:
         line += ' (%s)' % version_repr
-    line += ' ' + '.' * (TERM_WIDTH - len(line) - 30) + ' '
+    line += ' ' + '.' * (TERM_WIDTH - len(line) - 25) + ' '
 
     # Get version number.
     version_string = version_checker(dependency_name, **kwargs)
@@ -356,4 +356,3 @@ if __name__ == '__main__':
     else:
         # Check software dependencies, report and exit.
         main()
-

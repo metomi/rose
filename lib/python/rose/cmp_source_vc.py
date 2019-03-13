@@ -69,7 +69,7 @@ class SuiteVCComparator(object):
 
     def handle_event(self, *args, **kwargs):
         """Handle event."""
-        if isinstance(self.event_handler, collections.abc.Callable):
+        if callable(self.event_handler):
             self.event_handler(*args, **kwargs)
 
 
@@ -90,7 +90,7 @@ def main():
         sys.exit(2)
     try:
         lines = suite_vc_cmp.cmp_source_vc_info(suite_name=suite_name)
-    except (Exception, RosePopenError) as exc:
+    except Exception as exc:
         event_handler(exc)
         traceback.print_exc()
         sys.exit(2)

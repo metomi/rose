@@ -116,7 +116,7 @@ def env_export(key, value, event_handler=None):
         #      normally quite small.
         _EXPORTED_ENVS[key] = value
         os.environb[key.encode('UTF-8')] = value.encode('UTF-8')
-        if isinstance(event_handler, collections.abc.Callable):
+        if callable(event_handler):
             event_handler(EnvExportEvent(key, value))
 
 

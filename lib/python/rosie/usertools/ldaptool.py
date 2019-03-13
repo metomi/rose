@@ -21,7 +21,7 @@
 
 try:
     import ldap
-except (ImportError, ModuleNotFoundError):
+except ImportError:
     pass
 import os
 from rose.resource import ResourceLocator
