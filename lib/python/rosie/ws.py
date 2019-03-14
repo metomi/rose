@@ -41,18 +41,19 @@ import signal
 import socket
 from time import sleep
 from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado.options import define, options, parse_command_line
 import tornado.web
 
 from isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
+from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator
 import rosie.db
 from rosie.suite_id import SuiteId
 
 
-LOG_ROOT_TMPL = "~/.metomi/%(ns)s-%(util)s-%(host)s-%(port)s"
+LOG_ROOT_TMPL = os.path.join(
+    "~", ".metomi", "%(ns)s-%(util)s-%(host)s-%(port)s")
 DEFAULT_PORT = 8080
-INTERVAL_CHECK_FOR_STOP_CMD = 5  # in units of seconds
+INTERVAL_CHECK_FOR_STOP_CMD = 1  # in units of seconds
 
 
 class RosieDiscoServiceApplication(tornado.web.Application):
@@ -63,8 +64,9 @@ class RosieDiscoServiceApplication(tornado.web.Application):
     UTIL = "disco"
     TITLE = "Rosie Suites Discovery"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, service_root_mode=False, *args, **kwargs):
         self.stopping = False
+        self.service_root_mode = service_root_mode
 
         self.props = {}
         rose_conf = ResourceLocator.default().get_conf()
@@ -91,21 +93,24 @@ class RosieDiscoServiceApplication(tornado.web.Application):
                 db_url_map[key[3:]] = node.value
         self.db_url_map = db_url_map
 
+        # Specify the root URL for the handlers and template.
+        ROOT = "%s-%s" % (self.NAMESPACE, self.UTIL)
+        service_root = r"/"
+        if self.service_root_mode:
+            service_root += ROOT + r"/?"
+
         # Set-up the Tornado application request-handling structure.
-        service_root = r"/" + self.NAMESPACE + r"/?"
         prefix_handlers = []
         class_args = {"props": self.props}
-
         root_class_args = dict(class_args)  # mutable so copy for safety
         root_class_args.update({"db_url_map": self.db_url_map})
-        root_handler = (service_root, RosieDiscoServiceRoot,
-                        root_class_args)
+        root_handler = (service_root, RosieDiscoServiceRoot, root_class_args)
         for key, db_url in list(self.db_url_map.items()):
             prefix_class_args = dict(class_args)  # mutable so copy for safety
             prefix_class_args.update({
                 "prefix": key,
                 "db_url": db_url,
-                "root_service_url": self.NAMESPACE,
+                "service_root": service_root,
             })
             handler = (service_root + key + r"/?$", RosieDiscoService,
                        prefix_class_args)
@@ -170,7 +175,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
 
     """Serves the index page of the database of a given prefix."""
 
-    def initialize(self, props, prefix, db_url, root_service_url):
+    def initialize(self, props, prefix, db_url, service_root):
         self.props = props
         self.prefix = prefix
         source_option = "prefix-web." + self.prefix
@@ -180,7 +185,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
         if source_url_node is not None:
             self.source_url = source_url_node.value
         self.dao = rosie.db.DAO(db_url)
-        self.root_service_url = root_service_url
+        self.service_root = service_root
 
     # Decorator to ensure there is a trailing slash since buttons for keys
     # otherwise go to wrong URLs for "/rosie/key" (e.g. -> "rosie/query?...").
@@ -225,7 +230,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
             host=self.props["host_name"],
             rose_version=self.props["rose_version"],
             script="/static",
-            root_service_url=self.root_service_url,
+            service_root=self.service_root,
             prefix=self.prefix,
             prefix_source_url=self.source_url,
             known_keys=self.dao.get_known_keys(),
@@ -345,23 +350,54 @@ def _get_server_status(application, host, port):
     return ret
 
 
+def parse_cli(*args, **kwargs):
+    """Parse command line, start/stop ad-hoc server.
+
+    Return a CLI instruction tuple for a valid command instruction, else None:
+        ("start", Boolean, port):
+            start server on 'port', [2]==True indicating non_interactive mode.
+        ("stop", Boolean):
+            stop server, [2]==True indicating service_root_mode.
+    """
+    opt_parser = RoseOptionParser()
+    opt_parser.add_my_options("non_interactive", "service_root_mode")
+    opts, args = opt_parser.parse_args()
+    arg = None
+    if args:
+        arg = args[0]
+
+    if arg == "start":
+        port = None
+        if args[1:]:
+            port = args[1]
+            try:
+                port = int(port)
+            except ValueError:
+                pass
+        return ("start", opts.service_root_mode, port)
+    elif arg == "stop":
+        return ("stop", opts.non_interactive)
+
+
 def main():
     arg_msg_comp = "ad-hoc web service server"
-    # No value req for Boolean options e.g. --start equivalent to --start=True.
-    define("start", type=bool, default=False,
-           help="start %s (on specified port, else on port %s)" % (
-               arg_msg_comp, DEFAULT_PORT))
-    define("port", type=int, default=DEFAULT_PORT, help="port to listen on")
-    define("stop", type=bool, default=False, help="stop %s" % arg_msg_comp)
-    define("non-interactive", type=bool, default=False,
-           help="to stop %s w/o prompting" % arg_msg_comp)
-    parse_command_line()
-
     info_msg_end = " the server providing the Rosie Disco web application"
     status = None
-    app = RosieDiscoServiceApplication()
-    if options.start:
-        app.listen(options.port)
+
+    cli_input = parse_cli()
+    if not cli_input:
+        return
+    instruction, cli_opt = cli_input[:2]
+    port = DEFAULT_PORT
+    if len(cli_input) == 3:
+        port = cli_input[2]
+
+    if instruction == "start" and cli_opt:
+        app = RosieDiscoServiceApplication(service_root_mode=True)
+    else:
+        app = RosieDiscoServiceApplication()
+    if instruction == "start":
+        app.listen(port)
         signal.signal(signal.SIGINT, app.sigint_handler)
 
         # This runs a callback every INTERVAL_CHECK_FOR_STOP_CMD s, needed to
@@ -373,34 +409,33 @@ def main():
         # Before the actual IOLoop start() else it prints only on stop of loop.
         print("Started" + info_msg_end)
 
-        status = _log_server_status(app, app.props["host_name"], options.port)
+        status = _log_server_status(app, app.props["host_name"], port)
         IOLoop.current().start()
-    elif options.stop and (options.non_interactive or
-                           input("Stop server? y/n (default=n)") == "y") and (
+    elif instruction == "stop" and (cli_opt or
+            input("Stop server? y/n (default=n)") == "y") and (
         _get_server_status(
-            app, app.props["host_name"], options.port).get("pid")):
+            app, app.props["host_name"], port).get("pid")):
         os.killpg(int(_get_server_status(
-            app, app.props["host_name"], options.port).get("pid")),
+            app, app.props["host_name"], port).get("pid")),
             signal.SIGINT)
-        # Must wait for next callback, so server will not stop immediately.
-        print("Stopping" + info_msg_end + " within the next %s seconds" %
-              INTERVAL_CHECK_FOR_STOP_CMD)
-
-        # Wait one callback interval so server has definitely been stopped...
+        # Must wait for next callback, so server will not stop immediately;
+        # wait one callback interval so server has definitely been stopped...
         sleep(INTERVAL_CHECK_FOR_STOP_CMD)
         IOLoop.current().close()  # ... then close event loop to clean up.
 
         if status:
             os.unlink(status)
         print("Stopped" + info_msg_end)
-    elif options.stop:
+    elif instruction == "stop":
         print("Failed to stop%s; no such server or process to stop." % (
               info_msg_end))
+
 
 
 if __name__ == "__main__":  # Run on an ad-hoc server in a test environment.
     main()
 else:  # Run as a WSGI application in a system service environment.
+    app = RosieDiscoServiceApplication()
     wsgi_app = tornado.wsgi.WSGIAdapter(app)
     server = wsgiref.simple_server.make_server('', DEFAULT_PORT, wsgi_app)
     server.serve_forever()

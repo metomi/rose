@@ -356,13 +356,13 @@ Edit the :rose:conf:`rose.conf[rosie-disco]` settings to configure
 the web server's log directory and port number. Start the web server
 by running::
 
-   setsid /path/to/rose/bin/rosie disco --start 0</dev/null 1</dev/null 2>&1 &
+   setsid /path/to/rose/bin/rosie disco start 0</dev/null 1</dev/null 2>&1 &
 
 Check that the server is up and running using ``curl`` or a local
 web browser. E.g. If you have configured the server's port to be 1234,
 you can do::
 
-   curl -I http://localhost:1234/rosie/
+   curl -I http://localhost:1234/
 
 It should return a HTTP code 200.
 
