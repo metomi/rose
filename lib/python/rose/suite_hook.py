@@ -30,7 +30,6 @@ from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 from smtplib import SMTP, SMTPException
 import socket
-import collections.abc
 
 
 class RoseSuiteHook(object):
@@ -49,7 +48,7 @@ class RoseSuiteHook(object):
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callabale."""
-        if isinstance(self.event_handler, collections.abc.Callable):
+        if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
     def run(self, suite_name, task_id, hook_event, hook_message=None,

@@ -57,7 +57,6 @@ from rose.opt_parse import RoseOptionParser
 import rose.reporter
 import rose.resource
 import rose.variable
-import collections.abc
 
 
 ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate", "downgrade", "upgrade",

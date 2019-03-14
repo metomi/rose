@@ -237,7 +237,7 @@ class ReporterContext(object):
                 return self._tty_colour_err(Reporter.PREFIX_WARN)
             else:
                 return self._tty_colour_err(Reporter.PREFIX_FAIL)
-        if isinstance(self.prefix, collections.abc.Callable):
+        if callable(self.prefix):
             return self.prefix(kind, level)
         else:
             return self.prefix

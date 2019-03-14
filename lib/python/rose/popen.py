@@ -27,7 +27,6 @@ from rose.resource import ResourceLocator
 import shlex
 from subprocess import Popen, PIPE
 import sys
-import collections.abc
 
 
 class RosePopenError(Exception):

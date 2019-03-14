@@ -34,7 +34,6 @@ from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
 import sys
 import webbrowser
-import collections.abc
 
 
 class NoSuiteLogError(Exception):
@@ -539,7 +538,7 @@ class SuiteEngineProcessor(object):
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callable."""
-        if isinstance(self.event_handler, collections.abc.Callable):
+        if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
     def gcontrol(self, suite_name, args=None):

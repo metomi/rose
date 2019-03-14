@@ -29,7 +29,6 @@ from rose.suite_engine_proc import SuiteEngineProcessor
 import shlex
 import shutil
 from uuid import uuid4
-import collections.abc
 
 
 class RunConfigLoadEvent(Event):

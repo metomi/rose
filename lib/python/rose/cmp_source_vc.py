@@ -30,7 +30,6 @@ from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.run_source_vc import write_source_vc_info
 from rose.suite_engine_proc import SuiteEngineProcessor
-import collections.abc
 
 
 class SuiteVCComparator(object):

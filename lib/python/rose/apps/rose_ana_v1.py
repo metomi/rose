@@ -36,7 +36,6 @@ from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 from rose.app_run import BuiltinApp
-import collections.abc
 
 WARN = -1
 PASS = 0

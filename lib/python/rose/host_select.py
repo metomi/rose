@@ -32,7 +32,6 @@ from socket import (
 import sys
 from time import sleep, time
 import traceback
-import collections.abc
 
 
 class NoHostError(Exception):
