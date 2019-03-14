@@ -1,0 +1,81 @@
+
+
+Test of Exact Numeric Match Success
+
+Semi-major Axis: 1.0000 AU
+
+
+Test of Exact Numeric Match Fail
+
+Orbital Period: 1.0000 Earth Years
+
+
+Test of Exact Text Match Success
+
+Atmosphere: Oxygen/Nitrogen
+
+
+Test of Exact Text Match Fail
+
+Planet: Earth
+
+
+
+Test of Within Match Percentage Success
+
+Oxygen Partial Pressure:  0.2095
+
+
+Test of Within Match Percentage Fail
+
+Ocean coverage:  70.8%
+
+
+
+Test of Within Match Absolute Success
+
+Rotation Period: 0.99727 Standard days
+
+
+Test of Within Match Absolute Fail
+
+Surface Gravity: 9.80665 m/s^2
+
+Test of Exact List Match Success
+
+Periastron/Apastron:  0.98326
+Periastron/Apastron:  1.01559 
+ 
+
+
+Test of Within List Match Success
+
+Satellites Natural/Artificial:   1
+Satellites Natural/Artificial:   21000
+
+
+Test of Exact List Match Fail
+
+Other Planets:   Jupiter
+Other Planets:   Saturn
+Other Planets:   Uranus
+Other Planets:   Neptune
+
+
+
+Test of Within List Match Fail
+
+Inclination/Axial Tilt:   7.155
+Inclination/Axial Tilt:   23.43
+
+
+
+Test of Multi Pattern Success
+
+Known planet races: Earthlings Martians Jovians Neptunians
+
+
+Test of Multi Pattern Fail
+
+Friendly planet races: Earthlings Martians Jovians
+

@@ -1,0 +1,80 @@
+
+
+Test of Exact Numeric Match Success
+
+Semi-major Axis: 1.0000 AU
+
+
+Test of Exact Numeric Match Fail
+
+Orbital Period: 1.05234 Earth Years
+
+
+Test of Exact Text Match Success
+
+Atmosphere: Oxygen/Nitrogen
+
+
+Test of Exact Text Match Fail
+
+Planet: Atlantica
+
+
+
+Test of Within Match Percentage Success
+
+Oxygen Partial Pressure:  0.2103
+
+
+Test of Within Match Percentage Fail
+
+Ocean coverage: 95.8%
+
+
+Test of Within Match Absolute Success
+
+Surface Gravity: 9.72210 m/s^2
+
+
+Test of Within Match Absolute Fail
+
+Rotation Period: 0.9270 Standard days
+
+
+Test of Exact List Match Success
+
+Satellites Natural/Artificial:   1
+Satellites Natural/Artificial:   21000
+ 
+
+
+Test of Within List Match Success
+
+Periastron/Apastron:  0.98326
+Periastron/Apastron:  1.02559 
+
+
+Test of Exact List Match Fail
+
+Other Planets:   Lugh
+Other Planets:   Sulis
+Other Planets:   Morrigan
+Other Planets:   Brigantia
+
+
+
+Test of Within List Match Fail
+
+Inclination/Axial Tilt:   27.60
+Inclination/Axial Tilt:   2.453
+
+
+
+Test of Multi Pattern Success
+
+Known planet races: Earthlings Martians Jovians Neptunians
+
+
+Test of Multi Pattern Fail
+
+Friendly planet races: Earthlings Martians Plutonians
