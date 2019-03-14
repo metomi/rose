@@ -53,7 +53,7 @@ def main():
     except Exception as exc:
         report(exc)
         if opts.debug_mode:
-            traceback.print_exc(exc)
+            traceback.print_exc()
         sys.exit(1)
 
 
@@ -80,7 +80,7 @@ def suite_log_view(opts, args, event_handler=None):
         url = suite_engine_proc.get_suite_log_url(opts.user, opts.name)
         if url.startswith("file://"):
             if (opts.non_interactive or
-                    raw_input("Start rose bush? [y/n] (default=n) ") == "y"):
+                    input("Start rose bush? [y/n] (default=n) ") == "y"):
                 suite_engine_proc.popen.run_bg(
                     "rose", "bush", "start", preexec_fn=os.setpgrp)
                 is_rose_bush_started = True

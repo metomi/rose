@@ -242,7 +242,7 @@ file_pcregrep() {
 }
 
 _pcregrep() {
-    python2 - "$@" <<'__PYTHON__'
+    python3 - "$@" <<'__PYTHON__'
 import re
 import sys
 
@@ -280,7 +280,7 @@ while True:
     # Antisocially cut off the connection!
     client_soc.close()
 __PYTHON__
-       python2 $TEST_DIR/smtpd.py 1>"$SMTPD_LOG" 2>&1 &
+       python3 $TEST_DIR/smtpd.py 1>"$SMTPD_LOG" 2>&1 &
        local SMTPD_PID=$!
        while ! grep -q '^bound$' "$SMTPD_LOG" 2>/dev/null; do
             if ps $SMTPD_PID 1>/dev/null 2>&1; then
@@ -313,7 +313,7 @@ mock_smtpd_init() {
     for SMTPD_PORT in 8025 8125 8225 8325 8425 8525 8625 8725 8825 8925; do 
         local SMTPD_HOST=localhost:$SMTPD_PORT
         local SMTPD_LOG="$TEST_DIR/smtpd.log"
-        python2 -m smtpd -c DebuggingServer -d -n "$SMTPD_HOST" \
+        python3 -m smtpd -c DebuggingServer -d -n "$SMTPD_HOST" \
             1>"$SMTPD_LOG" 2>&1 &
         local SMTPD_PID=$!
         while ! grep -q 'DebuggingServer started' "$SMTPD_LOG" 2>/dev/null; do
@@ -405,7 +405,7 @@ rose_ws_kill() {
 rose_ws_json_greps() {
     local TEST_KEY="$1"
     shift 1
-    run_pass "${TEST_KEY}" python2 - "$@" <<'__PYTHON__'
+    run_pass "${TEST_KEY}" python3 - "$@" <<'__PYTHON__'
 import ast
 import json
 import sys

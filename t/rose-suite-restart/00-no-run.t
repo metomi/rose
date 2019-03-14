@@ -20,6 +20,7 @@
 # Test "rose suite-restart" on suites that don't exist.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 tests 7
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-pwd"

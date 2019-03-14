@@ -34,7 +34,7 @@ __CONFIG__
 setup
 init_meta test_tree/test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test_tree/test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -388,7 +388,7 @@ __CONFIG__
 setup
 init_meta test_tree/test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test_tree/test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -449,7 +449,7 @@ __CONFIG__
 setup
 init_meta test_tree/test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test_tree/test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -569,7 +569,7 @@ __CONFIG__
 setup
 init_meta test_tree/test-app-upgrade 0.1 0.2
 init_macro test_tree/test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -627,15 +627,15 @@ run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [D] Downgrade_0.2-0.1: changes: 6
-    env=A=5
-        Added with value '5'
     namelist:something=foo=bar
         Added with value 'bar'
     namelist:qwerty=None=None
         Added
-    env=B=5
-        Removed
+    env=A=5
+        Added with value '5'
     namelist:new=spam=eggs
+        Removed
+    env=B=5
         Removed
     =meta=test_tree/test-app-upgrade/0.1
         Downgraded from 0.2 to 0.1

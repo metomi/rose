@@ -27,6 +27,7 @@ environment variables are left unchanged.
 import os
 import re
 from rose.reporter import Event
+import collections.abc
 
 
 # _RE_DEFAULT = re.compile(r"""
@@ -114,7 +115,7 @@ def env_export(key, value, event_handler=None):
         # N.B. Should be safe, because the list of environment variables is
         #      normally quite small.
         _EXPORTED_ENVS[key] = value
-        os.environ[key] = value
+        os.environb[key.encode('UTF-8')] = value.encode('UTF-8')
         if callable(event_handler):
             event_handler(EnvExportEvent(key, value))
 
@@ -148,7 +149,10 @@ def env_var_process(text, unbound=None, match_mode=None):
 
     """
     ret = ""
-    tail = text
+    try:
+        tail = text.decode()
+    except AttributeError:
+        tail = text
     while tail:
         match = _MATCH_MODES[match_mode].match(tail)
         if match:
@@ -162,7 +166,7 @@ def env_var_process(text, unbound=None, match_mode=None):
                 else:
                     raise UnboundEnvironmentVariableError(groups["name"])
             ret += (groups["head"] +
-                    groups["escape"][0:len(groups["escape"]) / 2] +
+                    groups["escape"][0:len(groups["escape"]) // 2] +
                     substitute)
             tail = groups["tail"]
         else:

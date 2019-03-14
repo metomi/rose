@@ -20,6 +20,7 @@
 # Test "rose task-env" in 360day calendar mode.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 export ROSE_CONF_PATH=
 
 tests 1

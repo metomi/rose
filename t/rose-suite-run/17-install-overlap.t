@@ -20,6 +20,7 @@
 # Test "rose suite-run", file install targets overlap.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "@TODO: Awaiting App upgrade to Python3"
 tests 3
 export ROSE_CONF_PATH=
 

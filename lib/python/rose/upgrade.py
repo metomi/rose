@@ -22,6 +22,7 @@
 import inspect
 import os
 import sys
+from functools import cmp_to_key
 
 import rose.config
 import rose.macro
@@ -248,7 +249,7 @@ class MacroUpgrade(rose.macro.MacroBase):
         # Add parent section if missing.
         if option is not None and config.get([section]) is None:
             self.add_setting(config, [section])
-        if value is not None and not isinstance(value, basestring):
+        if value is not None and not isinstance(value, str):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(repr(value), id_))
 
@@ -292,7 +293,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             raise TypeError(text)
         if info is None:
             info = self.INFO_CHANGED_VAR.format(repr(node.value), repr(value))
-        if value is not None and not isinstance(value, basestring):
+        if value is not None and not isinstance(value, str):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(repr(value), id_))
         node.value = value
@@ -571,8 +572,8 @@ class MacroUpgradeManager(object):
                 func = macro.upgrade
             res = {}
             if not opt_non_interactive:
-                arglist = inspect.getargspec(func).args
-                defaultlist = inspect.getargspec(func).defaults
+                arglist = inspect.getfullargspec(func).args
+                defaultlist = inspect.getfullargspec(func).defaults
                 optionals = {}
                 while defaultlist is not None and len(defaultlist) > 0:
                     if arglist[-1] not in ["self", "config", "meta_config"]:
@@ -623,7 +624,7 @@ class MacroUpgradeManager(object):
                 break
         if self.tag == "HEAD":
             # Try to figure out the latest upgrade version.
-            macro_insts.sort(self._upgrade_sort)
+            macro_insts.sort(key=cmp_to_key(self._upgrade_sort))
             next_taglist = [m.AFTER_TAG for m in macro_insts]
             temp_list = list(macro_insts)
             for macro in list(temp_list[1:]):
@@ -739,7 +740,6 @@ def main():
     except OSError as exc:
         reporter(exc)
         sys.exit(1)
-
     need_all_versions = opts.all_versions or args
     ok_versions = upgrade_manager.get_tags(only_named=not need_all_versions)
     if args:
@@ -778,6 +778,7 @@ def main():
                                                  upgrade_manager.get_name())
     new_config_map, changes_map = rose.macro.apply_macro_to_config_map(
         combined_config_map, meta_config, macro_function, macro_name=macro_id)
+    sys.stdout.flush()  # Ensure text from macro output before next fn
     has_changes = rose.macro.handle_transform(config_map, new_config_map,
                                               changes_map, macro_id,
                                               opts.conf_dir, opts.output_dir,

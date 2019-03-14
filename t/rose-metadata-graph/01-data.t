@@ -22,7 +22,8 @@
 . $(dirname $0)/test_header_extra
 . $(dirname $0)/test_header
 
-python2 -c "import pygraphviz" 2>/dev/null || \
+skip_all "Disabled - Not working in Python3 yet"
+python3 -c "import pygraphviz" 2>/dev/null || \
     skip_all '"pygraphviz" not installed'
 #-------------------------------------------------------------------------------
 tests 12

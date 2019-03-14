@@ -45,4 +45,4 @@
 #     -u, --upper
 #         Shorthand for `--case=upper`.
 #-------------------------------------------------------------------------------
-exec python2 -m rose.namelist_dump "$@"
+exec python3 -m rose.namelist_dump "$@"

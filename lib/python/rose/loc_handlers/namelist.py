@@ -25,6 +25,7 @@ import rose.config
 from rose.config_processor import ConfigProcessError
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.reporter import Event
+from functools import cmp_to_key
 
 
 RE_NAMELIST_GROUP = re.compile(r"\Anamelist:(\w+).*\Z")
@@ -52,10 +53,10 @@ class NamelistLocHandler(object):
         loc.loc_type = loc.TYPE_BLOB
         if loc.name.endswith("(:)"):
             name = loc.name[0:-2]
-            sections = [k for k in conf_tree.node.value.keys()
+            sections = [k for k in list(conf_tree.node.value)
                         if k.startswith(name)]
         else:
-            sections = [k for k in conf_tree.node.value.keys()
+            sections = [k for k in list(conf_tree.node.value)
                         if k == loc.name]
         for section in list(sections):
             section_value = conf_tree.node.get_value([section])
@@ -69,22 +70,22 @@ class NamelistLocHandler(object):
         """Write namelist to loc.cache."""
         sections = self.parse(loc, conf_tree)
         if loc.name.endswith("(:)"):
-            sections.sort(rose.config.sort_settings)
-        handle = open(loc.cache, "wb")
-        for section in sections:
-            section_value = conf_tree.node.get_value([section])
-            group = RE_NAMELIST_GROUP.match(section).group(1)
-            nlg = "&" + group + "\n"
-            for key, node in sorted(section_value.items()):
-                if node.state:
-                    continue
-                try:
-                    value = env_var_process(node.value)
-                except UnboundEnvironmentVariableError as exc:
-                    raise ConfigProcessError([section, key], node.value, exc)
-                nlg += "%s=%s,\n" % (key, value)
-            nlg += "/" + "\n"
-            handle.write(nlg)
-            self.manager.handle_event(NamelistEvent(nlg))
-
-        handle.close()
+            sections.sort(key=cmp_to_key(rose.config.sort_settings))
+        with open(loc.cache, "wb") as handle:
+            for section in sections:
+                section_value = conf_tree.node.get_value([section])
+                group = RE_NAMELIST_GROUP.match(section).group(1)
+                nlg = "&" + group + "\n"
+                for key, node in sorted(section_value.items()):
+                    if node.state:
+                        continue
+                    try:
+                        value = env_var_process(node.value)
+                    except UnboundEnvironmentVariableError as exc:
+                        raise ConfigProcessError([section, key],
+                                                 node.value,
+                                                 exc)
+                    nlg += "%s=%s,\n" % (key, value)
+                nlg += "/" + "\n"
+                handle.write(nlg.encode('UTF-8'))
+                self.manager.handle_event(NamelistEvent(nlg))

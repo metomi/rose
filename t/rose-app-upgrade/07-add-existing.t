@@ -36,7 +36,7 @@ __CONFIG__
 setup
 init_meta park no-dinosaurs dinosaurs HEAD
 init_macro park <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 

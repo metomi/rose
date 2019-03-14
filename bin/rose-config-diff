@@ -114,4 +114,4 @@
 #           rose config-diff --ignore=namelist:bar --ignore=namelist:baz ...
 #
 #-------------------------------------------------------------------------------
-exec python2 -m rose.config_diff "$@"
+exec python3 -m rose.config_diff "$@"

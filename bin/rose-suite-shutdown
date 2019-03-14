@@ -54,4 +54,4 @@
 #         See the cylc documentation, cylc shutdown for options and details on 
 #         `EXTRA-ARGS`.
 #-------------------------------------------------------------------------------
-exec python2 -m rose.suite_control shutdown "$@"
+exec python3 -m rose.suite_control shutdown "$@"

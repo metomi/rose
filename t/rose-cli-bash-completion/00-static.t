@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 201
+tests 197
 setup
 #-------------------------------------------------------------------------------
 # Source the script.
@@ -273,7 +273,7 @@ SEMI_MAJOR_AXIS_M=4.2e8
 __CONFIG__
 init_upgrade_meta jupiter_moons io europa ganymede callisto
 init_upgrade_macro jupiter_moons <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -836,18 +836,6 @@ export ROSE_CONF_PATH=$PWD
 COMP_WORDS=( rosie create --prefix = "" )
 COMP_CWORD=4
 COMPREPLY=
-run_pass "$TEST_KEY" _rose
-compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
-electron
-muon
-tau
-__REPLY__
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#-------------------------------------------------------------------------------
-# List option arguments for "rosie go --prefix= ".
-TEST_KEY=$TEST_KEY_BASE-rosie-go-prefix
-COMP_WORDS=( rosie go --prefix = "" )
 run_pass "$TEST_KEY" _rose
 compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 electron

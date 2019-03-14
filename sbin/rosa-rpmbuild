@@ -67,7 +67,7 @@ License: GPLv3
 URL: https://github.com/metomi/$NAME/
 Source0: https://github.com/metomi/$NAME/releases/
 BuildArch: noarch
-Requires: bash fcm filesystem Jinja2 perl python2 python-cherrypy python-requests SQLAlchemy subversion
+Requires: bash fcm filesystem Jinja2 perl python3 python-cherrypy python-requests SQLAlchemy subversion
 
 %description
 Rose: a framework for managing and running meteorological suites
@@ -81,7 +81,7 @@ rm -fr %{buildroot}
 mkdir -p %{buildroot}/etc/bash_completion.d %{buildroot}/opt %{buildroot}/usr/bin
 cp -p %_sourcedir/$NAME-$REV_BASE_DOT/etc/rose-bash-completion %{buildroot}/etc/bash_completion.d
 cp -pr %_sourcedir/$NAME-$REV_BASE_DOT %{buildroot}/opt/$NAME
-python2 -m compileall %{buildroot}/opt/$NAME/lib
+python3 -m compileall %{buildroot}/opt/$NAME/lib
 cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rose
 cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rosie
 

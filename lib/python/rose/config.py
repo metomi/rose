@@ -34,7 +34,7 @@
 Synopsis:
     >>> # Create a config file.
     >>> with open('config.conf', 'w+') as config_file:
-    ...     config_file.write('''
+    ...     _ = config_file.write('''
     ... [foo]
     ... bar=Bar
     ... !baz=Baz
@@ -49,7 +49,7 @@ Synopsis:
 
     >>> # Retrieve config settings.
     >>> config_node.get(['foo', 'bar'])
-    {'state': '', 'comments': [], 'value': 'Bar'}
+    {'value': 'Bar', 'state': '', 'comments': []}
 
     >>> # Set new config settings.
     >>> _ = config_node.set(['foo', 'new'], 'New')
@@ -97,6 +97,7 @@ from rose.env import env_var_escape
 import shlex
 import sys
 from tempfile import NamedTemporaryFile, TemporaryFile
+from functools import cmp_to_key
 
 
 CHAR_ASSIGN = "="
@@ -133,12 +134,12 @@ class ConfigNode(object):
         >>> _ = config_node.set(keys=['foo', 'bar'], value='Bar')
         >>> _ = config_node.set(keys=['foo', 'baz'], value='Baz')
         >>> config_node # doctest: +NORMALIZE_WHITESPACE
-        {'state': '', 'comments': [],
-         'value': {'foo': {'state': '', 'comments': [],
-                           'value': {'baz': {'state': '', 'comments': [],
-                                             'value': 'Baz'},
-                                     'bar': {'state': '', 'comments': [],
-                                             'value': 'Bar'}}}}}
+        {'value': {'foo': {'value': {'bar': {'value': 'Bar',
+                                             'state': '', 'comments': []},
+                                     'baz': {'value': 'Baz',
+                                             'state': '', 'comments': []}},
+                           'state': '', 'comments': []}},
+         'state': '', 'comments': []}
 
         >>> # Set the state of a node.
         >>> _ = config_node.set(keys=['foo', 'bar'],
@@ -150,7 +151,7 @@ class ConfigNode(object):
 
         >>> # Walk over the hierarchical structure of a node.
         >>> [keys for keys, sub_node in config_node.walk()]
-        [['foo'], ['foo', 'bar'], ['foo', 'baz']]
+        [['foo'], ['foo', 'baz'], ['foo', 'bar']]
 
         >>> # Walk over the config skipping ignored sections.
         >>> [keys for keys, sub_node in config_node.walk(no_ignore=True)]
@@ -161,12 +162,11 @@ class ConfigNode(object):
         >>> _ = another_config_node.set(keys=['new'], value='New')
         >>> new_config_node = config_node + another_config_node
         >>> [keys for keys, sub_node in new_config_node.walk()]
-        [['foo'], ['foo', 'baz'], ['foo', 'bar'], ['', 'new']]
+        [['', 'new'], ['foo'], ['foo', 'baz'], ['foo', 'bar']]
 
     """
 
-    __slots__ = ["STATE_NORMAL", "STATE_USER_IGNORED",
-                 "STATE_SYST_IGNORED", "value", "state", "comments"]
+    __slots__ = ["value", "state", "comments"]
 
     STATE_NORMAL = ""
     """The default state of a ConfigNode."""
@@ -259,11 +259,11 @@ class ConfigNode(object):
 
             >>> # Walk over the full hierarchy.
             >>> [keys for keys, sub_node in config_node.walk()]
-            [['foo'], ['foo', 'bar'], ['foo', 'baz']]
+            [['foo'], ['foo', 'baz'], ['foo', 'bar']]
 
             >>> # Walk over one branch of the hierarchy
             >>> [keys for keys, sub_node in config_node.walk(keys=['foo'])]
-            [['foo', 'bar'], ['foo', 'baz']]
+            [['foo', 'baz'], ['foo', 'bar']]
 
             >>> # Skip over ignored nodes.
             >>> [keys for keys, sub_node in config_node.walk(no_ignore=True)]
@@ -320,16 +320,16 @@ class ConfigNode(object):
 
             >>> # A ConfigNode containing sub-nodes.
             >>> config_node.get(keys=['foo']) # doctest: +NORMALIZE_WHITESPACE
-            {'state': '', 'comments': [],
-             'value': {'baz': {'state': '!', 'comments': [], 'value': 'Baz'},
-                       'bar': {'state': '', 'comments': [], 'value': 'Bar'}}}
+            {'value': {'bar': {'value': 'Bar', 'state': '', 'comments': []},
+                       'baz': {'value': 'Baz', 'state': '!', 'comments': []}},
+             'state': '', 'comments': []}
 
             >>> # A bottom level sub-node.
             >>> config_node.get(keys=['foo', 'bar'])
-            {'state': '', 'comments': [], 'value': 'Bar'}
+            {'value': 'Bar', 'state': '', 'comments': []}
 
             >>> # Skip ignored nodes.
-            >>> print config_node.get(keys=['foo', 'baz'], no_ignore=True)
+            >>> print(config_node.get(keys=['foo', 'baz'], no_ignore=True))
             None
 
         """
@@ -360,15 +360,15 @@ class ConfigNode(object):
         Examples:
             >>> config_node = ConfigNode(value=42)
             >>> config_node.get_filter(False)
-            {'state': '', 'comments': [], 'value': 42}
+            {'value': 42, 'state': '', 'comments': []}
             >>> config_node.get_filter(True)
-            {'state': '', 'comments': [], 'value': 42}
+            {'value': 42, 'state': '', 'comments': []}
 
             >>> config_node = ConfigNode(value=42,
             ...                      state=ConfigNode.STATE_USER_IGNORED)
             >>> config_node.get_filter(False)
-            {'state': '!', 'comments': [], 'value': 42}
-            >>> print config_node.get_filter(True)
+            {'value': 42, 'state': '!', 'comments': []}
+            >>> print(config_node.get_filter(True))
             None
 
 
@@ -401,13 +401,13 @@ class ConfigNode(object):
             >>> # root ConfigNode (which in this case is a dict of its
             >>> # sub-nodes).
             >>> config_node.get_value() # doctest: +NORMALIZE_WHITESPACE
-            {'foo': {'state': '', 'comments': [],
-                     'value': {'bar': {'state': '', 'comments': [],
-                                       'value': 'Bar'}}}}
+            {'foo': {'value': {'bar': {'value': 'Bar', 'state': '',
+                                       'comments': []}},
+                     'state': '', 'comments': []}}
 
             >>> # Intermediate level ConfigNode.
             >>> config_node.get_value(keys=['foo'])
-            {'bar': {'state': '', 'comments': [], 'value': 'Bar'}}
+            {'bar': {'value': 'Bar', 'state': '', 'comments': []}}
 
             >>> # Bottom level ConfigNode.
             >>> config_node.get_value(keys=['foo', 'bar'])
@@ -440,25 +440,26 @@ class ConfigNode(object):
             >>> # Create ConfigNode.
             >>> config_node = ConfigNode()
             >>> config_node
-            {'state': '', 'comments': [], 'value': {}}
+            {'value': {}, 'state': '', 'comments': []}
 
             >>> # Add a sub-node at the position 'foo' with the comment 'Info'.
             >>> config_node.set(keys=['foo'], comments='Info')
             ... # doctest: +NORMALIZE_WHITESPACE
-            {'state': '', 'comments': [],
-             'value': {'foo': {'state': '', 'comments': 'Info', 'value': {}}}}
+            {'value': {'foo': {'value': {}, 'state': '', 'comments': 'Info'}},
+             'state': '', 'comments': []}
 
             >>> # Set the value for the sub-node at the position
             >>> # 'foo' to 'Foo'.
             >>> config_node.set(keys=['foo'], value='Foo')
             ... # doctest: +NORMALIZE_WHITESPACE
-            {'state': '', 'comments': [], 'value': {'foo': {'state': '',
-             'comments': 'Info', 'value': 'Foo'}}}
+            {'value': {'foo': {'value': 'Foo', 'state': '',
+                               'comments': 'Info'}},
+             'state': '', 'comments': []}
 
             >>> # Set the value of the ConfigNode to True, this overwrites all
             >>> # sub-nodes!
             >>> config_node.set(keys=[''], value=True)
-            {'state': '', 'comments': [], 'value': True}
+            {'value': True, 'state': '', 'comments': []}
 
         """
         if keys is None:
@@ -502,19 +503,19 @@ class ConfigNode(object):
             >>> _ = config_node.set(keys=['foo'], value='Foo')
 
             >>> # Unset without providing any keys does nothing.
-            >>> print config_node.unset()
+            >>> print(config_node.unset())
             None
 
             >>> # Unset with invalid keys does nothing.
-            >>> print config_node.unset(keys=['bar'])
+            >>> print(config_node.unset(keys=['bar']))
             None
 
             >>> # Unset with valid keys removes the node from the node.
             >>> config_node.unset(keys=['foo'])
-            {'state': '', 'comments': [], 'value': 'Foo'}
+            {'value': 'Foo', 'state': '', 'comments': []}
 
             >>> config_node
-            {'state': '', 'comments': [], 'value': {}}
+            {'value': {}, 'state': '', 'comments': []}
 
         """
         if keys is None:
@@ -549,7 +550,7 @@ class ConfigNode(object):
             >>> # Apply ConfigNodeDiff to ConfigNode
             >>> config_node.add(config_node_diff)
             >>> [keys for keys, sub_node in config_node.walk()]
-            [['foo'], ['foo', 'bar'], ['foo', 'baz']]
+            [['foo'], ['foo', 'baz'], ['foo', 'bar']]
         """
         for added_key, added_data in config_diff.get_added():
             value, state, comments = added_data
@@ -589,9 +590,9 @@ class ConfigNode(object):
         Examples:
             >>> # Add one ConfigNode to another ConfigNode
             >>> config_node_1 = ConfigNode()
-            >>> config_node_1.set(keys=['foo'], value='Foo')
+            >>> _ = config_node_1.set(keys=['foo'], value='Foo')
             >>> config_node_2 = ConfigNode()
-            >>> config_node_2.set(keys=['bar'], value='Bar')
+            >>> _ = config_node_2.set(keys=['bar'], value='Bar')
             >>> new_config_node = config_node_1 + config_node_2
             >>> [keys for keys, sub_node in new_config_node.walk()]
             [['', 'bar'], ['', 'foo']]
@@ -626,9 +627,9 @@ class ConfigNode(object):
         Examples:
             >>> # Create a ConfigNodeDiff from two ConfigNodes
             >>> config_node_1 = ConfigNode()
-            >>> config_node_1.set(keys=['foo'], value='Foo')
+            >>> _ = config_node_1.set(keys=['foo'], value='Foo')
             >>> config_node_2 = ConfigNode()
-            >>> config_node_2.set(keys=['bar'], value='Bar')
+            >>> _ = config_node_2.set(keys=['bar'], value='Bar')
             >>> config_node_diff = config_node_1 - config_node_2
 
             >>> config_node_diff.get_added()
@@ -677,7 +678,7 @@ class ConfigNodeDiff(object):
             >>> config_node.add(config_node_diff)
             >>> [(keys, sub_node.get_value()) for keys, sub_node in
             ...  config_node.walk()]
-            [(['', 'baz'], 'Baz'), (['', 'bar'], 'Bar')]
+            [(['', 'bar'], 'Bar'), (['', 'baz'], 'Baz')]
 
             >>> # Create a ConfigNodeDiff by comparing two ConfigNodes.
             >>> another_config_node = ConfigNode()
@@ -768,8 +769,8 @@ class ConfigNodeDiff(object):
             ...                                      ('Bar', None, None,))
             >>> config_node = config_node_diff.get_as_opt_config()
             >>> list(config_node.walk()) # doctest: +NORMALIZE_WHITESPACE
-            [(['', 'bar'], {'state': '!', 'comments': [], 'value': 'Bar'}),
-             (['', 'foo'], {'state': '', 'comments': [], 'value': 'Foo'})]
+            [(['', 'bar'], {'value': 'Bar', 'state': '!', 'comments': []}),
+             (['', 'foo'], {'value': 'Foo', 'state': '', 'comments': []})]
 
         """
         node = ConfigNode()
@@ -806,9 +807,9 @@ class ConfigNodeDiff(object):
             >>> config_node.add(config_node_diff)
 
             >>> list(config_node.walk()) # doctest: +NORMALIZE_WHITESPACE
-            [(['', 'bar'], {'state': '!', 'comments': 'Some Info',
-                            'value': 'Bar'}),
-             (['', 'foo'], {'state': '', 'comments': [], 'value': 'Foo'})]
+            [(['', 'foo'], {'value': 'Foo', 'state': '', 'comments': []}),
+             (['', 'bar'],
+              {'value': 'Bar', 'state': '!', 'comments': 'Some Info'})]
 
         """
         keys = tuple(keys)
@@ -841,7 +842,8 @@ class ConfigNodeDiff(object):
             >>> # Apply the ConfigNodeDiff to the ConfigNode
             >>> config_node.add(config_node_diff)
             >>> config_node.get(keys=['foo'])
-            {'state': '', 'comments': 'Some Info', 'value': 'New Foo'}
+            {'value': 'New Foo', 'state': '', 'comments': 'Some Info'}
+
         """
         keys = tuple(keys)
         self._data[self.KEY_MODIFIED][keys] = (old_data, data)
@@ -866,7 +868,7 @@ class ConfigNodeDiff(object):
 
             >>> # Apply the ConfigNodeDiff to the ConfigNode
             >>> config_node.add(config_node_diff)
-            >>> print config_node.get(keys=['foo'])
+            >>> print(config_node.get(keys=['foo']))
             None
 
         """
@@ -1062,15 +1064,16 @@ class ConfigDumper(object):
                 target_dir = "."
             if not os.path.isdir(target_dir):
                 os.makedirs(target_dir)
-            handle = NamedTemporaryFile(prefix=os.path.basename(target),
+            handle = NamedTemporaryFile(mode='w',
+                                        prefix=os.path.basename(target),
                                         dir=target_dir, delete=False)
         blank = ""
         if root.comments:
             for comment in root.comments:
-                handle.write(self._comment_format(comment))
+                self._write_safely(handle, self._comment_format(comment))
             blank = "\n"
-        root_keys = root.value.keys()
-        root_keys.sort(sort_sections)
+        root_keys = list(root.value.keys())
+        root_keys.sort(key=cmp_to_key(sort_sections))
         root_option_keys = []
         section_keys = []
         for key in root_keys:
@@ -1079,7 +1082,7 @@ class ConfigDumper(object):
             else:
                 section_keys.append(key)
         if root_option_keys:
-            handle.write(blank)
+            self._write_safely(handle, blank)
             blank = "\n"
             if concat_mode:
                 handle.write(CHAR_SECTION_OPEN + CHAR_SECTION_CLOSE + "\n")
@@ -1088,17 +1091,18 @@ class ConfigDumper(object):
                     key, root.value[key], handle, env_escape_ok)
         for section_key in section_keys:
             section_node = root.value[section_key]
-            handle.write(blank)
+            self._write_safely(handle, blank)
             blank = "\n"
             for comment in section_node.comments:
-                handle.write(self._comment_format(comment))
-            handle.write("%(open)s%(state)s%(key)s%(close)s\n" % {
-                "open": CHAR_SECTION_OPEN,
-                "state": section_node.state,
-                "key": section_key,
-                "close": CHAR_SECTION_CLOSE})
-            keys = section_node.value.keys()
-            keys.sort(sort_option_items)
+                self._write_safely(handle, self._comment_format(comment))
+            self._write_safely(
+                handle, "%(open)s%(state)s%(key)s%(close)s\n" % {
+                    "open": CHAR_SECTION_OPEN,
+                    "state": section_node.state,
+                    "key": section_key,
+                    "close": CHAR_SECTION_CLOSE})
+            keys = list(section_node.value.keys())
+            keys.sort(key=cmp_to_key(sort_option_items))
             for key in keys:
                 value = section_node.value[key]
                 self._string_node_dump(key, value, handle, env_escape_ok)
@@ -1118,25 +1122,38 @@ class ConfigDumper(object):
 
         """
         state = node.state
-        values = node.value.split("\n")
+        try:
+            values = node.value.decode().split("\n")
+        except AttributeError:
+            values = node.value.split("\n")
         for comment in node.comments:
-            handle.write(self._comment_format(comment))
+            self._write_safely(handle, self._comment_format(comment))
         value0 = values.pop(0)
         if env_escape_ok:
             value0 = env_var_escape(value0)
-        handle.write(state + key + self.char_assign + value0)
-        handle.write("\n")
+        self._write_safely(handle, state + key + self.char_assign + value0)
+        self._write_safely(handle, "\n")
         if values:
             indent = " " * len(state + key)
             for value in values:
                 if env_escape_ok:
                     value = env_var_escape(value)
-                handle.write(indent + self.char_assign + value + "\n")
+                self._write_safely(handle,
+                                   indent + self.char_assign + value + "\n")
 
     @classmethod
     def _comment_format(cls, comment):
         """Return text representation of a configuration comment."""
         return "#%s\n" % (comment)
+
+    @staticmethod
+    def _write_safely(handle, text):
+        try:
+            handle.write(text)
+        except TypeError:
+            handle.write(text.encode('UTF-8'))
+        except UnicodeEncodeError:
+            handle.buffer.write(text.encode('UTF-8'))
 
 
 class ConfigLoader(object):
@@ -1145,7 +1162,7 @@ class ConfigLoader(object):
 
     Example:
         >>> with open('config.conf', 'w+') as config_file:
-        ...     config_file.write('''
+        ...     _ = config_file.write('''
         ... [foo]
         ... !bar=Bar
         ... baz=Baz
@@ -1156,7 +1173,7 @@ class ConfigLoader(object):
         ... except ConfigSyntaxError:
         ...     raise  # Handle exception.
         >>> config_node.get(keys=['foo', 'bar'])
-        {'state': '!', 'comments': [], 'value': 'Bar'}
+        {'value': 'Bar', 'state': '!', 'comments': []}
     """
 
     RE_SECTION = re.compile(
@@ -1235,14 +1252,14 @@ class ConfigLoader(object):
 
             >>> # Write config file.
             >>> with open('config.conf', 'w+') as config_file:
-            ...     config_file.write('''
+            ...     _ = config_file.write('''
             ... [foo]
             ... bar=Bar
             ...     ''')
             >>> # Write optional config file (foo).
             >>> os.mkdir('opt')
             >>> with open('opt/config-foo.conf', 'w+') as opt_config_file:
-            ...     opt_config_file.write('''
+            ...     _ = opt_config_file.write('''
             ... [foo]
             ... bar=Baz
             ...     ''')
@@ -1331,9 +1348,9 @@ class ConfigLoader(object):
                 sect = ""
             if value is None:
                 value = ""
-            source.write("[%s]\n" % sect)
+            source.write(("[%s]\n" % sect).encode())
             if key is not None:
-                source.write("%s=%s\n" % (key, value))
+                source.write(("%s=%s\n" % (key, value)).encode())
         source.seek(0)
         node = self.load(source, node)
         return node
@@ -1352,7 +1369,7 @@ class ConfigLoader(object):
         Examples:
             >>> # Create example config file.
             >>> with open('config.conf', 'w+') as config_file:
-            ...     config_file.write('''
+            ...     _ = config_file.write('''
             ... [foo]
             ... # Some comment
             ... !bar=Bar
@@ -1365,7 +1382,7 @@ class ConfigLoader(object):
             ... except ConfigSyntaxError:
             ...     raise  # Handle exception.
             >>> config_node.get(keys=['foo', 'bar'])
-            {'state': '!', 'comments': [' Some comment'], 'value': 'Bar'}
+            {'value': 'Bar', 'state': '!', 'comments': [' Some comment']}
 
         """
         if node is None:
@@ -1378,6 +1395,8 @@ class ConfigLoader(object):
         # Note: "for line in handle:" hangs for sys.stdin
         while True:
             line = handle.readline()
+            if isinstance(line, bytes):
+                line = line.decode(errors='ignore')
             if not line:
                 break
             line_num += 1
@@ -1511,7 +1530,7 @@ class ConfigLoader(object):
                 file_name = self.UNKNOWN_NAME
         else:
             file_name = os.path.abspath(file_)
-            file_ = open(file_name, "r")
+            file_ = open(file_name, "rb")
         return (file_, file_name)
 
 
@@ -1530,13 +1549,14 @@ class ConfigSyntaxError(Exception):
 
     Examples:
         >>> with open('config.conf', 'w+') as config_file:
-        ...     config_file.write('[foo][foo]')
+        ...     _ = config_file.write('[foo][foo]')
         >>> loader = ConfigLoader()
         >>> try:
         ...     loader.load('config.conf')
         ... except ConfigSyntaxError as exc:
-        ...     print 'Error (%s) in file "%s" at %s:%s' % (
-        ...         exc.code, exc.file_name, exc.line_num, exc.col_num)
+        ...     print('Error (%s) in file "%s" at %s:%s' % (
+        ...         exc.code, exc.file_name, exc.line_num, exc.col_num))
+        ... # doctest: +ELLIPSIS
         Error (BAD_CHAR) in file "..." at 1:5
 
     """
@@ -1580,20 +1600,23 @@ def load(source, root=None):
 
 def sort_element(elem_1, elem_2):
     """Sort pieces of text, numerically if possible."""
-    if elem_1.isdigit():
-        if elem_2.isdigit():
-            return cmp(int(elem_1), int(elem_2))
+    if elem_1.isdigit() and elem_2.isdigit():
+        # This logic replicates output of the deprecated Python2 `cmp` builtin
+        return (int(elem_1) > int(elem_2)) - (int(elem_1) < int(elem_2))
+    elif elem_1.isdigit():
         return -1
     elif elem_2.isdigit():
         return 1
-    return cmp(elem_1, elem_2)
+    else:
+        return (elem_1 > elem_2) - (elem_1 < elem_2)
 
 
 def sort_settings(setting_1, setting_2):
     """Sort sections and options, by numeric element if possible."""
-    if (not isinstance(setting_1, basestring) or
-            not isinstance(setting_2, basestring)):
-        return cmp(setting_1, setting_2)
+    if (not isinstance(setting_1, str) or
+            not isinstance(setting_2, str)):
+        # This logic replicates output of the deprecated Python2 `cmp` builtin
+        return (setting_1 > setting_2) - (setting_1 < setting_2)
     match_1 = REC_SETTING_ELEMENT.match(setting_1)
     match_2 = REC_SETTING_ELEMENT.match(setting_2)
     if match_1 and match_2:
@@ -1601,4 +1624,5 @@ def sort_settings(setting_1, setting_2):
         text_2, num_2 = match_2.groups()
         if text_1 == text_2:
             return sort_element(num_1, num_2)
-    return cmp(setting_1, setting_2)
+    # This logic replicates output of the deprecated Python2 `cmp` builtin
+    return (setting_1 > setting_2) - (setting_1 < setting_2)

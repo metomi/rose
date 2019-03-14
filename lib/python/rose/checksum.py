@@ -124,22 +124,39 @@ def guess_checksum_algorithm(checksum):
 
 
 def _get_hexdigest(algorithm, source):
-    """Load content of source into an hash object, and return its hexdigest."""
-    hashobj = hashlib.new(algorithm)
+    """Load content of source into an hash object, and return its hexdigest.
+
+    Args:
+        algorithm (str):
+            Hash algorithm as namespaced in hashlib.
+        source (str, file):
+            The item to hexdigest, can be:
+
+            * Path to a file (``str``).
+            * Path to a directory (``str``).
+            * A file object ``readable`` in bytes mode.
+
+    """
     if hasattr(source, "read"):
         handle = source
     else:
-        handle = open(source)
+        handle = open(source, 'rb')
+
+    # Attempt to find the preferred file system block size
     try:
         f_bsize = os.statvfs(handle.name).f_bsize
     except (AttributeError, OSError):
         f_bsize = 4096
+
+    # Spoon the data into a hashobj
+    hashobj = hashlib.new(algorithm)
     while True:
         bytes_ = handle.read(f_bsize)
         if not bytes_:
             break
         hashobj.update(bytes_)
     handle.close()
+
     return hashobj.hexdigest()
 
 

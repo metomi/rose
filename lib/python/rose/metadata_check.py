@@ -22,11 +22,11 @@
 import os
 import re
 import sys
+from functools import cmp_to_key
 
 import rose.config
 import rose.config_tree
 import rose.formats.namelist
-from rose.gtk import INTERACTIVE_ENABLED
 import rose.macro
 import rose.macros
 import rose.opt_parse
@@ -172,7 +172,7 @@ def _check_value_titles(title_value, values_value):
 
 def _check_type(value):
     types = rose.variable.parse_type_expression(value)
-    if isinstance(types, basestring):
+    if isinstance(types, str):
         types = [types]
     if " " in value and "," not in value:
         types = [value]
@@ -206,13 +206,7 @@ def _check_value_hints(hints_value):
 
 def _check_widget(value, module_files=None, meta_dir=None):
     """Check widget setting is OK.
-
-    Ignore if no DISPLAY in environment and GTK widget requires display.
     """
-    if not INTERACTIVE_ENABLED:
-        # gtk 2.0 not available, skip check.
-        return
-
     if module_files is None:
         module_files = _get_module_files(meta_dir)
     if not module_files:
@@ -250,8 +244,8 @@ def metadata_check(meta_config, meta_dir=None,
     allowed_properties = get_allowed_metadata_properties()
     reports = []
     module_files = _get_module_files(meta_dir)
-    sections = meta_config.value.keys()
-    sections.sort(rose.config.sort_settings)
+    sections = list(meta_config.value)
+    sections.sort(key=cmp_to_key(rose.config.sort_settings))
     for section in sections:
         node = meta_config.value[section]
         if node.is_ignored() or not isinstance(node.value, dict):
@@ -275,8 +269,8 @@ def metadata_check(meta_config, meta_dir=None,
                 value = node.get_value([rose.META_PROP_LENGTH])
                 reports.append(rose.macro.MacroReport(
                     section, rose.META_PROP_LENGTH, value, info))
-        options = node.value.keys()
-        options.sort(rose.config.sort_settings)
+        options = list(node.value)
+        options.sort(key=cmp_to_key(rose.config.sort_settings))
         for option in options:
             opt_node = node.value[option]
             if ((only_these_properties is not None and
@@ -342,7 +336,7 @@ def metadata_check(meta_config, meta_dir=None,
                 new_rep_value = rep_trig_node.value
         reports.append(rose.macro.MacroReport(new_rep_section, new_rep_option,
                                               new_rep_value, report.info))
-    reports.sort(rose.macro.report_sort)
+    reports.sort(key=cmp_to_key(rose.macro.report_sort))
     return reports
 
 

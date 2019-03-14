@@ -42,12 +42,13 @@ It also stores macro base classes and macro library functions.
 import ast
 import copy
 import glob
-import imp
 import inspect
 import os
 import re
 import sys
 import traceback
+from functools import cmp_to_key
+from importlib.machinery import SourceFileLoader
 
 import rose.config
 import rose.config_tree
@@ -56,6 +57,7 @@ from rose.opt_parse import RoseOptionParser
 import rose.reporter
 import rose.resource
 import rose.variable
+import collections.abc
 
 
 ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate", "downgrade", "upgrade",
@@ -236,7 +238,9 @@ class MacroBase(object):
         id1 = self._get_id_from_section_option(rep1.section, rep1.option)
         id2 = self._get_id_from_section_option(rep2.section, rep2.option)
         if id1 == id2:
-            return cmp(rep1.value, rep2.value)
+            # This logic replicates output of the deprecated Python2 `cmp`
+            # builtin
+            return (rep1.value > rep2.value) - (rep1.value < rep2.value)
         return rose.config.sort_settings(id1, id2)
 
     def _load_meta_config(self, config, meta=None, directory=None,
@@ -260,13 +264,13 @@ class MacroBase(object):
         Example:
             >>> # Create a rose app.
             >>> with open('rose-app.conf', 'w+') as app_config:
-            ...     app_config.write('''
+            ...     _ = app_config.write('''
             ... [foo]
             ... bar=2
             ...     ''')
             >>> os.mkdir('meta')
             >>> with open('meta/rose-meta.conf', 'w+') as meta_config:
-            ...     meta_config.write('''
+            ...     _ = meta_config.write('''
             ... [foo=bar]
             ... values = 1,2,3
             ...     ''')
@@ -469,7 +473,7 @@ class MacroValidatorCollection(MacroBase):
                 continue
             macro_method = getattr(macro_inst, VALIDATE_METHOD)
             p_list = macro_method(config, meta_config)
-            p_list.sort(self._sorter)
+            p_list.sort(key=cmp_to_key(self._sorter))
             self.reports += p_list
         return self.reports
 
@@ -488,7 +492,7 @@ class MacroTransformerCollection(MacroBase):
                 continue
             macro_method = getattr(macro_inst, TRANSFORM_METHOD)
             config, c_list = macro_method(config, meta_config)
-            c_list.sort(self._sorter)
+            c_list.sort(key=cmp_to_key(self._sorter))
             self.reports += c_list
         return config, self.reports
 
@@ -744,12 +748,12 @@ def load_meta_macro_modules(meta_files, module_prefix=None):
         else:
             as_name = module_prefix + macro_name
         try:
-            modules.append(imp.load_source(as_name, meta_file))
+            modules.append(SourceFileLoader(as_name, meta_file).load_module())
         except Exception:
             rose.reporter.Reporter()(
                 MacroLoadError(meta_file, traceback.format_exc()))
         sys.path.pop(0)
-    modules.sort()
+    modules.sort(key=str)
     return modules
 
 
@@ -768,9 +772,11 @@ def get_macro_class_methods(macro_modules):
                     doc_string = obj.__doc__
                     macro_methods.append((macro_name, obj_name, att_name,
                                           doc_string))
-    macro_methods.sort(lambda x, y: cmp(x[1], y[1]))
-    macro_methods.sort(lambda x, y: cmp(x[0], y[0]))
-    macro_methods.sort(lambda x, y: cmp(y[2], x[2]))
+    macro_methods.sort(key=lambda x: x[1])
+    macro_methods.sort(key=lambda x: x[1])
+    # This logic replicates output of the deprecated Python2 `cmp` builtin
+    macro_methods.sort(
+        key=cmp_to_key(lambda x, y: (y[2] > x[2]) - (y[2] < x[2])))
     return macro_methods
 
 
@@ -821,12 +827,12 @@ def check_config_integrity(app_config):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node, "node", type(node), "rose.config.ConfigNode"))
         if (not isinstance(node.value, dict) and
-                not isinstance(node.value, basestring)):
+                not isinstance(node.value, str)):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.value, "node.value", type(node.value),
                 "dict, basestring"
             ))
-        if not isinstance(node.state, basestring):
+        if not isinstance(node.state, str):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.state, "node.state", type(node.state), "basestring"))
         if node.state not in [rose.config.ConfigNode.STATE_NORMAL,
@@ -840,12 +846,12 @@ def check_config_integrity(app_config):
                 "list"
             ))
         for comment in node.comments:
-            if not isinstance(comment, basestring):
+            if not isinstance(comment, str):
                 return MacroReturnedCorruptConfigError(
                     ERROR_RETURN_TYPE.format(
                         comment, "comment", type(comment), "basestring"))
         for key in keys:
-            if not isinstance(key, basestring):
+            if not isinstance(key, str):
                 return MacroReturnedCorruptConfigError(
                     ERROR_RETURN_TYPE.format(
                         key, "key", type(key), "basestring"))
@@ -874,8 +880,8 @@ def report_config(app_config, meta_config, run_macro_list, modules,
                     break
             res = {}
             if not opt_non_interactive:
-                arglist = inspect.getargspec(macro_meth).args
-                defaultlist = inspect.getargspec(macro_meth).defaults
+                arglist = inspect.getfullargspec(macro_meth).args
+                defaultlist = inspect.getfullargspec(macro_meth).defaults
                 optionals = {}
                 while defaultlist is not None and len(defaultlist) > 0:
                     if arglist[-1] not in ["self", "config", "meta_config"]:
@@ -931,8 +937,8 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 break
         res = {}
         if not opt_non_interactive:
-            arglist = inspect.getargspec(macro_method).args
-            defaultlist = inspect.getargspec(macro_method).defaults
+            arglist = inspect.getfullargspec(macro_method).args
+            defaultlist = inspect.getfullargspec(macro_method).defaults
             optionals = {}
             while defaultlist is not None and len(defaultlist) > 0:
                 if arglist[-1] not in ["self", "config", "meta_config"]:
@@ -1014,13 +1020,13 @@ def get_metadata_for_config_id(setting_id, meta_config):
     Example:
         >>> # Create a rose app.
         >>> with open('rose-app.conf', 'w+') as app_config:
-        ...     app_config.write('''
+        ...     _ = app_config.write('''
         ... [foo]
         ... bar=2
         ...     ''')
         >>> os.mkdir('meta')
         >>> with open('meta/rose-meta.conf', 'w+') as meta_config:
-        ...     meta_config.write('''
+        ...     _ = meta_config.write('''
         ... [foo=bar]
         ... values = 1,2,3
         ...     ''')
@@ -1182,9 +1188,9 @@ def run_macros(config_map, meta_config, config_name, macro_names,
                 ret_code = 1
             for macro, problem_list in config_problems_map.items():
                 macro_config_problems_map.setdefault(macro, {})
-                problem_list.sort(report_sort)
+                problem_list.sort(key=cmp_to_key(report_sort))
                 macro_config_problems_map[macro][conf_key] = problem_list
-        problem_macros = macro_config_problems_map.keys()
+        problem_macros = list(macro_config_problems_map)
         problem_macros.sort()
         for macro_name in problem_macros:
             config_problems_map = macro_config_problems_map[macro_name]
@@ -1233,7 +1239,9 @@ def report_sort(report1, report2):
         opt1 = report1.option
         opt2 = report2.option
         if opt1 is None or opt2 is None:
-            return cmp(opt1, opt2)
+            # This logic replicates output of the deprecated Python2 `cmp`
+            # builtin
+            return (str(opt1) > str(opt2)) - (str(opt1) < str(opt2))
         return rose.config.sort_settings(opt1, opt2)
     return rose.config.sort_settings(sect1, sect2)
 
@@ -1247,7 +1255,7 @@ def get_reports_as_text(config_reports_map, macro_id,
     config_issues_list = []
 
     main_reports = set(config_reports_map.get(None, []))
-    conf_keys = sorted(config_reports_map)
+    conf_keys = list(config_reports_map)
     conf_keys = sorted(conf_keys, key=lambda x: x is not None)
     for conf_key in conf_keys:
         reports = config_reports_map[conf_key]
@@ -1309,7 +1317,7 @@ def handle_transform(config_map, new_config_map, change_map, macro_id,
                                  is_from_transform=True),
              level=reporter.V, prefix="")
     if has_changes and (opt_non_interactive or _get_user_accept()):
-        for conf_key, config in sorted(new_config_map.items()):
+        for conf_key, config in new_config_map.items():
             dump_config(config, opt_conf_dir, opt_output_dir,
                         conf_key=conf_key)
         if reporter is not None:
@@ -1378,7 +1386,7 @@ def apply_macro_to_config_map(config_map, meta_config, macro_function,
     """Apply a transform macro function to a config_map."""
     new_config_map = {}
     changes_map = {}
-    conf_keys = sorted(config_map)
+    conf_keys = list(config_map)
     conf_keys = sorted(conf_keys, key=lambda x: x is not None)
     for conf_key in conf_keys:
         config = config_map[conf_key]
@@ -1408,7 +1416,7 @@ def apply_macro_to_config_map(config_map, meta_config, macro_function,
 
 def _get_user_accept():
     try:
-        user_input = raw_input(PROMPT_ACCEPT_CHANGES)
+        user_input = input(PROMPT_ACCEPT_CHANGES)
     except EOFError:
         user_allowed_changes = False
     else:
@@ -1425,8 +1433,8 @@ def get_user_values(options, ignore=None):
         entered = False
         while not entered:
             try:
-                user_input = raw_input("Value for " + str(key) + " (default " +
-                                       str(val) + "): ")
+                user_input = input("Value for " + str(key) + " (default " +
+                                   str(val) + "): ")
             except EOFError:
                 user_input = ""
                 entered = True

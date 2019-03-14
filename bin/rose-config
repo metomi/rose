@@ -99,4 +99,4 @@
 #     optional ROSE_META_PATH
 #         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
-exec python2 -m rose.config_cli "$@"
+exec python3 -m rose.config_cli "$@"

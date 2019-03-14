@@ -21,6 +21,7 @@
 # Prune only host relevant to the relevant cycle.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 
 JOB_HOSTS="$(rose config --default= 't' 'job-hosts')"
 JOB_HOST_1="$(awk '{print $1}' <<<"${JOB_HOSTS}")"

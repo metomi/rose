@@ -19,8 +19,6 @@
 # -----------------------------------------------------------------------------
 """An extension for auto-documenting command line interfaces."""
 
-from __future__ import print_function
-
 from collections import OrderedDict
 import re
 from subprocess import PIPE, check_output, CalledProcessError
@@ -425,7 +423,7 @@ def get_rose_command_reference(command_name):
     # Obtain help text.
     cmd = [command_name, 'doc']
     try:
-        stdout = check_output(cmd)
+        stdout = check_output(cmd).decode()
     except CalledProcessError:
         sys.exit(1)
 

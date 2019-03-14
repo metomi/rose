@@ -20,6 +20,7 @@
 # Test "rose suite-log --update TASK", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "skipped: @TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')

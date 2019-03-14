@@ -1,6 +1,6 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
-from __future__ import print_function
+
 
 # png.py - PNG encoder/decoder in pure Python
 #
@@ -167,7 +167,7 @@ try:
     # filtering functions defined later in this file (see `class
     # pngfilters`).
     import cpngfilters as pngfilters
-except ImportError:
+except ModuleNotFoundError:
     pass
 
 

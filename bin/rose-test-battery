@@ -52,14 +52,14 @@
 . $(dirname $0)/../lib/bash/rose_log
 rose_init
 mkdir -p ~/.metomi
-if [[ $ROSE_HOME != $(rose_readlink_canonicalize .) ]]; then
+if [[ $ROSE_HOME != . ]]; then
     info 1 cd "$ROSE_HOME"
     cd "$ROSE_HOME"
 fi
 # Recompile *.pyc files to ensure we are running the current code.
 if [[ -w 'lib/python/' ]]; then
     find 'lib/python/' -name '*.pyc' -type 'f' -delete
-    python2 -mcompileall -q 'lib/python/'
+    python3 -mcompileall -q 'lib/python/'
 fi
 if PROVE_OPTIONS=$(rose config t prove-options); then
     exec prove $PROVE_OPTIONS -r "${@:-t}"
@@ -67,7 +67,7 @@ else
     if [[ -f /proc/cpuinfo ]]; then
         NPROC=$(grep -ic processor /proc/cpuinfo)
     else
-        NPROC=$(python2 -c \
+        NPROC=$(python3 -c \
             'import multiprocessing; print multiprocessing.cpu_count()')
     fi
     exec prove -j "$NPROC" -s -r "${@:-t}"

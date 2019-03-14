@@ -82,4 +82,4 @@
 #         is intended to specify the revision of `fcm-make` config files.
 #
 #-------------------------------------------------------------------------------
-exec python2 -m rose.stem "$@"
+exec python3 -m rose.stem "$@"

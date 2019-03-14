@@ -31,4 +31,4 @@
 #         Specify the name of one or more Rosie web service servers to use.
 #         This option can be used multiple times.
 #-------------------------------------------------------------------------------
-exec python2 -m rosie.ws_client_cli hello "$@"
+exec python3 -m rosie.ws_client_cli hello "$@"

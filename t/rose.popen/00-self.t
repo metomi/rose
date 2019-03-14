@@ -20,5 +20,5 @@
 D=$(cd $(dirname $0) && pwd)
 . $D/test_header
 tests 1
-run_pass "$TEST_KEY_BASE" python2 $ROSE_HOME/lib/python/rose/popen.py "$@"
+run_pass "$TEST_KEY_BASE" python3 $ROSE_HOME/lib/python/rose/popen.py "$@"
 exit 0

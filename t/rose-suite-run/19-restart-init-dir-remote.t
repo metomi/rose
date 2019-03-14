@@ -21,6 +21,7 @@
 # on remote host.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "@TODO: Awaiting App upgrade to Python3"
 
 T_HOST=$(rose config --default= t job-host)
 T_HOST_RUN_ROOT=$(rose config --default= t job-host-run-root)
@@ -32,7 +33,7 @@ T_HOST=$(rose host-select -q $T_HOST)
 SSH='ssh -oBatchMode=yes'
 function ssh_mkdtemp() {
     local T_HOST=$1
-    $SSH $T_HOST python2 - <<'__PYTHON__'
+    $SSH $T_HOST python3 - <<'__PYTHON__'
 import os
 from tempfile import mkdtemp
 print mkdtemp(dir=os.path.expanduser("~"), prefix="rose-")

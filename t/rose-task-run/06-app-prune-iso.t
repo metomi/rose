@@ -20,6 +20,7 @@
 # Test rose_prune built-in application, basic cycle housekeep usage.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "@TODO: Awaiting App upgrade to Python3"
 
 #-------------------------------------------------------------------------------
 # Test the suite.

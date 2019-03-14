@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 init </dev/null
 rm config/rose-app.conf
-TEST_PARSER="python2 $TEST_SOURCE_DIR/$TEST_KEY_BASE.py"
+TEST_PARSER="python3 $TEST_SOURCE_DIR/$TEST_KEY_BASE.py"
 #-------------------------------------------------------------------------------
 tests 24
 #-------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ TEST_KEY=$TEST_KEY_BASE-standard
 setup
 run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_numeric: 40, 50; namelist:nl1=my_no_values; namelist:nl1=my_other_no_values;"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-{'namelist:nl1=my_other_no_values': [], 'namelist:nl1=my_numeric': ['40', '50'], 'namelist:nl1=my_no_values': []}
+{'namelist:nl1=my_numeric': ['40', '50'], 'namelist:nl1=my_no_values': [], 'namelist:nl1=my_other_no_values': []}
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -97,7 +97,7 @@ TEST_KEY=$TEST_KEY_BASE-complex
 setup
 run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_numeric: 40, 50; namelist:nl1=my_logical_expr: this != 40; namelist:nl1=my_strings: \;range\;, quadrillion, 'hopefully, a joined-up string; a block of characters'"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-{'namelist:nl1=my_logical_expr': ['this != 40'], 'namelist:nl1=my_numeric': ['40', '50'], 'namelist:nl1=my_strings': [';range;', 'quadrillion', "'hopefully, a joined-up string; a block of characters'"]}
+{'namelist:nl1=my_numeric': ['40', '50'], 'namelist:nl1=my_logical_expr': ['this != 40'], 'namelist:nl1=my_strings': [';range;', 'quadrillion', "'hopefully, a joined-up string; a block of characters'"]}
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

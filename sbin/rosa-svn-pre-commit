@@ -26,4 +26,4 @@
 # DESCRIPTION
 #     Ensure that an SVN commit conforms to the rules of Rosie.
 #-------------------------------------------------------------------------------
-exec python2 -m rosie.svn_pre_commit "$@"
+exec python3 -m rosie.svn_pre_commit "$@"

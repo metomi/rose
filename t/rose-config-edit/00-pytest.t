@@ -20,7 +20,7 @@
 . "$(dirname "$0")/test_header"
 set -eu
 
-if ! python2 -c 'import mock, pytest, tap' 2>'/dev/null'; then
+if ! python3 -c 'import mock, pytest, tap' 2>'/dev/null'; then
     skip_all 'Python modules "mock", "pytest" or "tap" not installed'
 fi
 py.test --tap-stream "${TEST_SOURCE_DIR}"

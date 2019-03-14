@@ -128,4 +128,4 @@
 #     * `cylc help register`
 #     * `cylc help run`
 #-------------------------------------------------------------------------------
-exec python2 -m rose.suite_run "$@"
+exec python3 -m rose.suite_run "$@"

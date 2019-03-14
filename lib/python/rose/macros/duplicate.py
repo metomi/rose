@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
+from functools import cmp_to_key
 
 import rose.macro
 
@@ -33,9 +34,9 @@ class DuplicateChecker(rose.macro.MacroBase):
         """Return a list of errors, if any."""
         self.reports = []
         sect_error_no_dupl = {}
-        sect_keys = config.value.keys()
+        sect_keys = list(config.value)
         sorter = rose.config.sort_settings
-        sect_keys.sort(sorter)
+        sect_keys.sort(key=cmp_to_key(sorter))
         for section in sect_keys:
             node = config.get([section])
             if not isinstance(node.value, dict):
@@ -63,7 +64,7 @@ class DuplicateChecker(rose.macro.MacroBase):
         return self.reports
 
     def _get_has_metadata(self, metadata, basic_section, meta_config):
-        if metadata.keys() != ["id"]:
+        if list(metadata) != ["id"]:
             return True
         for meta_keys, meta_node in meta_config.walk(no_ignore=True):
             meta_section = meta_keys[0]

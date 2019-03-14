@@ -21,4 +21,4 @@
 such as namelists. To add a new format, place it in this directory and
 add an import statement below.
 """
-import namelist
+from . import namelist

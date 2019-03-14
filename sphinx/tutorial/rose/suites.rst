@@ -509,43 +509,6 @@ Rose Applications In Rose Suite Configurations
    Or alternatively using :envvar:`ROSE_TASK_APP`.
 
 
-Rose Bush
----------
-
-.. TODO - move this into the Cylc tutorial with the upcomming Cylc "nameless".
-
-.. ifnotslides::
-
-   Rose provides a utility for viewing the status and logs of Cylc suites called
-   Rose Bush. Rose Bush displays suite information in web pages.
-
-.. figure:: img/rose-bush.png
-   :alt: Rose Bush screenshot
-   :width: 100%
-
-   Screenshot of a Rose Bush web page.
-
-.. ifnotslides::
-
-   If a Rose Bush server is provided at your site, you can open the Rose Bush
-   page for a suite by running the :ref:`command-rose-suite-log` command
-   in the suite directory.
-
-   Otherwise an add-hoc web server can be set up using the
-   :ref:`command-rose-bush` ``start`` command argument.
-
-.. ifslides::
-
-   * :ref:`command-rose-suite-log`
-   * :ref:`command-rose-bush` ``start``
-
-   .. nextslide::
-
-   .. rubric:: In this practical we will take the ``forecast`` Rose application
-      that we developed in the :ref:`Metadata Tutorial <tutorial-rose-metadata>`
-      and integrate it into the :ref:`weather-forecasting suite
-      <tutorial-datetime-cycling-practical>`.
-
    Next section: :ref:`tutorial-rosie`
 
 

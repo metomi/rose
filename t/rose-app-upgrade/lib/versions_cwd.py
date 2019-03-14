@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -16,5 +16,5 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
 
     def upgrade(self, config, meta_config=None):
         self.add_setting(config, ["namelist:add_sect_only"])
-        print "Current directory:", os.getcwd()
+        print("Current directory:", os.getcwd())
         return config, self.reports

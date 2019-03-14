@@ -116,8 +116,8 @@ def type_gen(value):
     # For example, types = ["A", "B", "A", "B"], length = 1
     # should be types = ["A", "B"], length = 2
     for i in range(2, len(types)):
-        if types[:i] * (len(types) / i) == types:
-            length = len(types) / i
+        if types[:i] * (len(types) // i) == types:
+            length = len(types) // i
             types = types[:i]
             break
     return ", ".join(types), str(length)

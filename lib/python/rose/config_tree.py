@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
@@ -194,14 +194,14 @@ class _Test(object):
         """Test if actual == expect."""
         self.test_num += 1
         if actual == expect:
-            print "ok %d - %s" % (self.test_num, key)
+            print("ok %d - %s" % (self.test_num, key))
         else:
-            print "not ok %d - %s" % (self.test_num, key)
+            print("not ok %d - %s" % (self.test_num, key))
 
     def test1(self):
         """Test: configuration file only."""
         os.mkdir("t1")
-        handle = open("t1/rose-t.conf", "wb")
+        handle = open("t1/rose-t.conf", "w")
         handle.write(r"""title=breakfast
 type=fried up
 
@@ -237,7 +237,7 @@ type=fried
     def test2(self):
         """Test: configuration file and some other files."""
         os.mkdir("t2")
-        handle = open("t2/rose-t.conf", "wb")
+        handle = open("t2/rose-t.conf", "w")
         handle.write(r"""title=all day breakfast
 
 [sausage]
@@ -255,18 +255,18 @@ type=grilled
 """)
         handle.close()
         os.mkdir("t2/bin")
-        handle = open("t2/bin/make-breakfast", "wb")
+        handle = open("t2/bin/make-breakfast", "w")
         handle.write(r"""#!/bin/sh
 echo "Making breakfast $@"
 """)
         handle.close()
-        os.chmod("t2/bin/make-breakfast", 0755)
+        os.chmod("t2/bin/make-breakfast", 0o755)
         os.mkdir("t2/etc")
         for key, val in (
                 ("sausage", "10 fat sausages"),
                 ("bread", "slice bread"),
                 ("tomato", "a red tomato")):
-            handle = open(os.path.join("t2/etc", key), "wb")
+            handle = open(os.path.join("t2/etc", key), "w")
             handle.write(val + "\n")
             handle.close()
         conf_tree = self.config_tree_loader("t2", "rose-t.conf")
@@ -300,13 +300,13 @@ type=grilled
     def test3(self):
         """Test: configuration that imports t1 and t2."""
         os.mkdir("t3")
-        handle = open("t3/rose-t.conf", "wb")
+        handle = open("t3/rose-t.conf", "w")
         handle.write(r"""import=t2 t1
 size=large
 """)
         handle.close()
         os.mkdir("t3/etc")
-        handle = open("t3/etc/bread", "wb")
+        handle = open("t3/etc/bread", "w")
         handle.write("50/50 slice bread\n")
         handle.close()
         conf_tree = self.config_tree_loader("t3", "rose-t.conf")
@@ -353,7 +353,7 @@ type=grilled
     def test3_opt(self):
         """Test: configuration that imports t1 and t2, with opt conf."""
         os.mkdir("t1/opt")
-        handle = open("t1/opt/rose-t-go-large.conf", "wb")
+        handle = open("t1/opt/rose-t-go-large.conf", "w")
         handle.write(r"""[bacon]
 number=4
 
@@ -362,7 +362,7 @@ number=3
 """)
         handle.close()
         os.mkdir("t3/opt")
-        handle = open("t3/opt/rose-t-go-large.conf", "wb")
+        handle = open("t3/opt/rose-t-go-large.conf", "w")
         handle.write(r"""[bean]
 type=baked
 """)
@@ -406,13 +406,13 @@ type=grilled
         """Test: as t3, but use an alternate path."""
         os.chdir("../b")
         os.mkdir("t4")
-        handle = open("t4/rose-t.conf", "wb")
+        handle = open("t4/rose-t.conf", "w")
         handle.write(r"""import=t2 t1
 size=large
 """)
         handle.close()
         os.mkdir("t4/etc")
-        handle = open("t4/etc/bread", "wb")
+        handle = open("t4/etc/bread", "w")
         handle.write("50/50 slice bread\n")
         handle.close()
         conf_tree = self.config_tree_loader("t4", "rose-t.conf",
@@ -462,7 +462,7 @@ type=grilled
 
     def run(self):
         """Run the tests."""
-        print self.test_plan
+        print(self.test_plan)
 
         cwd = os.getcwd()
         work_dir = mkdtemp()
@@ -485,7 +485,7 @@ type=grilled
 if __name__ == "__main__":
     # These modules are only required for running the self tests.
     from rose.config import ConfigDumper
-    from StringIO import StringIO
+    from io import StringIO
     from shutil import rmtree
     from tempfile import mkdtemp
     _Test().run()

@@ -20,6 +20,7 @@
 # Test "rose_arch" built-in application, archive with optional sources.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 
 #-------------------------------------------------------------------------------
 tests 2

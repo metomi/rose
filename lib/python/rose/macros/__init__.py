@@ -22,12 +22,12 @@ Module to contain internal system macros for operating on a configuration.
 """
 
 import rose.macro
-import compulsory
-import duplicate
-import format
-import rule
-import trigger
-import value
+from . import compulsory
+from . import duplicate
+from . import format
+from . import rule
+from . import trigger
+from . import value
 
 
 MODULES = [compulsory, duplicate, format, rule, trigger, value]

@@ -43,8 +43,10 @@ class ScriptInclude(Directive):
                        ).communicate()[0]
         node = nodes.section()
         node.document = self.state.document
-        nested_parse_with_titles(self.state, ViewList(stdout.splitlines()),
-                                 node)
+        nested_parse_with_titles(
+            self.state,
+            ViewList([i.decode() for i in stdout.splitlines()]),
+            node)
         return node.children
 
 

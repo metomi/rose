@@ -50,4 +50,4 @@
 #     Return the difference between the number of arguments and number of
 #     successfully cleaned suites, i.e. 0 if all successful.
 #-------------------------------------------------------------------------------
-exec python2 -m rose.suite_clean "$@"
+exec python3 -m rose.suite_clean "$@"

@@ -20,6 +20,7 @@
 # Test rose_ana built-in application, basic usage of builtin grepper module
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 N_TESTS=52
 tests $N_TESTS

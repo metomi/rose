@@ -151,7 +151,7 @@ class KGODatabase(object):
         self.statement_buffer = []
 
 
-class AnalysisTask(object):
+class AnalysisTask(object, metaclass=abc.ABCMeta):
     """Base class for an analysis task.
 
     All custom user tasks should inherit from this class and override
@@ -173,7 +173,6 @@ class AnalysisTask(object):
             used by the parent app (for spawning subprocesses).
 
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, parent_app, task_options):
         """

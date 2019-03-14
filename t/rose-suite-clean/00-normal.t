@@ -20,6 +20,7 @@
 # Test "rose suite-clean", normal mode.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "@TODO: Awaiting App upgrade to Python3"
 
 install_suite() {
     set -e

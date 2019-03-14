@@ -19,9 +19,7 @@
 # -----------------------------------------------------------------------------
 """A multiprocessing runner of jobs with dependencies."""
 
-from multiprocessing import Pool
 from rose.reporter import Event
-from time import sleep
 
 
 class JobEvent(Event):
@@ -59,7 +57,7 @@ class JobManager(object):
         """Return the next job that requires processing."""
         while self.ready_jobs:
             job = self.ready_jobs.pop()
-            for dep_key, dep_job in job.pending_for.items():
+            for dep_key, dep_job in list(job.pending_for.items()):
                 if dep_job.state == dep_job.ST_DONE:
                     job.pending_for.pop(dep_key)
                     if job.name in dep_job.needed_by:
@@ -99,7 +97,7 @@ class JobManager(object):
         job.update(job_proxy)
         if job_proxy.exc is None:
             job.state = job.ST_DONE
-            for up_key, up_job in job.needed_by.items():
+            for up_key, up_job in list(job.needed_by.items()):
                 job.needed_by.pop(up_key)
                 up_job.pending_for.pop(job.name)
                 if not up_job.pending_for:
@@ -181,73 +179,30 @@ class JobRunner(object):
 
         When a job is completed, calls
             self.job_processor.post_process_job(job_proxy, *args)
-
         """
-        nproc = self.nproc
-        if nproc > len(job_manager.jobs):
-            nproc = len(job_manager.jobs)
-        pool = Pool(processes=nproc)
+        # @TODO reimplement this with asyncio
+        while job_manager.has_ready_jobs():
+            job = job_manager.get_job()
+            if not job:
+                continue
 
-        results = {}
-        while job_manager.has_jobs():
-            # Process results, if any is ready
-            for name, result in results.items():
-                if result.ready():
-                    results.pop(name)
-                    job_proxy, args_of_events = result.get()
-                    for args_of_event in args_of_events:
-                        self.job_processor.handle_event(*args_of_event)
-                    job = job_manager.put_job(job_proxy)
-                    if job_proxy.exc is None:
-                        self.job_processor.post_process_job(job, *args)
-                        self.job_processor.handle_event(JobEvent(job))
-                    else:
-                        self.job_processor.handle_event(job_proxy.exc)
-            # Add some more jobs into the worker pool, as they are ready
-            while job_manager.has_ready_jobs():
-                job = job_manager.get_job()
-                if job is None:
-                    break
-                job_run_args = [self.job_processor, job] + list(args)
-                result = pool.apply_async(_job_run, job_run_args)
-                results[job.name] = result
-            if results:
-                sleep(self.POLL_DELAY)
+            if job.exc is None:
+                try:
+                    self.job_processor.process_job(job, *args)
+                except Exception as exc:
+                    self.job_processor.handle_event(exc)
+                    job.exc = exc
+                self.job_processor.post_process_job(job, *args)
+                self.job_processor.handle_event(JobEvent(job))
+            else:
+                self.job_processor.handle_event(job.exc)
 
+            job_manager.put_job(job)
         dead_jobs = job_manager.get_dead_jobs()
         if dead_jobs:
             raise JobRunnerNotCompletedError(dead_jobs)
 
     __call__ = run
-
-
-def _job_run(job_processor, job_proxy, *args):
-    """Helper for JobRunner."""
-    event_handler = JobRunnerWorkerEventHandler()
-    job_processor.set_event_handler(event_handler)
-    try:
-        job_processor.process_job(job_proxy, *args)
-    except Exception as exc:
-        job_proxy.exc = exc
-    finally:
-        job_processor.set_event_handler(None)
-    return (job_proxy, event_handler.events)
-
-
-class JobRunnerWorkerEventHandler(object):
-    """Temporary event handler in a function run by a pool worker process.
-
-    Events are collected in the self.events which is a list of tuples
-    representing the arguments the report method in an instance of
-    rose.reporter.Reporter.
-
-    """
-    def __init__(self):
-        self.events = []
-
-    def __call__(self, message, kind=None, level=None, prefix=None,
-                 clip=None):
-        self.events.append((message, kind, level, prefix, clip))
 
 
 class JobRunnerNotCompletedError(Exception):

@@ -20,6 +20,7 @@
 # Test "rose suite-run", with and without site/user configurations.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 JOB_HOST="$(rose config --default= 't' 'job-host')"
 if [[ -n "${JOB_HOST}" ]]; then

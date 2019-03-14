@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors - GNU V3+.
@@ -19,6 +19,7 @@ Environment Variables:
 from glob import glob
 import math
 import os
+import sys
 
 import util
 
@@ -30,8 +31,8 @@ def plot_wind_data(wind_x, wind_y, x_range, y_range, x_coords, y_coords,
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-    except ImportError:
-        print 'matplotlib not installed: plotting disabled.'
+    except ModuleNotFoundError:
+        print('matplotlib not installed: plotting disabled.', file=sys.stderr)
         return
 
     plt.figure()

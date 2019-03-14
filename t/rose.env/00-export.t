@@ -19,5 +19,5 @@
 #-----------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 tests 1
-run_pass "${TEST_KEY_BASE}" python2 -m "rose.env" "$@"
+run_pass "${TEST_KEY_BASE}" python3 -m "rose.env" "$@"
 exit 0

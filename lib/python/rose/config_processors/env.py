@@ -39,7 +39,7 @@ class ConfigProcessorForEnv(ConfigProcessorBase):
             os.environ.pop("UNDEF")
         environ = {}
         if env_node and not env_node.state:
-            for key, node in env_node.value.iteritems():
+            for key, node in env_node.value.items():
                 if node.state:
                     continue
                 try:

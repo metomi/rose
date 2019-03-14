@@ -32,7 +32,7 @@ __CONFIG__
 setup
 init_meta test-app-upgrade apple fig HEAD
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -100,13 +100,13 @@ TEST_KEY=$TEST_KEY_BASE-broken-import
 # Overwrite versions.py with something with a broken import
 rm "../rose-meta/test-app-upgrade/versions.pyc"
 init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 import rose.upgrade
 import some_broken_import
 __MACRO__
+
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config
-file_grep "$TEST_KEY.out.grep" "ImportError" "$TEST_KEY.err"
+file_grep "$TEST_KEY.out.grep" "ModuleNotFoundError" "$TEST_KEY.err"
 teardown

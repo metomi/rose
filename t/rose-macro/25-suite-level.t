@@ -59,7 +59,7 @@ values=valid-title
 __META_CONF__
 touch $TEST_DIR/$TEST_SUITE/meta/lib/python/macros/__init__.py
 cat >$TEST_DIR/$TEST_SUITE/meta/lib/python/macros/suite.py <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import rose.macro
@@ -80,7 +80,7 @@ class SuiteChecker(rose.macro.MacroBase):
         return config, self.reports
 
     def report(self, config, meta_config=None):
-        print ('The answer to life, the universe and everything is, is, is ' +
+        print('The answer to life, the universe and everything is, is, is ' +
             config.get(['env', 'ANSWER']))
 __MACRO__
 
@@ -97,7 +97,7 @@ type=integer
 __META_CONF__
 touch $TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/__init__.py
 cat >$TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/foo.py <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import rose.macro
@@ -117,7 +117,7 @@ class FooChecker(rose.macro.MacroBase):
         return config, self.reports
 
     def report(self, config, meta_config=None):
-        print 'foo is ' + config.get(['env', 'FOO'])
+        print('foo is ' + config.get(['env', 'FOO']))
 __MACRO__
 
 # app/bar
@@ -133,7 +133,7 @@ type=integer
 __META_CONF__
 touch $TEST_DIR/$TEST_SUITE/app/bar/meta/lib/python/macros/__init__.py
 cat >$TEST_DIR/$TEST_SUITE/app/bar/meta/lib/python/macros/bar.py <<'__MACRO__'
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import rose.macro
@@ -154,7 +154,7 @@ class BarChecker(rose.macro.MacroBase):
 
     def report(self, config, meta_config=None):
         symbol = config.get(['env', 'BAR'])
-        print (symbol + ' ') * 6 + 'ram'
+        print((symbol + ' ') * 6 + 'ram')
 __MACRO__
 #-------------------------------------------------------------------------------
 # List all macros from the suite directory.
@@ -173,14 +173,14 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [R] bar.BarChecker
     # Bar checker macro.
 [INFO] app/foo/rose-app.conf
-[V] foo.FooChecker
-    # Foo checker macro.
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] foo.FooChecker
+[V] foo.FooChecker
     # Foo checker macro.
 [T] rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
+[T] foo.FooChecker
+    # Foo checker macro.
 [R] foo.FooChecker
     # Foo checker macro.
 [INFO] rose-suite.conf
@@ -217,14 +217,14 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [R] bar.BarChecker
     # Bar checker macro.
 [INFO] app/foo/rose-app.conf
-[V] foo.FooChecker
-    # Foo checker macro.
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] foo.FooChecker
+[V] foo.FooChecker
     # Foo checker macro.
 [T] rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
+[T] foo.FooChecker
+    # Foo checker macro.
 [R] foo.FooChecker
     # Foo checker macro.
 [INFO] rose-suite.conf
@@ -249,14 +249,14 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-list-all-app-foo
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[V] foo.FooChecker
-    # Foo checker macro.
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] foo.FooChecker
+[V] foo.FooChecker
     # Foo checker macro.
 [T] rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
+[T] foo.FooChecker
+    # Foo checker macro.
 [R] foo.FooChecker
     # Foo checker macro.
 __OUT__
@@ -265,14 +265,14 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-list-all-app-foo-subdir
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo/meta
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[V] foo.FooChecker
-    # Foo checker macro.
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] foo.FooChecker
+[V] foo.FooChecker
     # Foo checker macro.
 [T] rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
+[T] foo.FooChecker
+    # Foo checker macro.
 [R] foo.FooChecker
     # Foo checker macro.
 __OUT__
@@ -293,14 +293,14 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [R] bar.BarChecker
     # Bar checker macro.
 [INFO] app/foo/rose-app.conf
-[V] foo.FooChecker
-    # Foo checker macro.
 [V] rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] foo.FooChecker
+[V] foo.FooChecker
     # Foo checker macro.
 [T] rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
+[T] foo.FooChecker
+    # Foo checker macro.
 [R] foo.FooChecker
     # Foo checker macro.
 [INFO] rose-suite.conf
@@ -370,8 +370,8 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [T] bar.BarChecker: changes: 0
 [T] rose.macros.DefaultTransforms: changes: 0
 [INFO] app/foo/rose-app.conf
-[T] foo.FooChecker: changes: 0
 [T] rose.macros.DefaultTransforms: changes: 0
+[T] foo.FooChecker: changes: 0
 [INFO] rose-suite.conf
 [T] rose.macros.DefaultTransforms: changes: 0
 [T] suite.SuiteChecker: changes: 0
@@ -473,8 +473,8 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-transform-all-suite-app-foo
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -T -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[T] foo.FooChecker: changes: 0
 [T] rose.macros.DefaultTransforms: changes: 0
+[T] foo.FooChecker: changes: 0
 __OUT__
 #-------------------------------------------------------------------------------
 # Run all fixer macros from an app directory.

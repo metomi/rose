@@ -25,6 +25,7 @@ from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
 from rose.scheme_handler import SchemeHandlersManager
 import sys
+import collections.abc
 
 
 class UnknownContentError(Exception):

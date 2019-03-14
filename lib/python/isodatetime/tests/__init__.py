@@ -15,31 +15,4 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
-
-"""Provide an optimisation decorator and other utilities."""
-
-
-MAX_CACHE_SIZE = 100000
-
-
-def cache_results(func):
-    """Decorator to store results for given inputs.
-
-    func is the decorated function.
-
-    A maximum of MAX_CACHE_SIZE arg-value pairs are stored.
-
-    """
-    cache = {}
-
-    def _wrap_func(*args, **kwargs):
-        key = (str(args), str(kwargs))
-        if key in cache:
-            return cache[key]
-        else:
-            results = func(*args, **kwargs)
-            if len(cache) >= MAX_CACHE_SIZE:
-                cache.popitem()
-            cache[key] = results
-            return results
-    return _wrap_func
+"""Test modules for "isodatetime"."""

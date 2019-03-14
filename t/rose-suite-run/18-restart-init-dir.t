@@ -20,6 +20,7 @@
 # Test "rose suite-run --restart" does not re-initialise run directory.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "@TODO: Awaiting App upgrade to Python3"
 tests 3
 
 export ROSE_CONF_PATH=

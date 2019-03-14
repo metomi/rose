@@ -20,6 +20,7 @@
 """Utilities for parsing namelist files."""
 
 import re
+import io
 
 
 # ERROR REPORTING:
@@ -295,7 +296,7 @@ def _parse_func(ctx):
     while ctx.files:
         if ctx.handle is None:
             ctx.handle = ctx.files[0]
-            if not isinstance(ctx.handle, file):
+            if not isinstance(ctx.handle, io.IOBase):
                 ctx.handle = open(ctx.handle, "r")
             # FIXME: may be incorrect for already opened file
             ctx.line_number = 0

@@ -175,7 +175,7 @@ venv-activate () {
 
 venv-install () {
     venv-destroy
-    virtualenv --python=python2.7 "${VENV_PATH}"
+    virtualenv --python=python3.7 "${VENV_PATH}"
     venv-activate
     pip install 'sphinx'
     pip install 'sphinx_rtd_theme'

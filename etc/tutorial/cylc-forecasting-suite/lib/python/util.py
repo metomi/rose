@@ -7,6 +7,7 @@
 from copy import copy
 import math
 import jinja2
+import sys
 
 
 R_0 = 6371.  # Radius of the Earth (km).
@@ -178,7 +179,7 @@ def plot_vector_grid(filename, x_grid, y_grid):
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
     except ImportError:
-        print 'Plotting diasbled'
+        print('Plotting disabled', file=sys.stderr)
         return
 
     fig = plt.figure()

@@ -67,8 +67,8 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             msg_init_ln = self.COMMENT_TEMPL % self.MSG_INIT
             msg_done_ln = self.COMMENT_TEMPL % self.MSG_DONE
             tmp_file = NamedTemporaryFile()
-            tmp_file.write(scheme_ln)
-            tmp_file.write(msg_init_ln)
+            tmp_file.write(scheme_ln.encode('UTF-8'))
+            tmp_file.write(msg_init_ln.encode('UTF-8'))
             for key, node in sorted(s_node.value.items()):
                 if node.is_ignored():
                     continue
@@ -76,14 +76,16 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                     value = env_var_process(node.value)
                 except UnboundEnvironmentVariableError as exc:
                     raise ConfigProcessError([s_key, key], node.value, exc)
-                tmp_file.write(self.ASSIGN_TEMPL % (key, value))
+                tmp_file.write(
+                    (self.ASSIGN_TEMPL % (key, value)).encode('UTF-8'))
             environ = kwargs.get("environ")
             if environ:
-                tmp_file.write('[cylc]\n')
-                tmp_file.write('    [[environment]]\n')
+                tmp_file.write('[cylc]\n'.encode('UTF-8'))
+                tmp_file.write('    [[environment]]\n'.encode('UTF-8'))
                 for key, value in sorted(environ.items()):
-                    tmp_file.write('        %s=%s\n' % (key, value))
-            tmp_file.write(msg_done_ln)
+                    tmp_file.write(
+                        ('        %s=%s\n' % (key, value)).encode('UTF-8'))
+            tmp_file.write(msg_done_ln.encode('UTF-8'))
             line_n = 0
             is_in_old_insert = False
             for line in open(source):
@@ -98,7 +100,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                     continue
                 elif is_in_old_insert:
                     continue
-                tmp_file.write(line)
+                tmp_file.write(line.encode('UTF-8'))
             tmp_file.seek(0)
             if os.access(target, os.F_OK | os.R_OK):
                 if filecmp.cmp(target, tmp_file.name):  # identical
@@ -109,7 +111,10 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             # Write content to target
             target_file = open(target, "w")
             for line in tmp_file:
-                target_file.write(line)
+                try:
+                    target_file.write(line)
+                except TypeError:
+                    target_file.write(line.decode())
             event = FileSystemEvent(FileSystemEvent.INSTALL, target)
             self.manager.handle_event(event)
             tmp_file.close()

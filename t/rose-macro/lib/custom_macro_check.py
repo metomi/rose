@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
@@ -20,7 +20,7 @@
 # -----------------------------------------------------------------------------
 """Class to check if a URL is valid."""
 
-import httplib
+import http.client
 
 import rose.macro
 
@@ -44,7 +44,7 @@ class URLChecker(rose.macro.MacroBase):
                 if (not value.isdigit() and " " not in value and
                         "," not in value):
                     try:
-                        connection = httplib.HTTPConnection(value, 80)
+                        connection = http.client.HTTPConnection(value, 80)
                         connection.request("HEAD", "")
                     except IOError as exc:
                         self._flag_problem(section, option, value, exc)

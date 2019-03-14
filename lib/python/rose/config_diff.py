@@ -23,7 +23,7 @@ import ast
 import re
 import os
 import shlex
-import StringIO
+import io
 import sys
 import tempfile
 
@@ -122,7 +122,7 @@ def format_metadata_as_text(metadata, only_these_options=None):
         if value is None:
             continue
         id_node.set([property_], value=value)
-    string_file = StringIO.StringIO()
+    string_file = io.StringIO()
     rose.config.dump(id_node, target=string_file)
     return string_file.getvalue()
 
@@ -219,8 +219,8 @@ def main():
     return_code = 1
     try:
         return_code, stdout, stderr = popener.run(*diff_cmd)
-        sys.stdout.write(stdout)
-        sys.stderr.write(stderr)
+        sys.stdout.buffer.write(stdout)
+        sys.stderr.buffer.write(stderr)
     finally:
         fs_util = rose.fs_util.FileSystemUtil()
         for path in output_filenames:

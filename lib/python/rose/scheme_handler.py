@@ -24,6 +24,7 @@ from glob import glob
 import inspect
 import os
 import sys
+import collections.abc
 
 
 class SchemeHandlersManager(object):
