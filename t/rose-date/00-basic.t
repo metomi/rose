@@ -322,7 +322,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 #-------------------------------------------------------------------------------
 # Test rose date --as-total=FORMAT for use case 2 with an offset
-if python3 -c "import argparse; argparse.ArgumentParser.parse_intermixed_args"
+if python3 -c "import argparse; argparse.ArgumentParser.parse_intermixed_args"; then
   TEST_KEY=$TEST_KEY_BASE-as-total-between-dates-with-offset
   run_pass "$TEST_KEY" rose date 2000-01-01T00:00:00 --offset=PT1H   2000-01-01T01:00:00 --as-total=s
 else

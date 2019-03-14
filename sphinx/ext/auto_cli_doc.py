@@ -328,9 +328,6 @@ def write_command_reference(write, commands):
             (a.strip(), b) for a, b in
             ROSE_HELP_SECTION_REGEX.findall(help_text))
 
-        # The NAME section is not used.
-        del sections['NAME']
-
         # Write command name as a heading.
         write_rst_heading(write, command, 2, True, 'command-%s')
 
