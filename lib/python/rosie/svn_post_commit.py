@@ -68,7 +68,7 @@ class RosieWriteDAO(object):
         """Perform a delete on table key, using kwargs to select rows."""
         table = self._get_table(key)
         where = None
-        for col, value in list(kwargs.items()):
+        for col, value in kwargs.items():
             if where is None:
                 where = table.c[col] == value
             else:
@@ -132,7 +132,7 @@ class RosieSvnPostCommitHook(object):
         # Do nothing if prefix is not registered
         conf = ResourceLocator.default().get_conf()
         rosie_db_node = conf.get(["rosie-db"], no_ignore=True)
-        for key, node in list(rosie_db_node.value.items()):
+        for key, node in rosie_db_node.value.items():
             if node.is_ignored() or not key.startswith("repos."):
                 continue
             if os.path.realpath(repos) == os.path.realpath(node.value):
@@ -145,8 +145,8 @@ class RosieSvnPostCommitHook(object):
 
         # Date-time of this commit
         os.environ["TZ"] = "UTC"
-        date_time_str = self._svnlook("date", "-r", revision, repos)
-        date, dtime, _ = date_time_str.split(None, 2)
+        date_time = self._svnlook("date", "-r", revision, repos)
+        date, dtime, _ = date_time.split(None, 2)
         date = mktime(strptime(
             " ".join([date.decode("ascii"), dtime.decode(), "UTC"]),
             self.DATE_FMT))
@@ -465,7 +465,7 @@ def main():
     except Exception as exc:
         report(exc)
         if opts.debug_mode:
-            traceback.print_exc(exc)
+            traceback.print_exc()
         sys.exit(1)
 
 

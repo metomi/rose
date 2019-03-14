@@ -42,7 +42,7 @@ def _col_by_key(table, key):
 
 def _col_keys(table):
     """Return the column keys in "table"."""
-    return [c.key for c in str(table.c)]
+    return [c.key for c in table.c]
 
 
 class RosieDatabaseConnectError(al.exc.OperationalError):

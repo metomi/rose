@@ -22,7 +22,6 @@
 # svn-post-commit", which is tested quite thoroughly in its own test suite.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 if ! python3 -c 'import sqlalchemy' 2>/dev/null; then
     skip_all '"sqlalchemy" not installed'
