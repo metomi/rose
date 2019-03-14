@@ -50,8 +50,7 @@ jobs:
       - cp "${TRAVIS_BUILD_DIR}/.travis/sitecustomize.py" ./lib/python
       - export PYTHONPATH="${TRAVIS_BUILD_DIR}/.travis"
       - coverage run .travis/cover.py
-      # Pytest fails if there are no tests.
-      # - PYTHONPATH=$PYTHONPATH:lib/python/ pytest lib/python/rose/tests/*
+      - PYTHONPATH=$PYTHONPATH:lib/python/ pytest lib/python/rose/tests/*
       - rm ./lib/python/sitecustomize.py
     - name: "Documentation"
       script:

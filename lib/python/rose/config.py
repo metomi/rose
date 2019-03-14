@@ -98,6 +98,7 @@ import shlex
 import sys
 from tempfile import NamedTemporaryFile, TemporaryFile
 from functools import cmp_to_key
+from rose.unicode_utils import write_safely
 
 
 CHAR_ASSIGN = "="
@@ -1070,7 +1071,7 @@ class ConfigDumper(object):
         blank = ""
         if root.comments:
             for comment in root.comments:
-                self._write_safely(handle, self._comment_format(comment))
+                write_safely(self._comment_format(comment), handle)
             blank = "\n"
         root_keys = list(root.value.keys())
         root_keys.sort(key=cmp_to_key(sort_sections))
@@ -1082,7 +1083,7 @@ class ConfigDumper(object):
             else:
                 section_keys.append(key)
         if root_option_keys:
-            self._write_safely(handle, blank)
+            write_safely(blank, handle)
             blank = "\n"
             if concat_mode:
                 handle.write(CHAR_SECTION_OPEN + CHAR_SECTION_CLOSE + "\n")
@@ -1091,16 +1092,17 @@ class ConfigDumper(object):
                     key, root.value[key], handle, env_escape_ok)
         for section_key in section_keys:
             section_node = root.value[section_key]
-            self._write_safely(handle, blank)
+            write_safely(blank, handle)
             blank = "\n"
             for comment in section_node.comments:
-                self._write_safely(handle, self._comment_format(comment))
-            self._write_safely(
-                handle, "%(open)s%(state)s%(key)s%(close)s\n" % {
+                write_safely(self._comment_format(comment), handle)
+            write_safely(
+                "%(open)s%(state)s%(key)s%(close)s\n" % {
                     "open": CHAR_SECTION_OPEN,
                     "state": section_node.state,
                     "key": section_key,
-                    "close": CHAR_SECTION_CLOSE})
+                    "close": CHAR_SECTION_CLOSE},
+                handle)
             keys = list(section_node.value.keys())
             keys.sort(key=cmp_to_key(sort_option_items))
             for key in keys:
@@ -1127,33 +1129,23 @@ class ConfigDumper(object):
         except AttributeError:
             values = node.value.split("\n")
         for comment in node.comments:
-            self._write_safely(handle, self._comment_format(comment))
+            write_safely(self._comment_format(comment), handle)
         value0 = values.pop(0)
         if env_escape_ok:
             value0 = env_var_escape(value0)
-        self._write_safely(handle, state + key + self.char_assign + value0)
-        self._write_safely(handle, "\n")
+        write_safely(state + key + self.char_assign + value0, handle)
+        write_safely("\n", handle)
         if values:
             indent = " " * len(state + key)
             for value in values:
                 if env_escape_ok:
                     value = env_var_escape(value)
-                self._write_safely(handle,
-                                   indent + self.char_assign + value + "\n")
+                write_safely(indent + self.char_assign + value + "\n", handle)
 
     @classmethod
     def _comment_format(cls, comment):
         """Return text representation of a configuration comment."""
         return "#%s\n" % (comment)
-
-    @staticmethod
-    def _write_safely(handle, text):
-        try:
-            handle.write(text)
-        except TypeError:
-            handle.write(text.encode('UTF-8'))
-        except UnicodeEncodeError:
-            handle.buffer.write(text.encode('UTF-8'))
 
 
 class ConfigLoader(object):
