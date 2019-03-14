@@ -436,7 +436,7 @@ class RoseAnaApp(BuiltinApp):
                     # it as a failure.
                     task_error = True
                     number_of_failures += 1
-                    msg = ("Task #{0} encountered an error at "
+                    msg = ("Task #{0} encountered an error at {1}"
                            .format(itask + 1, timestamp()))
                     summary_status.append(("{0} ({1})".format(
                         msg, task.options["full_task_name"]),
