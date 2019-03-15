@@ -2,6 +2,7 @@
 
 APT=()
 PIP=()
+NPM=()
 
 install_coverage () {
     export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
@@ -36,7 +37,12 @@ install_sphinx () {
 }
 
 install_unittests () {
-    PIP+=(pycodestyle pytest)
+    PIP+=(pytest)
+}
+
+install_linters () {
+    PIP+=(pycodestyle)
+    NPM+=(eslint)
 }
 
 install () {
@@ -51,6 +57,10 @@ install () {
 
     if [[ ${#PIP[@]} -gt 0 ]]; then
         pip install "${PIP[@]}"
+    fi
+
+    if [[ ${#NPM[@]} > 0 ]]; then
+        npm install -g "${NPM[@]}"
     fi
 }
 
@@ -67,6 +77,7 @@ unit_test () {
 
 style_test () {
     pycodestyle
+    eslint
 }
 
 test_battery () {
