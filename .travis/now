@@ -1,0 +1,86 @@
+#!/bin/bash
+
+APT=()
+PIP=()
+
+install_coverage () {
+    export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
+    export PYTHONPATH="${TRAVIS_BUILD_DIR}/.travis"
+    PIP+=(coverage pytest-cov)
+}
+
+install_cylc () {
+    wget 'https://github.com/cylc/cylc-flow/archive/master.tar.gz' \
+        -O - | tar -xz -C "${HOME}"
+    pip install -e "${HOME}/cylc-flow-master"
+    APT+=(at heirloom-mailx)
+    PIP+=(colorama python-jose pyzmq Jinja2)
+}
+
+install_fcm () {
+    sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
+        `lsb_release -cs` svn19" >> /etc/apt/sources.list.d/subversion19.list'
+    sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- | \
+        sudo apt-key add -
+    wget 'https://github.com/metomi/fcm/archive/master.tar.gz' \
+        -O '/tmp/fcm-master.tar.gz'
+    tar -xvf '/tmp/fcm-master.tar.gz' -C "${HOME}"
+    APT+=(subversion build-essential gfortran libxml-parser-perl \
+          libconfig-inifiles-perl libdbi-perl libdbd-sqlite3-perl)
+}
+
+install_sphinx () {
+    APT+=(latexmk texlive texlive-generic-extra texlive-latex-extra \
+          texlive-fonts-recommended)
+    PIP+=(sphinx sphinx_rtd_theme sphinxcontrib-httpdomain hieroglyph pillow)
+}
+
+install_unittests () {
+    PIP+=(pycodestyle pytest)
+}
+
+install () {
+    for arg in "$@"; do
+        "install_${arg}"
+    done
+
+    if [[ ${#APT[@]} -gt 0 ]]; then
+        sudo apt-get update
+        sudo apt-get install -y "${APT[@]}"
+    fi
+
+    if [[ ${#PIP[@]} -gt 0 ]]; then
+        pip install "${PIP[@]}"
+    fi
+}
+
+report_coverage () {
+    coverage combine --append
+    coverage xml --ignore-errors
+    bash <(curl -s https://codecov.io/bash)
+}
+
+unit_test () {
+    PYTHONPATH=$PYTHONPATH:lib/python/ pytest lib/python/rose/tests/*
+    return
+}
+
+style_test () {
+    pycodestyle
+}
+
+test_battery () {
+    cp "${TRAVIS_BUILD_DIR}/.travis/sitecustomize.py" ./lib/python
+    coverage run .travis/cover.py
+    rm ./lib/python/sitecustomize.py
+}
+
+docs_test () {
+    rose make-docs --strict clean linkcheck doctest
+}
+
+docs_build () {
+    rose make-docs --strict clean html slides latexpdf
+}
+
+"$@"

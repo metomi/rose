@@ -32,58 +32,63 @@ import sys
 import conf
 
 
-try:
-    BUILD_DIR = sys.argv[1]
-except IndexError:
-    sys.exit('usage: extract-pdf-documents BUILD_DIR')
-LATEX_DIR = os.path.join(BUILD_DIR, 'latex')
-PDF_DIR = os.path.join(BUILD_DIR, 'pdf')
-try:
-    os.mkdir(PDF_DIR)
-except OSError as exc:
-    if exc.errno == errno.EEXIST:
-        # directory exists -> no further action required
-        pass
-    else:
-        # meaningful os error -> raise
-        raise
+def main():
+    try:
+        build_dir = sys.argv[1]
+    except IndexError:
+        sys.exit('usage: extract-pdf-documents build_dir')
+    latex_dir = os.path.join(build_dir, 'latex')
+    pdf_dir = os.path.join(build_dir, 'pdf')
+    try:
+        os.mkdir(pdf_dir)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            # directory exists -> no further action required
+            pass
+        else:
+            # meaningful os error -> raise
+            raise
 
-# the index html file
-html = (
-    '<!DOCTYPE html>'
-    '<html>'
-    '<head>'
-    '<title>Rose Documentation - PDF Documents</title>'
-    '</head>'
-    '<body>'
-    '<h1>Rose Documentation - PDF Documents</h1>'
-    '<ul>'
-)
-
-# loop over PDF documents defined in the Sphinx configuration file
-for file_name, document_name in (x[1:3] for x in conf.latex_documents):
-    # move PDF document into the pdf directory
-    file_name = file_name.replace('.tex', '.pdf')
-    os.rename(
-        os.path.join(LATEX_DIR, file_name),
-        os.path.join(PDF_DIR, file_name)
+    # the index html file
+    html = (
+        '<!DOCTYPE html>'
+        '<html>'
+        '<head>'
+        '<title>Rose Documentation - PDF Documents</title>'
+        '</head>'
+        '<body>'
+        '<h1>Rose Documentation - PDF Documents</h1>'
+        '<ul>'
     )
-    # add an index entry for this document
+
+    # loop over PDF documents defined in the Sphinx configuration file
+    for file_name, document_name in (x[1:3] for x in conf.latex_documents):
+        # move PDF document into the pdf directory
+        file_name = file_name.replace('.tex', '.pdf')
+        os.rename(
+            os.path.join(latex_dir, file_name),
+            os.path.join(pdf_dir, file_name)
+        )
+        # add an index entry for this document
+        html += (
+            '<li>'
+            '<a href="%s">%s</a>'
+            '</li>' % (file_name, document_name)
+        )
+
     html += (
-        '<li>'
-        '<a href="%s">%s</a>'
-        '</li>' % (file_name, document_name)
+        '</ul>'
+        '</body>'
+        '</html>'
     )
 
-html += (
-    '</ul>'
-    '</body>'
-    '</html>'
-)
+    # write index file
+    with open(os.path.join(pdf_dir, 'index.html'), 'w+') as index:
+        index.write(html)
 
-# write index file
-with open(os.path.join(PDF_DIR, 'index.html'), 'w+') as index:
-    index.write(html)
+    # remove now un-necessary latex directory
+    shutil.rmtree(latex_dir)
 
-# remove now un-necessary latex directory
-shutil.rmtree(LATEX_DIR)
+
+if __name__ == '__main__':
+    main()
