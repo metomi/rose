@@ -344,5 +344,5 @@ __OUTPUT__
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}*
+rm -f ~/.metomi/rosie-disco-${HOSTNAME:-0.0.0.0}-${PORT}*
 exit

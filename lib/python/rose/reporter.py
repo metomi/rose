@@ -19,7 +19,7 @@
 # -----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
-import multiprocessing
+
 import sys
 import time
 

@@ -218,11 +218,11 @@ def output_graph(graph, debug_mode=False, filename=None, form="svg"):
     if filename is None:
         image_file_handle = tempfile.NamedTemporaryFile(suffix=("." + form))
     else:
-        image_file_handle = open(filename, "w")
+        image_file_handle = open(filename, encoding='utf-8')
     graph.draw(image_file_handle.name, prog="dot")
     if debug_mode:
         image_file_handle.seek(0)
-        print(image_file_handle.read())
+        print(image_file_handle.read().decode())
         image_file_handle.close()
         return
     rose.external.launch_image_viewer(image_file_handle.name, run_fg=True)

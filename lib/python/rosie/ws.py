@@ -38,12 +38,12 @@ import json
 import os
 import pwd
 import signal
-import socket
 from time import sleep
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.web
 
 from isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
+from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator
 import rosie.db
@@ -74,7 +74,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
             ["rosie-disco", "title"], self.TITLE)
         self.props["host_name"] = rose_conf.get_value(["rosie-disco", "host"])
         if self.props["host_name"] is None:
-            self.props["host_name"] = socket.gethostname()
+            self.props["host_name"] = HostSelector().get_local_host()
             if self.props["host_name"] and "." in self.props["host_name"]:
                 self.props["host_name"] = (
                     self.props["host_name"].split(".", 1)[0])
@@ -85,7 +85,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
                 ResourceLocator.default().get_util_home(
                     "lib", "html", "template", "rosie-disco")),
             autoescape=jinja2.select_autoescape(
-                enabled_extensions=('html', 'xml'), default_for_string=True))
+                enabled_extensions=("html", "xml"), default_for_string=True))
 
         db_url_map = {}
         for key, node in list(rose_conf.get(["rosie-db"]).value.items()):
@@ -95,7 +95,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
 
         # Specify the root URL for the handlers and template.
         ROOT = "%s-%s" % (self.NAMESPACE, self.UTIL)
-        service_root = r"/"
+        service_root = r"/?"
         if self.service_root_mode:
             service_root += ROOT + r"/?"
 
@@ -112,20 +112,22 @@ class RosieDiscoServiceApplication(tornado.web.Application):
                 "db_url": db_url,
                 "service_root": service_root,
             })
-            handler = (service_root + key + r"/?$", RosieDiscoService,
-                       prefix_class_args)
+            handler = (service_root + key + r"/?",
+                       RosieDiscoService, prefix_class_args)
+            get_handler = (service_root + key + r"/get_(.*)",
+                           GetHandler, prefix_class_args)
             hello_handler = (service_root + key + r"/hello/?$",
                              HelloHandler, prefix_class_args)
-            search_handler = (service_root + key + r"/search(.*)",
+            search_handler = (service_root + key + r"/search?(.*)",
                               SearchHandler, prefix_class_args)
-            query_handler = (service_root + key + r"/query(.*)",
+            query_handler = (service_root + key + r"/query?(.*)",
                              QueryHandler, prefix_class_args)
             prefix_handlers.extend(
-                [handler, hello_handler, search_handler, query_handler])
+                [handler, get_handler, hello_handler, search_handler,
+                 query_handler])
 
         handlers = [root_handler] + prefix_handlers
         settings = dict(
-            debug=True,
             autoreload=True,
             static_path=ResourceLocator.default().get_util_home(
                 "lib", "html", "static"),
@@ -173,7 +175,7 @@ class RosieDiscoServiceRoot(tornado.web.RequestHandler):
 
 class RosieDiscoService(tornado.web.RequestHandler):
 
-    """Serves the index page of the database of a given prefix."""
+    """Serves a page for the database of a given prefix."""
 
     def initialize(self, props, prefix, db_url, service_root):
         self.props = props
@@ -190,7 +192,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
     # Decorator to ensure there is a trailing slash since buttons for keys
     # otherwise go to wrong URLs for "/rosie/key" (e.g. -> "rosie/query?...").
     @tornado.web.addslash
-    def get(self, *_):
+    def get(self, *args, **kwargs):
         """Provide the index page."""
         try:
             self._render()
@@ -199,21 +201,6 @@ class RosieDiscoService(tornado.web.RequestHandler):
             traceback.print_exc()
         except rosie.db.RosieDatabaseConnectError as exc:
             raise tornado.web.HTTPError(404, str(exc))
-
-    def get_known_keys(self, format=None):
-        """Return the names of the common fields."""
-        if self.get_query_argument("format", default=None) == "json":
-            self.write(json.dumps(self.dao.get_known_keys()))
-
-    def get_query_operators(self, format=None):
-        """Return the allowed query operators."""
-        if self.get_query_argument("format", default=None) == "json":
-            self.write(json.dumps(self.dao.get_query_operators()))
-
-    def get_optional_keys(self, format=None):
-        """Return the names of the optional fields."""
-        if self.get_query_argument("format", default=None) == "json":
-            self.write(json.dumps(self.dao.get_optional_keys()))
 
     def _render(self, all_revs=0, data=None, filters=None, s=None):
         """Render return data with a template."""
@@ -242,6 +229,26 @@ class RosieDiscoService(tornado.web.RequestHandler):
         )
 
 
+class GetHandler(RosieDiscoService):
+
+    """Write out basic data for the names of standard fields or operators."""
+
+    QUERY_KEYS = [
+        "known_keys",  # Return the names of the common fields.
+        "query_operators",  # Return the allowed query operators.
+        "optional_keys",  # Return the names of the optional fields.
+    ]
+
+    def get(self, get_arg=None):
+        """Return data for basic API points of query keys without values."""
+        if (get_arg and
+                self.get_query_argument("format", default=None) == "json"):
+            for query in self.QUERY_KEYS:
+                if get_arg.startswith(query):
+                    # No need to catch AttributeError as all QUERY_KEYS valid.
+                    self.write(json.dumps(getattr(self.dao, "get_" + query)()))
+
+
 class HelloHandler(RosieDiscoService):
 
     """Writes a 'Hello' message to the current logged-in user, else 'user'."""
@@ -261,26 +268,28 @@ class SearchHandler(RosieDiscoService):
 
     """Serves a search of the database on the page of a given prefix."""
 
-    def get(self, _, all_revs=0):
+    def get(self, _):
         """Search database for rows with data matching the search string."""
-        all_revs = int(all_revs)
-        # None default produces a blank search i.e. returns all suites in DB.
         s_arg = self.get_query_argument("s", default=None)
-        data = self.dao.search(s_arg, all_revs)
+        all_revs = self.get_query_argument("all_revs", default=0)
+        if s_arg:
+            data = self.dao.search(s_arg, all_revs)
+        else:  # Blank search: provide no rather than all output (else slow)
+            data = None
         if self.get_query_argument("format", default=None) == "json":
             self.write(json.dumps(data))
         else:
-            self._render(all_revs, data, s=s_arg)
+            self._render(all_revs, data, s=s)
 
 
 class QueryHandler(RosieDiscoService):
 
     """Serves a query of the database on the page of a given prefix."""
 
-    def get(self, _, all_revs=0):
+    def get(self, _):
         """Search database for rows with data matching the query string."""
-        all_revs = int(all_revs)
         q_args = self.get_query_arguments("q")
+        all_revs = self.get_query_argument("all_revs", default=0)
         filters = []
         if not isinstance(q_args, list):
             q_args = [q_args]
@@ -322,8 +331,7 @@ def _log_server_status(application, host, port):
         "host": host,
         "port": port})
     log_status = log_root + ".status"
-    if not os.path.isdir(os.path.dirname(log_root)):
-        os.makedirs(os.path.dirname(log_root))
+    os.makedirs(os.path.dirname(log_root), exist_ok=True)
     with open(log_status, "w") as handle:
         handle.write("host=%s\n" % host)
         handle.write("port=%d\n" % port)
@@ -367,20 +375,18 @@ def parse_cli(*args, **kwargs):
         arg = args[0]
 
     if arg == "start":
-        port = None
+        port = DEFAULT_PORT
         if args[1:]:
-            port = args[1]
             try:
-                port = int(port)
+                port = int(args[1])
             except ValueError:
-                pass
+                print("Invalid port specified. Using the default port.")
         return ("start", opts.service_root_mode, port)
     elif arg == "stop":
         return ("stop", opts.non_interactive)
 
 
 def main():
-    arg_msg_comp = "ad-hoc web service server"
     info_msg_end = " the server providing the Rosie Disco web application"
     status = None
 
@@ -411,10 +417,10 @@ def main():
 
         status = _log_server_status(app, app.props["host_name"], port)
         IOLoop.current().start()
-    elif instruction == "stop" and (cli_opt or
-            input("Stop server? y/n (default=n)") == "y") and (
-        _get_server_status(
-            app, app.props["host_name"], port).get("pid")):
+    elif instruction == "stop" and (
+            cli_opt or input("Stop server? y/n (default=n)") == "y") and (
+                _get_server_status(
+                    app, app.props["host_name"], port).get("pid")):
         os.killpg(int(_get_server_status(
             app, app.props["host_name"], port).get("pid")),
             signal.SIGINT)
@@ -431,11 +437,10 @@ def main():
               info_msg_end))
 
 
-
 if __name__ == "__main__":  # Run on an ad-hoc server in a test environment.
     main()
 else:  # Run as a WSGI application in a system service environment.
     app = RosieDiscoServiceApplication()
     wsgi_app = tornado.wsgi.WSGIAdapter(app)
-    server = wsgiref.simple_server.make_server('', DEFAULT_PORT, wsgi_app)
+    server = wsgiref.simple_server.make_server("", DEFAULT_PORT, wsgi_app)
     server.serve_forever()

@@ -145,11 +145,9 @@ class RosieSvnPostCommitHook(object):
 
         # Date-time of this commit
         os.environ["TZ"] = "UTC"
-        date_time = self._svnlook("date", "-r", revision, repos)
+        date_time = self._svnlook("date", "-r", revision, repos).decode()
         date, dtime, _ = date_time.split(None, 2)
-        date = mktime(strptime(
-            " ".join([date.decode("ascii"), dtime.decode(), "UTC"]),
-            self.DATE_FMT))
+        date = mktime(strptime(" ".join([date, dtime, "UTC"]), self.DATE_FMT))
         # Detail of changes
         changeset_attribs = {
             "repos": repos,
@@ -257,10 +255,11 @@ class RosieSvnPostCommitHook(object):
             elif path_status == self.ST_DELETED:
                 # The suite has been deleted
                 tree_out = self._svnlook(
-                    "tree", "-r", str(int(revision) - 1), "-N", repos, path)
+                    "tree", "-r", str(int(revision) - 1), "-N", repos,
+                    path).decode("utf-8")
                 # Include all branches of the suite in the deletion info
                 for tree_line in tree_out.splitlines()[1:]:
-                    del_branch = tree_line.strip().decode().rstrip("/")
+                    del_branch = tree_line.strip().rstrip("/")
                     branch_attribs_dict[(sid, del_branch)] = (
                         self._new_suite_branch_change(sid, del_branch, {
                             "old_info": self._load_info(
@@ -273,11 +272,12 @@ class RosieSvnPostCommitHook(object):
 
     def _load_info(self, repos, revision, sid, branch):
         """Load info file from branch_path in repos @revision."""
-        info_file_path = "%s/%s/%s" % ("/".join(sid), branch, self.INFO_FILE)
+        info_file_path = "%s/%s/%s" % (
+            "/".join(str(sid)), branch, self.INFO_FILE)
         t_handle = TemporaryFile()
         try:
             t_handle.write(self._svnlook(
-                "cat", "-r", str(revision), repos, info_file_path))
+                "cat", "-r", str(revision).encode(), repos, info_file_path))
         except RosePopenError:
             return None
         t_handle.seek(0)

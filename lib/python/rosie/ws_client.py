@@ -29,14 +29,13 @@ import json
 from multiprocessing import Pool
 import requests
 import shlex
-import sys
 from time import sleep
 
-from rosie.suite_id import SuiteId
-from rosie.ws_client_auth import RosieWSClientAuthManager
 from rose.popen import RosePopener
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
+from rosie.suite_id import SuiteId
+from rosie.ws_client_auth import RosieWSClientAuthManager
 
 
 class RosieWSClientConfError(Exception):
