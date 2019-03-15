@@ -39,15 +39,7 @@ def main():
         sys.exit('usage: extract-pdf-documents build_dir')
     latex_dir = os.path.join(build_dir, 'latex')
     pdf_dir = os.path.join(build_dir, 'pdf')
-    try:
-        os.mkdir(pdf_dir)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST:
-            # directory exists -> no further action required
-            pass
-        else:
-            # meaningful os error -> raise
-            raise
+    os.makedirs(pdf_dir, exist_ok=True)
 
     # the index html file
     html = (

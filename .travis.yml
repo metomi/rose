@@ -7,31 +7,35 @@ python:
     - 3.7
 dist: xenial
 
-
 before_install:
   - export PATH="$PWD/.travis:$PATH"
 
 after_success:
   - now report_coverage
 
+after_failure:
+  - printenv PATH PYTHONPATH
+  - rose check-software
+
 jobs:
   include:
     - name: "Unit Tests"
       install:
-        - now install coverage cylc linters
+        - now install coverage cylc linters pytest rose
       script:
-        - now style_test
-        - now unit_test
+        - now test style
+        - now test units
 
     - name: "Test Battery"
-      install:
-        - now install coverage cylc fcm
+      before_install:
+        - export PATH="$PWD/.travis:$PATH"
+        - now install coverage cylc fcm rose tut_suite
       script:
-        - now test_battery
+        - now test battery
 
     - name: "Documentation"
       install:
-        - now install sphinx coverage
+        - now install coverage rose sphinx tut_suite
       script:
-        - docs_test
-        - docs_build
+        - now test docs
+        - now build docs
