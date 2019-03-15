@@ -18,10 +18,13 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-"""This file is used by Travis-CI to start the coverage process. In order to make
-Python aware of it, we export PYTHONPATH when running the tests"""
+"""This file is used by Travis-CI to start the coverage process.
+
+In order to make python aware of it, we export PYTHONPATH when running
+the tests.
+
+"""
 
 
 import coverage
 coverage.process_startup()
-
