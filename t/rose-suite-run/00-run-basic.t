@@ -20,7 +20,6 @@
 # Test "rose suite-run", with and without site/user configurations.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 # Run the suite.
 if [[ "${TEST_KEY_BASE}" == *conf ]]; then
@@ -47,7 +46,7 @@ RUND="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${RUND}")"
 run_pass "${TEST_KEY}" \
     rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol
+    
 CONTACT="${HOME}/cylc-run/${NAME}/.service/contact"
 SUITE_HOST="$(sed -n 's/CYLC_SUITE_HOST=//p' "${CONTACT}")"
 SUITE_OWNER="$(sed -n 's/CYLC_SUITE_OWNER=//p' "${CONTACT}")"
@@ -60,7 +59,7 @@ poll ! test -e "${RUND}/log/job/20130101T0000Z/my_task_1/01"
 for OPTION in -i -l '' --restart; do
     TEST_KEY="${TEST_KEY_BASE}-running${OPTION}"
     run_fail "${TEST_KEY}" rose suite-run "${OPTION}" \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" 
     file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 [FAIL] Suite "${NAME}" appears to be running:
 [FAIL] Contact info from: "${CONTACT}"
@@ -82,7 +81,7 @@ do
 done
 TEST_KEY="${TEST_KEY_BASE}-running-reload"
 run_pass "${TEST_KEY}" rose suite-run --reload \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol \
+    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     --debug
 sleep 1
 #-------------------------------------------------------------------------------

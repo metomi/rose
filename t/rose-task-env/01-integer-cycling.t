@@ -20,7 +20,7 @@
 # Test "rose task-env" in integer cycling mode.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ tests 7
 SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME=$(basename "${SUITE_RUN_DIR}")
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --host=localhost -- --no-detach --debug
 
 run_pass "$TEST_KEY_BASE-0" ls -d $HOME/cylc-run/${NAME}/share/cycle/0
 run_pass "$TEST_KEY_BASE-1" ls -d $HOME/cylc-run/${NAME}/share/cycle/1

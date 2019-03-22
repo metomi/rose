@@ -20,7 +20,7 @@
 # Test "rose suite-clean", while the suite is running.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 #-------------------------------------------------------------------------------
 tests 7
@@ -33,7 +33,7 @@ SUITE_RUN_DIR="$(readlink -f "${SUITE_RUN_DIR}")"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 # Install suite, and prove that directories are created
 rose suite-run --debug -q \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol \
+    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     -- --no-detach --debug &
 ROSE_SUITE_RUN_PID=$!
 poll ! test -e "${SUITE_RUN_DIR}/log/job/2013010100/my_task_1/01/job"

@@ -20,7 +20,7 @@
 # Test "rose suite-restart" on suites that don't exist.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 7
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-pwd"
@@ -46,7 +46,7 @@ head -1 "${TEST_KEY}.err" >"${TEST_KEY}.err.head"
 file_cmp "${TEST_KEY}.err.head" "${TEST_KEY}.err.head" <<__ERR__
 [FAIL] cylc restart ${NAME} --no-detach --debug # return-code=1, stderr=
 __ERR__
-file_grep "${TEST_KEY}.err.grep" "ERROR: no suite.rc in ${HOME}/cylc-run/${NAME}" \
+file_grep "${TEST_KEY}.err.grep" "no suite.rc in ${HOME}/cylc-run/${NAME}" \
     "${TEST_KEY}.err"
 rm -fr "${HOME}/cylc-run/${NAME}"
 #-------------------------------------------------------------------------------

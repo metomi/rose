@@ -20,7 +20,7 @@
 # Test "rose task-env" in non-cycling mode.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ tests 1
 SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME=$(basename "${SUITE_RUN_DIR}")
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --host=localhost -- --no-detach --debug
 
 sqlite3 "${SUITE_RUN_DIR}/log/db" \
     'select distinct status from task_states;' >"$TEST_KEY_BASE-db.out"

@@ -389,7 +389,7 @@ class RoseAnaApp(BuiltinApp):
 
     def titlebar(self, title):
         sidebarlen = (self._printbar_width - len(title) + 1) / 2 - 1
-        self.reporter("{0} {1} {0}".format("*" * sidebarlen, title))
+        self.reporter("{0} {1} {0}".format("*" * int(sidebarlen), title))
 
     def _get_global_ana_config(self):
         """Retrieves all rose_ana config options; these could be from the
@@ -446,7 +446,7 @@ class RoseAnaApp(BuiltinApp):
             # Remove the method path from the sys.path
             sys.path.pop(0)
         self.modules = list(self.modules)
-        self.modules.sort()
+        self.modules.sort(key=str)
 
         # Report the modules which were loaded
         self.reporter("Method modules loaded:")

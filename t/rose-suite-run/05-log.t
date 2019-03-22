@@ -20,7 +20,7 @@
 # Test --*-log-* options of "rose suite-run".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 #-------------------------------------------------------------------------------
 tests 23
@@ -31,7 +31,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 ROSE_SUITE_RUN="rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE"
 ROSE_SUITE_RUN="$ROSE_SUITE_RUN --name=$NAME"
-ROSE_SUITE_RUN="$ROSE_SUITE_RUN --no-gcontrol"
+ROSE_SUITE_RUN="$ROSE_SUITE_RUN "
 
 N_RUNS=6
 I_KEEP=$((RANDOM % N_RUNS)) # 0 to N_RUNS - 1

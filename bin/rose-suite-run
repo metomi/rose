@@ -57,13 +57,13 @@
 #     --host=HOST
 #         Specify a host for running the suite.
 #     --install-only, -i
-#         Install the suite. Do not run it. Implies `--no-gcontrol`.
+#         Install the suite. Do not run it.
 #     --local-install-only, -l
 #         Install the suite locally. Do not install to job hosts. Do not run
-#         it. Implies --no-gcontrol.
+#         it.
 #     --validate-suite-only
 #         Install the suite in a temporary location. Do not setup any directories.
-#         Do not run any jobs. Implies --no-gcontrol. Overrides --install-only and
+#         Do not run any jobs. Overrides --install-only and
 #         --local-install-only.
 #     --log-keep=DAYS
 #         Specify the number of days to keep log directories/archives.
@@ -82,9 +82,6 @@
 #         running `rose suite-clean -y && rose suite-run` and will remove
 #         previous runs. Users may want to take extra care when using this
 #         option.
-#     --no-gcontrol
-#         Do not run `cylc gui`. Default is to run `cylc gui` if the suite is
-#         running and the `DISPLAY` environment variable is defined.
 #     --no-log-archive
 #         Do not archive (tar-gzip) old log directories.
 #     --no-overwrite

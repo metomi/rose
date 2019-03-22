@@ -20,7 +20,7 @@
 # Test fcm_make built-in application, basic usages.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'
 fi
@@ -43,12 +43,12 @@ NAME=$(basename $SUITE_RUN_DIR)
 if [[ -n ${JOB_HOST:-} ]]; then
     timeout 60 rose suite-run -q \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-        --no-gcontrol --host='localhost' \
+        --host='localhost' \
         -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --no-detach --debug
 else
     timeout 60 rose suite-run -q \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-        --no-gcontrol --host='localhost' -- --no-detach --debug
+        --host='localhost' -- --no-detach --debug
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-status"

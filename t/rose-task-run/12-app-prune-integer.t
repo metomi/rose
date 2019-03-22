@@ -20,7 +20,7 @@
 # Test "rose prune" with integer cycling
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
@@ -40,15 +40,16 @@ NAME=$(basename $SUITE_RUN_DIR)
 if [[ -n ${JOB_HOST:-} ]]; then
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost \
+        --host=localhost \
         -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" \
         -- --no-detach --debug
 else
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost \
+        --host=localhost \
         -- --no-detach --debug
 fi
+cat ~/cylc-run/$NAME/log/job/*/*/NN/job.err >&2
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-work
 run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/work/1

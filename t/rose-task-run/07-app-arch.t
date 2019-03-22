@@ -20,7 +20,7 @@
 # Test rose_arch built-in application.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 #-------------------------------------------------------------------------------
 tests 48
@@ -33,7 +33,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --host=localhost -- --no-detach
 #-------------------------------------------------------------------------------
 # Results, good ones
 TEST_KEY="$TEST_KEY_BASE-find-foo"
@@ -144,7 +144,7 @@ __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-8"
 sed '/^\[FAIL\] /!d' "${FILE_PREFIX}8/01/job.err" >"${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
-[FAIL] foo://20130101T1200Z/planet-n.tar.gz: bad rename-parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
+[FAIL] foo://20130101T1200Z/planet-n.tar.gz: bad rename-parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: missing ), unterminated subpattern at position 7
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-9"
 sed '/^\[INFO\] [=!+]/!d;

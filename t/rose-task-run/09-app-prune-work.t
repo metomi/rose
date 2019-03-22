@@ -20,7 +20,7 @@
 # Test "rose_prune" built-in application, more advanced usage on work directory.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 #-------------------------------------------------------------------------------
 tests 2
@@ -32,7 +32,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\

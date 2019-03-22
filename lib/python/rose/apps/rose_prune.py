@@ -126,7 +126,8 @@ class RosePruneApp(BuiltinApp):
                 for line in sorted(out.splitlines()):
                     if not host_selector.is_local_host(host):
                         line = host + ":" + line
-                    event = FileSystemEvent(FileSystemEvent.DELETE, line)
+                    event = FileSystemEvent(
+                        FileSystemEvent.DELETE, line.decode())
                     app_runner.handle_event(event)
             finally:
                 if sdir:

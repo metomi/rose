@@ -20,7 +20,7 @@
 # Test "rose task-env" in 360day calendar mode.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 export ROSE_CONF_PATH=
 
 tests 1
@@ -28,7 +28,7 @@ tests 1
 RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rtb-rose-task-env-02.XXXXXX')"
 NAME="$(basename "${RUN_DIR}")"
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' -- --no-detach --debug
+    --host='localhost' -- --no-detach --debug
 for CYCLE in \
     '20200227T0000Z' \
     '20200228T0000Z' \

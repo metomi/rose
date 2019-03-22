@@ -21,14 +21,14 @@
 # See issue metomi/rose#1143.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 1
 export ROSE_CONF_PATH=
 cp -r $TEST_SOURCE_DIR/$TEST_KEY_BASE/* .
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -n $NAME --no-gcontrol
+rose suite-run -q -n $NAME 
 # Wait for the only task to fail, before reload
 ST_FILE=$SUITE_RUN_DIR/log/job/1/t1/01/job.status
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
@@ -39,7 +39,7 @@ do
 done
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
-run_pass "$TEST_KEY" rose suite-run --reload -q -n $NAME --no-gcontrol
+run_pass "$TEST_KEY" rose suite-run --reload -q -n $NAME 
 #-------------------------------------------------------------------------------
 rose suite-stop -q -y -n $NAME -- --max-polls=12 --interval=5
 rose suite-clean -q -y $NAME

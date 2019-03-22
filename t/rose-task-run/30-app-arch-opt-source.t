@@ -20,7 +20,7 @@
 # Test "rose_arch" built-in application, archive with optional sources.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 #-------------------------------------------------------------------------------
 tests 6
@@ -32,7 +32,7 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-job.status"
 file_grep "${TEST_KEY}-archive1-01" \

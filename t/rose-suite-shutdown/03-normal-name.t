@@ -28,7 +28,7 @@ export ROSE_CONF_PATH=
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
+rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME 
 HOST="$(awk -F= '$1 == "CYLC_SUITE_HOST" {print $2}' "${SUITE_RUN_DIR}/.service/contact")"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE

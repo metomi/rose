@@ -30,7 +30,7 @@ tests 20
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost
+    --host=localhost
 #-------------------------------------------------------------------------------
 # rose suite-gcontrol --name=
 TEST_KEY=$TEST_KEY_BASE

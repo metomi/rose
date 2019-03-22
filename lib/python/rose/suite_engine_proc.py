@@ -501,7 +501,7 @@ class SuiteEngineProcessor(object):
         # Note: should we create the offsets directories?
         for dir_ in (
                 [tprops.dir_data, tprops.dir_data_cycle] +
-                tprops.dir_data_cycle_offsets.values()):
+                list(tprops.dir_data_cycle_offsets.values())):
             if dir_ is None:
                 continue
             if os.path.exists(dir_) and not os.path.isdir(dir_):
@@ -540,14 +540,6 @@ class SuiteEngineProcessor(object):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
-
-    def gcontrol(self, suite_name, args=None):
-        """Launch control GUI for a suite_name."""
-        raise NotImplementedError()
-
-    def gscan(self, args=None):
-        """Launch suites scan GUI."""
-        raise NotImplementedError()
 
     def is_suite_registered(self, suite_name):
         """Return whether or not a suite is registered."""

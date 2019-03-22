@@ -121,6 +121,7 @@ class RoseBunchApp(BuiltinApp):
     PREFIX_PASS = "[PASS] "
     PREFIX_NOTRUN = "[SKIP] "
     DEFAULT_ARGUMENT_MODE = "Default"
+    # @TODO: Match ACCEPTED_ARGUMENT_MODES to what python is actually doing
     ACCEPTED_ARGUMENT_MODES = [DEFAULT_ARGUMENT_MODE,
                                "izip",
                                "izip_longest",
@@ -200,8 +201,14 @@ class RoseBunchApp(BuiltinApp):
         if argument_mode == self.DEFAULT_ARGUMENT_MODE:
             pass
         elif argument_mode in self.ACCEPTED_ARGUMENT_MODES:
-            _itertools_cmd = getattr(itertools, argument_mode)
-            if argument_mode == "izip_longest":
+            if argument_mode == 'izip_longest':
+                argument_mode = 'zip_longest'
+            # Python3 deprecates itertools.izip in favour of builtin zip
+            if argument_mode == 'izip':
+                _itertools_cmd = zip
+            else:
+                _itertools_cmd = getattr(itertools, argument_mode)
+            if argument_mode == "zip_longest":
                 _permutations = _itertools_cmd(*bunch_args_values,
                                                fillvalue="")
             else:
@@ -224,7 +231,7 @@ class RoseBunchApp(BuiltinApp):
                 arglength = len(instances)
             else:
                 arglength = len(bunch_args_values[0])
-            self.invocation_names = range(0, arglength)
+            self.invocation_names = list(range(0, arglength))
         else:
             arglength = len(self.invocation_names)
 
@@ -287,7 +294,7 @@ class RoseBunchApp(BuiltinApp):
         abort = False
 
         while procs or (commands and not abort):
-            for key, proc in procs.items():
+            for key, proc in list(procs.items()):
                 if proc.poll() is not None:
                     procs.pop(key)
                     if proc.returncode:

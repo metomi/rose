@@ -20,7 +20,6 @@
 # Test rose_ana built-in application, basic usage of OutputGrepper
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 N_TESTS=36
 tests $N_TESTS
@@ -33,14 +32,14 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_fail "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 # Test the output
 OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-exact_numeric_success
 file_grep $TEST_KEY "[ OK ].*Semi-major Axis.*all: 0%:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_numeric_fail
-file_grep $TEST_KEY "[FAIL].*Orbital Period.*1: 5.234%" $OUTPUT
+file_grep $TEST_KEY "[FAIL].*Orbital Period.*1: 5.234000000000005%" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_text_success
 file_grep $TEST_KEY "[ OK ].*Atmosphere.*all: 0%" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_text_fail
@@ -48,11 +47,11 @@ file_grep $TEST_KEY "[FAIL].*Planet.*1: XX%.* (4 values)" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_percentage_success
 file_grep $TEST_KEY "[ OK ].*Oxygen Partial Pressure.*all% <= 5%" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_percentage_fail
-file_grep $TEST_KEY "[FAIL].*Ocean coverage.*35.3107344633% > 5%:.* (95.8) c.f. .* (70.8)" $OUTPUT
+file_grep $TEST_KEY "[FAIL].*Ocean coverage.*35.31073446327684% > 5%:.* (95.8) c.f. .* (70.8)" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_absolute_success
 file_grep $TEST_KEY "[ OK ].*Surface Gravity.*all% <= 1.0:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_absolute_fail
-file_grep $TEST_KEY "[FAIL].*Rotation Period.*7.04623622489% > 0.05:.* (0.927) c.f. .* (0.99727)" $OUTPUT
+file_grep $TEST_KEY "[FAIL].*Rotation Period.*7.046236224893955% > 0.05:.* (0.927) c.f. .* (0.99727)" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_list_success
 file_grep $TEST_KEY "[ OK ].*Satellites Natural/Artificial.*all: 0%:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_list_fail
@@ -60,7 +59,7 @@ file_grep $TEST_KEY "[FAIL].*Other Planets.*1: XX%:.* (4 values)" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_list_success
 file_grep $TEST_KEY "[ OK ].*Periastron/Apastron.*all% <= 5%:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_list_fail
-file_grep $TEST_KEY "[FAIL].*Inclination/Axial Tilt.*285.744234801% > 5%:.* (value 1 of 2)" $OUTPUT
+file_grep $TEST_KEY "[FAIL].*Inclination/Axial Tilt.*285.74423480083857% > 5%:.* (value 1 of 2)" $OUTPUT
 #-------------------------------------------------------------------------------
 # Test of ignoring a task
 # First, test that the basic task ran ok

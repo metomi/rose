@@ -24,7 +24,7 @@
 #      "gfortran" being installed and available.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'
 fi
@@ -58,7 +58,7 @@ ssh -n -oBatchMode=yes "${JOB_HOST}" \
 
 timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' \
+    --host='localhost' \
     -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --no-detach --debug
 #-------------------------------------------------------------------------------
 ssh -n -oBatchMode=yes "${JOB_HOST}" \

@@ -20,7 +20,7 @@
 # Test rose_prune built-in application, basic cycle housekeep usage.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 #-------------------------------------------------------------------------------
 # Test the suite.
@@ -46,11 +46,11 @@ tests 7
 # Run the suite.
 if [[ -n ${JOB_HOST:-} ]]; then
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost \
+        --host=localhost \
         -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --no-detach --debug
 else
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost -- --no-detach --debug
+        --host=localhost -- --no-detach --debug
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-prune-log

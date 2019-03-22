@@ -20,7 +20,7 @@
 # Test "rose suite-run", match TIMESTAMP of local and remote log.TIMESTAMP/
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 JOB_HOST="$(rose config --default= 't' 'job-host')"
 if [[ -n "${JOB_HOST}" ]]; then
     JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
@@ -51,7 +51,7 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename ${SUITE_RUN_DIR})"
 run_pass "${TEST_KEY_BASE}" \
-    rose suite-run --debug --name="${NAME}" --no-gcontrol \
+    rose suite-run --debug --name="${NAME}" \
     -S "HOST=\"${JOB_HOST}\"" -- --no-detach
 NOW_STR="$(sed 's/^.*now-str=\([^,]*\),\?.*$/\1/' 'myssh.log')"
 run_pass "${TEST_KEY_BASE}-log-timestamp-local" \

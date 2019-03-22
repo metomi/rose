@@ -455,7 +455,7 @@ class Analyse(object):
             except ImportError as exc:
                 self.reporter(exc)
             sys.path.pop(0)
-        modules.sort()
+        modules.sort(key=str)
         self.modules = modules
 
         user_methods = []

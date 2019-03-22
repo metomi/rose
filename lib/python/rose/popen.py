@@ -76,7 +76,7 @@ class RosePopenEvent(Event):
                 # FIXME: Is this safe?
                 pos = self.stdin.tell()
                 ret += " <<'__STDIN__'\n" +\
-                       self.stdin.read().decode() + "\n'__STDIN__'"
+                       self.stdin.read() + "\n'__STDIN__'"
                 self.stdin.seek(pos)
             except IOError:
                 pass
@@ -160,6 +160,12 @@ class RosePopener(object):
         if isinstance(kwargs.get("stdin"), str):
             stdin = kwargs.get("stdin")
         stdout, stderr = proc.communicate(stdin)
+        # @TODO - probably a tider way to do things, but broke at least one
+        # @TODO fast fix in the Python3 conversion. Working > perfect
+        # if isinstance(stderr, bytes):
+        #     stderr = stderr.decode()
+        # if isinstance(stdout, bytes):
+        #     stdout = stdout.decode()
         return proc.wait(), stdout, stderr
 
     def run_bg(self, *args, **kwargs):

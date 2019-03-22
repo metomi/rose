@@ -20,7 +20,7 @@
 # Test "rose suite-restart", --host=HOST option.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 HOSTS=$(rose config --default= 'rose-suite-run' 'hosts')
 HOST=
@@ -37,12 +37,12 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 rose suite-run --debug -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-    --name="${NAME}" --host="${HOST}" --no-gcontrol \
+    --name="${NAME}" --host="${HOST}" \
     -- --no-detach --debug
 
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" rose suite-restart \
-    -v -v --debug --name="${NAME}" --host="${HOST}" --no-gcontrol \
+    -v -v --debug --name="${NAME}" --host="${HOST}" \
     -- --no-detach --debug
 file_grep "${TEST_KEY}.out" \
     "cylc restart --host=${HOST} ${NAME} --no-detach --debug" "${TEST_KEY}.out"

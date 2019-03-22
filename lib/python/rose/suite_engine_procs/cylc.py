@@ -134,21 +134,6 @@ class CylcProcessor(SuiteEngineProcessor):
         finally:
             os.unlink(new_suite_rc_processed)
 
-    def gcontrol(self, suite_name, args=None):
-        """Launch control GUI for a suite_name."""
-        return self.popen.run_nohup_gui(
-            r'env CYLC_VERSION=%s cylc gui %s %s' % (
-                self.get_suite_contact(suite_name).get('CYLC_VERSION', ''),
-                suite_name,
-                self.popen.list_to_shell_str(args),
-            )
-        )
-
-    def gscan(self, args=None):
-        """Launch suites scan GUI."""
-        return self.popen.run_nohup_gui(
-            r'cylc gscan %s' % (self.popen.list_to_shell_str(args),))
-
     def get_running_suites(self):
         """Return a list containing the names of running suites."""
         rootd = os.path.join(os.path.expanduser('~'), self.SUITE_DIR_REL_ROOT)
@@ -237,9 +222,9 @@ class CylcProcessor(SuiteEngineProcessor):
         user, host = (None, None)
         items = out.strip().split(None, 1)
         if items:
-            user = items.pop(0).replace("*", " ")
+            user = items.pop(0).replace(b"*", b" ")
         if items:
-            host = items.pop(0).replace("*", " ")
+            host = items.pop(0).replace(b"*", b" ")
         return self._parse_user_host(user=user, host=host)
 
     def get_tasks_auths(self, suite_name):
@@ -615,6 +600,12 @@ class CylcProcessor(SuiteEngineProcessor):
             host = auth
             if "@" in auth:
                 user, host = auth.split("@", 1)
+
+        if isinstance(user, bytes):
+            user = user.decode()
+        if isinstance(host, bytes):
+            host = host.decode()
+
         if user in ["None", self.user]:
             user = None
         if host and ("`" in host or "$" in host):

@@ -50,9 +50,6 @@
 #     --name=NAME, -n NAME
 #         Specify the suite `NAME` in cylc, instead of using the basename of
 #         the current working directory.
-#     --no-gcontrol
-#         Do not run `cylc gui`. Default is to run `cylc gui` if the suite is
-#         running and the `DISPLAY` environment variable is defined.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v
