@@ -119,7 +119,11 @@ access-list=no-such-user-550 root no-such-user-551
 __ROSE_SUITE_INFO__
 run_fail "$TEST_KEY" svn commit -q -m 't' --non-interactive aa000
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+# $TEST_KEY.err gets the two fail lines in arbitary order, so test for either.
+file_cmp_any "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] NO SUCH USER: U   a/a/0/0/0/trunk/rose-suite.info: access-list=no-such-user-551
+[FAIL] NO SUCH USER: U   a/a/0/0/0/trunk/rose-suite.info: access-list=no-such-user-550
+__filesep__
 [FAIL] NO SUCH USER: U   a/a/0/0/0/trunk/rose-suite.info: access-list=no-such-user-550
 [FAIL] NO SUCH USER: U   a/a/0/0/0/trunk/rose-suite.info: access-list=no-such-user-551
 __ERR__
