@@ -279,7 +279,7 @@ class SearchHandler(RosieDiscoService):
         if self.get_query_argument("format", default=None) == "json":
             self.write(json.dumps(data))
         else:
-            self._render(all_revs, data, s=s)
+            self._render(all_revs, data, s=s_arg)
 
 
 class QueryHandler(RosieDiscoService):
@@ -288,13 +288,18 @@ class QueryHandler(RosieDiscoService):
 
     def get(self, _):
         """Search database for rows with data matching the query string."""
-        q_args = self.get_query_arguments("q")
+        q_args = self.get_query_arguments("q")  # empty list if none given
         all_revs = self.get_query_argument("all_revs", default=0)
         filters = []
         if not isinstance(q_args, list):
             q_args = [q_args]
         filters = [self._query_parse_string(q_str) for q_str in q_args]
-        data = self.dao.query(filters, all_revs)
+        while None in filters:  # remove invalid i.e. blank query filters
+            filters.remove(None)
+        if filters:
+            data = self.dao.query(filters, all_revs)
+        else:  # in case of a fully blank query
+            data = None
         if self.get_query_argument("format", default=None) == "json":
             self.write(json.dumps(data))
         else:
@@ -312,7 +317,10 @@ class QueryHandler(RosieDiscoService):
         if all(s == "(" for s in q_str.split(" ", 1)[0]):
             start_group, q_str = q_str.split(" ", 1)
             filt.append(start_group)
-        key, operator, value = q_str.split(" ", 2)
+        try:
+            key, operator, value = q_str.split(" ", 2)
+        except ValueError:  # blank query i.e. no value provided
+            return None
         filt.extend([key, operator])
         last_groups = value.rsplit(" ", 1)
         if (len(last_groups) > 1 and last_groups[1] and
