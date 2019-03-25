@@ -19,33 +19,35 @@
 # -----------------------------------------------------------------------------
 
 import io
-import pytest
 
 from rose.unicode_utils import write_safely
 
 TESTSTR = "Hello World"
 TESTBYTES = b"Bonjour, Le Monde!"
 
-# The first four tests are designed to test each branch in the function
+
 def test_try_BufferedWriter_and_str(tmpdir):
-    with open(tmpdir.join('test.txt'), 'wb') as handle:
+    with open(tmpdir.join("test.txt"), "wb") as handle:
         assert isinstance(handle, io.BufferedWriter)
         write_safely(TESTSTR, handle)
-    with open(tmpdir.join('test.txt'), 'r') as handle:
+    with open(tmpdir.join("test.txt"), "r") as handle:
         assert handle.read() == TESTSTR
 
+
 def test_try_BufferedWriter_and_bytes(tmpdir):
-    with open(tmpdir.join('test.txt'), 'wb') as handle:
+    with open(tmpdir.join("test.txt"), "wb") as handle:
         assert isinstance(handle, io.BufferedWriter)
         write_safely(TESTBYTES, handle)
-    with open(tmpdir.join('test.txt'), 'rb') as handle:
+    with open(tmpdir.join("test.txt"), "rb") as handle:
         assert handle.read() == TESTBYTES
+
 
 def test_try_StringIO_and_str():
     with io.StringIO() as handle:
         write_safely(TESTSTR, handle)
         assert isinstance(handle, io.StringIO)
         assert handle.getvalue() == TESTSTR
+
 
 def test_try_StringIO_and_bytes():
     with io.StringIO() as handle:

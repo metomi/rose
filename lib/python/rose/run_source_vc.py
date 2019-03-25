@@ -65,7 +65,7 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
                 if out:
                     write_safely(("#" * 80 + "\n"), handle)
                     write_safely(("# %s\n" % popen.list_to_shell_str(cmd)),
-                                  handle)
+                                 handle)
                     write_safely(("#" * 80 + "\n"), handle)
                     write_safely(out, handle)
                 if ret_code:  # If cmd fails once, it will likely fail again

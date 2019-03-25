@@ -21,7 +21,8 @@
 import io
 import _io
 
-ENCODING='UTF-8'
+ENCODING = "UTF-8"
+
 
 def write_safely(msg, handle):
     """Wrap handle.write command in logic to deal with change to
@@ -31,17 +32,32 @@ def write_safely(msg, handle):
         msg (str or bytes):
             Message to be written - type uncertain.
         handle (file handle):
-            Potentially Obscure file or file-like object. May include a variety of
-            buffer types.
+            Potentially Obscure file or file-like object. May include a variety
+            of buffer types.
     """
-    if isinstance(msg, bytes):
-        if (isinstance(handle, _io.TextIOWrapper) or
-            isinstance(handle, _io.StringIO)):
-            handle.write(msg.decode())
-        elif isinstance(handle, io.BufferedWriter):
+    # Unforgiving, but fast logic.
+    try:
+        if isinstance(msg, bytes):
+            if isinstance(handle, _io.TextIOWrapper) or isinstance(
+                handle, _io.StringIO
+            ):
+                handle.write(msg.decode())
+            elif isinstance(handle, io.BufferedWriter):
+                handle.write(msg)
+            else:
+                handle.write(msg.decode())
+        elif isinstance(msg, str):
+            if isinstance(handle, io.BufferedWriter):
+                handle.write(msg.encode(ENCODING))
+            else:
+                handle.write(msg)
+
+    # Forgiving, but potentially quite slow logic.
+    except TypeError:
+        try:
             handle.write(msg)
-    elif isinstance(msg, str):
-        if isinstance(handle, io.BufferedWriter):
-            handle.write(msg.encode(ENCODING))
-        else:
-            handle.write(msg)
+        except TypeError:
+            if isinstance(msg, str):
+                handle.write(msg.encode())
+            elif isinstance(msg, bytes):
+                handle.write(msg.decode())
