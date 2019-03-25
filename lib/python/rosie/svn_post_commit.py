@@ -27,8 +27,18 @@ Notify owner and users on access-list on changes to trunk.
 
 from difflib import unified_diff
 from email.mime.text import MIMEText
+from io import StringIO
 import os
 import re
+import shlex
+from smtplib import SMTP
+import socket
+import sqlalchemy as al
+import sys
+from tempfile import TemporaryFile
+from time import mktime, strptime
+import traceback
+
 import rose.config
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
@@ -37,15 +47,6 @@ from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
 from rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
-import shlex
-from smtplib import SMTP
-import socket
-import sqlalchemy as al
-from io import StringIO
-import sys
-from tempfile import TemporaryFile
-from time import mktime, strptime
-import traceback
 
 
 class RosieWriteDAO(object):
