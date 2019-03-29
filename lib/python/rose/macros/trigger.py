@@ -61,7 +61,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                 expr = opt_node.value
                 id_value_dict = rose.variable.parse_trigger_expression(expr)
                 for trig_id, values in id_value_dict.items():
-                    if values == []:
+                    if not len(values):
                         id_value_dict.update({trig_id: [None]})
                 self.trigger_family_lookup.update({setting_id: id_value_dict})
         self._trigger_involved_ids = self.get_all_ids()
