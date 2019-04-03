@@ -181,8 +181,6 @@ import os
 from isodatetime.main import main
 
 if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
-
     # Handle Legacy Rose-date -c functionality
     if '-c' in sys.argv or '--use-task-cycle-time' in sys.argv:
         if os.getenv('ROSE_TASK_CYCLE_TIME'):
@@ -191,7 +189,7 @@ if __name__ == '__main__':
             sys.exit("[FAIL] [UNDEFINED ENVIRONMENT VARIABLE] ROSE_TASK_CYCLE_TIME")
 
         for opt in ('-c', '--use-task-cycle-time'):
-            while opt in sys.argv:
+            if opt in sys.argv:
                 sys.argv.remove(opt)
         if 'ref' not in sys.argv:
             sys.argv.append('ref')

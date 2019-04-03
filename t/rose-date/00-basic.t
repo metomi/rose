@@ -292,8 +292,10 @@ __OUT__
 # Test rose date --as-total=m PT1S
 TEST_KEY=$TEST_KEY_BASE-as-total-PT1S-m
 run_pass "$TEST_KEY" rose date --as-total=m PT1S
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-0.016666666666666666
+head -c 10 "$TEST_KEY.out" > $TEST_KEY.out.truncated
+echo "" >> $TEST_KEY.out.truncated
+file_cmp "$TEST_KEY.out.truncated" "$TEST_KEY.out.truncated" <<'__OUT__'
+0.01666666
 __OUT__
 #-------------------------------------------------------------------------------
 # Test rose date --as-total=h P832DT23H12M45S
