@@ -20,13 +20,15 @@
 set -eu
 shopt -s extglob
 
-cd "$(dirname "$BASH_SOURCE")/../"
+cd "$(dirname "${BASH_SOURCE[0]}")/../"
 
 REMOTE='origin'
 TEMP_DOCS_LABEL='doc-build-dir'
-DOCUMENTATION_FILES=!(doc|404.md|CHANGES.md|"$TEMP_DOCS_LABEL"|_config.yml)
+DOCUMENTATION_FILES=(!(doc|404.md|CHANGES.md|"$TEMP_DOCS_LABEL"|_config.yml))
 
+# shellcheck disable=SC1091
 . ./rose-version
+
 if [[ -z $ROSE_VERSION ]]; then
     exit 1
 fi
@@ -43,12 +45,12 @@ initial_deployment () {  # Create a new gh-pages branch from scratch.
     git checkout --orphan gh-pages
 
     # move docs to the top level and delete everything else
-    git rm -rf $DOCUMENTATION_FILES     # remove tracked files
-    git clean -xf $DOCUMENTATION_FILES  # remove untracked files
+    git rm -rf "${DOCUMENTATION_FILES[@]}"     # remove tracked files
+    git clean -xf "${DOCUMENTATION_FILES[@]}"  # remove untracked files
     mv doc "$TEMP_DOCS_LABEL"  # permit the alias "doc"
     mv "$TEMP_DOCS_LABEL"/* .
     git clean -xf "$TEMP_DOCS_LABEL"
-    git add * -f
+    git add -f -- *
 
     # commit and push
     git commit -m "${ROSE_VERSION}"
@@ -73,7 +75,7 @@ subsequent_deployment () {  # Add new version to documentation.
     git checkout gh-pages
     rsync -av "${TMP_DOCS_DIR}/" .  # NOTE: the trailing slash is required
     rm -rf "${TMP_DOCS_DIR}"
-    git add * -f
+    git add -f -- *
 
     # commit and push
     git commit -m "${ROSE_VERSION}"
