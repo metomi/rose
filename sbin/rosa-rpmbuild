@@ -35,26 +35,26 @@
 #-------------------------------------------------------------------------------
 
 set -eu
-THIS=$(basename $0)
 NAME='rose'
 
 rpmdev-setuptree
 
 # Create the source tree
 REV=${1:-HEAD}
-REV_NAME=$(git describe $REV)
-REV_BASE=$(git describe --abbrev=0 $REV)
+REV_NAME="$(git describe "$REV")"
+REV_BASE="$(git describe --abbrev=0 "$REV")"
 RELEASE=1
-if [[ $REV_NAME != $REV_BASE ]]; then
-    COMMIT_DATE=$(date -u +%Y%m%dT%H%M "--date=$(git show -s --format=%ci $REV)")
+if [[ $REV_NAME != "$REV_BASE" ]]; then
+    COMMIT_DATE="$(\
+        date -u +%Y%m%dT%H%M "--date=$(git show -s --format=%ci "$REV")")"
     RELEASE=${COMMIT_DATE}git${REV_NAME#$REV_BASE-*-g}
 fi
-REV_BASE_DOT=$(sed 's/-/./g' <<<$REV_BASE)
-git archive --format=tar --prefix=$NAME-$REV_BASE_DOT/ $REV \
+REV_BASE_DOT="$(sed 's/-/./g' <<<"$REV_BASE")"
+git archive --format=tar --prefix="$NAME-$REV_BASE_DOT/" "$REV" \
     | (cd ~/rpmbuild/SOURCES/ && tar -xf -)
 echo "ROSE_VERSION=\"$REV_BASE_DOT\";" \
-    >~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/doc/$NAME-version.js
-rm -r ~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/{demo,t}
+    >~"/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/doc/$NAME-version.js"
+rm -r ~"/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/{demo,t}"
 
 # Create the rpmbuild spec file
 {
@@ -99,5 +99,5 @@ __SPEC__
 
 cd ~/rpmbuild/SPECS
 rpmbuild -ba $NAME.spec
-rm -fr ~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT
+rm -fr ~"/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT"
 exit
