@@ -111,7 +111,7 @@
 # DIAGNOSTICS
 #     Return 0 on success, 1 or exit code of the launcher program on failure.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/../lib/bash/rose_init
+. "$(dirname "$0")/../lib/bash/rose_init"
 rose_init rose_log
 
 # ------------------------------------------------------------------------------
@@ -135,14 +135,14 @@ while (($# > 0)); do
         shift 1
         if [[ -n ${ROSE_LAUNCHER_ULIMIT_OPTS:-} ]]; then
             while getopts 'HST:ab:c:d:e:f:i:l:m:n:p:q:r:s:t:u:v:x:' \
-                OPT $ROSE_LAUNCHER_ULIMIT_OPTS
+                OPT "$ROSE_LAUNCHER_ULIMIT_OPTS"
             do
                 case "$OPT" in
                   '?')
                       err "ROSE_LAUNCHER_ULIMIT_OPTS=$ROSE_LAUNCHER_ULIMIT_OPTS"
                       :;;
                     *)
-                      ulimit -$OPT ${OPTARG:-} || err \
+                      ulimit "-$OPT" "${OPTARG:-}" || err \
                           "ROSE_LAUNCHER_ULIMIT_OPTS=$ROSE_LAUNCHER_ULIMIT_OPTS"
                       :;;
                 esac
@@ -189,14 +189,14 @@ else
     if (($# < 1)); then
         rose_usage 1
     fi
-    if ! ROSE_COMMAND=$(type -P $1); then
+    if ! ROSE_COMMAND="$(type -P "$1")"; then
         err "$1: COMMAND not found"
     fi
     shift 1
 fi
 
 ROSE_LAUNCHER_LIST=${ROSE_LAUNCHER_LIST:-$( \
-    rose config --default= $ROSE_NS launcher-list)}
+    rose config --default= "$ROSE_NS" launcher-list)}
 export NPROC=${NPROC:-1}
 
 #-------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ ROSE_LAUNCHER_LIST="${ROSE_LAUNCHER_MPICH:-} $ROSE_LAUNCHER_LIST"
 if ! printenv ROSE_LAUNCHER >/dev/null; then
     ROSE_LAUNCHER=
     for LAUNCHER in $ROSE_LAUNCHER_LIST; do
-        if type -P $LAUNCHER >/dev/null; then
+        if type -P "$LAUNCHER" >/dev/null; then
             ROSE_LAUNCHER=$LAUNCHER
             break
         fi
@@ -224,11 +224,11 @@ fi
 ROSE_LAUNCHER_BASE=
 if [[ -n $ROSE_LAUNCHER ]]; then
     # Path
-    if ! ROSE_LAUNCHER_PATH=$(type -P $ROSE_LAUNCHER); then
+    if ! ROSE_LAUNCHER_PATH="$(type -P "$ROSE_LAUNCHER")"; then
         err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
     fi
     ROSE_LAUNCHER=$ROSE_LAUNCHER_PATH
-    ROSE_LAUNCHER_BASE=$(basename $ROSE_LAUNCHER)
+    ROSE_LAUNCHER_BASE="$(basename "$ROSE_LAUNCHER")"
 fi
 
 #-------------------------------------------------------------------------------
@@ -239,9 +239,10 @@ if [[ -n $ROSE_COMMAND_FILE ]]; then
         err "ROSE_LAUNCHER not defined, command file not supported."
     fi
     ROSE_LAUNCHER_FILEOPTS=${ROSE_LAUNCHER_FILEOPTS:-$( \
-        rose config --default= $ROSE_NS launcher-fileopts.$ROSE_LAUNCHER_BASE)}
-    eval "info 2 exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $@"
-    eval "exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $@"
+        rose config --default= "$ROSE_NS" \
+        "launcher-fileopts.$ROSE_LAUNCHER_BASE")}
+    eval "info 2 exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $*"
+    eval "exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $*"
 else
     if [[ -n $ROSE_LAUNCHER_BASE ]]; then
         ROSE_LAUNCH_INNER=
@@ -250,9 +251,9 @@ else
         fi
         # Options
         ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-$(rose config -E \
-            --default= $ROSE_NS launcher-preopts.$ROSE_LAUNCHER_BASE)}
+            --default= "$ROSE_NS" "launcher-preopts.$ROSE_LAUNCHER_BASE")}
         ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:-$(rose config -E \
-            --default= $ROSE_NS launcher-postopts.$ROSE_LAUNCHER_BASE)}
+            --default= "$ROSE_NS" "launcher-postopts.$ROSE_LAUNCHER_BASE")}
     else
         ROSE_LAUNCH_INNER=
         ROSE_LAUNCHER_PREOPTS=
@@ -261,8 +262,10 @@ else
     if ((ROSE_VERBOSITY >= 3)); then
         info 3 printenv
         printenv | sort
-        run ldd $ROSE_COMMAND || true 2>/dev/null
+        run ldd "$ROSE_COMMAND" || true 2>/dev/null
     fi
+
+    # shellcheck disable=SC2086
     info 2 exec \
         $ROSE_LAUNCHER \
         $ROSE_LAUNCHER_PREOPTS \
@@ -270,6 +273,7 @@ else
         "$ROSE_COMMAND" \
         $ROSE_LAUNCHER_POSTOPTS \
         "$@"
+    # shellcheck disable=SC2086
     exec \
         $ROSE_LAUNCHER \
         $ROSE_LAUNCHER_PREOPTS \
