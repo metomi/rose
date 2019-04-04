@@ -28,4 +28,4 @@ if [[ -z ${ROSE_HOME:-} ]]; then
         ROSE_HOME=$ROSE_HOME_ROOT/rose-$ROSE_VERSION
     fi
 fi
-exec $ROSE_HOME/bin/$(basename $0) "$@"
+exec "$ROSE_HOME/bin/$(basename "$0")" "$@"
