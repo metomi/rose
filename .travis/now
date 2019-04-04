@@ -106,6 +106,7 @@ _install_pytest () {
 }
 
 _install_linters () {
+    APT+=(shellcheck)
     PIP+=(pycodestyle)
     NPM+=(eslint)
 }
@@ -117,6 +118,7 @@ _test_units () {
 _test_style () {
     pycodestyle
     eslint .
+    ./shellchecker
 }
 
 _test_battery () {
