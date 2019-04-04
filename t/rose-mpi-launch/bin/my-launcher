@@ -19,7 +19,7 @@
 #     Refer to COPYRIGHT.txt of this distribution for details.
 #-------------------------------------------------------------------------------
 THIS=$(basename $0)
-echo "[$THIS] $@"
+echo "[$THIS] $*"
 if printenv ROSE_TEST_RC 1>/dev/null; then
     exit $ROSE_TEST_RC
 fi

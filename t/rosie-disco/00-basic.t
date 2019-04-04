@@ -101,13 +101,13 @@ run_pass "$TEST_KEY" \
 echo -n '[]' >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 #-------------------------------------------------------------------------------
-for FILE in $(ls $TEST_SOURCE_DIR/$TEST_KEY_BASE/*.conf); do
+for FILE in "$TEST_SOURCE_DIR/$TEST_KEY_BASE/"*.conf; do
     rosie create -q -y --info-file=$FILE --no-checkout
     $ROSE_HOME/sbin/rosa svn-post-commit \
         $PWD/svn/foo $(svnlook youngest $PWD/svn/foo)
 done
 #-------------------------------------------------------------------------------
-for FILE in $(ls $TEST_SOURCE_DIR/$TEST_KEY_BASE/*.conf.1); do
+for FILE in "$TEST_SOURCE_DIR/$TEST_KEY_BASE/"*.conf.1; do
     ID=foo-$(basename $FILE .conf.1)
     rosie checkout -q $ID
     cat <$FILE >$PWD/roses/$ID/rose-suite.info
