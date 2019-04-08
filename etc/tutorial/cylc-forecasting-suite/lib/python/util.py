@@ -33,7 +33,7 @@ def read_csv(filename, cast=float):
     with open(filename, 'r') as datafile:
         line = datafile.readline()
         while line:
-            data.append(map(cast, line.split(',')))
+            data.append(list(map(cast, line.split(','))))
             line = datafile.readline()
     return data
 
@@ -87,16 +87,18 @@ def permutations(collection_1, collection_2):
             yield val_1, val_2
 
 
-def great_arc_distance((lng_1, lat_1), (lng_2, lat_2)):
+def great_arc_distance(coordinate_1, coordinate_2):
     """Compute the distance between two (lng, lat) coordinates in km.
 
     Uses the Haversine formula.
 
     Args:
-        coorinate_1 (tuple): A 2-tuple (lng, lat) of the first coordinate.
-        coorinate_2 (tuple): A 2-tuple (lng, lat) of the second coordinate.
+        coordinate_1 (tuple): A 2-tuple (lng, lat) of the first coordinate.
+        coordinate_2 (tuple): A 2-tuple (lng, lat) of the second coordinate.
 
     """
+    (lng_1, lat_1) = coordinate_1
+    (lng_2, lat_2) = coordinate_2
     lng_1 = math.radians(lng_1)
     lat_1 = math.radians(lat_1)
     lng_2 = math.radians(lng_2)
@@ -230,7 +232,7 @@ class SurfaceFitter(object):
     """
 
     def __init__(self, x_points, y_points, z_points, kind='linear'):
-        self.points = zip(x_points, y_points, z_points)
+        self.points = list(zip(x_points, y_points, z_points))
 
         if kind == 'linear':
             self.power = 1.
@@ -265,7 +267,7 @@ class SurfaceFitter(object):
 
 
 def parse_domain(domain):
-    bbox = map(float, domain.split(','))
+    bbox = list(map(float, domain.split(',')))
     return {
         'lng1': bbox[0],
         'lat1': bbox[1],

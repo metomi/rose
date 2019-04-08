@@ -70,7 +70,3 @@ lib/html/static/js/moment.min.js:
 lib/python/isodatetime/:
 * Unmodified external software library released under the LGPL license.
   See <https://github.com/metomi/isodatetime>
-
-etc/tutorial/cylc/python/png.py:
-* Unmodified external software library released under the MIT licence.
-  see <https://github.com/drj11/pypng>

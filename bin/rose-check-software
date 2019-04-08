@@ -135,7 +135,7 @@ def py_version(module, attr_name='__version__'):
     """
     try:
         imported_module = __import__(module)
-    except (ImportError, RuntimeError):
+    except (ImportError, RuntimeError, ModuleNotFoundError):
         return DEP_NOT_FOUND
     try:
         version = getattr(imported_module, attr_name)
@@ -299,7 +299,17 @@ def main(check=check):
               shell=['perl', '-e', 'print(substr($^V, 1))'])
     ])
 
+    tutorial(check=check)
     docs(check=check)
+    return ret
+
+
+def tutorial(check=check):
+    """Check software dependencies for the Cylc/Rose tutorial."""
+    ret = check_all('Tutorial', [
+        check('py:pillow <PIL>')
+    ])
+
     return ret
 
 

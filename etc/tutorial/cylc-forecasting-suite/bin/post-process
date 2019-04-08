@@ -90,6 +90,6 @@ if __name__ == '__main__':
     try:
         args = (sys.argv[1].lower(), int(sys.argv[2]))
     except IndexError:
-        print __doc__
+        print(__doc__)
         sys.exit(1)
     main(*args)

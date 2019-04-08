@@ -21,7 +21,7 @@ Environment Variables:
 from datetime import datetime
 import json
 import os
-import urllib2
+import urllib.request
 
 
 BASE_URL = ('http://datapoint.metoffice.gov.uk/public/data/'
@@ -57,16 +57,18 @@ def get_datapoint_data(site_id, time, api_key):
     url = BASE_URL.format(time=time, site_id=site_id,
                           api_key=api_key)
     # Get the data and parse it as JSON.
-    print 'Opening URL: %s' % url
-    return json.loads(urllib2.urlopen(url).read())['SiteRep']['DV']['Location']
+    print('Opening URL: %s' % url)
+    return json.loads(
+        urllib.request.urlopen(url).read().decode()
+    )['SiteRep']['DV']['Location']
 
 
 def get_archived_data(site_id, time):
     """Return archived weather data from the suite directory."""
-    print [os.environ['CYLC_SUITE_DEF_PATH'], 'data', time, site_id + '.json']
+    print([os.environ['CYLC_SUITE_DEF_PATH'], 'data', time, site_id + '.json'])
     path = os.path.join(
         os.environ['CYLC_SUITE_DEF_PATH'], 'data', time, site_id + '.json')
-    print 'Opening File: %s' % path
+    print('Opening File: %s' % path)
     return json.load(file(path))['SiteRep']['DV']['Location']
 
 
@@ -82,10 +84,10 @@ def main(site_id, api_key=None):
     cycle_point = os.environ['CYLC_TASK_CYCLE_POINT']
 
     if api_key:
-        print 'Attempting to get weather data from DataPoint...'
+        print('Attempting to get weather data from DataPoint...')
         data = get_datapoint_data(site_id, cycle_point, api_key)
     else:
-        print 'No API key provided, falling back to archived data'
+        print('No API key provided, falling back to archived data')
         data = get_archived_data(site_id, cycle_point)
 
     obs = extract_observations(data)

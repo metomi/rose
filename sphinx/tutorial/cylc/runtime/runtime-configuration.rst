@@ -260,41 +260,39 @@ Start, Stop, Restart
       You will now have a copy of the weather-forecasting suite along with some
       executables and python modules.
 
-   .. _tutorial-cylc-runtime-tutorial-suite-initial-and-final-cyle-points:
-
    #. **Set The Initial And Final Cycle Points.**
 
-      First we will set the initial and final cycle points (see the
-      :ref:`datetime tutorial <tutorial-iso8601-datetimes>` for help with
-      writing ISO8601 datetimes):
+      We want the suite to run for 6 hours, starting at least 7 hours ago, on
+      the hour.
 
-      * The :term:`final cycle point` should be set to the time one hour ago
-        from the present time (with minutes and seconds ignored), *e.g. if the
-        current time is 9:45 UTC then the final cycle point should be at
-        8:00 UTC.*
+      We could work out the dates and times manually, or we could let Cylc do
+      the maths for us.
 
-      * The :term:`initial cycle point` should be the final cycle point minus
-        six hours.
+      Set the :term:`initial cycle point`:
 
-      .. admonition:: Reminder
-         :class: tip
+      .. code-block:: cylc
 
-         Remember that we are working in UTC mode (the ``+00`` time zone).
-         Datetimes should end with a ``Z`` character to reflect this.
+         initial cycle point = previous(T-00) - PT7H
 
-      .. spoiler:: Solution warning
+      * ``previous(T-00)`` returns the current time ignoring minutes and
+        seconds.
 
-         You can check your answers by running the following commands
-         (hyphens and colons optional but can't be mixed):
+        *e.g. if the current time is 12:34 this will return 12:00*
 
-         For the initial cycle point:
-            ``rose date --utc --offset -PT7H --format CCYY-MM-DDThh:00Z``
-         For the final cycle point:
-            ``rose date --utc --offset -PT1H --format CCYY-MM-DDThh:00Z``
+      * ``-PT7H`` subtracts 7 hours from this value.
 
-      Run ``cylc validate`` to check for any errors::
+      Set the :term:`final cycle point`:
 
-         cylc validate .
+      .. code-block:: cylc
+
+         final cycle point = +PT6H
+
+      This sets the :term:`final cycle point` six hours after the
+      :term:`initial cycle point`.
+
+      Run `cylc validate` to check for any errors::
+
+          cylc validate .
 
    #. **Add Runtime Configuration For The** ``get_observations`` **Tasks.**
 
