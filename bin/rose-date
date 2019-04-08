@@ -178,7 +178,7 @@ import re
 import sys
 import os
 
-from isodatetime.main import main
+from isodatetime.main import main as iso_main
 
 if __name__ == '__main__':
     # Handle Legacy Rose-date -c functionality
@@ -198,4 +198,4 @@ if __name__ == '__main__':
     if os.getenv('ROSE_CYCLING_MODE'):
         os.environ['ISODATETIMECALENDAR'] = os.getenv('ROSE_CYCLING_MODE')
 
-    sys.exit(main())
+    sys.exit(iso_main())
