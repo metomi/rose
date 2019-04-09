@@ -118,7 +118,7 @@ _test_units () {
 _test_style () {
     pycodestyle
     eslint .
-    ./shellchecker
+    "$(dirname "$0")/shellchecker"
 }
 
 _test_battery () {

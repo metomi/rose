@@ -193,8 +193,8 @@ file_cmp_any() {
     local TEST_KEY=$1
     local FILE_ACTUAL=$2
     local FILE_EXPECT=${3:--}
-    csplit --prefix="$TEST_KEY-cmp-any-csplit" -  /^__filesep__$/ '{'*'}' \
-        <"${FILE_EXPECT}"
+    csplit --prefix="$TEST_KEY-cmp-any-csplit" "$FILE_EXPECT" \
+        /^__filesep__$/ '{*}'
     for SPLIT_FILENAME in "$TEST_KEY-cmp-any-csplit"*; do
         sed -i "/^__filesep__$/d" "$SPLIT_FILENAME"
         if cmp -s "$SPLIT_FILENAME" "$FILE_ACTUAL"; then

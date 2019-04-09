@@ -51,13 +51,8 @@ function rose_init() {
     local ITEM=
     for ITEM in rose_usage "$@"; do
         local FILE=
-        (
-            # shellcheck disable=SC2106
-            cd "$LIB/$ITEM" 2>/dev/null || continue
-            for FILE in *; do
-                [[ -e $FILE ]] || break
-                . "$FILE"
-            done
-        )
+        for FILE in $LIB/$ITEM; do
+            . "$FILE"
+        done
     done
 }

@@ -134,15 +134,18 @@ while (($# > 0)); do
     --inner)
         shift 1
         if [[ -n ${ROSE_LAUNCHER_ULIMIT_OPTS:-} ]]; then
+            # shellcheck disable=SC2086
+            # permit word splitting in ROSE_LAUNCHER_ULIMIT_OPTS
+            # alternative would be to use an array
             while getopts 'HST:ab:c:d:e:f:i:l:m:n:p:q:r:s:t:u:v:x:' \
-                OPT "$ROSE_LAUNCHER_ULIMIT_OPTS"
+                OPT $ROSE_LAUNCHER_ULIMIT_OPTS
             do
                 case "$OPT" in
                   '?')
                       err "ROSE_LAUNCHER_ULIMIT_OPTS=$ROSE_LAUNCHER_ULIMIT_OPTS"
                       :;;
                     *)
-                      ulimit "-$OPT" "${OPTARG:-}" || err \
+                      ulimit -$OPT ${OPTARG:-} || err \
                           "ROSE_LAUNCHER_ULIMIT_OPTS=$ROSE_LAUNCHER_ULIMIT_OPTS"
                       :;;
                 esac
@@ -239,8 +242,8 @@ if [[ -n $ROSE_COMMAND_FILE ]]; then
         err "ROSE_LAUNCHER not defined, command file not supported."
     fi
     ROSE_LAUNCHER_FILEOPTS=${ROSE_LAUNCHER_FILEOPTS:-$( \
-        rose config --default= "$ROSE_NS" \
-        "launcher-fileopts.$ROSE_LAUNCHER_BASE")}
+        rose config --default= \
+        "$ROSE_NS" "launcher-fileopts.$ROSE_LAUNCHER_BASE")}
     eval "info 2 exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $*"
     eval "exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $*"
 else
@@ -264,8 +267,8 @@ else
         printenv | sort
         run ldd "$ROSE_COMMAND" || true 2>/dev/null
     fi
-
     # shellcheck disable=SC2086
+    # permit word splitting in command / argument strings
     info 2 exec \
         $ROSE_LAUNCHER \
         $ROSE_LAUNCHER_PREOPTS \
@@ -274,6 +277,7 @@ else
         $ROSE_LAUNCHER_POSTOPTS \
         "$@"
     # shellcheck disable=SC2086
+    # permit word splitting in command / argument strings
     exec \
         $ROSE_LAUNCHER \
         $ROSE_LAUNCHER_PREOPTS \

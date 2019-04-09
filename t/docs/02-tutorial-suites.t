@@ -65,6 +65,11 @@ tests $(( ( ${#TESTS[@]} - 1 ) * 2 ))
 mkdir "${HOME}/cylc-run" -p
 export REG_BASE=$(mktemp -d --tmpdir="${HOME}/cylc-run" |xargs basename)
 for IND in $(seq 1 $(( ${#TEST_KEYS[@]} - 1 ))); do
+    if grep -q '\(widget\|rose.*suite\)' <<< "${TEST_KEYS[$IND]}"; then
+        # @TODO remove skips with Python3 upgrade
+        skip 2 "${TEST_KEYS[$IND]}"
+        continue
+    fi
     TEST_KEY="${TEST_KEY_BASE}-${TEST_KEYS[$IND]}"
     export TUT_DIR="${TUT_DIRS[$IND]}"
     export CYLC_RUN_DIR="${HOME}/cylc-run/"
