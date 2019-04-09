@@ -60,7 +60,6 @@ ROSE_COMMAND_REGEX = re.compile(r'={%d}\n(.*)\n={%d}\n(((?!====).*\n)+)' %
 ROSE_HELP_SECTION_REGEX = re.compile(r'(^(?:\w+\s?)+$)((?:\n(?!^\w).*)+)',
                                      re.MULTILINE)
 
-
 # --- Rose specific help section formatting. ---
 
 # Documentation sections which should be rendered as mono-spaced plain-text.
@@ -328,7 +327,7 @@ def write_command_reference(write, commands):
             (a.strip(), b) for a, b in
             ROSE_HELP_SECTION_REGEX.findall(help_text))
 
-        # The NAME section is not used.
+        # The NAME section is not used
         del sections['NAME']
 
         # Write command name as a heading.
