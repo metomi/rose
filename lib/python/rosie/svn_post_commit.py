@@ -388,8 +388,6 @@ class RosieSvnPostCommitHook(object):
             "idx": idx,
             "branch": branch_attribs["branch"],
             "revision": changeset_attribs["revision"]}
-        for key in vc_attrs:
-            vc_attrs[key] = vc_attrs[key].encode().decode("utf-8")
         # Latest table
         try:
             dao.delete(
