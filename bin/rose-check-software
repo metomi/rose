@@ -286,7 +286,8 @@ def main(check=check):
     ret = check_all('Required Software', [
         check('python3', (3, 6), version_template=r'Python (.*)'),
         check('cylc', (8,)),
-        check('py:jinja2')
+        check('py:jinja2'),
+        check('py:aiofiles')
     ])
 
     check_all('Rosie', [

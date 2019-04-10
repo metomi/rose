@@ -20,6 +20,7 @@
 """Wraps Python's subprocess.Popen."""
 
 import os
+import asyncio
 import re
 import io
 from rose.reporter import Event
@@ -269,6 +270,65 @@ class RosePopener(object):
             file_name = os.path.join(dir_, name)
             if os.access(file_name, os.F_OK | os.X_OK):
                 return file_name
+
+    async def run_bg_async(self, *args, **kwargs):
+        """Provide a Rose-friendly interface to subprocess.Popen.
+
+        Return a subprocess.Popen object.
+
+        If kwargs["stdin"] is a str, turn it into subprocess.PIPE.
+        However, it cannot communicate stdin to the Popen object,
+        because the Popen.communicate() method implies a wait().
+
+        """
+        for key in ["stdout", "stderr"]:
+            if kwargs.get(key) is None:
+                kwargs[key] = asyncio.subprocess.PIPE
+        stdin = kwargs.get("stdin")
+        if isinstance(stdin, str):
+            kwargs["stdin"] = asyncio.subprocess.PIPE
+        elif stdin is None:
+            kwargs["stdin"] = open(os.devnull)
+        self.handle_event(RosePopenEvent(args, stdin))
+        sys.stdout.flush()
+        try:
+            if kwargs.get("shell"):
+                proc = Popen(args[0], **kwargs)
+            else:
+                command = ' '.join(map(shlex.quote, args))
+                proc = await asyncio.create_subprocess_shell(command, **kwargs)
+        except OSError as exc:
+            if exc.filename is None and args:
+                exc.filename = args[0]
+            raise RosePopenError(args, 1, "", str(exc))
+        return proc
+
+    async def run_async(self, *args, **kwargs):
+        """Provide a Rose-friendly interface to subprocess.Popen.
+
+        Return ret_code, out, err.
+
+        If kwargs["stdin"] is a str, communicate it to the command via a pipe.
+
+        """
+        proc = await self.run_bg_async(*args, **kwargs)
+        stdin = None
+        if isinstance(kwargs.get("stdin"), str):
+            stdin = kwargs.get("stdin")
+        stdout, stderr = await proc.communicate(stdin)
+        await proc.wait()
+        return proc.returncode, stdout, stderr
+
+    async def run_ok_async(self, *args, **kwargs):
+        ret_code, stdout, stderr = await self.run_async(*args, **kwargs)
+        if ret_code:
+            if stderr:
+                stderr = stderr.decode()
+            else:
+                stderr = ''
+            raise RosePopenError(
+                args, ret_code, stdout, stderr, kwargs.get("stdin"))
+        return stdout, stderr
 
     __call__ = run_ok
 

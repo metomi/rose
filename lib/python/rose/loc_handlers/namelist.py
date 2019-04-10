@@ -66,7 +66,7 @@ class NamelistLocHandler(object):
             raise ValueError(loc.name)
         return sections
 
-    def pull(self, loc, conf_tree):
+    async def pull(self, loc, conf_tree):
         """Write namelist to loc.cache."""
         sections = self.parse(loc, conf_tree)
         if loc.name.endswith("(:)"):

@@ -19,6 +19,8 @@
 # -----------------------------------------------------------------------------
 """A multiprocessing runner of jobs with dependencies."""
 
+import asyncio
+
 from rose.reporter import Event
 
 
@@ -149,9 +151,6 @@ class JobProxy(object):
 class JobRunner(object):
     """Runs JobProxy objects with pool of workers."""
 
-    NPROC = 6
-    POLL_DELAY = 0.05
-
     def __init__(self, job_processor, nproc=None):
         """
         Initialise a job runner.
@@ -164,40 +163,84 @@ class JobRunner(object):
 
         """
         self.job_processor = job_processor
-        if nproc is None:
-            nproc = self.NPROC
-        self.nproc = nproc
 
     def run(self, job_manager, *args):
         """
         Start the job runner with an instance of JobManager.
 
-        Poll self.job_manager for ready jobs.
+        Args:
+            job_manager (JobManager):
+                A JobManager object used to handle the list of jobs to be done
 
-        Put ready jobs in a worker pool, which calls
-            self.job_processor.process_job(job_proxy, *args)
+        Outline:
+                 +------------------+
+            +---->  job_manager.    +------------>  FINISH
+            |    |  has_jobs ?      |   No
+            |    +------------------+
+            |        |Yes
+            |    +---v--------------+
+            |    |Post-process any  |
+            |    |finished jobs     |
+            |    +---+--------------+
+            |        |
+            |    +---v--------------------------------+
+            |    |   Check for ready jobs             |
+            |    |   Add ready jobs to "awaiting"     |
+            |    +---+-------------------------^------+
+            |        |                         |
+            |    +---v---------------+         |
+            +----+ Are there any jobs|         |
+            No   | in "awaiting"?    |         |
+                 +-------------------+         |
+                     |Yes                      |
+                 +-------------------+         |
+                 | Add jobs to event |         |
+                 | loop - wait until |         |
+                 | asyncio returns   |         |
+                 | first result.     +---------+
+                 +-------------------+
 
-        When a job is completed, calls
-            self.job_processor.post_process_job(job_proxy, *args)
         """
-        # @TODO reimplement this with asyncio
-        while job_manager.has_ready_jobs():
-            job = job_manager.get_job()
-            if not job:
-                continue
+        loop = asyncio.get_event_loop()
+        loop.set_exception_handler(self.job_processor.handle_event)
+        results = {}
 
-            if job.exc is None:
-                try:
-                    self.job_processor.process_job(job, *args)
-                except Exception as exc:
-                    self.job_processor.handle_event(exc)
-                    job.exc = exc
-                self.job_processor.post_process_job(job, *args)
-                self.job_processor.handle_event(JobEvent(job))
-            else:
-                self.job_processor.handle_event(job.exc)
+        while job_manager.has_jobs():
+            # Post-process all finished jobs and handle exceptions.
+            for job_proxy, result in list(results.items()):
+                results.pop(job_proxy)
+                job_proxy.exc = result.exception()
+                job_manager.put_job(job_proxy)
+                if not job_proxy.exc:
+                    self.job_processor.post_process_job(job_proxy, *args)
+                    self.job_processor.handle_event(JobEvent(job_proxy))
+                else:
+                    self.job_processor.handle_event(job_proxy.exc)
 
-            job_manager.put_job(job)
+            awaiting = set()
+
+            def get_ready_jobs():
+                """Get list of jobs with satisfied dependencies"""
+                while job_manager.has_ready_jobs():
+                    job = job_manager.get_job()
+                    if job is None:
+                        break
+                    task = loop.create_task(
+                        self.job_processor.process_job(job, *args))
+                    task.job = job
+                    awaiting.add(task)
+
+            get_ready_jobs()
+            while awaiting:
+                # Submit all tasks in awaiting to event loop, then wait until
+                # one of them completes, at which point check whether any more
+                # jobs have become ready and submit those.
+                just_completed, awaiting = loop.run_until_complete(
+                    asyncio.wait(awaiting, return_when=asyncio.FIRST_COMPLETED)
+                )
+                results.update({task.job: task for task in just_completed})
+                get_ready_jobs()
+
         dead_jobs = job_manager.get_dead_jobs()
         if dead_jobs:
             raise JobRunnerNotCompletedError(dead_jobs)
