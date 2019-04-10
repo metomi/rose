@@ -112,16 +112,16 @@ class RosieDiscoServiceApplication(tornado.web.Application):
                 "db_url": db_url,
                 "service_root": service_root,
             })
-            handler = (service_root + key + r"/?",
-                       RosieDiscoService, prefix_class_args)
-            get_handler = (service_root + key + r"/get_(.*)",
-                           GetHandler, prefix_class_args)
-            hello_handler = (service_root + key + r"/hello/?$",
-                             HelloHandler, prefix_class_args)
-            search_handler = (service_root + key + r"/search?(.*)",
-                              SearchHandler, prefix_class_args)
-            query_handler = (service_root + key + r"/query?(.*)",
-                             QueryHandler, prefix_class_args)
+            handler = (service_root + key + r"/?", RosieDiscoService,
+                       prefix_class_args)
+            get_handler = (service_root + key + r"/get_(.+)", GetHandler,
+                           prefix_class_args)
+            hello_handler = (service_root + key + r"/hello/?", HelloHandler,
+                             prefix_class_args)
+            search_handler = (service_root + key + r"/search", SearchHandler,
+                              prefix_class_args)
+            query_handler = (service_root + key + r"/query", QueryHandler,
+                             prefix_class_args)
             prefix_handlers.extend(
                 [handler, get_handler, hello_handler, search_handler,
                  query_handler])
@@ -192,7 +192,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
     # Decorator to ensure there is a trailing slash since buttons for keys
     # otherwise go to wrong URLs for "/rosie/key" (e.g. -> "rosie/query?...").
     @tornado.web.addslash
-    def get(self, *args, **kwargs):
+    def get(self, *args):
         """Provide the index page."""
         try:
             self._render()
@@ -239,10 +239,10 @@ class GetHandler(RosieDiscoService):
         "optional_keys",  # Return the names of the optional fields.
     ]
 
-    def get(self, get_arg=None):
+    def get(self, get_arg):
         """Return data for basic API points of query keys without values."""
-        if (get_arg and
-                self.get_query_argument("format", default=None) == "json"):
+        format_arg = self.get_query_argument("format", default=None)
+        if get_arg and format_arg == "json":
             for query in self.QUERY_KEYS:
                 if get_arg.startswith(query):
                     # No need to catch AttributeError as all QUERY_KEYS valid.
@@ -257,8 +257,9 @@ class HelloHandler(RosieDiscoService):
 
     def get(self):
         """Say Hello on success."""
+        format_arg = self.get_query_argument("format", default=None)
         data = self.HELLO % pwd.getpwuid(os.getuid()).pw_name
-        if self.get_query_argument("format", default=None) == "json":
+        if format_arg == "json":
             self.write(json.dumps(data))
         else:
             self.write(data)
@@ -268,15 +269,17 @@ class SearchHandler(RosieDiscoService):
 
     """Serves a search of the database on the page of a given prefix."""
 
-    def get(self, _):
+    def get(self):
         """Search database for rows with data matching the search string."""
         s_arg = self.get_query_argument("s", default=None)
         all_revs = self.get_query_argument("all_revs", default=0)
+        format_arg = self.get_query_argument("format", default=None)
+
         if s_arg:
             data = self.dao.search(s_arg, all_revs)
         else:  # Blank search: provide no rather than all output (else slow)
             data = None
-        if self.get_query_argument("format", default=None) == "json":
+        if format_arg == "json":
             self.write(json.dumps(data))
         else:
             self._render(all_revs, data, s=s_arg)
@@ -286,10 +289,12 @@ class QueryHandler(RosieDiscoService):
 
     """Serves a query of the database on the page of a given prefix."""
 
-    def get(self, _):
+    def get(self):
         """Search database for rows with data matching the query string."""
         q_args = self.get_query_arguments("q")  # empty list if none given
         all_revs = self.get_query_argument("all_revs", default=0)
+        format_arg = self.get_query_argument("format", default=None)
+
         filters = []
         if not isinstance(q_args, list):
             q_args = [q_args]
@@ -300,7 +305,7 @@ class QueryHandler(RosieDiscoService):
             data = self.dao.query(filters, all_revs)
         else:  # in case of a fully blank query
             data = None
-        if self.get_query_argument("format", default=None) == "json":
+        if format_arg == "json":
             self.write(json.dumps(data))
         else:
             self._render(all_revs, data, filters=filters)
