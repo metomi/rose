@@ -1106,6 +1106,14 @@ simple rules for variable values.
 Operators
 ^^^^^^^^^
 
+The following *logical* operators are supported:
+
+.. code-block:: python
+
+   and   # Logical AND
+   or    # Logical OR
+   not   # Logical NOT
+
 The following *numeric* operators are supported:
 
 .. code-block:: python
@@ -1125,8 +1133,6 @@ The following *string* operators are supported:
    +      # concatenate - e.g. "foo" + "bar" implies "foobar"
    *      # self-concatenate some number of times - e.g. "foo" * 2 implies "foofoo"
    %      # formatting - e.g. "foo %s baz" % "bar" implies "foo bar baz"
-   in     # contained in (True/False) - e.g. "oo" in "foobar" implies True
-   not in # opposite sense of in
 
    # Where m, n are integers or expressions that evaluate to integers
    # (negative numbers count from the end of the string):
@@ -1134,14 +1140,6 @@ The following *string* operators are supported:
    [m:n] # get slice of string from m to n - e.g. "foobar"[1:5] implies "ooba"
    [m:]  # get slice of string from m onwards - e.g. "foobar"[1:] implies "oobar"
    [:n]  # get slice of string up to n - e.g. "foobar"[:5] implies "fooba"
-
-The following *logical* operators are supported:
-
-.. code-block:: python
-
-   and   # Logical AND
-   or    # Logical OR
-   not   # Logical NOT
 
 The following *comparison* operators are supported:
 
@@ -1155,9 +1153,39 @@ The following *comparison* operators are supported:
    <=    # Less than or equal to
    !=    # Not equal to
 
-Operator precedence is intended to be the same as Python. However, with the
-current choice of language engine, the ``%`` and ``//`` operators may not
-obey this - make sure you force the correct behaviour using brackets.
+The following *membership* operator is supported:
+
+.. code-block:: python
+
+   in     # contained in (True/False)
+   # e.g. "oo" in "foobar" implies True; "foo" in ["bar", "baz"] implies False
+
+   # To test for lack of membership, combine with the "not" logical operator:
+   not in # not contained in, i.e. the opposite to that described above
+
+.. tip::
+   The ``in`` operator functions as it does in Python, testing for membership
+   in a collection which can be a sequence or string. This means that you
+   must contain value(s) to test for in a list, like so:
+
+   .. code-block:: python
+
+      this in ['that']  # equivalent to: this == 'that'
+
+   rather than comparing to the bare value(s):
+
+   .. code-block:: python
+
+      this in 'that'
+
+   as the latter will test that the setting is contained in the string 'that',
+   i.e. that it is one of the characters 't', 'h' and 'a'.
+
+.. note::
+
+   Operator precedence is intended to be the same as Python. However, with the
+   current choice of language engine, the ``%`` and ``//`` operators may not
+   obey this - make sure you force the correct behaviour using brackets.
 
 Constants
 ^^^^^^^^^
