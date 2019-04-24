@@ -9,8 +9,9 @@ dist: xenial
 
 
 before_install:
-    - wget 'https://github.com/cylc/cylc/archive/master.tar.gz' -O '/tmp/cylc-master.tar.gz'
+    - wget 'https://github.com/cylc/cylc-flow/archive/master.tar.gz' -O '/tmp/cylc-master.tar.gz'
     - tar -xvf '/tmp/cylc-master.tar.gz' -C "${HOME}"
+    - mv "${HOME}/cylc-flow-master" "${HOME}/cylc-master"
     - wget 'https://github.com/metomi/fcm/archive/master.tar.gz' -O '/tmp/fcm-master.tar.gz'
     - tar -xvf '/tmp/fcm-master.tar.gz' -C "${HOME}"
     - cat >"${HOME}/.bashrc" <<<"export PATH=${PWD}/bin:${HOME}/fcm-master/bin:${HOME}/cylc-master/bin:\$PATH"
