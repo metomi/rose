@@ -1,7 +1,7 @@
 .. include:: ../../../hyperlinks.rst
    :start-line: 1
 
-.. _nowcasting: https://www.metoffice.gov.uk/learning/science/hours-ahead/nowcasting
+.. _nowcasting: https://www.metoffice.gov.uk/weather/learn-about/how-forecasts-are-made
 
 .. _tutorial-datetime-cycling:
 
