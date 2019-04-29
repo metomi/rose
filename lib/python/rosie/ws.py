@@ -26,6 +26,7 @@ Base classes:
     RosieDiscoService - discovery service request handler for a given prefix.
 
 Sub-classes, for handling API points by inheriting from RosieDiscoService:
+    GetHandler - overrides HTTP GET method to return known fields and operators
     HelloHandler - overrides HTTP GET method to write a hello message
     SearchHandler - overrides HTTP GET method to serve a database search
     QueryHandler - overrides HTTP GET method to serve a database query
@@ -35,11 +36,13 @@ Sub-classes, for handling API points by inheriting from RosieDiscoService:
 from glob import glob
 import jinja2
 import json
+import logging
 import os
 import pwd
 import signal
 from time import sleep
 from tornado.ioloop import IOLoop, PeriodicCallback
+import tornado.log
 import tornado.web
 
 from isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
@@ -336,6 +339,24 @@ class QueryHandler(RosieDiscoService):
         return filt
 
 
+def _log_app_base(
+        application, host, port, logger_type, file_ext, level_threshold=None):
+    """ Log to file some information from an application and/or its server."""
+    log = logging.getLogger(logger_type)
+    log.propagate = False
+    if level_threshold:  # else defaults to logging.WARNING
+        log.setLevel(level_threshold)
+
+    log_root = os.path.expanduser(LOG_ROOT_TMPL % {
+        "ns": application.NAMESPACE,
+        "util": application.UTIL,
+        "host": host,
+        "port": port})
+    log_channel = logging.FileHandler(log_root + file_ext)
+    log.addHandler(log_channel)
+    return log_channel
+
+
 def _log_server_status(application, host, port):
     """ Log a brief status, including process ID, for an application server."""
     log_root = os.path.expanduser(LOG_ROOT_TMPL % {
@@ -360,7 +381,7 @@ def _get_server_status(application, host, port):
         "util": application.UTIL,
         "host": "*",
         "port": "*"})
-    for filename in glob(log_root_glob):
+    for filename in glob(log_root_glob + ".status"):
         try:
             for line in open(filename):
                 key, value = line.strip().split("=", 1)
@@ -400,8 +421,11 @@ def parse_cli(*args, **kwargs):
 
 
 def main():
-    info_msg_end = " the server providing the Rosie Disco web application"
     status = None
+    # Detailed messages to be written to log file:
+    log_msg_end = " server running application %s on host %s and port %s"
+    # User-friendly message to be written to STDOUT:
+    user_msg_end = " the server providing the Rosie Disco web application"
 
     cli_input = parse_cli()
     if not cli_input:
@@ -415,6 +439,8 @@ def main():
         app = RosieDiscoServiceApplication(service_root_mode=True)
     else:
         app = RosieDiscoServiceApplication()
+    app_info = app, app.props["host_name"], port
+
     if instruction == "start":
         app.listen(port)
         signal.signal(signal.SIGINT, app.sigint_handler)
@@ -425,18 +451,21 @@ def main():
         PeriodicCallback(
             app.stop_application, INTERVAL_CHECK_FOR_STOP_CMD * 1000).start()
 
-        # Before the actual IOLoop start() else it prints only on stop of loop.
-        print("Started" + info_msg_end)
+        # Set-up logging and message outputs
+        status = _log_server_status(*app_info)
+        _log_app_base(*app_info, "tornado.access", ".access", logging.INFO)
+        _log_app_base(*app_info, "tornado.general", ".general", logging.DEBUG)
+        _log_app_base(*app_info, "tornado.application", ".error")
 
-        status = _log_server_status(app, app.props["host_name"], port)
+        tornado.log.gen_log.info("Started" + log_msg_end % (app_info))
+        # Call print before IOLoop start() else it prints only on loop stop.
+        print("Started" + user_msg_end)
+
         IOLoop.current().start()
     elif instruction == "stop" and (
             cli_opt or input("Stop server? y/n (default=n)") == "y") and (
-                _get_server_status(
-                    app, app.props["host_name"], port).get("pid")):
-        os.killpg(int(_get_server_status(
-            app, app.props["host_name"], port).get("pid")),
-            signal.SIGINT)
+                _get_server_status(*app_info).get("pid")):
+        os.killpg(int(_get_server_status(*app_info).get("pid")), signal.SIGINT)
         # Must wait for next callback, so server will not stop immediately;
         # wait one callback interval so server has definitely been stopped...
         sleep(INTERVAL_CHECK_FOR_STOP_CMD)
@@ -444,10 +473,14 @@ def main():
 
         if status:
             os.unlink(status)
-        print("Stopped" + info_msg_end)
+        tornado.log.gen_log.info("User stopped" + log_msg_end % (app_info))
+        print("Stopped" + user_msg_end)
+        sleep(5)
+        logging.shutdown()  # close all logging handlers to release log files
     elif instruction == "stop":
+        tornado.log.gen_log.info("Failed to stop" + log_msg_end % (app_info))
         print("Failed to stop%s; no such server or process to stop." % (
-              info_msg_end))
+              user_msg_end))
 
 
 if __name__ == "__main__":  # Run on an ad-hoc server in a test environment.
