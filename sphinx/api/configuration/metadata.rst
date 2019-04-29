@@ -3,7 +3,7 @@
 
 .. _floating point: https://docs.python.org/3/library/stdtypes.html#typesnumeric
 .. _cast: https://docs.python.org/2/library/ast.html#ast.literal_eval
-
+.. _Python in operator: https://docs.python.org/3/reference/expressions.html#membership-test-operations
 
 .. _Metadata:
 .. _conf-meta:
@@ -1164,22 +1164,20 @@ The following *membership* operator is supported:
    not in # not contained in, i.e. the opposite to that described above
 
 .. tip::
-   The ``in`` operator functions as it does in Python, testing for membership
-   in a collection which can be a sequence or string. This means that you
-   must contain value(s) to test for in a list, like so:
+   The ``in`` operator functions `as it does in Python <Python in operator>`_.
+   Note the difference between testing if a setting's value is equal to some
+   possibility contained within a collection, for example as in:
 
    .. code-block:: python
 
-      this in ['that']  # equivalent to: this == 'that'
+      place in ['here', 'there']  # i.e: place == 'here' or place == 'there'
 
-   rather than comparing to the bare value(s):
+   and testing if it is a substring, as in:
 
    .. code-block:: python
 
-      this in 'that'
+      place in 'there'  # place could be 'there', 'here', 'er', 'the', etc.
 
-   as the latter will test that the setting is contained in the string 'that',
-   i.e. that it is one of the characters 't', 'h' and 'a'.
 
 .. note::
 
