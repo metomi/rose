@@ -151,6 +151,8 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         """Stop main event loop and server if 'stopping' flag is True."""
         if self.stopping:
             IOLoop.current().stop()
+            # Log that the stop was clean (as opposed to a kill of the process)
+            tornado.log.gen_log.info("Stopped application and server cleanly")
 
 
 class RosieDiscoServiceRoot(tornado.web.RequestHandler):
@@ -353,6 +355,8 @@ def _log_app_base(
         "host": host,
         "port": port})
     log_channel = logging.FileHandler(log_root + file_ext)
+    # Use Tornado's log formatter to add datetime stamps & handle encoding:
+    log_channel.setFormatter(tornado.log.LogFormatter(color=False))
     log.addHandler(log_channel)
     return log_channel
 
@@ -421,12 +425,6 @@ def parse_cli(*args, **kwargs):
 
 
 def main():
-    status = None
-    # Detailed messages to be written to log file:
-    log_msg_end = " server running application %s on host %s and port %s"
-    # User-friendly message to be written to STDOUT:
-    user_msg_end = " the server providing the Rosie Disco web application"
-
     cli_input = parse_cli()
     if not cli_input:
         return
@@ -434,12 +432,18 @@ def main():
     port = DEFAULT_PORT
     if len(cli_input) == 3:
         port = cli_input[2]
-
     if instruction == "start" and cli_opt:
         app = RosieDiscoServiceApplication(service_root_mode=True)
     else:
         app = RosieDiscoServiceApplication()
+
+    status = None
     app_info = app, app.props["host_name"], port
+    # User-friendly message to be written to STDOUT:
+    user_msg_end = " the server providing the Rosie Disco web application"
+    # Detailed message to be written to log file:
+    log_msg_end = " server running application %s on host %s and port %s" % (
+        app_info)
 
     if instruction == "start":
         app.listen(port)
@@ -457,7 +461,7 @@ def main():
         _log_app_base(*app_info, "tornado.general", ".general", logging.DEBUG)
         _log_app_base(*app_info, "tornado.application", ".error")
 
-        tornado.log.gen_log.info("Started" + log_msg_end % (app_info))
+        tornado.log.gen_log.info("Started" + log_msg_end)
         # Call print before IOLoop start() else it prints only on loop stop.
         print("Started" + user_msg_end)
 
@@ -473,12 +477,10 @@ def main():
 
         if status:
             os.unlink(status)
-        tornado.log.gen_log.info("User stopped" + log_msg_end % (app_info))
+        # Log stop via stop_application callback (logging module is blocking)
         print("Stopped" + user_msg_end)
-        sleep(5)
         logging.shutdown()  # close all logging handlers to release log files
     elif instruction == "stop":
-        tornado.log.gen_log.info("Failed to stop" + log_msg_end % (app_info))
         print("Failed to stop%s; no such server or process to stop." % (
               user_msg_end))
 
