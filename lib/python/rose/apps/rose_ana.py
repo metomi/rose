@@ -467,7 +467,7 @@ class RoseAnaApp(BuiltinApp):
                     self.reporter(
                         "Starting thread for task {0} at {1}"
                         .format(itask + 1, timestamp()))
-                    running.append(threads[itask])                    
+                    running.append(threads[itask])
                     threads[itask].start()
                     itask += 1
                 for thread in running:
