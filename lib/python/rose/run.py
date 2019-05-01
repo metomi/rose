@@ -160,12 +160,8 @@ class Runner(object):
             getattr(opts, 'defines_suite', [])))
 
         conf_tree = self.conf_tree_loader.load(conf_dir, conf_name,
-                                               opt_keys=opt_conf_keys)
-
-        # Optional defines
-        if opts.defines:
-            self.conf_tree_loader.node_loader.load_defines(opts.defines,
-                                                           conf_tree.node)
+                                               opt_keys=opt_conf_keys,
+                                               defines=opts.defines)
         return conf_tree
 
     def run(self, opts, args):
