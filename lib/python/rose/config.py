@@ -96,7 +96,6 @@ import re
 from rose.env import env_var_escape
 import shlex
 import sys
-from tempfile import NamedTemporaryFile, TemporaryFile
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile
 
 
