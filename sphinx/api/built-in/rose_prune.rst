@@ -1,3 +1,6 @@
+.. include:: ../../hyperlinks.rst
+   :start-line: 1
+
 ``rose_prune``
 ==============
 
@@ -23,6 +26,14 @@ by a colon. In these, the argument should be globs for matching items
 in the directory. If two or more globs are required, they should be
 separated by a space. In which case, either the argument should be
 quoted or the space should be escaped by a backslash.
+
+.. note::
+
+   ``rose_prune`` uses Bash `extglob pattern matching`_ which supports simple
+   (e.g. ``*``) and extended (e.g. ``!(foo)``) pattern matching.
+
+   For more information see the ``shopt`` documentation for the version
+   of bash you have installed (``$ man shopt``).
 
 
 Invocation
