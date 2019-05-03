@@ -100,7 +100,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         ROOT = "%s-%s" % (self.NAMESPACE, self.UTIL)
         service_root = r"/?"
         if self.service_root_mode:
-            service_root += ROOT + r"/?"
+            service_root = service_root.replace("?", ROOT + r"/?")
 
         # Set-up the Tornado application request-handling structure.
         prefix_handlers = []
@@ -192,7 +192,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
         if source_url_node is not None:
             self.source_url = source_url_node.value
         self.dao = rosie.db.DAO(db_url)
-        self.service_root = service_root
+        self.service_root = service_root[:-1]  # remove the '?' regex aspect
 
     # Decorator to ensure there is a trailing slash since buttons for keys
     # otherwise go to wrong URLs for "/rosie/key" (e.g. -> "rosie/query?...").
@@ -244,12 +244,12 @@ class GetHandler(RosieDiscoService):
         "optional_keys",  # Return the names of the optional fields.
     ]
 
-    def get(self, get_arg):
+    def get(self, *args):
         """Return data for basic API points of query keys without values."""
         format_arg = self.get_query_argument("format", default=None)
-        if get_arg and format_arg == "json":
+        if args[0] and format_arg == "json":
             for query in self.QUERY_KEYS:
-                if get_arg.startswith(query):
+                if args[0].startswith(query):
                     # No need to catch AttributeError as all QUERY_KEYS valid.
                     self.write(json.dumps(getattr(self.dao, "get_" + query)()))
 
@@ -260,7 +260,7 @@ class HelloHandler(RosieDiscoService):
 
     HELLO = "Hello %s\n"
 
-    def get(self):
+    def get(self, *args):
         """Say Hello on success."""
         format_arg = self.get_query_argument("format", default=None)
         data = self.HELLO % pwd.getpwuid(os.getuid()).pw_name
@@ -274,7 +274,7 @@ class SearchHandler(RosieDiscoService):
 
     """Serves a search of the database on the page of a given prefix."""
 
-    def get(self):
+    def get(self, *args):
         """Search database for rows with data matching the search string."""
         s_arg = self.get_query_argument("s", default=None)
         all_revs = self.get_query_argument("all_revs", default=0)
@@ -294,7 +294,7 @@ class QueryHandler(RosieDiscoService):
 
     """Serves a query of the database on the page of a given prefix."""
 
-    def get(self):
+    def get(self, *args):
         """Search database for rows with data matching the query string."""
         q_args = self.get_query_arguments("q")  # empty list if none given
         all_revs = self.get_query_argument("all_revs", default=0)
@@ -462,8 +462,15 @@ def main():
         _log_app_base(*app_info, "tornado.application", ".error")
 
         tornado.log.gen_log.info("Started" + log_msg_end)
-        # Call print before IOLoop start() else it prints only on loop stop.
+        # Call to print before IOLoop start() else it prints only on loop stop.
         print("Started" + user_msg_end)
+        append_url_root = ""
+        if app.service_root_mode:
+            append_url_root = "%s-%s/" % (app.NAMESPACE, app.UTIL)
+        # Also print the URL for quick access; 'http://' added so that the URL
+        # is hyperlinked in the terminal stdout, but it is not required.
+        print("Application root page available at http://%s:%s/%s" % (
+            app.props["host_name"], port, append_url_root))
 
         IOLoop.current().start()
     elif instruction == "stop" and (
