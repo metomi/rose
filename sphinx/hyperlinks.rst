@@ -13,6 +13,7 @@
 .. _Cylc User Guide: http://cylc.github.io/documentation.html#the-cylc-user-guide
 .. _Cylc Suite Design Guide: http://cylc.github.io/doc/built-sphinx/suite-design-guide/suite-design-guide-master.html
 .. _EmPy: http://www.alcyone.com/software/empy/
+.. _extglob pattern matching: https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching
 .. _FCM: https://metomi.github.io/fcm/doc/
 .. _FCM User Guide: http://metomi.github.io/fcm/doc/user_guide/
 .. _INI: https://en.wikipedia.org/wiki/INI_file
