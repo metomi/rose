@@ -5,6 +5,28 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2019.01.1 (2019-05-03)
+
+Rose release 58. This maintenance release is expected to be used with:
+* [cylc-flow-7.8.2](https://github.com/cylc/cylc-flow/releases/tag/7.8.2), and
+* [fcm-2019.05.0](https://github.com/metomi/fcm/releases/tag/2019.05.0).
+
+### Noteworthy Changes
+
+[#2328](https://github.com/metomi/rose/pull/2328):
+rose_ana: speed up by running in multiple threads.
+
+[#2296](https://github.com/metomi/rose/pull/2296):
+rose config-edit: fix element removal on array-like types.
+
+[#2290](https://github.com/metomi/rose/pull/2290):
+rose suite-run: fix connection to suite that has just been started.
+
+[#2289](https://github.com/metomi/rose/pull/2289):
+rose config-edit: fix int spin box manual edit.
+
+--------------------------------------------------------------------------------
+
 ## 2019.01.0 (2019-01-25)
 
 Rose release 57. This release is expected to be used with:
