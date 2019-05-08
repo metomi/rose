@@ -91,7 +91,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
                 enabled_extensions=("html", "xml"), default_for_string=True))
 
         db_url_map = {}
-        for key, node in list(rose_conf.get(["rosie-db"]).value.items()):
+        for key, node in rose_conf.get(["rosie-db"]).value.items():
             if key.startswith("db.") and key[3:]:
                 db_url_map[key[3:]] = node.value
         self.db_url_map = db_url_map
@@ -108,7 +108,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         root_class_args = dict(class_args)  # mutable so copy for safety
         root_class_args.update({"db_url_map": self.db_url_map})
         root_handler = (service_root, RosieDiscoServiceRoot, root_class_args)
-        for key, db_url in list(self.db_url_map.items()):
+        for key, db_url in self.db_url_map.items():
             prefix_class_args = dict(class_args)  # mutable so copy for safety
             prefix_class_args.update({
                 "prefix": key,
