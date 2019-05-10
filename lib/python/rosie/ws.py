@@ -399,15 +399,18 @@ def _get_server_status(application, host, port):
 def parse_cli(*args, **kwargs):
     """Parse command line, start/stop ad-hoc server.
 
-    Return a CLI instruction tuple for a valid command instruction, else None:
+    Return a CLI instruction tuple for a valid command instruction, else False:
         ("start", Boolean, port):
             start server on 'port', [2]==True indicating non_interactive mode.
         ("stop", Boolean):
             stop server, [2]==True indicating service_root_mode.
+        None:
+            bare command, requesting to print server status
     """
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("non_interactive", "service_root_mode")
     opts, args = opt_parser.parse_args()
+
     arg = None
     if args:
         arg = args[0]
@@ -422,23 +425,30 @@ def parse_cli(*args, **kwargs):
         return ("start", opts.service_root_mode, port)
     elif arg == "stop":
         return ("stop", opts.non_interactive)
+    elif arg:  # unrecognised (invalid) argument, to ignore
+        return False  # False to distinguish from None for no arguments given
 
 
 def main():
-    cli_input = parse_cli()
-    if not cli_input:
-        return
-    instruction, cli_opt = cli_input[:2]
     port = DEFAULT_PORT
-    if len(cli_input) == 3:
-        port = cli_input[2]
+    instruction = False
+
+    cli_input = parse_cli()
+    if cli_input is False:  # invalid arguments
+        print(" Command argument unrecognised.")
+    elif cli_input is None:  # no arguments: bare command
+        instruction = "status"
+    else:  # valid argument, either 'start' or 'stop'
+        instruction, cli_opt = cli_input[:2]
+        if len(cli_input) == 3:
+            port = cli_input[2]
+
     if instruction == "start" and cli_opt:
         app = RosieDiscoServiceApplication(service_root_mode=True)
     else:
         app = RosieDiscoServiceApplication()
-
-    status = None
     app_info = app, app.props["host_name"], port
+
     # User-friendly message to be written to STDOUT:
     user_msg_end = " the server providing the Rosie Disco web application"
     # Detailed message to be written to log file:
@@ -456,7 +466,7 @@ def main():
             app.stop_application, INTERVAL_CHECK_FOR_STOP_CMD * 1000).start()
 
         # Set-up logging and message outputs
-        status = _log_server_status(*app_info)
+        _log_server_status(*app_info)
         _log_app_base(*app_info, "tornado.access", ".access", logging.INFO)
         _log_app_base(*app_info, "tornado.general", ".general", logging.DEBUG)
         _log_app_base(*app_info, "tornado.application", ".error")
@@ -473,23 +483,34 @@ def main():
             app.props["host_name"], port, append_url_root))
 
         IOLoop.current().start()
+    elif instruction == "status":
+        status_info = _get_server_status(*app_info)
+        if status_info:
+            # Use JSON: 1) easily-parsable & 2) can "pretty print" via indent.
+            print(json.dumps(status_info, indent=4))
+        else:
+            print("No such server running.")
     elif instruction == "stop" and (
             cli_opt or input("Stop server? y/n (default=n)") == "y") and (
                 _get_server_status(*app_info).get("pid")):
-        os.killpg(int(_get_server_status(*app_info).get("pid")), signal.SIGINT)
-        # Must wait for next callback, so server will not stop immediately;
-        # wait one callback interval so server has definitely been stopped...
-        sleep(INTERVAL_CHECK_FOR_STOP_CMD)
-        IOLoop.current().close()  # ... then close event loop to clean up.
+        stop_server = True
+        try:
+            os.killpg(
+                int(_get_server_status(*app_info).get("pid")), signal.SIGINT)
+        except ProcessLookupError:  # process already stopped, e.g. by Ctrl-C
+            print("Failed to stop%s; no such server or process to stop." % (
+                  user_msg_end))
+            stop_server = False
+        if stop_server:
+            # Must wait for next callback, so server will not stop immediately;
+            # wait one callback interval so server has definitely stopped...
+            sleep(INTERVAL_CHECK_FOR_STOP_CMD)
+            IOLoop.current().close()  # ... then close event loop to clean up.
 
-        if status:
-            os.unlink(status)
-        # Log stop via stop_application callback (logging module is blocking)
-        print("Stopped" + user_msg_end)
-        logging.shutdown()  # close all logging handlers to release log files
-    elif instruction == "stop":
-        print("Failed to stop%s; no such server or process to stop." % (
-              user_msg_end))
+            # Log via stop_application callback (logging module is blocking):
+            print("Stopped" + user_msg_end)
+            # Close all logging handlers to release log files:
+            logging.shutdown()
 
 
 if __name__ == "__main__":  # Run on an ad-hoc server in a test environment.
