@@ -40,7 +40,7 @@ REST API
    Example Request
       .. code-block:: http
 
-         GET http://host/my_prefix/get_known/keys?format=json HTTP/1.1
+         GET http://host/my_prefix/get_known_keys?format=json HTTP/1.1
 
    Example Response
       .. code-block:: json
@@ -91,7 +91,7 @@ REST API
    Return a list of suites matching all search terms.
 
    :arg str prefix: Repository prefix.
-   :param list query: List of queries.
+   :param list q: List of queries.
    :param string format: Desired return format (``json`` or ``None``).
    :param flag all_revs: Switch on searching older revisions of current suites
       and deleted suites.
@@ -141,7 +141,7 @@ REST API
    Return a list of suites matching one or more search terms.
 
    :arg str prefix: Repository prefix.
-   :param list search: List of queries in the same format as
+   :param list s: List of queries in the same format as
       :http:get:`(str:prefix)/query`
    :param string format: Desired return format (``json`` or ``None``).
    :param flag all_revs: Switch on searching older revisions of current suites
@@ -152,7 +152,7 @@ REST API
 
       .. code-block:: http
 
-         GET http://host/my_prefix/search?var+bob+nowcast&format=json HTTP/1.1
+         GET http://host/my_prefix/search/?s=var+bob+nowcast&format=json HTTP/1.1
 
    Example Response
       .. code-block:: json
