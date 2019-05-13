@@ -38,7 +38,6 @@ from io import BytesIO
 import sys
 from tempfile import mkdtemp
 from urllib.parse import urlparse
-import collections.abc
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):

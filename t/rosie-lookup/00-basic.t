@@ -22,10 +22,9 @@
 # svn-post-commit", which is tested quite thoroughly in its own test suite.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
-if ! python3 -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
-    skip_all '"cherrypy" or "sqlalchemy" not installed'
+if ! python3 -c 'import tornado, sqlalchemy' 2>/dev/null; then
+    skip_all '"tornado" or "sqlalchemy" not installed'
 fi
 tests 75
 #-------------------------------------------------------------------------------
@@ -235,7 +234,7 @@ local suite             owner  project   title
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
 =     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
-url: http://$HOSTNAME:$PORT/foo/search?all_revs=1&s=a
+url: http://$HOSTNAME:$PORT/foo/search?s=a&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -371,8 +370,8 @@ run_pass "$TEST_KEY" rosie lookup \
     --format="%suite %local %description %access-list" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             local description       access-list
-foo-aa001/trunk@3 =     %description      [u'roses', u'violets']
-foo-aa002/trunk@5 =     Nom nom nom roses [u'allthebugs']
+foo-aa001/trunk@3 =     %description      ['roses', 'violets']
+foo-aa002/trunk@5 =     Nom nom nom roses ['allthebugs']
 foo-aa003/trunk@6 =     %description      %access-list
 url: http://$HOSTNAME:$PORT/foo/search?s=a
 __OUT__
@@ -383,13 +382,13 @@ run_pass "$TEST_KEY" rosie lookup --all-revs \
     --format="%suite %local %description %access-list" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             local description               access-list
-foo-aa000/trunk@1       Bad corn ear and pew pull [u'*']
-foo-aa001/trunk@2 >     Violets are Blue...       [u'*']
-foo-aa001/trunk@3 =     %description              [u'roses', u'violets']
-foo-aa000/trunk@4       Bad corn ear and pew pull [u'*']
-foo-aa002/trunk@5 =     Nom nom nom roses         [u'allthebugs']
+foo-aa000/trunk@1       Bad corn ear and pew pull ['*']
+foo-aa001/trunk@2 >     Violets are Blue...       ['*']
+foo-aa001/trunk@3 =     %description              ['roses', 'violets']
+foo-aa000/trunk@4       Bad corn ear and pew pull ['*']
+foo-aa002/trunk@5 =     Nom nom nom roses         ['allthebugs']
 foo-aa003/trunk@6 =     %description              %access-list
-url: http://$HOSTNAME:$PORT/foo/search?all_revs=1&s=a
+url: http://$HOSTNAME:$PORT/foo/search?s=a&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -416,5 +415,5 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}*
+rm -f ~/.metomi/rosie-disco-${HOSTNAME:-0.0.0.0}-${PORT}*
 exit

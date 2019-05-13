@@ -313,7 +313,7 @@ mock_smtpd_init() {
     for SMTPD_PORT in 8025 8125 8225 8325 8425 8525 8625 8725 8825 8925; do 
         local SMTPD_HOST=localhost:$SMTPD_PORT
         local SMTPD_LOG="$TEST_DIR/smtpd.log"
-        python3 -m smtpd -c DebuggingServer -d -n "$SMTPD_HOST" \
+        python3 -u -m smtpd -n -c DebuggingServer -d -n "$SMTPD_HOST" \
             1>"$SMTPD_LOG" 2>&1 &
         local SMTPD_PID=$!
         while ! grep -q 'DebuggingServer started' "$SMTPD_LOG" 2>/dev/null; do
@@ -356,7 +356,7 @@ port_is_busy() {
         HOSTNAME="${HOSTNAME:-'localhost'}"
         netcat -z "${HOSTNAME}" "${PORT}"
     else
-        netstat -atun | grep -q "127.0.0.1:${PORT}"
+        netstat -atun | grep -q "0.0.0.0:${PORT}"
     fi
 }
 
@@ -382,7 +382,7 @@ rose_ws_init() {
     TEST_ROSE_WS_PORT="${PORT}"
     if port_is_busy "${TEST_ROSE_WS_PORT}"; then
         pass "${TEST_KEY}"
-        TEST_ROSE_WS_URL="http://${HOSTNAME}:${TEST_ROSE_WS_PORT}/${NS}-${UTIL}/"
+        TEST_ROSE_WS_URL="http://${HOSTNAME}:${TEST_ROSE_WS_PORT}/${NS}-${UTIL}"
     else
         fail "${TEST_KEY}"
         rose_ws_kill
@@ -395,7 +395,7 @@ rose_ws_kill() {
         wait 2>'/dev/null'
     fi
     if [[ -n "${TEST_ROSE_WS_PORT}" ]]; then
-        rm -fr "${HOME}/.metomi/"*"-0.0.0.0-${TEST_ROSE_WS_PORT}"* 2>'/dev/null'
+        rm -fr "${HOME}/.metomi/"*"-${HOSTNAME:-0.0.0.0}-${TEST_ROSE_WS_PORT}"* 2>'/dev/null'
     fi
     TEST_ROSE_WS_PID=
     TEST_ROSE_WS_PORT=

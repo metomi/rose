@@ -27,7 +27,6 @@ environment variables are left unchanged.
 import os
 import re
 from rose.reporter import Event
-import collections.abc
 
 
 # _RE_DEFAULT = re.compile(r"""

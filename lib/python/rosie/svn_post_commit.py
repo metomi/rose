@@ -27,8 +27,18 @@ Notify owner and users on access-list on changes to trunk.
 
 from difflib import unified_diff
 from email.mime.text import MIMEText
+from io import StringIO
 import os
 import re
+import shlex
+from smtplib import SMTP
+import socket
+import sqlalchemy as al
+import sys
+from tempfile import TemporaryFile
+from time import mktime, strptime
+import traceback
+
 import rose.config
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
@@ -37,15 +47,6 @@ from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
 from rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
-import shlex
-from smtplib import SMTP
-import socket
-import sqlalchemy as al
-from io import StringIO
-import sys
-from tempfile import TemporaryFile
-from time import mktime, strptime
-import traceback
 
 
 class RosieWriteDAO(object):
@@ -145,17 +146,16 @@ class RosieSvnPostCommitHook(object):
 
         # Date-time of this commit
         os.environ["TZ"] = "UTC"
-        date_time = self._svnlook("date", "-r", revision, repos)
+        date_time = self._svnlook("date", "-r", revision, repos).decode()
         date, dtime, _ = date_time.split(None, 2)
-        date = mktime(strptime(b" ".join([date, dtime, b"UTC"]).decode(),
-                      self.DATE_FMT))
-
+        date = mktime(strptime(" ".join([date, dtime, "UTC"]), self.DATE_FMT))
         # Detail of changes
         changeset_attribs = {
             "repos": repos,
             "revision": revision,
             "prefix": prefix,
-            "author": self._svnlook("author", "-r", revision, repos).strip(),
+            "author": self._svnlook(
+                "author", "-r", revision, repos).decode("utf-8").strip(),
             "date": date}
         branch_attribs_dict = self._get_suite_branch_changes(repos, revision)
 
@@ -175,7 +175,8 @@ class RosieSvnPostCommitHook(object):
         """Retrieve changed statuses."""
         branch_attribs_dict = {}
         changed_lines = self._svnlook(
-            "changed", "--copy-info", "-r", revision, repos).splitlines(True)
+            "changed", "--copy-info", "-r", revision, repos).decode(
+                "utf-8").splitlines(True)
         while changed_lines:
             changed_line = changed_lines.pop(0)
             # A normal status changed_line
@@ -185,18 +186,18 @@ class RosieSvnPostCommitHook(object):
             # Column 5+: path
             path = changed_line[4:].strip()
             path_status = changed_line[0]
-            if path.endswith(b"/") and path_status == "_":
+            if path.endswith("/") and path_status == "_":
                 # Ignore property change on a directory
                 continue
             # Path must be (under) a valid suite branch, including the special
             # ROSIE suite
-            names = path.split(b"/", self.LEN_ID + 1)
+            names = path.split("/", self.LEN_ID + 1)
             if (len(names) < self.LEN_ID + 1 or (
-                    b"".join(names[0:self.LEN_ID]) != b"ROSIE" and
-                    any(name.decode() not in id_chars for name, id_chars in
+                    "".join(names[0:self.LEN_ID]) != "ROSIE" and
+                    any(name not in id_chars for name, id_chars in
                         zip(names, self.ID_CHARS_LIST)))):
                 continue
-            sid = b"".join(names[0:self.LEN_ID])
+            sid = "".join(names[0:self.LEN_ID])
             branch = names[self.LEN_ID]
             if branch:
                 # Change to a path in a suite branch
@@ -255,7 +256,8 @@ class RosieSvnPostCommitHook(object):
             elif path_status == self.ST_DELETED:
                 # The suite has been deleted
                 tree_out = self._svnlook(
-                    "tree", "-r", str(int(revision) - 1), "-N", repos, path)
+                    "tree", "-r", str(int(revision) - 1), "-N", repos,
+                    path).decode("utf-8")
                 # Include all branches of the suite in the deletion info
                 for tree_line in tree_out.splitlines()[1:]:
                     del_branch = tree_line.strip().rstrip("/")
@@ -271,13 +273,12 @@ class RosieSvnPostCommitHook(object):
 
     def _load_info(self, repos, revision, sid, branch):
         """Load info file from branch_path in repos @revision."""
-        info_file_path = "%s/%s/%s" % ("/".join(str(sid)),
-                                       branch,
-                                       self.INFO_FILE)
+        info_file_path = "%s/%s/%s" % (
+            "/".join(str(sid)), branch, self.INFO_FILE)
         t_handle = TemporaryFile()
         try:
             t_handle.write(self._svnlook(
-                "cat", "-r", str(revision), repos, info_file_path))
+                "cat", "-r", str(revision).encode(), repos, info_file_path))
         except RosePopenError:
             return None
         t_handle.seek(0)
@@ -382,14 +383,11 @@ class RosieSvnPostCommitHook(object):
 
     def _update_info_db(self, dao, changeset_attribs, branch_attribs):
         """Update the suite info database for a suite branch."""
-        idx = changeset_attribs["prefix"] + "-" +\
-            branch_attribs["sid"].decode()
+        idx = changeset_attribs["prefix"] + "-" + branch_attribs["sid"]
         vc_attrs = {
             "idx": idx,
             "branch": branch_attribs["branch"],
             "revision": changeset_attribs["revision"]}
-        for key in vc_attrs:
-            vc_attrs[key] = vc_attrs[key]
         # Latest table
         try:
             dao.delete(
@@ -419,11 +417,6 @@ class RosieSvnPostCommitHook(object):
                 changeset_attribs["prefix"] + "-" + "".join(from_names))
         cols["status"] = (
             branch_attribs["status"] + branch_attribs["status_info_file"])
-        for key in cols:
-            try:
-                cols[key] = cols[key].decode("utf-8")
-            except AttributeError:
-                pass
         dao.insert(MAIN_TABLE_NAME, **cols)
         # Optional table
         for name in branch_attribs[info_key].value:
@@ -433,8 +426,7 @@ class RosieSvnPostCommitHook(object):
             if value is None:  # setting may have ignore flag (!)
                 continue
             cols = dict(vc_attrs)
-            cols.update({
-                "name": name.decode("utf-8"), "value": value.decode("utf-8")})
+            cols.update({"name": name, "value": value})
             dao.insert(OPTIONAL_TABLE_NAME, **cols)
 
     def _update_known_keys(self, dao, changeset_attribs):
@@ -443,7 +435,7 @@ class RosieSvnPostCommitHook(object):
         revision = changeset_attribs["revision"]
         keys_str = self._svnlook(
             "cat", "-r", revision, repos, self.KNOWN_KEYS_FILE_PATH)
-        keys_str = " ".join(shlex.split(keys_str)).decode("utf-8")
+        keys_str = " ".join(shlex.split(keys_str.decode("utf-8")))
         if keys_str:
             try:
                 dao.insert(META_TABLE_NAME, name="known_keys", value=keys_str)

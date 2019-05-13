@@ -19,13 +19,9 @@
 # -----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
-import queue
 
-import multiprocessing
 import sys
-
 import time
-import collections.abc
 
 
 class Reporter(object):
@@ -241,7 +237,7 @@ class ReporterContext(object):
                 return self._tty_colour_err(Reporter.PREFIX_WARN)
             else:
                 return self._tty_colour_err(Reporter.PREFIX_FAIL)
-        if isinstance(self.prefix, collections.abc.Callable):
+        if callable(self.prefix):
             return self.prefix(kind, level)
         else:
             return self.prefix
@@ -268,57 +264,6 @@ class ReporterContext(object):
         except AttributeError:
             pass
         return str_
-
-
-class ReporterContextQueue(ReporterContext):
-
-    """A context for the reporter object.
-
-    It has the following attributes:
-    kind:
-        The message kind to report to this context.
-        (Reporter.KIND_ERR, Reporter.KIND_ERR or None.)
-    verbosity:
-        The verbosity of this context.
-    queue:
-        The multiprocessing.Queue.
-    prefix:
-        The default message prefix (str or callable).
-
-    """
-
-    def __init__(self,
-                 kind=None,
-                 verbosity=Reporter.DEFAULT,
-                 queue=None,
-                 prefix=None):
-        ReporterContext.__init__(self, kind, verbosity, None, prefix)
-        if queue is None:
-            queue = multiprocessing.Manager().Queue()
-        self.queue = queue
-        self.closed = False
-        self._messages_pending = []
-
-    def close(self):
-        self._send_pending_messages()
-        self.closed = True
-
-    def is_closed(self):
-        return self.closed
-
-    def write(self, message):
-        self._messages_pending.append(message)
-        self._send_pending_messages()
-
-    def _send_pending_messages(self):
-        while self._messages_pending:
-            message = self._messages_pending[0]
-            try:
-                self.queue.put(message, block=False)
-            except queue.Full:
-                break
-            else:
-                del self._messages_pending[0]
 
 
 class Event(object):

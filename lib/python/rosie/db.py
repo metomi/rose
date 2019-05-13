@@ -229,6 +229,7 @@ class DAO(object):
 
         """
         self._connect()
+        all_revs = int(all_revs)  # so distinguish 0 or 1 below, else both True
         if all_revs:
             from_obj, cols = self._get_hist_join_and_columns()
         else:
@@ -357,6 +358,7 @@ class DAO(object):
 
         """
         self._connect()
+        all_revs = int(all_revs)  # so distinguish 0 or 1 below, else both True
         if all_revs:
             from_obj, cols = self._get_hist_join_and_columns()
         else:

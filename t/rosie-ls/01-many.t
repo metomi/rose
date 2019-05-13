@@ -20,9 +20,8 @@
 # Test for "rosie ls", ensure healthy on large number of checked out suites.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
-if ! python3 -c 'import cherrypy, sqlalchemy' 2>'/dev/null'; then
-    skip_all '"cherrypy" or "sqlalchemy" not installed'
+if ! python3 -c 'import tornado, sqlalchemy' 2>'/dev/null'; then
+    skip_all '"tornado" or "sqlalchemy" not installed'
 fi
 tests 3
 #-------------------------------------------------------------------------------
@@ -108,5 +107,5 @@ file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}*
+rm -f ~/.metomi/rosie-disco-${HOSTNAME:-0.0.0.0}-${PORT}*
 exit

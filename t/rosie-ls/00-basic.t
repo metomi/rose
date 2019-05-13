@@ -20,10 +20,9 @@
 # Basic tests for "rosie ls", with 2 repositories.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
-if ! python3 -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
-    skip_all '"cherrypy" or "sqlalchemy" not installed'
+if ! python3 -c 'import tornado, sqlalchemy' 2>/dev/null; then
+    skip_all '"tornado" or "sqlalchemy" not installed'
 fi
 tests 15
 #-------------------------------------------------------------------------------
@@ -193,5 +192,5 @@ svn up -q "$PWD/roses/bar-aa000"
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-0.0.0.0-${PORT}*
+rm -f ~/.metomi/rosie-disco-${HOSTNAME:-0.0.0.0}-${PORT}*
 exit
