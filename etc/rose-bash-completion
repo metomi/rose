@@ -259,12 +259,6 @@ _rose_stem__task() {
     _rose_stem__group "$@"
 }
 
-_rose_suite_gcontrol__name() {
-    local names
-    names=$(cylc print -xy 2>/dev/null)
-    COMPREPLY=( $(compgen -W "$names" -- $1) )
-}
-
 _rose_suite_hook__mail_cc() {
     local users
     prev_users=$1

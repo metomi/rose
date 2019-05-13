@@ -85,8 +85,8 @@ class RoseArchEvent(Event):
                                  key=lambda s: s.name):
                 ret += "\n%s\t%s (%s)" % (
                     target.status, source.name, source.orig_name)
-        if isinstance(ret, bytes):
-            ret = ret.decode()
+        # if isinstance(ret, bytes):
+        #     ret = ret.decode()
         return ret
 
 

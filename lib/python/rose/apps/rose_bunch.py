@@ -123,8 +123,8 @@ class RoseBunchApp(BuiltinApp):
     DEFAULT_ARGUMENT_MODE = "Default"
     # @TODO: Match ACCEPTED_ARGUMENT_MODES to what python is actually doing
     ACCEPTED_ARGUMENT_MODES = [DEFAULT_ARGUMENT_MODE,
-                               "izip",
-                               "izip_longest",
+                               "izip", "zip",
+                               "izip_longest", "zip_longest",
                                "product"]
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
@@ -201,18 +201,19 @@ class RoseBunchApp(BuiltinApp):
         if argument_mode == self.DEFAULT_ARGUMENT_MODE:
             pass
         elif argument_mode in self.ACCEPTED_ARGUMENT_MODES:
-            if argument_mode == 'izip_longest':
-                argument_mode = 'zip_longest'
-            # Python3 deprecates itertools.izip in favour of builtin zip
-            if argument_mode == 'izip':
-                _itertools_cmd = zip
+            # The behaviour of of izip and izip_longest are special cases
+            # because:
+            # * izip was deprecated in Python3 use zip
+            # * itertools.izip_longest was renamed and requires the fillvalue
+            #     kwarg
+            if argument_mode in ['zip', 'izip']:
+                _permutations = zip(*bunch_args_values)
+            elif argument_mode in ['zip_longest', 'izip_longest']:
+                _permutations = itertools.zip_longest(*bunch_args_values,
+                                                      fillvalue="")
             else:
-                _itertools_cmd = getattr(itertools, argument_mode)
-            if argument_mode == "zip_longest":
-                _permutations = _itertools_cmd(*bunch_args_values,
-                                               fillvalue="")
-            else:
-                _permutations = _itertools_cmd(*bunch_args_values)
+                iteration_cmd = getattr(itertools, argument_mode)
+                _permutations = iteration_cmd(*bunch_args_values)
 
             # Reconstruct the bunch_args_values
             _permutations = list(_permutations)

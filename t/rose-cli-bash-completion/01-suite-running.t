@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 export ROSE_CONF_PATH=
-tests 20
+tests 16
 #-------------------------------------------------------------------------------
 # Source the script.
 . $ROSE_HOME/etc/rose-bash-completion || exit 1
@@ -31,17 +31,6 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --host=localhost
-#-------------------------------------------------------------------------------
-# rose suite-gcontrol --name=
-TEST_KEY=$TEST_KEY_BASE
-TEST_KEY=$TEST_KEY_BASE-gcontrol-name
-COMP_WORDS=( rose suite-gcontrol --name = "" )
-COMP_CWORD=4
-COMPREPLY=
-run_pass "$TEST_KEY" _rose
-compreply_grep "$TEST_KEY.reply" '^'"$NAME"'$'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # rose suite-log -n
 TEST_KEY=$TEST_KEY_BASE
