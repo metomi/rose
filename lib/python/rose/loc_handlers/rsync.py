@@ -112,10 +112,10 @@ elif os.path.isfile(path):
                         name, mtime, size)
                 loc.add_path(name, fake_sum, access_mode)
 
-    def pull(self, loc, _):
+    async def pull(self, loc, _):
         """Run "rsync" to pull files or directories of loc to its cache."""
         name = loc.name
         if loc.loc_type == loc.TYPE_TREE:
             name = loc.name + "/"
         cmd = self.manager.popen.get_cmd("rsync", name, loc.cache)
-        self.manager.popen(*cmd)
+        await self.manager.popen.run_ok_async(*cmd)

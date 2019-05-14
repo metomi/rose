@@ -54,7 +54,7 @@ class FileSystemLocHandler(object):
             loc.loc_type = loc.TYPE_TREE
 
     @classmethod
-    def pull(cls, loc, _):
+    async def pull(cls, loc, _):
         """If loc is in the file system, sets loc.cache to loc.name.
 
         Otherwise, raise an OSError.

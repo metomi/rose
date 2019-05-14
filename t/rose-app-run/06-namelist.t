@@ -177,23 +177,27 @@ test_teardown
 TEST_KEY=$TEST_KEY_BASE-install-only
 test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -i --debug
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
-[INFO] export PATH=$PATH
-[INFO] install: vegetables.nl
-[INFO]     source: namelist:vegetables{green}(:)
-[INFO] install: shopping-list.nl
-[INFO]     source: namelist:shopping_list(:)
-[INFO] install: shopping-list-2.nl
-[INFO]     source: namelist:shopping_list(10)
+python3 -c "import re, sys
+print(''.join(sorted(sys.stdin.readlines())))" \
+    <"$TEST_KEY.out" >"$TEST_KEY.sorted.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.sorted.out" <<__CONTENT__
+[INFO]     source: namelist:empty
+[INFO]     source: namelist:empty
+[INFO]     source: namelist:hello
+[INFO]     source: namelist:hello
 [INFO]     source: namelist:shopping_list(1)
-[INFO] install: hello.nl
-[INFO]     source: namelist:hello
-[INFO] install: empty.nl
-[INFO]     source: namelist:empty
-[INFO] install: empty-and-hello.nl
-[INFO]     source: namelist:empty
-[INFO]     source: namelist:hello
+[INFO]     source: namelist:shopping_list(10)
+[INFO]     source: namelist:shopping_list(:)
+[INFO]     source: namelist:vegetables{green}(:)
 [INFO] command: mkdir out && cp *.nl out/
+[INFO] export PATH=$PATH
+[INFO] install: empty-and-hello.nl
+[INFO] install: empty.nl
+[INFO] install: hello.nl
+[INFO] install: shopping-list-2.nl
+[INFO] install: shopping-list.nl
+[INFO] install: vegetables.nl
+
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 test_teardown

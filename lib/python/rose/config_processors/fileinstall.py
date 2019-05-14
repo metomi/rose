@@ -38,6 +38,7 @@ from io import BytesIO
 import sys
 from tempfile import mkdtemp
 from urllib.parse import urlparse
+import aiofiles
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
@@ -112,7 +113,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 exc = FileOverwriteError(name)
                 raise ConfigProcessError([key], None, exc)
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(name))
-
         # Gets a list of sources and targets
         sources = {}
         targets = {}
@@ -352,12 +352,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             event = ChecksumEvent(target.name, target.paths[0].checksum)
             self.handle_event(event)
 
-    def process_job(self, job, conf_tree, loc_dao, work_dir):
+    async def process_job(self, job, conf_tree, loc_dao, work_dir):
         """Process a job, helper for "process"."""
         for key, method in [(Loc.A_INSTALL, self._target_install),
                             (Loc.A_SOURCE, self._source_pull)]:
             if job.context.action_key == key:
-                return method(job.context, conf_tree, work_dir)
+                return await method(job.context, conf_tree, work_dir)
 
     @classmethod
     def post_process_job(cls, job, conf_tree, loc_dao, work_dir):
@@ -371,7 +371,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         except AttributeError:
             pass
 
-    def _source_pull(self, source, conf_tree, work_dir):
+    async def _source_pull(self, source, conf_tree, work_dir):
         """Pulls a source to its cache in the work directory."""
         source.cache = os.path.join(
             work_dir,
@@ -380,16 +380,17 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             # and filesystem safe identifier for a source name (which could be
             # a url).
             get_checksum_func()(BytesIO(source.name.encode())))
-        return self.loc_handlers_manager.pull(source, conf_tree)
+        return await self.loc_handlers_manager.pull(source, conf_tree)
 
-    def _target_install(self, target, conf_tree, work_dir):
+    async def _target_install(self, target, conf_tree, work_dir):
         """Install target.
 
         Build target using its source(s).
         Calculate the checksum(s) of (paths in) target.
 
         """
-        handle = None
+        CHUNK_SIZE = 1024 * 4
+        tgt_handle = None
         mod_bits = None
         is_first = True
         # Install target
@@ -400,21 +401,19 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 raise LocTypeError(target.name, source.name, target.loc_type,
                                    source.loc_type)
             if target.loc_type == target.TYPE_BLOB:
-                if handle is None:
+                if tgt_handle is None:
                     if not os.path.isfile(target.name):
                         self.manager.fs_util.delete(target.name)
-                    handle = open(target.name, "wb")
-                f_bsize = os.statvfs(source.cache).f_bsize
-                source_handle = open(source.cache, 'rb')
-                while True:
-                    bytes_ = source_handle.read(f_bsize)
-                    if not bytes_:
-                        break
-                    try:
-                        handle.write(bytes_.encode())
-                    except AttributeError:
-                        handle.write(bytes_)
-                source_handle.close()
+                    tgt_handle = await aiofiles.open(target.name, "wb")
+
+                async with aiofiles.open(
+                    source.cache, mode='rb'
+                ) as source_handle:
+                    while True:
+                        bytes_ = await source_handle.read(CHUNK_SIZE)
+                        if not bytes_:
+                            break
+                        await tgt_handle.write(bytes_)
                 if mod_bits is None:
                     mod_bits = os.stat(source.cache).st_mode
                 else:
@@ -427,8 +426,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 cmd = self.manager.popen.get_cmd("rsync", *args)
                 self.manager.popen(*cmd)
             is_first = False
-        if handle is not None:
-            handle.close()
+        if tgt_handle is not None:
+            await tgt_handle.close()
         if mod_bits:
             os.chmod(target.name, mod_bits)
 
