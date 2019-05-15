@@ -14,7 +14,6 @@ const sphinx_admonition_classes = {
 }
 
 $(document).ready(function() {
-    var css_class;
     var button_class;
     var spoilers = $('.spoiler');
     for (let spoiler of spoilers) {

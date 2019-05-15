@@ -22,7 +22,7 @@
 import os
 import re
 import sys
-from functools import cmp_to_key
+from functools import cmp_to_key, partial
 
 import rose.config
 import rose.config_tree
@@ -293,17 +293,17 @@ def metadata_check(meta_config, meta_dir=None,
                     reports.append(rose.macro.MacroReport(section, option,
                                                           value, info))
             if option.startswith(rose.META_PROP_WIDGET):
-                check_func = lambda v: _check_widget(
-                    v, module_files)
+                check_func = partial(_check_widget, module_files=module_files)
             elif option == rose.META_PROP_MACRO:
-                check_func = lambda v: _check_macro(
-                    v, module_files)
+                check_func = partial(_check_macro, module_files=module_files)
             elif option == rose.META_PROP_VALUE_TITLES:
-                check_func = lambda v: _check_value_titles(
-                    v, node.get_value([rose.META_PROP_VALUES]))
+                check_func = partial(
+                    _check_value_titles,
+                    values_value=node.get_value([rose.META_PROP_VALUES])
+                )
             elif option in [rose.META_PROP_FAIL_IF, rose.META_PROP_WARN_IF]:
-                check_func = lambda v: _check_rule(
-                    v, section, meta_config)
+                check_func = partial(
+                    _check_rule, setting_id=section, meta_config=meta_config)
             else:
                 func_name = "_check_" + option.replace("-", "_")
                 check_func = globals().get(func_name, lambda v: None)

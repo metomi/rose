@@ -8,6 +8,8 @@ Classes:
 
 """
 
+from functools import partial
+
 import gobject
 import pygtk
 pygtk.require('2.0')
@@ -34,7 +36,7 @@ class UsernameValueWidget(gtk.HBox):
                         padding=0)
         self.entry.connect('focus-in-event',
                            hook.trigger_scroll)
-        self.grab_focus = lambda : hook.get_focus(self.entry)
+        self.grab_focus = partial(hook.get_focus, self.entry)
 
     def _setter(self, *args):
         """Alter the variable value and update status."""

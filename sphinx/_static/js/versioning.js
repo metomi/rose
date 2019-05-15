@@ -1,3 +1,5 @@
+/* global root_dir current_builder current_page_name current_version */
+
 $(document).ready(function() {
     $.ajax({
         'async': false,

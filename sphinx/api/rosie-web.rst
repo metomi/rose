@@ -166,13 +166,3 @@ REST API
           {"idx": "mo1-aa100", "branch": "trunk", "revision": 352, "owner": "ops_account",
            "project": "nowcast", "title": "The operational Nowcast suite",
            "status": "M ", "ensemble": "yes"}]
-
-
-Python API
-----------
-
-The REST API maps onto the Python :py:class:`RosieWSClient` back-end which can be
-used as a standalone Python API.
-
-.. autoclass:: rosie.ws_client.RosieWSClient
-   :members:

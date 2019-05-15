@@ -1,3 +1,5 @@
+/*eslint no-console: off*/
+
 // Default Cylc colour theme.
 var minicylc_default_theme = {
     'waiting_fill': 'none',
