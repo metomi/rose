@@ -191,8 +191,7 @@ class SuiteRunner(Runner):
             extra_defines.append('[%s]%s="%s"' % (suite_section, key, val))
 
         # Pass automatic Rose constants as suite defines
-        self.conf_tree_loader.node_loader.load_defines(extra_defines,
-                                                       conf_tree.node)
+        self.conf_tree_loader.node_loader.load(extra_defines, conf_tree.node)
 
         # See if suite is running or not
         if opts.run_mode == "reload":
