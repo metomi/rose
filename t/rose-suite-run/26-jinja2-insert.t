@@ -63,6 +63,14 @@ for I in $(seq 1 $N_TESTS); do
 {% set ROSE_VERSION="$ROSE_VERSION" %}
 {% set bar="barley drink" %}
 {% set foo="food store" %}
+{% set ROSE_SUITE_VARIABLES={
+    'CYLC_VERSION': CYLC_VERSION,
+    'ROSE_ORIG_HOST': ROSE_ORIG_HOST,
+    'ROSE_SITE': ROSE_SITE,
+    'ROSE_VERSION': ROSE_VERSION,
+    'bar': bar,
+    'foo': foo,
+} %}
 [cylc]
     [[environment]]
         CYLC_VERSION=${CYLC_VERSION}
