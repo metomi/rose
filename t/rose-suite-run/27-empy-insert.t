@@ -61,12 +61,20 @@ for I in $(seq 1 $N_TESTS); do
     file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
 #!empy
 @# Rose Configuration Insertion: Init
-@{ CYLC_VERSION="$CYLC_VERSION" }@
-@{ ROSE_ORIG_HOST="$ROSE_ORIG_HOST" }@
-@{ ROSE_SITE="" }@
-@{ ROSE_VERSION="$ROSE_VERSION" }@
-@{ baz=True }@
-@{ foo="food store" }@
+@{CYLC_VERSION="$CYLC_VERSION"}@
+@{ROSE_ORIG_HOST="$ROSE_ORIG_HOST"}@
+@{ROSE_SITE=""}@
+@{ROSE_VERSION="$ROSE_VERSION"}@
+@{baz=True}@
+@{foo="food store"}@
+@{ROSE_SUITE_VARIABLES={
+    'CYLC_VERSION': CYLC_VERSION,
+    'ROSE_ORIG_HOST': ROSE_ORIG_HOST,
+    'ROSE_SITE': ROSE_SITE,
+    'ROSE_VERSION': ROSE_VERSION,
+    'baz': baz,
+    'foo': foo,
+}}@
 [cylc]
     [[environment]]
         CYLC_VERSION=${CYLC_VERSION}

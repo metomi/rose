@@ -69,6 +69,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             tmp_file = NamedTemporaryFile()
             tmp_file.write(scheme_ln)
             tmp_file.write(msg_init_ln)
+            suite_variables = ['{']
             for key, node in sorted(s_node.value.items()):
                 if node.is_ignored():
                     continue
@@ -77,6 +78,10 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                 except UnboundEnvironmentVariableError as exc:
                     raise ConfigProcessError([s_key, key], node.value, exc)
                 tmp_file.write(self.ASSIGN_TEMPL % (key, value))
+                suite_variables.append("    '%s': %s," % (key, key))
+            suite_variables.append('}')
+            tmp_file.write(self.ASSIGN_TEMPL % ('ROSE_SUITE_VARIABLES',
+                                                '\n'.join(suite_variables)))
             environ = kwargs.get("environ")
             if environ:
                 tmp_file.write('[cylc]\n')
