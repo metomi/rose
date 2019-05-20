@@ -188,9 +188,7 @@ class SingleCommandStatus(AnalysisTask):
         """Simple command runner; returns output error and return code."""
         retcode, stdout, stderr = self.popen.run(command, shell=True)
         if isinstance(stdout, bytes):
-            stdout = stdout.decode()
-        if isinstance(stderr, bytes):
-            stderr = stderr.decode()
+            stdout, stderr = stdout.decode(), stderr.decode()
         return retcode, stdout, stderr
 
     def read_file(self, filename):

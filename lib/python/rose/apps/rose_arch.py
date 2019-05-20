@@ -85,8 +85,6 @@ class RoseArchEvent(Event):
                                  key=lambda s: s.name):
                 ret += "\n%s\t%s (%s)" % (
                     target.status, source.name, source.orig_name)
-        # if isinstance(ret, bytes):
-        #     ret = ret.decode()
         return ret
 
 
@@ -371,9 +369,7 @@ class RoseArchApp(BuiltinApp):
                 "target": app_runner.popen.list_to_shell_str([target.name])}
             ret_code, out, err = app_runner.popen.run(command, shell=True)
             if isinstance(out, bytes):
-                out = out.decode()
-            if isinstance(err, bytes):
-                err = err.decode()
+                out, err = out.decode(), err.decode()
             times[2] = time()  # archived time
             if ret_code:
                 app_runner.handle_event(

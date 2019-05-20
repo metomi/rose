@@ -167,20 +167,7 @@ class Reporter(object):
                     msg = message()
                 else:
                     msg = message
-
-                # @TODO Tidy this. It's horrid
-                if isinstance(msg, bytes):
-                    msg = msg.decode()
-                else:
-                    try:
-                        msg = str(msg)
-                    except UnicodeDecodeError:
-                        try:
-                            msg = str(msg, 'utf-8')
-                        except TypeError:
-                            msg = str(msg)
-                        except UnicodeEncodeError:
-                            pass
+                msg = str(msg)
 
             msg_lines = self.format_msg(msg, context.verbosity, prefix, clip)
             for line in msg_lines:

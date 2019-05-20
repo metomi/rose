@@ -31,12 +31,7 @@ TEST_KEYS=('')
 TUT_DIRS=('')
 TESTS=('')
 TUTORIALS_PATH="${ROSE_HOME}/etc/tutorial"
-SKIPS=('')  # TODO - remove me once Python3 conversion complete
 for tutorial in $(ls -1 "${TUTORIALS_PATH}"); do
-    if grep -q '\(widget\|rose.*suite\)' <<< "${tutorial}"; then
-        SKIPS+=("${tutorial}")
-        continue
-    fi
     tutorial_path="${TUTORIALS_PATH}/${tutorial}"
     validate_file="${tutorial_path}/.validate"
     if [[ -f "${tutorial_path}" ]]; then
@@ -64,11 +59,7 @@ for tutorial in $(ls -1 "${TUTORIALS_PATH}"); do
         continue
     fi
 done
-tests $(( ( ${#SKIPS[@]} - 1 ) + (( ${#TESTS[@]} - 1 ) * 2) ))
-
-for skip in ${SKIPS[@]}; do
-    skip 1 "'${skip}' - awaiting rose suite-run port to Python3"
-done
+tests $(( ( ${#TESTS[@]} - 1 ) * 2 ))
 #-------------------------------------------------------------------------------
 # Run the tests.
 mkdir "${HOME}/cylc-run" -p

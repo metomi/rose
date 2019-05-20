@@ -39,7 +39,7 @@ OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-exact_numeric_success
 file_grep $TEST_KEY "[ OK ].*Semi-major Axis.*all: 0%:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_numeric_fail
-file_grep $TEST_KEY "[FAIL].*Orbital Period.*1: 5.234.*%" $OUTPUT
+file_grep $TEST_KEY "[FAIL].*Orbital Period.*1: 5.234[0-9]*%" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_text_success
 file_grep $TEST_KEY "[ OK ].*Atmosphere.*all: 0%" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_text_fail

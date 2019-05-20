@@ -160,13 +160,10 @@ class RosePopener(object):
         if isinstance(kwargs.get("stdin"), str):
             stdin = kwargs.get("stdin")
         stdout, stderr = proc.communicate(stdin)
-        # @TODO - probably a tider way to do things, but broke at least one
-        # @TODO fast fix in the Python3 conversion. Working > perfect
-        # if isinstance(stderr, bytes):
-        #     stderr = stderr.decode()
-        # if isinstance(stdout, bytes):
-        #     stdout = stdout.decode()
-        return proc.wait(), stdout, stderr
+        retcode = proc.wait()
+        if isinstance(retcode, bytes):
+            retcode = retcode.decode()
+        return retcode, stdout, stderr
 
     def run_bg(self, *args, **kwargs):
         """Provide a Rose-friendly interface to subprocess.Popen.
