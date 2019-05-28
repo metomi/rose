@@ -25,9 +25,9 @@ cd "$(dirname "$0")/../"
 
 # find shell files under the specified directory
 find_files () {
-    FPATH="$1"
-    grep --color=never -rl '^#\!.*bash' "${FPATH}" | sed 's/^\.\///' &
-    find "${FPATH}" -name '*.sh' | sed 's/^\.\///'
+    FILE_PATH="$1"
+    grep --color=never -rl '^#\!.*bash' "${FILE_PATH}" | sed 's/^\.\///'
+    find "${FILE_PATH}" -name '*.sh' | sed 's/^\.\///'
 }
 
 main () {
@@ -79,7 +79,6 @@ default () {
     main bin etc lib/bash sbin usr t/lib/bash \
         --exclude etc/rose-bash-completion \
         -- -e SC1090 \
-
 
     # run a lenient check on all test scripts
     main t -- -S error -e SC1090
