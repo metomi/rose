@@ -1,8 +1,6 @@
     [[consolidate_observations]]
         script = consolidate-observations
         [[[environment]]]
-            # Add the `python` directory to the PYTHONPATH.
-            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:${PYTHONPATH:-}"
             # The dimensions of each grid cell in degrees.
             RESOLUTION = 0.2
             # The area to generate forecasts for (lng1, lat1, lng2, lat2)
@@ -14,8 +12,6 @@
             # The key required to get weather data from the DataPoint service.
             # To use archived data comment this line out.
             API_KEY = DATAPOINT_API_KEY
-            # Add the `python` directory to the PYTHONPATH.
-            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:${PYTHONPATH:-}"
             # The dimensions of each grid cell in degrees.
             RESOLUTION = 0.2
             # The area to generate forecasts for (lng1, lat1, lng2, lat2)
@@ -24,8 +20,6 @@
     [[forecast]]
         script = forecast 60 5  # Generate 5 forecasts at 60 minute intervals.
         [[[environment]]]
-            # Add the `python` directory to the PYTHONPATH.
-            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:${PYTHONPATH:-}"
             # The dimensions of each grid cell in degrees.
             RESOLUTION = 0.2
             # The area to generate forecasts for (lng1, lat1, lng2, lat2)
@@ -47,8 +41,6 @@
         # Generate a forecast for Exeter 60 minutes in the future.
         script = post-process exeter 60
         [[[environment]]]
-            # Add the `python` directory to the PYTHONPATH.
-            PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:${PYTHONPATH:-}"
             # The dimensions of each grid cell in degrees.
             RESOLUTION = 0.2
             # The area to generate forecasts for (lng1, lat1, lng2, lat2)
