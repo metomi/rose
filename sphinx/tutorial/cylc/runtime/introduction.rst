@@ -72,14 +72,18 @@ We can also call other scripts or executables in this way, e.g:
        [[hello_world]]
            script = ~/foo/bar/baz/hello_world
 
-.. nextslide::
+
+:envvar:`PATH` and :envvar:`PYTHONPATH`
+---------------------------------------
 
 .. ifnotslides::
 
-   It is often a good idea to keep our scripts within the Cylc suite directory
-   tree rather than leaving them somewhere else on the system. If you create a
-   ``bin`` sub-directory within the :term:`suite directory` this directory will
-   be added to the path when tasks run, e.g:
+   It is often a good idea to keep our scripts with the Cylc suite rather than
+   leaving them somewhere else on the system.
+
+   If you create a ``bin/`` sub-directory within the :term:`suite directory`
+   Cylc will automatically prepend it to the :envvar:`PATH` environment
+   variable when the task runs.
 
 .. code-block:: bash
    :caption: bin/hello_world
@@ -89,11 +93,30 @@ We can also call other scripts or executables in this way, e.g:
 
 .. code-block:: cylc
    :caption: suite.rc
-   :emphasize-lines: 3
 
    [runtime]
        [[hello_world]]
            script = hello_world
+
+.. nextslide::
+
+.. ifnotslides::
+
+   Similarly the ``lib/python/`` directory gets prepended to the
+   :envvar:`PYTHONPATH` variable.
+
+.. code-block:: python
+   :caption: lib/python/hello.py
+
+   def world():
+      print('Hello World!')
+
+.. code-block:: cylc
+   :caption: suite.rc
+
+   [runtime]
+      [[hello_world]]
+         script = python -c 'import hello; hello.world()'
 
 
 .. _tutorial-tasks-and-jobs:

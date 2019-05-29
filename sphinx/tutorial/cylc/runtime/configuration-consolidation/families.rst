@@ -241,18 +241,17 @@ Families and ``cylc graph``
 
    2. **Move Site-Wide Settings Into The** ``root`` **Family.**
 
-      The following three environment variables are used by multiple tasks:
+      The following two environment variables are used by multiple tasks:
 
       .. code-block:: none
 
-         PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH"
          RESOLUTION = 0.2
          DOMAIN = -12,48,5,61  # Do not change!
 
       Rather than manually adding them to each task individually we could put
       them in the ``root`` family, making them accessible to all tasks.
 
-      Add a ``root`` section containing these three environment variables.
+      Add a ``root`` section containing these two environment variables.
       Remove the variables from any other task's ``environment`` sections:
 
       .. code-block:: diff
@@ -260,8 +259,6 @@ Families and ``cylc graph``
           [runtime]
          +    [[root]]
          +        [[[environment]]]
-         +            # Add the `python` directory to the PYTHONPATH.
-         +            PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH"
          +            # The dimensions of each grid cell in degrees.
          +            RESOLUTION = 0.2
          +            # The area to generate forecasts for (lng1, lat1, lng2, lat2).
@@ -272,8 +269,6 @@ Families and ``cylc graph``
           [[consolidate_observations]]
               script = consolidate-observations
          -    [[[environment]]]
-         -        # Add the `python` directory to the PYTHONPATH.
-         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -        # The dimensions of each grid cell in degrees.
          -        RESOLUTION = 0.2
          -        # The area to generate forecasts for (lng1, lat1, lng2, lat2).
@@ -285,8 +280,6 @@ Families and ``cylc graph``
                   # The key required to get weather data from the DataPoint service.
                   # To use archived data comment this line out.
                   API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-         -        # Add the `python` directory to the PYTHONPATH.
-         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -        # The dimensions of each grid cell in degrees.
          -        RESOLUTION = 0.2
          -        # The area to generate forecasts for (lng1, lat1, lng2, lat2).
@@ -295,8 +288,6 @@ Families and ``cylc graph``
           [[forecast]]
               script = forecast 60 5  # Generate 5 forecasts at 60 minute intervals.
               [[[environment]]]
-         -        # Add the `python` directory to the PYTHONPATH.
-         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -        # The dimensions of each grid cell in degrees.
          -        RESOLUTION = 0.2
          -        # The area to generate forecasts for (lng1, lat1, lng2, lat2)
@@ -318,8 +309,6 @@ Families and ``cylc graph``
               # Generate a forecast for Exeter 60 minutes into the future.
               script = post-process exeter 60
          -    [[[environment]]]
-         -        # Add the `python` directory to the PYTHONPATH.
-         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
          -        # The dimensions of each grid cell in degrees.
          -        RESOLUTION = 0.2
          -        # The area to generate forecasts for (lng1, lat1, lng2, lat2).

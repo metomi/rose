@@ -388,12 +388,10 @@ See the :ref:`Cheat Sheet` for more information.
 
       .. code-block:: diff
 
-          [runtime]
-              [[root]]
-                  # These environment variables will be available to all tasks.
-                  [[[environment]]]
-                      # Add the `python` directory to the PYTHONPATH.
-                      PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+         -[runtime]
+         -    [[root]]
+         -        # These environment variables will be available to all tasks.
+         -        [[[environment]]]
          -            # The dimensions of each grid cell in degrees.
          -            RESOLUTION = 0.2
          -            # The area to generate forecasts for (lng1, lat1, lng2, lat2).
