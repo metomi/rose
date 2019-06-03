@@ -178,7 +178,8 @@ class Reporter(object):
                         msg = unicode(msg, 'utf-8')
                     except TypeError:
                         msg = str(msg)
-                    except UnicodeEncodeError:
+                    except (UnicodeEncodeError, UnicodeDecodeError):
+                        # allow mojibake to pass through
                         pass
 
             msg_lines = self.format_msg(msg, context.verbosity, prefix, clip)
