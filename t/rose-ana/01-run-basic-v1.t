@@ -47,11 +47,11 @@ file_grep $TEST_KEY "[FAIL].*Planet.*1: XX%.* (4 values)" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_percentage_success
 file_grep $TEST_KEY "[ OK ].*Oxygen Partial Pressure.*all% <= 5%" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_percentage_fail
-file_grep $TEST_KEY "[FAIL].*Ocean coverage.*35.31073446327684% > 5%:.* (95.8) c.f. .* (70.8)" $OUTPUT
+file_grep $TEST_KEY "[FAIL].*Ocean coverage.*35.310734463[0-9]*% > 5%:.* (95.8) c.f. .* (70.8)" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_absolute_success
 file_grep $TEST_KEY "[ OK ].*Surface Gravity.*all% <= 1.0:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_absolute_fail
-file_grep $TEST_KEY "[FAIL].*Rotation Period.*7.046236224893955% > 0.05:.* (0.927) c.f. .* (0.99727)" $OUTPUT
+file_grep $TEST_KEY "[FAIL].*Rotation Period.*7.0462362248[0-9]*% > 0.05:.* (0.927) c.f. .* (0.99727)" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_list_success
 file_grep $TEST_KEY "[ OK ].*Satellites Natural/Artificial.*all: 0%:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_list_fail
@@ -59,7 +59,7 @@ file_grep $TEST_KEY "[FAIL].*Other Planets.*1: XX%:.* (4 values)" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_list_success
 file_grep $TEST_KEY "[ OK ].*Periastron/Apastron.*all% <= 5%:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-within_list_fail
-file_grep $TEST_KEY "[FAIL].*Inclination/Axial Tilt.*285.74423480083857% > 5%:.* (value 1 of 2)" $OUTPUT
+file_grep $TEST_KEY "[FAIL].*Inclination/Axial Tilt.*285.74423480[0-9]*% > 5%:.* (value 1 of 2)" $OUTPUT
 #-------------------------------------------------------------------------------
 # Test of ignoring a task
 # First, test that the basic task ran ok

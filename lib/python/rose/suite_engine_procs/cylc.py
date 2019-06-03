@@ -600,8 +600,9 @@ class CylcProcessor(SuiteEngineProcessor):
             host = auth
             if "@" in auth:
                 user, host = auth.split("@", 1)
-        if isinstance(user, bytes):
-            user, host = user.decode(), host.decode()
+        for strlike in [user, host]:
+            if isinstance(strlike, bytes):
+                strlike = strlike.decode()
         if user in ["None", self.user]:
             user = None
         if host and ("`" in host or "$" in host):
