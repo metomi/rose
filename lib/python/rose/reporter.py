@@ -132,6 +132,8 @@ class Reporter(object):
         arguments and return its result instead.
 
         """
+        if isinstance(message, bytes):
+            message = message.decode()
         if callable(self.event_handler):
             return self.event_handler(message, kind, level, prefix, clip)
 
