@@ -416,7 +416,7 @@ class SuiteRunner(Runner):
             out, err = proc.communicate()
             ret_code, out, err = [
                 i.decode() if isinstance(i, bytes) else i for i in [
-                ret_code, out, err]]
+                    ret_code, out, err]]
             if ret_code:
                 raise RosePopenError(command, ret_code, out, err)
             if command_name == "rsync":
