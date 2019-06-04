@@ -252,7 +252,8 @@ class RosePopener(object):
         stdout_level = kwargs.pop("stdout_level", None)
         ret_code, stdout, stderr = self.run(*args, **kwargs)
         stderr, stdout = [
-            i.decode() if isinstance(i, bytes) else i for i in [stderr, stdout]]
+            i.decode() if isinstance(i, bytes) else i for i in [
+                stderr, stdout]]
         if stdout:
             self.handle_event(stdout, level=stdout_level)
         if ret_code:
