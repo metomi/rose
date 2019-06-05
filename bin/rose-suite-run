@@ -118,7 +118,8 @@
 #         configuration. The configurations are applied first-to-last.
 #
 # SUITE VARIABLES
-#     `rose suite-run` provides the following variables to the suite.
+#     `rose suite-run` provides the following variables to the suite as
+#      template variables (i.e. Jinja2 or EmPy).
 #
 #     ROSE_ORIG_HOST
 #         The name of the host where the `rose suite-run` command was invoked.
