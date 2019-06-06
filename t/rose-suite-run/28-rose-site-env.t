@@ -59,6 +59,12 @@ for I in $(seq 1 "${N_TESTS}"); do
 {% set ROSE_ORIG_HOST="${ROSE_ORIG_HOST}" %}
 {% set ROSE_SITE="my-site" %}
 {% set ROSE_VERSION="${ROSE_VERSION}" %}
+{% set ROSE_SUITE_VARIABLES={
+    'CYLC_VERSION': CYLC_VERSION,
+    'ROSE_ORIG_HOST': ROSE_ORIG_HOST,
+    'ROSE_SITE': ROSE_SITE,
+    'ROSE_VERSION': ROSE_VERSION,
+} %}
 [cylc]
     [[environment]]
         CYLC_VERSION=${CYLC_VERSION}

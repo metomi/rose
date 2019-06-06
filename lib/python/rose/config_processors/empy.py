@@ -27,7 +27,7 @@ class ConfigProcessorForEmPy(ConfigProcessorForJinja2):
     """Processor for [empy:FILE] sections in a runtime configuration."""
 
     SCHEME = "empy"
-    ASSIGN_TEMPL = "@{ %s=%s }@\n"
+    ASSIGN_TEMPL = "@{%s=%s}@\n"
     COMMENT_TEMPL = "@# %s\n"
 
 
