@@ -37,7 +37,8 @@ The ``suite.rc`` File Format
      so a sub-section would be written ``[[sub-section]]``, a sub-sub-section
      ``[[[sub-sub-section]]]``, and so on.
 
-.. nextslide::
+Example
+^^^^^^^
 
 .. code-block:: cylc
 
@@ -47,83 +48,106 @@ The ``suite.rc`` File Format
        [[sub-section]]
            another-key = another-value  # Inline comment
            yet-another-key = """
-   A
-   Multi-line
-   String
-   """
+               A
+               Multi-line
+               String
+           """
 
-.. nextslide::
+Shorthand
+^^^^^^^^^
 
 Throughout this tutorial we will refer to settings in the following format:
 
-* ``[section]`` - refers to the entire section.
-* ``[section]key`` - refers to a setting within the section.
-* ``[section]key=value`` - expresses the value of the setting.
-* ``[section][sub-section]another-key``. Note we only use one set of square
-  brackets with nested sections.
+``[section]``
+   Refers to the entire section.
+``[section]key``
+   Refers to a setting within the section.
+``[section]key=value``
+   Expresses the value of the setting.
+``[section][sub-section]another-key``
+   Note we only use one set of square brackets with nested sections.
+
+Duplicate Items
+^^^^^^^^^^^^^^^
+
+Duplicate sections get merged:
+
+.. list-table::
+   :class: grid-table
+
+   * -
+      .. code-block:: cylc
+         :caption: input
+
+         [a]
+            c = C
+         [b]
+            d = D
+         [a]  # duplicate
+            e = E
+
+     -
+      .. code-block:: cylc
+         :caption: result
+
+         [a]
+            c = C
+            e = E
+         [b]
+            d = D
 
 .. nextslide::
 
-.. tip::
+Duplicate settings get overwritten:
 
-   It is advisable to indent ``suite.rc`` files. This indentation, however,
-   is ignored when the file is parsed so settings must appear before
-   sub-sections.
+.. list-table::
+   :class: grid-table
 
-   .. code-block:: cylc
+   * -
+      .. code-block:: cylc
+         :caption: input
 
-      [section]
-          key = value  # This setting belongs to the section.
-          [[sub-section]]
-              key = value  # This setting belongs to the sub-section.
+         a = foo
+         a = bar  # duplicate
 
-          # This setting belongs to the sub-section as indentation is ignored.
-          # Always write settings before defining any sub-sections!
-          key = value
+     -
+      .. code-block:: cylc
+         :caption: result
 
-.. nextslide::
+         a = bar
 
-.. admonition:: Note
-   :class: tip
+Indentation
+^^^^^^^^^^^
 
-   .. ifnotslides::
+It is advisable to indent ``suite.rc`` files.
 
-      In the ``suite.rc`` file format duplicate sections are additive, that is
-      to say the following two examples are equivalent:
+However, Cylc ignores this indentation meaning the following two examples
+are equivalent:
 
-   .. code-block:: cylc
+.. list-table::
+   :class: grid-table
 
-      [a]
-         c = C
-      [b]
-         d = D
-      [a]
-         e = E
+   * - 
+       .. code-block:: cylc
+          :caption: input
 
-   .. code-block:: cylc
-
-      [a]
-         c = C
-         e = E
-      [b]
-         d = D
-
-   .. ifnotslides::
-
-      Settings, however, are not additive meaning that a duplicate setting will
-      override an earlier value. The following two examples are also equivalent:
-
-   .. nextslide::
-
-   .. code-block:: cylc
-
-      a = foo
-      a = bar
+          [section]
+              a = A
+              [[sub-section]]
+                  b = B
+              b = C
+              # this setting is still
+              # in [[sub-section]]
 
 
-   .. code-block:: cylc
+     - 
+       .. code-block:: cylc
+          :caption: result
 
-      a = bar
+          [section]
+              a = A
+              [[sub-section]]
+                  b = C
 
 
 Graph Strings
@@ -254,14 +278,22 @@ Cylc Graphs
 
 .. hint::
 
-   A graph can be drawn in multiple ways, for instance the following two
-   examples are equivalent:
+   .. ifnotslides::
+
+      A graph can be drawn in multiple ways, for instance the following two
+      examples are equivalent:
+
+   .. ifslides::
+
+      A graph can be drawn in multiple ways:
 
    .. image:: ../img/cylc-graph-reversible.svg
       :align: center
 
-   The graph drawn by ``cylc graph`` may vary slightly from one run to another
-   but the tasks and dependencies will always be the same.
+   .. ifnotslides::
+
+      The graph drawn by ``cylc graph`` may vary slightly from one run to
+      another but the tasks and dependencies will always be the same.
 
 .. nextslide::
 
