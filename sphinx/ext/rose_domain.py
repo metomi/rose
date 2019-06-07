@@ -953,7 +953,11 @@ class RoseAutoDirective(Directive):
             raise
 
         nodes = []
-        nodes.append(addnodes.highlightlang(lang='rose', linenothreshold=20))
+        nodes.append(addnodes.highlightlang(
+            lang='rose',
+            force=False,
+            linenothreshold=20
+        ))
 
         # Append file level comments if present.
         if conf.comments:
@@ -1003,7 +1007,11 @@ class RoseAutoDirective(Directive):
             node.append(section.run()[1])
         nodes.append(node)
 
-        nodes.append(addnodes.highlightlang(lang='bash', linenothreshold=20))
+        nodes.append(addnodes.highlightlang(
+            lang='bash',
+            force=False,
+            linenothreshold=20
+        ))
 
         return nodes
 
