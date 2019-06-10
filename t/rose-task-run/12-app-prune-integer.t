@@ -49,7 +49,6 @@ else
         --host=localhost \
         -- --no-detach --debug
 fi
-cat ~/cylc-run/$NAME/log/job/*/*/NN/job.err >&2
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-work
 run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/work/1
