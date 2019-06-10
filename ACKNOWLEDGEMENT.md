@@ -70,3 +70,6 @@ lib/html/static/js/moment.min.js:
 lib/python/isodatetime/:
 * Unmodified external software library released under the LGPL license.
   See <https://github.com/metomi/isodatetime>
+
+lib/python/rose/tests/test_ancils/unicode.txt:
+* Markus Kuhn <http://www.cl.cam.ac.uk/~mgk25/> - 2015-08-28 - CC BY 4.0
