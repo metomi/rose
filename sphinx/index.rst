@@ -69,5 +69,7 @@ Other
 .. toctree::
    :hidden:
    :name: hidden-index
+   :glob:
 
    terms
+   course/*

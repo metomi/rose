@@ -143,6 +143,8 @@ Metadata Items
    Next section: :ref:`tutorial-rose-suites`
 
 
+.. _rose metadata practical:
+
 .. practical::
 
    .. rubric:: In this practical we will write metadata for the

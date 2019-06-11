@@ -507,6 +507,8 @@ Rose Applications In Rose Suite Configurations
    Next section: :ref:`tutorial-rosie`
 
 
+.. _task run practical:
+
 .. practical::
 
    .. rubric:: In this practical we will take the ``forecast`` Rose application

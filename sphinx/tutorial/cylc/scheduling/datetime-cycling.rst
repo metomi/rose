@@ -434,6 +434,8 @@ Putting It All Together
    Next section: :ref:`tutorial-cylc-further-scheduling`
 
 
+.. _datetime cycling practical:
+
 .. practical::
 
    .. rubric:: In this practical we will create a dummy forecasting suite

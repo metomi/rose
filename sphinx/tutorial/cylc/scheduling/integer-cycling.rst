@@ -418,6 +418,8 @@ Recurrence Sections
 
    Next section: :ref:`tutorial-datetime-cycling`
 
+.. _basic cycling practical:
+
 .. practical::
 
    .. rubric:: In this practical we will take the :term:`suite <Cylc suite>`
