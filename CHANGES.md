@@ -5,6 +5,27 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2019.01.2 (2019-06-12)
+
+Rose release 59. This maintenance release is expected to be used with:
+* [cylc-flow-7.8.3](https://github.com/cylc/cylc-flow/releases/tag/7.8.3), and
+* [fcm-2019.05.0](https://github.com/metomi/fcm/releases/tag/2019.05.0).
+
+### Noteworthy Changes
+
+[#2343](https://github.com/metomi/rose/pull/2343):
+rose.reporter: allow mojibake to pass through in diagnostic messages.
+
+[#2338](https://github.com/metomi/rose/pull/2338):
+rose app-run, rose task-run, rose suite-run: new suite variable dict for
+templating insertion.
+
+[#2330](https://github.com/metomi/rose/pull/2330):
+rose app-run, rose task-run, rose suite-run: allow use of `--define=` on top
+level special settings such as `opts` and `import` in configuration.
+
+--------------------------------------------------------------------------------
+
 ## 2019.01.1 (2019-05-03)
 
 Rose release 58. This maintenance release is expected to be used with:
