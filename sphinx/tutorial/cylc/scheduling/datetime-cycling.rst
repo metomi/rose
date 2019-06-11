@@ -36,8 +36,8 @@ In Cylc, dates, times and durations are written using the :term:`ISO8601` format
 
 .. _tutorial-iso8601-datetimes:
 
-Date-Times
-^^^^^^^^^^
+ISO8601 Date-Times
+^^^^^^^^^^^^^^^^^^
 
 .. ifnotslides::
 
@@ -77,8 +77,8 @@ Date-Times
 
 .. _tutorial-iso8601-durations:
 
-Durations
-^^^^^^^^^
+ISO8601 Durations
+^^^^^^^^^^^^^^^^^
 
 .. ifnotslides::
 
