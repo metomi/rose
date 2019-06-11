@@ -65,7 +65,7 @@ duplicate = true
 [namelist:nl5]
 duplicate = true
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -83,10 +83,10 @@ duplicate = true
 
 [namelist:nl5]
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] metomi.rose.macros.DefaultValidators: issues: 4
     namelist:nl1=None=None
         incorrect "duplicate=true" metadata
     namelist:nl2(1)=None=None

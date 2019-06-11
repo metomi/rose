@@ -110,7 +110,7 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         self.fs_util = fs_util
         path = os.path.dirname(os.path.dirname(sys.modules["metomi.rose"].__file__))
         SchemeHandlersManager.__init__(
-            self, [path], "metomi.rose.config_processors", ["process"])
+            self, [path], "rose.config_processors", ["process"])
 
     def handle_event(self, *args, **kwargs):
         """Report an event."""

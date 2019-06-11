@@ -369,7 +369,7 @@ class SuiteRunner(Runner):
             if not no_login_shell or no_login_shell.lower() != "true":
                 shcommand += r""" bash -l -c '"$0" "$@"'"""
             # Path to "rose" command, if applicable
-            metomi.rose_bin = self._run_conf(
+            rose_bin = self._run_conf(
                 "remote-rose-bin", host=host, conf_tree=conf_tree,
                 default="rose")
             # Build remote "rose suite-run" command

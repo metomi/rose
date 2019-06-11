@@ -50,7 +50,7 @@ range = 678.3
 [namelist:values_nl1=my_real_neg]
 range = -345.1
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -77,7 +77,7 @@ range = -3.546e-2, -100
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = -2.3, 56.0e+67, 56, 5, 1, -2
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -104,7 +104,7 @@ range = -1:0
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = 0:1e70
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -131,7 +131,7 @@ range = -1: 0
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = :1e70
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -158,7 +158,7 @@ range = -1: 0, -45, 12
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = 1, 2:, 546, :-1
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -185,7 +185,7 @@ range = this / 4350384059 < 1
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = 1e99 > this - 100
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

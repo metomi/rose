@@ -309,12 +309,13 @@ class SuiteEngineProcessor(object):
             path = os.path.dirname(
                 os.path.dirname(sys.modules["metomi.rose"].__file__))
             cls.SCHEME_HANDLER_MANAGER = SchemeHandlersManager(
-                [path], ns="metomi.rose.suite_engine_procs", attrs=["SCHEME"],
+                [path], ns="rose.suite_engine_procs", attrs=["SCHEME"],
                 can_handle=None, event_handler=event_handler, popen=popen,
                 fs_util=fs_util, host_selector=host_selector)
         if key is None:
             key = cls.SCHEME_DEFAULT
-        return cls.SCHEME_HANDLER_MANAGER.get_handler(key)
+        x = cls.SCHEME_HANDLER_MANAGER.get_handler(key)
+        return x
 
     def __init__(self, event_handler=None, popen=None, fs_util=None,
                  host_selector=None, **_):

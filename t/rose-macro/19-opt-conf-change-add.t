@@ -48,7 +48,7 @@ init_macro add.py <<'__MACRO__'
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #-----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
 class AddSpoiler(rose.macro.MacroBase):

@@ -89,10 +89,10 @@ type=boolean
 length=5
 type=boolean
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] metomi.rose.macros.DefaultValidators: issues: 4
     namelist:values_nl1=my_boolean_array_any=False
         Not true/false: 'False'
     namelist:values_nl1=my_boolean_array_fixed=false,true,false,true,true,false
@@ -122,10 +122,10 @@ type=character
 length=:
 type=character
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] metomi.rose.macros.DefaultValidators: issues: 4
     namelist:values_nl1=my_char='Character string ending in unescaped''
         Not in a valid single quoted format: "'Character string ending in unescaped''"
     namelist:values_nl1=my_char_array_any="h"
@@ -155,10 +155,10 @@ type=integer
 length=6
 type=integer
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] metomi.rose.macros.DefaultValidators: issues: 4
     namelist:values_nl1=my_int=1.4
         Not an integer: '1.4'
     namelist:values_nl1=my_int_array_any=three
@@ -187,10 +187,10 @@ type=real
 type=real
 length=:
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] metomi.rose.macros.DefaultValidators: issues: 4
     namelist:values_nl1=my_real=1.0x6
         Not a real number: '1.0x6'
     namelist:values_nl1=my_real_array_any=three point zero
@@ -228,10 +228,10 @@ type=quoted
 length=4
 type=quoted
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] metomi.rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_quoted="\\" Bad quoted quoted"
         Not in a valid double quoted format: '"\\\\" Bad quoted quoted"'
     namelist:values_nl1=my_quoted_array_fixed="a, "b\"", "\"c", "d"
@@ -266,10 +266,10 @@ type=logical
 length=6
 type=logical
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] metomi.rose.macros.DefaultValidators: issues: 4
     namelist:values_nl1=my_logical_array_any=maybe
         Not Fortran true/false: 'maybe'
     namelist:values_nl1=my_logical_array_fixed=.t.
@@ -299,10 +299,10 @@ length=3
 type=raw, logical, character, real
 length=:
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 3
+[V] metomi.rose.macros.DefaultValidators: issues: 3
     namelist:values_nl1=my_derived_type_quo_int_raw_bool_array='quoted quoted,  23',456.x45,false,'I like to quote \'stuff\'',3456,^xx2,true,'I do not contain quotes',-45,i be a raw entry,true
         Derived type has an invalid length: 11
     namelist:values_nl1=my_derived_type_raw_log_char_real=45.0p2
@@ -322,11 +322,11 @@ type=python_list
 [namelist:values_nl1=my_python_list_empty]
 type=python_list
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 # Note - the format of the value changes due to the namelist-specific formatting.
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 2
+[V] metomi.rose.macros.DefaultValidators: issues: 2
     namelist:values_nl1=my_python_list=["Spam",True,"Cheese, False, 2000.0]
         Not a valid Python list format: '["Spam",True,"Cheese, False, 2000.0]'
     namelist:values_nl1=my_python_list_empty=
@@ -344,10 +344,10 @@ length=8
 [namelist:values_nl1=my_spaced_list]
 length=2
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 2
+[V] metomi.rose.macros.DefaultValidators: issues: 2
     namelist:values_nl1=my_array_fixed='x,',y,5.0e-3,5,6,y,21,o,(),opsdf,sdfkl
         Array longer than max length: 11 instead of 8
     namelist:values_nl1=my_spaced_list=1 2 3 "bob"
@@ -395,10 +395,10 @@ compulsory=true
 type=real, integer
 length=:
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 7
+[V] metomi.rose.macros.DefaultValidators: issues: 7
     namelist:values_nl1=my_boolean_array_null_comp=
         Not true/false: ''
     namelist:values_nl1=my_char_array_null_comp=

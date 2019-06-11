@@ -50,10 +50,10 @@ range = 7.3
 [namelist:values_nl1=my_real_neg]
 range = -3.1
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] metomi.rose.macros.DefaultValidators: issues: 4
     namelist:values_nl1=my_int=5
         Value 5 is not in the range criteria: 3
     namelist:values_nl1=my_int_neg=-2
@@ -87,10 +87,10 @@ range = -3.6e-2, -100
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = -2.3, 5.0e+6, 56, 5, 1, -2
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] metomi.rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
         Value 5 is not in the range criteria: 3, 4, 6
     namelist:values_nl1=my_int_neg=-2
@@ -128,10 +128,10 @@ range = -100:-1
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = 1e70:1.1e70
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] metomi.rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
         Value 5 is not in the range criteria: 1:3, 7:10
     namelist:values_nl1=my_int_neg=-2
@@ -169,10 +169,10 @@ range = -100: -50
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = :1e60
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] metomi.rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
         Value 5 is not in the range criteria: : 4
     namelist:values_nl1=my_int_neg=-2
@@ -210,10 +210,10 @@ range = -2:-1, -45, 12
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = 1:-1, 2, 546, :-1
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] metomi.rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
         Value 5 is not in the range criteria: 4, 3:4, 7:, 8
     namelist:values_nl1=my_int_neg=-2
@@ -251,10 +251,10 @@ range = this / 4560457 > 0
 [namelist:values_nl1=my_real_sci_notation_pos]
 range = 0 < this / 100 < 6
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] metomi.rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
         Value 5 is not in the range criteria: this % 2 == 0
     namelist:values_nl1=my_int_neg=-2

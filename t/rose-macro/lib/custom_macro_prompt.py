@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import rose.macro
+import metomi.rose.macro
 
 
 class Test(rose.macro.MacroBase):

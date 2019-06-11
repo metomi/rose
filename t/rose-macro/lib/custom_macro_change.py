@@ -19,7 +19,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
 class LogicalTransformer(rose.macro.MacroBase):

@@ -4,7 +4,7 @@
 import os
 
 
-import rose.macro
+import metomi.rose.macro
 
 
 class PrintCwd(rose.macro.MacroBase):
