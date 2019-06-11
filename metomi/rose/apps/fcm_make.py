@@ -25,11 +25,11 @@ import shlex
 import sys
 from tempfile import mkdtemp
 
-from rose.env import (
+from metomi.rose.env import (
     env_export, env_var_process, UnboundEnvironmentVariableError)
-from rose.app_run import BuiltinApp, ConfigValueError
-from rose.fs_util import FileSystemEvent
-from rose.popen import RosePopenError
+from metomi.rose.app_run import BuiltinApp, ConfigValueError
+from metomi.rose.fs_util import FileSystemEvent
+from metomi.rose.popen import RosePopenError
 
 ORIG = 0
 CONT = 1

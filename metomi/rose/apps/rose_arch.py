@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
-"""Builtin application: rose_arch: transform and archive suite files."""
+"""Builtin application: metomi.rose_arch: transform and archive suite files."""
 
 import errno
 from glob import glob
 import os
 import re
-from rose.app_run import (
+from metomi.rose.app_run import (
     BuiltinApp,
     ConfigValueError,
     CompulsoryConfigValueError)
-from rose.checksum import get_checksum, get_checksum_func
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.popen import RosePopenError
-from rose.reporter import Event, Reporter
-from rose.scheme_handler import SchemeHandlersManager
+from metomi.rose.checksum import get_checksum, get_checksum_func
+from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.popen import RosePopenError
+from metomi.rose.reporter import Event, Reporter
+from metomi.rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sqlite3
 import sys
@@ -105,7 +105,7 @@ class RoseArchApp(BuiltinApp):
         suite_name = os.getenv("ROSE_SUITE_NAME")
         if not suite_name:
             app_runner.handle_event(
-                'rose_arch must be run under rose task-run.',
+                'rose_arch must be run under metomi.rose task-run.',
                 level=Reporter.FAIL, kind=Reporter.KIND_ERR)
             return 1
         suite_dir = app_runner.suite_engine_proc.get_suite_dir(suite_name)

@@ -20,10 +20,10 @@
 """Launch suite engine's control commands."""
 
 import os
-from rose.fs_util import FileSystemUtil
-from rose.opt_parse import RoseOptionParser
-from rose.reporter import Reporter
-from rose.suite_engine_proc import SuiteEngineProcessor
+from metomi.rose.fs_util import FileSystemUtil
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.reporter import Reporter
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor
 import sys
 
 

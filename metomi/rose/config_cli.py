@@ -19,13 +19,13 @@
 # -----------------------------------------------------------------------------
 """Implements the "rose config" command."""
 
-from rose.config import (
+from metomi.rose.config import (
     ConfigDumper, ConfigLoader, ConfigNode, ConfigSyntaxError)
-from rose.env import env_var_process
-from rose.opt_parse import RoseOptionParser
-from rose.reporter import Reporter, Event
-from rose.resource import ResourceLocator
-import rose.macro
+from metomi.rose.env import env_var_process
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.reporter import Reporter, Event
+from metomi.rose.resource import ResourceLocator
+import metomi.rose.macro
 import os
 import sys
 
@@ -48,7 +48,7 @@ def get_meta_path(root_node, rel_path=None, meta_key=False):
         dir_path = os.path.abspath(rel_path)
     else:
         dir_path = os.getcwd()
-    meta_dir = rose.macro.load_meta_path(config=root_node,
+    meta_dir = metomi.rose.macro.load_meta_path(config=root_node,
                                          directory=dir_path)[0]
     if meta_dir is None:
         return None
@@ -65,7 +65,7 @@ def main():
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
-    rose.macro.add_meta_paths()
+    metomi.rose.macro.add_meta_paths()
 
     if opts.meta_key:
         opts.meta = True
@@ -102,7 +102,7 @@ def main():
             root_node.set(["meta"], opts.meta_key)
         else:
             fname = os.path.join(
-                os.getcwd(), rose.SUB_CONFIG_NAME)
+                os.getcwd(), metomi.rose.SUB_CONFIG_NAME)
             try:
                 root_node = config_loader.load(fname)
             except ConfigSyntaxError as exc:

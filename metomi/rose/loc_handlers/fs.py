@@ -20,7 +20,7 @@
 """A handler of file system locations."""
 
 import errno
-from rose.checksum import get_checksum
+from metomi.rose.checksum import get_checksum
 import os
 
 

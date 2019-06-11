@@ -21,10 +21,10 @@
 
 import os
 import pwd
-from rose.opt_parse import RoseOptionParser
-from rose.reporter import Event, Reporter
-from rose.suite_engine_proc import SuiteEngineProcessor
-from rose.suite_control import get_suite_name
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.reporter import Event, Reporter
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor
+from metomi.rose.suite_control import get_suite_name
 import sys
 from time import sleep
 import traceback
@@ -80,7 +80,7 @@ def suite_log_view(opts, args, event_handler=None):
         url = suite_engine_proc.get_suite_log_url(opts.user, opts.name)
         if url.startswith("file://"):
             if (opts.non_interactive or
-                    input("Start rose bush? [y/n] (default=n) ") == "y"):
+                    input("Start metomi.rose bush? [y/n] (default=n) ") == "y"):
                 suite_engine_proc.popen.run_bg(
                     "rose", "bush", "start", preexec_fn=os.setpgrp)
                 is_rose_bush_started = True

@@ -23,11 +23,11 @@ import os
 import sys
 import traceback
 
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopenError
-from rose.reporter import Reporter
-from rose.suite_control import get_suite_name, SuiteNotFoundError
-from rose.suite_engine_proc import SuiteEngineProcessor
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopenError
+from metomi.rose.reporter import Reporter
+from metomi.rose.suite_control import get_suite_name, SuiteNotFoundError
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor
 
 
 class SuiteRestarter(object):

@@ -39,12 +39,12 @@ from tempfile import TemporaryFile
 from time import mktime, strptime
 import traceback
 
-import rose.config
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
-from rose.reporter import Reporter
-from rose.resource import ResourceLocator
-from rose.scheme_handler import SchemeHandlersManager
+import metomi.rose.config
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener, RosePopenError
+from metomi.rose.reporter import Reporter
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.scheme_handler import SchemeHandlersManager
 from rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 
@@ -282,7 +282,7 @@ class RosieSvnPostCommitHook(object):
         except RosePopenError:
             return None
         t_handle.seek(0)
-        config = rose.config.load(t_handle)
+        config = metomi.rose.config.load(t_handle)
         t_handle.close()
         return config
 
@@ -327,9 +327,9 @@ class RosieSvnPostCommitHook(object):
             if (changed_line[4:].strip() == info_file_path and
                     branch_attribs["status_info_file"] == self.ST_MODIFIED):
                 old_strio = StringIO()
-                rose.config.dump(branch_attribs["old_info"], old_strio)
+                metomi.rose.config.dump(branch_attribs["old_info"], old_strio)
                 new_strio = StringIO()
-                rose.config.dump(branch_attribs["info"], new_strio)
+                metomi.rose.config.dump(branch_attribs["info"], new_strio)
                 for diff_line in unified_diff(
                         old_strio.getvalue().splitlines(True),
                         new_strio.getvalue().splitlines(True),

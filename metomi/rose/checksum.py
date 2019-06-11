@@ -25,7 +25,7 @@ import hashlib
 import inspect
 import os
 
-from rose.resource import ResourceLocator
+from metomi.rose.resource import ResourceLocator
 
 
 _DEFAULT_DEFAULT_KEY = "md5"

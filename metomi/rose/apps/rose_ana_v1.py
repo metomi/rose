@@ -30,12 +30,12 @@ import sqlite3
 import time
 
 # Rose modules
-import rose.config
-from rose.env import env_var_process
-from rose.popen import RosePopener
-from rose.reporter import Reporter, Event
-from rose.resource import ResourceLocator
-from rose.app_run import BuiltinApp
+import metomi.rose.config
+from metomi.rose.env import env_var_process
+from metomi.rose.popen import RosePopener
+from metomi.rose.reporter import Reporter, Event
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.app_run import BuiltinApp
 
 WARN = -1
 PASS = 0
@@ -51,7 +51,7 @@ USRCOMPARISON_EXT = ".py"
 
 class KGODatabase(object):
     """
-    KGO Database object, stores comparison information for rose_ana apps.
+    KGO Database object, stores comparison information for metomi.rose_ana apps.
 
     """
     # Stores retries of database creation and the maximum allowed number
@@ -168,23 +168,23 @@ class RoseAnaV1App(BuiltinApp):
                          popen=app_runner.popen)
 
         # Initialise a database session
-        rose_ana_task_name = os.getenv("ROSE_TASK_NAME")
+        metomi.rose_ana_task_name = os.getenv("ROSE_TASK_NAME")
         kgo_db = KGODatabase()
 
         # Add an entry for this task, with a non-zero status code
-        kgo_db.enter_task(rose_ana_task_name, 1)
+        kgo_db.enter_task(metomi.rose_ana_task_name, 1)
 
         # Run the analysis
         num_failed, tasks = engine.analyse()
 
         # Update the database to indicate that the task succeeded
-        kgo_db.enter_task(rose_ana_task_name, 0)
+        kgo_db.enter_task(metomi.rose_ana_task_name, 0)
 
         # Update the database
         for task in tasks:
             # The primary key in the database is composed from both the
-            # rose_ana app name and the task index (to make it unique)
-            app_task = "{0} ({1})".format(rose_ana_task_name, task.name)
+            # metomi.rose_ana app name and the task index (to make it unique)
+            app_task = "{0} ({1})".format(metomi.rose_ana_task_name, task.name)
             # Include an indication of what extract/comparison was performed
             comparison = "{0} : {1} : {2}".format(
                 task.comparison, task.extract, getattr(task, "subextract", ""))
@@ -229,7 +229,7 @@ class TaskCompletionEvent(Event):
 
 class TestsFailedException(Exception):
 
-    """Exception raised if any rose-ana comparisons fail."""
+    """Exception raised if any metomi.rose-ana comparisons fail."""
 
     def __init__(self, num_failed):
         self.ret_code = num_failed
@@ -345,7 +345,7 @@ class Analyse(object):
         return task
 
     def _run_command(self, command):
-        """Run an external command using rose.popen."""
+        """Run an external command using metomi.rose.popen."""
         output = self.popen.run_ok(command, shell=True)[0]
         output = "".join(output).splitlines()
         return output
@@ -473,7 +473,7 @@ class Analyse(object):
 
     def write_config(self, filename, tasks):
         """Write an analysis config file based on a list of tasks provided"""
-        config = rose.config.ConfigNode()
+        config = metomi.rose.config.ConfigNode()
 
         for task in tasks:
             sectionname = task.name
@@ -495,7 +495,7 @@ class Analyse(object):
                 config.set([sectionname, "tolerance"], task.tolerance)
             if task.warnonfail:
                 config.set([sectionname, "warnonfail"], "true")
-        rose.config.dump(config, filename)
+        metomi.rose.config.dump(config, filename)
 
 
 class AnalysisTask(object):

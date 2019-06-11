@@ -27,15 +27,15 @@ Ensure that commits conform to the rules of Rosie.
 from fnmatch import fnmatch
 import os
 import re
-import rose
-from rose.config import ConfigLoader
-from rose.opt_parse import RoseOptionParser
-from rose.macro import add_meta_paths, get_reports_as_text, load_meta_config
-from rose.macros import DefaultValidators
-from rose.popen import RosePopener
-from rose.reporter import Reporter
-from rose.resource import ResourceLocator
-from rose.scheme_handler import SchemeHandlersManager
+import metomi.rose
+from metomi.rose.config import ConfigLoader
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.macro import add_meta_paths, get_reports_as_text, load_meta_config
+from metomi.rose.macros import DefaultValidators
+from metomi.rose.popen import RosePopener
+from metomi.rose.reporter import Reporter
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sys
 import tempfile

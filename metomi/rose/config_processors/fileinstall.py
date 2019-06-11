@@ -17,20 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
-"""Process "file:*" sections in node of a rose.config_tree.ConfigTree."""
+"""Process "file:*" sections in node of a metomi.rose.config_tree.ConfigTree."""
 
 from fnmatch import fnmatch
 from glob import glob
 import os
-from rose.checksum import (
+from metomi.rose.checksum import (
     get_checksum, get_checksum_func, guess_checksum_algorithm)
-from rose.config_processor import ConfigProcessError, ConfigProcessorBase
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.fs_util import FileSystemUtil
-from rose.job_runner import JobManager, JobProxy, JobRunner
-from rose.popen import RosePopener
-from rose.reporter import Event
-from rose.scheme_handler import SchemeHandlersManager
+from metomi.rose.config_processor import ConfigProcessError, ConfigProcessorBase
+from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.fs_util import FileSystemUtil
+from metomi.rose.job_runner import JobManager, JobProxy, JobRunner
+from metomi.rose.popen import RosePopener
+from metomi.rose.reporter import Event
+from metomi.rose.scheme_handler import SchemeHandlersManager
 import shlex
 from shutil import rmtree
 import sqlite3
@@ -42,7 +42,7 @@ import aiofiles
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
-    """Processor for [file:*] in node of a rose.config_tree.ConfigTree."""
+    """Processor for [file:*] in node of a metomi.rose.config_tree.ConfigTree."""
 
     SCHEME = "file"
 

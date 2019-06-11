@@ -19,7 +19,7 @@
 # -----------------------------------------------------------------------------
 """Compare two lists of numbers exactly."""
 
-from rose.apps.rose_ana_v1 import DataLengthError
+from metomi.rose.apps.rose_ana_v1 import DataLengthError
 
 OUTPUT_STRING = "%s %s: %s%%: File %s %s %s (%s values)"
 PASS = "=="

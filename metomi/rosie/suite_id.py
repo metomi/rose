@@ -30,13 +30,13 @@ Functions:
 
 import os
 import re
-import rose.env
-from rose.loc_handlers.svn import SvnInfoXMLParser
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
-from rose.reporter import Reporter
-from rose.resource import ResourceLocator
-from rose.suite_engine_proc import SuiteEngineProcessor, NoSuiteLogError
+import metomi.rose.env
+from metomi.rose.loc_handlers.svn import SvnInfoXMLParser
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener, RosePopenError
+from metomi.rose.reporter import Reporter
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor, NoSuiteLogError
 import shlex
 import string
 import sys
@@ -217,7 +217,7 @@ class SuiteId(object):
             local_copy_root = os.path.expanduser(
                 os.path.join("~" + user, "roses"))
         elif value:
-            local_copy_root = rose.env.env_var_process(value)
+            local_copy_root = metomi.rose.env.env_var_process(value)
         else:
             local_copy_root = os.path.expanduser(os.path.join("~", "roses"))
         return local_copy_root

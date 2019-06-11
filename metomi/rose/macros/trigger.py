@@ -20,15 +20,15 @@
 
 import copy
 
-import rose.config
-import rose.config_tree
-import rose.env
-import rose.macro
-import rose.macros.rule
-import rose.resource
+import metomi.rose.config
+import metomi.rose.config_tree
+import metomi.rose.env
+import metomi.rose.macro
+import metomi.rose.macros.rule
+import metomi.rose.resource
 
 
-class TriggerMacro(rose.macro.MacroBaseRoseEdit):
+class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
 
     """Class to load and check trigger dependencies."""
 
@@ -51,15 +51,15 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         self.trigger_family_lookup = {}
         self._id_is_duplicate = {}  # Speedup dictionary.
         self.enabled_dict = {}
-        self.evaluator = rose.macros.rule.RuleEvaluator()
-        self.rec_rule = rose.macros.rule.REC_EXPR_IS_THIS_RULE
+        self.evaluator = metomi.rose.macros.rule.RuleEvaluator()
+        self.rec_rule = metomi.rose.macros.rule.REC_EXPR_IS_THIS_RULE
         for setting_id, sect_node in meta_config.value.items():
             if sect_node.is_ignored():
                 continue
-            opt_node = sect_node.get([rose.META_PROP_TRIGGER], no_ignore=True)
+            opt_node = sect_node.get([metomi.rose.META_PROP_TRIGGER], no_ignore=True)
             if opt_node is not None:
                 expr = opt_node.value
-                id_value_dict = rose.variable.parse_trigger_expression(expr)
+                id_value_dict = metomi.rose.variable.parse_trigger_expression(expr)
                 for trig_id, values in id_value_dict.items():
                     if not len(values):
                         id_value_dict.update({trig_id: [None]})
@@ -73,9 +73,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         self._setup_triggers(meta_config)
         self.enabled_dict = {}
         self.ignored_dict = {}
-        enabled = rose.config.ConfigNode.STATE_NORMAL
-        trig_ignored = rose.config.ConfigNode.STATE_SYST_IGNORED
-        user_ignored = rose.config.ConfigNode.STATE_USER_IGNORED
+        enabled = metomi.rose.config.ConfigNode.STATE_NORMAL
+        trig_ignored = metomi.rose.config.ConfigNode.STATE_SYST_IGNORED
+        user_ignored = metomi.rose.config.ConfigNode.STATE_USER_IGNORED
         state_map = {enabled: 'enabled     ',
                      trig_ignored: 'trig-ignored',
                      user_ignored: 'user-ignored'}
@@ -125,18 +125,18 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         var_id - a setting id to start the triggering update at.
         If an id has duplicates (e.g. is part of a duplicate section),
         update all duplicate ids.
-        config_data - a rose.config.ConfigNode or a dictionary that
+        config_data - a metomi.rose.config.ConfigNode or a dictionary that
         looks like this:
         {"sections":
-            {"namelist:foo": rose.section.Section instance,
-             "env": rose.section.Section instance},
+            {"namelist:foo": metomi.rose.section.Section instance,
+             "env": metomi.rose.section.Section instance},
          "variables":
-            {"namelist:foo": [rose.variable.Variable instance,
-                              rose.variable.Variable instance],
-             "env": [rose.variable.Variable instance]
+            {"namelist:foo": [metomi.rose.variable.Variable instance,
+                              metomi.rose.variable.Variable instance],
+             "env": [metomi.rose.variable.Variable instance]
             }
         }
-        meta_config - a rose.config.ConfigNode.
+        meta_config - a metomi.rose.config.ConfigNode.
 
         """
         config_sections = self._get_config_sections(config_data)
@@ -296,12 +296,12 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
     def validate(self, config, meta_config=None):
         self.reports = []
         if meta_config is None:
-            meta_config = rose.config.ConfigNode()
+            meta_config = metomi.rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
-        enabled = rose.config.ConfigNode.STATE_NORMAL
-        trig_ignored = rose.config.ConfigNode.STATE_SYST_IGNORED
-        user_ignored = rose.config.ConfigNode.STATE_USER_IGNORED
+        enabled = metomi.rose.config.ConfigNode.STATE_NORMAL
+        trig_ignored = metomi.rose.config.ConfigNode.STATE_SYST_IGNORED
+        user_ignored = metomi.rose.config.ConfigNode.STATE_USER_IGNORED
         state_map = {enabled: 'enabled     ',
                      trig_ignored: 'trig-ignored',
                      user_ignored: 'user-ignored'}
@@ -330,7 +330,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         """Validate the trigger setup - e.g. check for cyclic dependencies."""
         self.reports = []
         if meta_config is None:
-            meta_config = rose.config.ConfigNode()
+            meta_config = metomi.rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
         config_sections = config.value
@@ -363,7 +363,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                     if self.rec_rule.search(string):
                         try:
                             self.evaluate_trig_rule(string, start_id, '')
-                        except rose.macros.rule.RuleValueError:
+                        except metomi.rose.macros.rule.RuleValueError:
                             continue
                         except Exception:
                             return self._get_error_report_for_id(
@@ -419,12 +419,12 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
     def _get_family_dict(self, setting_id, config_data, meta_config):
         if self._check_is_id_dupl(setting_id, meta_config):
             sect, opt = self._get_section_option_from_id(setting_id)
-            base_sect = rose.macro.REC_ID_STRIP.sub("", sect)
+            base_sect = metomi.rose.macro.REC_ID_STRIP.sub("", sect)
             trig_id = self._get_id_from_section_option(base_sect, opt)
             items = list(self.trigger_family_lookup.get(trig_id, {}).items())
             for i, (child_id, vals) in enumerate(items):
                 ch_sect, ch_opt = self._get_section_option_from_id(child_id)
-                if rose.macro.REC_ID_STRIP.sub("", ch_sect) == base_sect:
+                if metomi.rose.macro.REC_ID_STRIP.sub("", ch_sect) == base_sect:
                     new_id = self._get_id_from_section_option(sect, ch_opt)
                     items[i] = (new_id, vals)
             return dict(items)
@@ -458,16 +458,16 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         if setting_id not in self._id_is_duplicate:
             sect = self._get_section_option_from_id(setting_id)[0]
             # Note: when modifier metadata ticket goes in, change the regex.
-            sect = rose.macro.REC_ID_STRIP.sub("", sect)
-            node = meta_config.get([sect, rose.META_PROP_DUPLICATE])
+            sect = metomi.rose.macro.REC_ID_STRIP.sub("", sect)
+            node = meta_config.get([sect, metomi.rose.META_PROP_DUPLICATE])
             self._id_is_duplicate[setting_id] = (
-                node is not None and node.value == rose.META_PROP_VALUE_TRUE)
+                node is not None and node.value == metomi.rose.META_PROP_VALUE_TRUE)
         return self._id_is_duplicate[setting_id]
 
     def _get_stripped_id(self, setting_id, meta_config):
         if self._check_is_id_dupl(setting_id, meta_config):
             sect, opt = self._get_section_option_from_id(setting_id)
-            base_sect = rose.macro.REC_ID_STRIP.sub("", sect)
+            base_sect = metomi.rose.macro.REC_ID_STRIP.sub("", sect)
             return self._get_id_from_section_option(base_sect, opt)
         return setting_id
 
@@ -503,7 +503,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             else:
                 if string == value:
                     return True
-        return rose.env.contains_env_var(value)
+        return metomi.rose.env.contains_env_var(value)
 
     def evaluate_trig_rule(self, rule, setting_id, value):
         """Launch an evaluation of a custom trigger expression."""
@@ -511,9 +511,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             return self._evaluated_rule_checks[(rule, value)]
         except KeyError:
             section, option = self._get_section_option_from_id(setting_id)
-            tiny_config = rose.config.ConfigNode()
+            tiny_config = metomi.rose.config.ConfigNode()
             tiny_config.set([section, option], value)
-            tiny_meta_config = rose.config.ConfigNode()
+            tiny_meta_config = metomi.rose.config.ConfigNode()
             check_failed = self.evaluator.evaluate_rule(
                 rule, setting_id, tiny_config, tiny_meta_config)
             if len(self._evaluated_rule_checks) > self.MAX_STORED_RULE_CHECKS:

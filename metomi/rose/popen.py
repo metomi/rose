@@ -23,8 +23,8 @@ import os
 import asyncio
 import re
 import io
-from rose.reporter import Event
-from rose.resource import ResourceLocator
+from metomi.rose.reporter import Event
+from metomi.rose.resource import ResourceLocator
 import shlex
 from subprocess import Popen, PIPE
 import sys

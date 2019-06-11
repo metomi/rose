@@ -21,10 +21,10 @@
 
 import os
 from random import choice, random, shuffle
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener
-from rose.reporter import Reporter, Event
-from rose.resource import ResourceLocator
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener
+from metomi.rose.reporter import Reporter, Event
+from metomi.rose.resource import ResourceLocator
 import shlex
 import signal
 from socket import (

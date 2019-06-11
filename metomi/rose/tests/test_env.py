@@ -20,7 +20,7 @@
 import os
 import unittest
 
-from rose.env import env_export
+from metomi.rose.env import env_export
 
 
 class _TestEnvExport(unittest.TestCase):

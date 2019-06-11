@@ -19,7 +19,7 @@
 # -----------------------------------------------------------------------------
 """The following options can be specified in:
 
-* :rose:conf:`rose.conf[rose-ana]`
+* :rose:conf:`rose.conf[metomi.rose-ana]`
 * :rose:conf:`rose_ana[ana:config]`
 
 .. describe:: Options
@@ -42,8 +42,8 @@
 
 import os
 import re
-from rose import TYPE_LOGICAL_VALUE_TRUE
-from rose.apps.rose_ana import AnalysisTask
+from metomi.rose import TYPE_LOGICAL_VALUE_TRUE
+from metomi.rose.apps.rose_ana import AnalysisTask
 
 
 class SingleCommandStatus(AnalysisTask):
@@ -65,7 +65,7 @@ class SingleCommandStatus(AnalysisTask):
     """
 
     def run_analysis(self):
-        """Main analysis routine called from rose_ana."""
+        """Main analysis routine called from metomi.rose_ana."""
         self.process_opt_files()
         self.process_opt_kgo()
         self.process_opt_command()
@@ -234,7 +234,7 @@ class SingleCommandPattern(SingleCommandStatus):
     """
 
     def run_analysis(self):
-        """Main analysis routine called from rose_ana."""
+        """Main analysis routine called from metomi.rose_ana."""
         # Note that this is identical to the above class, only it has the
         # additional pattern option; so call back to the parent class
         self.process_opt_pattern()
@@ -304,7 +304,7 @@ class FilePattern(SingleCommandPattern):
     """
 
     def run_analysis(self):
-        """Main analysis routine called from rose_ana."""
+        """Main analysis routine called from metomi.rose_ana."""
         self.process_opt_files()
         self.process_opt_kgo()
         self.process_opt_pattern()
@@ -484,7 +484,7 @@ class FileCommandPattern(FilePattern):
     """
 
     def run_analysis(self):
-        """Main analysis routine called from rose_ana."""
+        """Main analysis routine called from metomi.rose_ana."""
         # Note that this is identical to the above class, only it has the
         # additional command option; so call back to the parent class
         self.process_opt_command()

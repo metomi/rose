@@ -25,9 +25,9 @@ from isodatetime.dumpers import TimePointDumper
 from isodatetime.parsers import TimePointParser, DurationParser
 import os
 import re
-from rose.env import UnboundEnvironmentVariableError
-from rose.opt_parse import RoseOptionParser
-from rose.reporter import Reporter
+from metomi.rose.env import UnboundEnvironmentVariableError
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.reporter import Reporter
 import sys
 
 

@@ -25,16 +25,16 @@ from fnmatch import fnmatchcase
 from glob import glob
 import os
 import pipes
-from rose.config import ConfigDumper, ConfigLoader, ConfigNode
-from rose.env import env_var_process
-from rose.host_select import HostSelector
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopenError
-from rose.reporter import Event, Reporter, ReporterContext
-from rose.resource import ResourceLocator
-from rose.run import ConfigValueError, NewModeError, Runner
-from rose.run_source_vc import write_source_vc_info
-from rose.suite_clean import SuiteRunCleaner
+from metomi.rose.config import ConfigDumper, ConfigLoader, ConfigNode
+from metomi.rose.env import env_var_process
+from metomi.rose.host_select import HostSelector
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopenError
+from metomi.rose.reporter import Event, Reporter, ReporterContext
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.run import ConfigValueError, NewModeError, Runner
+from metomi.rose.run_source_vc import write_source_vc_info
+from metomi.rose.suite_clean import SuiteRunCleaner
 import shutil
 import sys
 from tempfile import TemporaryFile, mkdtemp
@@ -253,14 +253,14 @@ class SuiteRunner(Runner):
                 mode = "local-install-only"
             prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), mode)
 
-            # Dump the actual configuration as rose-suite-run.conf
+            # Dump the actual configuration as metomi.rose-suite-run.conf
             ConfigDumper()(conf_tree.node, "log/" + prefix + ".conf")
 
             # Install version information file
             write_source_vc_info(
                 suite_conf_dir, "log/" + prefix + ".version", self.popen)
 
-            # If run through rose-stem, install version information files for
+            # If run through metomi.rose-stem, install version information files for
             # each source tree if they're a working copy
             if hasattr(opts, 'source') and hasattr(opts, 'project'):
                 for i, url in enumerate(opts.source):
@@ -369,11 +369,11 @@ class SuiteRunner(Runner):
             if not no_login_shell or no_login_shell.lower() != "true":
                 shcommand += r""" bash -l -c '"$0" "$@"'"""
             # Path to "rose" command, if applicable
-            rose_bin = self._run_conf(
+            metomi.rose_bin = self._run_conf(
                 "remote-rose-bin", host=host, conf_tree=conf_tree,
                 default="rose")
             # Build remote "rose suite-run" command
-            shcommand += " %s suite-run -vv -n %s" % (rose_bin, suite_name)
+            shcommand += " %s suite-run -vv -n %s" % (metomi.rose_bin, suite_name)
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:

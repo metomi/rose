@@ -25,7 +25,7 @@ import os
 import re
 import tarfile
 
-from rose.suite_engine_procs.cylc import CylcProcessor, CylcSuiteDAO
+from metomi.rose.suite_engine_procs.cylc import CylcProcessor, CylcSuiteDAO
 
 
 class RoseBushDAO(object):

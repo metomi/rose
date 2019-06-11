@@ -22,7 +22,7 @@ Convenient functions for searching resource files.
 """
 
 import os
-from rose.config import ConfigLoader, ConfigNode
+from metomi.rose.config import ConfigLoader, ConfigNode
 import inspect
 import string
 import sys
@@ -148,7 +148,7 @@ class ResourceLocator(object):
             return os.path.basename(sys.argv[0])
 
     def get_version(self, ignore_environment=False):
-        """return the current rose_version number.
+        """return the current metomi.rose_version number.
 
         By default pass through the value of the ``ROSE_VERSION`` environment
         variable.
@@ -189,7 +189,7 @@ def import_object(import_string, from_files, error_handler,
 
     import_string is the '.' delimited path to the callable,
     as in normal Python - e.g.
-    rose.config_editor.pagewidget.table.PageTable
+    metomi.rose.config_editor.pagewidget.table.PageTable
     from_files is a list of available Python file paths to search in
     error_handler is a function that accepts an Exception instance
     or string and does something appropriate with it.

@@ -29,7 +29,7 @@ This module contains:
 import copy
 import re
 
-import rose
+import metomi.rose
 
 
 RE_REAL = r"[\+\-]?\d*\.?\d*(?:[de][\+\-]?\d+)?"
@@ -43,7 +43,7 @@ REC_RANGE_RANGE = re.compile(
     r"(?<!^:)$")  # Expression can't just be a colon.
 REC_FULL_URL = re.compile(r"^(\w+://|www\.)")
 
-# Ignored types used in rose.variable.ignored_reason,
+# Ignored types used in metomi.rose.variable.ignored_reason,
 # used by macros and user switches.
 IGNORED_BY_SECTION = 'Section ignored'
 IGNORED_BY_SYSTEM = 'Trigger ignored'
@@ -226,11 +226,11 @@ def get_ignored_markup(variable):
     """Return pango markup for a variable's ignored reason."""
     markup = ""
     if IGNORED_BY_SECTION in variable.ignored_reason:
-        markup += rose.config.STATE_SECT_IGNORED
+        markup += metomi.rose.config.STATE_SECT_IGNORED
     if IGNORED_BY_SYSTEM in variable.ignored_reason:
-        markup += rose.config.ConfigNode.STATE_SYST_IGNORED
+        markup += metomi.rose.config.ConfigNode.STATE_SYST_IGNORED
     elif IGNORED_BY_USER in variable.ignored_reason:
-        markup += rose.config.ConfigNode.STATE_USER_IGNORED
+        markup += metomi.rose.config.ConfigNode.STATE_USER_IGNORED
     if markup:
         markup = "<b>" + markup + "</b> "
     return markup
@@ -256,22 +256,22 @@ def _is_quote_state_change(string, index, quote_lookup, quote_state):
 def get_value_from_metadata(meta_data):
     """Use raw metadata to get a 'correct' value for a variable."""
     var_value = ''
-    if rose.META_PROP_VALUES in meta_data:
-        var_value = array_split(meta_data[rose.META_PROP_VALUES])[0]
-    elif rose.META_PROP_TYPE in meta_data:
-        var_type = meta_data[rose.META_PROP_TYPE]
+    if metomi.rose.META_PROP_VALUES in meta_data:
+        var_value = array_split(meta_data[metomi.rose.META_PROP_VALUES])[0]
+    elif metomi.rose.META_PROP_TYPE in meta_data:
+        var_type = meta_data[metomi.rose.META_PROP_TYPE]
         if var_type == 'logical':
-            var_value = rose.TYPE_LOGICAL_VALUE_FALSE
+            var_value = metomi.rose.TYPE_LOGICAL_VALUE_FALSE
         elif var_type == 'boolean':
-            var_value = rose.TYPE_BOOLEAN_VALUE_FALSE
+            var_value = metomi.rose.TYPE_BOOLEAN_VALUE_FALSE
         elif var_type in ['integer', 'real']:
             var_value = '0'
         elif var_type == 'character':
             var_value = "''"
         elif var_type == 'quoted':
             var_value = '""'
-    elif rose.META_PROP_VALUE_HINTS in meta_data:
-        var_value = array_split(meta_data[rose.META_PROP_VALUE_HINTS])[0]
+    elif metomi.rose.META_PROP_VALUE_HINTS in meta_data:
+        var_value = array_split(meta_data[metomi.rose.META_PROP_VALUE_HINTS])[0]
     return var_value
 
 

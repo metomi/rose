@@ -21,13 +21,13 @@
 
 import os
 from pipes import quote
-from rose.config import ConfigLoader, ConfigNode, ConfigSyntaxError
-from rose.fs_util import FileSystemEvent
-from rose.host_select import HostSelector
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopenError
-from rose.reporter import Reporter
-from rose.suite_engine_proc import SuiteEngineProcessor, SuiteStillRunningError
+from metomi.rose.config import ConfigLoader, ConfigNode, ConfigSyntaxError
+from metomi.rose.fs_util import FileSystemEvent
+from metomi.rose.host_select import HostSelector
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopenError
+from metomi.rose.reporter import Reporter
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor, SuiteStillRunningError
 import sys
 import traceback
 from uuid import uuid4

@@ -26,7 +26,7 @@ environment variables are left unchanged.
 
 import os
 import re
-from rose.reporter import Event
+from metomi.rose.reporter import Event
 
 
 # _RE_DEFAULT = re.compile(r"""

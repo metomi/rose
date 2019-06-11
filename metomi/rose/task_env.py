@@ -21,11 +21,11 @@
 
 from glob import glob
 import os
-from rose.env import EnvExportEvent
-from rose.opt_parse import RoseOptionParser
-from rose.reporter import Reporter
-from rose.resource import ResourceLocator
-from rose.suite_engine_proc import SuiteEngineProcessor
+from metomi.rose.env import EnvExportEvent
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.reporter import Reporter
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor
 import sys
 import traceback
 
@@ -38,7 +38,7 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=None,
                       full_mode=False):
     """Return map of PATH-like env-var names to path lists to prepend to them.
 
-    event_handler -- An instance of rose.reporter.Reporter or an object with a
+    event_handler -- An instance of metomi.rose.reporter.Reporter or an object with a
                      similar interface.
     path_root -- If a glob is relative and this is defined, this is the root
                  directory of the relative path.

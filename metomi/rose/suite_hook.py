@@ -23,11 +23,11 @@
 from email.mime.text import MIMEText
 import os
 import pwd
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener
-from rose.reporter import Reporter
-from rose.resource import ResourceLocator
-from rose.suite_engine_proc import SuiteEngineProcessor
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener
+from metomi.rose.reporter import Reporter
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor
 from smtplib import SMTP, SMTPException
 import socket
 

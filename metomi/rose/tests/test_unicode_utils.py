@@ -20,7 +20,7 @@
 
 import io
 
-from rose.unicode_utils import write_safely
+from metomi.rose.unicode_utils import write_safely
 
 TESTSTR = "Hello World"
 TESTBYTES = b"Bonjour, Le Monde!"

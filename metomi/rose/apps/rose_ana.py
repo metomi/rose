@@ -34,16 +34,16 @@ import fcntl
 from contextlib import contextmanager
 
 # Rose modules
-from rose import TYPE_LOGICAL_VALUE_TRUE
-from rose.reporter import Reporter
-from rose.resource import ResourceLocator
-from rose.app_run import BuiltinApp
-from rose.env import env_var_process
+from metomi.rose import TYPE_LOGICAL_VALUE_TRUE
+from metomi.rose.reporter import Reporter
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.app_run import BuiltinApp
+from metomi.rose.env import env_var_process
 
 
 class KGODatabase(object):
     """
-    KGO Database object, stores comparison information for rose_ana apps.
+    KGO Database object, stores comparison information for metomi.rose_ana apps.
 
     """
     # This SQL command ensures a "comparisons" table exists in the database
@@ -87,7 +87,7 @@ class KGODatabase(object):
         sql_statement = (
             "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)")
         # Prepend the task_name onto each entry, to try and ensure it is
-        # unique (the individual comparison names may not be, but the rose
+        # unique (the individual comparison names may not be, but the metomi.rose
         # task name + the comparison task name should)
         sql_args = [self.task_name + " - " + comp_task,
                     kgo_file, suite_file, status, comparison]
@@ -243,17 +243,17 @@ class RoseAnaApp(BuiltinApp):
         self.config = conf_tree.node
         self.app_runner = app_runner
 
-        # Attach to the main rose config (for retrieving settings from things
+        # Attach to the main metomi.rose config (for retrieving settings from things
         # like the user's ~/.metomi/rose.conf)
         self.rose_conf = ResourceLocator.default().get_conf()
 
         # Attach to a reporter instance for sending messages.
         self._init_reporter(app_runner.event_handler)
 
-        # As part of the introduction of a re-written rose_ana, backwards
+        # As part of the introduction of a re-written metomi.rose_ana, backwards
         # compatibility is maintained here by detecting the lack of the
         # newer syntax in the app config and falling back to the old version
-        # of the rose_ana app (renamed to rose_ana_v1)
+        # of the metomi.rose_ana app (renamed to rose_ana_v1)
         # **Once the old behaviour is removed the below block can be too**.
         new_style_app = False
         for keys, _ in self.config.walk(no_ignore=True):
@@ -263,14 +263,14 @@ class RoseAnaApp(BuiltinApp):
                 break
         if not new_style_app:
             # Use the previous app by instantiating and calling it explicitly
-            self.reporter("!!WARNING!! - Detected old style rose_ana app; "
-                          "Using previous rose_ana version...")
-            from rose.apps.rose_ana_v1 import RoseAnaV1App
+            self.reporter("!!WARNING!! - Detected old style metomi.rose_ana app; "
+                          "Using previous metomi.rose_ana version...")
+            from metomi.rose.apps.rose_ana_v1 import RoseAnaV1App
             old_app = RoseAnaV1App(manager=self.manager)
             return old_app.run(
                 app_runner, conf_tree, opts, args, uuid, work_files)
 
-        # Load any rose_ana specific configuration settings either from the
+        # Load any metomi.rose_ana specific configuration settings either from the
         # site defaults or the user's personal config
         self._get_global_ana_config()
 
@@ -285,7 +285,7 @@ class RoseAnaApp(BuiltinApp):
             self.titlebar("Initialising KGO database")
             self.kgo_db.buffer_to_db(self.reporter)
 
-        self.titlebar("Launching rose_ana")
+        self.titlebar("Launching metomi.rose_ana")
 
         # Load available methods for analysis and the tasks in the app.
         self._load_analysis_modules()
@@ -301,7 +301,7 @@ class RoseAnaApp(BuiltinApp):
             self.titlebar("Running task #{0}".format(itask + 1))
             self.reporter("Method: {0}".format(task.options["full_task_name"]))
 
-            # Since the run_analysis method is out of rose's control in many
+            # Since the run_analysis method is out of metomi.rose's control in many
             # cases the safest thing to do is a blanket try/except; since we
             # have no way of knowing what exceptions might be raised.
             try:
@@ -379,7 +379,7 @@ class RoseAnaApp(BuiltinApp):
         self.titlebar("Final status")
         self.reporter(msg, prefix=prefix)
 
-        self.titlebar("Completed rose_ana")
+        self.titlebar("Completed metomi.rose_ana")
 
         # Finally if there were legitimate test failures raise an exception
         # so that the task is caught by cylc as failed.  Also fail if it looks
@@ -392,7 +392,7 @@ class RoseAnaApp(BuiltinApp):
         self.reporter("{0} {1} {0}".format("*" * int(sidebarlen), title))
 
     def _get_global_ana_config(self):
-        """Retrieves all rose_ana config options; these could be from the
+        """Retrieves all metomi.rose_ana config options; these could be from the
         site's settings or the user's personal settings."""
         self.ana_config = {}
         user_config = (
@@ -481,7 +481,7 @@ class RoseAnaApp(BuiltinApp):
                 task = task.split(":", 1)[1]
                 if len(keys) == 2:
 
-                    # The app may define a section containing rose_ana config
+                    # The app may define a section containing metomi.rose_ana config
                     # settings; add these to the config dictionary (if any of
                     # the names match existing config options from the global
                     # config it will be overwritten)
@@ -501,7 +501,7 @@ class RoseAnaApp(BuiltinApp):
 
                     # If the user passed a blank curled-braces expression
                     # it should be expanded to contain each of the arguments
-                    # passed to rose_ana
+                    # passed to metomi.rose_ana
                     new_values = []
                     for value in values:
                         if "{}" in value:
@@ -573,7 +573,7 @@ class RoseAnaApp(BuiltinApp):
         if os.path.exists(ana_dir):
             method_paths.append(ana_dir)
 
-        # The rose config can specify a directory for site-specific methods
+        # The metomi.rose config can specify a directory for site-specific methods
         config_paths = self.rose_conf.get_value(["rose-ana", "method-path"])
         if config_paths:
             for config_dir in config_paths.split():
@@ -589,7 +589,7 @@ class RoseAnaApp(BuiltinApp):
 
 class TestsFailedException(Exception):
 
-    """Exception raised if any rose-ana comparisons fail."""
+    """Exception raised if any metomi.rose-ana comparisons fail."""
 
     def __init__(self, num_failed):
         self.failed = num_failed

@@ -23,17 +23,17 @@ import atexit
 from fnmatch import fnmatch
 import os
 import pwd
-import rose.config
-import rose.external
-import rose.metadata_check
-import rose.reporter
-from rose.fs_util import FileSystemUtil
-from rose.macro import add_meta_paths, load_meta_config
-from rose.macros import DefaultValidators
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
-from rose.reporter import Event, Reporter
-from rose.resource import ResourceLocator
+import metomi.rose.config
+import metomi.rose.external
+import metomi.rose.metadata_check
+import metomi.rose.reporter
+from metomi.rose.fs_util import FileSystemUtil
+from metomi.rose.macro import add_meta_paths, load_meta_config
+from metomi.rose.macros import DefaultValidators
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener, RosePopenError
+from metomi.rose.reporter import Event, Reporter
+from metomi.rose.resource import ResourceLocator
 from rosie.suite_id import SuiteId, SuiteIdOverflowError, SuiteIdPrefixError
 import shutil
 from io import StringIO
@@ -90,9 +90,9 @@ class LocalCopyStatusError(Exception):
 
 
 class SuiteInfoError(Exception):
-    """Raised when settings in rose-suite.info are invalid."""
+    """Raised when settings in metomi.rose-suite.info are invalid."""
     def __str__(self):
-        return rose.macro.get_reports_as_text(
+        return metomi.rose.macro.get_reports_as_text(
             {None: self.args[0]}, "rose-suite.info")
 
 
@@ -245,7 +245,7 @@ class RosieVCClient(object):
                meta_suite_mode=False):
         """Create a suite.
 
-        info_config -- A rose.config.ConfigNode object, which will be used as
+        info_config -- A metomi.rose.config.ConfigNode object, which will be used as
                        the content of the "rose-suite.info" file of the new
                        suite.
         from_id -- If defined, copy items from it.
@@ -268,7 +268,7 @@ class RosieVCClient(object):
                 self.popen("svn", "export", "-q", "--force", from_id_url, dir_)
             else:
                 open(os.path.join(dir_, "rose-suite.conf"), "w").close()
-            rose.config.dump(
+            metomi.rose.config.dump(
                 info_config, os.path.join(dir_, "rose-suite.info"))
 
             # Attempt to import the temporary suite to the repository
@@ -332,12 +332,12 @@ class RosieVCClient(object):
         return id_
 
     def generate_info_config(self, from_id=None, prefix=None, project=None):
-        """Generate a rose.config.ConfigNode for a rose-suite.info.
+        """Generate a metomi.rose.config.ConfigNode for a rose-suite.info.
 
         This is suitable for passing into the create method of this
         class.
         If from_id is defined, copy items from it.
-        Return the rose.config.ConfigNode instance.
+        Return the metomi.rose.config.ConfigNode instance.
 
         """
         from_project = None
@@ -347,11 +347,11 @@ class RosieVCClient(object):
                                                           from_id.branch,
                                                           from_id.revision)
             out_data = self.popen("svn", "cat", from_info_url)[0]
-            from_config = rose.config.load(StringIO(out_data.decode()))
+            from_config = metomi.rose.config.load(StringIO(out_data.decode()))
 
         res_loc = ResourceLocator.default()
         older_config = None
-        info_config = rose.config.ConfigNode()
+        info_config = metomi.rose.config.ConfigNode()
 
         # Determine project if given as a command-line option on create
         if from_id is None and project is not None:
@@ -392,7 +392,7 @@ class RosieVCClient(object):
         owner = res_loc.get_conf().get_value(
             ["rosie-id", "prefix-username." + prefix])
         if not owner and self.subversion_servers_conf:
-            servers_conf = rose.config.load(self.subversion_servers_conf)
+            servers_conf = metomi.rose.config.load(self.subversion_servers_conf)
             groups_node = servers_conf.get(["groups"])
             if groups_node is not None:
                 prefix_loc = SuiteId.get_prefix_location(prefix)
@@ -446,7 +446,7 @@ class RosieVCClient(object):
                     reminder = ("please remove all commented hints/lines " +
                                 "in the main/top section before saving.")
                     info_config.set([sect],
-                                    rose.variable.array_split(value)[0],
+                                    metomi.rose.variable.array_split(value)[0],
                                     comments=[value, reminder])
         if older_config is not None:
             for node_keys, node in older_config.walk(no_ignore=True):
@@ -493,7 +493,7 @@ class RosieVCClient(object):
             dir_ = os.path.join(temp_local_copy, os.sep.join(new_id.sid))
             self.popen(
                 "svn", "cp", "-q", from_id_url, os.path.join(dir_, "trunk"))
-            rose.config.dump(
+            metomi.rose.config.dump(
                 info_config, os.path.join(dir_, "trunk", "rose-suite.info"))
             message = self.COMMIT_MESSAGE_COPY % (
                 new_id, from_id.to_string_with_version())
@@ -579,7 +579,7 @@ def create(argv):
         file_ = opts.info_file
         if opts.info_file == "-":
             file_ = sys.stdin
-        info_config = rose.config.load(file_)
+        info_config = metomi.rose.config.load(file_)
     info_config = _validate_info_config(opts, client, info_config)
     if interactive_mode:
         prefix = opts.prefix
@@ -638,7 +638,7 @@ def _edit_info_config(opts, client, info_config):
     temp_desc, temp_name = mkstemp()
     try:
         temp_file = os.fdopen(temp_desc, "w")
-        rose.config.dump(info_config, temp_file)
+        metomi.rose.config.dump(info_config, temp_file)
         temp_file.write(CREATE_INFO_CONFIG_COMMENT)
         temp_file.close()
         command_list = client.popen.get_cmd("editor", temp_name)
@@ -647,7 +647,7 @@ def _edit_info_config(opts, client, info_config):
         client.event_handler(exc)
         sys.exit(1)
     else:
-        return rose.config.load(temp_name)
+        return metomi.rose.config.load(temp_name)
     finally:
         os.unlink(temp_name)
 

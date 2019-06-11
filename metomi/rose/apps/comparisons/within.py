@@ -20,7 +20,7 @@
 """Compare one list of numbers is within a tolerance of a second."""
 
 import re
-from rose.apps.rose_ana_v1 import DataLengthError
+from metomi.rose.apps.rose_ana_v1 import DataLengthError
 
 OUTPUT_STRING = "%(extract)s %(percent)s%% %(sign)s %(tolerance)s: " + \
                 "File %(file1)s c.f. %(file2)s (%(numvals)s values)"

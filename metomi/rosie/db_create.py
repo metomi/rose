@@ -23,11 +23,11 @@ import os
 import sqlalchemy as al
 import sys
 
-from rose.fs_util import FileSystemUtil
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener
-from rose.reporter import Reporter, Event
-from rose.resource import ResourceLocator
+from metomi.rose.fs_util import FileSystemUtil
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener
+from metomi.rose.reporter import Reporter, Event
+from metomi.rose.resource import ResourceLocator
 from rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 from rosie.svn_post_commit import RosieSvnPostCommitHook

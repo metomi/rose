@@ -24,7 +24,7 @@ try:
 except ImportError:
     pass
 import os
-from rose.resource import ResourceLocator
+from metomi.rose.resource import ResourceLocator
 
 
 class LDAPUserTool(object):

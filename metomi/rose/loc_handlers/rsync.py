@@ -21,7 +21,7 @@
 
 from tempfile import TemporaryFile
 from time import sleep, time
-from rose.popen import RosePopenError
+from metomi.rose.popen import RosePopenError
 
 
 class RsyncLocHandler(object):

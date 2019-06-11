@@ -18,17 +18,17 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 import os.path
-import rose.config
+import metomi.rose.config
 from io import StringIO
 import unittest
 
 
 class TestConfigData(unittest.TestCase):
-    """Test usage of the rose.config.ConfigNode object."""
+    """Test usage of the metomi.rose.config.ConfigNode object."""
 
     def test_init(self):
         """Test empty Config object."""
-        conf = rose.config.ConfigNode()
+        conf = metomi.rose.config.ConfigNode()
         self.assertFalse(conf is None)
         self.assertEqual(conf.get([]), conf)
         self.assertFalse(conf.get(["rubbish"]))
@@ -40,7 +40,7 @@ class TestConfigData(unittest.TestCase):
 
     def test_set(self):
         """Test setting/unsetting value/ignored flag in a Config object."""
-        conf = rose.config.ConfigNode()
+        conf = metomi.rose.config.ConfigNode()
         self.assertFalse(conf is None)
         self.assertEqual(conf.set([], {}), conf)
         conf.set(["", "top-option"], "rubbish")
@@ -80,7 +80,7 @@ class TestConfigData(unittest.TestCase):
 
     def test_iter(self):
         """Test the iterator"""
-        conf = rose.config.ConfigNode()
+        conf = metomi.rose.config.ConfigNode()
         conf.set(["", "food"], "glorious")
         conf.set(["dinner", "starter"], "soup")
         conf.set(["dinner", "dessert"], "custard")
@@ -90,12 +90,12 @@ class TestConfigData(unittest.TestCase):
 
 
 class TestConfigDump(unittest.TestCase):
-    """Test usage of the rose.config.Dump object."""
+    """Test usage of the metomi.rose.config.Dump object."""
 
     def test_dump_empty(self):
         """Test dumping an empty configuration."""
-        conf = rose.config.ConfigNode({})
-        dumper = rose.config.ConfigDumper()
+        conf = metomi.rose.config.ConfigNode({})
+        dumper = metomi.rose.config.ConfigDumper()
         target = StringIO()
         dumper.dump(conf, target)
         self.assertEqual(target.getvalue(), "")
@@ -103,7 +103,7 @@ class TestConfigDump(unittest.TestCase):
 
     def test_dump_normal(self):
         """Test normal dumping a configuration."""
-        conf = rose.config.ConfigNode({})
+        conf = metomi.rose.config.ConfigNode({})
         conf.set(["foo"], {})
         conf.set(["foo", "bar"], "BAR BAR")
         conf.set(["foo", "baz"], "BAZ\n BAZ")
@@ -112,7 +112,7 @@ class TestConfigDump(unittest.TestCase):
         conf.set(["egg", "boiled"], "false")
         conf.set(["egg", "scrambled"], "false", "!")
         conf.set(["egg", "poached"], "true", "!!")
-        dumper = rose.config.ConfigDumper()
+        dumper = metomi.rose.config.ConfigDumper()
         target = StringIO()
         dumper.dump(conf, target)
         self.assertEqual(target.getvalue(), """[egg]
@@ -130,13 +130,13 @@ baz=BAZ
 
     def test_dump_root(self):
         """Test dumping of a configuration with root settings."""
-        conf = rose.config.ConfigNode({}, comments=["hello"])
+        conf = metomi.rose.config.ConfigNode({}, comments=["hello"])
         conf.set(["foo"], "foo", comments=["foo foo", "foo foo"])
         conf.set(["bar"], "bar")
         conf.set(["baz"], {})
         conf.set(["baz", "egg"], "egg")
         conf.set(["baz", "ham"], "ham")
-        dumper = rose.config.ConfigDumper()
+        dumper = metomi.rose.config.ConfigDumper()
         target = StringIO()
         dumper.dump(conf, target)
         self.assertEqual(target.getvalue(), """#hello
@@ -154,18 +154,18 @@ ham=ham
 
 
 class TestConfigLoad(unittest.TestCase):
-    """Test usage of the rose.config.Load object."""
+    """Test usage of the metomi.rose.config.Load object."""
 
     def test_load_empty(self):
         """Test loading an empty configuration."""
-        conf = rose.config.ConfigNode({})
-        loader = rose.config.ConfigLoader()
+        conf = metomi.rose.config.ConfigNode({})
+        loader = metomi.rose.config.ConfigLoader()
         loader.load(os.path.devnull, conf)
         self.assertEqual((conf.value, conf.state), ({}, ""))
 
     def test_load_basic(self):
         """Test basic loading a configuration."""
-        conf = rose.config.ConfigNode({})
+        conf = metomi.rose.config.ConfigNode({})
         source = StringIO("""# test
 
 stuff=stuffing
@@ -191,7 +191,7 @@ worlds=earth
 [foo]
 bar=BAR BAR BAR
 """)
-        loader = rose.config.ConfigLoader()
+        loader = metomi.rose.config.ConfigLoader()
         loader.load(source, conf)
         source.close()
         self.assertEqual(conf.comments, [" test"])

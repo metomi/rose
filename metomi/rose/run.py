@@ -20,12 +20,12 @@
 """Shared utilities for app/suite/task run."""
 
 import os
-from rose.config_processor import ConfigProcessorsManager
-from rose.config_tree import ConfigTreeLoader
-from rose.fs_util import FileSystemUtil
-from rose.popen import RosePopener
-from rose.reporter import Event
-from rose.suite_engine_proc import SuiteEngineProcessor
+from metomi.rose.config_processor import ConfigProcessorsManager
+from metomi.rose.config_tree import ConfigTreeLoader
+from metomi.rose.fs_util import FileSystemUtil
+from metomi.rose.popen import RosePopener
+from metomi.rose.reporter import Event
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor
 import shlex
 import shutil
 from uuid import uuid4
@@ -129,7 +129,7 @@ class Runner(object):
     def config_load(self, opts):
         """Combine main config file with optional ones and defined ones.
 
-        Return an instance of rose.config_tree.ConfigTree.
+        Return an instance of metomi.rose.config_tree.ConfigTree.
 
         """
 

@@ -19,9 +19,9 @@
 # -----------------------------------------------------------------------------
 
 
-import rose.config
-import rose.macro
-import rose.variable
+import metomi.rose.config
+import metomi.rose.macro
+import metomi.rose.variable
 
 
 _OPTIONS_KEY = "options"
@@ -29,7 +29,7 @@ _REPORTED_SECTION_KEY = "reported config sect"
 _SECTION_IS_COMPULSORY_KEY = "section is compulsory"
 
 
-class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
+class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
 
     """Returns sections and options that are compulsory but missing.
 
@@ -58,8 +58,8 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
         for setting_id, sect_node in meta_config.value.items():
             if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
-            if (sect_node.get_value([rose.META_PROP_COMPULSORY]) ==
-                    rose.META_PROP_VALUE_TRUE):
+            if (sect_node.get_value([metomi.rose.META_PROP_COMPULSORY]) ==
+                    metomi.rose.META_PROP_VALUE_TRUE):
                 config_sect, config_opt = (
                     self._get_section_option_from_id(setting_id))
                 compulsory_data.setdefault(
@@ -74,29 +74,29 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
                 else:
                     compulsory_data[config_sect][_OPTIONS_KEY].append(
                         config_opt)
-                if (sect_node.get_value([rose.META_PROP_DUPLICATE]) ==
-                        rose.META_PROP_VALUE_TRUE):
+                if (sect_node.get_value([metomi.rose.META_PROP_DUPLICATE]) ==
+                        metomi.rose.META_PROP_VALUE_TRUE):
                     compulsory_data[config_sect][_REPORTED_SECTION_KEY] = (
                         config_sect + "({0})".format(
-                            rose.CONFIG_SETTING_INDEX_DEFAULT)
+                            metomi.rose.CONFIG_SETTING_INDEX_DEFAULT)
                     )
         return compulsory_data
 
     def validate(self, config_data, meta_config):
         """Return a list of compulsory-related errors, if any.
 
-        config_data - a rose.config.ConfigNode or a dictionary that
+        config_data - a metomi.rose.config.ConfigNode or a dictionary that
         looks like this:
         {"sections":
-            {"namelist:foo": rose.section.Section instance,
-             "env": rose.section.Section instance},
+            {"namelist:foo": metomi.rose.section.Section instance,
+             "env": metomi.rose.section.Section instance},
          "variables":
-            {"namelist:foo": [rose.variable.Variable instance,
-                              rose.variable.Variable instance],
-             "env": [rose.variable.Variable instance]
+            {"namelist:foo": [metomi.rose.variable.Variable instance,
+                              metomi.rose.variable.Variable instance],
+             "env": [metomi.rose.variable.Variable instance]
             }
         }
-        meta_config - a rose.config.ConfigNode.
+        meta_config - a metomi.rose.config.ConfigNode.
 
         """
         return self.validate_settings(config_data, meta_config)
@@ -105,18 +105,18 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
                           only_these_sections=None):
         """Return a list of compulsory-related errors, if any.
 
-        config_data - a rose.config.ConfigNode or a dictionary that
+        config_data - a metomi.rose.config.ConfigNode or a dictionary that
         looks like this:
         {"sections":
-            {"namelist:foo": rose.section.Section instance,
-             "env": rose.section.Section instance},
+            {"namelist:foo": metomi.rose.section.Section instance,
+             "env": metomi.rose.section.Section instance},
          "variables":
-            {"namelist:foo": [rose.variable.Variable instance,
-                              rose.variable.Variable instance],
-             "env": [rose.variable.Variable instance]
+            {"namelist:foo": [metomi.rose.variable.Variable instance,
+                              metomi.rose.variable.Variable instance],
+             "env": [metomi.rose.variable.Variable instance]
             }
         }
-        meta_config - a rose.config.ConfigNode.
+        meta_config - a metomi.rose.config.ConfigNode.
         only_these_sections (default None) - a list of sections to
         examine. If specified, checking for other sections will be
         skipped.
@@ -176,7 +176,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
                             config_data, alias_section):
                         if (option == alias_option or
                             (alias_option.startswith(option) and
-                             rose.macro.REC_ID_STRIP_DUPL.sub(
+                             metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
                                  "", alias_option) == option)):
                             setting_id = self._get_id_from_section_option(
                                 alias_section, alias_option)
@@ -190,7 +190,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
         # Check that ids that we have found are not user-ignored.
         for setting_id in check_user_ignored_ids:
             if (self._get_config_id_state(config_data, setting_id) ==
-                    rose.config.ConfigNode.STATE_USER_IGNORED):
+                    metomi.rose.config.ConfigNode.STATE_USER_IGNORED):
                 value = self._get_config_id_value(config_data, setting_id)
                 section, option = self._get_section_option_from_id(setting_id)
                 self.add_report(section, option, value,
@@ -202,9 +202,9 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
         for section in self._get_config_sections(config_data):
             if section not in self.alias_section_to_basics:
                 basic_section_no_modifier = (
-                    rose.macro.REC_ID_STRIP.sub('', section))
+                    metomi.rose.macro.REC_ID_STRIP.sub('', section))
                 basic_section_keep_modifier = (
-                    rose.macro.REC_ID_STRIP_DUPL.sub('', section))
+                    metomi.rose.macro.REC_ID_STRIP_DUPL.sub('', section))
                 basic_sections = set([basic_section_no_modifier,
                                       basic_section_keep_modifier])
                 for basic_section in basic_sections:
@@ -215,7 +215,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
                     self.basic_section_aliases[basic_section].append(section)
 
 
-class CompulsoryChanger(rose.macro.MacroBase):
+class CompulsoryChanger(metomi.rose.macro.MacroBase):
 
     """Add sections and options that are compulsory but missing.
 
@@ -254,9 +254,9 @@ class CompulsoryChanger(rose.macro.MacroBase):
             if opt is None:
                 continue
             var_id = self._get_id_from_section_option(sect, opt)
-            metadata = rose.macro.get_metadata_for_config_id(
+            metadata = metomi.rose.macro.get_metadata_for_config_id(
                 var_id, meta_config)
-            value = rose.variable.get_value_from_metadata(metadata)
+            value = metomi.rose.variable.get_value_from_metadata(metadata)
             config.set([sect, opt], value)
             self.add_report(sect, opt, value,
                             self.ADD_COMPULSORY_OPT)

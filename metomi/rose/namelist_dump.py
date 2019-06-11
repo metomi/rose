@@ -21,15 +21,15 @@
 Module to convert from a Fortran namelist file to a Rose configuration.
 
 This contains wrapper functions for the namelist parser and the dumper
-(rose.config).
+(metomi.rose.config).
 
 """
 
 import re
 import sys
-import rose.config
-import rose.formats.namelist
-from rose.opt_parse import RoseOptionParser
+import metomi.rose.config
+import metomi.rose.formats.namelist
+from metomi.rose.opt_parse import RoseOptionParser
 
 
 RE_NAME_INDEX = re.compile(r"^(.*)\((\d+)\)$")
@@ -73,7 +73,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
         output_file = open(output_file, "w")
 
     # Config: file: sections
-    config = rose.config.ConfigNode()
+    config = metomi.rose.config.ConfigNode()
     files = []
     for arg in args:
         if arg == STD_FILE_ARG:
@@ -84,7 +84,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
             config.set(["file:" + arg], {})
 
     # Parse files into a list of NamelistGroup objects
-    groups = rose.formats.namelist.parse(files)
+    groups = metomi.rose.formats.namelist.parse(files)
 
     # Count group in files and group
     groups_in_file = {}
@@ -125,7 +125,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
                 config.set([section, lhs], obj.get_rhs_as_string())
 
     # Config: write results
-    rose.config.dump(config, output_file,
+    metomi.rose.config.dump(config, output_file,
                      sort_sections=_sort_config_key,
                      sort_option_items=_sort_config_key,
                      env_escape_ok=True)

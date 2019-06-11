@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Process a section in a rose.config.ConfigNode into a Jinja2 template."""
+"""Process a section in a metomi.rose.config.ConfigNode into a Jinja2 template."""
 
 import filecmp
-from rose.config_processor import ConfigProcessError, ConfigProcessorBase
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.fs_util import FileSystemEvent
+from metomi.rose.config_processor import ConfigProcessError, ConfigProcessorBase
+from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.fs_util import FileSystemEvent
 import os
 from tempfile import NamedTemporaryFile
 
@@ -44,7 +44,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
 
         Arguments:
             conf_tree:
-                The relevant rose.config_tree.ConfigTree object with the full
+                The relevant metomi.rose.config_tree.ConfigTree object with the full
                 configuration.
             item: The current configuration item to process.
             orig_keys:

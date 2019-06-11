@@ -28,14 +28,14 @@ import traceback
 
 from isodatetime.data import get_timepoint_for_now
 from isodatetime.parsers import ISO8601SyntaxError
-from rose.config import ConfigDumper
-from rose.date import RoseDateTimeOperator
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopenError
-from rose.reporter import Event, Reporter
-from rose.run import Runner
-from rose.scheme_handler import SchemeHandlersManager
+from metomi.rose.config import ConfigDumper
+from metomi.rose.date import RoseDateTimeOperator
+from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopenError
+from metomi.rose.reporter import Event, Reporter
+from metomi.rose.run import Runner
+from metomi.rose.scheme_handler import SchemeHandlersManager
 
 
 class ConfigValueError(Exception):
@@ -292,7 +292,7 @@ class BuiltinApp(object):
     """An abstract base class for a builtin application.
 
     Instance of sub-classes are expected to be managed by
-    rose.scheme_handler.SchemeHandlersManager.
+    metomi.rose.scheme_handler.SchemeHandlersManager.
 
     """
 
@@ -380,7 +380,7 @@ class AppRunner(Runner):
         if opts.new_mode:
             self._prep_new(opts)
 
-        # Dump the actual configuration as rose-app-run.conf
+        # Dump the actual configuration as metomi.rose-app-run.conf
         ConfigDumper()(conf_tree.node, "rose-app-run.conf")
 
         # Environment variables: PATH

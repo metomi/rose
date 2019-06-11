@@ -24,53 +24,53 @@ Module to automatically generate metadata from a Rose configuration.
 import os
 import sys
 
-import rose.config
-import rose.config_tree
-import rose.formats.namelist
-import rose.macro
-import rose.macros.value
-import rose.meta_type
-import rose.opt_parse
-import rose.resource
+import metomi.rose.config
+import metomi.rose.config_tree
+import metomi.rose.formats.namelist
+import metomi.rose.macro
+import metomi.rose.macros.value
+import metomi.rose.meta_type
+import metomi.rose.opt_parse
+import metomi.rose.resource
 
 
 def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
     """Automatically guess the metadata for an application configuration."""
     if prop_map is None:
         prop_map = {}
-    rose.macro.standard_format_config(config)
+    metomi.rose.macro.standard_format_config(config)
     if meta_config is None:
-        meta_config = rose.config.ConfigNode()
+        meta_config = metomi.rose.config.ConfigNode()
     for keylist, node in config.walk():
         sect = keylist[0]
         if len(keylist) == 1:
             option = None
         else:
             option = keylist[1]
-        if sect in [rose.CONFIG_SECT_CMD]:
+        if sect in [metomi.rose.CONFIG_SECT_CMD]:
             continue
-        if keylist == [rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE]:
+        if keylist == [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE]:
             continue
-        meta_sect = rose.macro.REC_ID_STRIP.sub("", sect)
-        modifier_sect = rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
+        meta_sect = metomi.rose.macro.REC_ID_STRIP.sub("", sect)
+        modifier_sect = metomi.rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
         if sect and option is None:
             if (modifier_sect != meta_sect and
                     modifier_sect != sect and
                     meta_config.get([modifier_sect]) is None and auto_type):
-                meta_config.set([modifier_sect, rose.META_PROP_DUPLICATE],
-                                rose.META_PROP_VALUE_TRUE)
+                meta_config.set([modifier_sect, metomi.rose.META_PROP_DUPLICATE],
+                                metomi.rose.META_PROP_VALUE_TRUE)
             if meta_config.get([meta_sect]) is not None:
                 continue
             meta_config.set([meta_sect])
             if meta_sect != sect and auto_type:
                 # Add duplicate = true at base and modifier level (if needed).
-                meta_config.set([meta_sect, rose.META_PROP_DUPLICATE],
-                                rose.META_PROP_VALUE_TRUE)
+                meta_config.set([meta_sect, metomi.rose.META_PROP_DUPLICATE],
+                                metomi.rose.META_PROP_VALUE_TRUE)
             for prop_key, prop_value in prop_map.items():
                 meta_config.set([meta_sect, prop_key], prop_value)
         if option is None:
             continue
-        meta_key = rose.macro.REC_ID_STRIP_DUPL.sub('', option)
+        meta_key = metomi.rose.macro.REC_ID_STRIP_DUPL.sub('', option)
         meta_opt = meta_sect + "=" + meta_key
         if meta_config.get([meta_opt]) is not None:
             continue
@@ -80,9 +80,9 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
         if auto_type:
             opt_type, length = type_gen(node.value)
             if opt_type is not None:
-                meta_config.set([meta_opt, rose.META_PROP_TYPE], opt_type)
+                meta_config.set([meta_opt, metomi.rose.META_PROP_TYPE], opt_type)
             if int(length) > 1:
-                meta_config.set([meta_opt, rose.META_PROP_LENGTH], length)
+                meta_config.set([meta_opt, metomi.rose.META_PROP_LENGTH], length)
     return meta_config
 
 
@@ -96,12 +96,12 @@ def type_gen(value):
     length = 0
     if not value:
         return None, str(length)
-    for val in rose.variable.array_split(value):
+    for val in metomi.rose.variable.array_split(value):
         length += 1
         val_meta_type = "raw"
         for meta_type in ["integer", "real", "quoted", "character", "logical",
                           "boolean"]:
-            is_ok = rose.meta_type.meta_type_checker(val, meta_type)[0]
+            is_ok = metomi.rose.meta_type.meta_type_checker(val, meta_type)[0]
             if is_ok:
                 val_meta_type = meta_type
                 break
@@ -124,10 +124,10 @@ def type_gen(value):
 
 
 def main():
-    opt_parser = rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("auto_type", "conf_dir", "output_dir")
     opts, args = opt_parser.parse_args()
-    rose.macro.add_meta_paths()
+    metomi.rose.macro.add_meta_paths()
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
@@ -138,18 +138,18 @@ def main():
             prop_val_map.update({key: val})
         else:
             prop_val_map.update({arg: ""})
-    for filename in [rose.SUB_CONFIG_NAME, rose.TOP_CONFIG_NAME]:
+    for filename in [metomi.rose.SUB_CONFIG_NAME, metomi.rose.TOP_CONFIG_NAME]:
         path = os.path.join(opts.conf_dir, filename)
         if os.path.isfile(path):
             break
     else:
         sys.exit(opt_parser.get_usage())
-    source_config = rose.config.load(path)
-    meta_dir = os.path.join(opts.conf_dir, rose.CONFIG_META_DIR)
-    metadata_config = rose.config.ConfigNode()
+    source_config = metomi.rose.config.load(path)
+    meta_dir = os.path.join(opts.conf_dir, metomi.rose.CONFIG_META_DIR)
+    metadata_config = metomi.rose.config.ConfigNode()
     try:
-        metadata_config = rose.config_tree.ConfigTreeLoader().load(
-            meta_dir, rose.META_CONFIG_NAME, list(sys.path)).node
+        metadata_config = metomi.rose.config_tree.ConfigTreeLoader().load(
+            meta_dir, metomi.rose.META_CONFIG_NAME, list(sys.path)).node
     except IOError:
         pass
     metadata_config = metadata_gen(source_config,
@@ -162,8 +162,8 @@ def main():
         dest = opts.output_dir
     if not os.path.isdir(dest):
         os.mkdir(dest)
-    dest_file = os.path.join(dest, rose.META_CONFIG_NAME)
-    rose.config.dump(metadata_config, dest_file)
+    dest_file = os.path.join(dest, metomi.rose.META_CONFIG_NAME)
+    metomi.rose.config.dump(metadata_config, dest_file)
 
 
 if __name__ == "__main__":

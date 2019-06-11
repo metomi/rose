@@ -24,8 +24,8 @@ import re
 import jinja2
 import jinja2.exceptions
 
-import rose.macro
-import rose.variable
+import metomi.rose.macro
+import metomi.rose.variable
 
 
 REC_EXPR_IS_THIS_RULE = re.compile(
@@ -62,7 +62,7 @@ class RuleValueError(Exception):
         return "{0} - could not retrieve value. ".format(arg_string)
 
 
-class FailureRuleChecker(rose.macro.MacroBase):
+class FailureRuleChecker(metomi.rose.macro.MacroBase):
 
     """Check the fail-if and warn-if conditions"""
 
@@ -86,7 +86,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
             sect, opt = node_keys
             value = node.value
             setting_id = self._get_id_from_section_option(sect, opt)
-            metadata = rose.macro.get_metadata_for_config_id(setting_id,
+            metadata = metomi.rose.macro.get_metadata_for_config_id(setting_id,
                                                              meta_config)
             for rule_opt in [self.RULE_ERROR_NAME, self.RULE_WARNING_NAME]:
                 if rule_opt in metadata:
@@ -146,7 +146,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
         return self.reports
 
 
-class RuleEvaluator(rose.macro.MacroBase):
+class RuleEvaluator(metomi.rose.macro.MacroBase):
 
     """Evaluate logical expressions in the metadata."""
 
@@ -229,7 +229,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                     var_id = setting_id
                 setting_value = get_value_from_id(
                     var_id, config, meta_config, setting_id)
-                array_value = rose.variable.array_split(str(setting_value))
+                array_value = metomi.rose.variable.array_split(str(setting_value))
                 new_string = start + "("
                 for elem_num in range(1, len(array_value) + 1):
                     new_string += self.ARRAY_EXPR.format(var_id, elem_num,
@@ -248,7 +248,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                 var_id = var_id.replace("this", setting_id)
             setting_value = get_value_from_id(
                 var_id, config, meta_config, setting_id)
-            array_value = rose.variable.array_split(str(setting_value))
+            array_value = metomi.rose.variable.array_split(str(setting_value))
             new_string = start + str(len(array_value)) + end
             rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
 
@@ -316,15 +316,15 @@ class RuleEvaluator(rose.macro.MacroBase):
         section, option = self._get_section_option_from_id(variable_id)
         if variable_id != parent_id:
             # We may need to de-duplicate the section in the variable_id.
-            dupl_section = rose.macro.REC_ID_STRIP.sub("", section)
+            dupl_section = metomi.rose.macro.REC_ID_STRIP.sub("", section)
             dupl_node = meta_config.get(
-                [dupl_section, rose.META_PROP_DUPLICATE], no_ignore=True)
+                [dupl_section, metomi.rose.META_PROP_DUPLICATE], no_ignore=True)
             if (dupl_node is not None and
-                    dupl_node.value == rose.META_PROP_VALUE_TRUE):
+                    dupl_node.value == metomi.rose.META_PROP_VALUE_TRUE):
                 # This is an id in a duplicate namelist.
                 parent_section = self._get_section_option_from_id(
                     parent_id)[0]
-                parent_dupl_section = rose.macro.REC_ID_STRIP.sub(
+                parent_dupl_section = metomi.rose.macro.REC_ID_STRIP.sub(
                     "", parent_section)
                 if parent_dupl_section != dupl_section:
                     raise RuleValueError(variable_id)
@@ -348,7 +348,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                         index = int(element)
                     except (TypeError, ValueError):
                         raise RuleValueError(variable_id)
-                    val_array = rose.variable.array_split(value)
+                    val_array = metomi.rose.variable.array_split(value)
                     try:
                         return_value = val_array[index - 1]
                     except IndexError:

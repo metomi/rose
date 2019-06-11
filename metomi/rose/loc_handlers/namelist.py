@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Process namelist: sections in a rose.config.ConfigNode matching a name."""
+"""Process namelist: sections in a metomi.rose.config.ConfigNode matching a name."""
 
 
 import re
-import rose.config
-from rose.config_processor import ConfigProcessError
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.reporter import Event
+import metomi.rose.config
+from metomi.rose.config_processor import ConfigProcessError
+from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.reporter import Event
 from functools import cmp_to_key
 
 
@@ -70,7 +70,7 @@ class NamelistLocHandler(object):
         """Write namelist to loc.cache."""
         sections = self.parse(loc, conf_tree)
         if loc.name.endswith("(:)"):
-            sections.sort(key=cmp_to_key(rose.config.sort_settings))
+            sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         with open(loc.cache, "wb") as handle:
             for section in sections:
                 section_value = conf_tree.node.get_value([section])

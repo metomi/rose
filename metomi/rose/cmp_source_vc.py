@@ -25,11 +25,11 @@ from io import StringIO
 import sys
 import traceback
 
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
-from rose.reporter import Reporter
-from rose.run_source_vc import write_source_vc_info
-from rose.suite_engine_proc import SuiteEngineProcessor
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener, RosePopenError
+from metomi.rose.reporter import Reporter
+from metomi.rose.run_source_vc import write_source_vc_info
+from metomi.rose.suite_engine_proc import SuiteEngineProcessor
 
 
 class SuiteVCComparator(object):
@@ -96,7 +96,7 @@ def main():
     else:
         if lines is None:
             event_handler(
-                '%s: rose-suite-run.version: VC info not found' % (suite_name),
+                '%s: metomi.rose-suite-run.version: VC info not found' % (suite_name),
                 kind=Reporter.KIND_ERR, level=Reporter.FAIL)
             sys.exit(2)
         lines = list(line for line in lines)

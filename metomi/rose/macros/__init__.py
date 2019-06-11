@@ -21,7 +21,7 @@
 Module to contain internal system macros for operating on a configuration.
 """
 
-import rose.macro
+import metomi.rose.macro
 from . import compulsory
 from . import duplicate
 from . import format
@@ -33,15 +33,15 @@ from . import value
 MODULES = [compulsory, duplicate, format, rule, trigger, value]
 
 
-class DefaultTransforms(rose.macro.MacroTransformerCollection):
+class DefaultTransforms(metomi.rose.macro.MacroTransformerCollection):
 
     """Runs all the default fixers, such as trigger fixing."""
 
     def __init__(self):
         macros = []
-        macro_info_tuples = rose.macro.get_macro_class_methods(MODULES)
+        macro_info_tuples = metomi.rose.macro.get_macro_class_methods(MODULES)
         for module_name, class_name, method, _ in macro_info_tuples:
-            if method == rose.macro.TRANSFORM_METHOD:
+            if method == metomi.rose.macro.TRANSFORM_METHOD:
                 for module in MODULES:
                     if module.__name__ == module_name:
                         macro_inst = getattr(module, class_name)()
@@ -49,15 +49,15 @@ class DefaultTransforms(rose.macro.MacroTransformerCollection):
         super(DefaultTransforms, self).__init__(*macros)
 
 
-class DefaultValidators(rose.macro.MacroValidatorCollection):
+class DefaultValidators(metomi.rose.macro.MacroValidatorCollection):
 
     """Runs all the default checks, such as compulsory checking."""
 
     def __init__(self):
         macros = []
-        macro_info_tuples = rose.macro.get_macro_class_methods(MODULES)
+        macro_info_tuples = metomi.rose.macro.get_macro_class_methods(MODULES)
         for module_name, class_name, method, _ in macro_info_tuples:
-            if method == rose.macro.VALIDATE_METHOD:
+            if method == metomi.rose.macro.VALIDATE_METHOD:
                 for module in MODULES:
                     if module.__name__ == module_name:
                         macro_inst = getattr(module, class_name)()

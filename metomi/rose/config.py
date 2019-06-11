@@ -22,9 +22,9 @@
 .. testsetup:: *
 
     import os
-    from rose.config import *
+    from metomi.rose.config import *
 
-.. testcleanup:: rose.config
+.. testcleanup:: metomi.rose.config
 
     try:
         os.remove('config.conf')
@@ -68,15 +68,15 @@ Synopsis:
 
 Classes:
     .. autosummary::
-        rose.config.ConfigNode
-        rose.config.ConfigNodeDiff
-        rose.config.ConfigDumper
-        rose.config.ConfigLoader
+        metomi.rose.config.ConfigNode
+        metomi.rose.config.ConfigNodeDiff
+        metomi.rose.config.ConfigDumper
+        metomi.rose.config.ConfigLoader
 
 Functions:
     .. autosummary::
-       rose.config.load
-       rose.config.dump
+       metomi.rose.config.load
+       metomi.rose.config.dump
 
 Limitations:
     - The loader does not handle trailing comments.
@@ -93,12 +93,12 @@ What about the standard library ConfigParser? Well, it is problematic:
 import copy
 import os.path
 import re
-from rose.env import env_var_escape
+from metomi.rose.env import env_var_escape
 import shlex
 import sys
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile
 from functools import cmp_to_key
-from rose.unicode_utils import write_safely
+from metomi.rose.unicode_utils import write_safely
 
 
 CHAR_ASSIGN = "="
@@ -1234,7 +1234,7 @@ class ConfigLoader(object):
                   pairs. Only returned if return_config_map is True.
 
         Examples:
-            .. testcleanup:: rose.config.ConfigLoader.load_with_opts
+            .. testcleanup:: metomi.rose.config.ConfigLoader.load_with_opts
 
                 try:
                     os.remove('config.conf')

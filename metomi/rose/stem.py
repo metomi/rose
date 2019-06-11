@@ -23,14 +23,14 @@ import os
 import re
 import sys
 
-import rose.config
-from rose.fs_util import FileSystemUtil
-from rose.host_select import HostSelector
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
-from rose.reporter import Reporter, Event
-from rose.resource import ResourceLocator
-from rose.suite_run import SuiteRunner
+import metomi.rose.config
+from metomi.rose.fs_util import FileSystemUtil
+from metomi.rose.host_select import HostSelector
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener, RosePopenError
+from metomi.rose.reporter import Reporter, Event
+from metomi.rose.resource import ResourceLocator
+from metomi.rose.suite_run import SuiteRunner
 
 DEFAULT_TEST_DIR = 'rose-stem'
 OPTIONS = ['group', 'source', 'task', ]
@@ -96,17 +96,17 @@ class ProjectNotFoundException(Exception):
 
 class RoseStemVersionException(Exception):
 
-    """Exception class when running the wrong rose-stem version."""
+    """Exception class when running the wrong metomi.rose-stem version."""
 
     def __init__(self, version):
         Exception.__init__(self, version)
         if version is None:
-            self.suite_version = "not rose-stem compatible"
+            self.suite_version = "not metomi.rose-stem compatible"
         else:
             self.suite_version = "at version %s" % (version)
 
     def __repr__(self):
-        return "Running rose-stem version %s but suite is %s" % (
+        return "Running metomi.rose-stem version %s but suite is %s" % (
             ROSE_STEM_VERSION, self.suite_version)
 
     __str__ = __repr__
@@ -114,7 +114,7 @@ class RoseStemVersionException(Exception):
 
 class RoseSuiteConfNotFoundException(Exception):
 
-    """Exception class when unable to find rose-suite.conf."""
+    """Exception class when unable to find metomi.rose-suite.conf."""
 
     def __init__(self, location):
         Exception.__init__(self, location)
@@ -350,15 +350,15 @@ class StemRunner(object):
         return suitedir
 
     def _read_auto_opts(self):
-        """Read the site rose.conf file."""
+        """Read the site metomi.rose.conf file."""
         return ResourceLocator.default().get_conf().get_value(
             ["rose-stem", "automatic-options"])
 
     def _check_suite_version(self, fname):
-        """Check the suite is compatible with this version of rose-stem."""
+        """Check the suite is compatible with this version of metomi.rose-stem."""
         if not os.path.isfile(fname):
             raise RoseSuiteConfNotFoundException(os.path.dirname(fname))
-        config = rose.config.load(fname)
+        config = metomi.rose.config.load(fname)
         suite_rose_stem_version = config.get(['ROSE_STEM_VERSION'])
         if suite_rose_stem_version:
             suite_rose_stem_version = int(suite_rose_stem_version.value)
@@ -456,7 +456,7 @@ class StemRunner(object):
 
 
 def main():
-    """Launcher for command line invokation of rose stem."""
+    """Launcher for command line invokation of metomi.rose stem."""
 
     # Process options
     opt_parser = RoseOptionParser()

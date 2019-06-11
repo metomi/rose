@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
-"""Builtin application: rose_prune: suite housekeeping application."""
+"""Builtin application: metomi.rose_prune: suite housekeeping application."""
 
 import os
 from random import shuffle
-from rose.app_run import BuiltinApp, ConfigValueError
-from rose.date import RoseDateTimeOperator
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.fs_util import FileSystemEvent
-from rose.host_select import HostSelector
-from rose.popen import RosePopenError
+from metomi.rose.app_run import BuiltinApp, ConfigValueError
+from metomi.rose.date import RoseDateTimeOperator
+from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.fs_util import FileSystemEvent
+from metomi.rose.host_select import HostSelector
+from metomi.rose.popen import RosePopenError
 import shlex
 
 

@@ -24,31 +24,31 @@ import time
 
 import pygraphviz
 
-import rose.metadata_graph
-import rose.opt_parse
-import rose.reporter
+import metomi.rose.metadata_graph
+import metomi.rose.opt_parse
+import metomi.rose.reporter
 import rosie.suite_id
 import rosie.ws_client
 import rosie.ws_client_cli
 
 
-class NoConnectionsEvent(rose.reporter.Event):
+class NoConnectionsEvent(metomi.rose.reporter.Event):
     """An event raised if the graph has no edges or nodes.
 
     event.args[0] is the filter id string.
 
     """
 
-    KIND = rose.reporter.Reporter.KIND_ERR
+    KIND = metomi.rose.reporter.Reporter.KIND_ERR
 
     def __str__(self):
         return "%s: no copy relationships to other suites" % self.args[0]
 
 
-class PrintSuiteDetails(rose.reporter.Event):
+class PrintSuiteDetails(metomi.rose.reporter.Event):
     """An event to print out suite details when writing to CLI"""
 
-    KIND = rose.reporter.Reporter.KIND_OUT
+    KIND = metomi.rose.reporter.Reporter.KIND_OUT
 
     def __str__(self):
         template = " %s"
@@ -128,7 +128,7 @@ def calculate_edges(graph, suite_data, filter_id=None, properties=None,
             add_node(graph, node1, node_rosie_properties.get(node1))
             graph.add_edge(edge[0], edge[1])
     else:
-        reporter = rose.reporter.Reporter()
+        reporter = metomi.rose.reporter.Reporter()
 
         # Only plot the connections involving filter_id.
         node_stack = []
@@ -185,7 +185,7 @@ def make_graph(suite_data, filter_id, properties, prefix, max_distance=None):
 
 def output_graph(graph, filename=None, debug_mode=False):
     """Draw the graph to filename (or temporary file if None)."""
-    rose.metadata_graph.output_graph(graph, debug_mode=debug_mode,
+    metomi.rose.metadata_graph.output_graph(graph, debug_mode=debug_mode,
                                      filename=filename)
 
 
@@ -194,7 +194,7 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     if properties is None:
         properties = []
 
-    reporter = rose.reporter.Reporter()
+    reporter = metomi.rose.reporter.Reporter()
 
     ancestry = {}
     # Process suite_data to get ancestry tree
@@ -246,7 +246,7 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
 
 def main():
     """Provide the CLI interface."""
-    opt_parser = rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("distance",
                               "output_file",
                               "prefix",

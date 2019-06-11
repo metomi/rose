@@ -21,7 +21,7 @@
 
 import asyncio
 
-from rose.reporter import Event
+from metomi.rose.reporter import Event
 
 
 class JobEvent(Event):

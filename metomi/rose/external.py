@@ -21,7 +21,7 @@
 
 import sys
 
-from rose.popen import RosePopener
+from metomi.rose.popen import RosePopener
 
 
 def _launch(name, event_handler=None, run_fg=False, *args, **kwargs):

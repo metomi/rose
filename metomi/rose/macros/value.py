@@ -21,30 +21,30 @@
 import copy
 import re
 
-import rose.env
-import rose.macro
-import rose.macros.rule
-import rose.variable
+import metomi.rose.env
+import metomi.rose.macro
+import metomi.rose.macros.rule
+import metomi.rose.variable
 
-import rose.meta_type
+import metomi.rose.meta_type
 
 REC_CHARACTER = re.compile(r"'(?:[^']|'')*'$")
 
 
-class ValueChecker(rose.macro.MacroBase):
+class ValueChecker(metomi.rose.macro.MacroBase):
 
     """Returns sections and options with wrong values according to metadata.
 
     It can use any metadata widget errors (within the GUI), or some defined
     behaviours (default) to check if a value is outside the
     allowed range, or the wrong type or composition. Call with either
-    rose.config objects or config filenames.
+    metomi.rose.config objects or config filenames.
 
     """
 
-    META_PROPS = [rose.META_PROP_LENGTH, rose.META_PROP_PATTERN,
-                  rose.META_PROP_RANGE, rose.META_PROP_TYPE,
-                  rose.META_PROP_VALUES]
+    META_PROPS = [metomi.rose.META_PROP_LENGTH, metomi.rose.META_PROP_PATTERN,
+                  metomi.rose.META_PROP_RANGE, rose.META_PROP_TYPE,
+                  metomi.rose.META_PROP_VALUES]
     WARNING_BAD_PATTERN = "Value {0} does not contain the pattern: {1}"
     WARNING_BAD_RANGE = "Value {0} is not in the range criteria: {1}"
     WARNING_INVALID_LENGTH = 'Derived type has an invalid length: {0}'
@@ -69,7 +69,7 @@ class ValueChecker(rose.macro.MacroBase):
             sect, key = node_keys
             value = node.value
             # Skip environment variable values
-            if rose.env.contains_env_var(value):
+            if metomi.rose.env.contains_env_var(value):
                 continue
             var_id = self._get_id_from_section_option(sect, key)
             self._validate_id(var_id, value, meta_config)
@@ -82,7 +82,7 @@ class ValueChecker(rose.macro.MacroBase):
             # Don't check ignored variables.
             if variable.ignored_reason:
                 continue
-            if rose.env.contains_env_var(variable.value):
+            if metomi.rose.env.contains_env_var(variable.value):
                 continue
             var_id = variable.metadata["id"]
             value = variable.value
@@ -91,7 +91,7 @@ class ValueChecker(rose.macro.MacroBase):
 
     def _validate_id(self, var_id, value, meta_config):
         """Validate the value of a particular variable id."""
-        metadata = rose.macro.get_metadata_for_config_id(var_id,
+        metadata = metomi.rose.macro.get_metadata_for_config_id(var_id,
                                                          meta_config)
         sect, key = self._get_section_option_from_id(var_id)
         saved_metadata = copy.deepcopy(metadata)
@@ -106,14 +106,14 @@ class ValueChecker(rose.macro.MacroBase):
             self.add_report(sect, key, value,
                             self.bad_value_meta_map[goodness_id])
             return
-        variable = rose.variable.Variable(key, value, metadata)
+        variable = metomi.rose.variable.Variable(key, value, metadata)
         metadata = variable.metadata
         if not isinstance(value, str):
             text = self.WARNING_NOT_STRING.format(repr(value))
             self.bad_value_meta_map[goodness_id] = text
             self.add_report(sect, key, value, text)
             return
-        num_elements = variable.metadata.get(rose.META_PROP_LENGTH, 1)
+        num_elements = variable.metadata.get(metomi.rose.META_PROP_LENGTH, 1)
         if num_elements != 1:
             if num_elements == ':':
                 num_elements = -1
@@ -123,11 +123,11 @@ class ValueChecker(rose.macro.MacroBase):
                 except (TypeError, ValueError):
                     num_elements = 1
         val_list = [value]
-        type_list = metadata.get(rose.META_PROP_TYPE, '')
+        type_list = metadata.get(metomi.rose.META_PROP_TYPE, '')
         if isinstance(type_list, str):
             type_list = [type_list]
         if num_elements != 1:
-            val_list = rose.variable.array_split(value)
+            val_list = metomi.rose.variable.array_split(value)
             if num_elements != -1:
                 if len(val_list) > num_elements * len(type_list):
                     text = self.WARNING_WRONG_LENGTH.format(
@@ -141,10 +141,10 @@ class ValueChecker(rose.macro.MacroBase):
                     self.add_report(sect, key, value, text)
                     return
             num_elements = len(val_list)
-        skip_nulls = (metadata.get(rose.META_PROP_COMPULSORY) !=
-                      rose.META_PROP_VALUE_TRUE and num_elements != 1)
-        if rose.META_PROP_VALUES in metadata:
-            meta_values = metadata[rose.META_PROP_VALUES]
+        skip_nulls = (metadata.get(metomi.rose.META_PROP_COMPULSORY) !=
+                      metomi.rose.META_PROP_VALUE_TRUE and num_elements != 1)
+        if metomi.rose.META_PROP_VALUES in metadata:
+            meta_values = metadata[metomi.rose.META_PROP_VALUES]
             for val in val_list:
                 if skip_nulls and not val:
                     continue
@@ -158,8 +158,8 @@ class ValueChecker(rose.macro.MacroBase):
                     self.bad_value_meta_map[goodness_id] = text
                     self.add_report(sect, key, value, text)
                     break
-        elif rose.META_PROP_TYPE in metadata:
-            meta_type = metadata[rose.META_PROP_TYPE]
+        elif metomi.rose.META_PROP_TYPE in metadata:
+            meta_type = metadata[metomi.rose.META_PROP_TYPE]
             if (num_elements == 1 and isinstance(meta_type, str)):
                 # A standard, non array variable.
                 for val in val_list:
@@ -176,7 +176,7 @@ class ValueChecker(rose.macro.MacroBase):
                     type_list = [meta_type]
                 else:
                     type_list = meta_type
-                    val_list = rose.variable.array_split(value)
+                    val_list = metomi.rose.variable.array_split(value)
                 if num_elements == -1:
                     array_length = len(val_list) / len(type_list)
                 else:
@@ -193,8 +193,8 @@ class ValueChecker(rose.macro.MacroBase):
                             break
                     except KeyError:
                         pass
-        if rose.META_PROP_PATTERN in metadata:
-            pattern = metadata[rose.META_PROP_PATTERN]
+        if metomi.rose.META_PROP_PATTERN in metadata:
+            pattern = metadata[metomi.rose.META_PROP_PATTERN]
             if pattern not in self.pattern_comp_map:
                 self.pattern_comp_map[pattern] = re.compile(
                     pattern, re.VERBOSE)
@@ -203,8 +203,8 @@ class ValueChecker(rose.macro.MacroBase):
                 self.bad_value_meta_map[goodness_id] = text
                 self.add_report(sect, key, value, text)
                 return
-        if rose.META_PROP_RANGE in metadata:
-            range_pat = metadata[rose.META_PROP_RANGE]
+        if metomi.rose.META_PROP_RANGE in metadata:
+            range_pat = metadata[metomi.rose.META_PROP_RANGE]
             text = self.check_range(range_pat, var_id, sect, key,
                                     val_list, type_list,
                                     skip_nulls=skip_nulls)
@@ -221,7 +221,7 @@ class ValueChecker(rose.macro.MacroBase):
 
     def meta_check(self, value, meta_type, sect, key):
         """Check function wrapper"""
-        res = rose.meta_type.meta_type_checker(value, meta_type)
+        res = metomi.rose.meta_type.meta_type_checker(value, meta_type)
         if not res[0]:
             self.add_report(sect, key, value, res[1])
         return res[0]
@@ -239,9 +239,9 @@ class ValueChecker(rose.macro.MacroBase):
         """Check against a range pattern."""
         is_range_complex = "this" in range_pat
         if is_range_complex:
-            tiny_config = rose.config.ConfigNode()
+            tiny_config = metomi.rose.config.ConfigNode()
         elif range_pat not in self.range_func_map:
-            check_func = rose.variable.parse_range_expression(range_pat)
+            check_func = metomi.rose.variable.parse_range_expression(range_pat)
             self.range_func_map.update({range_pat: check_func})
         else:
             check_func = self.range_func_map[range_pat]
@@ -260,12 +260,12 @@ class ValueChecker(rose.macro.MacroBase):
                 break
             if is_range_complex:
                 tiny_config.set([sect, key], val)
-                tiny_meta_config = rose.config.ConfigNode()
-                evaluator = rose.macros.rule.RuleEvaluator()
+                tiny_meta_config = metomi.rose.config.ConfigNode()
+                evaluator = metomi.rose.macros.rule.RuleEvaluator()
                 try:
                     check_ok = evaluator.evaluate_rule(
                         range_pat, var_id, tiny_config, tiny_meta_config)
-                except rose.macros.rule.RuleValueError:
+                except metomi.rose.macros.rule.RuleValueError:
                     pass
             else:
                 val_num = float(val)
@@ -277,7 +277,7 @@ class ValueChecker(rose.macro.MacroBase):
         return self.WARNING_BAD_RANGE.format(cur_val, range_pat)
 
 
-class TypeFixer(rose.macro.MacroBase):
+class TypeFixer(metomi.rose.macro.MacroBase):
 
     """Fix incorrect types."""
 
@@ -296,7 +296,7 @@ class TypeFixer(rose.macro.MacroBase):
             sect = item.section
             opt = item.option
             var_id = self._get_id_from_section_option(sect, opt)
-            metadata = rose.macro.get_metadata_for_config_id(var_id,
+            metadata = metomi.rose.macro.get_metadata_for_config_id(var_id,
                                                              meta_config)
             saved_metadata = copy.deepcopy(metadata)
             saved_metadata.pop('id')
@@ -304,14 +304,14 @@ class TypeFixer(rose.macro.MacroBase):
             value = node.value
             ignored_state = node.state
             old_value = value
-            m_type = metadata.get(rose.META_PROP_TYPE)
+            m_type = metadata.get(metomi.rose.META_PROP_TYPE)
             if m_type in ["boolean", "character", "logical", "quoted"]:
-                if (metadata.get(rose.META_PROP_LENGTH, '').isdigit() or
-                        metadata.get(rose.META_PROP_LENGTH) == ':'):
-                    val_list = rose.variable.array_split(value)
+                if (metadata.get(metomi.rose.META_PROP_LENGTH, '').isdigit() or
+                        metadata.get(metomi.rose.META_PROP_LENGTH) == ':'):
+                    val_list = metomi.rose.variable.array_split(value)
                     for i, val in enumerate(val_list):
                         val_list[i] = self.meta_transform(val, m_type)
-                    value = rose.variable.array_join(val_list)
+                    value = metomi.rose.variable.array_join(val_list)
                 else:
                     value = self.meta_transform(value, m_type)
             if value != old_value:
@@ -321,4 +321,4 @@ class TypeFixer(rose.macro.MacroBase):
         return config, self.reports
 
     def meta_transform(self, value, meta_type):
-        return rose.meta_type.meta_type_transform(value, meta_type)
+        return metomi.rose.meta_type.meta_type_transform(value, meta_type)

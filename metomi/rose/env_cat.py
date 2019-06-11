@@ -20,8 +20,8 @@
 """Implements "rose env-cat"."""
 
 
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.opt_parse import RoseOptionParser
+from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.opt_parse import RoseOptionParser
 import sys
 
 

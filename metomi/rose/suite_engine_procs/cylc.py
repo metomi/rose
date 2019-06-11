@@ -32,10 +32,10 @@ from tempfile import mkstemp
 from time import sleep
 from uuid import uuid4
 
-from rose.fs_util import FileSystemEvent
-from rose.popen import RosePopenError
-from rose.reporter import Event, Reporter
-from rose.suite_engine_proc import (
+from metomi.rose.fs_util import FileSystemEvent
+from metomi.rose.popen import RosePopenError
+from metomi.rose.reporter import Event, Reporter
+from metomi.rose.suite_engine_proc import (
     SuiteEngineProcessor, SuiteEngineGlobalConfCompatError,
     SuiteNotRunningError, SuiteStillRunningError, TaskProps)
 

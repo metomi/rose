@@ -20,10 +20,10 @@
 
 from functools import cmp_to_key
 
-import rose.macro
+import metomi.rose.macro
 
 
-class DuplicateChecker(rose.macro.MacroBase):
+class DuplicateChecker(metomi.rose.macro.MacroBase):
 
     """Returns settings whose duplicate status does not match their name."""
 
@@ -35,16 +35,16 @@ class DuplicateChecker(rose.macro.MacroBase):
         self.reports = []
         sect_error_no_dupl = {}
         sect_keys = list(config.value)
-        sorter = rose.config.sort_settings
+        sorter = metomi.rose.config.sort_settings
         sect_keys.sort(key=cmp_to_key(sorter))
         for section in sect_keys:
             node = config.get([section])
             if not isinstance(node.value, dict):
                 continue
             metadata = self.get_metadata_for_config_id(section, meta_config)
-            duplicate = metadata.get(rose.META_PROP_DUPLICATE)
-            is_duplicate = duplicate == rose.META_PROP_VALUE_TRUE
-            basic_section = rose.macro.REC_ID_STRIP.sub("", section)
+            duplicate = metadata.get(metomi.rose.META_PROP_DUPLICATE)
+            is_duplicate = duplicate == metomi.rose.META_PROP_VALUE_TRUE
+            basic_section = metomi.rose.macro.REC_ID_STRIP.sub("", section)
             if is_duplicate:
                 if basic_section == section:
                     self.add_report(section, None, None,
@@ -52,7 +52,7 @@ class DuplicateChecker(rose.macro.MacroBase):
             elif section != basic_section:
                 if basic_section not in sect_error_no_dupl:
                     sect_error_no_dupl.update({basic_section: 1})
-                    no_index_section = rose.macro.REC_ID_STRIP_DUPL.sub(
+                    no_index_section = metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
                         "", section)
                     if no_index_section != section:
                         basic_section = no_index_section
@@ -72,7 +72,7 @@ class DuplicateChecker(rose.macro.MacroBase):
                 continue
             if ((meta_section == basic_section or
                     meta_section.startswith(
-                    basic_section + rose.CONFIG_DELIMITER)) and
+                    basic_section + metomi.rose.CONFIG_DELIMITER)) and
                     isinstance(meta_node.value, dict)):
                 return True
         return False

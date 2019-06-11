@@ -28,14 +28,14 @@ import pygraphviz  # Graphviz and pygraphviz need to be installed.
 
 from functools import cmp_to_key
 
-import rose.config
-import rose.config_tree
-import rose.external
-import rose.macro
-import rose.macros.trigger
-import rose.opt_parse
-import rose.reporter
-import rose.resource
+import metomi.rose.config
+import metomi.rose.config_tree
+import metomi.rose.external
+import metomi.rose.macro
+import metomi.rose.macros.trigger
+import metomi.rose.opt_parse
+import metomi.rose.reporter
+import metomi.rose.resource
 
 
 COLOUR_ENABLED = "green"
@@ -46,7 +46,7 @@ COLOUR_USER_IGNORED = "orange"
 SHAPE_NODE_EXTERNAL = "rectangle"
 SHAPE_NODE_SECTION = "octagon"
 
-STATE_NORMAL = rose.config.ConfigNode.STATE_NORMAL
+STATE_NORMAL = metomi.rose.config.ConfigNode.STATE_NORMAL
 
 STYLE_ARROWHEAD_EMPTY = "empty"
 
@@ -62,14 +62,14 @@ def get_node_state_attrs(config, section, option=None, allowed_sections=None):
     if allowed_sections is None:
         allowed_sections = []
     config_section_node = config.get([section])
-    id_ = rose.macro.get_id_from_section_option(section, option)
+    id_ = metomi.rose.macro.get_id_from_section_option(section, option)
     state = ""
     config_node = config.get([section, option])
     node_attrs["color"] = COLOUR_IGNORED
     if (config_section_node is not None and
             config_section_node.state != STATE_NORMAL and
             option is not None):
-        state = rose.config.STATE_SECT_IGNORED
+        state = metomi.rose.config.STATE_SECT_IGNORED
     if config_node is None:
         node_attrs["color"] = COLOUR_MISSING
     elif config_node.state != STATE_NORMAL:
@@ -93,7 +93,7 @@ def get_graph(config, meta_config, name, allowed_sections=None,
     if allowed_properties is None:
         allowed_properties = []
     if err_reporter is None:
-        err_reporter = rose.reporter.Reporter()
+        err_reporter = metomi.rose.reporter.Reporter()
     graph = pygraphviz.AGraph(directed=True)
     graph.graph_attr["rankdir"] = "LR"
     graph.graph_attr["label"] = name
@@ -107,27 +107,27 @@ def get_graph(config, meta_config, name, allowed_sections=None,
 def add_trigger_graph(graph, config, meta_config, err_reporter,
                       allowed_sections=None):
     """Add trigger-related nodes and edges to the graph."""
-    trigger = rose.macros.trigger.TriggerMacro()
+    trigger = metomi.rose.macros.trigger.TriggerMacro()
     bad_reports = trigger.validate_dependencies(config, meta_config)
     if bad_reports:
-        err_reporter(rose.macro.get_reports_as_text(
+        err_reporter(metomi.rose.macro.get_reports_as_text(
                      bad_reports, "trigger.TriggerMacro"))
         return None
     ids = []
     for keylist, node in meta_config.walk(no_ignore=True):
         id_ = keylist[0]
-        if (id_.startswith(rose.META_PROP_NS + rose.CONFIG_DELIMITER) or
-                id_.startswith(rose.SUB_CONFIG_FILE_DIR + ":*")):
+        if (id_.startswith(metomi.rose.META_PROP_NS + metomi.rose.CONFIG_DELIMITER) or
+                id_.startswith(metomi.rose.SUB_CONFIG_FILE_DIR + ":*")):
             continue
         if isinstance(node.value, dict):
             section, option = (
-                rose.macro.get_section_option_from_id(id_))
+                metomi.rose.macro.get_section_option_from_id(id_))
             if not allowed_sections or (
                     allowed_sections and section in allowed_sections):
                 ids.append(id_)
-    ids.sort(key=cmp_to_key(rose.config.sort_settings))
+    ids.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
     for id_ in ids:
-        section, option = rose.macro.get_section_option_from_id(id_)
+        section, option = metomi.rose.macro.get_section_option_from_id(id_)
         node_attrs = get_node_state_attrs(
             config, section, option,
             allowed_sections=allowed_sections
@@ -135,7 +135,7 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
         graph.add_node(id_, **node_attrs)
     for setting_id, id_value_dict in sorted(
             trigger.trigger_family_lookup.items()):
-        section, option = rose.macro.get_section_option_from_id(setting_id)
+        section, option = metomi.rose.macro.get_section_option_from_id(setting_id)
         section_node = config.get([section], no_ignore=True)
         node = config.get([section, option])
         if node is None:
@@ -144,7 +144,7 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
             setting_value = node.value
         setting_is_section_ignored = (option is None and section_node is None)
         for dependent_id, values in sorted(id_value_dict.items()):
-            dep_section, dep_option = rose.macro.get_section_option_from_id(
+            dep_section, dep_option = metomi.rose.macro.get_section_option_from_id(
                 dependent_id)
             if (allowed_sections and
                     (section not in allowed_sections and
@@ -225,20 +225,20 @@ def output_graph(graph, debug_mode=False, filename=None, form="svg"):
         print(image_file_handle.read().decode())
         image_file_handle.close()
         return
-    rose.external.launch_image_viewer(image_file_handle.name, run_fg=True)
+    metomi.rose.external.launch_image_viewer(image_file_handle.name, run_fg=True)
 
 
 def _exit_with_metadata_fail():
     """Handle a load metadata failure."""
-    text = rose.macro.ERROR_LOAD_METADATA.format("")
-    rose.reporter.Reporter()(text,
+    text = metomi.rose.macro.ERROR_LOAD_METADATA.format("")
+    metomi.rose.reporter.Reporter()(text,
                              kind=rose.reporter.Reporter.KIND_ERR,
                              level=rose.reporter.Reporter.FAIL)
     sys.exit(1)
 
 
 def _load_override_config():
-    conf = rose.resource.ResourceLocator.default().get_conf().get(
+    conf = metomi.rose.resource.ResourceLocator.default().get_conf().get(
         ["rose-metadata-graph"])
     if conf is None:
         return
@@ -255,8 +255,8 @@ def _load_override_config():
 def main():
     """Run the metadata graphing from the command line."""
     _load_override_config()
-    rose.macro.add_meta_paths()
-    opt_parser = rose.opt_parse.RoseOptionParser()
+    metomi.rose.macro.add_meta_paths()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
     options = ["conf_dir", "meta_path", "output_dir", "property"]
     opt_parser.add_my_options(*options)
     opts, args = opt_parser.parse_args()
@@ -264,28 +264,28 @@ def main():
         os.chdir(opts.conf_dir)
     opts.conf_dir = os.getcwd()
     sys.path.append(
-        rose.resource.ResourceLocator.default().get_util_home())
-    rose.macro.add_opt_meta_paths(opts.meta_path)
+        metomi.rose.resource.ResourceLocator.default().get_util_home())
+    metomi.rose.macro.add_opt_meta_paths(opts.meta_path)
 
-    config_file_path = os.path.join(opts.conf_dir, rose.SUB_CONFIG_NAME)
-    meta_config_file_path = os.path.join(opts.conf_dir, rose.META_CONFIG_NAME)
-    config_tree_loader = rose.config_tree.ConfigTreeLoader()
+    config_file_path = os.path.join(opts.conf_dir, metomi.rose.SUB_CONFIG_NAME)
+    meta_config_file_path = os.path.join(opts.conf_dir, metomi.rose.META_CONFIG_NAME)
+    config_tree_loader = metomi.rose.config_tree.ConfigTreeLoader()
     if os.path.exists(config_file_path):
-        config = config_tree_loader(opts.conf_dir, rose.SUB_CONFIG_NAME,
+        config = config_tree_loader(opts.conf_dir, metomi.rose.SUB_CONFIG_NAME,
                                     conf_dir_paths=sys.path).node
-        meta_path = rose.macro.load_meta_path(config, opts.conf_dir)[0]
+        meta_path = metomi.rose.macro.load_meta_path(config, opts.conf_dir)[0]
         if meta_path is None:
             _exit_with_metadata_fail()
-        meta_config = rose.macro.load_meta_config(
+        meta_config = metomi.rose.macro.load_meta_config(
             config,
             directory=opts.conf_dir,
         )
         if not meta_config.value.keys():
             _exit_with_metadata_fail()
     elif os.path.exists(meta_config_file_path):
-        config = rose.config.ConfigNode()
+        config = metomi.rose.config.ConfigNode()
         meta_config = (
-            config_tree_loader(opts.conf_dir, rose.META_CONFIG_NAME)).node
+            config_tree_loader(opts.conf_dir, metomi.rose.META_CONFIG_NAME)).node
     else:
         _exit_with_metadata_fail()
     name = opts.conf_dir

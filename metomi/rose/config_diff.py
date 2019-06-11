@@ -27,22 +27,22 @@ import io
 import sys
 import tempfile
 
-import rose.config
-import rose.fs_util
-import rose.macro
-import rose.opt_parse
-import rose.popen
-import rose.resource
-import rose.run
+import metomi.rose.config
+import metomi.rose.fs_util
+import metomi.rose.macro
+import metomi.rose.opt_parse
+import metomi.rose.popen
+import metomi.rose.resource
+import metomi.rose.run
 
 
 class ConfigDiffDefaults(object):
 
-    """Store default settings for the rose config-diff command."""
+    """Store default settings for the metomi.rose config-diff command."""
 
     PROPERTIES = ",".join(
-        [rose.META_PROP_TITLE, rose.META_PROP_NS,
-         rose.META_PROP_DESCRIPTION, rose.META_PROP_HELP]
+        [metomi.rose.META_PROP_TITLE, metomi.rose.META_PROP_NS,
+         metomi.rose.META_PROP_DESCRIPTION, rose.META_PROP_HELP]
     )
     SHORTHAND = []
 
@@ -52,11 +52,11 @@ _DEFAULTS = ConfigDiffDefaults()
 
 def annotate_config_with_metadata(config, meta_config, ignore_regexes=None,
                                   metadata_properties=None):
-    """Add metadata to the rose.config.ConfigNode.comments attribute.
+    """Add metadata to the metomi.rose.config.ConfigNode.comments attribute.
 
-    config -- a rose.config.ConfigNode instance, containing app or
+    config -- a metomi.rose.config.ConfigNode instance, containing app or
               suite data.
-    meta_config -- a rose.config.ConfigNode instance, containing
+    meta_config -- a metomi.rose.config.ConfigNode instance, containing
                    metadata for config.
     ignore_regexes -- (default None) a list of uncompiled regular
                       expressions - if a setting contains any of these,
@@ -73,11 +73,11 @@ def annotate_config_with_metadata(config, meta_config, ignore_regexes=None,
         option = None
         if len(keylist) > 1:
             option = keylist[1]
-        id_ = rose.macro.get_id_from_section_option(section, option)
+        id_ = metomi.rose.macro.get_id_from_section_option(section, option)
         if any(_.search(id_) for _ in ignore_recs):
             unset_keys.append(keylist)
             continue
-        metadata = rose.macro.get_metadata_for_config_id(id_, meta_config)
+        metadata = metomi.rose.macro.get_metadata_for_config_id(id_, meta_config)
         metadata_text = format_metadata_as_text(
             metadata, only_these_options=metadata_properties)
         metadata_lines = [" " + line for line in metadata_text.splitlines()]
@@ -113,7 +113,7 @@ def format_metadata_as_text(metadata, only_these_options=None):
     metadata keys. Otherwise, output all metadata keys.
 
     """
-    id_node = rose.config.ConfigNode()
+    id_node = metomi.rose.config.ConfigNode()
     if only_these_options is None:
         # Default to every option.
         only_these_options = sorted(metadata.keys())
@@ -123,28 +123,28 @@ def format_metadata_as_text(metadata, only_these_options=None):
             continue
         id_node.set([property_], value=value)
     string_file = io.StringIO()
-    rose.config.dump(id_node, target=string_file)
+    metomi.rose.config.dump(id_node, target=string_file)
     return string_file.getvalue()
 
 
 def main():
     """Implement the "rose config-diff" command."""
-    opt_parser = rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("diff_tool", "graphical",
                               "ignore", "meta_path", "properties",
                               "opt_conf_keys_1", "opt_conf_keys_2")
     my_sys_args = list(sys.argv)
 
     opts, args = opt_parser.parse_args(my_sys_args[1:])
-    rose.macro.add_meta_paths()
-    rose.macro.add_opt_meta_paths(opts.meta_path)
+    metomi.rose.macro.add_meta_paths()
+    metomi.rose.macro.add_opt_meta_paths(opts.meta_path)
 
     paths, diff_args = args[:2], args[2:]
 
     if len(paths) != 2:
         sys.exit(opt_parser.get_usage())
 
-    config_loader = rose.config.ConfigLoader()
+    config_loader = metomi.rose.config.ConfigLoader()
 
     if opts.properties is None:
         properties = _DEFAULTS.PROPERTIES.split(",")
@@ -155,7 +155,7 @@ def main():
 
     # get file paths
     output_filenames = []
-    config_type = rose.SUB_CONFIG_NAME
+    config_type = metomi.rose.SUB_CONFIG_NAME
     file_paths = []
     for path in paths:
         if path == "-":
@@ -163,15 +163,15 @@ def main():
             continue
         path = os.path.abspath(path)
         if os.path.isdir(path):
-            for filename in rose.CONFIG_NAMES:
+            for filename in metomi.rose.CONFIG_NAMES:
                 file_path = os.path.join(path, filename)
                 if os.path.isfile(file_path):
                     config_type = filename
                     file_paths.append(file_path)
                     break
             else:
-                raise rose.run.ConfigNotFoundError(
-                    path, rose.GLOB_CONFIG_FILE)
+                raise metomi.rose.run.ConfigNotFoundError(
+                    path, metomi.rose.GLOB_CONFIG_FILE)
         else:
             config_type = os.path.basename(path)
             file_paths.append(path)
@@ -193,10 +193,10 @@ def main():
             directory, filename = path.rsplit(os.sep, 1)
         config = config_loader.load_with_opts(path, mark_opt_confs=True,
                                               more_keys=opt_conf_keys)
-        meta_config_tree = rose.macro.load_meta_config_tree(
+        meta_config_tree = metomi.rose.macro.load_meta_config_tree(
             config, directory=directory, config_type=filename)
         if meta_config_tree is None:
-            meta_config = rose.config.ConfigNode()
+            meta_config = metomi.rose.config.ConfigNode()
         else:
             meta_config = meta_config_tree.node
         annotated_config = annotate_config_with_metadata(
@@ -205,9 +205,9 @@ def main():
         )
         output_dir = tempfile.mkdtemp()
         output_path = os.path.join(output_dir, filename)
-        rose.config.dump(annotated_config, target=output_path)
+        metomi.rose.config.dump(annotated_config, target=output_path)
         output_filenames.append(output_path)
-    popener = rose.popen.RosePopener()
+    popener = metomi.rose.popen.RosePopener()
     cmd_opts_args = diff_args + output_filenames
     if opts.diff_tool is None:
         if opts.graphical_mode:
@@ -222,7 +222,7 @@ def main():
         sys.stdout.buffer.write(stdout)
         sys.stderr.buffer.write(stderr)
     finally:
-        fs_util = rose.fs_util.FileSystemUtil()
+        fs_util = metomi.rose.fs_util.FileSystemUtil()
         for path in output_filenames:
             fs_util.delete(os.path.dirname(path))
     sys.exit(return_code)
@@ -230,7 +230,7 @@ def main():
 
 def load_override_config():
     """Load user or site options for the config_diff command."""
-    conf = rose.resource.ResourceLocator.default().get_conf().get(
+    conf = metomi.rose.resource.ResourceLocator.default().get_conf().get(
         ["rose-config-diff"])
     if conf is None:
         return

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
-"""Builtin application: rose_bunch: run multiple commands in parallel."""
+"""Builtin application: metomi.rose_bunch: run multiple commands in parallel."""
 
 
 import itertools
@@ -26,12 +26,12 @@ import shlex
 import sqlite3
 from time import sleep
 
-from rose.app_run import (
+from metomi.rose.app_run import (
     BuiltinApp,
     ConfigValueError)
-from rose.popen import RosePopenError
-import rose.job_runner
-from rose.reporter import Event
+from metomi.rose.popen import RosePopenError
+import metomi.rose.job_runner
+from metomi.rose.reporter import Event
 
 
 class CommandNotDefinedError(Exception):
@@ -141,13 +141,13 @@ class RoseBunchApp(BuiltinApp):
                                                          "names"])
         if self.invocation_names:
             self.invocation_names = shlex.split(
-                rose.env.env_var_process(self.invocation_names))
+                metomi.rose.env.env_var_process(self.invocation_names))
             if len(set(self.invocation_names)) != len(self.invocation_names):
                 raise ConfigValueError([self.BUNCH_SECTION, "names"],
                                        self.invocation_names,
                                        "names must be unique")
 
-        self.fail_mode = rose.env.env_var_process(conf_tree.node.get_value(
+        self.fail_mode = metomi.rose.env.env_var_process(conf_tree.node.get_value(
             [self.BUNCH_SECTION, "fail-mode"], self.TYPE_CONTINUE_ON_FAIL))
 
         if self.fail_mode not in self.FAIL_MODE_TYPES:
@@ -159,10 +159,10 @@ class RoseBunchApp(BuiltinApp):
                                                     "incremental"],
                                                     "true")
         if self.incremental:
-            self.incremental = rose.env.env_var_process(self.incremental)
+            self.incremental = metomi.rose.env.env_var_process(self.incremental)
 
         self.isformatted = True
-        self.command = rose.env.env_var_process(
+        self.command = metomi.rose.env.env_var_process(
             conf_tree.node.get_value([self.BUNCH_SECTION, "command-format"]))
 
         if not self.command:
@@ -178,7 +178,7 @@ class RoseBunchApp(BuiltinApp):
 
         if instances:
             try:
-                instances = range(int(rose.env.env_var_process(instances)))
+                instances = range(int(metomi.rose.env.env_var_process(instances)))
             except ValueError:
                 raise ConfigValueError([self.BUNCH_SECTION,
                                         "command-instances"],
@@ -192,7 +192,7 @@ class RoseBunchApp(BuiltinApp):
         for key, val in multi_args.items():
             bunch_args_names.append(key)
             bunch_args_values.append(
-                shlex.split(rose.env.env_var_process(val.value)))
+                shlex.split(metomi.rose.env.env_var_process(val.value)))
 
         # Update the argument values based on the argument-mode
         argument_mode = conf_tree.node.get_value([self.BUNCH_SECTION,
@@ -263,7 +263,7 @@ class RoseBunchApp(BuiltinApp):
         max_procs = conf_tree.node.get_value([self.BUNCH_SECTION, "pool-size"])
 
         if max_procs:
-            max_procs = int(rose.env.env_var_process(max_procs))
+            max_procs = int(metomi.rose.env.env_var_process(max_procs))
         else:
             max_procs = arglength
 
@@ -403,7 +403,7 @@ class RoseBunchCmd(object):
 
 
 class RoseBunchDAO(object):
-    """Database object for rose_bunch"""
+    """Database object for metomi.rose_bunch"""
 
     TABLE_COMMANDS = "commands"
     TABLE_CONFIG = "config"

@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Process named settings in rose.config.ConfigTree."""
+"""Process named settings in metomi.rose.config.ConfigTree."""
 
 import os
-from rose.env import UnboundEnvironmentVariableError
-from rose.fs_util import FileSystemUtil
-from rose.popen import RosePopener
-from rose.scheme_handler import SchemeHandlersManager
+from metomi.rose.env import UnboundEnvironmentVariableError
+from metomi.rose.fs_util import FileSystemUtil
+from metomi.rose.popen import RosePopener
+from metomi.rose.scheme_handler import SchemeHandlersManager
 import sys
 
 
@@ -85,7 +85,7 @@ class ConfigProcessorBase(object):
 
         Arguments:
             conf_tree:
-                The relevant rose.config_tree.ConfigTree object with the full
+                The relevant metomi.rose.config_tree.ConfigTree object with the full
                 configuration.
             item: The current configuration item to process.
             orig_keys:
