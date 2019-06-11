@@ -239,6 +239,13 @@ Inter-Cycle Dependencies
    ingredients, the bakery wants to purchase ingredients two batches ahead.
    This can be achieved by adding the following dependency:
 
+.. ifslides::
+
+   We need ``purchase_ingredients`` to be dependent on ``sell_bread`` from
+   two cycles before.
+
+.. nextslide::
+
 .. code-block:: diff
 
     [scheduling]
