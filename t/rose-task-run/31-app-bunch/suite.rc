@@ -43,6 +43,10 @@
             POOL_SIZE=1
     [[bunch_print_envar]]
         inherit = BUNCH_TASKS
+    [[bunch_argument_mode_zip]]
+        inherit = BUNCH_TASKS
+    [[bunch_argument_mode_zip_longest]]
+        inherit = BUNCH_TASKS
     [[bunch_argument_mode_izip]]
         inherit = BUNCH_TASKS
     [[bunch_argument_mode_izip_longest]]

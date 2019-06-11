@@ -41,7 +41,7 @@ class RoseArchTarGzip(object):
         Use work_dir to dump results.
 
         """
-        sources = target.sources.values()
+        sources = list(target.sources.values())
         if (len(sources) == 1 and
                 sources[0].path.endswith("." + target.compress_scheme)):
             target.work_source_path = sources[0].path
@@ -52,10 +52,11 @@ class RoseArchTarGzip(object):
         scheme_format = self.SCHEME_FORMATS.get(target.compress_scheme,
                                                 tarfile.DEFAULT_FORMAT)
         f_bsize = os.statvfs(work_dir).f_bsize
+        # @TODO This is not very Python3: context managers and tarhandle.add
         tarhandle = tarfile.open(
             tar_name, "w", bufsize=f_bsize, format=scheme_format)
         for source in sources:
-            handle = open(source.path)
+            handle = open(source.path, 'rb')
             tarinfo = tarhandle.gettarinfo(arcname=source.name, fileobj=handle)
             tarhandle.addfile(tarinfo, handle)
         tarhandle.close()

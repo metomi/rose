@@ -76,7 +76,7 @@ class RosePopenEvent(Event):
                 # FIXME: Is this safe?
                 pos = self.stdin.tell()
                 ret += " <<'__STDIN__'\n" +\
-                       self.stdin.read().decode() + "\n'__STDIN__'"
+                       self.stdin.read() + "\n'__STDIN__'"
                 self.stdin.seek(pos)
             except IOError:
                 pass
@@ -160,7 +160,10 @@ class RosePopener(object):
         if isinstance(kwargs.get("stdin"), str):
             stdin = kwargs.get("stdin")
         stdout, stderr = proc.communicate(stdin)
-        return proc.wait(), stdout, stderr
+        retcode = proc.wait()
+        if isinstance(retcode, bytes):
+            retcode = retcode.decode()
+        return retcode, stdout, stderr
 
     def run_bg(self, *args, **kwargs):
         """Provide a Rose-friendly interface to subprocess.Popen.
@@ -248,6 +251,9 @@ class RosePopener(object):
         stderr_level = kwargs.pop("stderr_level", None)
         stdout_level = kwargs.pop("stdout_level", None)
         ret_code, stdout, stderr = self.run(*args, **kwargs)
+        stderr, stdout = [
+            i.decode() if isinstance(i, bytes) else i for i in [
+                stderr, stdout]]
         if stdout:
             self.handle_event(stdout, level=stdout_level)
         if ret_code:

@@ -20,18 +20,18 @@
 # Test "rose suite-clean", normal mode.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 install_suite() {
     set -e
     if [[ -n "$JOB_HOST" ]]; then
         rose suite-run --new -q \
-            -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol \
+            -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME \
             -S "HOST=\"$JOB_HOST\""
         ssh "$JOB_HOST" "ls -d cylc-run/$NAME 1>/dev/null"
     else
         rose suite-run --new -q \
-            -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol
+            -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME 
     fi
     ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e

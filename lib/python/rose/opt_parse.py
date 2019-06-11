@@ -38,11 +38,6 @@ class RoseOptionParser(OptionParser):
              "const": "address",
              "dest": "lookup_mode",
              "help": "Shorthand for --lookup-mode=url"}],
-        "all": [
-            ["--all"],
-            {"action": "store_true",
-             "default": False,
-             "help": "Open gcontrol for all running suites."}],
         "all_revs": [
             ["--all-revs"],
             {"action": "store_true",
@@ -201,12 +196,6 @@ class RoseOptionParser(OptionParser):
              "dest": "graphical_mode",
              "default": False,
              "help": "Run in graphical mode (X windows, etc.)"}],
-        "gcontrol_mode": [
-            ["--no-gcontrol"],
-            {"action": "store_false",
-             "dest": "gcontrol_mode",
-             "default": True,
-             "help": "Do not run suite control GUI."}],
         "group": [
             ["--group", "-g"],
             {"action": "append",

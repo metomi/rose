@@ -20,7 +20,7 @@
 # Test "rose suite-restart", basic usage.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 2
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
@@ -28,12 +28,12 @@ mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 rose suite-run --debug -q \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol \
+    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     -- --no-detach --debug
 
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
-    rose suite-restart --debug --name="${NAME}" --no-gcontrol \
+    rose suite-restart --debug --name="${NAME}" \
     -- --no-detach --debug
 # N.B. This relies on output from "cylc restart"
 file_grep "${TEST_KEY}.log" \

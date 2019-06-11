@@ -168,14 +168,11 @@ class RoseArchApp(BuiltinApp):
                 target.status = target.ST_OLD
             targets.append(target)
         targets.sort(key=lambda target: target.name)
-
         # Delete from database items that are no longer relevant
         dao.delete_all(filter_targets=targets)
-
         # Update the targets
         for target in targets:
             self._run_target_update(dao, app_runner, compress_manager, target)
-
         return [target.status for target in targets].count(
             RoseArchTarget.ST_BAD)
 
@@ -371,6 +368,8 @@ class RoseArchApp(BuiltinApp):
                 "sources": app_runner.popen.list_to_shell_str(sources),
                 "target": app_runner.popen.list_to_shell_str([target.name])}
             ret_code, out, err = app_runner.popen.run(command, shell=True)
+            if isinstance(out, bytes):
+                out, err = out.decode(), err.decode()
             times[2] = time()  # archived time
             if ret_code:
                 app_runner.handle_event(

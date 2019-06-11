@@ -76,7 +76,6 @@ class SuiteRunner(Runner):
         "conf_dir",
         "defines",
         "defines_suite",
-        "gcontrol_mode",
         "host",
         "install_only_mode",
         "local_install_only_mode",
@@ -171,7 +170,8 @@ class SuiteRunner(Runner):
             suite_engine_version = prev_config.get_value(
                 ["env", suite_engine_key])
         else:
-            suite_engine_version = self.suite_engine_proc.get_version()
+            suite_engine_version =\
+                self.suite_engine_proc.get_version().decode()
         resloc = ResourceLocator.default()
         auto_items = [
             (suite_engine_key, suite_engine_version),
@@ -414,6 +414,9 @@ class SuiteRunner(Runner):
                 continue
             ret_code = proc.wait()
             out, err = proc.communicate()
+            ret_code, out, err = [
+                i.decode() if isinstance(i, bytes) else i for i in [
+                    ret_code, out, err]]
             if ret_code:
                 raise RosePopenError(command, ret_code, out, err)
             if command_name == "rsync":
@@ -451,11 +454,6 @@ class SuiteRunner(Runner):
         # be associated with the log file.
         self.event_handler.contexts[uuid].handle.close()
         self.event_handler.contexts.pop(uuid)
-
-        # Launch the monitoring tool
-        # Note: maybe use os.ttyname(sys.stdout.fileno())?
-        if opts.gcontrol_mode and opts.run_mode != "reload":
-            self.suite_engine_proc.gcontrol(suite_name)
 
         return 0
 

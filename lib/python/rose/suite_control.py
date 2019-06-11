@@ -39,20 +39,6 @@ class SuiteControl(object):
         self.suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=event_handler)
 
-    def gcontrol(self, suite_name, confirm=None, stderr=None,
-                 stdout=None, *args):
-        """Launch suite engine's control GUI.
-
-        suite_name: name of the suite.
-        args: extra arguments for the suite engine's gcontrol command.
-
-        N.B. "confirm", "stderr" and "stdout" are not used. They are included
-        so that this method can have the same interface as the "shutdown"
-        method.
-
-        """
-        self.suite_engine_proc.gcontrol(suite_name, args)
-
     def shutdown(self, suite_name, confirm=None, stderr=None,
                  stdout=None, *args):
         """Shutdown the suite.
@@ -105,11 +91,11 @@ def prompt(action, suite_name, host):
 
 
 def main():
-    """Implement "rose suite-gcontrol" and "rose suite-shutdown"."""
+    """Implement "rose suite-shutdown"."""
     argv = sys.argv[1:]
     method_name = argv.pop(0)
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("all", "name", "non_interactive")
+    opt_parser.add_my_options("name", "non_interactive")
     opts, args = opt_parser.parse_args(argv)
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_control = SuiteControl(event_handler=event_handler)
@@ -118,10 +104,6 @@ def main():
     suite_names = []
     if not opts.non_interactive:
         confirm = prompt
-    if opts.all and method_name == 'gcontrol':
-        suite_control.suite_engine_proc.gscan(args)
-    elif opts.all:
-        suite_names = suite_control.suite_engine_proc.get_running_suites()
     else:
         if opts.name:
             suite_names.append(opts.name)

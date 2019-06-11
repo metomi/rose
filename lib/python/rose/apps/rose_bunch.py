@@ -121,9 +121,10 @@ class RoseBunchApp(BuiltinApp):
     PREFIX_PASS = "[PASS] "
     PREFIX_NOTRUN = "[SKIP] "
     DEFAULT_ARGUMENT_MODE = "Default"
+    # @TODO: Match ACCEPTED_ARGUMENT_MODES to what python is actually doing
     ACCEPTED_ARGUMENT_MODES = [DEFAULT_ARGUMENT_MODE,
-                               "izip",
-                               "izip_longest",
+                               "izip", "zip",
+                               "izip_longest", "zip_longest",
                                "product"]
 
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
@@ -200,12 +201,19 @@ class RoseBunchApp(BuiltinApp):
         if argument_mode == self.DEFAULT_ARGUMENT_MODE:
             pass
         elif argument_mode in self.ACCEPTED_ARGUMENT_MODES:
-            _itertools_cmd = getattr(itertools, argument_mode)
-            if argument_mode == "izip_longest":
-                _permutations = _itertools_cmd(*bunch_args_values,
-                                               fillvalue="")
+            # The behaviour of of izip and izip_longest are special cases
+            # because:
+            # * izip was deprecated in Python3 use zip
+            # * itertools.izip_longest was renamed and requires the fillvalue
+            #     kwarg
+            if argument_mode in ['zip', 'izip']:
+                _permutations = zip(*bunch_args_values)
+            elif argument_mode in ['zip_longest', 'izip_longest']:
+                _permutations = itertools.zip_longest(*bunch_args_values,
+                                                      fillvalue="")
             else:
-                _permutations = _itertools_cmd(*bunch_args_values)
+                iteration_cmd = getattr(itertools, argument_mode)
+                _permutations = iteration_cmd(*bunch_args_values)
 
             # Reconstruct the bunch_args_values
             _permutations = list(_permutations)
@@ -224,7 +232,7 @@ class RoseBunchApp(BuiltinApp):
                 arglength = len(instances)
             else:
                 arglength = len(bunch_args_values[0])
-            self.invocation_names = range(0, arglength)
+            self.invocation_names = list(range(0, arglength))
         else:
             arglength = len(self.invocation_names)
 
@@ -287,7 +295,7 @@ class RoseBunchApp(BuiltinApp):
         abort = False
 
         while procs or (commands and not abort):
-            for key, proc in procs.items():
+            for key, proc in list(procs.items()):
                 if proc.poll() is not None:
                     procs.pop(key)
                     if proc.returncode:

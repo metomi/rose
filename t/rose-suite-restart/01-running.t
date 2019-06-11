@@ -20,7 +20,7 @@
 # Test "rose suite-restart" on suites that are still running.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 4
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
@@ -29,7 +29,7 @@ SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX
 SUITE_RUN_DIR="$(readlink -f ${SUITE_RUN_DIR})"
 NAME="$(basename "${SUITE_RUN_DIR}")"
 timeout 120 rose suite-run --debug -q \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" --no-gcontrol \
+    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
     -- --no-detach &
 ROSE_SUITE_RUN_PID=$!
 CONTACT="${HOME}/cylc-run/${NAME}/.service/contact"

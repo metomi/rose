@@ -20,7 +20,7 @@
 # Test "rose_prune" built-in application, with bash extglob, using not glob.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 JOB_HOST_OPT=
 if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
@@ -45,7 +45,7 @@ NAME="$(basename "${SUITE_RUN_DIR}")"
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
     rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' ${JOB_HOST_OPT} -- --no-detach --debug
+    --host='localhost' ${JOB_HOST_OPT} -- --no-detach --debug
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\

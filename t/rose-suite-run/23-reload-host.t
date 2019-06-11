@@ -20,7 +20,7 @@
 # Test "rose suite-run", reload with a new job host.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 JOB_HOST="$(rose config --default= 't' 'job-host')"
 if [[ -n "${JOB_HOST}" ]]; then
     JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
@@ -34,7 +34,7 @@ rsync -a "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/" '.'
 mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename ${SUITE_RUN_DIR})"
-rose suite-run --debug --name="${NAME}" --no-gcontrol \
+rose suite-run --debug --name="${NAME}" \
     -S "HOST=\"${JOB_HOST}\"" -- --no-detach --debug --hold 1>'/dev/null' 2>&1 &
 ROSE_SUITE_RUN_PID=$!
 
@@ -44,7 +44,7 @@ sed -i "s/host = localhost/host = ${JOB_HOST}/" 'suite.rc'
 
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
-    rose suite-run --debug --reload --name="${NAME}" --no-gcontrol \
+    rose suite-run --debug --reload --name="${NAME}" \
     -S "HOST=\"${JOB_HOST}\""
 sed -n '/\(delete\|install\): suite\.rc/p' \
     "${TEST_KEY}.out" >"${TEST_KEY}.out.edited"

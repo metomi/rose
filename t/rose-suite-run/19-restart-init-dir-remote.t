@@ -21,7 +21,7 @@
 # on remote host.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 T_HOST=$(rose config --default= t job-host)
 T_HOST_RUN_ROOT=$(rose config --default= t job-host-run-root)
@@ -61,7 +61,7 @@ __CONF__
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -n $NAME --no-gcontrol -C src -- --no-detach --debug
+rose suite-run -q -n $NAME -C src -- --no-detach --debug
 cat >'src/rose-suite.conf' <<__CONF__
 root-dir=$T_HOST=$T_HOST_RUN_ROOT
 [jinja2:suite.rc]
@@ -70,7 +70,7 @@ __CONF__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-restart"
 run_pass "$TEST_KEY" \
-    rose suite-run -q -n $NAME --no-gcontrol -C src --restart \
+    rose suite-run -q -n $NAME -C src --restart \
     -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-dir"

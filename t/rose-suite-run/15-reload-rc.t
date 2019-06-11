@@ -20,7 +20,7 @@
 # Test "rose suite-run", reload "suite.rc".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 3
 export ROSE_CONF_PATH=
 mkdir -p src
@@ -28,7 +28,7 @@ cp -r $TEST_SOURCE_DIR/$TEST_KEY_BASE/* src
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -n $NAME --no-gcontrol -C src
+rose suite-run -q -n $NAME -C src
 poll ! test -e "$SUITE_RUN_DIR/log/job/20130101T0000Z/t1/01/job.status"
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE"
@@ -36,7 +36,7 @@ cat >src/rose-suite.conf <<'__CONF__'
 [jinja2:suite.rc]
 ROSE_TASK_RUN_ARGS="-O earth"
 __CONF__
-run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
+run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME -C src
 sed -n '/\(delete\|install\): suite\.rc/p' "${TEST_KEY}.out" \
     >"${TEST_KEY}.out.edited"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.edited" <<'__OUT__'

@@ -21,7 +21,6 @@
 # Test "rose suite-log -U --prune-remote", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO App Waiting on Python3 port"
 #-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')
@@ -41,12 +40,12 @@ NAME=$(basename $SUITE_RUN_DIR)
 if [[ -n ${JOB_HOST:-} ]]; then
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost \
+        --host=localhost \
         -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --no-detach --debug
 else
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost -- --no-detach --debug
+        --host=localhost -- --no-detach --debug
 fi
 #-------------------------------------------------------------------------------
 # Test --force.

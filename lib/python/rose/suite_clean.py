@@ -141,6 +141,7 @@ class SuiteRunCleaner(object):
                 command.append(quote(sh_command))
             is_after_uuid_str = False
             for line in engine.popen(*command)[0].splitlines():
+                line = line.decode()
                 if is_after_uuid_str:
                     engine.handle_event(FileSystemEvent(
                         FileSystemEvent.DELETE, auth + ":" + line.strip()))

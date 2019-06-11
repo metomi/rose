@@ -20,7 +20,7 @@
 # Test "rose suite-run", modification of the suite run root directory.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 if [[ -z ${TMPDIR:-} || -z ${USER:-} || $TMPDIR/$USER == $HOME ]]; then
     skip_all '"TMPDIR" or "USER" not defined or "TMPDIR"/"USER" is "HOME"'
 fi
@@ -54,7 +54,7 @@ TEST_KEY=$TEST_KEY_BASE-install
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" rose suite-run -n $NAME -i --no-gcontrol $JOB_HOST_OPT
+run_pass "$TEST_KEY" rose suite-run -n $NAME -i $JOB_HOST_OPT
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-locs"
 rose config -f $SUITE_RUN_DIR/log/rose-suite-run.locs localhost root-dir \

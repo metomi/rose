@@ -16,6 +16,7 @@ after_success:
 after_failure:
   - printenv PATH PYTHONPATH
   - rose check-software
+  - cat /tmp/sphinx-err*  # sphinx traceback
 
 jobs:
   include:

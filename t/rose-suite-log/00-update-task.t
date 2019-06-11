@@ -20,7 +20,6 @@
 # Test "rose suite-log --update TASK", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "skipped: @TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')
@@ -40,11 +39,11 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 if [[ -n ${JOB_HOST:-} ]]; then
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost \
+        --host=localhost \
         -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --no-detach --debug
 else
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost -- --no-detach --debug
+        --host=localhost -- --no-detach --debug
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-before-log.out

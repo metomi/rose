@@ -24,7 +24,7 @@
 #      "gfortran" being installed and available.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'
 fi
@@ -43,7 +43,7 @@ SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX
 NAME="$(basename "${SUITE_RUN_DIR}")"
 timeout 120 rose suite-run -q --debug \
     -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' -S "FAST_DEST_ROOT=\"${PWD}/fast\"" \
+    --host='localhost' -S "FAST_DEST_ROOT=\"${PWD}/fast\"" \
     -- --no-detach --debug
 #-------------------------------------------------------------------------------
 # Permission modes of make directory should be the same as a normal directory

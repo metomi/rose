@@ -20,18 +20,18 @@
 # Test "rose suite-run", null reloads.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 7
 export ROSE_CONF_PATH=
 cp -r $TEST_SOURCE_DIR/$TEST_KEY_BASE src
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -n $NAME --no-gcontrol -C src
+rose suite-run -q -n $NAME -C src
 poll ! test -e "$SUITE_RUN_DIR/log/job/20130101T0000Z/t1/01/job.status"
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-0"
-run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
+run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME -C src
 sed -n '/reload complete/p' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] $NAME: reload complete. "suite.rc" unchanged
@@ -44,7 +44,7 @@ cat >"src/hello.txt" <<'__TXT__'
 hello world
 hello earth
 __TXT__
-run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
+run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME -C src
 sed -n '/hello\.txt/p; /reload complete/p' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] install: hello.txt

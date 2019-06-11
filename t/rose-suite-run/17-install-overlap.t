@@ -20,7 +20,7 @@
 # Test "rose suite-run", file install targets overlap.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 3
 export ROSE_CONF_PATH=
 
@@ -34,9 +34,9 @@ NAME=$(basename $SUITE_RUN_DIR)
 TEST_KEY=$TEST_KEY_BASE
 export TEST_DIR
 run_pass "$TEST_KEY-1" rose suite-run \
-    -n $NAME --no-gcontrol -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i
+    -n $NAME -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i
 run_pass "$TEST_KEY-2" rose suite-run \
-    -n $NAME --no-gcontrol -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i
+    -n $NAME -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i
 (cd $SUITE_RUN_DIR/etc; find -type f) | LANG=C sort >"$TEST_KEY.find"
 file_cmp "$TEST_KEY.find" "$TEST_KEY.find" <<'__FIND__'
 ./foo/bar/baz/bacon.txt

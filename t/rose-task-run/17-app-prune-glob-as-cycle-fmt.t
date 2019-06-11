@@ -21,7 +21,7 @@
 # Prune items with glob with "%(cycle)s" substitution.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 2
 
 export ROSE_CONF_PATH=
@@ -32,7 +32,7 @@ NAME="$(basename "${SUITE_RUN_DIR}")"
 TEST_KEY="${TEST_KEY_BASE}"
 run_pass "${TEST_KEY}" \
     rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --no-gcontrol --host='localhost' --debug -- --no-detach --debug
+    --host='localhost' --debug -- --no-detach --debug
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*/YYYY-MM-DDTHHMM/g'\

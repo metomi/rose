@@ -44,8 +44,7 @@ class SuiteRestarter(object):
         if callable(self.event_handler):
             self.event_handler(*args, **kwargs)
 
-    def restart(
-            self, suite_name=None, host=None, gcontrol_mode=None, args=None):
+    def restart(self, suite_name=None, host=None, args=None):
         """Restart a "cylc" suite."""
         # Check suite engine specific compatibility
         self.suite_engine_proc.check_global_conf_compat()
@@ -63,18 +62,13 @@ class SuiteRestarter(object):
         # Restart the suite
         self.suite_engine_proc.run(suite_name, host, "restart", args)
 
-        # Launch the monitoring tool
-        # Note: maybe use os.ttyname(sys.stdout.fileno())?
-        if gcontrol_mode:
-            self.suite_engine_proc.gcontrol(suite_name)
-
         return
 
 
 def main():
     """Launcher for the CLI."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("gcontrol_mode", "host", "name")
+    opt_parser.add_my_options("host", "name")
     opts, args = opt_parser.parse_args(sys.argv[1:])
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_restarter = SuiteRestarter(event_handler)
@@ -82,7 +76,6 @@ def main():
         sys.exit(suite_restarter.restart(
             suite_name=opts.name,
             host=opts.host,
-            gcontrol_mode=opts.gcontrol_mode,
             args=args))
     except Exception as exc:
         event_handler(exc)

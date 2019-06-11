@@ -20,7 +20,7 @@
 # Test "rose suite-run --restart" does not re-initialise run directory.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 3
 
 export ROSE_CONF_PATH=
@@ -28,14 +28,14 @@ cp -r $TEST_SOURCE_DIR/$TEST_KEY_BASE src
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -n $NAME --no-gcontrol -C src -- --no-detach --debug
+rose suite-run -q -n $NAME -C src -- --no-detach --debug
 cat >'src/rose-suite.conf' <<__CONF__
 root-dir=*=$PWD
 __CONF__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-restart"
 run_pass "$TEST_KEY" \
-    rose suite-run -q -n $NAME --no-gcontrol -C src --restart \
+    rose suite-run -q -n $NAME -C src --restart \
     -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-dir"

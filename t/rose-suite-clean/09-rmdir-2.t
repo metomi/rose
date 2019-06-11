@@ -20,7 +20,7 @@
 # Test "rose suite-clean", clean up parent directories.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR0="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
@@ -56,7 +56,7 @@ export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 export ROSE_TEST_ROOT_DIR="${PWD}/root.d"
 set -e
-rose suite-run --name="${NAME}" -q -C "${PWD}/source" --no-gcontrol \
+rose suite-run --name="${NAME}" -q -C "${PWD}/source" \
     --host='localhost' -- --no-detach --debug
 # Prove that the directories exist before clean
 test -d "${HOME}/cylc-run/${NAME}"

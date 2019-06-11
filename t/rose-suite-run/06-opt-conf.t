@@ -20,7 +20,7 @@
 # Test "rose suite-run -O KEY".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 #-------------------------------------------------------------------------------
 tests 6
@@ -36,7 +36,7 @@ done
 while read OPT_KEY SUITE_RUN_DIR; do
     NAME=$(basename $SUITE_RUN_DIR)
     ROSE_SUITE_RUN="rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE"
-    ROSE_SUITE_RUN="$ROSE_SUITE_RUN --name=$NAME --no-gcontrol"
+    ROSE_SUITE_RUN="$ROSE_SUITE_RUN --name=$NAME "
     if [[ $OPT_KEY != 'world' ]]; then
         ROSE_SUITE_RUN="$ROSE_SUITE_RUN -O $OPT_KEY"
     fi

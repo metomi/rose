@@ -21,13 +21,12 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 14
+tests 12
 #-------------------------------------------------------------------------------
 export PAGER=cat
 
 cat >'rose-aliases.txt' <<'__TXT__'
 config-edit edit
-suite-gcontrol sgc
 suite-hook task-hook
 suite-log slv suite-log-view
 __TXT__

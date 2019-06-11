@@ -20,7 +20,6 @@
 # Test rose_ana built-in application, basic usage of builtin grepper module
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
 #-------------------------------------------------------------------------------
 N_TESTS=52
 tests $N_TESTS
@@ -43,7 +42,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_fail "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 # Test the output
 OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t1/01/job.out"

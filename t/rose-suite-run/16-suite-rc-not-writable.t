@@ -20,7 +20,7 @@
 # Test "rose suite-run", should work whether "suite.rc" is writable or not.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 1
 export ROSE_CONF_PATH=
 mkdir -p src
@@ -31,7 +31,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
-run_pass "$TEST_KEY" rose suite-run -q -n $NAME --no-gcontrol -C src \
+run_pass "$TEST_KEY" rose suite-run -q -n $NAME -C src \
     -- --no-detach --debug
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

@@ -20,7 +20,7 @@
 # Test "rose suite-run", multiple imports.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 tests 5
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
@@ -52,7 +52,7 @@ __FIND__
 TEST_KEY="$TEST_KEY_BASE-suite-run"
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/greet_earth \
-    -n $NAME --no-gcontrol -- --no-detach --debug
+    -n $NAME -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-suite-run-my-hello.log"
 LANG=C sort $SUITE_RUN_DIR/my-hello.log >"$TEST_KEY"

@@ -20,7 +20,7 @@
 # Test "rose suite-run", with and without site/user configurations.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 #-------------------------------------------------------------------------------
 JOB_HOST="$(rose config --default= 't' 'job-host')"
 if [[ -n "${JOB_HOST}" ]]; then
@@ -55,12 +55,12 @@ touch "${TEST_KEY_BASE}/colon:is:ok"
 if [[ -n "${JOB_HOST}" ]]; then
     run_pass "${TEST_KEY}" rose suite-run --debug \
         -C "${TEST_KEY_BASE}" "${OPTION}" \
-        --name="${NAME}" --no-gcontrol \
+        --name="${NAME}" \
         -S "HOST=\"${JOB_HOST}\""
 else
     run_pass "${TEST_KEY}" rose suite-run --debug \
         -C "${TEST_KEY_BASE}" "${OPTION}" \
-        --name="${NAME}" --no-gcontrol
+        --name="${NAME}" 
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-port-file"

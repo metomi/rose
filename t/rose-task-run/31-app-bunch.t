@@ -20,9 +20,9 @@
 # Test rose_bunch built-in application.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 #-------------------------------------------------------------------------------
-tests 67
+tests 74
 #-------------------------------------------------------------------------------
 # Define some constant patterns
 FAIL_PATTERN="\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
@@ -39,7 +39,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost -- --no-detach --debug
+    --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 CYCLE=20100101T0000Z
 LOG_DIR="$SUITE_RUN_DIR/log/job/$CYCLE"
@@ -171,49 +171,53 @@ for KEY in $(seq 0 3); do
         "ROSE_BUNCH_LOG_PREFIX: $KEY" $FILE_DIR/bunch.$KEY.out
 done
 #-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-# Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP shortens all bunch-args to the length
-# of the shortest bunch-arg
-#-------------------------------------------------------------------------------
-APP=bunch_argument_mode_izip
-#-------------------------------------------------------------------------------
-TEST_KEY_PREFIX=argument_mode_izip
-FILE=$LOG_DIR/$APP/01/job.out
-ARG1=1
-ARG2=a
-ARG3=9
-file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
-    "$INFO_PATTERN echo arg1: $ARG1 - arg2: $ARG2 - arg3: $ARG3" \
-    "$FILE"
-file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
-    "$INFO_PATTERN TOTAL: 1" \
-    "$FILE"
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-# Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP_LONGEST lengthens all bunch-args to
-# the length of the longest bunch-arg, padding any which are shorter with
-# empty arguments
-#-------------------------------------------------------------------------------
-APP=bunch_argument_mode_izip_longest
-#-------------------------------------------------------------------------------
-TEST_KEY_PREFIX=argument_mode_izip_longest
-FILE=$LOG_DIR/$APP/01/job.out
-# Four permutations should exist from the izip_longest bunch run
-# There are three arguments in bunch-args of varying length, so the expected
-# arguments are in comma separated values to show what each bunch-args values
-# are expected to become, where no value indicates an empty string
-for VALUES in 1,a,9 2,,23 3,, 4,,; do
-    # Split VALUES on ',' into an ARGS array to account for empty strings
-    IFS=, read -r -a ARGS <<< "$VALUES"
-    EXPECTED_LINE="echo arg1: ${ARGS[0]:-} - arg2: ${ARGS[1]:-}"
-    EXPECTED_LINE="$EXPECTED_LINE - arg3: ${ARGS[2]:-}"
-    file_grep "$TEST_KEY_PREFIX-RUN-${ARGS[0]:-}-${ARGS[1]:-}-${ARGS[2]:-}" \
-        "$INFO_PATTERN $EXPECTED_LINE" \
+# zip and zip longest have a legacy Python 2 mode.
+for version in zip izip; do
+    #---------------------------------------------------------------------------
+    # Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP shortens all bunch-args to the
+    # length of the shortest bunch-arg
+    #---------------------------------------------------------------------------
+    APP=bunch_argument_mode_${version}
+    #---------------------------------------------------------------------------
+    TEST_KEY_PREFIX=argument_mode_${version}
+    FILE=$LOG_DIR/$APP/01/job.out
+    ARG1=1
+    ARG2=a
+    ARG3=9
+    file_grep "$TEST_KEY_PREFIX-RUN-$ARG1-$ARG2-$ARG3" \
+        "$INFO_PATTERN echo arg1: $ARG1 - arg2: $ARG2 - arg3: $ARG3" \
+        "$FILE"
+    file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
+        "$INFO_PATTERN TOTAL: 1" \
+        "$FILE"
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    # Testing ROSE_BUNCH_ARGUMENT_MODE_IZIP_LONGEST lengthens all bunch-args to
+    # the length of the longest bunch-arg, padding any which are shorter with
+    # empty arguments
+    #---------------------------------------------------------------------------
+    APP=bunch_argument_mode_${version}_longest
+    #---------------------------------------------------------------------------
+    TEST_KEY_PREFIX=argument_mode_${version}_longest
+    FILE=$LOG_DIR/$APP/01/job.out
+    # Four permutations should exist from the izip_longest bunch run
+    # There are three arguments in bunch-args of varying length, so the expected
+    # expected arguments are in comma separated values to show what each
+    # bunch-args values are expected to become, where no value indicates an
+    # empty string.
+    for VALUES in 1,a,9 2,,23 3,, 4,,; do
+        # Split VALUES on ',' into an ARGS array to account for empty strings
+        IFS=, read -r -a ARGS <<< "$VALUES"
+        EXPECTED_LINE="echo arg1: ${ARGS[0]:-} - arg2: ${ARGS[1]:-}"
+        EXPECTED_LINE="$EXPECTED_LINE - arg3: ${ARGS[2]:-}"
+        file_grep "$TEST_KEY_PREFIX-RUN-${ARGS[0]:-}-${ARGS[1]:-}-${ARGS[2]:-}" \
+            "$INFO_PATTERN $EXPECTED_LINE" \
+            "$FILE"
+    done
+    file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
+        "$INFO_PATTERN TOTAL: 4" \
         "$FILE"
 done
-file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
-    "$INFO_PATTERN TOTAL: 4" \
-    "$FILE"
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Testing ROSE_BUNCH_ARGUMENT_MODE_PRODUCT updates all bunch-args to be all

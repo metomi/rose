@@ -132,6 +132,8 @@ class Reporter(object):
         arguments and return its result instead.
 
         """
+        if isinstance(message, bytes):
+            message = message.decode()
         if callable(self.event_handler):
             return self.event_handler(message, kind, level, prefix, clip)
 
@@ -167,19 +169,9 @@ class Reporter(object):
                     msg = message()
                 else:
                     msg = message
-
-                try:
-                    msg = str(msg)
-                except UnicodeDecodeError:
-                    try:
-                        msg = str(msg, 'utf-8')
-                    except TypeError:
-                        msg = str(msg)
-                    except UnicodeEncodeError:
-                        pass
+                msg = str(msg)
 
             msg_lines = self.format_msg(msg, context.verbosity, prefix, clip)
-
             for line in msg_lines:
                 context.write(line)
 

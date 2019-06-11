@@ -21,7 +21,7 @@
 # variable declarations to "suite.rc" do not get repeated.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 #-------------------------------------------------------------------------------
 N_TESTS=3

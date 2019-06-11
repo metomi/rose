@@ -20,13 +20,13 @@
 # Test "rose suite-clean", --only= glob and a localhost root-dir{*} setting.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all "@TODO: Awaiting App upgrade to Python3"
+
 
 run_suite() {
     set -e
     rose suite-run --new -q \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" --name="$NAME" \
-        --no-gcontrol -- --no-detach --debug
+        -- --no-detach --debug
     ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e
 }
