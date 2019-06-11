@@ -18,12 +18,12 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose task-env
+#     metomi.rose task-env
 #
 # SYNOPSIS
-#     rose task-env [OPTIONS]
+#     metomi.rose task-env [OPTIONS]
 #
-#     eval $(rose task-env)
+#     eval $(metomi.rose task-env)
 #
 # DESCRIPTION
 #     Provide an environment for cycling suite task.
@@ -104,13 +104,13 @@
 #         environment variable.
 #
 #         E.g. `--cycle-offset=PT3H --cycle-offset=PT6H` will tell
-#         `rose task-env` to export `ROSE_DATACPT3H` and `ROSE_DATACPT6H`.
+#         `metomi.rose task-env` to export `ROSE_DATACPT3H` and `ROSE_DATACPT6H`.
 #
 #         NOTE: The main usage of this option is to reference a cycle time in
 #               the past, so a positive offset is used to go backward in time,
 #               and a negative offset is used to go forward in time.
 #
-#         E.g. `--cycle-offset=-PT3H` will tell `rose task-env` to export
+#         E.g. `--cycle-offset=-PT3H` will tell `metomi.rose task-env` to export
 #         `ROSE_DATAC__PT3H` for `ROSE_DATAC` of 3 hours ahead of the current
 #         cycle time.
 #
@@ -135,9 +135,9 @@
 #         Increment verbosity.
 #
 # USAGE IN SUITES
-#     rose `task-env` can be used to make environment variables available to a
+#     metomi.rose `task-env` can be used to make environment variables available to a
 #     suite by defining its `suite.rc` `env-script` option as
-#     `env-script = eval $(rose task-env)`.
+#     `env-script = eval $(metomi.rose task-env)`.
 #
 #-------------------------------------------------------------------------------
-exec python3 -m rose.task_env "$@"
+exec python3 -m metomi.rose.task_env "$@"

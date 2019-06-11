@@ -42,7 +42,7 @@ class ConfigDiffDefaults(object):
 
     PROPERTIES = ",".join(
         [metomi.rose.META_PROP_TITLE, metomi.rose.META_PROP_NS,
-         metomi.rose.META_PROP_DESCRIPTION, rose.META_PROP_HELP]
+         metomi.rose.META_PROP_DESCRIPTION, metomi.rose.META_PROP_HELP]
     )
     SHORTHAND = []
 

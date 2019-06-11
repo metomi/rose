@@ -272,7 +272,7 @@ class RosieSvnPreCommitHook(object):
                     txn_info_map[path_head],
                     load_meta_config(
                         txn_info_map[path_head],
-                        config_type=rose.INFO_CONFIG_NAME))
+                        config_type=metomi.rose.INFO_CONFIG_NAME))
                 if reports:
                     reports_str = get_reports_as_text({None: reports}, path)
                     bad_changes.append(

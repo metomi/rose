@@ -55,7 +55,7 @@ setup
 run_fail "$TEST_KEY" rose metadata-graph --unknown-option
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-Usage: rose metadata-graph [OPTIONS] [SECTION ...]
+Usage: metomi.rose metadata-graph [OPTIONS] [SECTION ...]
 
 rose metadata-graph: error: no such option: --unknown-option
 __CONTENT__

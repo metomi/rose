@@ -360,7 +360,7 @@ class RosieVCClient(object):
         # Set the compulsory fields and use the project and metadata if
         #  available.
         meta_config = load_meta_config(
-            info_config, config_type=rose.INFO_CONFIG_NAME)
+            info_config, config_type=metomi.rose.INFO_CONFIG_NAME)
         if from_id is None and project is not None:
             for node_keys, node in meta_config.walk(no_ignore=True):
                 if isinstance(node.value, dict):
@@ -463,7 +463,7 @@ class RosieVCClient(object):
         """Validate contents in suite info file."""
         reports = DefaultValidators().validate(
             info_config,
-            load_meta_config(info_config, config_type=rose.INFO_CONFIG_NAME))
+            load_meta_config(info_config, config_type=metomi.rose.INFO_CONFIG_NAME))
         if reports:
             raise SuiteInfoError(reports)
 
@@ -560,7 +560,7 @@ def create(argv):
             meta_config = load_meta_config(
                 info_config,
                 directory=None,
-                config_type=rose.INFO_CONFIG_NAME,
+                config_type=metomi.rose.INFO_CONFIG_NAME,
                 error_handler=None,
                 ignore_meta_error=False)
             for node_keys, node in meta_config.walk(no_ignore=True):

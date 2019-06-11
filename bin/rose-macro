@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose macro
+#     metomi.rose macro
 #
 # SYNOPSIS
-#     rose macro [OPTIONS] [MACRO_NAME ...]
+#     metomi.rose macro [OPTIONS] [MACRO_NAME ...]
 #
 # DESCRIPTION
 #     List or run macros associated with a suite or application.
@@ -30,10 +30,10 @@
 #     `--config=DIR` is set):
 #
 #     * If the config dir is an app directory (or is within an app directory)
-#       macros will be listed/run for the `rose-app.conf` file of that app.
-#     * Otherwise macros will be listed/run for the `rose-suite.conf`,
-#       `rose-suite.info` and (unless `--suite-only` is set) all
-#       `rose-app.conf` files.
+#       macros will be listed/run for the `metomi.rose-app.conf` file of that app.
+#     * Otherwise macros will be listed/run for the `metomi.rose-suite.conf`,
+#       `metomi.rose-suite.info` and (unless `--suite-only` is set) all
+#       `metomi.rose-app.conf` files.
 #
 #     If a configuration contains optional configurations:
 #
@@ -76,4 +76,4 @@
 #     optional ROSE_META_PATH
 #         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.macro "$@"
+exec python3 -m metomi.rose.macro "$@"

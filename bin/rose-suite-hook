@@ -18,12 +18,12 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose suite-hook
+#     metomi.rose suite-hook
 #
 # SYNOPSIS
 #     # Cylc interface
-#     rose suite-hook [OPTIONS] EVENT SUITE MSG
-#     rose task-hook [OPTIONS] EVENT SUITE TASK_ID MSG
+#     metomi.rose suite-hook [OPTIONS] EVENT SUITE MSG
+#     metomi.rose task-hook [OPTIONS] EVENT SUITE TASK_ID MSG
 #
 # DESCRIPTION
 #     Deprecated. Use cylc built-in event handlers instead.
@@ -51,4 +51,4 @@
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.suite_hook "$@"
+exec python3 -m metomi.rose.suite_hook "$@"

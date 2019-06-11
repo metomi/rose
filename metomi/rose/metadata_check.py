@@ -285,8 +285,8 @@ def metadata_check(meta_config, meta_dir=None,
                                                       value, info))
             if section.split('=')[0] == 'ns':
                 allowed = [metomi.rose.META_PROP_TITLE, metomi.rose.META_PROP_DESCRIPTION,
-                           metomi.rose.META_PROP_HELP, rose.META_PROP_SORT_KEY,
-                           metomi.rose.META_PROP_MACRO, rose.META_PROP_URL,
+                           metomi.rose.META_PROP_HELP, metomi.rose.META_PROP_SORT_KEY,
+                           metomi.rose.META_PROP_MACRO, metomi.rose.META_PROP_URL,
                            metomi.rose.META_PROP_WIDGET]
                 if option not in allowed:
                     info = INVALID_SETTING_FOR_NAMESPACE.format(option)

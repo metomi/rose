@@ -1446,8 +1446,8 @@ def get_user_values(options, ignore=None):
                         "Invalid entry: Input should be a valid python "
                         "value.\nNote that strings should be quoted. "
                         "Please try again:\n",
-                        kind=rose.reporter.Reporter.KIND_ERR,
-                        level=rose.reporter.Reporter.FAIL
+                        kind=metomi.rose.reporter.Reporter.KIND_ERR,
+                        level=metomi.rose.reporter.Reporter.FAIL
                     )
             else:
                 entered = True
@@ -1455,7 +1455,7 @@ def get_user_values(options, ignore=None):
 
 
 def dump_config(config, opt_conf_dir, opt_output_dir=None,
-                conf_key=None, name=rose.SUB_CONFIG_NAME):
+                conf_key=None, name=metomi.rose.SUB_CONFIG_NAME):
     """Dump the config in a standard form."""
     config = copy.deepcopy(config)
     pretty_format_config(config)
@@ -1509,8 +1509,8 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
             if warning:
                 text = warning
             metomi.rose.reporter.Reporter()(text,
-                                     kind=rose.reporter.Reporter.KIND_ERR,
-                                     level=rose.reporter.Reporter.FAIL)
+                                     kind=metomi.rose.reporter.Reporter.KIND_ERR,
+                                     level=metomi.rose.reporter.Reporter.FAIL)
             return None
     else:
         meta_config = load_meta_config(app_config,
@@ -1551,8 +1551,8 @@ def _report_error(exception=None, text=""):
         text += type(exception).__name__ + ": " + str(exception) + "\n"
     metomi.rose.reporter.Reporter()(
         text + "\n",
-        kind=rose.reporter.Reporter.KIND_ERR,
-        level=rose.reporter.Reporter.FAIL
+        kind=metomi.rose.reporter.Reporter.KIND_ERR,
+        level=metomi.rose.reporter.Reporter.FAIL
     )
 
 
@@ -1579,7 +1579,7 @@ def scan_rose_directory(conf_dir, suite_only=False):
             if not suite_only:
                 # Add app/*/rose-app.conf files.
                 confs = sorted(glob.glob(os.path.join(
-                    path, metomi.rose.SUB_CONFIGS_DIR, '*', rose.SUB_CONFIG_NAME)))
+                    path, metomi.rose.SUB_CONFIGS_DIR, '*', metomi.rose.SUB_CONFIG_NAME)))
             # Add metomi.rose-suite.conf file.
             confs.append(os.path.join(path, metomi.rose.TOP_CONFIG_NAME))
             # Add metomi.rose-suite.info file.
@@ -1609,15 +1609,15 @@ def main():
     # Fail if no config files could be found.
     if not confs:
         reporter(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir),
-                 kind=rose.reporter.Reporter.KIND_ERR,
-                 level=rose.reporter.Reporter.FAIL)
+                 kind=metomi.rose.reporter.Reporter.KIND_ERR,
+                 level=metomi.rose.reporter.Reporter.FAIL)
         sys.exit(1)
 
     # Fail if --output-dir specified and multiple config files found.
     if len(confs) > 1 and opts.output_dir:
         reporter(ERROR_OUT_DIR_MULTIPLE_APPS,
-                 kind=rose.reporter.Reporter.KIND_ERR,
-                 level=rose.reporter.Reporter.FAIL)
+                 kind=metomi.rose.reporter.Reporter.KIND_ERR,
+                 level=metomi.rose.reporter.Reporter.FAIL)
         sys.exit(1)
 
     # Path manipulation.

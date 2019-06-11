@@ -49,7 +49,7 @@ SAME_UPGRADE_VERSION = "{0}: already at this version."
 DOWNGRADE_METHOD = "downgrade"
 UPGRADE_METHOD = "upgrade"
 
-IGNORE_MAP = {rose.config.ConfigNode.STATE_NORMAL: "enabled",
+IGNORE_MAP = {metomi.rose.config.ConfigNode.STATE_NORMAL: "enabled",
               metomi.rose.config.ConfigNode.STATE_USER_IGNORED: "user-ignored",
               metomi.rose.config.ConfigNode.STATE_SYST_IGNORED: "trig-ignored"}
 
@@ -407,10 +407,10 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         """
         return self._ignore_setting(config, list(keys),
                                     info=info,
-                                    state=rose.config.ConfigNode.STATE_NORMAL)
+                                    state=metomi.rose.config.ConfigNode.STATE_NORMAL)
 
     def ignore_setting(self, config, keys, info=None,
-                       state=rose.config.ConfigNode.STATE_USER_IGNORED):
+                       state=metomi.rose.config.ConfigNode.STATE_USER_IGNORED):
         """User-ignore a setting in the configuration.
 
         Args:
@@ -707,8 +707,8 @@ def parse_upgrade_args(argv=None):
             not os.path.isfile(config_file_path)):
         metomi.rose.reporter.Reporter()(metomi.rose.macro.ERROR_LOAD_CONFIG_DIR.format(
             opts.conf_dir),
-            kind=rose.reporter.Reporter.KIND_ERR,
-            level=rose.reporter.Reporter.FAIL)
+            kind=metomi.rose.reporter.Reporter.KIND_ERR,
+            level=metomi.rose.reporter.Reporter.FAIL)
         return None
 
     return (
@@ -787,7 +787,7 @@ def main():
         return
     new_meta_config = metomi.rose.macro.load_meta_config(
         new_config_map[None], directory=opts.conf_dir,
-        config_type=rose.SUB_CONFIG_NAME,
+        config_type=metomi.rose.SUB_CONFIG_NAME,
         ignore_meta_error=True
     )
     config_map = new_config_map

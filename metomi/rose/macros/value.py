@@ -43,7 +43,7 @@ class ValueChecker(metomi.rose.macro.MacroBase):
     """
 
     META_PROPS = [metomi.rose.META_PROP_LENGTH, metomi.rose.META_PROP_PATTERN,
-                  metomi.rose.META_PROP_RANGE, rose.META_PROP_TYPE,
+                  metomi.rose.META_PROP_RANGE, metomi.rose.META_PROP_TYPE,
                   metomi.rose.META_PROP_VALUES]
     WARNING_BAD_PATTERN = "Value {0} does not contain the pattern: {1}"
     WARNING_BAD_RANGE = "Value {0} is not in the range criteria: {1}"

@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose app-run
+#     metomi.rose app-run
 #
 # SYNOPSIS
-#     rose app-run [OPTIONS] [--] [COMMAND ...]
+#     metomi.rose app-run [OPTIONS] [--] [COMMAND ...]
 #
 # DESCRIPTION
 #     Run an application according to its configuration.
@@ -86,4 +86,4 @@
 #     optional ROSE_FILE_INSTALL_ROOT
 #         If specified, change to the specified directory to install files.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.app_run "$@"
+exec python3 -m metomi.rose.app_run "$@"

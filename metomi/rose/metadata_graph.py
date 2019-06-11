@@ -232,8 +232,8 @@ def _exit_with_metadata_fail():
     """Handle a load metadata failure."""
     text = metomi.rose.macro.ERROR_LOAD_METADATA.format("")
     metomi.rose.reporter.Reporter()(text,
-                             kind=rose.reporter.Reporter.KIND_ERR,
-                             level=rose.reporter.Reporter.FAIL)
+                             kind=metomi.rose.reporter.Reporter.KIND_ERR,
+                             level=metomi.rose.reporter.Reporter.FAIL)
     sys.exit(1)
 
 

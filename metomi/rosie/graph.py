@@ -72,7 +72,7 @@ def get_suite_data(prefix, properties=None):
 
     ws_client = rosie.ws_client.RosieWSClient(
         prefixes=[prefix],
-        event_handler=rose.reporter.Reporter()
+        event_handler=metomi.rose.reporter.Reporter()
     )
     suite_data = ws_client.search(prefix, all_revs=1)[0][0]
     for dict_row in sorted(suite_data, key=lambda _: _["revision"]):

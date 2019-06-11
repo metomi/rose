@@ -332,9 +332,9 @@ class AppRunner(Runner):
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
-        path = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        path = os.path.dirname(os.path.dirname(sys.modules["metomi.rose"].__file__))
         self.builtins_manager = SchemeHandlersManager(
-            [path], "rose.apps", ["run"], None, *args, **kwargs)
+            [path], "metomi.rose.apps", ["run"], None, *args, **kwargs)
         self.date_time_oper = RoseDateTimeOperator()
 
     def run_impl(self, opts, args, uuid, work_files):

@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose metadata-gen
+#     metomi.rose metadata-gen
 #
 # SYNOPSIS
-#     rose metadata-gen [OPTIONS] [PROPERTY=VALUE ...]
+#     metomi.rose metadata-gen [OPTIONS] [PROPERTY=VALUE ...]
 #
 # DESCRIPTION
 #     Automatically generate metadata from an application or suite
@@ -46,4 +46,4 @@
 #        every setting e.g. `compulsory=true`. If `=VALUE` is missing,
 #        the property will be set to a null string in each setting.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.metadata_gen "$@"
+exec python3 -m metomi.rose.metadata_gen "$@"

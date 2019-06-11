@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose env-cat
+#     metomi.rose env-cat
 #
 # SYNOPSIS
-#     rose env-cat [OPTIONS] [FILE ...]
+#     metomi.rose env-cat [OPTIONS] [FILE ...]
 #
 # DESCRIPTION
 #     Substitute environment variables in input files and print.
@@ -48,4 +48,4 @@
 #         variable with the value of `STRING`, (which can be an empty string),
 #         instead of failing.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.env_cat "$@"
+exec python3 -m metomi.rose.env_cat "$@"

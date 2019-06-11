@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 # NAME
-#     rose config-edit
+#     metomi.rose config-edit
 #
 # SYNOPSIS
-#     rose config-edit [OPTIONS]... [PAGE_PATH]...
+#     metomi.rose config-edit [OPTIONS]... [PAGE_PATH]...
 #
 # DESCRIPTION
 #     Launch the GTK+ GUI to edit a suite or application configuration.
@@ -35,10 +35,10 @@
 #
 #        1. a directory containing a suite with a file named
 #           `suite.rc` and a directory called `app` containing
-#           subdirectories with files named `rose-app.conf`,
+#           subdirectories with files named `metomi.rose-app.conf`,
 #           in the format specified in the Rose pages.
 #        2. a directory containing a single 'application' - a file named
-#           `rose-app.conf` and an optional subdirectory called `file`
+#           `metomi.rose-app.conf` and an optional subdirectory called `file`
 #           with other application files.
 #
 #     --load-all-apps
@@ -70,4 +70,4 @@
 #     optional ROSE_META_PATH
 #         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.config_editor.main "$@"
+exec python3 -m metomi.rose.config_editor.main "$@"

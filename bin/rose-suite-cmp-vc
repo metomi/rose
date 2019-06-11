@@ -18,21 +18,21 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose suite-cmp-vc
+#     metomi.rose suite-cmp-vc
 #
 # SYNOPSIS
-#     rose suite-cmp-vc NAME
-#     rose suite-cmp-vc --name=NAME
+#     metomi.rose suite-cmp-vc NAME
+#     metomi.rose suite-cmp-vc --name=NAME
 #
 #     # If CYLC_SUITE_NAME is exported, compare source info of the current
 #     # suite from within a suite task if no name is specified.
-#     rose suite-cmp-vc
+#     metomi.rose suite-cmp-vc
 #
 # DESCRIPTION
 #     Compare VCS information of a suite source between installation and now.
 #
 #     Version control system information of a suite is installed under
-#     log/rose-suite-run.version file. This command attempts to regenerate the
+#     log/metomi.rose-suite-run.version file. This command attempts to regenerate the
 #     information from the recorded source, and compare the original file with
 #     the latest information.
 #
@@ -50,4 +50,4 @@
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.cmp_source_vc "$@"
+exec python3 -m metomi.rose.cmp_source_vc "$@"

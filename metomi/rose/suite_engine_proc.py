@@ -307,9 +307,9 @@ class SuiteEngineProcessor(object):
 
         if cls.SCHEME_HANDLER_MANAGER is None:
             path = os.path.dirname(
-                os.path.dirname(sys.modules["rose"].__file__))
+                os.path.dirname(sys.modules["metomi.rose"].__file__))
             cls.SCHEME_HANDLER_MANAGER = SchemeHandlersManager(
-                [path], ns="rose.suite_engine_procs", attrs=["SCHEME"],
+                [path], ns="metomi.rose.suite_engine_procs", attrs=["SCHEME"],
                 can_handle=None, event_handler=event_handler, popen=popen,
                 fs_util=fs_util, host_selector=host_selector)
         if key is None:

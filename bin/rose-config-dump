@@ -18,20 +18,20 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose config-dump
+#     metomi.rose config-dump
 #
 # SYNOPSIS
-#     rose config-dump
-#     rose config-dump -C /path/to/conf/dir
-#     rose config-dump -f /path/to/file1 -f /path/to/file2
+#     metomi.rose config-dump
+#     metomi.rose config-dump -C /path/to/conf/dir
+#     metomi.rose config-dump -f /path/to/file1 -f /path/to/file2
 #
 # DESCRIPTION
 #     Re-dump Rose configuration files in the common format.
 #
-#     Load and dump `"rose-*.conf"` files in place. Apply format-specific
+#     Load and dump `"metomi.rose-*.conf"` files in place. Apply format-specific
 #     pretty-printing.
 #
-#     By default, it recursively loads and dumps all `rose-*.conf` files in the
+#     By default, it recursively loads and dumps all `metomi.rose-*.conf` files in the
 #     current working directory.
 #
 # OPTIONS
@@ -47,4 +47,4 @@
 #     --quiet, -q
 #         Decrement verbosity. Do not report modified files.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.config_dump "$@"
+exec python3 -m metomi.rose.config_dump "$@"

@@ -18,17 +18,17 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose suite-clean
+#     metomi.rose suite-clean
 #
 # SYNOPSIS
-#     rose suite-clean [OPTIONS] [SUITE-NAME [...]]
+#     metomi.rose suite-clean [OPTIONS] [SUITE-NAME [...]]
 #
 # DESCRIPTION
-#     Remove items created by "rose suite-run".
+#     Remove items created by "metomi.rose suite-run".
 #
 #     If no argument is specified, use the base-name of `$PWD` as suite name.
 #
-#     Correctly remove runtime directories created by `rose suite-run`
+#     Correctly remove runtime directories created by `metomi.rose suite-run`
 #     including those on remote job hosts.
 #
 # OPTIONS
@@ -50,4 +50,4 @@
 #     Return the difference between the number of arguments and number of
 #     successfully cleaned suites, i.e. 0 if all successful.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.suite_clean "$@"
+exec python3 -m metomi.rose.suite_clean "$@"

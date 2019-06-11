@@ -3,10 +3,10 @@
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose app-upgrade
+#     metomi.rose app-upgrade
 #
 # SYNOPSIS
-#     rose app-upgrade [OPTIONS] [VERSION]
+#     metomi.rose app-upgrade [OPTIONS] [VERSION]
 #
 # DESCRIPTION
 #     Upgrade an application configuration using metadata upgrade macros.
@@ -48,4 +48,4 @@
 #     optional ROSE_META_PATH
 #         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
-exec python3 -m rose.upgrade "$@"
+exec python3 -m metomi.rose.upgrade "$@"

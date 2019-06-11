@@ -18,23 +18,23 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose config-diff
+#     metomi.rose config-diff
 #
 # SYNOPSIS
 #     # Display the metadata-annotated diff between two Rose config files.
-#     rose config-diff FILE1 FILE2
+#     metomi.rose config-diff FILE1 FILE2
 #
 #     # Display the metadata-annotated diff between two Rose config dirs.
-#     rose config-diff DIR1 DIR2
+#     metomi.rose config-diff DIR1 DIR2
 #
 #     # Display the diff, ignoring particular setting patterns
-#     rose config-diff --ignore=namelist:foo FILE1 FILE2
+#     metomi.rose config-diff --ignore=namelist:foo FILE1 FILE2
 #
 #     # Display the diff with a particular diff tool
-#     rose config-diff --diff-tool=kdiff3 FILE1 FILE2
+#     metomi.rose config-diff --diff-tool=kdiff3 FILE1 FILE2
 #
 #     # Display the diff with some diff tool specific options/arguments
-#     rose config-diff FILE1 FILE2 -- [DIFF_OPTIONS] [DIFF_ARGUMENTS]
+#     metomi.rose config-diff FILE1 FILE2 -- [DIFF_OPTIONS] [DIFF_ARGUMENTS]
 #
 # DESCRIPTION
 #     Display the metadata-annotated difference between two Rose config files.
@@ -90,28 +90,28 @@
 #           diff-tool=diff3
 #           gdiff-tool=kompare
 #
-#        in your site or user Rose configuration (`rose.conf`).
+#        in your site or user Rose configuration (`metomi.rose.conf`).
 #
-#     [rose-config-diff]properties, [rose-config-diff]ignore{...}
+#     [metomi.rose-config-diff]properties, [rose-config-diff]ignore{...}
 #        You can override the default metadata properties to display by
 #        setting e.g::
 #
-#           [rose-config-diff]
+#           [metomi.rose-config-diff]
 #           properties=title,ns,description,help
 #
-#        in your site or user Rose configuration (`rose.conf`).
+#        in your site or user Rose configuration (`metomi.rose.conf`).
 #        You can also set shorthand ignore patterns by setting e.g.::
 #
-#          [rose-config-diff]
+#          [metomi.rose-config-diff]
 #          ignore{foo}=namelist:bar,namelist:baz
 #
 #        in the same location. This will allow you to run::
 #
-#           rose config-diff --ignore=foo ...
+#           metomi.rose config-diff --ignore=foo ...
 #
 #        instead of::
 #
-#           rose config-diff --ignore=namelist:bar --ignore=namelist:baz ...
+#           metomi.rose config-diff --ignore=namelist:bar --ignore=namelist:baz ...
 #
 #-------------------------------------------------------------------------------
-exec python3 -m rose.config_diff "$@"
+exec python3 -m metomi.rose.config_diff "$@"
