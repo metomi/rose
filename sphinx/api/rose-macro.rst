@@ -84,7 +84,7 @@ A validator macro should look like:
 
    import rose.macro
 
-   class SomeValidator(rose.macro.MacroBase):
+   class SomeValidator(metomi.rose.macro.MacroBase):
 
    """This does some kind of check."""
 
@@ -142,7 +142,7 @@ A transformer macro should look like:
 
    import rose.macro
 
-   class SomeTransformer(rose.macro.MacroBase):
+   class SomeTransformer(metomi.rose.macro.MacroBase):
 
    """This does some kind of change to the config."""
 

@@ -402,7 +402,7 @@ init_macro beef burger.py <<'__MACRO__'
 import rose.macro
 
 
-class BeefBurgerTransformer(rose.macro.MacroBase):
+class BeefBurgerTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to change the value of a boolean environment variable."""
 

@@ -7,7 +7,7 @@
 import rose.macro
 
 
-class NamelistAdderRemover(rose.macro.MacroBase):
+class NamelistAdderRemover(metomi.rose.macro.MacroBase):
 
     """Test class to add and remove a section."""
 

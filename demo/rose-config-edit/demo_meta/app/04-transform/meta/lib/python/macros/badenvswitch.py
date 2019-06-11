@@ -7,7 +7,7 @@
 import rose.macro
 
 
-class InvalidValueTransformer(rose.macro.MacroBase):
+class InvalidValueTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to return an invalid value."""
 

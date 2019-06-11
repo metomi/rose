@@ -111,7 +111,7 @@ init_rose_meta_macro baked-alaska-sponge vn1.0 desoggy.py <<'__MACRO__'
 import metomi.rose.macro
 
 
-class SpongeDeSoggifier(rose.macro.MacroBase):
+class SpongeDeSoggifier(metomi.rose.macro.MacroBase):
 
     """De-soggifies the sponge."""
 

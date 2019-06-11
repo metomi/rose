@@ -7,7 +7,7 @@
 import rose.macro
 
 
-class NamelistIgnorer(rose.macro.MacroBase):
+class NamelistIgnorer(metomi.rose.macro.MacroBase):
 
     """Test class to ignore and enable a section."""
 

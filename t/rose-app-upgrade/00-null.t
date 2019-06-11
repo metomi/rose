@@ -142,10 +142,10 @@ init_macro test-app-upgrade <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class Upgrade02to03(rose.upgrade.MacroUpgrade):
+class Upgrade02to03(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from 0.2 to 0.3."""
 
@@ -178,10 +178,10 @@ init_macro test-app-upgrade << '__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class Upgrade02to03(rose.upgrade.MacroUpgrade):
+class Upgrade02to03(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from 0.2 to 0.3."""
 
@@ -214,10 +214,10 @@ init_macro test-app-upgrade <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class Upgrade02to03(rose.upgrade.MacroUpgrade):
+class Upgrade02to03(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from 0.2 to 0.3."""
 
@@ -250,7 +250,7 @@ init_macro test-app-upgrade <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 __MACRO__
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.1
@@ -277,10 +277,10 @@ init_macro test-app-upgrade <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class Upgrade01to02(rose.upgrade.MacroUpgrade):
+class Upgrade01to02(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from 0.1 to 0.2."""
 
@@ -291,7 +291,7 @@ class Upgrade01to02(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class Upgrade02to03(rose.upgrade.MacroUpgrade):
+class Upgrade02to03(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from 0.2 to 0.3."""
 

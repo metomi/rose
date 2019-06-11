@@ -8,7 +8,7 @@ import rose.macro
 import rose.variable
 
 
-class NullChecker(rose.macro.MacroBase):
+class NullChecker(metomi.rose.macro.MacroBase):
 
     """Class to report errors for missing or null settings."""
 

@@ -8,7 +8,7 @@ import rose.macro
 import rose.variable
 
 
-class NullTransformer(rose.macro.MacroBase):
+class NullTransformer(metomi.rose.macro.MacroBase):
 
     """Class to report changes for missing or null settings."""
 

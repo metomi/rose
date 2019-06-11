@@ -8,7 +8,7 @@ import rose.macro
 import rose.variable
 
 
-class FibonacciChecker(rose.macro.MacroBase):
+class FibonacciChecker(metomi.rose.macro.MacroBase):
 
     """Class to check if an array matches a Fibonacci sequence."""
 

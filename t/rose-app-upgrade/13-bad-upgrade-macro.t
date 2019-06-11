@@ -39,10 +39,10 @@ init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class Upgrade01to02(rose.upgrade.MacroUpgrade):
+class Upgrade01to02(metomi.rose.upgrade.MacroUpgrade):
     
     """Test class to upgrade the macro with a bad change and fail on save."""
     

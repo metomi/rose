@@ -65,7 +65,7 @@ cat >$TEST_DIR/$TEST_SUITE/meta/lib/python/macros/suite.py <<'__MACRO__'
 import metomi.rose.macro
 
 
-class SuiteChecker(rose.macro.MacroBase):
+class SuiteChecker(metomi.rose.macro.MacroBase):
     """Suite checker macro."""
 
     def validate(self, config, meta_config=None):
@@ -103,7 +103,7 @@ cat >$TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/foo.py <<'__MACRO__'
 import metomi.rose.macro
 
 
-class FooChecker(rose.macro.MacroBase):
+class FooChecker(metomi.rose.macro.MacroBase):
     """Foo checker macro."""
 
     def validate(self, config, meta_config=None):
@@ -139,7 +139,7 @@ cat >$TEST_DIR/$TEST_SUITE/app/bar/meta/lib/python/macros/bar.py <<'__MACRO__'
 import metomi.rose.macro
 
 
-class BarChecker(rose.macro.MacroBase):
+class BarChecker(metomi.rose.macro.MacroBase):
     """Bar checker macro."""
 
     def validate(self, config, meta_config=None):

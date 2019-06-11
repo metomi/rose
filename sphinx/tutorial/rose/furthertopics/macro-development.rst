@@ -99,7 +99,7 @@ Open ``planet.py`` in a text editor and paste in the following code:
    import rose.macro
 
 
-   class PlanetChecker(rose.macro.MacroBase):
+   class PlanetChecker(metomi.rose.macro.MacroBase):
 
        """Checks option values that refer to planets."""
 
@@ -171,7 +171,7 @@ at the top of the class, like this:
 
 .. code-block:: python
 
-   class PlanetChecker(rose.macro.MacroBase):
+   class PlanetChecker(metomi.rose.macro.MacroBase):
 
        """Checks option values that refer to planets."""
 
@@ -216,7 +216,7 @@ Your final macro should look like this:
    import rose.macro
 
 
-   class PlanetChecker(rose.macro.MacroBase):
+   class PlanetChecker(metomi.rose.macro.MacroBase):
 
        """Checks option values that refer to planets."""
 
@@ -305,7 +305,7 @@ Open ``planet.py`` in a text editor and append the following code:
 
 .. code-block:: python
 
-   class PlanetChanger(rose.macro.MacroBase):
+   class PlanetChanger(metomi.rose.macro.MacroBase):
 
        """Switch between planets."""
 
@@ -380,7 +380,7 @@ Your class should now look like this:
 
 .. code-block:: python
 
-   class PlanetChanger(rose.macro.MacroBase):
+   class PlanetChanger(metomi.rose.macro.MacroBase):
 
        """Switch between planets."""
 
@@ -436,7 +436,7 @@ Open ``planet.py`` and paste in this text:
 
 .. code-block:: python
 
-   class PlanetReporter(rose.macro.MacroBase):
+   class PlanetReporter(metomi.rose.macro.MacroBase):
 
        """Creates a report on the value of env=WORLD."""
 
@@ -510,7 +510,7 @@ Open ``planet.py`` and alter the ``PlanetChanger`` class to look like this:
 
 .. code-block:: python
 
-   class PlanetChanger(rose.macro.MacroBase):
+   class PlanetChanger(metomi.rose.macro.MacroBase):
 
        """Switch between planets."""
 

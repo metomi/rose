@@ -56,7 +56,7 @@ init_macro remove.py <<'__MACRO__'
 import metomi.rose.macro
 
 
-class RemoveLotsOfStuff(rose.macro.MacroBase):
+class RemoveLotsOfStuff(metomi.rose.macro.MacroBase):
 
     """Remove many things."""
 

@@ -41,10 +41,10 @@ cat >$TEST_DIR/rose-meta/$category/sith.py <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeAddLightSaber(rose.upgrade.MacroUpgrade):
+class UpgradeAddLightSaber(metomi.rose.upgrade.MacroUpgrade):
 
     """'An elegant weapon, for a more civilized age.'
 
