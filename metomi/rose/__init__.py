@@ -39,7 +39,7 @@ INFO_CONFIG_NAME = "rose-suite.info"
 TOP_CONFIG_NAME = "rose-suite.conf"
 META_DEFAULT_VN_DIR = "HEAD"
 
-# Optional configurations - not applicable to rose.conf optional configs.
+# Optional configurations - not applicable to metomi.rose.conf optional configs.
 GLOB_OPT_CONFIG_FILE = "rose-*-*.conf"
 RE_OPT_CONFIG_FILE = "rose-.*?-(.+).conf$"
 
@@ -127,3 +127,5 @@ FILE_VAR_SOURCE = "source"
 
 # Paths in the Rose distribution.
 FILEPATH_README = "README.md"
+
+__version__ = "2.0.0alpha"
