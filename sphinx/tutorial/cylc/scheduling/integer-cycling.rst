@@ -443,7 +443,7 @@ Recurrence Sections
 
       .. code-block:: bash
 
-         mkdir ~/cylc-run/integer-cycling
+         mkdir -p ~/cylc-run/integer-cycling
          cd ~/cylc-run/integer-cycling
 
       Copy the above code into a ``suite.rc`` file in that directory.
