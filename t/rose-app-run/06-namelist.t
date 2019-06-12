@@ -177,8 +177,8 @@ test_teardown
 TEST_KEY=$TEST_KEY_BASE-install-only
 test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -i --debug
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
-[INFO] export PATH=$PATH
+sort >'expected.out.sorted' <<__CONTENT__
+[INFO] export PATH=${PATH}
 [INFO] install: empty-and-hello.nl
 [INFO]     source: namelist:empty
 [INFO]     source: namelist:hello
@@ -195,6 +195,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO]     source: namelist:empty
 [INFO] command: mkdir out && cp *.nl out/
 __CONTENT__
+sort "${TEST_KEY}.out" >"${TEST_KEY}.out.sorted"
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.sorted" 'expected.out.sorted'
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 test_teardown
 #-------------------------------------------------------------------------------
