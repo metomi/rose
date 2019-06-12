@@ -34,7 +34,7 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Event, Reporter
 from metomi.rose.resource import ResourceLocator
-from rosie.suite_id import SuiteId, SuiteIdOverflowError, SuiteIdPrefixError
+from metomi.rosie.suite_id import SuiteId, SuiteIdOverflowError, SuiteIdPrefixError
 import shutil
 from io import StringIO
 import sys
@@ -704,7 +704,7 @@ def main():
         if argv[0] == name:
             return globals()[name](argv[1:])
     else:
-        sys.exit("rosie.vc: %s: incorrect usage" % argv[0])
+        sys.exit("metomi.rosie.vc: %s: incorrect usage" % argv[0])
 
 
 if __name__ == "__main__":

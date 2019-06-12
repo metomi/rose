@@ -399,7 +399,7 @@ init <<'__CONFIG__'
 meta=beef/HEAD
 __CONFIG__
 init_macro beef burger.py <<'__MACRO__'
-import rose.macro
+import metomi.rose.macro
 
 
 class BeefBurgerTransformer(metomi.rose.macro.MacroBase):

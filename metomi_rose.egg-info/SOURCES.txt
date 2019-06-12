@@ -159,3 +159,9 @@ metomi_rose.egg-info/SOURCES.txt
 metomi_rose.egg-info/dependency_links.txt
 metomi_rose.egg-info/requires.txt
 metomi_rose.egg-info/top_level.txt
+sbin/rosa
+sbin/rosa-db-create
+sbin/rosa-rpmbuild
+sbin/rosa-svn-post-commit
+sbin/rosa-svn-pre-commit
+sbin/rosa-ws

@@ -28,9 +28,9 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter, Event
 from metomi.rose.resource import ResourceLocator
-from rosie.db import (
+from metomi.rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
-from rosie.svn_post_commit import RosieSvnPostCommitHook
+from metomi.rosie.svn_post_commit import RosieSvnPostCommitHook
 
 
 class RosieDatabaseCreateEvent(Event):

@@ -96,7 +96,7 @@ Open ``planet.py`` in a text editor and paste in the following code:
    import re
    import subprocess
 
-   import rose.macro
+   import metomi.rose.macro
 
 
    class PlanetChecker(metomi.rose.macro.MacroBase):
@@ -213,7 +213,7 @@ Your final macro should look like this:
    import re
    import subprocess
 
-   import rose.macro
+   import metomi.rose.macro
 
 
    class PlanetChecker(metomi.rose.macro.MacroBase):

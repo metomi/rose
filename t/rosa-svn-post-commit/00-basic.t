@@ -50,7 +50,7 @@ echo \$? >$PWD/rosa-svn-post-commit.rc
 __POST_COMMIT__
 chmod +x repos/foo/hooks/post-commit
 export LANG=C
-$ROSE_HOME/sbin/rosa db-create -q || exit 1
+rosa db-create -q || exit 1
 Q_LATEST='SELECT * FROM latest'
 Q_MAIN='SELECT idx,branch,revision,owner,project,title,author,status,from_idx FROM main'
 Q_META='SELECT * FROM meta'

@@ -416,7 +416,7 @@ def get_rose_command_reference(command_name):
 
     Args:
         command_name (str): The name of the Rose command to be documented (i.e.
-            rose / rosie.
+            rose / metomi.rosie.
 
     """
     # Obtain help text.
@@ -445,7 +445,7 @@ class AutoCLIDoc(Directive):
     required_arguments = 2
 
     def run(self):
-        # The rose command to document (i.e. rose / rosie)
+        # The rose command to document (i.e. rose / metomi.rosie.
         cli_help_format, command = self.arguments[0:2]
 
         if cli_help_format == 'rose':

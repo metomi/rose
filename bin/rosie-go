@@ -18,15 +18,15 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 # NAME
-#     rosie go
+#     metomi.rosie.go
 #
 # SYNOPSIS
-#     rosie go [OPTIONS] [...]
+#     metomi.rosie.go [OPTIONS] [...]
 #
 # DESCRIPTION
 #     Launch the Rosie client GTK+ GUI.
 #
-#     If arguments are specified, rosie go will perform an initial lookup based
+#     If arguments are specified, metomi.rosie.go will perform an initial lookup based
 #     on the arguments, which can be an address, a query, or search words. See
 #     `rosie lookup` for detail.
 #
@@ -44,7 +44,7 @@
 #     * `%` (percent) is a substitute for zero or more characters.
 #     * `_` (underscore) is a substitute for a single character.
 #
-#     If no argument is specified, rosie go will display a list of all your
+#     If no argument is specified, metomi.rosie.go will display a list of all your
 #     locally checked out suites.
 #
 # OPTIONS
@@ -67,5 +67,5 @@
 #     * `rosie lookup`
 #     * `rosie ls`
 #-------------------------------------------------------------------------------
-exec python3 -m rosie.browser.main "$@"
+exec python3 -m metomi.rosie.browser.main "$@"
 

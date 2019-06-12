@@ -1,3 +1,5 @@
 jinja2<2.11.0,>=2.10.1
 cylc==8.0a0
 aiofiles
+tornado
+sqlalchemy

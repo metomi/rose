@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rosie lookup
+#     metomi.rosie.lookup
 #
 # SYNOPSIS
-#     rosie lookup [OPTIONS] LOOKUP-TEXT ...
+#     metomi.rosie.lookup [OPTIONS] LOOKUP-TEXT ...
 #
 # DESCRIPTION
 #     Find suites in the suite discovery database.
@@ -85,4 +85,4 @@
 #     --verbose, -v
 #         Display full info for each returned suite.
 #-------------------------------------------------------------------------------
-exec python3 -m rosie.ws_client_cli lookup "$@"
+exec python3 -m metomi.rosie.ws_client_cli lookup "$@"

@@ -32,7 +32,7 @@ rose suite-run -C './source' --debug -q --name="${NAME}" -l
 TEST_KEY="${TEST_KEY_BASE}"
 run_fail "${TEST_KEY}" rose suite-cmp-vc "${NAME}"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
-[FAIL] ${NAME}: rose-suite-run.version: VC info not found
+[FAIL] ${NAME}: metomi.rose-suite-run.version: VC info not found
 __ERR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y "${NAME}"

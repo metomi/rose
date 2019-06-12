@@ -45,7 +45,7 @@ from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
-from rosie.db import (
+from metomi.rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 
 
@@ -123,7 +123,7 @@ class RosieSvnPostCommitHook(object):
         if popen is None:
             popen = RosePopener(self.event_handler)
         self.popen = popen
-        path = os.path.dirname(os.path.dirname(sys.modules["rosie"].__file__))
+        path = os.path.dirname(os.path.dirname(sys.modules["metomi.rosie"].__file__))
         self.usertools_manager = SchemeHandlersManager(
             [path], "rosie.usertools", ["get_emails"])
 
@@ -132,8 +132,8 @@ class RosieSvnPostCommitHook(object):
         # Lookup prefix of repos
         # Do nothing if prefix is not registered
         conf = ResourceLocator.default().get_conf()
-        rosie_db_node = conf.get(["rosie-db"], no_ignore=True)
-        for key, node in rosie_db_node.value.items():
+        metomi.rosie.db_node = conf.get(["rosie-db"], no_ignore=True)
+        for key, node in metomi.rosie.db_node.value.items():
             if node.is_ignored() or not key.startswith("repos."):
                 continue
             if os.path.realpath(repos) == os.path.realpath(node.value):

@@ -6,7 +6,7 @@
 
 import http.client
 
-import rose.macro
+import metomi.rose.macro
 
 
 class URLChecker(metomi.rose.macro.MacroBase):

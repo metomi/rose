@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rosie ls
+#     metomi.rosie.ls
 #
 # SYNOPSIS
-#     rosie ls [OPTIONS]
+#     metomi.rosie.ls [OPTIONS]
 #
 # DESCRIPTION
 #     List the local suites.
@@ -62,4 +62,4 @@
 #     --verbose, -v
 #         Display full info for each returned suite.
 #-------------------------------------------------------------------------------
-exec python3 -m rosie.ws_client_cli list_local_suites "$@"
+exec python3 -m metomi.rosie.ws_client_cli list_local_suites "$@"

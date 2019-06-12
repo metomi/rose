@@ -4,8 +4,8 @@
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 
-import rose.macro
-import rose.variable
+import metomi.rose.macro
+import metomi.rose.variable
 
 
 class FibonacciChecker(metomi.rose.macro.MacroBase):
@@ -28,7 +28,7 @@ class FibonacciChecker(metomi.rose.macro.MacroBase):
         if node is None:
             return []
         value = node.value
-        elems = rose.variable.array_split(value)
+        elems = metomi.rose.variable.array_split(value)
         if all([w.isdigit() for w in elems]) and len(elems) > 1:
             int_elems = [int(w) for w in elems]
             if len(int_elems) >= 2 and int_elems[:2] != seq:

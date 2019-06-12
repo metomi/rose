@@ -82,7 +82,7 @@ A validator macro should look like:
 
 .. code-block:: python
 
-   import rose.macro
+   import metomi.rose.macro
 
    class SomeValidator(metomi.rose.macro.MacroBase):
 
@@ -140,7 +140,7 @@ A transformer macro should look like:
 
 .. code-block:: python
 
-   import rose.macro
+   import metomi.rose.macro
 
    class SomeTransformer(metomi.rose.macro.MacroBase):
 

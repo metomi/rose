@@ -27,9 +27,9 @@ import pygraphviz
 import metomi.rose.metadata_graph
 import metomi.rose.opt_parse
 import metomi.rose.reporter
-import rosie.suite_id
-import rosie.ws_client
-import rosie.ws_client_cli
+import metomi.rosie.suite_id
+import metomi.rosie.ws_client
+import metomi.rosie.ws_client_cli
 
 
 class NoConnectionsEvent(metomi.rose.reporter.Event):
@@ -70,13 +70,13 @@ def get_suite_data(prefix, properties=None):
     if properties is None:
         properties = []
 
-    ws_client = rosie.ws_client.RosieWSClient(
+    ws_client = metomi.rosie.ws_client.RosieWSClient(
         prefixes=[prefix],
         event_handler=metomi.rose.reporter.Reporter()
     )
     suite_data = ws_client.search(prefix, all_revs=1)[0][0]
     for dict_row in sorted(suite_data, key=lambda _: _["revision"]):
-        suite_id = rosie.suite_id.SuiteId.from_idx_branch_revision(
+        suite_id = metomi.rosie.suite_id.SuiteId.from_idx_branch_revision(
             dict_row["idx"],
             dict_row["branch"],
             dict_row["revision"]
@@ -86,7 +86,7 @@ def get_suite_data(prefix, properties=None):
             dict_row["local"] = suite_id.get_status()
         if "date" in properties:
             dict_row["date"] = time.strftime(
-                rosie.ws_client_cli.DATE_TIME_FORMAT,
+                metomi.rosie.ws_client_cli.DATE_TIME_FORMAT,
                 time.gmtime(dict_row.get("date"))
             )
 
@@ -256,13 +256,13 @@ def main():
     filter_id = None
     if args:
         filter_id = args[0]
-        prefix = rosie.suite_id.SuiteId(id_text=filter_id).prefix
+        prefix = metomi.rosie.suite_id.SuiteId(id_text=filter_id).prefix
         if opts.prefix:
             opt_parser.error("No need to specify --prefix when specifying ID")
     elif opts.prefix:
         prefix = opts.prefix
     else:
-        prefix = rosie.suite_id.SuiteId.get_prefix_default()
+        prefix = metomi.rosie.suite_id.SuiteId.get_prefix_default()
     if opts.distance and not args:
         opt_parser.error("distance option requires an ID")
     if opts.text and not args:
