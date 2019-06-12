@@ -1,0 +1,469 @@
+
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Jinja2 &mdash; Rose Documentation 2019.01.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../../',
+              VERSION:'2019.01.2',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/js/minicylc.js"></script>
+        <script type="text/javascript" src="../../../../_static/js/spoiler.js"></script>
+        <script type="text/javascript" src="../../../../_static/js/metomi.js"></script>
+        <script type="text/javascript" src="../../../../_static/js/versioning.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/metomi.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Parameterised Tasks" href="parameters.html" />
+    <link rel="prev" title="Families" href="families.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Rose Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2019.01.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Cylc Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../scheduling/index.html">Scheduling</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">Runtime</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../runtime-configuration.html">Runtime Configuration</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Consolidating Configuration</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="families.html">Families</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Jinja2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="parameters.html">Parameterised Tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#the-cylc-get-config-command">The <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code> Command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#the-three-approaches">The Three Approaches</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#which-approach-to-use">Which Approach To Use</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../furthertopics/index.html">Further Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cheat-sheet.html">Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/rose-gtk-library.html">Rose GTK library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../terms.html">Rose Terms Of Use</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Rose Documentation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Cylc Tutorial</a> &raquo;</li>
+        
+          <li><a href="../index.html">Runtime</a> &raquo;</li>
+        
+          <li><a href="index.html">Consolidating Configuration</a> &raquo;</li>
+        
+      <li>Jinja2</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="jinja2">
+<span id="tutorial-cylc-jinja2"></span><h1>Jinja2<a class="headerlink" href="#jinja2" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="#jinja2">Jinja2</a> is a templating language often used in web design with some
+similarities to python. It can be used to make a suite definition more
+dynamic.</p>
+<div class="section" id="the-jinja2-language">
+<h2>The Jinja2 Language<a class="headerlink" href="#the-jinja2-language" title="Permalink to this headline">¶</a></h2>
+<p>In Jinja2 statements are wrapped with <code class="docutils literal notranslate"><span class="pre">{%</span></code> characters, i.e:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{% ... %}
+</pre></div>
+</div>
+<p>Variables are initiated using the <code class="docutils literal notranslate"><span class="pre">set</span></code> statement, e.g:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">set</span> <span class="nv">foo</span> <span class="o">=</span> <span class="m">3</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Expressions wrapped with <code class="docutils literal notranslate"><span class="pre">{{</span></code> characters will be replaced with the value of
+the evaluation of the expression, e.g:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">There</span> <span class="nt">are</span> <span class="cp">{{</span> <span class="nv">foo</span> <span class="cp">}}</span> <span class="nt">methods</span> <span class="nt">for</span> <span class="nt">consolidating</span> <span class="nt">the</span> <span class="nt">suite</span><span class="p">.</span><span class="nc">rc</span> <span class="nt">file</span>
+</pre></div>
+</div>
+<p>Would result in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">There</span> <span class="n">are</span> <span class="mi">3</span> <span class="n">methods</span> <span class="k">for</span> <span class="n">consolidating</span> <span class="n">the</span> <span class="n">suite</span><span class="o">.</span><span class="n">rc</span> <span class="n">file</span>
+</pre></div>
+</div>
+<p>Loops are written with <code class="docutils literal notranslate"><span class="pre">for</span></code> statements, e.g:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">x</span> <span class="k">in</span> <span class="nv">range</span><span class="o">(</span><span class="nv">foo</span><span class="o">)</span> <span class="cp">%}</span>
+   <span class="cp">{{</span> <span class="nv">x</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Would result in:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>0
+1
+2
+</pre></div>
+</div>
+<p>To enable Jinja2 in the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file, add the following <a class="reference external" href="https://en.wikipedia.org/wiki/Shebang_(Unix)">shebang</a> to the
+top of the file:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="ch">#!Jinja2</span>
+</pre></div>
+</div>
+<p>For more information see the <a class="reference external" href="http://jinja.pocoo.org/docs">Jinja2 Tutorial</a>.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>To consolidate the configuration for the <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> tasks we could
+define a dictionary of station and ID pairs:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">set</span> <span class="nv">stations</span> <span class="o">=</span> <span class="o">{</span><span class="s1">&#39;belmullet&#39;</span><span class="o">:</span> <span class="m">3976</span><span class="o">,</span>
+                   <span class="s1">&#39;camborne&#39;</span><span class="o">:</span> <span class="m">3808</span><span class="o">,</span>
+                   <span class="s1">&#39;heathrow&#39;</span><span class="o">:</span> <span class="m">3772</span><span class="o">,</span>
+                   <span class="s1">&#39;shetland&#39;</span><span class="o">:</span> <span class="m">3005</span><span class="o">}</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>We could then loop over the stations like so:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">station</span> <span class="k">in</span> <span class="nv">stations</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">station</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>After processing, this would result in:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>belmullet
+camborne
+heathrow
+shetland
+</pre></div>
+</div>
+<p>We could also loop over both the stations and corresponding IDs like so:</p>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">station</span><span class="o">,</span> <span class="nv">id</span> <span class="k">in</span> <span class="nv">stations.items</span><span class="o">()</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">station</span> <span class="cp">}}</span> <span class="nt">-</span> <span class="cp">{{</span> <span class="nv">id</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>This would result in:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>belmullet - 3976
+camborne - 3808
+heathrow - 3772
+shetland - 3005
+</pre></div>
+</div>
+<p>Putting this all together, the <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> configuration could be
+written as follows:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="ch">#!Jinja2</span>
+
+<span class="cp">{% set stations = {&#39;belmullet&#39;: 3976,</span>
+<span class="cp">                   &#39;camborne&#39;: 3808,</span>
+<span class="cp">                   &#39;heathrow&#39;: 3772,</span>
+<span class="cp">                   &#39;shetland&#39;: 3005} %}</span>
+
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[dependencies]]</span>
+        <span class="nt">[[[T00/PT3H]]]</span>
+            <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="cp">{% for station in stations %}</span>
+               <span class="kd">get_observations_</span><span class="cp">{{station}}</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+<span class="cp">{% endfor %}</span>
+            <span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+<span class="cp">{% for station, id in stations.items() %}</span>
+    <span class="nt">[[get_observations_</span><span class="cp">{{station}}</span><span class="nt">]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> get-observations</span>
+        <span class="nt">[[[environment]]]</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> </span><span class="cp">{{ id }}</span>
+            <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+
+<span class="cp">{% endfor %}</span>
+</pre></div>
+</div>
+<div class="note admonition" id="cylc-tutorial-jinja2-practical">
+<p class="first admonition-title">Practical</p>
+<p class="rubric">This practical continues on from the
+<a class="reference internal" href="families.html#cylc-tutorial-families-practical"><span class="std std-ref">families practical</span></a>.</p>
+<ol class="last arabic" start="3">
+<li><p class="first"><strong>Use Jinja2 To Avoid Duplication.</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">API_KEY</span></code> environment variable is used by both the
+<code class="docutils literal notranslate"><span class="pre">get_observations</span></code> and <code class="docutils literal notranslate"><span class="pre">get_rainfall</span></code> tasks. Rather than writing it
+out multiple times we will use Jinja2 to centralise this configuration.</p>
+<p>At the top of the <code class="docutils literal notranslate"><span class="pre">suite.rc</span></code> file add the Jinja2 shebang line. Then
+copy the value of the <code class="docutils literal notranslate"><span class="pre">API_KEY</span></code> environment variable and use it to
+define an <code class="docutils literal notranslate"><span class="pre">API_KEY</span></code> Jinja2 variable:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="ch">#!Jinja2</span>
+
+<span class="cp">{% set API_KEY = &#39;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&#39; %}</span>
+</pre></div>
+</div>
+<p>Next replace the key, where it appears in the suite, with
+<code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">API_KEY</span> <span class="pre">}}</span></code>:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span> [runtime]
+     [[get_observations_heathrow]]
+         script = get-observations
+         [[[environment]]]
+             SITE_ID = 3772
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+     [[get_observations_camborne]]
+         script = get-observations
+         [[[environment]]]
+             SITE_ID = 3808
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+     [[get_observations_shetland]]
+         script = get-observations
+         [[[environment]]]
+            SITE_ID = 3005
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+     [[get_observations_belmullet]]
+         script = get-observations
+         [[[environment]]]
+             SITE_ID = 3976
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+    [[get_rainfall]]
+        script = get-rainfall
+        [[[environment]]]
+            # The key required to get weather data from the DataPoint service.
+            # To use archived data comment this line out.
+<span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+<span class="gi">+            API_KEY = {{ API_KEY }}</span>
+</pre></div>
+</div>
+<p>Check the result with <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">get-config</span></code>. The Jinja2 will be processed
+so you should not see any difference after making these changes.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parameters.html" class="btn btn-neutral float-right" title="Parameterised Tasks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="families.html" class="btn btn-neutral float-left" title="Families" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright : Copyright (C) 2012-2019 British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2019.01.2
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2019.01.2";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "tutorial/cylc/runtime/configuration-consolidation/jinja2";
+    </script>
+  </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
