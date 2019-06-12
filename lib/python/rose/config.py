@@ -1485,7 +1485,7 @@ class ConfigLoader(object):
                 file_name = file_.name
             except AttributeError:
                 file_name = self.UNKNOWN_NAME
-        elif isinstance(file_, str):
+        elif isinstance(file_, str) or isinstance(file_, unicode):
             file_name = os.path.abspath(file_)
             file_ = open(file_name, "r")
         else:
