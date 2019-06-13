@@ -99,6 +99,10 @@
     border: 0 !important;  /* Remove cell border. */
     vertical-align: top !important;  /* All content should float to the top. */
 }
+.grid-table td {
+    /* docutils sticks tables inside an align-center class, correct this */
+    text-align: left;
+}
 
 /* Tables handle their own margin, this prevents getting a double margin. */
 .grid-table div.highlight {
