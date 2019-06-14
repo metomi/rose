@@ -169,6 +169,7 @@ report_coverage () {
 
 test () {
     PS1='$' . "${HOME}/.bashrc"
+    export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
     for arg in "$@"; do
         "_test_${arg}"
     done
