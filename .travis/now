@@ -55,7 +55,6 @@ _build_docs () {
 }
 
 _install_coverage () {
-    export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
     PIP+=(coverage pytest-cov)
     PY_PATH+=("${TRAVIS_BUILD_DIR}/.travis")
 }
@@ -169,6 +168,7 @@ report_coverage () {
 
 test () {
     PS1='$' . "${HOME}/.bashrc"
+    export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
     for arg in "$@"; do
         "_test_${arg}"
     done
