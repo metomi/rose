@@ -249,7 +249,7 @@ Families and ``cylc graph``
 
       .. code-block:: none
 
-         PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH"
+         PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:${PYTHONPATH:-}"
          RESOLUTION = 0.2
          DOMAIN = -12,48,5,61  # Do not change!
 
@@ -265,7 +265,7 @@ Families and ``cylc graph``
          +    [[root]]
          +        [[[environment]]]
          +            # Add the `python` directory to the PYTHONPATH.
-         +            PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:$PYTHONPATH"
+         +            PYTHONPATH="$CYLC_SUITE_DEF_PATH/lib/python:${PYTHONPATH:-}"
          +            # The dimensions of each grid cell in degrees.
          +            RESOLUTION = 0.2
          +            # The area to generate forecasts for (lng1, lat1, lng2, lat2).
@@ -277,7 +277,7 @@ Families and ``cylc graph``
               script = consolidate-observations
          -    [[[environment]]]
          -        # Add the `python` directory to the PYTHONPATH.
-         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:${PYTHONPATH:-}"
          -        # The dimensions of each grid cell in degrees.
          -        RESOLUTION = 0.2
          -        # The area to generate forecasts for (lng1, lat1, lng2, lat2).
@@ -290,7 +290,7 @@ Families and ``cylc graph``
                   # To use archived data comment this line out.
                   API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          -        # Add the `python` directory to the PYTHONPATH.
-         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:${PYTHONPATH:-}"
          -        # The dimensions of each grid cell in degrees.
          -        RESOLUTION = 0.2
          -        # The area to generate forecasts for (lng1, lat1, lng2, lat2).
@@ -300,7 +300,7 @@ Families and ``cylc graph``
               script = forecast 60 5  # Generate 5 forecasts at 60 minute intervals.
               [[[environment]]]
          -        # Add the `python` directory to the PYTHONPATH.
-         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:${PYTHONPATH:-}"
          -        # The dimensions of each grid cell in degrees.
          -        RESOLUTION = 0.2
          -        # The area to generate forecasts for (lng1, lat1, lng2, lat2)
@@ -323,7 +323,7 @@ Families and ``cylc graph``
               script = post-process exeter 60
          -    [[[environment]]]
          -        # Add the `python` directory to the PYTHONPATH.
-         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:$PYTHONPATH"
+         -        PYTHONPATH="$CYLC_SUITE_RUN_DIR/lib/python:${PYTHONPATH:-}"
          -        # The dimensions of each grid cell in degrees.
          -        RESOLUTION = 0.2
          -        # The area to generate forecasts for (lng1, lat1, lng2, lat2).
