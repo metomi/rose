@@ -73,12 +73,13 @@ main () {
     shellcheck "$@" "${files[@]}"
 }
 
-# default configuration for linting cylc
+# default configuration for linting rose
 default () {
     # run a strict check on all "functional" scripts
-    main bin etc lib/bash sbin usr t/lib/bash \
+    main . \
         --exclude etc/rose-bash-completion \
-        -- -e SC1090 \
+        --exclude t \
+        -- -e SC1090
 
     # run a lenient check on all test scripts
     main t -- -S error -e SC1090

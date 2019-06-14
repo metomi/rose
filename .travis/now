@@ -76,6 +76,7 @@ _install_cylc () {
 }
 
 _install_fcm () {
+    # shellcheck disable=SC1004
     sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
         `lsb_release -cs` svn19" >> /etc/apt/sources.list.d/subversion19.list'
     sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- | \
@@ -137,6 +138,7 @@ build () {
     done
 }
 
+    # shellcheck disable=SC2032
 install () {
     for arg in "$@"; do
         "_install_${arg}"
@@ -152,6 +154,7 @@ install () {
 
     if [[ ${#APT[@]} -gt 0 ]]; then
         sudo apt-get update
+        # shellcheck disable=SC155,2033
         sudo apt-get install -y "${APT[@]}"
     fi
 
