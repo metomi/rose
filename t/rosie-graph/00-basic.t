@@ -25,6 +25,9 @@
 if ! python3 -c 'import tornado, sqlalchemy' 2>/dev/null; then
     skip_all '"tornado" or "sqlalchemy" not installed'
 fi
+if ! python3 -c 'import pygraphviz' 2>/dev/null; then
+    skip_all '"pygraphviz" not installed'
+fi
 tests 33
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.

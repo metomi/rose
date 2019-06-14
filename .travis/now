@@ -104,7 +104,6 @@ _install_rose () {
     RC_PATH+=("${TRAVIS_BUILD_DIR}/bin")
 }
 
-
 _install_rosie () {
     PIP+=(requests tornado sqlalchemy)
     RI_PATH+=("$(_path_for python)" "$(_path_for rose)")
@@ -132,6 +131,7 @@ _install_linters () {
     APT+=(shellcheck)
     PIP+=(pycodestyle)
     NPM+=(eslint)
+}
 
 _path_for () {
     COMMAND="$1"

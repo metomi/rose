@@ -53,7 +53,7 @@ URL_FOO_Q="${URL_FOO}query?"
 #-------------------------------------------------------------------------------
 # Test for correct status and headers in root index pages.
 
-# Note: 'curl -I' always procudes 'text/html' content type for Tornado apps,
+# Note: 'curl -I' always produces 'text/html' content type for Tornado apps,
 # so to request just the JSON data, need to use 'curl -i', see e.g.
 # https://groups.google.com/forum/#!topic/python-tornado/bolRj0wSfos.
 
