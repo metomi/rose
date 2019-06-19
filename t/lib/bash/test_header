@@ -141,41 +141,41 @@ skip() {
     shift 1
     local I=0
     while ((I++ < N_SKIPS)); do
-        echo "ok $((++TEST_NUMBER)) # skip $@"
+        echo "ok $((++TEST_NUMBER)) # skip $*"
     done
 }
 
 skip_all() {
-    echo "1..0 # SKIP $@"
+    echo "1..0 # SKIP $*"
     exit
 }
 
 pass() {
-    echo "ok $((++TEST_NUMBER)) - $@"
+    echo "ok $((++TEST_NUMBER)) - $*"
 }
 
 fail() {
-    echo "not ok $((++TEST_NUMBER)) - $@"
+    echo "not ok $((++TEST_NUMBER)) - $*"
 }
 
 run_pass() {
     local TEST_KEY=$1
     shift 1
-    if ! "$@" 1>$TEST_KEY.out 2>$TEST_KEY.err; then
-        fail $TEST_KEY
+    if ! "$@" 1>"$TEST_KEY.out" 2>"$TEST_KEY.err"; then
+        fail "$TEST_KEY"
         return
     fi
-    pass $TEST_KEY
+    pass "$TEST_KEY"
 }
 
 run_fail() {
     local TEST_KEY=$1
     shift 1
-    if "$@" 1>$TEST_KEY.out 2>$TEST_KEY.err; then
-        fail $TEST_KEY
+    if "$@" 1>"$TEST_KEY.out" 2>"$TEST_KEY.err"; then
+        fail "$TEST_KEY"
         return
     fi
-    pass $TEST_KEY
+    pass "$TEST_KEY"
 }
 
 file_cmp() {
@@ -183,39 +183,39 @@ file_cmp() {
     local FILE_ACTUAL=$2
     local FILE_EXPECT=${3:--}
     if diff -u "${FILE_EXPECT}" "${FILE_ACTUAL}" >&2; then
-        pass $TEST_KEY
+        pass "$TEST_KEY"
         return
     fi
-    fail $TEST_KEY
+    fail "$TEST_KEY"
 }
 
 file_cmp_any() {
     local TEST_KEY=$1
     local FILE_ACTUAL=$2
     local FILE_EXPECT=${3:--}
-    cat $FILE_EXPECT | \
-        csplit --prefix="$TEST_KEY-cmp-any-csplit" -  /^__filesep__$/ {*}
-    for SPLIT_FILENAME in $TEST_KEY-cmp-any-csplit*; do
-        sed -i "/^__filesep__$/d" $SPLIT_FILENAME
-        if cmp -s $SPLIT_FILENAME $FILE_ACTUAL; then
-            pass $TEST_KEY
+    csplit --prefix="$TEST_KEY-cmp-any-csplit" "$FILE_EXPECT" \
+        /^__filesep__$/ '{*}'
+    for SPLIT_FILENAME in "$TEST_KEY-cmp-any-csplit"*; do
+        sed -i "/^__filesep__$/d" "$SPLIT_FILENAME"
+        if cmp -s "$SPLIT_FILENAME" "$FILE_ACTUAL"; then
+            pass "$TEST_KEY"
             return
         fi
     done
-    for SPLIT_FILENAME in $TEST_KEY-cmp-any-csplit*; do
-        diff -u $SPLIT_FILENAME $FILE_ACTUAL >&2
+    for SPLIT_FILENAME in "$TEST_KEY-cmp-any-csplit"*; do
+        diff -u "$SPLIT_FILENAME" "$FILE_ACTUAL" >&2
     done
-    fail $TEST_KEY
+    fail "$TEST_KEY"
 }
 
 file_test() {
     local TEST_KEY=$1
     local FILE=$2
     local OPTION=${3:--e}
-    if test $OPTION $FILE; then
-        pass $TEST_KEY
+    if test "$OPTION" "$FILE"; then
+        pass "$TEST_KEY"
     else
-        fail $TEST_KEY
+        fail "$TEST_KEY"
     fi
 }
 
@@ -223,11 +223,11 @@ file_grep() {
     local TEST_KEY=$1
     local PATTERN=$2
     local FILE=$3
-    if grep -q -e "$PATTERN" $FILE; then
-        pass $TEST_KEY
+    if grep -q -e "$PATTERN" "$FILE"; then
+        pass "$TEST_KEY"
         return
     fi
-    fail $TEST_KEY
+    fail "$TEST_KEY"
 }
 
 file_pcregrep() {
@@ -255,11 +255,11 @@ file_grep_fail() {
     local TEST_KEY=$1
     local PATTERN=$2
     local FILE=$3
-    if grep -q -e "$PATTERN" $FILE; then
-        fail $TEST_KEY
+    if grep -q -e "$PATTERN" "$FILE"; then
+        fail "$TEST_KEY"
         return
     fi
-    pass $TEST_KEY
+    pass "$TEST_KEY"
 }
 
 bad_smtpd_init() {
@@ -268,7 +268,7 @@ bad_smtpd_init() {
         local SMTPD_HOST=localhost:$SMTPD_PORT
         local SMTPD_LOG="$TEST_DIR/badsmtpd.log"
         # Piping the code directly to python does not work, for some reason.
-        cat >$TEST_DIR/smtpd.py <<__PYTHON__
+        cat >"$TEST_DIR/smtpd.py" <<__PYTHON__
 import socket, sys
 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 soc.bind(('localhost', $SMTPD_PORT))
@@ -280,7 +280,7 @@ while True:
     # Antisocially cut off the connection!
     client_soc.close()
 __PYTHON__
-       python3 $TEST_DIR/smtpd.py 1>"$SMTPD_LOG" 2>&1 &
+       python3 "$TEST_DIR/smtpd.py" 1>"$SMTPD_LOG" 2>&1 &
        local SMTPD_PID=$!
        while ! grep -q '^bound$' "$SMTPD_LOG" 2>/dev/null; do
             if ps $SMTPD_PID 1>/dev/null 2>&1; then
@@ -326,8 +326,10 @@ mock_smtpd_init() {
             fi
         done
         if [[ -n ${SMTPD_PID:-} ]]; then
+            # shellcheck disable=SC2034
             TEST_SMTPD_HOST=$SMTPD_HOST
             TEST_SMTPD_PID=$SMTPD_PID
+            # shellcheck disable=SC2034
             TEST_SMTPD_LOG=$SMTPD_LOG
             break
         fi
@@ -366,9 +368,9 @@ TEST_ROSE_WS_URL=
 rose_ws_init() {
     local NS="$1"
     local UTIL="$2"
-    local PORT="$((${RANDOM} + 10000))"
+    local PORT="$((RANDOM + 10000))"
     while port_is_busy "${PORT}"; do
-        PORT="$((${RANDOM} + 10000))"
+        PORT="$((RANDOM + 10000))"
     done
 
     TEST_KEY="${TEST_KEY_BASE}-${NS}-${UTIL}"
@@ -376,7 +378,7 @@ rose_ws_init() {
         0<'/dev/null' 1>"${NS}-${UTIL}.out" 2>"${NS}-${UTIL}.err" &
     TEST_ROSE_WS_PID="$!"
     T_INIT="$(date '+%s')"
-    while ! port_is_busy "${PORT}" && (($(date '+%s') < ${T_INIT} + 60)); do
+    while ! port_is_busy "${PORT}" && (($(date '+%s') < T_INIT + 60)); do
         sleep 1
     done
     TEST_ROSE_WS_PORT="${PORT}"
@@ -399,6 +401,7 @@ rose_ws_kill() {
     fi
     TEST_ROSE_WS_PID=
     TEST_ROSE_WS_PORT=
+    # shellcheck disable=SC2034
     TEST_ROSE_WS_URL=
 }
 
@@ -437,14 +440,15 @@ __PYTHON__
     fi
 }
 
-ROSE_HOME=${ROSE_HOME:-$(cd $(dirname $BASH_SOURCE)/../../.. && pwd)}
+ROSE_HOME="${ROSE_HOME:-"$(\
+    cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"}"
 PATH=$ROSE_HOME/bin:$PATH
-
-DIFFTOOL=$(rose config '--default=diff -u' t difftool)
-
-TEST_KEY_BASE=$(basename $0 .t)
-TEST_SOURCE_DIR=$(cd $(dirname $0) && pwd)
-TEST_DIR=$(mktemp -d)
-cd $TEST_DIR
+# shellcheck disable=SC2034
+DIFFTOOL="$(rose config '--default=diff -u' t difftool)"
+TEST_KEY_BASE="$(basename "$0" .t)"
+# shellcheck disable=SC2034
+TEST_SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
+TEST_DIR="$(mktemp -d)"
+cd "$TEST_DIR"
 
 set +e

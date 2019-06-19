@@ -48,8 +48,11 @@
 # SEE ALSO
 #     * `prove(1)`
 #-------------------------------------------------------------------------------
-. $(dirname $0)/../lib/bash/rose_init
-. $(dirname $0)/../lib/bash/rose_log
+. "$(dirname "$0")/../lib/bash/rose_init"
+. "$(dirname "$0")/../lib/bash/rose_log"
+
+set -eu
+
 rose_init
 mkdir -p ~/.metomi
 if [[ $ROSE_HOME != . ]]; then
@@ -62,6 +65,7 @@ if [[ -w 'lib/python/' ]]; then
     python3 -mcompileall -q 'lib/python/'
 fi
 if PROVE_OPTIONS=$(rose config t prove-options); then
+    # shellcheck disable=SC2086
     exec prove $PROVE_OPTIONS -r "${@:-t}"
 else
     if [[ -f /proc/cpuinfo ]]; then

@@ -37,7 +37,7 @@ usage () {
     echo 'rose tutorial SUITE [DIR]'
     echo
     echo 'Available tutorial suites:'
-    ls -1 "${ROSE_HOME}/etc/tutorial/" | sed -e 's/^/    /'
+    find "./etc/tutorial/" -maxdepth 1 -exec basename {} \; | sed 's/^/    /'
 }
 
 api-key () {
@@ -70,7 +70,7 @@ fi
 
 # Prompt user if directory exists.
 if [[ -d $DIRECTORY ]]; then
-    while read -p "Directory $DIRECTORY exists, overwrite it (y/n)? " usr
+    while read -rp "Directory $DIRECTORY exists, overwrite it (y/n)? " usr
     do
         case "${usr}" in
             [Yy])
@@ -89,9 +89,8 @@ rose_init 'rose_log'
 mkdir -p "$(dirname "${DIRECTORY}")"
 if run rsync -rLptgoD "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}" \
     --exclude='.validate'; then
-    for file in $(find "${DIRECTORY}" -type f); do
-        sed -i "s/DATAPOINT_API_KEY/$(api-key)/" $file
-    done
+    find "${DIRECTORY}" -type f \
+        -exec sed -i "s/DATAPOINT_API_KEY/$(api-key)/" {} \;
     echo 'done'
 else
     echo

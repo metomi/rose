@@ -107,13 +107,9 @@ SPHINX_PATH=sphinx
 . "${ROSE_HOME}/rose-version"
 # documentation root output directory
 DOCS_DIR="${ROSE_HOME}/doc"
-# documentation output directory for this version
-BUILD_DIR="${DOCS_DIR}/${ROSE_VERSION}"
-# glob for documentation formats within a rose version
-DOC_FORMATS=!(*.html|doctrees)
 
 # is the virtualenv command available
-if which virtualenv >/dev/null 2>&1; then
+if command -v virtualenv >/dev/null 2>&1; then
     VENV_COMPLIANT=true
 else
     VENV_COMPLIANT=false
@@ -124,8 +120,8 @@ VENV_MODE=false
 FORCE=false
 DEV_MODE=false
 DEBUG=''
-BUILDS=''
-SPHINX_OPTS=''
+BUILDS=()
+SPHINX_OPTS=()
 DEFAULT_ALIAS='doc'
 DEFAULT_VERSION=
 while [[ $# -gt 0 ]]; do
@@ -143,7 +139,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --strict)
-            SPHINX_OPTS='SPHINXOPTS=-aEW'
+            SPHINX_OPTS+=('SPHINXOPTS=-aEW')
             shift
             ;;
         --debug)
@@ -156,16 +152,14 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            BUILDS="${BUILDS} $1"
+            BUILDS+=("$1")
             shift
             ;;
     esac
 done
-if [[ -z "${BUILDS}" ]]; then
-    BUILDS='html'
+if [[ "${#BUILDS}" == 0 ]]; then
+    BUILDS=('html')
 fi
-# glob for documented rose versions
-DOC_VERSIONS=!(*.html|doc|versions.json|"${DEFAULT_ALIAS}"|CHANGES.md|404.md|_config.yml)
 
 
 venv-activate () {
@@ -192,30 +186,26 @@ venv-destroy () {
     rm -rf "${VENV_PATH}"
 }
 
-json_list () {
-    # write out a bash array as a JSON list
-    echo -n "[\"$(local IFS=','; echo "$*" | sed 's/,/", "/g';)\"]"
-}
-
 version_file () {
     # output the dictionary {"version": ["build", ...]} in JSON format
     DOCS_DIR="$1"
 
-    echo '{'
+    ret='{'
+
     # scrape filesystem for list of rose versions which have built docs
-    VERSIONS=( $(cd "${DOCS_DIR}"; echo $DOC_VERSIONS) )
-    for version in "${VERSIONS[@]}"; do
+    for version_dir in "${DOCS_DIR}/"*.*.*; do
+        version=$(basename "$version_dir")
         # scrape filesystem to get list of formats this version is available in
-        formats=( $(cd "${DOCS_DIR}/${version}"; echo $DOC_FORMATS) )
-        list="    \"${version}\": $(json_list ${formats[@]})"
-        if [[ $version == "${VERSIONS[$(( ${#VERSIONS[@]} - 1 ))]}" ]]; then
-            # JSON doesn't permit a comma after the last item in a collection
-            echo "${list}"
-        else
-            echo "${list},"
-        fi
+        ret+="\n    \"$version\": ["
+        for format_dir in "${version_dir}/"!(doctrees|*.html); do
+            format=$(basename "$format_dir")
+            ret+="$format, "
+        done
+        ret="${ret:0:-2}],"
     done
-    echo '}'
+
+    ret="${ret:0:-1}\n}"
+    echo -e "$ret"
 }
 
 html_redirect () {
@@ -223,16 +213,16 @@ html_redirect () {
     SRC="$1"
     DEST="$2"
 
-    cat >"$2" << __HTML__
+    cat >"$DEST" << __HTML__
 <!DOCTYPE html>
 <html>
     <head>
         <title>Rose Documentation</title>
-        <meta http-equiv="REFRESH" content="0;url=$1">
+        <meta http-equiv="REFRESH" content="0;url=$SRC">
     </head>
     <body>
         <p>If not automatically redirected, please click
-        <a href="$1">Rose Documentation</a>.</p>
+        <a href="$SRC">Rose Documentation</a>.</p>
     </body>
 </html>
 __HTML__
@@ -256,7 +246,7 @@ if ! rose-check-software --doc >/dev/null; then
         venv-install
     elif ! "${FORCE}"; then
         echo 'Software required by the rose documentation builder is not
-present (run `rose check-software --doc` for details).
+present (run "rose check-software --doc" for details).
 
 For information on building a Python environment for the Rose documentation
 builder see the "Software Dependencies" section of the help page for this
@@ -266,10 +256,10 @@ command.' >&2
 fi
 
 # makefile argument to set the output directory for this build
-SPHINX_OPTS="${SPHINX_OPTS} BUILDDIR=${DOCS_DIR}/${ROSE_VERSION}"
+SPHINX_OPTS+=("BUILDDIR=${DOCS_DIR}/${ROSE_VERSION}")
 
 # run sphinx-build
-if make ${DEBUG} -C "${SPHINX_PATH}" ${BUILDS} ${SPHINX_OPTS}; then
+if make ${DEBUG} -C "${SPHINX_PATH}" "${BUILDS[@]}" "${SPHINX_OPTS[@]}"; then
     RET=0
     # output file containing details of all versions and formats the
     # documentation has been built in (locally) for the version / format

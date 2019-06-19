@@ -33,7 +33,6 @@ jobs:
         - now install coverage cylc fcm rose tut_suite
       script:
         - now test battery
-
     - name: "Documentation"
       install:
         - now install coverage rose sphinx tut_suite

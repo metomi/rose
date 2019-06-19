@@ -59,16 +59,16 @@ ROSE_VERBOSITY=${ROSE_VERBOSITY:-1}
 function err() {
     ROSE_RC=${ROSE_RC:-1}
     {
-        echo "[FAIL] $@"
+        echo "[FAIL] $*"
         echo "[FAIL] exit $ROSE_RC"
-    } | tee -a ${ROSE_LOG:-/dev/null} >&2
-    exit $ROSE_RC
+    } | tee -a "${ROSE_LOG:-/dev/null}" >&2
+    exit "$ROSE_RC"
 }
 
 function info() {
     local LEVEL=$1
     shift 1
-    echo "[INFO] $@" | out $LEVEL
+    echo "[INFO] $*" | out "$LEVEL"
 }
 
 function optv() {
@@ -76,13 +76,13 @@ function optv() {
     if [[ -o xtrace ]]; then
         OPT=' --debug'
     fi
-    if (($ROSE_VERBOSITY > 1)); then
+    if ((ROSE_VERBOSITY > 1)); then
         OPT="$OPT --verbose"
         ((V = ROSE_VERBOSITY))
         while ((--V > 1)); do
             OPT="$OPT --verbose"
         done
-    elif (($ROSE_VERBOSITY <= 0)); then
+    elif ((ROSE_VERBOSITY <= 0)); then
         OPT="$OPT --quiet"
     fi
     if [[ -n $OPT ]]; then
@@ -92,8 +92,8 @@ function optv() {
 
 function out() {
     local LEVEL=${1:-2}
-    tee -a ${ROSE_LOG:-/dev/null} | {
-        if (($ROSE_VERBOSITY >= $LEVEL)) || ${ROSE_DRY_RUN_MODE:-false}; then
+    tee -a "${ROSE_LOG:-/dev/null}" | {
+        if ((ROSE_VERBOSITY >= LEVEL)) || ${ROSE_DRY_RUN_MODE:-false}; then
             cat
         else
             cat >/dev/null
@@ -109,5 +109,5 @@ function run() {
 }
 
 function warn() {
-    echo "[WARN] $@" | out 1 >&2
+    echo "[WARN] $*" | out 1 >&2
 }

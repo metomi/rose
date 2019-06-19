@@ -29,7 +29,7 @@ FILES=($(find "${ROSE_HOME}/sphinx/ext" -name "*.py"))
 tests $(( ${#FILES[@]} * 2 ))
 #-------------------------------------------------------------------------------
 TERM=  # Nasty solution to prevent control chars being printed in python output.
-for file in ${FILES[@]}; do
+for file in "${FILES[@]}"; do
     TEST_KEY="${TEST_KEY_BASE}-$(basename ${file})"
     run_pass "${TEST_KEY}" python3 -m doctest "${file}"
     file_cmp "${TEST_KEY}-err" "${TEST_KEY}.out" '/dev/null'

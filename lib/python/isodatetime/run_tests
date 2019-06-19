@@ -18,5 +18,6 @@
 #-----------------------------------------------------------------------------
 # Run tests for the ISO 8601 parsing and data model functionality."""
 #-----------------------------------------------------------------------------
+set -eu
 cd "$(dirname "$0")/../"
 TZ=UTC python3 -m isodatetime.tests "$@"
