@@ -45,8 +45,8 @@ function rose_usage() {
                 }
             }
         }
-    }' ${ROSE_USAGE_FILE:-$0} >&$FD
+    }' "${ROSE_USAGE_FILE:-$0}" >&"$FD"
     if [[ -n $CODE ]]; then
-        exit $CODE
+        exit "$CODE"
     fi
 }

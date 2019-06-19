@@ -21,7 +21,7 @@ set -eu
 FOO=$(basename $0)
 FOO_SESSION=${FOO_SESSION:-0}
 FOO_RC=${FOO_RC:-0}
-echo "$FOO $@ # rc=$FOO_RC" 1>>$FOO.log.$FOO_SESSION
+echo "$FOO $* # rc=$FOO_RC" 1>>"$FOO.log.$FOO_SESSION"
 ACTION=$1
 shift 1
 if [[ $ACTION != 'put' ]]; then

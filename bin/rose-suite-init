@@ -20,4 +20,4 @@
 # Deprecated.
 # Alias of "rose suite-run".
 #-------------------------------------------------------------------------------
-exec $(dirname $0)/rose-suite-run "$@"
+exec "$(dirname "$0")/rose-suite-run" "$@"
