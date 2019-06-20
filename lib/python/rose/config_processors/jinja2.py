@@ -69,6 +69,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             tmp_file = NamedTemporaryFile()
             tmp_file.write(scheme_ln.encode('UTF-8'))
             tmp_file.write(msg_init_ln.encode('UTF-8'))
+            suite_variables = ['{']
             for key, node in sorted(s_node.value.items()):
                 if node.is_ignored():
                     continue
@@ -78,6 +79,11 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                     raise ConfigProcessError([s_key, key], node.value, exc)
                 tmp_file.write(
                     (self.ASSIGN_TEMPL % (key, value)).encode('UTF-8'))
+                suite_variables.append("    '%s': %s," % (key, key))
+            suite_variables.append('}')
+            suite_variables = self.ASSIGN_TEMPL % ('ROSE_SUITE_VARIABLES',
+                                                   '\n'.join(suite_variables))
+            tmp_file.write(suite_variables.encode('UTF-8'))
             environ = kwargs.get("environ")
             if environ:
                 tmp_file.write('[cylc]\n'.encode('UTF-8'))

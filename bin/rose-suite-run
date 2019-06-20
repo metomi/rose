@@ -114,11 +114,15 @@
 #         Each `KEY` in this space delimited list switches on an optional
 #         configuration. The configurations are applied first-to-last.
 #
-# JINJA2 VARIABLES
-#     `rose suite-run` provides the following Jinja2 variables to the suite.
+# SUITE VARIABLES
+#     `rose suite-run` provides the following variables to the suite as
+#      template variables (i.e. Jinja2 or EmPy).
 #
 #     ROSE_ORIG_HOST
 #         The name of the host where the `rose suite-run` command was invoked.
+#     ROSE_SUITE_VARIABLES
+#         Dictionary containing all suite variables inserted via
+#         `[jinja2:suite.rc]` or `[empy:suite.rc]` section.
 #
 # SEE ALSO
 #     * `cylc help gui`

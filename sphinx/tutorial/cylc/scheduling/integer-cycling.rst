@@ -239,6 +239,13 @@ Inter-Cycle Dependencies
    ingredients, the bakery wants to purchase ingredients two batches ahead.
    This can be achieved by adding the following dependency:
 
+.. ifslides::
+
+   We need ``purchase_ingredients`` to be dependent on ``sell_bread`` from
+   two cycles before.
+
+.. nextslide::
+
 .. code-block:: diff
 
     [scheduling]
@@ -411,6 +418,8 @@ Recurrence Sections
 
    Next section: :ref:`tutorial-datetime-cycling`
 
+.. _basic cycling practical:
+
 .. practical::
 
    .. rubric:: In this practical we will take the :term:`suite <Cylc suite>`
@@ -436,7 +445,7 @@ Recurrence Sections
 
       .. code-block:: bash
 
-         mkdir ~/cylc-run/integer-cycling
+         mkdir -p ~/cylc-run/integer-cycling
          cd ~/cylc-run/integer-cycling
 
       Copy the above code into a ``suite.rc`` file in that directory.
