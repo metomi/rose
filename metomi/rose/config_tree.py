@@ -22,8 +22,12 @@
 
 import os
 from metomi.rose.c3 import mro
-from metomi.rose.config import ConfigNode, ConfigLoader
+from metomi.rose.config import ConfigNode, ConfigLoader, ConfigDumper
 import shlex
+from metomi.rose.config import ConfigDumper
+from io import StringIO
+from shutil import rmtree
+from tempfile import mkdtemp
 
 
 class BadOptionalConfigurationKeysError(Exception):
@@ -486,8 +490,4 @@ type=grilled
 
 if __name__ == "__main__":
     # These modules are only required for running the self tests.
-    from metomi.rose.config import ConfigDumper
-    from io import StringIO
-    from shutil import rmtree
-    from tempfile import mkdtemp
     _Test().run()

@@ -52,10 +52,9 @@
 . rose_log
 rose_init
 mkdir -p ~/.metomi
-if [[ $ROSE_HOME != . ]]; then
-    info 1 cd "$ROSE_HOME"
-    cd "$ROSE_HOME"
-fi
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd $DIR
+cd ../../
 # Recompile *.pyc files to ensure we are running the current code.
 if [[ -w 'lib/python/' ]]; then
     find 'lib/python/' -name '*.pyc' -type 'f' -delete

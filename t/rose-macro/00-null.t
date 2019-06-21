@@ -52,7 +52,7 @@ setup
 run_fail "$TEST_KEY" rose macro --unknown-option
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-Usage: metomi.rose macro [OPTIONS] [MACRO_NAME ...]
+Usage: rose macro [OPTIONS] [MACRO_NAME ...]
 
 rose macro: error: no such option: --unknown-option
 __CONTENT__
