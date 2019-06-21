@@ -380,7 +380,7 @@ class AppRunner(Runner):
         if opts.new_mode:
             self._prep_new(opts)
 
-        # Dump the actual configuration as metomi.rose-app-run.conf
+        # Dump the actual configuration as rose-app-run.conf
         ConfigDumper()(conf_tree.node, "rose-app-run.conf")
 
         # Environment variables: PATH

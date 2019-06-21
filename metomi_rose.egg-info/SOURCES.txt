@@ -80,6 +80,7 @@ metomi/rose/metadata_gen.py
 metomi/rose/metadata_graph.py
 metomi/rose/namelist_dump.py
 metomi/rose/opt_parse.py
+metomi/rose/pkg_resources.py
 metomi/rose/popen.py
 metomi/rose/reporter.py
 metomi/rose/resource.py
@@ -123,6 +124,8 @@ metomi/rose/config_processors/empy.py
 metomi/rose/config_processors/env.py
 metomi/rose/config_processors/fileinstall.py
 metomi/rose/config_processors/jinja2.py
+metomi/rose/etc/rose-demo-upgrade/versions.py
+metomi/rose/etc/rose-demo-upgrade-null/versions.py
 metomi/rose/formats/__init__.py
 metomi/rose/formats/namelist.py
 metomi/rose/loc_handlers/__init__.py
