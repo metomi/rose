@@ -18,28 +18,28 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rose suite-restart
+#     rose suite-restart
 #
 # SYNOPSIS
-#     metomi.rose suite-restart [OPTIONS] [[--] CYLC-RESTART-ARGS]
+#     rose suite-restart [OPTIONS] [[--] CYLC-RESTART-ARGS]
 #
 #     # Restart cylc suite with name equal to basename of $PWD.
-#     metomi.rose suite-restart
+#     rose suite-restart
 #
 #     # Restart cylc suite NAME
-#     metomi.rose suite-restart --name=NAME
+#     rose suite-restart --name=NAME
 #
 #     # Restart cylc suite NAME with a given state dump
-#     metomi.rose suite-restart --name=NAME -- state.20141118T161121.195326Z
+#     rose suite-restart --name=NAME -- state.20141118T161121.195326Z
 #
 #     # Restart cylc suite NAME on given host
-#     metomi.rose suite-restart --name=NAME --host=my-suite-host
+#     rose suite-restart --name=NAME --host=my-suite-host
 #
 # DESCRIPTION
 #     Restart a shutdown suite from its last known state without reinstalling
 #     it.
 #
-#     If re-installation is required, use `metomi.rose suite-run --restart`.
+#     If re-installation is required, use `rose suite-run --restart`.
 #
 # ARGUMENTS
 #    Arguments (and options after `--`) are passed to `cylc restart`.
@@ -55,4 +55,4 @@
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rose.suite_restart "$@"
+exec python3 -m rose.suite_restart "$@"

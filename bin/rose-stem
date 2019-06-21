@@ -18,27 +18,27 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rose stem
+#     rose stem
 #
 # SYNOPSIS
-#     metomi.rose stem [options]
+#     rose stem [options]
 #
 # DESCRIPTION
 #     Run a suitable suite with a specified set of source tree(s).
 #
 #     Default values of some of these settings are suite-dependent, specified
-#     in the `metomi.rose-suite.conf` file.
+#     in the `rose-suite.conf` file.
 #
 # EXAMPLES
-#     metomi.rose stem --group=developer
-#     metomi.rose stem --source=/path/to/source --source=/other/source --group=mygroup
-#     metomi.rose stem --source=foo=/path/to/source --source=bar=fcm:bar_tr@head
+#     rose stem --group=developer
+#     rose stem --source=/path/to/source --source=/other/source --group=mygroup
+#     rose stem --source=foo=/path/to/source --source=bar=fcm:bar_tr@head
 #
 # OPTIONS
-#     All options of `metomi.rose suite-run` are supported. Additional options are:
+#     All options of `rose suite-run` are supported. Additional options are:
 #
 #     --source=SOURCE, -s SOURCE, --source=PROJECT=SOURCE, -s PROJECT=SOURCE
-#         Specify a source tree to include in a metomi.rose-stem suite. The first
+#         Specify a source tree to include in a rose-stem suite. The first
 #         source tree must be a working copy as the location of the suite and
 #         fcm-make config files are taken from it. Further source trees can be
 #         added with additional `--source` arguments. The project which is 
@@ -67,7 +67,7 @@
 #         intended to specify the location of `fcm-make` config files. Working 
 #         copies in this list have their hostname prefixed.
 #     RUN_NAMES
-#         A list of groups to run in the metomi.rose-stem suite.
+#         A list of groups to run in the rose-stem suite.
 #     SOURCE_<project>
 #         The complete list of source trees for a given project. Unlike the 
 #         `HOST_` variable of similar name, paths to working copies do NOT 
@@ -82,4 +82,4 @@
 #         is intended to specify the revision of `fcm-make` config files.
 #
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rose.stem "$@"
+exec python3 -m rose.stem "$@"

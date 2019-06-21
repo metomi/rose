@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rosie.checkout
+#     rosie checkout
 #
 # SYNOPSIS
-#     metomi.rosie.checkout [OPTIONS] ID ...
+#     rosie checkout [OPTIONS] ID ...
 #
 # DESCRIPTION
 #     Checkout local copies of suites.
@@ -38,4 +38,4 @@
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rosie.vc checkout "$@"
+exec python3 -m rosie.vc checkout "$@"

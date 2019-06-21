@@ -30,7 +30,7 @@
 #     Make a copy of one of the tutorial SUITE in the cylc-run directory.
 #
 #-------------------------------------------------------------------------------
-. rose_init
+. "$(dirname "$0")/../lib/bash/rose_init"
 mkdir -p "$HOME/cylc-run"
 
 usage () {

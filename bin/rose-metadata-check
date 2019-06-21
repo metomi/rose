@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rose metadata-check
+#     rose metadata-check
 #
 # SYNOPSIS
-#     metomi.rose metadata-check [OPTIONS] [ID ...]
+#     rose metadata-check [OPTIONS] [ID ...]
 #
 # DESCRIPTION
 #     Validate configuration metadata.
@@ -29,7 +29,7 @@
 # OPTIONS
 #     --config=DIR, -C DIR
 #        The directory containing the configuration metadata i.e.
-#        containing the `metomi.rose-meta.conf` file, amongst other things.
+#        containing the `rose-meta.conf` file, amongst other things.
 #        If not specified, the current directory will be used.
 #     --property=PROPERTY, -p PROPERTY
 #        Only check a certain property e.g. trigger. This can be
@@ -40,4 +40,4 @@
 #        metadata e.g.`env=FOO` or `namelist:bar`. If specified, only
 #        this section will be checked.
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rose.metadata_check "$@"
+exec python3 -m rose.metadata_check "$@"

@@ -18,16 +18,16 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rose host-select
+#     rose host-select
 #
 # SYNOPSIS
-#     metomi.rose host-select [OPTIONS] [GROUP/HOST ...]
+#     rose host-select [OPTIONS] [GROUP/HOST ...]
 #
 # DESCRIPTION
 #     Select a host from a set of groups or names by load, by free memory
 #     or by random.
 #
-#     Use settings in `$ROSE_HOME/etc/metomi.rose.conf` and `$HOME/.metomi/rose.conf`
+#     Use settings in `$ROSE_HOME/etc/rose.conf` and `$HOME/.metomi/rose.conf`
 #     to determine the ranking method.
 #
 #     Print the selected host name.
@@ -74,9 +74,9 @@
 #         Increment verbosity.
 #
 # CONFIGURATION
-#     The command reads its settings from the `[metomi.rose-host-select]` section in
-#     `$ROSE_HOME/etc/metomi.rose.conf` and `$HOME/.metomi/rose.conf`. All settings
-#     are optional. Type `metomi.rose config rose-host-select` to print settings.
+#     The command reads its settings from the `[rose-host-select]` section in
+#     `$ROSE_HOME/etc/rose.conf` and `$HOME/.metomi/rose.conf`. All settings
+#     are optional. Type `rose config rose-host-select` to print settings.
 #     Valid settings are:
 #
 #     default = GROUP/HOST ...
@@ -91,4 +91,4 @@
 #        Set the timeout in seconds of SSH commands to hosts.
 #        (default=10.0)
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rose.host_select "$@"
+exec python3 -m rose.host_select "$@"

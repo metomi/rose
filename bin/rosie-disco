@@ -18,13 +18,13 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 # NAME
-#     metomi.rosie.disco
+#     rosie disco
 #
 # SYNOPSIS
-#     metomi.rosie.disco start [PORT] # start ad-hoc web service server (on PORT)
-#     metomi.rosie.disco stop         # stop ad-hoc web service server
-#     metomi.rosie.disco stop -y      # stop ad-hoc web service server w/o prompting
-#     metomi.rosie.disco              # print status of ad-hoc web service server
+#     rosie disco start [PORT] # start ad-hoc web service server (on PORT)
+#     rosie disco stop         # stop ad-hoc web service server
+#     rosie disco stop -y      # stop ad-hoc web service server w/o prompting
+#     rosie disco              # print status of ad-hoc web service server
 #
 # DESCRIPTION
 #     Start/stop ad-hoc Rosie suite discovery web service server.
@@ -38,4 +38,4 @@
 #     --service-root, -R
 #         (For start only.) Include web service name under root of URL.
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rosie.ws "$@"
+exec python3 -m rosie.ws "$@"

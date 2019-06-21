@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rosie.graph
+#     rosie graph
 #
 # SYNOPSIS
-#     metomi.rosie.graph [OPTIONS] [ID]
+#     rosie graph [OPTIONS] [ID]
 #
 # DESCRIPTION
 #     Graph suite copy ancestry.
@@ -62,4 +62,4 @@
 #         A suite id to graph. If given, only the suites that are
 #         connected to this id by copy history will be graphed.
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rosie.graph "$@"
+exec python3 -m rosie.graph "$@"

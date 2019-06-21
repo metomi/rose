@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rose namelist-dump
+#     rose namelist-dump
 #
 # SYNOPSIS
-#     metomi.rose-namelist-dump [OPTIONS] [FILE ...]
+#     rose-namelist-dump [OPTIONS] [FILE ...]
 #
 # DESCRIPTION
 #     Convert namelist files into a Rose application configuration snippet.
@@ -45,4 +45,4 @@
 #     -u, --upper
 #         Shorthand for `--case=upper`.
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rose.namelist_dump "$@"
+exec python3 -m rose.namelist_dump "$@"

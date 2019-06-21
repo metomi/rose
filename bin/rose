@@ -37,7 +37,7 @@
 if ${ROSE_DEBUG:-false}; then
     set -x
 fi
-. rose_init
+. $(dirname $0)/../lib/bash/rose_init
 rose_init
 
 # Print actual command of a command alias

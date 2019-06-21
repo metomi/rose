@@ -18,40 +18,40 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rosie.id
+#     rosie id
 #
 # SYNOPSIS
-#     metomi.rosie.id [OPTIONS]
+#     rosie id [OPTIONS]
 #
 #     # Print the repository URL of a given suite ID
-#     metomi.rosie.id --to-origin mo1-abc45
+#     rosie id --to-origin mo1-abc45
 #
 #     # Print the local location of a given suite ID
-#     metomi.rosie.id --to-local-copy mo1-abc45
+#     rosie id --to-local-copy mo1-abc45
 #
 #     # Print the output directory of a given suite ID
-#     metomi.rosie.id --to-output mo1-abc45
+#     rosie id --to-output mo1-abc45
 #
 #     # Print the web URL of a given suite ID
-#     metomi.rosie.id --to-web mo1-abc45
+#     rosie id --to-web mo1-abc45
 #
 #     # Print suite ID of working copy in $PWD
-#     metomi.rosie.id
+#     rosie id
 #
 #     # Print suite ID of working copy in a directory
-#     metomi.rosie.id /path/to/working/copy
+#     rosie id /path/to/working/copy
 #
 #     # Print suite ID of a given URL
-#     metomi.rosie.id svn://fcm1/rose_mo1_svn/a/b/c/4/5
+#     rosie id svn://fcm1/rose_mo1_svn/a/b/c/4/5
 #
 #     # Print latest suite ID in the default repository
-#     metomi.rosie.id --latest
+#     rosie id --latest
 #
 #     # Print latest suite ID in the given repository
-#     metomi.rosie.id --latest mot
+#     rosie id --latest mot
 #
 #     # Print next suite ID in the default repository
-#     metomi.rosie.id --next
+#     rosie id --next
 #
 # DESCRIPTION
 #     Utility for working with suite IDs.
@@ -70,4 +70,4 @@
 #     --next
 #         Print the next available suite ID in the repository
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rosie.suite_id "$@"
+exec python3 -m rosie.suite_id "$@"

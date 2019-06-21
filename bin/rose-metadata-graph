@@ -18,10 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rose metadata-graph
+#     rose metadata-graph
 #
 # SYNOPSIS
-#     metomi.rose metadata-graph [OPTIONS] [SECTION ...]
+#     rose metadata-graph [OPTIONS] [SECTION ...]
 #
 # DESCRIPTION
 #     Graph configuration metadata.
@@ -50,4 +50,4 @@
 #     optional ROSE_META_PATH
 #         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rose.metadata_graph "$@"
+exec python3 -m rose.metadata_graph "$@"

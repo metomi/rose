@@ -18,23 +18,23 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     metomi.rose suite-run
+#     rose suite-run
 #
 # SYNOPSIS
-#     metomi.rose suite-run [OPTIONS] [[--] CYLC-RUN-ARGS]
+#     rose suite-run [OPTIONS] [[--] CYLC-RUN-ARGS]
 #
 #     # Install and run a Cylc suite in $PWD.
-#     metomi.rose suite-run
+#     rose suite-run
 #
 #     # As above, but start the suite in simulation mode.
-#     metomi.rose suite-run -- --mode=simulation
+#     rose suite-run -- --mode=simulation
 #
 #     # Install and run the suite in $PWD, and register it as "my.suite".
-#     metomi.rose suite-run -n my.suite
+#     rose suite-run -n my.suite
 #
 #     # Install and run suite in "/dir/to/my.suite".
-#     # Equivalent to (cd /dir/to/my.suite && metomi.rose suite-run).
-#     metomi.rose suite-run -C /dir/to/my.suite
+#     # Equivalent to (cd /dir/to/my.suite && rose suite-run).
+#     rose suite-run -C /dir/to/my.suite
 #
 # DESCRIPTION
 #     Install and run a Cylc suite.
@@ -79,7 +79,7 @@
 #         the configuration directory.
 #     --new, -N
 #         (Re-)create suite runtime locations. This option is equivalent to
-#         running `metomi.rose suite-clean -y && rose suite-run` and will remove
+#         running `rose suite-clean -y && rose suite-run` and will remove
 #         previous runs. Users may want to take extra care when using this
 #         option.
 #     --no-log-archive
@@ -106,10 +106,10 @@
 #         Increment verbosity.
 #
 # ENVIRONMENT VARIABLES
-#     `metomi.rose suite-run` provides the following environment variables to the suite.
+#     `rose suite-run` provides the following environment variables to the suite.
 #
 #     ROSE_ORIG_HOST
-#         The name of the host where the `metomi.rose suite-run` command was invoked.
+#         The name of the host where the `rose suite-run` command was invoked.
 #     optional ROSE_SUITE_OPT_CONF_KEYS
 #         Each `KEY` in this space delimited list switches on an optional
 #         configuration. The configurations are applied first-to-last.
@@ -129,4 +129,4 @@
 #     * `cylc help register`
 #     * `cylc help run`
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rose.suite_run "$@"
+exec python3 -m rose.suite_run "$@"
