@@ -100,7 +100,7 @@ path_lead() {
 
 # Print Rose version
 function print_version() {
-    echo "Rose $ROSE_VERSION ($ROSE_HOME)"
+    echo "Rose $ROSE_VERSION"
 }
 
 #-------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ version|--version|-V)
     :;;
 doc)
     PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
-    PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
+    PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME_BIN")
     ROSE_UTIL=$UTIL
     export PATH PYTHONPATH ROSE_UTIL
     ns_len=$(( ${#ROSE_NS}+2 ))
@@ -186,7 +186,7 @@ if (($# > 0)) && [[ $1 == '--help' || $1 == '-h' ]]; then
     exit
 fi
 PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
-PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
+PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME_BIN")
 ROSE_UTIL=$UTIL
 export PATH PYTHONPATH ROSE_UTIL
 exec "$COMMAND" "$@"
