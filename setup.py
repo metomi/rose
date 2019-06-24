@@ -67,7 +67,7 @@ setup(
     python_requires='>3.7',
     package_data={
         'metomi.rose': [
-            'etc/*',
+            'etc/.*',
             'rose-version'
         ]},
     packages=find_namespace_packages(include=["metomi.*"]),
