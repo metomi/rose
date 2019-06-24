@@ -19,10 +19,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
-class LogicalTransformer(rose.macro.MacroBase):
+class LogicalTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to change the value of a boolean environment variable."""
 
@@ -33,17 +33,17 @@ class LogicalTransformer(rose.macro.MacroBase):
         self.reports = []
         if config.get(["env", "TRANSFORM_SWITCH"]) is not None:
             value = config.get(["env", "TRANSFORM_SWITCH"]).value
-            if value == rose.TYPE_BOOLEAN_VALUE_FALSE:
-                new_value = rose.TYPE_BOOLEAN_VALUE_TRUE
+            if value == metomi.rose.TYPE_BOOLEAN_VALUE_FALSE:
+                new_value = metomi.rose.TYPE_BOOLEAN_VALUE_TRUE
             else:
-                new_value = rose.TYPE_BOOLEAN_VALUE_FALSE
+                new_value = metomi.rose.TYPE_BOOLEAN_VALUE_FALSE
             config.set(["env", "TRANSFORM_SWITCH"], new_value)
             info = self.WARNING_CHANGED_VALUE.format(value, new_value)
             self.add_report("env", "TRANSFORM_SWITCH", value, info)
         return config, self.reports
 
 
-class LogicalTruthChecker(rose.macro.MacroBase):
+class LogicalTruthChecker(metomi.rose.macro.MacroBase):
 
     """Test class to check the value of a boolean environment variable."""
 
@@ -53,7 +53,7 @@ class LogicalTruthChecker(rose.macro.MacroBase):
         """Check the env switch."""
         self.reports = []
         node = config.get(["env", "TRANSFORM_SWITCH"], no_ignore=True)
-        if node is not None and node.value != rose.TYPE_BOOLEAN_VALUE_FALSE:
+        if node is not None and node.value != metomi.rose.TYPE_BOOLEAN_VALUE_FALSE:
             info = self.ERROR_NOT_TRUE.format(node.value)
             self.add_report("env", "TRANSFORM_SWITCH", value, info)
         return self.reports

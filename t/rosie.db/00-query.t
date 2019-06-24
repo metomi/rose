@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test rosie.db parsing.
+# Test metomi.rosie.db parsing.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 TEST_PARSER="python3 $TEST_SOURCE_DIR/$TEST_KEY_BASE.py"

@@ -47,7 +47,7 @@ file_cmp "${TEST_KEY}.err.head" "${TEST_KEY}.err.head" <<__ERR__
 [FAIL] cylc restart ${NAME} --no-detach --debug # return-code=1, stderr=
 __ERR__
 file_grep "${TEST_KEY}.err.grep"\
-    "cylc.flow.exceptions.SuiteServiceFileError: no suite.rc in ${HOME}/cylc-run/${NAME}" \
+    "cylc.exceptions.SuiteServiceFileError: no suite.rc in ${HOME}/cylc-run/${NAME}" \
     "${TEST_KEY}.err"
 rm -fr "${HOME}/cylc-run/${NAME}"
 #-------------------------------------------------------------------------------

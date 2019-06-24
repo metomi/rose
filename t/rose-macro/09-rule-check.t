@@ -386,10 +386,10 @@ warn-if=this % 3 == 0;  # Probably should not be a multiple of 3.
        =this < 0;  # Probably should not be less than 0.
        =this * this * this < 100;  # Cube should be less than 100.
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 23
+[V] metomi.rose.macros.DefaultValidators: issues: 23
     =top_level_model_subset_fail='ofo_001'
         failed because: =top_level_model == "'foo'" and 'foo' not in this
     complex:array_test=test_array_len_fail=0, 1, 2
@@ -436,7 +436,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         failed because: this!=0
     simple:scalar_test=test_var_sum_fail=6.00
         failed because: this != simple:scalar_test=control_sum_1 + simple:scalar_test=control_sum_2 + simple:scalar_test=control_sum_3
-[V] rose.macros.DefaultValidators: warnings: 3
+[V] metomi.rose.macros.DefaultValidators: warnings: 3
     simple:warn_test=test_var_1=1
         warn because: this > 0
     simple:warn_test=test_var_3=-1
@@ -465,10 +465,10 @@ fail-if=oh no bad syntax, syntax:bad_before_id_expansion=bar
 [syntax:bad_after_id_expansion=foo]
 fail-if=this * 20 syntax:bad_after_id_expansion=bar
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 2
+[V] metomi.rose.macros.DefaultValidators: issues: 2
     syntax:bad_after_id_expansion=foo=2
         Syntax error (fail-if) this * 20 syntax:bad_after_id_expansion=bar: expected token 'end of statement block', got '_id0'
     syntax:bad_before_id_expansion=foo=0

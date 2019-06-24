@@ -51,10 +51,10 @@ init_macro modify.py <<'__MACRO__'
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #-----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
-class InvisibleCarPaint(rose.macro.MacroBase):
+class InvisibleCarPaint(metomi.rose.macro.MacroBase):
 
     """The coolest colour is... invisible."""
 
@@ -67,7 +67,7 @@ class InvisibleCarPaint(rose.macro.MacroBase):
         return config, self.reports
 
 
-class ExtraWheels(rose.macro.MacroBase):
+class ExtraWheels(metomi.rose.macro.MacroBase):
 
     """Add some more wheels."""
 
@@ -80,7 +80,7 @@ class ExtraWheels(rose.macro.MacroBase):
         return config, self.reports
 
 
-class ChangeHouseComments(rose.macro.MacroBase):
+class ChangeHouseComments(metomi.rose.macro.MacroBase):
 
     """Change comments for our house."""
 
@@ -93,7 +93,7 @@ class ChangeHouseComments(rose.macro.MacroBase):
         return config, self.reports
 
 
-class IgnoreGarage(rose.macro.MacroBase):
+class IgnoreGarage(metomi.rose.macro.MacroBase):
 
     """Park outside."""
 

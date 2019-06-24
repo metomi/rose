@@ -166,7 +166,7 @@ length=:
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --fix --non-interactive --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[T] rose.macros.DefaultTransforms: changes: 8
+[T] metomi.rose.macros.DefaultTransforms: changes: 8
     namelist:values_nl1=my_boolean_array_any=true,false,true
         true,False,true -> true,false,true
     namelist:values_nl1=my_char='Character string with no surrounding quotes'

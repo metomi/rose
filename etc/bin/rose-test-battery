@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-test-battery
+#
+# SYNOPSIS
+#     rose test-battery
+#
+# DESCRIPTION
+#     Run Rose self tests.
+#
+#     Change directory to Rose source tree, and runs this shell command:
+#
+#     `exec prove -j "$NPROC" -s -r "${@:-t}"`
+#
+#     where `NPROC` is the number of processors on your computer (or the
+#     setting `[t]prove-options` in the site/user configuration file). If you
+#     do not want to run the full test suite, you can specify the names of
+#     individual test files or their containing directories as extra arguments.
+#
+# EXAMPLES
+#     # Run the full test suite with the default options.
+#     rose test-battery
+#     # Run the full test suite with 12 processes.
+#     rose test-battery -j 12
+#     # Run only tests under "t/rose-app-run/" with 12 processes.
+#     rose test-battery -j 12 t/rose-app-run
+#     # Run only "t/rose-app-run/07-opt.t" in verbose mode.
+#     rose test-battery -v t/rose-app-run/07-opt.t
+#
+# SEE ALSO
+#     * `prove(1)`
+#-------------------------------------------------------------------------------
+. rose_init
+. rose_log
+
+set -eu
+
+rose_init
+
+# Move to folder in which prove command should be run.
+TESTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd $TESTDIR/../../
+mkdir -p ~/.metomi
+
+# Recompile *.pyc files to ensure we are running the current code.
+# @TODO Consider if this is appropriate in new version
+if [[ -w 'lib/python/' ]]; then
+    find 'lib/python/' -name '*.pyc' -type 'f' -delete
+    python3 -mcompileall -q 'lib/python/'
+fi
+if PROVE_OPTIONS=$(rose config t prove-options); then
+    # shellcheck disable=SC2086
+    exec prove $PROVE_OPTIONS -r "${@:-t}"
+else
+    if [[ -f /proc/cpuinfo ]]; then
+        NPROC=$(grep -ic processor /proc/cpuinfo)
+    else
+        NPROC=$(python3 -c \
+            'import multiprocessing; print(multiprocessing.cpu_count())')
+    fi
+    exec prove -j "$NPROC" -s -r "${@:-t}"
+fi

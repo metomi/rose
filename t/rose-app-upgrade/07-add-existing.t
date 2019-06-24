@@ -40,10 +40,10 @@ init_macro park <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeAddDinosaurs(rose.upgrade.MacroUpgrade):
+class UpgradeAddDinosaurs(metomi.rose.upgrade.MacroUpgrade):
 
     """Install dinosaurs in our super-secure facility."""
 

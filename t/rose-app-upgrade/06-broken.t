@@ -36,10 +36,10 @@ init_macro test-app-upgrade <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeWhatevertoOtherWhatever(rose.upgrade.MacroUpgrade):
+class UpgradeWhatevertoOtherWhatever(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from Whatever to Other Whatever."""
 
@@ -50,7 +50,7 @@ class UpgradeWhatevertoOtherWhatever(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class UpgradeDunnoToOtherDunno(rose.upgrade.MacroUpgrade):
+class UpgradeDunnoToOtherDunno(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from Dunno to Other Dunno."""
 
@@ -102,7 +102,7 @@ rm "../rose-meta/test-app-upgrade/versions.pyc"
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python3
 
-import rose.upgrade
+import metomi.rose.upgrade
 import some_broken_import
 __MACRO__
 

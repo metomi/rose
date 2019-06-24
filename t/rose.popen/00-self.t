@@ -20,5 +20,6 @@
 D=$(cd $(dirname $0) && pwd)
 . $D/test_header
 tests 1
-run_pass "$TEST_KEY_BASE" python3 $ROSE_HOME/lib/python/rose/popen.py "$@"
+POPEN_FILE=$(python -c "import metomi.rose.popen; print(metomi.rose.popen.__file__)")
+run_pass "$TEST_KEY_BASE" python3 $POPEN_FILE "$@"
 exit 0

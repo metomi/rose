@@ -66,7 +66,7 @@ values = 5
 [namelist:values_nl2{mod1}=my_num]
 values = 4
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -97,10 +97,10 @@ values = 4
 [namelist:values_nl2{mod1}=my_num]
 values = 5
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] metomi.rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_char='orange'
         Value 'orange' should be 'maroon'
     namelist:values_nl1=my_fixed_array=red,red,red,red,red
@@ -148,7 +148,7 @@ values = something"(")\\\,, something_else
 [namelist:values_nl2]
 duplicate = true
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -185,10 +185,10 @@ values = x, y, z
 [namelist:values_nl2]
 duplicate = true
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] metomi.rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_char='orange'
         Value 'orange' not in allowed values ["'maroon'", "'turquoise'"]
     namelist:values_nl1=my_char_array='red','green'
@@ -240,7 +240,7 @@ values = 'Manchester\, England', 'Glasgow\, Scotland'
 __META_CONFIG__
 run_fail "${TEST_KEY}" rose macro -V --config='../config'
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 1
+[V] metomi.rose.macros.DefaultValidators: issues: 1
     namelist:values_nl1=my_location='Exeter, England'
         Value 'Exeter, England' not in allowed values ["'Manchester, England'", "'Glasgow, Scotland'"]
 __ERR__

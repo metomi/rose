@@ -34,11 +34,11 @@ init_meta </dev/null
 init_macro url.py < $TEST_SOURCE_DIR/lib/custom_macro_check.py
 run_pass "$TEST_KEY" rose macro --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] url.URLChecker
     # Class to check if a URL is valid.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
