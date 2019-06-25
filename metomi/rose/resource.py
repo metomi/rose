@@ -33,13 +33,13 @@ ERROR_LOCATE_OBJECT = "Could not locate {0}"
 
 
 def get_util_home(*args):
-    """Return ROSE_HOME or the dirname of the dirname of sys.argv[0].
+    """Return ROSE_LIB or the dirname of the dirname of sys.argv[0].
 
     If args are specified, they are added to the end of returned path.
 
     """
     try:
-        value = os.environ["ROSE_HOME"]
+        value = os.environ["ROSE_LIB"]
     except KeyError:
         value = os.path.abspath(__file__)
         for _ in range(4):  # assume __file__ under $ROSE_HOME/lib/python/rose/

@@ -100,10 +100,11 @@ path_lead() {
 
 # Print Rose version
 function print_version() {
-    echo "Rose $ROSE_VERSION ($ROSE_HOME)"
+    echo "Rose $ROSE_VERSION ($ROSE_HOME_BIN)"
 }
 
 #-------------------------------------------------------------------------------
+# if "rose x" input then set UTIL=x
 UTIL="help"
 if (($# > 0)); then
     UTIL=$1
@@ -115,6 +116,7 @@ help|h|?|--help|-h)
     if (($# == 0)); then
         {
             print_version
+            # This is the problem line- we aren't getting anything back here.
             rose_usage
             echo
             echo "$ROSE_NS provides the following utilities:"
@@ -186,7 +188,7 @@ if (($# > 0)) && [[ $1 == '--help' || $1 == '-h' ]]; then
     exit
 fi
 PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
-PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
+PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_LIB")
 ROSE_UTIL=$UTIL
 export PATH PYTHONPATH ROSE_UTIL
 exec "$COMMAND" "$@"

@@ -30,20 +30,21 @@
 #     * load the "rose_usage" function.
 #     * load any FUNC specified in the argument list.
 #-------------------------------------------------------------------------------
+. rose_usage
 
 function rose_init() {
     set -eu
     ROSE_NS=$(basename $0)
-    ROSE_HOME_BIN=$(which rose)
-    ROSE_HOME=$(dirname $ROSE_HOME_BIN)
+    #ROSE_HOME=$(which rose)
+    ROSE_LIB=$(dirname $(python -c "import metomi.rose; print(metomi.rose.__file__)"))
+    ROSE_HOME_BIN=$(dirname $(which rose))
     export ROSE_VERSION=$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")
     local DESC=
-    if DESC="$(cd "$ROSE_HOME" && git describe 2>/dev/null)"; then
-        ROSE_VERSION=$DESC
-    fi
-    export ROSE_HOME ROSE_HOME_BIN ROSE_NS ROSE_VERSION
-
-    local LIB=$ROSE_HOME_BIN
+#    if DESC="$(cd "$ROSE_HOME" && git describe 2>/dev/null)"; then
+#        ROSE_VERSION=$DESC
+#    fi
+    export ROSE_LIB ROSE_HOME_BIN ROSE_NS ROSE_VERSION
+    local LIB=$ROSE_LIB
     if [[ -f $LIB/${FUNCNAME[0]}_site ]]; then
         . "$LIB/${FUNCNAME[0]}_site"
     fi

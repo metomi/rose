@@ -26,10 +26,10 @@ SpongeDeSoggifier, a rose transform macro.
 import re
 import subprocess
 
-import rose.macro
+import metomi.rose.macro
 
 
-class SpongeDeSoggifier(rose.macro.MacroBase):
+class SpongeDeSoggifier(metomi.rose.macro.MacroBase):
 
     """De-soggifies the sponge."""
 

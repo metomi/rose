@@ -34,7 +34,7 @@ __CONFIG__
 TEST_KEY=$TEST_KEY_BASE
 test_setup
 touch .rose-config_processors-file.db
-run_pass "$TEST_KEY" rose app-run --config=../config -q
+run_pass "$TEST_KEY" rose app-run --config=../config -q --debug
 file_test "$TEST_KEY.db" .rose-config_processors-file.db -s
 file_test "$TEST_KEY.COPYING" COPYING
 test_teardown

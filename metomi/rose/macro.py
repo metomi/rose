@@ -552,7 +552,7 @@ def add_site_meta_paths():
         for path in path.split(os.pathsep):
             path = os.path.expanduser(os.path.expandvars(path))
             sys.path.insert(0, os.path.abspath(path))
-    sys.path.append(os.path.join(os.getenv("ROSE_HOME_BIN"), "etc/rose-meta"))
+    sys.path.append(os.path.join(os.getenv("ROSE_LIB"), "etc/rose-meta"))
 
 
 def add_env_meta_paths():
@@ -1621,7 +1621,7 @@ def main():
         sys.exit(1)
 
     # Path manipulation.
-    sys.path.append(os.getenv("ROSE_HOME"))
+    sys.path.append(os.getenv("ROSE_LIB"))
     add_opt_meta_paths(opts.meta_path)
 
     # Run macros for each config.
