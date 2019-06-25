@@ -96,7 +96,7 @@ import re
 from rose.env import env_var_escape
 import shlex
 import sys
-from tempfile import NamedTemporaryFile, TemporaryFile
+from tempfile import NamedTemporaryFile, SpooledTemporaryFile
 from functools import cmp_to_key
 from rose.unicode_utils import write_safely
 
@@ -1202,7 +1202,7 @@ class ConfigLoader(object):
 
     def load_with_opts(self, source, node=None, more_keys=None,
                        used_keys=None, return_config_map=False,
-                       mark_opt_confs=False):
+                       mark_opt_confs=False, defines=None):
         """Read a source configuration file with optional configurations.
 
         Arguments:
@@ -1225,6 +1225,7 @@ class ConfigLoader(object):
                 a dict (config_map) containing config names vs their uncombined
                 nodes. Optional configurations use their opt keys as keys, and
                 the main configuration uses 'None'.
+            defines (list - optional): A list of [SECTION]KEY=VALUE overrides.
 
         Returns:
             tuple: node or (node, config_map):
@@ -1272,6 +1273,8 @@ class ConfigLoader(object):
 
         """
         node = self.load(source, node)
+        if defines is not None:
+            node = self.load(defines, node)  # enable opts override
         if return_config_map:
             config_map = {None: copy.deepcopy(node)}
         opt_conf_keys_node = node.unset(["opts"])
@@ -1313,45 +1316,18 @@ class ConfigLoader(object):
                     used_keys.append(key)
                 if return_config_map:
                     config_map[key] = self.load(opt_conf_file_name)
+        if defines is not None:
+            node = self.load(defines, node)
         if return_config_map:
             return node, config_map
-        return node
-
-    def load_defines(self, defines, node=None):
-        """Read configuration from a list of command line defines.
-
-        Arguments:
-            defines (list): A list of [SECTION]KEY=VALUE items.
-            node (ConfigNode - optional): A ConfigNode object if specified,
-                otherwise one is created.
-
-        Returns:
-            ConfigNode: A new ConfigNode object.
-        """
-        # N.B. In theory, we should write the values in "defines" to
-        # "node" directly. However, the values in "defines" may contain
-        # "ignore" flags. Rather than replicating the logic for parsing
-        # ignore flags, it is actually easier to write the values in
-        # "defines" to a file and pass it to the loader to parse it.
-        source = TemporaryFile()
-        for define in defines:
-            sect, key, value = self.RE_OPT_DEFINE.match(define).groups()
-            if sect is None:
-                sect = ""
-            if value is None:
-                value = ""
-            source.write(("[%s]\n" % sect).encode())
-            if key is not None:
-                source.write(("%s=%s\n" % (key, value)).encode())
-        source.seek(0)
-        node = self.load(source, node)
         return node
 
     def load(self, source, node=None, default_comments=None):
         """Read a source configuration file.
 
         Arguments:
-            source (str): An open file handle or a string for a file path.
+            source (str): An open file handle, a string for a file path or
+                a list of [SECTION]KEY=VALUE items.
             node (ConfigNode): A ConfigNode object if specified, otherwise
                 created.
 
@@ -1520,9 +1496,23 @@ class ConfigLoader(object):
                 file_name = file_.name
             except AttributeError:
                 file_name = self.UNKNOWN_NAME
-        else:
+        elif isinstance(file_, str):
             file_name = os.path.abspath(file_)
             file_ = open(file_name, "rb")
+        else:
+            defines = file_
+            file_ = SpooledTemporaryFile()
+            file_name = self.UNKNOWN_NAME
+            for define in defines:
+                sect, key, value = self.RE_OPT_DEFINE.match(define).groups()
+                if sect is None:
+                    sect = ""
+                if value is None:
+                    value = ""
+                file_.write(("[%s]\n" % sect).encode())
+                if key is not None:
+                    file_.write(("%s=%s\n" % (key, value)).encode())
+            file_.seek(0)
         return (file_, file_name)
 
 
