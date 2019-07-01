@@ -22,7 +22,8 @@
 import os
 from metomi.rose.env import (
     env_export, env_var_process, UnboundEnvironmentVariableError)
-from metomi.rose.config_processor import ConfigProcessError, ConfigProcessorBase
+from metomi.rose.config_processor import (
+    ConfigProcessError, ConfigProcessorBase)
 
 
 class ConfigProcessorForEnv(ConfigProcessorBase):

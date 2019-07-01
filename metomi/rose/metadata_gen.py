@@ -49,7 +49,8 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
             option = keylist[1]
         if sect in [metomi.rose.CONFIG_SECT_CMD]:
             continue
-        if keylist == [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE]:
+        if keylist == [metomi.rose.CONFIG_SECT_TOP,
+                       metomi.rose.CONFIG_OPT_META_TYPE]:
             continue
         meta_sect = metomi.rose.macro.REC_ID_STRIP.sub("", sect)
         modifier_sect = metomi.rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
@@ -57,8 +58,9 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
             if (modifier_sect != meta_sect and
                     modifier_sect != sect and
                     meta_config.get([modifier_sect]) is None and auto_type):
-                meta_config.set([modifier_sect, metomi.rose.META_PROP_DUPLICATE],
-                                metomi.rose.META_PROP_VALUE_TRUE)
+                meta_config.set(
+                    [modifier_sect, metomi.rose.META_PROP_DUPLICATE],
+                    metomi.rose.META_PROP_VALUE_TRUE)
             if meta_config.get([meta_sect]) is not None:
                 continue
             meta_config.set([meta_sect])
@@ -80,9 +82,11 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
         if auto_type:
             opt_type, length = type_gen(node.value)
             if opt_type is not None:
-                meta_config.set([meta_opt, metomi.rose.META_PROP_TYPE], opt_type)
+                meta_config.set(
+                    [meta_opt, metomi.rose.META_PROP_TYPE], opt_type)
             if int(length) > 1:
-                meta_config.set([meta_opt, metomi.rose.META_PROP_LENGTH], length)
+                meta_config.set(
+                    [meta_opt, metomi.rose.META_PROP_LENGTH], length)
     return meta_config
 
 

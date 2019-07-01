@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Process namelist: sections in a metomi.rose.config.ConfigNode matching a name."""
+"""Process namelist: sections in a metomi.rose.config.ConfigNode matching a
+name."""
 
 
 import re

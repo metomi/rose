@@ -29,9 +29,11 @@ from setuptools import setup, find_namespace_packages
 
 here = abspath(dirname(__file__))
 
+
 def read(*parts):
-    with codecs.open(join(here, *parts), 'r') as fp:
+    with codecs.open(join(here, *parts), "r") as fp:
         return fp.read()
+
 
 def find_version(*file_paths):
     version_file = read(*file_paths)
@@ -41,15 +43,17 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 INSTALL_REQUIRES = [
-    'jinja2>=2.10.1, <2.11.0',
-    'cylc-flow==8.0a0',
-    'aiofiles',
-    'tornado',
-    'sqlalchemy'
+    "jinja2>=2.10.1, <2.11.0",
+    "cylc-flow==8.0a0",
+    "aiofiles",
+    "tornado",
+    "sqlalchemy",
+    "isodatetime",
 ]
 
 setup(
@@ -60,17 +64,11 @@ setup(
     description="Rose, a framework for meteorological suites.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    scripts=glob(join('bin', '*')) +
-            glob(join('sbin', '*')) +
-            glob(join('lib', 'bash', '*')),
+    scripts=glob(join("bin", "*"))
+    + glob(join("sbin", "*"))
+    + glob(join("lib", "bash", "*")),
     install_requires=INSTALL_REQUIRES,
-    python_requires='>3.7',
-    package_data={
-        'metomi.rose': [
-            'etc/.*',
-            'rose-version'
-        ]},
+    python_requires=">3.7",
+    package_data={"metomi.rose": ["etc/.*", "rose-version"]},
     packages=find_namespace_packages(include=["metomi.*"]),
-
-
 )

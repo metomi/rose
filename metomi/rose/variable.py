@@ -271,7 +271,8 @@ def get_value_from_metadata(meta_data):
         elif var_type == 'quoted':
             var_value = '""'
     elif metomi.rose.META_PROP_VALUE_HINTS in meta_data:
-        var_value = array_split(meta_data[metomi.rose.META_PROP_VALUE_HINTS])[0]
+        var_value = array_split(
+            meta_data[metomi.rose.META_PROP_VALUE_HINTS])[0]
     return var_value
 
 

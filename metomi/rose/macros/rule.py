@@ -86,8 +86,8 @@ class FailureRuleChecker(metomi.rose.macro.MacroBase):
             sect, opt = node_keys
             value = node.value
             setting_id = self._get_id_from_section_option(sect, opt)
-            metadata = metomi.rose.macro.get_metadata_for_config_id(setting_id,
-                                                             meta_config)
+            metadata = metomi.rose.macro.get_metadata_for_config_id(
+                setting_id, meta_config)
             for rule_opt in [self.RULE_ERROR_NAME, self.RULE_WARNING_NAME]:
                 if rule_opt in metadata:
                     rule = metadata.get(rule_opt)
@@ -229,7 +229,8 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
                     var_id = setting_id
                 setting_value = get_value_from_id(
                     var_id, config, meta_config, setting_id)
-                array_value = metomi.rose.variable.array_split(str(setting_value))
+                array_value = metomi.rose.variable.array_split(
+                    str(setting_value))
                 new_string = start + "("
                 for elem_num in range(1, len(array_value) + 1):
                     new_string += self.ARRAY_EXPR.format(var_id, elem_num,
@@ -318,7 +319,8 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             # We may need to de-duplicate the section in the variable_id.
             dupl_section = metomi.rose.macro.REC_ID_STRIP.sub("", section)
             dupl_node = meta_config.get(
-                [dupl_section, metomi.rose.META_PROP_DUPLICATE], no_ignore=True)
+                [dupl_section, metomi.rose.META_PROP_DUPLICATE],
+                no_ignore=True)
             if (dupl_node is not None and
                     dupl_node.value == metomi.rose.META_PROP_VALUE_TRUE):
                 # This is an id in a duplicate namelist.

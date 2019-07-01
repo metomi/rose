@@ -27,7 +27,8 @@ from metomi.rose.host_select import HostSelector
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Reporter
-from metomi.rose.suite_engine_proc import SuiteEngineProcessor, SuiteStillRunningError
+from metomi.rose.suite_engine_proc import (
+    SuiteEngineProcessor, SuiteStillRunningError)
 import sys
 import traceback
 from uuid import uuid4

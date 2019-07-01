@@ -91,8 +91,8 @@ class ValueChecker(metomi.rose.macro.MacroBase):
 
     def _validate_id(self, var_id, value, meta_config):
         """Validate the value of a particular variable id."""
-        metadata = metomi.rose.macro.get_metadata_for_config_id(var_id,
-                                                         meta_config)
+        metadata = metomi.rose.macro.get_metadata_for_config_id(
+            var_id, meta_config)
         sect, key = self._get_section_option_from_id(var_id)
         saved_metadata = copy.deepcopy(metadata)
         saved_metadata.pop('id')
@@ -296,8 +296,8 @@ class TypeFixer(metomi.rose.macro.MacroBase):
             sect = item.section
             opt = item.option
             var_id = self._get_id_from_section_option(sect, opt)
-            metadata = metomi.rose.macro.get_metadata_for_config_id(var_id,
-                                                             meta_config)
+            metadata = metomi.rose.macro.get_metadata_for_config_id(
+                var_id, meta_config)
             saved_metadata = copy.deepcopy(metadata)
             saved_metadata.pop('id')
             node = config.get([sect, opt])

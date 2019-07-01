@@ -79,7 +79,7 @@ ERROR_RETURN_VALUE = "{0}: incorrect return value"
 ERROR_RETURN_VALUE_STATE = "{0}: node.state: invalid returned value"
 MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"),
                              metomi.rose.META_DIR_MACRO)
-ERROR_OUT_DIR_MULTIPLE_APPS = ("Cannot specify an output dir when running metomi.rose"
+ERROR_OUT_DIR_MULTIPLE_APPS = ("Cannot specify an output dir when running"
                                " macro over multiple apps.")
 MACRO_EXT = ".py"
 MACRO_OUTPUT_HELP = "    # {0}\n"
@@ -254,8 +254,8 @@ class MacroBase(object):
 
         Args:
             setting_id (str): The name of the setting to extract metadata for.
-            meta_config (metomi.rose.config.ConfigNode): Config node containing the
-                metadata to extract from.
+            meta_config (metomi.rose.config.ConfigNode): Config node containing
+                the metadata to extract from.
 
         Return:
             dict: A dictionary containing metadata options.
@@ -547,7 +547,8 @@ def add_meta_paths():
 def add_site_meta_paths():
     """Load any metadata paths specified in a user or site configuration."""
     conf = metomi.rose.resource.ResourceLocator.default().get_conf()
-    path = conf.get_value([metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_PATH])
+    path = conf.get_value(
+        [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_PATH])
     if path is not None:
         for path in path.split(os.pathsep):
             path = os.path.expanduser(os.path.expandvars(path))
@@ -637,7 +638,8 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         if is_upgrade:
             meta_keys = ['/'.join(split_key)]
         else:
-            default_key = '/'.join(split_key + [metomi.rose.META_DEFAULT_VN_DIR])
+            default_key = '/'.join(
+                split_key + [metomi.rose.META_DEFAULT_VN_DIR])
             if default_key != key:
                 meta_keys.append(default_key)
     for i, meta_key in enumerate(meta_keys):
@@ -788,7 +790,8 @@ def get_macros_for_config(config=None,
     """Driver function to return macro names for a config object.
 
     kwargs:
-        config - The config to retrieve macros for as a metomi.rose.config.ConfigNode
+        config - The config to retrieve macros for as a
+            metomi.rose.config.ConfigNode
         config_directory - The directory that the config file is located in.
         return_modules - If true then a list of macro modules is also returned.
         include_system - Include default metomi.rose macros?
@@ -834,9 +837,11 @@ def check_config_integrity(app_config):
         if not isinstance(node.state, str):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.state, "node.state", type(node.state), "basestring"))
-        if node.state not in [metomi.rose.config.ConfigNode.STATE_NORMAL,
-                              metomi.rose.config.ConfigNode.STATE_SYST_IGNORED,
-                              metomi.rose.config.ConfigNode.STATE_USER_IGNORED]:
+        if node.state not in [
+            metomi.rose.config.ConfigNode.STATE_NORMAL,
+            metomi.rose.config.ConfigNode.STATE_SYST_IGNORED,
+            metomi.rose.config.ConfigNode.STATE_USER_IGNORED
+        ]:
             return MacroReturnedCorruptConfigError(
                 ERROR_RETURN_VALUE_STATE.format(node.state))
         if not isinstance(node.comments, list):
@@ -1479,7 +1484,8 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
                       metomi.rose.INFO_CONFIG_NAME)
     optional_keys = []
     optional_dir = os.path.join(conf_dir, metomi.rose.config.OPT_CONFIG_DIR)
-    optional_glob = os.path.join(optional_dir, metomi.rose.GLOB_OPT_CONFIG_FILE)
+    optional_glob = os.path.join(
+        optional_dir, metomi.rose.GLOB_OPT_CONFIG_FILE)
     for path in glob.glob(optional_glob):
         filename = os.path.basename(path)
         # filename is a null string if path is to a directory.
@@ -1508,9 +1514,10 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
             text = ERROR_LOAD_METADATA.format("")
             if warning:
                 text = warning
-            metomi.rose.reporter.Reporter()(text,
-                                     kind=metomi.rose.reporter.Reporter.KIND_ERR,
-                                     level=metomi.rose.reporter.Reporter.FAIL)
+            metomi.rose.reporter.Reporter()(
+                text,
+                kind=metomi.rose.reporter.Reporter.KIND_ERR,
+                level=metomi.rose.reporter.Reporter.FAIL)
             return None
     else:
         meta_config = load_meta_config(app_config,
@@ -1557,7 +1564,8 @@ def _report_error(exception=None, text=""):
 
 
 def scan_rose_directory(conf_dir, suite_only=False):
-    """Returns a list of metomi.rose config files found within the given conf_dir.
+    """Returns a list of metomi.rose config files found within the given
+    conf_dir.
 
     * If the conf_dir is an application directory then return only the
       application configuration file
@@ -1578,8 +1586,11 @@ def scan_rose_directory(conf_dir, suite_only=False):
             confs = []
             if not suite_only:
                 # Add app/*/rose-app.conf files.
-                confs = sorted(glob.glob(os.path.join(
-                    path, metomi.rose.SUB_CONFIGS_DIR, '*', metomi.rose.SUB_CONFIG_NAME)))
+                confs = sorted(glob.glob(
+                    os.path.join(
+                        path, metomi.rose.SUB_CONFIGS_DIR,
+                        '*',
+                        metomi.rose.SUB_CONFIG_NAME)))
             # Add metomi.rose-suite.conf file.
             confs.append(os.path.join(path, metomi.rose.TOP_CONFIG_NAME))
             # Add metomi.rose-suite.info file.

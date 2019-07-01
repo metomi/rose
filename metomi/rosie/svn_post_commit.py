@@ -123,7 +123,8 @@ class RosieSvnPostCommitHook(object):
         if popen is None:
             popen = RosePopener(self.event_handler)
         self.popen = popen
-        path = os.path.dirname(os.path.dirname(sys.modules["metomi.rosie"].__file__))
+        path = os.path.dirname(os.path.dirname(
+            sys.modules["metomi.rosie"].__file__))
         self.usertools_manager = SchemeHandlersManager(
             [path], "rosie.usertools", ["get_emails"])
 

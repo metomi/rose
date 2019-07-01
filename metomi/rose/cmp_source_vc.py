@@ -96,7 +96,8 @@ def main():
     else:
         if lines is None:
             event_handler(
-                '%s: metomi.rose-suite-run.version: VC info not found' % (suite_name),
+                '%s: metomi.rose-suite-run.version: VC info not found' % (
+                    suite_name),
                 kind=Reporter.KIND_ERR, level=Reporter.FAIL)
             sys.exit(2)
         lines = list(line for line in lines)

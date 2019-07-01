@@ -51,7 +51,8 @@ USRCOMPARISON_EXT = ".py"
 
 class KGODatabase(object):
     """
-    KGO Database object, stores comparison information for metomi.rose_ana apps.
+    KGO Database object, stores comparison information for metomi.rose_ana
+    apps.
 
     """
     # Stores retries of database creation and the maximum allowed number

@@ -77,7 +77,8 @@ def annotate_config_with_metadata(config, meta_config, ignore_regexes=None,
         if any(_.search(id_) for _ in ignore_recs):
             unset_keys.append(keylist)
             continue
-        metadata = metomi.rose.macro.get_metadata_for_config_id(id_, meta_config)
+        metadata = metomi.rose.macro.get_metadata_for_config_id(
+            id_, meta_config)
         metadata_text = format_metadata_as_text(
             metadata, only_these_options=metadata_properties)
         metadata_lines = [" " + line for line in metadata_text.splitlines()]

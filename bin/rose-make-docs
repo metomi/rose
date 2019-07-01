@@ -96,7 +96,6 @@ shopt -s extglob
 
 # Move into rose directory
 cd "$(dirname "$0")/../"
-
 # Path for virtualenv.
 VENV_PATH='venv'  # Note: update above docs when changing this value
 # Set to `true` when the virtualenv is being used.

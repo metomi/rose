@@ -53,7 +53,8 @@ class LogicalTruthChecker(metomi.rose.macro.MacroBase):
         """Check the env switch."""
         self.reports = []
         node = config.get(["env", "TRANSFORM_SWITCH"], no_ignore=True)
-        if node is not None and node.value != metomi.rose.TYPE_BOOLEAN_VALUE_FALSE:
+        if node is not None and node.value != \
+                metomi.rose.TYPE_BOOLEAN_VALUE_FALSE:
             info = self.ERROR_NOT_TRUE.format(node.value)
             self.add_report("env", "TRANSFORM_SWITCH", value, info)
         return self.reports

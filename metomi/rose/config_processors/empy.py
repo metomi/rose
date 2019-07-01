@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Process a section in a metomi.rose.config.ConfigNode into a EmPy template."""
+# Process a section in a metomi.rose.config.ConfigNode into a EmPy template.
+
 
 from metomi.rose.config_processors.jinja2 import ConfigProcessorForJinja2
 

@@ -79,12 +79,13 @@ default () {
     main . \
         --exclude etc/rose-bash-completion \
         --exclude t \
-        -- -e SC1090
+        -- -e SC1090 -e SC2119
 
     # run a lenient check on all test scripts
     main t -- -S error -e SC1090
 }
 
+shellcheck -V
 if [[ $# -gt 0 ]]; then
     main "$@"
 else

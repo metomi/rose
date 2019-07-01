@@ -56,10 +56,13 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         for setting_id, sect_node in meta_config.value.items():
             if sect_node.is_ignored():
                 continue
-            opt_node = sect_node.get([metomi.rose.META_PROP_TRIGGER], no_ignore=True)
+            opt_node = sect_node.get([metomi.rose.META_PROP_TRIGGER],
+                                     no_ignore=True)
             if opt_node is not None:
                 expr = opt_node.value
-                id_value_dict = metomi.rose.variable.parse_trigger_expression(expr)
+                id_value_dict = metomi.rose.variable.parse_trigger_expression(
+                    expr
+                )
                 for trig_id, values in id_value_dict.items():
                     if not len(values):
                         id_value_dict.update({trig_id: [None]})
@@ -424,7 +427,8 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             items = list(self.trigger_family_lookup.get(trig_id, {}).items())
             for i, (child_id, vals) in enumerate(items):
                 ch_sect, ch_opt = self._get_section_option_from_id(child_id)
-                if metomi.rose.macro.REC_ID_STRIP.sub("", ch_sect) == base_sect:
+                if metomi.rose.macro.REC_ID_STRIP.sub("", ch_sect)\
+                        == base_sect:
                     new_id = self._get_id_from_section_option(sect, ch_opt)
                     items[i] = (new_id, vals)
             return dict(items)
@@ -461,7 +465,8 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             sect = metomi.rose.macro.REC_ID_STRIP.sub("", sect)
             node = meta_config.get([sect, metomi.rose.META_PROP_DUPLICATE])
             self._id_is_duplicate[setting_id] = (
-                node is not None and node.value == metomi.rose.META_PROP_VALUE_TRUE)
+                node is not None
+                and node.value == metomi.rose.META_PROP_VALUE_TRUE)
         return self._id_is_duplicate[setting_id]
 
     def _get_stripped_id(self, setting_id, meta_config):

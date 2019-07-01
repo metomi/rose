@@ -157,13 +157,15 @@ def _check_range(value):
 
 def _check_value_titles(title_value, values_value):
     try:
-        title_list = metomi.rose.variable.array_split(title_value,
-                                               only_this_delim=",")
+        title_list = metomi.rose.variable.array_split(
+            title_value,
+            only_this_delim=",")
     except Exception as exc:
         return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
     try:
-        value_list = metomi.rose.variable.array_split(values_value,
-                                               only_this_delim=",")
+        value_list = metomi.rose.variable.array_split(
+            values_value,
+            only_this_delim=",")
     except Exception:
         return INCOMPATIBLE.format(metomi.rose.META_PROP_VALUES)
     if len(title_list) != len(value_list):
@@ -196,8 +198,9 @@ def _check_values(value):
 def _check_value_hints(hints_value):
     """Checks that the input is a valid format"""
     try:
-        hints_list = metomi.rose.variable.array_split(hints_value,
-                                               only_this_delim=",")
+        hints_list = metomi.rose.variable.array_split(
+            hints_value,
+            only_this_delim=",")
     except Exception as exc:
         return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
     if not hints_list:
@@ -253,7 +256,8 @@ def metadata_check(meta_config, meta_dir=None,
         if (only_these_sections is not None and
                 section not in only_these_sections):
             continue
-        if node.get([metomi.rose.META_PROP_VALUES], no_ignore=True) is not None:
+        if node.get(
+                [metomi.rose.META_PROP_VALUES], no_ignore=True) is not None:
             # 'values' supercedes other type-like props, so don't use them.
             for type_like_prop in [metomi.rose.META_PROP_PATTERN,
                                    metomi.rose.META_PROP_RANGE,
@@ -281,17 +285,20 @@ def metadata_check(meta_config, meta_dir=None,
             if (option not in allowed_properties and
                     not option.startswith(metomi.rose.META_PROP_WIDGET)):
                 info = UNKNOWN_PROP.format(option)
-                reports.append(metomi.rose.macro.MacroReport(section, option,
-                                                      value, info))
+                reports.append(metomi.rose.macro.MacroReport(
+                    section, option, value, info))
             if section.split('=')[0] == 'ns':
-                allowed = [metomi.rose.META_PROP_TITLE, metomi.rose.META_PROP_DESCRIPTION,
-                           metomi.rose.META_PROP_HELP, metomi.rose.META_PROP_SORT_KEY,
-                           metomi.rose.META_PROP_MACRO, metomi.rose.META_PROP_URL,
+                allowed = [metomi.rose.META_PROP_TITLE,
+                           metomi.rose.META_PROP_DESCRIPTION,
+                           metomi.rose.META_PROP_HELP,
+                           metomi.rose.META_PROP_SORT_KEY,
+                           metomi.rose.META_PROP_MACRO,
+                           metomi.rose.META_PROP_URL,
                            metomi.rose.META_PROP_WIDGET]
                 if option not in allowed:
                     info = INVALID_SETTING_FOR_NAMESPACE.format(option)
-                    reports.append(metomi.rose.macro.MacroReport(section, option,
-                                                          value, info))
+                    reports.append(metomi.rose.macro.MacroReport(
+                        section, option, value, info))
             if option.startswith(metomi.rose.META_PROP_WIDGET):
                 check_func = partial(_check_widget, module_files=module_files)
             elif option == metomi.rose.META_PROP_MACRO:
@@ -301,7 +308,8 @@ def metadata_check(meta_config, meta_dir=None,
                     _check_value_titles,
                     values_value=node.get_value([metomi.rose.META_PROP_VALUES])
                 )
-            elif option in [metomi.rose.META_PROP_FAIL_IF, metomi.rose.META_PROP_WARN_IF]:
+            elif option in [metomi.rose.META_PROP_FAIL_IF,
+                            metomi.rose.META_PROP_WARN_IF]:
                 check_func = partial(
                     _check_rule, setting_id=section, meta_config=meta_config)
             else:
@@ -309,8 +317,8 @@ def metadata_check(meta_config, meta_dir=None,
                 check_func = globals().get(func_name, lambda v: None)
             info = check_func(value)
             if info:
-                reports.append(metomi.rose.macro.MacroReport(section, option,
-                                                      value, info))
+                reports.append(metomi.rose.macro.MacroReport(
+                    section, option, value, info))
     # Check triggering.
     trigger_macro = metomi.rose.macros.trigger.TriggerMacro()
     # The .validate method will be replaced in a forthcoming enhancement.
@@ -334,8 +342,8 @@ def metadata_check(meta_config, meta_dir=None,
                 new_rep_value = None
             else:
                 new_rep_value = rep_trig_node.value
-        reports.append(metomi.rose.macro.MacroReport(new_rep_section, new_rep_option,
-                                              new_rep_value, report.info))
+        reports.append(metomi.rose.macro.MacroReport(
+            new_rep_section, new_rep_option, new_rep_value, report.info))
     reports.sort(key=cmp_to_key(metomi.rose.macro.report_sort))
     return reports
 

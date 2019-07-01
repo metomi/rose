@@ -34,7 +34,9 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Event, Reporter
 from metomi.rose.resource import ResourceLocator
-from metomi.rosie.suite_id import SuiteId, SuiteIdOverflowError, SuiteIdPrefixError
+from metomi.rosie.suite_id import (SuiteId,
+                                   SuiteIdOverflowError,
+                                   SuiteIdPrefixError)
 import shutil
 from io import StringIO
 import sys
@@ -245,9 +247,9 @@ class RosieVCClient(object):
                meta_suite_mode=False):
         """Create a suite.
 
-        info_config -- A metomi.rose.config.ConfigNode object, which will be used as
-                       the content of the "rose-suite.info" file of the new
-                       suite.
+        info_config -- A metomi.rose.config.ConfigNode object, which will be
+                       used as the content of the "rose-suite.info" file of the
+                       new suite.
         from_id -- If defined, copy items from it.
         prefix -- If defined, create the suite in the suite repository named by
                   the prefix instead of the default one.
@@ -392,7 +394,8 @@ class RosieVCClient(object):
         owner = res_loc.get_conf().get_value(
             ["rosie-id", "prefix-username." + prefix])
         if not owner and self.subversion_servers_conf:
-            servers_conf = metomi.rose.config.load(self.subversion_servers_conf)
+            servers_conf = metomi.rose.config.load(
+                self.subversion_servers_conf)
             groups_node = servers_conf.get(["groups"])
             if groups_node is not None:
                 prefix_loc = SuiteId.get_prefix_location(prefix)
@@ -463,7 +466,8 @@ class RosieVCClient(object):
         """Validate contents in suite info file."""
         reports = DefaultValidators().validate(
             info_config,
-            load_meta_config(info_config, config_type=metomi.rose.INFO_CONFIG_NAME))
+            load_meta_config(info_config,
+                             config_type=metomi.rose.INFO_CONFIG_NAME))
         if reports:
             raise SuiteInfoError(reports)
 

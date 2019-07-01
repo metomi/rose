@@ -48,8 +48,9 @@ def get_meta_path(root_node, rel_path=None, meta_key=False):
         dir_path = os.path.abspath(rel_path)
     else:
         dir_path = os.getcwd()
-    meta_dir = metomi.rose.macro.load_meta_path(config=root_node,
-                                         directory=dir_path)[0]
+    meta_dir = metomi.rose.macro.load_meta_path(
+        config=root_node,
+        directory=dir_path)[0]
     if meta_dir is None:
         return None
     else:

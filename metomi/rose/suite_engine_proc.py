@@ -412,14 +412,16 @@ class SuiteEngineProcessor(object):
             break
         if not metomi.rose_bush_url:
             conf = ResourceLocator.default().get_conf()
-            metomi.rose_bush_url = conf.get_value(["rose-suite-log", "rose-bush"])
+            metomi.rose_bush_url = conf.get_value(
+                ["rose-suite-log", "rose-bush"])
         if not metomi.rose_bush_url:
             return "file://" + suite_d
         if not metomi.rose_bush_url.endswith("/"):
             metomi.rose_bush_url += "/"
         if not user_name:
             user_name = pwd.getpwuid(os.getuid()).pw_name
-        return metomi.rose_bush_url + "/".join(["taskjobs", user_name, suite_name])
+        return metomi.rose_bush_url + "/".join(
+            ["taskjobs", user_name, suite_name])
 
     def get_task_auth(self, suite_name, task_name):
         """Return [user@]host for a remote task in a suite."""

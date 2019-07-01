@@ -85,8 +85,8 @@ class ConfigProcessorBase(object):
 
         Arguments:
             conf_tree:
-                The relevant metomi.rose.config_tree.ConfigTree object with the full
-                configuration.
+                The relevant metomi.rose.config_tree.ConfigTree object with the
+                full configuration.
             item: The current configuration item to process.
             orig_keys:
                 The keys for locating the originating setting in conf_tree in a
@@ -108,7 +108,8 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        path = os.path.dirname(os.path.dirname(sys.modules["metomi.rose"].__file__))
+        path = os.path.dirname(
+            os.path.dirname(sys.modules["metomi.rose"].__file__))
         SchemeHandlersManager.__init__(
             self, [path], "rose.config_processors", ["process"])
 

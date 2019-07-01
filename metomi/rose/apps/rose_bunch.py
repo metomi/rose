@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
-"""Builtin application: metomi.rose_bunch: run multiple commands in parallel."""
+# Builtin application: metomi.rose_bunch: run multiple commands in parallel.
 
 
 import itertools
@@ -147,8 +147,9 @@ class RoseBunchApp(BuiltinApp):
                                        self.invocation_names,
                                        "names must be unique")
 
-        self.fail_mode = metomi.rose.env.env_var_process(conf_tree.node.get_value(
-            [self.BUNCH_SECTION, "fail-mode"], self.TYPE_CONTINUE_ON_FAIL))
+        self.fail_mode = metomi.rose.env.env_var_process(
+            conf_tree.node.get_value(
+                [self.BUNCH_SECTION, "fail-mode"], self.TYPE_CONTINUE_ON_FAIL))
 
         if self.fail_mode not in self.FAIL_MODE_TYPES:
             raise ConfigValueError([self.BUNCH_SECTION, "fail-mode"],
@@ -159,7 +160,8 @@ class RoseBunchApp(BuiltinApp):
                                                     "incremental"],
                                                     "true")
         if self.incremental:
-            self.incremental = metomi.rose.env.env_var_process(self.incremental)
+            self.incremental = metomi.rose.env.env_var_process(
+                self.incremental)
 
         self.isformatted = True
         self.command = metomi.rose.env.env_var_process(
@@ -178,7 +180,8 @@ class RoseBunchApp(BuiltinApp):
 
         if instances:
             try:
-                instances = range(int(metomi.rose.env.env_var_process(instances)))
+                instances = range(
+                    int(metomi.rose.env.env_var_process(instances)))
             except ValueError:
                 raise ConfigValueError([self.BUNCH_SECTION,
                                         "command-instances"],

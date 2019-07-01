@@ -355,7 +355,8 @@ class StemRunner(object):
             ["rose-stem", "automatic-options"])
 
     def _check_suite_version(self, fname):
-        """Check the suite is compatible with this version of metomi.rose-stem."""
+        """Check the suite is compatible with this version of metomi.rose-stem.
+        """
         if not os.path.isfile(fname):
             raise RoseSuiteConfNotFoundException(os.path.dirname(fname))
         config = metomi.rose.config.load(fname)

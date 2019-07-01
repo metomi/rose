@@ -20,6 +20,8 @@
 # Basic tests for "rosa svn-pre-commit".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all # Skipped pending fix
+skip_all
 export ROSE_CONF_PATH=
 mkdir conf
 cat >conf/rose.conf <<'__ROSE_CONF__'

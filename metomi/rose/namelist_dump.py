@@ -125,10 +125,11 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
                 config.set([section, lhs], obj.get_rhs_as_string())
 
     # Config: write results
-    metomi.rose.config.dump(config, output_file,
-                     sort_sections=_sort_config_key,
-                     sort_option_items=_sort_config_key,
-                     env_escape_ok=True)
+    metomi.rose.config.dump(
+        config, output_file,
+        sort_sections=_sort_config_key,
+        sort_option_items=_sort_config_key,
+        env_escape_ok=True)
     output_file.close()
 
 

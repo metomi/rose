@@ -30,7 +30,9 @@ import re
 import metomi.rose
 from metomi.rose.config import ConfigLoader
 from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.macro import add_meta_paths, get_reports_as_text, load_meta_config
+from metomi.rose.macro import (add_meta_paths,
+                               get_reports_as_text,
+                               load_meta_config)
 from metomi.rose.macros import DefaultValidators
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter

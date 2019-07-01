@@ -115,7 +115,8 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
     ids = []
     for keylist, node in meta_config.walk(no_ignore=True):
         id_ = keylist[0]
-        if (id_.startswith(metomi.rose.META_PROP_NS + metomi.rose.CONFIG_DELIMITER) or
+        if (id_.startswith(
+                metomi.rose.META_PROP_NS + metomi.rose.CONFIG_DELIMITER) or
                 id_.startswith(metomi.rose.SUB_CONFIG_FILE_DIR + ":*")):
             continue
         if isinstance(node.value, dict):
@@ -134,7 +135,8 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
         graph.add_node(id_, **node_attrs)
     for setting_id, id_value_dict in sorted(
             trigger.trigger_family_lookup.items()):
-        section, option = metomi.rose.macro.get_section_option_from_id(setting_id)
+        section, option = metomi.rose.macro.get_section_option_from_id(
+            setting_id)
         section_node = config.get([section], no_ignore=True)
         node = config.get([section, option])
         if node is None:
@@ -143,8 +145,9 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
             setting_value = node.value
         setting_is_section_ignored = (option is None and section_node is None)
         for dependent_id, values in sorted(id_value_dict.items()):
-            dep_section, dep_option = metomi.rose.macro.get_section_option_from_id(
-                dependent_id)
+            dep_section, dep_option = \
+                metomi.rose.macro.get_section_option_from_id(
+                    dependent_id)
             if (allowed_sections and
                     (section not in allowed_sections and
                      dep_section not in allowed_sections)):
@@ -224,15 +227,17 @@ def output_graph(graph, debug_mode=False, filename=None, form="svg"):
         print(image_file_handle.read().decode())
         image_file_handle.close()
         return
-    metomi.rose.external.launch_image_viewer(image_file_handle.name, run_fg=True)
+    metomi.rose.external.launch_image_viewer(
+        image_file_handle.name, run_fg=True)
 
 
 def _exit_with_metadata_fail():
     """Handle a load metadata failure."""
     text = metomi.rose.macro.ERROR_LOAD_METADATA.format("")
-    metomi.rose.reporter.Reporter()(text,
-                             kind=metomi.rose.reporter.Reporter.KIND_ERR,
-                             level=metomi.rose.reporter.Reporter.FAIL)
+    metomi.rose.reporter.Reporter()(
+        text,
+        kind=metomi.rose.reporter.Reporter.KIND_ERR,
+        level=metomi.rose.reporter.Reporter.FAIL)
     sys.exit(1)
 
 
@@ -267,7 +272,8 @@ def main():
     metomi.rose.macro.add_opt_meta_paths(opts.meta_path)
 
     config_file_path = os.path.join(opts.conf_dir, metomi.rose.SUB_CONFIG_NAME)
-    meta_config_file_path = os.path.join(opts.conf_dir, metomi.rose.META_CONFIG_NAME)
+    meta_config_file_path = os.path.join(
+        opts.conf_dir, metomi.rose.META_CONFIG_NAME)
     config_tree_loader = metomi.rose.config_tree.ConfigTreeLoader()
     if os.path.exists(config_file_path):
         config = config_tree_loader(opts.conf_dir, metomi.rose.SUB_CONFIG_NAME,
@@ -284,7 +290,8 @@ def main():
     elif os.path.exists(meta_config_file_path):
         config = metomi.rose.config.ConfigNode()
         meta_config = (
-            config_tree_loader(opts.conf_dir, metomi.rose.META_CONFIG_NAME)).node
+            config_tree_loader(
+                opts.conf_dir, metomi.rose.META_CONFIG_NAME)).node
     else:
         _exit_with_metadata_fail()
     name = opts.conf_dir

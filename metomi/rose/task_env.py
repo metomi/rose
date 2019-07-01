@@ -38,8 +38,8 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=None,
                       full_mode=False):
     """Return map of PATH-like env-var names to path lists to prepend to them.
 
-    event_handler -- An instance of metomi.rose.reporter.Reporter or an object with a
-                     similar interface.
+    event_handler -- An instance of metomi.rose.reporter.Reporter or an object
+                     with a similar interface.
     path_root -- If a glob is relative and this is defined, this is the root
                  directory of the relative path.
     path_glob_args -- A list of strings in the form GLOB or NAME=GLOB. NAME is

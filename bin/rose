@@ -37,6 +37,8 @@
 if ${ROSE_DEBUG:-false}; then
     set -x
 fi
+# shellcheck source=lib/bash/rose_init
+# shellcheck source=lib/bash/rose_usage
 . rose_init
 rose_init
 

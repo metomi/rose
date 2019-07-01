@@ -260,8 +260,8 @@ class SuiteRunner(Runner):
             write_source_vc_info(
                 suite_conf_dir, "log/" + prefix + ".version", self.popen)
 
-            # If run through metomi.rose-stem, install version information files for
-            # each source tree if they're a working copy
+            # If run through metomi.rose-stem, install version information
+            # files for each source tree if they're a working copy
             if hasattr(opts, 'source') and hasattr(opts, 'project'):
                 for i, url in enumerate(opts.source):
                     if os.path.isdir(url):
@@ -373,7 +373,8 @@ class SuiteRunner(Runner):
                 "remote-rose-bin", host=host, conf_tree=conf_tree,
                 default="rose")
             # Build remote "rose suite-run" command
-            shcommand += " %s suite-run -vv -n %s" % (metomi.rose_bin, suite_name)
+            shcommand += " %s suite-run -vv -n %s" % (
+                metomi.rose_bin, suite_name)
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:

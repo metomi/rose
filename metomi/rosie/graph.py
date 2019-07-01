@@ -186,7 +186,7 @@ def make_graph(suite_data, filter_id, properties, prefix, max_distance=None):
 def output_graph(graph, filename=None, debug_mode=False):
     """Draw the graph to filename (or temporary file if None)."""
     metomi.rose.metadata_graph.output_graph(graph, debug_mode=debug_mode,
-                                     filename=filename)
+                                            filename=filename)
 
 
 def print_graph(suite_data, filter_id, properties=None, max_distance=None):

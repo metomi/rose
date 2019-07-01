@@ -104,7 +104,8 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         methods as part of the same upgrade.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application configuration.
+            config (metomi.rose.config.ConfigNode): The application
+                configuration.
             downgrade (bool): True if downgrading.
 
         Returns:
@@ -160,7 +161,8 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         """Add a setting to the configuration.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application configuration.
+            config (metomi.rose.config.ConfigNode): The application
+                configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
             value (string - optional): String denoting the new setting value.
@@ -263,7 +265,8 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         """Change a setting (option) value in the configuration.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application configuration.
+            config (metomi.rose.config.ConfigNode): The application
+                configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
             value (string): The new value. Required for options, can be
@@ -305,7 +308,8 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         """Return the value of a setting or ``None`` if not set.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application configuration.
+            config (metomi.rose.config.ConfigNode): The application
+                configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
             no_ignore (bool - optional): If ``True`` return ``None`` if the
@@ -323,7 +327,8 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         """Remove a setting from the configuration.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application configuration.
+            config (metomi.rose.config.ConfigNode): The application
+                configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
             info (string - optional): A short string containing no new lines,
@@ -346,7 +351,8 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         """Rename a setting in the configuration.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application configuration.
+            config (metomi.rose.config.ConfigNode): The application
+                configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
             new_keys (list): The new hierarchy of node.value 'keys'.
@@ -396,7 +402,8 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         """Enable a setting in the configuration.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application configuration.
+            config (metomi.rose.config.ConfigNode): The application
+                configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
             info (string - optional): A short string containing no new lines,
@@ -405,16 +412,19 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         Returns:
             False - if the setting's state is not changed else ``None``.
         """
-        return self._ignore_setting(config, list(keys),
-                                    info=info,
-                                    state=metomi.rose.config.ConfigNode.STATE_NORMAL)
+        return self._ignore_setting(
+            config,
+            list(keys),
+            info=info,
+            state=metomi.rose.config.ConfigNode.STATE_NORMAL)
 
     def ignore_setting(self, config, keys, info=None,
                        state=metomi.rose.config.ConfigNode.STATE_USER_IGNORED):
         """User-ignore a setting in the configuration.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application configuration.
+            config (metomi.rose.config.ConfigNode): The application
+                configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
             info (string - optional): A short string containing no new lines,
@@ -473,8 +483,9 @@ class MacroUpgradeManager(object):
         self.downgrade = downgrade
         self.new_version = None
         self.named_tags = []
-        opt_node = app_config.get([metomi.rose.CONFIG_SECT_TOP,
-                                   metomi.rose.CONFIG_OPT_META_TYPE], no_ignore=True)
+        opt_node = app_config.get(
+            [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE],
+            no_ignore=True)
         tag_items = opt_node.value.split("/")
         if len(tag_items) > 1:
             self.tag = tag_items.pop(-1)
@@ -496,7 +507,8 @@ class MacroUpgradeManager(object):
         meta_path = os.path.abspath(meta_path)
         self.named_tags = []
         for node in os.listdir(meta_path):
-            node_meta = os.path.join(meta_path, node, metomi.rose.META_CONFIG_NAME)
+            node_meta = os.path.join(
+                meta_path, node, metomi.rose.META_CONFIG_NAME)
             if os.path.exists(node_meta):
                 self.named_tags.append(node)
         self.version_module = get_meta_upgrade_module(meta_path)
@@ -591,17 +603,19 @@ class MacroUpgradeManager(object):
             upgrade_macro_result = func(config, meta_config, **res)
             config, i_changes = upgrade_macro_result
             self.reports += i_changes
-        opt_node = config.get([metomi.rose.CONFIG_SECT_TOP,
-                               metomi.rose.CONFIG_OPT_META_TYPE], no_ignore=True)
+        opt_node = config.get(
+            [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE],
+            no_ignore=True)
         new_value = self.meta_flag_no_tag + "/" + self.new_tag
         opt_node.value = new_value
         if self.downgrade:
             info = INFO_DOWNGRADED.format(self.tag, self.new_tag)
         else:
             info = INFO_UPGRADED.format(self.tag, self.new_tag)
-        report = metomi.rose.macro.MacroReport(metomi.rose.CONFIG_SECT_TOP,
-                                        metomi.rose.CONFIG_OPT_META_TYPE,
-                                        new_value, info)
+        report = metomi.rose.macro.MacroReport(
+            metomi.rose.CONFIG_SECT_TOP,
+            metomi.rose.CONFIG_OPT_META_TYPE,
+            new_value, info)
         self.reports += [report]
         return config, self.reports
 
@@ -705,8 +719,9 @@ def parse_upgrade_args(argv=None):
                                     metomi.rose.SUB_CONFIG_NAME)
     if (not os.path.exists(config_file_path) or
             not os.path.isfile(config_file_path)):
-        metomi.rose.reporter.Reporter()(metomi.rose.macro.ERROR_LOAD_CONFIG_DIR.format(
-            opts.conf_dir),
+        metomi.rose.reporter.Reporter()(
+            metomi.rose.macro.ERROR_LOAD_CONFIG_DIR.format(
+                opts.conf_dir),
             kind=metomi.rose.reporter.Reporter.KIND_ERR,
             level=metomi.rose.reporter.Reporter.FAIL)
         return None
@@ -774,15 +789,16 @@ def main():
     method_id = UPGRADE_METHOD.upper()[0]
     if opts.downgrade:
         method_id = DOWNGRADE_METHOD.upper()[0]
-    macro_id = metomi.rose.macro.MACRO_OUTPUT_ID.format(method_id,
-                                                 upgrade_manager.get_name())
+    macro_id = metomi.rose.macro.MACRO_OUTPUT_ID.format(
+        method_id, upgrade_manager.get_name())
     new_config_map, changes_map = metomi.rose.macro.apply_macro_to_config_map(
         combined_config_map, meta_config, macro_function, macro_name=macro_id)
     sys.stdout.flush()  # Ensure text from macro output before next fn
-    has_changes = metomi.rose.macro.handle_transform(config_map, new_config_map,
-                                              changes_map, macro_id,
-                                              opts.conf_dir, opts.output_dir,
-                                              opts.non_interactive, reporter)
+    has_changes = metomi.rose.macro.handle_transform(
+        config_map, new_config_map,
+        changes_map, macro_id,
+        opts.conf_dir, opts.output_dir,
+        opts.non_interactive, reporter)
     if not has_changes:
         return
     new_meta_config = metomi.rose.macro.load_meta_config(
@@ -804,10 +820,11 @@ def main():
         MACRO_UPGRADE_TRIGGER_NAME
     )
     if any(changes_map.values()):
-        metomi.rose.macro.handle_transform(config_map, new_config_map,
-                                    changes_map, trig_macro_id,
-                                    opts.conf_dir, opts.output_dir,
-                                    opts.non_interactive, reporter)
+        metomi.rose.macro.handle_transform(
+            config_map, new_config_map,
+            changes_map, trig_macro_id,
+            opts.conf_dir, opts.output_dir,
+            opts.non_interactive, reporter)
 
 
 if __name__ == "__main__":

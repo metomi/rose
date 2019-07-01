@@ -29,10 +29,10 @@ class _TestOSErrorFilename(unittest.TestCase):
 
     def test_oserror_has_filename(self):
         """Does what it says."""
-        metomi.rose_popen = RosePopener()
+        rose_popen = RosePopener()
         name = "bad-command"
         try:
-            metomi.rose_popen.run(name)
+            rose_popen.run(name)
         except RosePopenError as exc:
             ose = FileNotFoundError(errno.ENOENT,
                                     os.strerror(errno.ENOENT),

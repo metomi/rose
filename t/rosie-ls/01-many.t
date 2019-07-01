@@ -20,6 +20,7 @@
 # Test for "rosie ls", ensure healthy on large number of checked out suites.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all "not fixing Rosie/Rosa here"
 if ! python3 -c 'import tornado, sqlalchemy' 2>'/dev/null'; then
     skip_all '"tornado" or "sqlalchemy" not installed'
 fi

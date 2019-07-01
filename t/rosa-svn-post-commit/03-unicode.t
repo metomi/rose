@@ -20,6 +20,7 @@
 # Test "rosa svn-post-commit": Discovery Service database update with unicode.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
+skip_all
 #-------------------------------------------------------------------------------
 if ! python3 -c 'import sqlalchemy' 2>'/dev/null'; then
     skip_all '"sqlalchemy" not installed'

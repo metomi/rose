@@ -48,6 +48,8 @@
 # SEE ALSO
 #     * `prove(1)`
 #-------------------------------------------------------------------------------
+# shellcheck source=lib/bash/rose_init
+# shellcheck source=lib/bash/rose_log
 . rose_init
 . rose_log
 
@@ -57,14 +59,14 @@ rose_init
 
 # Move to folder in which prove command should be run.
 TESTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-cd $TESTDIR/../../
+cd "$TESTDIR/../../"
 mkdir -p ~/.metomi
 
 # Recompile *.pyc files to ensure we are running the current code.
 # @TODO Consider if this is appropriate in new version
-if [[ -w 'lib/python/' ]]; then
-    find 'lib/python/' -name '*.pyc' -type 'f' -delete
-    python3 -mcompileall -q 'lib/python/'
+if [[ -w 'metomi/' ]]; then
+    find 'metomi/' -name '*.pyc' -type 'f' -delete
+    python3 -mcompileall -q 'metomi'
 fi
 if PROVE_OPTIONS=$(rose config t prove-options); then
     # shellcheck disable=SC2086
