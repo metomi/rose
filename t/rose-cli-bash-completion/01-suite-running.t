@@ -24,7 +24,7 @@ export ROSE_CONF_PATH=
 tests 16
 #-------------------------------------------------------------------------------
 # Source the script.
-. $ROSE_HOME/etc/rose-bash-completion || exit 1
+. $ROSE_TEST_HOME/etc/rose-bash-completion || exit 1
 #-------------------------------------------------------------------------------
 # Run the suite.
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')

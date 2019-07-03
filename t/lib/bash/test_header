@@ -440,10 +440,8 @@ __PYTHON__
     fi
 }
 
-ROSE_HOME="${ROSE_HOME:-"$(\
-    cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"}"
-export ROSE_HOME
-PATH=$ROSE_HOME/metomi/rose:$ROSE_HOME/metomi/rosie:$PATH
+ROSE_TEST_HOME=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
+export ROSE_TEST_HOME
 DIFFTOOL="$(rose config '--default=diff -u' t difftool)"
 TEST_KEY_BASE="$(basename "$0" .t)"
 # shellcheck disable=SC2034

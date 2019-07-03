@@ -152,7 +152,7 @@ version|--version|-V)
     :;;
 doc)
     PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
-    PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
+    PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_LIB")
     ROSE_UTIL=$UTIL
     export PATH PYTHONPATH ROSE_UTIL
     ns_len=$(( ${#ROSE_NS}+2 ))
