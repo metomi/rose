@@ -95,7 +95,8 @@ set -o pipefail
 shopt -s extglob
 
 # Move into rose directory
-cd "$(dirname "$0")/../"
+cd "$(dirname "$0")/../.."
+ROSE_HOME=$PWD
 # Path for virtualenv.
 VENV_PATH='venv'  # Note: update above docs when changing this value
 # Set to `true` when the virtualenv is being used.
@@ -103,7 +104,7 @@ USING_VENV=false
 # Path to the sphinx directory.
 SPHINX_PATH=sphinx
 # pick up official rose version
-. "${ROSE_HOME}/rose-version"
+ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
 # documentation root output directory
 DOCS_DIR="${ROSE_HOME}/doc"
 
@@ -188,7 +189,6 @@ venv-destroy () {
 version_file () {
     # output the dictionary {"version": ["build", ...]} in JSON format
     DOCS_DIR="$1"
-
     ret='{'
 
     # scrape filesystem for list of rose versions which have built docs

@@ -13,7 +13,7 @@ in the reference material).
 Example
 -------
 
-.. image:: http://upload.wikimedia.org/wikipedia/commons/b/b9/Proa1.jpg
+.. image:: https://upload.wikimedia.org/wikipedia/commons/b/b9/Proa1.jpg
    :align: right
    :width: 250px
 
@@ -234,7 +234,7 @@ Paste the following into your ``versions.py`` file:
 
 .. code-block:: python
 
-   import rose.upgrade
+   import metomi.rose.upgrade
 
 
    class MyFirstUpgradeMacro(rose.upgrade.MacroUpgrade):

@@ -31,5 +31,5 @@ Rose provides a Python API for loading, processing, editing and dumping Rose
 configurations via the :py:mod:`rose.config` module located within the Rose
 Python library.
 
-.. automodule:: rose.config
+.. automodule:: metomi.rose.config
    :members:

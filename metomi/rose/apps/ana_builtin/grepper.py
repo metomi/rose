@@ -19,7 +19,7 @@
 # -----------------------------------------------------------------------------
 """The following options can be specified in:
 
-* :rose:conf:`rose.conf[metomi.rose-ana]`
+* :rose:conf:`rose.conf[rose-ana]`
 * :rose:conf:`rose_ana[ana:config]`
 
 .. describe:: Options

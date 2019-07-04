@@ -20,8 +20,8 @@
 import sys
 import os
 
-from rose.popen import RosePopener
-from rose.resource import ResourceLocator
+import metomi.rose
+from metomi.rose.popen import RosePopener
 
 # rose-documentation build configuration file, initial version created by
 # sphinx-quickstart.
@@ -102,7 +102,7 @@ copyright = (
 
 # The full version for the project you're documenting, acts as replacement for
 # |version|.
-release = ResourceLocator().get_version(ignore_environment=True)
+release = metomi.rose.__version__
 # The short X.Y version, acts as replacement for |release|.
 version = release
 

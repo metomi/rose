@@ -26,7 +26,7 @@ import sys
 import traceback
 
 from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.popen import RosePopener, RosePopenError
+from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter
 from metomi.rose.run_source_vc import write_source_vc_info
 from metomi.rose.suite_engine_proc import SuiteEngineProcessor

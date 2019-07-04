@@ -49,7 +49,7 @@ WANDISCO=false
 
 
 _build_docs () {
-    rose make-docs --strict clean html slides latexpdf
+    etc/bin/rose-make-docs --strict clean html slides latexpdf
 }
 
 _gh_extract () {  # extract project from GitHub to $HOME
@@ -90,6 +90,12 @@ _install_cylc () {
     APT+=(at heirloom-mailx)
     GIT+=('cylc|cylc-flow|master')
     RC_PATH+=("${HOME}/cylc-master/bin")
+}
+
+_install_isodatetime () {
+    wget 'https://github.com/metomi/isodatetime/archive/master.tar.gz' \
+        -O - | tar -xz -C "${HOME}"
+    pip install -e "${HOME}/isodatetime-master"
 }
 
 _install_fcm () {
@@ -153,11 +159,10 @@ _test_style () {
 _test_battery () {
     cp "${TRAVIS_BUILD_DIR}/.travis/sitecustomize.py" ./lib/python
     coverage run .travis/cover.py
-    rm ./lib/python/sitecustomize.py
 }
 
 _test_docs () {
-    rose make-docs --strict clean linkcheck doctest
+    etc/bin/rose-make-docs --strict clean linkcheck doctest
 }
 
 _wandisco_configure () {  # extract Wandisco stuff

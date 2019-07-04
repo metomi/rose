@@ -57,13 +57,18 @@ INSTALL_REQUIRES = [
 ]
 
 setup(
+    # Metadata
     name="metomi-rose",
-    version=find_version("metomi", "rose", "__init__.py"),
-    author="Harry Caine",
-    author_email="metomi@metoffice.gov.uk",
     description="Rose, a framework for meteorological suites.",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    version=find_version("metomi", "rose", "__init__.py"),
+    author="2012-2019 British Crown (Met Office) & Contributors",
+    author_email="metomi@metoffice.gov.uk",
+    license_file="https://metomi.github.io/rose/doc/html/terms.html",
+    url="https://metomi.github.io/rose/doc/html/index.html",
+
+    # Options
     scripts=glob(join("bin", "*"))
     + glob(join("sbin", "*"))
     + glob(join("lib", "bash", "*")),

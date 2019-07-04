@@ -151,10 +151,8 @@ version|--version|-V)
     exit
     :;;
 doc)
-    PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
-    PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_LIB")
     ROSE_UTIL=$UTIL
-    export PATH PYTHONPATH ROSE_UTIL
+    export ROSE_UTIL
     ns_len=$(( ${#ROSE_NS}+2 ))
     for U in $(cd "$ROSE_HOME_BIN" && ls "$ROSE_NS-"*); do
         NAME="$(sed "s/^$ROSE_NS-\\(.*\\)\$/\1/" <<<"$U")"
@@ -189,8 +187,6 @@ if (($# > 0)) && [[ $1 == '--help' || $1 == '-h' ]]; then
     help_util "$UTIL"
     exit
 fi
-PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
-PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_LIB")
 ROSE_UTIL=$UTIL
-export PATH PYTHONPATH ROSE_UTIL
+export ROSE_UTIL
 exec "$COMMAND" "$@"

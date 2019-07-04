@@ -22,7 +22,7 @@
 
 import os
 from metomi.rose.c3 import mro
-from metomi.rose.config import ConfigNode, ConfigLoader, ConfigDumper
+from metomi.rose.config import ConfigNode, ConfigLoader
 import shlex
 from metomi.rose.config import ConfigDumper
 from io import StringIO
