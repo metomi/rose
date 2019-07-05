@@ -84,11 +84,11 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         self.props["rose_version"] = ResourceLocator.default().get_version()
         # Autoescape markup to prevent code injection from user inputs.
         self.props["template_env"] = jinja2.Environment(
+            autoescape=jinja2.select_autoescape(
+                enabled_extensions=("html", "xml"), default_for_string=True),
             loader=jinja2.FileSystemLoader(
                 ResourceLocator.default().get_util_home(
-                    "lib", "html", "template", "rosie-disco")),
-            autoescape=jinja2.select_autoescape(
-                enabled_extensions=("html", "xml"), default_for_string=True))
+                    "lib", "html", "template", "rosie-disco")))
 
         db_url_map = {}
         for key, node in rose_conf.get(["rosie-db"]).value.items():
