@@ -113,7 +113,8 @@ _install_sphinx () {
     # sphinx documentation and its extensions
     APT+=(latexmk texlive texlive-generic-extra texlive-latex-extra \
           texlive-fonts-recommended graphviz)
-    PIP+=(sphinx sphinx_rtd_theme sphinxcontrib-httpdomain hieroglyph)
+    PIP+=(sphinx sphinx_rtd_theme sphinxcontrib-httpdomain hieroglyph \
+          sphinxcontrib-svg2pdfconverter)
 }
 
 _install_tut_suite () {
@@ -220,10 +221,25 @@ install () {
         "
 }
 
-report_coverage () {
+_report_coverage () {
     coverage combine --append
     coverage xml --ignore-errors
     bash <(curl -s https://codecov.io/bash)
+}
+
+_report_error() {
+    # don't bail out on error
+    set +eu
+
+    printenv PATH PYTHONPATH
+    rose check-software
+    cat /tmp/sphinx-err* >&2 # sphinx traceback
+}
+
+report () {
+    for arg in "$@"; do
+        "_report_${arg}"
+    done
 }
 
 test () {

@@ -11,12 +11,10 @@ before_install:
   - export PATH="$PWD/.travis:$PATH"
 
 after_success:
-  - now report_coverage
+  - now report coverage
 
 after_failure:
-  - printenv PATH PYTHONPATH
-  - rose check-software
-  - cat /tmp/sphinx-err*  # sphinx traceback
+  - now report error
 
 jobs:
   include:
