@@ -118,7 +118,6 @@ help|h|?|--help|-h)
     if (($# == 0)); then
         {
             print_version
-            # This is the problem line- we aren't getting anything back here.
             rose_usage
             echo
             echo "$ROSE_NS provides the following utilities:"
