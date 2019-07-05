@@ -24,8 +24,6 @@ import os
 import sys
 import tempfile
 
-import pygraphviz  # Graphviz and pygraphviz need to be installed.
-
 from functools import cmp_to_key
 
 import rose.config
@@ -88,6 +86,7 @@ def get_node_state_attrs(config, section, option=None, allowed_sections=None):
 def get_graph(config, meta_config, name, allowed_sections=None,
               allowed_properties=None, err_reporter=None):
     """Return a Graphviz graph object constructed from metadata properties."""
+    import pygraphviz  # Graphviz and pygraphviz need to be installed.
     if allowed_sections is None:
         allowed_sections = []
     if allowed_properties is None:

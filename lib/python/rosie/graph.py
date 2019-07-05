@@ -22,8 +22,6 @@
 import textwrap
 import time
 
-import pygraphviz
-
 import rose.metadata_graph
 import rose.opt_parse
 import rose.reporter
@@ -172,6 +170,7 @@ def add_node(graph, node, node_label_properties, **kwargs):
 
 def make_graph(suite_data, filter_id, properties, prefix, max_distance=None):
     """Construct the pygraphviz graph."""
+    import pygraphviz
     graph = pygraphviz.AGraph(directed=True)
     graph.graph_attr["rankdir"] = "LR"
     if filter_id:

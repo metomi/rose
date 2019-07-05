@@ -1,0 +1,271 @@
+<!--?xml version="1.0" encoding="utf-8"?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <link rel="icon" href="{{script}}/favicon.ico" />
+  <link rel="shortcut icon" href="{{script}}/favicon.ico" />
+  <link href="{{script}}/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{script}}/css/jquery.dataTables.css" rel="stylesheet">
+<title>{{prefix}}: {{title}} @ {{host}}</title>
+</head>
+
+<body>
+
+<!-- Static navbar -->
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed"
+      data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+      aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{script}}/">
+        {{prefix}}: {{title}}
+        <small>@ {{host}}</small>
+      </a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav pull-right">
+        <li class="active search-button">
+          <a href="javascript: Rosie.show('search');">search</a>
+        </li>
+
+        <li class="query-button">
+          <a href="javascript: Rosie.show('query');">query</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div id="body-query">
+        <form id="search" class="form-inline" action="search">
+          <div>
+            <input id="s" class="search-query form-control"
+            type="text" name="s" placeholder="Search term ..."
+            title="Search term ... (may contain SQL wildcard characters)"
+{% if s %}
+            value="{{ s }}"
+{% endif %}
+            />
+            <div class="checkbox">
+              <label>
+                <input id="search-all" type="checkbox" name="all_revs"
+                value="1"{% if all_revs %} checked="checked"{% endif %} />
+                  all revisions
+              </label>
+            </div>
+            <input class="btn btn-primary" type="submit" value="search"/>
+          </div>
+        </form>
+        <form id="query" action="javascript:Rosie.query();">
+          <table id="query-table" summary="Query Table">
+            <tbody>
+{%- set group0_values = ["", "(", "((", "(((", "((((", "((((("] %}
+{%- set group1_values = ["", ")", "))", ")))", "))))", ")))))"] %}
+{%- if not filters %}
+{%- set filters = [["and", "", "", "", "", ""]] %}
+{%- endif %}
+{%- for filter in filters %}
+{%- set i = 0 %}
+              <tr id="q_{{ loop.index0 }}">
+                <td>
+{%- if loop.first %}
+                  <select class="q_conjunction form-control"
+                  name="q_conjunction_{{ loop.index0 }}"
+                  disabled="disabled">
+{%- else %}
+                  <select class="q_conjunction form-control"
+                  name="q_conjunction_{{ loop.index0 }}">
+{%- endif %}
+{%- for conjunction in ["and", "or"] %}
+{%- if filter[i] == conjunction %}
+                    <option selected="selected">{{ conjunction }}</option>
+{%- else %}
+                    <option>{{ conjunction }}</option>
+{%- endif %}
+{%- endfor %}{# conjunction #}
+                  </select>
+                </td>
+{%- set i = i + 1 %}
+                <td>
+                  <select class="q_group0 form-control"
+                  name="q_group0_{{ loop.index0 }}">
+{%- for group0 in group0_values %}
+{%- if filter[i] == group0 and filter|length > 4 %}
+                    <option selected="selected">{{ group0 }}</option>
+{%- else %}
+                    <option>{{ group0 }}</option>
+{%- endif %}
+{%- endfor %}{# group0 #}
+                  </select>
+                </td>
+{%- if filter[i] in group0_values %}
+{%- set i = i + 1 %}
+{%- endif %}
+                <td>
+                  <select class="q_key form-control"
+                  name="q_key_{{ loop.index0 }}">
+{%- for common_key in known_keys %}
+{%- if filter[i] == common_key %}
+                    <option selected="selected">{{ common_key }}</option>
+{%- else %}
+                    <option>{{ common_key }}</option>
+{%- endif %}{# common_key #}
+{%- endfor %}
+                  </select>
+                </td>
+{%- set i = i + 1 %}
+                <td>
+                  <select class="q_operator form-control"
+                  name="q_operator_{{ loop.index0 }}">
+{%- for query_operator in query_operators %}
+{%- if filter[i] == query_operator %}
+                    <option selected="selected">{{ query_operator }}</option>
+{%- else %}
+                    <option>{{ query_operator }}</option>
+{%- endif %}
+{%- endfor %}{# query_operator #}
+                  </select>
+                </td>
+{%- set i = i + 1 %}
+                <td>
+                  <input type="text" class="q_value form-control"
+                  name="q_value_{{ loop.index0 }}"
+                  value="{{ filter[i] }}" />
+                </td>
+{%- set i = i + 1 %}
+                <td>
+                  <select class="q_group1 form-control"
+                  name="q_group1_{{ loop.index0 }}">
+{%- for group1 in group1_values %}
+{%- if filter[i] == group1 %}
+                    <option selected="selected">{{ group1 }}</option>
+{%- else %}
+                    <option>{{ group1 }}</option>
+{%- endif %}
+{%- endfor %}{# group1 #}
+                  </select>
+                </td>
+{%- if loop.first %}
+                <td><div><button class="btn" type="button"><i class="glyphicon glyphicon-minus"></i></button></div></td>
+{%- else %}
+                <td><div><button class="btn" type="button"><i class="glyphicon glyphicon-minus"></i></button></div></td>
+{%- endif %}
+        </tr>
+{%- endfor %}{# filter #}
+            </tbody>
+          </table>
+          <div class="form-group">
+            <div id="controls">
+              <button class="btn" type="button"
+              onclick="javascript: Rosie.query_add();"><i class="glyphicon glyphicon-plus"></i></button>
+            </div>
+          </div>
+          <div class="form-group">
+            <div id="checkbox">
+              <label>
+                <input id="query-all" type="checkbox" name="all_revs" value="1"
+{%- if all_revs %}
+                checked="checked" />
+{%- else %}
+                />
+{%- endif %}
+                all revisions
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <input class="btn" id="show-groups" type="button" name="show_groups"
+            data-toggle="button" value="display group controls"/>
+            <input class="btn btn-primary" type="submit" value="query" />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <table id="list-result-table" class="table table-bordered"
+      summary="List Result Table">
+        <thead>
+          <tr>
+            <th>detail</th>
+            <th>idx</th>
+            <th>branch</th>
+            <th>revision</th>
+            <th>owner</th>
+            <th>project</th>
+            <th>title</th>
+{%- for other_col in known_keys %}
+{%- if other_col not in ["idx", "branch", "revision", "owner", "project", "title"] %}
+            <th>{{ other_col }}</th>
+{%- endif %}
+{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+{%- if data %}
+{%- for item in data %}
+{%- set info = "<strong>suite:</strong> %s/%s@%s<br/>"|format(item.idx, item.branch, item.revision) %}
+{%- for key, value in item|dictsort %}
+{%- if value is not none and key not in ["idx", "branch", "revision", "href", "owner", "project", "title"] %}
+{%- if "-list" in key %}
+{%- set value = value|join(" ") %}
+{%- endif %}
+{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": " ~ value ~ "<br/>"  %}
+{%- endif %}
+{%- if loop.last %}
+          <tr>
+            <td><a class="infotip" href="#" data-html="true"
+            data-content="{{info}}" title="">
+              <i class="glyphicon glyphicon-list"></i>
+            </a></td>
+{%- endif %}
+{%- endfor %}
+            <td><a href="{{ item.href }}" class=tip>{{ item.idx }}</a></td>
+{%- for col in ["branch", "revision", "owner", "project", "title"] %}
+            <td>{{ item[col] }}</td>
+{%- endfor %}
+{%- for other_col in known_keys %}
+{%- if other_col not in ["idx", "branch", "revision", "owner", "project", "title"] %}
+            <td>{{ item[other_col] }}</td>
+{%- endif %}
+{%- endfor %}
+          </tr>
+{%- endfor %}
+{%- endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-12 text-right">
+      <hr/>
+      <address><small>Rose {{rose_version}}</small></address>
+    </div>
+
+  </div>
+</div>
+
+<script type="text/javascript" src="{{script}}/js/jquery.min.js"></script>
+<script type="text/javascript" src="{{script}}/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{{script}}/js/jquery.dataTables.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/js/dataTables.bootstrap.js">
+</script>
+<script type="text/javascript" src="{{script}}/js/rosie-disco.js">
+</script>
+</body>
+</html>

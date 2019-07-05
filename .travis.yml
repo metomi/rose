@@ -30,7 +30,7 @@ jobs:
     - name: "Test Battery"
       before_install:
         - export PATH="$PWD/.travis:$PATH"
-        - now install coverage cylc fcm rose tut_suite
+        - now install coverage cylc fcm rose rosie tut_suite
       script:
         - now test battery
     - name: "Documentation"

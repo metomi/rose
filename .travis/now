@@ -39,24 +39,63 @@ fi
 set -eu
 
 APT=()
-PIP=()
 NPM=()
+PIP=()
+GIT=()
 PY_PATH=()
 RC_PATH=("${HOME}")
+RI_PATH=()
+WANDISCO=false
 
-_join () {
-    local IFS="$1";
-    shift;
-    echo "$*";
-}
 
 _build_docs () {
     rose make-docs --strict clean html slides latexpdf
 }
 
+_gh_extract () {  # extract project from GitHub to $HOME
+    IFS='|' read -ra SPEC <<< "$1"
+    local USR="${SPEC[0]}"
+    local REPO="${SPEC[1]}"
+    local BRANCH="${SPEC[2]}"
+    local URL="https://github.com/${USR}/${REPO}/archive/${BRANCH}.tar.gz"
+    local DEST="${HOME}/${REPO}-${BRANCH}"
+
+    if [[ -d "${DEST}" ]]; then
+        # already installed
+        return
+    fi
+
+    # download + unpack
+    wget "${URL}" -O - | tar -xz -C "${HOME}"
+
+    # in-place installation
+    if [[ -f "${DEST}/setup.py" ]]; then
+        pip install -e "${DEST}"
+    fi
+}
+
 _install_coverage () {
     PIP+=(coverage pytest-cov)
     PY_PATH+=("${TRAVIS_BUILD_DIR}/.travis")
+}
+
+_install_cylc () {
+    APT+=(at heirloom-mailx)
+    GIT+=('cylc|cylc-flow|master')
+    RC_PATH+=("${HOME}/cylc-master/bin")
+}
+
+_install_fcm () {
+    APT+=(subversion build-essential gfortran libxml-parser-perl \
+          libconfig-inifiles-perl libdbi-perl libdbd-sqlite3-perl)
+    GIT+=('metomi|fcm|master')
+    RC_PATH+=("${HOME}/fcm-master/bin")
+    WANDISCO=true
+}
+
+_install_pytest () {
+    # pytest and its extensions
+    PIP+=(pytest)
 }
 
 _install_rose () {
@@ -65,27 +104,9 @@ _install_rose () {
     RC_PATH+=("${TRAVIS_BUILD_DIR}/bin")
 }
 
-_install_cylc () {
-    wget 'https://github.com/cylc/cylc-flow/archive/master.tar.gz' \
-        -O - | tar -xz -C "${HOME}"
-    pip install -e "${HOME}/cylc-flow-master"
-    APT+=(at heirloom-mailx)
-    PIP+=(colorama python-jose pyzmq Jinja2)
-    RC_PATH+=("${HOME}/cylc-master/bin")
-}
-
-_install_fcm () {
-    # shellcheck disable=SC1004,SC2016
-    sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
-        `lsb_release -cs` svn19" >> /etc/apt/sources.list.d/subversion19.list'
-    sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- | \
-        sudo apt-key add -
-    wget 'https://github.com/metomi/fcm/archive/master.tar.gz' \
-        -O '/tmp/fcm-master.tar.gz'
-    tar -xvf '/tmp/fcm-master.tar.gz' -C "${HOME}"
-    APT+=(subversion build-essential gfortran libxml-parser-perl \
-          libconfig-inifiles-perl libdbi-perl libdbd-sqlite3-perl)
-    RC_PATH+=("${HOME}/fcm-master/bin")
+_install_rosie () {
+    PIP+=(requests tornado sqlalchemy)
+    RI_PATH+=("$(_path_for python)" "$(_path_for rose)")
 }
 
 _install_sphinx () {
@@ -100,15 +121,21 @@ _install_tut_suite () {
     PIP+=(pillow)
 }
 
-_install_pytest () {
-    # pytest and its extensions
-    PIP+=(pytest)
+_join () {
+    local IFS="$1";
+    shift;
+    echo "$*";
 }
 
 _install_linters () {
     APT+=(shellcheck)
     PIP+=(pycodestyle)
     NPM+=(eslint)
+}
+
+_path_for () {
+    COMMAND="$1"
+    dirname "$(command -v "${COMMAND}")"
 }
 
 _test_units () {
@@ -131,6 +158,14 @@ _test_docs () {
     rose make-docs --strict clean linkcheck doctest
 }
 
+_wandisco_configure () {  # extract Wandisco stuff
+    # shellcheck disable=SC1004,SC2016
+    sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
+        `lsb_release -cs` svn19" >> /etc/apt/sources.list.d/subversion19.list'
+    sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- | \
+        sudo apt-key add -
+}
+
 build () {
     for arg in "$@"; do
         "_build_${arg}"
@@ -142,6 +177,10 @@ install () {
     for arg in "$@"; do
         "_install_${arg}"
     done
+
+    if ${WANDISCO}; then
+        _wandisco_configure
+    fi
 
     if [[ ${#PIP[@]} -gt 0 ]]; then
         pip install "${PIP[@]}" &
@@ -157,12 +196,28 @@ install () {
         sudo apt-get install -y "${APT[@]}"
     fi
 
+    if [[ ${#GIT[@]} -gt 0 ]]; then
+        # wrapping the for loop to avoid unbound variable "GIT[@]" error
+        for gh_project in "${GIT[@]}"; do
+            _gh_extract "${gh_project}"
+        done
+    fi
+
     wait
 
+    # .bashrc
     cat >"${HOME}/.bashrc" \
         <<<"export PATH=\"$(_join ':' "${RC_PATH[@]}"):\$PATH\";"
     cat >>"${HOME}/.bashrc" \
         <<<"export PYTHONPATH=\"$(_join ':' "${PY_PATH[@]}"):\$PYTHONPATH\";"
+
+    # rose_init_site
+    cat >"${TRAVIS_BUILD_DIR}/lib/bash/rose_init_site" \
+        <<<"
+            if [[ -z \${HOME+x} ]]; then
+                export PATH=\"$(_join ':' "${RI_PATH[@]}"):\${PATH:-}\";
+            fi
+        "
 }
 
 report_coverage () {
