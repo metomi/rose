@@ -51,7 +51,7 @@ USRCOMPARISON_EXT = ".py"
 
 class KGODatabase(object):
     """
-    KGO Database object, stores comparison information for metomi.rose_ana
+    KGO Database object, stores comparison information for rose_ana
     apps.
 
     """
@@ -230,7 +230,7 @@ class TaskCompletionEvent(Event):
 
 class TestsFailedException(Exception):
 
-    """Exception raised if any metomi.rose-ana comparisons fail."""
+    """Exception raised if any rose-ana comparisons fail."""
 
     def __init__(self, num_failed):
         self.ret_code = num_failed

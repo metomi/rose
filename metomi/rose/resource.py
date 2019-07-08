@@ -42,7 +42,7 @@ def get_util_home(*args):
         value = os.environ["ROSE_LIB"]
     except KeyError:
         value = os.path.abspath(__file__)
-        for _ in range(4):  # assume __file__ under $ROSE_HOME/lib/python/rose/
+        for _ in range(3):  # assume __file__ under $ROSE_LIB/metomi/rose/
             value = os.path.dirname(value)
     return os.path.join(value, *args)
 

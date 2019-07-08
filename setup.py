@@ -44,9 +44,6 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
 INSTALL_REQUIRES = [
     "jinja2>=2.10.1, <2.11.0",
     "cylc-flow==8.0a0",
@@ -55,6 +52,11 @@ INSTALL_REQUIRES = [
     "sqlalchemy",
     "isodatetime",
 ]
+
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 
 setup(
     # Metadata
@@ -65,6 +67,7 @@ setup(
     version=find_version("metomi", "rose", "__init__.py"),
     author="2012-2019 British Crown (Met Office) & Contributors",
     author_email="metomi@metoffice.gov.uk",
+    license='GPL',
     license_file="https://metomi.github.io/rose/doc/html/terms.html",
     url="https://metomi.github.io/rose/doc/html/index.html",
 
@@ -74,6 +77,8 @@ setup(
     + glob(join("lib", "bash", "*")),
     install_requires=INSTALL_REQUIRES,
     python_requires=">3.7",
-    package_data={"metomi.rose": ["etc/.*", "rose-version"]},
+    package_data={
+        "metomi.rose": ["etc/.*", "rose-version"]
+    },
     packages=find_namespace_packages(include=["metomi.*"]),
 )

@@ -19,13 +19,14 @@
 #-------------------------------------------------------------------------------
 # Run doctests in sphinx extensions.
 #-------------------------------------------------------------------------------
+THIS_TEST_HOME=$(pwd)
 . "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
 if ! rose check-software --docs 2>'/dev/null'; then
     skip_all "Software dependencies for documentation not met."
 fi
 #-------------------------------------------------------------------------------
-FILES=($(find "${ROSE_HOME}/sphinx/ext" -name "*.py"))
+FILES=($(find "${THIS_TEST_HOME}/sphinx/ext" -name "*.py"))
 tests $(( ${#FILES[@]} * 2 ))
 #-------------------------------------------------------------------------------
 TERM=  # Nasty solution to prevent control chars being printed in python output.

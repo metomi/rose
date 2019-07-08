@@ -20,8 +20,7 @@
 # Tests for "rosa svn-pre-commit", Unix passwd user check.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all # Skipped pending fix
-skip_all
+skip_all "not fixing Rosie/Rosa here"
 export ROSE_CONF_PATH=
 mkdir conf
 cat >conf/rose.conf <<'__ROSE_CONF__'

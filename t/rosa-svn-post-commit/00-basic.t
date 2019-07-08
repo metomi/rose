@@ -20,8 +20,7 @@
 # Test "rosa svn-post-commit": Rosie WS DB update.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all # Skipped pending fix
-skip_all
+skip_all "not fixing Rosie/Rosa here"
 #-------------------------------------------------------------------------------
 if ! python3 -c 'import sqlalchemy' 2>/dev/null; then
     skip_all '"sqlalchemy" not installed'
