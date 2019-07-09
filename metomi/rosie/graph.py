@@ -22,8 +22,6 @@
 import textwrap
 import time
 
-import pygraphviz
-
 import metomi.rose.metadata_graph
 import metomi.rose.opt_parse
 import metomi.rose.reporter
