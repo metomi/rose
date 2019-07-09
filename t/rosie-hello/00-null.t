@@ -20,6 +20,7 @@
 # Test "rosie hello" with no settings.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all "Not testing Rosie in this branch"
 tests 2
 
 export ROSE_CONF_PATH=

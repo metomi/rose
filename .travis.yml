@@ -28,9 +28,9 @@ jobs:
     - name: "Test Battery"
       before_install:
         - export PATH="$PWD/.travis:$PATH"
-        - now install coverage fcm tut_suite
+        - now install coverage fcm tut_suite isodatetime
       install:
-        - now install isodatetime cylc rose
+        - now install cylc rose
       script:
         - now test battery
 
