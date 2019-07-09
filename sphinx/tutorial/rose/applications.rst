@@ -163,7 +163,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
          mkdir application-tutorial
          cd application-tutorial
 
-   #. **Move the required resources into the** ``application-tutorial``
+   #. **Provide the required resources in the** ``application-tutorial``
       **application.**
 
       The application requires three resources:
@@ -176,11 +176,13 @@ An application can be run using the :ref:`command-rose-app-run` command:
       :term:`suite directory` we can encapsulate them into the
       application directory.
 
-      Copy the ``forecast`` script and ``util.py`` library into the ``bin/``
-      directory where they will be automatically added to the ``PATH`` when
-      the application is run::
+      Install the ``forecast`` script and ``util.py`` library into the ``bin/``
+      directory by running this command::
 
          rose tutorial forecast-script bin
+
+      The ``bin/`` directory will be automatically added to the ``PATH`` when
+      the application is run.
 
       Copy the HTML template into the ``file/`` directory by running::
 
