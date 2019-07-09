@@ -233,7 +233,7 @@ E.g. The application configuration directory may look like:
          .. code-block:: rose
 
             # Default
-            delays=0
+            delays=PT0S
 
             # Poll 1 minute after the runner begins, repeat every minute 10 times
             delays=10*PT1M
@@ -242,4 +242,4 @@ E.g. The application configuration directory may look like:
             # repeat every 10 seconds 6 times,
             # repeat every minute 60 times,
             # repeat once after 1 hour
-            delays=0,6*PT10S,60*PT1M,PT1H
+            delays=PT0S,6*PT10S,60*PT1M,PT1H
