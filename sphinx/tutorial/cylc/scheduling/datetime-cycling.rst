@@ -584,6 +584,14 @@ Putting It All Together
       Try adding this line to your suite then visualising it with ``cylc
       graph``.
 
+      .. hint::
+
+         Try adjusting the number of cycles displayed by ``cylc graph``:
+
+         .. code-block:: console
+
+            $ cylc graph . 2000 20000101T12Z &
+
       You will notice that there is a dependency which looks like this:
 
       .. digraph:: example
