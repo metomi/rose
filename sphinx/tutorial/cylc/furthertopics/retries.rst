@@ -85,14 +85,13 @@ Stop the suite::
 Configuring Retries
 -------------------
 
-We need to tell Cylc to retry it a few times - replace the line
-``[[roll_doubles]]`` in the ``suite.rc`` file with:
+We need to tell Cylc to retry it a few times. To do this, add the following
+to the end of the ``[[roll_doubles]]`` task section in the ``suite.rc`` file:
 
 .. code-block:: cylc
 
-   [[roll_doubles]]
-       [[[job]]]
-           execution retry delays = 5*PT6S
+   [[[job]]]
+       execution retry delays = 5*PT6S
 
 This means that if the ``roll_doubles`` task fails, Cylc expects to
 retry running it 5 times before finally failing. Each retry will have
