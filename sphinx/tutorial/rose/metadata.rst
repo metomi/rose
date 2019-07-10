@@ -66,7 +66,8 @@ The Metadata Format
 
    [env=WORLD]
    description=The name of the world to say hello to.
-   values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+   values=Mercury, Venus, Earth, Mars, Jupiter,
+         =Saturn, Uranus, Neptune
 
 This example gives the ``WORLD`` variable a title and a list of allowed values.
 
