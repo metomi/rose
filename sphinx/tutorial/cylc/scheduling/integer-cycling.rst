@@ -523,9 +523,9 @@ Recurrence Sections
 
       #. Between ``wop`` from the previous cycle and ``pub``.
       #. Between ``baz`` from the previous cycle and ``foo``
-         *every odd cycle*.
+         *every odd cycle* (e.g. baz.2 => foo.3).
       #. Between ``qux`` from the previous cycle and ``foo``
-         *every even cycle*.
+         *every even cycle* (e.g. qux.1 => foo.2).
 
       Have a go at adding inter-cycle dependencies to your ``suite.rc`` file to
       make your workflow match the diagram below.
