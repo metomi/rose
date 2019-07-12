@@ -124,6 +124,13 @@ A suite directory may contain the following:
       hostnames matching ``hpc*``. In which case, it will create
       ``~/cylc-run/$NAME`` as a symbolic link to ``$WORKDIR/cylc-run/$NAME/``.
 
+      .. warning::
+
+         If a suite has previously been run changes to any of the ``root-dir``
+         settings will take effect on the next clean re-installation i.e::
+
+            $ rose suite-run --new
+
    .. rose:conf:: root-dir{share}=LIST
 
       A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN`` should

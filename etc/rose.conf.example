@@ -292,6 +292,13 @@ root-dir=HOST-GLOB=$HOST-DIR
 # Root location of a suite run's ``share/`` directory. Syntax is the same
 # as :rose:conf:`root-dir`.
 # Multiple pairs can be specified by a new-line separated list.
+#
+# .. warning::
+#
+#    If a suite has previously been run changes to any of the ``root-dir``
+#    settings will take effect on the next clean re-installation i.e::
+#
+#       $ rose suite-run --new
 root-dir{share}=HOST-GLOB=$HOST-DIR
 # :default: $HOME
 #
