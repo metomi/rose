@@ -67,7 +67,7 @@ __ROSE_SUITE_INFO
 done
 
 # Setup DB
-"${ROSE_HOME}/sbin/rosa" db-create -q
+rosa db-create -q
 
 #-------------------------------------------------------------------------------
 # Run WS

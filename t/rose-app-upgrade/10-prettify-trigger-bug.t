@@ -54,9 +54,9 @@ init_macro tulip <<'__MACRO__'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import rose.upgrade
+import metomi.rose.upgrade
 
-class UpgradeTulipToBlue(rose.upgrade.MacroUpgrade):
+class UpgradeTulipToBlue(metomi.rose.upgrade.MacroUpgrade):
 
     """Blue tulips are prettier (?)."""
 

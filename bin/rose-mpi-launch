@@ -111,7 +111,8 @@
 # DIAGNOSTICS
 #     Return 0 on success, 1 or exit code of the launcher program on failure.
 #-------------------------------------------------------------------------------
-. "$(dirname "$0")/../lib/bash/rose_init"
+# shellcheck source=lib/bash/rose_init
+. rose_init
 rose_init rose_log
 
 # ------------------------------------------------------------------------------

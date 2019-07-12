@@ -4,10 +4,10 @@
 import os
 
 
-import rose.macro
+import metomi.rose.macro
 
 
-class PrintCwd(rose.macro.MacroBase):
+class PrintCwd(metomi.rose.macro.MacroBase):
 
     """Upgrade from Apple to Fig."""
 

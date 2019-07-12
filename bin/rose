@@ -37,7 +37,9 @@
 if ${ROSE_DEBUG:-false}; then
     set -x
 fi
-. "$(dirname "$0")/../lib/bash/rose_init"
+# shellcheck source=lib/bash/rose_init
+# shellcheck source=lib/bash/rose_usage
+. rose_init
 rose_init
 
 # Print actual command of a command alias
@@ -100,10 +102,11 @@ path_lead() {
 
 # Print Rose version
 function print_version() {
-    echo "Rose $ROSE_VERSION ($ROSE_HOME)"
+    echo "Rose $ROSE_VERSION ($ROSE_HOME_BIN)"
 }
 
 #-------------------------------------------------------------------------------
+# if "rose x" input then set UTIL=x
 UTIL="help"
 if (($# > 0)); then
     UTIL=$1
@@ -147,10 +150,8 @@ version|--version|-V)
     exit
     :;;
 doc)
-    PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
-    PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
     ROSE_UTIL=$UTIL
-    export PATH PYTHONPATH ROSE_UTIL
+    export ROSE_UTIL
     ns_len=$(( ${#ROSE_NS}+2 ))
     for U in $(cd "$ROSE_HOME_BIN" && ls "$ROSE_NS-"*); do
         NAME="$(sed "s/^$ROSE_NS-\\(.*\\)\$/\1/" <<<"$U")"
@@ -185,8 +186,6 @@ if (($# > 0)) && [[ $1 == '--help' || $1 == '-h' ]]; then
     help_util "$UTIL"
     exit
 fi
-PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
-PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
 ROSE_UTIL=$UTIL
-export PATH PYTHONPATH ROSE_UTIL
+export ROSE_UTIL
 exec "$COMMAND" "$@"

@@ -112,13 +112,13 @@ There is one built-in module of analysis classes called ``grepper``.
 
 .. To document everything:
 
-   .. automodule:: rose.apps.ana_builtin.grepper
+   .. automodule:: metomi.rose.apps.ana_builtin.grepper
       :members:
 
-.. autoclass:: rose.apps.ana_builtin.grepper.FileCommandPattern
+.. autoclass:: metomi.rose.apps.ana_builtin.grepper.FileCommandPattern
 
-.. autoclass:: rose.apps.ana_builtin.grepper.FilePattern
+.. autoclass:: metomi.rose.apps.ana_builtin.grepper.FilePattern
 
-.. autoclass:: rose.apps.ana_builtin.grepper.SingleCommandPattern
+.. autoclass:: metomi.rose.apps.ana_builtin.grepper.SingleCommandPattern
 
-.. autoclass:: rose.apps.ana_builtin.grepper.SingleCommandStatus
+.. autoclass:: metomi.rose.apps.ana_builtin.grepper.SingleCommandStatus

@@ -20,6 +20,7 @@
 # Basic tests for "rosa svn-pre-commit".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+
 export ROSE_CONF_PATH=
 mkdir conf
 cat >conf/rose.conf <<'__ROSE_CONF__'
@@ -32,10 +33,15 @@ tests 117
 mkdir repos
 svnadmin create repos/foo
 SVN_URL=file://$PWD/repos/foo
+ROSE_BIN=$(dirname $(command -v rose))
+ROSE_LIB=$(dirname $(python -c "import metomi.rose; print(metomi.rose.__file__)"))
+export ROSE_LIB ROSE_BIN
 cat >repos/foo/hooks/pre-commit <<__PRE_COMMIT__
 #!/bin/bash
 export ROSE_CONF_PATH=$PWD/conf
-exec $ROSE_HOME/sbin/rosa svn-pre-commit "\$@"
+export PATH=$PATH:${ROSE_BIN}
+export ROSE_LIB=${ROSE_LIB}
+rosa svn-pre-commit "\$@"
 __PRE_COMMIT__
 chmod +x repos/foo/hooks/pre-commit
 export LANG=C

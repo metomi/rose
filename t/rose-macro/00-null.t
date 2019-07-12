@@ -64,9 +64,9 @@ TEST_KEY=$TEST_KEY_BASE-no-metadata
 setup
 run_pass "$TEST_KEY" rose macro -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -78,8 +78,8 @@ TEST_KEY=$TEST_KEY_BASE-no-metadata-quiet
 setup
 run_pass "$TEST_KEY" rose macro -q -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators
-[T] rose.macros.DefaultTransforms
+[V] metomi.rose.macros.DefaultValidators
+[T] metomi.rose.macros.DefaultTransforms
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -168,8 +168,8 @@ __META_CONFIG__
 init_macro report.py <<'__MACRO__'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import rose.macro
-class Test(rose.macro.MacroBase):
+import metomi.rose.macro
+class Test(metomi.rose.macro.MacroBase):
     """Test reporter macro."""
     def report(self, config, meta_config=None):
         return True

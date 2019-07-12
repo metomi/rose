@@ -105,7 +105,7 @@ compulsory=true
 [namelist:compulsory_nl7=my_var9]
 compulsory=true
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -198,10 +198,10 @@ compulsory=true
 [namelist:compulsory_nl7=my_var9]
 compulsory=true
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 5
+[V] metomi.rose.macros.DefaultValidators: issues: 5
     namelist:compulsory_nl2=my_var2=235
         Compulsory settings should not be user-ignored.
     namelist:compulsory_nl4(1)=my_var4=.true.
@@ -248,10 +248,10 @@ compulsory=true
 [namelist:compulsory_nl5=my_var5]
 compulsory=true
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 5
+[V] metomi.rose.macros.DefaultValidators: issues: 5
     namelist:compulsory_nl2=None=None
         Section set as compulsory, but not in configuration.
     namelist:compulsory_nl3=None=None
@@ -418,7 +418,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 17
+[V] metomi.rose.macros.DefaultValidators: issues: 17
     compulsory_duplicate_section_missing(1)=None=None
         Section set as compulsory, but not in configuration.
     compulsory_duplicate_section_missing_empty(1)=None=None
@@ -457,7 +457,7 @@ __ERR__
 TEST_KEY=$TEST_KEY_BASE-fixing
 run_pass "$TEST_KEY" rose macro --fix --config=../config --non-interactive
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-[T] rose.macros.DefaultTransforms: changes: 23
+[T] metomi.rose.macros.DefaultTransforms: changes: 23
     compulsory_duplicate_section_missing(1)=None=None
         Added compulsory section
     compulsory_duplicate_section_missing(1)=compulsory_missing_and_err=false

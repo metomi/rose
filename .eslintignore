@@ -1,6 +1,6 @@
 doc/*
-lib/html/static/js/bootstrap*
-lib/html/static/js/dataTables.bootstrap*
-lib/html/static/js/jquery*
-lib/html/static/js/livestamp.min.js
-lib/html/static/js/moment.min.js
+metomi/rosie/lib/html/static/js/bootstrap*
+metomi/rosie/lib/html/static/js/dataTables.bootstrap*
+metomi/rosie/lib/html/static/js/jquery*
+metomi/rosie/lib/html/static/js/livestamp.min.js
+metomi/rosie/lib/html/static/js/moment.min.js

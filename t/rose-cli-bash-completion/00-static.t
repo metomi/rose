@@ -21,11 +21,11 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 197
+tests 193
 setup
 #-------------------------------------------------------------------------------
 # Source the script.
-. $ROSE_HOME/etc/rose-bash-completion || exit 1
+. $ROSE_TEST_HOME/etc/rose-bash-completion || exit 1
 #-------------------------------------------------------------------------------
 # List Rose subcommands.
 TEST_KEY=$TEST_KEY_BASE-rose-subcommands
@@ -277,10 +277,10 @@ init_upgrade_macro jupiter_moons <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeIotoEuropa(rose.upgrade.MacroUpgrade):
+class UpgradeIotoEuropa(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from Io to Europa."""
 
@@ -292,7 +292,7 @@ class UpgradeIotoEuropa(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class UpgradeEuropatoGanymede(rose.upgrade.MacroUpgrade):
+class UpgradeEuropatoGanymede(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from Europa to Ganymede."""
 
@@ -304,7 +304,7 @@ class UpgradeEuropatoGanymede(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class UpgradeGanymedetoCallisto(rose.upgrade.MacroUpgrade):
+class UpgradeGanymedetoCallisto(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from Ganymede to Callisto."""
 
@@ -316,7 +316,7 @@ class UpgradeGanymedetoCallisto(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class UpgradeCallistotoThemisto(rose.upgrade.MacroUpgrade):
+class UpgradeCallistotoThemisto(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from Callisto to Themisto."""
 
@@ -384,8 +384,8 @@ COMP_WORDS=( rose macro -C ../config "" )
 COMP_CWORD=4
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-compreply_grep "$TEST_KEY.reply1" '^rose.macros.DefaultTransforms$'
-compreply_grep "$TEST_KEY.reply2" '^rose.macros.DefaultValidators$'
+compreply_grep "$TEST_KEY.reply1" '^metomi.rose.macros.DefaultTransforms$'
+compreply_grep "$TEST_KEY.reply2" '^metomi.rose.macros.DefaultValidators$'
 compreply_grep "$TEST_KEY.reply3" '^--config=$'
 compreply_grep "$TEST_KEY.reply4" '^-C$'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
@@ -399,10 +399,10 @@ init <<'__CONFIG__'
 meta=beef/HEAD
 __CONFIG__
 init_macro beef burger.py <<'__MACRO__'
-import rose.macro
+import metomi.rose.macro
 
 
-class BeefBurgerTransformer(rose.macro.MacroBase):
+class BeefBurgerTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to change the value of a boolean environment variable."""
 
@@ -419,8 +419,8 @@ COMP_WORDS=( rose macro --meta-path = ../config/etc/rose-meta -C ../config "" )
 COMP_CWORD=7
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-compreply_grep "$TEST_KEY.reply1" '^rose.macros.DefaultTransforms$'
-compreply_grep "$TEST_KEY.reply2" '^rose.macros.DefaultValidators$'
+compreply_grep "$TEST_KEY.reply1" '^metomi.rose.macros.DefaultTransforms$'
+compreply_grep "$TEST_KEY.reply2" '^metomi.rose.macros.DefaultValidators$'
 compreply_grep "$TEST_KEY.reply3" '^burger.BeefBurgerTransformer$'
 compreply_grep "$TEST_KEY.reply4" '^--config=$'
 compreply_grep "$TEST_KEY.reply5" '^-C$'
@@ -433,8 +433,8 @@ COMP_WORDS=( rose macro -M ../config/etc/rose-meta -C ../config "" )
 COMP_CWORD=6
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-compreply_grep "$TEST_KEY.reply1" '^rose.macros.DefaultTransforms$'
-compreply_grep "$TEST_KEY.reply2" '^rose.macros.DefaultValidators$'
+compreply_grep "$TEST_KEY.reply1" '^metomi.rose.macros.DefaultTransforms$'
+compreply_grep "$TEST_KEY.reply2" '^metomi.rose.macros.DefaultValidators$'
 compreply_grep "$TEST_KEY.reply3" '^burger.BeefBurgerTransformer$'
 compreply_grep "$TEST_KEY.reply4" '^--config=$'
 compreply_grep "$TEST_KEY.reply5" '^-C$'
@@ -800,18 +800,6 @@ compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 bar
 foo
 __REPLY__
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
-#-------------------------------------------------------------------------------
-# List arguments for "rose test-battery ".
-TEST_KEY=$TEST_KEY_BASE-rose-test-battery
-setup
-COMP_WORDS=( rose test-battery "" )
-COMP_CWORD=2
-COMPREPLY=
-run_pass "$TEST_KEY" _rose
-compreply_grep "$TEST_KEY.reply" "^rose-cli-bash-completion$"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

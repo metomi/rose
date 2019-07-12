@@ -30,11 +30,11 @@ Rose Domain
 
 .. autoclass:: rose_domain.RoseDirective
    :members: NAME, LABEL, ARGUMENT_SEPARATOR, ALT_FORM_SEPARATOR, ALT_FORM_TEMPLATE
-   
+
 .. autoclass:: rose_domain.RoseAppDirective
 
 .. autoclass:: rose_domain.RoseFileDirective
-   
+
 .. autoclass:: rose_domain.RoseConfigDirective
 
 .. autoclass:: rose_domain.RoseAutoDirective

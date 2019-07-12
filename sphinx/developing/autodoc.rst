@@ -87,7 +87,7 @@ values will have to be provided and should sit on the next newline.
 
 .. code-block:: python
 
-   >>> import rose.config
+   >>> import metomi.rose.config
    >>> rose.config.ConfigNode()
    {'state': '', 'comments': [], 'value': {}}
 

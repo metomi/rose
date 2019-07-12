@@ -43,6 +43,7 @@ mkdir conf
 cat >conf/rose.conf <<__ROSE_CONF__
 opts=port (default)
 
+
 [rosie-db]
 repos.bar=$PWD/repos/bar
 repos.foo=$PWD/repos/foo
@@ -79,7 +80,7 @@ __ROSE_SUITE_INFO
 rosie create -q -y --prefix=bar --info-file=rose-suite.info --no-checkout
 
 # Setup DB
-$ROSE_HOME/sbin/rosa db-create -q
+rosa db-create -q
 
 #-------------------------------------------------------------------------------
 # Run WS

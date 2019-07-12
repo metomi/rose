@@ -65,7 +65,7 @@ __ROSE_SUITE_INFO
 rosie create -q -y --prefix='foo' --info-file='rose-suite.info' --no-checkout
 
 # Setup DB
-"${ROSE_HOME}/sbin/rosa" db-create -q
+rosa db-create -q
 
 #-------------------------------------------------------------------------------
 # Run WS

@@ -19,10 +19,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
-class InvalidCommentsTransformer(rose.macro.MacroBase):
+class InvalidCommentsTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to return invalid comments."""
 
@@ -40,7 +40,7 @@ class InvalidCommentsTransformer(rose.macro.MacroBase):
         return config, self.reports
 
 
-class InvalidConfigKeysTransformer(rose.macro.MacroBase):
+class InvalidConfigKeysTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to return invalid comments."""
 
@@ -55,7 +55,7 @@ class InvalidConfigKeysTransformer(rose.macro.MacroBase):
         return config, self.reports
 
 
-class InvalidConfigObjectTransformer(rose.macro.MacroBase):
+class InvalidConfigObjectTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to return invalid configs."""
 
@@ -65,7 +65,7 @@ class InvalidConfigObjectTransformer(rose.macro.MacroBase):
         return None, self.reports
 
 
-class InvalidStateTransformer(rose.macro.MacroBase):
+class InvalidStateTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to return an invalid state."""
 
@@ -82,7 +82,7 @@ class InvalidStateTransformer(rose.macro.MacroBase):
         return config, self.reports
 
 
-class InvalidValueTransformer(rose.macro.MacroBase):
+class InvalidValueTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to return an invalid value."""
 

@@ -25,7 +25,7 @@ tests 2
 export ROSE_CONF_PATH=
 run_fail "${TEST_KEY_BASE}" rosie hello
 file_cmp "${TEST_KEY_BASE}.err" "${TEST_KEY_BASE}.err" <<'__ERR__'
-[rosie-id] settings not defined in site/user configuration.
+[metomi.rosie-id] settings not defined in site/user configuration.
 __ERR__
 
 exit

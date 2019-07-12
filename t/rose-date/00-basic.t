@@ -121,7 +121,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Parse format and print format (5).
 TEST_KEY=$TEST_KEY_BASE-parse-print-5
-run_pass "$TEST_KEY" rose date -p "%s" -f "%Y%m%dT%H%M%S%z" '1396429200'
+run_pass "$TEST_KEY" rose date -p "%s" -f "%Y%m%dT%H%M%S%z" '1396429200' --utc
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 20140402T090000+0000
 __OUT__
@@ -234,7 +234,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Print format with offset.
 TEST_KEY=$TEST_KEY_BASE-format-and-offset
-run_pass "$TEST_KEY" rose date --offset=-PT3H -f "%y%m" "20121125T15" 
+run_pass "$TEST_KEY" rose date --offset=-PT3H -f "%y%m" "20121125T15"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 1211
 __OUT__

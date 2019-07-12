@@ -230,19 +230,19 @@ The only analysis module provided with Rose is
 :py:mod:`rose.apps.ana_builtin.grepper`, it provides the following analysis
 tasks and options:
 
-.. autoclass:: rose.apps.ana_builtin.grepper.SingleCommandStatus
+.. autoclass:: metomi.rose.apps.ana_builtin.grepper.SingleCommandStatus
    :noindex:
 
-.. autoclass:: rose.apps.ana_builtin.grepper.SingleCommandPattern
+.. autoclass:: metomi.rose.apps.ana_builtin.grepper.SingleCommandPattern
    :noindex:
 
-.. autoclass:: rose.apps.ana_builtin.grepper.FilePattern
+.. autoclass:: metomi.rose.apps.ana_builtin.grepper.FilePattern
    :noindex:
 
-.. autoclass:: rose.apps.ana_builtin.grepper.FileCommandPattern
+.. autoclass:: metomi.rose.apps.ana_builtin.grepper.FileCommandPattern
    :noindex:
 
-.. automodule:: rose.apps.ana_builtin.grepper
+.. automodule:: metomi.rose.apps.ana_builtin.grepper
    :noindex:
 
 The format for analysis modules themselves is relatively simple; the easiest
@@ -252,13 +252,13 @@ recognised as a valid analysis module, the Python file must contain at
 least one class which inherits and extends
 :py:mod:`rose.apps.rose_ana.AnalysisTask`:
 
-.. autoclass:: rose.apps.rose_ana.AnalysisTask
+.. autoclass:: metomi.rose.apps.rose_ana.AnalysisTask
 
 For example:
 
 .. code-block:: python
 
-   from rose.apps.rose_ana import AnalysisTask
+   from metomi.rose.apps.rose_ana import AnalysisTask
 
    class CustomAnalysisTask(AnalysisTask):
        """My new custom analysis task."""

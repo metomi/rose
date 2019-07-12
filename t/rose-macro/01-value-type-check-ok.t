@@ -61,7 +61,7 @@ my_logical_array_any = .false., .true., .false.,, 6*.true.
 my_logical_array_fixed = .true., .true., .false., .true., .false., .false.
 my_derived_type_str_int_raw_bool = "I escape \" quotes like this: \"", -45, $something, false
 my_derived_type_str_int_raw_bool_array = "A string string", -23, 456.x45, false,
-                                       = "\"Hello\", said the string", 3456, ^%£2, true,
+                                       = "\"Hello\", said the string", 3456, ^%ï¿½2, true,
                                        = "I do not contain quotes", -45, i be a raw entry, true
 my_derived_type_raw_log_char_real = raw ^%75\\, .true., 'a simple character string', 45.0
 my_derived_type_raw_log_char_real_array = xlkdf",", .true., 'I''m a character string', 3.0e-3,
@@ -164,7 +164,7 @@ setup
 init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_raw]
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

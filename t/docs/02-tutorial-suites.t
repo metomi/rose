@@ -30,7 +30,7 @@
 TEST_KEYS=('')
 TUT_DIRS=('')
 TESTS=('')
-TUTORIALS_PATH="${ROSE_HOME}/etc/tutorial"
+TUTORIALS_PATH="${ROSE_TEST_HOME}/etc/tutorial"
 for tutorial in $(ls -1 "${TUTORIALS_PATH}"); do
     tutorial_path="${TUTORIALS_PATH}/${tutorial}"
     validate_file="${tutorial_path}/.validate"

@@ -5,6 +5,8 @@ etc/opt
 lib/bash/rose_init_site
 doc
 venv
+metomi_rose.egg-info
+dist
 
 # coverage
 .coverage

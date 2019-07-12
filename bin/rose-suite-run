@@ -129,4 +129,4 @@
 #     * `cylc help register`
 #     * `cylc help run`
 #-------------------------------------------------------------------------------
-exec python3 -m rose.suite_run "$@"
+exec python3 -m metomi.rose.suite_run "$@"

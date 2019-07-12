@@ -229,7 +229,7 @@ run_fail "$TEST_KEY" \
              --name $SUITENAME -- --no-detach --debug 
 OUTPUT=$TEST_DIR/${TEST_KEY}.err
 TEST_KEY=$TEST_KEY_BASE-incompatible-versions-correct_error
-file_grep $TEST_KEY "Running rose-stem version 1 but suite is at version 0" $OUTPUT
+file_grep $TEST_KEY "Running metomi.rose-stem version 1 but suite is at version 0" $OUTPUT
 #-------------------------------------------------------------------------------
 # Eighth test - test error message when project not in keywords
 # Remove the keywords file and re-copy the original rose-suite.conf file

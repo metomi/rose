@@ -71,7 +71,7 @@ trigger = namelist:near_cyclic_namelist=f
 [namelist:dupl_nl]
 duplicate = true
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -105,10 +105,10 @@ trigger = namelist:near_cyclic_namelist=f
 [namelist:dupl_nl]
 duplicate = true
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[V] rose.macros.DefaultValidators: issues: 1
+[V] metomi.rose.macros.DefaultValidators: issues: 1
     namelist:near_cyclic_namelist=f=2
         No metadata entry found
 __CONTENT__
@@ -145,10 +145,10 @@ trigger = namelist:near_cyclic_namelist=f; namelist:near_cyclic_namelist=switch
 [namelist:dupl_nl]
 duplicate = true
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[V] rose.macros.DefaultValidators: issues: 1
+[V] metomi.rose.macros.DefaultValidators: issues: 1
     namelist:near_cyclic_namelist=switch=.false.
         Cyclic dependency detected: namelist:near_cyclic_namelist=a to namelist:near_cyclic_namelist=switch
 __CONTENT__
@@ -164,10 +164,10 @@ duplicate = true
 [namelist:dupl_nl=a]
 trigger = namelist:subject_nl=atrig: .true.
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[V] rose.macros.DefaultValidators: issues: 1
+[V] metomi.rose.macros.DefaultValidators: issues: 1
     namelist:dupl_nl=a=None
         Badly defined trigger - namelist:dupl_nl is 'duplicate'
 __CONTENT__
@@ -187,7 +187,7 @@ trigger=env=FOO_SUB: qux;
 
 [env=FOO_SUB]
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -862,10 +862,10 @@ trigger=namelist:trig_absent=two_values_triggered: 1, 2
 
 [namelist:trig_absent=two_values_triggered]
 __META_CONFIG__
-run_fail "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro --non-interactive --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 32
+[V] metomi.rose.macros.DefaultValidators: issues: 32
     namelist:already_triggered_ignored_namelist=ab_trig_var1=2
         State should be trig-ignored
     namelist:already_triggered_ignored_namelist=ab_trig_var2=2
@@ -969,7 +969,7 @@ duplicate=true
 
 [namelist:bar=wobble]
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -1005,7 +1005,7 @@ trigger=namelist:baz=c: 2;
 
 [namelist:baz=c]
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -1064,7 +1064,7 @@ trigger=namelist:zzz=lowest_level_opt: .true.
 
 [namelist:zzz=lowest_level_opt]
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

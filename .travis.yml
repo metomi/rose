@@ -20,7 +20,7 @@ jobs:
   include:
     - name: "Unit Tests"
       install:
-        - now install coverage cylc linters pytest rose
+        - now install coverage linters pytest cylc rose
       script:
         - now test style
         - now test units
@@ -28,12 +28,14 @@ jobs:
     - name: "Test Battery"
       before_install:
         - export PATH="$PWD/.travis:$PATH"
-        - now install coverage cylc fcm rose rosie tut_suite
+        - now install coverage fcm tut_suite
+      install:
+        - now install isodatetime cylc rose
       script:
         - now test battery
+
     - name: "Documentation"
       install:
-        - now install coverage rose sphinx tut_suite
+        - now install coverage isodatetime rose sphinx tut_suite
       script:
         - now test docs
-        - now build docs

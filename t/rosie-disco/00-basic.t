@@ -40,7 +40,7 @@ prefix-default=foo
 prefix-location.foo=$SVN_URL
 __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD
-$ROSE_HOME/sbin/rosa db-create -q
+rosa db-create -q
 #-------------------------------------------------------------------------------
 rose_ws_init 'rosie' 'disco'
 if [[ -z "${TEST_ROSE_WS_PORT}" ]]; then
@@ -59,6 +59,7 @@ URL_FOO_Q="${URL_FOO}query?"
 
 TEST_KEY=$TEST_KEY_BASE-curl-root-trailing-slash
 run_pass "$TEST_KEY" curl -i "${TEST_ROSE_WS_URL}/"  # note: slash at end
+cat $TEST_KEY.out >&2
 file_grep "$TEST_KEY.out" 'HTTP/.* 200 OK' "$TEST_KEY.out"
 
 # The app has been set-up so that a trailing slash, as in the test directly
@@ -103,7 +104,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 #-------------------------------------------------------------------------------
 for FILE in "$TEST_SOURCE_DIR/$TEST_KEY_BASE/"*.conf; do
     rosie create -q -y --info-file=$FILE --no-checkout
-    $ROSE_HOME/sbin/rosa svn-post-commit \
+    rosa svn-post-commit \
         $PWD/svn/foo $(svnlook youngest $PWD/svn/foo)
 done
 #-------------------------------------------------------------------------------
@@ -112,7 +113,7 @@ for FILE in "$TEST_SOURCE_DIR/$TEST_KEY_BASE/"*.conf.1; do
     rosie checkout -q $ID
     cat <$FILE >$PWD/roses/$ID/rose-suite.info
     svn ci -q -m 'test' $PWD/roses/$ID
-    $ROSE_HOME/sbin/rosa svn-post-commit \
+    rosa svn-post-commit \
         $PWD/svn/foo $(svnlook youngest $PWD/svn/foo)
 done
 #-------------------------------------------------------------------------------

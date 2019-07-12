@@ -22,10 +22,10 @@
 
 import http.client
 
-import rose.macro
+import metomi.rose.macro
 
 
-class URLChecker(rose.macro.MacroBase):
+class URLChecker(metomi.rose.macro.MacroBase):
 
     """Class to check if a URL is valid."""
 

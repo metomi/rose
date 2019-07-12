@@ -158,10 +158,10 @@ init_macro test-app-upgrade <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
+class UpgradeAppletoFig(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from Apple to Fig."""
 
@@ -670,10 +670,10 @@ init_macro test-app-upgrade <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
+class UpgradeAppletoFig(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from Apple to Fig."""
 

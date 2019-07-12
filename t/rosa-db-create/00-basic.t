@@ -22,6 +22,7 @@
 # svn-post-commit", which is tested quite thoroughly in its own test suite.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+
 #-------------------------------------------------------------------------------
 if ! python3 -c 'import sqlalchemy' 2>/dev/null; then
     skip_all '"sqlalchemy" not installed'
@@ -46,7 +47,7 @@ export ROSE_CONF_PATH=$PWD/conf
 cat >repos/foo/hooks/post-commit <<__POST_COMMIT__
 #!/bin/bash
 export ROSE_CONF_PATH=$ROSE_CONF_PATH
-$ROSE_HOME/sbin/rosa svn-post-commit --debug "\$@" \\
+rosa svn-post-commit --debug "\$@" \\
     1>$PWD/rosa-svn-post-commit.out 2>$PWD/rosa-svn-post-commit.err
 echo \$? >$PWD/rosa-svn-post-commit.rc
 __POST_COMMIT__
@@ -54,7 +55,7 @@ chmod +x repos/foo/hooks/post-commit
 export LANG=C
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-0"
-run_pass "$TEST_KEY" $ROSE_HOME/sbin/rosa db-create
+run_pass "$TEST_KEY" rosa db-create
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] sqlite:///$PWD/repos/foo.db: DB created.
 __OUT__
@@ -73,7 +74,7 @@ __ROSE_SUITE_INFO
 rosie create -q -y --info-file=rose-suite.info --no-checkout || exit 1
 echo "2009-02-13T23:31:30.000000Z" >foo-date-1.txt
 svnadmin setrevprop $PWD/repos/foo -r 1 svn:date foo-date-1.txt
-run_pass "$TEST_KEY" $ROSE_HOME/sbin/rosa db-create
+run_pass "$TEST_KEY" rosa db-create
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] sqlite:///$PWD/repos/foo.db: DB created.
 [INFO] $PWD/repos/foo: DB loaded, r1 of 1.
@@ -105,7 +106,7 @@ cp rose-suite.info $PWD/roses/foo-aa001/
      svn update -q) || exit 1
 echo "2009-02-13T23:31:32.000000Z" >foo-date-3.txt
 svnadmin setrevprop $PWD/repos/foo -r 3 svn:date foo-date-3.txt
-run_pass "$TEST_KEY" $ROSE_HOME/sbin/rosa db-create
+run_pass "$TEST_KEY" rosa db-create
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] sqlite:///$PWD/repos/foo.db: DB created.
 [INFO] $PWD/repos/foo: DB loaded, r3 of 3.
@@ -120,7 +121,7 @@ rm $PWD/repos/foo.db
 rosie delete -q -y foo-aa000 || exit 1
 echo "2009-02-13T23:31:33.000000Z" >foo-date-4.txt
 svnadmin setrevprop $PWD/repos/foo -r 4 svn:date foo-date-4.txt
-run_pass "$TEST_KEY" $ROSE_HOME/sbin/rosa db-create
+run_pass "$TEST_KEY" rosa db-create
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] sqlite:///$PWD/repos/foo.db: DB created.
 [INFO] $PWD/repos/foo: DB loaded, r4 of 4.
