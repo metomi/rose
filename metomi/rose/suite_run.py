@@ -374,7 +374,7 @@ class SuiteRunner(Runner):
                 default="rose")
             # Build remote "rose suite-run" command
             shcommand += " %s suite-run -vv -n %s" % (
-                metomi.rose_bin, suite_name)
+                rose_bin, suite_name)
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:

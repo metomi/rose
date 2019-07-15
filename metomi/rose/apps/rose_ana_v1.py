@@ -167,23 +167,23 @@ class RoseAnaV1App(BuiltinApp):
                          popen=app_runner.popen)
 
         # Initialise a database session
-        metomi.rose_ana_task_name = os.getenv("ROSE_TASK_NAME")
+        rose_ana_task_name = os.getenv("ROSE_TASK_NAME")
         kgo_db = KGODatabase()
 
         # Add an entry for this task, with a non-zero status code
-        kgo_db.enter_task(metomi.rose_ana_task_name, 1)
+        kgo_db.enter_task(rose_ana_task_name, 1)
 
         # Run the analysis
         num_failed, tasks = engine.analyse()
 
         # Update the database to indicate that the task succeeded
-        kgo_db.enter_task(metomi.rose_ana_task_name, 0)
+        kgo_db.enter_task(rose_ana_task_name, 0)
 
         # Update the database
         for task in tasks:
             # The primary key in the database is composed from both the
             # rose_ana app name and the task index (to make it unique)
-            app_task = "{0} ({1})".format(metomi.rose_ana_task_name, task.name)
+            app_task = "{0} ({1})".format(rose_ana_task_name, task.name)
             # Include an indication of what extract/comparison was performed
             comparison = "{0} : {1} : {2}".format(
                 task.comparison, task.extract, getattr(task, "subextract", ""))

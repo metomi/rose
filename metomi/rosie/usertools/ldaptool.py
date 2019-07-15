@@ -20,7 +20,7 @@
 """User information via LDAP."""
 
 try:
-    import ldap
+    import ldap3 as ldap
 except ImportError:
     pass
 import os

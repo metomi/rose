@@ -57,6 +57,7 @@ from metomi.rose.opt_parse import RoseOptionParser
 import metomi.rose.reporter
 import metomi.rose.resource
 import metomi.rose.variable
+from metomi.rose.config import ConfigNode
 
 
 ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate", "downgrade", "upgrade",
@@ -799,7 +800,7 @@ def get_macros_for_config(config=None,
         no_warn - Output metadata warnings?
     """
     if config is None:
-        config = metomi.rose.config.ConfigNode()
+        config = ConfigNode()
     meta_config_tree = load_meta_config_tree(
         config, directory=config_directory, no_warn=no_warn)
     if meta_config_tree is None:

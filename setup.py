@@ -55,7 +55,8 @@ INSTALL_REQUIRES = [
     "tornado",
     "sqlalchemy",
     "isodatetime",
-    "requests"
+    "requests",
+    "ldap3",
 ]
 
 
@@ -71,6 +72,15 @@ setup(
     license='GPL',
     license_file="https://metomi.github.io/rose/doc/html/terms.html",
     url="https://metomi.github.io/rose/doc/html/index.html",
+    platforms="any",
+    classifiers="""Environment :: Console
+Environment :: Web Environment
+Intended Audience :: Developers
+Intended Audience :: System Administrators
+Intended Audience :: Science/Research
+Operating System :: POSIX :: Linux
+Programming Language :: Python :: 3.7
+Topic :: Scientific/Engineering :: Atmospheric Science""",
 
     # Options
     scripts=glob(join("bin", "*"))
