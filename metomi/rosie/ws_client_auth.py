@@ -18,27 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 """The authentication manager for the Rosie web service client."""
-
-# This try/except loop attempts to load the 'Secret' object. Running on
-# systems with GTK+ >=v3 this should work: Systems on GTK <v3 will not load
-# this module.
-import warnings
-try:
-    from gi import require_version, pygtkcompat
-    require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
-    require_version('Secret', '1')
-    from gi.repository import Secret
-    del pygtkcompat
-    GI_FLAG = True
-except (ImportError, ValueError):
-    GI_FLAG = False
-try:
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        import gtk
-    import gnomekeyring
-except ImportError:
-    pass
+GI_FLAG = False
 
 import ast
 from getpass import getpass
