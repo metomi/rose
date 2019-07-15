@@ -19,7 +19,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-from rose.macro import MacroBase
+from metomi.rose.macro import MacroBase
 
 
 class ArgumentTransformer(MacroBase):

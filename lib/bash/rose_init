@@ -30,20 +30,17 @@
 #     * load the "rose_usage" function.
 #     * load any FUNC specified in the argument list.
 #-------------------------------------------------------------------------------
+# shellcheck source=lib/bash/rose_usage
+. rose_usage
 
 function rose_init() {
     set -eu
-    ROSE_NS="$(basename "$0")"
-    ROSE_HOME_BIN="$(cd "$(dirname "$0")" && pwd)"
-    ROSE_HOME="$(dirname "$ROSE_HOME_BIN")"
-    eval "$(grep 'ROSE_VERSION' "$ROSE_HOME/rose-version")"
-    local DESC=
-    if DESC="$(cd "$ROSE_HOME" && git describe 2>/dev/null)"; then
-        ROSE_VERSION=$DESC
-    fi
-    export ROSE_HOME ROSE_HOME_BIN ROSE_NS ROSE_VERSION
-
-    local LIB=$ROSE_HOME/lib/bash
+    ROSE_NS=$(basename "$0")
+    ROSE_LIB="$(dirname "$(python -c "import metomi.rose; print(metomi.rose.__file__)")")"
+    ROSE_HOME_BIN=$(dirname "$(command -v rose)")
+    ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
+    export ROSE_LIB ROSE_HOME_BIN ROSE_NS ROSE_VERSION
+    local LIB=$ROSE_LIB
     if [[ -f $LIB/${FUNCNAME[0]}_site ]]; then
         . "$LIB/${FUNCNAME[0]}_site"
     fi
@@ -51,7 +48,7 @@ function rose_init() {
     local ITEM=
     for ITEM in rose_usage "$@"; do
         local FILE=
-        for FILE in $LIB/$ITEM; do
+        for FILE in $ITEM; do
             . "$FILE"
         done
     done

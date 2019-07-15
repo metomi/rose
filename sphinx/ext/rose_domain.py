@@ -134,7 +134,7 @@ from sphinx.util.nodes import make_refnode
 from sphinx.util import logging
 from sphinx.util.docfields import Field, TypedField
 
-from rose import config
+from metomi.rose import config
 
 
 LOGGER = logging.getLogger(__name__)

@@ -10,8 +10,9 @@ Installation
 The source code for Rose is available via `GitHub`_, code
 releases are available in ``zip`` and ``tar.gz`` `archives`_.
 
-1. Un-pack the archive file into an appropriate location on your system.
-2. Add the ``rose/bin/`` directory into your ``PATH`` environment variable.
+1. If you wish to do so create a new environment using Conda, Venv or some
+   other environment manager.
+2. Install using ``pip install metomi-rose``
 3. Check system compatibility by running :ref:`command-rose-check-software`.
 
 
@@ -70,7 +71,7 @@ Hosts For Running User Interactive Tools
 
 Installation requirements:
    * Rose, Cylc, Bash, Python, requests, Subversion, FCM,
-     Pygraphviz (+ graphviz), PyGTK (+ GTK).
+     Pygraphviz (+ graphviz).
 
 Connectivity requirements:
    * Must have HTTP access to the hosts running the Rosie web service.
@@ -84,7 +85,7 @@ Hosts For Running Rose Bush
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Installation requirements:
-   * Rose, Bash, Python, cherrypy, jinja2.
+   * Rose, Bash, Python, jinja2.
 
 Connectivity requirements:
    * Must be able to access the home directories of users' Cylc run directories.
@@ -96,7 +97,7 @@ Typically you will only need a single host but you can have multiple
 repositories on different hosts if you require this.
 
 Installation requirements:
-   * Rose, Bash, Python, cherrypy, jinja2, sqlalchemy, Subversion.
+   * Rose, Bash, Python, jinja2, sqlalchemy, Subversion.
 
 .. note::
 
@@ -111,25 +112,6 @@ Installation requirements:
 
 Configuring Rose
 ----------------
-
-``lib/bash/rose_init_site``
-   If you do not have root access to install the required Python libraries,
-   you may need to edit this file to ensure Python libraries are included
-   in the ``PYTHONPATH`` environment variable. For example, if you have
-   installed some essential Python libraries in your ``HOME`` directory,
-   you can add a ``lib/bash/rose_init_site`` file with the following
-   contents:
-
-   .. code-block:: bash
-
-      # Essential Python libraries installed under
-      # "/home/daisy/usr/lib/python2.6/site-packages/"
-      if [[ -n "${PYTHONPATH:-}" ]]; then
-          PYTHONPATH="/home/daisy/usr/lib/python2.6/site-packages:${PYTHONPATH}"
-      else
-          PYTHONPATH="/home/daisy/usr/lib/python2.6/site-packages"
-      fi
-      export PYTHONPATH
 
 ``etc/rose.conf``
    You should add/edit this file to meet the requirement of your site.
@@ -268,12 +250,7 @@ You can start an ad-hoc Rose Bush web server by running::
 You will find the access and error logs under ``~/.metomi/rose-bush*``.
 
 Alternatively you can run the Rose Bush web service under Apache
-``mod_wsgi``. To do this you will need to set up an Apache module
-configuration file (typically in ``/etc/httpd/conf.d/rose-wsgi.conf``)
-containing the following (with the paths set appropriately)::
-
-   WSGIPythonPath /path/to/rose/lib/python
-   WSGIScriptAlias /rose-bush /path/to/rose/lib/python/rose/bush.py
+``mod_wsgi``.
 
 Use the Apache log at e.g. ``/var/log/httpd/`` to debug problems.
 See also `Configuring a Rosie Server`_.

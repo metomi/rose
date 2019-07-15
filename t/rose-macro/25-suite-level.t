@@ -62,10 +62,10 @@ cat >$TEST_DIR/$TEST_SUITE/meta/lib/python/macros/suite.py <<'__MACRO__'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import rose.macro
+import metomi.rose.macro
 
 
-class SuiteChecker(rose.macro.MacroBase):
+class SuiteChecker(metomi.rose.macro.MacroBase):
     """Suite checker macro."""
 
     def validate(self, config, meta_config=None):
@@ -100,10 +100,10 @@ cat >$TEST_DIR/$TEST_SUITE/app/foo/meta/lib/python/macros/foo.py <<'__MACRO__'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import rose.macro
+import metomi.rose.macro
 
 
-class FooChecker(rose.macro.MacroBase):
+class FooChecker(metomi.rose.macro.MacroBase):
     """Foo checker macro."""
 
     def validate(self, config, meta_config=None):
@@ -136,10 +136,10 @@ cat >$TEST_DIR/$TEST_SUITE/app/bar/meta/lib/python/macros/bar.py <<'__MACRO__'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import rose.macro
+import metomi.rose.macro
 
 
-class BarChecker(rose.macro.MacroBase):
+class BarChecker(metomi.rose.macro.MacroBase):
     """Bar checker macro."""
 
     def validate(self, config, meta_config=None):
@@ -164,40 +164,40 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [INFO] app/bar/rose-app.conf
 [V] bar.BarChecker
     # Bar checker macro.
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [T] bar.BarChecker
     # Bar checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [R] bar.BarChecker
     # Bar checker macro.
 [INFO] app/foo/rose-app.conf
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] foo.FooChecker
     # Foo checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] foo.FooChecker
     # Foo checker macro.
 [R] foo.FooChecker
     # Foo checker macro.
 [INFO] rose-suite.conf
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] suite.SuiteChecker
     # Suite checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] suite.SuiteChecker
     # Suite checker macro.
 [R] suite.SuiteChecker
     # Suite checker macro.
 [INFO] rose-suite.info
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 __OUT__
 #-------------------------------------------------------------------------------
@@ -208,40 +208,40 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [INFO] app/bar/rose-app.conf
 [V] bar.BarChecker
     # Bar checker macro.
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [T] bar.BarChecker
     # Bar checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [R] bar.BarChecker
     # Bar checker macro.
 [INFO] app/foo/rose-app.conf
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] foo.FooChecker
     # Foo checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] foo.FooChecker
     # Foo checker macro.
 [R] foo.FooChecker
     # Foo checker macro.
 [INFO] rose-suite.conf
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] suite.SuiteChecker
     # Suite checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] suite.SuiteChecker
     # Suite checker macro.
 [R] suite.SuiteChecker
     # Suite checker macro.
 [INFO] rose-suite.info
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 __OUT__
 #-------------------------------------------------------------------------------
@@ -249,11 +249,11 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-list-all-app-foo
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] foo.FooChecker
     # Foo checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] foo.FooChecker
     # Foo checker macro.
@@ -265,11 +265,11 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-list-all-app-foo-subdir
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo/meta
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] foo.FooChecker
     # Foo checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] foo.FooChecker
     # Foo checker macro.
@@ -284,40 +284,40 @@ file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [INFO] app/bar/rose-app.conf
 [V] bar.BarChecker
     # Bar checker macro.
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [T] bar.BarChecker
     # Bar checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [R] bar.BarChecker
     # Bar checker macro.
 [INFO] app/foo/rose-app.conf
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] foo.FooChecker
     # Foo checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] foo.FooChecker
     # Foo checker macro.
 [R] foo.FooChecker
     # Foo checker macro.
 [INFO] rose-suite.conf
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
 [V] suite.SuiteChecker
     # Suite checker macro.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] suite.SuiteChecker
     # Suite checker macro.
 [R] suite.SuiteChecker
     # Suite checker macro.
 [INFO] rose-suite.info
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 __OUT__
 #-------------------------------------------------------------------------------
@@ -328,16 +328,16 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
 [V] bar.BarChecker: issues: 1
     env=BAR=|
         bar < pub
-[V] rose.macros.DefaultValidators: issues: 1
+[V] metomi.rose.macros.DefaultValidators: issues: 1
     env=BAR=|
         Not an integer: '|'
 [V] foo.FooChecker: issues: 1
     env=FOO=baz
         Not foo enough
-[V] rose.macros.DefaultValidators: issues: 1
+[V] metomi.rose.macros.DefaultValidators: issues: 1
     env=FOO=baz
         Not an integer: 'baz'
-[V] rose.macros.DefaultValidators: issues: 2
+[V] metomi.rose.macros.DefaultValidators: issues: 2
     env=ANSWER=quarante deux
         Not an integer: 'quarante deux'
     (opts=optional)env=ANSWER=caurenta y dos
@@ -347,7 +347,7 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
         Incorrectanswer
     (opts=optional)env=ANSWER=caurenta y dos
         Incorrectanswer
-[V] rose.macros.DefaultValidators: issues: 3
+[V] metomi.rose.macros.DefaultValidators: issues: 3
     =owner=None
         Variable set as compulsory, but not in configuration.
     =project=None
@@ -368,15 +368,15 @@ run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE -T -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [INFO] app/bar/rose-app.conf
 [T] bar.BarChecker: changes: 0
-[T] rose.macros.DefaultTransforms: changes: 0
+[T] metomi.rose.macros.DefaultTransforms: changes: 0
 [INFO] app/foo/rose-app.conf
-[T] rose.macros.DefaultTransforms: changes: 0
+[T] metomi.rose.macros.DefaultTransforms: changes: 0
 [T] foo.FooChecker: changes: 0
 [INFO] rose-suite.conf
-[T] rose.macros.DefaultTransforms: changes: 0
+[T] metomi.rose.macros.DefaultTransforms: changes: 0
 [T] suite.SuiteChecker: changes: 0
 [INFO] rose-suite.info
-[T] rose.macros.DefaultTransforms: changes: 2
+[T] metomi.rose.macros.DefaultTransforms: changes: 2
     =owner=
         Added compulsory option
     =project=
@@ -388,13 +388,13 @@ TEST_KEY=$TEST_KEY_BASE-fix-all-suite
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE -F -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
 [INFO] app/bar/rose-app.conf
-[T] rose.macros.DefaultTransforms: changes: 0
+[T] metomi.rose.macros.DefaultTransforms: changes: 0
 [INFO] app/foo/rose-app.conf
-[T] rose.macros.DefaultTransforms: changes: 0
+[T] metomi.rose.macros.DefaultTransforms: changes: 0
 [INFO] rose-suite.conf
-[T] rose.macros.DefaultTransforms: changes: 0
+[T] metomi.rose.macros.DefaultTransforms: changes: 0
 [INFO] rose-suite.info
-[T] rose.macros.DefaultTransforms: changes: 2
+[T] metomi.rose.macros.DefaultTransforms: changes: 2
     =owner=
         Added compulsory option
     =project=
@@ -405,7 +405,7 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-validate-all-suite-only-suite
 run_fail $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE -V --suite-only
 file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 2
+[V] metomi.rose.macros.DefaultValidators: issues: 2
     env=ANSWER=quarante deux
         Not an integer: 'quarante deux'
     (opts=optional)env=ANSWER=caurenta y dos
@@ -415,7 +415,7 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
         Incorrectanswer
     (opts=optional)env=ANSWER=caurenta y dos
         Incorrectanswer
-[V] rose.macros.DefaultValidators: issues: 3
+[V] metomi.rose.macros.DefaultValidators: issues: 3
     =owner=None
         Variable set as compulsory, but not in configuration.
     =project=None
@@ -432,7 +432,7 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-validate-all-suite-only-app-foo
 run_fail $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -V --suite-only
 file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 2
+[V] metomi.rose.macros.DefaultValidators: issues: 2
     env=ANSWER=quarante deux
         Not an integer: 'quarante deux'
     (opts=optional)env=ANSWER=caurenta y dos
@@ -442,7 +442,7 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
         Incorrectanswer
     (opts=optional)env=ANSWER=caurenta y dos
         Incorrectanswer
-[V] rose.macros.DefaultValidators: issues: 3
+[V] metomi.rose.macros.DefaultValidators: issues: 3
     =owner=None
         Variable set as compulsory, but not in configuration.
     =project=None
@@ -462,7 +462,7 @@ file_cmp $TEST_KEY.err $TEST_KEY.err <<'__ERR__'
 [V] foo.FooChecker: issues: 1
     env=FOO=baz
         Not foo enough
-[V] rose.macros.DefaultValidators: issues: 1
+[V] metomi.rose.macros.DefaultValidators: issues: 1
     env=FOO=baz
         Not an integer: 'baz'
 __ERR__
@@ -473,7 +473,7 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-transform-all-suite-app-foo
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -T -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[T] rose.macros.DefaultTransforms: changes: 0
+[T] metomi.rose.macros.DefaultTransforms: changes: 0
 [T] foo.FooChecker: changes: 0
 __OUT__
 #-------------------------------------------------------------------------------
@@ -481,7 +481,7 @@ __OUT__
 TEST_KEY=$TEST_KEY_BASE-fix-all-suite-app-foo
 run_pass $TEST_KEY rose macro -C $TEST_DIR/$TEST_SUITE/app/foo -F -y
 file_cmp $TEST_KEY.out $TEST_KEY.out <<'__OUT__'
-[T] rose.macros.DefaultTransforms: changes: 0
+[T] metomi.rose.macros.DefaultTransforms: changes: 0
 __OUT__
 #-------------------------------------------------------------------------------
 rm -r $TEST_DIR/$TEST_SUITE

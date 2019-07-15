@@ -28,7 +28,7 @@ TEST_KEY=$TEST_KEY_BASE
 ROSE_LAUNCHER_ULIMIT_OPTS='-a' \
     run_pass "$TEST_KEY" rose mpi-launch echo hello world
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[my-launcher] -n 1 $ROSE_HOME/bin/rose-mpi-launch --inner $(which echo) hello world
+[my-launcher] -n 1 $ROSE_HOME_BIN/rose-mpi-launch --inner $(which echo) hello world
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

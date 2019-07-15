@@ -80,7 +80,7 @@ looks like this:
    fuelless_weight_kg=2353.0
    specific_impulse_s=311.0
 
-.. image:: http://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apollo16LM.jpg/533px-Apollo16LM.jpg
+.. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apollo16LM.jpg/533px-Apollo16LM.jpg
    :align: right
    :alt: Apollo 11 Lunar Module, returning from the surface of the Moon
    :width: 250px

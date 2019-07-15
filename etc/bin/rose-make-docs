@@ -1,0 +1,290 @@
+#!/usr/bin/env bash
+#-----------------------------------------------------------------------------
+# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+# NAME
+#     rose make-docs
+#
+# SYNOPSIS
+#     rose make-docs [OPTIONS] [BUILD...]
+#
+# DESCRIPTION
+#     Build the rose documentation in the requested `BUILD` format(s).
+#
+# OPTIONS
+#     --venv
+#         Build virtualenv for temporarilly installing python dependencies
+#         if necessary.
+#     --dev
+#         Development mode, don't remove virtualenv after build.
+#     --strict
+#         Disable cache forcing a complete re-build and turn warnings into
+#         errors.
+#     --debug
+#         Run `make` with the --debug option.
+#     --default-version=VERSION
+#         By default the current version is symlinked as the default version,
+#         provide an alternative version to override this.
+#
+# BUILD
+#     The format(s) to build the documentation in - default html.
+#     Avaliable formats are listed in the sphinx documentation
+#     (http://www.sphinx-doc.org/en/stable/builders.html).
+#     The most commonly used formats are:
+#
+#     `html`
+#         For building standalone HTML files.
+#     `singlehtml`
+#         For building a single page HTML document.
+#     `latexpdf`
+#         For building PDF documentation.
+#     `clean`
+#         Removes all built documentation for the current rose version.
+#         (use `rm -rf doc` to remove all documentation).
+#
+# DEVELOPMENT BUILDS
+#     For development purposes use the following BUILDs:
+#
+#     `doctest`
+#         Runs any doctest examples present in documented python modules.
+#     `linkcheck`
+#         Checks external links.
+#
+# SOFTWARE ENVIRONMENT
+#     The software dependencies can be found by running the command::
+#
+#        $ rose check-software --docs
+#
+#     Rose provides two ways of installing the Python dependencies for the Rose
+#     documentation builder:
+#
+#     Virtual Environment:
+#         Rose will automatically build a Python virtual environment
+#         when the --venv flag is used with this command. The virtual
+#         environment will be created in rose/venv and will be destroyed
+#         after use. Use the --dev flag to prevent the environment being
+#         destroyed for future use. Example::
+#
+#            $ rose make-docs --venv --dev html  # create and keep a virtualenv
+#
+#     Conda
+#         An environment file for creating a conda env can be found in
+#         etc/rose-docs-env.yaml. Example usage::
+#
+#            $ conda env create -f etc/rose-docs-env.yaml  # create conda env
+#            $ source activate rose-docs  # activate conda env
+#            $ rose make-docs html  # make docs as normal
+#-----------------------------------------------------------------------------
+set -e
+set -o pipefail
+shopt -s extglob
+
+# Move into rose directory
+cd "$(dirname "$0")/../.."
+ROSE_HOME=$PWD
+# Path for virtualenv.
+VENV_PATH='venv'  # Note: update above docs when changing this value
+# Set to `true` when the virtualenv is being used.
+USING_VENV=false
+# Path to the sphinx directory.
+SPHINX_PATH=sphinx
+# pick up official rose version
+ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
+# documentation root output directory
+DOCS_DIR="${ROSE_HOME}/doc"
+
+# is the virtualenv command available
+if command -v virtualenv >/dev/null 2>&1; then
+    VENV_COMPLIANT=true
+else
+    VENV_COMPLIANT=false
+fi
+
+# Parse command line args.
+VENV_MODE=false
+FORCE=false
+DEV_MODE=false
+DEBUG=''
+BUILDS=()
+SPHINX_OPTS=()
+DEFAULT_ALIAS='doc'
+DEFAULT_VERSION=
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --venv)
+            VENV_MODE=true
+            shift
+            ;;
+        --dev)
+            DEV_MODE=true
+            shift
+            ;;
+        --force)
+            FORCE=true
+            shift
+            ;;
+        --strict)
+            SPHINX_OPTS+=('SPHINXOPTS=-aEW')
+            shift
+            ;;
+        --debug)
+            DEBUG='--debug'
+            shift
+            ;;
+        --default-version)
+            DEFAULT_VERSION="$2"
+            shift
+            shift
+            ;;
+        *)
+            BUILDS+=("$1")
+            shift
+            ;;
+    esac
+done
+if [[ "${#BUILDS}" == 0 ]]; then
+    BUILDS=('html')
+fi
+
+
+venv-activate () {
+    USING_VENV=true
+    . "${VENV_PATH}/bin/activate"
+}
+
+venv-install () {
+    venv-destroy
+    virtualenv --python=python3.7 "${VENV_PATH}"
+    venv-activate
+    pip install 'sphinx'
+    pip install 'sphinx_rtd_theme'
+    pip install 'sphinxcontrib-httpdomain'
+    pip install 'hieroglyph'
+}
+
+venv-deactivate () {
+    deactivate >/dev/null 2>&1 || true
+}
+
+venv-destroy () {
+    venv-deactivate
+    rm -rf "${VENV_PATH}"
+}
+
+version_file () {
+    # output the dictionary {"version": ["build", ...]} in JSON format
+    DOCS_DIR="$1"
+    ret='{'
+
+    # scrape filesystem for list of rose versions which have built docs
+    for version_dir in "${DOCS_DIR}/"*.*.*; do
+        version=$(basename "$version_dir")
+        # scrape filesystem to get list of formats this version is available in
+        ret+="\n    \"$version\": ["
+        for format_dir in "${version_dir}/"!(doctrees|*.html); do
+            format=$(basename "$format_dir")
+            ret+="$format, "
+        done
+        ret="${ret:0:-2}],"
+    done
+
+    ret="${ret:0:-1}\n}"
+    echo -e "$ret"
+}
+
+html_redirect () {
+    # write an html file to $2 which auto-redirects to the relative path $1
+    SRC="$1"
+    DEST="$2"
+
+    cat >"$DEST" << __HTML__
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rose Documentation</title>
+        <meta http-equiv="REFRESH" content="0;url=$SRC">
+    </head>
+    <body>
+        <p>If not automatically redirected, please click
+        <a href="$SRC">Rose Documentation</a>.</p>
+    </body>
+</html>
+__HTML__
+}
+
+
+# Use virtualenv if present and requested or if we are in development mode.
+if "${DEV_MODE}" || "${VENV_MODE}"; then
+    if ! "${VENV_COMPLIANT}"; then
+        echo 'The virtualenv command is required for the --venv option.'
+        exit 1
+    fi
+    if [[ -d "${VENV_PATH}" ]]; then
+        venv-activate
+    fi
+fi
+
+# Check core (sphinx) builder.
+if ! rose-check-software --doc >/dev/null; then
+    if "${VENV_MODE}"; then
+        venv-install
+    elif ! "${FORCE}"; then
+        echo 'Software required by the rose documentation builder is not
+present (run "rose check-software --doc" for details).
+
+For information on building a Python environment for the Rose documentation
+builder see the "Software Dependencies" section of the help page for this
+command.' >&2
+        exit 1
+    fi
+fi
+
+# makefile argument to set the output directory for this build
+SPHINX_OPTS+=("BUILDDIR=${DOCS_DIR}/${ROSE_VERSION}")
+
+# run sphinx-build
+if make ${DEBUG} -C "${SPHINX_PATH}" "${BUILDS[@]}" "${SPHINX_OPTS[@]}"; then
+    RET=0
+    # output file containing details of all versions and formats the
+    # documentation has been built in (locally) for the version / format
+    # switching pane
+    version_file "${DOCS_DIR}" > "${DOCS_DIR}/versions.json"
+    # symlink this version as the default
+    (
+        cd "${DOCS_DIR}"
+        rm "${DEFAULT_ALIAS}" 2>/dev/null || true
+        ln -s "${DEFAULT_VERSION:-$ROSE_VERSION}" "${DEFAULT_ALIAS}"
+    )
+    # symlink landing pages
+    html_redirect "${DEFAULT_ALIAS}/html/index.html" 'doc/index.html'
+    html_redirect "html/index.html" "doc/${ROSE_VERSION}/index.html"
+    # support legacy doc/rose.html url
+    mkdir 'doc/doc' 2>/dev/null || true
+    html_redirect "html/index.html" "doc/${ROSE_VERSION}/rose.html"
+else
+    RET=1
+fi
+
+# Remove virtualenv if used and if we are not in development mode.
+if "${USING_VENV}"; then
+    if ! "${DEV_MODE}"; then
+        venv-destroy
+    fi 
+fi
+
+exit ${RET}

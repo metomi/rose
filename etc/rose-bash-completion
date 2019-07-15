@@ -57,7 +57,7 @@ _rose() {
     else
         ROSE_DIR=$(__rose_get_rose_dir)
     fi
-    ok_subcommands=$(cd $ROSE_DIR/bin && ls $rose_command-* | \
+    ok_subcommands=$(cd $ROSE_DIR/ && ls $rose_command-* | \
                      sed "s/^$rose_command-//g")
 
     # Determine the subcommand (e.g. app-run for rose app-run)

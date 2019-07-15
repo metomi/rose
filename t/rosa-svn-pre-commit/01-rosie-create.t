@@ -20,6 +20,7 @@
 # Tests for "rosa svn-pre-commit" with "rosie create".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+
 #-------------------------------------------------------------------------------
 tests 18
 #-------------------------------------------------------------------------------
@@ -34,11 +35,15 @@ prefix-default=foo
 prefix-owner-default.foo=fred
 prefix-location.foo=$SVN_URL
 __ROSE_CONF__
+ROSE_BIN_HOME=$(dirname $(command -v rose))
+ROSE_LIB=$(dirname $(python -c "import metomi.rose; print(metomi.rose.__file__)"))
 export ROSE_CONF_PATH=$PWD/conf
 cat >repos/foo/hooks/pre-commit <<__PRE_COMMIT__
 #!/bin/bash
 export ROSE_CONF_PATH=$ROSE_CONF_PATH
-exec $ROSE_HOME/sbin/rosa svn-pre-commit --debug "\$@"
+export PATH=$PATH:${ROSE_BIN_HOME}
+export ROSE_LIB="${ROSE_LIB}"
+rosa svn-pre-commit --debug "\$@"
 __PRE_COMMIT__
 chmod +x repos/foo/hooks/pre-commit
 export LANG=C

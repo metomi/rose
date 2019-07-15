@@ -34,9 +34,9 @@ init_meta </dev/null
 init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro_change.py
 run_pass "$TEST_KEY" rose macro --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] envswitch.LogicalTransformer
     # Test class to change the value of a boolean environment variable.

@@ -73,7 +73,7 @@ type=real
 __META_CONFIG__
 
 # Check that it runs OK.
-run_pass "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
@@ -89,10 +89,10 @@ ICECREAM_TEMPERATURE=1
 MERINGUE_NICENESS=50
 SPONGE_DENSITY=20.0
 __CONFIG__
-run_fail "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config rose.macros.DefaultValidators
+run_fail "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] metomi.rose.macros.DefaultValidators: issues: 4
     env=ICECREAM_FLAVOUR=chocolate
         Value chocolate should be vanilla
     env=ICECREAM_TEMPERATURE=1
@@ -108,10 +108,10 @@ TEST_KEY=$TEST_KEY_BASE-basic-custom-macro-list
 init_rose_meta_macro baked-alaska-sponge vn1.0 desoggy.py <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
-import rose.macro
+import metomi.rose.macro
 
 
-class SpongeDeSoggifier(rose.macro.MacroBase):
+class SpongeDeSoggifier(metomi.rose.macro.MacroBase):
 
     """De-soggifies the sponge."""
 
@@ -129,9 +129,9 @@ class SpongeDeSoggifier(rose.macro.MacroBase):
 __MACRO__
 run_pass "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-[V] rose.macros.DefaultValidators
+[V] metomi.rose.macros.DefaultValidators
     # Runs all the default checks, such as compulsory checking.
-[T] rose.macros.DefaultTransforms
+[T] metomi.rose.macros.DefaultTransforms
     # Runs all the default fixers, such as trigger fixing.
 [T] desoggy.SpongeDeSoggifier
     # De-soggifies the sponge.

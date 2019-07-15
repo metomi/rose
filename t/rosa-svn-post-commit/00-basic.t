@@ -20,6 +20,7 @@
 # Test "rosa svn-post-commit": Rosie WS DB update.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+
 #-------------------------------------------------------------------------------
 if ! python3 -c 'import sqlalchemy' 2>/dev/null; then
     skip_all '"sqlalchemy" not installed'
@@ -41,16 +42,18 @@ prefix-owner-default.foo=fred
 prefix-location.foo=$SVN_URL
 __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD/conf
+ROSE_BIN_HOME=$(dirname $(command -v rose))
 cat >repos/foo/hooks/post-commit <<__POST_COMMIT__
 #!/bin/bash
-export ROSE_CONF_PATH=$ROSE_CONF_PATH
-$ROSE_HOME/sbin/rosa svn-post-commit --debug "\$@" \\
+export ROSE_CONF_PATH=${ROSE_CONF_PATH}
+export PATH=$PATH:${ROSE_BIN_HOME}
+rosa svn-post-commit --debug "\$@" \\
     1>$PWD/rosa-svn-post-commit.out 2>$PWD/rosa-svn-post-commit.err
 echo \$? >$PWD/rosa-svn-post-commit.rc
 __POST_COMMIT__
 chmod +x repos/foo/hooks/post-commit
 export LANG=C
-$ROSE_HOME/sbin/rosa db-create -q || exit 1
+rosa db-create -q || exit 1
 Q_LATEST='SELECT * FROM latest'
 Q_MAIN='SELECT idx,branch,revision,owner,project,title,author,status,from_idx FROM main'
 Q_META='SELECT * FROM meta'

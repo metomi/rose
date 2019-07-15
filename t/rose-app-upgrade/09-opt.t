@@ -42,10 +42,10 @@ init_macro test-app-upgrade <<'__MACRO__'
 # -*- coding: utf-8 -*-
 
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class Upgrade01to02(rose.upgrade.MacroUpgrade):
+class Upgrade01to02(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade from 0.1 to 0.2."""
 

@@ -24,7 +24,7 @@ from subprocess import call
 
 
 def main():
-    command = ['rose', 'test-battery', '-j', '5']
+    command = ['etc/bin/rose-test-battery', '-j', '5']
     if call(command + ['--state=save']):
         # Non-zero return code
         sys.stderr.write('\n\nRerunning Failed Tests...\n\n')

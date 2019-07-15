@@ -34,6 +34,8 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --host=localhost -- --no-detach
+cp ${TEST_KEY}.err ~/temp
+cp ${TEST_KEY}.out ~/temp
 #-------------------------------------------------------------------------------
 # Results, good ones
 TEST_KEY="$TEST_KEY_BASE-find-foo"

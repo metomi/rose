@@ -19,7 +19,7 @@ release for production use.
 
 [Installation](http://metomi.github.io/rose/doc/html/installation.html) |
 [User Guide](http://metomi.github.io/rose/) |
-[How to Contribute](CONTRIBUTING.md)
+[How to Contribute](https://github.com/metomi/rose/blob/master/CONTRIBUTING.md)
 
 ## Copyright and Terms of Use
 
@@ -46,4 +46,4 @@ See <http://metomi.github.io/rose/doc/html/terms.html>.
 
 ## Acknowledgement for non-Rose Work
 
-See [Acknowledgement for Non-Rose Work](ACKNOWLEDGEMENT.md).
+See [Acknowledgement for Non-Rose Work](https://github.com/metomi/rose/blob/master/ACKNOWLEDGEMENT.md).

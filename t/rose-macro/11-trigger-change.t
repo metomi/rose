@@ -693,9 +693,9 @@ trigger=namelist:trig_absent=two_values_triggered: 1, 2
 
 [namelist:trig_absent=two_values_triggered]
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultTransforms
+run_pass "$TEST_KEY" rose macro --non-interactive --config=../config metomi.rose.macros.DefaultTransforms
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONFIG__'
-[T] rose.macros.DefaultTransforms: changes: 31
+[T] metomi.rose.macros.DefaultTransforms: changes: 31
     namelist:already_triggered_ignored_namelist=ab_trig_var1=2
         enabled      -> trig-ignored
     namelist:already_triggered_ignored_namelist=ab_trig_var2=2
@@ -972,7 +972,7 @@ duplicate=true
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --non-interactive --fix --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-[T] rose.macros.DefaultTransforms: changes: 4
+[T] metomi.rose.macros.DefaultTransforms: changes: 4
     namelist:bar(1)=baz=0
         enabled      -> trig-ignored
     namelist:bar(1)=fred=0

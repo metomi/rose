@@ -58,7 +58,7 @@ touch 'conf/opt/rose-port.conf'
 cat >repos/foo/hooks/post-commit <<__POST_COMMIT__
 #!/bin/bash
 export ROSE_CONF_PATH=$ROSE_CONF_PATH
-$ROSE_HOME/sbin/rosa svn-post-commit --debug "\$@" \\
+rosa svn-post-commit --debug "\$@" \\
     1>$PWD/rosa-svn-post-commit.out 2>$PWD/rosa-svn-post-commit.err
 echo \$? >$PWD/rosa-svn-post-commit.rc
 __POST_COMMIT__
@@ -128,7 +128,7 @@ echo "2009-02-13T23:31:35.000000Z" >foo-date-6.txt
 svnadmin setrevprop $PWD/repos/foo -r 6 svn:date foo-date-6.txt
 
 # Setup db.
-$ROSE_HOME/sbin/rosa db-create -q
+rosa db-create -q
 
 #-------------------------------------------------------------------------------
 # Run ws.

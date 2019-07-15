@@ -113,7 +113,7 @@ __ROSE_SUITE_INFO
 rosie create -q -y --prefix=bar --info-file=rose-suite.info
 
 # Setup DB
-$ROSE_HOME/sbin/rosa db-create -q
+rosa db-create -q
 
 #-------------------------------------------------------------------------------
 # Run WS

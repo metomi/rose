@@ -48,10 +48,10 @@ init_macro add.py <<'__MACRO__'
 # Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
 #-----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
-class AddSpoiler(rose.macro.MacroBase):
+class AddSpoiler(metomi.rose.macro.MacroBase):
 
     """Add a spoiler."""
 
@@ -64,7 +64,7 @@ class AddSpoiler(rose.macro.MacroBase):
         return config, self.reports
 
 
-class AddGarageRoof(rose.macro.MacroBase):
+class AddGarageRoof(metomi.rose.macro.MacroBase):
 
     """Add garage roof."""
 
@@ -77,7 +77,7 @@ class AddGarageRoof(rose.macro.MacroBase):
         return config, self.reports
 
 
-class AddElectricBike(rose.macro.MacroBase):
+class AddElectricBike(metomi.rose.macro.MacroBase):
 
     """Add an electric bike!"""
 

@@ -177,7 +177,7 @@ PRINT FORMAT
 import sys
 import os
 
-from isodatetime.main import main as iso_main
+from metomi.isodatetime.main import main as iso_main
 
 
 def main():

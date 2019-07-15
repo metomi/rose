@@ -28,13 +28,14 @@ test_init <<'__CONFIG__'
 default=true
 
 [file:COPYING]
-source=$ROSE_HOME/COPYING
+source=$ROSE_TEST_HOME/COPYING
 __CONFIG__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
 test_setup
 touch .rose-config_processors-file.db
-run_pass "$TEST_KEY" rose app-run --config=../config -q
+run_pass "$TEST_KEY" rose app-run --config=../config -q --debug
+cat $TEST_KEY.err >&2
 file_test "$TEST_KEY.db" .rose-config_processors-file.db -s
 file_test "$TEST_KEY.COPYING" COPYING
 test_teardown

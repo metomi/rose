@@ -55,5 +55,5 @@ file - ``rose-meta/CATEGORY/versions.py``.
 Upgrade macros are subclasses of :py:class:`rose.upgrade.MacroUpgrade`. They
 have all the functionality of the :ref:`transformer macros <api-rose-macro>`.
 
-.. autoclass:: rose.upgrade.MacroUpgrade
+.. autoclass:: metomi.rose.upgrade.MacroUpgrade
    :members:
