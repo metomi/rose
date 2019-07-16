@@ -62,32 +62,15 @@ INSTALL_REQUIRES = [
 
 setup(
     # Metadata
-    name="metomi-rose",
-    description="Rose, a framework for meteorological suites.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     version=find_version("metomi", "rose", "__init__.py"),
-    author="2012-2019 British Crown (Met Office) & Contributors",
-    author_email="metomi@metoffice.gov.uk",
-    license='GPL',
-    license_file="https://metomi.github.io/rose/doc/html/terms.html",
-    url="https://metomi.github.io/rose/doc/html/index.html",
-    platforms="any",
-    classifiers="""Environment :: Console
-Environment :: Web Environment
-Intended Audience :: Developers
-Intended Audience :: System Administrators
-Intended Audience :: Science/Research
-Operating System :: POSIX :: Linux
-Programming Language :: Python :: 3.7
-Topic :: Scientific/Engineering :: Atmospheric Science""",
 
     # Options
     scripts=glob(join("bin", "*"))
     + glob(join("sbin", "*"))
     + glob(join("lib", "bash", "*")),
     install_requires=INSTALL_REQUIRES,
-    python_requires=">=3.7",
     package_data={
         "metomi.rose": ["etc/.*"],
         "metomi.rosie": ["lib/*"]
