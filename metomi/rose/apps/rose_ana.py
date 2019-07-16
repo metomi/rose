@@ -462,13 +462,18 @@ class RoseAnaApp(BuiltinApp):
             # Start threads within the set number of concurrent threads until
             # all have been started
             itask = 0
+            running = []
             while itask < len(threads):
-                if threading.active_count() < n_threads:
+                if len(running) < n_threads:
                     self.reporter(
                         "Starting thread for task {0} at {1}"
                         .format(itask + 1, timestamp()))
+                    running.append(threads[itask])
                     threads[itask].start()
                     itask += 1
+                for thread in running:
+                    if not thread.is_alive():
+                        running.remove(thread)
 
             # Gather up the results
             number_of_failures = 0
