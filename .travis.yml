@@ -20,7 +20,7 @@ jobs:
   include:
     - name: "Unit Tests"
       install:
-        - now install coverage linters pytest cylc rose
+        - now install coverage linters pytest isodatetime cylc rose
       script:
         - now test style
         - now test units

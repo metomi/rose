@@ -46,7 +46,7 @@ from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
 
-from isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
+from metomi.isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 from metomi.rose.host_select import HostSelector
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.resource import ResourceLocator

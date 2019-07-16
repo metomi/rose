@@ -54,7 +54,7 @@ INSTALL_REQUIRES = [
     "aiofiles",
     "tornado",
     "sqlalchemy",
-    "isodatetime",
+    "metomi-isodatetime",
     "requests",
     "ldap3",
 ]
