@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-N_TESTS=52
+N_TESTS=81
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 
@@ -45,88 +45,104 @@ run_fail "$TEST_KEY" \
     --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 # Test the output
+#
+# Note that t1 and t5 are identical except t5 uses threading, so use a loop here
+for t in t1 t5 ; do
+  OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_$t/01/job.out"
+  file_pcregrep "${TEST_KEY_BASE}-$t-exact_list_fail}" \
+      'Running task #([0-9]+).*\n.*Exact List Match Fail.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-exact_list_success" \
+      'Running task #([0-9]+).*\n.*Exact List Match Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-exact_numeric_fail" \
+      'Running task #([0-9]+).*\n.*Exact Numeric Match Fail.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-exact_numeric_success" \
+      'Running task #([0-9]+).*\n.*Exact Numeric Match Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-exact_text_fail" \
+      'Running task #([0-9]+).*\n.*Exact Text Match Fail.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-exact_text_success" \
+      'Running task #([0-9]+).*\n.*Exact Text Match Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-within_list_fail" \
+      'Running task #([0-9]+).*\n.*Within List Match Fail.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-within_list_success" \
+      'Running task #([0-9]+).*\n.*Within List Match Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-within_absolute_fail" \
+      'Running task #([0-9]+).*\n.*Within Match Absolute Fail.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-within_absolute_success" \
+      'Running task #([0-9]+).*\n.*Within Match Absolute Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-within_percentage_fail" \
+      'Running task #([0-9]+).*\n.*Within Match Percentage Fail.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-within_percentage_success" \
+      'Running task #([0-9]+).*\n.*Within Match Percentage Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-simple_command_success" \
+      'Running task #([0-9]+).*\n.*Simple-Command Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-simple_command_fail" \
+      'Running task #([0-9]+).*\n.*Simple-Command Failure.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-file_command_success" \
+      'Running task #([0-9]+).*\n.*File-Command Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-file_command_fail" \
+      'Running task #([0-9]+).*\n.*File-Command Failure.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-simple_command_pattern_success" \
+      'Running task #([0-9]+).*\n.*Simple-Command Pattern Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-simple_command_pattern_fail" \
+      'Running task #([0-9]+).*\n.*Simple-Command Pattern Failure.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-file_command_pattern_success" \
+      'Running task #([0-9]+).*\n.*File-Command Pattern Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-file_command_pattern_fail" \
+      'Running task #([0-9]+).*\n.*File-Command Pattern Failure.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-file_command_fail_but_pattern_success" \
+      'Running task #([0-9]+).*\n.*File-Command Fail but Pattern Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-multi_command_success" \
+      'Running task #([0-9]+).*\n.*Multi-Command Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-multi_command_fail" \
+      'Running task #([0-9]+).*\n.*Multi-Command Failure.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-multi_group_success" \
+      'Running task #([0-9]+).*\n.*Multi-Group Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-multi_group_fail" \
+      'Running task #([0-9]+).*\n.*Multi-Group Failure.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-multi_group_multi_occurence_success" \
+      'Running task #([0-9]+).*\n.*Multi-Group Multi-Occurence Success.*\n.*Task #\1 passed' \
+      "${OUTPUT}"
+  file_pcregrep "${TEST_KEY_BASE}-$t-multi_group_multi_occurence_fail" \
+      'Running task #([0-9]+).*\n.*Multi-Group Multi-Occurence Failure.*\n.*Task #\1 did not pass' \
+      "${OUTPUT}"
+done
+
+# Now check that the threading option is reflected in the output
 OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t1/01/job.out"
-file_pcregrep "${TEST_KEY_BASE}-exact_list_fail}" \
-    'Running task #([0-9]+).*\n.*Exact List Match Fail.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-exact_list_success" \
-    'Running task #([0-9]+).*\n.*Exact List Match Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-exact_numeric_fail" \
-    'Running task #([0-9]+).*\n.*Exact Numeric Match Fail.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-exact_numeric_success" \
-    'Running task #([0-9]+).*\n.*Exact Numeric Match Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-exact_text_fail" \
-    'Running task #([0-9]+).*\n.*Exact Text Match Fail.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-exact_text_success" \
-    'Running task #([0-9]+).*\n.*Exact Text Match Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-within_list_fail" \
-    'Running task #([0-9]+).*\n.*Within List Match Fail.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-within_list_success" \
-    'Running task #([0-9]+).*\n.*Within List Match Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-within_absolute_fail" \
-    'Running task #([0-9]+).*\n.*Within Match Absolute Fail.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-within_absolute_success" \
-    'Running task #([0-9]+).*\n.*Within Match Absolute Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-within_percentage_fail" \
-    'Running task #([0-9]+).*\n.*Within Match Percentage Fail.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-within_percentage_success" \
-    'Running task #([0-9]+).*\n.*Within Match Percentage Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-simple_command_success" \
-    'Running task #([0-9]+).*\n.*Simple-Command Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-simple_command_fail" \
-    'Running task #([0-9]+).*\n.*Simple-Command Failure.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-file_command_success" \
-    'Running task #([0-9]+).*\n.*File-Command Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-file_command_fail" \
-    'Running task #([0-9]+).*\n.*File-Command Failure.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-simple_command_pattern_success" \
-    'Running task #([0-9]+).*\n.*Simple-Command Pattern Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-simple_command_pattern_fail" \
-    'Running task #([0-9]+).*\n.*Simple-Command Pattern Failure.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-file_command_pattern_success" \
-    'Running task #([0-9]+).*\n.*File-Command Pattern Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-file_command_pattern_fail" \
-    'Running task #([0-9]+).*\n.*File-Command Pattern Failure.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-file_command_fail_but_pattern_success" \
-    'Running task #([0-9]+).*\n.*File-Command Fail but Pattern Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-multi_command_success" \
-    'Running task #([0-9]+).*\n.*Multi-Command Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-multi_command_fail" \
-    'Running task #([0-9]+).*\n.*Multi-Command Failure.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-multi_group_success" \
-    'Running task #([0-9]+).*\n.*Multi-Group Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-multi_group_fail" \
-    'Running task #([0-9]+).*\n.*Multi-Group Failure.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-multi_group_multi_occurence_success" \
-    'Running task #([0-9]+).*\n.*Multi-Group Multi-Occurence Success.*\n.*Task #\1 passed' \
-    "${OUTPUT}"
-file_pcregrep "${TEST_KEY_BASE}-multi_group_multi_occurence_fail" \
-    'Running task #([0-9]+).*\n.*Multi-Group Multi-Occurence Failure.*\n.*Task #\1 did not pass' \
-    "${OUTPUT}"
+TEST_KEY=$TEST_KEY_BASE-t1-serial_statement
+REGEXP="Running in SERIAL mode"
+file_grep $TEST_KEY "$REGEXP" $OUTPUT
+
+OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t5/01/job.out"
+TEST_KEY=$TEST_KEY_BASE-t5-threading_statement
+REGEXP="Running in THREADED mode, with 4 threads"
+file_grep $TEST_KEY "$REGEXP" $OUTPUT
+
 #-------------------------------------------------------------------------------
 # Test of ignoring a task
 # First, test that the basic task ran ok
