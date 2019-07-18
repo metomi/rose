@@ -7,5 +7,4 @@ exclude_paths:
   - lib/html/static/js/jquery*
   - lib/html/static/js/livestamp.min.js
   - lib/html/static/js/moment.min.js
-  - lib/python/isodatetime/
   - etc/tutorial/cylc/python/png.py

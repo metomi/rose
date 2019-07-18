@@ -45,7 +45,6 @@ ignore:
   - "sphinx/**/*.py"
   - "t/**/*.py"
   - ".travis/**/*.py"
-  - "lib/python/isodatetime/**/*.py"
 
 # turn off comments to pull requests
 comment: off
