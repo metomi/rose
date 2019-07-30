@@ -19,8 +19,8 @@
 # -----------------------------------------------------------------------------
 """Suite engine processor management."""
 
-from isodatetime.data import Duration
-from isodatetime.parsers import DurationParser, ISO8601SyntaxError
+from metomi.isodatetime.data import Duration
+from metomi.isodatetime.parsers import DurationParser, ISO8601SyntaxError
 from glob import glob
 import os
 import pwd

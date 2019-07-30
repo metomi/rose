@@ -26,8 +26,8 @@ import sys
 from time import localtime, sleep, strftime, time
 import traceback
 
-from isodatetime.data import get_timepoint_for_now
-from isodatetime.parsers import ISO8601SyntaxError
+from metomi.isodatetime.data import get_timepoint_for_now
+from metomi.isodatetime.parsers import ISO8601SyntaxError
 from metomi.rose.config import ConfigDumper
 from metomi.rose.date import RoseDateTimeOperator
 from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError

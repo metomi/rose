@@ -20,9 +20,9 @@
 """Parse and format date and time."""
 
 from datetime import datetime
-from isodatetime.data import Calendar, Duration, get_timepoint_for_now
-from isodatetime.dumpers import TimePointDumper
-from isodatetime.parsers import TimePointParser, DurationParser
+from metomi.isodatetime.data import Calendar, Duration, get_timepoint_for_now
+from metomi.isodatetime.dumpers import TimePointDumper
+from metomi.isodatetime.parsers import TimePointParser, DurationParser
 import os
 import re
 from metomi.rose.env import UnboundEnvironmentVariableError
@@ -84,7 +84,8 @@ class RoseDateTimeOperator(object):
         utc_mode -- If True, parse/print in UTC mode rather than local or
                     other timezones.
 
-        calendar_mode -- Set calendar mode, for isodatetime.data.Calendar.
+        calendar_mode -- Set calendar mode for
+                         metomi.isodatetime.data.Calendar.
 
         ref_point_str -- Set the reference time point for operations.
                          If not specified, operations use current date time.
@@ -128,8 +129,8 @@ class RoseDateTimeOperator(object):
     def date_parse(self, time_point_str=None):
         """Parse time_point_str.
 
-        Return (t, format) where t is a isodatetime.data.TimePoint object and
-        format is the format that matches time_point_str.
+        Return (t, format) where t is a metomi.isodatetime.data.TimePoint
+        object and format is the format that matches time_point_str.
 
         time_point_str -- The time point string to parse.
                           Otherwise, use ref time.
@@ -273,14 +274,17 @@ class RoseDateTimeOperator(object):
             Calendar.default().set_mode(calendar_mode)
 
     def strftime(self, time_point, print_format):
-        """Use either the isodatetime or datetime strftime time formatting."""
+        """Use either the metomi.isodatetime or datetime strftime time
+        formatting.
+        """
         try:
             return time_point.strftime(print_format)
         except ValueError:
             return self.get_datetime_strftime(time_point, print_format)
 
     def strptime(self, time_point_str, parse_format):
-        """Use either the isodatetime or datetime strptime time parsing."""
+        """Use either the metomi.isodatetime or datetime strptime time parsing.
+        """
         try:
             return self.time_point_parser.strptime(time_point_str,
                                                    parse_format)

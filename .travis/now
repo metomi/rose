@@ -91,12 +91,6 @@ _install_cylc () {
     RC_PATH+=("${HOME}/cylc-master/bin")
 }
 
-_install_isodatetime () {
-    wget 'https://github.com/metomi/isodatetime/archive/master.tar.gz' \
-        -O - | tar -xz -C "${HOME}"
-    pip install -e "${HOME}/isodatetime-master"
-}
-
 _install_fcm () {
     APT+=(subversion build-essential gfortran libxml-parser-perl \
           libconfig-inifiles-perl libdbi-perl libdbd-sqlite3-perl)

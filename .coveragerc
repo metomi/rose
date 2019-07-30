@@ -46,9 +46,6 @@ debug=
 #    trace
 # Include can be used only if source is not used!
 note=
-omit=
-    */lib/python/isodatetime*
-    */lib/python/sitecustomize.py
 parallel = True
 plugins=
 include=
@@ -69,9 +66,6 @@ exclude_lines =
 fail_under=0
 ignore_errors = False
 include=
-omit=
-    */lib/python/isodatetime*
-    */lib/python/sitecustomize.py
 partial_branches=
 precision=2
 show_missing=False

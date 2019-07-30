@@ -30,12 +30,12 @@ jobs:
         - export PATH="$PWD/.travis:$PATH"
         - now install coverage fcm tut_suite
       install:
-        - now install isodatetime cylc rose
+        - now install cylc rose
       script:
         - now test battery
 
     - name: "Documentation"
       install:
-        - now install coverage isodatetime rose sphinx tut_suite
+        - now install coverage rose sphinx tut_suite
       script:
         - now test docs
