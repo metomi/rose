@@ -113,8 +113,7 @@ _install_sphinx () {
     # sphinx documentation and its extensions
     APT+=(latexmk texlive texlive-generic-extra texlive-latex-extra \
           texlive-fonts-recommended graphviz)
-    PIP+=(sphinx sphinx_rtd_theme sphinxcontrib-httpdomain hieroglyph \
-          sphinxcontrib-svg2pdfconverter)
+    pip install -e .[docs]
 }
 
 _install_tut_suite () {
