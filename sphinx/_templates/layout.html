@@ -2,15 +2,6 @@
 
 {% extends "!layout.html" %}
 
-{# Correct undesirable behaviour of the sphinx rtd theme. #}
-{% set css_files = css_files + [
-    '_static/css/metomi.css',
-    '_static/pygments.css']
-%}
-{% set script_files = script_files + [
-    '_static/js/metomi.js',
-    '_static/js/versioning.js']
-%}
 
 {# Change some default colours of the sphinx rtd theme. #}
 {% block footer %} {{ super() }}
