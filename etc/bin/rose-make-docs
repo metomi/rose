@@ -198,7 +198,7 @@ version_file () {
         ret+="\n    \"$version\": ["
         for format_dir in "${version_dir}/"!(doctrees|*.html); do
             format=$(basename "$format_dir")
-            ret+="$format, "
+            ret+="\"$format\", "
         done
         ret="${ret:0:-2}],"
     done
