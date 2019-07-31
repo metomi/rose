@@ -39,19 +39,27 @@ extensions = [
     'sphinx.ext.graphviz',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+
     # sphinx user community extensions
     'hieroglyph',
     'sphinxcontrib.httpdomain',
+
     # custom project extensions (located in ext/)
-    'hieroglyph_patch',  # https://github.com/nyergler/hieroglyph/issues/148
     'auto_cli_doc',
-    'cylc_lang',
-    'minicylc',
-    'practical',
     'rose_lang',
     'rose_domain',
     'script_include',
-    'sub_lang'
+
+    # cylc.sphinx_ext extensions (from cylc.sphinx_ext-extensions library)
+    'cylc.sphinx_ext.cylc_lang',
+    'cylc.sphinx_ext.diff_selection',
+    'cylc.sphinx_ext.grid_table',
+    'cylc.sphinx_ext.hieroglyph_patch',
+    'cylc.sphinx_ext.hieroglyph_theme_addons',
+    'cylc.sphinx_ext.minicylc',
+    'cylc.sphinx_ext.practical',
+    'cylc.sphinx_ext.rtd_theme_addons',
+    'cylc.sphinx_ext.sub_lang',
 ]
 
 # Select best available SVG image converter.
@@ -119,7 +127,9 @@ pygments_style = 'autumn'
 html_theme = 'sphinx_rtd_theme'
 # rtd_theme only handles 4 levels for the sidebar navigation.
 html_theme_options = {'navigation_depth': 4}
-html_static_path = ['_static']
+
+html_js_files = ['js/versioning.js']
+
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 html_show_sphinx = False
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
@@ -179,3 +189,9 @@ texinfo_documents = [
 ]
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'
+
+
+def setup(app):
+    # set the html_static_path in an extension so as not to conflict with
+    # cylc.sphinx_ext extensions
+    app.config.html_static_path.append('_static')
