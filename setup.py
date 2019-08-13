@@ -58,6 +58,22 @@ INSTALL_REQUIRES = [
     "requests",
     "ldap3",
 ]
+EXTRAS_REQUIRE = {
+    'docs': [
+        'sphinx',
+        'sphinx_rtd_theme',
+        'sphinxcontrib-httpdomain',
+        'hieroglyph',
+        'sphinxcontrib-svg2pdfconverter',
+        (
+            'cylc-sphinx-extensions'
+            ' @ '
+            'git+https://github.com/cylc/cylc-sphinx-extensions.git'
+            '#egg=metomi_rose[all]'
+        )
+    ]
+}
+EXTRAS_REQUIRE['all'] = list({y for x in EXTRAS_REQUIRE.values() for y in x})
 
 
 setup(
@@ -71,6 +87,7 @@ setup(
     + glob(join("sbin", "*"))
     + glob(join("lib", "bash", "*")),
     install_requires=INSTALL_REQUIRES,
+    extras_require=EXTRAS_REQUIRE,
     package_data={
         "metomi.rose": ["etc/.*"],
         "metomi.rosie": ["lib/*"]
