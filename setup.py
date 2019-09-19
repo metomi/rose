@@ -50,7 +50,7 @@ with open("README.md", "r") as fh:
 
 INSTALL_REQUIRES = [
     "jinja2>=2.10.1, <2.11.0",
-    "cylc-flow==8.0a0",
+    "cylc-flow==8.0a1",
     "aiofiles",
     "tornado",
     "sqlalchemy",
