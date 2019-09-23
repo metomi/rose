@@ -52,8 +52,6 @@ fi
 REV_BASE_DOT=$(sed 's/-/./g' <<<$REV_BASE)
 git archive --format=tar --prefix=$NAME-$REV_BASE_DOT/ $REV \
     | (cd ~/rpmbuild/SOURCES/ && tar -xf -)
-echo "ROSE_VERSION=\"$REV_BASE_DOT\";" \
-    >~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/doc/$NAME-version.js
 rm -r ~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/{demo,t}
 
 # Create the rpmbuild spec file
@@ -89,7 +87,6 @@ cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rosie
 rm -fr %{buildroot}
 
 %files
-/etc/bash_completion.d
 /etc/bash_completion.d/rose-bash-completion
 /opt/$NAME
 /usr/bin/rose
