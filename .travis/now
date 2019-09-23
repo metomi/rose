@@ -87,8 +87,6 @@ _install_rose () {
 
 _install_cylc () {
     APT+=(at heirloom-mailx)
-    GIT+=('cylc|cylc-flow|master')
-    RC_PATH+=("${HOME}/cylc-master/bin")
 }
 
 _install_fcm () {

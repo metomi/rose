@@ -5,6 +5,35 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2.0a1 (2019-09-19)
+
+Rose release 59. This is an __alpha preview__ release. It is expected that it 
+will be used with:
+* [cylc-flow-8.0a1](https://github.com/cylc/cylc-flow/releases/tag/7.8.2), and
+* [fcm-2019.05.0](https://github.com/metomi/fcm/releases/tag/2019.05.0).
+
+It is able to run most existing Rose Suites and has been ported to Python3.
+
+**but**
+* It is not production-ready yet.
+* There are no GUI programs available.
+
+### Noteworthy Changes
+
+**This is the first Python3 version of Rose**
+
+[#2288](https://github.com/metomi/rose/pull/2288):
+Rosie & Rosa: migrate to Python 3(.6-.7) & Tornado
+
+[#2317](https://github.com/metomi/rose/pull/2317):
+Python3 Conversion of Rose Suite Run
+
+[#2366](https://github.com/metomi/rose/pull/2366):
+Rose and Rosie: Future versions of Rose will be deployed to PyPI and installed
+via Conda.
+
+--------------------------------------------------------------------------------
+
 ## 2019.01.1 (2019-05-03)
 
 Rose release 58. This maintenance release is expected to be used with:
