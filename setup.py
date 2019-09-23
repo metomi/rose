@@ -65,12 +65,7 @@ EXTRAS_REQUIRE = {
         'sphinxcontrib-httpdomain',
         'hieroglyph',
         'sphinxcontrib-svg2pdfconverter',
-        (
-            'cylc-sphinx-extensions'
-            ' @ '
-            'git+https://github.com/cylc/cylc-sphinx-extensions.git'
-            '#egg=metomi_rose[all]'
-        )
+        'cylc-sphinx-extensions[all]'
     ]
 }
 EXTRAS_REQUIRE['all'] = list({y for x in EXTRAS_REQUIRE.values() for y in x})
