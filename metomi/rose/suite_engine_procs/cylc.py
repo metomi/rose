@@ -605,6 +605,7 @@ class CylcProcessor(SuiteEngineProcessor):
         if user in ["None", self.user]:
             user = None
         if host and ("`" in host or "$" in host):
+            # We need to evaluate a host command.
             command = ["bash", "-ec", "H=" + host + "; echo $H"]
             host = self.popen(*command)[0].strip().decode()
         if (host in ["None", self.host] or
