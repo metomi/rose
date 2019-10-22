@@ -41,8 +41,37 @@ Invocation
 In automatic selection mode, this built-in application will be invoked
 automatically if a task has a name that starts with ``rose_arch*``.
 
+This means that you can use Rose Arch with something like the example below
+in your ``suite.rc``:
+
+.. code-block:: cfg
+
+ [scheduling]
+    ...
+    [[dependencies]]
+        [[[P1]]]
+        graph = """
+        all => the => tasks => rose_arch_archive
+        """
+
+ [runtime]
+    ...
+
+    [[rose_arch_archive]]
+
+
 Example
 -------
+
+The following examples all form part of a single ``rose-app.conf`` file:
+
+General Settings
+^^^^^^^^^^^^^^^^
+These settings are placed here to be inherited by other archive tasks in the
+file: In this case we've set ``command format`` which sets how we are going
+to copy the files to the archive location.
+We've also set prefixes for the source and target locations, so that we
+don't have repeatedly specify common locations.
 
 .. code-block:: rose
 
@@ -52,59 +81,130 @@ Example
    source-prefix=$ROSE_DATAC/
    target-prefix=foo://hello/
 
+Archive a file to a file
+^^^^^^^^^^^^^^^^^^^^^^^^
+In this simplest use case rose arch is just moving a single file to another
+location.
+
+.. code-block:: rose
+
    # Archive a file to a file
    [arch:world.out]
    source=hello/world.out
 
-   # Auto gzip (compression inferred from target extension)
+Archiving directories
+^^^^^^^^^^^^^^^^^^^^^
+You can archive files matched by one or more glob expressions to a directory:
+
+.. code-block:: rose
+
+   # A single glob
+   [arch:worlds/]
+   source=hello/worlds/*
+
+   # Three globs
+   [arch:worlds/]
+   source=hello/worlds/* greeting/worlds/* hi/worlds/*
+
+Missing files and directories
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+It's also possibly to deal with a situation where one or more of the glob
+expressions might not return anything by putting brackets - ``()`` - around it:
+
+.. code-block:: rose
+
+   # If there isn't anything in greeting/worlds/ Rose Arch continues
+   [arch:worlds/]
+   source=hello/worlds/* (greeting/worlds/*) hi/worlds/*
+
+You can even tell Rose Arch that there may be nothing to archive, but to carry
+on:
+
+.. code-block:: rose
+
+   [arch:(black-box/)]
+   source=cats.txt dogs.txt
+
+Zipping files
+^^^^^^^^^^^^^
+There are multiple ways of specifying that you want your achive to be
+compressed:
+
+You can infer compression from the target extension:
+
+.. code-block:: rose
+
    [arch:planet.gz]
    source=hello/planet.out
 
-   # Manual gzip (rose does not recognise the .out.gz extension)
+...or manually specify a compression program. (In this case the ``out.gz`` is
+not regcognized by rose arch as an extension to be compressed.)
+
+.. code-block:: rose
+
    [arch:planet.out.gz]
    compress=gz
    source=hello/planet.out
 
-   # Archive files matched by a glob to a directory
-   [arch:worlds/]
-   source=hello/worlds/*
+For more details see :rose:conf:`rose_arch[arch]compress`
 
-   # Archive multiple files matched by globs or names to a directory
-   [arch:worlds/]
-   source=hello/worlds/* greeting/worlds/* hi/worlds/*
+Zipping directories
+^^^^^^^^^^^^^^^^^^^
+You can tar and zip entire directories - as with single files Rose Arch will
+attempt to infer archive and compression from ``[arch:TARGET.extension]`` if it
+can:
 
-   # As above, but "greeting/worlds/*" may return an empty list
-   [arch:worlds/]
-   source=hello/worlds/* (greeting/worlds/*) hi/worlds/*
+.. code-block:: rose
 
-   # Target is optional, implied that sources may all be missing
-   [arch:(black-box/)]
-   source=cats.txt dogs.txt
-
-   # Auto tar-gzip
    [arch:galaxies.tar.gz]
    source-prefix=hello/
    source=galaxies/*
    # File with multiple galaxies may be large, don't do its checksum
    update-check=mtime+size
 
+You might prefer to explicitly gzip each file in the source directory separately:
+
+.. code-block:: rose
+
    # Force gzip each source file
    [arch:stars/]
    source=stars/*
    compress=gzip
 
-   # Source name transformation
+Renaming files simply
+^^^^^^^^^^^^^^^^^^^^^
+You may wish to change the name of the archived files. By default the contents
+of your app'a ``[arch:Target]source=whatever-you-put-here`` and
+``$CYLC_TASK_CYCLE_TIME`` are available to you as python formatting strings
+``%(name)s`` and ``%(cycle)s``.
+
+.. code-block:: rose
+
    [arch:moons.tar.gz]
    source=moons/*
    rename-format=%(cycle)s-%(name)s
-   source-edit-format=sed 's/Hello/Greet/g' %(in)s >%(out)s
 
-   # Source name transformation with a rename-parser
-   [arch:unknown/stuff.pax]
+.. warning::
+
+   As ``%(cycle)s`` can be a path is may not always make sense to
+   prepend ``%(name)s`` to it - consider ``01_/absolute/path/to/datafile``
+
+Renaming using a ``rename-parser``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+See [rename-parser].
+This allows you to parse the the name you give in ``[arch:Target]source=`` using
+regular expressions for use in ``rename-format``.
+
+This is handy if you set a path to ``[arch:Target]source=`` but want the target
+to just be a name - imagine a case where you wanted to collect a group of files
+with names in the form ``data_001.txt``:
+
+.. code-block:: rose
+
+   [arch:Target]
+   source=/some/path/data*.txt
+   rename-parser=^//some//path//data_(?P<serial_number>[0-9]{3})(?P<name_tail>.*)$
    rename-format=hello/%(cycle)s-%(name_head)s%(name_tail)s
-   rename-parser=^(?P<name_head>stuff)ing(?P<name_tail>-.*)$
-   source=stuffing-*.txt
-
 
 Output
 ------
@@ -164,71 +264,119 @@ Configuration
 
       .. rose:conf:: compress=pax|tar|pax.gz|tar.gz|tgz|gz
 
-         If specified, compress source files to the given scheme before
-         sending them to the archive. If not specified, the compress
-         scheme is automatically determined by the file extension of
-         the target, if it matches one of the allowed values. For the
-         ``pax|tar`` scheme, the sources will be placed in a TAR archive
-         before being sent to the target. For the ``pax.gz|tar.gz|tgz``
-         scheme, the sources will be placed in a TAR-GZIP file before
-         being sent to the target. For the ``gz`` scheme, each source
-         file will be compressed by GZIP before being sent to the target.
+         If specified, compress source files scheme before sending them to the
+         archive. If not set Rose Arch will attempt to set a compression scheme
+         if the file extension of the target implies compression: For
+         example, setting target as ``[arch:example.tar]`` is the same as
+         setting ``compress=tar``.
+
+         Each compression scheme works slightly differently:
+
+         +------------------+-----------------------------------------------+
+         |Compression Scheme|Behaviour                                      |
+         +------------------+-----------------------------------------------+
+         |``pax`` or ``tar``|Sources will be placed in a TAR archive before |
+         |                  |being sent to the target.                      |
+         +------------------+-----------------------------------------------+
+         |``pax.gz``,       |Sources will be placed in a TAR-GZIP file      |
+         |``tar.gz`` or     |before being sent to the target.               |
+         |``tgz``           |                                               |
+         +------------------+-----------------------------------------------+
+         |``gz``            |Each source ile will be compressed by GZIP     |
+         |                  |before being sent to the target.               |
+         +------------------+-----------------------------------------------+
 
       .. rose:conf:: rename-format
 
          If specified, the source files will be renamed according to the
          specified format. The format string should be a Pythonic
-         ``printf``-style format string. It may contain the placeholder
-         ``%(cycle)s`` (for the current :envvar:`ROSE_TASK_CYCLE_TIME`, the
-         placeholder ``%(name)s`` for the name of the file, and/or named
-         placeholders that are generated by :rose:conf:`rename-parser`.
+         ``printf``-style format string.
+
+         By default the following variables are available:
+         * ``%(cycle)s`` for the current :envvar:`ROSE_TASK_CYCLE_TIME`
+         * ``%(name)s`` for the file or path set in ``[arch]source=``
+
+         You may also use :rose:conf:`rename-parser` to generate further fields
+         from the input name.
+
+         .. warning::
+
+       	  As ``%(name)s`` can be a path, so that if ``rename-format="%(cycle)s_%(name)s"``
+          you can have destination
+          paths such ``02_path/to/some.file``, which are unlikely to work. If
+          you want to manipulate your source name in such cases
+          should use ``rename-parser``
 
       .. rose:conf:: rename-parser
 
-         Ignored if ``rename-format`` is not specified. Specify a regular
-         expression to parse the name of a source. The regular expression
-         should do named captures of strings from source file names,
-         which can then be used to substitute named placeholders in the
-         corresponding :rose:conf:`rename-format`.
+         Ignored if ``rename-format`` is not specified.
+
+         Specify a regular expression to parse the name provided by ``source``,
+         using the Python regex syntax ``(?P<label>what you want to capture)``
+
+         For example, a regular expression in the form:
+
+         .. code-block:: console
+
+            ^\/home\/data\/(?P<filename>myfile)(?P<serialnumber>[0-9]{3}).someExtension$
+
+         Will label the captured section using with the contents of ``<>``.
+         In this example you would then have ``%(filename)s`` and
+         ``%(serialnumber)`` to use in your :rose:conf:`rename-format` string.
 
       .. rose:conf:: source=NAME
 
-         :compolsory: True
+         :compulsory: True
 
-         Specify a list of space delimited source file names and/or globs
-         for matching source file names. (File names with space or quote
-         characters can be escaped using quotes or backslashes, like in
-         a shell.) Paths, if not absolute (beginning with a ``/``), are
-         assumed to be relative to :envvar:`ROSE_SUITE_DIR` or to
-         ``$ROSE_SUITE_DIR/PREFIX`` if
-         :rose:conf:`source-prefix` is specified.
-         If a name or glob is given in a pair of brackets, e.g.
-         ``(hello-world.*)``, the source is considered optional and will
-         not cause a failure if it does not match any source file names.
-         However, a compulsory target that ends up with no matching source
-         file will be considered a failure.
+         Specify a list of source file names and/or globs
+         for matching source file names. List items are separated by spaces.
+
+         * File names with space or quote  characters can be escaped using quotes
+           or backslashes, like in a shell.)
+         * Paths, if not absolute (beginning with a ``/``), are
+           assumed to be relative to :envvar:`ROSE_SUITE_DIR` or to
+           ``$ROSE_SUITE_DIR/PREFIX`` if :rose:conf:`source-prefix` is specified.
+         * If a name or glob is given in a pair of brackets,
+           e.g.``(hello-world.*)``, the source is considered optional and will
+           not cause a failure if it does not match any source file names.
+
+         .. warning::
+
+         	 If a target does not have ``()`` around it then is it compulsory and if no matching source is found then the archiving of that file will be considered a failure.
+
 
       .. rose:conf:: source-edit-format=FORMAT
 
-         A Pythonic ``printf``-style format string to construct a command to
-         edit or modify the content of source files before archiving them.
+         Construct a command to edit or modify the content of source files
+         before archiving them. It uses a Pythonic ``printf``-style format
+         string to describe inputs and outputs.
+
          It must contain the placeholders ``%(in)s`` and ``%(out)s`` for
          substitution of the path to the source file and the path to the
          modified source file (which will be created in a temporary working
          directory).
+
+         For example you might wish to replace the word "Hello" with "Greet"
+         using sed:
+
+         .. code-block:: bash
+
+          source-edit-format=sed 's/Hello/Greet/g' %(in)s >%(out)s
+
 
       .. rose:conf:: source-prefix=PREFIX
 
          Add a prefix to each value in a source declaration. A trailing
          slash should be added for a directory. Paths are assumed to be
          relative to :envvar:`ROSE_SUITE_DIR`. This setting serves two
-         purposes. It provides a way to avoid typing the same thing
-         repeatedly. It also modifies the name-spaces of the sources if
-         the target is in a TAR or TAR-GZIP file. In the absence of this
-         setting, the name of a source in a TAR or TAR-GZIP file is the
-         path relative to :envvar:`ROSE_SUITE_DIR`. By specifying this
-         setting, the source names in a TAR or TAR-GZIP file will be
-         shortened by the prefix.
+         purposes:
+
+         * It provides a way to avoid typing the name of the source directory
+           repeatedly.
+         * If you are using :rose:conf:`rename-format` or if the target is
+           a compressed file your target's ``%(name)s`` will be the entirety
+           of what you set in :rose:conf:`source`, so you may wish to avoid
+           this being a full path.
 
       .. rose:conf:: target-prefix=PREFIX
 
@@ -249,5 +397,4 @@ Configuration
          Python's `hashlib`_, such as ``md5`` (default), ``sha1``, etc.
          In this mode, the application will use the checksum (based on
          the specified hashing method) of the content of each source file
-         to determine if it has changed or not. 
-
+         to determine if it has changed or not.

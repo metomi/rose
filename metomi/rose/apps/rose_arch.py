@@ -291,7 +291,7 @@ class RoseArchApp(BuiltinApp):
                 rename_parser = None
             for source in target.sources.values():
                 dict_ = {
-                    "cycle": os.getenv("ROSE_TASK_CYCLE_TIME"),
+                    "cycle": os.getenv("CYLC_TASK_CYCLE_TIME"),
                     "name": source.name}
                 if rename_parser:
                     match = rename_parser.match(source.name)

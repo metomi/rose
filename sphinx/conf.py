@@ -168,7 +168,8 @@ latex_show_pagerefs = True
 latex_show_urls = 'inline'
 # Don't link RST source page.
 html_show_sourcelink = False
-
+# Add a custom css file to make tables wrap correctly.
+html_css_files = ['custom.css']
 
 # -- Options for manual page output ---------------------------------------
 
