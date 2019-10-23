@@ -24,6 +24,14 @@ The following builders are useful for development:
 ``doctest``
    Run any doctests contained within documented code (e.g. see ``rose.config``).
 
+Additionally, if you are not using an editor with a spellchecker you may
+wish to use aspell/ispell/hunspell to check any changed docs:
+
+.. code-block:: bash
+
+   hunspell path/to/changed.rst
+   # or
+   aspell check path/to/changed.rst
 
 ``rose test-battery``
 ---------------------
