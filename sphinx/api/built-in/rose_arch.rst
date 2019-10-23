@@ -44,24 +44,23 @@ automatically if a task has a name that starts with ``rose_arch*``.
 This means that you can use Rose Arch with something like the example below
 in your ``suite.rc``:
 
-.. code-block:: cfg
+.. code-block:: cylc
 
- [scheduling]
-    ...
-    [[dependencies]]
-        [[[P1]]]
-        graph = """
-        all => the => tasks => rose_arch_archive
-        """
+   [scheduling]
+      # ...
+      [[dependencies]]
+          P1 = """
+          all => the => tasks => rose_arch_archive
+          """
 
- [runtime]
-    ...
+   [runtime]
+      # ...
 
-    [[rose_arch_archive]]
+      [[rose_arch_archive]]
 
 
-Example
--------
+Examples
+--------
 
 The following examples all form part of a single ``rose-app.conf`` file:
 
@@ -108,7 +107,7 @@ You can archive files matched by one or more glob expressions to a directory:
 
 Missing files and directories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-It's also possibly to deal with a situation where one or more of the glob
+It's also possibly to deal with a situation where one or more of the source
 expressions might not return anything by putting brackets - ``()`` - around it:
 
 .. code-block:: rose
@@ -127,7 +126,7 @@ on:
 
 Zipping files
 ^^^^^^^^^^^^^
-There are multiple ways of specifying that you want your achive to be
+There are multiple ways of specifying that you want your archive to be
 compressed:
 
 You can infer compression from the target extension:
@@ -137,8 +136,8 @@ You can infer compression from the target extension:
    [arch:planet.gz]
    source=hello/planet.out
 
-...or manually specify a compression program. (In this case the ``out.gz`` is
-not regcognized by rose arch as an extension to be compressed.)
+or manually specify a compression program. (In this case the ``out.gz`` is
+not recognized by rose arch as an extension to be compressed.)
 
 .. code-block:: rose
 
@@ -174,7 +173,7 @@ You might prefer to explicitly gzip each file in the source directory separately
 Renaming files simply
 ^^^^^^^^^^^^^^^^^^^^^
 You may wish to change the name of the archived files. By default the contents
-of your app'a ``[arch:Target]source=whatever-you-put-here`` and
+of your app'a :rose:conf:`rose_arch[arch]source` and
 ``$CYLC_TASK_CYCLE_TIME`` are available to you as python formatting strings
 ``%(name)s`` and ``%(cycle)s``.
 
@@ -186,16 +185,17 @@ of your app'a ``[arch:Target]source=whatever-you-put-here`` and
 
 .. warning::
 
-   As ``%(cycle)s`` can be a path is may not always make sense to
-   prepend ``%(name)s`` to it - consider ``01_/absolute/path/to/datafile``
+   As ``%(name)s`` can be a path is may not always make sense to
+   prepend ``%(cycle)s`` to it - consider ``01_/absolute/path/to/datafile``
 
 Renaming using a ``rename-parser``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-See [rename-parser].
-This allows you to parse the the name you give in ``[arch:Target]source=`` using
+See :rose:conf:`rose_arch[arch]rename-parser`.
+
+This allows you to parse the the name you give in :rose:conf:`rose_arch[arch]source` using
 regular expressions for use in ``rename-format``.
 
-This is handy if you set a path to ``[arch:Target]source=`` but want the target
+This is handy if you set a path to :rose:conf:`rose_arch[arch]source` but want the target
 to just be a name - imagine a case where you wanted to collect a group of files
 with names in the form ``data_001.txt``:
 
@@ -282,7 +282,7 @@ Configuration
          |``tar.gz`` or     |before being sent to the target.               |
          |``tgz``           |                                               |
          +------------------+-----------------------------------------------+
-         |``gz``            |Each source ile will be compressed by GZIP     |
+         |``gz``            |Each source file will be compressed by GZIP    |
          |                  |before being sent to the target.               |
          +------------------+-----------------------------------------------+
 
@@ -293,25 +293,27 @@ Configuration
          ``printf``-style format string.
 
          By default the following variables are available:
+
          * ``%(cycle)s`` for the current :envvar:`ROSE_TASK_CYCLE_TIME`
-         * ``%(name)s`` for the file or path set in ``[arch]source=``
+         * ``%(name)s`` for the file or path set in :rose:conf:`source`
 
          You may also use :rose:conf:`rename-parser` to generate further fields
          from the input name.
 
          .. warning::
 
-       	  As ``%(name)s`` can be a path, so that if ``rename-format="%(cycle)s_%(name)s"``
-          you can have destination
-          paths such ``02_path/to/some.file``, which are unlikely to work. If
-          you want to manipulate your source name in such cases
-          should use ``rename-parser``
+            As ``%(name)s`` can be a path, so that
+            if ``rename-format="%(cycle)s_%(name)s"`` you can have destination
+            paths such ``02_path/to/some.file``, which are unlikely to work. If
+            you want to manipulate your source name in such cases
+            should use :rose:conf:`rename-parser`.
+
 
       .. rose:conf:: rename-parser
 
-         Ignored if ``rename-format`` is not specified.
+         Ignored if :rose:conf:`rename-format` is not specified.
 
-         Specify a regular expression to parse the name provided by ``source``,
+         Specify a regular expression to parse the name provided by :rose:conf:`source`,
          using the Python regex syntax ``(?P<label>what you want to capture)``
 
          For example, a regular expression in the form:
@@ -342,7 +344,9 @@ Configuration
 
          .. warning::
 
-         	 If a target does not have ``()`` around it then is it compulsory and if no matching source is found then the archiving of that file will be considered a failure.
+            If a target does not have ``()`` around it then is it compulsory
+            and if no matching source is found then the archiving of that file
+            will be considered a failure.
 
 
       .. rose:conf:: source-edit-format=FORMAT
@@ -361,7 +365,7 @@ Configuration
 
          .. code-block:: bash
 
-          source-edit-format=sed 's/Hello/Greet/g' %(in)s >%(out)s
+            source-edit-format=sed 's/Hello/Greet/g' %(in)s >%(out)s
 
 
       .. rose:conf:: source-prefix=PREFIX
