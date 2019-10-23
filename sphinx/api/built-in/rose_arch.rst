@@ -63,7 +63,7 @@ in your ``suite.rc``:
 Example
 -------
 
-The following examples all form part of a single ``rose-app.conf`` file:
+The following examples all form part of a single :rose:file:`rose-app.conf` file:
 
 General Settings
 ^^^^^^^^^^^^^^^^
