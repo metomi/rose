@@ -46,6 +46,9 @@ case "${TEST_KEY_BASE}" in
         OPTION='-l';;
     *validate*)
         OPTION='--validate-suite-only';;
+    *host-localhost*)
+        OPTION='-i'
+        JOB_HOST=$HOSTNAME;;
     *)
         OPTION='-i';;
 esac
@@ -76,6 +79,7 @@ if [[ "${TEST_KEY_BASE}" != *validate* ]]; then
     sort "${TEST_KEY}.out" >"${TEST_KEY}.out.sort"
     file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out.sort" <<__OUT__
 ${SUITE_RUN_DIR}/app/my_task_1/rose-app.conf
+${SUITE_RUN_DIR}/app/my_task_2/rose-app.conf
 ${SUITE_RUN_DIR}/colon:is:ok
 ${SUITE_RUN_DIR}/etc/junk
 __OUT__
