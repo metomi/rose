@@ -590,7 +590,7 @@ The metadata options for a configuration fall into four categories:
 
          * normal
          * user ignored (stored in the configuration file with a ``!`` flag,
-           ignored at run time)
+           ignored at runtime)
          * logically ignored (stored in the configuration file with a ``!!``
            flag, ignored at runtime)
 
@@ -684,6 +684,40 @@ The metadata options for a configuration fall into four categories:
          ``env=SNOWFLAKE_SIDES`` is enabled and less than ``2``. The logical
          expression syntax can be used with non-numeric variables in the same
          way as the fail-if metadata.
+
+         .. _trigger-file-creation:
+
+         It is possible to use metadata triggers to trigger file creation, 
+         switching on/off as required.
+
+         For example, with the following :rose:file:`rose-app.conf` and 
+         :rose:file:`rose-meta.conf` files, file creation is triggered when
+         setting ``trigger=file:foo`` to ``.true.``. 
+
+
+         :rose:file:`rose-app.conf` file: 
+
+         .. code-block:: rose
+
+            [command]
+            default=true
+
+            [file:foo]
+            source=namelist:foo
+
+            [namelist:foo]
+            switch=.false.
+
+         :rose:file:`rose-meta.conf` file:  
+
+         .. code-block:: rose
+
+            [file:foo]
+
+            [namelist:foo=switch]
+            type=logical
+            trigger=file:foo: .true.
+
 
       .. rose:conf:: duplicate
 

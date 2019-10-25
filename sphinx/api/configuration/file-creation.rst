@@ -71,6 +71,7 @@ root directory to install file targets with a relative path:
          ``~/.ssh/config`` to specify the user ID for logging into ``HOST``
          if required.
 
+
    .. rose:conf:: file:TARGET
 
       .. rose:conf:: source=SOURCE & source=(SOURCE)
@@ -92,7 +93,12 @@ root directory to install file targets with a relative path:
             can be used to specify an optional source. E.g.
             ``source=namelist:foo (namelist:bar)`` would allow
             ``namelist:bar`` to be missing or ignored without an error.
+ 
+         .. note::
 
+            File creation can be triggered with use of the metadata triggers. An
+            example can be found :ref:`here <trigger-file-creation>`. 
+      
       .. rose:conf:: checksum
 
          The expected MD5 checksum of the target. If specified, the file
