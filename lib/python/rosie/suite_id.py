@@ -515,8 +515,12 @@ class SuiteId(object):
             try:
                 info_entry = info_parser.parse(
                     self.svn("info", "--xml", location))
-            except RosePopenError:
-                raise SuiteIdTextError(location)
+            except RosePopenError as exc:
+                if 'E200009' in exc.stderr:
+                    # E200009: Could not display info for all targets
+                    #          because some targets don't exist
+                    raise SuiteIdTextError(location)
+                raise
             else:
                 if "commit:revision" in info_entry:
                     revision = int(info_entry["commit:revision"])
