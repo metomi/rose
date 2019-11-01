@@ -14,3 +14,4 @@ This section looks at further topics in cylc.
    queues
    retries
    suicide-triggers
+   message-triggers
