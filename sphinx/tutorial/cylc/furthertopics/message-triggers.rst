@@ -42,15 +42,15 @@ How to create a message trigger
 
 In order to get our suite to trigger messages, we need to:
 
-   * specify our custom message in a section called ``[[outputs]]`` within the
+* specify our custom message in a section called ``[[outputs]]`` within the
      ``[runtime]`` section of our suite,
 
-   * add ``cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "YOUR CHOSEN TRIGGER MESSAGE"``
+* add ``cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "YOUR CHOSEN TRIGGER MESSAGE"``
      to the ``script`` section of ``[runtime]``, your chosen trigger message 
      should be unique and should exactly match the message defined in
      ``[[outputs]]``.  
 
-   * Refer to these messages in the ``[dependencies]`` section of our suite.
+* Refer to these messages in the ``[dependencies]`` section of our suite.
 
 These outputs are then triggered during the running of the task.    
 We can use these to manage tasks dependant on partially completed tasks.
@@ -58,24 +58,24 @@ We can use these to manage tasks dependant on partially completed tasks.
 So, a basic example, where we have a task foo, that when partially completed 
 triggers another task bar and when fully completed triggers another task, baz. 
 
-      .. code-block:: cylc
+   .. code-block:: cylc
 
-         [scheduling]
-            [[dependencies]]
-            graph = """foo:out1 => bar
-                        foo => baz"""
-         [runtime]
-            [[foo]]
-               script = """
-                  sleep 5
-                  cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "file 1 done"
-                  sleep 10
-                     """
-               [[[outputs]]]
-                  out1 = "file 1 done"
-                    
-            [[bar, baz]]
-               script = sleep 10
+      [scheduling]
+         [[dependencies]]
+         graph = """foo:out1 => bar
+                     foo => baz"""
+      [runtime]
+         [[foo]]
+            script = """
+               sleep 5
+               cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "file 1 done"
+               sleep 10
+                  """
+            [[[outputs]]]
+               out1 = "file 1 done"
+                  
+         [[bar, baz]]
+            script = sleep 10
 
 .. _message triggers practical:
 
@@ -244,10 +244,12 @@ triggers another task bar and when fully completed triggers another task, baz.
                  script = """
                      sleep 2
                      random.sh
-         +           cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "Task partially complete, report ready to view"
+         +           cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" \
+                         "Task partially complete, report ready to view"
                      sleep 2
                      random.sh
-         +           cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "Task partially complete, report updated"
+         +           cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" \
+                         "Task partially complete, report updated"
                      sleep 2
                      random.sh
                  """
@@ -303,10 +305,12 @@ triggers another task bar and when fully completed triggers another task, baz.
                     script = """
                         sleep 2
                         random.sh
-                        cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "Task partially complete, report ready to view"
+                        cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" \
+                            "Task partially complete, report ready to view"
                         sleep 2
                         random.sh
-                        cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "Task partially complete, report updated"
+                        cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" \
+                            "Task partially complete, report updated"
                         sleep 2
                         random.sh
                     """
@@ -402,10 +406,12 @@ triggers another task bar and when fully completed triggers another task, baz.
                     script = """
                         sleep 2
                         random.sh
-                        cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "Task partially complete, report ready to view"
+                        cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" \
+                            "Task partially complete, report ready to view"
                         sleep 2
                         random.sh
-                        cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" "Task partially complete, report updated"
+                        cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" \
+                            "Task partially complete, report updated"
                         sleep 2
                         random.sh
                     """
