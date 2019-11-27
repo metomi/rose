@@ -118,7 +118,7 @@ triggers another task bar and when fully completed triggers another task, baz.
 
       .. code-block:: bash
 
-         touch random.sh
+         touch bin/random.sh
  
       Open the file and paste the following basic bash script into it:
 
