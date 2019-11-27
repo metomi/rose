@@ -28,7 +28,7 @@ complete.
 We could also set up :term:`message triggers <message trigger>` to, for example,
 send an email to inform us that a submission has failed, making use of Cylc's 
 task event handling system. More information is available on these in the 
-`Cylc User Guide <https://cylc.github.io/doc/built-sphinx/task-implementation.html#task-messages`_.
+`Cylc User Guide <https://cylc.github.io/doc/built-sphinx/task-implementation.html#task-messages>`_.
 
 
 :term:`Message triggers <message trigger>` provide a superior solution to
