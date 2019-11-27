@@ -113,7 +113,6 @@ triggers another task bar and when fully completed triggers another task, baz.
       .. code-block:: bash
 
          mkdir ~/cylc-run/message-triggers/bin
-         cd ~mkdir ~/cylc-run/message-triggers/bin
              
       Create a bash script in the bin directory:    
 
