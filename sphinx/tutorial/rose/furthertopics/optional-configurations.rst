@@ -120,7 +120,7 @@ following lines:
    [env]
    FLAVOUR=fudge
    CONE_TYPE=tub
-   TOPPINGS=nuts
+   TOPPING=nuts
 
 Run the app using both the ``chocolate`` and ``fudge-sundae`` optional
 configurations::
