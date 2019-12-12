@@ -202,12 +202,24 @@ class. An app may begin with a section like this:
    [ana:config]
    grepper-report-limit=5
    skip-if-all-files-missing=.true.
+   threads=10
 
-Each of these modifies the behaviour of ``grepper``. The first option
-suppresses printed output for each analysis task once the specified number
-of lines have been printed (in this case 5 lines). The second option
-causes Rose Ana to skip any ``grepper`` tasks which compare files in the
-case that both files do not exist.
+Each of these modifies the behaviour of ``grepper``:
+
+``grepper-report-limit``
+    Suppresses printed output for each analysis task once the 
+    specified number of lines have been printed (in this case 5 lines). 
+
+``skip-if-all-files-missing``
+    Causes Rose Ana to skip any ``grepper`` tasks which compare files 
+    in the case that both files do not exist
+
+``threads``
+    Causes rose_ana to use multiple threads (10 in this case), split 
+    across the individual analysis tasks. Be aware that any custom 
+    (user provided) analysis task which itself makes use of threading 
+    (e.g. by calling a library using OpenMP) may clash or interfere 
+    with the correct operation of this setting.
 
 .. note::
 

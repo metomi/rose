@@ -639,7 +639,9 @@ class RoseAnaApp(BuiltinApp):
                     # any) of the names match existing config options from the
                     # global config it will be overwritten)
                     if task == "config":
-                        self.ana_config[keys[1]] = node.value
+                        # Process any environment variables first
+                        value = env_var_process(node.value)
+                        self.ana_config[keys[1]] = value
                         continue
 
                     _tasks.setdefault(task, {})
