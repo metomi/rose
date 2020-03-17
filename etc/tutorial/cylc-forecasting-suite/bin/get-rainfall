@@ -97,16 +97,27 @@ def get_datapoint_radar_image(filename, time, api_key):
 
     Args:
         filename (str): The path to write the image file to.
-        time (str): The date-time of the image to reteieve in ISO8601 format.
+        time (str): The date-time of the image to retrieve in ISO8601 format.
         api_key (str): Datapoint API key.
 
     """
     time = datetime.strptime(time, '%Y%m%dT%H%MZ'
                             ).strftime('%Y-%m-%dT%H:%M:%SZ')
     url = URL.format(time=time, api_key=api_key)
+    # HTTP header to prevent 403 error:
+    hdr = {'User-Agent': ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 '
+                          '(KHTML, like Gecko) Chrome/23.0.1271.64 '
+                          'Safari/537.11'),
+           'Accept': ('text/html,application/xhtml+xml,application/xml;'
+                      'q=0.9,*/*;q=0.8'),
+           'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+           'Accept-Encoding': 'none',
+           'Accept-Language': 'en-US,en;q=0.8',
+           'Connection': 'keep-alive'}
+    req = urllib2.Request(url, headers=hdr)
     print 'Opening URL: %s' % url
     with open(filename, 'w+') as png_file:
-        png_file.write(urllib2.urlopen(url).read())
+        png_file.write(urllib2.urlopen(req).read())
 
 
 def get_archived_radar_image(filename, time):
