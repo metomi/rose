@@ -83,10 +83,22 @@ def get_archived_data(site_id, time):
 
 def extract_observations(data):
     """Extract the relevant observations from the weather data."""
+    try:
+        direction = ORDINATES[data['Period']['Rep']['D']]
+    except KeyError:
+        direction = '0'
+        print 'No wind direction in file so using 0'
+
+    try:
+        speed = data['Period']['Rep']['S']
+    except KeyError:
+        speed = '0'
+        print 'No wind speed in file so using 0'
+
     return [data['lon'],
             data['lat'],
-            ORDINATES[data['Period']['Rep']['D']],
-            data['Period']['Rep']['S']]
+            direction,
+            speed]
 
 
 def main(site_id, api_key=None):
