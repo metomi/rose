@@ -46,6 +46,7 @@ below:
 * Thomas Coleman (Bureau of Meteorology, Australia)
 * Bruno P. Kinoshita (National Institute of Water and Atmospheric Research, New Zealand)
 * Tim Pillinger (Met Office, UK)
+* Ronnie Dutta (Met Office, UK)
 
 (All contributors are identifiable with email addresses in the version control
 logs or otherwise.)
