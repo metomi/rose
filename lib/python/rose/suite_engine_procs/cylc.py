@@ -530,7 +530,7 @@ class CylcProcessor(SuiteEngineProcessor):
         The current working directory is assumed to be the suite log directory.
 
         suite_name: the name of the suite.
-        host: the host to run the suite. "localhost" if None.
+        host: the host to run the suite.
         run_mode: call "cylc restart|reload" instead of "cylc run".
         args: arguments to pass to "cylc run".
 
@@ -540,7 +540,7 @@ class CylcProcessor(SuiteEngineProcessor):
         cmd = ['cylc', run_mode]
         if run_mode == 'reload':
             cmd.append('--force')
-        if host and not self.host_selector.is_local_host(host):
+        if host:
             cmd.append('--host=%s' % host)
         cmd.append(suite_name)
         cmd += args
