@@ -5,6 +5,27 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2019.01.3 (2020-04-22)
+
+Rose release 59. This maintenance release is expected to be used with:
+* [cylc-flow-7.8.5](https://github.com/cylc/cylc-flow/releases/tag/7.8.5)
+* [fcm-2019.05.0](https://github.com/metomi/fcm/releases/tag/2019.05.0)
+
+### Noteworthy Changes
+
+[2399](https://github.com/metomi/rose/pull/2399)
+Fix bug where `--host=localhost` gets ignored
+
+#### Documentation Updates
+
+[#2398](https://github.com/metomi/rose/pull/2398)
+Remove forecast suite tutorial's absolute dependency on external data.
+
+[#2392](https://github.com/metomi/rose/pull/2392)
+A tutorial on how to use Message Triggers.
+
+--------------------------------------------------------------------------------
+
 ## 2019.01.2 (2019-06-12)
 
 Rose release 59. This maintenance release is expected to be used with:

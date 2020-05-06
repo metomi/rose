@@ -22,7 +22,7 @@ Until then we recommend the latest cylc-7.8 release for production use.
 
 ## Copyright and Terms of Use
 
-Copyright (C) 2012-2019 British Crown (Met Office) &amp; Contributors
+Copyright (C) 2012-2020 British Crown (Met Office) &amp; Contributors
 
 Rose is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
