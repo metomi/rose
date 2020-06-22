@@ -22,6 +22,7 @@
 from __future__ import print_function
 
 from collections import OrderedDict
+import os
 import re
 from subprocess import PIPE, check_output, CalledProcessError
 import sys
@@ -422,8 +423,15 @@ def get_rose_command_reference(command_name):
             rose / rosie.
 
     """
+    # Get the path to the requested command.
+    cmd_path = os.path.join(
+        os.path.realpath(
+            os.path.join(__file__, '../', '../', '../'),
+        ),
+        command_name
+    )
     # Obtain help text.
-    cmd = [command_name, 'doc']
+    cmd = [cmd_path, 'doc']
     try:
         stdout = check_output(cmd)
     except CalledProcessError:
@@ -483,7 +491,10 @@ if __name__ == '__main__':
     write_rst_heading(writer, 'Command Reference', 0)
 
     write_rst_heading(writer, 'Rose Commands', 1)
-    write_command_reference(writer, get_rose_command_reference('rose'))
+    write_command_reference(writer, get_rose_command_reference('bin/rose'))
 
     write_rst_heading(writer, 'Rosie Commands', 1)
-    write_command_reference(writer, get_rose_command_reference('rosie'))
+    write_command_reference(writer, get_rose_command_reference('bin/rosie'))
+
+    write_rst_heading(writer, 'Rosa Commands', 1)
+    write_command_reference(writer, get_rose_command_reference('sbin/rosa'))
