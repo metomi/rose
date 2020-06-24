@@ -13,3 +13,6 @@ dist
 .coverage.*
 coverage.xml
 htmlcov/
+
+.vscode/
+.pytest_cache/
