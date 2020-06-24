@@ -13,3 +13,5 @@ coverage.xml
 htmlcov/
 
 *.egg-info
+.vscode/
+.pytest_cache/
