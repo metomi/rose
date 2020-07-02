@@ -180,7 +180,7 @@ venv-install () {
     pip install 'sphinx'
     pip install 'sphinx_rtd_theme'
     pip install 'sphinxcontrib-httpdomain'
-    pip install 'hieroglyph'
+    pip install 'hieroglyph=1'
 }
 
 venv-deactivate () {
