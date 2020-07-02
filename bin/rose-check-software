@@ -320,7 +320,7 @@ def docs(check=check):
         check('py:sphinx', (1, 5, 3)),
         check('py:sphinx_rtd_theme', (0, 2, 4)),
         check('py:sphinxcontrib.httpdomain'),
-        check('py:hieroglyph')
+        check('py:hieroglyph', (1,), (2,))
     ])
 
     check_all('Documentation Builder - Recommended Extras', [
