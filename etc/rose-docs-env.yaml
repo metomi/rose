@@ -9,5 +9,5 @@ dependencies:
   - sphinx_rtd_theme
   - sphinxcontrib-httpdomain
   - pip:
-    - hieroglyph
+    - hieroglyph==1
     - sphinxcontrib-svg2pdfconverter
