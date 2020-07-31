@@ -22,30 +22,33 @@
 #
 # SYNOPSIS
 #     rosie create [OPTIONS]
-#     rosie copy [OPTIONS] FROM-ID
+#     rosie copy [OPTIONS] ID-OF-EXISTING-SUITE
 #
 # DESCRIPTION
-#     Create a new suite, and optionally copy items from an existing one.
+#     rosie create: Create a new suite
+#     rosie copy  : Create a new suite and copy content from an existing one.
 #
-#     Assign an `ID` and create the directory structure in the central
+#     Assign a new `ID` and create the directory structure in the central
 #     repository for a new suite.
 #
 #     The location of the repository for the new suite is determined in order
 #     of preference:
 #
 #     1. `--prefix=PREFIX` option
-#     2. prefix of the `FROM-ID`
+#     2. prefix of the `ID-OF-EXISTING-SUITE`
 #     3. `[rosie-id]prefix-default` option in the site/user configuration.
 #
-#     If `FROM-ID` is specified, copy items from the existing suite `FROM-ID`
-#     when the suite is created. It is worth noting that revision history of
-#     the copied items can only be preserved if `FROM-ID` is in the same
-#     repository of the new suite.
+#     If `ID-OF-EXISTING-SUITE` is specified, copy items from the existing suite
+#     `ID-OF-EXISTING-SUITE` when the suite is created. It is worth noting that
+#     revision history of the copied items can only be preserved if
+#     `ID-OF-EXISTING-SUITE` is in the same repository of the new suite
 #
-#     The syntax of the FROM-ID is PREFIX-xxNNN[/BRANCH][@REV] (e.g. my-su173,
-#     my-su173/trunk, my-su173/trunk@HEAD). If REV is not specified, the last
-#     changed revision of the branch is used. If BRANCH is not specified,
+#     The syntax of the ID-OF-EXISTING-SUITE is PREFIX-xxNNN[/BRANCH][@REV]
+#     (e.g. my-su173, my-su173/trunk, my-su173/trunk@HEAD). If REV is not specified,
+#     the last changed revision of the branch is used. If BRANCH is not specified,
 #     "trunk" is used.
+#
+#     NOTE: ID-OF-EXISTING-SUITE is _not_ a filepath.
 #
 # OPTIONS
 #     --info-file=FILE
