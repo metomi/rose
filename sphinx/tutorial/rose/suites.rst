@@ -416,8 +416,9 @@ See the :ref:`Cheat Sheet` for more information.
       Running :ref:`command-rose-suite-run` will cause the suite to be
       installed, validated and run.
 
-      Use the ``--local-install-only`` command-line option to install the
-      suite on your local machine and validate it::
+      This suite is not ready to run yet but you can install it: Use the
+      ``--local-install-only`` command-line option to install the suite on
+      your local machine and validate it::
 
          rose suite-run --local-install-only
 
