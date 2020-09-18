@@ -145,7 +145,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
         bad_changes = []
         author = None
         super_users = None
-        rev_info_map = {}  # {path-id: (owner, access-list), ...}
+        rev_info_map = {}
         txn_info_map = {}
 
         conf = ResourceLocator.default().get_conf()
@@ -158,6 +158,8 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
             names = path.split("/", self.LEN_ID + 1)
             tail = None
+            sid = "".join(names[0:self.LEN_ID])
+            branch = names[self.LEN_ID]
             if not names[-1]:
                 tail = names.pop()
 
@@ -184,9 +186,9 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 bad_changes.append(BadChange(status, path))
                 continue
 
-            # No need to check non-trunk changes
-            if len(names) > self.LEN_ID and names[self.LEN_ID] != "trunk":
-                continue
+            # No need to check non-trunk changes  # Why?
+            # if len(names) > self.LEN_ID and names[self.LEN_ID] != "trunk":
+            #     continue
 
             # New suite should have an info file
             if status[0] == self.ST_ADDED and len(names) == self.LEN_ID:
@@ -203,7 +205,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 continue
 
             # The rest are trunk changes in a suite
-            path_head = "/".join(names[0:self.LEN_ID]) + "/"
+            path_head = "/".join(sid) + "/"
             path_tail = path[len(path_head):]
 
             # For meta suite, make sure keys in keys file can be parsed
@@ -220,11 +222,11 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             # User IDs of owner and access list must be real
             if (status not in self.ST_DELETED and
                     path_tail == self.TRUNK_INFO_FILE):
-                if path_head not in txn_info_map:
-                    txn_info_map[path_head] = self._load_info(
-                        repos, path_head, txn)
+                if sid not in txn_info_map:
+                    txn_info_map[sid] = self._load_info(
+                        repos, sid, branch=branch, transaction=txn)
                 txn_owner, txn_access_list = self._get_access_info(
-                    txn_info_map[path_head])
+                    txn_info_map[sid])
                 if not txn_owner:
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_OWNER))
@@ -233,9 +235,9 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                         status, path, txn_owner, txn_access_list, bad_changes):
                     continue
                 reports = DefaultValidators().validate(
-                    txn_info_map[path_head],
+                    txn_info_map[sid],
                     load_meta_config(
-                        txn_info_map[path_head],
+                        txn_info_map[sid],
                         config_type=rose.INFO_CONFIG_NAME))
                 if reports:
                     reports_str = get_reports_as_text({None: reports}, path)
@@ -271,10 +273,10 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                     if value is not None:
                         super_users = shlex.split(value)
                         break
-            if path_head not in rev_info_map:
-                rev_info_map[path_head] = self._get_info(
-                    repos, path_head)
-            owner, access_list = self._get_access_info(rev_info_map[path_head])
+            if sid not in rev_info_map:
+                rev_info_map[sid] = self._load_info(
+                    repos, sid, branch=branch, transaction=txn)
+            owner, access_list = self._get_access_info(rev_info_map[sid])
             admin_users = super_users + [owner]
 
             # Only admin users can remove the suite
@@ -292,11 +294,11 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 continue
 
             # The owner must not be deleted
-            if path_head not in txn_info_map:
-                txn_info_map[path_head] = self._get_info(
-                    repos, path_head, txn)
+            if sid not in txn_info_map:
+                txn_info_map[sid] = self._load_info(
+                    repos, sid, branch=branch, transaction=txn)
             txn_owner, txn_access_list = self._get_access_info(
-                txn_info_map[path_head])
+                txn_info_map[sid])
             if not txn_owner:
                 bad_changes.append(BadChange(status, path, BadChange.NO_OWNER))
                 continue
