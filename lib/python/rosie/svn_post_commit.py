@@ -31,10 +31,10 @@ import os
 import re
 import rose.config
 from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
+from rosie.svn_hook import RosieSvnHook
 from rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 import shlex
@@ -43,7 +43,6 @@ import socket
 import sqlalchemy as al
 from StringIO import StringIO
 import sys
-from tempfile import TemporaryFile
 from time import mktime, strptime
 import traceback
 
@@ -94,7 +93,7 @@ class RosieWriteDAO(object):
         self.connection.execute(statement)
 
 
-class RosieSvnPostCommitHook(object):
+class RosieSvnPostCommitHook(RosieSvnHook):
 
     """A post-commit hook on a Rosie Subversion repository.
 
@@ -103,28 +102,13 @@ class RosieSvnPostCommitHook(object):
 
     """
 
-    DATE_FMT = "%Y-%m-%d %H:%M:%S %Z"
-    ID_CHARS_LIST = ["abcdefghijklmnopqrstuvwxyz"] * 2 + ["0123456789"] * 3
-    LEN_ID = len(ID_CHARS_LIST)
-    INFO_FILE = "rose-suite.info"
     KNOWN_KEYS_FILE_PATH = "R/O/S/I/E/trunk/rosie-keys"
     REC_COPY_INFO = re.compile(r"\A\s+\(from\s(\S+):r(\d+)\)\s*\Z")
-    ST_ADDED = "A"
-    ST_DELETED = "D"
-    ST_MODIFIED = "M"
-    ST_EMPTY = " "
-    TRUNK = "trunk"
 
     def __init__(self, event_handler=None, popen=None):
-        if event_handler is None:
-            event_handler = Reporter()
-        self.event_handler = event_handler
-        if popen is None:
-            popen = RosePopener(self.event_handler)
-        self.popen = popen
-        path = os.path.dirname(os.path.dirname(sys.modules["rosie"].__file__))
+        super(RosieSvnPostCommitHook, self).__init__(event_handler, popen)
         self.usertools_manager = SchemeHandlersManager(
-            [path], "rosie.usertools", ["get_emails"])
+            [self.path], "rosie.usertools", ["get_emails"])
 
     def run(self, repos, revision, no_notification=False):
         """Update database with changes in a changeset."""
@@ -211,10 +195,12 @@ class RosieSvnPostCommitHook(object):
                     # Suite info file change
                     if branch_attribs["info"] is None:
                         branch_attribs["info"] = self._load_info(
-                            repos, revision, sid, branch)
+                            repos, sid, branch, revision=revision,
+                            allow_popen_err=True)
                     if path_status != self.ST_ADDED:
                         branch_attribs["old_info"] = self._load_info(
-                            repos, int(revision) - 1, sid, branch)
+                            repos, sid, branch, revision=int(revision)-1,
+                            allow_popen_err=True)
                         if (branch_attribs["old_info"] !=
                                 branch_attribs["info"] and
                                 branch_attribs["status"] != self.ST_ADDED):
@@ -232,11 +218,13 @@ class RosieSvnPostCommitHook(object):
                 # Load suite info and old info regardless
                 if branch_attribs["info"] is None:
                     branch_attribs["info"] = self._load_info(
-                        repos, revision, sid, branch)
+                        repos, sid, branch, revision=revision,
+                        allow_popen_err=True)
                 if (branch_attribs["old_info"] is None and
                         branch_attribs["status"] == self.ST_DELETED):
                     branch_attribs["old_info"] = self._load_info(
-                        repos, int(revision) - 1, sid, branch)
+                        repos, sid, branch, revision=int(revision)-1,
+                        allow_popen_err=True)
                 # Append changed lines, so they can be used for notification
                 branch_attribs["changed_lines"].append(changed_line)
                 if changed_line[2] == "+":
@@ -261,26 +249,14 @@ class RosieSvnPostCommitHook(object):
                     branch_attribs_dict[(sid, del_branch)] = (
                         self._new_suite_branch_change(sid, del_branch, {
                             "old_info": self._load_info(
-                                repos, int(revision) - 1, sid, del_branch),
+                                repos, sid, del_branch,
+                                revision=int(revision)-1,
+                                allow_popen_err=True),
                             "status": self.ST_DELETED,
                             "status_info_file": self.ST_EMPTY,
                             "changed_lines": [
                                 "D   %s/%s/" % (path, del_branch)]}))
         return branch_attribs_dict
-
-    def _load_info(self, repos, revision, sid, branch):
-        """Load info file from branch_path in repos @revision."""
-        info_file_path = "%s/%s/%s" % ("/".join(sid), branch, self.INFO_FILE)
-        t_handle = TemporaryFile()
-        try:
-            t_handle.write(self._svnlook(
-                "cat", "-r", str(revision), repos, info_file_path))
-        except RosePopenError:
-            return None
-        t_handle.seek(0)
-        config = rose.config.load(t_handle)
-        t_handle.close()
-        return config
 
     def _new_suite_branch_change(self, sid, branch, attribs=None):
         """Return a dict to represent a suite branch change."""
@@ -371,11 +347,6 @@ class RosieSvnPostCommitHook(object):
         smtp = SMTP(smtp_host)
         smtp.sendmail(msg["From"], emails, msg.as_string())
         smtp.quit()
-
-    def _svnlook(self, *args):
-        """Return the standard output from "svnlook"."""
-        command = ["svnlook"] + list(args)
-        return self.popen(*command)[0]
 
     def _update_info_db(self, dao, changeset_attribs, branch_attribs):
         """Update the suite info database for a suite branch."""
