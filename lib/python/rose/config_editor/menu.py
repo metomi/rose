@@ -129,7 +129,7 @@ class MenuBar(object):
         <menuitem action="Page Web Help"/>
       </menu>
       <menu action="Help">
-        <menuitem action="GUI Help"/>
+        <menuitem action="Help"/>
         <menuitem action="About"/>
       </menu>
     </menubar>
@@ -223,7 +223,7 @@ class MenuBar(object):
          rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
         ('Help', None,
          rose.config_editor.TOP_MENU_HELP),
-        ('GUI Help', gtk.STOCK_HELP,
+        ('Help', gtk.STOCK_HELP,
          rose.config_editor.TOP_MENU_HELP_GUI,
          rose.config_editor.ACCEL_HELP_GUI),
         ('About', gtk.STOCK_DIALOG_INFO,
