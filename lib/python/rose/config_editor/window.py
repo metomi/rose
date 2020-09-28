@@ -261,7 +261,11 @@ class MainWindow(object):
 
     def launch_help_dialog(self, somewidget=None):
         """Launch a browser to open the help url."""
-        webbrowser.open('https://metomi.github.io/rose/doc/html/index.html', new=True, autoraise=True)
+        webbrowser.open(
+            'https://metomi.github.io/rose/doc/html/index.html',
+            new=True,
+            autoraise=True
+        )
         return False
 
     def launch_ignore_dialog(self, name_section_dict, prefs, is_ignored):
