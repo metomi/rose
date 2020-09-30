@@ -452,7 +452,7 @@ class MainWindow(gtk.Window):
                       self.show_search_history),
                      ('/TopMenuBar/History/Clear history',
                       self.handle_clear_history),
-                     ('/TopMenuBar/Help/GUI Help',
+                     ('/TopMenuBar/Help/Documentation',
                       self.launch_help),
                      ('/TopMenuBar/Help/About',
                       rosie.browser.util.launch_about_dialog)]

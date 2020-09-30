@@ -537,7 +537,7 @@ class MainController(object):
              lambda m: self._get_current_page().launch_help()),
             ('/TopMenuBar/Page/Page Web Help',
              lambda m: self._get_current_page().launch_url()),
-            ('/TopMenuBar/Help/GUI Help', self.main_handle.help),
+            ('/TopMenuBar/Help/Documentation', self.main_handle.help),
             ('/TopMenuBar/Help/About', self.main_handle.about_dialog)
         ]
         is_toggled = dict(
