@@ -114,24 +114,30 @@ class SuiteRunner(Runner):
 
     def run_impl(self, opts, args, uuid, work_files):
         # Log file, temporary
+        ## remove:obsolete (use a logger on the Cylc side)
         if hasattr(self.event_handler, "contexts"):
             t_file = TemporaryFile()
             log_context = ReporterContext(None, self.event_handler.VV, t_file)
             self.event_handler.contexts[uuid] = log_context
 
         # Check suite engine specific compatibility
+        ## remove:obsolete
         self.suite_engine_proc.check_global_conf_compat()
 
         # Suite name from the current working directory
+        ## remove:obsolete (cylc does the template installation now)
+        ## arg:suite_name (str)
         if opts.conf_dir:
             self.fs_util.chdir(opts.conf_dir)
         opts.conf_dir = os.getcwd()
 
         # --remote=KEY=VALUE,...
+        ## remove (obsolete)
         if opts.remote:
             # opts.name always set for remote.
             return self._run_remote(opts, opts.name)
 
+        ## keep
         conf_tree = self.config_load(opts)
         self.fs_util.chdir(conf_tree.conf_dirs[0])
 
@@ -140,6 +146,7 @@ class SuiteRunner(Runner):
             suite_name = os.path.basename(os.getcwd())
 
         # Check suite.rc #! line for template scheme
+        ## keep (use to choose which :suite.rc section we use)
         templ_scheme = "jinja2"
         if self.suite_engine_proc.SUITE_CONF in conf_tree.files:
             suiterc_path = os.path.join(
@@ -161,23 +168,28 @@ class SuiteRunner(Runner):
         # ROSE_ORIG_HOST: originating host
         # ROSE_VERSION: Rose version (not retained in run_mode=="reload")
         # Suite engine version
+        ## keep
         my_rose_version = ResourceLocator.default().get_version()
-        suite_engine_key = self.suite_engine_proc.get_version_env_name()
+        # suite_engine_key = self.suite_engine_proc.get_version_env_name()
         if opts.run_mode in ["reload", "restart"]:
             prev_config_path = self.suite_engine_proc.get_suite_dir(
                 suite_name, "log", "rose-suite-run.conf")
             prev_config = ConfigLoader()(prev_config_path)
-            suite_engine_version = prev_config.get_value(
-                ["env", suite_engine_key])
+            # suite_engine_version = prev_config.get_value(
+            #    ["env", suite_engine_key])
         else:
             suite_engine_version =\
                 self.suite_engine_proc.get_version().decode()
         resloc = ResourceLocator.default()
         auto_items = [
-            (suite_engine_key, suite_engine_version),
+            # (suite_engine_key, suite_engine_version),
+            # make a note of this, we will probably need to get Cylc
+            # to export the CYLC_VERSION variable
             ("ROSE_ORIG_HOST", self.host_selector.get_local_host()),
             ("ROSE_SITE", resloc.get_conf().get_value(['site'], '')),
             ("ROSE_VERSION", resloc.get_version())]
+
+        ## not sure, probably re-write
         for key, val in auto_items:
             requested_value = conf_tree.node.get_value(["env", key])
             if requested_value:
@@ -191,9 +203,11 @@ class SuiteRunner(Runner):
             extra_defines.append('[%s]%s="%s"' % (suite_section, key, val))
 
         # Pass automatic Rose constants as suite defines
+        ## ??
         self.conf_tree_loader.node_loader.load(extra_defines, conf_tree.node)
 
         # See if suite is running or not
+        ## remove:obsolete
         if opts.run_mode == "reload":
             # Check suite is running
             self.suite_engine_proc.get_suite_contact(suite_name)
@@ -201,6 +215,7 @@ class SuiteRunner(Runner):
             self.suite_engine_proc.check_suite_not_running(suite_name)
 
         # Install the suite to its run location
+        ## remove:obsolete
         suite_dir_rel = self._suite_dir_rel(suite_name)
 
         # Unfortunately a large try/finally block to ensure a temporary folder
@@ -210,14 +225,16 @@ class SuiteRunner(Runner):
             # Process Environment Variables
             environ = self.config_pm(conf_tree, "env")
 
-            if opts.validate_suite_only_mode:
-                temp_dir = mkdtemp()
-                suite_dir = os.path.join(temp_dir, suite_dir_rel)
-                os.makedirs(suite_dir, 0o0700)
-            else:
-                suite_dir = os.path.join(
-                    os.path.expanduser("~"), suite_dir_rel)
+            # remove validate only mode (obsolete)
+            #if opts.validate_suite_only_mode:
+            #    temp_dir = mkdtemp()
+            #    suite_dir = os.path.join(temp_dir, suite_dir_rel)
+            #    os.makedirs(suite_dir, 0o0700)
+            #else:
+            suite_dir = os.path.join(
+                os.path.expanduser("~"), suite_dir_rel)
 
+            ## remove:obsolete (cylc does the installation now)
             suite_conf_dir = os.getcwd()
             locs_conf = ConfigNode()
             if opts.new_mode:
@@ -233,6 +250,7 @@ class SuiteRunner(Runner):
                 os.chdir(suite_dir)
 
             # Housekeep log files
+            ## remove:obsolete (not re-implementing this in Cylc)
             now_str = None
             if not opts.install_only_mode and not opts.local_install_only_mode:
                 now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
@@ -240,28 +258,31 @@ class SuiteRunner(Runner):
             self.fs_util.makedirs("log/suite")
 
             # Rose configuration and version logs
+            ## keep
             self.fs_util.makedirs("log/rose-conf")
             run_mode = opts.run_mode
             if run_mode not in ["reload", "restart", "run"]:
                 run_mode = "run"
             mode = run_mode
-            if opts.validate_suite_only_mode:
-                mode = "validate-suite-only"
-            elif opts.install_only_mode:
-                mode = "install-only"
-            elif opts.local_install_only_mode:
-                mode = "local-install-only"
+            #if opts.validate_suite_only_mode:
+            #    mode = "validate-suite-only"
+            #elif opts.install_only_mode:
+            #    mode = "install-only"
+            #elif opts.local_install_only_mode:
+            #    mode = "local-install-only"
             prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), mode)
 
             # Dump the actual configuration as rose-suite-run.conf
             ConfigDumper()(conf_tree.node, "log/" + prefix + ".conf")
 
             # Install version information file
+            ## keep
             write_source_vc_info(
                 suite_conf_dir, "log/" + prefix + ".version", self.popen)
 
             # If run through rose-stem, install version information
             # files for each source tree if they're a working copy
+            ## keep
             if hasattr(opts, 'source') and hasattr(opts, 'project'):
                 for i, url in enumerate(opts.source):
                     if os.path.isdir(url):
@@ -269,10 +290,12 @@ class SuiteRunner(Runner):
                             url, "log/" + opts.project[i] + "-" + str(i) +
                             ".version", self.popen)
 
+            ## keep
             for ext in [".conf", ".version"]:
                 self.fs_util.symlink(prefix + ext, "log/rose-suite-run" + ext)
 
             # Move temporary log to permanent log
+            ## remove:re-implement (don't write to a temporary file)
             if hasattr(self.event_handler, "contexts"):
                 log_file_path = os.path.abspath(
                     os.path.join("log", "rose-suite-run.log"))
@@ -284,6 +307,7 @@ class SuiteRunner(Runner):
                 temp_log_file.close()
 
             # Process Files
+            ## keep
             cwd = os.getcwd()
             for rel_path, conf_dir in conf_tree.files.items():
                 if (conf_dir == cwd or
@@ -315,10 +339,12 @@ class SuiteRunner(Runner):
 
             # Process suite configuration template header
             # (e.g. Jinja2:suite.rc, EmPy:suite.rc)
+            ## re-implement
             self.config_pm(conf_tree, templ_scheme, environ=environ)
 
             # Ask suite engine to parse suite configuration
             # and determine if it is up to date (unchanged)
+            ## remove:obsolete
             if opts.validate_suite_only_mode:
                 suite_conf_unchanged = self.suite_engine_proc.cmp_suite_conf(
                     suite_dir, None, opts.strict_mode,
@@ -330,14 +356,17 @@ class SuiteRunner(Runner):
         finally:
             # Ensure the temporary directory created is cleaned up regardless
             # of success or failure
+            ## remove:obsolte (why would we need a temp dir any more?)
             if opts.validate_suite_only_mode and os.path.exists(temp_dir):
                 shutil.rmtree(temp_dir)
 
         # Only validating so finish now
+        ## remove:obsolte
         if opts.validate_suite_only_mode:
             return
 
         # Install share/work directories (local)
+        ## remove:obsolte
         for name in ["share", "share/cycle", "work"]:
             self._run_init_dir_work(
                 opts, suite_name, name, conf_tree, locs_conf=locs_conf)
@@ -346,12 +375,14 @@ class SuiteRunner(Runner):
             return
 
         # Install suite files to each remote [user@]host
+        ## remove:obsolte
         for name in ["", "log/", "share/", "share/cycle/", "work/"]:
             uuid_file = os.path.abspath(name + uuid)
             open(uuid_file, "w").close()
             work_files.append(uuid_file)
 
         # Install items to user@host
+        ## remove:obsolte
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
         proc_queue = []  # [[proc, command, "ssh"|"rsync", auth], ...]
         for auth in sorted(auths):
@@ -406,6 +437,7 @@ class SuiteRunner(Runner):
             proc = self.popen.run_bg(*command)
             proc_queue.append([proc, command, "ssh", auth])
 
+        ## remove:obsolte
         while proc_queue:
             sleep(self.SLEEP_PIPE)
             proc, command, command_name, auth = proc_queue.pop(0)
@@ -438,6 +470,7 @@ class SuiteRunner(Runner):
                     [self.popen.run_bg(*cmd), cmd, "rsync", auth])
 
         # Install ends
+        ## remove:obsolte
         ConfigDumper()(locs_conf, os.path.join("log", "rose-suite-run.locs"))
         if opts.install_only_mode:
             return
@@ -447,11 +480,13 @@ class SuiteRunner(Runner):
             return
 
         # Start the suite
+        ## remove:obsolte
         self.fs_util.chdir("log")
         self.suite_engine_proc.run(suite_name, opts.host, opts.run_mode, args)
 
         # Disconnect log file handle, so monitoring tool command will no longer
         # be associated with the log file.
+        ## remove:obsolte
         self.event_handler.contexts[uuid].handle.close()
         self.event_handler.contexts.pop(uuid)
 
