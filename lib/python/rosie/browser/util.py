@@ -327,7 +327,7 @@ class MenuBar(object):
         <menuitem action="Clear history"/>
       </menu>
       <menu action="Help">
-        <menuitem action="GUI Help"/>
+        <menuitem action="Documentation"/>
         <menuitem action="About"/>
       </menu>
     </menubar>
@@ -349,7 +349,7 @@ class MenuBar(object):
                       ('Clear history', gtk.STOCK_CLEAR,
                        rosie.browser.TOP_MENU_CLEAR_HISTORY),
                       ('Help', None, rosie.browser.TOP_MENU_HELP),
-                      ('GUI Help', gtk.STOCK_HELP,
+                      ('Documentation', gtk.STOCK_HELP,
                        rosie.browser.TOP_MENU_GUI_HELP,
                        rose.config_editor.ACCEL_HELP_GUI),
                       ('About', gtk.STOCK_DIALOG_INFO,
