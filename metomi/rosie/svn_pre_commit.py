@@ -188,10 +188,6 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 bad_changes.append(BadChange(status, path))
                 continue
 
-            # No need to check non-trunk changes  # Why?
-            # if len(names) > self.LEN_ID and names[self.LEN_ID] != "trunk":
-            #     continue
-
             # New suite should have an info file
             if status[0] == self.ST_ADDED and len(names) == self.LEN_ID:
                 if (self.ST_ADDED, path + "trunk/") not in changes:
@@ -204,6 +200,10 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                          path_trunk_info_file) not in changes):
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_INFO))
+                continue
+
+            # No need to check non-trunk changes  # Why?
+            if len(names) > self.LEN_ID and names[self.LEN_ID] != "trunk":
                 continue
 
             # The rest are trunk changes in a suite
