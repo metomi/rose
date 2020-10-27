@@ -275,7 +275,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                         break
             if sid not in rev_info_map:
                 rev_info_map[sid] = self._load_info(
-                    repos, sid, branch=branch, transaction=txn)
+                    repos, sid, branch=branch)
             owner, access_list = self._get_access_info(rev_info_map[sid])
             admin_users = super_users + [owner]
 

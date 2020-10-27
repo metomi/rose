@@ -74,7 +74,7 @@ class RosieSvnHook(object):
             allow_popen_err (bool): If True, return None if a RosePopenError
                 occurs during svnlook command.
         """
-        if branch is None:
+        if not branch:
             branch = self.TRUNK
         commit_opts = []
         # TODO: warn or raise if both supplied?
