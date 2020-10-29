@@ -160,8 +160,6 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
             names = path.split("/", self.LEN_ID + 1)
             tail = None
-            sid = "".join(names[0:self.LEN_ID])
-            branch = names[self.LEN_ID]
             if not names[-1]:
                 tail = names.pop()
 
@@ -175,21 +173,19 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 bad_changes.append(BadChange(status, path))
                 continue
 
-            # Can only add directories at levels above the suites
+            # At levels above the suites, can only add directories
             if len(names) < self.LEN_ID:
                 if status[0] != self.ST_ADDED:
                     bad_changes.append(BadChange(status, path))
                 continue
-            else:
-                is_meta_suite = "".join(names[0:self.LEN_ID]) == "ROSIE"
 
-            # A file at the branch level
+            # Cannot have a file at the branch level
             if len(names) == self.LEN_ID + 1 and tail is None:
                 bad_changes.append(BadChange(status, path))
                 continue
 
             # New suite should have an info file
-            if status[0] == self.ST_ADDED and len(names) == self.LEN_ID:
+            if len(names) == self.LEN_ID and status == self.ST_ADDED:
                 if (self.ST_ADDED, path + "trunk/") not in changes:
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_TRUNK))
@@ -202,13 +198,20 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                         BadChange(status, path, BadChange.NO_INFO))
                 continue
 
-            # No need to check non-trunk changes  # Why?
-            if len(names) > self.LEN_ID and names[self.LEN_ID] != "trunk":
-                continue
-
-            # The rest are trunk changes in a suite
+            sid = "".join(names[0:self.LEN_ID])
+            branch = names[self.LEN_ID] if len(names) > self.LEN_ID else None
             path_head = "/".join(sid) + "/"
             path_tail = path[len(path_head):]
+            is_meta_suite = (sid == "ROSIE")
+
+            if status != self.ST_DELETED:
+                # Check info file
+                if sid not in txn_info_map:
+                    txn_info_map[sid] = self._load_info(
+                        repos, sid, branch=branch, transaction=txn)
+            # No need to check other non-trunk changes (?)
+            if branch and branch != "trunk":
+                continue
 
             # For meta suite, make sure keys in keys file can be parsed
             if is_meta_suite and path_tail == self.TRUNK_KNOWN_KEYS_FILE:
@@ -222,7 +225,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
             # Suite trunk information file must have an owner
             # User IDs of owner and access list must be real
-            if (status not in self.ST_DELETED and
+            if (status != self.ST_DELETED and
                     path_tail == self.TRUNK_INFO_FILE):
                 if sid not in txn_info_map:
                     txn_info_map[sid] = self._load_info(
