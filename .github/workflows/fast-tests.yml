@@ -1,17 +1,22 @@
 name: check-build
 on: [push, pull_request]
 jobs:
-  check-style:
+  FastChecks:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup-Python
         uses: actions/setup-python@v1
-      - name: Install Pycodestyle
+      - name: Install Python Tools
         run: | 
           pip install pycodestyle
+          pip install pytest
+          pip install pytest-cov
+      - name: Install Rose
+        run: |
+          pip install -e .
       - name: Pycodestyle
         run: |
           pycodestyle
@@ -23,3 +28,6 @@ jobs:
       - name: Eslint
         run: |
           yarn run eslint .
+      - name: Run Pytests
+        run: |
+          pytest --cov-append metomi/rose/tests/*
