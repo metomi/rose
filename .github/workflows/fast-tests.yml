@@ -9,8 +9,17 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup-Python
         uses: actions/setup-python@v1
-      - name: Setup-Python-Extras
+      - name: Install Pycodestyle
         run: | 
           pip install pycodestyle
       - name: Pycodestyle
-        run: pycodestyle
+        run: |
+          pycodestyle
+      - name: Install eslint
+        run: |
+          yarn
+          yarn add eslint
+          yarn run eslint --init
+      - name: Eslint
+        run: |
+          yarn run eslint .
