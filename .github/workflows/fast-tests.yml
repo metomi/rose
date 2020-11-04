@@ -1,9 +1,9 @@
 name: Fast-Checks
 on: [pull_request]
 jobs:
-  FastChecks:
+  Linting:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 2
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -12,11 +12,6 @@ jobs:
       - name: Install Python Tools
         run: | 
           pip install pycodestyle
-          pip install pytest
-          pip install pytest-cov
-      - name: Install Rose
-        run: |
-          pip install -e .
       - name: Pycodestyle
         run: |
           pycodestyle
@@ -28,6 +23,22 @@ jobs:
       - name: Eslint
         run: |
           yarn run eslint .
-      - name: Rose Unit Tests
-        run: |
-          pytest --cov-append metomi/rose/tests/*
+
+  UnitTests:
+      runs-on: ubuntu-latest
+      timeout-minutes: 2
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+        - name: Setup-Python
+          uses: actions/setup-python@v1
+        - name: Install Python Tools
+          run: | 
+            pip install pytest
+            pip install pytest-cov
+        - name: Install Rose
+          run: |
+            pip install -e .
+        - name: Rose Unit Tests
+          run: |
+            pytest --cov-append metomi/rose/tests/*
