@@ -18,13 +18,6 @@ after_failure:
 
 jobs:
   include:
-    - name: "Unit Tests"
-      install:
-        - now install coverage linters pytest cylc rose
-      script:
-        - now test style
-        - now test units
-
     - name: "Test Battery"
       before_install:
         - export PATH="$PWD/.travis:$PATH"
