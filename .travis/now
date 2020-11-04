@@ -86,7 +86,7 @@ _install_rose () {
 }
 
 _install_cylc () {
-    APT+=(at heirloom-mailx)
+    APT+=(at)
 }
 
 _install_fcm () {
