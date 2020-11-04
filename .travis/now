@@ -86,7 +86,7 @@ _install_rose () {
 }
 
 _install_cylc () {
-    APT+=(at heirloom-mailx)
+    APT+=(at)
 }
 
 _install_fcm () {
@@ -128,7 +128,7 @@ _join () {
 _install_linters () {
     APT+=(shellcheck)
     PIP+=(pycodestyle)
-    NPM+=(eslint)
+    NPM+=(eslint@6)
 }
 
 _path_for () {
