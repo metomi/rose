@@ -75,6 +75,7 @@ _gh_extract () {  # extract project from GitHub to $HOME
 }
 
 _install_coverage () {
+    APT+=(nodejs)
     PIP+=(coverage pytest-cov)
     PY_PATH+=("${TRAVIS_BUILD_DIR}/.travis")
 }
