@@ -1,9 +1,9 @@
-name: check-build
-on: [push, pull_request]
+name: Fast-Checks
+on: [pull_request]
 jobs:
   FastChecks:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 3
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -28,6 +28,6 @@ jobs:
       - name: Eslint
         run: |
           yarn run eslint .
-      - name: Run Pytests
+      - name: Rose Unit Tests
         run: |
           pytest --cov-append metomi/rose/tests/*
