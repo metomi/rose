@@ -209,6 +209,15 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 if sid not in txn_info_map:
                     txn_info_map[sid] = self._load_info(
                         repos, sid, branch=branch, transaction=txn)
+
+                # Suite must have an owner
+                txn_owner, txn_access_list = self._get_access_info(
+                    txn_info_map[sid])
+                if not txn_owner:
+                    bad_changes.append(
+                        BadChange(status, path, BadChange.NO_OWNER))
+                    continue
+
             # No need to check other non-trunk changes (?)
             if branch and branch != "trunk":
                 continue
@@ -223,7 +232,6 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                         BadChange(status, path, BadChange.VALUE))
                     continue
 
-            # Suite trunk information file must have an owner
             # User IDs of owner and access list must be real
             if (status != self.ST_DELETED and
                     path_tail == self.TRUNK_INFO_FILE):
@@ -232,10 +240,6 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                         repos, sid, branch=branch, transaction=txn)
                 txn_owner, txn_access_list = self._get_access_info(
                     txn_info_map[sid])
-                if not txn_owner:
-                    bad_changes.append(
-                        BadChange(status, path, BadChange.NO_OWNER))
-                    continue
                 if self._verify_users(
                         status, path, txn_owner, txn_access_list, bad_changes):
                     continue
@@ -296,16 +300,6 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                     continue
             else:
                 bad_changes.append(BadChange(status, path))
-                continue
-
-            # The owner must not be deleted
-            if sid not in txn_info_map:
-                txn_info_map[sid] = self._load_info(
-                    repos, sid, branch=branch, transaction=txn)
-            txn_owner, txn_access_list = self._get_access_info(
-                txn_info_map[sid])
-            if not txn_owner:
-                bad_changes.append(BadChange(status, path, BadChange.NO_OWNER))
                 continue
 
             # Only the admin users can change owner and access list
