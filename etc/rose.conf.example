@@ -191,8 +191,8 @@ group{NAME}=GROUP/HOST ...
 method{NAME}=METHOD[:METHOD-ARG]
 # Declare the default threshold(s) for a group of hosts e.g::
 #
-#   thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
-#   thresholds{linux}=mem:8000
+#    thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
+#    thresholds{linux}=mem:8000
 #
 # For detail on the methods see :ref:`command-rose-host-select`.
 thresholds{NAME}=[METHOD[:METHOD-ARG]:]VALUE ...
@@ -221,7 +221,7 @@ rose-bush=URL
 [rose-mpi-launch]
 # Specify a list of launcher commands e.g::
 #
-#   launcher-list=poe mpiexec
+#    launcher-list=poe mpiexec
 launcher-list=LAUNCHER ...
 # Specify the options to a ``LAUNCHER`` for launching with a command file.
 # The template string should contain ``$ROSE_COMMAND_FILE`` (or
@@ -235,7 +235,7 @@ launcher-fileopts.LAUNCHER=OPTION-TEMPLATE
 # ``preopts`` are options placed after the launcher command but before
 # ``COMMAND``. E.g::
 #
-#   launcher-preopts.mpiexec=-n $NPROC
+#    launcher-preopts.mpiexec=-n $NPROC
 launcher-preopts.LAUNCHER=OPTIONS-TEMPLATE
 # Specify the options to a ``LAUNCHER`` for launching with a command.
 # ``postopts`` are options placed after ``COMMAND`` but before the
@@ -296,7 +296,7 @@ root-dir=HOST-GLOB=$HOST-DIR
 # .. warning::
 #
 #    If a suite has previously been run changes to any of the ``root-dir``
-#    settings will take effect on the next clean re-installation i.e::
+#    settings will take effect on the next clean re-installation i.e:
 #
 #       $ rose suite-run --new
 root-dir{share}=HOST-GLOB=$HOST-DIR
