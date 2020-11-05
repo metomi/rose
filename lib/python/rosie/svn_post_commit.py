@@ -350,11 +350,13 @@ class RosieSvnPostCommitHook(RosieSvnHook):
 
     def _update_info_db(self, dao, changeset_attribs, branch_attribs):
         """Update the suite info database for a suite branch."""
-        idx = changeset_attribs["prefix"] + "-" + branch_attribs["sid"]
+        idx = "{0}-{1}".format(
+            changeset_attribs["prefix"], branch_attribs["sid"])
         vc_attrs = {
             "idx": idx,
             "branch": branch_attribs["branch"],
-            "revision": changeset_attribs["revision"]}
+            "revision": changeset_attribs["revision"]
+        }
         for key in vc_attrs:
             vc_attrs[key] = vc_attrs[key].decode("utf-8")
         # Latest table
@@ -382,8 +384,8 @@ class RosieSvnPostCommitHook(RosieSvnHook):
             cols[name] = branch_attribs[info_key].get_value([name])
         if branch_attribs["from_path"] and vc_attrs["branch"] == u"trunk":
             from_names = branch_attribs["from_path"].split("/")[:self.LEN_ID]
-            cols["from_idx"] = (
-                changeset_attribs["prefix"] + "-" + "".join(from_names))
+            cols["from_idx"] = "{0}-{1}".format(
+                changeset_attribs["prefix"], "".join(from_names))
         cols["status"] = (
             branch_attribs["status"] + branch_attribs["status_info_file"])
         for key in cols:
@@ -401,7 +403,9 @@ class RosieSvnPostCommitHook(RosieSvnHook):
                 continue
             cols = dict(vc_attrs)
             cols.update({
-                "name": name.decode("utf-8"), "value": value.decode("utf-8")})
+                "name": name.decode("utf-8"),
+                "value": value.decode("utf-8")
+            })
             dao.insert(OPTIONAL_TABLE_NAME, **cols)
 
     def _update_known_keys(self, dao, changeset_attribs):
