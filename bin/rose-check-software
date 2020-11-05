@@ -317,8 +317,8 @@ def tutorial(check=check):
 def docs(check=check):
     """Check software dependencies for the documentation builder."""
     ret = check_all('Documentation Builder', [
-        check('graphviz-dot <dot>', command_template='-V',
-               version_template='graphviz version ([^\s]+)', outfile=2),
+        # check('graphviz-dot <dot>', command_template='-V',
+        #        version_template='graphviz version ([^\s]+)', outfile=2),
         check('py:sphinx', (1, 5, 3)),
         check('py:sphinx_rtd_theme', (0, 2, 4)),
         check('py:sphinxcontrib.httpdomain'),

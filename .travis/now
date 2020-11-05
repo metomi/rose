@@ -76,13 +76,13 @@ _gh_extract () {  # extract project from GitHub to $HOME
 
 _install_coverage () {
     PIP+=(coverage pytest-cov)
-    PY_PATH+=("${TRAVIS_BUILD_DIR}/.travis")
+    PY_PATH+=("./.travis")
 }
 
 _install_rose () {
     pip install -e .
-    PY_PATH+=("${TRAVIS_BUILD_DIR}/metomi")
-    RC_PATH+=("${TRAVIS_BUILD_DIR}/bin")
+    PY_PATH+=("./metomi")
+    RC_PATH+=("./bin")
 }
 
 _install_cylc () {
@@ -147,7 +147,7 @@ _test_style () {
 }
 
 _test_battery () {
-    cp "${TRAVIS_BUILD_DIR}/.travis/sitecustomize.py" ./lib/python
+    cp "./.travis/sitecustomize.py" ./lib/python
     coverage run .travis/cover.py
 }
 
@@ -209,7 +209,7 @@ install () {
         <<<"export PYTHONPATH=\"$(_join ':' "${PY_PATH[@]}"):\$PYTHONPATH\";"
 
     # rose_init_site
-    cat >"${TRAVIS_BUILD_DIR}/lib/bash/rose_init_site" \
+    cat >"./lib/bash/rose_init_site" \
         <<<"
             if [[ -z \${HOME+x} ]]; then
                 export PATH=\"$(_join ':' "${RI_PATH[@]}"):\${PATH:-}\";
@@ -240,7 +240,7 @@ report () {
 
 test () {
     PS1='$' . "${HOME}/.bashrc"
-    export COVERAGE_PROCESS_START="${TRAVIS_BUILD_DIR}/.coveragerc"
+    export COVERAGE_PROCESS_START="./.coveragerc"
     for arg in "$@"; do
         "_test_${arg}"
     done
