@@ -262,6 +262,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 continue
 
             # Can only remove trunk with suite
+            # (Don't allow replacing trunk with a copy from elsewhere, either)
             if status == self.ST_DELETED and path_tail == "trunk/":
                 if (self.ST_DELETED, path_head) not in changes:
                     bad_changes.append(

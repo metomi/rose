@@ -351,11 +351,13 @@ class RosieSvnPostCommitHook(RosieSvnHook):
 
     def _update_info_db(self, dao, changeset_attribs, branch_attribs):
         """Update the suite info database for a suite branch."""
-        idx = changeset_attribs["prefix"] + "-" + branch_attribs["sid"]
+        idx = "{0}-{1}".format(
+            changeset_attribs["prefix"], branch_attribs["sid"])
         vc_attrs = {
             "idx": idx,
             "branch": branch_attribs["branch"],
-            "revision": changeset_attribs["revision"]}
+            "revision": changeset_attribs["revision"]
+        }
         # Latest table
         try:
             dao.delete(
@@ -381,8 +383,8 @@ class RosieSvnPostCommitHook(RosieSvnHook):
             cols[name] = branch_attribs[info_key].get_value([name])
         if branch_attribs["from_path"] and vc_attrs["branch"] == "trunk":
             from_names = branch_attribs["from_path"].split("/")[:self.LEN_ID]
-            cols["from_idx"] = (
-                changeset_attribs["prefix"] + "-" + "".join(from_names))
+            cols["from_idx"] = "{0}-{1}".format(
+                changeset_attribs["prefix"], "".join(from_names))
         cols["status"] = (
             branch_attribs["status"] + branch_attribs["status_info_file"])
         dao.insert(MAIN_TABLE_NAME, **cols)
