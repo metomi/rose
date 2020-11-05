@@ -10,8 +10,8 @@
           :start-line: 1
 
 .. _Cylc: https://cylc.github.io/
-.. _Cylc User Guide: https://cylc.github.io/documentation.html#the-cylc-user-guide
-.. _Cylc Suite Design Guide: https://cylc.github.io/doc/built-sphinx/suite-design-guide/suite-design-guide-master.html
+.. _Cylc User Guide: https://cylc.github.io/documentation/#the-cylc-user-guide
+.. _Cylc Suite Design Guide: https://cylc.github.io/doc/built-sphinx/suite-design-guide/suite-design-guide-master.html#suite-design-guide
 .. _EmPy: http://www.alcyone.com/software/empy/
 .. _extglob pattern matching: https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching
 .. _FCM: https://metomi.github.io/fcm/doc/
