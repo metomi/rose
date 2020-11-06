@@ -22,4 +22,3 @@ This section goes into detail in additional Rose topics.
    trigger
    upgrading
    upgrading-macro-development
-   widget-development
