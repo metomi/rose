@@ -358,7 +358,7 @@ class RosieSvnPostCommitHook(RosieSvnHook):
             "revision": changeset_attribs["revision"]
         }
         for key in vc_attrs:
-            vc_attrs[key] = vc_attrs[key].decode("utf-8")
+            vc_attrs[key] = self._decode_to_unicode(vc_attrs[key])
         # Latest table
         try:
             dao.delete(
@@ -390,7 +390,7 @@ class RosieSvnPostCommitHook(RosieSvnHook):
             branch_attribs["status"] + branch_attribs["status_info_file"])
         for key in cols:
             try:
-                cols[key] = cols[key].decode("utf-8")
+                cols[key] = self._decode_to_unicode(cols[key])
             except AttributeError:
                 pass
         dao.insert(MAIN_TABLE_NAME, **cols)
@@ -403,8 +403,8 @@ class RosieSvnPostCommitHook(RosieSvnHook):
                 continue
             cols = dict(vc_attrs)
             cols.update({
-                "name": name.decode("utf-8"),
-                "value": value.decode("utf-8")
+                "name": self._decode_to_unicode(name),
+                "value": self._decode_to_unicode(value)
             })
             dao.insert(OPTIONAL_TABLE_NAME, **cols)
 
@@ -414,7 +414,7 @@ class RosieSvnPostCommitHook(RosieSvnHook):
         revision = changeset_attribs["revision"]
         keys_str = self._svnlook(
             "cat", "-r", revision, repos, self.KNOWN_KEYS_FILE_PATH)
-        keys_str = " ".join(shlex.split(keys_str)).decode("utf-8")
+        keys_str = self._decode_to_unicode(" ".join(shlex.split(keys_str)))
         if keys_str:
             try:
                 dao.insert(META_TABLE_NAME, name=u"known_keys", value=keys_str)
@@ -422,6 +422,16 @@ class RosieSvnPostCommitHook(RosieSvnHook):
                 dao.update(
                     META_TABLE_NAME, (u"name",),
                     name=u"known_keys", value=keys_str)
+
+    @staticmethod
+    def _decode_to_unicode(string):
+        err_msgs = []
+        for codec in ["utf-8", "latin-1"]:  # Note: must try UTF-8 first
+            try:
+                return string.decode(codec)
+            except UnicodeDecodeError as exc:
+                err_msgs.append(str(exc))
+        raise ValueError(". ".join(err_msgs))
 
 
 def main():
