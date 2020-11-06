@@ -391,7 +391,7 @@ Configuration
 
       .. rose:conf:: update-check=mtime+size|md5|sha1|...
 
-         .. _hashlib: https://docs.python.org/2/library/hashlib.html
+         .. _hashlib: https://docs.python.org/3/library/hashlib.html
 
          Specify the method for checking whether a source has changed
          since the previous run. If the value is mtime+size, the

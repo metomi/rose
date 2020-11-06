@@ -1,4 +1,3 @@
-.. _Jinja2 Tutorial: http://jinja.pocoo.org/docs
 .. _shebang: https://en.wikipedia.org/wiki/Shebang_(Unix)
 
 
@@ -67,7 +66,7 @@ top of the file:
 
    #!Jinja2
 
-For more information see the `Jinja2 Tutorial`_.
+For more information see the `Jinja2 Tutorial <Jinja2>`_.
 
 
 Example

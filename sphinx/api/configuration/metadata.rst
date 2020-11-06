@@ -2,7 +2,7 @@
    :start-line: 1
 
 .. _floating point: https://docs.python.org/3/library/stdtypes.html#typesnumeric
-.. _cast: https://docs.python.org/2/library/ast.html#ast.literal_eval
+.. _cast: https://docs.python.org/3/library/ast.html#ast.literal_eval
 .. _Python in operator: https://docs.python.org/3/reference/expressions.html#membership-test-operations
 
 .. _Metadata:

@@ -251,7 +251,7 @@ Glossary
       * `International Organisation For Standardisation
         <https://www.iso.org/iso-8601-date-and-time-format.html>`_
       * `a summary of the international standard date and time notation
-        <http://www.cl.cam.ac.uk/%7Emgk25/iso-time.html>`_
+        <https://www.cl.cam.ac.uk/~mgk25/iso-time.html>`_
 
    ISO8601 datetime
       A date-time written in the ISO8601

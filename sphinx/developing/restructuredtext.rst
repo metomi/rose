@@ -2,8 +2,7 @@ reStructuredText
 ================
 
 
-.. _reStructuredText Markup Specification: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
-.. _Sphinx Markup Documentation: http://www.sphinx-doc.org/en/stable/rest.html
+.. _reStructuredText Markup Specification: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 
 
 Reference
@@ -12,7 +11,6 @@ Reference
 For reference material see:
 
 * `reStructuredText Markup Specification`_
-* `Sphinx Markup Documentation`_
 
 
 Headings
