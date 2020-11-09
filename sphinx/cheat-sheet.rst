@@ -4,8 +4,8 @@ Cheat Sheet
 ===========
 
 This page outlines how to perform suite operations for "pure" :term:`Cylc
-suites <Cylc suite>` (*the Cylc way*) and those using :term:`Rose suite
-configurations <rose suite configuration>` (*the Rose way*).
+suites <Cylc suite>` (*the Cylc way*) and those using
+:term:`Rose suite configurations <Rose suite configuration>` (*the Rose way*).
 
 .. Use the "sub" lexer as the default for this file.
 
@@ -153,7 +153,7 @@ Visualise A Running Suite
 
    cylc gui <name>
 
-Visualise A Suite's :term:`Graph`
+Visualise A Suite's :term:`graph`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
