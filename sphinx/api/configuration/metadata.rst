@@ -1198,7 +1198,7 @@ The following *membership* operator is supported:
    not in # not contained in, i.e. the opposite to that described above
 
 .. tip::
-   The ``in`` operator functions `as it does in Python <Python in operator>`_.
+   The ``in`` operator functions as it does in Python `Python in operator`_.
    Note the difference between testing if a setting's value is equal to some
    possibility contained within a collection, for example as in:
 
