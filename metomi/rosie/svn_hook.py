@@ -20,7 +20,7 @@
 
 import os
 import sys
-import metomi.rose
+from metomi.rose.config import ConfigLoader
 from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
 from tempfile import TemporaryFile
@@ -94,6 +94,6 @@ class RosieSvnHook(object):
                 return None
             raise err
         t_handle.seek(0)
-        config_node = metomi.rose.config.load(t_handle)
+        config_node = ConfigLoader(allow_sections=False)(t_handle)
         t_handle.close()
         return config_node
