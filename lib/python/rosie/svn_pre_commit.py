@@ -33,6 +33,8 @@ from rose.macros import DefaultValidators
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
+from rose.config import ConfigSyntaxError
+from rose.popen import RosePopenError
 from rosie.svn_hook import RosieSvnHook
 import shlex
 import sys
@@ -76,6 +78,28 @@ class BadChanges(Exception):
     def __str__(self):
         bad_changes = self.args[0]
         return "\n".join([str(bad_change) for bad_change in bad_changes])
+
+
+class InfoFileError(BadChange):
+
+    """Error representing a bad or missing info file.
+
+    Args:
+        reason (str): a user-friendly message.
+        exception (Exception): the exception encountered in loading the
+            bad info file.
+    """
+
+    VALUE = "BAD VALUE IN '{0}'".format(RosieSvnHook.INFO_FILE)
+
+    def __init__(self, reason=BadChange.PERM, exception=None):
+        self.reason = reason
+        self.exc = exception
+
+    def __str__(self):
+        if self.exc:
+            return "{0}: {1}".format(self.reason, self.exc)
+        return self.reason
 
 
 class RosieSvnPreCommitHook(RosieSvnHook):
@@ -205,16 +229,26 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             if status != self.ST_DELETED:
                 # Check info file
                 if sid not in txn_info_map:
-                    txn_info_map[sid] = self._load_info(
-                        repos, sid, branch=branch, transaction=txn)
+                    try:
+                        txn_info_map[sid] = self._load_info(
+                            repos, sid, branch=branch, transaction=txn)
+                        err = None
+                    except ConfigSyntaxError as exc:
+                        err = InfoFileError(InfoFileError.VALUE, exc)
+                    except RosePopenError as exc:
+                        err = InfoFileError(InfoFileError.NO_INFO, exc)
+                    if err:
+                        bad_changes.append(err)
+                        txn_info_map[sid] = err
+                        continue
 
-                # Suite must have an owner
-                txn_owner, txn_access_list = self._get_access_info(
-                    txn_info_map[sid])
-                if not txn_owner:
-                    bad_changes.append(
-                        BadChange(status, path, BadChange.NO_OWNER))
-                    continue
+                    # Suite must have an owner
+                    txn_owner, txn_access_list = self._get_access_info(
+                        txn_info_map[sid])
+                    if not txn_owner:
+                        bad_changes.append(
+                            BadChange(status, path, BadChange.NO_OWNER))
+                        continue
 
             # No need to check other non-trunk changes (?)
             if branch and branch != "trunk":
@@ -232,10 +266,8 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
             # User IDs of owner and access list must be real
             if (status != self.ST_DELETED and
-                    path_tail == self.TRUNK_INFO_FILE):
-                if sid not in txn_info_map:
-                    txn_info_map[sid] = self._load_info(
-                        repos, sid, branch=branch, transaction=txn)
+                    path_tail == self.TRUNK_INFO_FILE and
+                    not isinstance(txn_info_map[sid], InfoFileError)):
                 txn_owner, txn_access_list = self._get_access_info(
                     txn_info_map[sid])
                 if self._verify_users(
