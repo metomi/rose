@@ -1166,7 +1166,8 @@ class ConfigLoader(object):
     TYPE_OPTION = "TYPE_OPTION"
     UNKNOWN_NAME = "<???>"
 
-    def __init__(self, char_assign=CHAR_ASSIGN, char_comment=CHAR_COMMENT):
+    def __init__(self, char_assign=CHAR_ASSIGN, char_comment=CHAR_COMMENT,
+                 allow_sections=True):
         """Initialise the configuration utility.
 
         Arguments:
@@ -1178,6 +1179,7 @@ class ConfigLoader(object):
         """
         self.char_assign = char_assign
         self.char_comment = char_comment
+        self.allow_sections = allow_sections
         self.re_option = re.compile(
             r"^(?P<state>!?!?)(?P<option>[^\s" +
             char_assign + r"]+)\s*" +
@@ -1375,41 +1377,46 @@ class ConfigLoader(object):
                     value_cont = value_cont[1:]
                 node.set(keys[:], value + "\n" + value_cont)
                 continue
-            # Match a section header?
-            match = self.RE_SECTION.match(line)
-            if match:
-                head, section, state = match.group("head", "section", "state")
-                bad_index = self._check_section_value(section)
-                if bad_index > -1:
-                    raise ConfigSyntaxError(
-                        ConfigSyntaxError.BAD_CHAR,
-                        file_name, line_num, len(head) + bad_index, line)
-                # Find position under root node
-                if type_ == self.TYPE_OPTION:
-                    keys.pop()
-                if keys:
-                    keys.pop()
-                section = section.strip()
-                if section:
-                    keys.append(section)
-                    type_ = self.TYPE_SECTION
-                else:
-                    keys = []
-                    type_ = None
-                section_node = node.get(keys[:])
-                if section_node is None:
-                    node.set(keys[:], {}, state, comments)
-                else:
-                    section_node.state = state
-                    if comments:
-                        section_node.comments += comments
-                comments = []
-                continue
+            if self.allow_sections:
+                # Match a section header?
+                match = self.RE_SECTION.match(line)
+                if match:
+                    head, section, state = match.group(
+                        "head", "section", "state")
+                    bad_index = self._check_section_value(section)
+                    if bad_index > -1:
+                        raise ConfigSyntaxError(
+                            ConfigSyntaxError.BAD_CHAR,
+                            file_name, line_num, len(head) + bad_index, line)
+                    # Find position under root node
+                    if type_ == self.TYPE_OPTION:
+                        keys.pop()
+                    if keys:
+                        keys.pop()
+                    section = section.strip()
+                    if section:
+                        keys.append(section)
+                        type_ = self.TYPE_SECTION
+                    else:
+                        keys = []
+                        type_ = None
+                    section_node = node.get(keys[:])
+                    if section_node is None:
+                        node.set(keys[:], {}, state, comments)
+                    else:
+                        section_node.state = state
+                        if comments:
+                            section_node.comments += comments
+                    comments = []
+                    continue
             # Match the start of an option setting?
             match = self.re_option.match(line)
             if not match:
-                raise ConfigSyntaxError(
-                    ConfigSyntaxError.BAD_SYNTAX, file_name, line_num, 0, line)
+                if self.allow_sections:
+                    err = ConfigSyntaxError.BAD_SYNTAX
+                else:
+                    err = ConfigSyntaxError.BAD_SYNTAX_NO_SECTIONS
+                raise ConfigSyntaxError(err, file_name, line_num, 0, line)
             option, value, state = match.group("option", "value", "state")
             if type_ == self.TYPE_OPTION:
                 keys.pop()
@@ -1533,10 +1540,12 @@ class ConfigSyntaxError(Exception):
 
     BAD_CHAR = "BAD_CHAR"
     BAD_SYNTAX = "BAD_SYNTAX"
+    BAD_SYNTAX_NO_SECTIONS = "BAD_SYNTAX_NO_SECTIONS"
 
     MESSAGES = {
         BAD_CHAR: """unexpected character or end of value""",
         BAD_SYNTAX: '''expecting "[SECTION]" or "KEY=VALUE"''',
+        BAD_SYNTAX_NO_SECTIONS: '''expecting "KEY=VALUE"'''
     }
 
     def __init__(self, code, file_name, line_num, col_num, line):

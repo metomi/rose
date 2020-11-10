@@ -20,7 +20,7 @@
 
 import os
 import sys
-import rose
+from rose.config import ConfigLoader
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from tempfile import TemporaryFile
@@ -92,6 +92,6 @@ class RosieSvnHook(object):
                 return None
             raise err
         t_handle.seek(0)
-        config_node = rose.config.load(t_handle)
+        config_node = ConfigLoader(allow_sections=False)(t_handle)
         t_handle.close()
         return config_node
