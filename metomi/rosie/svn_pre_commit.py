@@ -51,7 +51,7 @@ class BadChange(Exception):
     FMT_TAIL_1 = ": %s"
     FMT_TAIL_M = ":\n%s"
     NO_INFO = "SUITE MUST HAVE INFO FILE"
-    NO_OWNER = "SUITE MUST HAVE OWNER"
+    NO_OWNER = "SUITE MUST HAVE OWNER SPECIFIED IN INFO FILE"
     NO_TRUNK = "SUITE MUST HAVE TRUNK"
     PERM = "PERMISSION DENIED"
     USER = "NO SUCH USER"
@@ -238,7 +238,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                     except ConfigSyntaxError as exc:
                         err = InfoFileError(InfoFileError.VALUE, exc)
                     except RosePopenError as exc:
-                        err = InfoFileError(InfoFileError.NO_INFO, exc)
+                        err = InfoFileError(InfoFileError.NO_INFO, exc.stderr)
                     if err:
                         bad_changes.append(err)
                         txn_info_map[sid] = err
@@ -249,7 +249,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                         txn_info_map[sid])
                     if not txn_owner:
                         bad_changes.append(
-                            BadChange(status, path, BadChange.NO_OWNER))
+                            InfoFileError(InfoFileError.NO_OWNER))
                         continue
 
             # No need to check other non-trunk changes (?)
