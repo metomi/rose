@@ -62,7 +62,7 @@ Rosie.query = function() {
         }
         q += "q=" + filter_list.join("+");
     });
-    if ($("#query-all").attr("checked")) {
+    if ($("#query-all").prop("checked")) {
         q += "&all_revs=1"
     }
     if (q_open_groups != 0) {
