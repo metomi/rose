@@ -221,6 +221,7 @@ class RosieSvnPostCommitHook(RosieSvnHook):
                     branch_attribs["info"] = self._load_info(
                         repos, sid, branch, revision=revision,
                         allow_popen_err=True)
+                    # Note: if (allowed) popen err, no DB entry will be created
                 if (branch_attribs["old_info"] is None and
                         branch_attribs["status"] == self.ST_DELETED):
                     branch_attribs["old_info"] = self._load_info(
@@ -380,7 +381,7 @@ class RosieSvnPostCommitHook(RosieSvnHook):
             "author": changeset_attribs["author"],
             "date": changeset_attribs["date"]})
         for name in ["owner", "project", "title"]:
-            cols[name] = branch_attribs[info_key].get_value([name])
+            cols[name] = branch_attribs[info_key].get_value([name], "null")
         if branch_attribs["from_path"] and vc_attrs["branch"] == "trunk":
             from_names = branch_attribs["from_path"].split("/")[:self.LEN_ID]
             cols["from_idx"] = "{0}-{1}".format(
