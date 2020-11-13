@@ -34,7 +34,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
-from rosie.svn_hook import RosieSvnHook
+from rosie.svn_hook import RosieSvnHook, InfoFileError
 from rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 import shlex
@@ -194,9 +194,12 @@ class RosieSvnPostCommitHook(RosieSvnHook):
                 if tail == self.INFO_FILE:
                     # Suite info file change
                     if branch_attribs["info"] is None:
-                        branch_attribs["info"] = self._load_info(
-                            repos, sid, branch, revision=revision,
-                            allow_popen_err=True)
+                        try:
+                            branch_attribs["info"] = self._load_info(
+                                repos, sid, branch, revision=revision,
+                                allow_popen_err=True)
+                        except rose.config.ConfigSyntaxError as exc:
+                            raise InfoFileError(InfoFileError.VALUE, exc)
                     if path_status != self.ST_ADDED:
                         branch_attribs["old_info"] = self._load_info(
                             repos, sid, branch, revision=int(revision)-1,
@@ -217,9 +220,12 @@ class RosieSvnPostCommitHook(RosieSvnHook):
                     branch_attribs["status"] = path_status
                 # Load suite info and old info regardless
                 if branch_attribs["info"] is None:
-                    branch_attribs["info"] = self._load_info(
-                        repos, sid, branch, revision=revision,
-                        allow_popen_err=True)
+                    try:
+                        branch_attribs["info"] = self._load_info(
+                            repos, sid, branch, revision=revision,
+                            allow_popen_err=True)
+                    except rose.config.ConfigSyntaxError as exc:
+                        raise InfoFileError(InfoFileError.VALUE, exc)
                     # Note: if (allowed) popen err, no DB entry will be created
                 if (branch_attribs["old_info"] is None and
                         branch_attribs["status"] == self.ST_DELETED):
