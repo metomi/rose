@@ -22,4 +22,4 @@
 .. _Python: https://www.python.org/
 .. _Python Regular Expressions: https://docs.python.org/3/library/re.html#regular-expression-syntax
 .. _SRS: https://code.metoffice.gov.uk/auth/UI/Login?realm=mo-realm-1&goto=https%3A%2F%2Fcode.metoffice.gov.uk%2Ftrac%2Fhome
-.. _SVN: https://subversion.apache.org/
+.. _SVN: http://subversion.apache.org/

@@ -57,7 +57,7 @@ using `FCM`_.
 
 .. ifnotslides::
 
-   FCM is a `subversion <SVN>`_ (SVN) wrapper which provides a standard working
+   FCM is a `SVN`_ (Subversion) wrapper which provides a standard working
    practice for SVN projects. FCM implements all of the SVN commands as well as
    additional functionality. See the `FCM User Guide`_ for more information.
 

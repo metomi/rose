@@ -7,8 +7,8 @@ generating API documentation from source code.
 Writing Docstrings
 ------------------
 
-.. _Google Docstrings: https://google.github.io/styleguide/pyguide.html?showone=Comments#Comments
-.. _Numpy Docstrings: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
+.. _Google Docstrings: https://google.github.io/styleguide/pyguide.html
+.. _Numpy Docstrings: https://numpydoc.readthedocs.io/en/latest/format.html
 .. _Napoleon Google Example: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 .. _Napoleon Numpy Example: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html
 
@@ -17,8 +17,8 @@ allowing them to be written in plain text as opposed to reStructuredText.
 
 Napoleon accepts docstrings in one of two formats:
 
-* `Google <Google Docstrings>`_  - `Napoleon Google Example`_
-* `Numpy <Numpy Docstrings>`_  - `Napoleon Numpy Example`_
+* Google
+* Numpy
 
 For Rose docstrings please stick to the **Google** convention.
 Some quick examples:
