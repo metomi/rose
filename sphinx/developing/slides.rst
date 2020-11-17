@@ -1,4 +1,4 @@
-.. _Hieroglyph: http://docs.hieroglyph.io/en/latest/
+.. _Hieroglyph: https://hieroglyph.readthedocs.io/en/latest/
 
 
 Slides

@@ -252,7 +252,7 @@ In the above example a regular expression 'reg exp' was used by the
 
 .. note::
 
-   .. _Python flavor: https://docs.python.org/2/howto/regex.html
+   .. _Python flavor: https://docs.python.org/3/howto/regex.html
 
    ``rose arch`` uses the `Python flavor`_ for regular expressions.
 

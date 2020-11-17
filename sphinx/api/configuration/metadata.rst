@@ -2,7 +2,7 @@
    :start-line: 1
 
 .. _floating point: https://docs.python.org/3/library/stdtypes.html#typesnumeric
-.. _cast: https://docs.python.org/2/library/ast.html#ast.literal_eval
+.. _cast: https://docs.python.org/3/library/ast.html#ast.literal_eval
 .. _Python in operator: https://docs.python.org/3/reference/expressions.html#membership-test-operations
 
 .. _Metadata:
@@ -19,7 +19,7 @@ It is represented in a directory with the following:
 * Other files, e.g.:
 
   * ``lib/python/widget/my_widget.py`` would be the location of a
-    :ref:`custom widget <widget-dev>`.
+    custom widget.
   * ``lib/python/macros/my_macro_validator.py`` would be the location of a
     :ref:`custom macro <macro-dev>`.
   * ``etc/`` would contain any resources for the logics in ``lib/python/``,
@@ -778,7 +778,7 @@ The metadata options for a configuration fall into four categories:
             widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
 
          Another useful Rose built-in widget to use is the array element
-         aligning :ref:`page widget <conf-ed-cust-pages>`,
+         aligning page widget,
          ``rose.config_editor.pagewidget.table.PageArrayTable``. You can set
          this for a section or namespace to make sure each *n*-th variable value
          element lines up horizontally. For example:
@@ -1198,7 +1198,7 @@ The following *membership* operator is supported:
    not in # not contained in, i.e. the opposite to that described above
 
 .. tip::
-   The ``in`` operator functions `as it does in Python <Python in operator>`_.
+   The ``in`` operator functions as it does in Python `Python in operator`_.
    Note the difference between testing if a setting's value is equal to some
    possibility contained within a collection, for example as in:
 

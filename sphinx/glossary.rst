@@ -251,7 +251,7 @@ Glossary
       * `International Organisation For Standardisation
         <https://www.iso.org/iso-8601-date-and-time-format.html>`_
       * `a summary of the international standard date and time notation
-        <http://www.cl.cam.ac.uk/%7Emgk25/iso-time.html>`_
+        <https://www.cl.cam.ac.uk/~mgk25/iso-time.html>`_
 
    ISO8601 datetime
       A date-time written in the ISO8601
@@ -627,15 +627,15 @@ Glossary
 
       * :ref:`Restarting Suites`
       * :term:`start`
-      * :term:`Stop`
-      * :term:`Reload`
+      * :term:`stop`
+      * :term:`reload`
 
    reload
       Any changes made to the ``suite.rc`` file whilst the suite is running
       will not have any effect until the suite is either:
       
-      * :term:`Shutdown` and :term:`rerun <start>`
-      * :term:`Shutdown` and :term:`restarted <restart>`
+      * :term:`shutdown` and :term:`rerun <start>`
+      * :term:`shutdown` and :term:`restarted <restart>`
       * "Reloaded"
 
       Reloading does not require the suite to be :term:`shutdown`. When a suite

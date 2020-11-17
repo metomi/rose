@@ -17,10 +17,9 @@
 .. _FCM: https://metomi.github.io/fcm/doc/
 .. _FCM User Guide: http://metomi.github.io/fcm/doc/user_guide/
 .. _INI: https://en.wikipedia.org/wiki/INI_file
-.. _Jinja2: http://jinja.pocoo.org/
+.. _Jinja2: https://jinja.palletsprojects.com/en/2.11.x/
 .. _metomi-vms: https://github.com/metomi/metomi-vms
-.. _PyGTK: http://www.pygtk.org/
 .. _Python: https://www.python.org/
-.. _Python Regular Expressions: https://docs.python.org/2/library/re.html#regular-expression-syntax
-.. _SRS: https://code.metoffice.gov.uk/
-.. _SVN: https://subversion.apache.org/
+.. _Python Regular Expressions: https://docs.python.org/3/library/re.html#regular-expression-syntax
+.. _SRS: https://code.metoffice.gov.uk/auth/UI/Login?realm=mo-realm-1&goto=https%3A%2F%2Fcode.metoffice.gov.uk%2Ftrac%2Fhome
+.. _SVN: http://subversion.apache.org/

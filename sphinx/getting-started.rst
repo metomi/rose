@@ -65,7 +65,7 @@ highlighting of Rose configuration files, located within the Rose installation:
 
 The plugins contain setup instructions within.
 
-.. _Pygments: http://pygments.org
+.. _Pygments: https://pygments.org
 
 Additionally there is a `Pygments`_ lexer located in
 ``sphinx/ext/rose_lang.py``.

@@ -1,4 +1,3 @@
-.. _Jinja2 Tutorial: http://jinja.pocoo.org/docs
 .. _shebang: https://en.wikipedia.org/wiki/Shebang_(Unix)
 
 
@@ -7,7 +6,8 @@
 Jinja2
 ======
 
-`Jinja2`_ is a templating language often used in web design with some
+`Jinja2 <https://jinja.palletsprojects.com/en/2.11.x/>`_
+is a templating language often used in web design with some
 similarities to python. It can be used to make a suite definition more
 dynamic.
 
@@ -67,7 +67,8 @@ top of the file:
 
    #!Jinja2
 
-For more information see the `Jinja2 Tutorial`_.
+For more information see the
+`Jinja2 Tutorial <https://jinja2docs.readthedocs.io/en/stable/templates.html>`_.
 
 
 Example

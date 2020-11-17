@@ -1,7 +1,7 @@
 Sphinx Domains
 ==============
 
-.. _domains: http://www.sphinx-doc.org/en/stable/domains.html
+.. _domains: https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html
 
 Sphinx includes a system for documenting objects in a structured way via
 `domains`_. For example to document a Python function one might do:

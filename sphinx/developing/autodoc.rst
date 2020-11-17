@@ -7,8 +7,8 @@ generating API documentation from source code.
 Writing Docstrings
 ------------------
 
-.. _Google Docstrings: https://google.github.io/styleguide/pyguide.html?showone=Comments#Comments
-.. _Numpy Docstrings: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
+.. _Google Docstrings: https://google.github.io/styleguide/pyguide.html
+.. _Numpy Docstrings: https://numpydoc.readthedocs.io/en/latest/format.html
 .. _Napoleon Google Example: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 .. _Napoleon Numpy Example: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html
 
@@ -17,8 +17,8 @@ allowing them to be written in plain text as opposed to reStructuredText.
 
 Napoleon accepts docstrings in one of two formats:
 
-* `Google <Google Docstrings>`_  - `Napoleon Google Example`_
-* `Numpy <Numpy Docstrings>`_  - `Napoleon Numpy Example`_
+* Google
+* Numpy
 
 For Rose docstrings please stick to the **Google** convention.
 Some quick examples:
@@ -78,7 +78,7 @@ Writing Doctests
 ----------------
 
 Examples [in docstrings] written in  `doctest format
-<https://docs.python.org/2/library/doctest.html>`_ will appear nicely
+<https://docs.python.org/3/library/doctest.html>`_ will appear nicely
 formatted in the API docs, as an added bonus they are testable (``make -C doc
 doctest``, incorporated in the :ref:`command-rose-test-battery`).
 
@@ -124,5 +124,5 @@ Doctests are performed in the doc/sphinx directory and any files created will
 have to be `tidied up
 <https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html#directive-testcleanup>`_.
 
-See `doctest <https://docs.python.org/3.3/library/doctest.html>`_ for more
+See `doctest <https://docs.python.org/3/library/doctest.html>`_ for more
 details.

@@ -62,9 +62,9 @@ EXTRAS_REQUIRE = {
         'sphinx',
         'sphinx_rtd_theme',
         'sphinxcontrib-httpdomain',
-        'hieroglyph',
+        'hieroglyph>=2.1.0',
         'sphinxcontrib-svg2pdfconverter',
-        'cylc-sphinx-extensions[all]'
+        'cylc-sphinx-extensions[all]>=1.2.0'
     ]
 }
 EXTRAS_REQUIRE['all'] = list({y for x in EXTRAS_REQUIRE.values() for y in x})
