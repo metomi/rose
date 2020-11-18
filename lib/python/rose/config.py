@@ -1377,10 +1377,10 @@ class ConfigLoader(object):
                     value_cont = value_cont[1:]
                 node.set(keys[:], value + "\n" + value_cont)
                 continue
-            if self.allow_sections:
-                # Match a section header?
-                match = self.RE_SECTION.match(line)
-                if match:
+            # Match a section header?
+            match = self.RE_SECTION.match(line)
+            if match:
+                if self.allow_sections:
                     head, section, state = match.group(
                         "head", "section", "state")
                     bad_index = self._check_section_value(section)
@@ -1409,6 +1409,10 @@ class ConfigLoader(object):
                             section_node.comments += comments
                     comments = []
                     continue
+                else:
+                    raise ConfigSyntaxError(
+                        ConfigSyntaxError.SECTIONS_NOT_ALLOWED, file_name,
+                        line_num, 0, line)
             # Match the start of an option setting?
             match = self.re_option.match(line)
             if not match:
@@ -1541,11 +1545,13 @@ class ConfigSyntaxError(Exception):
     BAD_CHAR = "BAD_CHAR"
     BAD_SYNTAX = "BAD_SYNTAX"
     BAD_SYNTAX_NO_SECTIONS = "BAD_SYNTAX_NO_SECTIONS"
+    SECTIONS_NOT_ALLOWED = "SECTIONS_NOT_ALLOWED"
 
     MESSAGES = {
-        BAD_CHAR: """unexpected character or end of value""",
-        BAD_SYNTAX: '''expecting "[SECTION]" or "KEY=VALUE"''',
-        BAD_SYNTAX_NO_SECTIONS: '''expecting "KEY=VALUE"'''
+        BAD_CHAR: 'unexpected character or end of value',
+        BAD_SYNTAX: 'expecting "[SECTION]" or "KEY=VALUE"',
+        BAD_SYNTAX_NO_SECTIONS: 'expecting "KEY=VALUE"',
+        SECTIONS_NOT_ALLOWED: 'sections not permitted in this configuration'
     }
 
     def __init__(self, code, file_name, line_num, col_num, line):

@@ -211,7 +211,7 @@ class RosieDatabaseInitiator(object):
                 err_msg = "Exception occurred: {0} - {1}".format(
                     type(err).__name__, str(err))
                 message = ("Could not load revision {0} of {1} as the post-"
-                           "commit hook failed:\r{2}\r".format(
+                           "commit hook failed:\n{2}\n".format(
                                 revision, youngest, err_msg))
                 event = RosieDatabaseLoadSkipEvent(repos_path, message)
             else:
