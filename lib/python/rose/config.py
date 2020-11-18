@@ -1171,10 +1171,11 @@ class ConfigLoader(object):
         """Initialise the configuration utility.
 
         Arguments:
-        char_comment -- the character to indicate the start of a
-        comment.
-        char_assign -- the character to use to delimit a key=value
-        assignment.
+            char_assign (str): the character to use to delimit a key=value
+                assignment.
+            char_comment (str): the character to indicate the start of a
+                comment.
+            allow_sections (bool): whether to permit sections in the config.
 
         """
         self.char_assign = char_assign

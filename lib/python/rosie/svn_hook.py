@@ -154,6 +154,6 @@ class RosieSvnHook(object):
                 return None
             raise err
         t_handle.seek(0)
-        config_node = ConfigLoader(allow_sections=False)(t_handle)
+        config_node = ConfigLoader(allow_sections=False).load(t_handle)
         t_handle.close()
         return config_node
