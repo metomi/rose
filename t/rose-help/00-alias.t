@@ -21,21 +21,16 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 12
+tests 4
 #-------------------------------------------------------------------------------
 export PAGER=cat
 
-cat >'rose-aliases.txt' <<'__TXT__'
-config-edit edit
-suite-hook task-hook
-suite-log slv suite-log-view
-__TXT__
 cat >'rosie-aliases.txt' <<'__TXT__'
 checkout co
 create copy
 __TXT__
 #-------------------------------------------------------------------------------
-for PREFIX in 'rose' 'rosie'; do
+for PREFIX in 'rosie'; do
     while read; do
         COMMAND=$(cut -d' ' -f 1 <<<"${REPLY}")
         "${PREFIX}" help "${COMMAND}" >'help.txt'

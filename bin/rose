@@ -44,6 +44,49 @@ ROSE_HOME_BIN="$(dirname "$0")"
 ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
 export ROSE_NS ROSE_HOME_BIN ROSE_VERSION
 
+# NOTE: cannot use assiciative array due to bash version requirement
+DEAD_ENDS=(
+    rose-config-edit
+    rose-edit
+    rose-suite-clean
+    rose-suite-cmp-vc
+    rose-suite-gcontrol
+    rose-sgc
+    rose-suite-hook
+    rose-task-hook
+    rose-suite-log-view
+    rose-suite-log
+    rose-slv
+    rose-suite-restart
+    rose-suite-run
+    rose-suite-init
+    rose-suite-scan
+    rose-suite-shutdown
+    rose-suite-stop
+)
+
+# NOTE: indicies must match DEAD_ENDS array
+# (be very careful not to jumble them)
+DEAD_END_MSGS=(
+    'The Rose configuration editor has been removed, use the Cylc GUI.'
+    'The Rose configuration editor has been removed, use the Cylc GUI.'
+    'This command has been replaced by: "cylc clean".'
+    'This command is awaiting re-implementation in Cylc8'
+    'This command has been removed: use the Cylc GUI.'
+    'This command has been removed: use the Cylc GUI.'
+    'Command obsolete, use Cylc event handlers'
+    'Command obsolete, use Cylc event handlers'
+    'This command has been removed: use the Cylc GUI.'
+    'This command has been removed: use the Cylc GUI'
+    'This command has been removed: use the Cylc GUI'
+    'This command has been replaced by: "cylc restart".'
+    'This command has been replaced by: "cylc install".'
+    'This command has been replaced by: "cylc install".'
+    'This command has been replaced by: "cylc scan".'
+    'This command has been replaced by: "cylc stop".'
+    'This command has been replaced by: "cylc stop".'
+)
+
 # Print actual command of a command alias
 get_alias() {
     local NAME="$1"
@@ -134,8 +177,16 @@ help|h|?|--help|-h)
                     echo "        (=$ALIAS)"
                 else
                     echo "    $NAME"
-                    sed '1,/^# DESCRIPTION$/d;{s/^# /    /;q;}' \
-                        "$ROSE_HOME_BIN/$U"
+                    if [[ $U == 'rose-date' ]]; then
+                        # hack an exception for this lone Python command
+                        # shellcheck disable=SC2026
+                        echo '       '\
+                             'Parse and print 1. a date time point '\
+                             'or 2. a duration.'
+                    else
+                        sed '1,/^# DESCRIPTION$/d;{s/^# /    /;q;}' \
+                            "$ROSE_HOME_BIN/$U"
+                    fi
                 fi
             done
         } | ${PAGER:-less}
@@ -181,6 +232,14 @@ doc)
     :;;
 esac
 
+CMD="${ROSE_NS}-${UTIL}"
+for i in $(seq 0 $(( ${#DEAD_ENDS[@]} - 1 ))); do
+    if [[ "${DEAD_ENDS[$i]}" == "$CMD" ]]; then
+        echo "${DEAD_END_MSGS[$i]}" >&2
+        exit 42
+    fi
+done
+
 COMMAND="$(dirname "$0")/$ROSE_NS-$UTIL"
 if [[ ! -f $COMMAND || ! -x $COMMAND ]]; then
     echo "$ROSE_NS: $UTIL: unknown utility. Abort." >&2
@@ -193,4 +252,5 @@ if (($# > 0)) && [[ $1 == '--help' || $1 == '-h' ]]; then
 fi
 ROSE_UTIL=$UTIL
 export ROSE_UTIL
+
 exec "$COMMAND" "$@"

@@ -50,4 +50,5 @@
 #     optional ROSE_META_PATH
 #         Prepend `$ROSE_META_PATH` to the metadata search path.
 #-------------------------------------------------------------------------------
-exec python3 -m metomi.rose.metadata_graph "$@"
+echo 'This command has been removed pending re-implementation' >&2
+exit 1

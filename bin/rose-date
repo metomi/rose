@@ -182,6 +182,11 @@ from metomi.isodatetime.main import main as iso_main
 
 def main():
     """Implement rose date."""
+    print(
+        'WARNING: "rose date" is depreacted, use the "isodatetime" command.',
+        file=sys.stderr
+    )
+
     # Handle Legacy Rose-date -c functionality
     if '-c' in sys.argv or '--use-task-cycle-time' in sys.argv:
         if os.getenv('ROSE_TASK_CYCLE_TIME'):
