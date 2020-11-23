@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Shared utilities for app/suite/task run."""
+"""Shared utilities for app/task run."""
 
 import os
 from metomi.rose.config_processor import ConfigProcessorsManager
@@ -94,7 +94,7 @@ class Dummy(object):
 
 class Runner(object):
 
-    """Invoke a Rose application or a Rose suite."""
+    """Invoke a Rose application."""
 
     CONF_NAME = None
     NAME = None

@@ -24,7 +24,6 @@ import pwd
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Event, Reporter
 from metomi.rose.suite_engine_proc import SuiteEngineProcessor
-from metomi.rose.suite_control import get_suite_name
 import sys
 from time import sleep
 import traceback
@@ -55,6 +54,25 @@ def main():
         if opts.debug_mode:
             traceback.print_exc()
         sys.exit(1)
+
+
+def get_suite_name(event_handler=None):
+    """Find the top level of a suite directory structure"""
+    fs_util = FileSystemUtil(event_handler)
+    conf_dir = os.getcwd()
+    while True:
+        if os.path.basename(conf_dir) != "rose-stem":
+            for tail in [
+                    "rose-suite.conf",
+                    "log/rose-suite-run.conf",
+                    "rose-stem/rose-suite.conf"]:
+                conf = os.path.join(conf_dir, tail)
+                if os.path.exists(conf):
+                    return os.path.basename(conf_dir)
+        up_dir = fs_util.dirname(conf_dir)
+        if up_dir == conf_dir:
+            raise SuiteNotFoundError(os.getcwd())
+        conf_dir = up_dir
 
 
 def suite_log_view(opts, args, event_handler=None):
