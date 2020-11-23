@@ -40,8 +40,8 @@ TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_fail "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+# run_fail "$TEST_KEY" \
+    rose-suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --host=localhost -- --no-detach --debug
 #-------------------------------------------------------------------------------
 # Test the output

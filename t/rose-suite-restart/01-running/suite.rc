@@ -1,9 +1,0 @@
-[scheduling]
-    [[dependencies]]
-        graph = foo
-[runtime]
-    [[foo]]
-        script = """
-touch 'file'
-timeout 60 bash -c 'while test -e "file"; do sleep 1; done'
-"""

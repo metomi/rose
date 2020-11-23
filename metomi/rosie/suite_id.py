@@ -29,7 +29,14 @@ Functions:
 """
 
 import os
+from pathlib import Path
 import re
+import shlex
+import string
+import sys
+import traceback
+import xml.parsers.expat
+
 import metomi.rose.env
 from metomi.rose.loc_handlers.svn import SvnInfoXMLParser
 from metomi.rose.opt_parse import RoseOptionParser
@@ -37,11 +44,6 @@ from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.suite_engine_proc import SuiteEngineProcessor, NoSuiteLogError
-import shlex
-import string
-import sys
-import traceback
-import xml.parsers.expat
 
 
 class SvnCaller(RosePopener):
@@ -365,9 +367,20 @@ class SuiteId(object):
 
     def _from_location(self, location):
         """Return the ID of a location (origin URL or local copy path)."""
-        # Is location a "~/cylc-run/$SUITE/" directory?
-        # Use a hacky way to read the "log/rose-suite-run.version" file
         suite_engine_proc = SuiteEngineProcessor.get_processor()
+        suite_dir_rel_root = getattr(
+            suite_engine_proc, "SUITE_DIR_REL_ROOT", None)
+
+        # Cylc8 run directory
+        loc = Path(location)
+        sdrr = Path(suite_dir_rel_root)
+        if loc.relative_to(sdrr):
+            if (loc / 'rose-suite.info').exists():
+                # TODO
+                raise SuiteIdLocationError(location)
+
+        # Cylc7 run directory
+        # Use a hacky way to read the "log/rose-suite-run.version" file
         suite_dir_rel_root = getattr(
             suite_engine_proc, "SUITE_DIR_REL_ROOT", None)
         if suite_dir_rel_root and "/" + suite_dir_rel_root + "/" in location:
