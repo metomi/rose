@@ -24,7 +24,7 @@
 if ! python2 -c 'import sqlalchemy' 2>'/dev/null'; then
     skip_all '"sqlalchemy" not installed'
 fi
-tests 10
+tests 15
 #-------------------------------------------------------------------------------
 set -e
 mkdir 'repos'
@@ -117,4 +117,34 @@ foo-aa000|trunk|2|access-list|*
 foo-aa000|trunk|2|more-title|We will lose € if we can't handle unicode
 __OUT__
 #-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-western"
+INFO_FILE="${PWD}/roses/foo-aa000/rose-suite.info"
+cat > "$INFO_FILE" <<'__ROSE_SUITE_INFO'
+access-list=*
+owner=ivy
+project=euro
+title=What if we éñçöde the info file in latin-1/western?
+more-title=Foo â bar
+__ROSE_SUITE_INFO
+iconv -f UTF-8 -t LATIN1 "$INFO_FILE" -o "$INFO_FILE"
+set -e
+svn commit -q -m 't' "${PWD}/roses/foo-aa000"
+svn update -q "${PWD}/roses/foo-aa000"
+set +e
+file_cmp "${TEST_KEY}-hook.out" "${PWD}/rosa-svn-post-commit.out" <'/dev/null'
+file_cmp "${TEST_KEY}-hook.err" "${PWD}/rosa-svn-post-commit.err" <'/dev/null'
+file_cmp "${TEST_KEY}-hook.rc" "${PWD}/rosa-svn-post-commit.rc" <<<'0'
+
+TEST_KEY="${TEST_KEY}-db-select"
+sqlite3 "${PWD}/repos/foo.db" "${Q_MAIN} WHERE idx=='foo-aa000' AND revision=='3'" \
+    >"${TEST_KEY}-main.out"
+file_cmp "${TEST_KEY}-main.out" "${TEST_KEY}-main.out" <<__OUT__
+foo-aa000|trunk|3|ivy|euro|What if we éñçöde the info file in latin-1/western?|${USER}| M|
+__OUT__
+sqlite3 "${PWD}/repos/foo.db" "${Q_OPTIONAL} WHERE idx=='foo-aa000' AND revision=='3'" \
+    >"${TEST_KEY}-optional.out"
+file_cmp "${TEST_KEY}-optional.out" "${TEST_KEY}-optional.out" <<'__OUT__'
+foo-aa000|trunk|3|access-list|*
+foo-aa000|trunk|3|more-title|Foo â bar
+__OUT__
 exit 0

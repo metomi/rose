@@ -222,6 +222,31 @@ bar=BAR BAR BAR
         self.assertEqual(node.value, "hi")
         self.assertEqual(node.state, "!!")
 
+    def test_load_bad_syntax(self):
+        """Test loading a configuration with bad syntax present"""
+        loader = rose.config.ConfigLoader()
+        source = StringIO("""# test
+foo=bar
+baz
+""")
+        with self.assertRaises(rose.config.ConfigSyntaxError) as cm:
+            loader.load(source)
+        assert cm.exception.code == 'BAD_SYNTAX'
+        assert cm.exception.line_num == 3
+
+    def test_load_info_config_bad_syntax(self):
+        """Test loading a configuration in which sections are not allowed"""
+        loader = rose.config.ConfigLoader(allow_sections=False)
+        source = StringIO("""# test
+stuff=stuffing
+[egg]
+boiled=false
+""")
+        with self.assertRaises(rose.config.ConfigSyntaxError) as cm:
+            loader.load(source)
+        assert cm.exception.code == 'SECTIONS_NOT_ALLOWED'
+        assert cm.exception.line_num == 3
+
 
 if __name__ == "__main__":
     unittest.main()
