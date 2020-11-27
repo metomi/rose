@@ -46,9 +46,9 @@ run_fail "$TEST_KEY" \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: A   a/b/c/
-[FAIL] PERMISSION DENIED: A   a/b/c/d/
-[FAIL] PERMISSION DENIED: A   a/b/c/d/e/
+[FAIL] PERMISSION DENIED: A   a/b/c/: Directories above the suites must match the ID patterns
+[FAIL] PERMISSION DENIED: A   a/b/c/d/: Directories above the suites must match the ID patterns
+[FAIL] PERMISSION DENIED: A   a/b/c/d/e/: Directories above the suites must match the ID patterns
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-bad-2
@@ -57,11 +57,11 @@ run_fail "$TEST_KEY" \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: A   1/
-[FAIL] PERMISSION DENIED: A   1/2/
-[FAIL] PERMISSION DENIED: A   1/2/3/
-[FAIL] PERMISSION DENIED: A   1/2/3/4/
-[FAIL] PERMISSION DENIED: A   1/2/3/4/5/
+[FAIL] PERMISSION DENIED: A   1/: Directories above the suites must match the ID patterns
+[FAIL] PERMISSION DENIED: A   1/2/: Directories above the suites must match the ID patterns
+[FAIL] PERMISSION DENIED: A   1/2/3/: Directories above the suites must match the ID patterns
+[FAIL] PERMISSION DENIED: A   1/2/3/4/: Directories above the suites must match the ID patterns
+[FAIL] PERMISSION DENIED: A   1/2/3/4/5/: Directories above the suites must match the ID patterns
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-bad-n-levels
@@ -162,7 +162,7 @@ run_fail "$TEST_KEY" svn import -q -m 't' 'null' "${SVN_URL}/a/a/0/0/0/null"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <'/dev/null'
 sed -i '/^\[FAIL\]/!d' "${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: A   a/a/0/0/0/null
+[FAIL] PERMISSION DENIED: A   a/a/0/0/0/null: Cannot have a file at the branch level
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-branch-anyone
@@ -241,7 +241,7 @@ run_fail "$TEST_KEY" svn ci --username=rosemary -q -m't' work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: User not in access list
 __ERR__
 svn revert -q -R work/aa000
 #-------------------------------------------------------------------------------
@@ -261,7 +261,7 @@ run_fail "$TEST_KEY" svn ci --username=fred -q -m't' work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: A   a/a/0/0/0/trunk/rose-suite.conf
+[FAIL] PERMISSION DENIED: A   a/a/0/0/0/trunk/rose-suite.conf: User not in access list
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-access-add
@@ -283,7 +283,7 @@ run_fail "$TEST_KEY" svn ci --username=fred -q -m't' work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.conf
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.conf: User not in access list
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-access-modify
@@ -300,7 +300,7 @@ run_fail "$TEST_KEY" svn ci --username=fred -q -m't' work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: D   a/a/0/0/0/trunk/rose-suite.conf
+[FAIL] PERMISSION DENIED: D   a/a/0/0/0/trunk/rose-suite.conf: User not in access list
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-access-delete
@@ -320,7 +320,7 @@ run_fail "$TEST_KEY" svn ci --username=fred -q -m't' work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: User not in access list
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-access-list-mod
@@ -378,7 +378,7 @@ svn revert -q -R work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.conf
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.conf: User not in access list
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-modify-with-access-list
@@ -404,7 +404,7 @@ run_fail "$TEST_KEY" svn rm --username=rosemary -q -m't' $SVN_URL/a/a/0/0/0
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: D   a/a/0/0/0/
+[FAIL] PERMISSION DENIED: D   a/a/0/0/0/: Only the suite owner can remove the suite
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-delete-suite

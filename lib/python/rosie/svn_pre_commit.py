@@ -131,18 +131,22 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                     is_bad = True
                     break
             if is_bad:
-                bad_changes.append(BadChange(status, path))
+                msg = "Directories above the suites must match the ID patterns"
+                bad_changes.append(BadChange(status, path, content=msg))
                 continue
 
             # At levels above the suites, can only add directories
             if len(names) < self.LEN_ID:
                 if status[0] != self.ST_ADDED:
-                    bad_changes.append(BadChange(status, path))
+                    msg = ("At levels above the suites, "
+                           "can only add directories")
+                    bad_changes.append(BadChange(status, path, content=msg))
                 continue
 
             # Cannot have a file at the branch level
             if len(names) == self.LEN_ID + 1 and tail is None:
-                bad_changes.append(BadChange(status, path))
+                msg = "Cannot have a file at the branch level"
+                bad_changes.append(BadChange(status, path, content=msg))
                 continue
 
             # New suite should have an info file
@@ -260,7 +264,8 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
             # Only admin users can remove the suite
             if author not in admin_users and not path_tail:
-                bad_changes.append(BadChange(status, path))
+                msg = "Only the suite owner can remove the suite"
+                bad_changes.append(BadChange(status, path, content=msg))
                 continue
 
             # Admin users and those in access list can modify everything in
@@ -269,7 +274,8 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 if path_tail != self.TRUNK_INFO_FILE:
                     continue
             else:
-                bad_changes.append(BadChange(status, path))
+                msg = "User not in access list"
+                bad_changes.append(BadChange(status, path, content=msg))
                 continue
 
             # Only the admin users can change owner and access list
