@@ -54,7 +54,13 @@ class RosieDatabaseCreateSkipEvent(Event):
 
 class RosieDatabaseLoadEvent(Event):
 
-    """Event raised when a Rosie database has loaded with I of N revisions."""
+    """Event raised when a Rosie database has loaded with I of N revisions.
+
+    Args:
+        repos_path (str)
+        revision (int) - Ith revision
+        youngest (int) - Nth revision
+    """
 
     LEVEL = Event.V
 
@@ -64,12 +70,17 @@ class RosieDatabaseLoadEvent(Event):
 
 class RosieDatabaseLoadSkipEvent(Event):
 
-    """Event raised when a Rosie database load is skipped."""
+    """Event raised when a Rosie database load is skipped.
+
+    Args:
+        repos_path (str)
+        message (str)
+    """
 
     KIND = Event.KIND_ERR
 
     def __str__(self):
-        return "%s: DB not loaded." % (self.args[0])
+        return "%s: DB not loaded: %s" % self.args
 
 
 class RosieDatabaseInitiator(object):
@@ -175,7 +186,8 @@ class RosieDatabaseInitiator(object):
     def load(self, repos_path):
         """Load database contents from a repository."""
         if not repos_path or not os.path.exists(repos_path):
-            self.handle_event(RosieDatabaseLoadSkipEvent(repos_path))
+            message = "Path not found"
+            self.handle_event(RosieDatabaseLoadSkipEvent(repos_path, message))
             return
         repos_path = os.path.abspath(repos_path)
         youngest = int(self.popen("svnlook", "youngest", repos_path)[0])
@@ -198,8 +210,7 @@ class RosieDatabaseInitiator(object):
                 message = ("Could not load revision {0} of {1} as the post-"
                            "commit hook failed:\r{2}\r".format(
                                 revision, youngest, err_msg))
-                self.handle_event(message, kind=Event.KIND_ERR)
-                event = RosieDatabaseLoadSkipEvent(repos_path)
+                event = RosieDatabaseLoadSkipEvent(repos_path, message)
             else:
                 event = RosieDatabaseLoadEvent(repos_path, revision, youngest)
             if revision == youngest:
