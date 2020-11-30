@@ -192,7 +192,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                             InfoFileError(InfoFileError.NO_OWNER))
                         continue
 
-            # No need to check other non-trunk changes (?)
+            # No need to check other non-trunk changes
             if branch and branch != "trunk":
                 continue
 

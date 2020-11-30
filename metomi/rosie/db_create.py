@@ -196,8 +196,8 @@ class RosieDatabaseInitiator(object):
         while revision <= youngest:
             if sys.stdout.isatty():
                 sys.stdout.write(
-                    "\r%s... loading revision %d of %d" %
-                    (Reporter.PREFIX_INFO, revision, youngest))
+                    f"\r{Reporter.PREFIX_INFO}... loading revision {revision} "
+                    f"of {youngest}")
                 sys.stdout.flush()
             try:
                 self.post_commit_hook.run(
@@ -207,11 +207,10 @@ class RosieDatabaseInitiator(object):
                 if sys.stdout.isatty():
                     sys.stdout.write("\r")
                     sys.stdout.flush()
-                err_msg = "Exception occurred: {0} - {1}".format(
-                    type(err).__name__, str(err))
-                message = ("Could not load revision {0} of {1} as the post-"
-                           "commit hook failed:\r{2}\r".format(
-                                revision, youngest, err_msg))
+                err_msg = f"Exception occurred: {type(err).__name__} - {err}"
+                message = (
+                    f"Could not load revision {revision} of {youngest} as "
+                    f"the post-commit hook failed:\n{err_msg}\n")
                 event = RosieDatabaseLoadSkipEvent(repos_path, message)
             else:
                 event = RosieDatabaseLoadEvent(repos_path, revision, youngest)

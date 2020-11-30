@@ -137,6 +137,10 @@ class RosieSvnHook(object):
         commit_opts = []
         # TODO: warn or raise if both supplied?
         if transaction is not None:
+            if revision is not None:
+                raise ValueError(
+                    f"Cannot load transaction {transaction} and "
+                    f"revision {revision} at the same time")
             commit_opts = ["-t", transaction]
         if revision is not None:
             commit_opts = ["-r", str(revision)]
