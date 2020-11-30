@@ -31,6 +31,7 @@ from metomi.rose.resource import ResourceLocator
 from metomi.rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 from metomi.rosie.svn_post_commit import RosieSvnPostCommitHook
+from metomi.rose.config import ConfigSyntaxError
 
 
 class RosieDatabaseCreateEvent(Event):
@@ -185,9 +186,22 @@ class RosieDatabaseInitiator(object):
                     "\r%s... loading revision %d of %d" %
                     (Reporter.PREFIX_INFO, revision, youngest))
                 sys.stdout.flush()
-            self.post_commit_hook.run(
-                repos_path, str(revision), no_notification=True)
-            event = RosieDatabaseLoadEvent(repos_path, revision, youngest)
+            try:
+                self.post_commit_hook.run(
+                    repos_path, str(revision), no_notification=True)
+            except (ConfigSyntaxError, al.exc.DatabaseError) as err:
+                if sys.stdout.isatty():
+                    sys.stdout.write("\r")
+                    sys.stdout.flush()
+                err_msg = "Exception occurred: {0} - {1}".format(
+                    type(err).__name__, str(err))
+                message = ("Could not load revision {0} of {1} as the post-"
+                           "commit hook failed:\r{2}\r".format(
+                                revision, youngest, err_msg))
+                self.handle_event(message, kind=Event.KIND_ERR)
+                event = RosieDatabaseLoadSkipEvent(repos_path)
+            else:
+                event = RosieDatabaseLoadEvent(repos_path, revision, youngest)
             if revision == youngest:
                 # Check if any new revisions have been added.
                 youngest = self.popen("svnlook", "youngest", repos_path)[0]
