@@ -26,6 +26,64 @@ from metomi.rose.reporter import Reporter
 from tempfile import TemporaryFile
 
 
+class BadChange(Exception):
+    """An error representing a bad change in a commit transaction."""
+
+    FMT_HEAD = "%s: %-4s%s"
+    FMT_TAIL_1 = ": %s"
+    FMT_TAIL_M = ":\n%s"
+    NO_INFO = "SUITE MUST HAVE INFO FILE"
+    NO_OWNER = "SUITE MUST HAVE OWNER SPECIFIED IN INFO FILE"
+    NO_TRUNK = "SUITE MUST HAVE TRUNK"
+    PERM = "PERMISSION DENIED"
+    USER = "NO SUCH USER"
+    VALUE = "BAD VALUE IN FILE"
+
+    def __init__(self, status, path, reason=PERM, content=""):
+        Exception.__init__(self, status, path, reason, content)
+        self.status = status
+        self.path = path
+        self.reason = reason
+        self.content = content
+
+    def __str__(self):
+        tail = ""
+        if self.content and "\n" in self.content:
+            tail = self.FMT_TAIL_M % self.content
+        elif self.content:
+            tail = self.FMT_TAIL_1 % self.content
+        return self.FMT_HEAD % (self.reason, self.status, self.path) + tail
+
+
+class InfoFileError(BadChange):
+    """Error representing a bad or missing info file.
+
+    Args:
+        reason (str): a user-friendly message.
+        exception (Exception): the exception encountered in loading the
+            bad info file.
+    """
+
+    VALUE = "BAD VALUE IN INFO FILE"
+
+    def __init__(self, reason=BadChange.PERM, exception=None):
+        self.reason = reason
+        self.exc = exception
+
+    def __str__(self):
+        if self.exc:
+            return f"{self.reason}: {self.exc}"
+        return self.reason
+
+
+class BadChanges(Exception):
+    """An error representing bad changes in a commit transaction."""
+
+    def __str__(self):
+        bad_changes = self.args[0]
+        return "\n".join(str(bad_change) for bad_change in bad_changes)
+
+
 class RosieSvnHook(object):
     """A parent class for hooks on a Rosie Subversion repository."""
 
@@ -82,7 +140,7 @@ class RosieSvnHook(object):
             commit_opts = ["-t", transaction]
         if revision is not None:
             commit_opts = ["-r", str(revision)]
-        info_file_path = "%s/%s/%s" % ("/".join(sid), branch, self.INFO_FILE)
+        info_file_path = os.path.join("/".join(sid), branch, self.INFO_FILE)
         t_handle = TemporaryFile()
         try:
             t_handle.write(

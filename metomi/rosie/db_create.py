@@ -30,6 +30,7 @@ from metomi.rose.reporter import Reporter, Event
 from metomi.rose.resource import ResourceLocator
 from metomi.rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
+from metomi.rosie.svn_hook import InfoFileError
 from metomi.rosie.svn_post_commit import RosieSvnPostCommitHook
 from metomi.rose.config import ConfigSyntaxError
 
@@ -201,7 +202,8 @@ class RosieDatabaseInitiator(object):
             try:
                 self.post_commit_hook.run(
                     repos_path, str(revision), no_notification=True)
-            except (ConfigSyntaxError, al.exc.DatabaseError) as err:
+            except (ConfigSyntaxError, InfoFileError,
+                    al.exc.DatabaseError) as err:
                 if sys.stdout.isatty():
                     sys.stdout.write("\r")
                     sys.stdout.flush()
