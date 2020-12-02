@@ -35,18 +35,17 @@ from smtplib import SMTP
 import socket
 import sqlalchemy as al
 import sys
-from tempfile import TemporaryFile
 from time import mktime, strptime
 import traceback
 
 import metomi.rose.config
 from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
 from metomi.rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
+from metomi.rosie.svn_hook import RosieSvnHook
 
 
 class RosieWriteDAO(object):
@@ -95,7 +94,7 @@ class RosieWriteDAO(object):
         self.connection.execute(statement)
 
 
-class RosieSvnPostCommitHook(object):
+class RosieSvnPostCommitHook(RosieSvnHook):
 
     """A post-commit hook on a Rosie Subversion repository.
 
@@ -104,29 +103,13 @@ class RosieSvnPostCommitHook(object):
 
     """
 
-    DATE_FMT = "%Y-%m-%d %H:%M:%S %Z"
-    ID_CHARS_LIST = ["abcdefghijklmnopqrstuvwxyz"] * 2 + ["0123456789"] * 3
-    LEN_ID = len(ID_CHARS_LIST)
-    INFO_FILE = "rose-suite.info"
     KNOWN_KEYS_FILE_PATH = "R/O/S/I/E/trunk/rosie-keys"
     REC_COPY_INFO = re.compile(r"\A\s+\(from\s(\S+):r(\d+)\)\s*\Z")
-    ST_ADDED = "A"
-    ST_DELETED = "D"
-    ST_MODIFIED = "M"
-    ST_EMPTY = " "
-    TRUNK = "trunk"
 
     def __init__(self, event_handler=None, popen=None):
-        if event_handler is None:
-            event_handler = Reporter()
-        self.event_handler = event_handler
-        if popen is None:
-            popen = RosePopener(self.event_handler)
-        self.popen = popen
-        path = os.path.dirname(os.path.dirname(
-            sys.modules["metomi.rosie"].__file__))
+        super(RosieSvnPostCommitHook, self).__init__(event_handler, popen)
         self.usertools_manager = SchemeHandlersManager(
-            [path], "rosie.usertools", ["get_emails"])
+            [self.path], "rosie.usertools", ["get_emails"])
 
     def run(self, repos, revision, no_notification=False):
         """Update database with changes in a changeset."""
@@ -147,7 +130,7 @@ class RosieSvnPostCommitHook(object):
 
         # Date-time of this commit
         os.environ["TZ"] = "UTC"
-        date_time = self._svnlook("date", "-r", revision, repos).decode()
+        date_time = self._svnlook("date", "-r", revision, repos)
         date, dtime, _ = date_time.split(None, 2)
         date = mktime(strptime(" ".join([date, dtime, "UTC"]), self.DATE_FMT))
         # Detail of changes
@@ -155,9 +138,9 @@ class RosieSvnPostCommitHook(object):
             "repos": repos,
             "revision": revision,
             "prefix": prefix,
-            "author": self._svnlook(
-                "author", "-r", revision, repos).decode("utf-8").strip(),
-            "date": date}
+            "author": self._svnlook("author", "-r", revision, repos).strip(),
+            "date": date
+        }
         branch_attribs_dict = self._get_suite_branch_changes(repos, revision)
 
         for key, branch_attribs in sorted(branch_attribs_dict.items()):
@@ -176,8 +159,7 @@ class RosieSvnPostCommitHook(object):
         """Retrieve changed statuses."""
         branch_attribs_dict = {}
         changed_lines = self._svnlook(
-            "changed", "--copy-info", "-r", revision, repos).decode(
-                "utf-8").splitlines(True)
+            "changed", "--copy-info", "-r", revision, repos).splitlines(True)
         while changed_lines:
             changed_line = changed_lines.pop(0)
             # A normal status changed_line
@@ -214,10 +196,12 @@ class RosieSvnPostCommitHook(object):
                     # Suite info file change
                     if branch_attribs["info"] is None:
                         branch_attribs["info"] = self._load_info(
-                            repos, revision, sid, branch)
+                            repos, sid, branch, revision=revision,
+                            allow_popen_err=True)
                     if path_status != self.ST_ADDED:
                         branch_attribs["old_info"] = self._load_info(
-                            repos, int(revision) - 1, sid, branch)
+                            repos, sid, branch, revision=int(revision)-1,
+                            allow_popen_err=True)
                         if (branch_attribs["old_info"] !=
                                 branch_attribs["info"] and
                                 branch_attribs["status"] != self.ST_ADDED):
@@ -235,11 +219,13 @@ class RosieSvnPostCommitHook(object):
                 # Load suite info and old info regardless
                 if branch_attribs["info"] is None:
                     branch_attribs["info"] = self._load_info(
-                        repos, revision, sid, branch)
+                        repos, sid, branch, revision=revision,
+                        allow_popen_err=True)
                 if (branch_attribs["old_info"] is None and
                         branch_attribs["status"] == self.ST_DELETED):
                     branch_attribs["old_info"] = self._load_info(
-                        repos, int(revision) - 1, sid, branch)
+                        repos, sid, branch, revision=int(revision)-1,
+                        allow_popen_err=True)
                 # Append changed lines, so they can be used for notification
                 branch_attribs["changed_lines"].append(changed_line)
                 if changed_line[2] == "+":
@@ -257,35 +243,21 @@ class RosieSvnPostCommitHook(object):
             elif path_status == self.ST_DELETED:
                 # The suite has been deleted
                 tree_out = self._svnlook(
-                    "tree", "-r", str(int(revision) - 1), "-N", repos,
-                    path).decode("utf-8")
+                    "tree", "-r", str(int(revision) - 1), "-N", repos, path)
                 # Include all branches of the suite in the deletion info
                 for tree_line in tree_out.splitlines()[1:]:
                     del_branch = tree_line.strip().rstrip("/")
                     branch_attribs_dict[(sid, del_branch)] = (
                         self._new_suite_branch_change(sid, del_branch, {
                             "old_info": self._load_info(
-                                repos, int(revision) - 1, sid, del_branch),
+                                repos, sid, del_branch,
+                                revision=int(revision)-1,
+                                allow_popen_err=True),
                             "status": self.ST_DELETED,
                             "status_info_file": self.ST_EMPTY,
                             "changed_lines": [
                                 "D   %s/%s/" % (path, del_branch)]}))
         return branch_attribs_dict
-
-    def _load_info(self, repos, revision, sid, branch):
-        """Load info file from branch_path in repos @revision."""
-        info_file_path = "%s/%s/%s" % (
-            "/".join(str(sid)), branch, self.INFO_FILE)
-        t_handle = TemporaryFile()
-        try:
-            t_handle.write(self._svnlook(
-                "cat", "-r", str(revision).encode(), repos, info_file_path))
-        except RosePopenError:
-            return None
-        t_handle.seek(0)
-        config = metomi.rose.config.load(t_handle)
-        t_handle.close()
-        return config
 
     def _new_suite_branch_change(self, sid, branch, attribs=None):
         """Return a dict to represent a suite branch change."""
@@ -377,11 +349,6 @@ class RosieSvnPostCommitHook(object):
         smtp.sendmail(msg["From"], emails, msg.as_string())
         smtp.quit()
 
-    def _svnlook(self, *args):
-        """Return the standard output from "svnlook"."""
-        command = ["svnlook"] + list(args)
-        return self.popen(*command)[0]
-
     def _update_info_db(self, dao, changeset_attribs, branch_attribs):
         """Update the suite info database for a suite branch."""
         idx = changeset_attribs["prefix"] + "-" + branch_attribs["sid"]
@@ -436,7 +403,7 @@ class RosieSvnPostCommitHook(object):
         revision = changeset_attribs["revision"]
         keys_str = self._svnlook(
             "cat", "-r", revision, repos, self.KNOWN_KEYS_FILE_PATH)
-        keys_str = " ".join(shlex.split(keys_str.decode("utf-8")))
+        keys_str = " ".join(shlex.split(keys_str))
         if keys_str:
             try:
                 dao.insert(META_TABLE_NAME, name="known_keys", value=keys_str)
