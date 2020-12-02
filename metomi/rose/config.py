@@ -96,9 +96,16 @@ import re
 from metomi.rose.env import env_var_escape
 import shlex
 import sys
+import codecs
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile
 from functools import cmp_to_key
 from metomi.rose.unicode_utils import write_safely
+
+
+codecs.register_error(
+    'handle_decode_err',
+    lambda err: (_ for _ in ()).throw(ConfigDecodeError(err))
+)  # The above is just a hack to raise an exception inside a lambda
 
 
 CHAR_ASSIGN = "="
@@ -1367,7 +1374,7 @@ class ConfigLoader(object):
         while True:
             line = handle.readline()
             if isinstance(line, bytes):
-                line = line.decode(errors='ignore')
+                line = line.decode(errors='handle_decode_err')
             if not line:
                 break
             line_num += 1
@@ -1582,6 +1589,25 @@ class ConfigSyntaxError(Exception):
             self.MESSAGES[self.code],
             self.line,
             " " * self.col_num)
+
+
+class ConfigDecodeError(Exception):
+    """Exception that should be raised when loading a configuration file that
+    is not encoded in a UTF-8 compatible charset.
+
+    Args:
+        unicode_decode_err (UnicodeDecodeError): The original exception raised
+            when doing bytes.decode()
+    """
+
+    MESSAGE = (
+        'Configuration files must be encoded in UTF-8 (or a subset of UTF-8)')
+
+    def __init__(self, unicode_decode_err):
+        self.err = unicode_decode_err
+
+    def __str__(self):
+        return f'{self.MESSAGE}. {self.err}'
 
 
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,

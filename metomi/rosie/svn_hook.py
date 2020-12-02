@@ -112,7 +112,7 @@ class RosieSvnHook(object):
     def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
         command = ["svnlook", *args]
-        return self.popen(*command)[0].decode()
+        return self.popen(*command)[0].decode(errors='handle_decode_err')
 
     def _load_info(self, repos, sid, branch=None, revision=None,
                    transaction=None, allow_popen_err=False):
