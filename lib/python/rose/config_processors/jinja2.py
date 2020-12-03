@@ -20,11 +20,13 @@
 """Process a section in a rose.config.ConfigNode into a Jinja2 template."""
 
 import filecmp
-from rose.config_processor import ConfigProcessError, ConfigProcessorBase
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.fs_util import FileSystemEvent
 import os
 from tempfile import NamedTemporaryFile
+
+from rose.config_processor import ConfigProcessError, ConfigProcessorBase
+from rose.cylc_templatevars import templatevar_eval
+from rose.env import env_var_process, UnboundEnvironmentVariableError
+from rose.fs_util import FileSystemEvent
 
 
 class ConfigProcessorForJinja2(ConfigProcessorBase):
@@ -77,6 +79,16 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                     value = env_var_process(node.value)
                 except UnboundEnvironmentVariableError as exc:
                     raise ConfigProcessError([s_key, key], node.value, exc)
+                else:
+                    # forewarning of Cylc8 capabilities
+                    try:
+                        templatevar_eval(value)
+                    except Exception as exc:  # purposefully vague
+                        self.manager.handle_event(
+                            exc,
+                            level=1
+                        )
+
                 tmp_file.write(self.ASSIGN_TEMPL % (key, value))
                 suite_variables.append("    '%s': %s," % (key, key))
             suite_variables.append('}')
