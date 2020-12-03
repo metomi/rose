@@ -6,7 +6,7 @@ CREATE TABLE latest (
 	revision INTEGER NOT NULL, 
 	PRIMARY KEY (idx, branch, revision)
 );
-INSERT INTO "latest" VALUES('foo-aa000','trunk',1);
+INSERT INTO latest VALUES('foo-aa000','trunk',1);
 CREATE TABLE main (
 	idx VARCHAR(1024) NOT NULL, 
 	branch VARCHAR(1024) NOT NULL, 
@@ -20,7 +20,7 @@ CREATE TABLE main (
 	from_idx VARCHAR(1024), 
 	PRIMARY KEY (idx, branch, revision)
 );
-INSERT INTO "main" VALUES('foo-aa000','trunk',1,'iris','eye pad','Should have gone to ...','$USER',1234567890,'A ',NULL);
+INSERT INTO main VALUES('foo-aa000','trunk',1,'iris','eye pad','Should have gone to ...','$USER',1234567890,'A ',NULL);
 CREATE TABLE optional (
 	idx VARCHAR(1024) NOT NULL, 
 	branch VARCHAR(1024) NOT NULL, 
@@ -29,7 +29,7 @@ CREATE TABLE optional (
 	value VARCHAR(1024), 
 	PRIMARY KEY (idx, branch, revision, name)
 );
-INSERT INTO "optional" VALUES('foo-aa000','trunk',1,'access-list','*');
+INSERT INTO optional VALUES('foo-aa000','trunk',1,'access-list','*');
 CREATE TABLE meta (
 	name VARCHAR(1024) NOT NULL, 
 	value VARCHAR(1024), 
