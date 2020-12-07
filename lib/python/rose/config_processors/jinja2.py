@@ -19,12 +19,62 @@
 # -----------------------------------------------------------------------------
 """Process a section in a rose.config.ConfigNode into a Jinja2 template."""
 
+from ast import literal_eval
 import filecmp
+import os
+from tempfile import NamedTemporaryFile
+
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
-import os
-from tempfile import NamedTemporaryFile
+from rose.reporter import Reporter
+
+
+def warn_cylc_8(values, handle_event=None):
+    """Warn users of upcoming changes to template variable parsing.
+
+    Examples:
+        >>> def handler(msg, kind=None, level=None):
+        ...     print msg
+
+        # Python literals should pass through:
+        >>> warn_cylc_8(
+        ...     ['True', '42', '"string"', '42.00', '[0]'],
+        ...     handler
+        ... )
+
+        # Jinja2 expressions should be logged:
+        >>> warn_cylc_8(
+        ...     ['range(5)', '[0] + [1]', '(1, 2) | list'],
+        ...     handler
+        ... )  # doctest: +ELLIPSIS
+        Template variables will be incompatible with Cylc8/Rose2
+        see: https://cylc.discourse.group...
+        * range(5)
+        * [0] + [1]
+        * (1, 2) | list
+
+    """
+    bad_values = []
+    for value in values:
+        try:
+            literal_eval(value)
+        except Exception:
+            bad_values.append(value)
+
+    if bad_values:
+        # purpusly vague exception
+        handle_event(
+            'Template variables will be incompatible with Cylc8/Rose2'
+            '\nsee: https://cylc.discourse.group/t/'
+            'cylc8-rose-template-variables-jinja2-suite-rc/295'
+            + '\n' + '\n'.join([
+                '* %s' % value
+                for value in bad_values
+            ]),
+            level=Reporter.WARN,
+            kind=Reporter.KIND_ERR
+        )
 
 
 class ConfigProcessorForJinja2(ConfigProcessorBase):
@@ -70,6 +120,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             tmp_file.write(scheme_ln)
             tmp_file.write(msg_init_ln)
             suite_variables = ['{']
+            tmpvars = []
             for key, node in sorted(s_node.value.items()):
                 if node.is_ignored():
                     continue
@@ -77,8 +128,11 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                     value = env_var_process(node.value)
                 except UnboundEnvironmentVariableError as exc:
                     raise ConfigProcessError([s_key, key], node.value, exc)
+                tmpvars.append(value)
                 tmp_file.write(self.ASSIGN_TEMPL % (key, value))
                 suite_variables.append("    '%s': %s," % (key, key))
+            warn_cylc_8(tmpvars, self.manager.handle_event)
+            del tmpvars
             suite_variables.append('}')
             tmp_file.write(self.ASSIGN_TEMPL % ('ROSE_SUITE_VARIABLES',
                                                 '\n'.join(suite_variables)))
