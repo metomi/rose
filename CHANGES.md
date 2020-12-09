@@ -10,7 +10,7 @@ for a full listing of issues for each release.
 Rose release 60. This maintenance release is expected to be used with:
 * [cylc-flow-7.9.2](https://github.com/cylc/cylc-flow/releases/tag/7.9.2), or
 * [cylc-flow-7.8.7](https://github.com/cylc/cylc-flow/releases/tag/7.8.7), and
-* [fcm-2019.05.0](https://github.com/metomi/fcm/releases/tag/2019.05.0).
+* [fcm-2019.09.0](https://github.com/metomi/fcm/releases/tag/2019.09.0).
 
 ### Noteworthy Changes
 
