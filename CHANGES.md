@@ -5,6 +5,25 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2019.01.4 (2019-12-xx)
+
+Rose release 60. This maintenance release is expected to be used with:
+* [cylc-flow-7.9.2](https://github.com/cylc/cylc-flow/releases/tag/7.9.2), or
+* [cylc-flow-7.8.7](https://github.com/cylc/cylc-flow/releases/tag/7.8.7), and
+* [fcm-2019.09.0](https://github.com/metomi/fcm/releases/tag/2019.09.0).
+
+### Noteworthy Changes
+
+[#2417](https://github.com/metomi/rose/pull/2417) Fix bugs in the Rosie
+pre/post-commit hook scripts.
+
+[#2425](https://github.com/metomi/rose/pull/2425) Forewarn of any future
+template variable incompatibility with Cylc8.
+(see the
+[discourse post](https://cylc.discourse.group/t/cylc8-rose-template-variables-jinja2-suite-rc/295)).
+
+--------------------------------------------------------------------------------
+
 ## 2019.01.3 (2020-04-22)
 
 Rose release 59. This maintenance release is expected to be used with:
