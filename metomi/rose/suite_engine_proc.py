@@ -19,9 +19,7 @@
 # -----------------------------------------------------------------------------
 """Suite engine processor management."""
 
-from glob import glob
 import os
-import pwd
 import re
 import sys
 
@@ -32,7 +30,6 @@ from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.host_select import HostSelector
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event
-from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
 
 
@@ -161,35 +158,6 @@ class ISOCycleOffset(BaseCycleOffset):
     def to_duration(self):
         """Convert to a Duration."""
         return self.duration
-
-
-class SuiteEngineGlobalConfCompatError(Exception):
-
-    """An exception raised on incompatible global configuration."""
-
-    def __str__(self):
-        engine, key, value = self.args
-        return ("%s global configuration incompatible to Rose: %s=%s" %
-                (engine, key, value))
-
-
-class SuiteNotRunningError(Exception):
-
-    """An exception raised when a suite is not running."""
-
-    def __str__(self):
-        return "%s: does not appear to be running" % (self.args)
-
-
-class SuiteStillRunningError(Exception):
-
-    """An exception raised when a suite is still running."""
-
-    FMT_HEAD = "Suite \"%(suite_name)s\" appears to be running:\n"
-
-    def __str__(self):
-        suite_name, extras = self.args
-        return self.FMT_HEAD % {"suite_name": suite_name} + "".join(extras)
 
 
 class CycleOffsetError(ValueError):
@@ -332,7 +300,6 @@ class SuiteEngineProcessor(object):
         self.date_time_oper = RoseDateTimeOperator()
 
     def get_suite_dir(self, suite_name, *paths):
-        # $$$ KEEP
         """Return the path to the suite running directory.
 
         paths -- if specified, are added to the end of the path.
@@ -342,7 +309,6 @@ class SuiteEngineProcessor(object):
                             self.get_suite_dir_rel(suite_name, *paths))
 
     def get_suite_dir_rel(self, suite_name, *paths):
-        # $$$ KEEP
         """Return the relative path to the suite running directory.
 
         paths -- if specified, are added to the end of the path.
@@ -351,12 +317,10 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def get_task_auth(self, suite_name, task_name):
-        # $$$ KEEP
         """Return [user@]host for a remote task in a suite."""
         raise NotImplementedError()
 
     def get_task_props(self, *args, **kwargs):
-        # $$$ KEEP
         """Return a TaskProps object containing suite task's attributes."""
         calendar_mode = self.date_time_oper.get_calendar_mode()
         try:
@@ -366,7 +330,6 @@ class SuiteEngineProcessor(object):
             self.date_time_oper.set_calendar_mode(calendar_mode)
 
     def _get_task_props(self, *_, **kwargs):
-        # $$$ KEEP
         """Helper for get_task_props."""
         tprops = TaskProps()
         # If suite_name and task_id are defined, we can assume that the rest
@@ -463,7 +426,6 @@ class SuiteEngineProcessor(object):
             return self.event_handler(*args, **kwargs)
 
     def job_logs_archive(self, suite_name, items):
-        # $$$ KEEP
         """Archive cycle job logs.
 
         suite_name -- The name of a suite.
@@ -474,7 +436,6 @@ class SuiteEngineProcessor(object):
 
     def job_logs_pull_remote(self, suite_name, items,
                              prune_remote_mode=False, force_mode=False):
-        # $$$ KEEP
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
@@ -486,7 +447,6 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def job_logs_remove_on_server(self, suite_name, items):
-        # $$$ KEEP
         """Remove cycle job logs.
 
         suite_name -- The name of a suite.
@@ -496,7 +456,6 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def parse_job_log_rel_path(self, f_name):
-        # $$$ ???
         """Return (cycle, task, submit_num, ext) for a job log rel path."""
         raise NotImplementedError()
 

@@ -32,10 +32,11 @@ from uuid import uuid4
 
 from metomi.rose.fs_util import FileSystemEvent
 from metomi.rose.popen import RosePopenError
-from metomi.rose.reporter import Event, Reporter
+from metomi.rose.reporter import Reporter
 from metomi.rose.suite_engine_proc import (
-    SuiteEngineProcessor, SuiteEngineGlobalConfCompatError,
-    SuiteNotRunningError, SuiteStillRunningError, TaskProps)
+    SuiteEngineProcessor,
+    TaskProps
+)
 
 
 class CylcProcessor(SuiteEngineProcessor):
@@ -45,7 +46,7 @@ class CylcProcessor(SuiteEngineProcessor):
     REC_CYCLE_TIME = re.compile(
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
     SCHEME = "cylc"
-    SUITE_CONF = "suite.rc"
+    SUITE_CONF = "flow.cylc"
     SUITE_NAME_ENV = "CYLC_SUITE_NAME"
     SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
