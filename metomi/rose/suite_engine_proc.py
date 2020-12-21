@@ -350,41 +350,6 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_suite_log_url(self, user_name, suite_name):
-        # $$$ KEEP
-        """Return the "rose bush" URL for a user's suite."""
-        prefix = "~"
-        if user_name:
-            prefix += user_name
-        suite_d = os.path.join(prefix, self.get_suite_dir_rel(suite_name))
-        suite_d = os.path.expanduser(suite_d)
-        if not os.path.isdir(suite_d):
-            raise NoSuiteLogError(user_name, suite_name)
-        rose_bush_url = None
-        for f_name in glob(os.path.expanduser("~/.metomi/rose-bush*.status")):
-            status = {}
-            for line in open(f_name):
-                key, value = line.strip().split("=", 1)
-                status[key] = value
-            if status.get("host"):
-                rose_bush_url = "http://" + status["host"]
-                if status.get("port"):
-                    rose_bush_url += ":" + status["port"]
-            rose_bush_url += "/"
-            break
-        if not rose_bush_url:
-            conf = ResourceLocator.default().get_conf()
-            rose_bush_url = conf.get_value(
-                ["rose-suite-log", "rose-bush"])
-        if not rose_bush_url:
-            return "file://" + suite_d
-        if not rose_bush_url.endswith("/"):
-            rose_bush_url += "/"
-        if not user_name:
-            user_name = pwd.getpwuid(os.getuid()).pw_name
-        return rose_bush_url + "/".join(
-            ["taskjobs", user_name, suite_name])
-
     def get_task_auth(self, suite_name, task_name):
         # $$$ KEEP
         """Return [user@]host for a remote task in a suite."""

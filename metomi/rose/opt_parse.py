@@ -616,10 +616,6 @@ class RoseOptionParser(OptionParser):
             ["--to-origin"],
             {"action": "store_true",
              "help": "Convert ID to the origin URL"}],
-        "to_output": [
-            ["--to-output"],
-            {"action": "store_true",
-             "help": "Get the ID output directory"}],
         "to_web": [
             ["--to-web"],
             {"action": "store_true",

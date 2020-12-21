@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 45
+tests 39
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -90,21 +90,6 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 http://trac-host/foo/intertrac/source:/a/a/0/0/0/trunk@HEAD
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-
-TEST_KEY=$TEST_KEY_BASE-1-to-output.1
-run_fail "$TEST_KEY" rosie id --to-output foo-aa000
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] foo-aa000: suite log not found
-__ERR__
-
-mkdir -p $HOME/cylc-run/foo-aa000/log/job
-rose suite-log -q -U -n foo-aa000
-TEST_KEY=$TEST_KEY_BASE-1-to-output.2
-run_pass "$TEST_KEY" rosie id --to-output foo-aa000
-file_grep "$TEST_KEY.out" '/foo-aa000$' "$TEST_KEY.out"
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-rm -fr "${HOME}/cylc-run/foo-aa000"
 
 TEST_KEY=$TEST_KEY_BASE-1-full-wc-id
 run_pass "$TEST_KEY" rosie id roses/foo-aa000

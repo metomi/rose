@@ -29,9 +29,6 @@
 #     # Print the local location of a given suite ID
 #     rosie id --to-local-copy mo1-abc45
 #
-#     # Print the output directory of a given suite ID
-#     rosie id --to-output mo1-abc45
-#
 #     # Print the web URL of a given suite ID
 #     rosie id --to-web mo1-abc45
 #
@@ -63,8 +60,6 @@
 #         Print the local location of a given suite ID
 #     --to-origin
 #         Print the repository URL of a given suite ID
-#     --to-output
-#         Print the output directory of a given suite ID
 #     --to-web
 #         Print the web URL of a given suite ID
 #     --next

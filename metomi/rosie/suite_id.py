@@ -549,17 +549,12 @@ class SuiteId(object):
             revision = self.REV_HEAD
         return url + self.FORMAT_VERSION % (branch, revision)
 
-    def to_output(self):
-        """Return the output directory for this suite."""
-        suite_engine_proc = SuiteEngineProcessor.get_processor()
-        return suite_engine_proc.get_suite_log_url(None, str(self))
-
 
 def main():
     """Implement the "rose suite-id" command."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("latest", "next", "to_local_copy", "to_origin",
-                              "to_output", "to_web")
+                              "to_web")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     SuiteId.svn.event_handler = report  # FIXME: ugly?
@@ -575,10 +570,6 @@ def main():
             for arg in args:
                 report(
                     str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0)
-        elif opts.to_output:
-            for arg in args:
-                url = SuiteId(id_text=arg).to_output()
-                report(str(url) + "\n", level=0)
         elif opts.to_web:
             for arg in args:
                 report(str(SuiteId(id_text=arg).to_web()) + "\n", level=0)
