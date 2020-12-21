@@ -19,7 +19,6 @@
 # -----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
-import filecmp
 from glob import glob
 import os
 import pwd
@@ -28,7 +27,6 @@ from random import shuffle
 import socket
 import sqlite3
 import tarfile
-from tempfile import mkstemp
 from time import sleep
 from uuid import uuid4
 
@@ -40,17 +38,10 @@ from metomi.rose.suite_engine_proc import (
     SuiteNotRunningError, SuiteStillRunningError, TaskProps)
 
 
-_PORT_SCAN = "port-scan"
-
-
 class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the cylc suite engine."""
 
-    CONTACT_KEYS = (
-        "CYLC_SUITE_HOST", "CYLC_SUITE_OWNER", "CYLC_SUITE_PORT",
-        "CYLC_SUITE_PROCESS")
-    PGREP_CYLC_RUN = r"python.*/bin/cylc-(run|restart)( | .+ )%s( |$)"
     REC_CYCLE_TIME = re.compile(
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
     SCHEME = "cylc"
@@ -66,108 +57,6 @@ class CylcProcessor(SuiteEngineProcessor):
         self.daos = {}
         self.host = None
         self.user = None
-
-    def check_global_conf_compat(self):
-        """Raise exception on incompatible Cylc global configuration."""
-        expected = os.path.join("~", self.SUITE_DIR_REL_ROOT)
-        expected = os.path.expanduser(expected)
-        for key in ["[hosts][localhost]run directory",
-                    "[hosts][localhost]work directory"]:
-            out = self.popen("cylc", "get-global-config", "-i", key)[0]
-            lines = out.splitlines()
-            try:
-                lines[0] = lines[0].decode()
-            except AttributeError:
-                pass
-            if lines and lines[0] != expected:
-                raise SuiteEngineGlobalConfCompatError(
-                    self.SCHEME, key, lines[0])
-
-    def check_suite_not_running(self, suite_name):
-        """Check if a suite is still running.
-
-        Args:
-            suite_name (str): the name of the suite as known by Cylc.
-        Raise:
-            SuiteStillRunningError: if suite is still running.
-        """
-        try:
-            contact_info = self.get_suite_contact(suite_name)
-        except SuiteNotRunningError:
-            return  # No contact file, suite not running
-        else:
-            fname = self.get_suite_dir(suite_name, ".service", "contact")
-            extras = ["Contact info from: \"%s\"\n" % fname]
-            for key, value in sorted(contact_info.items()):
-                if key in self.CONTACT_KEYS:
-                    extras.append("    %s=%s\n" % (key, value))
-            extras.append("Try \"cylc stop '%s'\" first?" % suite_name)
-            raise SuiteStillRunningError(suite_name, extras)
-
-    def cmp_suite_conf(
-            self, suite_name, run_mode, strict_mode=False, debug_mode=False):
-        """Parse and compare current "suite.rc" with that in the previous run.
-
-        (Re-)register and validate the "suite.rc" file.
-        Raise RosePopenError on failure.
-        Return True if "suite.rc.processed" is unmodified c.f. previous run.
-        Return False otherwise.
-
-        """
-        suite_dir = self.get_suite_dir(suite_name)
-        if run_mode == "run":
-            self.popen.run_simple("cylc", "register", suite_name, suite_dir)
-        f_desc, new_suite_rc_processed = mkstemp()
-        os.close(f_desc)
-        command = ["cylc", "validate", "-o", new_suite_rc_processed]
-        if debug_mode:
-            command.append("--debug")
-        if strict_mode:
-            command.append("--strict")
-        command.append(suite_name)
-        old_suite_rc_processed = os.path.join(suite_dir, "suite.rc.processed")
-        try:
-            self.popen.run_simple(*command, stdout_level=Event.V)
-            return (
-                os.path.exists(old_suite_rc_processed) and
-                filecmp.cmp(old_suite_rc_processed, new_suite_rc_processed))
-        finally:
-            os.unlink(new_suite_rc_processed)
-
-    def get_running_suites(self):
-        """Return a list containing the names of running suites."""
-        rootd = os.path.join(os.path.expanduser('~'), self.SUITE_DIR_REL_ROOT)
-        sub_names = ['.service', 'log', 'share', 'work', self.SUITE_CONF]
-        items = []
-        for dirpath, dnames, fnames in os.walk(rootd, followlinks=True):
-            if dirpath != rootd and any(
-                    name in dnames + fnames for name in sub_names):
-                dnames[:] = []
-            else:
-                continue
-            if os.path.exists(os.path.join(dirpath, '.service', 'contact')):
-                items.append(os.path.relpath(dirpath, rootd))
-        return items
-
-    def get_suite_contact(self, suite_name):
-        """Return suite contact information for a user suite.
-
-        Return (dict): suite contact information.
-        """
-        try:
-            # Note: low level directory open ensures that the file system
-            # containing the contact file is synchronised, e.g. in an NFS
-            # environment.
-            os.close(os.open(
-                self.get_suite_dir(suite_name, ".service"), os.O_DIRECTORY))
-            ret = {}
-            for line in open(
-                    self.get_suite_dir(suite_name, ".service", "contact")):
-                key, value = [item.strip() for item in line.split("=", 1)]
-                ret[key] = value
-            return ret
-        except (IOError, OSError, ValueError):
-            raise SuiteNotRunningError(suite_name)
 
     @classmethod
     def get_suite_dir_rel(cls, suite_name, *paths):
@@ -211,50 +100,8 @@ class CylcProcessor(SuiteEngineProcessor):
         Or None if task does not run remotely.
 
         """
-        try:
-            out = self.popen(
-                "cylc", "get-config", "-o",
-                "-i", "[runtime][%s][remote]owner" % task_name,
-                "-i", "[runtime][%s][remote]host" % task_name,
-                suite_name)[0]
-        except RosePopenError:
-            return
-        user, host = (None, None)
-        items = out.strip().split(None, 1)
-        if items:
-            user = items.pop(0).replace(b"*", b" ")
-        if items:
-            host = items.pop(0).replace(b"*", b" ")
-        return self._parse_user_host(user=user, host=host)
-
-    def get_tasks_auths(self, suite_name):
-        """Return a list of unique [user@]host for remote tasks in a suite."""
-        actual_hosts = {}
-        auths = []
-        out = self.popen("cylc", "get-config", "-ao",
-                         "-i", "[remote]owner",
-                         "-i", "[remote]host",
-                         suite_name)[0]
-        for line in out.splitlines():
-            items = line.split(None, 2)
-            user, host = (None, None)
-            items.pop(0)
-            if items:
-                user = items.pop(0).decode().replace("*", " ")
-            if items:
-                host = items.pop(0).decode().replace("*", " ")
-            if host in actual_hosts:
-                host = str(actual_hosts[host])
-                auth = self._parse_user_host(user=user, host=host)
-            else:
-                auth = self._parse_user_host(user=user, host=host)
-                if auth and "@" in auth:
-                    actual_hosts[host] = auth.split("@", 1)[1]
-                else:
-                    actual_hosts[host] = auth
-            if auth and auth not in auths:
-                auths.append(auth)
-        return auths
+        # TODO: reimplement for Cylc8?
+        return None
 
     def get_task_props_from_env(self):
         """Get attributes of a suite task from environment variables.
@@ -287,17 +134,6 @@ class CylcProcessor(SuiteEngineProcessor):
                          task_log_root=task_log_root,
                          task_is_cold_start=task_is_cold_start,
                          cycling_mode=cycling_mode)
-
-    def get_version(self):
-        """Return Cylc's version."""
-        return self.popen("cylc", "--version")[0].strip()
-
-    def is_suite_registered(self, suite_name):
-        """See if a suite is registered
-            Return True directory for a suite if it is registered
-            Return False otherwise
-        """
-        return self.popen.run("cylc", "get-directory", suite_name)[0] == 0
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
@@ -502,62 +338,6 @@ class CylcProcessor(SuiteEngineProcessor):
     def parse_job_log_rel_path(cls, f_name):
         """Return (cycle, task, submit_num, ext)."""
         return f_name.replace("log/job/", "").split("/", 3)
-
-    @staticmethod
-    def process_suite_hook_args(*args, **_):
-        """Rearrange args for TaskHook.run."""
-        task = None
-        if len(args) == 3:
-            hook_event, suite, hook_message = args
-        else:
-            hook_event, suite, task, hook_message = args
-        return [suite, task, hook_event, hook_message]
-
-    def run(self, suite_name, host=None, run_mode=None, args=None):
-        """Invoke "cylc run" (in a specified host).
-
-        The current working directory is assumed to be the suite log directory.
-
-        suite_name: the name of the suite.
-        host: the host to run the suite. "localhost" if None.
-        run_mode: call "cylc restart|reload" instead of "cylc run".
-        args: arguments to pass to "cylc run".
-
-        """
-        if run_mode not in ['reload', 'restart', 'run']:
-            run_mode = 'run'
-        cmd = ['cylc', run_mode]
-        if run_mode == 'reload':
-            cmd.append('--force')
-        if host and not self.host_selector.is_local_host(host):
-            cmd.append('--host=%s' % host)
-        cmd.append(suite_name)
-        cmd += args
-        out, err = self.popen(*cmd)
-        if err:
-            self.handle_event(err, kind=Event.KIND_ERR)
-        if out:
-            self.handle_event(out)
-
-    def shutdown(self, suite_name, args=None, stderr=None, stdout=None):
-        """Shut down the suite.
-
-        suite_name -- the name of the suite.
-        stderr -- A file handle for stderr, if relevant for suite engine.
-        stdout -- A file handle for stdout, if relevant for suite engine.
-        args -- extra arguments for "cylc shutdown".
-
-        """
-        contact_info = self.get_suite_contact(suite_name)
-        if not contact_info:
-            raise SuiteNotRunningError(suite_name)
-        environ = dict(os.environ)
-        environ.update({'CYLC_VERSION': contact_info['CYLC_VERSION']})
-        command = ["cylc", "shutdown", suite_name, "--force"]
-        if args:
-            command += args
-        self.popen.run_simple(
-            *command, env=environ, stderr=stderr, stdout=stdout)
 
     def _db_close(self, suite_name):
         """Close a named database connection."""

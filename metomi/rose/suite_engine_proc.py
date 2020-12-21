@@ -19,12 +19,14 @@
 # -----------------------------------------------------------------------------
 """Suite engine processor management."""
 
-from metomi.isodatetime.data import Duration
-from metomi.isodatetime.parsers import DurationParser, ISO8601SyntaxError
 from glob import glob
 import os
 import pwd
 import re
+import sys
+
+from metomi.isodatetime.data import Duration
+from metomi.isodatetime.parsers import DurationParser, ISO8601SyntaxError
 from metomi.rose.date import RoseDateTimeOperator, OffsetValueError
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.host_select import HostSelector
@@ -32,8 +34,6 @@ from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
-import sys
-import webbrowser
 
 
 class NoSuiteLogError(Exception):
@@ -331,48 +331,8 @@ class SuiteEngineProcessor(object):
         self.host_selector = host_selector
         self.date_time_oper = RoseDateTimeOperator()
 
-    def check_global_conf_compat(self):
-        """Raise exception on suite engine specific incompatibity.
-
-        Should raise SuiteEngineGlobalConfCompatError.
-
-        """
-        raise NotImplementedError()
-
-    def check_suite_not_running(self, suite_name):
-        """Check that suite is not running.
-
-        This method is not implemented. Sub-class should override.
-
-        Arguments:
-            suite_name: name of suite to check.
-
-        Raise:
-            SuiteStillRunningError:
-                Should raise SuiteStillRunningError if suite is still running.
-        """
-        raise NotImplementedError()
-
-    def cmp_suite_conf(
-            self, suite_name, run_mode, strict_mode=False, debug_mode=False):
-        """Compare current suite configuration with that in the previous run.
-
-        An implementation of this method should:
-        * Raise an exception on failure.
-        * Return True if suite configuration is unmodified c.f. previous run.
-        * Return False otherwise.
-
-        """
-        raise NotImplementedError()
-
-    def get_suite_contact(self, suite_name):
-        """Return suite contact information for a user suite.
-
-        Return (dict): suite contact information.
-        """
-        raise NotImplementedError()
-
     def get_suite_dir(self, suite_name, *paths):
+        # $$$ KEEP
         """Return the path to the suite running directory.
 
         paths -- if specified, are added to the end of the path.
@@ -382,6 +342,7 @@ class SuiteEngineProcessor(object):
                             self.get_suite_dir_rel(suite_name, *paths))
 
     def get_suite_dir_rel(self, suite_name, *paths):
+        # $$$ KEEP
         """Return the relative path to the suite running directory.
 
         paths -- if specified, are added to the end of the path.
@@ -390,6 +351,7 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def get_suite_log_url(self, user_name, suite_name):
+        # $$$ KEEP
         """Return the "rose bush" URL for a user's suite."""
         prefix = "~"
         if user_name:
@@ -424,14 +386,12 @@ class SuiteEngineProcessor(object):
             ["taskjobs", user_name, suite_name])
 
     def get_task_auth(self, suite_name, task_name):
+        # $$$ KEEP
         """Return [user@]host for a remote task in a suite."""
         raise NotImplementedError()
 
-    def get_tasks_auths(self, suite_name):
-        """Return a list of [user@]host for remote tasks in a suite."""
-        raise NotImplementedError()
-
     def get_task_props(self, *args, **kwargs):
+        # $$$ KEEP
         """Return a TaskProps object containing suite task's attributes."""
         calendar_mode = self.date_time_oper.get_calendar_mode()
         try:
@@ -441,6 +401,7 @@ class SuiteEngineProcessor(object):
             self.date_time_oper.set_calendar_mode(calendar_mode)
 
     def _get_task_props(self, *_, **kwargs):
+        # $$$ KEEP
         """Helper for get_task_props."""
         tprops = TaskProps()
         # If suite_name and task_id are defined, we can assume that the rest
@@ -531,24 +492,13 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_version(self):
-        """Return the version string of the suite engine."""
-        raise NotImplementedError()
-
-    def get_version_env_name(self):
-        """Return the name of the suite engine version environment variable."""
-        return self.SCHEME.upper() + "_VERSION"
-
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def is_suite_registered(self, suite_name):
-        """Return whether or not a suite is registered."""
-        raise NotImplementedError()
-
     def job_logs_archive(self, suite_name, items):
+        # $$$ KEEP
         """Archive cycle job logs.
 
         suite_name -- The name of a suite.
@@ -559,6 +509,7 @@ class SuiteEngineProcessor(object):
 
     def job_logs_pull_remote(self, suite_name, items,
                              prune_remote_mode=False, force_mode=False):
+        # $$$ KEEP
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
@@ -570,6 +521,7 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def job_logs_remove_on_server(self, suite_name, items):
+        # $$$ KEEP
         """Remove cycle job logs.
 
         suite_name -- The name of a suite.
@@ -578,28 +530,9 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def launch_suite_log_browser(self, user_name, suite_name):
-        """Launch web browser to view suite log.
-
-        Return URL of suite log on success, None otherwise.
-
-        """
-        url = self.get_suite_log_url(user_name, suite_name)
-        browser = webbrowser.get()
-        browser.open(url, new=True, autoraise=True)
-        self.handle_event(WebBrowserEvent(browser.name, url))
-        return url
-
     def parse_job_log_rel_path(self, f_name):
+        # $$$ ???
         """Return (cycle, task, submit_num, ext) for a job log rel path."""
-        raise NotImplementedError()
-
-    def run(self, suite_name, host=None, run_mode=None, args=None):
-        """Start a suite (in a specified host)."""
-        raise NotImplementedError()
-
-    def shutdown(self, suite_name, args=None, stderr=None, stdout=None):
-        """Shut down the suite."""
         raise NotImplementedError()
 
     def _get_offset_cycle_time(self, cycle, cycle_offset):

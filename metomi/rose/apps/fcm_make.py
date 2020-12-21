@@ -173,6 +173,7 @@ class FCMMakeApp(BuiltinApp):
         # Determine the name of the continuation task
         task_name_cont = task.task_name.replace(
             orig_cont_map[ORIG], orig_cont_map[CONT])
+        # TODO: get_task_auth currently does nothing
         auth = app_runner.suite_engine_proc.get_task_auth(
             task.suite_name, task_name_cont)
         if auth is not None:
