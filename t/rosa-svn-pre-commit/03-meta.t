@@ -41,7 +41,7 @@ mkdir 'repos'
 svnadmin create 'repos/foo'
 SVN_URL="file://${PWD}/repos/foo"
 ROSE_BIN_HOME=$(dirname $(command -v rose))
-ROSE_LIB=$(dirname $(python -c "import metomi.rose; print(metomi.rose.__file__)"))
+ROSE_LIB=$(dirname $(python3 -c "import metomi.rose; print(metomi.rose.__file__)"))
 cat >'repos/foo/hooks/pre-commit' <<__PRE_COMMIT__
 #!/bin/bash
 export ROSE_CONF_PATH=${PWD}/conf

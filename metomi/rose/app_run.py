@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -115,7 +112,7 @@ class PollEvent(Event):
             ok_str, strftime("%Y-%m-%dT%H:%M:%S", localtime(sec)), test)
 
 
-class Poller(object):
+class Poller:
 
     """Handle the [poll] functionality for AppRunner."""
 
@@ -287,7 +284,7 @@ class Poller(object):
         return is_done
 
 
-class BuiltinApp(object):
+class BuiltinApp:
 
     """An abstract base class for a builtin application.
 

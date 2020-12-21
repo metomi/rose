@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -24,7 +21,7 @@ PASS = "~~"
 FAIL = "!~"
 
 
-class Mandatory(object):
+class Mandatory:
     def run(self, task):
         """Perform an exact comparison between the result and the KGO data"""
         failures = 0
@@ -35,7 +32,7 @@ class Mandatory(object):
         return task
 
 
-class MandatoryStringResult(object):
+class MandatoryStringResult:
 
     """Result of mandatory text examination."""
 

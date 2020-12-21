@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -64,7 +61,7 @@ class RosieWSClientQuerySplitError(RosieWSClientError):
         return "Query syntax error: " + " ".join(self.args[0])
 
 
-class RosieWSClient(object):
+class RosieWSClient:
 
     """A client for the Rosie web service.
 
@@ -75,7 +72,7 @@ class RosieWSClient(object):
             credentials. Takes and returns the arguments username and password.
         popen (rose.popen.RosePopener): Use initiated RosePopener instance
             create a new one if ``None``.
-        event_handler (object): A callable object for reporting popen output,
+        event_handler : A callable object for reporting popen output,
             see :py:class:`rose.reporter.Reporter`.
     """
 

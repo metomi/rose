@@ -25,7 +25,7 @@ Some quick examples:
 
 .. code-block:: python
 
-    def Some_Class(object):
+    def Some_Class:
         """Some summary.
 
         Note __init__ methods are not autodocumented, specify constructor

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -29,7 +26,7 @@ from metomi.rose.loc_handlers.rsync_remote_check import (
 )
 
 
-class RsyncLocHandler(object):
+class RsyncLocHandler:
     """Handler of locations on remote hosts."""
 
     SCHEME = "rsync"

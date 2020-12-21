@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors - GNU V3+.
 # This is illustrative code developed for tutorial purposes, it is not
 # intended for scientific use and is not guarantied to be accurate or correct.
@@ -213,7 +211,7 @@ def get_grid_coordinates(lng, lat, domain, resolution):
         length_y - int((abs(lat - domain['lat1'])) // resolution))
 
 
-class SurfaceFitter(object):
+class SurfaceFitter:
     """A 2D interpolation for random points.
 
     A standin for scipy.interpolate.interp2d

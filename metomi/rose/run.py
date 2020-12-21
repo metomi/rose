@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -83,7 +80,7 @@ class NewModeError(Exception):
         return "%s=%s, --new mode not supported." % self.args
 
 
-class Dummy(object):
+class Dummy:
 
     """Convert a dict into an object."""
 
@@ -92,7 +89,7 @@ class Dummy(object):
             setattr(self, key, value)
 
 
-class Runner(object):
+class Runner:
 
     """Invoke a Rose application."""
 

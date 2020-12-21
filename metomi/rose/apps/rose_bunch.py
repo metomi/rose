@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -372,7 +369,7 @@ class RoseBunchApp(BuiltinApp):
             return 0
 
 
-class RoseBunchCmd(object):
+class RoseBunchCmd:
     """A command instance to run."""
 
     OUTPUT_TEMPLATE = "bunch.%s.%s"
@@ -406,7 +403,7 @@ class RoseBunchCmd(object):
         return self.name
 
 
-class RoseBunchDAO(object):
+class RoseBunchDAO:
     """Database object for rose_bunch"""
 
     TABLE_COMMANDS = "commands"

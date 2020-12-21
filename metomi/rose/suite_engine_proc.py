@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -59,7 +56,7 @@ class WebBrowserEvent(Event):
         return "%s %s" % self.args
 
 
-class BaseCycleOffset(object):
+class BaseCycleOffset:
 
     """Represent a cycle time offset."""
 
@@ -181,7 +178,7 @@ class CyclingModeError(ValueError):
         return self.args[0] + ": unrecognised cycling mode."
 
 
-class TaskProps(object):
+class TaskProps:
 
     """Task properties.
 
@@ -259,7 +256,7 @@ class TaskProps(object):
         return ret
 
 
-class SuiteEngineProcessor(object):
+class SuiteEngineProcessor:
     """An abstract suite engine processor."""
 
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}

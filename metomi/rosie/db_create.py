@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -84,7 +81,7 @@ class RosieDatabaseLoadSkipEvent(Event):
         return "%s: DB not loaded: %s" % self.args
 
 
-class RosieDatabaseInitiator(object):
+class RosieDatabaseInitiator:
 
     """Initiate a database file from the repository information."""
 

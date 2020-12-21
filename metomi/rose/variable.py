@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -50,7 +47,7 @@ IGNORED_BY_SYSTEM = 'Trigger ignored'
 IGNORED_BY_USER = 'User ignored'
 
 
-class Variable(object):
+class Variable:
 
     """This class stores the data and metadata of an input variable.
 
@@ -276,7 +273,7 @@ def get_value_from_metadata(meta_data):
     return var_value
 
 
-class RangeSubFunction(object):
+class RangeSubFunction:
 
     """Holds a checking function."""
 
@@ -304,7 +301,7 @@ class RangeSubFunction(object):
             self.operator, self.values)
 
 
-class CombinedRangeSubFunction(object):
+class CombinedRangeSubFunction:
 
     def __init__(self, *range_insts):
         self.range_insts = range_insts

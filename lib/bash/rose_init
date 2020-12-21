@@ -36,7 +36,7 @@
 function rose_init() {
     set -eu
     ROSE_NS=$(basename "$0")
-    ROSE_LIB="$(dirname "$(python -c "import metomi.rose; print(metomi.rose.__file__)")")"
+    ROSE_LIB="$(dirname "$(python3 -c "import metomi.rose; print(metomi.rose.__file__)")")"
     ROSE_HOME_BIN=$(dirname "$(command -v rose)")
     ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
     export ROSE_LIB ROSE_HOME_BIN ROSE_NS ROSE_VERSION

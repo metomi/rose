@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -55,7 +52,7 @@ class ResourceError(Exception):
         Exception.__init__(self, "%s: resource not found." % key)
 
 
-class ResourceLocator(object):
+class ResourceLocator:
 
     """A class for searching resource files."""
 

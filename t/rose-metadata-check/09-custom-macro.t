@@ -121,7 +121,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [V] rose.metadata_check.MetadataChecker: issues: 1
     namelist:macro_nl=my_macro_var1=macro=envswitch.LogicalTransformer
-        Could not import envswitch.LogicalTransformer: IndentationError: expected an indented block (envswitch.py, line 37)
+        Could not import envswitch.LogicalTransformer: IndentationError: expected an indented block (envswitch.py, line 35)
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------

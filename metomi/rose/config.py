@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -114,7 +111,7 @@ STATE_SECT_IGNORED = "^"
 OPT_CONFIG_SETTING_COMMENT = " setting from opt config \"%s\" (%s)"
 
 
-class ConfigNode(object):
+class ConfigNode:
 
     """Represent a node in a configuration file.
 
@@ -661,7 +658,7 @@ class ConfigNode(object):
         self.comments = state["comments"]
 
 
-class ConfigNodeDiff(object):
+class ConfigNodeDiff:
 
     """Represent differences between two ConfigNode instances.
 
@@ -1007,7 +1004,7 @@ class ConfigNodeDiff(object):
         self._data[self.KEY_REMOVED] = {}
 
 
-class ConfigDumper(object):
+class ConfigDumper:
 
     """Dumper of a ConfigNode object in Rose INI format.
 
@@ -1148,7 +1145,7 @@ class ConfigDumper(object):
         return "#%s\n" % (comment)
 
 
-class ConfigLoader(object):
+class ConfigLoader:
 
     """Loader of an INI format configuration into a ConfigNode object.
 

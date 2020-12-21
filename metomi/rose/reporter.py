@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -24,7 +21,7 @@ import sys
 import time
 
 
-class Reporter(object):
+class Reporter:
 
     """Report diagnostic messages.
 
@@ -181,7 +178,7 @@ class Reporter(object):
     __call__ = report
 
 
-class ReporterContext(object):
+class ReporterContext:
 
     """A context for the reporter object.
 
@@ -260,7 +257,7 @@ class ReporterContext(object):
         return str_
 
 
-class Event(object):
+class Event:
 
     """A base class for events suitable for feeding into a Reporter."""
 

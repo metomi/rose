@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -38,7 +35,7 @@ class BadOptionalConfigurationKeysError(Exception):
         return "Bad optional configuration key(s): " + ", ".join(self.args[0])
 
 
-class ConfigTree(object):
+class ConfigTree:
 
     """A run time Rose configuration with linearised inheritance.
 
@@ -77,7 +74,7 @@ class ConfigTree(object):
             os.path.join(file_loc, key) for file_loc in self.file_locs[key]]
 
 
-class ConfigTreeLoader(object):
+class ConfigTreeLoader:
 
     """Load a Rose configuration with inheritance."""
 
@@ -186,7 +183,7 @@ class ConfigTreeLoader(object):
         return os.path.abspath(os.path.join(conf_dir_paths[0], conf_dir))
 
 
-class _Test(object):
+class _Test:
 
     """Self tests. Print results in TAP format."""
 

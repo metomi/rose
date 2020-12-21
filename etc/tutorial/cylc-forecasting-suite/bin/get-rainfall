@@ -34,7 +34,7 @@ URL = ('http://datapoint.metoffice.gov.uk/public/data/layer/wxobs/'
        'RADAR_UK_Composite_Highres/png?TIME={time}&key={api_key}')
 
 
-class Rainfall(object):
+class Rainfall:
     """Class for holding rainfall data.
 
     Args:

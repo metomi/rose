@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -34,7 +31,7 @@ PASS = "<="
 FAIL = ">"
 
 
-class Within(object):
+class Within:
     def run(self, task):
         """Check that the results are within a specified tolerance."""
         failures = 0
@@ -63,7 +60,7 @@ class Within(object):
         return task
 
 
-class WithinComparisonFailure(object):
+class WithinComparisonFailure:
 
     """Class used if results are not within a certain amount of the KGO"""
 
@@ -108,7 +105,7 @@ class WithinComparisonFailure(object):
     __str__ = __repr__
 
 
-class WithinComparisonSuccess(object):
+class WithinComparisonSuccess:
 
     """Class used if results are within a certain amount of the KGO"""
 

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -173,7 +170,7 @@ class MetaConfigFlagMissingError(Exception):
         return ERROR_LOAD_CONF_META_NODE
 
 
-class MacroBase(object):
+class MacroBase:
 
     """Base class for macros for validating or transforming configurations.
 
@@ -497,7 +494,7 @@ class MacroTransformerCollection(MacroBase):
         return config, self.reports
 
 
-class MacroReport(object):
+class MacroReport:
 
     """Class to hold information about a macro issue.
 

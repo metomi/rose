@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -24,7 +21,7 @@ from metomi.rose.checksum import get_checksum
 import os
 
 
-class FileSystemLocHandler(object):
+class FileSystemLocHandler:
 
     """Handler of file system locations."""
 

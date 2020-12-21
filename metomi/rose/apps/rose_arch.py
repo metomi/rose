@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -404,7 +401,7 @@ class RoseArchApp(BuiltinApp):
         return value
 
 
-class RoseArchTarget(object):
+class RoseArchTarget:
 
     """An archive target."""
 
@@ -435,7 +432,7 @@ class RoseArchTarget(object):
         return not self.__eq__(other)
 
 
-class RoseArchSource(object):
+class RoseArchSource:
 
     """An archive source."""
 
@@ -457,7 +454,7 @@ class RoseArchSource(object):
         return not self.__eq__(other)
 
 
-class RoseArchDAO(object):
+class RoseArchDAO:
 
     """Data access object for incremental mode."""
 

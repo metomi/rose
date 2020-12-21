@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -116,7 +113,7 @@ class TimedOutHostEvent(Event):
         return self.args[0] + ": (timed out)"
 
 
-class HostSelector(object):
+class HostSelector:
 
     """Select an available host machine by load of by random."""
 
@@ -419,7 +416,7 @@ class HostSelector(object):
     __call__ = select
 
 
-class ScorerConf(object):
+class ScorerConf:
 
     """Wrap a threshold/ranking scorer + extra configuration."""
 
@@ -444,7 +441,7 @@ class ScorerConf(object):
         return self.scorer.command_out_parser(out, self.method_arg)
 
 
-class RandomScorer(object):
+class RandomScorer:
 
     """Base class for threshold/ranking scorer.
 

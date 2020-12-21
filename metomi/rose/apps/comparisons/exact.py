@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -26,7 +23,7 @@ PASS = "=="
 FAIL = "!="
 
 
-class Exact(object):
+class Exact:
     def run(self, task):
         """Perform an exact comparison between the result and the KGO data"""
         failures = 0
@@ -46,7 +43,7 @@ class Exact(object):
         return task
 
 
-class ExactComparisonFailure(object):
+class ExactComparisonFailure:
 
     """Class used if results do not match the KGO"""
 
@@ -79,7 +76,7 @@ class ExactComparisonFailure(object):
     __str__ = __repr__
 
 
-class ExactComparisonSuccess(object):
+class ExactComparisonSuccess:
 
     """Class used if results match the KGO"""
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors - GNU V3+.
 # This is illustrative code developed for tutorial purposes, it is not
 # intended for scientific use and is not guarantied to be accurate or correct.

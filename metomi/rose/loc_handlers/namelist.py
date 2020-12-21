@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -37,7 +34,7 @@ class NamelistEvent(Event):
     LEVEL = Event.VV
 
 
-class NamelistLocHandler(object):
+class NamelistLocHandler:
     """Handler of namelists."""
 
     SCHEME = "namelist"

@@ -36,7 +36,7 @@ prefix-owner-default.foo=fred
 prefix-location.foo=$SVN_URL
 __ROSE_CONF__
 ROSE_BIN_HOME=$(dirname $(command -v rose))
-ROSE_LIB=$(dirname $(python -c "import metomi.rose; print(metomi.rose.__file__)"))
+ROSE_LIB=$(dirname $(python3 -c "import metomi.rose; print(metomi.rose.__file__)"))
 export ROSE_CONF_PATH=$PWD/conf
 cat >repos/foo/hooks/pre-commit <<__PRE_COMMIT__
 #!/bin/bash

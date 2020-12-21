@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -486,7 +483,7 @@ class FileUnchangedEvent(Event):
         return str(self.args[0])
 
 
-class Loc(object):
+class Loc:
 
     """Represent a location.
 
@@ -576,7 +573,7 @@ class LocTypeError(Exception):
         return "%s <= %s, expected %s, got %s" % self.args
 
 
-class LocSubPath(object):
+class LocSubPath:
     """Represent a sub-path in a location."""
 
     def __init__(self, name, checksum=None, access_mode=None):
@@ -603,7 +600,7 @@ class LocSubPath(object):
         return self.name
 
 
-class LocDAO(object):
+class LocDAO:
     """DAO for information for incremental updates."""
 
     FILE_NAME = ".rose-config_processors-file.db"

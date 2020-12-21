@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -63,7 +60,7 @@ class RosieStoreRetrievalError(Exception):
         return message
 
 
-class GnomekeyringStore(object):
+class GnomekeyringStore:
 
     """Password management with gnomekeyring."""
 
@@ -121,7 +118,7 @@ class GnomekeyringStore(object):
         self.item_ids[(scheme, host, username)] = (None, item_id)
 
 
-class GPGAgentStore(object):
+class GPGAgentStore:
 
     """Password management with gpg-agent."""
 
@@ -232,7 +229,7 @@ class GPGAgentStore(object):
         pass
 
 
-class LibsecretStore(object):
+class LibsecretStore:
 
     """Password management with libsecret."""
 
@@ -275,7 +272,7 @@ class LibsecretStore(object):
             pass
 
 
-class RosieWSClientAuthManager(object):
+class RosieWSClientAuthManager:
 
     """Manage authentication info for a Rosie web service client."""
 
