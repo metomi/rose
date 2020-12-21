@@ -81,15 +81,6 @@ Connectivity requirements:
    * Must share user accounts and ``$HOME`` directories with the hosts running
      the Cylc suites.
 
-Hosts For Running Rose Bush
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Installation requirements:
-   * Rose, Bash, Python, jinja2.
-
-Connectivity requirements:
-   * Must be able to access the home directories of users' Cylc run directories.
-
 Hosts For Rosie Subversion Repositories And The Rosie Web Services
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -236,26 +227,6 @@ under ``/etc/rose-meta/`` at your site. You can do::
    See also :ref:`app-meta-loc`.
 
 
-Configuring Rose Bush
----------------------
-
-Rose Bush provides an intranet web service at your site for users to
-view their suite logs using a web browser. Depending on settings at
-your site, you may or may not be able to set up this service.
-
-You can start an ad-hoc Rose Bush web server by running::
-
-   setsid /path/to/rose/bin/rose bush start 0</dev/null 1>/dev/null 2>&1 &
-
-You will find the access and error logs under ``~/.metomi/rose-bush*``.
-
-Alternatively you can run the Rose Bush web service under Apache
-``mod_wsgi``.
-
-Use the Apache log at e.g. ``/var/log/httpd/`` to debug problems.
-See also `Configuring a Rosie Server`_.
-
-
 Configuring a Rosie Server
 --------------------------
 
@@ -352,7 +323,6 @@ following (with the paths set appropriately)::
    WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
 
 Use the Apache log at e.g. ``/var/log/httpd/`` to debug problems.
-See also `Configuring Rose Bush`_.
 
 Hopefully, you should now have a working Rosie service server. Configure
 the client settings by editing the :rose:conf:`rose.conf[rosie-id]`

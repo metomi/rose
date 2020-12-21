@@ -111,42 +111,6 @@ notification-from=EMAIL-ADDRESS
 user-tool=ldap|passwd
 
 
-# Configuration for Rose Bush server.
-[rose-bush]
-# :default: 100
-#
-# Cycles list view: default number of cycles per page.
-cycles-per-page=NUMBER
-# :default: The server's host name.
-#
-# An alternative host name.
-host=NAME
-# :default: 15
-#
-# Job list view: default number of jobs per page.
-jobs-per-page=NUMBER
-# :default: 300
-#
-# Job list view: maximum number of jobs per page.
-jobs-per-page-max=NUMBER
-# Image logo attributes, can be any HTML ``<img/>`` tag attributes
-# e.g: ``logo=src="http://server/my-rose-bush-logo.png" alt="My Rose Bush
-# Logo"``.
-logo=HTML-IMG-ATTRIBUTE ...
-# :default: 100
-#
-# Suites list view: default number of suites per page.
-suites-per-page=NUMBER
-# :default: "Rose Bush"
-#
-# An alternative service title.
-title=TITLE
-# :default: 10485760
-#
-# File view: maximum viewable file size in bytes.
-view-size-max=BYTES
-
-
 # Configuration specific to :ref:`command-rose-config-diff`.
 [rose-config-diff]
 # :default: "title,ns,description,help"
@@ -209,12 +173,6 @@ timeout=FLOAT
 # variables in the ``suite.rc`` file. E.g ``automatic-options=TEA=earl_grey``
 # would set the Jinja2 variable ``TEA`` to be ``earl_grey``.
 automatic-options=VARIABLE=VALUE
-
-
-# Configuration related to :ref:`command-rose-suite-log`.
-[rose-suite-log]
-# URL to the site's Rose Bush web service.
-rose-bush=URL
 
 
 # Configuration related to :ref:`command-rose-mpi-launch`.

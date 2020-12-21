@@ -77,7 +77,6 @@ main () {
 default () {
     # run a strict check on all "functional" scripts
     main . \
-        --exclude etc/rose-bash-completion \
         --exclude t \
         -- -e SC1090 -e SC2119 -e SC2001
 

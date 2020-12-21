@@ -77,31 +77,8 @@ Additionally there is a `Pygments`_ lexer located in
       rose version --long
 
 
-Bash Auto-Completion
---------------------
-
-There is a Rose bash completion script that you can source to enhance the
-Rose command line interface within an interactive Bash shell.
-
-The script allows you to tab-complete Rose commands, options, and arguments.
-
-You can find the script in the Rose installation ``etc/rose-bash-completion``.
-The file contains the instructions for using it.
-
-
 Configuring Cylc
 ----------------
 
 See the "Installation" and "User Config File" sections of the
 `Cylc User Guide`_.
-
-.. warning::
-
-   Do not modify the default values of the following cylc settings:
-   
-   * ``[hosts][HOST]run directory``
-   * ``[hosts][HOST]work directory``
-   
-   Equivalent functionalities are provided by the
-   :rose:conf:`rose.conf[rose-suite-run]root-dir` settings in the Rose
-   site/user configuration.

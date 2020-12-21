@@ -107,62 +107,6 @@ A suite directory may contain the following:
       used by various Rose utilities, such as the config editor GUI. It can be
       used to specify the suite type.
 
-   .. rose:conf:: root-dir=LIST
-
-      A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN``
-      should be a glob-like pattern for matching a host name. The ``DIR``
-      should be the root directory to install a suite run directory. E.g.:
-
-      .. code-block:: rose
-
-         root-dir=hpc*=$WORKDIR
-                 =*=$DATADIR
-
-      In this example, :ref:`command-rose-suite-run` of a suite with name
-      ``$NAME`` will create ``~/cylc-run/$NAME`` as a symbolic link to
-      ``$DATADIR/cylc-run/$NAME/`` on any machine, except those with their
-      hostnames matching ``hpc*``. In which case, it will create
-      ``~/cylc-run/$NAME`` as a symbolic link to ``$WORKDIR/cylc-run/$NAME/``.
-
-      .. warning::
-
-         If a suite has previously been run changes to any of the ``root-dir``
-         settings will take effect on the next clean re-installation i.e::
-
-            $ rose suite-run --new
-
-   .. rose:conf:: root-dir{share}=LIST
-
-      A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN`` should
-      be a glob-like pattern for matching a host name. The ``DIR`` should be the
-      root directory where the suite's ``share/`` directory should be created.
-
-   .. rose:conf:: root-dir{share/cycle}=LIST
-
-      A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN`` should
-      be a glob-like pattern for matching a host name. The ``DIR`` should be the
-      root directory where the suite's ``share/cycle/`` directory should be
-      be created.
-
-   .. rose:conf:: root-dir{work}=LIST
-
-      A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN`` should
-      be a glob-like pattern for matching a host name. The ``DIR`` should be the
-      root directory where the suite's ``work/`` directory for tasks should be
-      created.
-
-   .. rose:conf:: root-dir-share=LIST
-
-      .. deprecated:: 2015.04
-
-         Equivalent to :rose:conf:`root-dir{share}=LIST`.
-
-   .. rose:conf:: root-dir-work=LIST
-
-      .. deprecated:: 2015.04
-
-         Equivalent to :rose:conf:`root-dir{work}=LIST`.
-
 .. rose:file:: rose-suite.info
 
    The suite information file :rose:file:`rose-suite.info` should contain the

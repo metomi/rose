@@ -828,7 +828,6 @@ Glossary
       * Environment variables to be provided to ``cylc run`` (
         :rose:conf:`rose-suite.conf[env]`).
       * Installation configuration (e.g.
-        :rose:conf:`rose-suite.conf|root-dir`,
         :rose:conf:`rose-suite.conf[file:NAME]`).
 
       See also:
