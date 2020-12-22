@@ -21,7 +21,6 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
-
 JOB_HOST_OPT=
 if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
     JOB_HOST=$(rose config --default= 't' 'job-host')
@@ -35,18 +34,27 @@ if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
     JOB_HOST_OPT="-S JOB_HOST=\"${JOB_HOST}\""
 fi
 
-tests 2
+tests 3
 
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
-TEST_KEY="${TEST_KEY_BASE}"
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
-    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' ${JOB_HOST_OPT} -- --no-detach --debug
-
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${NAME}" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-run"
+run_pass "${TEST_KEY}" \
+    cylc run \
+        "${NAME}" \
+        --host='localhost' \
+        ${JOB_HOST_OPT} \
+        --no-detach \
+        --debug
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\
     "${SUITE_RUN_DIR}/prune.log" > stamp-removed.log

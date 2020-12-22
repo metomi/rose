@@ -24,13 +24,22 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 1
+tests 3
 #-------------------------------------------------------------------------------
 # Run the suite.
 SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME=$(basename "${SUITE_RUN_DIR}")
-rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host=localhost -- --no-detach --debug
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${NAME}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-run" \
+    cylc run \
+        "${NAME}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 
 sqlite3 "${SUITE_RUN_DIR}/log/db" \
     'select distinct status from task_states;' >"$TEST_KEY_BASE-db.out"

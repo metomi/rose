@@ -21,18 +21,27 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-N_TESTS=36
+N_TESTS=37
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_fail "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+TEST_KEY="${TEST_KEY_BASE}-install"
+run_pass "$TEST_KEY" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$NAME" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-run"
+run_pass "$TEST_KEY" \
+    cylc run \
+        "${NAME}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 # Test the output
 OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t1/01/job.out

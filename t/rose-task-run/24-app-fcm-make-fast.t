@@ -32,7 +32,7 @@ if ! gfortran --version 1>/dev/null 2>&1; then
     skip_all '"gfortran" unavailable'
 fi
 #-------------------------------------------------------------------------------
-tests 5
+tests 7
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
@@ -41,10 +41,19 @@ MTIME_OF_FAST_BEFORE=$(stat '-c%y' 'fast')
 #-------------------------------------------------------------------------------
 SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
 NAME="$(basename "${SUITE_RUN_DIR}")"
-timeout 120 rose suite-run -q --debug \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' -S "FAST_DEST_ROOT=\"${PWD}/fast\"" \
-    -- --no-detach --debug
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${NAME}" \
+            -S "FAST_DEST_ROOT='${PWD}/fast'" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-run" \
+    timeout 120 \
+        cylc run \
+            "${NAME}" \
+            --host='localhost' \
+            --no-detach \
+            --debug
 #-------------------------------------------------------------------------------
 # Permission modes of make directory should be the same as a normal directory
 mkdir "${SUITE_RUN_DIR}/share/hello-make-perm-mode-test"

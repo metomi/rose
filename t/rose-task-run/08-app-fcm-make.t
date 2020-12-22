@@ -28,7 +28,7 @@ if ! gfortran --version 1>/dev/null 2>&1; then
     skip_all '"gfortran" unavailable'
 fi
 #-------------------------------------------------------------------------------
-tests 8
+tests 10
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
@@ -40,16 +40,23 @@ export ROSE_CONF_PATH=
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
+OPTS=(
+    "--flow-name=${NAME}"
+    "--no-run-name"
+)
 if [[ -n ${JOB_HOST:-} ]]; then
-    timeout 60 rose suite-run -q \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-        --host='localhost' \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --no-detach --debug
-else
-    timeout 60 rose suite-run -q \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-        --host='localhost' -- --no-detach --debug
+    OPTS+=(-S "HOST='$JOB_HOST'")
 fi
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        "${OPTS[@]}"
+run_pass "${TEST_KEY_BASE}-run" \
+    cylc run \
+        "${NAME}" \
+        --host='localhost' \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-status"
 sqlite3 $SUITE_RUN_DIR/log/db \

@@ -351,14 +351,15 @@ poll() {
 }
 
 port_is_busy() {
-    local PORT="${1}"
-    if type -P netcat 1>/dev/null; then
-        HOSTNAME="${HOSTNAME:-"$(hostname)"}"
-        HOSTNAME="${HOSTNAME:-'localhost'}"
-        netcat -z "${HOSTNAME}" "${PORT}"
-    else
-        netstat -atun | grep -q "0.0.0.0:${PORT}"
-    fi
+    # use Python rather than netcat/netstat which aren't as portable
+    python3 -c '
+import socket
+import sys
+
+print(sys.argv[1])
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    assert sock.connect_ex(("localhost", int(sys.argv[1]))) == 0
+    ' "$1" 2>/dev/null
 }
 
 TEST_ROSE_WS_PID=
@@ -445,7 +446,7 @@ DIFFTOOL="$(rose config '--default=diff -u' t difftool)"
 TEST_KEY_BASE="$(basename "$0" .t)"
 # shellcheck disable=SC2034
 TEST_SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
-TEST_DIR="$(mktemp -d)"
+TEST_DIR="$(realpath "$(mktemp -d)")"
 cd "$TEST_DIR"
 
 set +e

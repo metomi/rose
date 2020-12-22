@@ -51,11 +51,16 @@ init_meta </dev/null
 init_macro url.py < $TEST_SOURCE_DIR/lib/custom_macro_check.py
 run_fail "$TEST_KEY" rose macro --config=../config url.URLChecker
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+# strip the exact error as it is OS and network dependent
+sed -i 's/: \[Errno.*//' "${TEST_KEY}.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] url.URLChecker: issues: 1
     env=BAD_URL=htpp://www.google.co.uk
-        htpp://www.google.co.uk: [Errno -2] Name or service not known
+        htpp://www.google.co.uk
 __CONTENT__
+# NOTE: this test can fail due to ISP/network configuration
+# (for example ISP may reroute failed DNS to custom search page)
+# e.g: https://www.virginmedia.com/help/advanced-network-error-search
 teardown
 #-------------------------------------------------------------------------------
 exit

@@ -25,30 +25,38 @@
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
     JOB_HOST=$(rose host-select -q $JOB_HOST)
-    tests 15
+    tests 16
 else
-    tests 12
+    tests 13
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
+OPTS=(
+    "--flow-name=$NAME"
+    --no-run-name
+)
 if [[ -n ${JOB_HOST:-} ]]; then
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" \
-        -- --no-detach --debug
-else
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --host=localhost \
-        -- --no-detach --debug
+    OPTS+=(
+        -S "HOST='$JOB_HOST'"
+    )
 fi
+TEST_KEY="${TEST_KEY_BASE}-install"
+run_pass "${TEST_KEY}" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        "${OPTS[@]}"
+TEST_KEY="${TEST_KEY_BASE}-run"
+run_pass "${TEST_KEY}" \
+    cylc run \
+        "${NAME}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-work
 run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/work/1

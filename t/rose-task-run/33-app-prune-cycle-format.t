@@ -22,17 +22,26 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
-tests 2
+tests 3
 
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
-TEST_KEY="${TEST_KEY_BASE}"
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
-    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' --debug -- --no-detach --debug
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${NAME}" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-run"
+run_pass "${TEST_KEY}" \
+    cylc run \
+        "${NAME}" \
+        --host='localhost' \
+        --debug \
+        --no-detach
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\

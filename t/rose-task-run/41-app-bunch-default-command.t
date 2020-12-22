@@ -22,17 +22,26 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 26
+tests 27
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$NAME" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-run"
+run_pass "$TEST_KEY" \
+    cylc run \
+        "${NAME}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 CYCLE=20100101T0000Z
 LOG_DIR="$SUITE_RUN_DIR/log/job/$CYCLE"
@@ -65,9 +74,14 @@ for TASK in buncher_default buncher_import; do
 done
 #-------------------------------------------------------------------------------
 # Run suite a second time
+# TODO: replace with cylc run --rerun / cylc clean
+rm -rf "${HOME}/cylc-run/${NAME}/log"
+rm -rf "${HOME}/cylc-run/${NAME}/.service/db"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+    cylc run "${NAME}" \
+    --host=localhost \
+    --no-detach \
+    --debug
 #-------------------------------------------------------------------------------
 # Testing successful rerun
 #-------------------------------------------------------------------------------

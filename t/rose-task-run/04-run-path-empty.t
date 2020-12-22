@@ -24,13 +24,22 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 3
+tests 5
 #-------------------------------------------------------------------------------
 # Run the suite.
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$NAME" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-run" \
+    cylc run \
+        "${NAME}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 PREV_CYCLE=
 for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do

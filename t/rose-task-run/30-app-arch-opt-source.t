@@ -23,7 +23,7 @@
 
 
 #-------------------------------------------------------------------------------
-tests 6
+tests 8
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export CYLC_CONF_PATH=
@@ -31,8 +31,17 @@ export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
 NAME="$(basename "${SUITE_RUN_DIR}")"
-rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host=localhost -- --no-detach --debug
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${NAME}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-run" \
+    cylc run \
+        "${NAME}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-job.status"
 file_grep "${TEST_KEY}-archive1-01" \

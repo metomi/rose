@@ -23,19 +23,27 @@
 
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
-tests 10
+tests 11
 #-------------------------------------------------------------------------------
 # Run the suite.
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost \
-    -- --no-detach --debug
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$NAME" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-run"
+run_pass "$TEST_KEY" \
+    cylc run \
+        "${NAME}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-log
 run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/log/job/20100101T0000Z

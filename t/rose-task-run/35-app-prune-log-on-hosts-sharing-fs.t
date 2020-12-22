@@ -31,19 +31,28 @@ if [[ -z "${JOB_HOST_1}" || -z "${JOB_HOST_2}" ]]; then
     skip_all '"[t]job-hosts-sharing-fs" not defined with 2 host names'
 fi
 
-tests 4
+tests 5
 
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
 SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
 NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
-TEST_KEY="${TEST_KEY_BASE}"
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
-    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' --debug \
-    -S "JOB_HOST_1=\"${JOB_HOST_1}\"" -S "JOB_HOST_2=\"${JOB_HOST_2}\"" \
-    -- --no-detach --debug
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${NAME}" \
+        --no-run-name \
+        -S "JOB_HOST_1=\"${JOB_HOST_1}\"" \
+        -S "JOB_HOST_2=\"${JOB_HOST_2}\""
+TEST_KEY="${TEST_KEY_BASE}-run"
+run_pass "${TEST_KEY}" \
+    cylc run \
+        "${NAME}" \
+        --host='localhost' \
+        --debug \
+        --no-detach
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 grep \

@@ -43,7 +43,7 @@ if [[ -z "${JOB_HOST}" ]]; then
     skip_all '"[t]job-host" not defined or not available'
 fi
 #-------------------------------------------------------------------------------
-tests 2
+tests 4
 export ROSE_CONF_PATH=
 mkdir -p "${HOME}/cylc-run"
 
@@ -56,10 +56,19 @@ ssh -n -oBatchMode=yes "${JOB_HOST}" \
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
     "touch 'cylc-run/${NAME}/share/hello-make/junk1'"
 
-timeout 120 rose suite-run -q --debug \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' \
-    -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" -- --no-detach --debug
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${NAME}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-run" \
+    timeout 120 \
+        cylc run \
+            "${NAME}" \
+            --host='localhost' \
+            -S "HOST='${JOB_HOST}'" \
+            --no-detach \
+            --debug
 #-------------------------------------------------------------------------------
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
     cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'

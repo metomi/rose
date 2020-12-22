@@ -26,7 +26,9 @@
 # Test the suite.
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
-    JOB_HOST=$(rose host-select -q $JOB_HOST)
+    JOB_HOST="-S JOB_HOST='$(rose host-select -q "$JOB_HOST")'"
+else
+    JOB_HOST=
 fi
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
@@ -34,24 +36,22 @@ TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l \
-    1>/dev/null 2>&1
-if (($? != 0)); then
-    skip_all "cylc version not compatible with ISO 8601"
-    exit 0
-fi
+
 #-------------------------------------------------------------------------------
-tests 7
+tests 9
 #-------------------------------------------------------------------------------
-# Run the suite.
-if [[ -n ${JOB_HOST:-} ]]; then
-    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$NAME" \
+        --no-run-name \
+        "$JOB_HOST"
+run_pass "${TEST_KEY_BASE}-run" \
+    cylc run \
+        "$NAME" \
         --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --no-detach --debug
-else
-    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --host=localhost -- --no-detach --debug
-fi
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-prune-log
 sed '/^\[INFO\] \(create\|delete\|update\)/!d;

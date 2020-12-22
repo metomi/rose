@@ -24,13 +24,22 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 44
+tests 46
 #-------------------------------------------------------------------------------
 # Run the suite.
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE \
+        --flow-name=$NAME \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-run" \
+    cylc run \
+        "${NAME}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 MY_PATH=
 for P in $(ls -d $SUITE_RUN_DIR/etc/my-path/*); do

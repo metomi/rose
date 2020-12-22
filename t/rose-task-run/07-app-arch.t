@@ -23,17 +23,26 @@
 
 
 #-------------------------------------------------------------------------------
-tests 48
+tests 49
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$NAME" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-run"
+run_pass "$TEST_KEY" \
+    cylc run \
+        "$NAME" \
+        --host=localhost \
+        --no-detach \
+        --debug
 cp ${TEST_KEY}.err ~/temp
 cp ${TEST_KEY}.out ~/temp
 #-------------------------------------------------------------------------------
@@ -130,7 +139,12 @@ file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 [FAIL] !	hello/venus.txt (hello/venus.txt)
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
-sed '/^\[FAIL\] /!d; s/ \[compress.*\]$//' "$TEST_KEY.err" \
+# NOTE: /BASH_XTRACEFD/d is to remove any Cylc errors of the form:
+# BASH_XTRACEFD: 19: invalid value for trace file descriptor
+sed \
+    -e '/^\[FAIL\] /!d; s/ \[compress.*\]$//' \
+    -e '/BASH_XTRACEFD/d' \
+    "$TEST_KEY.err" \
     "${FILE_PREFIX}6/01/job.err" >"$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] foo push foo://20130101T1200Z/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/cycle/20130101T1200Z/hello/mars.txt # return-code=1, stderr=
@@ -159,6 +173,7 @@ sed -e '/^\[FAIL\] /!d' \
     -e 's/^\(\[FAIL\] my-bad-command\) .*\( # return-code=1, stderr=\)$/\1\2/' \
     -e '/^\[FAIL\] \[my-bad-command\]/d' \
     -e 's/ \[compress.*]$//' \
+    -e '/BASH_XTRACEFD/d' \
     "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.err" >"$TEST_KEY.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 [FAIL] ! foo://20130101T1200Z/planet-n.tar.gz
