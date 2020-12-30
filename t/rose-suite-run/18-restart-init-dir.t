@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -39,9 +39,9 @@ run_pass "$TEST_KEY" \
     -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-dir"
-run_pass "$TEST_KEY" test -d "$SUITE_RUN_DIR" 
+run_pass "$TEST_KEY" test -d "$SUITE_RUN_DIR"
 TEST_KEY="$TEST_KEY_BASE-symlink"
-run_fail "$TEST_KEY" test -L "$SUITE_RUN_DIR" 
+run_fail "$TEST_KEY" test -L "$SUITE_RUN_DIR"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit

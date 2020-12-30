@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -51,7 +51,7 @@
 #     --verbose, -v
 #         Increment verbosity.
 #     -- --EXTRA-ARGS
-#         See the cylc documentation, cylc shutdown for options and details on 
+#         See the cylc documentation, cylc shutdown for options and details on
 #         `EXTRA-ARGS`.
 #-------------------------------------------------------------------------------
 exec python3 -m metomi.rose.suite_control shutdown "$@"

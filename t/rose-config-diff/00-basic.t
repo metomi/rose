@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -288,7 +288,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 TEST_KEY=$TEST_KEY_BASE-custom-diff-tool
 echo >conf/rose.conf
 run_pass "$TEST_KEY" rose config-diff --diff-tool='cat -n' \
-    $TEST_DIR/app{1,2}/rose-app.conf 
+    $TEST_DIR/app{1,2}/rose-app.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
      1	# description=Environment variable configuration
      2	[env]
@@ -318,7 +318,7 @@ cat >conf/rose.conf <<__ROSE_CONF__
 [external]
 diff_tool=cat -n
 __ROSE_CONF__
-run_pass "$TEST_KEY" rose config-diff $TEST_DIR/app{1,2}/rose-app.conf 
+run_pass "$TEST_KEY" rose config-diff $TEST_DIR/app{1,2}/rose-app.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
      1	# description=Environment variable configuration
      2	[env]

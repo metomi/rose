@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -41,9 +41,9 @@
 #         Specify a source tree to include in a rose-stem suite. The first
 #         source tree must be a working copy as the location of the suite and
 #         fcm-make config files are taken from it. Further source trees can be
-#         added with additional `--source` arguments. The project which is 
+#         added with additional `--source` arguments. The project which is
 #         associated with a given source is normally automatically determined
-#         using FCM, however the project can be specified by putting the 
+#         using FCM, however the project can be specified by putting the
 #         project name as the first part of this argument separated by an
 #         equals sign as in the third example above.
 #         Defaults to `.` if not specified.
@@ -64,17 +64,17 @@
 #         in this list have their hostname prefixed, e.g. `host:/path/wc`.
 #     HOST_SOURCE_<project>_BASE
 #         The base of the project specified on the command line. This is
-#         intended to specify the location of `fcm-make` config files. Working 
+#         intended to specify the location of `fcm-make` config files. Working
 #         copies in this list have their hostname prefixed.
 #     RUN_NAMES
 #         A list of groups to run in the rose-stem suite.
 #     SOURCE_<project>
-#         The complete list of source trees for a given project. Unlike the 
-#         `HOST_` variable of similar name, paths to working copies do NOT 
+#         The complete list of source trees for a given project. Unlike the
+#         `HOST_` variable of similar name, paths to working copies do NOT
 #         include the host name.
 #     SOURCE_<project>_BASE
 #         The base of the project specified on the command line. This is
-#         intended to specify the location of `fcm-make` config files. Unlike 
+#         intended to specify the location of `fcm-make` config files. Unlike
 #         the `HOST_` variable of similar name, paths to working copies do NOT
 #         include the host name.
 #     SOURCE_<project>_REV

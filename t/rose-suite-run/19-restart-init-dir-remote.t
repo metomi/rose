@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -74,9 +74,9 @@ run_pass "$TEST_KEY" \
     -- --no-detach --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-dir"
-run_pass "$TEST_KEY" ssh -oBatchMode=yes $T_HOST test -d "cylc-run/$NAME" 
+run_pass "$TEST_KEY" ssh -oBatchMode=yes $T_HOST test -d "cylc-run/$NAME"
 TEST_KEY="$TEST_KEY_BASE-symlink"
-run_fail "$TEST_KEY" ssh -oBatchMode=yes $T_HOST test -L "cylc-run/$NAME" 
+run_fail "$TEST_KEY" ssh -oBatchMode=yes $T_HOST test -L "cylc-run/$NAME"
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 $SSH $T_HOST "rm -fr '$T_HOST_ROSE_HOME'"

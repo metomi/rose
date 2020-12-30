@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -35,7 +35,7 @@ init_meta < $TEST_SOURCE_DIR/lib/rose-meta.conf
 CONFIG_PATH=$(cd ../config && pwd -P)
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted"
 sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 "env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
@@ -98,7 +98,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 TEST_KEY=$TEST_KEY_BASE-ok-sub-section
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config namelist:qux
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted"
 sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL_NAMELIST_QUX" -> "env=CONTROL_NAMELIST_QUX=bar" [color=red, label=foo
 "env=CONTROL_NAMELIST_QUX" [color=green, shape=rectangle
@@ -122,7 +122,7 @@ TEST_KEY=$TEST_KEY_BASE-ok-property
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config \
     --property=trigger
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted"
 sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 "env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
@@ -186,7 +186,7 @@ TEST_KEY=$TEST_KEY_BASE-ok-property-sub-section
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config \
     --property=trigger env
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted"
 sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL" -> "env=CONTROL=None" [color=green, label=foo
 "env=CONTROL" -> "env=CONTROL=bar" [color=red, label=foo
