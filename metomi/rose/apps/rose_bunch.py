@@ -17,7 +17,7 @@
 """Builtin application: rose_bunch: run multiple commands in parallel.
 """
 
-
+from collections import Counter
 import itertools
 import os
 import shlex
@@ -438,7 +438,7 @@ class RoseBunchDAO:
     def create_tables(self):
         """Create tables as appropriate"""
         existing = []
-        first_run = os.environ.get("CYLC_TASK_SUBMIT_NUMBER") == "1"
+        first_run = os.environ.get("CYLC_TASK_TRY_NUMBER") == "1"
 
         for row in self.conn.execute("SELECT name FROM sqlite_master " +
                                      "WHERE type=='table'"):
@@ -540,7 +540,15 @@ class RoseBunchDAO:
         unchanged = True
         current = self.flatten_config(current)
         for key, value in self.conn.execute(s_stmt):
-            if key in current:
+            if key == 'env_PATH':
+                # due to re-invocation the PATH may have changed in-between
+                # runs - only re-run jobs if the PATH has changed in a way
+                # that could actually make a difference
+                if simplify_path(current[key]) != simplify_path(value):
+                    break
+                else:
+                    current.pop(key)
+            elif key in current:
                 if current[key] != value:
                     break
                 else:
@@ -551,3 +559,36 @@ class RoseBunchDAO:
         if current:
             unchanged = False
         return unchanged
+
+
+def simplify_path(path):
+    """Removes duplication in paths whilst maintaining integrity.
+
+    If duplicate items are present in a path this keeps the first item and
+    removes any subsequent duplicates.
+
+    Examples:
+        >>> simplify_path('')
+        ''
+        >>> simplify_path('a')
+        'a'
+        >>> simplify_path('a:a:a')
+        'a'
+        >>> simplify_path('a:b:a')
+        'a:b'
+        >>> simplify_path('a:b:b:a')
+        'a:b'
+        >>> simplify_path('a:b:a:b:c:d:a:b:c:d:e')
+        'a:b:c:d:e'
+
+    """
+    path = path.split(':')
+    counter = Counter(path)
+    for item, count in counter.items():
+        ptr = len(path) - 1
+        while count > 1:
+            if path[ptr] == item:
+                path.pop(ptr)
+                count -= 1
+            ptr -= 1
+    return ':'.join(path)
