@@ -369,12 +369,23 @@ class SuiteId:
             suite_engine_proc, "SUITE_DIR_REL_ROOT", None)
 
         # Cylc8 run directory
+        # TODO: extract version control information
         loc = Path(location)
-        sdrr = Path(suite_dir_rel_root)
-        if loc.relative_to(sdrr):
-            if (loc / 'rose-suite.info').exists():
-                # TODO
-                raise SuiteIdLocationError(location)
+        sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
+        try:
+            if loc.relative_to(sdrr):
+                if (loc / 'rose-suite.info').exists():
+                    # This is an installed workflow with a rose-suite.info file
+                    # (most likely a Cylc8 run directory)
+
+                    # TODO: extract version control information written by
+                    # Cylc install, see:
+                    # https://github.com/metomi/rose/issues/2432
+                    # https://github.com/cylc/cylc-flow/issues/3849
+                    raise SuiteIdLocationError(location)
+        except ValueError:
+            # Not an installed Cylc8 workflow run directory
+            pass
 
         # Cylc7 run directory
         # Use a hacky way to read the "log/rose-suite-run.version" file
