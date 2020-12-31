@@ -39,7 +39,7 @@ file_grep "${TEST_KEY}-archive-01" \
     'CYLC_JOB_EXIT=SUCCEEDED' \
     "${SUITE_RUN_DIR}/log/job/1/archive/01/job.status"
 TEST_KEY="${TEST_KEY_BASE}-find"
-(cd "${SUITE_RUN_DIR}/share/backup" && find -type f) | sort >"${TEST_KEY}.out"
+(cd "${SUITE_RUN_DIR}/share/backup" && find . -type f) | sort >"${TEST_KEY}.out"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<'__FIND__'
 ./archive.d/2016.txt.gz
 ./archive.d/whatever.tar.gz
