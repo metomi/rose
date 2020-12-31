@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -43,9 +43,9 @@ import metomi.rose.upgrade
 
 
 class Upgrade01to02(metomi.rose.upgrade.MacroUpgrade):
-    
+
     """Test class to upgrade the macro with a bad change and fail on save."""
-    
+
     BEFORE_TAG = "0.1"
     AFTER_TAG = "0.2"
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -226,7 +226,7 @@ TEST_KEY=$TEST_KEY_BASE-incompatible_versions
 run_fail "$TEST_KEY" \
    rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
              --source=$WORKINGCOPY --source=fcm:foo.x_tr@head \
-             --name $SUITENAME -- --no-detach --debug 
+             --name $SUITENAME -- --no-detach --debug
 OUTPUT=$TEST_DIR/${TEST_KEY}.err
 TEST_KEY=$TEST_KEY_BASE-incompatible-versions-correct_error
 file_grep $TEST_KEY "Running metomi.rose-stem version 1 but suite is at version 0" $OUTPUT
@@ -239,7 +239,7 @@ TEST_KEY=$TEST_KEY_BASE-project-not-in-keywords
 run_fail "$TEST_KEY" \
    rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
              --source=$WORKINGCOPY --source=fcm:foo.x_tr@head \
-             --name $SUITENAME -- --no-detach --debug 
+             --name $SUITENAME -- --no-detach --debug
 OUTPUT=$TEST_DIR/${TEST_KEY}.err
 TEST_KEY=$TEST_KEY_BASE-project-not-in-keywords-correct_error
 file_grep $TEST_KEY "Cannot ascertain project for source tree" $OUTPUT

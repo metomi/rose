@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -85,7 +85,7 @@ python3 -m compileall %{buildroot}/opt/$NAME/lib
 cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rose
 cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rosie
 
-%clean 
+%clean
 rm -fr %{buildroot}
 
 %files

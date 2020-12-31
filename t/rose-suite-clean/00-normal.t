@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -31,7 +31,7 @@ install_suite() {
         ssh "$JOB_HOST" "ls -d cylc-run/$NAME 1>/dev/null"
     else
         rose suite-run --new -q \
-            -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME 
+            -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME
     fi
     ls -d $HOME/cylc-run/$NAME 1>/dev/null
     set +e

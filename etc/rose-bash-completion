@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -72,7 +72,7 @@ _rose() {
     fi
     if [[ -n $subcommand && -L $ROSE_DIR/bin/rose-$subcommand ]]; then
         subcommand=$(readlink $subcommand)
-    fi          
+    fi
 
     # Determine option or option argument completion.
     current_option_line=$(printf "%s\n" "${COMP_WORDS[@]}" | grep -n "^-" | \
@@ -213,7 +213,7 @@ _rose_macro_ARGS() {
     meta_path_option="--meta-path=$meta_path"
     if [[ -z $meta_path ]]; then
         meta_path_option=
-    fi  
+    fi
     rose macro -q $meta_path_option --config=$config_dir 2>/dev/null | \
         sed "s/^\[.*\] //g"
 }
@@ -418,7 +418,7 @@ __rose_get_rose_dir() {
 __rose_get_users() {
     getent passwd | cut -d: -f1 | LANG=C sort -u
 }
-    
+
 __rose_help() {
     local subcommand
     subcommand=$1

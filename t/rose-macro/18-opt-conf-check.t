@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -44,7 +44,7 @@ init_opt colour <<'__OPT_CONFIG__'
 paint_job=sparkly
 __OPT_CONFIG__
 TEST_KEY=$TEST_KEY_BASE-bad-single-opt
-run_fail "$TEST_KEY" rose macro --config=../config -V 
+run_fail "$TEST_KEY" rose macro --config=../config -V
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [V] metomi.rose.macros.DefaultValidators: issues: 1

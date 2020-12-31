@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -37,7 +37,7 @@ function init_meta() {
 
 function init_rose_meta() {
     local category=$1
-    local version=$2    
+    local version=$2
     mkdir -p $TEST_DIR/rose-meta/$category/$version
     cat >$TEST_DIR/rose-meta/$category/$version/rose-meta.conf
 }

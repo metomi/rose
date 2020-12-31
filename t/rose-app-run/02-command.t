@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -76,7 +76,7 @@ __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 test_teardown
 #-------------------------------------------------------------------------------
-# Normal mode, command key provided via ROSE_APP_COMMAND_KEY, 
+# Normal mode, command key provided via ROSE_APP_COMMAND_KEY,
 # command-key=hello-user.
 TEST_KEY=$TEST_KEY_BASE-hello-from-env
 test_setup

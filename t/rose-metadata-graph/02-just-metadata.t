@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -36,7 +36,7 @@ init_meta < $TEST_SOURCE_DIR/lib/rose-meta.conf
 META_CONFIG_PATH=$(cd ../config/meta && pwd -P)
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config/meta
 filter_graphviz <"$TEST_KEY.out" >"$TEST_KEY.filtered.out"
-sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted" 
+sort "$TEST_KEY.filtered.out" >"$TEST_KEY.filtered.out.sorted"
 sort >"$TEST_KEY.filtered.out.expected" <<__OUTPUT__
 "env=CONTROL" -> "env=CONTROL=None" [color=grey
 "env=CONTROL" -> "env=CONTROL=bar" [color=grey

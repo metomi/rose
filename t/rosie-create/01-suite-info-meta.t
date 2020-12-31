@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Copyright (C) 2012-2019 British Crown (Met Office) & Contributors.
+# Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -112,7 +112,7 @@ title=this should never fail
 unknown=I am an unknow field but do include me
 __INFO__
 file_cmp "$TEST_KEY_BASE-info-copy-mode.out" \
-    "$TEST_KEY_BASE-info-copy-mode.out" "$TEST_KEY-copy-mode-edit.out" 
+    "$TEST_KEY_BASE-info-copy-mode.out" "$TEST_KEY-copy-mode-edit.out"
 file_cmp "${TEST_KEY}-rose-suite.info" \
     "${PWD}/roses/foo-aa001/rose-suite.info" <<__INFO__
 description=Copy of foo-aa000/trunk@1
