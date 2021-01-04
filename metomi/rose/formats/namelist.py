@@ -38,11 +38,11 @@ RE_FLOAT = r"(?:\.\d+)|(?:" + RE_NATURAL + r")(?:\.\d*)?"
 # Matches namelist literals for intrinsic types
 RE_INTEGER = r"[\+\-]?(?:" + RE_NATURAL + r")"
 REC_INTEGER = _rec(r"\A(?:" + RE_INTEGER + r")\Z")
-RE_REAL = r"(?i)[\+\-]?(?:" + RE_FLOAT + r")(?:[de][\+\-]?\d+)?"
+RE_REAL = r"[\+\-]?(?:" + RE_FLOAT + r")(?:[deDE][\+\-]?\d+)?"
 REC_REAL = _rec(r"\A(?:" + RE_REAL + r")\Z")
 RE_COMPLEX = r"\(\s*" + RE_REAL + r"\s*" + RE_SEP + r"\s*" + RE_REAL + r"\s*\)"
 REC_COMPLEX = _rec(r"\A(?:" + RE_COMPLEX + r")\Z")
-RE_LOGICAL = r"(?i)\.(?:true|false)\."
+RE_LOGICAL = r"\.(?:[Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])\."
 REC_LOGICAL = _rec(r"\A(?:" + RE_LOGICAL + r")\Z")
 RE_CHARACTER = r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\""
 REC_CHARACTER = _rec(r"\A(?:" + RE_CHARACTER + r")\Z")
