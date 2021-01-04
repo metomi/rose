@@ -7,10 +7,10 @@ Quotes are copyright Python (Monty) Pictures Ltd, Freeway Cam (UK) Ltd.
 
 """
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeGarden01(rose.upgrade.MacroUpgrade):
+class UpgradeGarden01(metomi.rose.upgrade.MacroUpgrade):
 
     """'We want... a shrubbery!'"""
 
@@ -26,7 +26,7 @@ class UpgradeGarden01(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class UpgradeGarden02(rose.upgrade.MacroUpgrade):
+class UpgradeGarden02(metomi.rose.upgrade.MacroUpgrade):
 
     """'...there is one small problem...'"""
 
@@ -49,7 +49,7 @@ class UpgradeGarden02(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class UpgradeGarden03(rose.upgrade.MacroUpgrade):
+class UpgradeGarden03(metomi.rose.upgrade.MacroUpgrade):
 
     """'You must find... another shrubbery!'"""
 
@@ -79,7 +79,7 @@ class UpgradeGarden03(rose.upgrade.MacroUpgrade):
         return shrub_num
 
 
-class UpgradeGarden041(rose.upgrade.MacroUpgrade):
+class UpgradeGarden041(metomi.rose.upgrade.MacroUpgrade):
 
     """'...the two-level effect with a little path running down the middle'"""
 
@@ -95,7 +95,7 @@ class UpgradeGarden041(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class UpgradeGarden09(rose.upgrade.MacroUpgrade):
+class UpgradeGarden09(metomi.rose.upgrade.MacroUpgrade):
 
     """'cut down the mightiest tree in the forest... with... a herring!'"""
 

@@ -2,10 +2,10 @@
 # Copyright (C) British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
-class InvalidValueTransformer(rose.macro.MacroBase):
+class InvalidValueTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to return an invalid value."""
 

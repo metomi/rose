@@ -3,10 +3,10 @@
 # -----------------------------------------------------------------------------
 """Module containing test upgrade macros"""
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeNull01(rose.upgrade.MacroUpgrade):
+class UpgradeNull01(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade nothing..."""
 
