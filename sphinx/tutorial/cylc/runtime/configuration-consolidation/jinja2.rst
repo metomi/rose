@@ -34,11 +34,11 @@ the evaluation of the expression, e.g:
 
 .. code-block:: css+jinja
 
-   There are {{ foo }} methods for consolidating the suite.rc file
+   There are {{ foo }} methods for consolidating the flow.cylc file
 
 Would result in::
 
-   There are 3 methods for consolidating the suite.rc file
+   There are 3 methods for consolidating the flow.cylc file
 
 .. nextslide::
 
@@ -60,7 +60,7 @@ Would result in:
 
 .. nextslide::
 
-To enable Jinja2 in the ``suite.rc`` file, add the following `shebang`_ to the
+To enable Jinja2 in the ``flow.cylc`` file, add the following `shebang`_ to the
 top of the file:
 
 .. code-block:: cylc
@@ -184,7 +184,7 @@ This would result in:
       ``get_observations`` and ``get_rainfall`` tasks. Rather than writing it
       out multiple times we will use Jinja2 to centralise this configuration.
 
-      At the top of the ``suite.rc`` file add the Jinja2 shebang line. Then
+      At the top of the ``flow.cylc`` file add the Jinja2 shebang line. Then
       copy the value of the ``API_KEY`` environment variable and use it to
       define an ``API_KEY`` Jinja2 variable:
 

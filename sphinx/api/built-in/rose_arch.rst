@@ -42,7 +42,7 @@ In automatic selection mode, this built-in application will be invoked
 automatically if a task has a name that starts with ``rose_arch*``.
 
 This means that you can use Rose Arch with something like the example below
-in your ``suite.rc``:
+in your ``flow.cylc``:
 
 .. code-block:: cylc
 

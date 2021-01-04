@@ -8,7 +8,7 @@ Suite Configuration
 
 The configuration and functionality of a suite will usually be covered by
 the use of `Cylc`_. In which case, most of the suite configuration will live
-in the Cylc ``suite.rc`` file. Otherwise, a suite is just a directory of
+in the Cylc ``flow.cylc`` file. Otherwise, a suite is just a directory of
 files.
 
 A suite directory may contain the following:
@@ -76,20 +76,20 @@ A suite directory may contain the following:
       .. rose:conf:: KEY=VALUE
 
          Define a `Jinja2`_ variable ``KEY`` with the value ``VALUE`` for use
-         in the ``suite.rc`` file.
+         in the ``flow.cylc`` file.
 
          The assignment will be inserted after the ``#!jinja2`` line of the
-         installed ``suite.rc`` file.
+         installed ``flow.cylc`` file.
 
    .. rose:conf:: empy:suite.rc
 
       .. rose:conf:: KEY=VALUE
 
          Define a `EmPy`_ variable ``KEY`` with the value ``VALUE`` for use
-         in the ``suite.rc`` file.
+         in the ``flow.cylc`` file.
 
          The assignment will be inserted after the ``#!empy`` line of the
-         installed ``suite.rc`` file.
+         installed ``flow.cylc`` file.
 
    .. rose:conf:: [file:NAME]
 

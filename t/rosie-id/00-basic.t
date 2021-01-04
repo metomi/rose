@@ -122,7 +122,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #SUITE_NAME="$(basename "${SUITE_DIR}")"
 #svn co -q "${URL}/a/a/0/0/0/trunk" 'foo-aa000'
 #touch 'foo-aa000/rose-suite.conf'
-#cat >'foo-aa000/suite.rc' <<'__SUITE_RC__'
+#cat >'foo-aa000/flow.cylc' <<'__SUITE_RC__'
 #[scheduling]
 #    [[dependencies]]
 #        graph='t1'

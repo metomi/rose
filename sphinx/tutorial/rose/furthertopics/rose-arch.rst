@@ -18,7 +18,7 @@ Create a new Rose suite configuration::
 
    mkdir -p ~/rose-tutorial/rose-arch-tutorial
 
-Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc``
 file that looks like this:
 
 .. code-block:: cylc

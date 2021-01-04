@@ -16,7 +16,7 @@ Create a new suite by running the command::
    rose tutorial inheritance-tutorial
    cd ~/cylc-run/inheritance-tutorial
 
-You will now have a ``suite.rc`` file that defines two tasks each representing
+You will now have a ``flow.cylc`` file that defines two tasks each representing
 a different aircraft, the Airbus A380 jumbo jet and the Robson R44 helicopter:
 
 .. image:: https://upload.wikimedia.org/wikipedia/commons/0/09/A6-EDY_A380_Emirates_31_jan_2013_jfk_%288442269364%29_%28cropped%29.jpg
@@ -170,7 +170,7 @@ As the V-22 can be thought of as both a plane and a helicopter we want it to
 inherit from both the ``AIRPLANE`` and ``HELICOPTER`` families. In Cylc we can
 inherit from multiple families by separating their names with commas:
 
-Add the following task to your ``suite.rc`` file.
+Add the following task to your ``flow.cylc`` file.
 
 .. code-block:: cylc
 

@@ -9,7 +9,7 @@ Glossary
 
    suite
    Cylc suite
-      A Cylc suite is a directory containing a ``suite.rc`` file which contains
+      A Cylc suite is a directory containing a ``flow.cylc`` file which contains
       :term:`graphing<graph>` representing a workflow.
 
       See also:
@@ -20,7 +20,7 @@ Glossary
 
    suite directory
       The suite directory contains all of the configuration for a suite (e.g.
-      the ``suite.rc`` file and for Rose suites the :rose:file:`rose-suite.conf`
+      the ``flow.cylc`` file and for Rose suites the :rose:file:`rose-suite.conf`
       file).
 
       This is the directory which is registered using ``cylc reg`` or, for Rose
@@ -83,7 +83,7 @@ Glossary
 
    graph string
       A graph string is a collection of dependencies which are placed under a
-      ``graph`` section in the ``suite.rc`` file. E.G:
+      ``graph`` section in the ``flow.cylc`` file. E.G:
 
       .. code-block:: cylc-graph
 
@@ -213,7 +213,7 @@ Glossary
       been configured to use integer cycling. When a suite uses integer cycling
       integer :term:`recurrences <recurrence>` may be used in the :term:`graph`,
       e.g. ``P3`` means every third cycle. This is configured by setting
-      ``[scheduling]cycling mode = integer`` in the ``suite.rc`` file.
+      ``[scheduling]cycling mode = integer`` in the ``flow.cylc`` file.
 
       See also:
 
@@ -539,7 +539,7 @@ Glossary
       what a :term:`job's <job>` requirements are, e.g. how much memory
       it requires.
 
-      Directives are set in the ``suite.rc`` file in the ``[runtime]`` section
+      Directives are set in the ``flow.cylc`` file in the ``[runtime]`` section
       (``[runtime][<task-name>][directives]``).
 
       See also:
@@ -631,7 +631,7 @@ Glossary
       * :term:`reload`
 
    reload
-      Any changes made to the ``suite.rc`` file whilst the suite is running
+      Any changes made to the ``flow.cylc`` file whilst the suite is running
       will not have any effect until the suite is either:
       
       * :term:`shutdown` and :term:`rerun <start>`
@@ -654,7 +654,7 @@ Glossary
 
    parameterisation
       Parameterisation is a way to consolidate configuration in the Cylc
-      ``suite.rc`` file by implicitly looping over a set of pre-defined
+      ``flow.cylc`` file by implicitly looping over a set of pre-defined
       variables e.g:
 
       .. code-block:: cylc
@@ -823,7 +823,7 @@ Glossary
       with other optional files and directories which configure the way in
       which a :term:`Cylc suite` is run. E.g:
 
-      * Jinja2 variables to be passed into the ``suite.rc`` file (
+      * Jinja2 variables to be passed into the ``flow.cylc`` file (
         :rose:conf:`rose-suite.conf[jinja2:suite.rc]`).
       * Environment variables to be provided to ``cylc run`` (
         :rose:conf:`rose-suite.conf[env]`).

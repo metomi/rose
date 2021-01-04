@@ -451,7 +451,7 @@ Putting It All Together
          mkdir ~/cylc-run/datetime-cycling
          cd ~/cylc-run/datetime-cycling
 
-      Create a ``suite.rc`` file and paste the following code into it:
+      Create a ``flow.cylc`` file and paste the following code into it:
 
       .. code-block:: cylc
 
@@ -521,7 +521,7 @@ Putting It All Together
 
          .. code-block:: sub
 
-            cylc graph <path/to/suite.rc>
+            cylc graph <path/to/flow.cylc>
 
       .. spoiler:: Solution warning
 

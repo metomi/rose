@@ -49,7 +49,7 @@ Create a new Rose suite configuration::
    mkdir -p ~/rose-tutorial/rose-bunch
    cd ~/rose-tutorial/rose-bunch
 
-Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc``
 file that looks like this:
 
 .. code-block:: cylc
@@ -134,7 +134,7 @@ directory of the lander app and running::
 
    chmod +x land
 
-Navigate to the top directory of your suite (where the ``suite.rc`` and
+Navigate to the top directory of your suite (where the ``flow.cylc`` and
 :rose:file:`rose-suite.conf` files can be found) and run
 :ref:`command-rose-suite-run`.
 

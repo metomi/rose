@@ -26,7 +26,7 @@ Create a new suite in the ``cylc-run`` directory called
    mkdir ~/cylc-run/tutorial-broadcast
    cd ~/cylc-run/tutorial-broadcast
 
-Copy the following configuration into a ``suite.rc`` file:
+Copy the following configuration into a ``flow.cylc`` file:
 
 .. code-block:: cylc
 

@@ -73,7 +73,7 @@ Example:
           .. rose:conf:: jinja2:suite.rc
 
              A section for specifying Jinja2 settings for use in the
-             ``suite.rc`` file.
+             ``flow.cylc`` file.
 
              Note that one ommits the square brackets for config sections. If
              :rose:conf: contains other :rose:conf:'s then it is implicitly a

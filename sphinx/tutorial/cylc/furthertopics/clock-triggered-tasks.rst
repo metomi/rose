@@ -47,7 +47,7 @@ Within your ``~/cylc-run`` directory create a new directory called
    mkdir ~/cylc-run/clock-trigger
    cd ~/cylc-run/clock-trigger
 
-Paste the following code into a ``suite.rc`` file:
+Paste the following code into a ``flow.cylc`` file:
 
 .. code-block:: cylc
 
@@ -91,7 +91,7 @@ We want our clock to only ring in real-time rather than the simulated
 cycle time.
 
 To do this, add the following lines to the ``[scheduling]`` section of
-your ``suite.rc``:
+your ``flow.cylc``:
 
 .. code-block:: cylc
 
@@ -123,7 +123,7 @@ Adding More Clock-Triggered Tasks
 We will now modify our suite to run tasks at quarter-past, half-past and
 quarter-to the hour.
 
-Open your ``suite.rc`` and modify the ``[runtime]`` section by adding the
+Open your ``flow.cylc`` and modify the ``[runtime]`` section by adding the
 following:
 
 .. code-block:: cylc

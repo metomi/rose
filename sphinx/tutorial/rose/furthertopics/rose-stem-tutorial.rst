@@ -129,12 +129,12 @@ The ``$SOURCE_SPACESHIP`` environment variable will be set using the
 Jinja2 variable of the same name which is provided by Rose Stem.
 
 
-The ``suite.rc`` file
----------------------
+The ``flow.cylc`` file
+----------------------
 
-Next we will look at the ``rose-stem/suite.rc`` file.
+Next we will look at the ``rose-stem/flow.cylc`` file.
 
-The ``suite.rc`` file starts off with ``UTC mode = True``, which you
+The ``flow.cylc`` file starts off with ``UTC mode = True``, which you
 should already be :ref:`familiar with <tutorial-cylc-datetime-utc>`.
 The next part is a Jinja2 block which links the group names the user
 can specify with the :term:`graph <graph>` for that group. In this
@@ -285,7 +285,7 @@ Further Exercises
 -----------------
 
 If you wish, you can try extending the suite to include the ``fire_lasers``
-group of tasks which was in the list of groups in the ``suite.rc`` file.
+group of tasks which was in the list of groups in the ``flow.cylc`` file.
 Using the same technique as we've just demonstrated for piloting the
 spaceship, you should be able to aim and fire the ship's weapons.
 
@@ -306,5 +306,5 @@ option on the ``rose stem`` command line. For example:
    automatic-options=GRAVITY=newtonian PLANET=jupiter
 
 sets the variable ``GRAVITY`` to have the value ``newtonian``, and
-``PLANET`` to be ``jupiter``. These can then be used in the ``suite.rc``
+``PLANET`` to be ``jupiter``. These can then be used in the ``flow.cylc``
 file as Jinja2 variables.

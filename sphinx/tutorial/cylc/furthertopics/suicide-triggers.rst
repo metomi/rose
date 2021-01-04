@@ -109,7 +109,7 @@ Create a new suite called ``suicide-triggers``::
    mkdir -p ~/cylc-run/suicide-triggers
    cd ~/cylc-run/suicide-triggers
 
-Paste the following code into the ``suite.rc`` file:
+Paste the following code into the ``flow.cylc`` file:
 
 .. code-block:: cylc
 

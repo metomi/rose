@@ -427,7 +427,7 @@ Recurrence Sections
       :term:`cycling suite <cycling>`.
 
    If you have not completed the previous practical use the following code for
-   your ``suite.rc`` file.
+   your ``flow.cylc`` file.
 
    .. code-block:: cylc
 
@@ -448,7 +448,7 @@ Recurrence Sections
          mkdir -p ~/cylc-run/integer-cycling
          cd ~/cylc-run/integer-cycling
 
-      Copy the above code into a ``suite.rc`` file in that directory.
+      Copy the above code into a ``flow.cylc`` file in that directory.
 
    #. **Make the suite cycle.**
 
@@ -496,7 +496,7 @@ Recurrence Sections
       Suppose we wanted the ``qux`` task to run every *other* cycle as opposed
       to every cycle. We can do this by adding another recurrence.
 
-      Make the following changes to your ``suite.rc`` file.
+      Make the following changes to your ``flow.cylc`` file.
 
       .. code-block:: diff
 
@@ -527,7 +527,7 @@ Recurrence Sections
       #. Between ``qux`` from the previous cycle and ``foo``
          *every even cycle* (e.g. qux.1 => foo.2).
 
-      Have a go at adding inter-cycle dependencies to your ``suite.rc`` file to
+      Have a go at adding inter-cycle dependencies to your ``flow.cylc`` file to
       make your workflow match the diagram below.
 
       .. hint::

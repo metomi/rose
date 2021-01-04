@@ -37,18 +37,18 @@ So far we have covered:
         fontsize = "20"
         fontcolor = "#5050aa"
         labelloc = "r"
-        "suite.rc" [fontsize="18",
+        "flow.cylc" [fontsize="18",
                     fontname="mono",
                     fontcolor="black"]
         "rcinfo" [label="Defines the workflow\nin terms of tasks\nand dependencies"]
-        "suite.rc" -- "rcinfo"
+        "flow.cylc" -- "rcinfo"
 
         subgraph cluster_2 {
             label = "Rose Suite Configuration"
             "rose-suite.conf" [fontsize="18",
                                fontname="mono",
                                fontcolor="black"]
-            "confinfo" [label="Defines Jinja2 variables for\nthe suite.rc and environment\nvariables for use throughout\nthe suite"]
+            "confinfo" [label="Defines Jinja2 variables for\nthe flow.cylc and environment\nvariables for use throughout\nthe suite"]
             "rose-suite.conf" -- "confinfo"
 
             subgraph cluster_3 {
@@ -88,9 +88,9 @@ Suite Commands
    ``cylc graph``
       Draws the suite's :term:`graph`.
    ``cylc get-config``
-      Processes the ``suite.rc`` file and prints it back out.
+      Processes the ``flow.cylc`` file and prints it back out.
    ``cylc validate``
-      Validates the Cylc ``suite.rc`` file to check for any obvious errors.
+      Validates the Cylc ``flow.cylc`` file to check for any obvious errors.
    ``cylc run``
       Runs a suite.
    ``cylc stop``

@@ -34,7 +34,7 @@
 #        A path to either:
 #
 #        1. a directory containing a suite with a file named
-#           `suite.rc` and a directory called `app` containing
+#           `flow.cylc` and a directory called `app` containing
 #           subdirectories with files named `rose-app.conf`,
 #           in the format specified in the Rose pages.
 #        2. a directory containing a single 'application' - a file named

@@ -20,7 +20,7 @@ Create a new Rose suite configuration called ``command-keys``::
    mkdir -p ~/rose-tutorial/command-keys
    cd ~/rose-tutorial/command-keys
 
-Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc`` file that
+Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc`` file that
 looks like this:
 
 .. code-block:: cylc
@@ -74,7 +74,7 @@ Open the :rose:file:`rose-app.conf` file and edit to look like this:
    make_dough=sleep 8; echo 'dough for later'
    timed_bread=sleep 15; echo 'fresh bread when you want it'
 
-Save your changes and open up your ``suite.rc`` file. Alter the
+Save your changes and open up your ``flow.cylc`` file. Alter the
 ``[[breadmaker]]`` task to look like this:
 
 .. code-block:: cylc

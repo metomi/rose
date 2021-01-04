@@ -28,7 +28,7 @@ behaviours such as:
    :term:`Rose suite configuration`
       A Rose configuration designed to run :term:`Cylc suites <Cylc suite>`.
       For instance it may be used to define Jinja2 variables for use in the
-      ``suite.rc`` file.
+      ``flow.cylc`` file.
 
 .. ifslides::
 
@@ -52,7 +52,7 @@ Rose Configuration Format
 
 .. ifslides::
 
-   .. rubric:: Like the ``suite.rc`` format:
+   .. rubric:: Like the ``flow.cylc`` format:
 
 * Comments start with a ``#`` character.
 * Settings are written as ``key=value`` pairs.
@@ -67,7 +67,7 @@ Rose Configuration Format
 
 .. ifslides::
 
-   .. rubric:: Unlike the ``suite.rc`` format:
+   .. rubric:: Unlike the ``flow.cylc`` format:
 
 * Sections cannot be nested.
 * Settings should not be indented.

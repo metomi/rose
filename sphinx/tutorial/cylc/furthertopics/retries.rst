@@ -86,7 +86,7 @@ Configuring Retries
 -------------------
 
 We need to tell Cylc to retry it a few times. To do this, add the following
-to the end of the ``[[roll_doubles]]`` task section in the ``suite.rc`` file:
+to the end of the ``[[roll_doubles]]`` task section in the ``flow.cylc`` file:
 
 .. code-block:: cylc
 

@@ -19,7 +19,7 @@ Create a new suite called ``queues-tutorial``::
    rose tutorial queues-tutorial
    cd ~/cylc-run/queues-tutorial
 
-You will now have a ``suite.rc`` file that looks like this:
+You will now have a ``flow.cylc`` file that looks like this:
 
 .. code-block:: cylc
 
