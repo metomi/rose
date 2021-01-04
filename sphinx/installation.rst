@@ -271,14 +271,14 @@ Add the following hook scripts to the repository:
 
   .. code-block:: sub
 
-     #!/bin/bash
+     #!/usr/bin/env bash
      exec <path-to-rose>/sbin/rosa svn-pre-commit "$@"
 
 * post-commit:
 
   .. code-block:: sub
 
-      #!/bin/bash
+      #!/usr/bin/env bash
       exec <path-to-rose>/sbin/rosa svn-post-commit "$@"
 
 You should replace ``/path/to/rose/`` with the location of your Rose

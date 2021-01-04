@@ -99,7 +99,7 @@ In the ``app/lander/`` directory create a ``bin/`` directory::
 Using your editor of choice, create a file named ``land`` under the ``bin``
 directory and paste in these lines::
 
-   #!/bin/bash
+   #!/usr/bin/env bash
 
    CLASS=$1
    PASSENGERS=$2

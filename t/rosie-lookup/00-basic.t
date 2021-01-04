@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -56,7 +56,7 @@ touch 'conf/opt/rose-port.conf'
 
 # Setup repository - create a suite.
 cat >repos/foo/hooks/post-commit <<__POST_COMMIT__
-#!/bin/bash
+#!/usr/bin/env bash
 export ROSE_CONF_PATH=$ROSE_CONF_PATH
 rosa svn-post-commit --debug "\$@" \\
     1>$PWD/rosa-svn-post-commit.out 2>$PWD/rosa-svn-post-commit.err

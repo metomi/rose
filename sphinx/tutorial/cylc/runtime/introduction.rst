@@ -88,7 +88,7 @@ We can also call other scripts or executables in this way, e.g:
 .. code-block:: bash
    :caption: bin/hello_world
 
-   #!/usr/bin/bash
+   #!/usr/usr/bin/env bash
    echo 'Hello World!'
 
 .. code-block:: cylc

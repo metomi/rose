@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -31,7 +31,7 @@ hello-from-env = hello run by env
 __CONFIG__
 mkdir $PWD/config/bin
 cat > $PWD/config/bin/hello <<'__SCRIPT__'
-#!/bin/bash
+#!/usr/bin/env bash
 echo "Hello ${@:-world}!"
 __SCRIPT__
 chmod +x $PWD/config/bin/hello

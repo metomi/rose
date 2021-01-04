@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -44,7 +44,7 @@ __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD/conf
 ROSE_BIN_HOME=$(dirname $(command -v rose))
 cat >repos/foo/hooks/post-commit <<__POST_COMMIT__
-#!/bin/bash
+#!/usr/bin/env bash
 export ROSE_CONF_PATH=${ROSE_CONF_PATH}
 export PATH=$PATH:${ROSE_BIN_HOME}
 rosa svn-post-commit --debug "\$@" \\
