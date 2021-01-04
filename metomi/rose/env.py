@@ -136,7 +136,7 @@ def env_var_escape(text, match_mode=None):
     return ret
 
 
-def env_var_process(text, unbound=None, match_mode=None):
+def env_var_process(text, unbound=None, match_mode=None, environ=os.environ):
     """Substitute environment variables into a string.
 
     For each $NAME and ${NAME} in "text", substitute with the value
@@ -158,8 +158,8 @@ def env_var_process(text, unbound=None, match_mode=None):
             groups = match.groupdict()
             substitute = groups["symbol"]
             if len(groups["escape"]) % 2 == 0:
-                if groups["name"] in os.environ:
-                    substitute = os.environ[groups["name"]]
+                if groups["name"] in environ:
+                    substitute = environ[groups["name"]]
                 elif unbound is not None:
                     substitute = str(unbound)
                 else:
