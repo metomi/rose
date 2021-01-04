@@ -16,19 +16,28 @@
 # -----------------------------------------------------------------------------
 """Select an available host machine by load or by random."""
 
+from collections import namedtuple
+from functools import lru_cache
+import json
 import os
 from random import choice, random, shuffle
+import shlex
+import signal
+from socket import (
+    getaddrinfo,
+    gethostbyname_ex,
+    gethostname,
+    getfqdn,
+    error as SocketError
+)
+import sys
+from time import sleep, time
+import traceback
+
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter, Event
 from metomi.rose.resource import ResourceLocator
-import shlex
-import signal
-from socket import (
-    getaddrinfo, gethostbyname_ex, gethostname, getfqdn, error as SocketError)
-import sys
-from time import sleep, time
-import traceback
 
 
 class NoHostError(Exception):
@@ -348,40 +357,61 @@ class HostSelector:
         # ssh to each host to return its score(s).
         host_proc_dict = {}
         for host_name in sorted(host_names):
+            # build host-select-client command
             command = []
             if not self.is_local_host(host_name):
                 command_args = []
                 command_args.append(host_name)
                 command = self.popen.get_cmd("ssh", *command_args)
-            command.append("bash")
-            stdin = rank_conf.get_command()
+            command.extend(["rose", "host-select-client"])
+
+            # build list of metrics to obtain for each host
+            metrics = rank_conf.get_command()
             for threshold_conf in threshold_confs:
-                stdin += threshold_conf.get_command()
-            stdin += "exit\n"
-            proc = self.popen.run_bg(*command, stdin=stdin,
-                                     preexec_fn=os.setpgrp)
+                for metric in threshold_conf.get_command():
+                    if metric not in metrics:
+                        metrics.append(metric)
+
+            # convert metrics list to JSON stdin
+            stdin = (
+                '\n***start**\n'
+                + json.dumps(metrics)
+                + '\n**end**\n'
+            )
+
+            # fire off host-select-client processes
+            proc = self.popen.run_bg(
+                *command,
+                stdin=stdin,
+                preexec_fn=os.setpgrp
+            )
             proc.stdin.write(stdin.encode('UTF-8'))
             proc.stdin.flush()
-            host_proc_dict[host_name] = proc
+            host_proc_dict[host_name] = (proc, metrics)
 
         # Retrieve score for each host name
         host_score_list = []
         time0 = time()
         while host_proc_dict:
             sleep(self.SSH_CMD_POLL_DELAY)
-            for host_name, proc in list(host_proc_dict.items()):
+            for host_name, (proc, metrics) in list(host_proc_dict.items()):
                 if proc.poll() is None:
                     score = None
                 elif proc.wait():
+                    stdout, stderr = (f.decode() for f in proc.communicate())
                     self.handle_event(DeadHostEvent(host_name))
                     host_proc_dict.pop(host_name)
                 else:
-                    out = proc.communicate()[0]
+                    out = proc.communicate()[0].decode()
+                    out = _deserialise(metrics, json.loads(out.strip()))
+
                     host_proc_dict.pop(host_name)
                     for threshold_conf in threshold_confs:
                         try:
-                            is_bad = threshold_conf.check_threshold(out)
-                            score = threshold_conf.command_out_parser(out)
+                            score = threshold_conf.command_out_parser(
+                                out, metrics
+                            )
+                            is_bad = threshold_conf.check_threshold(score)
                         except ValueError:
                             is_bad = True
                             score = None
@@ -391,7 +421,7 @@ class HostSelector:
                             break
                     else:
                         try:
-                            score = rank_conf.command_out_parser(out)
+                            score = rank_conf.command_out_parser(out, metrics)
                             host_score_list.append((host_name, score))
                         except ValueError:
                             score = None
@@ -401,7 +431,7 @@ class HostSelector:
                 break
 
         # Report timed out hosts
-        for host_name, proc in sorted(host_proc_dict.items()):
+        for host_name, (proc, _) in sorted(host_proc_dict.items()):
             self.handle_event(TimedOutHostEvent(host_name))
             os.killpg(proc.pid, signal.SIGTERM)
             proc.wait()
@@ -414,6 +444,40 @@ class HostSelector:
         return host_score_list
 
     __call__ = select
+
+
+@lru_cache()
+def _tuple_factory(name, params):
+    """Wrapper to namedtuple which caches results to prevent duplicates."""
+    return namedtuple(name, params)
+
+
+def _deserialise(metrics, data):
+    """Convert dict to named tuples.
+
+    Examples:
+        >>> _deserialise(
+        ...     [
+        ...         ['foo', 'bar'],
+        ...         ['baz']
+        ...     ],
+        ...     [
+        ...         {'a': 1, 'b': 2, 'c': 3},
+        ...         [1, 2, 3]
+        ...     ]
+        ... )
+        [foo(a=1, b=2, c=3), [1, 2, 3]]
+
+    """
+    for index, (metric, datum) in enumerate(zip(metrics, data)):
+        if isinstance(datum, dict):
+            data[index] = _tuple_factory(
+                metric[0],
+                tuple(datum.keys())
+            )(
+                *datum.values()
+            )
+    return data
 
 
 class ScorerConf:
@@ -430,15 +494,22 @@ class ScorerConf:
         """Return a shell command to get the info for scoring a host."""
         return self.scorer.get_command(self.method_arg)
 
-    def check_threshold(self, out):
+    def check_threshold(self, score):
         """Parse command output. Return True if threshold not met."""
-        score = self.command_out_parser(out)
         return (float(score) * self.scorer.SIGN >
                 float(self.value) * self.scorer.SIGN)
 
-    def command_out_parser(self, out):
+    def command_out_parser(self, out, metrics):
         """Parse command output to return a numeric score."""
-        return self.scorer.command_out_parser(out, self.method_arg)
+        results = self.get_results(out, metrics)
+        return self.scorer.command_out_parser(results, self.method_arg)
+
+    def get_results(self, out, metrics):
+        """Return list of results for the requested metrics."""
+        return [
+            out[metrics.index(metric)]
+            for metric in self.scorer.get_command(self.method_arg)
+        ]
 
 
 class RandomScorer:
@@ -451,17 +522,13 @@ class RandomScorer:
 
     ARG = None
     KEY = "random"
-    CMD = "true\n"
+    CMD = ['cpu_count']  # fetch an arbitrary metric
     CMD_IS_FORMAT = False
     SIGN = 1  # Positive
 
     def get_command(self, method_arg=None):
         """Return a shell command to get the info for scoring a host."""
-
-        if self.CMD_IS_FORMAT:
-            return self.CMD % {"method_arg": method_arg}
-        else:
-            return self.CMD
+        return list(self.CMD)
 
     @classmethod
     def command_out_parser(cls, out, method_arg=None):
@@ -471,7 +538,6 @@ class RandomScorer:
         returned by the command run on the remote host. Otherwise, this method
         returns a random number.
         """
-
         return random()
 
 
@@ -481,24 +547,13 @@ class LoadScorer(RandomScorer):
 
     ARG = "15"
     KEY = "load"
-    INDEX_OF = {"1": 1, "5": 2, "15": 3}
-    CMD = ("echo nproc=$((cat /proc/cpuinfo || lscfg) | grep -ic processor)\n"
-           "echo uptime=$(uptime)\n")
+    VALUES = ('1', '5', '15')  # 1, 5, 15 min average values
+    CMD = [["getloadavg"], ["cpu_count"]]
 
     def command_out_parser(self, out, method_arg=None):
-        if method_arg is None:
-            method_arg = self.ARG
-        nprocs = None
-        load = None
-        for line in out.splitlines():
-            if line.startswith(b"nproc="):
-                nprocs = line.split(b"=", 1)[1]
-            elif line.startswith(b"uptime="):
-                idx = self.INDEX_OF[method_arg]
-                load = line.rsplit(None, 3)[idx].rstrip(b",")
-        if load is None or not nprocs:
-            return None
-        return float(load) / float(nprocs)
+        load = out[0][self.VALUES.index(method_arg or self.ARG)]
+        cpus = out[1]
+        return load / cpus
 
 
 class MemoryScorer(RandomScorer):
@@ -506,34 +561,25 @@ class MemoryScorer(RandomScorer):
     """Score host by amount of free memory"""
 
     KEY = "mem"
-    CMD = """echo mem=$(free -m | sed '3!d; s/^.* \\<//')\n"""
+    CMD = [["virtual_memory"]]
     SIGN = -1  # Negative
 
     def command_out_parser(self, out, method_arg=None):
-        if method_arg is None:
-            method_arg = self.ARG
-        mem = None
-        for line in out.splitlines():
-            if line.startswith(b"mem="):
-                mem = line.split(b"=", 1)[1]
-        return float(mem)
+        return out[0].available
 
 
 class FileSystemScorer(RandomScorer):
 
     """Score host by average file system percentage usage."""
 
-    ARG = "~"
+    ARG = "/"  # TODO?
     KEY = "fs"
-    CMD = """echo df:'%(method_arg)s'=$(df -Pk %(method_arg)s | tail -1)\n"""
-    CMD_IS_FORMAT = True
+
+    def get_command(self, method_arg):
+        return [['disk_usage', method_arg or self.ARG]]
 
     def command_out_parser(self, out, method_arg=None):
-        if method_arg is None:
-            method_arg = self.ARG
-        for line in out.splitlines():
-            if line.startswith("df:" + method_arg + "="):
-                return int(line.rsplit(None, 2)[-2][0:-1])
+        return out[0].percent
 
 
 def main():

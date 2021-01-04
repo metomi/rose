@@ -49,13 +49,14 @@ with open("README.md", "r") as fh:
 
 
 INSTALL_REQUIRES = [
-    "jinja2>=2.10.1",
     "aiofiles",
-    "tornado",
-    "sqlalchemy",
+    "jinja2>=2.10.1",
+    "ldap3",
     "metomi-isodatetime",
     "requests",
-    "ldap3",
+    "sqlalchemy",
+    "tornado",
+    'psutil>=5.6.0',
 ]
 EXTRAS_REQUIRE = {
     'docs': [

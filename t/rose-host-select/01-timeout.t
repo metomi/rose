@@ -38,8 +38,8 @@ __ERR__
 cut -f2- mock-ssh.out | LANG=C sort >mock-ssh.out.sorted
 # N.B. Tab between 1 and sleepy?
 file_cmp "$TEST_KEY.mock-ssh.out" mock-ssh.out.sorted <<'__OUT__'
-sleepy1 bash
-sleepy2 bash
+sleepy1 rose host-select-client
+sleepy2 rose host-select-client
 __OUT__
 # Make sure there is no lingering processes
 run_fail "$TEST_KEY.ps" ps $(cut -f1 mock-ssh.out)
