@@ -51,6 +51,7 @@
 #         Compare contents in $FILE_ACTUAL and $FILE_EXPECT. pass/fail
 #         $TEST_KEY if contents are identical/different. If $FILE_EXPECT is "-"
 #         or not defined, compare $FILE_ACTUAL with STDIN to this function.
+#         Uses `diff -i` if DIFF_CASE_INSENSITIVE is set.
 #     file_cmp_any TEST_KEY FILE_ACTUAL [FILE_EXPECT]
 #         As file_cmp, but FILE_EXPECT should consist of more than one
 #         contents set to compare against, separated by a line matching
@@ -181,7 +182,11 @@ file_cmp() {
     local TEST_KEY=$1
     local FILE_ACTUAL=$2
     local FILE_EXPECT=${3:--}
-    if diff -u "${FILE_EXPECT}" "${FILE_ACTUAL}" >&2; then
+    local diff_opts=(-u)
+    if [[ -n ${DIFF_CASE_INSENSITIVE:-} ]]; then
+        diff_opts+=(-i)
+    fi
+    if diff "${diff_opts[@]}" "${FILE_EXPECT}" "${FILE_ACTUAL}" >&2; then
         pass "$TEST_KEY"
         return
     fi

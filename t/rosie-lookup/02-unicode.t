@@ -29,6 +29,10 @@ tests 3
 # Setup Rose site/user configuration for the tests.
 export TZ='UTC'
 
+# Ignore case in file_cmp methods
+# (this is to allow case-insensitive host names)
+DIFF_CASE_INSENSITIVE=true
+
 set -e
 
 # Create repositories

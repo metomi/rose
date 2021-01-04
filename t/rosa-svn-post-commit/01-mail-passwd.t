@@ -30,6 +30,17 @@ if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
     skip_all "cannot start mock SMTP server"
 fi
 
+# pick a second user account for testing
+# (must exist else tests fail)
+USERS=(bin nobody)
+for user in "${USERS[@]}"; do
+    if grep "^$user" /etc/passwd; then
+        USER2="$user"
+        break
+    fi
+done
+export USER2
+
 TEST_CONF="${TEST_SOURCE_DIR}/${TEST_KEY_BASE}.conf"
 # Get recipients from configuration
 get_recips() {
@@ -182,7 +193,7 @@ file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
 TEST_KEY="$TEST_KEY_BASE-mod-access-list-2"
 rosie checkout -q foo-aa001
 cat >$PWD/roses/foo-aa001/rose-suite.info <<__ROSE_SUITE_INFO
-access-list=root bin
+access-list=root $USER2
 owner=$USER
 project=hook
 sub-project=post-commit
@@ -198,7 +209,7 @@ file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
     "^Data: b'.*Subject: foo-aa001/trunk@6" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
-    "^Data: b'.*-access-list=\\*.*+access-list=root bin" "$TEST_SMTPD_LOG"
+    "^Data: b'.*-access-list=\\*.*+access-list=root $USER2" "$TEST_SMTPD_LOG"
 file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-del"

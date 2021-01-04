@@ -27,6 +27,7 @@ export ROSE_CONF_PATH=
 # Run the suite.
 tests 3
 TEST_KEY=$TEST_KEY_BASE
+mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "${TEST_KEY_BASE}-install" \
