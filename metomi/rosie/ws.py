@@ -42,6 +42,7 @@ from time import sleep
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
+import wsgiref
 
 from metomi.isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 from metomi.rose.host_select import HostSelector

@@ -18,4 +18,5 @@
 such as namelists. To add a new format, place it in this directory and
 add an import statement below.
 """
+# flake8: noqa: F401
 from . import namelist

@@ -68,7 +68,13 @@ EXTRAS_REQUIRE = {
         'cylc-sphinx-extensions[all]>=1.2.0'
     ]
 }
-EXTRAS_REQUIRE['all'] = list({y for x in EXTRAS_REQUIRE.values() for y in x})
+TESTS_REQUIRE = [
+    'pytest',
+    'flake8'
+]
+EXTRAS_REQUIRE['all'] = list(set(
+    [y for x in EXTRAS_REQUIRE.values() for y in x] + TESTS_REQUIRE
+))
 
 
 setup(
@@ -83,6 +89,7 @@ setup(
     + glob(join("lib", "bash", "*")),
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
+    tests_require=TESTS_REQUIRE,
     package_data={
         "metomi.rose": ["etc/.*"],
         "metomi.rosie": ["lib/*"]

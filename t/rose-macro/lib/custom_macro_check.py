@@ -30,7 +30,6 @@ class URLChecker(metomi.rose.macro.MacroBase):
 
     def validate(self, config, meta_config):
         """Validate a string containing a URL."""
-        seq = [1, 1]
         self.reports = []
         for section in config.value.keys():
             for option in config.get([section]).value.keys():

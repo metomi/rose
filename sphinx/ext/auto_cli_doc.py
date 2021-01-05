@@ -18,7 +18,7 @@
 
 from collections import OrderedDict
 import re
-from subprocess import PIPE, check_output, CalledProcessError
+from subprocess import check_output, CalledProcessError
 import sys
 
 from docutils import nodes

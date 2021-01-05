@@ -24,7 +24,6 @@ FAIL = "~~"
 class Prohibited:
     def run(self, task):
         """Perform an exact comparison between the result and the KGO data"""
-        failures = 0
         if len(task.resultdata) == 0:
             task.set_pass(ProhibitedStringResult(task, PASS))
         else:

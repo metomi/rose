@@ -34,7 +34,6 @@ FAIL = ">"
 class Within:
     def run(self, task):
         """Check that the results are within a specified tolerance."""
-        failures = 0
         if len(task.resultdata) != len(task.kgo1data):
             raise DataLengthError(task)
         val_num = 0

@@ -26,7 +26,6 @@ FAIL = "!="
 class Exact:
     def run(self, task):
         """Perform an exact comparison between the result and the KGO data"""
-        failures = 0
         if len(task.resultdata) != len(task.kgo1data):
             raise DataLengthError(task)
         location = 0

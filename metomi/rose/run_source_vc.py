@@ -19,7 +19,6 @@
 import os
 from metomi.rose.popen import RosePopener
 import sys
-import _io
 from metomi.rose.unicode_utils import write_safely
 
 

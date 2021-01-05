@@ -20,9 +20,6 @@ SpongeDeSoggifier, a rose transform macro.
 
 """
 
-import re
-import subprocess
-
 import metomi.rose.macro
 
 
