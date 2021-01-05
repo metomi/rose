@@ -21,7 +21,7 @@
 # Wrapper for running `shellcheck` over projects.
 
 set -e
-cd "$(dirname "$0")/../"
+cd "$(dirname "$0")/../../"
 
 # find shell files under the specified directory
 find_files () {
@@ -78,6 +78,8 @@ default () {
     # run a strict check on all "functional" scripts
     main . \
         --exclude t \
+        --exclude node_modules \
+        --exclude .git \
         -- -e SC1090 -e SC2119 -e SC2001
 
     # run a lenient check on all test scripts

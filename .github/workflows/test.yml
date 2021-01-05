@@ -1,0 +1,115 @@
+name: test
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: The branch to open the PR against
+        required: false
+        default: 'master'
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.7']
+        #include:
+        #  - os: 'macos-latest'
+        #    python-version: '3.7'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Configure Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          # temp: use cylc-install branch
+          pip install git+https://github.com/datamel/cylc-flow@cylc-install
+          # TODO: remove editable mode
+          # there are other Rose files (e.g. meta-all/rose-meta.conf)
+          # that are not yet installed as part of the Python package
+          # which need to be moved into metomi/rose/etc/
+          pip install -e ."[all]"
+          pip install --no-deps git+https://github.com/cylc/cylc-rose.git
+          yarn install
+
+      - name: Brew Install
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          # apply DNS patch
+          hostuserutil="$(python3 -c '
+          import cylc.flow.hostuserutil
+          print(cylc.flow.hostuserutil.__file__)
+          ')"
+          patch "${hostuserutil}" < etc/conf/macos-patch
+
+          # install system deps
+          brew update
+          brew install bash coreutils gnu-sed shellcheck sqlite3
+
+          # old stuff, not sure if all needed
+          brew install \
+            subversion
+
+          # add GNU coreutils and sed to the user PATH
+          # (see instructions in brew install output)
+          cat >> "$HOME/.bashrc" <<__HERE__
+          PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
+          PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+          __HERE__
+
+      - name: Apt-Get Install
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck sqlite3
+
+          # old stuff, not sure if all needed
+          sudo apt-get install -y \
+            subversion \
+            build-essential \
+            gfortran \
+            libxml-parser-perl \
+            libconfig-inifiles-perl \
+            libdbi-perl \
+            libdbd-sqlite3-perl
+
+          # yet more old stuff, not sure if needed
+          sudo apt-get install -y at
+          sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
+              `lsb_release -cs` svn19" >> /etc/apt/sources.list.d/subversion19.list'
+          sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- | \
+              sudo apt-key add -
+
+      - name: Style
+        run: |
+          pycodestyle
+          flake8
+          etc/bin/shellchecker
+          yarn run lint
+
+      - name: Tests
+        run: |
+          pytest
+
+      - name: Debug
+        run: |
+          pip list | grep cylc
+          pip list | grep rose
+          cylc version --long
+          rose version --long
+
+      - name: Functional Tests
+        run: |
+          etc/bin/rose-test-battery -j 4

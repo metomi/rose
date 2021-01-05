@@ -39,9 +39,10 @@ fi
 set -eu
 
 APT=()
-NPM=()
 PIP=()
 GIT=()
+BREW=()
+YARN=false
 PY_PATH=()
 RC_PATH=("${HOME}")
 RI_PATH=()
@@ -70,7 +71,7 @@ _gh_extract () {  # extract project from GitHub to $HOME
 
     # in-place installation
     if [[ -f "${DEST}/setup.py" ]]; then
-        pip install -e "${DEST}"
+        pip install "${DEST}"
     fi
 }
 
@@ -80,13 +81,27 @@ _install_coverage () {
 }
 
 _install_rose () {
-    pip install -e .
-    PY_PATH+=("./metomi")
-    RC_PATH+=("./bin")
+    pip install .
 }
 
 _install_cylc () {
     APT+=(at)
+    BREW+=(bash coreutils gnu-sed)
+    if [[ "$OSTYPE" == darwin* ]]; then
+        # add GNU coreutils and sed to the user PATH
+        # (see instructions in brew install output)
+        # shellcheck disable=SC2016
+        RC_PATH+=('$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH')
+        # shellcheck disable=SC2016
+        RC_PATH+=('/usr/local/opt/gnu-sed/libexec/gnubin:$PATH')
+        # apply DNS patch
+        hostuserutil="$(python3 -c '
+        import cylc.flow.hostuserutil
+        print(cylc.flow.hostuserutil.__file__)
+        ')"
+        patch "${hostuserutil}" < etc/conf/macos-patch
+    fi
+    #brew install bash coreutils gnu-sed shellcheck sqlite3 subversion
 }
 
 _install_fcm () {
@@ -95,11 +110,6 @@ _install_fcm () {
     GIT+=('metomi|fcm|master')
     RC_PATH+=("${HOME}/fcm-master/bin")
     WANDISCO=true
-}
-
-_install_pytest () {
-    # pytest and its extensions
-    PIP+=(pytest)
 }
 
 _install_rosie () {
@@ -127,8 +137,8 @@ _join () {
 
 _install_linters () {
     APT+=(shellcheck)
-    PIP+=(pycodestyle)
-    NPM+=(eslint@6)
+    BREW+=(shellcheck)
+    YARN=true
 }
 
 _path_for () {
@@ -136,24 +146,24 @@ _path_for () {
     dirname "$(command -v "${COMMAND}")"
 }
 
-_test_units () {
-    pytest --cov-append metomi/rose/tests/*
-}
+#_test_units () {
+#    pytest --cov-append metomi/rose/tests/*
+#}
 
-_test_style () {
-    pycodestyle
-    eslint .
-    "$(dirname "$0")/shellchecker"
-}
+#_test_style () {
+#    pycodestyle
+#    eslint .
+#    "$(dirname "$0")/shellchecker"
+#}
 
-_test_battery () {
-    cp "./.travis/sitecustomize.py" ./lib/python
-    coverage run .travis/cover.py
-}
+#_test_battery () {
+#    cp "./.travis/sitecustomize.py" ./lib/python
+#    coverage run .travis/cover.py
+#}
 
-_test_docs () {
-    etc/bin/rose-make-docs --strict clean linkcheck doctest
-}
+#_test_docs () {
+#    etc/bin/rose-make-docs --strict clean linkcheck doctest
+#}
 
 _wandisco_configure () {  # extract Wandisco stuff
     # shellcheck disable=SC1004,SC2016
@@ -183,14 +193,21 @@ install () {
         pip install "${PIP[@]}" &
     fi
 
-    if [[ ${#NPM[@]} -gt 0 ]]; then
-        npm install -g "${NPM[@]}" &
+    if $YARN; then
+        yarn install
     fi
 
-    if [[ ${#APT[@]} -gt 0 ]]; then
-        sudo apt-get update
-        # shellcheck disable=SC155,2033
-        sudo apt-get install -y "${APT[@]}"
+    if [[ "$OSTYPE" == darwin* ]]; then
+        if [[ ${#BREW[@]} -gt 0 ]]; then
+            brew update
+            brew install "${BREW[@]}"
+        fi
+    else
+        if [[ ${#APT[@]} -gt 0 ]]; then
+            sudo apt-get update
+            # shellcheck disable=SC155,2033
+            sudo apt-get install -y "${APT[@]}"
+        fi
     fi
 
     if [[ ${#GIT[@]} -gt 0 ]]; then
@@ -223,14 +240,14 @@ _report_coverage () {
     bash <(curl -s https://codecov.io/bash)
 }
 
-_report_error() {
-    # don't bail out on error
-    set +eu
+#_report_error() {
+#    # don't bail out on error
+#    set +eu
 
-    printenv PATH PYTHONPATH
-    rose check-software
-    cat /tmp/sphinx-err* >&2 # sphinx traceback
-}
+#    printenv PATH PYTHONPATH
+#    rose check-software
+#    cat /tmp/sphinx-err* >&2 # sphinx traceback
+#}
 
 report () {
     for arg in "$@"; do
