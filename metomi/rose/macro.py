@@ -338,7 +338,7 @@ class MacroBase:
     def add_report(self, *args, **kwargs):
         """Add a metomi.rose.macro.MacroReport.
 
-        See :class:`rose.macro.MacroReport` for details of arguments.
+        See :class:`metomi.rose.macro.MacroReport` for details of arguments.
 
         Examples:
             >>> # An example validator macro which adds a report to the setting
@@ -502,7 +502,7 @@ class MacroReport:
         section (str): The name of the section to attach this report to.
         option (str): The name of the option (within the section) to
             attach this report to.
-        value (obj): The value of the configuration associated with this
+        value (object): The value of the configuration associated with this
             report.
         info (str): Text information describing the nature of the report.
         is_warning (bool): If True then this report will be logged as a
@@ -763,7 +763,7 @@ def get_macro_class_methods(macro_modules):
         macro_name = macro_module.__name__
         contents = inspect.getmembers(macro_module)
         for obj_name, obj in contents:
-            if not inspect.isclass(obj):
+            if not inspect.isclass(object):
                 continue
             for att_name in ALLOWED_MACRO_CLASS_METHODS:
                 if (hasattr(obj, att_name) and

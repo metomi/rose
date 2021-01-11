@@ -10,7 +10,7 @@ metadata versions. They are classes, very similar to
 * An ``upgrade`` method instead of a ``transform`` method
 * An optional ``downgrade`` method, identical in API to the ``upgrade``
   method, but intended for performing the reverse operation
-* A more helpful API via :py:class:`rose.upgrade.MacroUpgrade` methods
+* A more helpful API via :py:class:`metomi.rose.upgrade.MacroUpgrade` methods
 * ``BEFORE_TAG`` and ``AFTER_TAG`` attributes - the version of metadata they
   apply to (``BEFORE_TAG``) and the version they upgrade to (``AFTER_TAG``)
 
@@ -52,8 +52,9 @@ file - ``rose-meta/CATEGORY/versions.py``.
    these very modules carefully or use absolute or package level imports like
    this: ``from .versionXX_YY import FooBar``.
 
-Upgrade macros are subclasses of :py:class:`rose.upgrade.MacroUpgrade`. They
-have all the functionality of the :ref:`transformer macros <api-rose-macro>`.
+Upgrade macros are subclasses of :py:class:`metomi.rose.upgrade.MacroUpgrade`.
+They have all the functionality of the
+:ref:`transformer macros <api-rose-macro>`.
 
 .. autoclass:: metomi.rose.upgrade.MacroUpgrade
    :members:

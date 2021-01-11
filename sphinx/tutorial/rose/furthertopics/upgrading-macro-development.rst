@@ -221,7 +221,7 @@ Upgrade macros are bits of Python code that essentially look like this:
            return config, self.reports
 
 They are sub-classes of a particular class,
-:py:class:`rose.upgrade.MacroUpgrade`,
+:py:class:`metomi.rose.upgrade.MacroUpgrade`,
 which means that some of the Python functionality is done 'under the hood'
 to make things easier.
 

@@ -239,8 +239,8 @@ of precedence):
    variable.
 
 The only analysis module provided with Rose is
-:py:mod:`rose.apps.ana_builtin.grepper`, it provides the following analysis
-tasks and options:
+:py:mod:`metomi.rose.apps.ana_builtin.grepper`, it provides the following
+analysis tasks and options:
 
 .. autoclass:: metomi.rose.apps.ana_builtin.grepper.SingleCommandStatus
    :noindex:
@@ -262,7 +262,7 @@ route to understanding how they should be arranged is likely to look at the
 built-in ``grepper`` module. But the key concepts are as follows. To be
 recognised as a valid analysis module, the Python file must contain at
 least one class which inherits and extends
-:py:mod:`rose.apps.rose_ana.AnalysisTask`:
+:py:mod:`metomi.rose.apps.rose_ana.AnalysisTask`:
 
 .. autoclass:: metomi.rose.apps.rose_ana.AnalysisTask
 

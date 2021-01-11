@@ -779,9 +779,9 @@ The metadata options for a configuration fall into four categories:
 
          Another useful Rose built-in widget to use is the array element
          aligning page widget,
-         ``rose.config_editor.pagewidget.table.PageArrayTable``. You can set
-         this for a section or namespace to make sure each *n*-th variable value
-         element lines up horizontally. For example:
+         ``metomi.rose.config_editor.pagewidget.table.PageArrayTable``. You can
+         set this for a section or namespace to make sure each *n*-th variable
+         value element lines up horizontally. For example:
 
          .. code-block:: rose
 

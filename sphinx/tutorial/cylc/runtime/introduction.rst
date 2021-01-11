@@ -73,8 +73,8 @@ We can also call other scripts or executables in this way, e.g:
            script = ~/foo/bar/baz/hello_world
 
 
-:envvar:`PATH` and :envvar:`PYTHONPATH`
----------------------------------------
+``PATH`` and :envvar:`PYTHONPATH`
+---------------------------------
 
 .. ifnotslides::
 
@@ -82,7 +82,7 @@ We can also call other scripts or executables in this way, e.g:
    leaving them somewhere else on the system.
 
    If you create a ``bin/`` sub-directory within the :term:`suite directory`
-   Cylc will automatically prepend it to the :envvar:`PATH` environment
+   Cylc will automatically prepend it to the ``PATH`` environment
    variable when the task runs.
 
 .. code-block:: bash

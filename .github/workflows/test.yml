@@ -17,9 +17,9 @@ jobs:
       matrix:
         os: ['ubuntu-latest']
         python-version: ['3.7']
-        #include:
-        #  - os: 'macos-latest'
-        #    python-version: '3.7'
+        include:
+          - os: 'macos-latest'
+            python-version: '3.7'
 
     steps:
       - name: Checkout
@@ -102,13 +102,66 @@ jobs:
         run: |
           pytest
 
-      - name: Debug
-        run: |
-          pip list | grep cylc
-          pip list | grep rose
-          cylc version --long
-          rose version --long
-
       - name: Functional Tests
+        id: functest
         run: |
-          etc/bin/rose-test-battery -j 4
+          etc/bin/rose-test-battery -j 4 --state=save
+
+      - name: Re-Run Fails
+        if: steps.functest.conclusion == 'failure'
+        run: |
+          etc/bin/rose-test-battery -j 1 -v --state=save,failed
+
+      - name: Upload
+        if: steps.functest.conclusion == 'failure'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Upload cylc-run artifact
+          path: cylc-run
+
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Configure Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: install
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            latexmk \
+            texlive \
+            texlive-generic-extra \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            graphviz
+          pip install -e .[docs]
+
+      - name: build (html)
+        run: |
+          make -C sphinx/ html SPHINXOPTS='-Wn'
+
+      - name: build (slides)
+        run: |
+          make -C sphinx/ slides SPHINXOPTS='-Wn'
+
+      - name: build (latexpdf)
+        run: |
+          make -C sphinx/ latexpdf SPHINXOPTS='-Wn'
+
+      - name: build (linkcheck)
+        run: |
+          make -C sphinx/ linkcheck SPHINXOPTS='-Wn'
+
+      - name: debug
+        if: failure()
+        run: |
+          cat /tmp/sphinx-err* >&2

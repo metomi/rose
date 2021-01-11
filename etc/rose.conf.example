@@ -122,20 +122,6 @@ properties=title,ns,description,help
 ignore{foo}=REGEX
 
 
-
-# Configuration specific to :ref:`command-rose-config-edit`.
-[rose-config-edit]
-# :default: /opt/cylc/images/icon.svg
-#
-# Path to an image containing the suite engine icon.
-# See :py:mod:`rose.config_editor` for detail.
-icon-path-scheduler=PATH
-# :default: https://github.com/metomi/rose/
-#
-# Hyperlink to the Rose project page.
-project-url=URL
-
-
 # Configuration related to :ref:`command-rose-host-select`.
 [rose-host-select]
 # The default arguments to use for this command e.g. ``default=hpc``.
@@ -220,9 +206,9 @@ method-path=/path/1 /path2
 # <The Rose Ana Comparison Database>`.
 kgo-database=.true.
 # Limits the number of lines printed when using the
-# :py:mod:`rose.apps.ana_builtin.grepper` analysis class.
+# :py:mod:`metomi.rose.apps.ana_builtin.grepper` analysis class.
 grepper-report-limit=42
-# Causes the :py:mod:`rose.apps.ana_builtin.grepper` class to pass
+# Causes the :py:mod:`metomi.rose.apps.ana_builtin.grepper` class to pass
 # if all files to be compared are missing.
 skip-if-all-files-missing=.true.
 
@@ -254,7 +240,6 @@ title=TITLE
 
 
 # Configuration related to the :ref:`command-rosie-go` GUI.
-# See :py:mod:`rosie.browser` for detail.
 [rosie-go]
 # :default: /opt/cylc/images/icon.svg
 #

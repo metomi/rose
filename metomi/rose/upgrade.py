@@ -162,22 +162,24 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
                 configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
-            value (string - optional): String denoting the new setting value.
+            value (str): String denoting the new setting value.
                 Required for options but not for settings.
-            forced (bool - optional)
+            forced (bool)
                 If True override value if the setting already exists.
-            state (str - optional):
+            state (str):
                 The state of the new setting - should be one of the
-                ``rose.config.ConfigNode`` states e.g.
-                ``rose.config.ConfigNode.STATE_USER_IGNORED``. Defaults to
-                ``rose.config.ConfigNode.STATE_NORMAL``.
-            comments (list - optional): List of comment lines (strings) for
+                :py:class:`metomi.rose.config.ConfigNode` states e.g.
+                :py:data:`metomi.rose.config.ConfigNode.STATE_USER_IGNORED`.
+                Defaults to
+                :py:data:`metomi.rose.config.ConfigNode.STATE_NORMAL`.
+            comments (list): List of comment lines (strings) for
                 the new setting or ``None``.
-            info (string - optional): A short string containing no new lines,
+            info (str): A short string containing no new lines,
                 describing the addition of the setting.
 
         Returns:
             None
+
         """
         section, option = self._get_section_option_from_keys(keys)
         id_ = self._get_id_from_section_option(section, option)
@@ -266,12 +268,12 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
                 configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
-            value (string): The new value. Required for options, can be
+            value (str): The new value. Required for options, can be
                 ``None`` for sections.
             forced (bool): Create the setting if it is not present in config.
-            comments (list - optional): List of comment lines (strings) for
+            comments (list): List of comment lines (strings) for
                 the new setting or ``None``.
-            info (string - optional): A short string containing no new lines,
+            info (str): A short string containing no new lines,
                 describing the addition of the setting.
 
         Returns:
@@ -309,11 +311,12 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
                 configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
-            no_ignore (bool - optional): If ``True`` return ``None`` if the
+            no_ignore (bool): If ``True`` return ``None`` if the
                 setting is ignored (else return the value).
 
         Returns:
             object - The setting value or ``None`` if not defined.
+
         """
         section, option = self._get_section_option_from_keys(keys)
         if config.get([section, option], no_ignore=no_ignore) is None:
@@ -328,11 +331,12 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
                 configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
-            info (string - optional): A short string containing no new lines,
+            info (str): A short string containing no new lines,
                 describing the addition of the setting.
 
         Returns:
             None
+
         """
         section, option = self._get_section_option_from_keys(keys)
         if option is None:
@@ -353,11 +357,12 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
             new_keys (list): The new hierarchy of node.value 'keys'.
-            info (string - optional): A short string containing no new lines,
+            info (str): A short string containing no new lines,
                 describing the addition of the setting.
 
         Returns:
             None
+
         """
         section, option = self._get_section_option_from_keys(keys)
         new_section, new_option = self._get_section_option_from_keys(new_keys)
@@ -403,11 +408,12 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
                 configuration.
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
-            info (string - optional): A short string containing no new lines,
+            info (str): A short string containing no new lines,
                 describing the addition of the setting.
 
         Returns:
             False - if the setting's state is not changed else ``None``.
+
         """
         return self._ignore_setting(
             config,
@@ -420,17 +426,22 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         """User-ignore a setting in the configuration.
 
         Args:
-            config (metomi.rose.config.ConfigNode): The application
-                configuration.
-            keys (list): A list defining a hierarchy of node.value 'keys'.
+            config (metomi.rose.config.ConfigNode):
+                The application configuration.
+            keys (list):
+                A list defining a hierarchy of node.value 'keys'.
                 A section will be a list of one keys, an option will have two.
-            info (string - optional): A short string containing no new lines,
-                describing the addition of the setting.
-            state (string - optional): A ``rose.config.ConfigNode`` state.
-                ``STATE_USER_IGNORED`` by default.
+            info (str):
+                A short string containing no new lines, describing the addition
+                of the setting.
+            state (str):
+                A :py:class:`metomi.rose.config.ConfigNode` state.
+                :py:data:`metomi.rose.config.ConfigNode.STATE_USER_IGNORED` by
+                default.
 
         Returns:
             False - if the setting's state is not changed else ``None``.
+
         """
         return self._ignore_setting(config, list(keys),
                                     info=info, state=state)

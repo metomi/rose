@@ -59,7 +59,7 @@ Autodocumentation:
     Documentation can be auto-built from RST formatted comments in Rose
     configuration files using the ``autoconfig`` directive.
 
-    Note that due to the implementation of :py:mod:`rose.config` the
+    Note that due to the implementation of :py:mod:`metomi.rose.config` the
     autodocumenter will represent empty sections as top level configuration
     nodes.
 
@@ -922,7 +922,7 @@ class RoseAutoDirective(Directive):
     """Directive for autodocumenting Rose configuration files.
 
     Uses RST formatted comments in Rose configuration files using
-    :py:mod:`rose.config`.
+    :py:mod:`metomi.rose.config`.
 
     Note the directive only documents config objects not the file itself.
 

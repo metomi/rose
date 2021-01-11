@@ -73,7 +73,7 @@ class RosieWSClient:
         popen (rose.popen.RosePopener): Use initiated RosePopener instance
             create a new one if ``None``.
         event_handler : A callable object for reporting popen output,
-            see :py:class:`rose.reporter.Reporter`.
+            see :py:class:`metomi.rose.reporter.Reporter`.
     """
 
     MAX_LOCAL_QUERIES = 64
