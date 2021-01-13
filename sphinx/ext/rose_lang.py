@@ -154,4 +154,4 @@ class RoseLexer(RegexLexer):
 
 def setup(app):
     """Sphinx plugin setup function."""
-    app.add_lexer('rose', RoseLexer())
+    app.add_lexer('rose', RoseLexer)
