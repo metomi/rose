@@ -19,11 +19,13 @@ Convenient functions for searching resource files.
 """
 
 import os
-from metomi.rose.config import ConfigLoader, ConfigNode
+from pathlib import Path
 import inspect
 import string
 import sys
 from importlib.machinery import SourceFileLoader
+
+from metomi.rose.config import ConfigLoader, ConfigNode
 
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
@@ -52,12 +54,29 @@ class ResourceError(Exception):
         Exception.__init__(self, "%s: resource not found." % key)
 
 
+ROSE_CONF_PATH = 'ROSE_CONF_PATH'
+ROSE_SITE_CONF_PATH = 'ROSE_SITE_CONF_PATH'
+
+
 class ResourceLocator:
+    """A class for searching resource files.
 
-    """A class for searching resource files."""
+    Loads files in the following order:
 
-    SITE_CONF_PATH = get_util_home("etc")
-    USER_CONF_PATH = os.path.join(os.path.expanduser("~"), ".metomi")
+    System:
+        /etc
+    Site:
+        $ROSE_SITE_CONF_PATH
+    User:
+        ~/.metomi
+
+    If $ROSE_CONF_PATH is defined these files are skipped and configuration
+    found in $ROSE_CONF_PATH is loaded instead.
+
+    """
+
+    SYST_CONF_PATH = Path('/etc')
+    USER_CONF_PATH = Path('~/.metomi').expanduser()
     ROSE_CONF = "rose.conf"
     _DEFAULT_RESOURCE_LOCATOR = None
 
@@ -83,19 +102,37 @@ class ResourceLocator:
     def get_conf(self):
         """Return the site/user configuration root node."""
         if self.conf is None:
-            paths = [self.SITE_CONF_PATH, self.USER_CONF_PATH]
+            # base system conf path
+            paths = [self.SYST_CONF_PATH]
+
+            # add $ROSE_SITE_CONF_PATH if defined
+            if "ROSE_SITE_CONF_PATH" in os.environ:
+                path_str = os.environ["ROSE_SITE_CONF_PATH"].strip()
+                if path_str:
+                    paths.append(Path(path_str))
+
+            # add user conf path
+            paths.append(self.USER_CONF_PATH)
+
+            # use $ROSE_CONF_PATH (and ignore all others) if defined
             if "ROSE_CONF_PATH" in os.environ:
                 paths_str = os.getenv("ROSE_CONF_PATH").strip()
                 if paths_str:
-                    paths = paths_str.split(os.pathsep)
+                    paths = [
+                        Path(path)
+                        for path in paths_str.split(os.pathsep)
+                    ]
                 else:
                     paths = []
+
+            # load and cache config
             self.conf = ConfigNode()
             config_loader = ConfigLoader()
             for path in paths:
-                name = os.path.join(path, self.ROSE_CONF)
-                if os.path.isfile(name) and os.access(name, os.R_OK):
-                    config_loader.load_with_opts(name, self.conf)
+                conffile = path / self.ROSE_CONF
+                if conffile.is_file() and os.access(conffile, os.R_OK):
+                    config_loader.load_with_opts(str(conffile), self.conf)
+
         return self.conf
 
     def get_doc_url(self):

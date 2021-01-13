@@ -10,6 +10,8 @@
           :start-line: 1
 
 .. _Cylc: https://cylc.github.io/
+.. _Cylc Flow: https://github.com/cylc/cylc-flow
+.. _Cylc Rose: https://github.com/cylc/cylc-rose
 .. _Cylc User Guide: https://cylc.github.io/documentation/#the-cylc-user-guide
 .. _Cylc Suite Design Guide: https://cylc.github.io/cylc-doc/current/html/suite-design-guide/suite-design-guide-master.html
 .. _EmPy: http://www.alcyone.com/software/empy/

@@ -1,113 +1,87 @@
 .. include:: hyperlinks.rst
    :start-line: 1
 
+
 Installation
 ============
 
-.. _GitHub: https://github.com/metomi/rose
-.. _archives: https://github.com/metomi/rose/tags
+Rose runs on Unix-like systems including Linux and MacOS.
 
-The source code for Rose is available via `GitHub`_, code
-releases are available in ``zip`` and ``tar.gz`` `archives`_.
+Quick Installation
+------------------
 
-1. If you wish to do so create a new environment using Conda, Venv or some
-   other environment manager.
-2. Install using ``pip install metomi-rose``
-3. Check system compatibility by running :ref:`command-rose-check-software`.
+With ``conda`` (recommended)::
 
+   $ conda install metomi-rose
 
-System Requirements
--------------------
+With ``pip`` (you will need to ensure `Non Python Dependencies`_ are met)::
 
-Rose runs on Unix/Linux systems and is known to run on RHEL6 and a number of
-systems including those documented under `metomi-vms`_.
+   $ pip install metomi-rose
 
-System compatibility can be tested using the :ref:`command-rose-check-software`
-command.
+Installing With Cylc
+^^^^^^^^^^^^^^^^^^^^
 
-.. script-include:: rose check-software --rst
+Rose does not require and is distributed independently of `Cylc`_.
 
+To use Rose with Cylc you will need to install `Cylc Flow`_ and `Cylc Rose`_
+into the same Python environment as Rose.
 
-Host Requirements
------------------
+With ``conda`` (recommended)::
 
-Whilst you can install and use Rose & Cylc on a single host (i.e. machine),
-most installations are likely to be more complex. There are five types of
-installation:
+   $ conda install cylc-flow cylc-rose
 
-Hosts For Running Cylc Suites
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+With ``pip`` (you will need to ensure `Non Python Dependencies`_ are met)::
 
-Each user can just run their suites on the host where they issue the
-:ref:`command-rose-suite-run` command. However, the local host may not meet the
-necessary requirements for connectivity (to the hosts running the tasks)
-or for availability (the host needs to remain up for the duration of
-the suite). Therefore, Rose can be configured to run the suites on
-remote hosts. If multiple hosts are available, by default the host with
-the lowest system load average will be used.
-
-Installation requirements:
-   * Rose, Cylc, Bash, Python, jinja2.
-   * Subversion & FCM *(only if you want* :ref:`command-rose-suite-run` *to
-     install files from Subversion using FCM keywords).*
-Connectivity requirements:
-   * Must be able to submit tasks to the hosts which run the suite tasks,
-     either directly or via SSH access to another host.
-
-Hosts For Running Tasks In Suites
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Installation requirements:
-   * Rose, Cylc, Bash, Python.
-   * Subversion & FCM *only if you want to use the Rose install utility
-     to install files from Subversion using FCM keywords*.
-
-Connectivity requirements:
-   * Must be able to communicate back to the hosts running the Cylc suites
-     via HTTPS (preferred), HTTP or SSH.
-
-Hosts For Running User Interactive Tools
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Installation requirements:
-   * Rose, Cylc, Bash, Python, requests, Subversion, FCM,
-     Pygraphviz (+ graphviz).
-
-Connectivity requirements:
-   * Must have HTTP access to the hosts running the Rosie web service.
-   * Must have access to the Rosie Subversion repositories via the
-     appropriate protocol.
-   * Must have HTTP and SSH access to the hosts running the Cylc suites.
-   * Must share user accounts and ``$HOME`` directories with the hosts running
-     the Cylc suites.
-
-Hosts For Rosie Subversion Repositories And The Rosie Web Services
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Typically you will only need a single host but you can have multiple
-repositories on different hosts if you require this.
-
-Installation requirements:
-   * Rose, Bash, Python, jinja2, sqlalchemy, Subversion.
+   $ pip install cylc-flow cylc-rose
 
 .. note::
 
-   This section has assumed that you wish to use Rose & Cylc (including
-   their respective GUIs) and use Rosie to store your suites. However,
-   there are many ways of using Rose. For instance:
+   `Cylc`_ is a distributed system, not all dependencies are required on all
+   platforms.
 
-   * You can use Rose without using cylc.
-   * You can use Rose & Cylc but not use Rosie.
-   * You can use Rose & Cylc from the command line without using their GUIs.
+   See the `Cylc`_ installation instructions for more information.
+
+   .. TODO
+
+      This reference will pass once intersphinx has a more contemporary
+      version of cylc-doc to point at (see conf.py)
+
+      See the :ref:`Cylc installation instructions <cylc:installation>` for more
+      information.
+
+Non Python Dependencies
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The following packages are installed by ``conda`` but not by ``pip``:
+
+* FCM
+* Perl
+* Python3
+* Subversion
+
+If installing via ``pip`` run :ref:`command-rose-check-software` to ensure
+non-Python dependencies are satisfied.
+
+.. note::
+
+   Subversion & FCM are required for installing files from Subversion using FCM
+   keywords by:
+
+   + ``rose app-run``
+   + ``rose task-run``
+   + ``cylc install``
 
 
 Configuring Rose
 ----------------
 
-``etc/rose.conf``
-   You should add/edit this file to meet the requirement of your site.
-   Examples can be found at the ``etc/rose.conf.example`` file in your
-   Rose distribution. See also :rose:file:`rose.conf` in the API reference.
+Rose configuration files can be located in the following places:
+
+* ``/etc/.metomi/rose.conf``
+* ``$ROSE_SITE_CONF_PATH/.metomi/rose.conf``
+* ``$HOME/.metomi/rose.conf``
+
+See :rose:file:`rose.conf` in the API reference for more information.
 
 
 Configuring Rosie Client
@@ -121,6 +95,7 @@ a web interface for suite discovery and lookup.
 If users at your site are able to access Rosie services on the Internet
 or if someone else has already configured Rosie services at your site,
 all you need to do is configure the client to talk to the servers.
+
 Refer to the `Configuring a Rosie Server`_ section if you need to
 configure a Rosie server for your site.
 
@@ -281,7 +256,7 @@ Add the following hook scripts to the repository:
       #!/usr/bin/env bash
       exec <path-to-rose>/sbin/rosa svn-post-commit "$@"
 
-You should replace ``/path/to/rose/`` with the location of your Rose
+You should replace ``<path-to-rose>`` with the location of your Rose
 installation.
 
 Make sure the hook scripts are executable.
@@ -292,9 +267,11 @@ are committed to the repository. Edit the :rose:conf:`rose.conf[rosie-db]`
 settings to point to your host machine and provide relevant
 paths such as the location for your repository and database.
 
-Once you have done that, create the Rosie database by running::
+Once you have done that, create the Rosie database by running:
 
-   /path/to/rose/sbin/rosa db-create
+.. code-block:: sub
+
+   <path-to-rose>/sbin/rosa db-create
 
 Make sure that the account that runs the repository hooks has read/write
 access to the database and database directory.
@@ -302,13 +279,17 @@ access to the database and database directory.
 You can test that everything is working using the built-in web server.
 Edit the :rose:conf:`rose.conf[rosie-disco]` settings to configure
 the web server's log directory and port number. Start the web server
-by running::
+by running:
 
-   setsid /path/to/rose/bin/rosie disco start 0</dev/null 1</dev/null 2>&1 &
+.. code-block:: sub
+
+   setsid <path-to-rose>/bin/rosie disco start 0</dev/null 1</dev/null 2>&1 &
 
 Check that the server is up and running using ``curl`` or a local
 web browser. E.g. If you have configured the server's port to be 1234,
-you can do::
+you can do:
+
+.. code-block:: sub
 
    curl -I http://localhost:1234/
 
@@ -317,10 +298,12 @@ It should return a HTTP code 200.
 Alternatively you can run the Rosie web service under Apache ``mod_wsgi``.
 To do this you will need to set up an Apache module configuration file
 (typically in ``/etc/httpd/conf.d/rose-wsgi.conf``) containing the
-following (with the paths set appropriately)::
+following (with the paths set appropriately):
 
-   WSGIPythonPath /path/to/rose/lib/python
-   WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
+.. code-block:: sub
+
+   WSGIPythonPath <path-to-rose>/lib/python
+   WSGIScriptAlias /rosie <path-to-rose>/lib/python/rosie/ws.py
 
 Use the Apache log at e.g. ``/var/log/httpd/`` to debug problems.
 

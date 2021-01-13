@@ -79,7 +79,7 @@ else:
 
 # mapping to other Sphinx projects
 # (allows us to reference objects from other projects)
-cylc_version = 'current'
+cylc_version = '8.0a2'
 intersphinx_mapping = {
     'cylc': (
         f'https://cylc.github.io/cylc-doc/{cylc_version}/html/', None

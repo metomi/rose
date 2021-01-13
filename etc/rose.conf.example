@@ -1,7 +1,8 @@
 # The :rose:file:`rose.conf` file can be installed in:
 #
-# * ``$ROSE_HOME/etc/`` for *site* configuration.
-# * ``$HOME/.metomi/rose/`` for *user* configuration.
+# * ``/etc/rose.conf``
+# * ``$ROSE_SITE_CONF_PATH/rose.conf``
+# * ``$HOME/.metomi/rose.conf``
 #
 #.. This file documents the settings and their default values.
 #   Values of settings in this file are mostly placeholders,
