@@ -125,7 +125,12 @@ def line_strip(lines):
         ...     ''
         ... ])
         ['a']
+        >>> line_strip([''])
+        []
+
     """
+    if all(not line for line in lines):
+        return []
     lines = list(lines)
     kill = []
     for itt in range(0, len(lines)):

@@ -56,25 +56,20 @@ Editor Syntax Highlighting
 --------------------------
 
 There are ``gedit``, ``kate``, ``vim``, and ``emacs`` plugins for syntax
-highlighting of Rose configuration files, located within the Rose installation:
+highlighting of Rose configuration files, located within the Rose installation.
 
-* ``etc/rose-conf.lang``
-* ``etc/rose-conf.xml``
-* ``etc/rose-conf.vim``
-* ``etc/rose-conf-mode.el``
+Run the following command to see the available syntax files and their
+locations::
 
-The plugins contain setup instructions within.
+   $ rose resource syntax
+
+Each file contains setup instructions within.
 
 .. _Pygments: https://pygments.org
+.. _Rose Lang: https://github.com/metomi/rose/blob/master/sphinx/ext/rose_lang.py
 
-Additionally there is a `Pygments`_ lexer located in
-``sphinx/ext/rose_lang.py``.
-
-.. hint::
-
-   You can locate your Rose installation using::
-
-      rose version --long
+Additionally there is a `Pygments`_ lexer located
+`in the source code <https://github.com/metomi/rose/blob/master/sphinx/ext/rose_lang.py>`_
 
 
 Configuring Cylc

@@ -645,7 +645,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         if is_upgrade:
             path = meta_key
         try:
-            meta_path = locator.locate(path)
+            meta_path = str(locator.locate(path))
         except metomi.rose.resource.ResourceError:
             continue
         else:
@@ -687,7 +687,7 @@ def load_meta_config_tree(config, directory=None, config_type=None,
     meta_config = metomi.rose.config.ConfigNode()
     for meta_key in meta_list:
         try:
-            meta_path = locator.locate(meta_key)
+            meta_path = str(locator.locate(meta_key))
         except metomi.rose.resource.ResourceError:
             if not ignore_meta_error:
                 error_handler(text=ERROR_LOAD_META_PATH.format(meta_key))

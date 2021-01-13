@@ -17,7 +17,7 @@
 """Common option parser for Rose command utilities."""
 
 from optparse import OptionParser
-from metomi.rose.resource import ResourceLocator
+import  metomi.rose.resource
 
 
 class RoseOptionParser(OptionParser):
@@ -679,9 +679,15 @@ class RoseOptionParser(OptionParser):
     def __init__(self, *args, **kwargs):
         if hasattr(kwargs, "prog"):
             namespace, util = kwargs["prog"].split(None, 1)
-            resource_loc = ResourceLocator(namespace=namespace, util=util)
+            resource_loc = (
+                metomi.rose.resource.ResourceLocator(
+                    namespace=namespace, util=util
+                )
+            )
         else:
-            resource_loc = ResourceLocator.default()
+            resource_loc = (
+                metomi.rose.resource.ResourceLocator.default()
+            )
         kwargs["prog"] = resource_loc.get_util_name()
         if not hasattr(kwargs, "usage"):
             kwargs["usage"] = resource_loc.get_synopsis()

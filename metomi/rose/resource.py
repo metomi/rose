@@ -27,6 +27,8 @@ from importlib.machinery import SourceFileLoader
 
 import metomi.rose
 from metomi.rose.config import ConfigLoader, ConfigNode
+import metomi.rose.opt_parse
+from metomi.rose.reporter import Reporter
 
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
@@ -163,15 +165,10 @@ class ResourceLocator:
         """Return the location of the resource key."""
         key = os.path.expanduser(key)
         for path in self.paths:
-            name = os.path.join(path, key)
-            if os.path.exists(name):
+            name = path / key
+            if name.exists():
                 return name
         raise ResourceError(key)
-
-
-def resource_locate(key):
-    """Return the location of the resource key."""
-    return ResourceLocator.default().locate(key)
 
 
 def import_object(import_string, from_files, error_handler,
@@ -230,3 +227,40 @@ def import_object(import_string, from_files, error_handler,
         if obj_name == class_name and inspect.isclass(obj):
             return_object = obj
     return return_object
+
+
+def main():
+    """Launcher for the CLI."""
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser.add_my_options()
+    opts, args = opt_parser.parse_args(sys.argv[1:])
+    reporter = Reporter(opts.verbosity - opts.quietness)
+    is_top_level = False
+    if len(args) > 1:
+        reporter.report('Only one argument accepted\n', level=Reporter.FAIL)
+        sys.exit(1)
+    if len(args) == 0:
+        key = ROSE_INSTALL_ROOT / 'etc'
+        path = ResourceLocator(paths=[ROSE_INSTALL_ROOT]).locate('etc')
+        is_top_level = True
+    else:
+        key = args[0]
+        try:
+            path = ResourceLocator().locate(key)
+        except ResourceError:
+            reporter.report('Resource not found\n', level=Reporter.FAIL)
+            sys.exit(1)
+    if path.is_file():
+        print(path)
+    elif path.is_dir():
+        print(f'{key}/')
+        for item in path.iterdir():
+            if is_top_level:
+                item = item.relative_to(path)
+            else:
+                item = item.relative_to(path.parent)
+            print(f'  {item}')
+
+
+if __name__ == "__main__":
+    main()
