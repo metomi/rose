@@ -21,10 +21,9 @@
 ;;    An emacs syntax highlighting mode for the various rose .conf files
 ;;
 ;; = Instructions =
-;;    Place this file in a directory on your emacs load path (or symlink it)
-;;    e.g.
-;;         mkdir -p ~/.emacs.d/lisp
-;;         ln -s $ROSE_HOME/etc/rose-conf-mode.el ~/.emacs.d/lisp/
+;;    Place this file in a directory on your emacs load path. e.g:
+;;
+;;         ~/.emacs.d/lisp
 ;;
 ;;    and in your .emacs file:
 ;;

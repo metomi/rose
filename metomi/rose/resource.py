@@ -25,25 +25,11 @@ import string
 import sys
 from importlib.machinery import SourceFileLoader
 
+import metomi.rose
 from metomi.rose.config import ConfigLoader, ConfigNode
 
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
-
-
-def get_util_home(*args):
-    """Return ROSE_LIB or the dirname of the dirname of sys.argv[0].
-
-    If args are specified, they are added to the end of returned path.
-
-    """
-    try:
-        value = os.environ["ROSE_LIB"]
-    except KeyError:
-        value = os.path.abspath(__file__)
-        for _ in range(3):  # assume __file__ under $ROSE_LIB/metomi/rose/
-            value = os.path.dirname(value)
-    return os.path.join(value, *args)
 
 
 class ResourceError(Exception):
@@ -56,6 +42,7 @@ class ResourceError(Exception):
 
 ROSE_CONF_PATH = 'ROSE_CONF_PATH'
 ROSE_SITE_CONF_PATH = 'ROSE_SITE_CONF_PATH'
+ROSE_INSTALL_ROOT = Path(metomi.rose.__file__).parent
 
 
 class ResourceLocator:
@@ -93,10 +80,10 @@ class ResourceLocator:
         if paths:
             self.paths = list(paths)
         else:
-            home = self.get_util_home()
-            name = self.get_util_name("-")
-            self.paths = [os.path.join(home, "etc", name),
-                          os.path.join(home, "etc")]
+            self.paths = [
+                (ROSE_INSTALL_ROOT / 'etc') / self.get_util_name("-"),
+                ROSE_INSTALL_ROOT / 'etc'
+            ]
         self.conf = None
 
     def get_conf(self):
@@ -137,7 +124,7 @@ class ResourceLocator:
 
     def get_doc_url(self):
         """Return the URL of Rose documentation."""
-        default = "file://%s/doc/" % self.get_util_home()
+        default = f"file://{ROSE_INSTALL_ROOT}/doc/"
         return self.get_conf().get_value(["rose-doc"], default=default)
 
     def get_synopsis(self):
@@ -153,15 +140,6 @@ class ResourceLocator:
                     in_synopsis = True
         except IOError:
             return None
-
-    @classmethod
-    def get_util_home(cls, *args):
-        """Return ROSE_HOME or the dirname of the dirname of sys.argv[0].
-
-        If args are specified, they are added to the end of returned path.
-
-        """
-        return get_util_home(*args)
 
     def get_util_name(self, separator=" "):
         """Return the name of the Rose utility, e.g. "rose app-run".
@@ -180,27 +158,6 @@ class ResourceLocator:
             return namespace + separator + util
         except KeyError:
             return os.path.basename(sys.argv[0])
-
-    def get_version(self, ignore_environment=False):
-        """return the current metomi.rose_version number.
-
-        By default pass through the value of the ``ROSE_VERSION`` environment
-        variable.
-
-        Args:
-            ignore_environment (bool): Return the value extracted from the
-                ``rose-version`` file.
-        """
-        version = None
-        if not ignore_environment:
-            version = os.getenv("ROSE_VERSION")
-        if not version:
-            for line in open(self.get_util_home("rose-version")):
-                if line.startswith("ROSE_VERSION="):
-                    value = line.replace("ROSE_VERSION=", "")
-                    version = value.strip(string.whitespace + "\";")
-                    break
-        return version
 
     def locate(self, key):
         """Return the location of the resource key."""

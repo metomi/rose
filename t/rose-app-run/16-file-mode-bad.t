@@ -27,8 +27,8 @@ test_init <<'__CONFIG__'
 [command]
 default=true
 
-[file:COPYING]
-source=$ROSE_HOME/COPYING
+[file:beef]
+source=wellington
 # Oops, typos
 mode=5ym1ink
 __CONFIG__
@@ -38,7 +38,7 @@ test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] file:COPYING=mode=5ym1ink: bad or missing value
+[FAIL] file:beef=mode=5ym1ink: bad or missing value
 __ERR__
 test_teardown
 #-------------------------------------------------------------------------------

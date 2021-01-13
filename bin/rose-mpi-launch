@@ -54,7 +54,8 @@
 #
 # CONFIGURATION
 #     The command reads from the `[rose-mpi-launch]` section in
-#     `$ROSE_HOME/etc/rose.conf` and `$HOME/.metomi/rose.conf`.
+#     the Rose configuration.
+#
 #     Valid settings are:
 #
 #     launcher-list=LIST

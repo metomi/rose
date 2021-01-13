@@ -39,7 +39,7 @@ of precedence:
    See :ref:`app-meta-loc` for more details.
 
 The configuration metadata that controls default behaviour will be located in
-``$ROSE_HOME/etc/rose-meta/``.
+``etc/rose-meta/`` within the ``metomi.rose`` Python installation.
 
 
 Configuration Metadata File

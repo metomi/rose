@@ -264,8 +264,6 @@ def main():
     if opts.conf_dir:
         os.chdir(opts.conf_dir)
     opts.conf_dir = os.getcwd()
-    sys.path.append(
-        metomi.rose.resource.ResourceLocator.default().get_util_home())
     metomi.rose.macro.add_opt_meta_paths(opts.meta_path)
 
     config_file_path = os.path.join(opts.conf_dir, metomi.rose.SUB_CONFIG_NAME)

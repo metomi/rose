@@ -56,12 +56,26 @@ Rose Environment Variables
 .. envvar:: ROSE_CONF_PATH
 
    Description
-      Specify a colon (``:``) separated list of paths for searching and loading
-      site/user configuration. If this environment variable is not defined, the
-      normal behaviour is to search for and load :rose:file:`rose.conf` from
-      ``$ROSE_HOME/etc`` and then ``$HOME/.metomi``.
+      If defined this will override the default configuration search path.
+
+      Provide a colon (``:``) separated list of paths to search for
+      ``rose.conf`` files.
+
+      If set to an empty string no config files will be loaded.
    Used By
       * :ref:`command-rose-test-battery`
+   See also
+      * :envvar:`ROSE_SITE_CONF_PATH`
+      * :rose:file:`rose.conf`
+
+.. envvar:: ROSE_SITE_CONF_PATH
+
+   Description
+      Defines the location of the "site" configuration. Configurations defined
+      here can be overridden by the "user" configuration.
+   See also
+      * :envvar:`ROSE_CONF_PATH`
+      * :rose:file:`rose.conf`
 
 .. envvar:: ROSE_CYCLING_MODE
 
@@ -123,21 +137,6 @@ Rose Environment Variables
    Used By
       * :ref:`command-rose-app-run`
       * :ref:`command-rose-task-run`
-
-.. envvar:: ROSE_HOME
-
-   Description
-      Specifies the path to the Rose home directory.
-   Used and Provided By
-      * ``rose``
-
-.. envvar:: ROSE_HOME_BIN
-
-   Description
-      Specifies the path to the ``bin/`` or ``sbin/`` directory of the current
-      Rose utility.
-   Used and Provided By
-      * ``rose``
 
 .. envvar:: ROSE_LAUNCHER
 

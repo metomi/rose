@@ -21,15 +21,12 @@
 #     test_header
 #
 # SYNOPSIS
-#     . $ROSE_HOME/t/lib/bash/test_header
+#     . t/lib/bash/test_header
 #
 # DESCRIPTION
 #     Provide bash shell functions for writing tests for "rose" commands to
 #     output in Perl's TAP format. Add "set -eu". Create a temporary working
 #     directory $TEST_DIR and change to it. Automatically increment test number.
-#     If $ROSE_HOME is not specified, set it to point to the "rose" source tree
-#     containing this script. Add $ROSE_HOME/bin to the front of $PATH.
-#
 # FUNCTIONS
 #     tests N
 #         echo "1..$N".
