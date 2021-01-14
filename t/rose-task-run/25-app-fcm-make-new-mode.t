@@ -65,5 +65,5 @@ run_fail "${TEST_KEY_BASE}" ls \
     "${SUITE_RUN_DIR}/share/hello-make/junk1" \
     "${SUITE_RUN_DIR}/share/hello-make/junk2"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

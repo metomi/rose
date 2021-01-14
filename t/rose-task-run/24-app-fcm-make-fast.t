@@ -79,5 +79,5 @@ MTIME_OF_FAST_AFTER=$(stat '-c%y' 'fast')
 run_pass "${TEST_KEY_BASE}-mtime-of-fast" \
     test "${MTIME_OF_FAST_BEFORE}" '!=' "${MTIME_OF_FAST_AFTER}"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

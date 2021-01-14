@@ -78,5 +78,5 @@ sort >'job.err.expected' <<__LOG__
 __LOG__
 file_cmp "${TEST_KEY}-job.err.sorted" 'job.err.sorted' 'job.err.expected'
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

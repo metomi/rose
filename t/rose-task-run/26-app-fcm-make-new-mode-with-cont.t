@@ -77,5 +77,5 @@ run_fail "${TEST_KEY_BASE}" \
     ssh -n -oBatchMode=yes "${JOB_HOST}" \
     "ls 'cylc-run/${NAME}/share/hello-make/junk'*"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

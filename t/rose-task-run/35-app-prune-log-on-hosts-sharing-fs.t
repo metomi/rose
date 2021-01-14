@@ -76,5 +76,5 @@ else
         "${SUITE_RUN_DIR}/prune.log"
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

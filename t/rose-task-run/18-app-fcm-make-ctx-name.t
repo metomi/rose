@@ -69,5 +69,5 @@ ssh -n -oBatchMode=yes "${JOB_HOST}" \
     cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'
 file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<<'Hello World!'
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

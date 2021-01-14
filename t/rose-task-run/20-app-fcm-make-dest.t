@@ -84,5 +84,5 @@ Hello World!
 __TXT__
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

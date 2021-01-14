@@ -138,7 +138,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #foo-aa000
 #__OUT__
 #file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#rose suite-clean -q -y --name="${SUITE_NAME}"
+#cylc clean "${SUITE_NAME}"
 #rm -fr 'foo-aa000'
 #-------------------------------------------------------------------------------
 # Latest and next should still be correct if latest suite removed from HEAD

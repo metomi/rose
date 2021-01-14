@@ -45,5 +45,5 @@ sqlite3 "${SUITE_RUN_DIR}/log/db" \
     'select distinct status from task_states;' >"$TEST_KEY_BASE-db.out"
 file_cmp "$TEST_KEY_BASE-db.out" "$TEST_KEY_BASE-db.out" <<<'succeeded'
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

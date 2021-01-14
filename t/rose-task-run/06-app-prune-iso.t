@@ -92,5 +92,5 @@ else
     skip 3 '[t]job-host not defined'
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

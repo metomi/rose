@@ -77,5 +77,5 @@ file_cmp "${TEST_KEY_BASE}-my-datac" 'expected-my-datac.txt' <<'__TXT__'
 /share/cycle/20200303T0000Z
 __TXT__
 
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

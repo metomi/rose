@@ -54,5 +54,5 @@ file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<'__FIND__'
 ./archive.d/whatever.tar.gz
 __FIND__
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

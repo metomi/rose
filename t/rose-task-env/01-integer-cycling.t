@@ -49,5 +49,5 @@ run_pass "$TEST_KEY_BASE-6" ls -d $HOME/cylc-run/${NAME}/share/cycle/6
 run_pass "$TEST_KEY_BASE-7" ls -d $HOME/cylc-run/${NAME}/share/cycle/7
 run_pass "$TEST_KEY_BASE-8" ls -d $HOME/cylc-run/${NAME}/share/cycle/8
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

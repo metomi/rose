@@ -51,5 +51,5 @@ sed '/^\[INFO\] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=/p;
     stamp-removed.log >edited-prune.log
 file_cmp "$TEST_KEY" "$TEST_SOURCE_DIR/$TEST_KEY_BASE.log" edited-prune.log
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

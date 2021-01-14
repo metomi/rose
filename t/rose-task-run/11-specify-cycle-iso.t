@@ -43,5 +43,5 @@ run_pass "${TEST_KEY_BASE}-run" \
         --debug
 #-------------------------------------------------------------------------------
 file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/file" <<<'20121231T1200Z'
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

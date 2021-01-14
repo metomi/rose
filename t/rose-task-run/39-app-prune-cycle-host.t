@@ -61,5 +61,5 @@ run_fail "${TEST_KEY}-ssh-2" \
     grep -q "ssh .* ${JOB_HOST_2} .* share/cycle/19700101T0000Z;" \
     "${RUND}/prune.log"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

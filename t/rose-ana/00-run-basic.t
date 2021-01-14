@@ -290,6 +290,6 @@ file_pcregrep "${TEST_KEY_BASE}-missing_skip_working" \
 
 #-------------------------------------------------------------------------------
 #Clean suite
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 #-------------------------------------------------------------------------------
 exit 0

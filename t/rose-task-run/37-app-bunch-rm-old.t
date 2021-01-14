@@ -91,5 +91,5 @@ for ARGVALUE in 0 1 2 3; do
 done
 #-------------------------------------------------------------------------------
 
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

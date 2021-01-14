@@ -117,5 +117,5 @@ else
         $SUITE_RUN_DIR/log/job/1/fcm_make2_t5/01/job.out
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

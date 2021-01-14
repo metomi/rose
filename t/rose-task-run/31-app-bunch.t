@@ -251,5 +251,5 @@ file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
     "$INFO_PATTERN TOTAL: 8" \
     "$FILE"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

@@ -113,5 +113,5 @@ TEST_KEY=${TEST_KEY_PREFIX}-TOTAL
 file_grep $TEST_KEY "\[INFO\] TOTAL: 5" $FILE
 
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

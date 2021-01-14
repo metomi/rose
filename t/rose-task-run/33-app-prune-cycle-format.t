@@ -57,5 +57,5 @@ file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
 [INFO] YYYY-MM-DDTHHMM delete: share/hello-venus-in-1970.txt
 __LOG__
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

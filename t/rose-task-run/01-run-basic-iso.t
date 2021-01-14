@@ -99,5 +99,5 @@ for CYCLE in 20130102T0000Z 20130101T1200Z 20130101T0000Z; do
     NEXT_CYCLE="${CYCLE}"
 done
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

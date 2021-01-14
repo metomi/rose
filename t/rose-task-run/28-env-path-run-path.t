@@ -46,5 +46,5 @@ file_cmp "${TEST_KEY}" "${SUITE_RUN_DIR}/hello.txt" <<__HELLO__
 Hello Earth!
 __HELLO__
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

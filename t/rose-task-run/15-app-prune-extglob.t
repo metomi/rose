@@ -59,5 +59,5 @@ file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
 [INFO] YYYY-MM-DDTHHMM delete: work/20150102T0000Z/creator/rose-app-run.conf
 __LOG__
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+cylc clean "${NAME}"
 exit 0

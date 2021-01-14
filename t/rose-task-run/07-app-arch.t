@@ -209,5 +209,5 @@ file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 __ERR__
 
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+cylc clean $NAME
 exit 0

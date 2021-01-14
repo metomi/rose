@@ -83,6 +83,6 @@ if [[ -n "$JOB_HOST" ]]; then
     run_pass "$TEST_KEY.3" ssh "$JOB_HOST" "ls -d ~/cylc-run/$NAME/log/job/3"
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -y --name=$NAME
+cylc clean $NAME
 #-------------------------------------------------------------------------------
 exit 0
