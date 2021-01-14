@@ -720,7 +720,6 @@ def parse_upgrade_args(argv=None):
     opts.conf_dir = os.path.abspath(opts.conf_dir)
     if opts.output_dir is not None:
         opts.output_dir = os.path.abspath(opts.output_dir)
-    sys.path.append(os.getenv("ROSE_LIB"))
     metomi.rose.macro.add_opt_meta_paths(opts.meta_path)
     config_name = os.path.basename(opts.conf_dir)
     config_file_path = os.path.join(opts.conf_dir,

@@ -49,7 +49,7 @@
 #     * `prove(1)`
 #-------------------------------------------------------------------------------
 set -eu
-# shellcheck source=../../metomi/rose/etc/lib/bash/rose_log
+# shellcheck source=metomi/rose/etc/lib/bash/rose_log
 . "$(rose resource lib/bash/rose_log)"
 
 # Move to folder in which prove command should be run.

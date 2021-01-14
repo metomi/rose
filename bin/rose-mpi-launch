@@ -113,9 +113,9 @@
 #     Return 0 on success, 1 or exit code of the launcher program on failure.
 #-------------------------------------------------------------------------------
 set -eu
-# shellcheck source=../metomi/rose/etc/lib/bash/rose_log
+# shellcheck source=metomi/rose/etc/lib/bash/rose_log
 . "$(rose resource lib/bash/rose_log)"
-# shellcheck source=../metomi/rose/etc/lib/bash/rose_usage
+# shellcheck source=metomi/rose/etc/lib/bash/rose_usage
 . "$(rose resource lib/bash/rose_usage)"
 
 ROSE_CMD="${ROSE_NS}-${ROSE_UTIL}"

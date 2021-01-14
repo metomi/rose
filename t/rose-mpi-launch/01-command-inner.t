@@ -25,6 +25,7 @@ tests 12
 #-------------------------------------------------------------------------------
 # Basic.
 TEST_KEY=$TEST_KEY_BASE
+ROSE_HOME_BIN="$(rose version --long | sed 's/.*(\(.*\))/\1/')"
 ROSE_LAUNCHER_ULIMIT_OPTS='-a' \
     run_pass "$TEST_KEY" rose mpi-launch echo hello world
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__

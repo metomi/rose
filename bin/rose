@@ -40,10 +40,9 @@ fi
 set -eu
 
 ROSE_NS=$(basename "$0")
-ROSE_LIB="$(dirname "$(python3 -c "import metomi.rose; print(metomi.rose.__file__)")")"
-ROSE_HOME_BIN=$(dirname "$(command -v rose)")
+ROSE_HOME_BIN="$(dirname "$0")"
 ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
-export ROSE_NS ROSE_LIB ROSE_HOME_BIN ROSE_VERSION
+export ROSE_NS ROSE_HOME_BIN ROSE_VERSION
 
 # Print actual command of a command alias
 get_alias() {
@@ -122,7 +121,7 @@ help|h|?|--help|-h)
     if (($# == 0)); then
         {
             print_version
-            # shellcheck source=../metomi/rose/etc/lib/bash/rose_usage
+            # shellcheck source=metomi/rose/etc/lib/bash/rose_usage
             . "$(rose resource lib/bash/rose_usage)"
             rose_usage
             echo
