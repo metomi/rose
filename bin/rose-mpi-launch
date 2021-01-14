@@ -112,9 +112,13 @@
 # DIAGNOSTICS
 #     Return 0 on success, 1 or exit code of the launcher program on failure.
 #-------------------------------------------------------------------------------
-# shellcheck source=lib/bash/rose_init
-. rose_init
-rose_init rose_log
+set -eu
+# shellcheck source=../metomi/rose/etc/lib/bash/rose_log
+. "$(rose resource lib/bash/rose_log)"
+# shellcheck source=../metomi/rose/etc/lib/bash/rose_usage
+. "$(rose resource lib/bash/rose_usage)"
+
+ROSE_CMD="${ROSE_NS}-${ROSE_UTIL}"
 
 # ------------------------------------------------------------------------------
 ROSE_COMMAND=
@@ -201,7 +205,7 @@ else
 fi
 
 ROSE_LAUNCHER_LIST=${ROSE_LAUNCHER_LIST:-$( \
-    rose config --default= "$ROSE_NS" launcher-list)}
+    rose config --default= "$ROSE_CMD" launcher-list)}
 export NPROC=${NPROC:-1}
 
 #-------------------------------------------------------------------------------
@@ -245,7 +249,7 @@ if [[ -n $ROSE_COMMAND_FILE ]]; then
     fi
     ROSE_LAUNCHER_FILEOPTS=${ROSE_LAUNCHER_FILEOPTS:-$( \
         rose config --default= \
-        "$ROSE_NS" "launcher-fileopts.$ROSE_LAUNCHER_BASE")}
+        "$ROSE_CMD" "launcher-fileopts.$ROSE_LAUNCHER_BASE")}
     eval "info 2 exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $*"
     eval "exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $*"
 else
@@ -256,9 +260,9 @@ else
         fi
         # Options
         ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-$(rose config -E \
-            --default= "$ROSE_NS" "launcher-preopts.$ROSE_LAUNCHER_BASE")}
+            --default= "$ROSE_CMD" "launcher-preopts.$ROSE_LAUNCHER_BASE")}
         ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:-$(rose config -E \
-            --default= "$ROSE_NS" "launcher-postopts.$ROSE_LAUNCHER_BASE")}
+            --default= "$ROSE_CMD" "launcher-postopts.$ROSE_LAUNCHER_BASE")}
     else
         ROSE_LAUNCH_INNER=
         ROSE_LAUNCHER_PREOPTS=

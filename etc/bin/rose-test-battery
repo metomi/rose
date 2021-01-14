@@ -48,14 +48,9 @@
 # SEE ALSO
 #     * `prove(1)`
 #-------------------------------------------------------------------------------
-# shellcheck source=lib/bash/rose_init
-# shellcheck source=lib/bash/rose_log
-. rose_init
-. rose_log
-
 set -eu
-
-rose_init
+# shellcheck source=../../metomi/rose/etc/lib/bash/rose_log
+. "$(rose resource lib/bash/rose_log)"
 
 # Move to folder in which prove command should be run.
 TESTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"

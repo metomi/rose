@@ -80,7 +80,7 @@ class ResourceLocator:
         self.namespace = namespace
         self.util = util
         if paths:
-            self.paths = list(paths)
+            self.paths = list(map(Path, paths))
         else:
             self.paths = [
                 (ROSE_INSTALL_ROOT / 'etc') / self.get_util_name("-"),

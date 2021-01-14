@@ -1,16 +1,16 @@
 Rose Bash Library
 =================
 
-The Rose bash library lives in ``lib/bash/``. To import a module, load the file
-into your script. E.g. To load ``rose_usage``, you would do::
+Rose includes some bash modules, they can be located by running::
 
-   . lib/bash/rose_usage
+    $ rose resource lib/bash
+
+These modules can be invoked like so::
+
+   . "$(rose resource lib/bash/rose_log)"
 
 The modules are:
 
-``rose_init``
-    Called by ``rose`` on initialisation. This is not meant to be for general
-    use.
 ``rose_log``
     Provide functions to print log messages.
 ``rose_usage``

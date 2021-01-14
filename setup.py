@@ -84,9 +84,10 @@ setup(
     version=find_version("metomi", "rose", "__init__.py"),
 
     # Options
-    scripts=glob(join("bin", "*"))
-    + glob(join("sbin", "*"))
-    + glob(join("lib", "bash", "*")),
+    scripts=(
+        glob(join("bin", "*"))
+        + glob(join("sbin", "*"))
+    ),
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
     tests_require=TESTS_REQUIRE,

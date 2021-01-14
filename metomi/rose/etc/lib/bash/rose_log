@@ -21,7 +21,7 @@
 #     rose_log
 #
 # SYNOPSIS
-#     . $ROSE_HOME/lib/bash/rose_log
+#     . rose_log
 #     info 1 "Hello world"
 #     info 2 "Hello world"
 #     echo "Hello world" | out

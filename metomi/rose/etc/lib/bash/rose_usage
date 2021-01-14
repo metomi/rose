@@ -18,38 +18,35 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose_init
+#     rose_usage
 #
 # SYNOPSIS
-#     . $ROSE_HOME/lib/bash/rose_init
-#     rose_init [FUNC ...]
+#     . $rose_usage
+#     rose_usage [CODE]
 #
 # DESCRIPTION
-#     Initialise a bash script with the following:
-#     * "set -eu".
-#     * load the "rose_usage" function.
-#     * load any FUNC specified in the argument list.
+#     Prints the SYNOPSIS section of the header of $0. Expects the header to be
+#     formatted like this one. If CODE is specified, exits the current shell
+#     with it. If CODE is 0, prints the usage to STDOUT. If code is not 0,
+#     prints the usage to STDERR.
 #-------------------------------------------------------------------------------
-# shellcheck source=lib/bash/rose_usage
-. rose_usage
-
-function rose_init() {
-    set -eu
-    ROSE_NS=$(basename "$0")
-    ROSE_LIB="$(dirname "$(python3 -c "import metomi.rose; print(metomi.rose.__file__)")")"
-    ROSE_HOME_BIN=$(dirname "$(command -v rose)")
-    ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
-    export ROSE_LIB ROSE_HOME_BIN ROSE_NS ROSE_VERSION
-    local LIB=$ROSE_LIB
-    if [[ -f $LIB/${FUNCNAME[0]}_site ]]; then
-        . "$LIB/${FUNCNAME[0]}_site"
+function rose_usage() {
+    local CODE=${1:-}
+    local FD=1
+    if [[ -n $CODE ]] && ((CODE != 0)); then
+        FD=2
     fi
-
-    local ITEM=
-    for ITEM in rose_usage "$@"; do
-        local FILE=
-        for FILE in $ITEM; do
-            . "$FILE"
-        done
-    done
+    awk '{
+        if (/^# SYNOPSIS/) {
+            while (getline && !/^# [A-Z]/ && !/^[^#]/) {
+                if (!/^# *$/) {
+                    sub(/^# */, "");
+                    print "usage: " $0;
+                }
+            }
+        }
+    }' "$0" >&"$FD"
+    if [[ -n $CODE ]]; then
+        exit "$CODE"
+    fi
 }

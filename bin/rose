@@ -37,10 +37,13 @@
 if ${ROSE_DEBUG:-false}; then
     set -x
 fi
-# shellcheck source=lib/bash/rose_init
-# shellcheck source=lib/bash/rose_usage
-. rose_init
-rose_init
+set -eu
+
+ROSE_NS=$(basename "$0")
+ROSE_LIB="$(dirname "$(python3 -c "import metomi.rose; print(metomi.rose.__file__)")")"
+ROSE_HOME_BIN=$(dirname "$(command -v rose)")
+ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
+export ROSE_NS ROSE_LIB ROSE_HOME_BIN ROSE_VERSION
 
 # Print actual command of a command alias
 get_alias() {
@@ -48,6 +51,7 @@ get_alias() {
     sed -n 's/exec.*'"$ROSE_NS"'-\([^"]*\).*/\1/p' \
         "$ROSE_HOME_BIN/$ROSE_NS-$NAME"
 }
+
 
 # Print help for a given utility
 help_util() {
@@ -118,6 +122,8 @@ help|h|?|--help|-h)
     if (($# == 0)); then
         {
             print_version
+            # shellcheck source=../metomi/rose/etc/lib/bash/rose_usage
+            . "$(rose resource lib/bash/rose_usage)"
             rose_usage
             echo
             echo "$ROSE_NS provides the following utilities:"
