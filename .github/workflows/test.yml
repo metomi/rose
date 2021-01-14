@@ -40,7 +40,7 @@ jobs:
           # there are other Rose files (e.g. meta-all/rose-meta.conf)
           # that are not yet installed as part of the Python package
           # which need to be moved into metomi/rose/etc/
-          pip install -e ."[all]"
+          pip install ."[all]"
           pip install --no-deps git+https://github.com/cylc/cylc-rose.git
           yarn install
 

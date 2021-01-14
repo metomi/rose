@@ -1,0 +1,2 @@
+recursive-include metomi/rose/etc/ *
+recursive-include metomi/rosie/lib/ *

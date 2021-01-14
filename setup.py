@@ -91,9 +91,6 @@ setup(
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
     tests_require=TESTS_REQUIRE,
-    package_data={
-        "metomi.rose": ["etc/.*"],
-        "metomi.rosie": ["lib/*"]
-    },
+    include_package_data=True,
     packages=find_namespace_packages(include=["metomi.*"]),
 )
