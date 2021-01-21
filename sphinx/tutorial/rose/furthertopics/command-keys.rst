@@ -57,7 +57,7 @@ This sets up a simple suite that contains the following:
 
 Save your changes then run the suite using :ref:`command-rose-suite-run`.
 
-Once it has finished use :ref:`command-rose-suite-log` to view the suite log.
+Once it has finished use ``cylc cat-log`` to view the suite log.
 In the page that appears, click the "out" link for the breadmaker task. In the
 page you are taken to you should see a line saying "fresh bread".
 

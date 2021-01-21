@@ -149,7 +149,7 @@ its output (note that you can close the Cylc GUI at this point)::
 .. note::
 
    You can quickly get to the relevant page by running
-   :ref:`command-rose-suite-log` from within the :term:`suite directory`.
+   ``cylc cat-log`` from within the :term:`suite directory`.
 
 In the Rose Bush jobs page for your suite you should be presented with a
 page containing a single row for the ``lander`` task, from which you can
