@@ -162,10 +162,6 @@ jobs:
         run: |
           make -C sphinx/ slides SPHINXOPTS='-Wn'
 
-      - name: build (latexpdf)
-        run: |
-          make -C sphinx/ latexpdf SPHINXOPTS='-Wn'
-
       - name: build (linkcheck)
         run: |
           make -C sphinx/ linkcheck SPHINXOPTS='-Wn'
