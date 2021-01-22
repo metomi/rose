@@ -1,7 +1,6 @@
 #!jinja2
 [cylc]
     UTC mode = True
-    abort if any task fails = True
 [scheduling]
     [[dependencies]]
         graph = """hello-make => hello-run"""

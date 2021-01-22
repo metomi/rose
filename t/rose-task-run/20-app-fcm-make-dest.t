@@ -65,6 +65,7 @@ run_pass "${TEST_KEY_BASE}-run" \
     timeout 120 \
         cylc run \
             "${NAME}" \
+            --abort-if-any-task-fails \
             --no-detach \
             --debug \
             --host='localhost'

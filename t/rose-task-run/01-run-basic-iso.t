@@ -37,6 +37,7 @@ run_pass "${TEST_KEY_BASE}-install" \
 run_pass "${TEST_KEY_BASE}-run" \
     cylc run \
         "$NAME" \
+        --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \
         --debug

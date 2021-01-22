@@ -1,7 +1,6 @@
 #!jinja2
 [cylc]
     UTC mode = True
-    abort if any task fails = True
     [[events]]
         abort on timeout = True
         timeout = PT1M

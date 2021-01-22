@@ -54,6 +54,7 @@ TEST_KEY="${TEST_KEY_BASE}-run"
 run_pass "${TEST_KEY}" \
     cylc run \
         "${NAME}" \
+        --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \
         --debug
