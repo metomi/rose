@@ -18,5 +18,6 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 set -eu
+env >&2
 mkdir -p "$1"
 exec install -t "$@"

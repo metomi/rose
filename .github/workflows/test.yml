@@ -4,10 +4,30 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      branch:
-        description: The branch to open the PR against
+      rose-branch:
+        description: The Rose branch to test against
         required: false
         default: 'master'
+      fcm-branch:
+        description: The FCM branch to test against
+        required: false
+        default: 'master'
+      fcm-repo:
+        description: The FCM branch to test against
+        required: false
+        default: 'metomi/fcm'
+      cylc-branch:
+        description: The Cylc branch to test against
+        required: false
+        default: 'master'
+      cylc-repo:
+        description: The Cylc repo to test against
+        required: false
+        default: 'cylc/cylc-flow'
+
+defaults:
+  run:
+    shell: bash  # macos default shell is zsh
 
 jobs:
   test:
@@ -25,40 +45,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ github.event.inputs.rose-branch }}
+          path: rose
 
       - name: Configure Python
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install
+      - name: Install Cylc
+        env:
+          cylc_repo: ${{ github.events.inputs.cylc-repo }}
+          cylc_branch: ${{ github.events.inputs.cylc-branch }}
         run: |
           # temp: use cylc-install branch
-          pip install git+https://github.com/datamel/cylc-flow@cylc-install
-          # TODO: remove editable mode
-          # there are other Rose files (e.g. meta-all/rose-meta.conf)
-          # that are not yet installed as part of the Python package
-          # which need to be moved into metomi/rose/etc/
-          pip install ."[all]"
-          pip install --no-deps git+https://github.com/cylc/cylc-rose.git
-          yarn install
+          cylc_repo='datamel/cylc-flow'
+          cylc_branch='cylc-install'
+          pip install "git+https://github.com/$cylc_repo@$cylc_branch"
 
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
         run: |
-          # apply DNS patch
-          hostuserutil="$(python3 -c '
-          import cylc.flow.hostuserutil
-          print(cylc.flow.hostuserutil.__file__)
-          ')"
-          patch "${hostuserutil}" < etc/conf/macos-patch
-
+          which python
           # install system deps
           #brew update
-          brew install bash coreutils gnu-sed shellcheck sqlite3
+          brew install bash coreutils gnu-sed shellcheck sqlite3 subversion
 
-          # add GNU coreutils and sed to the user PATH
+          # add GNU coreutils and sed to the user PATH (for actions steps)
           # (see instructions in brew install output)
           echo \
             "$(brew --prefix)/opt/coreutils/libexec/gnubin" \
@@ -68,19 +81,73 @@ jobs:
             >> "${GITHUB_PATH}"
 
           # add GNU coreutils and sed to the user PATH (for Cylc jobs)
-          # (see instructions in brew install output)
           cat >> "$HOME/.bashrc" <<__HERE__
-          PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
-          PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+          PATH="/usr/local/opt/coreutils/libexec/gnubin:\$PATH"
+          PATH="/usr/local/opt/gnu-sed/libexec/gnubin:\$PATH"
+          PATH="$pythonLocation:\$PATH"
+          export PATH
+          # see NOTE in t/rosie-lookup/00-basic.t
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           __HERE__
+          cat "$HOME/.bashrc"
+          which python
+
+      - name: Brew Install post
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          set -x
+          which bash
+          which python
+          which python2
+          which python3
+          set +x
+          cat > mess <<__HERE__
+          #!/usr/bin/env bash
+          set -x
+          which bash
+          which python
+          which python2
+          which python3
+          set +x
+          __HERE__
+          chmod +x mess
+          ./mess
 
       - name: Apt-Get Install
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck sqlite3
+          sudo apt-get install -y shellcheck sqlite3 at
 
-          # old stuff, not sure if all needed
+      - name: MacOS DNS Patch
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          # apply DNS patch
+          hostuserutil="$(python3 -c '
+          import cylc.flow.hostuserutil
+          print(cylc.flow.hostuserutil.__file__)
+          ')"
+          patch "${hostuserutil}" < rose/etc/conf/macos-patch
+
+      - name: Install Rose
+        working-directory: rose
+        run: |
+          pip install ."[all]"
+          pip install --no-deps git+https://github.com/cylc/cylc-rose.git
+          yarn install
+
+      - name: Checkout FCM
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.fcm-repo }}
+          ref: ${{ github.event.inputs.fcm-branch }}
+          path: 'fcm'
+
+      - name: Install FCM
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          # install FCM deps
           sudo apt-get install -y \
             subversion \
             build-essential \
@@ -90,32 +157,43 @@ jobs:
             libdbi-perl \
             libdbd-sqlite3-perl
 
-          # yet more old stuff, not sure if needed
-          sudo apt-get install -y at
+          # install wandisco
           sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
-              `lsb_release -cs` svn19" >> /etc/apt/sources.list.d/subversion19.list'
-          sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- | \
-              sudo apt-key add -
+            `lsb_release -cs` svn19" \
+            >> /etc/apt/sources.list.d/subversion19.list'
+          sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- \
+            | sudo apt-key add -
+
+          # prepend FCM bin to $PATH
+          FCM_PATH="$GITHUB_WORKSPACE/fcm/bin"
+          # the github actions way (needed for cylc jobs)
+          echo "$FCM_PATH" >> "${GITHUB_PATH}"
+          # the bashrc wat (needed for subsequent gh action steps)
+          echo "export PATH=\"$FCM_PATH:\$PATH\"" >> "$HOME/.bashrc"
 
       - name: Style
+        working-directory: rose
         run: |
           flake8
           etc/bin/shellchecker
           yarn run lint
 
-      - name: Tests
+      - name: Unit Tests
+        working-directory: rose
         run: |
           pytest
 
       - name: Functional Tests
         timeout-minutes: 30
         id: functest
+        working-directory: rose
         run: |
           # rose tests should pass first time around
           etc/bin/rose-test-battery -j 4 --state=save
 
       - name: Re-Run Fails
         if: failure() && steps.functest.outcome == 'failure'
+        working-directory: rose
         run: |
           # so we only re-run for debug purposes
           cylc scan --state=all --color=never
