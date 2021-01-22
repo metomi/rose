@@ -1531,7 +1531,11 @@ class ConfigLoader(object):
         return (file_, file_name)
 
 
-class ConfigSyntaxError(Exception):
+class ConfigError(Exception):
+    """Base class for config errors."""
+
+
+class ConfigSyntaxError(ConfigError):
 
     """Exception raised for syntax error loading a configuration file.
 
@@ -1587,7 +1591,7 @@ class ConfigSyntaxError(Exception):
             " " * self.col_num)
 
 
-class ConfigDecodeError(Exception):
+class ConfigDecodeError(ConfigError):
     """Exception that should be raised when loading a configuration file that
     is not encoded in a UTF-8 compatible charset.
 
