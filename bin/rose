@@ -28,6 +28,7 @@
 #     rose help            # Print help and list available utilities
 #     rose help UTIL ...   # Print help for UTIL ...
 #     rose version         # Print version information
+#     rose version --long  # Print more version information
 #
 # DESCRIPTION
 #     Simple launcher for utilities in the "rose", "rosie" or "rosa"
@@ -148,7 +149,13 @@ path_lead() {
 
 # Print Rose version
 function print_version() {
-    echo "Rose $ROSE_VERSION ($ROSE_HOME_BIN)"
+    for arg in "$@"; do
+        if [[ "$arg" == '--long' ]]; then
+            echo "Rose $ROSE_VERSION ($ROSE_HOME_BIN)"
+            return
+        fi
+    done
+    echo "$ROSE_VERSION"
 }
 
 #-------------------------------------------------------------------------------
@@ -202,7 +209,7 @@ help|h|?|--help|-h)
     exit $RC
     :;;
 version|--version|-V)
-    print_version
+    print_version "$@"
     exit
     :;;
 doc)
