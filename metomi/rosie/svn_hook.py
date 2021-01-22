@@ -20,7 +20,7 @@
 
 import os
 import sys
-from metomi.rose.config import ConfigLoader
+from metomi.rose.config import ConfigDecodeError, ConfigLoader
 from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
 from tempfile import TemporaryFile
@@ -112,7 +112,7 @@ class RosieSvnHook(object):
     def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
         command = ["svnlook", *args]
-        return self.popen(*command)[0].decode(errors='handle_decode_err')
+        return self.popen(*command)[0].decode()
 
     def _load_info(self, repos, sid, branch=None, revision=None,
                    transaction=None, allow_popen_err=False):
@@ -150,6 +150,8 @@ class RosieSvnHook(object):
                 self._svnlook(
                     "cat", repos, info_file_path, *commit_opts).encode()
             )
+        except UnicodeDecodeError as err:
+            raise ConfigDecodeError(info_file_path, err)
         except RosePopenError as err:
             if allow_popen_err:
                 return None

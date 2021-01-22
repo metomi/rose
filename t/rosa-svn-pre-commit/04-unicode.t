@@ -60,5 +60,5 @@ run_fail "$TEST_KEY" \
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" < /dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" << '__ERR__'
-[FAIL] Configuration files must be encoded in UTF-8 (or a subset of UTF-8). 'utf-8' codec can't decode byte 0xe9 in position 43: invalid continuation byte
+[FAIL] Configuration files must be encoded in UTF-8 (or a subset of UTF-8). a/a/0/0/0/trunk/rose-suite.info: 'utf-8' codec can't decode byte 0xe9 in position 43: invalid continuation byte
 __ERR__
