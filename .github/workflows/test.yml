@@ -4,26 +4,21 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      rose-branch:
+      rose-ref:
         description: The Rose branch to test against
-        required: false
-        default: 'master'
-      fcm-branch:
+        required: true
+      fcm-ref:
         description: The FCM branch to test against
         required: false
-        default: 'master'
       fcm-repo:
         description: The FCM branch to test against
         required: false
-        default: 'metomi/fcm'
-      cylc-branch:
+      cylc-ref:
         description: The Cylc branch to test against
         required: false
-        default: 'master'
       cylc-repo:
         description: The Cylc repo to test against
         required: false
-        default: 'cylc/cylc-flow'
 
 defaults:
   run:
@@ -45,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.rose-branch }}
+          ref: ${{ github.event.inputs.rose-ref }}
           path: rose
 
       - name: Configure Python
@@ -55,8 +50,8 @@ jobs:
 
       - name: Install Cylc
         env:
-          cylc_repo: ${{ github.events.inputs.cylc-repo }}
-          cylc_branch: ${{ github.events.inputs.cylc-branch }}
+          cylc_repo: ${{ github.events.inputs.cylc-repo || 'cylc/cylc-flow' }}
+          cylc_branch: ${{ github.events.inputs.cylc-ref || 'master' }}
         run: |
           # temp: use cylc-install branch
           cylc_repo='datamel/cylc-flow'
@@ -140,8 +135,8 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.fcm-repo }}
-          ref: ${{ github.event.inputs.fcm-branch }}
+          repository: ${{ github.event.inputs.fcm-repo || 'metomi/fcm' }}
+          ref: ${{ github.event.inputs.fcm-ref || 'master' }}
           path: 'fcm'
 
       - name: Install FCM
@@ -213,7 +208,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ github.event.inputs.rose-ref }}
 
       - name: Configure Python
         uses: actions/setup-python@v1
