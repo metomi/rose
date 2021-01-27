@@ -28,17 +28,16 @@ tests 4
 # Run the suite, and wait for it to complete
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
-NAME="$(basename "${SUITE_RUN_DIR}")"
+
+get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${NAME}" \
+        --flow-name="${FLOW}" \
         --no-run-name
 run_pass "${TEST_KEY_BASE}-run" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \
@@ -47,13 +46,13 @@ run_pass "${TEST_KEY_BASE}-run" \
 TEST_KEY="${TEST_KEY_BASE}-job.status"
 file_grep "${TEST_KEY}-archive-01" \
     'CYLC_JOB_EXIT=SUCCEEDED' \
-    "${SUITE_RUN_DIR}/log/job/1/archive/01/job.status"
+    "${FLOW_RUN_DIR}/log/job/1/archive/01/job.status"
 TEST_KEY="${TEST_KEY_BASE}-find"
-(cd "${SUITE_RUN_DIR}/share/backup" && find . -type f) | sort >"${TEST_KEY}.out"
+(cd "${FLOW_RUN_DIR}/share/backup" && find . -type f) | sort >"${TEST_KEY}.out"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<'__FIND__'
 ./archive.d/2016.txt.gz
 ./archive.d/whatever.tar.gz
 __FIND__
 #-------------------------------------------------------------------------------
-cylc clean "${NAME}"
+purge
 exit 0

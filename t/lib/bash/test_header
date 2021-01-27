@@ -96,6 +96,13 @@
 #         array index. It can also be a dict {attr_key: attr_value, ...}. In
 #         which case, the expected data item is under a list of dicts, where a
 #         unique dict in the list contains all elements attr_key: attr_value.
+#     get_reg
+#         Generates a unique Cylc registration name.
+#         exports FLOW, FLOW_RUN_DIR
+#     purge [FLOW]
+#         Runs `cylc clean` on the provided reg (else uses the $FLOW env var)
+#         only if none of the subtests failed. Otherwise it passes so that
+#         the test files are left behind for debugging.
 #
 # VARIABLES
 #     TEST_DIR
@@ -128,6 +135,7 @@ trap 'test_finally EXIT' 'EXIT'
 trap 'test_finally INT' 'INT'
 
 TEST_NUMBER=0
+FAILURES=0
 
 tests() {
     echo "1..$1"
@@ -153,6 +161,7 @@ pass() {
 
 fail() {
     echo "not ok $((++TEST_NUMBER)) - $*"
+    ((++FAILURES))
 }
 
 run_pass() {
@@ -441,6 +450,27 @@ __PYTHON__
         cat "${TEST_KEY}.err" >&2
     fi
 }
+
+get_reg () {
+    local FLOW_UID
+    FLOW_UID="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c6)"
+    FLOW="rtb.$ROSE_TEST_TIME_INIT/${TEST_KEY_BASE}/${FLOW_UID}"
+    FLOW_RUN_DIR="$HOME/cylc-run/$FLOW"
+    echo "${FLOW}"
+    export FLOW FLOW_RUN_DIR
+}
+
+purge () {
+    local FLOW="${1:-$FLOW}"
+    if [[ -z "$FLOW" ]]; then
+        echo 'no flow to purge' >&2
+        return 1
+    elif ((FAILURES == 0)); then
+        cylc clean "${FLOW}"
+    fi
+}
+
+mkdir -p "$HOME/cylc-run"
 
 ROSE_TEST_HOME=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
 export ROSE_TEST_HOME

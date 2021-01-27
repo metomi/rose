@@ -28,24 +28,23 @@ tests 3
 # Run the suite, and wait for it to complete
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
-NAME="$(basename "${SUITE_RUN_DIR}")"
+
+get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${NAME}" \
+        --flow-name="${FLOW}" \
         --no-run-name
 run_pass "${TEST_KEY_BASE}-run" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --host=localhost \
         --no-detach \
         --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}"
 file_grep "${TEST_KEY}" 'duplicate archive target: "foo"' \
-    "${SUITE_RUN_DIR}/log/job/1/archive_fail_duplicate/NN/job.err"
+    "${FLOW_RUN_DIR}/log/job/1/archive_fail_duplicate/NN/job.err"
 #-------------------------------------------------------------------------------
-cylc clean "${NAME}"
+purge
 exit 0

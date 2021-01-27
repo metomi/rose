@@ -50,21 +50,19 @@ fi
 #-------------------------------------------------------------------------------
 tests 3
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
 #-------------------------------------------------------------------------------
-SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
-NAME="$(basename "${SUITE_RUN_DIR}")"
+get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${NAME}" \
+        --flow-name="${FLOW}" \
         --no-run-name
         -S "HOST=\"${JOB_HOST}\"" \
         -S "GREET=\"${GREET}\""
 run_pass "${TEST_KEY_BASE}-run" \
     timeout 120 \
         cylc run \
-            "${NAME}" \
+            "${FLOW}" \
             --abort-if-any-task-fails \
             --no-detach \
             --debug \
@@ -72,18 +70,18 @@ run_pass "${TEST_KEY_BASE}-run" \
 #-------------------------------------------------------------------------------
 JOB_HOST_HOME=$(ssh -n -oBatchMode=yes "${JOB_HOST}" 'echo "${HOME}"' | tail -1)
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
-    cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'
+    cat "cylc-run/${FLOW}/share/hello.txt" >'hello.txt'
 if [[ -n "${GREET}" ]]; then
     file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<__TXT__
-${JOB_HOST_HOME}/cylc-run/${NAME}/opt/greet/build/bin/hello
+${JOB_HOST_HOME}/cylc-run/${FLOW}/opt/greet/build/bin/hello
 Hello World!
 __TXT__
 else
     file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<__TXT__
-${JOB_HOST_HOME}/cylc-run/${NAME}/opt/hello/build/bin/hello
+${JOB_HOST_HOME}/cylc-run/${FLOW}/opt/hello/build/bin/hello
 Hello World!
 __TXT__
 fi
 #-------------------------------------------------------------------------------
-cylc clean "${NAME}"
+purge
 exit 0

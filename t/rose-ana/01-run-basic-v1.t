@@ -26,25 +26,24 @@ tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+
+get_reg
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
     cylc install \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
-        --flow-name="$NAME" \
+        --flow-name="$FLOW" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-run"
 run_pass "$TEST_KEY" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --host=localhost \
         --no-detach \
         --debug
 #-------------------------------------------------------------------------------
 # Test the output
-OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t1/01/job.out
+OUTPUT="$FLOW_RUN_DIR/log/job/1/rose_ana_t1/01/job.out"
 TEST_KEY=$TEST_KEY_BASE-exact_numeric_success
 file_grep $TEST_KEY "[ OK ].*Semi-major Axis.*all: 0%:" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-exact_numeric_fail
@@ -72,22 +71,22 @@ file_grep $TEST_KEY "[FAIL].*Inclination/Axial Tilt.*285.74423480[0-9]*% > 5%:.*
 #-------------------------------------------------------------------------------
 # Test of ignoring a task
 # First, test that the basic task ran ok
-OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t2_activated/01/job.out
+OUTPUT="$FLOW_RUN_DIR/log/job/1/rose_ana_t2_activated/01/job.out"
 TEST_KEY=$TEST_KEY_BASE-ignore-basic-1
 file_grep $TEST_KEY "[FAIL].*Species" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-ignore-basic-2
 file_grep $TEST_KEY "[ OK ].*Class" $OUTPUT
 # Then test that ignoring a test means the output is not present
-OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t2_deactivated/01/job.out
+OUTPUT="$FLOW_RUN_DIR/log/job/1/rose_ana_t2_deactivated/01/job.out"
 TEST_KEY=$TEST_KEY_BASE-ignore-notpresent
 file_grep_fail $TEST_KEY "[FAIL].*Species" $OUTPUT
 #-------------------------------------------------------------------------------
 # Test tolerance as an environment variable
 # First, test that the basic task ran ok
-OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t3_within_tolerance/01/job.out
+OUTPUT="$FLOW_RUN_DIR/log/job/1/rose_ana_t3_within_tolerance/01/job.out"
 TEST_KEY=$TEST_KEY_BASE-tolerance-env-var-pass
 file_grep $TEST_KEY "[PASS].*data" $OUTPUT
-OUTPUT=$HOME/cylc-run/$NAME/log/job/1/rose_ana_t3_outside_tolerance/01/job.out
+OUTPUT="$FLOW_RUN_DIR/log/job/1/rose_ana_t3_outside_tolerance/01/job.out"
 TEST_KEY=$TEST_KEY_BASE-tolerance-env-var-fail
 file_grep $TEST_KEY "[FAIL].*data" $OUTPUT
 #-------------------------------------------------------------------------------
@@ -97,7 +96,7 @@ file_grep $TEST_KEY "[FAIL].*data" $OUTPUT
 # Regexp for any number of digits (re-used a lot below)
 COMP_NUMBER="[0-9][0-9]*"
 
-OUTPUT=$HOME/cylc-run/$NAME/log/job/1/db_check/01/job.out
+OUTPUT="$FLOW_RUN_DIR/log/job/1/db_check/01/job.out"
 # For each of the 3 tasks check that a task entry exists with a status of 0
 for TASK_NAME in "rose_ana_t1" "rose_ana_t2_activated" "rose_ana_t2_deactivated" ; do
     TEST_KEY=$TEST_KEY_BASE-db_check_${TASK_NAME}_success
@@ -215,9 +214,6 @@ TASK_METHOD=".*Species.*"
 TEST_KEY=$TEST_KEY_BASE-db_check_t2_ignore_notpresent
 REGEXP="$COMP_NUMBER | $TASK_NAME | $COMP_FILES | $TASK_STATUS | $TASK_METHOD"
 file_grep_fail $TEST_KEY "$REGEXP" $OUTPUT
-
 #-------------------------------------------------------------------------------
-#Clean suite
-cylc clean $NAME
-#-------------------------------------------------------------------------------
+purge
 exit 0

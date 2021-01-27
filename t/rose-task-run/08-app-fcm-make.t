@@ -37,11 +37,9 @@ fi
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+get_reg
 OPTS=(
-    "--flow-name=${NAME}"
+    "--flow-name=${FLOW}"
     "--no-run-name"
 )
 if [[ -n ${JOB_HOST:-} ]]; then
@@ -53,14 +51,14 @@ run_pass "${TEST_KEY_BASE}-install" \
         "${OPTS[@]}"
 run_pass "${TEST_KEY_BASE}-run" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host='localhost' \
         --no-detach \
         --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-status"
-sqlite3 $SUITE_RUN_DIR/log/db \
+sqlite3 $FLOW_RUN_DIR/log/db \
     'SELECT name,status FROM task_states ORDER BY name;' \
     >"$TEST_KEY"
 if [[ -n $JOB_HOST ]]; then
@@ -83,40 +81,40 @@ fi
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-t1" # normal
 file_grep "$TEST_KEY.out" \
-    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$SUITE_RUN_DIR/work/1/fcm_make_t1/fcm-make.cfg -C .*$SUITE_RUN_DIR/share/fcm_make_t1 -j 4" \
-    $SUITE_RUN_DIR/log/job/1/fcm_make_t1/01/job.out
+    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW_RUN_DIR/work/1/fcm_make_t1/fcm-make.cfg -C .*$FLOW_RUN_DIR/share/fcm_make_t1 -j 4" \
+    $FLOW_RUN_DIR/log/job/1/fcm_make_t1/01/job.out
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-t2" # use-pwd
 file_grep "$TEST_KEY.out" "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -j 4" \
-    $SUITE_RUN_DIR/log/job/1/fcm_make_t2/01/job.out
+    $FLOW_RUN_DIR/log/job/1/fcm_make_t2/01/job.out
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-t3" # opt.jobs
 file_grep "$TEST_KEY.out" \
-    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$SUITE_RUN_DIR/work/1/fcm_make_t3/fcm-make.cfg -C .*$SUITE_RUN_DIR/share/fcm_make_t3 -j 1" \
-    $SUITE_RUN_DIR/log/job/1/fcm_make_t3/01/job.out
+    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW_RUN_DIR/work/1/fcm_make_t3/fcm-make.cfg -C .*$FLOW_RUN_DIR/share/fcm_make_t3 -j 1" \
+    $FLOW_RUN_DIR/log/job/1/fcm_make_t3/01/job.out
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-t4" # args
 file_grep "$TEST_KEY.out" \
-    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$SUITE_RUN_DIR/work/1/fcm_make_t4/fcm-make.cfg -C .*$SUITE_RUN_DIR/share/fcm_make_t4 -j 4 -v -v" \
-    $SUITE_RUN_DIR/log/job/1/fcm_make_t4/01/job.out
+    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW_RUN_DIR/work/1/fcm_make_t4/fcm-make.cfg -C .*$FLOW_RUN_DIR/share/fcm_make_t4 -j 4 -v -v" \
+    $FLOW_RUN_DIR/log/job/1/fcm_make_t4/01/job.out
 #-------------------------------------------------------------------------------
 if [[ -z $JOB_HOST ]]; then
     skip 3 '[t]job-host not defined'
 else
     TEST_KEY="$TEST_KEY_BASE-t5" # mirror
     file_grep "$TEST_KEY.out.env" \
-        "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* export ROSE_TASK_MIRROR_TARGET=$JOB_HOST:cylc-run/$NAME/share/fcm_make_t5" \
-        $SUITE_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
+        "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* export ROSE_TASK_MIRROR_TARGET=$JOB_HOST:cylc-run/$FLOW/share/fcm_make_t5" \
+        $FLOW_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
     file_grep "$TEST_KEY.out.cmd" \
-        "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$SUITE_RUN_DIR/work/1/fcm_make_t5/fcm-make.cfg -C .*$SUITE_RUN_DIR/share/fcm_make_t5 -j 4 mirror\\.target=${JOB_HOST}:cylc-run/${NAME}/share/fcm_make_t5" \
-        $SUITE_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
+        "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW_RUN_DIR/work/1/fcm_make_t5/fcm-make.cfg -C .*$FLOW_RUN_DIR/share/fcm_make_t5 -j 4 mirror\\.target=${JOB_HOST}:cylc-run/${FLOW}/share/fcm_make_t5" \
+        $FLOW_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
 
     TEST_KEY="$TEST_KEY_BASE-t5-part-2"
-    rose suite-log -q --name=$NAME --update fcm_make2_t5
+    rose suite-log -q --name=$FLOW --update fcm_make2_t5
     file_grep "$TEST_KEY.out" \
-        "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -C .*/cylc-run/${NAME}/share/fcm_make_t5 -n 2 -j 4" \
-        $SUITE_RUN_DIR/log/job/1/fcm_make2_t5/01/job.out
+        "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -C .*/cylc-run/${FLOW}/share/fcm_make_t5 -n 2 -j 4" \
+        $FLOW_RUN_DIR/log/job/1/fcm_make2_t5/01/job.out
 fi
 #-------------------------------------------------------------------------------
-cylc clean $NAME
+purge
 exit 0

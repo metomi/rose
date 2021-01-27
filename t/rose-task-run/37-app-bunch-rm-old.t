@@ -26,26 +26,25 @@ tests 15
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+
+get_reg
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
     cylc install \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
-        --flow-name=$NAME \
+        --flow-name="$FLOW" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-run"
 run_pass "$TEST_KEY" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \
         --debug
 #-------------------------------------------------------------------------------
 CYCLE=20100101T0000Z
-LOG_DIR="$SUITE_RUN_DIR/log/job/$CYCLE"
+LOG_DIR="$FLOW_RUN_DIR/log/job/$CYCLE"
 #-------------------------------------------------------------------------------
 # Testing successful runs
 #-------------------------------------------------------------------------------
@@ -72,11 +71,11 @@ done
 #-------------------------------------------------------------------------------
 # Run suite a second time
 # TODO: replace with cylc run --re-run / cylc clean
-rm -rf "${HOME}/cylc-run/${NAME}/log"
-rm -rf "${HOME}/cylc-run/${NAME}/.serivce/db"
+rm -rf "${FLOW_RUN_DIR}/log"
+rm -rf "${FLOW_RUN_DIR}/.serivce/db"
 run_pass "$TEST_KEY" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \
@@ -92,6 +91,5 @@ for ARGVALUE in 0 1 2 3; do
      $FILE
 done
 #-------------------------------------------------------------------------------
-
-cylc clean $NAME
+purge
 exit 0

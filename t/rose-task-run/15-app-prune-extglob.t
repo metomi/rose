@@ -24,27 +24,25 @@
 tests 3
 
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
-NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
+get_reg
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${NAME}" \
+        --flow-name="${FLOW}" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-run"
 run_pass "${TEST_KEY}" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host='localhost' \
         --no-detach \
         --debug
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\
-    "${SUITE_RUN_DIR}/prune.log" > stamp-removed.log
+    "${FLOW_RUN_DIR}/prune.log" > stamp-removed.log
 sed '/^\[INFO\] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=/p;
      /^\[INFO\] YYYY-MM-DDTHHMM delete: /!d' \
     "stamp-removed.log" >'edited-prune.log'
@@ -60,5 +58,5 @@ file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
 [INFO] YYYY-MM-DDTHHMM delete: work/20150102T0000Z/creator/rose-app-run.conf
 __LOG__
 #-------------------------------------------------------------------------------
-cylc clean "${NAME}"
+purge
 exit 0

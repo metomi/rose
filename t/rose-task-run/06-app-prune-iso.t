@@ -33,22 +33,20 @@ fi
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
 
 #-------------------------------------------------------------------------------
 tests 9
 #-------------------------------------------------------------------------------
+get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
-        --flow-name="$NAME" \
+        --flow-name="$FLOW" \
         --no-run-name \
         "$JOB_HOST"
 run_pass "${TEST_KEY_BASE}-run" \
     cylc run \
-        "$NAME" \
+        "$FLOW" \
         --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \
@@ -60,7 +58,7 @@ sed '/^\[INFO\] \(create\|delete\|update\)/!d;
      /^\[INFO\] delete: \.rose-suite-log.lock/d;
      /\.json/d;
      /[0-9a-h]\{8\}\(-[0-9a-h]\{4\}\)\{3\}-[0-9a-h]\{12\}$/d' \
-    $SUITE_RUN_DIR/prune.log >edited-prune.log
+    $FLOW_RUN_DIR/prune.log >edited-prune.log
 if [[ -n $JOB_HOST ]]; then
     sed "s/\\\$JOB_HOST/$JOB_HOST/g" \
         $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
@@ -72,8 +70,8 @@ file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ls
 run_pass "$TEST_KEY" \
-    ls $SUITE_RUN_DIR/log/job-*.tar.gz $SUITE_RUN_DIR/{log/job,share/cycle,work}
-sed "s?\\\$SUITE_RUN_DIR?$SUITE_RUN_DIR?g" \
+    ls $FLOW_RUN_DIR/log/job-*.tar.gz $FLOW_RUN_DIR/{log/job,share/cycle,work}
+sed "s?\\\$SUITE_RUN_DIR?$FLOW_RUN_DIR?g" \
     $TEST_SOURCE_DIR/$TEST_KEY.out >expected-ls.out
 if [[ -z $JOB_HOST ]]; then
     sed -i "/my_task_2/d" expected-ls.out
@@ -84,8 +82,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 if [[ -n $JOB_HOST ]]; then
     TEST_KEY=$TEST_KEY_BASE-host-ls
     run_pass "$TEST_KEY" ssh -oBatchMode=yes $JOB_HOST \
-        ls cylc-run/$NAME/{log/job,share/cycle,work}
-    sed "s/\\\$NAME/$NAME/g" \
+        ls cylc-run/$FLOW/{log/job,share/cycle,work}
+    sed "s/\\\$FLOW/$FLOW/g" \
         $TEST_SOURCE_DIR/$TEST_KEY.out >expected-host-ls.out
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-host-ls.out
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -93,5 +91,5 @@ else
     skip 3 '[t]job-host not defined'
 fi
 #-------------------------------------------------------------------------------
-cylc clean $NAME
+purge
 exit 0

@@ -118,8 +118,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 # https://github.com/metomi/rose/issues/2432
 
 #TEST_KEY="${TEST_KEY_BASE}-run"
-#SUITE_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
-#SUITE_NAME="$(basename "${SUITE_DIR}")"
+#get_reg
 #svn co -q "${URL}/a/a/0/0/0/trunk" 'foo-aa000'
 #touch 'foo-aa000/rose-suite.conf'
 #cat >'foo-aa000/flow.cylc' <<'__SUITE_RC__'
@@ -131,14 +130,14 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #__SUITE_RC__
 #cylc install \
 #    -C "${PWD}/foo-aa000" \
-#    --flow-name="${SUITE_NAME}" \
+#    --flow-name="${FLOW}" \
 #    --no-run-name
-#run_pass "$TEST_KEY" rosie id "${HOME}/cylc-run/${SUITE_NAME}"
+#run_pass "$TEST_KEY" rosie id "${HOME}/cylc-run/${FLOW}"
 #file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 #foo-aa000
 #__OUT__
 #file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#cylc clean "${SUITE_NAME}"
+#purge
 #rm -fr 'foo-aa000'
 #-------------------------------------------------------------------------------
 # Latest and next should still be correct if latest suite removed from HEAD

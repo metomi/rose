@@ -28,37 +28,34 @@ tests 11
 # Run the suite.
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+get_reg
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
     cylc install \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
-        --flow-name="$NAME" \
+        --flow-name="$FLOW" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-run"
 run_pass "$TEST_KEY" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \
         --debug
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-log
-run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/log/job/20100101T0000Z
-run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/log/job/20100102T0000Z
-run_fail "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/log/job/20100103T0000Z
-run_fail "$TEST_KEY.4" ls -d $HOME/cylc-run/$NAME/log/job/20100104T0000Z
-run_pass "$TEST_KEY.5" ls -d $HOME/cylc-run/$NAME/log/job/20100105T0000Z
+run_fail "$TEST_KEY.1" ls -d "$FLOW_RUN_DIR/log/job/20100101T0000Z"
+run_fail "$TEST_KEY.2" ls -d "$FLOW_RUN_DIR/log/job/20100102T0000Z"
+run_fail "$TEST_KEY.3" ls -d "$FLOW_RUN_DIR/log/job/20100103T0000Z"
+run_fail "$TEST_KEY.4" ls -d "$FLOW_RUN_DIR/log/job/20100104T0000Z"
+run_pass "$TEST_KEY.5" ls -d "$FLOW_RUN_DIR/log/job/20100105T0000Z"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-archived
-run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/log/job-20100101T0000Z.tar.gz
-run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/log/job-20100102T0000Z.tar.gz
-run_fail "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/log/job-20100103T0000Z.tar.gz
-run_pass "$TEST_KEY.4" ls -d $HOME/cylc-run/$NAME/log/job-20100104T0000Z.tar.gz
+run_fail "$TEST_KEY.1" ls -d "$FLOW_RUN_DIR/log/job-20100101T0000Z.tar.gz"
+run_fail "$TEST_KEY.2" ls -d "$FLOW_RUN_DIR/log/job-20100102T0000Z.tar.gz"
+run_fail "$TEST_KEY.3" ls -d "$FLOW_RUN_DIR/log/job-20100103T0000Z.tar.gz"
+run_pass "$TEST_KEY.4" ls -d "$FLOW_RUN_DIR/log/job-20100104T0000Z.tar.gz"
 #-------------------------------------------------------------------------------
-cylc clean $NAME
-#-------------------------------------------------------------------------------
+purge
 exit 0

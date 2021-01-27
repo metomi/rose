@@ -24,28 +24,26 @@
 tests 3
 
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
-NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
+get_reg
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${NAME}" \
+        --flow-name="${FLOW}" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-run"
 run_pass "${TEST_KEY}" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host='localhost' \
         --no-detach \
         --debug
 TEST_KEY="${TEST_KEY_BASE}-hello.txt"
-file_cmp "${TEST_KEY}" "${SUITE_RUN_DIR}/hello.txt" <<__HELLO__
+file_cmp "${TEST_KEY}" "${FLOW_RUN_DIR}/hello.txt" <<__HELLO__
 Hello Earth!
 __HELLO__
 #-------------------------------------------------------------------------------
-cylc clean "${NAME}"
+purge
 exit 0

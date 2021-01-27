@@ -33,25 +33,24 @@ SKIP_PATTERN="\[SKIP\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+
+get_reg
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
     cylc install \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
-        --flow-name="${NAME}" \
+        --flow-name="${FLOW}" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-run"
 run_pass "$TEST_KEY" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --host=localhost \
         --no-detach \
         --debug
 #-------------------------------------------------------------------------------
 CYCLE=20100101T0000Z
-LOG_DIR="$SUITE_RUN_DIR/log/job/$CYCLE"
+LOG_DIR="$FLOW_RUN_DIR/log/job/$CYCLE"
 #-------------------------------------------------------------------------------
 # Testing successful runs
 #-------------------------------------------------------------------------------
@@ -251,5 +250,5 @@ file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
     "$INFO_PATTERN TOTAL: 8" \
     "$FILE"
 #-------------------------------------------------------------------------------
-cylc clean $NAME
+purge
 exit 0

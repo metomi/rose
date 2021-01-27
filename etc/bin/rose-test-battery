@@ -58,6 +58,9 @@ cd "$TESTDIR/../../"
 mkdir -p ~/.metomi
 mkdir -p "${HOME}/cylc-run"
 
+ROSE_TEST_TIME_INIT="$(date -u +'%Y%m%dT%H%M%SZ')"
+export ROSE_TEST_TIME_INIT
+
 # Recompile *.pyc files to ensure we are running the current code.
 # @TODO Consider if this is appropriate in new version
 if [[ -w 'metomi/' ]]; then

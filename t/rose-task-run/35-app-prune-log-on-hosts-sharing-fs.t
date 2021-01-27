@@ -34,22 +34,20 @@ fi
 tests 5
 
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
-NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
+get_reg
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${NAME}" \
+        --flow-name="${FLOW}" \
         --no-run-name \
         -S "JOB_HOST_1=\"${JOB_HOST_1}\"" \
         -S "JOB_HOST_2=\"${JOB_HOST_2}\""
 TEST_KEY="${TEST_KEY_BASE}-run"
 run_pass "${TEST_KEY}" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host='localhost' \
         --debug \
@@ -58,24 +56,24 @@ run_pass "${TEST_KEY}" \
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 grep \
     "ssh .* \\(${JOB_HOST_1}\\|${JOB_HOST_2}\\).* ls. -d..* 19700101T0000Z" \
-    "${SUITE_RUN_DIR}/prune.log" >'prune-ssh.log'
+    "${FLOW_RUN_DIR}/prune.log" >'prune-ssh.log'
 run_pass "${TEST_KEY}-prune-ssh-wc-l" test "$(wc -l <'prune-ssh.log')" -eq 2
 
 if head -n 1 'prune-ssh.log' | grep ".* ${JOB_HOST_1} .*"; then
     run_pass "${TEST_KEY}-delete-1" \
         grep -q "delete: ${JOB_HOST_1}:log/job/19700101T0000Z" \
-        "${SUITE_RUN_DIR}/prune.log"
+        "${FLOW_RUN_DIR}/prune.log"
     run_fail "${TEST_KEY}-delete-2" \
         grep -q "delete: ${JOB_HOST_2}:log/job/19700101T0000Z" \
-        "${SUITE_RUN_DIR}/prune.log"
+        "${FLOW_RUN_DIR}/prune.log"
 else
     run_pass "${TEST_KEY}-delete-2" \
         grep -q "delete: ${JOB_HOST_2}:log/job/19700101T0000Z" \
-        "${SUITE_RUN_DIR}/prune.log"
+        "${FLOW_RUN_DIR}/prune.log"
     run_fail "${TEST_KEY}-delete-1" \
         grep -q "delete: ${JOB_HOST_1}:log/job/19700101T0000Z" \
-        "${SUITE_RUN_DIR}/prune.log"
+        "${FLOW_RUN_DIR}/prune.log"
 fi
 #-------------------------------------------------------------------------------
-cylc clean "${NAME}"
+purge
 exit 0

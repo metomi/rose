@@ -27,22 +27,21 @@ export ROSE_CONF_PATH=
 tests 3
 #-------------------------------------------------------------------------------
 # Run the suite.
-TEST_KEY=$TEST_KEY_BASE
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+TEST_KEY="$TEST_KEY_BASE"
+get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
-        --flow-name=$NAME \
+        --flow-name=$FLOW \
         --no-run-name
 run_pass "${TEST_KEY_BASE}-run" \
     cylc run \
-        "${NAME}" \
+        "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \
         --debug
+file_cmp "$TEST_KEY" "$FLOW_RUN_DIR/file" <<<'20121231T1200Z'
 #-------------------------------------------------------------------------------
-file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/file" <<<'20121231T1200Z'
-cylc clean $NAME
+purge
 exit 0
