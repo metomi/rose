@@ -1359,6 +1359,8 @@ class ConfigLoader(object):
         if node is None:
             node = ConfigNode()
         handle, file_name = self._get_file_and_name(source)
+        if isinstance(file_name, int):  # Probably a temporary file
+            file_name = ""
         keys = []  # Currently position under root node
         type_ = None  # Type of current node, section or option?
         comments = None  # Comments associated with next node
@@ -1583,12 +1585,10 @@ class ConfigSyntaxError(ConfigError):
         self.line = line
 
     def __str__(self):
-        return "%s(%d): %s\n%s%s^" % (
-            self.file_name,
-            self.line_num,
-            self.MESSAGES[self.code],
-            self.line,
-            " " * self.col_num)
+        msg = self.MESSAGES[self.code]
+        return (
+            f"{self.file_name}(line {self.line_num}): {msg}\n"
+            f"{self.line}{' ' * self.col_num}^")
 
 
 class ConfigDecodeError(ConfigError):
