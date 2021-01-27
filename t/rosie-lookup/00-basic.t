@@ -31,6 +31,9 @@ tests 75
 # Setup Rose site/user configuration for the tests.
 export TZ='UTC'
 
+# NOTE: if failing on MacOS try the following in ~/.bash_profile
+# export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
 # Ignore case in file_cmp methods
 # (this is to allow case-insensitive host names)
 DIFF_CASE_INSENSITIVE=true

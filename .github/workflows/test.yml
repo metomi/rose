@@ -85,28 +85,6 @@ jobs:
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           __HERE__
           cat "$HOME/.bashrc"
-          which python
-
-      - name: Brew Install post
-        if: startsWith(matrix.os, 'macos')
-        run: |
-          set -x
-          which bash
-          which python
-          which python2
-          which python3
-          set +x
-          cat > mess <<__HERE__
-          #!/usr/bin/env bash
-          set -x
-          which bash
-          which python
-          which python2
-          which python3
-          set +x
-          __HERE__
-          chmod +x mess
-          ./mess
 
       - name: Apt-Get Install
         if: startsWith(matrix.os, 'ubuntu')
@@ -182,6 +160,8 @@ jobs:
         timeout-minutes: 30
         id: functest
         working-directory: rose
+        env:
+          OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
         run: |
           # rose tests should pass first time around
           etc/bin/rose-test-battery -j 4 --state=save
@@ -189,6 +169,8 @@ jobs:
       - name: Re-Run Fails
         if: failure() && steps.functest.outcome == 'failure'
         working-directory: rose
+        env:
+          OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
         run: |
           # so we only re-run for debug purposes
           cylc scan --state=all --color=never
