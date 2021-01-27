@@ -157,14 +157,14 @@ fi
 
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-bad-prefix
-run_fail "$TEST_KEY" rosie lookup --prefix=bar poetry
+run_fail "$TEST_KEY" timeout 10 rosie lookup --prefix=bar poetry
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [rosie-id]prefix-ws.bar: configuration not defined
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-no-results
-run_pass "$TEST_KEY" rosie lookup dodo
+run_pass "$TEST_KEY" timeout 10 rosie lookup dodo
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite owner project title
 url: http://$HOSTNAME:$PORT/foo/search?s=dodo
@@ -172,7 +172,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-no-results-prefix
-run_pass "$TEST_KEY" rosie lookup --prefix=foo dodo
+run_pass "$TEST_KEY" timeout 10 rosie lookup --prefix=foo dodo
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite owner project title
 url: http://$HOSTNAME:$PORT/foo/search?s=dodo
@@ -180,7 +180,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-specific
-run_pass "$TEST_KEY" rosie lookup poetry
+run_pass "$TEST_KEY" timeout 10 rosie lookup poetry
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner project title
 =     foo-aa001/trunk@3 roses poetry  Roses are Red, Violets are Blue,...
@@ -189,7 +189,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-general
-run_pass "$TEST_KEY" rosie lookup a
+run_pass "$TEST_KEY" timeout 10 rosie lookup a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
@@ -200,7 +200,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-general-2
-run_pass "$TEST_KEY" rosie lookup 'a%'
+run_pass "$TEST_KEY" timeout 10 rosie lookup 'a%'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
@@ -211,7 +211,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-general-3
-run_pass "$TEST_KEY" rosie lookup 't a'
+run_pass "$TEST_KEY" timeout 10 rosie lookup 't a'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
@@ -220,7 +220,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-general-4
-run_pass "$TEST_KEY" rosie lookup 't a_l the'
+run_pass "$TEST_KEY" timeout 10 rosie lookup 't a_l the'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
@@ -229,7 +229,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-all-revs
-run_pass "$TEST_KEY" rosie lookup --all-revs a
+run_pass "$TEST_KEY" timeout 10 rosie lookup --all-revs a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@1 iris   eye pad   Should have gone to ...
@@ -243,7 +243,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-no-results
-run_pass "$TEST_KEY" rosie lookup -Q owner eq violets
+run_pass "$TEST_KEY" timeout 10 rosie lookup -Q owner eq violets
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite owner project title
 url: http://$HOSTNAME:$PORT/foo/query?q=and+owner+eq+violets
@@ -251,7 +251,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-specific
-run_pass "$TEST_KEY" rosie lookup --query project contains poe
+run_pass "$TEST_KEY" timeout 10 rosie lookup --query project contains poe
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner project title
 =     foo-aa001/trunk@3 roses poetry  Roses are Red, Violets are Blue,...
@@ -260,7 +260,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-description
-run_pass "$TEST_KEY" rosie lookup -Q description contains nom
+run_pass "$TEST_KEY" timeout 10 rosie lookup -Q description contains nom
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
@@ -269,7 +269,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-revision
-run_pass "$TEST_KEY" rosie lookup -Q revision gt 3
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup -Q revision gt 3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
@@ -279,7 +280,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs
-run_pass "$TEST_KEY" rosie lookup --all-revs --query title contains a
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup --all-revs --query title contains a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@1 iris   eye pad   Should have gone to ...
@@ -293,7 +295,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-description
-run_pass "$TEST_KEY" rosie lookup --all-revs --query description contains a
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup --all-revs --query description contains a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner project title
       foo-aa000/trunk@1 iris  eye pad Should have gone to ...
@@ -304,7 +307,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-revision
-run_pass "$TEST_KEY" rosie lookup --all-revs -Q revision gt 3
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup --all-revs -Q revision gt 3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
@@ -315,7 +319,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-multiple-and
-run_pass "$TEST_KEY" rosie lookup --all-revs --query title contains a and project eq poetry
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup --all-revs --query title contains a and project eq poetry
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner project title
 >     foo-aa001/trunk@2 roses poetry  Roses are Red,...
@@ -325,7 +330,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-multiple-or-0
-run_pass "$TEST_KEY" rosie lookup --all-revs --query title contains Roses or owner eq roses
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup --all-revs --query title contains Roses or owner eq roses
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 >     foo-aa001/trunk@2 roses  poetry    Roses are Red,...
@@ -336,7 +342,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-multiple-or-1
-run_pass "$TEST_KEY" rosie lookup --all-revs --query title contains Roses or owner eq iris
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup --all-revs --query title contains Roses or owner eq iris
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@1 iris   eye pad   Should have gone to ...
@@ -349,7 +356,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-verbosity-quiet
-run_pass "$TEST_KEY" rosie lookup -q a
+run_pass "$TEST_KEY" timeout 10 rosie lookup -q a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite
 foo-aa001/trunk@3
@@ -359,7 +366,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-main-props
-run_pass "$TEST_KEY" rosie lookup --format="%suite with %status" a
+run_pass "$TEST_KEY" timeout 10 rosie lookup --format="%suite with %status" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             with status
 foo-aa001/trunk@3 with  M
@@ -370,7 +377,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-other-props
-run_pass "$TEST_KEY" rosie lookup \
+run_pass "$TEST_KEY" timeout 10 rosie lookup \
     --format="%suite %local %description %access-list" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             local description       access-list
@@ -382,7 +389,7 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-other-props-all-revs
-run_pass "$TEST_KEY" rosie lookup --all-revs \
+run_pass "$TEST_KEY" timeout 10 rosie lookup --all-revs \
     --format="%suite %local %description %access-list" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             local description               access-list
@@ -397,7 +404,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-with-date
-run_pass "$TEST_KEY" rosie lookup --format="%suite by %owner at %date" a
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup --format="%suite by %owner at %date" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             by owner  at date
 foo-aa001/trunk@3 by roses  at 2009-02-13T23:31:32Z
@@ -408,7 +416,8 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-with-quiet-mode
-run_pass "$TEST_KEY" rosie lookup a -q --format="%suite by %owner at %date"
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup a -q --format="%suite by %owner at %date"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             by owner  at date
 foo-aa001/trunk@3 by roses  at 2009-02-13T23:31:32Z
