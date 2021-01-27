@@ -1,10 +1,11 @@
 # Minimal makefile for Sphinx documentation
 
 # You can set these variables from the command line:
+ROSE_VERSION = $(shell rose version)
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = ../doc
+BUILDDIR      = ../doc/$(ROSE_VERSION)
 SOURCEDIR     = .
 
 # Put it first so that "make" without argument is like "make help".
