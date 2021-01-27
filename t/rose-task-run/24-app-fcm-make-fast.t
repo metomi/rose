@@ -43,17 +43,16 @@ run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
         --flow-name="${FLOW}" \
-        -S "FAST_DEST_ROOT='${PWD}/fast'" \
         --no-run-name
 run_pass "${TEST_KEY_BASE}-run" \
     timeout 120 \
         cylc run \
             "${FLOW}" \
+            -s "FAST_DEST_ROOT='${PWD}/fast'" \
             --abort-if-any-task-fails \
             --host='localhost' \
             --no-detach \
             --debug
-
 #-------------------------------------------------------------------------------
 # Permission modes of make directory should be the same as a normal directory
 mkdir "${FLOW_RUN_DIR}/share/hello-make-perm-mode-test"
@@ -69,10 +68,10 @@ __TXT__
 # Logs
 HOST=$(hostname)
 file_grep "${TEST_KEY_BASE}.log" \
-    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make.1.${FLOW}" \
+    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make.1.${FLOW//\//_}" \
     "${FLOW_RUN_DIR}/share/hello-make/fcm-make.log"
 file_grep "${TEST_KEY_BASE}-bin.log" \
-    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make-bin.1.${FLOW}" \
+    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make-bin.1.${FLOW//\//_}" \
     "${FLOW_RUN_DIR}/share/hello-make/fcm-make-bin.log"
 # Prove that the fast directory has been modified
 MTIME_OF_FAST_AFTER=$(stat '-c%y' 'fast')

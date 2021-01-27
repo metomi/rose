@@ -9,7 +9,7 @@
     [[root]]
     [[MAKE]]
         script = """
-rose task-run --app-key=make \
+rose task-run --app-key=make -v -v --debug \
     --define=fast-dest-root-orig={{FAST_DEST_ROOT}} \
     --define=fast-dest-root-cont={{FAST_DEST_ROOT}}
 """
