@@ -4,19 +4,19 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      rose-ref:
+      rose_ref:
         description: The Rose branch to test against
         required: true
-      fcm-ref:
+      fcm_ref:
         description: The FCM branch to test against
         required: false
-      fcm-repo:
+      fcm_repo:
         description: The FCM branch to test against
         required: false
-      cylc-ref:
+      cylc_ref:
         description: The Cylc branch to test against
         required: false
-      cylc-repo:
+      cylc_repo:
         description: The Cylc repo to test against
         required: false
 
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.rose-ref }}
+          ref: ${{ github.event.inputs.rose_ref || github.sha }}
           path: rose
 
       - name: Configure Python
@@ -51,20 +51,15 @@ jobs:
 
       - name: Install Cylc
         env:
-          cylc_repo: ${{ github.events.inputs.cylc-repo || 'cylc/cylc-flow' }}
-          cylc_branch: ${{ github.events.inputs.cylc-ref || 'master' }}
+          cylc_repo: ${{ github.event.inputs.cylc_repo || 'cylc/cylc-flow' }}
+          cylc_branch: ${{ github.event.inputs.cylc_ref || 'master' }}
         run: |
-          # temp: use cylc-install branch
-          cylc_repo='datamel/cylc-flow'
-          cylc_branch='cylc-install'
           pip install "git+https://github.com/$cylc_repo@$cylc_branch"
 
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
         run: |
-          which python
           # install system deps
-          #brew update
           brew install bash coreutils gnu-sed shellcheck sqlite3 subversion
 
           # add GNU coreutils and sed to the user PATH (for actions steps)
@@ -114,8 +109,8 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.fcm-repo || 'metomi/fcm' }}
-          ref: ${{ github.event.inputs.fcm-ref || 'master' }}
+          repository: ${{ github.event.inputs.fcm_repo || 'metomi/fcm' }}
+          ref: ${{ github.event.inputs.fcm_ref || 'master' }}
           path: 'fcm'
 
       - name: Install FCM
@@ -191,23 +186,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.rose-ref }}
+          ref: ${{ github.event.inputs.rose_ref || github.sha }}
 
       - name: Configure Python
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
 
-      - name: install
+      - name: install graphviz
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            latexmk \
-            texlive \
-            texlive-generic-extra \
-            texlive-latex-extra \
-            texlive-fonts-recommended \
-            graphviz
+          sudo apt-get install -y graphviz pkg-config libgraphviz-dev
+          pip install pygraphviz
+
+      - name: install
+        run: |
           pip install -e .[docs]
 
       - name: build (html)
