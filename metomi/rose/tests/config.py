@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 import os.path
+import pytest
 import metomi.rose.config
 from io import StringIO
 
@@ -221,3 +222,30 @@ bar=BAR BAR BAR
     node = conf.get(["hello", "greet"])
     assert(node.value == "hi")
     assert(node.state == "!!")
+
+
+def test_load_bad_syntax():
+    """Test loading a configuration with bad syntax present"""
+    loader = metomi.rose.config.ConfigLoader()
+    source = StringIO("""# test
+foo=bar
+baz
+""")
+    with pytest.raises(metomi.rose.config.ConfigSyntaxError) as exc:
+        loader.load(source)
+    assert exc.value.code == 'BAD_SYNTAX'
+    assert exc.value.line_num == 3
+
+
+def test_load_info_config_bad_syntax():
+    """Test loading a configuration in which sections are not allowed"""
+    loader = metomi.rose.config.ConfigLoader(allow_sections=False)
+    source = StringIO("""# test
+stuff=stuffing
+[egg]
+boiled=false
+""")
+    with pytest.raises(metomi.rose.config.ConfigSyntaxError) as exc:
+        loader.load(source)
+    assert exc.value.code == 'SECTIONS_NOT_ALLOWED'
+    assert exc.value.line_num == 3

@@ -1175,18 +1175,21 @@ class ConfigLoader(object):
     TYPE_OPTION = "TYPE_OPTION"
     UNKNOWN_NAME = "<???>"
 
-    def __init__(self, char_assign=CHAR_ASSIGN, char_comment=CHAR_COMMENT):
+    def __init__(self, char_assign=CHAR_ASSIGN, char_comment=CHAR_COMMENT,
+                 allow_sections=True):
         """Initialise the configuration utility.
 
         Arguments:
-        char_comment -- the character to indicate the start of a
-        comment.
-        char_assign -- the character to use to delimit a key=value
-        assignment.
+            char_assign (str): the character to use to delimit a key=value
+                assignment.
+            char_comment (str): the character to indicate the start of a
+                comment.
+            allow_sections (bool): whether to permit sections in the config.
 
         """
         self.char_assign = char_assign
         self.char_comment = char_comment
+        self.allow_sections = allow_sections
         self.re_option = re.compile(
             r"^(?P<state>!?!?)(?P<option>[^\s" +
             char_assign + r"]+)\s*" +
@@ -1356,6 +1359,8 @@ class ConfigLoader(object):
         if node is None:
             node = ConfigNode()
         handle, file_name = self._get_file_and_name(source)
+        if isinstance(file_name, int):  # Probably a temporary file
+            file_name = ""
         keys = []  # Currently position under root node
         type_ = None  # Type of current node, section or option?
         comments = None  # Comments associated with next node
@@ -1364,7 +1369,10 @@ class ConfigLoader(object):
         while True:
             line = handle.readline()
             if isinstance(line, bytes):
-                line = line.decode(errors='ignore')
+                try:
+                    line = line.decode()
+                except UnicodeDecodeError as exc:
+                    raise ConfigDecodeError(source, exc)
             if not line:
                 break
             line_num += 1
@@ -1389,38 +1397,47 @@ class ConfigLoader(object):
             # Match a section header?
             match = self.RE_SECTION.match(line)
             if match:
-                head, section, state = match.group("head", "section", "state")
-                bad_index = self._check_section_value(section)
-                if bad_index > -1:
+                if self.allow_sections:
+                    head, section, state = match.group(
+                        "head", "section", "state")
+                    bad_index = self._check_section_value(section)
+                    if bad_index > -1:
+                        raise ConfigSyntaxError(
+                            ConfigSyntaxError.BAD_CHAR,
+                            file_name, line_num, len(head) + bad_index, line)
+                    # Find position under root node
+                    if type_ == self.TYPE_OPTION:
+                        keys.pop()
+                    if keys:
+                        keys.pop()
+                    section = section.strip()
+                    if section:
+                        keys.append(section)
+                        type_ = self.TYPE_SECTION
+                    else:
+                        keys = []
+                        type_ = None
+                    section_node = node.get(keys[:])
+                    if section_node is None:
+                        node.set(keys[:], {}, state, comments)
+                    else:
+                        section_node.state = state
+                        if comments:
+                            section_node.comments += comments
+                    comments = []
+                    continue
+                else:
                     raise ConfigSyntaxError(
-                        ConfigSyntaxError.BAD_CHAR,
-                        file_name, line_num, len(head) + bad_index, line)
-                # Find position under root node
-                if type_ == self.TYPE_OPTION:
-                    keys.pop()
-                if keys:
-                    keys.pop()
-                section = section.strip()
-                if section:
-                    keys.append(section)
-                    type_ = self.TYPE_SECTION
-                else:
-                    keys = []
-                    type_ = None
-                section_node = node.get(keys[:])
-                if section_node is None:
-                    node.set(keys[:], {}, state, comments)
-                else:
-                    section_node.state = state
-                    if comments:
-                        section_node.comments += comments
-                comments = []
-                continue
+                        ConfigSyntaxError.SECTIONS_NOT_ALLOWED, file_name,
+                        line_num, 0, line)
             # Match the start of an option setting?
             match = self.re_option.match(line)
             if not match:
-                raise ConfigSyntaxError(
-                    ConfigSyntaxError.BAD_SYNTAX, file_name, line_num, 0, line)
+                if self.allow_sections:
+                    err = ConfigSyntaxError.BAD_SYNTAX
+                else:
+                    err = ConfigSyntaxError.BAD_SYNTAX_NO_SECTIONS
+                raise ConfigSyntaxError(err, file_name, line_num, 0, line)
             option, value, state = match.group("option", "value", "state")
             if type_ == self.TYPE_OPTION:
                 keys.pop()
@@ -1516,7 +1533,11 @@ class ConfigLoader(object):
         return (file_, file_name)
 
 
-class ConfigSyntaxError(Exception):
+class ConfigError(Exception):
+    """Base class for config errors."""
+
+
+class ConfigSyntaxError(ConfigError):
 
     """Exception raised for syntax error loading a configuration file.
 
@@ -1545,10 +1566,14 @@ class ConfigSyntaxError(Exception):
 
     BAD_CHAR = "BAD_CHAR"
     BAD_SYNTAX = "BAD_SYNTAX"
+    BAD_SYNTAX_NO_SECTIONS = "BAD_SYNTAX_NO_SECTIONS"
+    SECTIONS_NOT_ALLOWED = "SECTIONS_NOT_ALLOWED"
 
     MESSAGES = {
-        BAD_CHAR: """unexpected character or end of value""",
-        BAD_SYNTAX: '''expecting "[SECTION]" or "KEY=VALUE"''',
+        BAD_CHAR: 'unexpected character or end of value',
+        BAD_SYNTAX: 'expecting "[SECTION]" or "KEY=VALUE"',
+        BAD_SYNTAX_NO_SECTIONS: 'expecting "KEY=VALUE"',
+        SECTIONS_NOT_ALLOWED: 'sections not permitted in this configuration'
     }
 
     def __init__(self, code, file_name, line_num, col_num, line):
@@ -1560,12 +1585,31 @@ class ConfigSyntaxError(Exception):
         self.line = line
 
     def __str__(self):
-        return "%s(%d): %s\n%s%s^" % (
-            self.file_name,
-            self.line_num,
-            self.MESSAGES[self.code],
-            self.line,
-            " " * self.col_num)
+        msg = self.MESSAGES[self.code]
+        return (
+            f"{self.file_name}(line {self.line_num}): {msg}\n"
+            f"{self.line}{' ' * self.col_num}^")
+
+
+class ConfigDecodeError(ConfigError):
+    """Exception that should be raised when loading a configuration file that
+    is not encoded in a UTF-8 compatible charset.
+
+    Args:
+        path (str): Path to the config file
+        unicode_decode_err (UnicodeDecodeError): The original exception raised
+            when doing bytes.decode()
+    """
+
+    MESSAGE = (
+        'Configuration files must be encoded in UTF-8 (or a subset of UTF-8)')
+
+    def __init__(self, path, unicode_decode_err):
+        self.path = path
+        self.err = unicode_decode_err
+
+    def __str__(self):
+        return f"{self.MESSAGE}. {self.path}: {self.err}"
 
 
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,

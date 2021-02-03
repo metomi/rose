@@ -241,11 +241,13 @@ class ReporterContext(object):
     def write(self, message):
         """Write the message to the context's handle."""
         try:
-            return self.handle.buffer.write(message.encode("utf-8"))
+            ret_code = self.handle.buffer.write(message.encode("utf-8"))
         except TypeError:
-            return self.handle.write(message)
+            ret_code = self.handle.write(message)
         except AttributeError:
-            return self.handle.write(message.encode('UTF-8'))
+            ret_code = self.handle.write(message.encode('UTF-8'))
+        self.handle.flush()
+        return ret_code
 
     def _tty_colour_err(self, str_):
         """Colour error string for terminal."""

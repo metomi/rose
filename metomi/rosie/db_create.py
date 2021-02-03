@@ -30,7 +30,9 @@ from metomi.rose.reporter import Reporter, Event
 from metomi.rose.resource import ResourceLocator
 from metomi.rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
+from metomi.rosie.svn_hook import InfoFileError
 from metomi.rosie.svn_post_commit import RosieSvnPostCommitHook
+from metomi.rose.config import ConfigError
 
 
 class RosieDatabaseCreateEvent(Event):
@@ -53,7 +55,13 @@ class RosieDatabaseCreateSkipEvent(Event):
 
 class RosieDatabaseLoadEvent(Event):
 
-    """Event raised when a Rosie database has loaded with I of N revisions."""
+    """Event raised when a Rosie database has loaded with I of N revisions.
+
+    Args:
+        repos_path (str)
+        revision (int) - Ith revision
+        youngest (int) - Nth revision
+    """
 
     LEVEL = Event.V
 
@@ -63,12 +71,17 @@ class RosieDatabaseLoadEvent(Event):
 
 class RosieDatabaseLoadSkipEvent(Event):
 
-    """Event raised when a Rosie database load is skipped."""
+    """Event raised when a Rosie database load is skipped.
+
+    Args:
+        repos_path (str)
+        message (str)
+    """
 
     KIND = Event.KIND_ERR
 
     def __str__(self):
-        return "%s: DB not loaded." % (self.args[0])
+        return "%s: DB not loaded: %s" % self.args
 
 
 class RosieDatabaseInitiator(object):
@@ -174,7 +187,8 @@ class RosieDatabaseInitiator(object):
     def load(self, repos_path):
         """Load database contents from a repository."""
         if not repos_path or not os.path.exists(repos_path):
-            self.handle_event(RosieDatabaseLoadSkipEvent(repos_path))
+            message = "Path not found"
+            self.handle_event(RosieDatabaseLoadSkipEvent(repos_path, message))
             return
         repos_path = os.path.abspath(repos_path)
         youngest = int(self.popen("svnlook", "youngest", repos_path)[0])
@@ -182,12 +196,23 @@ class RosieDatabaseInitiator(object):
         while revision <= youngest:
             if sys.stdout.isatty():
                 sys.stdout.write(
-                    "\r%s... loading revision %d of %d" %
-                    (Reporter.PREFIX_INFO, revision, youngest))
+                    f"\r{Reporter.PREFIX_INFO}... loading revision {revision} "
+                    f"of {youngest}")
                 sys.stdout.flush()
-            self.post_commit_hook.run(
-                repos_path, str(revision), no_notification=True)
-            event = RosieDatabaseLoadEvent(repos_path, revision, youngest)
+            try:
+                self.post_commit_hook.run(
+                    repos_path, str(revision), no_notification=True)
+            except (ConfigError, InfoFileError, al.exc.DatabaseError) as err:
+                if sys.stdout.isatty():
+                    sys.stdout.write("\r")
+                    sys.stdout.flush()
+                err_msg = f"Exception occurred: {type(err).__name__} - {err}"
+                message = (
+                    f"Could not load revision {revision} of {youngest} as "
+                    f"the post-commit hook failed:\n{err_msg}\n")
+                event = RosieDatabaseLoadSkipEvent(repos_path, message)
+            else:
+                event = RosieDatabaseLoadEvent(repos_path, revision, youngest)
             if revision == youngest:
                 # Check if any new revisions have been added.
                 youngest = self.popen("svnlook", "youngest", repos_path)[0]

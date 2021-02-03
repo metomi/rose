@@ -77,6 +77,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] SUITE MUST HAVE TRUNK: A   a/a/0/0/0/
+[FAIL] SUITE MUST HAVE INFO FILE: svnlook: E160013: Path 'a/a/0/0/0/0/rose-suite.info' does not exist
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-no-info
@@ -86,6 +87,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] SUITE MUST HAVE INFO FILE: A   a/a/0/0/0/
+[FAIL] SUITE MUST HAVE INFO FILE: svnlook: E160013: Path 'a/a/0/0/0/trunk/rose-suite.info' does not exist
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-empty-info
@@ -96,7 +98,15 @@ run_fail "$TEST_KEY" \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] SUITE MUST HAVE OWNER: A   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] SUITE MUST HAVE OWNER SPECIFIED IN INFO FILE
+[FAIL] BAD VALUE IN FILE: A   a/a/0/0/0/trunk/rose-suite.info:
+[FAIL] a/a/0/0/0/trunk/rose-suite.info: issues: 3
+[FAIL]     =owner=None
+[FAIL]         Variable set as compulsory, but not in configuration.
+[FAIL]     =project=None
+[FAIL]         Variable set as compulsory, but not in configuration.
+[FAIL]     =title=None
+[FAIL]         Variable set as compulsory, but not in configuration.
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-empty-owner
@@ -109,7 +119,15 @@ run_fail "$TEST_KEY" \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] SUITE MUST HAVE OWNER: A   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] SUITE MUST HAVE OWNER SPECIFIED IN INFO FILE
+[FAIL] BAD VALUE IN FILE: A   a/a/0/0/0/trunk/rose-suite.info:
+[FAIL] a/a/0/0/0/trunk/rose-suite.info: issues: 3
+[FAIL]     =project=None
+[FAIL]         Variable set as compulsory, but not in configuration.
+[FAIL]     =title=None
+[FAIL]         Variable set as compulsory, but not in configuration.
+[FAIL]     =owner=
+[FAIL]         Value  does not contain the pattern: ^.+(?# Must not be empty)
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-good-1
@@ -201,7 +219,7 @@ run_fail "$TEST_KEY" svn ci -q -m't' --username=daisy work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] SUITE MUST HAVE OWNER: U   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] SUITE MUST HAVE OWNER SPECIFIED IN INFO FILE
 __ERR__
 svn revert -q -R work/aa000
 #-------------------------------------------------------------------------------

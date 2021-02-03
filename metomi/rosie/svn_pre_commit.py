@@ -25,65 +25,26 @@ Ensure that commits conform to the rules of Rosie.
 
 
 from fnmatch import fnmatch
-import os
 import re
 import metomi.rose
-from metomi.rose.config import ConfigLoader
+from metomi.rose.config import ConfigSyntaxError
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.macro import (add_meta_paths,
                                get_reports_as_text,
                                load_meta_config)
 from metomi.rose.macros import DefaultValidators
-from metomi.rose.popen import RosePopener
+from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
+from metomi.rosie.svn_hook import (
+    RosieSvnHook, BadChange, InfoFileError, BadChanges)
 import shlex
 import sys
-import tempfile
 import traceback
 
 
-class BadChange(Exception):
-
-    """An error representing a bad change in a commit transaction."""
-
-    FMT_HEAD = "%s: %-4s%s"
-    FMT_TAIL_1 = ": %s"
-    FMT_TAIL_M = ":\n%s"
-    NO_INFO = "SUITE MUST HAVE INFO FILE"
-    NO_OWNER = "SUITE MUST HAVE OWNER"
-    NO_TRUNK = "SUITE MUST HAVE TRUNK"
-    PERM = "PERMISSION DENIED"
-    USER = "NO SUCH USER"
-    VALUE = "BAD VALUE IN FILE"
-
-    def __init__(self, status, path, reason=PERM, content=""):
-        Exception.__init__(self, status, path, reason, content)
-        self.status = status
-        self.path = path
-        self.reason = reason
-        self.content = content
-
-    def __str__(self):
-        tail = ""
-        if self.content and "\n" in self.content:
-            tail = self.FMT_TAIL_M % self.content
-        elif self.content:
-            tail = self.FMT_TAIL_1 % self.content
-        return self.FMT_HEAD % (self.reason, self.status, self.path) + tail
-
-
-class BadChanges(Exception):
-
-    """An error representing bad changes in a commit transaction."""
-
-    def __str__(self):
-        bad_changes = self.args[0]
-        return "\n".join([str(bad_change) for bad_change in bad_changes])
-
-
-class RosieSvnPreCommitHook(object):
+class RosieSvnPreCommitHook(RosieSvnHook):
 
     """A pre-commit hook on a Rosie Subversion repository.
 
@@ -93,25 +54,12 @@ class RosieSvnPreCommitHook(object):
 
     IGNORES = "svnperms.conf"
     RE_ID_NAMES = [r"[Ra-z]", r"[Oa-z]", r"[S\d]", r"[I\d]", r"[E\d]"]
-    LEN_ID = len(RE_ID_NAMES)
-    ST_ADD = "A"
-    ST_DELETE = "D"
-    ST_UPDATE = "U"
-    TRUNK_INFO_FILE = "trunk/rose-suite.info"
     TRUNK_KNOWN_KEYS_FILE = "trunk/rosie-keys"
 
     def __init__(self, event_handler=None, popen=None):
-        if event_handler is None:
-            event_handler = Reporter()
-        self.event_handler = event_handler
-        if popen is None:
-            popen = RosePopener(self.event_handler)
-        self.popen = popen
-        path = os.path.dirname(
-            os.path.dirname(sys.modules["metomi.rosie"].__file__)
-        )
+        super(RosieSvnPreCommitHook, self).__init__(event_handler, popen)
         self.usertools_manager = SchemeHandlersManager(
-            [path], "rosie.usertools", ["verify_users"])
+            [self.path], "rosie.usertools", ["verify_users"])
 
     def _get_access_info(self, info_node):
         """Return (owner, access_list) from "info_node"."""
@@ -119,29 +67,6 @@ class RosieSvnPreCommitHook(object):
         access_list = info_node.get_value(["access-list"], "").split()
         access_list.sort()
         return owner, access_list
-
-    def _get_info(self, repos, path_head, txn=None):
-        """Return a ConfigNode for the "rose-suite.info" of a suite.
-
-        The suite is located under path_head.
-
-        """
-        opt_txn = []
-        if txn is not None:
-            opt_txn = ["-t", txn]
-        t_handle = tempfile.TemporaryFile()
-        path = path_head + self.TRUNK_INFO_FILE
-        t_handle.write(self._svnlook("cat", repos, path, *opt_txn).encode())
-        t_handle.seek(0)
-        info_node = ConfigLoader()(t_handle)
-        t_handle.close()
-        return info_node
-
-    def _svnlook(self, *args):
-        """Return the standard output from "svnlook"."""
-        command = ["svnlook"] + list(args)
-        data = self.popen(*command, stderr=sys.stderr)[0]
-        return data.decode()
 
     def _verify_users(self, status, path, txn_owner, txn_access_list,
                       bad_changes):
@@ -186,7 +111,7 @@ class RosieSvnPreCommitHook(object):
         bad_changes = []
         author = None
         super_users = None
-        rev_info_map = {}  # {path-id: (owner, access-list), ...}
+        rev_info_map = {}
         txn_info_map = {}
 
         conf = ResourceLocator.default().get_conf()
@@ -212,39 +137,64 @@ class RosieSvnPreCommitHook(object):
                 bad_changes.append(BadChange(status, path))
                 continue
 
-            # Can only add directories at levels above the suites
+            # At levels above the suites, can only add directories
             if len(names) < self.LEN_ID:
-                if status[0] != self.ST_ADD:
+                if status[0] != self.ST_ADDED:
                     bad_changes.append(BadChange(status, path))
                 continue
-            else:
-                is_meta_suite = "".join(names[0:self.LEN_ID]) == "ROSIE"
 
-            # A file at the branch level
+            # Cannot have a file at the branch level
             if len(names) == self.LEN_ID + 1 and tail is None:
                 bad_changes.append(BadChange(status, path))
                 continue
 
-            # No need to check non-trunk changes
-            if len(names) > self.LEN_ID and names[self.LEN_ID] != "trunk":
-                continue
-
             # New suite should have an info file
-            if status[0] == self.ST_ADD and len(names) == self.LEN_ID:
-                if (self.ST_ADD, path + "trunk/") not in changes:
+            if len(names) == self.LEN_ID and status == self.ST_ADDED:
+                if (self.ST_ADDED, path + "trunk/") not in changes:
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_TRUNK))
                     continue
                 path_trunk_info_file = path + self.TRUNK_INFO_FILE
-                if ((self.ST_ADD, path_trunk_info_file) not in changes and
-                        (self.ST_UPDATE, path_trunk_info_file) not in changes):
+                if ((self.ST_ADDED, path_trunk_info_file) not in changes and
+                        (self.ST_UPDATED,
+                         path_trunk_info_file) not in changes):
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_INFO))
                 continue
 
-            # The rest are trunk changes in a suite
-            path_head = "/".join(names[0:self.LEN_ID]) + "/"
+            sid = "".join(names[0:self.LEN_ID])
+            branch = names[self.LEN_ID] if len(names) > self.LEN_ID else None
+            path_head = "/".join(sid) + "/"
             path_tail = path[len(path_head):]
+            is_meta_suite = (sid == "ROSIE")
+
+            if status != self.ST_DELETED:
+                # Check info file
+                if sid not in txn_info_map:
+                    try:
+                        txn_info_map[sid] = self._load_info(
+                            repos, sid, branch=branch, transaction=txn)
+                        err = None
+                    except ConfigSyntaxError as exc:
+                        err = InfoFileError(InfoFileError.VALUE, exc)
+                    except RosePopenError as exc:
+                        err = InfoFileError(InfoFileError.NO_INFO, exc.stderr)
+                    if err:
+                        bad_changes.append(err)
+                        txn_info_map[sid] = err
+                        continue
+
+                    # Suite must have an owner
+                    txn_owner, txn_access_list = self._get_access_info(
+                        txn_info_map[sid])
+                    if not txn_owner:
+                        bad_changes.append(
+                            InfoFileError(InfoFileError.NO_OWNER))
+                        continue
+
+            # No need to check other non-trunk changes
+            if branch and branch != "trunk":
+                continue
 
             # For meta suite, make sure keys in keys file can be parsed
             if is_meta_suite and path_tail == self.TRUNK_KNOWN_KEYS_FILE:
@@ -256,26 +206,19 @@ class RosieSvnPreCommitHook(object):
                         BadChange(status, path, BadChange.VALUE))
                     continue
 
-            # Suite trunk information file must have an owner
             # User IDs of owner and access list must be real
-            if (status not in self.ST_DELETE and
-                    path_tail == self.TRUNK_INFO_FILE):
-                if path_head not in txn_info_map:
-                    txn_info_map[path_head] = self._get_info(
-                        repos, path_head, txn)
+            if (status != self.ST_DELETED and
+                    path_tail == self.TRUNK_INFO_FILE and
+                    not isinstance(txn_info_map[sid], InfoFileError)):
                 txn_owner, txn_access_list = self._get_access_info(
-                    txn_info_map[path_head])
-                if not txn_owner:
-                    bad_changes.append(
-                        BadChange(status, path, BadChange.NO_OWNER))
-                    continue
+                    txn_info_map[sid])
                 if self._verify_users(
                         status, path, txn_owner, txn_access_list, bad_changes):
                     continue
                 reports = DefaultValidators().validate(
-                    txn_info_map[path_head],
+                    txn_info_map[sid],
                     load_meta_config(
-                        txn_info_map[path_head],
+                        txn_info_map[sid],
                         config_type=metomi.rose.INFO_CONFIG_NAME))
                 if reports:
                     reports_str = get_reports_as_text({None: reports}, path)
@@ -284,21 +227,22 @@ class RosieSvnPreCommitHook(object):
                     continue
 
             # Can only remove trunk information file with suite
-            if status == self.ST_DELETE and path_tail == self.TRUNK_INFO_FILE:
-                if (self.ST_DELETE, path_head) not in changes:
+            if status == self.ST_DELETED and path_tail == self.TRUNK_INFO_FILE:
+                if (self.ST_DELETED, path_head) not in changes:
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_INFO))
                 continue
 
             # Can only remove trunk with suite
-            if status == self.ST_DELETE and path_tail == "trunk/":
-                if (self.ST_DELETE, path_head) not in changes:
+            # (Don't allow replacing trunk with a copy from elsewhere, either)
+            if status == self.ST_DELETED and path_tail == "trunk/":
+                if (self.ST_DELETED, path_head) not in changes:
                     bad_changes.append(
                         BadChange(status, path, BadChange.NO_TRUNK))
                 continue
 
             # New suite trunk: ignore the rest
-            if (self.ST_ADD, path_head + "trunk/") in changes:
+            if (self.ST_ADDED, path_head + "trunk/") in changes:
                 continue
 
             # See whether author has permission to make changes
@@ -311,10 +255,10 @@ class RosieSvnPreCommitHook(object):
                     if value is not None:
                         super_users = shlex.split(value)
                         break
-            if path_head not in rev_info_map:
-                rev_info_map[path_head] = self._get_info(
-                    repos, path_head)
-            owner, access_list = self._get_access_info(rev_info_map[path_head])
+            if sid not in rev_info_map:
+                rev_info_map[sid] = self._load_info(
+                    repos, sid, branch=branch)
+            owner, access_list = self._get_access_info(rev_info_map[sid])
             admin_users = super_users + [owner]
 
             # Only admin users can remove the suite
@@ -329,16 +273,6 @@ class RosieSvnPreCommitHook(object):
                     continue
             else:
                 bad_changes.append(BadChange(status, path))
-                continue
-
-            # The owner must not be deleted
-            if path_head not in txn_info_map:
-                txn_info_map[path_head] = self._get_info(
-                    repos, path_head, txn)
-            txn_owner, txn_access_list = self._get_access_info(
-                txn_info_map[path_head])
-            if not txn_owner:
-                bad_changes.append(BadChange(status, path, BadChange.NO_OWNER))
                 continue
 
             # Only the admin users can change owner and access list
