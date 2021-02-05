@@ -61,7 +61,7 @@ class RsyncLocHandler(object):
         # Attempt to obtain the checksum(s) via "ssh"
         host, path = loc.name.split(":", 1)
         cmd = self.manager.popen.get_cmd(
-            "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
+            "ssh", host, "python2", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
         temp_file = TemporaryFile()
         temp_file.write(br"""
 import os
@@ -87,10 +87,10 @@ if os.path.isdir(path):
 elif os.path.isfile(path):
     print(str_blob)
     stat = os.stat(path)
-    print(oct(stat.st_mode), stat.st_mtime, stat.st_size, path)
+    print oct(stat.st_mode), stat.st_mtime, stat.st_size, path
 """)
         temp_file.seek(0)
-        out = self.manager.popen(*cmd, stdin=temp_file)[0]
+        out = self.manager.popen(*cmd, stdin=temp_file)[0].decode()
         lines = out.splitlines()
         if not lines or lines[0] not in [loc.TYPE_BLOB, loc.TYPE_TREE]:
             raise ValueError(loc.name)
