@@ -64,7 +64,7 @@ class RsyncLocHandler(object):
             "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
         temp_file = TemporaryFile()
         temp_file.write(
-            (Path(__file__).parent / 'rsync_remote_check').read_bytes()
+            (Path(__file__).parent / 'rsync_remote_check.py').read_bytes()
         )
         temp_file.seek(0)
         out = self.manager.popen(*cmd, stdin=temp_file)[0].decode()

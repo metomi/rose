@@ -29,6 +29,13 @@ import sys
 
 
 def main():
+    """Check file exists and print some info:
+
+    1. Octal protection bits.
+    2. Last modified time.
+    3. Filesize.
+    4. Path, which has been checked.
+    """
     path, str_blob, str_tree = sys.argv[1:]
     if os.path.isdir(path):
         print(str_tree)
@@ -51,6 +58,7 @@ def main():
         print(str_blob)
         stat = os.stat(path)
         print(oct(stat.st_mode), stat.st_mtime, stat.st_size, path)
+
 
 if __name__ == '__main__':
     main()
