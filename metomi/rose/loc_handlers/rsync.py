@@ -61,7 +61,7 @@ class RsyncLocHandler(object):
         # Attempt to obtain the checksum(s) via "ssh"
         host, path = loc.name.split(":", 1)
         cmd = self.manager.popen.get_cmd(
-            "ssh", host, "python2", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
+            "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
         temp_file = TemporaryFile()
         temp_file.write(
             (Path(__file__).parent / 'rsync_remote_check').read_bytes()
@@ -77,7 +77,7 @@ class RsyncLocHandler(object):
             access_mode, mtime, size, name = line.split(None, 3)
             fake_sum = "source=%s:mtime=%s:size=%s" % (
                 name, mtime, size)
-            loc.add_path(loc.BLOB, fake_sum, int(access_mode))
+            loc.add_path(loc.BLOB, fake_sum, int(access_mode, base=8))
         else:  # if loc.loc_type == loc.TYPE_TREE:
             for line in lines:
                 access_mode, mtime, size, name = line.split(None, 3)
