@@ -50,6 +50,7 @@ def test_check_folder(
     dirpath = tmp_path / 'stuff'
     dirpath.mkdir()
     (dirpath / 'more.stuff').write_text('Hi')
+    (dirpath / 'more.stuff').chmod(int('0o100633', base=8))
     (dirpath / 'even.more.stuff').write_text('Hi')
     dirpath.chmod(int(folder_permission_level, base=8))
     monkeypatch.setattr(
@@ -60,5 +61,5 @@ def test_check_folder(
     assert captured.out.splitlines()[0] == 'tree'
     mode, _, size, path = literal_eval(captured.out.splitlines()[1])
     assert path == str((dirpath/'more.stuff'))
-    assert mode == '0o100644'
+    assert mode == '0o100633'
     assert size == 2
