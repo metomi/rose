@@ -27,7 +27,7 @@ from metomi.rose.loc_handlers.rsync_remote_check import main
 
 def test_check_file(monkeypatch, capsys, tmp_path):
     content = 'blah'
-    permission_level = '0o100777'
+    permission_level = '0o100644'
     filepath = tmp_path / 'stuff'
     filepath.write_text(content)
     filepath.chmod(int(permission_level, base=8))
@@ -46,7 +46,7 @@ def test_check_file(monkeypatch, capsys, tmp_path):
 def test_check_folder(
     monkeypatch, capsys, tmp_path
 ):
-    folder_permission_level = '0o100777'
+    folder_permission_level = '0o100700'
     dirpath = tmp_path / 'stuff'
     dirpath.mkdir()
     (dirpath / 'more.stuff').write_text('Hi')

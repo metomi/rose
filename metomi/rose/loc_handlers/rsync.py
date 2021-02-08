@@ -22,7 +22,11 @@
 from pathlib import Path
 from tempfile import TemporaryFile
 from time import sleep, time
+
 from metomi.rose.popen import RosePopenError
+from metomi.rose.loc_handlers.rsync_remote_check import (
+    __file__ as rsync_remote_check_file
+)
 
 class RsyncLocHandler(object):
     """Handler of locations on remote hosts."""
@@ -63,9 +67,7 @@ class RsyncLocHandler(object):
         cmd = self.manager.popen.get_cmd(
             "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
         temp_file = TemporaryFile()
-        temp_file.write(
-            (Path(__file__).parent / 'rsync_remote_check.py').read_bytes()
-        )
+        temp_file.write(Path(rsync_remote_check_file).read_bytes())
         temp_file.seek(0)
         out = self.manager.popen(*cmd, stdin=temp_file)[0].decode()
         lines = out.splitlines()
