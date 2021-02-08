@@ -21,7 +21,7 @@
 A script for running over ssh to establish whether a file
 is available for installation.
 
-This is a Python file but we read it and pass it to stdout
+This is a Python file but we read it and pass it to stdin
 to avoid reliance on remote platforms having rose installed.
 """
 import os
