@@ -60,6 +60,6 @@ def test_check_folder(
     captured = capsys.readouterr()
     assert captured.out.splitlines()[0] == 'tree'
     mode, _, size, path = literal_eval(captured.out.splitlines()[1])
-    assert path == str((dirpath/'more.stuff'))
+    assert path == str(dirpath / 'more.stuff')
     assert mode == '0o100633'
     assert size == 2
