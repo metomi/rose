@@ -253,16 +253,22 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 # See if any sources have changed names.
                 if not target.is_out_of_date:
                     conn = loc_dao.get_conn()
-                    prev_dep_locs = conn.execute(
-                        "SELECT * FROM dep_names WHERE name=?", [target.name]
-                    ).fetchall()
-                    prev_dep_locs = [i[1] for i in prev_dep_locs]
-                    prev_dep_locs = [loc_dao.select(i) for i in prev_dep_locs]
-                    if (
-                        [i.name for i in prev_dep_locs] !=
-                        [i.name for i in target.dep_locs]
-                    ):
-                        target.is_out_of_date = True
+                    try:
+                        prev_dep_locs = conn.execute(
+                            "SELECT * FROM dep_names WHERE name=?",
+                            [target.name]
+                        ).fetchall()
+                        prev_dep_locs = [i[1] for i in prev_dep_locs]
+                        prev_dep_locs = [
+                            loc_dao.select(i) for i in prev_dep_locs
+                        ]
+                        if (
+                            [i.name for i in prev_dep_locs] !=
+                            [i.name for i in target.dep_locs]
+                        ):
+                            target.is_out_of_date = True
+                    finally:
+                        conn.close()
                 # See if any sources out of date
                 if not target.is_out_of_date:
                     for dep_loc in target.dep_locs:
