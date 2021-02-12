@@ -28,6 +28,7 @@ from metomi.rose.loc_handlers.rsync_remote_check import (
     __file__ as rsync_remote_check_file
 )
 
+
 class RsyncLocHandler(object):
     """Handler of locations on remote hosts."""
 
