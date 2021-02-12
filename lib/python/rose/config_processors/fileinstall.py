@@ -263,8 +263,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                             loc_dao.select(i) for i in prev_dep_locs
                         ]
                         if (
-                            [i.name for i in prev_dep_locs] !=
-                            [i.name for i in target.dep_locs]
+                            sorted([i.name for i in prev_dep_locs]) !=
+                            sorted([i.name for i in target.dep_locs])
                         ):
                             target.is_out_of_date = True
                     finally:
