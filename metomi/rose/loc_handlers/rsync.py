@@ -19,9 +19,14 @@
 # -----------------------------------------------------------------------------
 """A handler of locations on remote hosts."""
 
+from pathlib import Path
 from tempfile import TemporaryFile
 from time import sleep, time
+
 from metomi.rose.popen import RosePopenError
+from metomi.rose.loc_handlers.rsync_remote_check import (
+    __file__ as rsync_remote_check_file
+)
 
 
 class RsyncLocHandler(object):
@@ -63,34 +68,9 @@ class RsyncLocHandler(object):
         cmd = self.manager.popen.get_cmd(
             "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
         temp_file = TemporaryFile()
-        temp_file.write(br"""
-import os
-import sys
-path, str_blob, str_tree = sys.argv[1:]
-if os.path.isdir(path):
-    print(str_tree)
-    os.chdir(path)
-    for dirpath, dirnames, filenames in os.walk(path):
-        good_dirnames = []
-        for dirname in dirnames:
-            if not dirname.startswith("."):
-                good_dirnames.append(dirname)
-                name = os.path.join(dirpath, dirname)
-                print("-", "-", "-", name)
-        dirnames[:] = good_dirnames
-        for filename in filenames:
-            if filename.startswith("."):
-                continue
-            name = os.path.join(dirpath, filename)
-            stat = os.stat(name)
-            print(oct(stat.st_mode), stat.st_mtime, stat.st_size, name)
-elif os.path.isfile(path):
-    print(str_blob)
-    stat = os.stat(path)
-    print(oct(stat.st_mode), stat.st_mtime, stat.st_size, path)
-""")
+        temp_file.write(Path(rsync_remote_check_file).read_bytes())
         temp_file.seek(0)
-        out = self.manager.popen(*cmd, stdin=temp_file)[0]
+        out = self.manager.popen(*cmd, stdin=temp_file)[0].decode()
         lines = out.splitlines()
         if not lines or lines[0] not in [loc.TYPE_BLOB, loc.TYPE_TREE]:
             raise ValueError(loc.name)
@@ -100,7 +80,7 @@ elif os.path.isfile(path):
             access_mode, mtime, size, name = line.split(None, 3)
             fake_sum = "source=%s:mtime=%s:size=%s" % (
                 name, mtime, size)
-            loc.add_path(loc.BLOB, fake_sum, int(access_mode))
+            loc.add_path(loc.BLOB, fake_sum, int(access_mode, base=8))
         else:  # if loc.loc_type == loc.TYPE_TREE:
             for line in lines:
                 access_mode, mtime, size, name = line.split(None, 3)

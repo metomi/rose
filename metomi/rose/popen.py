@@ -76,7 +76,7 @@ class RosePopenEvent(Event):
                 # FIXME: Is this safe?
                 pos = self.stdin.tell()
                 ret += " <<'__STDIN__'\n" +\
-                       self.stdin.read() + "\n'__STDIN__'"
+                       self.stdin.read().decode() + "\n'__STDIN__'"
                 self.stdin.seek(pos)
             except IOError:
                 pass
