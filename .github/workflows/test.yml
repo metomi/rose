@@ -33,9 +33,15 @@ jobs:
       matrix:
         os: ['ubuntu-latest']
         python-version: ['3.7']
-        include:
-          - os: 'macos-latest'
-            python-version: '3.7'
+        # TODO: re-enable macos testing
+        # currently (in the absence of a wrapper script) rose cannot be run
+        # from within cylc jobs in situations where the output of the following
+        # commands differ:
+        #   bash -c 'which python'
+        #   bash -l -c 'which python'
+        # include:
+        #   - os: 'macos-latest'
+        #     python-version: '3.7'
 
     steps:
       - name: Checkout
