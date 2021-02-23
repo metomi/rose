@@ -59,9 +59,9 @@ run_pass "${TEST_KEY_BASE}-install" \
         --no-run-name
         -S "HOST=\"${JOB_HOST}\"" \
         -S "GREET=\"${GREET}\""
-run_pass "${TEST_KEY_BASE}-run" \
+run_pass "${TEST_KEY_BASE}-play" \
     timeout 120 \
-        cylc run \
+        cylc play \
             "${FLOW}" \
             --abort-if-any-task-fails \
             --no-detach \

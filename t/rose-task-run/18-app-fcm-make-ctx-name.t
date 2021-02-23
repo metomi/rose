@@ -55,9 +55,9 @@ run_pass "${TEST_KEY_BASE}-install" \
         --flow-name="${FLOW}" \
         --no-run-name \
         -S "HOST='${JOB_HOST}'"
-run_pass "${TEST_KEY_BASE}-run" \
+run_pass "${TEST_KEY_BASE}-play" \
     timeout 120 \
-        cylc run \
+        cylc play \
             "${FLOW}" \
             --abort-if-any-task-fails \
             --host='localhost' \

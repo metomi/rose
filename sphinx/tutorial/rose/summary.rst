@@ -91,7 +91,7 @@ Suite Commands
       Processes the ``flow.cylc`` file and prints it back out.
    ``cylc validate``
       Validates the Cylc ``flow.cylc`` file to check for any obvious errors.
-   ``cylc run``
+   ``cylc play``
       Runs a suite.
    ``cylc stop``
       Stops a suite, in a way that:
@@ -109,7 +109,7 @@ Suite Commands
    * ``cylc graph``
    * ``cylc get-config``
    * ``cylc validate``
-   * ``cylc run``
+   * ``cylc play``
    * ``cylc stop``
       * ``--kill``
       * ``--now --now``

@@ -27,7 +27,7 @@ echo '    foo=bar' >rose-bad.conf
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): expecting "[SECTION]" or "KEY=VALUE"
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): expecting "[SECTION]" or "KEY=VALUE"
 [FAIL]     foo=bar
 [FAIL] ^
 __ERR__
@@ -37,7 +37,7 @@ echo 'foo' >rose-bad.conf
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): expecting "[SECTION]" or "KEY=VALUE"
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): expecting "[SECTION]" or "KEY=VALUE"
 [FAIL] foo
 [FAIL] ^
 __ERR__
@@ -50,7 +50,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(2): expecting "[SECTION]" or "KEY=VALUE"
+[FAIL] $TEST_DIR/rose-bad.conf(line 2): expecting "[SECTION]" or "KEY=VALUE"
 [FAIL]     ivy=poison
 [FAIL] ^
 __ERR__
@@ -63,7 +63,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(2): expecting "[SECTION]" or "KEY=VALUE"
+[FAIL] $TEST_DIR/rose-bad.conf(line 2): expecting "[SECTION]" or "KEY=VALUE"
 [FAIL] jasmine
 [FAIL] ^
 __ERR__
@@ -76,7 +76,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [[flower]
 [FAIL]  ^
 __ERR__
@@ -89,7 +89,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [![flower]
 [FAIL]   ^
 __ERR__
@@ -102,7 +102,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [ what [flower]
 [FAIL]        ^
 __ERR__
@@ -115,7 +115,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower]]
 [FAIL]        ^
 __ERR__
@@ -128,7 +128,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower:daisy(21]
 [FAIL]                 ^
 __ERR__
@@ -141,7 +141,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower:daisy)]
 [FAIL]              ^
 __ERR__
@@ -154,7 +154,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower:daisy{white]
 [FAIL]                    ^
 __ERR__
@@ -167,7 +167,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower:daisywhite}]
 [FAIL]                   ^
 __ERR__
@@ -180,7 +180,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower:daisy)2(]
 [FAIL]              ^
 __ERR__
@@ -193,35 +193,35 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower:daisy}white{]
 [FAIL]              ^
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-2-open-bracket"
 cat >rose-bad.conf <<'__CONF__'
-[flower:daisy((2)]
+[flower:daisy((line 2)]
 ivy=poison
 __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
-[FAIL] [flower:daisy((2)]
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
+[FAIL] [flower:daisy((line 2)]
 [FAIL]               ^
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-2-close-bracket"
 cat >rose-bad.conf <<'__CONF__'
-[flower:daisy(2))]
+[flower:daisy(line 2))]
 ivy=poison
 __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
-[FAIL] [flower:daisy(2))]
-[FAIL]                 ^
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
+[FAIL] [flower:daisy(line 2))]
+[FAIL]                      ^
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-2-open-braces"
@@ -232,7 +232,7 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower:daisy{{2}]
 [FAIL]               ^
 __ERR__
@@ -245,34 +245,34 @@ __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
 [FAIL] [flower:daisy{2}}]
 [FAIL]                 ^
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-bracket-before-brace"
 cat >rose-bad.conf <<'__CONF__'
-[flower:daisy(2){white}]
+[flower:daisy(line 2){white}]
 ivy=poison
 __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
-[FAIL] [flower:daisy(2){white}]
-[FAIL]                 ^
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
+[FAIL] [flower:daisy(line 2){white}]
+[FAIL]                      ^
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-bracket-open-before-brace-close"
 cat >rose-bad.conf <<'__CONF__'
-[flower:daisy{white(2)}]
+[flower:daisy{white(line 2)}]
 ivy=poison
 __CONF__
 run_fail "$TEST_KEY" rose config -f rose-bad.conf
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $TEST_DIR/rose-bad.conf(1): unexpected character or end of value
-[FAIL] [flower:daisy{white(2)}]
+[FAIL] $TEST_DIR/rose-bad.conf(line 1): unexpected character or end of value
+[FAIL] [flower:daisy{white(line 2)}]
 [FAIL]                    ^
 __ERR__
 #-------------------------------------------------------------------------------

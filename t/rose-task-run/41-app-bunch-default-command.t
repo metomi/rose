@@ -34,9 +34,9 @@ run_pass "$TEST_KEY" \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
         --flow-name="$FLOW" \
         --no-run-name
-TEST_KEY="${TEST_KEY_BASE}-run"
+TEST_KEY="${TEST_KEY_BASE}-play-1"
 run_pass "$TEST_KEY" \
-    cylc run \
+    cylc play \
         "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \
@@ -74,11 +74,11 @@ for TASK in buncher_default buncher_import; do
 done
 #-------------------------------------------------------------------------------
 # Run suite a second time
-# TODO: replace with cylc run --rerun / cylc clean
+# TODO: replace with cylc clean when the required functionality is implemented
 rm -rf "${FLOW_RUN_DIR}/log"
 rm -rf "${FLOW_RUN_DIR}/.service/db"
 run_pass "$TEST_KEY" \
-    cylc run "${FLOW}" \
+    cylc play "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \
         --no-detach \

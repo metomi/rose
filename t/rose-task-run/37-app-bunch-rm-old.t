@@ -34,9 +34,9 @@ run_pass "$TEST_KEY" \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
         --flow-name="$FLOW" \
         --no-run-name
-TEST_KEY="${TEST_KEY_BASE}-run"
+TEST_KEY="${TEST_KEY_BASE}-play-1"
 run_pass "$TEST_KEY" \
-    cylc run \
+    cylc play \
         "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \
@@ -70,11 +70,11 @@ for ARGVALUE in 0 1 2 3; do
 done
 #-------------------------------------------------------------------------------
 # Run suite a second time
-# TODO: replace with cylc run --re-run / cylc clean
+# TODO: replace with cylc clean when required functionality is implemented
 rm -rf "${FLOW_RUN_DIR}/log"
-rm -rf "${FLOW_RUN_DIR}/.serivce/db"
-run_pass "$TEST_KEY" \
-    cylc run \
+rm -rf "${FLOW_RUN_DIR}/.service/db"
+run_pass "$TEST_KEY-play-2" \
+    cylc play \
         "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \

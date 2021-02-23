@@ -46,9 +46,9 @@ run_pass "${TEST_KEY_BASE}-install" \
 mkdir -p "${FLOW_RUN_DIR}/share/hello-make/junk2"
 touch "${FLOW_RUN_DIR}/share/hello-make/junk1"
 
-run_pass "${TEST_KEY_BASE}-run" \
+run_pass "${TEST_KEY_BASE}-play" \
     timeout 120 \
-        cylc run \
+        cylc play \
             "${FLOW}" \
             --abort-if-any-task-fails \
             --host='localhost' \

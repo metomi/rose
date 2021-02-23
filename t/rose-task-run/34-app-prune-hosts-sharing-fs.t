@@ -44,9 +44,9 @@ run_pass "${TEST_KEY}" \
         --no-run-name \
         -S "JOB_HOST_1=\"${JOB_HOST_1}\"" \
         -S "JOB_HOST_2=\"${JOB_HOST_2}\""
-TEST_KEY="${TEST_KEY_BASE}-run"
+TEST_KEY="${TEST_KEY_BASE}-play"
 run_pass "${TEST_KEY}" \
-    cylc run \
+    cylc play \
         "${FLOW}" \
         --abort-if-any-task-fails \
         --host='localhost' \

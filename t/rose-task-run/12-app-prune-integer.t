@@ -48,9 +48,9 @@ run_pass "${TEST_KEY}" \
     cylc install \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
         "${OPTS[@]}"
-TEST_KEY="${TEST_KEY_BASE}-run"
+TEST_KEY="${TEST_KEY_BASE}-play"
 run_pass "${TEST_KEY}" \
-    cylc run \
+    cylc play \
         "${FLOW}" \
         --abort-if-any-task-fails \
         --host=localhost \

@@ -28,7 +28,7 @@ Starting Suites
    * - ::
 
          cylc validate <name>
-         cylc run <name>
+         cylc play <name>
      - ::
 
          # run the suite in the current directory:

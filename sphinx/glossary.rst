@@ -566,7 +566,7 @@ Glossary
       run. This program controls the suite and is what we refer to as
       "running".
 
-      * A :term:`Cylc suite` is started using ``cylc run``.
+      * A :term:`Cylc suite` is started using ``cylc play``.
       * A :term:`Rose suite configuration` (or :term:`Rosie Suite`) is started
         using :ref:`command-rose-suite-run`.
 
@@ -586,7 +586,7 @@ Glossary
    cold start
       A cold start is one in which the :term:`suite` :term:`starts <start>`
       from the :term:`initial cycle point`. This is the default behaviour of
-      ``cylc run``.
+      ``cylc play``.
 
       See also:
 
@@ -825,7 +825,7 @@ Glossary
 
       * Jinja2 variables to be passed into the ``flow.cylc`` file (
         :rose:conf:`rose-suite.conf[jinja2:suite.rc]`).
-      * Environment variables to be provided to ``cylc run`` (
+      * Environment variables to be provided to ``cylc play`` (
         :rose:conf:`rose-suite.conf[env]`).
       * Installation configuration (e.g.
         :rose:conf:`rose-suite.conf[file:NAME]`).

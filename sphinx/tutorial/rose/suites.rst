@@ -239,7 +239,7 @@ Start, Stop, Restart
 
    :ref:`Starting Suites`
       Suites must be run using the :ref:`command-rose-suite-run` command which
-      in turn calls the ``cylc run`` command.
+      in turn calls the ``cylc play`` command.
    :ref:`Stopping Suites`
       Suites can be stopped using the ``cylc stop <SUITE_NAME>`` command,
       as for regular Cylc suites.
@@ -257,7 +257,7 @@ Start, Stop, Restart
 .. ifslides::
 
    Starting Suites
-      ``rose suite-run`` which in turn calls ``cylc run``
+      ``rose suite-run`` which in turn calls ``cylc play``
    Stopping Suites
       ``cylc stop <SUITE_NAME>``
    Restarting Suites

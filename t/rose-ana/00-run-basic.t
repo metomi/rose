@@ -46,7 +46,7 @@ run_pass "$TEST_KEY" \
 
 TEST_KEY="${TEST_KEY_BASE}-run"
 run_fail "$TEST_KEY" \
-    cylc run \
+    cylc play \
         "${FLOW}" \
         --host=localhost \
         --no-detach \
