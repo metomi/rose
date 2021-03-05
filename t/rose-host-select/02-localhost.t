@@ -67,7 +67,7 @@ if [[ -n ${MORE_HOST} ]]; then
         "stamp-removed.log" >"${TEST_KEY_BASE}.out.${MORE_HOST}"
     file_cmp "${TEST_KEY_BASE}.out.${MORE_HOST}" \
         "${TEST_KEY_BASE}.out.${MORE_HOST}" <<__OUT__
-[INFO] YYYY-MM-DDTHHMM ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST} bash <<'__STDIN__'
+[INFO] YYYY-MM-DDTHHMM ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST} rose host-select-client <<'__STDIN__'
 __OUT__
 fi
 
