@@ -16,8 +16,6 @@
 # -----------------------------------------------------------------------------
 """A handler of locations on remote hosts."""
 
-from pathlib import Path
-from tempfile import TemporaryFile
 from time import sleep, time
 
 from metomi.rose.popen import RosePopenError
@@ -64,10 +62,8 @@ class RsyncLocHandler:
         host, path = loc.name.split(":", 1)
         cmd = self.manager.popen.get_cmd(
             "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
-        temp_file = TemporaryFile()
-        temp_file.write(Path(rsync_remote_check_file).read_bytes())
-        temp_file.seek(0)
-        out = self.manager.popen(*cmd, stdin=temp_file)[0].decode()
+        with open(rsync_remote_check_file, 'rb') as stdin:
+            out = self.manager.popen(*cmd, stdin=stdin)[0].decode()
         lines = out.splitlines()
         if not lines or lines[0] not in [loc.TYPE_BLOB, loc.TYPE_TREE]:
             raise ValueError(loc.name)
@@ -77,7 +73,7 @@ class RsyncLocHandler:
             access_mode, mtime, size, name = line.split(None, 3)
             fake_sum = "source=%s:mtime=%s:size=%s" % (
                 name, mtime, size)
-            loc.add_path(loc.BLOB, fake_sum, int(access_mode, base=8))
+            loc.add_path(loc.BLOB, fake_sum, int(access_mode))
         else:  # if loc.loc_type == loc.TYPE_TREE:
             for line in lines:
                 access_mode, mtime, size, name = line.split(None, 3)

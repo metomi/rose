@@ -17,27 +17,34 @@
 """Process "file:*" sections in node of a metomi.rose.config_tree.ConfigTree.
 """
 
+import aiofiles
 from fnmatch import fnmatch
 from glob import glob
+from io import BytesIO
 import os
+import shlex
+from shutil import rmtree
+import sqlite3
+import sys
+from tempfile import mkdtemp
+from typing import Any, Optional
+from urllib.parse import urlparse
+
 from metomi.rose.checksum import (
-    get_checksum, get_checksum_func, guess_checksum_algorithm)
-from metomi.rose.config_processor import (ConfigProcessError,
-                                          ConfigProcessorBase)
+    get_checksum,
+    get_checksum_func,
+    guess_checksum_algorithm
+)
+from metomi.rose.config_processor import (
+    ConfigProcessError,
+    ConfigProcessorBase,
+)
 from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.job_runner import JobManager, JobProxy, JobRunner
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event
 from metomi.rose.scheme_handler import SchemeHandlersManager
-import shlex
-from shutil import rmtree
-import sqlite3
-from io import BytesIO
-import sys
-from tempfile import mkdtemp
-from urllib.parse import urlparse
-import aiofiles
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
@@ -574,12 +581,21 @@ class LocTypeError(Exception):
 
 
 class LocSubPath:
-    """Represent a sub-path in a location."""
+    """Represent a sub-path in a location.
+
+    Attrs:
+        name:
+            Path name.
+        checksum:
+            Computed checksum value.
+        access_mode:
+            File type and mode bits (see os.stat_result:st_mode).
+    """
 
     def __init__(self, name, checksum=None, access_mode=None):
-        self.name = name
-        self.checksum = checksum
-        self.access_mode = access_mode
+        self.name: str = name
+        self.checksum: Any = checksum
+        self.access_mode: Optional[int] = access_mode
 
     def __lt__(self, other):
         return (

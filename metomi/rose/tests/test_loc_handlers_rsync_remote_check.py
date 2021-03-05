@@ -18,48 +18,48 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import sys
-
-from ast import literal_eval
+from pathlib import Path
 
 from metomi.rose.loc_handlers.rsync_remote_check import main
 
 
-def test_check_file(monkeypatch, capsys, tmp_path):
+def test_check_file(capsys, tmp_path):
     content = 'blah'
-    permission_level = '0o100644'
+    permission_level = 33188
     filepath = tmp_path / 'stuff'
     filepath.write_text(content)
-    filepath.chmod(int(permission_level, base=8))
-    monkeypatch.setattr(
-        sys, 'argv', ['ignored', str(filepath), 'blob', 'tree']
-    )
-    main()
+    filepath.chmod(permission_level)
+    main(str(filepath), 'blob', 'tree')
     captured = capsys.readouterr()
     assert captured.out.splitlines()[0] == 'blob'
     mode, mtime, size, path = captured.out.splitlines()[1].split()
     assert path == str(filepath)
-    assert mode == permission_level
+    assert int(mode) == permission_level
     assert size == str(filepath.stat().st_size)
 
 
-def test_check_folder(
-    monkeypatch, capsys, tmp_path
-):
-    folder_permission_level = '0o100700'
-    dirpath = tmp_path / 'stuff'
-    dirpath.mkdir()
-    (dirpath / 'more.stuff').write_text('Hi')
-    (dirpath / 'more.stuff').chmod(int('0o100633', base=8))
-    (dirpath / 'even.more.stuff').write_text('Hi')
-    dirpath.chmod(int(folder_permission_level, base=8))
-    monkeypatch.setattr(
-        sys, 'argv', ['ignored', str(dirpath), 'blob', 'tree']
-    )
-    main()
-    captured = capsys.readouterr()
-    assert captured.out.splitlines()[0] == 'tree'
-    mode, _, size, path = literal_eval(captured.out.splitlines()[2])
-    assert path == str(dirpath / 'more.stuff')
-    assert mode == '0o100633'
-    assert size == 2
+def test_check_folder(capsys, tmp_path):
+    # create a file and chmod it
+    (tmp_path / 'more.stuff').write_text('Hi')
+    (tmp_path / 'more.stuff').chmod(int('0o100633', base=8))
+
+    # create another file
+    (tmp_path / 'even.more.stuff').write_text('Hi')
+
+    # run the remote check on the dir
+    main(str(tmp_path), 'blob', 'tree')
+    lines = capsys.readouterr().out.splitlines()
+
+    # the first line should be the dir
+    assert lines[0] == 'tree'
+
+    # the following lines should be the files
+    files = {
+        # filename: [mode, mod_time, size]
+        str(Path(line.split()[-1]).relative_to(tmp_path)): line.split()[:-1]
+        for line in lines[1:]
+    }
+    assert list(sorted(files)) == ['even.more.stuff', 'more.stuff']
+    mode, _, size = files['more.stuff']
+    assert mode == '33179'
+    assert size == '2'
