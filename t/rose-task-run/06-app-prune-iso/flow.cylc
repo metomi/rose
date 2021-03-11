@@ -11,7 +11,7 @@
         [[[PT12H]]]
             graph = """
 my_task_1
-{% if HOST is defined %}
+{% if HOST != 'localhost' %}
 my_task_2
 {% endif %}
 WARM[-PT12H]:finish-all => rose_prune
@@ -25,7 +25,7 @@ WARM[-PT12H]:finish-all => rose_prune
     [[WARM]]
     [[my_task_1]]
         inherit = WARM
-{% if HOST is defined %}
+{% if HOST != 'localhost' %}
     [[my_task_2]]
         inherit = WARM
         [[[remote]]]

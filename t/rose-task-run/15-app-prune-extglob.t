@@ -31,7 +31,8 @@ run_pass "${TEST_KEY}" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
         --flow-name="${FLOW}" \
-        --no-run-name
+        --no-run-name \
+        -S "JOB_HOST='localhost'"
 TEST_KEY="${TEST_KEY_BASE}-play"
 run_pass "${TEST_KEY}" \
     cylc play \

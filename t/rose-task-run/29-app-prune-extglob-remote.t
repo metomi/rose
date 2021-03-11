@@ -20,8 +20,8 @@
 # Test "rose_prune" built-in application, with bash extglob, using not glob.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all 'TODO: #2445'
 
-JOB_HOST_OPT=
 if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
     JOB_HOST=$(rose config --default= 't' 'job-host')
     if [[ -z "${JOB_HOST}" ]]; then
@@ -31,7 +31,6 @@ if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
     if [[ -z "${JOB_HOST}" ]]; then
         skip_all '"[t]job-host" not available'
     fi
-    JOB_HOST_OPT="-S JOB_HOST=\"${JOB_HOST}\""
 fi
 
 tests 3
@@ -44,13 +43,13 @@ run_pass "${TEST_KEY}" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
         --flow-name="${FLOW}" \
+        -S "JOB_HOST='$JOB_HOST'" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-play"
 run_pass "${TEST_KEY}" \
     cylc play \
         "${FLOW}" \
         --host='localhost' \
-        ${JOB_HOST_OPT} \
         --no-detach \
         --debug
 TEST_KEY="${TEST_KEY_BASE}-prune.log"

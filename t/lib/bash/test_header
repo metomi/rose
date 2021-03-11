@@ -162,6 +162,10 @@ pass() {
 fail() {
     echo "not ok $((++TEST_NUMBER)) - $*"
     ((++FAILURES))
+    if [[ -f "${TEST_KEY}.err" ]]; then
+        # output the last 10 lines of stderr for debug
+        tail -n 10 "${TEST_KEY}.err" >&2
+    fi
 }
 
 run_pass() {

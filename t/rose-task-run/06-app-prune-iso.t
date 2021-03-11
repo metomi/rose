@@ -20,22 +20,14 @@
 # Test rose_prune built-in application, basic cycle housekeep usage.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-
-
-#-------------------------------------------------------------------------------
-# Test the suite.
+skip_all 'TODO: #2445'
 JOB_HOST=$(rose config --default= 't' 'job-host')
-if [[ -n $JOB_HOST ]]; then
-    JOB_HOST="-S JOB_HOST='$(rose host-select -q "$JOB_HOST")'"
-else
-    JOB_HOST=
+tests 9
+if [[ -z $JOB_HOST ]]; then
+    JOB_HOST=localhost
 fi
-export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
-
-#-------------------------------------------------------------------------------
-tests 9
 #-------------------------------------------------------------------------------
 get_reg
 run_pass "${TEST_KEY_BASE}-install" \
@@ -43,7 +35,7 @@ run_pass "${TEST_KEY_BASE}-install" \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
         --flow-name="$FLOW" \
         --no-run-name \
-        "$JOB_HOST"
+        -S "HOST='${JOB_HOST}'"
 run_pass "${TEST_KEY_BASE}-play" \
     cylc play \
         "$FLOW" \
@@ -59,7 +51,7 @@ sed '/^\[INFO\] \(create\|delete\|update\)/!d;
      /\.json/d;
      /[0-9a-h]\{8\}\(-[0-9a-h]\{4\}\)\{3\}-[0-9a-h]\{12\}$/d' \
     $FLOW_RUN_DIR/prune.log >edited-prune.log
-if [[ -n $JOB_HOST ]]; then
+if [[ $JOB_HOST != localhost ]]; then
     sed "s/\\\$JOB_HOST/$JOB_HOST/g" \
         $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
 else
@@ -73,13 +65,13 @@ run_pass "$TEST_KEY" \
     ls $FLOW_RUN_DIR/log/job-*.tar.gz $FLOW_RUN_DIR/{log/job,share/cycle,work}
 sed "s?\\\$SUITE_RUN_DIR?$FLOW_RUN_DIR?g" \
     $TEST_SOURCE_DIR/$TEST_KEY.out >expected-ls.out
-if [[ -z $JOB_HOST ]]; then
+if [[ $JOB_HOST != localhost ]]; then
     sed -i "/my_task_2/d" expected-ls.out
 fi
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-ls.out
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-if [[ -n $JOB_HOST ]]; then
+if [[ $JOB_HOST != localhost ]]; then
     TEST_KEY=$TEST_KEY_BASE-host-ls
     run_pass "$TEST_KEY" ssh -oBatchMode=yes $JOB_HOST \
         ls cylc-run/$FLOW/{log/job,share/cycle,work}

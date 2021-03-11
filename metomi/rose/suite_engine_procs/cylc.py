@@ -67,38 +67,18 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def get_suite_jobs_auths(self, suite_name, cycle_name_tuples=None):
         """Return remote ["[user@]host", ...] for submitted jobs."""
-        auths = []
-        stmt = "SELECT DISTINCT user_at_host FROM task_jobs"
-        stmt_where_list = []
-        stmt_args = []
-        if cycle_name_tuples:
-            for cycle, name in cycle_name_tuples:
-                stmt_fragments = []
-                if cycle is not None:
-                    stmt_fragments.append("cycle==?")
-                    stmt_args.append(cycle)
-                if name is not None:
-                    stmt_fragments.append("name==?")
-                    stmt_args.append(name)
-                stmt_where_list.append(" AND ".join(stmt_fragments))
-        if stmt_where_list:
-            stmt += " WHERE (" + ") OR (".join(stmt_where_list) + ")"
-        for row in self._db_exec(suite_name, stmt, stmt_args):
-            if row and row[0]:
-                auth = self._parse_user_host(auth=row[0])
-                if auth:
-                    auths.append(auth)
-        self._db_close(suite_name)
-        return auths
+        # TODO: reimplement for Cylc8?
+        # https://github.com/metomi/rose/issues/2445
+        return []
 
     def get_task_auth(self, suite_name, task_name):
-        """
-        Return [user@]host for a remote task in a suite.
+        """Return [user@]host for a remote task in a suite.
 
         Or None if task does not run remotely.
 
         """
         # TODO: reimplement for Cylc8?
+        # https://github.com/metomi/rose/issues/2445
         return None
 
     def get_task_props_from_env(self):

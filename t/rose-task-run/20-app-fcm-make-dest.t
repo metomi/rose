@@ -24,6 +24,7 @@
 #      host, as well as "gfortran" being installed and available there.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all 'TODO: #2445'
 
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'
@@ -56,9 +57,9 @@ run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
         --flow-name="${FLOW}" \
-        --no-run-name
-        -S "HOST=\"${JOB_HOST}\"" \
-        -S "GREET=\"${GREET}\""
+        --no-run-name \
+        -S "HOST='${JOB_HOST}'" \
+        -S "GREET='${GREET}'"
 run_pass "${TEST_KEY_BASE}-play" \
     timeout 120 \
         cylc play \
