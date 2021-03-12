@@ -262,10 +262,14 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     conn = loc_dao.get_conn()
                     try:
                         prev_dep_locs = conn.execute(
-                            "SELECT * FROM dep_names WHERE name=?", [target.name]
+                            "SELECT * FROM dep_names WHERE name=?",
+                            [target.name]
                         ).fetchall()
                         prev_dep_locs = [i[1] for i in prev_dep_locs]
-                        prev_dep_locs = [loc_dao.select(i) for i in prev_dep_locs]
+                        prev_dep_locs = [
+                            loc_dao.select(i)
+                            for i in prev_dep_locs
+                        ]
                         if (
                             [i.name for i in prev_dep_locs] !=
                             [i.name for i in target.dep_locs]
