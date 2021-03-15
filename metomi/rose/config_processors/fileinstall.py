@@ -261,7 +261,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 if not target.is_out_of_date:
                     conn = loc_dao.get_conn()
                     prev_dep_locs = conn.execute(
-                        "SELECT * FROM dep_names WHERE name=?",
+                        """
+                            SELECT *
+                            FROM dep_names
+                            WHERE name=?
+                            ORDER BY ROWID
+                        """,
                         [target.name]
                     ).fetchall()
                     prev_dep_locs = [i[1] for i in prev_dep_locs]
