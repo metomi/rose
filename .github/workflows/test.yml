@@ -11,7 +11,7 @@ on:
         description: The FCM branch to test against
         required: false
       fcm_repo:
-        description: The FCM branch to test against
+        description: The FCM repo to test against
         required: false
       cylc_ref:
         description: The Cylc branch to test against
@@ -51,7 +51,7 @@ jobs:
           path: rose
 
       - name: Configure Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -60,7 +60,7 @@ jobs:
           cylc_repo: ${{ github.event.inputs.cylc_repo || 'cylc/cylc-flow' }}
           cylc_branch: ${{ github.event.inputs.cylc_ref || 'master' }}
         run: |
-          pip install "git+https://github.com/$cylc_repo@$cylc_branch"
+          pip install "git+https://github.com/${cylc_repo}@${cylc_branch}"
 
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
@@ -195,7 +195,7 @@ jobs:
           ref: ${{ github.event.inputs.rose_ref || github.sha }}
 
       - name: Configure Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.7
 
