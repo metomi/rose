@@ -32,7 +32,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.7']
+        python-version: ['3.7', '3.8', '3.9']
         # TODO: re-enable macos testing
         # currently (in the absence of a wrapper script) rose cannot be run
         # from within cylc jobs in situations where the output of the following
