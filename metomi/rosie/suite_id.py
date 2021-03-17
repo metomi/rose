@@ -373,19 +373,20 @@ class SuiteId:
         loc = Path(location)
         sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
         try:
-            if loc.relative_to(sdrr):
-                if (loc / 'rose-suite.info').exists():
-                    # This is an installed workflow with a rose-suite.info file
-                    # (most likely a Cylc8 run directory)
-
-                    # TODO: extract version control information written by
-                    # Cylc install, see:
-                    # https://github.com/metomi/rose/issues/2432
-                    # https://github.com/cylc/cylc-flow/issues/3849
-                    raise SuiteIdLocationError(location)
+            loc.relative_to(sdrr)
         except ValueError:
             # Not an installed Cylc8 workflow run directory
             pass
+        else:
+            if (loc / 'rose-suite.info').is_file():
+                # This is an installed workflow with a rose-suite.info file
+                # (most likely a Cylc8 run directory)
+
+                # TODO: extract version control information written by
+                # Cylc install, see:
+                # https://github.com/metomi/rose/issues/2432
+                # https://github.com/cylc/cylc-flow/issues/3849
+                raise SuiteIdLocationError(location)
 
         # Cylc7 run directory
         # Use a hacky way to read the "log/rose-suite-run.version" file
