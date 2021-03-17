@@ -17,7 +17,6 @@
 """Builtin application: rose_bunch: run multiple commands in parallel.
 """
 
-from collections import Counter
 import itertools
 import os
 import shlex
@@ -582,13 +581,6 @@ def simplify_path(path):
         'a:b:c:d:e'
 
     """
-    path = path.split(':')
-    counter = Counter(path)
-    for item, count in counter.items():
-        ptr = len(path) - 1
-        while count > 1:
-            if path[ptr] == item:
-                path.pop(ptr)
-                count -= 1
-            ptr -= 1
-    return ':'.join(path)
+    return ':'.join(
+        dict.fromkeys(path.split(':')).keys()
+    )
