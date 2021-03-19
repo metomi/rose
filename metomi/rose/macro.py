@@ -765,7 +765,7 @@ def get_macro_class_methods(macro_modules):
         macro_name = macro_module.__name__
         contents = inspect.getmembers(macro_module)
         for obj_name, obj in contents:
-            if not inspect.isclass(object):
+            if not inspect.isclass(obj):
                 continue
             for att_name in ALLOWED_MACRO_CLASS_METHODS:
                 if (hasattr(obj, att_name) and
