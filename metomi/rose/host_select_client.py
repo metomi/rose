@@ -23,13 +23,17 @@ import psutil
 
 def main():
     # read metrics from stdin
+    started = False
     line = True
     metrics = ''
     while True:
         line = sys.stdin.readline().strip()
         if '**start**' in line:
+            started = True
             continue
-        if '**end**' in line:
+        elif not started:
+            continue
+        elif '**end**' in line:
             break
         metrics += f'\n{line}'
     metrics = json.loads(metrics)
