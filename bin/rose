@@ -45,7 +45,7 @@ ROSE_HOME_BIN="$(dirname "$0")"
 ROSE_VERSION="$(python3 -c "import metomi.rose; print(metomi.rose.__version__)")"
 export ROSE_NS ROSE_HOME_BIN ROSE_VERSION
 
-# NOTE: cannot use assiciative array due to bash version requirement
+# NOTE: cannot use associative array due to bash version requirement
 DEAD_ENDS=(
     rose-config-edit
     rose-edit
