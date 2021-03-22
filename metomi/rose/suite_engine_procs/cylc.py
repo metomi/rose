@@ -69,6 +69,13 @@ class CylcProcessor(SuiteEngineProcessor):
         """Return remote ["[user@]host", ...] for submitted jobs."""
         # TODO: reimplement for Cylc8?
         # https://github.com/metomi/rose/issues/2445
+        self.handle_event(
+            Exception(
+                'WARNING: Rose cannot currently inspect the platform a Cylc'
+                ' task has or will run on.\n'
+                ' https://github.com/metomi/rose/issues/2445'
+            )
+        )
         return []
 
     def get_task_auth(self, suite_name, task_name):
@@ -79,6 +86,13 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         # TODO: reimplement for Cylc8?
         # https://github.com/metomi/rose/issues/2445
+        self.handle_event(
+            Exception(
+                'WARNING: Rose cannot currently inspect the platform a Cylc'
+                ' task has or will run on.\n'
+                ' https://github.com/metomi/rose/issues/2445'
+            )
+        )
         return None
 
     def get_task_props_from_env(self):
