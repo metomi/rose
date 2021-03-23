@@ -56,14 +56,23 @@ class NoHostSelectError(Exception):
         return "No hosts selected."
 
 
-class DeadHostEvent(Event):
+class HostSelectCommandFailedEvent(Event):
 
-    """An error raised when a host is not contactable."""
+    """A remote host select command failed."""
 
     KIND = Event.KIND_ERR
 
+    def __init__(self, return_code: int, host: str):
+        self.return_code = return_code
+        self.host = host
+        Event.__init__(self)
+
     def __str__(self):
-        return self.args[0] + ": (ssh failed)"
+        if self.return_code == 255:
+            msg = 'ssh failed'
+        else:
+            msg = f'failed {self.return_code}'
+        return f'{self.host}: ({msg})'
 
 
 class HostThresholdNotMetEvent(Event):
@@ -348,7 +357,11 @@ class HostSelector:
                     proc.wait()
                     self.handle_event(TimedOutHostEvent(host_name))
                 elif proc.wait():
-                    self.handle_event(DeadHostEvent(host_name))
+                    self.handle_event(
+                        HostSelectCommandFailedEvent(
+                            proc.returncode, host_name
+                        )
+                    )
                 else:
                     return [(host_name, 1)]
             else:
@@ -399,7 +412,11 @@ class HostSelector:
                     score = None
                 elif proc.wait():
                     stdout, stderr = (f.decode() for f in proc.communicate())
-                    self.handle_event(DeadHostEvent(host_name))
+                    self.handle_event(
+                        HostSelectCommandFailedEvent(
+                            proc.returncode, host_name
+                        )
+                    )
                     host_proc_dict.pop(host_name)
                 else:
                     out = proc.communicate()[0].decode()

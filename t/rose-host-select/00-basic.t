@@ -30,7 +30,15 @@ if [[ -n $HOST_GROUPS ]]; then
 else
     N_HOST_GROUPS=1
 fi
-tests $((N_HOST_GROUPS * 2 + 4))
+tests $((N_HOST_GROUPS * 2 + 7))
+#-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-ssh-fail"
+run_fail "${TEST_KEY}" rose 'host-select' 'electric-monkey-eggs'
+file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" </dev/null
+file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__HERE__
+[WARN] electric-monkey-eggs: (ssh failed)
+[FAIL] No hosts selected.
+__HERE__
 #-------------------------------------------------------------------------------
 # Host groups that can be tested.
 if [[ -n $HOST_GROUPS ]]; then
