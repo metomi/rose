@@ -3,14 +3,15 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
-## 2019.01.4 (2021-03-19)
+## 2019.01.5 (2021-03-19)
 
-Rose release 61. This maintenance release is expected to be used with:
+Rose release 62. This maintenance release is expected to be used with:
 * [cylc-flow-7.9.2](https://github.com/cylc/cylc-flow/releases/tag/7.9.2), or
 * [cylc-flow-7.8.7](https://github.com/cylc/cylc-flow/releases/tag/7.8.7), and
 * [fcm-2019.09.0](https://github.com/metomi/fcm/releases/tag/2019.09.0).
 
 ### Noteworthy Changes
+
 [#2440](https://github.com/metomi/rose/pull/2440) Fix bug where incremental
 fileinstall did not work if a file was installed previously, overwritten, then
 returned to to the orginal source.
