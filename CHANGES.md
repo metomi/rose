@@ -3,7 +3,7 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
-## 2019.01.4 (2021-03-19)
+## 2019.01.5 (2021-03-19)
 
 Rose release 61. This maintenance release is expected to be used with:
 * [cylc-flow-7.9.2](https://github.com/cylc/cylc-flow/releases/tag/7.9.2), or
