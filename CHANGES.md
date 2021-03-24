@@ -22,6 +22,8 @@ It is able to run most existing Rose Suites and has been ported to Python3.
 
 **This is the first Python3 version of Rose**
 
+[#2446](https://github.com/metomi/rose/pull/2446): Host select: change implementation to psutil for portability.
+
 [#2288](https://github.com/metomi/rose/pull/2288):
 Rosie & Rosa: migrate to Python 3(.6-.7) & Tornado
 
