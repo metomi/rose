@@ -18,11 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # Test "rose_arch" built-in application, archive with optional sources.
-#-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-
-
-#-------------------------------------------------------------------------------
 tests 8
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
@@ -48,7 +44,7 @@ file_grep "${TEST_KEY}-archive1-01" \
     'CYLC_JOB_EXIT=SUCCEEDED' \
     "${FLOW_RUN_DIR}/log/job/1/archive1/01/job.status"
 file_grep "${TEST_KEY}-archive2-01" \
-    'CYLC_JOB_EXIT=EXIT' \
+    'CYLC_JOB_EXIT=ERR' \
     "${FLOW_RUN_DIR}/log/job/1/archive2/01/job.status"
 file_grep "${TEST_KEY}-archive2-02" \
     'CYLC_JOB_EXIT=SUCCEEDED' \

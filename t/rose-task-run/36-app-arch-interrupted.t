@@ -44,7 +44,7 @@ run_pass "${TEST_KEY_BASE}-play" \
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-job.status"
 file_grep "${TEST_KEY}-archive-01" \
-    'CYLC_JOB_EXIT=EXIT' \
+    'CYLC_JOB_EXIT=ERR' \
     "${FLOW_RUN_DIR}/log/job/1/archive/01/job.status"
 file_grep "${TEST_KEY}-archive-02" \
     'CYLC_JOB_EXIT=SUCCEEDED' \
