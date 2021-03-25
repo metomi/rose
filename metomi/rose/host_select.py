@@ -589,7 +589,7 @@ class FileSystemScorer(RandomScorer):
 
     """Score host by average file system percentage usage."""
 
-    ARG = "/"  # TODO?
+    ARG = "~"
     KEY = "fs"
 
     def get_command(self, method_arg):

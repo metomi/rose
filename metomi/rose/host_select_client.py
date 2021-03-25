@@ -16,6 +16,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 import json
+from pathlib import Path
 import sys
 
 import psutil
@@ -40,8 +41,16 @@ def main():
 
     # extract metrics using psutil
     ret = [
-        getattr(psutil, key[0])(*key[1:])
-        for key in metrics
+        getattr(psutil, key)(
+            *args
+            if key != 'disk_usage'
+            else [
+                # expand ~ in paths for disk usage queries
+                Path(arg).expanduser()
+                for arg in args
+            ]
+        )
+        for key, *args in metrics
     ]
 
     # serialise results
