@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -24,23 +24,32 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 3
+tests 5
 #-------------------------------------------------------------------------------
 # Run the suite.
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$FLOW" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-play" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 PREV_CYCLE=
 for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
     TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
     TASK=my_task_1
-    FILE=$HOME/cylc-run/$NAME/log/job/$CYCLE/$TASK/01/job.txt
+    FILE="$FLOW_RUN_DIR/log/job/$CYCLE/$TASK/01/job.txt"
     file_grep "$TEST_KEY-PATH" \
-        "PATH=$SUITE_RUN_DIR/app/$TASK/bin:$SUITE_RUN_DIR/etc/your-path" $FILE
+        "PATH=$FLOW_RUN_DIR/app/$TASK/bin:$FLOW_RUN_DIR/etc/your-path" $FILE
     PREV_CYCLE=$CYCLE
 done
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+purge
 exit 0

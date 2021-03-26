@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -44,7 +44,7 @@ __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD/conf
 ROSE_BIN_HOME=$(dirname $(command -v rose))
 cat >repos/foo/hooks/post-commit <<__POST_COMMIT__
-#!/bin/bash
+#!/usr/bin/env bash
 export ROSE_CONF_PATH=${ROSE_CONF_PATH}
 export PATH=$PATH:${ROSE_BIN_HOME}
 rosa svn-post-commit --debug "\$@" \\
@@ -73,6 +73,8 @@ file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
 file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
+# if LOGNAME is not set (e.g. GH actions) use $USER
+LOGNAME="${LOGNAME:-$USER}"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
 file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
 foo-aa000|trunk|1|ivy|hook|test post commit hook: create|$LOGNAME|A |

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -18,56 +18,61 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # Test "rose_arch" built-in application, archive with optional sources.
-#-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-
-
-#-------------------------------------------------------------------------------
-tests 6
+tests 8
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
-NAME="$(basename "${SUITE_RUN_DIR}")"
-rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host=localhost -- --no-detach --debug
+
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-play" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-job.status"
 file_grep "${TEST_KEY}-archive1-01" \
     'CYLC_JOB_EXIT=SUCCEEDED' \
-    "${SUITE_RUN_DIR}/log/job/1/archive1/01/job.status"
+    "${FLOW_RUN_DIR}/log/job/1/archive1/01/job.status"
 file_grep "${TEST_KEY}-archive2-01" \
-    'CYLC_JOB_EXIT=EXIT' \
-    "${SUITE_RUN_DIR}/log/job/1/archive2/01/job.status"
+    'CYLC_JOB_EXIT=ERR' \
+    "${FLOW_RUN_DIR}/log/job/1/archive2/01/job.status"
 file_grep "${TEST_KEY}-archive2-02" \
     'CYLC_JOB_EXIT=SUCCEEDED' \
-    "${SUITE_RUN_DIR}/log/job/1/archive2/02/job.status"
+    "${FLOW_RUN_DIR}/log/job/1/archive2/02/job.status"
 TEST_KEY="${TEST_KEY_BASE}-find"
-(cd "${SUITE_RUN_DIR}/share/backup" && find -type f) | sort >"${TEST_KEY}.out"
+(cd "${FLOW_RUN_DIR}/share/backup" && find . -type f) | sort >"${TEST_KEY}.out"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<'__FIND__'
 ./archive1.d/2014.txt
 ./archive1.d/2016.txt
 ./archive2.d/2015.txt
 __FIND__
 sed -n 's/^\[INFO\] \([+!=0] [^ ]*\) .*$/\1/p' \
-    "${SUITE_RUN_DIR}/log/job/1/archive"*"/0"*"/job.out" \
+    "${FLOW_RUN_DIR}/log/job/1/archive"*"/0"*"/job.out" \
     | sort >'job.out.sorted'
 sort >'job.out.expected' <<__LOG__
-! ${SUITE_RUN_DIR}/share/backup/archive2.d/
-+ ${SUITE_RUN_DIR}/share/backup/archive1.d/
-+ ${SUITE_RUN_DIR}/share/backup/archive2.d/
-0 ${SUITE_RUN_DIR}/share/backup/nobody.d/
+! ${FLOW_RUN_DIR}/share/backup/archive2.d/
++ ${FLOW_RUN_DIR}/share/backup/archive1.d/
++ ${FLOW_RUN_DIR}/share/backup/archive2.d/
+0 ${FLOW_RUN_DIR}/share/backup/nobody.d/
 __LOG__
 file_cmp "${TEST_KEY}-job.out.sorted" 'job.out.sorted' 'job.out.expected'
 sed -n 's/^\[FAIL\] \(! [^ ]*\) .*$/\1/p' \
-    "${SUITE_RUN_DIR}/log/job/1/archive"*"/0"*"/job.err" \
+    "${FLOW_RUN_DIR}/log/job/1/archive"*"/0"*"/job.err" \
     | sort >'job.err.sorted'
 sort >'job.err.expected' <<__LOG__
-! ${SUITE_RUN_DIR}/share/backup/archive2.d/
+! ${FLOW_RUN_DIR}/share/backup/archive2.d/
 __LOG__
 file_cmp "${TEST_KEY}-job.err.sorted" 'job.err.sorted' 'job.err.expected'
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

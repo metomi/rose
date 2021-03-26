@@ -115,7 +115,7 @@ Open ``planet.py`` in a text editor and paste in the following code:
            return self.reports
 
 This is the bare bones of a Rose macro - a bit of Python that is a
-subclass of :py:class:`rose.macro.MacroBase`. At the moment, it doesn't
+subclass of :py:class:`metomi.rose.macro.MacroBase`. At the moment, it doesn't
 do anything.
 
 We need to check the value of the option (``env=WORLD``) in our

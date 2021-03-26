@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 
 import http.client
 
-import rose.macro
+import metomi.rose.macro
 
 
-class URLChecker(rose.macro.MacroBase):
+class URLChecker(metomi.rose.macro.MacroBase):
 
     """Class to check if a URL is valid."""
 
@@ -18,8 +16,6 @@ class URLChecker(rose.macro.MacroBase):
     def validate(self, config, meta_config):
         """Validate a string containing a URL."""
         self.reports = []
-        seq = [1, 1]
-        problem_list = []
         for section in config.value.keys():
             node = config.get([section])
             if not isinstance(node.value, dict):

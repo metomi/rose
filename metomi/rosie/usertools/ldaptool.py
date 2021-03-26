@@ -27,7 +27,7 @@ import os
 from metomi.rose.resource import ResourceLocator
 
 
-class LDAPUserTool(object):
+class LDAPUserTool:
 
     """User information tool via LDAP."""
 

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -49,7 +46,7 @@ USRCOMPARISON_DIRNAME = "comparisons"
 USRCOMPARISON_EXT = ".py"
 
 
-class KGODatabase(object):
+class KGODatabase:
     """
     KGO Database object, stores comparison information for rose_ana apps.
     """
@@ -239,7 +236,7 @@ class TestsFailedException(Exception):
     __str__ = __repr__
 
 
-class Analyse(object):
+class Analyse:
 
     """A comparison engine for Rose."""
 
@@ -388,7 +385,7 @@ class Analyse(object):
 
         tasks = []
         for task in self.config.value.keys():
-            if task is "env":
+            if task == "env":
                 continue
             if task.startswith("file:"):
                 continue
@@ -497,7 +494,7 @@ class Analyse(object):
         metomi.rose.config.dump(config, filename)
 
 
-class AnalysisTask(object):
+class AnalysisTask:
 
     """Class to completely describe an analysis task.
 

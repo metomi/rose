@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# Copyright (C) British Crown (Met Office) & Contributors.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose_log
+#
+# SYNOPSIS
+#     . rose_log
+#     info 1 "Hello world"
+#     info 2 "Hello world"
+#     echo "Hello world" | out
+#     echo "Hello world" | out 1
+#     err "Hollow world"
+#     run echo "Hello world"
+#
+# DESCRIPTION
+#     Functions for reporting messages and commands. If $ROSE_LOG is defined to an
+#     existing file, messages are appended to $ROSE_LOG regardless of verbosity.
+#         err  - report a 1-line error message to STDERR. Exit with ${ROSE_RC:-1}.
+#         info - echo a 1-line info message to STDOUT if $ROSE_VERBOSITY >= $1.
+#         out  - cat STDIN to STDOUT if $ROSE_VERBOSITY >= ${1:-2}.
+#         run  - report the command line with "info 3", and run the command if
+#                $ROSE_DRY_RUN_MODE is not "true".
+#         optv - echo a string that can be used as verbosity option for
+#                commands using the same --quiet and --verbose system.
+#         warn - echo a 1-line warning message to STDERR using "out 1".
+#
+# VARIABLES
+#     ROSE_DRY_RUN_MODE
+#         (true|*false*) If true, "run" will report the command
+#         instead of running it.
+#     ROSE_LOG
+#         (-no default-) If specified, messages are appended to this file
+#         regardless of verbosity.
+#     ROSE_RC
+#         (1) If specified, "err" will exit with this return code.
+#     ROSE_VERBOSITY
+#         (1) Specify the verbosity level.
+#-------------------------------------------------------------------------------
+
+ROSE_VERBOSITY=${ROSE_VERBOSITY:-1}
+
+function err() {
+    ROSE_RC=${ROSE_RC:-1}
+    {
+        echo "[FAIL] $*"
+        echo "[FAIL] exit $ROSE_RC"
+    } | tee -a "${ROSE_LOG:-/dev/null}" >&2
+    exit "$ROSE_RC"
+}
+
+function info() {
+    local LEVEL=$1
+    shift 1
+    echo "[INFO] $*" | out "$LEVEL"
+}
+
+function optv() {
+    local OPT=
+    if [[ -o xtrace ]]; then
+        OPT=' --debug'
+    fi
+    if ((ROSE_VERBOSITY > 1)); then
+        OPT="$OPT --verbose"
+        ((V = ROSE_VERBOSITY))
+        while ((--V > 1)); do
+            OPT="$OPT --verbose"
+        done
+    elif ((ROSE_VERBOSITY <= 0)); then
+        OPT="$OPT --quiet"
+    fi
+    if [[ -n $OPT ]]; then
+        echo "$OPT"
+    fi
+}
+
+function out() {
+    local LEVEL=${1:-2}
+    tee -a "${ROSE_LOG:-/dev/null}" | {
+        if ((ROSE_VERBOSITY >= LEVEL)) || ${ROSE_DRY_RUN_MODE:-false}; then
+            cat
+        else
+            cat >/dev/null
+        fi
+    }
+}
+
+function run() {
+    info 3 "$@"
+    if ! ${ROSE_DRY_RUN_MODE:-false}; then
+        "$@"
+    fi
+}
+
+function warn() {
+    echo "[WARN] $*" | out 1 >&2
+}

@@ -1,0 +1,19 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[events]]
+        abort on timeout = True
+        timeout = PT1M
+[scheduling]
+    initial cycle point = 2020
+    final cycle point = 2020
+    [[dependencies]]
+        [[[R1]]]
+            graph = t1
+
+[runtime]
+    [[t1]]
+        env-script = eval $(rose task-env --path='opt/world/bin')
+        script = rose task-run --path='opt/earth/bin'
+        [[[job]]]
+            execution time limit = PT30S

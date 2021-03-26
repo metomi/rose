@@ -49,13 +49,14 @@ with open("README.md", "r") as fh:
 
 
 INSTALL_REQUIRES = [
-    "jinja2>=2.10.1",
     "aiofiles",
-    "tornado",
-    "sqlalchemy",
+    "jinja2>=2.10.1",
+    "ldap3",
     "metomi-isodatetime",
     "requests",
-    "ldap3",
+    "sqlalchemy",
+    "tornado",
+    'psutil>=5.6.0',
 ]
 EXTRAS_REQUIRE = {
     'docs': [
@@ -67,7 +68,13 @@ EXTRAS_REQUIRE = {
         'cylc-sphinx-extensions[all]>=1.2.0'
     ]
 }
-EXTRAS_REQUIRE['all'] = list({y for x in EXTRAS_REQUIRE.values() for y in x})
+TESTS_REQUIRE = [
+    'pytest',
+    'flake8'
+]
+EXTRAS_REQUIRE['all'] = list(set(
+    [y for x in EXTRAS_REQUIRE.values() for y in x] + TESTS_REQUIRE
+))
 
 
 setup(
@@ -77,14 +84,13 @@ setup(
     version=find_version("metomi", "rose", "__init__.py"),
 
     # Options
-    scripts=glob(join("bin", "*"))
-    + glob(join("sbin", "*"))
-    + glob(join("lib", "bash", "*")),
+    scripts=(
+        glob(join("bin", "*"))
+        + glob(join("sbin", "*"))
+    ),
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
-    package_data={
-        "metomi.rose": ["etc/.*"],
-        "metomi.rosie": ["lib/*"]
-    },
+    tests_require=TESTS_REQUIRE,
+    include_package_data=True,
     packages=find_namespace_packages(include=["metomi.*"]),
 )

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -127,7 +124,13 @@ class FCMMakeApp(BuiltinApp):
         if fast_root:
             # N.B. Name in "little endian", like cycle task ID
             prefix = ".".join([
-                task.task_name, task.task_cycle_time, task.suite_name])
+                task.task_name,
+                task.task_cycle_time,
+                # suite_name may be a hierarchical registration which
+                # isn't a safe prefix
+                task.suite_name.replace(os.sep, '_')
+            ])
+            os.makedirs(fast_root, exist_ok=True)
             dest = mkdtemp(prefix=prefix, dir=fast_root)
             # N.B. Don't use app_runner.popen.get_cmd("rsync") as we are using
             #      "rsync" for a local copy.
@@ -173,6 +176,7 @@ class FCMMakeApp(BuiltinApp):
         # Determine the name of the continuation task
         task_name_cont = task.task_name.replace(
             orig_cont_map[ORIG], orig_cont_map[CONT])
+        # TODO: get_task_auth currently does nothing
         auth = app_runner.suite_engine_proc.get_task_auth(
             task.suite_name, task_name_cont)
         if auth is not None:

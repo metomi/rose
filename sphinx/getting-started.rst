@@ -56,37 +56,20 @@ Editor Syntax Highlighting
 --------------------------
 
 There are ``gedit``, ``kate``, ``vim``, and ``emacs`` plugins for syntax
-highlighting of Rose configuration files, located within the Rose installation:
+highlighting of Rose configuration files, located within the Rose installation.
 
-* ``etc/rose-conf.lang``
-* ``etc/rose-conf.xml``
-* ``etc/rose-conf.vim``
-* ``etc/rose-conf-mode.el``
+Run the following command to see the available syntax files and their
+locations::
 
-The plugins contain setup instructions within.
+   $ rose resource syntax
+
+Each file contains setup instructions within.
 
 .. _Pygments: https://pygments.org
+.. _Rose Lang: https://github.com/metomi/rose/blob/master/sphinx/ext/rose_lang.py
 
-Additionally there is a `Pygments`_ lexer located in
-``sphinx/ext/rose_lang.py``.
-
-.. hint::
-
-   You can locate your Rose installation using::
-
-      rose version --long
-
-
-Bash Auto-Completion
---------------------
-
-There is a Rose bash completion script that you can source to enhance the
-Rose command line interface within an interactive Bash shell.
-
-The script allows you to tab-complete Rose commands, options, and arguments.
-
-You can find the script in the Rose installation ``etc/rose-bash-completion``.
-The file contains the instructions for using it.
+Additionally there is a `Pygments`_ lexer located
+`in the source code <https://github.com/metomi/rose/blob/master/sphinx/ext/rose_lang.py>`_
 
 
 Configuring Cylc
@@ -94,14 +77,3 @@ Configuring Cylc
 
 See the "Installation" and "User Config File" sections of the
 `Cylc User Guide`_.
-
-.. warning::
-
-   Do not modify the default values of the following cylc settings:
-   
-   * ``[hosts][HOST]run directory``
-   * ``[hosts][HOST]work directory``
-   
-   Equivalent functionalities are provided by the
-   :rose:conf:`rose.conf[rose-suite-run]root-dir` settings in the Rose
-   site/user configuration.

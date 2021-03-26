@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -21,60 +21,68 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
+skip_all 'TODO: #2445'
+
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
     JOB_HOST=$(rose host-select -q $JOB_HOST)
-    tests 15
+    tests 16
 else
-    tests 12
+    tests 13
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+get_reg
+OPTS=(
+    "--flow-name=$FLOW"
+    --no-run-name
+)
 if [[ -n ${JOB_HOST:-} ]]; then
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" \
-        -- --no-detach --debug
-else
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --host=localhost \
-        -- --no-detach --debug
+    OPTS+=(
+        -S "HOST='$JOB_HOST'"
+    )
 fi
+TEST_KEY="${TEST_KEY_BASE}-install"
+run_pass "${TEST_KEY}" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        "${OPTS[@]}"
+TEST_KEY="${TEST_KEY_BASE}-play"
+run_pass "${TEST_KEY}" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-work
-run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/work/1
-run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/work/2
-run_pass "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/work/3
+run_fail "$TEST_KEY.1" ls -d "$FLOW_RUN_DIR/work/1"
+run_fail "$TEST_KEY.2" ls -d "$FLOW_RUN_DIR/work/2"
+run_pass "$TEST_KEY.3" ls -d "$FLOW_RUN_DIR/work/3"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-share
-run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/share/cycle/1
-run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/share/cycle/2
-run_pass "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/share/cycle/3
+run_fail "$TEST_KEY.1" ls -d "$FLOW_RUN_DIR/share/cycle/1"
+run_fail "$TEST_KEY.2" ls -d "$FLOW_RUN_DIR/share/cycle/2"
+run_pass "$TEST_KEY.3" ls -d "$FLOW_RUN_DIR/share/cycle/3"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-archive
 TEST_KEY=$TEST_KEY_BASE-share
-run_fail "$TEST_KEY.1" ls -d $HOME/cylc-run/$NAME/log/job/1
-run_pass "$TEST_KEY.1-tar" ls -d $HOME/cylc-run/$NAME/log/job-1.tar.gz
-run_fail "$TEST_KEY.2" ls -d $HOME/cylc-run/$NAME/log/job/2
-run_pass "$TEST_KEY.2-tar" ls -d $HOME/cylc-run/$NAME/log/job-2.tar.gz
-run_pass "$TEST_KEY.3" ls -d $HOME/cylc-run/$NAME/log/job/3
+run_fail "$TEST_KEY.1" ls -d "$FLOW_RUN_DIR/log/job/1"
+run_pass "$TEST_KEY.1-tar" ls -d "$FLOW_RUN_DIR/log/job-1.tar.gz"
+run_fail "$TEST_KEY.2" ls -d "$FLOW_RUN_DIR/log/job/2"
+run_pass "$TEST_KEY.2-tar" ls -d "$FLOW_RUN_DIR/log/job-2.tar.gz"
+run_pass "$TEST_KEY.3" ls -d "$FLOW_RUN_DIR/log/job/3"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-remote
 if [[ -n "$JOB_HOST" ]]; then
-    run_fail "$TEST_KEY.1" ssh "$JOB_HOST" "ls -d ~/cylc-run/$NAME/log/job/1"
-    run_fail "$TEST_KEY.2" ssh "$JOB_HOST" "ls -d ~/cylc-run/$NAME/log/job/2"
-    run_pass "$TEST_KEY.3" ssh "$JOB_HOST" "ls -d ~/cylc-run/$NAME/log/job/3"
+    run_fail "$TEST_KEY.1" ssh "$JOB_HOST" "ls -d $FLOW_RUN_DIR/log/job/1"
+    run_fail "$TEST_KEY.2" ssh "$JOB_HOST" "ls -d $FLOW_RUN_DIW/log/job/2"
+    run_pass "$TEST_KEY.3" ssh "$JOB_HOST" "ls -d $FLOW_RUN_DIW/log/job/3"
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -y --name=$NAME
-#-------------------------------------------------------------------------------
+purge
 exit 0

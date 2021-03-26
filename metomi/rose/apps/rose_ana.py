@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -50,7 +47,7 @@ def timestamp():
     return time.strftime("%H:%M:%S")
 
 
-class KGODatabase(object):
+class KGODatabase:
     """
     KGO Database object, stores comparison information for metomi.rose_ana
     apps.
@@ -173,14 +170,14 @@ class AnalysisTask(object, metaclass=abc.ABCMeta):
         self.config:
             A dictionary containing any Rose Ana configuration options.
         self.reporter:
-            A reference to the :py:class:`rose.reporter.Reporter` instance used
-            by the parent app (for printing to stderr/stdout).
+            A reference to the :py:class:`metomi.rose.reporter.Reporter`
+            instance used by the parent app (for printing to stderr/stdout).
         self.kgo_db:
             A reference to the KGO database object created by the parent app
             (for adding entries to the database).
         self.popen:
-            A reference to the :py:class:`rose.popen.RosePopener` instance
-            used by the parent app (for spawning subprocesses).
+            A reference to the :py:class:`metomi.rose.popen.RosePopener`
+            instance used by the parent app (for spawning subprocesses).
 
     """
 

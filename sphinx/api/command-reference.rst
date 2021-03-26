@@ -11,6 +11,29 @@ Rose Commands
 
 ----
 
+.. _command-rose-config-edit:
+
+rose config-edit
+^^^^^^^^^^^^^^^^
+
+TODO: This is here to allow the documentation tests to pass
+
+.. _command-rose-suite-run:
+
+rose suite-run
+^^^^^^^^^^^^^^
+
+TODO: This is here to allow the documentation tests to pass
+
+.. _command-rose-suite-restart:
+
+rose suite-restart
+^^^^^^^^^^^^^^^^^^
+
+TODO: This is here to allow the documentation tests to pass
+
+----
+
 .. _command-rose-test-battery:
 
 etc/bin/rose-test-battery

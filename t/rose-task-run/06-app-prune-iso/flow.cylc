@@ -1,0 +1,38 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[events]]
+        abort on timeout = True
+        timeout = PT1M
+[scheduling]
+    initial cycle point = 20130101
+    final cycle point = 20130103
+    [[dependencies]]
+        [[[PT12H]]]
+            graph = """
+my_task_1
+{% if HOST != 'localhost' %}
+my_task_2
+{% endif %}
+WARM[-PT12H]:finish-all => rose_prune
+"""
+
+[runtime]
+    [[root]]
+        script = rose task-run
+        [[[job]]]
+            execution time limit = PT1M
+    [[WARM]]
+    [[my_task_1]]
+        inherit = WARM
+{% if HOST != 'localhost' %}
+    [[my_task_2]]
+        inherit = WARM
+        [[[remote]]]
+            host = {{HOST}}
+{% endif %}
+    [[rose_prune]]
+        inherit = WARM
+        script = """
+rose task-run --debug | tee -a $CYLC_SUITE_RUN_DIR/prune.log
+"""

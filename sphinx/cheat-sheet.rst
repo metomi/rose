@@ -28,7 +28,7 @@ Starting Suites
    * - ::
 
          cylc validate <name>
-         cylc run <name>
+         cylc play <name>
      - ::
 
          # run the suite in the current directory:
@@ -173,8 +173,8 @@ Visualise A Suite's :term:`graph`
 
    cylc graph <name>
 
-View A Suite's ``suite.rc`` Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+View A Suite's ``flow.cylc`` Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
    :class: grid-table

@@ -1,0 +1,30 @@
+#!jinja2
+
+[cylc]
+    UTC mode = True
+    [[events]]
+        abort on timeout = True
+        timeout = PT1M
+
+[scheduling]
+    initial cycle point = 20150101
+    final cycle point = 20150103
+    [[dependencies]]
+        [[[P1D]]]
+            graph = """
+                creator[-P1D] => pruner => creator
+            """
+
+[runtime]
+    [[root]]
+        execution time limit = PT1M
+    [[creator]]
+        script = rose task-run
+{% if JOB_HOST != 'localhost' %}
+        [[[remote]]]
+            host = {{JOB_HOST}}
+{% endif %}
+    [[pruner]]
+        script = """
+            rose task-run -v -v --debug | tee -a "${CYLC_SUITE_RUN_DIR}/prune.log"
+        """

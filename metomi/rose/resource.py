@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -22,29 +19,19 @@ Convenient functions for searching resource files.
 """
 
 import os
-from metomi.rose.config import ConfigLoader, ConfigNode
+from pathlib import Path
 import inspect
 import string
 import sys
 from importlib.machinery import SourceFileLoader
 
+import metomi.rose
+from metomi.rose.config import ConfigLoader, ConfigNode
+import metomi.rose.opt_parse
+from metomi.rose.reporter import Reporter
+
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
-
-
-def get_util_home(*args):
-    """Return ROSE_LIB or the dirname of the dirname of sys.argv[0].
-
-    If args are specified, they are added to the end of returned path.
-
-    """
-    try:
-        value = os.environ["ROSE_LIB"]
-    except KeyError:
-        value = os.path.abspath(__file__)
-        for _ in range(3):  # assume __file__ under $ROSE_LIB/metomi/rose/
-            value = os.path.dirname(value)
-    return os.path.join(value, *args)
 
 
 class ResourceError(Exception):
@@ -55,12 +42,30 @@ class ResourceError(Exception):
         Exception.__init__(self, "%s: resource not found." % key)
 
 
-class ResourceLocator(object):
+ROSE_CONF_PATH = 'ROSE_CONF_PATH'
+ROSE_SITE_CONF_PATH = 'ROSE_SITE_CONF_PATH'
+ROSE_INSTALL_ROOT = Path(metomi.rose.__file__).parent
 
-    """A class for searching resource files."""
 
-    SITE_CONF_PATH = get_util_home("etc")
-    USER_CONF_PATH = os.path.join(os.path.expanduser("~"), ".metomi")
+class ResourceLocator:
+    """A class for searching resource files.
+
+    Loads files in the following order:
+
+    System:
+        /etc
+    Site:
+        $ROSE_SITE_CONF_PATH
+    User:
+        ~/.metomi
+
+    If $ROSE_CONF_PATH is defined these files are skipped and configuration
+    found in $ROSE_CONF_PATH is loaded instead.
+
+    """
+
+    SYST_CONF_PATH = Path('/etc')
+    USER_CONF_PATH = Path('~/.metomi').expanduser()
     ROSE_CONF = "rose.conf"
     _DEFAULT_RESOURCE_LOCATOR = None
 
@@ -75,35 +80,53 @@ class ResourceLocator(object):
         self.namespace = namespace
         self.util = util
         if paths:
-            self.paths = list(paths)
+            self.paths = list(map(Path, paths))
         else:
-            home = self.get_util_home()
-            name = self.get_util_name("-")
-            self.paths = [os.path.join(home, "etc", name),
-                          os.path.join(home, "etc")]
+            self.paths = [
+                (ROSE_INSTALL_ROOT / 'etc') / self.get_util_name("-"),
+                ROSE_INSTALL_ROOT / 'etc'
+            ]
         self.conf = None
 
     def get_conf(self):
         """Return the site/user configuration root node."""
         if self.conf is None:
-            paths = [self.SITE_CONF_PATH, self.USER_CONF_PATH]
+            # base system conf path
+            paths = [self.SYST_CONF_PATH]
+
+            # add $ROSE_SITE_CONF_PATH if defined
+            if "ROSE_SITE_CONF_PATH" in os.environ:
+                path_str = os.environ["ROSE_SITE_CONF_PATH"].strip()
+                if path_str:
+                    paths.append(Path(path_str))
+
+            # add user conf path
+            paths.append(self.USER_CONF_PATH)
+
+            # use $ROSE_CONF_PATH (and ignore all others) if defined
             if "ROSE_CONF_PATH" in os.environ:
                 paths_str = os.getenv("ROSE_CONF_PATH").strip()
                 if paths_str:
-                    paths = paths_str.split(os.pathsep)
+                    paths = [
+                        Path(path)
+                        for path in paths_str.split(os.pathsep)
+                    ]
                 else:
                     paths = []
+
+            # load and cache config
             self.conf = ConfigNode()
             config_loader = ConfigLoader()
             for path in paths:
-                name = os.path.join(path, self.ROSE_CONF)
-                if os.path.isfile(name) and os.access(name, os.R_OK):
-                    config_loader.load_with_opts(name, self.conf)
+                conffile = path / self.ROSE_CONF
+                if conffile.is_file() and os.access(conffile, os.R_OK):
+                    config_loader.load_with_opts(str(conffile), self.conf)
+
         return self.conf
 
     def get_doc_url(self):
         """Return the URL of Rose documentation."""
-        default = "file://%s/doc/" % self.get_util_home()
+        default = f"file://{ROSE_INSTALL_ROOT}/doc/"
         return self.get_conf().get_value(["rose-doc"], default=default)
 
     def get_synopsis(self):
@@ -119,15 +142,6 @@ class ResourceLocator(object):
                     in_synopsis = True
         except IOError:
             return None
-
-    @classmethod
-    def get_util_home(cls, *args):
-        """Return ROSE_HOME or the dirname of the dirname of sys.argv[0].
-
-        If args are specified, they are added to the end of returned path.
-
-        """
-        return get_util_home(*args)
 
     def get_util_name(self, separator=" "):
         """Return the name of the Rose utility, e.g. "rose app-run".
@@ -147,40 +161,14 @@ class ResourceLocator(object):
         except KeyError:
             return os.path.basename(sys.argv[0])
 
-    def get_version(self, ignore_environment=False):
-        """return the current metomi.rose_version number.
-
-        By default pass through the value of the ``ROSE_VERSION`` environment
-        variable.
-
-        Args:
-            ignore_environment (bool): Return the value extracted from the
-                ``rose-version`` file.
-        """
-        version = None
-        if not ignore_environment:
-            version = os.getenv("ROSE_VERSION")
-        if not version:
-            for line in open(self.get_util_home("rose-version")):
-                if line.startswith("ROSE_VERSION="):
-                    value = line.replace("ROSE_VERSION=", "")
-                    version = value.strip(string.whitespace + "\";")
-                    break
-        return version
-
     def locate(self, key):
         """Return the location of the resource key."""
         key = os.path.expanduser(key)
         for path in self.paths:
-            name = os.path.join(path, key)
-            if os.path.exists(name):
+            name = path / key
+            if name.exists():
                 return name
         raise ResourceError(key)
-
-
-def resource_locate(key):
-    """Return the location of the resource key."""
-    return ResourceLocator.default().locate(key)
 
 
 def import_object(import_string, from_files, error_handler,
@@ -239,3 +227,40 @@ def import_object(import_string, from_files, error_handler,
         if obj_name == class_name and inspect.isclass(obj):
             return_object = obj
     return return_object
+
+
+def main():
+    """Launcher for the CLI."""
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser.add_my_options()
+    opts, args = opt_parser.parse_args(sys.argv[1:])
+    reporter = Reporter(opts.verbosity - opts.quietness)
+    is_top_level = False
+    if len(args) > 1:
+        reporter.report('Only one argument accepted\n', level=Reporter.FAIL)
+        sys.exit(1)
+    if len(args) == 0:
+        key = ROSE_INSTALL_ROOT / 'etc'
+        path = ResourceLocator(paths=[ROSE_INSTALL_ROOT]).locate('etc')
+        is_top_level = True
+    else:
+        key = args[0]
+        try:
+            path = ResourceLocator().locate(key)
+        except ResourceError:
+            reporter.report('Resource not found\n', level=Reporter.FAIL)
+            sys.exit(1)
+    if path.is_file():
+        print(path)
+    elif path.is_dir():
+        print(f'{key}/')
+        for item in path.iterdir():
+            if is_top_level:
+                item = item.relative_to(path)
+            else:
+                item = item.relative_to(path.parent)
+            print(f'  {item}')
+
+
+if __name__ == "__main__":
+    main()

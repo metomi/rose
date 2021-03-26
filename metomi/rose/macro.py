@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -173,7 +170,7 @@ class MetaConfigFlagMissingError(Exception):
         return ERROR_LOAD_CONF_META_NODE
 
 
-class MacroBase(object):
+class MacroBase:
 
     """Base class for macros for validating or transforming configurations.
 
@@ -341,7 +338,7 @@ class MacroBase(object):
     def add_report(self, *args, **kwargs):
         """Add a metomi.rose.macro.MacroReport.
 
-        See :class:`rose.macro.MacroReport` for details of arguments.
+        See :class:`metomi.rose.macro.MacroReport` for details of arguments.
 
         Examples:
             >>> # An example validator macro which adds a report to the setting
@@ -497,7 +494,7 @@ class MacroTransformerCollection(MacroBase):
         return config, self.reports
 
 
-class MacroReport(object):
+class MacroReport:
 
     """Class to hold information about a macro issue.
 
@@ -505,7 +502,7 @@ class MacroReport(object):
         section (str): The name of the section to attach this report to.
         option (str): The name of the option (within the section) to
             attach this report to.
-        value (obj): The value of the configuration associated with this
+        value (object): The value of the configuration associated with this
             report.
         info (str): Text information describing the nature of the report.
         is_warning (bool): If True then this report will be logged as a
@@ -554,7 +551,9 @@ def add_site_meta_paths():
         for path in path.split(os.pathsep):
             path = os.path.expanduser(os.path.expandvars(path))
             sys.path.insert(0, os.path.abspath(path))
-    sys.path.append(os.path.join(os.getenv("ROSE_LIB"), "etc/rose-meta"))
+    sys.path.append(
+        metomi.rose.resource.ResourceLocator.default().locate('rose-meta')
+    )
 
 
 def add_env_meta_paths():
@@ -648,7 +647,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         if is_upgrade:
             path = meta_key
         try:
-            meta_path = locator.locate(path)
+            meta_path = str(locator.locate(path))
         except metomi.rose.resource.ResourceError:
             continue
         else:
@@ -690,7 +689,7 @@ def load_meta_config_tree(config, directory=None, config_type=None,
     meta_config = metomi.rose.config.ConfigNode()
     for meta_key in meta_list:
         try:
-            meta_path = locator.locate(meta_key)
+            meta_path = str(locator.locate(meta_key))
         except metomi.rose.resource.ResourceError:
             if not ignore_meta_error:
                 error_handler(text=ERROR_LOAD_META_PATH.format(meta_key))
@@ -1633,7 +1632,6 @@ def main():
         sys.exit(1)
 
     # Path manipulation.
-    sys.path.append(os.getenv("ROSE_LIB"))
     add_opt_meta_paths(opts.meta_path)
 
     # Run macros for each config.

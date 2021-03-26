@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -31,41 +31,49 @@ if [[ -z "${JOB_HOST_1}" || -z "${JOB_HOST_2}" ]]; then
     skip_all '"[t]job-hosts-sharing-fs" not defined with 2 host names'
 fi
 
-tests 4
+tests 5
 
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
-NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
-TEST_KEY="${TEST_KEY_BASE}"
+get_reg
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
-    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' --debug \
-    -S "JOB_HOST_1=\"${JOB_HOST_1}\"" -S "JOB_HOST_2=\"${JOB_HOST_2}\"" \
-    -- --no-detach --debug
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name \
+        -S "JOB_HOST_1=\"${JOB_HOST_1}\"" \
+        -S "JOB_HOST_2=\"${JOB_HOST_2}\""
+TEST_KEY="${TEST_KEY_BASE}-play"
+run_pass "${TEST_KEY}" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host='localhost' \
+        --debug \
+        --no-detach
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 grep \
     "ssh .* \\(${JOB_HOST_1}\\|${JOB_HOST_2}\\) .* share/cycle/19700101T0000Z;" \
-    "${SUITE_RUN_DIR}/prune.log" >'prune-ssh.log'
+    "${FLOW_RUN_DIR}/prune.log" >'prune-ssh.log'
 run_pass "${TEST_KEY}-prune-ssh-wc-l" test "$(wc -l <'prune-ssh.log')" -eq 2
 
 if head -n 1 'prune-ssh.log' | grep ".* ${JOB_HOST_1} .*"; then
     run_pass "${TEST_KEY}-delete-1" \
         grep -q "delete: ${JOB_HOST_1}:share/cycle/19700101T0000Z" \
-        "${SUITE_RUN_DIR}/prune.log"
+        "${FLOW_RUN_DIR}/prune.log"
     run_fail "${TEST_KEY}-delete-2" \
         grep -q "delete: ${JOB_HOST_2}:share/cycle/19700101T0000Z" \
-        "${SUITE_RUN_DIR}/prune.log"
+        "${FLOW_RUN_DIR}/prune.log"
 else
     run_pass "${TEST_KEY}-delete-2" \
         grep -q "delete: ${JOB_HOST_2}:share/cycle/19700101T0000Z" \
-        "${SUITE_RUN_DIR}/prune.log"
+        "${FLOW_RUN_DIR}/prune.log"
     run_fail "${TEST_KEY}-delete-1" \
         grep -q "delete: ${JOB_HOST_1}:share/cycle/19700101T0000Z" \
-        "${SUITE_RUN_DIR}/prune.log"
+        "${FLOW_RUN_DIR}/prune.log"
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

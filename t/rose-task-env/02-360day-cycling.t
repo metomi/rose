@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -23,12 +23,20 @@
 
 export ROSE_CONF_PATH=
 
-tests 1
+tests 3
 
-RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rtb-rose-task-env-02.XXXXXX')"
-NAME="$(basename "${RUN_DIR}")"
-rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' -- --no-detach --debug
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-play" \
+    cylc play \
+        "${FLOW}" \
+        --host='localhost' \
+        --no-detach \
+        --debug
 for CYCLE in \
     '20200227T0000Z' \
     '20200228T0000Z' \
@@ -38,7 +46,7 @@ for CYCLE in \
     '20200302T0000Z'
 do
     echo "${CYCLE}:"
-    sed "s?^${RUN_DIR}??" "${RUN_DIR}/work/${CYCLE}/foo/my-datac.txt"
+    sed "s?^${FLOW_RUN_DIR}??" "${FLOW_RUN_DIR}/work/${CYCLE}/foo/my-datac.txt"
 done >'expected-my-datac.txt'
 
 file_cmp "${TEST_KEY_BASE}-my-datac" 'expected-my-datac.txt' <<'__TXT__'
@@ -68,5 +76,5 @@ file_cmp "${TEST_KEY_BASE}-my-datac" 'expected-my-datac.txt' <<'__TXT__'
 /share/cycle/20200303T0000Z
 __TXT__
 
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

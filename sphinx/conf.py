@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -37,6 +34,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
 
@@ -78,6 +76,18 @@ else:
     # no extensions or converters available, fall-back to default
     # vector graphics will be converted to bitmaps in all documents
     extensions.append('sphinx.ext.imgconverter')
+
+# mapping to other Sphinx projects
+# (allows us to reference objects from other projects)
+cylc_version = '8.0a2'
+intersphinx_mapping = {
+    'cylc': (
+        f'https://cylc.github.io/cylc-doc/{cylc_version}/html/', None
+    ),
+    'python': (
+        'https://docs.python.org/', None
+    )
+}
 
 # Slide (hieroglyph) settings.
 slide_theme = 'single-level'

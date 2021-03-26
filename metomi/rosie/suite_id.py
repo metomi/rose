@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -29,7 +26,14 @@ Functions:
 """
 
 import os
+from pathlib import Path
 import re
+import shlex
+import string
+import sys
+import traceback
+import xml.parsers.expat
+
 import metomi.rose.env
 from metomi.rose.loc_handlers.svn import SvnInfoXMLParser
 from metomi.rose.opt_parse import RoseOptionParser
@@ -37,11 +41,6 @@ from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.suite_engine_proc import SuiteEngineProcessor, NoSuiteLogError
-import shlex
-import string
-import sys
-import traceback
-import xml.parsers.expat
 
 
 class SvnCaller(RosePopener):
@@ -108,7 +107,7 @@ class SuiteIdTextError(SuiteIdError):
         return "%s: invalid suite ID" % (self.args[0])
 
 
-class SuiteId(object):
+class SuiteId:
 
     """Represent a suite ID."""
 
@@ -365,9 +364,32 @@ class SuiteId(object):
 
     def _from_location(self, location):
         """Return the ID of a location (origin URL or local copy path)."""
-        # Is location a "~/cylc-run/$SUITE/" directory?
-        # Use a hacky way to read the "log/rose-suite-run.version" file
         suite_engine_proc = SuiteEngineProcessor.get_processor()
+        suite_dir_rel_root = getattr(
+            suite_engine_proc, "SUITE_DIR_REL_ROOT", None)
+
+        # Cylc8 run directory
+        # TODO: extract version control information
+        loc = Path(location)
+        sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
+        try:
+            loc.relative_to(sdrr)
+        except ValueError:
+            # Not an installed Cylc8 workflow run directory
+            pass
+        else:
+            if (loc / 'rose-suite.info').is_file():
+                # This is an installed workflow with a rose-suite.info file
+                # (most likely a Cylc8 run directory)
+
+                # TODO: extract version control information written by
+                # Cylc install, see:
+                # https://github.com/metomi/rose/issues/2432
+                # https://github.com/cylc/cylc-flow/issues/3849
+                raise SuiteIdLocationError(location)
+
+        # Cylc7 run directory
+        # Use a hacky way to read the "log/rose-suite-run.version" file
         suite_dir_rel_root = getattr(
             suite_engine_proc, "SUITE_DIR_REL_ROOT", None)
         if suite_dir_rel_root and "/" + suite_dir_rel_root + "/" in location:
@@ -536,17 +558,12 @@ class SuiteId(object):
             revision = self.REV_HEAD
         return url + self.FORMAT_VERSION % (branch, revision)
 
-    def to_output(self):
-        """Return the output directory for this suite."""
-        suite_engine_proc = SuiteEngineProcessor.get_processor()
-        return suite_engine_proc.get_suite_log_url(None, str(self))
-
 
 def main():
     """Implement the "rose suite-id" command."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("latest", "next", "to_local_copy", "to_origin",
-                              "to_output", "to_web")
+                              "to_web")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     SuiteId.svn.event_handler = report  # FIXME: ugly?
@@ -562,10 +579,6 @@ def main():
             for arg in args:
                 report(
                     str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0)
-        elif opts.to_output:
-            for arg in args:
-                url = SuiteId(id_text=arg).to_output()
-                report(str(url) + "\n", level=0)
         elif opts.to_web:
             for arg in args:
                 report(str(SuiteId(id_text=arg).to_web()) + "\n", level=0)

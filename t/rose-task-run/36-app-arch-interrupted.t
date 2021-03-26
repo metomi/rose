@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -23,29 +23,37 @@
 
 
 #-------------------------------------------------------------------------------
-tests 3
+tests 5
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
-NAME="$(basename "${SUITE_RUN_DIR}")"
-rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host=localhost -- --no-detach --debug
+
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-play" \
+    cylc play \
+        "${FLOW}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-job.status"
 file_grep "${TEST_KEY}-archive-01" \
-    'CYLC_JOB_EXIT=EXIT' \
-    "${SUITE_RUN_DIR}/log/job/1/archive/01/job.status"
+    'CYLC_JOB_EXIT=ERR' \
+    "${FLOW_RUN_DIR}/log/job/1/archive/01/job.status"
 file_grep "${TEST_KEY}-archive-02" \
     'CYLC_JOB_EXIT=SUCCEEDED' \
-    "${SUITE_RUN_DIR}/log/job/1/archive/02/job.status"
+    "${FLOW_RUN_DIR}/log/job/1/archive/02/job.status"
 TEST_KEY="${TEST_KEY_BASE}-find"
-(cd "${SUITE_RUN_DIR}/share" && find . -type f) | sort >"${TEST_KEY}.out"
+(cd "${FLOW_RUN_DIR}/share" && find . -type f) | sort >"${TEST_KEY}.out"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<'__FIND__'
 ./new_whatever
 __FIND__
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

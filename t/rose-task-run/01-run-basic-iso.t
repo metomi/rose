@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -23,47 +23,49 @@
 
 export ROSE_CONF_PATH=
 
+tests 48
+
 #-------------------------------------------------------------------------------
 # Run the suite.
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l \
-    1>/dev/null 2>&1
-if (($? != 0)); then
-    skip_all "cylc version not compatible with ISO 8601"
-    exit 0
-fi
-#-------------------------------------------------------------------------------
-tests 46
-#-------------------------------------------------------------------------------
-rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-play" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 MY_PATH=
-for P in $(ls -d $SUITE_RUN_DIR/etc/my-path/*); do
+for P in $(ls -d $FLOW_RUN_DIR/etc/my-path/*); do
     if [[ -n $MY_PATH ]]; then
         MY_PATH="$P:$MY_PATH"
     else
         MY_PATH="$P"
     fi
 done
-if [[ -d $SUITE_RUN_DIR/etc/your-path ]]; then
+if [[ -d $FLOW_RUN_DIR/etc/your-path ]]; then
     if [[ -n $MY_PATH ]]; then
-        MY_PATH="$SUITE_RUN_DIR/etc/your-path:$MY_PATH"
+        MY_PATH="$FLOW_RUN_DIR/etc/your-path:$MY_PATH"
     else
-        MY_PATH="$SUITE_RUN_DIR/etc/your-path"
+        MY_PATH="$FLOW_RUN_DIR/etc/your-path"
     fi
 fi
 PREV_CYCLE=
 for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
     TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
     TASK=my_task_1
-    FILE=$HOME/cylc-run/$NAME/log/job/$CYCLE/$TASK/01/job.txt
+    FILE="$FLOW_RUN_DIR/log/job/$CYCLE/$TASK/01/job.txt"
     file_test "$TEST_KEY" $FILE
-    file_grep "$TEST_KEY-ROSE_SUITE_DIR" "ROSE_SUITE_DIR=$SUITE_RUN_DIR" $FILE
+    file_grep "$TEST_KEY-ROSE_SUITE_DIR" "ROSE_SUITE_DIR=$FLOW_RUN_DIR" $FILE
     file_grep "$TEST_KEY-ROSE_SUITE_DIR_REL" \
-        "ROSE_SUITE_DIR_REL=${SUITE_RUN_DIR#$HOME/}" $FILE
-    file_grep "$TEST_KEY-ROSE_SUITE_NAME" "ROSE_SUITE_NAME=$NAME" $FILE
+        "ROSE_SUITE_DIR_REL=${FLOW_RUN_DIR#$HOME/}" $FILE
+    file_grep "$TEST_KEY-ROSE_SUITE_NAME" "ROSE_SUITE_NAME=${FLOW}" $FILE
     file_grep "$TEST_KEY-ROSE_TASK_NAME" "ROSE_TASK_NAME=$TASK" $FILE
     file_grep "$TEST_KEY-ROSE_TASK_CYCLE_TIME" \
         "ROSE_TASK_CYCLE_TIME=$CYCLE" $FILE
@@ -71,14 +73,14 @@ for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
         "ROSE_TASK_LOG_DIR=${FILE%/job.txt}" $FILE
     file_grep "$TEST_KEY-ROSE_TASK_LOG_ROOT" \
         "ROSE_TASK_LOG_ROOT=${FILE%job.txt}job" $FILE
-    file_grep "$TEST_KEY-ROSE_DATA" "ROSE_DATA=$SUITE_RUN_DIR/share/data" $FILE
+    file_grep "$TEST_KEY-ROSE_DATA" "ROSE_DATA=$FLOW_RUN_DIR/share/data" $FILE
     file_grep "$TEST_KEY-ROSE_DATAC" \
-        "ROSE_DATAC=$SUITE_RUN_DIR/share/cycle/$CYCLE" $FILE
+        "ROSE_DATAC=$FLOW_RUN_DIR/share/cycle/$CYCLE" $FILE
     if [[ -n $PREV_CYCLE ]]; then
         file_grep "$TEST_KEY-ROSE_DATACPT12H" \
-            "ROSE_DATACPT12H=$SUITE_RUN_DIR/share/cycle/$PREV_CYCLE" $FILE
+            "ROSE_DATACPT12H=$FLOW_RUN_DIR/share/cycle/$PREV_CYCLE" $FILE
     fi
-    file_grep "$TEST_KEY-ROSE_ETC" "ROSE_ETC=$SUITE_RUN_DIR/etc" $FILE
+    file_grep "$TEST_KEY-ROSE_ETC" "ROSE_ETC=$FLOW_RUN_DIR/etc" $FILE
     file_grep "$TEST_KEY-ROSE_TASK_PREFIX" "ROSE_TASK_PREFIX=my" $FILE
     file_grep "$TEST_KEY-ROSE_TASK_SUFFIX" "ROSE_TASK_SUFFIX=1" $FILE
     file_grep "$TEST_KEY-MY_PATH" "MY_PATH=$MY_PATH" $FILE
@@ -89,13 +91,13 @@ NEXT_CYCLE=
 for CYCLE in 20130102T0000Z 20130101T1200Z 20130101T0000Z; do
     if [[ -n "${NEXT_CYCLE}" ]]; then
         TEST_KEY="${TEST_KEY_BASE}-file-${CYCLE}"
-        FILE="${HOME}/cylc-run/${NAME}/log/job/${CYCLE}/my_task_1/01/job.txt"
+        FILE="${HOME}/cylc-run/${FLOW}/log/job/${CYCLE}/my_task_1/01/job.txt"
         file_grep "${TEST_KEY}-ROSE_DATAC__PT12H" \
-            "ROSE_DATAC__PT12H=${SUITE_RUN_DIR}/share/cycle/${NEXT_CYCLE}" \
+            "ROSE_DATAC__PT12H=${FLOW_RUN_DIR}/share/cycle/${NEXT_CYCLE}" \
             "${FILE}"
     fi
     NEXT_CYCLE="${CYCLE}"
 done
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+purge
 exit 0

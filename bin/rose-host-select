@@ -27,9 +27,6 @@
 #     Select a host from a set of groups or names by load, by free memory
 #     or by random.
 #
-#     Use settings in `$ROSE_HOME/etc/rose.conf` and `$HOME/.metomi/rose.conf`
-#     to determine the ranking method.
-#
 #     Print the selected host name.
 #
 # OPTIONS
@@ -75,8 +72,9 @@
 #
 # CONFIGURATION
 #     The command reads its settings from the `[rose-host-select]` section in
-#     `$ROSE_HOME/etc/rose.conf` and `$HOME/.metomi/rose.conf`. All settings
-#     are optional. Type `rose config rose-host-select` to print settings.
+#     the Rose configuration. All settings are optional. Type
+#     `rose config rose-host-select` to print settings.
+#
 #     Valid settings are:
 #
 #     default = GROUP/HOST ...

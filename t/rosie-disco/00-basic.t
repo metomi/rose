@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -59,7 +59,6 @@ URL_FOO_Q="${URL_FOO}query?"
 
 TEST_KEY=$TEST_KEY_BASE-curl-root-trailing-slash
 run_pass "$TEST_KEY" curl -i "${TEST_ROSE_WS_URL}/"  # note: slash at end
-cat $TEST_KEY.out >&2
 file_grep "$TEST_KEY.out" 'HTTP/.* 200 OK' "$TEST_KEY.out"
 
 # The app has been set-up so that a trailing slash, as in the test directly

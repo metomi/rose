@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -20,27 +17,34 @@
 """Process "file:*" sections in node of a metomi.rose.config_tree.ConfigTree.
 """
 
+import aiofiles
 from fnmatch import fnmatch
 from glob import glob
+from io import BytesIO
 import os
+import shlex
+from shutil import rmtree
+import sqlite3
+import sys
+from tempfile import mkdtemp
+from typing import Any, Optional
+from urllib.parse import urlparse
+
 from metomi.rose.checksum import (
-    get_checksum, get_checksum_func, guess_checksum_algorithm)
-from metomi.rose.config_processor import (ConfigProcessError,
-                                          ConfigProcessorBase)
+    get_checksum,
+    get_checksum_func,
+    guess_checksum_algorithm
+)
+from metomi.rose.config_processor import (
+    ConfigProcessError,
+    ConfigProcessorBase,
+)
 from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.job_runner import JobManager, JobProxy, JobRunner
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event
 from metomi.rose.scheme_handler import SchemeHandlersManager
-import shlex
-from shutil import rmtree
-import sqlite3
-from io import BytesIO
-import sys
-from tempfile import mkdtemp
-from urllib.parse import urlparse
-import aiofiles
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
@@ -256,19 +260,25 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 # See if any sources have changed names.
                 if not target.is_out_of_date:
                     conn = loc_dao.get_conn()
-                    try:
-                        prev_dep_locs = conn.execute(
-                            "SELECT * FROM dep_names WHERE name=?", [target.name]
-                        ).fetchall()
-                        prev_dep_locs = [i[1] for i in prev_dep_locs]
-                        prev_dep_locs = [loc_dao.select(i) for i in prev_dep_locs]
-                        if (
-                            [i.name for i in prev_dep_locs] !=
-                            [i.name for i in target.dep_locs]
-                        ):
-                            target.is_out_of_date = True
-                    finally:
-                        conn.close()
+                    prev_dep_locs = conn.execute(
+                        """
+                            SELECT *
+                            FROM dep_names
+                            WHERE name=?
+                            ORDER BY ROWID
+                        """,
+                        [target.name]
+                    ).fetchall()
+                    prev_dep_locs = [i[1] for i in prev_dep_locs]
+                    prev_dep_locs = [
+                        loc_dao.select(i)
+                        for i in prev_dep_locs
+                    ]
+                    if (
+                        [i.name for i in prev_dep_locs] !=
+                        [i.name for i in target.dep_locs]
+                    ):
+                        target.is_out_of_date = True
                 # See if any sources out of date
                 if not target.is_out_of_date:
                     for dep_loc in target.dep_locs:
@@ -486,7 +496,7 @@ class FileUnchangedEvent(Event):
         return str(self.args[0])
 
 
-class Loc(object):
+class Loc:
 
     """Represent a location.
 
@@ -576,13 +586,22 @@ class LocTypeError(Exception):
         return "%s <= %s, expected %s, got %s" % self.args
 
 
-class LocSubPath(object):
-    """Represent a sub-path in a location."""
+class LocSubPath:
+    """Represent a sub-path in a location.
+
+    Attrs:
+        name:
+            Path name.
+        checksum:
+            Computed checksum value.
+        access_mode:
+            File type and mode bits (see os.stat_result:st_mode).
+    """
 
     def __init__(self, name, checksum=None, access_mode=None):
-        self.name = name
-        self.checksum = checksum
-        self.access_mode = access_mode
+        self.name: str = name
+        self.checksum: Any = checksum
+        self.access_mode: Optional[int] = access_mode
 
     def __lt__(self, other):
         return (
@@ -603,7 +622,7 @@ class LocSubPath(object):
         return self.name
 
 
-class LocDAO(object):
+class LocDAO:
     """DAO for information for incremental updates."""
 
     FILE_NAME = ".rose-config_processors-file.db"

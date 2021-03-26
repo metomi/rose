@@ -48,19 +48,18 @@
 # SEE ALSO
 #     * `prove(1)`
 #-------------------------------------------------------------------------------
-# shellcheck source=lib/bash/rose_init
-# shellcheck source=lib/bash/rose_log
-. rose_init
-. rose_log
-
 set -eu
-
-rose_init
+# shellcheck source=metomi/rose/etc/lib/bash/rose_log
+. "$(rose resource lib/bash/rose_log)"
 
 # Move to folder in which prove command should be run.
 TESTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd "$TESTDIR/../../"
 mkdir -p ~/.metomi
+mkdir -p "${HOME}/cylc-run"
+
+ROSE_TEST_TIME_INIT="$(date -u +'%Y%m%dT%H%M%SZ')"
+export ROSE_TEST_TIME_INIT
 
 # Recompile *.pyc files to ensure we are running the current code.
 # @TODO Consider if this is appropriate in new version

@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 
-import rose.macro
-import rose.variable
+import metomi.rose.macro
 
 
-class NullTransformer(rose.macro.MacroBase):
+class NullTransformer(metomi.rose.macro.MacroBase):
 
     """Class to report changes for missing or null settings."""
 

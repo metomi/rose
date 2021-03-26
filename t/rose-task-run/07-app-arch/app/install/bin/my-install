@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eu
 PREFIX=
 if [[ ${ROSE_TASK_CYCLE_TIME:-} ]]; then

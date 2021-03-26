@@ -1,0 +1,26 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[events]]
+        abort on timeout=True
+        timeout=PT1M
+[scheduling]
+    initial cycle point=20130101
+    final cycle point=20130103
+    [[dependencies]]
+        [[[T00, T12]]]
+            graph="""
+t1 & t2 & t3
+root[-PT12H]:finish-all => rose_prune
+"""
+
+[runtime]
+    [[root]]
+        [[[job]]]
+            execution time limit=PT1M
+    [[t1,t2,t3]]
+        script=rose task-run --app-key=hello
+    [[rose_prune]]
+        script="""
+rose task-run -v -v --debug | tee -a $CYLC_SUITE_RUN_DIR/prune.log
+"""

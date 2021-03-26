@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -19,21 +16,18 @@
 # -----------------------------------------------------------------------------
 """Suite engine processor management."""
 
+import os
+import re
+import sys
+
 from metomi.isodatetime.data import Duration
 from metomi.isodatetime.parsers import DurationParser, ISO8601SyntaxError
-from glob import glob
-import os
-import pwd
-import re
 from metomi.rose.date import RoseDateTimeOperator, OffsetValueError
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.host_select import HostSelector
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event
-from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
-import sys
-import webbrowser
 
 
 class NoSuiteLogError(Exception):
@@ -62,7 +56,7 @@ class WebBrowserEvent(Event):
         return "%s %s" % self.args
 
 
-class BaseCycleOffset(object):
+class BaseCycleOffset:
 
     """Represent a cycle time offset."""
 
@@ -163,35 +157,6 @@ class ISOCycleOffset(BaseCycleOffset):
         return self.duration
 
 
-class SuiteEngineGlobalConfCompatError(Exception):
-
-    """An exception raised on incompatible global configuration."""
-
-    def __str__(self):
-        engine, key, value = self.args
-        return ("%s global configuration incompatible to Rose: %s=%s" %
-                (engine, key, value))
-
-
-class SuiteNotRunningError(Exception):
-
-    """An exception raised when a suite is not running."""
-
-    def __str__(self):
-        return "%s: does not appear to be running" % (self.args)
-
-
-class SuiteStillRunningError(Exception):
-
-    """An exception raised when a suite is still running."""
-
-    FMT_HEAD = "Suite \"%(suite_name)s\" appears to be running:\n"
-
-    def __str__(self):
-        suite_name, extras = self.args
-        return self.FMT_HEAD % {"suite_name": suite_name} + "".join(extras)
-
-
 class CycleOffsetError(ValueError):
     """Unrecognised cycle time offset format."""
 
@@ -213,7 +178,7 @@ class CyclingModeError(ValueError):
         return self.args[0] + ": unrecognised cycling mode."
 
 
-class TaskProps(object):
+class TaskProps:
 
     """Task properties.
 
@@ -291,7 +256,7 @@ class TaskProps(object):
         return ret
 
 
-class SuiteEngineProcessor(object):
+class SuiteEngineProcessor:
     """An abstract suite engine processor."""
 
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
@@ -331,47 +296,6 @@ class SuiteEngineProcessor(object):
         self.host_selector = host_selector
         self.date_time_oper = RoseDateTimeOperator()
 
-    def check_global_conf_compat(self):
-        """Raise exception on suite engine specific incompatibity.
-
-        Should raise SuiteEngineGlobalConfCompatError.
-
-        """
-        raise NotImplementedError()
-
-    def check_suite_not_running(self, suite_name):
-        """Check that suite is not running.
-
-        This method is not implemented. Sub-class should override.
-
-        Arguments:
-            suite_name: name of suite to check.
-
-        Raise:
-            SuiteStillRunningError:
-                Should raise SuiteStillRunningError if suite is still running.
-        """
-        raise NotImplementedError()
-
-    def cmp_suite_conf(
-            self, suite_name, run_mode, strict_mode=False, debug_mode=False):
-        """Compare current suite configuration with that in the previous run.
-
-        An implementation of this method should:
-        * Raise an exception on failure.
-        * Return True if suite configuration is unmodified c.f. previous run.
-        * Return False otherwise.
-
-        """
-        raise NotImplementedError()
-
-    def get_suite_contact(self, suite_name):
-        """Return suite contact information for a user suite.
-
-        Return (dict): suite contact information.
-        """
-        raise NotImplementedError()
-
     def get_suite_dir(self, suite_name, *paths):
         """Return the path to the suite running directory.
 
@@ -389,46 +313,8 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_suite_log_url(self, user_name, suite_name):
-        """Return the "rose bush" URL for a user's suite."""
-        prefix = "~"
-        if user_name:
-            prefix += user_name
-        suite_d = os.path.join(prefix, self.get_suite_dir_rel(suite_name))
-        suite_d = os.path.expanduser(suite_d)
-        if not os.path.isdir(suite_d):
-            raise NoSuiteLogError(user_name, suite_name)
-        rose_bush_url = None
-        for f_name in glob(os.path.expanduser("~/.metomi/rose-bush*.status")):
-            status = {}
-            for line in open(f_name):
-                key, value = line.strip().split("=", 1)
-                status[key] = value
-            if status.get("host"):
-                rose_bush_url = "http://" + status["host"]
-                if status.get("port"):
-                    rose_bush_url += ":" + status["port"]
-            rose_bush_url += "/"
-            break
-        if not rose_bush_url:
-            conf = ResourceLocator.default().get_conf()
-            rose_bush_url = conf.get_value(
-                ["rose-suite-log", "rose-bush"])
-        if not rose_bush_url:
-            return "file://" + suite_d
-        if not rose_bush_url.endswith("/"):
-            rose_bush_url += "/"
-        if not user_name:
-            user_name = pwd.getpwuid(os.getuid()).pw_name
-        return rose_bush_url + "/".join(
-            ["taskjobs", user_name, suite_name])
-
     def get_task_auth(self, suite_name, task_name):
         """Return [user@]host for a remote task in a suite."""
-        raise NotImplementedError()
-
-    def get_tasks_auths(self, suite_name):
-        """Return a list of [user@]host for remote tasks in a suite."""
         raise NotImplementedError()
 
     def get_task_props(self, *args, **kwargs):
@@ -531,22 +417,10 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_version(self):
-        """Return the version string of the suite engine."""
-        raise NotImplementedError()
-
-    def get_version_env_name(self):
-        """Return the name of the suite engine version environment variable."""
-        return self.SCHEME.upper() + "_VERSION"
-
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
-
-    def is_suite_registered(self, suite_name):
-        """Return whether or not a suite is registered."""
-        raise NotImplementedError()
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
@@ -578,28 +452,8 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def launch_suite_log_browser(self, user_name, suite_name):
-        """Launch web browser to view suite log.
-
-        Return URL of suite log on success, None otherwise.
-
-        """
-        url = self.get_suite_log_url(user_name, suite_name)
-        browser = webbrowser.get()
-        browser.open(url, new=True, autoraise=True)
-        self.handle_event(WebBrowserEvent(browser.name, url))
-        return url
-
     def parse_job_log_rel_path(self, f_name):
         """Return (cycle, task, submit_num, ext) for a job log rel path."""
-        raise NotImplementedError()
-
-    def run(self, suite_name, host=None, run_mode=None, args=None):
-        """Start a suite (in a specified host)."""
-        raise NotImplementedError()
-
-    def shutdown(self, suite_name, args=None, stderr=None, stdout=None):
-        """Shut down the suite."""
         raise NotImplementedError()
 
     def _get_offset_cycle_time(self, cycle, cycle_offset):

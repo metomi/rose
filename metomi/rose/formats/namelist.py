@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -41,11 +38,11 @@ RE_FLOAT = r"(?:\.\d+)|(?:" + RE_NATURAL + r")(?:\.\d*)?"
 # Matches namelist literals for intrinsic types
 RE_INTEGER = r"[\+\-]?(?:" + RE_NATURAL + r")"
 REC_INTEGER = _rec(r"\A(?:" + RE_INTEGER + r")\Z")
-RE_REAL = r"(?i)[\+\-]?(?:" + RE_FLOAT + r")(?:[de][\+\-]?\d+)?"
+RE_REAL = r"[\+\-]?(?:" + RE_FLOAT + r")(?:[deDE][\+\-]?\d+)?"
 REC_REAL = _rec(r"\A(?:" + RE_REAL + r")\Z")
 RE_COMPLEX = r"\(\s*" + RE_REAL + r"\s*" + RE_SEP + r"\s*" + RE_REAL + r"\s*\)"
 REC_COMPLEX = _rec(r"\A(?:" + RE_COMPLEX + r")\Z")
-RE_LOGICAL = r"(?i)\.(?:true|false)\."
+RE_LOGICAL = r"\.(?:[Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])\."
 REC_LOGICAL = _rec(r"\A(?:" + RE_LOGICAL + r")\Z")
 RE_CHARACTER = r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\""
 REC_CHARACTER = _rec(r"\A(?:" + RE_CHARACTER + r")\Z")
@@ -95,7 +92,7 @@ REC_REAL_TIDY = [
     [_rec(r"^([+-])0+(\d)"), r"\1\2"]]        # +02.0 => +2.0, -000.5 => -0.5
 
 
-class NamelistGroup(object):
+class NamelistGroup:
     """Represent a namelist group.
 
     It has the following attributes:
@@ -120,7 +117,7 @@ class NamelistGroup(object):
         return "&%s\n%s\n/\n" % (self.name, "\n".join(object_strings))
 
 
-class NamelistObject(object):
+class NamelistObject:
     """Represent an object in a namelist group.
 
     An object can be an assignment or a key=value pair in a
@@ -187,7 +184,7 @@ class NamelistObject(object):
         return "\n".join(lines)
 
 
-class NamelistValue(object):
+class NamelistValue:
     """Represent a value in a namelist object."""
 
     def __init__(self, value_init, quote=False):
@@ -232,7 +229,7 @@ class NamelistValue(object):
         return value
 
 
-class _ParseContext(object):
+class _ParseContext:
     """Convenient object for storing the parser's state."""
 
     def __init__(self):

@@ -47,16 +47,13 @@ chmod +x repos/foo/hooks/pre-commit
 export LANG=C
 
 TEST_KEY="${TEST_KEY_BASE}-western"
-cat > rose-suite.info << '__INFO__'
-owner=ivy
-project=euro
-title=We should not éñçödê config files in latin-1/western
-__INFO__
-iconv -f UTF-8 -t LATIN1 rose-suite.info -o rose-suite.info
-# -----------------------------------------------------------------------------
 run_fail "$TEST_KEY" \
-    svn import rose-suite.info -q -m 't' --non-interactive \
-    "${SVN_URL}/a/a/0/0/0/trunk/rose-suite.info"
+    svn import \
+        "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}/rose-suite.info" \
+        -q \
+        -m 't' \
+        --non-interactive \
+        "${SVN_URL}/a/a/0/0/0/trunk/rose-suite.info"
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" < /dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" << '__ERR__'

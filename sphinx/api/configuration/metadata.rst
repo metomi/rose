@@ -39,7 +39,7 @@ of precedence:
    See :ref:`app-meta-loc` for more details.
 
 The configuration metadata that controls default behaviour will be located in
-``$ROSE_HOME/etc/rose-meta/``.
+``etc/rose-meta/`` within the ``metomi.rose`` Python installation.
 
 
 Configuration Metadata File
@@ -779,9 +779,9 @@ The metadata options for a configuration fall into four categories:
 
          Another useful Rose built-in widget to use is the array element
          aligning page widget,
-         ``rose.config_editor.pagewidget.table.PageArrayTable``. You can set
-         this for a section or namespace to make sure each *n*-th variable value
-         element lines up horizontally. For example:
+         ``metomi.rose.config_editor.pagewidget.table.PageArrayTable``. You can
+         set this for a section or namespace to make sure each *n*-th variable
+         value element lines up horizontally. For example:
 
          .. code-block:: rose
 

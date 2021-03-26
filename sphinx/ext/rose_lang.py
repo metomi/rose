@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -157,4 +154,4 @@ class RoseLexer(RegexLexer):
 
 def setup(app):
     """Sphinx plugin setup function."""
-    app.add_lexer('rose', RoseLexer())
+    app.add_lexer('rose', RoseLexer)

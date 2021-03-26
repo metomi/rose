@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -21,21 +21,29 @@
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 
-tests 2
+tests 3
 
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
-NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
-TEST_KEY="${TEST_KEY_BASE}"
+get_reg
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
-    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' -- --no-detach --debug
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-play"
+run_pass "${TEST_KEY}" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host='localhost' \
+        --no-detach \
+        --debug
 TEST_KEY="${TEST_KEY_BASE}-hello.txt"
-file_cmp "${TEST_KEY}" "${SUITE_RUN_DIR}/hello.txt" <<__HELLO__
+file_cmp "${TEST_KEY}" "${FLOW_RUN_DIR}/hello.txt" <<__HELLO__
 Hello Earth!
 __HELLO__
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

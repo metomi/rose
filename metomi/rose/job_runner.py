@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -35,7 +32,7 @@ class JobEvent(Event):
         return str(self.args[0])
 
 
-class JobManager(object):
+class JobManager:
     """Manage a set of JobProxy objects and their states."""
 
     def __init__(self, jobs, names=None):
@@ -110,7 +107,7 @@ class JobManager(object):
         return job
 
 
-class JobProxy(object):
+class JobProxy:
     """Represent the state of the job."""
 
     ST_DONE = "ST_DONE"
@@ -148,7 +145,7 @@ class JobProxy(object):
         self.context.update(other.context)
 
 
-class JobRunner(object):
+class JobRunner:
     """Runs JobProxy objects with pool of workers."""
 
     def __init__(self, job_processor, nproc=None):

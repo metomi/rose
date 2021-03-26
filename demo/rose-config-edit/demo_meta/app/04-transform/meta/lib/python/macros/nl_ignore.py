@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
-class NamelistIgnorer(rose.macro.MacroBase):
+class NamelistIgnorer(metomi.rose.macro.MacroBase):
 
     """Test class to ignore and enable a section."""
 
@@ -16,15 +14,14 @@ class NamelistIgnorer(rose.macro.MacroBase):
 
     def transform(self, config, meta_config=None):
         """Perform the transform operation on the section."""
-        change_list = []
         section = "namelist:ignore_nl"
         node = config.get([section])
         if node is not None:
             if node.state:
-                node.state = rose.config.ConfigNode.STATE_NORMAL
+                node.state = metomi.rose.config.ConfigNode.STATE_NORMAL
                 info = self.WARNING_ENABLED.format(section)
             else:
-                node.state = rose.config.ConfigNode.STATE_USER_IGNORED
+                node.state = metomi.rose.config.ConfigNode.STATE_USER_IGNORED
                 info = self.WARNING_IGNORED.format(section)
         self.add_report(section, None, None, info)
         return config, self.reports

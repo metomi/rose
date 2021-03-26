@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 This module contains value widgets for helping enter usernames.
 
@@ -10,9 +9,9 @@ Classes:
 
 from functools import partial
 
-import gobject
 import pygtk
 pygtk.require('2.0')
+# flake8: noqa: E402
 import gtk
 
 

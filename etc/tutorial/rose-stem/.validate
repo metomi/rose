@@ -1,4 +1,4 @@
 mkdir "${CYLC_RUN_DIR}/${REG}"
-echo -e '#!Jinja2\n{% set RUN_NAMES=["command_spaceship"] %}' > "${CYLC_RUN_DIR}/${REG}/suite.rc"
-cat "$TUT_DIR/rose-stem/suite.rc" >> "${CYLC_RUN_DIR}/${REG}/suite.rc"
+echo -e '#!Jinja2\n{% set RUN_NAMES=["command_spaceship"] %}' > "${CYLC_RUN_DIR}/${REG}/flow.cylc"
+cat "$TUT_DIR/rose-stem/flow.cylc" >> "${CYLC_RUN_DIR}/${REG}/flow.cylc"
 cylc validate "${CYLC_RUN_DIR}/${REG}" -s "SOURCE_SPACESHIP=foo"

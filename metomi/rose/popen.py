@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -19,15 +16,16 @@
 # -----------------------------------------------------------------------------
 """Wraps Python's subprocess.Popen."""
 
-import os
 import asyncio
+import os
 import re
-import io
-from metomi.rose.reporter import Event
-from metomi.rose.resource import ResourceLocator
+import select
 import shlex
 from subprocess import Popen, PIPE
 import sys
+
+from metomi.rose.reporter import Event
+from metomi.rose.resource import ResourceLocator
 
 
 class RosePopenError(Exception):
@@ -69,21 +67,44 @@ class RosePopenEvent(Event):
             ret = command
         else:
             ret = RosePopener.list_to_shell_str(self.command)
-        if isinstance(self.stdin, str):
-            ret += " <<'__STDIN__'\n" + self.stdin + "\n'__STDIN__'"
-        elif isinstance(self.stdin, io.IOBase):
-            try:
-                # FIXME: Is this safe?
-                pos = self.stdin.tell()
-                ret += " <<'__STDIN__'\n" +\
-                       self.stdin.read().decode() + "\n'__STDIN__'"
-                self.stdin.seek(pos)
-            except IOError:
-                pass
+
+        try:
+            # real file or real stream
+            self.stdin.fileno()
+            # ask select if it is readable (real files can hang)
+            readable = bool(select.select([self.stdin], [], [], 0.0)[0])
+        except (AttributeError, IOError):
+            # file like
+            readable = True
+
+        if self.stdin:
+            if isinstance(self.stdin, str):
+                # string
+                stdin = self.stdin
+            elif isinstance(self.stdin, bytes):
+                # byte string
+                stdin = self.stdin.decode()
+            elif readable:
+                # file like
+                try:
+                    pos = self.stdin.tell()
+                    stdin = self.stdin.read()
+                    self.stdin.seek(pos)
+                    if not isinstance(stdin, str):
+                        stdin = stdin.decode()
+                except Exception:
+                    # purposefully vague for safety (catch any exception)
+                    stdin = ''
+            else:
+                stdin = ''
+
+            if stdin:
+                ret += f" <<'__STDIN__'\n{stdin}\n__STDIN__"
+
         return ret
 
 
-class RosePopener(object):
+class RosePopener:
 
     """Wrap Python's subprocess.Popen."""
 

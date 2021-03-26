@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -20,38 +20,29 @@
 # Test rose_prune built-in application, basic cycle housekeep usage.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-
-
-#-------------------------------------------------------------------------------
-# Test the suite.
+skip_all 'TODO: #2445'
 JOB_HOST=$(rose config --default= 't' 'job-host')
-if [[ -n $JOB_HOST ]]; then
-    JOB_HOST=$(rose host-select -q $JOB_HOST)
+tests 9
+if [[ -z $JOB_HOST ]]; then
+    JOB_HOST=localhost
 fi
-export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l \
-    1>/dev/null 2>&1
-if (($? != 0)); then
-    skip_all "cylc version not compatible with ISO 8601"
-    exit 0
-fi
 #-------------------------------------------------------------------------------
-tests 7
-#-------------------------------------------------------------------------------
-# Run the suite.
-if [[ -n ${JOB_HOST:-} ]]; then
-    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$FLOW" \
+        --no-run-name \
+        -S "HOST='${JOB_HOST}'"
+run_pass "${TEST_KEY_BASE}-play" \
+    cylc play \
+        "$FLOW" \
+        --abort-if-any-task-fails \
         --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --no-detach --debug
-else
-    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --host=localhost -- --no-detach --debug
-fi
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-prune-log
 sed '/^\[INFO\] \(create\|delete\|update\)/!d;
@@ -59,8 +50,8 @@ sed '/^\[INFO\] \(create\|delete\|update\)/!d;
      /^\[INFO\] delete: \.rose-suite-log.lock/d;
      /\.json/d;
      /[0-9a-h]\{8\}\(-[0-9a-h]\{4\}\)\{3\}-[0-9a-h]\{12\}$/d' \
-    $SUITE_RUN_DIR/prune.log >edited-prune.log
-if [[ -n $JOB_HOST ]]; then
+    $FLOW_RUN_DIR/prune.log >edited-prune.log
+if [[ $JOB_HOST != localhost ]]; then
     sed "s/\\\$JOB_HOST/$JOB_HOST/g" \
         $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
 else
@@ -71,20 +62,20 @@ file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ls
 run_pass "$TEST_KEY" \
-    ls $SUITE_RUN_DIR/log/job-*.tar.gz $SUITE_RUN_DIR/{log/job,share/cycle,work}
-sed "s?\\\$SUITE_RUN_DIR?$SUITE_RUN_DIR?g" \
+    ls $FLOW_RUN_DIR/log/job-*.tar.gz $FLOW_RUN_DIR/{log/job,share/cycle,work}
+sed "s?\\\$SUITE_RUN_DIR?$FLOW_RUN_DIR?g" \
     $TEST_SOURCE_DIR/$TEST_KEY.out >expected-ls.out
-if [[ -z $JOB_HOST ]]; then
+if [[ $JOB_HOST != localhost ]]; then
     sed -i "/my_task_2/d" expected-ls.out
 fi
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-ls.out
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-if [[ -n $JOB_HOST ]]; then
+if [[ $JOB_HOST != localhost ]]; then
     TEST_KEY=$TEST_KEY_BASE-host-ls
     run_pass "$TEST_KEY" ssh -oBatchMode=yes $JOB_HOST \
-        ls cylc-run/$NAME/{log/job,share/cycle,work}
-    sed "s/\\\$NAME/$NAME/g" \
+        ls cylc-run/$FLOW/{log/job,share/cycle,work}
+    sed "s/\\\$FLOW/$FLOW/g" \
         $TEST_SOURCE_DIR/$TEST_KEY.out >expected-host-ls.out
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-host-ls.out
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -92,5 +83,5 @@ else
     skip 3 '[t]job-host not defined'
 fi
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+purge
 exit 0

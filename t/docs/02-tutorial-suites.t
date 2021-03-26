@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -53,7 +53,7 @@ for tutorial in $(ls -1 "${TUTORIALS_PATH}"); do
         done
     else
         # Tutorial has no validate file - run cylc validate.
-        TESTS+=('cylc validate "'"${tutorial_path}/suite.rc"'"')
+        TESTS+=('cylc validate "'"${tutorial_path}/flow.cylc"'"')
         TEST_KEYS+=("${tutorial}-0")
         TUT_DIRS+=( "$tutorial_path" )
         continue

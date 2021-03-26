@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 """Module containing test upgrade macros"""
 
-import rose.upgrade
+import metomi.rose.upgrade
 
 
-class UpgradeNull01(rose.upgrade.MacroUpgrade):
+class UpgradeNull01(metomi.rose.upgrade.MacroUpgrade):
 
     """Upgrade nothing..."""
 

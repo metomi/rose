@@ -1,0 +1,15 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[events]]
+        abort on timeout=True
+        timeout=PT1M
+[scheduling]
+    [[dependencies]]
+        graph=archive
+
+[runtime]
+    [[archive]]
+        script=rose task-run --debug
+        [[[job]]]
+            execution time limit=PT1M

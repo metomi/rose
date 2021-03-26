@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -33,7 +33,7 @@ __CONFIG__
 
 mkdir "$TEST_DIR/bin"
 cat >"$TEST_DIR/bin/egg.sh" <<'__BASH__'
-#!/bin/bash
+#!/usr/bin/env bash
 echo 'Bash it, crack it, bin it.'
 __BASH__
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -21,8 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-N_TESTS=81
-tests $N_TESTS
+tests 82
 #-------------------------------------------------------------------------------
 
 # The database test is only valid if the user has set things up to use it, so
@@ -34,22 +33,32 @@ kgo-database=.true.
 __CONF__
 
 # Run the suite.
+get_reg
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=$PWD/conf
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+
+TEST_KEY="${TEST_KEY_BASE}-install"
+run_pass "$TEST_KEY" \
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+
+TEST_KEY="${TEST_KEY_BASE}-run"
 run_fail "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+    cylc play \
+        "${FLOW}" \
+        --host=localhost \
+        --no-detach \
+        --debug
+
 #-------------------------------------------------------------------------------
 # Test the output
 #
 # Note that t1 and t5 are identical except t5 uses threading, so use a loop here
 for t in t1 t5 ; do
-  OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_$t/01/job.out"
-  file_pcregrep "${TEST_KEY_BASE}-$t-exact_list_fail}" \
+  OUTPUT="${FLOW_RUN_DIR}/log/job/1/rose_ana_$t/01/job.out"
+  file_pcregrep "${TEST_KEY_BASE}-$t-exact_list_fail" \
       'Running task #([0-9]+).*\n.*Exact List Match Fail.*\n.*Task #\1 did not pass' \
       "${OUTPUT}"
   file_pcregrep "${TEST_KEY_BASE}-$t-exact_list_success" \
@@ -133,12 +142,12 @@ for t in t1 t5 ; do
 done
 
 # Now check that the threading option is reflected in the output
-OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t1/01/job.out"
+OUTPUT="${FLOW_RUN_DIR}/log/job/1/rose_ana_t1/01/job.out"
 TEST_KEY=$TEST_KEY_BASE-t1-serial_statement
 REGEXP="Running in SERIAL mode"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
 
-OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t5/01/job.out"
+OUTPUT="${FLOW_RUN_DIR}/log/job/1/rose_ana_t5/01/job.out"
 TEST_KEY=$TEST_KEY_BASE-t5-threading_statement
 REGEXP="Running in THREADED mode, with 4 threads"
 file_grep $TEST_KEY "$REGEXP" $OUTPUT
@@ -146,7 +155,7 @@ file_grep $TEST_KEY "$REGEXP" $OUTPUT
 #-------------------------------------------------------------------------------
 # Test of ignoring a task
 # First, test that the basic task ran ok
-OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t2_activated/01/job.out"
+OUTPUT="${FLOW_RUN_DIR}/log/job/1/rose_ana_t2_activated/01/job.out"
 file_pcregrep "${TEST_KEY_BASE}-ignore-basic-1" \
     'Running task #([0-9]+).*\n.*First Test.*\n.*Task #\1 did not pass' \
     "${OUTPUT}"
@@ -155,16 +164,16 @@ file_pcregrep "${TEST_KEY_BASE}-ignore-basic-2" \
 # Then test that ignoring a test means the output is not present
 file_pcregrep "${TEST_KEY_BASE}-ignore-notpresent" \
     'Running task #([0-9]+).*\n.*Second Test.*\n.*Task #\1 passed' \
-    "${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t2_deactivated/01/job.out"
+    "${FLOW_RUN_DIR}/log/job/1/rose_ana_t2_deactivated/01/job.out"
 #-------------------------------------------------------------------------------
 # Test tolerance as an environment variable
 # First, test that the basic task ran ok
 file_pcregrep "${TEST_KEY_BASE}-tolerance-env-var-pass" \
     'Running task #([0-9]+).*\n.*First Test.*\n.*Task #\1 passed' \
-    "${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t3_within_tolerance/01/job.out"
+    "${FLOW_RUN_DIR}/log/job/1/rose_ana_t3_within_tolerance/01/job.out"
 file_pcregrep "${TEST_KEY_BASE}-tolerance-env-var-fail" \
     'Running task #([0-9]+).*\n.*First Test.*\n.*Task #\1 did not pass' \
-    "${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t3_outside_tolerance/01/job.out"
+    "${FLOW_RUN_DIR}/log/job/1/rose_ana_t3_outside_tolerance/01/job.out"
 #-------------------------------------------------------------------------------
 
 # Test of comparison database
@@ -172,7 +181,7 @@ file_pcregrep "${TEST_KEY_BASE}-tolerance-env-var-fail" \
 # Regexp for any number of digits (re-used a lot below)
 COMP_NUMBER="[0-9][0-9]*"
 
-OUTPUT=$HOME/cylc-run/$NAME/log/job/1/db_check/01/job.out
+OUTPUT="$FLOW_RUN_DIR/log/job/1/db_check/01/job.out"
 # For each of the 3 tasks check that a task entry exists with a status of 0
 for TASK_NAME in "rose_ana_t1" "rose_ana_t2_activated" "rose_ana_t2_deactivated" ; do
     TEST_KEY=$TEST_KEY_BASE-db_check_${TASK_NAME}_success
@@ -272,7 +281,7 @@ file_grep $TEST_KEY "$REGEXP" $OUTPUT
 #-------------------------------------------------------------------------------
 # Test of a few config options
 
-OUTPUT="${HOME}/cylc-run/${NAME}/log/job/1/rose_ana_t4/01/job.out"
+OUTPUT="${FLOW_RUN_DIR}/log/job/1/rose_ana_t4/01/job.out"
 file_pcregrep "${TEST_KEY_BASE}-report_limit_working" \
     'Running task #([0-9]+).*Check report limit is active.*Some output omitted due to limit.*Task #\1 passed' \
     "${OUTPUT}"
@@ -281,7 +290,5 @@ file_pcregrep "${TEST_KEY_BASE}-missing_skip_working" \
     "${OUTPUT}"
 
 #-------------------------------------------------------------------------------
-#Clean suite
-rose suite-clean -q -y $NAME
-#-------------------------------------------------------------------------------
+purge
 exit 0

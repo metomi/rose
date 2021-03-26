@@ -1,7 +1,8 @@
 # The :rose:file:`rose.conf` file can be installed in:
 #
-# * ``$ROSE_HOME/etc/`` for *site* configuration.
-# * ``$HOME/.metomi/rose/`` for *user* configuration.
+# * ``/etc/rose.conf``
+# * ``$ROSE_SITE_CONF_PATH/rose.conf``
+# * ``$HOME/.metomi/rose.conf``
 #
 #.. This file documents the settings and their default values.
 #   Values of settings in this file are mostly placeholders,
@@ -111,42 +112,6 @@ notification-from=EMAIL-ADDRESS
 user-tool=ldap|passwd
 
 
-# Configuration for Rose Bush server.
-[rose-bush]
-# :default: 100
-#
-# Cycles list view: default number of cycles per page.
-cycles-per-page=NUMBER
-# :default: The server's host name.
-#
-# An alternative host name.
-host=NAME
-# :default: 15
-#
-# Job list view: default number of jobs per page.
-jobs-per-page=NUMBER
-# :default: 300
-#
-# Job list view: maximum number of jobs per page.
-jobs-per-page-max=NUMBER
-# Image logo attributes, can be any HTML ``<img/>`` tag attributes
-# e.g: ``logo=src="http://server/my-rose-bush-logo.png" alt="My Rose Bush
-# Logo"``.
-logo=HTML-IMG-ATTRIBUTE ...
-# :default: 100
-#
-# Suites list view: default number of suites per page.
-suites-per-page=NUMBER
-# :default: "Rose Bush"
-#
-# An alternative service title.
-title=TITLE
-# :default: 10485760
-#
-# File view: maximum viewable file size in bytes.
-view-size-max=BYTES
-
-
 # Configuration specific to :ref:`command-rose-config-diff`.
 [rose-config-diff]
 # :default: "title,ns,description,help"
@@ -156,20 +121,6 @@ properties=title,ns,description,help
 # Shorthand expressions for ignore-setting regular expressions
 # e.g. ``^baz,bar,w[ib]ble``.
 ignore{foo}=REGEX
-
-
-
-# Configuration specific to :ref:`command-rose-config-edit`.
-[rose-config-edit]
-# :default: /opt/cylc/images/icon.svg
-#
-# Path to an image containing the suite engine icon.
-# See :py:mod:`rose.config_editor` for detail.
-icon-path-scheduler=PATH
-# :default: https://github.com/metomi/rose/
-#
-# Hyperlink to the Rose project page.
-project-url=URL
 
 
 # Configuration related to :ref:`command-rose-host-select`.
@@ -206,15 +157,9 @@ timeout=FLOAT
 [rose-stem]
 # Automatic options. These are added as if the user added them with
 # ``--define-suite`` on the command line and can be accessed as Jinja2
-# variables in the ``suite.rc`` file. E.g ``automatic-options=TEA=earl_grey``
+# variables in the ``flow.cylc`` file. E.g ``automatic-options=TEA=earl_grey``
 # would set the Jinja2 variable ``TEA`` to be ``earl_grey``.
 automatic-options=VARIABLE=VALUE
-
-
-# Configuration related to :ref:`command-rose-suite-log`.
-[rose-suite-log]
-# URL to the site's Rose Bush web service.
-rose-bush=URL
 
 
 # Configuration related to :ref:`command-rose-mpi-launch`.
@@ -243,77 +188,6 @@ launcher-preopts.LAUNCHER=OPTIONS-TEMPLATE
 launcher-postopts.LAUNCHER=OPTIONS-TEMPLATE
 
 
-# Configuration related to :ref:`command-rose-suite-run`.
-[rose-suite-run]
-# Hosts in the :rose:conf:`[rose-host-select]` section that can be used to
-# run a suite e.g::
-#
-#    hosts=rose-vm
-hosts=HOST-GROUP|HOST ...
-# Hosts in the :rose:conf:`[rose-host-select]` section that can be scanned
-# by rose utilities e.g::
-#
-#    scan-hosts=localhost rose-vm
-scan-hosts=HOST-GROUP|HOST ...
-# :default: false
-#
-# Don't use login shell to invoke ``rose suite-run --remote``
-# where ``HOST-GLOB`` is a glob for matching host names e.g::
-#
-#    remote-no-login-shell=myhpc*=true
-#                          mycluster*=true
-remote-no-login-shell=HOST-GLOB=true|false
-# :default: rose
-#
-# Path to ``rose`` executable on remote hosts where:
-#
-# * ``HOST-GLOB`` is a glob for matching host names.
-# * ``ROSE-BIN-PATH`` is the path to the ``rose`` executable.
-#
-# E.g::
-#
-#    remote-rose-bin=myhpc*=/opt/rose/bin/rose
-#                    mycluster*=/usr/local/bin/rose
-remote-rose-bin=HOST-GLOB=ROSE-BIN-PATH
-# :default: $HOME
-#
-# Root location of a suite run directory where:
-#
-# * ``HOST-GLOB`` is a glob for matching host names.
-# * ``HOST-DIR`` is the value of the root location for matching hosts.
-#
-# E.g::
-#
-#    root-dir=hpc*=$DATADIR
-#            =*=$HOME
-root-dir=HOST-GLOB=$HOST-DIR
-# :default: $HOME
-#
-# Root location of a suite run's ``share/`` directory. Syntax is the same
-# as :rose:conf:`root-dir`.
-# Multiple pairs can be specified by a new-line separated list.
-#
-# .. warning::
-#
-#    If a suite has previously been run changes to any of the ``root-dir``
-#    settings will take effect on the next clean re-installation i.e:
-#
-#       $ rose suite-run --new
-root-dir{share}=HOST-GLOB=$HOST-DIR
-# :default: $HOME
-#
-# Root location of a suite run's ``share/cycle/`` directory. Syntax is
-# the same as :rose:conf:`root-dir`.
-# Multiple pairs can be specified by a new-line separated list.
-root-dir{share/cycle}=HOST-GLOB=$HOST-DIR
-# :default: $HOME
-#
-# Root location of a suite run's ``work/`` directory. Syntax is the same
-# as :rose:conf:`root-dir`.
-# Multiple pairs can be specified by a new-line separated list.
-root-dir{work}=HOST-GLOB=$HOST-DIR
-
-
 # Configuration related to :ref:`command-rose-task-run`.
 [rose-task-run]
 # Items to prepend to the ``PATH`` environment variable.
@@ -333,9 +207,9 @@ method-path=/path/1 /path2
 # <The Rose Ana Comparison Database>`.
 kgo-database=.true.
 # Limits the number of lines printed when using the
-# :py:mod:`rose.apps.ana_builtin.grepper` analysis class.
+# :py:mod:`metomi.rose.apps.ana_builtin.grepper` analysis class.
 grepper-report-limit=42
-# Causes the :py:mod:`rose.apps.ana_builtin.grepper` class to pass
+# Causes the :py:mod:`metomi.rose.apps.ana_builtin.grepper` class to pass
 # if all files to be compared are missing.
 skip-if-all-files-missing=.true.
 
@@ -367,7 +241,6 @@ title=TITLE
 
 
 # Configuration related to the :ref:`command-rosie-go` GUI.
-# See :py:mod:`rosie.browser` for detail.
 [rosie-go]
 # :default: /opt/cylc/images/icon.svg
 #
@@ -437,6 +310,8 @@ access-list-default=USER-ID ...
 # Tool to compare two files when there are differences.
 difftool=COMMAND ...
 # List of selectable host groups.
+#
+# These must be defined in :rose:conf:`[rose-host-select]group{NAME}`.
 host-groups=GROUP ...
 # A remote host that does not share its ``HOME`` directory with ``localhost``.
 job-host=HOST

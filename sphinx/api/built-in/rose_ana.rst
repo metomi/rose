@@ -83,12 +83,12 @@ details.
       .. rose:conf:: grepper-report-limit
 
          Limits the number of lines printed when using the
-         :py:mod:`rose.apps.ana_builtin.grepper` analysis class.
+         :py:mod:`metomi.rose.apps.ana_builtin.grepper` analysis class.
 
       .. rose:conf:: skip-if-all-files-missing
 
-         Causes the :py:mod:`rose.apps.ana_builtin.grepper` class to pass
-         if all files to be compared are missing.
+         Causes the :py:mod:`metomi.rose.apps.ana_builtin.grepper` class
+         to pass if all files to be compared are missing.
 
       .. rose:conf:: kgo-database
 
@@ -110,15 +110,5 @@ Analysis Classes
 
 There is one built-in module of analysis classes called ``grepper``.
 
-.. To document everything:
-
-   .. automodule:: metomi.rose.apps.ana_builtin.grepper
-      :members:
-
-.. autoclass:: metomi.rose.apps.ana_builtin.grepper.FileCommandPattern
-
-.. autoclass:: metomi.rose.apps.ana_builtin.grepper.FilePattern
-
-.. autoclass:: metomi.rose.apps.ana_builtin.grepper.SingleCommandPattern
-
-.. autoclass:: metomi.rose.apps.ana_builtin.grepper.SingleCommandStatus
+.. automodule:: metomi.rose.apps.ana_builtin.grepper
+   :members: FileCommandPattern, FilePattern, SingleCommandPattern, SingleCommandStatus

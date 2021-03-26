@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -20,9 +20,8 @@
 # Test "rose_prune" built-in application, with bash extglob, using not glob.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+skip_all 'TODO: #2445'
 
-
-JOB_HOST_OPT=
 if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
     JOB_HOST=$(rose config --default= 't' 'job-host')
     if [[ -z "${JOB_HOST}" ]]; then
@@ -32,24 +31,30 @@ if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
     if [[ -z "${JOB_HOST}" ]]; then
         skip_all '"[t]job-host" not available'
     fi
-    JOB_HOST_OPT="-S JOB_HOST=\"${JOB_HOST}\""
 fi
 
-tests 2
+tests 3
 
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
-NAME="$(basename "${SUITE_RUN_DIR}")"
 #-------------------------------------------------------------------------------
-TEST_KEY="${TEST_KEY_BASE}"
+get_reg
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
-    rose suite-run -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' ${JOB_HOST_OPT} -- --no-detach --debug
-
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        -S "JOB_HOST='$JOB_HOST'" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-play"
+run_pass "${TEST_KEY}" \
+    cylc play \
+        "${FLOW}" \
+        --host='localhost' \
+        --no-detach \
+        --debug
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\
-    "${SUITE_RUN_DIR}/prune.log" > stamp-removed.log
+    "${FLOW_RUN_DIR}/prune.log" > stamp-removed.log
 sed '/^\[INFO\] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=/p;
     /^\[INFO\] YYYY-MM-DDTHHMM delete: /!d' \
     "stamp-removed.log" >'edited-prune.log'
@@ -65,5 +70,5 @@ file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
 [INFO] YYYY-MM-DDTHHMM delete: work/20150101T0000Z
 __LOG__
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

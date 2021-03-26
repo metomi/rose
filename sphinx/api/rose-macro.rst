@@ -46,7 +46,7 @@ A module containing macros should be stored under a directory
 should be a Python package.
 
 When developing macros for Rose internals, macros should be placed in the
-:py:mod:`rose.macros` package in the Rose Python library. They should be
+:py:mod:`metomi.rose.macros` package in the Rose Python library. They should be
 referenced by the ``lib/python/rose/macros/__init__.py`` classes and a call to
 them can be added in the ``lib/python/rose/config_editor/main.py`` module if
 they need to be run implicitly by the config editor.
@@ -60,14 +60,15 @@ Writing Macros
    For basic usage see the :ref:`macro tutorial <macro-dev>`.
 
 Validator, transformer and reporter macros are Python classes which subclass
-from :py:class:`rose.macro.MacroBase` (:ref:`API <api-rose-macro-base>`).
+from :py:class:`metomi.rose.macro.MacroBase`
+(:ref:`API <api-rose-macro-base>`).
 
 These macros implement their behaviours by providing a ``validate``,
 ``transform`` or ``report`` method. A macro can contain any combination of
 these methods so, for example, a macro might be both a validator and a
 transformer.
 
-These methods should accept two :py:class:`rose.config.ConfigNode`
+These methods should accept two :py:class:`metomi.rose.config.ConfigNode`
 instances as arguments - one is the configuration, and one is the metadata
 configuration that provides information about the configuration items.
 
@@ -92,11 +93,11 @@ A validator macro should look like:
        # Some check on config appends to self.reports using self.add_report
        return self.reports
 
-The returned list should be a list of :py:class:`rose.macro.MacroReport` objects
-containing the section, option, value, and warning strings (info) for each
-setting that is in error. These are initialised behind the scenes by calling the
-inherited method :py:meth:`rose.macro.MacroBase.add_report` via
-:py:meth:`self.add_report`. This has the form:
+The returned list should be a list of :py:class:`metomi.rose.macro.MacroReport`
+objects containing the section, option, value, and warning strings (info) for
+each setting that is in error. These are initialised behind the scenes by
+calling the inherited method :py:meth:`metomi.rose.macro.MacroBase.add_report`.
+This has the form:
 
 .. code-block:: python
 
@@ -123,7 +124,7 @@ Validator macros have the option to give warnings, which do not count as
 formal errors in the Rose config editor GUI. These should be used when
 something *may* be wrong, such as warning when using an
 advanced-developer-only option. They are invoked by passing a 5th argument
-to :py:meth:`self.add_report`, ``is_warning``, like so:
+to :py:meth:`metomi.rose.macro.MacroBase.add_report`, ``is_warning``, like so:
 
 .. code-block:: python
 

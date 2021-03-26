@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -24,21 +24,30 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 7
+tests 9
 #-------------------------------------------------------------------------------
 # Run the suite.
-SUITE_RUN_DIR=$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')
-NAME=$(basename "${SUITE_RUN_DIR}")
-rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host=localhost -- --no-detach --debug
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-play" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 
-run_pass "$TEST_KEY_BASE-0" ls -d $HOME/cylc-run/${NAME}/share/cycle/0
-run_pass "$TEST_KEY_BASE-1" ls -d $HOME/cylc-run/${NAME}/share/cycle/1
-run_pass "$TEST_KEY_BASE-2" ls -d $HOME/cylc-run/${NAME}/share/cycle/2
-run_pass "$TEST_KEY_BASE-3" ls -d $HOME/cylc-run/${NAME}/share/cycle/3
-run_pass "$TEST_KEY_BASE-6" ls -d $HOME/cylc-run/${NAME}/share/cycle/6
-run_pass "$TEST_KEY_BASE-7" ls -d $HOME/cylc-run/${NAME}/share/cycle/7
-run_pass "$TEST_KEY_BASE-8" ls -d $HOME/cylc-run/${NAME}/share/cycle/8
+run_pass "$TEST_KEY_BASE-0" ls -d "$FLOW_RUN_DIR/share/cycle/0"
+run_pass "$TEST_KEY_BASE-1" ls -d "$FLOW_RUN_DIR/share/cycle/1"
+run_pass "$TEST_KEY_BASE-2" ls -d "$FLOW_RUN_DIR/share/cycle/2"
+run_pass "$TEST_KEY_BASE-3" ls -d "$FLOW_RUN_DIR/share/cycle/3"
+run_pass "$TEST_KEY_BASE-6" ls -d "$FLOW_RUN_DIR/share/cycle/6"
+run_pass "$TEST_KEY_BASE-7" ls -d "$FLOW_RUN_DIR/share/cycle/7"
+run_pass "$TEST_KEY_BASE-8" ls -d "$FLOW_RUN_DIR/share/cycle/8"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+purge
 exit 0

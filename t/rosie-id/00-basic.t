@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 45
+tests 36
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -91,21 +91,6 @@ http://trac-host/foo/intertrac/source:/a/a/0/0/0/trunk@HEAD
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
-TEST_KEY=$TEST_KEY_BASE-1-to-output.1
-run_fail "$TEST_KEY" rosie id --to-output foo-aa000
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] foo-aa000: suite log not found
-__ERR__
-
-mkdir -p $HOME/cylc-run/foo-aa000/log/job
-rose suite-log -q -U -n foo-aa000
-TEST_KEY=$TEST_KEY_BASE-1-to-output.2
-run_pass "$TEST_KEY" rosie id --to-output foo-aa000
-file_grep "$TEST_KEY.out" '/foo-aa000$' "$TEST_KEY.out"
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-rm -fr "${HOME}/cylc-run/foo-aa000"
-
 TEST_KEY=$TEST_KEY_BASE-1-full-wc-id
 run_pass "$TEST_KEY" rosie id roses/foo-aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
@@ -129,26 +114,31 @@ foo-aa000
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
-TEST_KEY="${TEST_KEY_BASE}-run"
-SUITE_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
-SUITE_NAME="$(basename "${SUITE_DIR}")"
-svn co -q "${URL}/a/a/0/0/0/trunk" 'foo-aa000'
-touch 'foo-aa000/rose-suite.conf'
-cat >'foo-aa000/suite.rc' <<'__SUITE_RC__'
-[scheduling]
-    [[dependencies]]
-        graph='t1'
-[runtime]
-    [[t1]]
-__SUITE_RC__
-rose suite-run -l -q -C "${PWD}/foo-aa000" --name="${SUITE_NAME}"
-run_pass "$TEST_KEY" rosie id "${HOME}/cylc-run/${SUITE_NAME}"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-foo-aa000
-__OUT__
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-rose suite-clean -q -y --name="${SUITE_NAME}"
-rm -fr 'foo-aa000'
+# TODO: Cylc8 support for rosie id
+# https://github.com/metomi/rose/issues/2432
+
+#TEST_KEY="${TEST_KEY_BASE}-run"
+#get_reg
+#svn co -q "${URL}/a/a/0/0/0/trunk" 'foo-aa000'
+#touch 'foo-aa000/rose-suite.conf'
+#cat >'foo-aa000/flow.cylc' <<'__SUITE_RC__'
+#[scheduling]
+#    [[dependencies]]
+#        graph='t1'
+#[runtime]
+#    [[t1]]
+#__SUITE_RC__
+#cylc install \
+#    -C "${PWD}/foo-aa000" \
+#    --flow-name="${FLOW}" \
+#    --no-run-name
+#run_pass "$TEST_KEY" rosie id "${HOME}/cylc-run/${FLOW}"
+#file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+#foo-aa000
+#__OUT__
+#file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#purge
+#rm -fr 'foo-aa000'
 #-------------------------------------------------------------------------------
 # Latest and next should still be correct if latest suite removed from HEAD
 TEST_KEY=$TEST_KEY_BASE-latest-not-at-head

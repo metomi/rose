@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/bash -l
+# NOTE: not using /usr/bin/env bash here to allow the -l flag to be provided
+# (required for MacOS to pick up GNU install rather than the BSD variant)
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -18,5 +20,6 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 set -eu
+env >&2
 mkdir -p "$1"
 exec install -t "$@"

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -23,12 +21,18 @@ is available for installation.
 
 This is a Python file but we read it and pass it to stdin
 to avoid reliance on remote platforms having rose installed.
+
+Warning:
+    This script will not necessarily be run in the Rose Python environment.
+    It should not have any dependencies outside of the stdlib and should be
+    compatible with as wide a range of Python3 versions as possible.
+
 """
 import os
 import sys
 
 
-def main():
+def main(path, str_blob, str_tree):
     """Check file exists and print some info:
 
     1. Octal protection bits.
@@ -36,7 +40,6 @@ def main():
     3. Filesize.
     4. Path, which has been checked.
     """
-    path, str_blob, str_tree = sys.argv[1:]
     if os.path.isdir(path):
         print(str_tree)
         os.chdir(path)
@@ -46,19 +49,19 @@ def main():
                 if not dirname.startswith("."):
                     good_dirnames.append(dirname)
                     name = os.path.join(dirpath, dirname)
-                    print(("-", "-", "-", name))
+                    print("-", "-", "-", name)
             dirnames[:] = good_dirnames
             for filename in filenames:
                 if filename.startswith("."):
                     continue
                 name = os.path.join(dirpath, filename)
                 stat = os.stat(name)
-                print((oct(stat.st_mode), stat.st_mtime, stat.st_size, name))
+                print(stat.st_mode, stat.st_mtime, stat.st_size, name)
     elif os.path.isfile(path):
         print(str_blob)
         stat = os.stat(path)
-        print(oct(stat.st_mode), stat.st_mtime, stat.st_size, path)
+        print(stat.st_mode, stat.st_mtime, stat.st_size, path)
 
 
 if __name__ == '__main__':
-    main()
+    main(*sys.argv[1:])

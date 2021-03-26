@@ -18,7 +18,7 @@ Create a new Rose suite configuration::
    mkdir -p ~/rose-tutorial/polling
    cd ~/rose-tutorial/polling
 
-Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc``
 file that looks like this:
 
 .. code-block:: cylc
@@ -37,7 +37,7 @@ This is a simple suite which consists of the following:
 * A ``bob`` task which we will be using to poll with.
 * A ``read_letter`` task which will run once the polling task is complete.
 
-It will need some runtime. Add the following to your ``suite.rc`` file:
+It will need some runtime. Add the following to your ``flow.cylc`` file:
 
 .. code-block:: cylc
 

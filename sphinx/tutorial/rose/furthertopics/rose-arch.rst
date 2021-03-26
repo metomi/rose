@@ -18,7 +18,7 @@ Create a new Rose suite configuration::
 
    mkdir -p ~/rose-tutorial/rose-arch-tutorial
 
-Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc``
 file that looks like this:
 
 .. code-block:: cylc
@@ -155,7 +155,7 @@ Save your changes and run the suite::
 
    rose suite-run
 
-View the suite output using :ref:`command-rose-suite-log` and inspect the
+View the suite output using ``cylc cat-log`` and inspect the
 output of the ``make_files``, ``archive_files_rsync`` and ``archive_files_scp``
 tasks.
 

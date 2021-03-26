@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -21,4 +18,5 @@
 such as namelists. To add a new format, place it in this directory and
 add an import statement below.
 """
+# flake8: noqa: F401
 from . import namelist

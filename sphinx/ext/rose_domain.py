@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -62,7 +59,7 @@ Autodocumentation:
     Documentation can be auto-built from RST formatted comments in Rose
     configuration files using the ``autoconfig`` directive.
 
-    Note that due to the implementation of :py:mod:`rose.config` the
+    Note that due to the implementation of :py:mod:`metomi.rose.config` the
     autodocumenter will represent empty sections as top level configuration
     nodes.
 
@@ -76,7 +73,7 @@ Example:
           .. rose:conf:: jinja2:suite.rc
 
              A section for specifying Jinja2 settings for use in the
-             ``suite.rc`` file.
+             ``flow.cylc`` file.
 
              Note that one ommits the square brackets for config sections. If
              :rose:conf: contains other :rose:conf:'s then it is implicitly a
@@ -925,7 +922,7 @@ class RoseAutoDirective(Directive):
     """Directive for autodocumenting Rose configuration files.
 
     Uses RST formatted comments in Rose configuration files using
-    :py:mod:`rose.config`.
+    :py:mod:`metomi.rose.config`.
 
     Note the directive only documents config objects not the file itself.
 

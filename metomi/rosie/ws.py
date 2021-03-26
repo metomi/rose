@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -38,15 +35,18 @@ import jinja2
 import json
 import logging
 import os
+from pathlib import Path
+import pkg_resources
 import pwd
 import signal
-import pkg_resources
 from time import sleep
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
+import wsgiref
 
 from metomi.isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
+from metomi.rose import __version__ as ROSE_VERSION
 from metomi.rose.host_select import HostSelector
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.resource import ResourceLocator
@@ -82,7 +82,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
             if self.props["host_name"] and "." in self.props["host_name"]:
                 self.props["host_name"] = (
                     self.props["host_name"].split(".", 1)[0])
-        self.props["rose_version"] = ResourceLocator.default().get_version()
+        self.props["rose_version"] = ROSE_VERSION
 
         # Get location of HTML files from package
         rosie_lib = os.path.join(
@@ -139,8 +139,9 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         handlers = [root_handler] + prefix_handlers
         settings = dict(
             autoreload=True,
-            static_path=ResourceLocator.default().get_util_home(
-                "lib", "html", "static"),
+            static_path=str(
+                Path(metomi.rosie.__file__).parent / 'lib/html/static'
+            )
         )
         super(
             RosieDiscoServiceApplication, self).__init__(handlers, **settings)

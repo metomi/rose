@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -27,6 +27,8 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
+skip_all 'TODO: #2445'
+
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'
 fi
@@ -45,21 +47,28 @@ if [[ -z "${JOB_HOST}" ]]; then
     skip_all '"[t]job-host" not defined or not available'
 fi
 #-------------------------------------------------------------------------------
-tests 1
+tests 3
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
 #-------------------------------------------------------------------------------
-SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
-NAME="$(basename "${SUITE_RUN_DIR}")"
-timeout 120 rose suite-run -v -v --debug \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' \
-    -D "[jinja2:suite.rc]HOST=\"${JOB_HOST}\"" \
-    -- --no-detach --debug 1>'/dev/null' 2>&1
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name \
+        -S "HOST='${JOB_HOST}'"
+run_pass "${TEST_KEY_BASE}-play" \
+    timeout 120 \
+        cylc play \
+            "${FLOW}" \
+            --abort-if-any-task-fails \
+            --host='localhost' \
+            --no-detach \
+            --debug
 #-------------------------------------------------------------------------------
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
-    cat "cylc-run/${NAME}/share/hello.txt" >'hello.txt'
+    cat "cylc-run/${FLOW}/share/hello.txt" >'hello.txt'
 file_cmp "${TEST_KEY_BASE}" 'hello.txt' <<<'Hello World!'
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

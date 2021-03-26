@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -27,7 +27,7 @@ MORE_HOST=$(rose config --default= 't' 'job-host-with-share')
 export ROSE_CONF_PATH=
 
 LOCAL_HOSTS='localhost 127.0.0.1'
-for CMD in 'hostname -s' 'hostname' 'hostname --fqdn' 'hostname -I'; do
+for CMD in 'hostname -s' 'hostname' 'hostname -f' 'hostname -I'; do
     if LOCAL_HOST=$(eval "$CMD"); then
         if ssh -n -q -oBatchMode=yes "${LOCAL_HOST}" true 1>'/dev/null' 2>&1
         then
@@ -47,9 +47,9 @@ run_pass "${TEST_KEY_BASE}" rose 'host-select' -v -v ${HOSTS}
 # 1 bash command
 sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\
      "${TEST_KEY_BASE}.out" > stamp-removed.log
-grep -F "[INFO] YYYY-MM-DDTHHMM bash" "stamp-removed.log" >"${TEST_KEY_BASE}.out.1"
+grep -F "[INFO] YYYY-MM-DDTHHMM rose" "stamp-removed.log" >"${TEST_KEY_BASE}.out.1"
 file_cmp "${TEST_KEY_BASE}.out.1" "${TEST_KEY_BASE}.out.1" <<'__OUT__'
-[INFO] YYYY-MM-DDTHHMM bash <<'__STDIN__'
+[INFO] YYYY-MM-DDTHHMM rose host-select-client <<'__STDIN__'
 __OUT__
 
 # 0 ssh LOCAL_HOST command
@@ -67,7 +67,7 @@ if [[ -n ${MORE_HOST} ]]; then
         "stamp-removed.log" >"${TEST_KEY_BASE}.out.${MORE_HOST}"
     file_cmp "${TEST_KEY_BASE}.out.${MORE_HOST}" \
         "${TEST_KEY_BASE}.out.${MORE_HOST}" <<__OUT__
-[INFO] YYYY-MM-DDTHHMM ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST} bash <<'__STDIN__'
+[INFO] YYYY-MM-DDTHHMM ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST} rose host-select-client <<'__STDIN__'
 __OUT__
 fi
 

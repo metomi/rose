@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ME=$(basename $0)
 echo -e "$$\t$*" >>$ME.out
 sleep 10 # A bit longer, so lingering process can be tested

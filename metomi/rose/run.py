@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -17,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Shared utilities for app/suite/task run."""
+"""Shared utilities for app/task run."""
 
 import os
 from metomi.rose.config_processor import ConfigProcessorsManager
@@ -83,7 +80,7 @@ class NewModeError(Exception):
         return "%s=%s, --new mode not supported." % self.args
 
 
-class Dummy(object):
+class Dummy:
 
     """Convert a dict into an object."""
 
@@ -92,9 +89,9 @@ class Dummy(object):
             setattr(self, key, value)
 
 
-class Runner(object):
+class Runner:
 
-    """Invoke a Rose application or a Rose suite."""
+    """Invoke a Rose application."""
 
     CONF_NAME = None
     NAME = None

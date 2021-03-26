@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -32,30 +32,38 @@ if ! gfortran --version 1>/dev/null 2>&1; then
     skip_all '"gfortran" unavailable'
 fi
 #-------------------------------------------------------------------------------
-tests 3
+tests 5
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
 
-SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
-NAME="$(basename "${SUITE_RUN_DIR}")"
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name
 
 # Add some garbage before running the suite
-mkdir -p "${SUITE_RUN_DIR}/share/hello-make/junk2"
-touch "${SUITE_RUN_DIR}/share/hello-make/junk1"
+mkdir -p "${FLOW_RUN_DIR}/share/hello-make/junk2"
+touch "${FLOW_RUN_DIR}/share/hello-make/junk1"
 
-timeout 120 rose suite-run -q --debug \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' -- --no-detach --debug
+run_pass "${TEST_KEY_BASE}-play" \
+    timeout 120 \
+        cylc play \
+            "${FLOW}" \
+            --abort-if-any-task-fails \
+            --host='localhost' \
+            --no-detach \
+            --debug
 #-------------------------------------------------------------------------------
-file_cmp "${TEST_KEY_BASE}" "${SUITE_RUN_DIR}/share/hello.txt" <<__TXT__
-${SUITE_RUN_DIR}/share/hello-make/build/bin/hello
+file_cmp "${TEST_KEY_BASE}" "${FLOW_RUN_DIR}/share/hello.txt" <<__TXT__
+${FLOW_RUN_DIR}/share/hello-make/build/bin/hello
 Hello World!
 __TXT__
 file_grep "${TEST_KEY_BASE}-fcm-make.log" \
-    '\[info\] mode=new' "${SUITE_RUN_DIR}/share/hello-make/fcm-make.log"
+    '\[info\] mode=new' "${FLOW_RUN_DIR}/share/hello-make/fcm-make.log"
 run_fail "${TEST_KEY_BASE}" ls \
-    "${SUITE_RUN_DIR}/share/hello-make/junk1" \
-    "${SUITE_RUN_DIR}/share/hello-make/junk2"
+    "${FLOW_RUN_DIR}/share/hello-make/junk1" \
+    "${FLOW_RUN_DIR}/share/hello-make/junk2"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

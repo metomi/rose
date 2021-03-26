@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -34,10 +34,10 @@ mkdir repos
 svnadmin create repos/foo
 SVN_URL=file://$PWD/repos/foo
 ROSE_BIN=$(dirname $(command -v rose))
-ROSE_LIB=$(dirname $(python -c "import metomi.rose; print(metomi.rose.__file__)"))
+ROSE_LIB=$(dirname $(python3 -c "import metomi.rose; print(metomi.rose.__file__)"))
 export ROSE_LIB ROSE_BIN
 cat >repos/foo/hooks/pre-commit <<__PRE_COMMIT__
-#!/bin/bash
+#!/usr/bin/env bash
 export ROSE_CONF_PATH=$PWD/conf
 export PATH=$PATH:${ROSE_BIN}
 export ROSE_LIB=${ROSE_LIB}

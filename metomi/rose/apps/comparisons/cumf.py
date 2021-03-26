@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -30,7 +27,7 @@ FAIL = "differ"
 HEADER = "differ, however the data fields are identical"
 
 
-class Cumf(object):
+class Cumf:
 
     """Analyse the output from the UM small exec cumf"""
 
@@ -54,7 +51,7 @@ class Cumf(object):
         return task
 
 
-class CumfWarnHeader(object):
+class CumfWarnHeader:
 
     """As cumf, but issue a warning if only the header has changed"""
 
@@ -74,7 +71,7 @@ class CumfWarnHeader(object):
         return task
 
 
-class CumfComparisonFailure(object):
+class CumfComparisonFailure:
 
     """Class used if a cumf comparison fails."""
 
@@ -97,7 +94,7 @@ class CumfComparisonFailure(object):
     __str__ = __repr__
 
 
-class CumfComparisonSuccess(object):
+class CumfComparisonSuccess:
 
     """Class used if a cumf comparison succeeds"""
 
@@ -114,7 +111,7 @@ class CumfComparisonSuccess(object):
     __str__ = __repr__
 
 
-class CumfComparisonHeaderWarning(object):
+class CumfComparisonHeaderWarning:
 
     """Class used if cumf reports just the header of a file is different"""
 
@@ -131,7 +128,7 @@ class CumfComparisonHeaderWarning(object):
     __str__ = __repr__
 
 
-class CumfSummaryNotFoundFailure(object):
+class CumfSummaryNotFoundFailure:
 
     """Class used if there is a problem finding a cumf summary file"""
 
@@ -148,7 +145,7 @@ class CumfSummaryNotFoundFailure(object):
     __str__ = __repr__
 
 
-class CumfDiffNotFoundFailure(object):
+class CumfDiffNotFoundFailure:
 
     """Class used if there is a problem finding a cumf diff file"""
 

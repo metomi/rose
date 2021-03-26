@@ -1,0 +1,27 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[events]]
+        abort on timeout=True
+        timeout=PT5M
+[scheduling]
+    [[dependencies]]
+        graph="""
+fcm_make_t1 # basic
+fcm_make_t2 # use-pwd
+fcm_make_t3 # opt.jobs
+fcm_make_t4 # args
+{% if HOST is defined %}
+fcm_make_t5 => fcm_make2_t5 # mirror
+{% endif %}
+"""
+[runtime]
+    [[root]]
+        script=rose task-run -v -v --debug
+    [[fcm_make_t1,fcm_make_t2,fcm_make_t3,fcm_make_t4]]
+{% if HOST is defined %}
+    [[fcm_make_t5]]
+    [[fcm_make2_t5]]
+        [[[remote]]]
+            host={{HOST}}
+{% endif %}

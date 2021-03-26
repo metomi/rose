@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -114,7 +111,7 @@ STATE_SECT_IGNORED = "^"
 OPT_CONFIG_SETTING_COMMENT = " setting from opt config \"%s\" (%s)"
 
 
-class ConfigNode(object):
+class ConfigNode:
 
     """Represent a node in a configuration file.
 
@@ -302,10 +299,10 @@ class ConfigNode(object):
         """Return a node at the position of keys, if any.
 
         Args:
-            keys (list, optional): A list defining a hierarchy of
+            keys (list): A list defining a hierarchy of
                 node.value 'keys'. If an entry in keys is the null
                 string, it is skipped.
-            no_ignore (bool, optional): If True any ignored nodes will
+            no_ignore (bool): If True any ignored nodes will
                 not be returned.
 
         Returns:
@@ -384,12 +381,12 @@ class ConfigNode(object):
         If the node does not exist or is ignored, return None.
 
         Args:
-            keys (list, optional): A list defining a hierarchy of node.value
+            keys (list): A list defining a hierarchy of node.value
                 'keys'. If an entry in keys is the null string, it is skipped.
-            default (obj, optional): Return default if the value is not set.
+            default (object): Return default if the value is not set.
 
         Returns:
-            obj: The value of this ConfigNode at the position of keys or
+            object: The value of this ConfigNode at the position of keys or
             default if not set.
 
         Examples:
@@ -428,7 +425,7 @@ class ConfigNode(object):
         Arguments:
             keys (list): A list defining a hierarchy of node.value 'keys'.
                 If an entry in keys is the null string, it is skipped.
-            value (obj): The node.value property to set at this position.
+            value (object): The node.value property to set at this position.
             state (str): The node.state property to set at this position.
                 If None, the node.state property is unchanged.
             comments (str): The node.comments property to set at this position.
@@ -619,7 +616,8 @@ class ConfigNode(object):
         """Produce a ConfigNodeDiff from another ConfigNode.
 
         Arguments:
-            other_config_node - The ConfigNode to be applied to this ConfigNode
+            other_config_node (ConfigNode):
+                The ConfigNode to be applied to this ConfigNode
                 to produce the ConfigNodeDiff.
 
         Returns:
@@ -661,7 +659,7 @@ class ConfigNode(object):
         self.comments = state["comments"]
 
 
-class ConfigNodeDiff(object):
+class ConfigNodeDiff:
 
     """Represent differences between two ConfigNode instances.
 
@@ -792,9 +790,12 @@ class ConfigNodeDiff(object):
         """Set a config setting to be "added" in this ConfigNodeDiff.
 
         Args:
-            keys (list/tuple): The position of the setting to add.
-            data (obj, str, str): A tuple (value, state, comments) for the
-                setting to add.
+            keys (list, tuple):
+                The position of the setting to add.
+            data (tuple):
+                A tuple of the form
+                ``(value: object, state: string, comments: string)``
+                for the setting to add.
 
         Examples:
             >>> config_node_diff = ConfigNodeDiff()
@@ -823,11 +824,14 @@ class ConfigNodeDiff(object):
         None then no change will be made to any pre-existing value.
 
         Args:
-            keys (list/tuple): The position of the setting to add.
-            old_data (obj, str, str): A tuple (value, state, comments) for
-                the "current" properties of the setting to modify.
-            data (obj, str, str): A tuple (value, state, comments) for "new"
-                properties to change this setting to.
+            keys (list, tuple):
+                The position of the setting to add.
+            old_data (tuple):
+                A tuple ``(value: object, state: str, comments: str)``
+                for the "current" properties of the setting to modify.
+            data (object):
+                A tuple ``(value: object, state: str, comments: str)``
+                for "new" properties to change this setting to.
 
         Examples:
             >>> # Create a ConfigNodeDiff.
@@ -853,8 +857,10 @@ class ConfigNodeDiff(object):
         """Set a config setting to be "removed" in this ConfigNodeDiff.
 
         Arguments:
-            keys (list): The position of the setting to add.
-            data (obj, str, str): A tuple (value, state, comments) of the
+            keys (list):
+                The position of the setting to add.
+            data (tuple):
+                A tuple ``(value: object, state: str, comments: str)`` of the
                 properties for the setting to remove.
 
         Example:
@@ -929,10 +935,10 @@ class ConfigNodeDiff(object):
         set to None for sections.
 
         Returns:
-            list - A list of the form [(keys, data), ...]:
-                - keys - The position of an added setting.
-                - data - Tuple of the form (value, state, comments) of the
-                  properties of the removed setting.
+            list: A list of the form ``[(keys, data), ...]``:
+               - keys - The position of an added setting.
+               - data - Tuple of the form (value, state, comments) of the
+                 properties of the removed setting.
 
         Examples:
             >>> config_node_diff = ConfigNodeDiff()
@@ -1007,7 +1013,7 @@ class ConfigNodeDiff(object):
         self._data[self.KEY_REMOVED] = {}
 
 
-class ConfigDumper(object):
+class ConfigDumper:
 
     """Dumper of a ConfigNode object in Rose INI format.
 
@@ -1040,17 +1046,17 @@ class ConfigDumper(object):
 
         Args:
             root (ConfigNode): The root config node.
-            target (str/file): An open file handle or a string containing a
+            target (object): An open file handle or a string containing a
                 file path. If not specified, the result is written to
                 sys.stdout.
-            sort_sections (fcn - optional): An optional argument that should be
+            sort_sections (Callable): An optional argument that should be
                 a function for sorting a list of section keys.
-            sort_option_items (fcn - optional): An optional argument that
+            sort_option_items (Callable): An optional argument that
                 should be a function for sorting a list of option (key, value)
                 tuples in string values.
-            env_escape_ok (bool - optional): An optional argument to indicate
+            env_escape_ok (bool): An optional argument to indicate
                 that $NAME and ${NAME} syntax in values should be escaped.
-            concat_mode (bool - optional): Switch on concatenation mode. If
+            concat_mode (bool): Switch on concatenation mode. If
                 True, add [] before root level options.
 
         """
@@ -1148,7 +1154,7 @@ class ConfigDumper(object):
         return "#%s\n" % (comment)
 
 
-class ConfigLoader(object):
+class ConfigLoader:
 
     """Loader of an INI format configuration into a ConfigNode object.
 
@@ -1210,25 +1216,25 @@ class ConfigLoader(object):
 
         Arguments:
             source (str): A file path.
-            node (ConfigNode - optional): A ConfigNode object if specified,
+            node (ConfigNode): A ConfigNode object if specified,
                 otherwise one is created.
-            more_keys (list - optional): A list of additional optional
+            more_keys (list): A list of additional optional
                 configuration names. If source is "rose-${TYPE}.conf", the
                 file of each name should be "opt/rose-${TYPE}-${NAME}.conf".
-            used_keys (list - optional): If defined, it should be a list for
+            used_keys (list): If defined, it should be a list for
                 this method to  append to. The key of each successfully loaded
                 optional configuration will be appended to the list (unless the
                 key is already in the list). Missing optional configurations
                 that are specified in more_keys will not raise an error.
                 If not defined, any missing optional configuration will
                 trigger an OSError.
-            mark_opt_configs (bool - optional): if True, add comments above any
+            mark_opt_configs (bool): if True, add comments above any
                 settings which have been loaded from an optional config.
-            return_config_map (bool - optional): If True, construct and return
+            return_config_map (bool): If True, construct and return
                 a dict (config_map) containing config names vs their uncombined
                 nodes. Optional configurations use their opt keys as keys, and
                 the main configuration uses 'None'.
-            defines (list - optional): A list of [SECTION]KEY=VALUE overrides.
+            defines (list): A list of [SECTION]KEY=VALUE overrides.
 
         Returns:
             tuple: node or (node, config_map):

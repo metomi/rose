@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -56,15 +53,6 @@ INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=owner",
                                 "=type"]
 SUB_CONFIG_DEFAULT_META_IDS = ["=file-install-root", "=meta", "=mode",
                                "=opts", "command", "file:", "poll"]
-TOP_CONFIG_DEFAULT_META_IDS = [
-    "file:",
-    "jinja2:suite.rc",
-    "=meta",
-    "=opts",
-    "=root-dir",
-    "=root-dir{share}",
-    "=root-dir{share/cycle}",
-    "=root-dir{work}"]
 CONFIG_SETTING_INDEX_DEFAULT = "1"
 
 

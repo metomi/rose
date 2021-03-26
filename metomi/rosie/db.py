@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -59,7 +56,7 @@ class RosieDatabaseConnectError(al.exc.OperationalError):
         return "Failed to connect to DB '%s'." % self.bad_db_url
 
 
-class DAO(object):
+class DAO:
 
     """Retrieves data from the suite database.
 

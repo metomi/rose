@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 74
+tests 75
 #-------------------------------------------------------------------------------
 # Define some constant patterns
 FAIL_PATTERN="\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
@@ -33,16 +33,24 @@ SKIP_PATTERN="\[SKIP\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+
+get_reg
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-play"
+run_pass "$TEST_KEY" \
+    cylc play \
+        "${FLOW}" \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 CYCLE=20100101T0000Z
-LOG_DIR="$SUITE_RUN_DIR/log/job/$CYCLE"
+LOG_DIR="$FLOW_RUN_DIR/log/job/$CYCLE"
 #-------------------------------------------------------------------------------
 # Testing successful runs
 #-------------------------------------------------------------------------------
@@ -242,5 +250,5 @@ file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
     "$INFO_PATTERN TOTAL: 8" \
     "$FILE"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+purge
 exit 0

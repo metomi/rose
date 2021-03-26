@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -24,10 +21,9 @@ PASS = "!~"
 FAIL = "~~"
 
 
-class Prohibited(object):
+class Prohibited:
     def run(self, task):
         """Perform an exact comparison between the result and the KGO data"""
-        failures = 0
         if len(task.resultdata) == 0:
             task.set_pass(ProhibitedStringResult(task, PASS))
         else:
@@ -35,7 +31,7 @@ class Prohibited(object):
         return task
 
 
-class ProhibitedStringResult(object):
+class ProhibitedStringResult:
 
     """Result of prohibited text examination."""
 

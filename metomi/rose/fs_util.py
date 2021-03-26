@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -54,7 +51,7 @@ class FileSystemEvent(Event):
         return "%s: %s" % (self.action, target)
 
 
-class FileSystemUtil(object):
+class FileSystemUtil:
 
     """File system utilities with event reporting."""
 

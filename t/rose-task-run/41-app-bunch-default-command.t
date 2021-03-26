@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -22,20 +22,29 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 26
+tests 27
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+
+get_reg
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$FLOW" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-play-1"
+run_pass "$TEST_KEY" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 CYCLE=20100101T0000Z
-LOG_DIR="$SUITE_RUN_DIR/log/job/$CYCLE"
+LOG_DIR="$FLOW_RUN_DIR/log/job/$CYCLE"
 #-------------------------------------------------------------------------------
 # Testing successful runs
 #-------------------------------------------------------------------------------
@@ -65,15 +74,20 @@ for TASK in buncher_default buncher_import; do
 done
 #-------------------------------------------------------------------------------
 # Run suite a second time
+# TODO: replace with cylc clean when the required functionality is implemented
+rm -rf "${FLOW_RUN_DIR}/log"
+rm -rf "${FLOW_RUN_DIR}/.service/db"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach --debug
+    cylc play "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
 # Testing successful rerun
 #-------------------------------------------------------------------------------
-for TASK in buncher_default buncher_import; do
-#-------------------------------------------------------------------------------
 # Confirm launching set of commands
+for TASK in buncher_default buncher_import; do
     TEST_KEY_PREFIX=launch-ok-2nd-run
     FILE=$LOG_DIR/$TASK/NN/job.out
     for INSTANCE in 0 1 2 3; do
@@ -82,8 +96,7 @@ for TASK in buncher_default buncher_import; do
         "\[INFO\] [-0-9]*T[+:0-9]* $INSTANCE: added to pool"\
          $FILE
     done
-#-------------------------------------------------------------------------------
 done
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+purge
 exit 0

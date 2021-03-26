@@ -9,7 +9,7 @@ Rose Applications
 
 .. ifnotslides::
 
-   The Cylc ``suite.rc`` file allows us to define environment variables for
+   The Cylc ``flow.cylc`` file allows us to define environment variables for
    use by :term:`tasks <task>` e.g:
 
 .. slide:: Cylc Task Environment
@@ -222,9 +222,9 @@ An application can be run using the :ref:`command-rose-app-run` command:
 
          rose tutorial test-data file/test-data
 
-   #. **Move environment variables defined in the** ``suite.rc`` **file.** 
+   #. **Move environment variables defined in the** ``flow.cylc`` **file.** 
 
-      In the ``[runtime][forecast][environment]`` section of the ``suite.rc``
+      In the ``[runtime][forecast][environment]`` section of the ``flow.cylc``
       file in the
       :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
       we set a few environment variables:
@@ -263,7 +263,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       To make this application work outside of the weather forecasting suite
       we will also need to
       provide the ``DOMAIN`` and ``RESOLUTION`` environment variables defined
-      in the ``[runtime][root][environment]`` section of the ``suite.rc``
+      in the ``[runtime][root][environment]`` section of the ``flow.cylc``
       file as well as the ``CYLC_TASK_CYCLE_POINT`` environment variable
       provided by Cylc when it runs a task.
 

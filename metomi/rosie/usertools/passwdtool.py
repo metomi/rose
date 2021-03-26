@@ -22,7 +22,7 @@
 from pwd import getpwnam
 
 
-class PasswdUserTool(object):
+class PasswdUserTool:
 
     """User information tool via Unix password info."""
 

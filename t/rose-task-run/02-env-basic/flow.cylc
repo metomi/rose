@@ -1,0 +1,21 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[events]]
+        abort on timeout = True
+        timeout = PT2M
+[scheduling]
+    initial cycle point = 20130101T00Z
+    final cycle point = 20130102T00Z
+    [[dependencies]]
+        [[[T00, T12]]]
+            graph = my_task_1
+
+[runtime]
+    [[my_task_1]]
+        env-script = """
+eval $(rose task-env --cycle-offset=T12H --path=MY_PATH='etc/my-path/*')
+"""
+        script = rose task-run --path=MY_PATH='etc/your-path'
+        [[[job]]]
+           execution time limit = PT1M

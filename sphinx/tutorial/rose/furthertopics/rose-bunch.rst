@@ -49,7 +49,7 @@ Create a new Rose suite configuration::
    mkdir -p ~/rose-tutorial/rose-bunch
    cd ~/rose-tutorial/rose-bunch
 
-Create a blank :rose:file:`rose-suite.conf` and a ``suite.rc``
+Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc``
 file that looks like this:
 
 .. code-block:: cylc
@@ -99,7 +99,7 @@ In the ``app/lander/`` directory create a ``bin/`` directory::
 Using your editor of choice, create a file named ``land`` under the ``bin``
 directory and paste in these lines::
 
-   #!/bin/bash
+   #!/usr/bin/env bash
 
    CLASS=$1
    PASSENGERS=$2
@@ -134,7 +134,7 @@ directory of the lander app and running::
 
    chmod +x land
 
-Navigate to the top directory of your suite (where the ``suite.rc`` and
+Navigate to the top directory of your suite (where the ``flow.cylc`` and
 :rose:file:`rose-suite.conf` files can be found) and run
 :ref:`command-rose-suite-run`.
 
@@ -149,7 +149,7 @@ its output (note that you can close the Cylc GUI at this point)::
 .. note::
 
    You can quickly get to the relevant page by running
-   :ref:`command-rose-suite-log` from within the :term:`suite directory`.
+   ``cylc cat-log`` from within the :term:`suite directory`.
 
 In the Rose Bush jobs page for your suite you should be presented with a
 page containing a single row for the ``lander`` task, from which you can

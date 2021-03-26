@@ -33,9 +33,9 @@ A Rose suite configuration is a Cylc :term:`suite directory` containing a
    :rose:conf:`rose-suite.conf[env]`
       Environment variables for use by the whole suite.
    :rose:conf:`rose-suite.conf[jinja2:suite.rc]`
-      `Jinja2`_ variables for use in the ``suite.rc`` file.
+      `Jinja2`_ variables for use in the ``flow.cylc`` file.
    :rose:conf:`rose-suite.conf[empy:suite.rc]`
-      `EmPy`_ variables for use in the ``suite.rc`` file.
+      `EmPy`_ variables for use in the ``flow.cylc`` file.
    :rose:conf:`rose-suite.conf[file:NAME]`
       Files and resources to be installed in the :term:`run directory` when the
       suite is run.
@@ -52,7 +52,7 @@ A Rose suite configuration is a Cylc :term:`suite directory` containing a
 
    In the following example the environment variable ``GREETING`` and the
    Jinja2 variable ``WORLD`` are both set in the :rose:file:`rose-suite.conf`
-   file. These variables can then be used in the ``suite.rc`` file:
+   file. These variables can then be used in the ``flow.cylc`` file:
 
 .. code-block:: rose
    :caption: rose-suite.conf
@@ -64,7 +64,7 @@ A Rose suite configuration is a Cylc :term:`suite directory` containing a
    WORLD=Earth
 
 .. code-block:: cylc
-   :caption: suite.rc
+   :caption: flow.cylc
 
    [scheduling]
        [[dependencies]]
@@ -81,7 +81,7 @@ Suite Directory Vs Run Directory
 --------------------------------
 
 :term:`suite directory`
-   The directory in which the suite is written. The ``suite.rc`` and
+   The directory in which the suite is written. The ``flow.cylc`` and
    :rose:file:`rose-suite.conf` files live here.
 :term:`run directory`
    The directory in which the suite runs. The ``work``, ``share`` and ``log``
@@ -137,7 +137,7 @@ Running Rose Suite Configurations
    it becomes the :term:`run directory`.
 #. Any files defined in the :rose:file:`rose-suite.conf` file are installed.
 #. Jinja2 variables defined in the :rose:file:`rose-suite.conf` file are added
-   to the top of the ``suite.rc`` file.
+   to the top of the ``flow.cylc`` file.
 #. The Cylc suite is validated.
 #. The Cylc suite is run.
 #. The Cylc GUI is launched.
@@ -239,7 +239,7 @@ Start, Stop, Restart
 
    :ref:`Starting Suites`
       Suites must be run using the :ref:`command-rose-suite-run` command which
-      in turn calls the ``cylc run`` command.
+      in turn calls the ``cylc play`` command.
    :ref:`Stopping Suites`
       Suites can be stopped using the ``cylc stop <SUITE_NAME>`` command,
       as for regular Cylc suites.
@@ -257,7 +257,7 @@ Start, Stop, Restart
 .. ifslides::
 
    Starting Suites
-      ``rose suite-run`` which in turn calls ``cylc run``
+      ``rose suite-run`` which in turn calls ``cylc play``
    Stopping Suites
       ``cylc stop <SUITE_NAME>``
    Restarting Suites
@@ -315,7 +315,7 @@ See the :ref:`Cheat Sheet` for more information.
       file does not need to have anything in it but it is required to run
       :ref:`command-rose-suite-run`.
 
-      There are three things defined in the ``suite.rc`` file which it might be
+      There are three things defined in the ``flow.cylc`` file which it might be
       useful to be able to configure:
 
       ``station``
@@ -377,9 +377,9 @@ See the :ref:`Cheat Sheet` for more information.
       This will contain the environment and Jinja2 variables we have just
       defined.
 
-   #. **Use Suite Variables In The** ``suite.rc`` **File.**
+   #. **Use Suite Variables In The** ``flow.cylc`` **File.**
 
-      Next we need to make use of these settings in the ``suite.rc`` file.
+      Next we need to make use of these settings in the ``flow.cylc`` file.
 
       We can delete the ``RESOLUTION`` and ``DOMAIN`` settings in the
       ``[runtime][root][environment]`` section which would otherwise override
@@ -470,7 +470,7 @@ Rose Applications In Rose Suite Configurations
 .. nextslide::
 
 .. code-block:: cylc
-   :caption: suite.rc
+   :caption: flow.cylc
 
    [runtime]
        [[hello]]
@@ -492,7 +492,7 @@ Rose Applications In Rose Suite Configurations
    :term:`app <Rose app>` in the task defined below.
 
 .. code-block:: cylc
-   :caption: suite.rc
+   :caption: flow.cylc
 
    [runtime]
        [[greetings]]
@@ -600,12 +600,12 @@ Rose Applications In Rose Suite Configurations
       We have moved the map template file (``map-template.html``) into the
       ``forecast`` application so we can delete the ``MAP_TEMPLATE``
       environment variable from the ``[runtime]forecast`` section of the
-      ``suite.rc`` file.
+      ``flow.cylc`` file.
 
       Copy the remaining environment variables defined in the ``forecast``
-      task within the ``suite.rc`` file into the :rose:file:`rose-app.conf`
+      task within the ``flow.cylc`` file into the :rose:file:`rose-app.conf`
       file of the ``forecast`` application, replacing any values already
-      specified if necessary. Remove the lines from the ``suite.rc`` file
+      specified if necessary. Remove the lines from the ``flow.cylc`` file
       when you are done.
 
       Remember, in Rose configuration files:
@@ -631,7 +631,7 @@ Rose Applications In Rose Suite Configurations
 
       Finally we need to change the ``forecast`` task to run
       :ref:`command-rose-task-run`. The ``[runtime]forecast`` section of the
-      ``suite.rc`` file should now look like this:
+      ``flow.cylc`` file should now look like this:
 
       .. code-block:: cylc
 

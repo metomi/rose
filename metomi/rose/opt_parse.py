@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -20,7 +17,7 @@
 """Common option parser for Rose command utilities."""
 
 from optparse import OptionParser
-from metomi.rose.resource import ResourceLocator
+import metomi.rose.resource
 
 
 class RoseOptionParser(OptionParser):
@@ -616,10 +613,6 @@ class RoseOptionParser(OptionParser):
             ["--to-origin"],
             {"action": "store_true",
              "help": "Convert ID to the origin URL"}],
-        "to_output": [
-            ["--to-output"],
-            {"action": "store_true",
-             "help": "Get the ID output directory"}],
         "to_web": [
             ["--to-web"],
             {"action": "store_true",
@@ -686,9 +679,15 @@ class RoseOptionParser(OptionParser):
     def __init__(self, *args, **kwargs):
         if hasattr(kwargs, "prog"):
             namespace, util = kwargs["prog"].split(None, 1)
-            resource_loc = ResourceLocator(namespace=namespace, util=util)
+            resource_loc = (
+                metomi.rose.resource.ResourceLocator(
+                    namespace=namespace, util=util
+                )
+            )
         else:
-            resource_loc = ResourceLocator.default()
+            resource_loc = (
+                metomi.rose.resource.ResourceLocator.default()
+            )
         kwargs["prog"] = resource_loc.get_util_name()
         if not hasattr(kwargs, "usage"):
             kwargs["usage"] = resource_loc.get_synopsis()

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -163,7 +160,7 @@ class SuiteDeleteEvent(Event):
         return "delete: %s" % id_.to_origin()
 
 
-class RosieVCClient(object):
+class RosieVCClient:
 
     """Client for version control functionalities."""
 

@@ -29,13 +29,13 @@ supported format is JSON) and use a url that looks like:
 REST API
 --------
 
-.. http:get:: (str:prefix)/get_known_keys
+.. http:get:: (prefix)/get_known_keys
 
    Return the main property names stored for suites (e.g. ``idx``, ``branch``,
    ``owner``) plus any additional names specified in the site config.
 
-   :arg str prefix: Repository prefix.
-   :param string format: Desired return format (``json`` or ``None``).
+   :arg prefix: Repository prefix.
+   :param format: Desired return format (``json`` or ``None``).
 
    Example Request
       .. code-block:: http
@@ -48,13 +48,13 @@ REST API
          ["access-list", "idx", "branch", "owner", "project", "revision", "status",  "title"]
 
 
-.. http:get:: (str:prefix)/get_optional_keys
+.. http:get:: (prefix)/get_optional_keys
 
    Return all unique optional or user-defined property names given in suite
    discovery information.
 
-   :arg str prefix: Repository prefix.
-   :param string format: Desired return format (``json`` or ``None``).
+   :arg prefix: Repository prefix.
+   :param format: Desired return format (``json`` or ``None``).
 
    Example Request
       .. code-block:: http
@@ -67,13 +67,13 @@ REST API
          ["access-list", "description", "endgame_status", "operational_flag", "tag-list"]
 
 
-.. http:get:: (str:prefix)/get_query_operators
+.. http:get:: (prefix)/get_query_operators
 
    Returns all the SQL-like operators used to compare column values that you
-   may use in :http:get:`(str:prefix)/query` (e.g. ``eq``, ``ne``, ``contains``, ``like``).
+   may use in :http:get:`(prefix)/query` (e.g. ``eq``, ``ne``, ``contains``, ``like``).
    
-   :arg str prefix: Repository prefix.
-   :param string format: Desired return format (``json`` or ``None``).
+   :arg prefix: Repository prefix.
+   :param format: Desired return format (``json`` or ``None``).
 
    Example Request
       .. code-block:: http
@@ -86,23 +86,21 @@ REST API
          ["eq", "ge", "gt", "le", "lt", "ne", "contains", "endswith", "ilike", "like", "match", "startswith"]
 
 
-.. http:get:: (str:prefix)/query
+.. http:get:: (prefix)/query
 
    Return a list of suites matching all search terms.
 
-   :arg str prefix: Repository prefix.
-   :param list q: List of queries.
-   :param string format: Desired return format (``json`` or ``None``).
-   :param flag all_revs: Switch on searching older revisions of current suites
-      and deleted suites.
+   :arg prefix: Repository prefix.
+   :param q: List of queries.
+   :param format: Desired return format (``json`` or ``None``).
+   :param all_revs: Switch on searching older revisions of current suites and deleted suites.
 
-   :queryparameter str CONJUNCTION: ``and`` or ``or``\ .
-   :queryparameter str OPEN_GROUP: optional, one or more ``(``\ .
-   :queryparameter str FIELD: e.g. ``idx`` or ``description``\ .
-   :queryparameter str OPERATOR: e.g. ``contains`` or ``between``, one of
-      the operators returned by :http:get:`(str:prefix)/get_query_operators`.
-   :queryparameter str VALUE: e.g. ``euro4m`` or ``200``\ .
-   :queryparameter str CLOSE_GROUP: optional, one or more ``)``\ .
+   :queryparameter CONJUNCTION: ``and`` or ``or``\ .
+   :queryparameter OPEN_GROUP: optional, one or more ``(``\ .
+   :queryparameter FIELD: e.g. ``idx`` or ``description``\ .
+   :queryparameter OPERATOR: e.g. ``contains`` or ``between``, one of the operators returned by :http:get:`(prefix)/get_query_operators`.
+   :queryparameter VALUE: e.g. ``euro4m`` or ``200``\ .
+   :queryparameter CLOSE_GROUP: optional, one or more ``)``\ .
 
    Query Format
       .. code-block:: none
@@ -136,16 +134,14 @@ REST API
            "access-list": ["*"], "operational": "Y"}]
 
 
-.. http:get:: (str:prefix)/search
+.. http:get:: (prefix)/search
 
    Return a list of suites matching one or more search terms.
 
-   :arg str prefix: Repository prefix.
-   :param list s: List of queries in the same format as
-      :http:get:`(str:prefix)/query`
-   :param string format: Desired return format (``json`` or ``None``).
-   :param flag all_revs: Switch on searching older revisions of current suites
-      and deleted suites.
+   :arg prefix: Repository prefix.
+   :param s: List of queries in the same format as :http:get:`(prefix)/query`
+   :param format: Desired return format (``json`` or ``None``).
+   :param ll_revs: Switch on searching older revisions of current suites and deleted suites.
 
    Example Request
       Return suites which match ``var``, ``bob`` or ``nowcast``.

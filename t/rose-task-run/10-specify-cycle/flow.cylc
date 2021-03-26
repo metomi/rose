@@ -1,0 +1,18 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[events]]
+        abort on timeout = True
+        timeout=PT1M
+[scheduling]
+    initial cycle point=20130101
+    final cycle point=20130101
+    [[dependencies]]
+        [[[T00]]]
+            graph=t1
+
+[runtime]
+    [[t1]]
+        script=rose task-run --cycle=T12H
+        [[[job]]]
+            execution time limit = PT1M

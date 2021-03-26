@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -32,43 +32,51 @@ if ! gfortran --version 1>/dev/null 2>&1; then
     skip_all '"gfortran" unavailable'
 fi
 #-------------------------------------------------------------------------------
-tests 5
+tests 7
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
 mkdir 'fast'
 MTIME_OF_FAST_BEFORE=$(stat '-c%y' 'fast')
 #-------------------------------------------------------------------------------
-SUITE_RUN_DIR="$(mktemp -d --tmpdir="${HOME}/cylc-run" 'rose-test-battery.XXXXXX')"
-NAME="$(basename "${SUITE_RUN_DIR}")"
-timeout 120 rose suite-run -q --debug \
-    -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host='localhost' -S "FAST_DEST_ROOT=\"${PWD}/fast\"" \
-    -- --no-detach --debug
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-play" \
+    timeout 120 \
+        cylc play \
+            "${FLOW}" \
+            -s "FAST_DEST_ROOT='${PWD}/fast'" \
+            --abort-if-any-task-fails \
+            --host='localhost' \
+            --no-detach \
+            --debug
 #-------------------------------------------------------------------------------
 # Permission modes of make directory should be the same as a normal directory
-mkdir "${SUITE_RUN_DIR}/share/hello-make-perm-mode-test"
+mkdir "${FLOW_RUN_DIR}/share/hello-make-perm-mode-test"
 run_pass "${TEST_KEY_BASE}-perm-mode" test \
-    "$(stat -c'%a' "${SUITE_RUN_DIR}/share/hello-make-perm-mode-test")" = \
-    "$(stat -c'%a' "${SUITE_RUN_DIR}/share/hello-make")"
-rmdir "${SUITE_RUN_DIR}/share/hello-make-perm-mode-test"
+    "$(stat -c'%a' "${FLOW_RUN_DIR}/share/hello-make-perm-mode-test")" = \
+    "$(stat -c'%a' "${FLOW_RUN_DIR}/share/hello-make")"
+rmdir "${FLOW_RUN_DIR}/share/hello-make-perm-mode-test"
 # Executable runs OK
-file_cmp "${TEST_KEY_BASE}" "${SUITE_RUN_DIR}/share/hello.txt" <<__TXT__
-${SUITE_RUN_DIR}/share/hello-make/build/bin/hello
+file_cmp "${TEST_KEY_BASE}" "${FLOW_RUN_DIR}/share/hello.txt" <<__TXT__
+${FLOW_RUN_DIR}/share/hello-make/build/bin/hello
 Hello World!
 __TXT__
 # Logs
 HOST=$(hostname)
 file_grep "${TEST_KEY_BASE}.log" \
-    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make.1.${NAME}" \
-    "${SUITE_RUN_DIR}/share/hello-make/fcm-make.log"
+    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make.1.${FLOW//\//_}" \
+    "${FLOW_RUN_DIR}/share/hello-make/fcm-make.log"
 file_grep "${TEST_KEY_BASE}-bin.log" \
-    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make-bin.1.${NAME}" \
-    "${SUITE_RUN_DIR}/share/hello-make/fcm-make-bin.log"
+    "\\[info\\] dest=${USER}@${HOST}:${PWD}/fast/hello-make-bin.1.${FLOW//\//_}" \
+    "${FLOW_RUN_DIR}/share/hello-make/fcm-make-bin.log"
 # Prove that the fast directory has been modified
 MTIME_OF_FAST_AFTER=$(stat '-c%y' 'fast')
 run_pass "${TEST_KEY_BASE}-mtime-of-fast" \
     test "${MTIME_OF_FAST_BEFORE}" '!=' "${MTIME_OF_FAST_AFTER}"
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -23,31 +23,39 @@
 
 
 #-------------------------------------------------------------------------------
-tests 2
+tests 4
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
-mkdir -p "${HOME}/cylc-run"
-SUITE_RUN_DIR="$(mktemp -d "${HOME}/cylc-run/rose-test-battery.XXXXXX")"
-NAME="$(basename "${SUITE_RUN_DIR}")"
-rose suite-run -q -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" --name="${NAME}" \
-    --host=localhost -- --no-detach --debug
+get_reg
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --flow-name="${FLOW}" \
+        --no-run-name
+run_pass "${TEST_KEY_BASE}-play" \
+    cylc play \
+        "${FLOW}" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 #-------------------------------------------------------------------------------
-FOO_UUID=$(<"${SUITE_RUN_DIR}/foo-uuid")
-grep -F "${FOO_UUID}" "${SUITE_RUN_DIR}/log/job/1/archive/NN/job.out" \
+FOO_UUID=$(<"${FLOW_RUN_DIR}/foo-uuid")
+grep -F "${FOO_UUID}" "${FLOW_RUN_DIR}/log/job/1/archive/NN/job.out" \
     >"${TEST_KEY_BASE}.out"
 # This ensures that the STDOUT of the "foo" command is only printed out once.
 file_cmp "${TEST_KEY_BASE}.out" "${TEST_KEY_BASE}.out" <<__OUT__
-[INFO] ${FOO_UUID} share/namelist/x.nl ${SUITE_RUN_DIR}/share/backup/x.nl
+[INFO] ${FOO_UUID} share/namelist/x.nl ${FLOW_RUN_DIR}/share/backup/x.nl
 __OUT__
 # This tests that the "foo" command has done what it is asked to do.
 file_cmp "${TEST_KEY_BASE}.content" \
-    "${SUITE_RUN_DIR}/share/backup/x.nl" <<'__NL__'
+    "${FLOW_RUN_DIR}/share/backup/x.nl" <<'__NL__'
 &x
 MMXIV=2014,
 /
 __NL__
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y "${NAME}"
+purge
 exit 0

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -30,8 +30,7 @@
 #     Make a copy of one of the tutorial SUITE in the cylc-run directory.
 #
 #-------------------------------------------------------------------------------
-# shellcheck source=lib/bash/rose_init
-. rose_init
+set -eu
 mkdir -p "$HOME/cylc-run"
 
 usage () {
@@ -86,7 +85,7 @@ fi
 
 # Copy files.
 echo -n "Copying tutorial files to ${DIRECTORY} ... "
-rose_init 'rose_log'
+
 mkdir -p "$(dirname "${DIRECTORY}")"
 if run rsync -rLptgoD "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}" \
     --exclude='.validate'; then

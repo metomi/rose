@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
-class LogicalTransformer(rose.macro.MacroBase):
+class LogicalTransformer(metomi.rose.macro.MacroBase):
 
     """Test class to change the value of a boolean environment variable."""
 
@@ -17,10 +15,10 @@ class LogicalTransformer(rose.macro.MacroBase):
         """Perform the transform operation on the env switch."""
         if config.get(["env", "TRANSFORM_SWITCH"]) is not None:
             value = config.get(["env", "TRANSFORM_SWITCH"]).value
-            if value == rose.TYPE_BOOLEAN_VALUE_FALSE:
-                new_value = rose.TYPE_BOOLEAN_VALUE_TRUE
+            if value == metomi.rose.TYPE_BOOLEAN_VALUE_FALSE:
+                new_value = metomi.rose.TYPE_BOOLEAN_VALUE_TRUE
             else:
-                new_value = rose.TYPE_BOOLEAN_VALUE_FALSE
+                new_value = metomi.rose.TYPE_BOOLEAN_VALUE_FALSE
             config.set(["env", "TRANSFORM_SWITCH"], new_value)
             info = self.WARNING_CHANGED_VALUE.format(value, new_value)
             self.add_report("env", "TRANSFORM_SWITCH", value, info)

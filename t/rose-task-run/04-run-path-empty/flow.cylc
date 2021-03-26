@@ -1,0 +1,25 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[events]]
+        abort on timeout = True
+        timeout = PT2M
+[scheduling]
+    initial cycle point = 20130101T00Z
+    final cycle point   = 20130102T00Z
+    [[dependencies]]
+        [[[ T00, T12 ]]]
+            graph = """
+install => my_task_1
+"""
+
+[runtime]
+    [[root]]
+        [[[job]]]
+           execution time limit = PT1M
+    [[install]]
+        script = """rose task-run"""
+    [[my_task_1]]
+        script = """
+rose task-run --path= --path=etc/your-path
+"""

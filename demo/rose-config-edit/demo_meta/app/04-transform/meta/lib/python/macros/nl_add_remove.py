@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 # -----------------------------------------------------------------------------
 
-import rose.macro
+import metomi.rose.macro
 
 
-class NamelistAdderRemover(rose.macro.MacroBase):
+class NamelistAdderRemover(metomi.rose.macro.MacroBase):
 
     """Test class to add and remove a section."""
 

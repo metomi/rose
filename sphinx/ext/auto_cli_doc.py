@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -21,7 +18,7 @@
 
 from collections import OrderedDict
 import re
-from subprocess import PIPE, check_output, CalledProcessError
+from subprocess import check_output, CalledProcessError
 import sys
 
 from docutils import nodes
@@ -128,7 +125,12 @@ def line_strip(lines):
         ...     ''
         ... ])
         ['a']
+        >>> line_strip([''])
+        []
+
     """
+    if all(not line for line in lines):
+        return []
     lines = list(lines)
     kill = []
     for itt in range(0, len(lines)):

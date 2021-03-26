@@ -8,7 +8,7 @@ Suite Configuration
 
 The configuration and functionality of a suite will usually be covered by
 the use of `Cylc`_. In which case, most of the suite configuration will live
-in the Cylc ``suite.rc`` file. Otherwise, a suite is just a directory of
+in the Cylc ``flow.cylc`` file. Otherwise, a suite is just a directory of
 files.
 
 A suite directory may contain the following:
@@ -76,20 +76,20 @@ A suite directory may contain the following:
       .. rose:conf:: KEY=VALUE
 
          Define a `Jinja2`_ variable ``KEY`` with the value ``VALUE`` for use
-         in the ``suite.rc`` file.
+         in the ``flow.cylc`` file.
 
          The assignment will be inserted after the ``#!jinja2`` line of the
-         installed ``suite.rc`` file.
+         installed ``flow.cylc`` file.
 
    .. rose:conf:: empy:suite.rc
 
       .. rose:conf:: KEY=VALUE
 
          Define a `EmPy`_ variable ``KEY`` with the value ``VALUE`` for use
-         in the ``suite.rc`` file.
+         in the ``flow.cylc`` file.
 
          The assignment will be inserted after the ``#!empy`` line of the
-         installed ``suite.rc`` file.
+         installed ``flow.cylc`` file.
 
    .. rose:conf:: [file:NAME]
 
@@ -106,62 +106,6 @@ A suite directory may contain the following:
       Specify the configuration metadata for the suite. The section may be
       used by various Rose utilities, such as the config editor GUI. It can be
       used to specify the suite type.
-
-   .. rose:conf:: root-dir=LIST
-
-      A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN``
-      should be a glob-like pattern for matching a host name. The ``DIR``
-      should be the root directory to install a suite run directory. E.g.:
-
-      .. code-block:: rose
-
-         root-dir=hpc*=$WORKDIR
-                 =*=$DATADIR
-
-      In this example, :ref:`command-rose-suite-run` of a suite with name
-      ``$NAME`` will create ``~/cylc-run/$NAME`` as a symbolic link to
-      ``$DATADIR/cylc-run/$NAME/`` on any machine, except those with their
-      hostnames matching ``hpc*``. In which case, it will create
-      ``~/cylc-run/$NAME`` as a symbolic link to ``$WORKDIR/cylc-run/$NAME/``.
-
-      .. warning::
-
-         If a suite has previously been run changes to any of the ``root-dir``
-         settings will take effect on the next clean re-installation i.e::
-
-            $ rose suite-run --new
-
-   .. rose:conf:: root-dir{share}=LIST
-
-      A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN`` should
-      be a glob-like pattern for matching a host name. The ``DIR`` should be the
-      root directory where the suite's ``share/`` directory should be created.
-
-   .. rose:conf:: root-dir{share/cycle}=LIST
-
-      A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN`` should
-      be a glob-like pattern for matching a host name. The ``DIR`` should be the
-      root directory where the suite's ``share/cycle/`` directory should be
-      be created.
-
-   .. rose:conf:: root-dir{work}=LIST
-
-      A new line delimited list of ``PATTERN=DIR`` pairs. The ``PATTERN`` should
-      be a glob-like pattern for matching a host name. The ``DIR`` should be the
-      root directory where the suite's ``work/`` directory for tasks should be
-      created.
-
-   .. rose:conf:: root-dir-share=LIST
-
-      .. deprecated:: 2015.04
-
-         Equivalent to :rose:conf:`root-dir{share}=LIST`.
-
-   .. rose:conf:: root-dir-work=LIST
-
-      .. deprecated:: 2015.04
-
-         Equivalent to :rose:conf:`root-dir{work}=LIST`.
 
 .. rose:file:: rose-suite.info
 

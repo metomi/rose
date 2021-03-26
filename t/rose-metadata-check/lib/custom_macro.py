@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -56,5 +53,5 @@ class LogicalTruthChecker(metomi.rose.macro.MacroBase):
         if node is not None and node.value != \
                 metomi.rose.TYPE_BOOLEAN_VALUE_FALSE:
             info = self.ERROR_NOT_TRUE.format(node.value)
-            self.add_report("env", "TRANSFORM_SWITCH", value, info)
+            self.add_report("env", "TRANSFORM_SWITCH", node.value, info)
         return self.reports

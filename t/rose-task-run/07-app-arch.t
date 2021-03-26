@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -23,38 +23,46 @@
 
 
 #-------------------------------------------------------------------------------
-tests 48
+tests 49
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
+get_reg
+TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --host=localhost -- --no-detach
+    cylc install \
+        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        --flow-name="$FLOW" \
+        --no-run-name
+TEST_KEY="${TEST_KEY_BASE}-play"
+run_pass "$TEST_KEY" \
+    cylc play \
+        "$FLOW" \
+        --abort-if-any-task-fails \
+        --host=localhost \
+        --no-detach \
+        --debug
 cp ${TEST_KEY}.err ~/temp
 cp ${TEST_KEY}.out ~/temp
 #-------------------------------------------------------------------------------
 # Results, good ones
 TEST_KEY="$TEST_KEY_BASE-find-foo"
-(cd $SUITE_RUN_DIR; find foo -type f | LANG=C sort) >"$TEST_KEY.out"
+(cd $FLOW_RUN_DIR; find foo -type f | LANG=C sort) >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_SOURCE_DIR/$TEST_KEY.out" "$TEST_KEY.out"
 for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
     TEST_KEY="$TEST_KEY_BASE-$CYCLE.out"
     sed '/^\[INFO\] [=!+]/!d;
          s/\(t(init)=\)[^Z]*Z/\1YYYY-mm-DDTHH:MM:SSZ/;
          s/\(dt(\(tran\|arch\))=\)[^s]*s/\1SSSSs/g' \
-         $SUITE_RUN_DIR/log/job/$CYCLE/archive/0*/job.out >"$TEST_KEY"
+         $FLOW_RUN_DIR/log/job/$CYCLE/archive/0*/job.out >"$TEST_KEY"
     file_cmp "$TEST_KEY" "$TEST_KEY" $TEST_SOURCE_DIR/$TEST_KEY_BASE-$CYCLE.out
     TEST_KEY="$TEST_KEY_BASE-planet-n"
-    tar -tzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/planet-n.tar.gz | \
+    tar -tzf $FLOW_RUN_DIR/foo/$CYCLE/hello/worlds/planet-n.tar.gz | \
         LANG=C sort >"$TEST_KEY-$CYCLE.out"
     file_cmp "$TEST_KEY-$CYCLE.out" \
         "$TEST_KEY-$CYCLE.out" "$TEST_SOURCE_DIR/$TEST_KEY.out"
     TEST_KEY="$TEST_KEY_BASE-unknown-stuff"
-    tar -tf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/unknown/stuff.pax | \
+    tar -tf $FLOW_RUN_DIR/foo/$CYCLE/hello/worlds/unknown/stuff.pax | \
         LANG=C sort >"$TEST_KEY-$CYCLE.out"
     sed "s/\\\$CYCLE/$CYCLE/" "$TEST_SOURCE_DIR/$TEST_KEY.out" \
         >"$TEST_KEY-$CYCLE.out.expected"
@@ -62,27 +70,27 @@ for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
         "$TEST_KEY-$CYCLE.out" "$TEST_KEY-$CYCLE.out.expected"
     TEST_KEY="$TEST_KEY_BASE-db"
     for TRY in 1 2; do
-        FILE=$SUITE_RUN_DIR/work/$CYCLE/archive/rose-arch-db-$TRY.out
-        sed "s?\\\$ROSE_DATAC?$SUITE_RUN_DIR/share/cycle/$CYCLE?" \
+        FILE=$FLOW_RUN_DIR/work/$CYCLE/archive/rose-arch-db-$TRY.out
+        sed "s?\\\$ROSE_DATAC?$FLOW_RUN_DIR/share/cycle/$CYCLE?" \
             "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" >$FILE.expected
         file_cmp "$TEST_KEY-$CYCLE.out" $FILE.expected $FILE
     done
     for KEY in dark-matter.txt jupiter.txt try.nl uranus.txt; do
         TEST_KEY="$TEST_KEY_BASE-$CYCLE-grep-$KEY-foo-log-2"
-        file_grep "$TEST_KEY" $KEY $SUITE_RUN_DIR/foo.log.$CYCLE.2
+        file_grep "$TEST_KEY" $KEY $FLOW_RUN_DIR/foo.log.$CYCLE.2
     done
-    if test $(wc -l <$SUITE_RUN_DIR/foo.log.$CYCLE.2) -eq 4; then
+    if test $(wc -l <$FLOW_RUN_DIR/foo.log.$CYCLE.2) -eq 4; then
         pass "$TEST_KEY_BASE-$CYCLE-foo-log-2-wc-l"
     else
         fail "$TEST_KEY_BASE-$CYCLE-foo-log-2-wc-l"
     fi
     TEST_KEY="$TEST_KEY_BASE-$CYCLE-neptune-1.txt"
     file_cmp "$TEST_KEY" \
-        $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/neptune-1.txt <<__TXT__
+        $FLOW_RUN_DIR/foo/$CYCLE/hello/worlds/neptune-1.txt <<__TXT__
 [$CYCLE] Greet Triton
 __TXT__
     TEST_KEY="$TEST_KEY_BASE-$CYCLE-jupiter-moons.tar.gz"
-    tar -xzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/jupiter-moons.tar.gz -O \
+    tar -xzf $FLOW_RUN_DIR/foo/$CYCLE/hello/worlds/jupiter-moons.tar.gz -O \
         >"$TEST_KEY.out"
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__TXT__
 [$CYCLE] Greet Io
@@ -92,7 +100,7 @@ done
 # Results, bad ones
 CYCLE=20130101T1200Z
 TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
-FILE_PREFIX="$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_"
+FILE_PREFIX="$FLOW_RUN_DIR/log/job/$CYCLE/archive_bad_"
 sed '/^\[FAIL\] /!d' "${FILE_PREFIX}1/01/job.err" >"${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
 [FAIL] foo://20130101T1200Z/hello/worlds/planet-n.tar.gz: bad command-format: foo put %(target)s %(source)s: KeyError: 'source'
@@ -125,15 +133,20 @@ __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-5"
 sed '/^\[FAIL\] /!d' "${FILE_PREFIX}5/01/job.err" >"${TEST_KEY}.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
-[FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: '${SUITE_RUN_DIR}/share/cycle/20130101T1200Z/hello/mercurry.txt'
+[FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: '${FLOW_RUN_DIR}/share/cycle/20130101T1200Z/hello/mercurry.txt'
 [FAIL] ! foo://20130101T1200Z/hello/worlds/inner.tar.gz [compress=tar.gz]
 [FAIL] !	hello/venus.txt (hello/venus.txt)
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
-sed '/^\[FAIL\] /!d; s/ \[compress.*\]$//' "$TEST_KEY.err" \
+# NOTE: /BASH_XTRACEFD/d is to remove any Cylc errors of the form:
+# BASH_XTRACEFD: 19: invalid value for trace file descriptor
+sed \
+    -e '/^\[FAIL\] /!d; s/ \[compress.*\]$//' \
+    -e '/BASH_XTRACEFD/d' \
+    "$TEST_KEY.err" \
     "${FILE_PREFIX}6/01/job.err" >"$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] foo push foo://20130101T1200Z/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/cycle/20130101T1200Z/hello/mars.txt # return-code=1, stderr=
+[FAIL] foo push foo://20130101T1200Z/hello/worlds/mars.txt.gz $FLOW_RUN_DIR/share/cycle/20130101T1200Z/hello/mars.txt # return-code=1, stderr=
 [FAIL] foo: push: unknown action
 [FAIL] ! foo://20130101T1200Z/hello/worlds/mars.txt.gz
 [FAIL] !	hello/mars.txt (hello/mars.txt)
@@ -152,14 +165,15 @@ TEST_KEY="$TEST_KEY_BASE-bad-archive-9"
 sed '/^\[INFO\] [=!+]/!d;
      s/\(t(init)=\)[^Z]*Z/\1YYYY-mm-DDTHH:MM:SSZ/;
      s/\(dt(\(tran\|arch\))=\)[^s]*s/\1SSSSs/g' \
-    "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.out" >"$TEST_KEY.out"
+    "$FLOW_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.out" >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" \
     "$TEST_SOURCE_DIR/$TEST_KEY_BASE-bad-9.out" "$TEST_KEY.out"
 sed -e '/^\[FAIL\] /!d' \
     -e 's/^\(\[FAIL\] my-bad-command\) .*\( # return-code=1, stderr=\)$/\1\2/' \
     -e '/^\[FAIL\] \[my-bad-command\]/d' \
     -e 's/ \[compress.*]$//' \
-    "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.err" >"$TEST_KEY.err"
+    -e '/BASH_XTRACEFD/d' \
+    "$FLOW_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.err" >"$TEST_KEY.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 [FAIL] ! foo://20130101T1200Z/planet-n.tar.gz
 [FAIL] !	hello/dark-matter.txt (hello/dark-matter.txt)
@@ -194,5 +208,5 @@ file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__ERR__
 __ERR__
 
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
+purge
 exit 0

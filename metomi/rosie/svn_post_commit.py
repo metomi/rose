@@ -48,7 +48,7 @@ from metomi.rosie.db import (
 from metomi.rosie.svn_hook import RosieSvnHook, InfoFileError
 
 
-class RosieWriteDAO(object):
+class RosieWriteDAO:
 
     """Data Access Object for writing to the Rosie web service database."""
 

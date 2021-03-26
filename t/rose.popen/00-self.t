@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
@@ -20,6 +20,6 @@
 D=$(cd $(dirname $0) && pwd)
 . $D/test_header
 tests 1
-POPEN_FILE=$(python -c "import metomi.rose.popen; print(metomi.rose.popen.__file__)")
+POPEN_FILE=$(python3 -c "import metomi.rose.popen; print(metomi.rose.popen.__file__)")
 run_pass "$TEST_KEY_BASE" python3 $POPEN_FILE "$@"
 exit 0
