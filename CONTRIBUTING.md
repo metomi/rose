@@ -44,6 +44,8 @@ below:
 * Steve Wardle (Met Office, UK)
 * Scott Wales (ARC Centre of Excellence for Climate Systems Science, Australia)
 * Thomas Coleman (Bureau of Meteorology, Australia)
+* Declan Valters (Met Office, UK)
+* Paul Cresswell (Met Office, UK)
 * Bruno P. Kinoshita (National Institute of Water and Atmospheric Research, New Zealand)
 * Tim Pillinger (Met Office, UK)
 * Mel Hall (Met Office, UK)

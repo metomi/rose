@@ -5,6 +5,49 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2.0b1 (2021-03-26)
+
+Rose release 60. This is a __beta pre-release__.
+
+For use with Cylc see [Cylc-Rose](https://github.com/cylc/cylc-rose).
+
+### Noteworthy Changes
+
+* All old GTK-based GUIs removed (no new alternative implemented yet)
+* Suite control commands have been removed:
+  * `rose suite-run` is now `cylc install`.
+  * `rose suite-restart` is now `cylc play`
+  * `rose suite-clean` is now `cylc clean`
+* Full list of retired commands (run them on the command line to see their
+  replacements):
+  * `rose config-edit`
+  * `rose edit`
+  * `rose sgc`
+  * `rose slv`
+  * `rose suite-clean`
+  * `rose suite-cmp-vc`
+  * `rose suite-gcontrol`
+  * `rose suite-hook`
+  * `rose suite-init`
+  * `rose suite-log-view`
+  * `rose suite-log`
+  * `rose suite-restart`
+  * `rose suite-run`
+  * `rose suite-scan`
+  * `rose suite-shutdown`
+  * `rose suite-stop`
+  * `rose task-hook`
+* `rose host-select` updated to use `psutil`.
+* Allow `fcm_make` to work with hierarchical workflow registrations.
+
+### Missing Interfaces
+
+The ability to tell where a Cylc task has or will run has not yet been
+re-implemented which can effect remote functionality of `fcm_make` and
+`rose_prune` - [#2445](https://github.com/metomi/rose/issues/2445).
+
+--------------------------------------------------------------------------------
+
 ## 2.0a1 (2019-09-19)
 
 Rose release 59. This is an __alpha preview__ release. It is expected that it 
