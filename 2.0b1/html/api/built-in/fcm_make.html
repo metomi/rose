@@ -1,0 +1,464 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>fcm_make &mdash; Rose Documentation 2.0b1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/diff_selector.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/grid_table.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/hieroglyph_theme_addons.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/tutorial.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/addons.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/rose-favicon.png"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/js/diff_selector.js"></script>
+        <script src="../../_static/js/minicylc.js"></script>
+        <script src="../../_static/js/spoiler.js"></script>
+        <script src="../../_static/js/addons.js"></script>
+        <script src="../../_static/js/versioning.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="rose_ana" href="rose_ana.html" />
+    <link rel="prev" title="Rose Built-In Applications" href="../rose-built-in-applications.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html">
+          
+
+          
+            
+            <img src="../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0b1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cheat-sheet.html">Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../rose-built-in-applications.html">Rose Built-In Applications</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#invocation">Invocation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rose-configuration-api">Rose Configuration API</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rose_ana.html"><code class="docutils literal notranslate"><span class="pre">rose_ana</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_arch.html"><code class="docutils literal notranslate"><span class="pre">rose_arch</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_bunch.html"><code class="docutils literal notranslate"><span class="pre">rose_bunch</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_prune.html"><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rose Documentation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../rose-built-in-applications.html">Rose Built-In Applications</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fcm-make">
+<h1><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code><a class="headerlink" href="#fcm-make" title="Permalink to this headline">¶</a></h1>
+<p>An application for running the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> application expects a file <code class="docutils literal notranslate"><span class="pre">file/fcm-make.cfg</span></code> in
+its application configuration. It runs <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> using this
+configuration file.</p>
+<p>You can configure these applications with environment variables or
+settings in <code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code>. (Settings in <code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code>
+override their equivalent environment variables.)</p>
+<p>By default the <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directories of builds will be prepended to
+the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable by <a class="reference internal" href="../command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a>
+and/or <a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> commands run by subsequent
+tasks in the suite.</p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">fcm_make</span>
+<span class="nv">mode</span><span class="o">=</span><span class="s">fcm_make</span>
+<span class="nv">opt.jobs</span><span class="o">=</span><span class="s">8</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="invocation">
+<h2>Invocation<a class="headerlink" href="#invocation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>If a task’s name contains the string <code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> then
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> will run this built-in application
+automatically.</p></li>
+<li><p>If a task’s name contains the string <code class="docutils literal notranslate"><span class="pre">fcm_make2*</span></code> and it does not
+have its own application configuration then
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> will attempt to associate it with
+the corresponding <code class="docutils literal notranslate"><span class="pre">fcm_make*</span></code> application configuration.</p></li>
+</ul>
+</div>
+<div class="section" id="rose-configuration-api">
+<h2>Rose Configuration API<a class="headerlink" href="#rose-configuration-api" title="Permalink to this headline">¶</a></h2>
+<dl class="rose app">
+<dt id="rose:app:fcm_make">
+<em class="property">Rose App </em><code class="sig-name descname">fcm_make</code><a class="headerlink" href="#rose:app:fcm_make" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="rose conf">
+<dt id="rose:conf:fcm_make|args">
+<em class="property">Config </em><code class="sig-name descname">args</code><em class="property">= ARG ...</em><a class="headerlink" href="#rose:conf:fcm_make|args" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Env Var</dt>
+<dd class="field-odd"><p><span class="target" id="index-0"></span><a class="reference internal" href="../environment-variables.html#envvar-ROSE_TASK_OPTIONS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_TASK_OPTIONS</span></code></a></p>
+</dd>
+</dl>
+<p>For passing extra options and arguments to the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|dest-orig">
+<em class="property">Config </em><code class="sig-name descname">dest-orig</code><em class="property">= PATH</em><a class="headerlink" href="#rose:conf:fcm_make|dest-orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the path to the destination of the original make. This
+is normally specified as a relative path under <code class="docutils literal notranslate"><span class="pre">$ROSE_SUITE_DIR/</span></code>.
+The default is <code class="docutils literal notranslate"><span class="pre">share/$ROSE_TASK_NAME</span></code>. If
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> is invoked in <code class="docutils literal notranslate"><span class="pre">--new</span></code> mode, the
+application will remove this directory before running <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span> <span class="pre">--new</span></code>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|dest-cont">
+<em class="property">Config </em><code class="sig-name descname">dest-cont</code><em class="property">= PATH</em><a class="headerlink" href="#rose:conf:fcm_make|dest-cont" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the path to the destination of the continuation make. This
+is normally specified as a relative path under <code class="docutils literal notranslate"><span class="pre">$ROSE_SUITE_DIR/</span></code>.
+The default is to use the same location as
+<a class="reference internal" href="#rose:conf:fcm_make|dest-orig" title="rose:conf:fcm_make|dest-orig"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">fcm_make|dest-orig</span></code></a>. If <a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>
+is invoked in <code class="docutils literal notranslate"><span class="pre">--new</span></code> mode, the application will remove this
+directory before running <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span> <span class="pre">--new</span></code>. (If this location is
+in the same physical location of the destination of the original
+make, you should only invoke <a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> <code class="docutils literal notranslate"><span class="pre">--new</span></code>
+on the original make. Otherwise, contents generated by the original
+make will be wiped clean before the continuation make begins.)</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|fast-dest-root-orig">
+<em class="property">Config </em><code class="sig-name descname">fast-dest-root-orig</code><em class="property">= PATH</em><a class="headerlink" href="#rose:conf:fcm_make|fast-dest-root-orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the path to an existing location that can be used as a
+fast working directory for the original make. If this is specified,
+the <code class="docutils literal notranslate"><span class="pre">fcm</span></code> make command will be invoked in a temporary directory
+under this location before being copied back to the actual destination.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|fast-dest-root-cont">
+<em class="property">Config </em><code class="sig-name descname">fast-dest-root-cont</code><em class="property">= PATH</em><a class="headerlink" href="#rose:conf:fcm_make|fast-dest-root-cont" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the path to an existing location that can be used as a fast
+working directory for the continuation make. If this is specified,
+the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command will be invoked in a temporary directory
+under this location before being copied back to the actual destination.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|make-name-orig">
+<em class="property">Config </em><code class="sig-name descname">make-name-orig</code><em class="property">= NAME</em><a class="headerlink" href="#rose:conf:fcm_make|make-name-orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the context name of the original make. The default is a
+null string. You can specify an alternate context name if this
+is undesirable. The <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command will be invoked with the
+<code class="docutils literal notranslate"><span class="pre">--name=NAME</span></code> option of <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|make-name-cont">
+<em class="property">Config </em><code class="sig-name descname">make-name-cont</code><em class="property">= NAME</em><a class="headerlink" href="#rose:conf:fcm_make|make-name-cont" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the context name of the continuation make. If the default
+<code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> → <code class="docutils literal notranslate"><span class="pre">fcm_make2</span></code> mapping is used, the context name of
+the continuation make will be set to <code class="docutils literal notranslate"><span class="pre">2</span></code>. You can specify an alternate
+context name if this is undesirable. The continuation command will
+be invoked with the <code class="docutils literal notranslate"><span class="pre">--name=NAME</span></code> option of <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|mirror-step">
+<em class="property">Config </em><code class="sig-name descname">mirror-step</code><em class="property">= STEP-NAME</em><a class="headerlink" href="#rose:conf:fcm_make|mirror-step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the name of the mirror step, if not mirror. The application
+will normally look for a matching task in the suite (e.g.
+<code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> → <code class="docutils literal notranslate"><span class="pre">fcm_make2</span></code>) which will continue the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code>
+command at a remote <code class="docutils literal notranslate"><span class="pre">HOST</span></code>. If such a task is found, it will add
+the configuration
+<code class="docutils literal notranslate"><span class="pre">mirror.target=HOST:cylc-run/$ROSE_SUITE_NAME/share/$ROSE_TASK_NAME</span></code>
+as an argument to the <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> command to substitute the mirror
+target. To switch off this feature, set <code class="docutils literal notranslate"><span class="pre">STEP-NAME</span></code> to a null
+string, i.e. <code class="docutils literal notranslate"><span class="pre">mirror-step=</span></code>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|opt.jobs">
+<em class="property">Config </em><code class="sig-name descname">opt.jobs</code><em class="property">= N</em><a class="headerlink" href="#rose:conf:fcm_make|opt.jobs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Env Var</dt>
+<dd class="field-odd"><p><span class="target" id="index-1"></span><a class="reference internal" href="../environment-variables.html#envvar-ROSE_TASK_N_JOBS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_TASK_N_JOBS</span></code></a></p>
+</dd>
+<dt class="field-even">Default</dt>
+<dd class="field-even"><p>4</p>
+</dd>
+</dl>
+<p>This can be used to control the number of processes <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code>
+would use in parallel.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|orig-cont-map">
+<em class="property">Config </em><code class="sig-name descname">orig-cont-map</code><em class="property">= ORIG-NAME:CONT-NAME</em><a class="headerlink" href="#rose:conf:fcm_make|orig-cont-map" title="Permalink to this definition">¶</a></dt>
+<dd><p>This setting allows you to override the default <code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> →
+<code class="docutils literal notranslate"><span class="pre">fcm_make2</span></code> mapping between the names of the original and the
+continuation tasks in the suite.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt id="rose:conf:fcm_make|use-pwd">
+<em class="property">Config </em><code class="sig-name descname">use-pwd</code><em class="property">= true</em><a class="headerlink" href="#rose:conf:fcm_make|use-pwd" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default, the application changes the working directory to
+<code class="docutils literal notranslate"><span class="pre">$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</span></code>. This option will stop
+this, and the working directory is the normal working directory of
+the task.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="rose_ana.html" class="btn btn-neutral float-right" title="rose_ana" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../rose-built-in-applications.html" class="btn btn-neutral float-left" title="Rose Built-In Applications" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.
+
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.0b1
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.0b1";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/built-in/fcm_make";
+    </script>
+  </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
