@@ -73,7 +73,7 @@ file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
 file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
-# if LOGNAME is not set (e.g. GH actions) use $USER
+# if LOGNAME is not set (e.g. GH actions) use $USER
 LOGNAME="${LOGNAME:-$USER}"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
 file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__

@@ -22,7 +22,7 @@ on:
 
 defaults:
   run:
-    shell: bash  # macos default shell is zsh
+    shell: bash  # macos default shell is zsh
 
 jobs:
   test:
