@@ -24,7 +24,6 @@
 #      "gfortran" being installed and available.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
-skip_all 'TODO: #2445'
 
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'
@@ -48,24 +47,25 @@ tests 4
 export ROSE_CONF_PATH=
 get_reg
 
+run_pass "${TEST_KEY_BASE}-install" \
+    cylc install \
+        --flow-name="${FLOW}" \
+        --no-run-name \
+        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        -S "HOST='${JOB_HOST}'"
+
 # Add some garbage before running the suite
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
     "mkdir -p 'cylc-run/${FLOW}/share/hello-make/junk2'"
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
     "touch 'cylc-run/${FLOW}/share/hello-make/junk1'"
 
-run_pass "${TEST_KEY_BASE}-install" \
-    cylc install \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${FLOW}" \
-        --no-run-name
 run_pass "${TEST_KEY_BASE}-play" \
     timeout 120 \
         cylc play \
             "${FLOW}" \
             --abort-if-any-task-fails \
             --host='localhost' \
-            -S "HOST='${JOB_HOST}'" \
             --no-detach \
             --debug
 #-------------------------------------------------------------------------------

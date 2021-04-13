@@ -33,7 +33,7 @@ fi
 
 #-------------------------------------------------------------------------------
 # Run the suite.
-export CYLC_CONF_PATH=
+# export CYLC_CONF_PATH=
 export ROSE_CONF_PATH=
 get_reg
 OPTS=(
@@ -80,8 +80,8 @@ run_pass "$TEST_KEY.3" ls -d "$FLOW_RUN_DIR/log/job/3"
 TEST_KEY=$TEST_KEY_BASE-remote
 if [[ -n "$JOB_HOST" ]]; then
     run_fail "$TEST_KEY.1" ssh "$JOB_HOST" "ls -d $FLOW_RUN_DIR/log/job/1"
-    run_fail "$TEST_KEY.2" ssh "$JOB_HOST" "ls -d $FLOW_RUN_DIW/log/job/2"
-    run_pass "$TEST_KEY.3" ssh "$JOB_HOST" "ls -d $FLOW_RUN_DIW/log/job/3"
+    run_fail "$TEST_KEY.2" ssh "$JOB_HOST" "ls -d $FLOW_RUN_DIR/log/job/2"
+    run_pass "$TEST_KEY.3" ssh "$JOB_HOST" "ls -d $FLOW_RUN_DIR/log/job/3"
 fi
 #-------------------------------------------------------------------------------
 purge

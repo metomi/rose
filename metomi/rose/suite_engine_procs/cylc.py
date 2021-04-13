@@ -68,10 +68,7 @@ class CylcProcessor(SuiteEngineProcessor):
     def get_suite_jobs_auths(self, suite_name, cycle_name_tuples=None):
         """Return remote ["[user@]host", ...] for submitted jobs."""
         from cylc.rose.platform_utils import get_platforms_from_task_jobs
-        from cylc.flow.platforms import (
-            get_install_target_from_platform,
-            get_host_from_platform
-        )
+        from cylc.flow.platforms import get_host_from_platform
         task_platforms = {}
         if cycle_name_tuples is not None:
             for cycle, name in cycle_name_tuples:

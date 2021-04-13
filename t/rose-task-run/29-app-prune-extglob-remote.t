@@ -20,7 +20,6 @@
 # Test "rose_prune" built-in application, with bash extglob, using not glob.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all 'TODO: #2445'
 
 if [[ "${TEST_KEY_BASE}" == *-remote ]]; then
     JOB_HOST=$(rose config --default= 't' 'job-host')
@@ -58,16 +57,17 @@ sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\
 sed '/^\[INFO\] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=/p;
     /^\[INFO\] YYYY-MM-DDTHHMM delete: /!d' \
     "stamp-removed.log" >'edited-prune.log'
-file_cmp "${TEST_KEY}" 'edited-prune.log' <<__LOG__
+sort edited-prune.log > sorted-prune.log
+file_cmp "${TEST_KEY}" 'sorted-prune.log' <<__LOG__
+[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150101T0000Z
+[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150101T0000Z/creator/red_dwarf.nl
+[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150101T0000Z/creator/rose-app-run.conf
+[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150102T0000Z/creator/red_dwarf.nl
+[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150102T0000Z/creator/rose-app-run.conf
+[INFO] YYYY-MM-DDTHHMM delete: work/20150101T0000Z
 [INFO] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=20150101T0000Z
 [INFO] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=20150102T0000Z
-[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150101T0000Z/creator/red_dwarf.nl
-[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150101T0000Z/creator/rose-app-run.conf
 [INFO] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=20150103T0000Z
-[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150101T0000Z
-[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150102T0000Z/creator/red_dwarf.nl
-[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150102T0000Z/creator/rose-app-run.conf
-[INFO] YYYY-MM-DDTHHMM delete: work/20150101T0000Z
 __LOG__
 #-------------------------------------------------------------------------------
 purge
