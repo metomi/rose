@@ -16,21 +16,28 @@
 # -----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
-from glob import glob
 import os
 import pwd
 import re
-from random import shuffle
 import socket
 import sqlite3
 import tarfile
+
+from glob import glob
+from random import shuffle
+from typing import Union, List, Tuple, Any
 from time import sleep
 from uuid import uuid4
 
-from metomi.rose.fs_util import FileSystemEvent
-from metomi.rose.popen import RosePopenError
-from metomi.rose.reporter import Reporter
-from metomi.rose.suite_engine_proc import (
+from cylc.flow.platforms import get_host_from_platform
+from cylc.rose.platform_utils import (  # type:ignore
+    get_platforms_from_task_jobs
+)
+from cylc.rose.platform_utils import get_platform_from_task_def
+from metomi.rose.fs_util import FileSystemEvent  # type:ignore
+from metomi.rose.popen import RosePopenError  # type:ignore
+from metomi.rose.reporter import Reporter  # type:ignore
+from metomi.rose.suite_engine_proc import (   # type:ignore
     SuiteEngineProcessor,
     TaskProps
 )
@@ -65,39 +72,49 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(cls.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
-    def get_suite_jobs_auths(self, suite_name, cycle_name_tuples=None):
-        """Return remote ["[user@]host", ...] for submitted jobs."""
-        from cylc.rose.platform_utils import get_platforms_from_task_jobs
-        from cylc.flow.platforms import get_host_from_platform
+    def get_suite_jobs_auths(
+        self, suite_name: str, cycle_name_tuples: Tuple[Any] = None
+    ) -> List[str]:
+        """Return remote ["host", ...] for submitted jobs."""
         task_platforms = {}
         if cycle_name_tuples is not None:
             for cycle, name in cycle_name_tuples:
-                task_platforms.update(
-                    get_platforms_from_task_jobs(suite_name, cycle)
-                )
+                new_platforms = get_platforms_from_task_jobs(suite_name, cycle)
+                task_platforms[cycle] = new_platforms
         # For each platform get a list of hosts
-        # We should consider something more sophisticated.
+        # We should consider something more sophisticated, like one host per
+        # install target.
         hosts = []
-        for platform in task_platforms.values():
-            hosts.append(get_host_from_platform(platform))
+        for cycle, tasks in task_platforms.items():
+            for platform in tasks.values():
+                hosts.append(get_host_from_platform(platform))
         hosts = list(set(hosts))
         return hosts
 
+    def get_task_auth(
+        self, suite_name: str, task_name: str
+    ) -> Union[str, None]:
+        """Get host for a remote task in a suite.
 
-    def get_task_auth(self, suite_name, task_name):
-        """Return [user@]host for a remote task in a suite.
+        Returns: Hostname or None if:
+          - task does not run remotely.
+          - task has not been defined.
 
-        Or None if task does not run remotely.
+        Examples:
 
         """
-        from cylc.rose.platform_utils import get_platform_from_task_def
-        platform = get_platform_from_task_def(suite_name, task_name)
-        import random
-        if 'localhost' in platform['hosts']:
+        # Check whether task has been defined.
+        try:
+            platform = get_platform_from_task_def(suite_name, task_name)
+        except KeyError:
             return None
         else:
-            host = random.choice(platform['hosts'])
-            return host
+            # If task has been defined return host:
+            if 'localhost' in platform['hosts']:
+                return None
+            else:
+                host = get_host_from_platform(platform)
+                return host
 
     def get_task_props_from_env(self):
         """Get attributes of a suite task from environment variables.

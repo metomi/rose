@@ -59,11 +59,11 @@ sed '/^\[INFO\] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=/p;
     "stamp-removed.log" >'edited-prune.log'
 sort edited-prune.log > sorted-prune.log
 file_cmp "${TEST_KEY}" 'sorted-prune.log' <<__LOG__
-[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150101T0000Z
-[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150101T0000Z/creator/red_dwarf.nl
-[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150101T0000Z/creator/rose-app-run.conf
-[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150102T0000Z/creator/red_dwarf.nl
-[INFO] YYYY-MM-DDTHHMM delete: exvcylcdev01:work/20150102T0000Z/creator/rose-app-run.conf
+[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150101T0000Z
+[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150101T0000Z/creator/red_dwarf.nl
+[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150101T0000Z/creator/rose-app-run.conf
+[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150102T0000Z/creator/red_dwarf.nl
+[INFO] YYYY-MM-DDTHHMM delete: ${JOB_HOST}:work/20150102T0000Z/creator/rose-app-run.conf
 [INFO] YYYY-MM-DDTHHMM delete: work/20150101T0000Z
 [INFO] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=20150101T0000Z
 [INFO] YYYY-MM-DDTHHMM export ROSE_TASK_CYCLE_TIME=20150102T0000Z

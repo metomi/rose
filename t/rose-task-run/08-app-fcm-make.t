@@ -32,7 +32,7 @@ tests 10
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
-    JOB_HOST=$(rose host-select -q $JOB_HOST)
+    JOB_HOST=$(rose host-select -q "$JOB_HOST")
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
