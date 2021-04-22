@@ -38,7 +38,7 @@ initial_deployment () {  # Create a new gh-pages branch from scratch.
     git clean -xf doc
 
     # build the documentation
-    rose make-docs html slides
+    make -C sphinx html slides
 
     # create the gh-pages branch
     git branch -D gh-pages || true
@@ -69,7 +69,7 @@ subsequent_deployment () {  # Add new version to documentation.
 
     # append new documentation to the temporary directory
     ln -s "$TMP_DOCS_DIR" doc
-    rose make-docs html slides
+    make -C sphinx html slides
 
     # apply changes to gh-pages branch
     git checkout gh-pages
