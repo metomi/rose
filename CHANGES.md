@@ -3,6 +3,19 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
+<!-- The topmost release date is automatically updated by GitHub Actions. When
+creating a new release entry be sure to copy & paste the span tag with the
+`actions:bind` attribute, which is used by a regex to find the text to be
+updated. Only the first match gets replaced, so it's fine to leave the old
+ones in. -->
+-------------------------------------------------------------------------------
+
+## 2.0b2 (<span actions:bind='release-date'>2021-??-??</span>)
+
+Rose release 61. This is a __beta pre-release__.
+
+For use with Cylc see [Cylc-Rose](https://github.com/cylc/cylc-rose).
+
 --------------------------------------------------------------------------------
 
 ## 2.0b1 (2021-03-26)
@@ -50,7 +63,7 @@ re-implemented which can effect remote functionality of `fcm_make` and
 
 ## 2.0a1 (2019-09-19)
 
-Rose release 59. This is an __alpha preview__ release. It is expected that it 
+Rose release 59. This is an __alpha preview__ release. It is expected that it
 will be used with:
 * [cylc-flow-8.0a1](https://github.com/cylc/cylc-flow/releases/tag/7.8.2), and
 * [fcm-2019.05.0](https://github.com/metomi/fcm/releases/tag/2019.05.0).
