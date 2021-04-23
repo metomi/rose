@@ -124,11 +124,6 @@ class ResourceLocator:
 
         return self.conf
 
-    def get_doc_url(self):
-        """Return the URL of Rose documentation."""
-        default = f"file://{ROSE_INSTALL_ROOT}/doc/"
-        return self.get_conf().get_value(["rose-doc"], default=default)
-
     def get_synopsis(self):
         """Return line 1 of SYNOPSIS in $ROSE_HOME_BIN/$ROSE_NS-$ROSE_UTIL."""
         try:

@@ -16,10 +16,6 @@
 checksum-method=md5|sha1|...
 # Paths to locate configuration metadata e.g. ``meta-path=/opt/rose-meta``.
 meta-path=DIR1[:DIR2[:...]]
-# :default: *file://${ROSE_HOME}/doc/*
-#
-# URL to Rose documentation.
-rose-doc=http://metomi.github.io/rose/
 # Site name, used by suite configuration for portability.
 site=SITE-NAME
 
@@ -238,18 +234,6 @@ host=NAME
 #
 # An alternative service title.
 title=TITLE
-
-
-# Configuration related to the :ref:`command-rosie-go` GUI.
-[rosie-go]
-# :default: /opt/cylc/images/icon.svg
-#
-# Path to an image containing the suite engine icon.
-icon-path-scheduler=
-# :default: https://github.com/metomi/rose/
-#
-# Hyperlink to the Rose project page.
-project-url=https://host/rose/
 
 
 # Configuration related to Rosie client commands.
