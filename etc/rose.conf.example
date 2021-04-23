@@ -236,18 +236,6 @@ host=NAME
 title=TITLE
 
 
-# Configuration related to the :ref:`command-rosie-go` GUI.
-[rosie-go]
-# :default: /opt/cylc/images/icon.svg
-#
-# Path to an image containing the suite engine icon.
-icon-path-scheduler=
-# :default: https://github.com/metomi/rose/
-#
-# Hyperlink to the Rose project page.
-project-url=https://host/rose/
-
-
 # Configuration related to Rosie client commands.
 [rosie-id]
 # :default: $HOME/roses
