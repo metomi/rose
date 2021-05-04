@@ -29,11 +29,6 @@ from typing import Union, List, Tuple, Any
 from time import sleep
 from uuid import uuid4
 
-from cylc.flow.platforms import get_host_from_platform
-from cylc.rose.platform_utils import (  # type:ignore
-    get_platforms_from_task_jobs
-)
-from cylc.rose.platform_utils import get_platform_from_task_def
 from metomi.rose.fs_util import FileSystemEvent  # type:ignore
 from metomi.rose.popen import RosePopenError  # type:ignore
 from metomi.rose.reporter import Reporter  # type:ignore
@@ -75,15 +70,24 @@ class CylcProcessor(SuiteEngineProcessor):
     def get_suite_jobs_auths(
         self, suite_name: str, cycle_name_tuples: Tuple[Any] = None
     ) -> List[str]:
-        """Return remote ["host", ...] for submitted jobs."""
+        """Get hosts of jobs from a Cylc workflow database.
+
+        returns: list of hostname strings.
+        """
+        # n.b. Imports inside function to avoid dependency on Cylc and
+        # Cylc-Rose is Rose is being used with a different workflow engine.
+        from cylc.flow.platforms import get_host_from_platform
+        from cylc.rose.platform_utils import (  # type:ignore
+            get_platforms_from_task_jobs
+        )
+
         task_platforms = {}
         if cycle_name_tuples is not None:
             for cycle, name in cycle_name_tuples:
                 new_platforms = get_platforms_from_task_jobs(suite_name, cycle)
                 task_platforms[cycle] = new_platforms
-        # For each platform get a list of hosts
-        # We should consider something more sophisticated, like one host per
-        # install target.
+
+        # For each platform get a list of hosts.
         hosts = []
         for cycle, tasks in task_platforms.items():
             for platform in tasks.values():
@@ -94,15 +98,17 @@ class CylcProcessor(SuiteEngineProcessor):
     def get_task_auth(
         self, suite_name: str, task_name: str
     ) -> Union[str, None]:
-        """Get host for a remote task in a suite.
+        """Get host for a remote task from a Cylc workflow definition.
 
         Returns: Hostname or None if:
           - task does not run remotely.
           - task has not been defined.
-
-        Examples:
-
         """
+        # n.b. Imports inside function to avoid dependency on Cylc and
+        # Cylc-Rose is Rose is being used with a different workflow engine.
+        from cylc.flow.platforms import get_host_from_platform
+        from cylc.rose.platform_utils import get_platform_from_task_def
+
         # Check whether task has been defined.
         try:
             platform = get_platform_from_task_def(suite_name, task_name)
