@@ -17,10 +17,10 @@
 """Tests for functions in the cylc suite engine proc.
 """
 
-import metomi
 import pytest
 from pytest import param
 
+import cylc.rose.platform_utils
 from metomi.rose.suite_engine_procs.cylc import CylcProcessor
 
 
@@ -43,7 +43,7 @@ def test_get_task_auth(monkeypatch, platform, expect):
         else:
             return platform
     monkeypatch.setattr(
-        metomi.rose.suite_engine_procs.cylc, 'get_platform_from_task_def',
+        cylc.rose.platform_utils, 'get_platform_from_task_def',
         fake_get_platform
     )
     assert CylcProcessor().get_task_auth('foo', 'bar') is expect
@@ -92,7 +92,7 @@ def test_get_suite_jobs_auths(
     monkeypatch, cycle_name_tuples, job_platform_map, expect
 ):
     monkeypatch.setattr(
-        metomi.rose.suite_engine_procs.cylc, 'get_platforms_from_task_jobs',
+        cylc.rose.platform_utils, 'get_platforms_from_task_jobs',
         lambda _, cycle: job_platform_map[cycle]
     )
     assert [
