@@ -1,21 +1,13 @@
 Building & Testing
 ==================
 
-
-``rose make-docs``
-------------------
-
-The documentation is built by the :ref:`command-rose-make-docs` command. Its
-arguments are provided to the sphinx makefile in order.
-
-Build using the ``--strict`` argument before committing changes, this forces a
-re-build and will fail if any warnings are raised.
+The documentation is built using Make.
 
 Whenever making changes to the sphinx infrastructure use a clean build e.g:
 
 .. code-block:: bash
 
-   rose make-docs clean html
+   make -C sphinx clean html
 
 The following builders are useful for development:
 
@@ -33,12 +25,3 @@ wish to use aspell/ispell/hunspell to check any changed docs:
    hunspell path/to/changed.rst
    # or
    aspell check path/to/changed.rst
-
-``rose test-battery``
----------------------
-
-The :ref:`command-rose-test-battery` runs:
-
-* pep8 on the python extensions (``sphinx/ext``).
-* ``python2 -m doctest <file>`` for python extensions (``sphinx/ext``).
-* eslint on any static javascript files (``sphinx/static/js``).

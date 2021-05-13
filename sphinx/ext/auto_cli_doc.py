@@ -320,23 +320,33 @@ def write_command_reference(write, commands):
             write('')
             continue
 
-        # Replace single back-quotes with double ones and insert links to other
-        # commands as required.
-        help_text = format_literals(help_text, commands, 'command-%s')
+        # Rose Stem is documented in Cylc format
+        if command == 'rose stem':
+            sections = {
+                'NAME': command,
+                'DESCRIPTION': '',
+                'SYNOPSIS': '\n  '.join(help_text.splitlines())
+            }
+            write('')
+        else:
+            # Replace single back-quotes with double ones and insert links to
+            # other commands as required.
+            help_text = format_literals(help_text, commands, 'command-%s')
 
-        # Split the help-text into sections.
-        sections = OrderedDict(
-            (a.strip(), b) for a, b in
-            ROSE_HELP_SECTION_REGEX.findall(help_text))
-
-        # The NAME section is not used
-        del sections['NAME']
+            # Split the help-text into sections.
+            sections = OrderedDict(
+                (a.strip(), b) for a, b in
+                ROSE_HELP_SECTION_REGEX.findall(help_text))
 
         # Write command name as a heading.
         write_rst_heading(write, command, 2, True, 'command-%s')
 
+        # The NAME section is not used
+        del sections['NAME']
+
         # Write synopsis as a bash formatted code block.
-        write('.. code-block:: bash')
+        lang = 'none' if command == 'rose stem' else 'bash'
+        write(f'.. code-block:: {lang}')
         write('')
         write_rst_section(write, sections['SYNOPSIS'], indent_level=1)
         del sections['SYNOPSIS']

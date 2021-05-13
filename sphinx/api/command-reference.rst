@@ -76,15 +76,6 @@ individual test files or their containing directories as extra arguments.
 
 ----
 
-.. _command-rose-make-docs:
-
-etc/bin/rose-make-docs
-^^^^^^^^^^^^^^^^^^^^^^
-
-stuf and nonsens
-
-----
-
 
 Rosie Commands
 --------------

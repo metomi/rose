@@ -65,7 +65,7 @@ Building
 
 Build using the ``slides`` builder i.e::
 
-   rose make-docs slides
+   make -C sphinx slides
 
 Note that if linking to the HTML version from within the slides you may be
 restricted to using either the single page HTML or directory HTML builders but

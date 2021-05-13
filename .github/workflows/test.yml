@@ -108,7 +108,7 @@ jobs:
         working-directory: rose
         run: |
           pip install ."[all]"
-          pip install --no-deps git+https://github.com/cylc/cylc-rose.git
+          pip install git+https://github.com/cylc/cylc-rose.git
           yarn install
 
       - name: Checkout FCM
@@ -208,6 +208,7 @@ jobs:
       - name: install
         run: |
           pip install -e .[docs]
+          pip install git+https://github.com/cylc/cylc-rose.git
 
       - name: build (html)
         run: |
