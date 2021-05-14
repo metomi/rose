@@ -153,6 +153,11 @@ jobs:
           etc/bin/shellchecker
           yarn run lint
 
+      - name: MyPy
+        working-directory: rose
+        run: |
+          mypy --explicit-package-bases
+
       - name: Unit Tests
         working-directory: rose
         run: |

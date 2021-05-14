@@ -22,6 +22,7 @@ import shlex
 import sys
 from time import localtime, sleep, strftime, time
 import traceback
+from typing import Optional
 
 from metomi.isodatetime.data import get_timepoint_for_now
 from metomi.isodatetime.parsers import ISO8601SyntaxError
@@ -293,7 +294,7 @@ class BuiltinApp:
 
     """
 
-    SCHEME = None
+    SCHEME: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
         manager = kwargs.pop("manager")

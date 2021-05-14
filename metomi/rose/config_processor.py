@@ -17,11 +17,13 @@
 """Process named settings in metomi.rose.config.ConfigTree."""
 
 import os
+import sys
+from typing import Optional
+
 from metomi.rose.env import UnboundEnvironmentVariableError
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.popen import RosePopener
 from metomi.rose.scheme_handler import SchemeHandlersManager
-import sys
 
 
 class UnknownContentError(Exception):
@@ -68,8 +70,8 @@ class ConfigProcessorBase:
 
     """Base class for a config processor."""
 
-    SCHEME = None
-    PREFIX = None
+    SCHEME: Optional[str] = None
+    PREFIX: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
         self.manager = kwargs.pop("manager")

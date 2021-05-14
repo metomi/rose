@@ -230,10 +230,17 @@ class RoseArchApp(BuiltinApp):
                 is_compulsory_source = False
             paths = glob(source_prefix + source_glob)
             if not paths:
-                exc = OSError(errno.ENOENT, os.strerror(errno.ENOENT),
-                              source_prefix + source_glob)
-                app_runner.handle_event(ConfigValueError(
-                    [t_key, "source"], source_glob, exc))
+                app_runner.handle_event(
+                    ConfigValueError(
+                        [t_key, "source"],
+                        source_glob,
+                        OSError(
+                            errno.ENOENT,
+                            os.strerror(errno.ENOENT),
+                            source_prefix + source_glob
+                        )
+                    )
+                )
                 if is_compulsory_source:
                     target.status = target.ST_BAD
                 continue

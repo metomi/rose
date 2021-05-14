@@ -16,6 +16,7 @@
 # -----------------------------------------------------------------------------
 
 import copy
+from typing import Dict, Any
 
 import metomi.rose.config
 import metomi.rose.config_tree
@@ -41,7 +42,7 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
     IGNORED_STATUS_VALUES = ('from parent value: {0} with {1} '
                              'is not in the allowed values: {2}')
     PARENT_VALUE = 'value {0}'
-    _evaluated_rule_checks = {}
+    _EVALUATED_RULE_CHECKS: Dict[tuple, Any] = {}
     MAX_STORED_RULE_CHECKS = 10000
 
     def _setup_triggers(self, meta_config):
@@ -510,7 +511,7 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
     def evaluate_trig_rule(self, rule, setting_id, value):
         """Launch an evaluation of a custom trigger expression."""
         try:
-            return self._evaluated_rule_checks[(rule, value)]
+            return self._EVALUATED_RULE_CHECKS[(rule, value)]
         except KeyError:
             section, option = self._get_section_option_from_id(setting_id)
             tiny_config = metomi.rose.config.ConfigNode()
@@ -518,9 +519,9 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             tiny_meta_config = metomi.rose.config.ConfigNode()
             check_failed = self.evaluator.evaluate_rule(
                 rule, setting_id, tiny_config, tiny_meta_config)
-            if len(self._evaluated_rule_checks) > self.MAX_STORED_RULE_CHECKS:
-                self._evaluated_rule_checks.popitem()
-            self._evaluated_rule_checks[(rule, value)] = check_failed
+            if len(self._EVALUATED_RULE_CHECKS) > self.MAX_STORED_RULE_CHECKS:
+                self._EVALUATED_RULE_CHECKS.popitem()
+            self._EVALUATED_RULE_CHECKS[(rule, value)] = check_failed
             return check_failed
 
     def get_all_ids(self):

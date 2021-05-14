@@ -19,6 +19,7 @@
 
 import sys
 import time
+from typing import Optional
 
 
 class Reporter:
@@ -269,8 +270,8 @@ class Event:
     KIND_ERR = Reporter.KIND_ERR
     KIND_OUT = Reporter.KIND_OUT
 
-    LEVEL = None
-    KIND = None
+    LEVEL: Optional[int] = None
+    KIND: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
         self.args = args

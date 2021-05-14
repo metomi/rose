@@ -17,15 +17,17 @@
 """Shared utilities for app/task run."""
 
 import os
+import shlex
+import shutil
+from typing import Optional, List
+from uuid import uuid4
+
 from metomi.rose.config_processor import ConfigProcessorsManager
 from metomi.rose.config_tree import ConfigTreeLoader
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event
 from metomi.rose.suite_engine_proc import SuiteEngineProcessor
-import shlex
-import shutil
-from uuid import uuid4
 
 
 class RunConfigLoadEvent(Event):
@@ -93,9 +95,9 @@ class Runner:
 
     """Invoke a Rose application."""
 
-    CONF_NAME = None
-    NAME = None
-    OPTIONS = []
+    CONF_NAME: Optional[str] = None
+    NAME: Optional[str] = None
+    OPTIONS: List[str] = []
 
     def __init__(self, event_handler=None, popen=None, config_pm=None,
                  fs_util=None, suite_engine_proc=None):

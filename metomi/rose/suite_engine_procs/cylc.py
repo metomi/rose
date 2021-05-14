@@ -29,10 +29,10 @@ from typing import Union, List, Tuple, Any
 from time import sleep
 from uuid import uuid4
 
-from metomi.rose.fs_util import FileSystemEvent  
-from metomi.rose.popen import RosePopenError  
-from metomi.rose.reporter import Reporter  
-from metomi.rose.suite_engine_proc import (   
+from metomi.rose.fs_util import FileSystemEvent
+from metomi.rose.popen import RosePopenError
+from metomi.rose.reporter import Reporter
+from metomi.rose.suite_engine_proc import (
     SuiteEngineProcessor,
     TaskProps
 )

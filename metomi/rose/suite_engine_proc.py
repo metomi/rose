@@ -19,6 +19,7 @@
 import os
 import re
 import sys
+from typing import Optional
 
 from metomi.isodatetime.data import Duration
 from metomi.isodatetime.parsers import DurationParser, ISO8601SyntaxError
@@ -260,8 +261,8 @@ class SuiteEngineProcessor:
     """An abstract suite engine processor."""
 
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
-    SCHEME = None
-    SCHEME_HANDLER_MANAGER = None
+    SCHEME: Optional[str] = None
+    SCHEME_HANDLER_MANAGER: Optional[str] = None
     SCHEME_DEFAULT = "cylc"  # TODO: site configuration?
     TIMEOUT = 5  # seconds
 

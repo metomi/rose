@@ -23,6 +23,7 @@ import shlex
 import io
 import sys
 import tempfile
+from typing import List, Tuple
 
 import metomi.rose.config
 import metomi.rose.fs_util
@@ -41,7 +42,7 @@ class ConfigDiffDefaults:
         [metomi.rose.META_PROP_TITLE, metomi.rose.META_PROP_NS,
          metomi.rose.META_PROP_DESCRIPTION, metomi.rose.META_PROP_HELP]
     )
-    SHORTHAND = []
+    SHORTHAND: List[Tuple[str]] = []
 
 
 _DEFAULTS = ConfigDiffDefaults()
