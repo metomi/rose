@@ -28,8 +28,6 @@ WARM[-PT12H]:finish-all => rose_prune
 {% if HOST != 'localhost' %}
     [[my_task_2]]
         inherit = WARM
-        # [[[remote]]]
-        #     host = {{HOST}}
         platform = {{HOST}}
 {% endif %}
     [[rose_prune]]
