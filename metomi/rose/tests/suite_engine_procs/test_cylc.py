@@ -95,9 +95,7 @@ def test_get_suite_jobs_auths(
         cylc.rose.platform_utils, 'get_platforms_from_task_jobs',
         lambda _, cycle: job_platform_map[cycle]
     )
-    assert [
-        item in expect for item in
-        CylcProcessor().get_suite_jobs_auths(
-            'suite_name', cycle_name_tuples
-        )
-    ]
+    for item in CylcProcessor().get_suite_jobs_auths(
+        'suite_name', cycle_name_tuples
+    ):
+        assert item in expect
