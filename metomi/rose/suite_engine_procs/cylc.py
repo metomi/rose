@@ -107,6 +107,7 @@ class CylcProcessor(SuiteEngineProcessor):
         # n.b. Imports inside function to avoid dependency on Cylc and
         # Cylc-Rose is Rose is being used with a different workflow engine.
         from cylc.flow.platforms import get_host_from_platform
+        from cylc.flow.hostuserutil import is_remote_platform
         from cylc.rose.platform_utils import get_platform_from_task_def
 
         # Check whether task has been defined.
@@ -116,11 +117,10 @@ class CylcProcessor(SuiteEngineProcessor):
             return None
         else:
             # If task has been defined return host:
-            if 'localhost' in platform['hosts']:
-                return None
+            if is_remote_platform(platform):
+                return get_host_from_platform(platform)
             else:
-                host = get_host_from_platform(platform)
-                return host
+                return None
 
     def get_task_props_from_env(self):
         """Get attributes of a suite task from environment variables.
