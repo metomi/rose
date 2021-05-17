@@ -29,10 +29,10 @@ from typing import Union, List, Tuple, Any
 from time import sleep
 from uuid import uuid4
 
-from metomi.rose.fs_util import FileSystemEvent  # type:ignore
-from metomi.rose.popen import RosePopenError  # type:ignore
-from metomi.rose.reporter import Reporter  # type:ignore
-from metomi.rose.suite_engine_proc import (   # type:ignore
+from metomi.rose.fs_util import FileSystemEvent  
+from metomi.rose.popen import RosePopenError  
+from metomi.rose.reporter import Reporter  
+from metomi.rose.suite_engine_proc import (   
     SuiteEngineProcessor,
     TaskProps
 )
@@ -77,7 +77,7 @@ class CylcProcessor(SuiteEngineProcessor):
         # n.b. Imports inside function to avoid dependency on Cylc and
         # Cylc-Rose is Rose is being used with a different workflow engine.
         from cylc.flow.platforms import get_host_from_platform
-        from cylc.rose.platform_utils import (  # type:ignore
+        from cylc.rose.platform_utils import (
             get_platforms_from_task_jobs
         )
 
