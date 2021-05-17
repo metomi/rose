@@ -28,7 +28,7 @@ from metomi.rose.suite_engine_procs.cylc import CylcProcessor
     'platform, expect',
     [
         param(
-            {'hosts': ['localhost', 'otter']}, None, id='platform is local'
+            {'hosts': ['localhost']}, None, id='platform is local'
         ),
         param(
             {'hosts': ['my_host']}, 'my_host', id='platform is remote'
