@@ -116,6 +116,7 @@ class RosePruneApp(BuiltinApp):
             except RosePopenError as exc:
                 app_runner.handle_event(exc)
             else:
+                out = out.decode()
                 if sdir is None:
                     event = FileSystemEvent(FileSystemEvent.CHDIR,
                                             host + ":" + suite_dir_rel)
@@ -124,7 +125,7 @@ class RosePruneApp(BuiltinApp):
                     if not host_selector.is_local_host(host):
                         line = host + ":" + line
                     event = FileSystemEvent(
-                        FileSystemEvent.DELETE, line.decode())
+                        FileSystemEvent.DELETE, line)
                     app_runner.handle_event(event)
             finally:
                 if sdir:

@@ -20,7 +20,6 @@
 # Test rose_prune built-in application, basic cycle housekeep usage.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all 'TODO: #2445'
 JOB_HOST=$(rose config --default= 't' 'job-host')
 tests 9
 if [[ -z $JOB_HOST ]]; then
@@ -58,7 +57,14 @@ else
     sed '/\$JOB_HOST/d; /my_task_2/d' \
         $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
 fi
-file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
+
+sort expected-prune.log > expected-prune.log.sorted
+sort edited-prune.log > edited-prune.log.sorted
+
+cp "expected-prune.log.sorted" ~/
+cp "edited-prune.log.sorted" ~/
+
+file_cmp "$TEST_KEY" expected-prune.log.sorted edited-prune.log.sorted
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ls
 run_pass "$TEST_KEY" \
@@ -73,10 +79,10 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 if [[ $JOB_HOST != localhost ]]; then
     TEST_KEY=$TEST_KEY_BASE-host-ls
-    run_pass "$TEST_KEY" ssh -oBatchMode=yes $JOB_HOST \
-        ls cylc-run/$FLOW/{log/job,share/cycle,work}
-    sed "s/\\\$FLOW/$FLOW/g" \
-        $TEST_SOURCE_DIR/$TEST_KEY.out >expected-host-ls.out
+    run_pass "$TEST_KEY" ssh -oBatchMode=yes -q "${JOB_HOST}" \
+        ls "cylc-run/${FLOW}/{log/job,share/cycle,work}"
+    sed "s@\\\$FLOW@$FLOW@g" \
+        "${TEST_KEY}.out" >expected-host-ls.out
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-host-ls.out
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 else

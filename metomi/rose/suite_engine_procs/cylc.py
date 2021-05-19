@@ -16,21 +16,23 @@
 # -----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
-from glob import glob
 import os
 import pwd
 import re
-from random import shuffle
 import socket
 import sqlite3
 import tarfile
+
+from glob import glob
+from random import shuffle
+from typing import Union, List, Tuple, Any
 from time import sleep
 from uuid import uuid4
 
-from metomi.rose.fs_util import FileSystemEvent
-from metomi.rose.popen import RosePopenError
-from metomi.rose.reporter import Reporter
-from metomi.rose.suite_engine_proc import (
+from metomi.rose.fs_util import FileSystemEvent  
+from metomi.rose.popen import RosePopenError  
+from metomi.rose.reporter import Reporter  
+from metomi.rose.suite_engine_proc import (   
     SuiteEngineProcessor,
     TaskProps
 )
@@ -65,35 +67,60 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(cls.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
-    def get_suite_jobs_auths(self, suite_name, cycle_name_tuples=None):
-        """Return remote ["[user@]host", ...] for submitted jobs."""
-        # TODO: reimplement for Cylc8?
-        # https://github.com/metomi/rose/issues/2445
-        self.handle_event(
-            Exception(
-                'WARNING: Rose cannot currently inspect the platform a Cylc'
-                ' task has or will run on.\n'
-                ' https://github.com/metomi/rose/issues/2445'
-            )
-        )
-        return []
+    def get_suite_jobs_auths(
+        self, suite_name: str, cycle_name_tuples: Tuple[Any] = None
+    ) -> List[str]:
+        """Get hosts of jobs from a Cylc workflow database.
 
-    def get_task_auth(self, suite_name, task_name):
-        """Return [user@]host for a remote task in a suite.
-
-        Or None if task does not run remotely.
-
+        returns: list of hostname strings.
         """
-        # TODO: reimplement for Cylc8?
-        # https://github.com/metomi/rose/issues/2445
-        self.handle_event(
-            Exception(
-                'WARNING: Rose cannot currently inspect the platform a Cylc'
-                ' task has or will run on.\n'
-                ' https://github.com/metomi/rose/issues/2445'
-            )
+        # n.b. Imports inside function to avoid dependency on Cylc and
+        # Cylc-Rose is Rose is being used with a different workflow engine.
+        from cylc.flow.platforms import get_host_from_platform
+        from cylc.rose.platform_utils import (
+            get_platforms_from_task_jobs
         )
-        return None
+
+        task_platforms = {}
+        if cycle_name_tuples is not None:
+            for cycle, name in cycle_name_tuples:
+                new_platforms = get_platforms_from_task_jobs(suite_name, cycle)
+                task_platforms[cycle] = new_platforms
+
+        # For each platform get a list of hosts.
+        hosts = []
+        for cycle, tasks in task_platforms.items():
+            for platform in tasks.values():
+                hosts.append(get_host_from_platform(platform))
+        hosts = list(set(hosts))
+        return hosts
+
+    def get_task_auth(
+        self, suite_name: str, task_name: str
+    ) -> Union[str, None]:
+        """Get host for a remote task from a Cylc workflow definition.
+
+        Returns: Hostname or None if:
+          - task does not run remotely.
+          - task has not been defined.
+        """
+        # n.b. Imports inside function to avoid dependency on Cylc and
+        # Cylc-Rose is Rose is being used with a different workflow engine.
+        from cylc.flow.platforms import get_host_from_platform
+        from cylc.flow.hostuserutil import is_remote_platform
+        from cylc.rose.platform_utils import get_platform_from_task_def
+
+        # Check whether task has been defined.
+        try:
+            platform = get_platform_from_task_def(suite_name, task_name)
+        except KeyError:
+            return None
+        else:
+            # If task has been defined return host:
+            if is_remote_platform(platform):
+                return get_host_from_platform(platform)
+            else:
+                return None
 
     def get_task_props_from_env(self):
         """Get attributes of a suite task from environment variables.
@@ -280,6 +307,7 @@ class CylcProcessor(SuiteEngineProcessor):
                         self.handle_event(exc, level=Reporter.WARN)
                     else:
                         for line in sorted(ssh_ls_out.splitlines()):
+                            line = line.decode()
                             event = FileSystemEvent(
                                 FileSystemEvent.DELETE,
                                 "%s:log/job/%s/" % (auth, line))

@@ -24,4 +24,5 @@ fcm_make_t5 => fcm_make2_t5 # mirror
     [[fcm_make2_t5]]
         [[[remote]]]
             host={{HOST}}
+            retrieve job logs = true
 {% endif %}

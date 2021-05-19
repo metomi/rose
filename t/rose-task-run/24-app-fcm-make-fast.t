@@ -43,12 +43,12 @@ run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
         --flow-name="${FLOW}" \
-        --no-run-name
+        --no-run-name \
+        -S "FAST_DEST_ROOT='${PWD}/fast'"
 run_pass "${TEST_KEY_BASE}-play" \
     timeout 120 \
         cylc play \
             "${FLOW}" \
-            -s "FAST_DEST_ROOT='${PWD}/fast'" \
             --abort-if-any-task-fails \
             --host='localhost' \
             --no-detach \

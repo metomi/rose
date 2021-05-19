@@ -20,7 +20,6 @@
 # Test fcm_make built-in application, basic usages.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-skip_all 'TODO: #2445'
 
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'
@@ -33,7 +32,7 @@ tests 10
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
-    JOB_HOST=$(rose host-select -q $JOB_HOST)
+    JOB_HOST=$(rose host-select -q "$JOB_HOST")
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
@@ -111,7 +110,8 @@ else
         $FLOW_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
 
     TEST_KEY="$TEST_KEY_BASE-t5-part-2"
-    rose suite-log -q --name=$FLOW --update fcm_make2_t5
+    # TODO: this test relies on "retrieve job logs = True".
+    #rose suite-log -q --name=$FLOW --update fcm_make2_t5
     file_grep "$TEST_KEY.out" \
         "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -C .*/cylc-run/${FLOW}/share/fcm_make_t5 -n 2 -j 4" \
         $FLOW_RUN_DIR/log/job/1/fcm_make2_t5/01/job.out

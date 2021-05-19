@@ -27,7 +27,6 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
-skip_all 'TODO: #2445'
 
 if ! fcm help make 1>/dev/null 2>&1; then
     skip_all '"fcm make" unavailable'

@@ -552,7 +552,7 @@ def add_site_meta_paths():
             path = os.path.expanduser(os.path.expandvars(path))
             sys.path.insert(0, os.path.abspath(path))
     sys.path.append(
-        metomi.rose.resource.ResourceLocator.default().locate('rose-meta')
+        str(metomi.rose.resource.ResourceLocator.default().locate('rose-meta'))
     )
 
 
