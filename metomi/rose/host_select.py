@@ -33,6 +33,7 @@ from socket import (
 import sys
 from time import sleep, time
 import traceback
+from typing import Optional
 
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
@@ -537,11 +538,11 @@ class RandomScorer:
 
     """
 
-    ARG = None
-    KEY = "random"
-    CMD = ['cpu_count']  # fetch an arbitrary metric
-    CMD_IS_FORMAT = False
-    SIGN = 1  # Positive
+    ARG: Optional[str] = None
+    KEY: str = "random"
+    CMD: list = ['cpu_count']  # fetch an arbitrary metric
+    CMD_IS_FORMAT: bool = False
+    SIGN: int = 1  # Positive
 
     def get_command(self, method_arg=None):
         """Return a shell command to get the info for scoring a host."""

@@ -117,8 +117,11 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             except UnboundEnvironmentVariableError as exc:
                 raise ConfigProcessError([key], key, exc)
             if os.path.exists(name) and kwargs.get("no_overwrite_mode"):
-                exc = FileOverwriteError(name)
-                raise ConfigProcessError([key], None, exc)
+                raise ConfigProcessError(
+                    [key],
+                    None,
+                    FileOverwriteError(name)
+                )
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(name))
         # Gets a list of sources and targets
         sources = {}
@@ -376,8 +379,11 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     if algorithm:
                         checksum = get_checksum_func(algorithm)(target.name)
                 if checksum_expected != checksum:
-                    exc = ChecksumError(checksum_expected, checksum)
-                    raise ConfigProcessError(keys, checksum_expected, exc)
+                    raise ConfigProcessError(
+                        keys,
+                        checksum_expected,
+                        ChecksumError(checksum_expected, checksum)
+                    )
             event = ChecksumEvent(target.name, target.paths[0].checksum)
             self.handle_event(event)
 

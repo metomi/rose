@@ -70,7 +70,8 @@ EXTRAS_REQUIRE = {
 }
 TESTS_REQUIRE = [
     'pytest',
-    'flake8'
+    'flake8>=3.0.0',
+    'mypy>=0.800',
 ]
 EXTRAS_REQUIRE['all'] = list(set(
     [y for x in EXTRAS_REQUIRE.values() for y in x] + TESTS_REQUIRE

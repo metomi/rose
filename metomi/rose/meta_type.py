@@ -18,6 +18,8 @@
 import ast
 import inspect
 import re
+from typing import Optional, Dict, Any, Type
+
 import metomi.rose.variable
 
 REC_CHARACTER = re.compile(r"'(?:[^']|'')*'$")
@@ -25,8 +27,8 @@ REC_CHARACTER = re.compile(r"'(?:[^']|'')*'$")
 
 class MetaType:
 
-    KEY = None
-    meta_type_classes = {}
+    KEY: Optional[str] = None
+    meta_type_classes: Dict[Any, Type] = {}
 
     @classmethod
     def get_meta_type(cls, key):
