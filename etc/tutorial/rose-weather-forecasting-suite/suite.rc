@@ -47,9 +47,9 @@
             # To use archived data comment this line out.
             API_KEY = 3b627bb4-f8aa-4ed5-b486-09c606a475ef
 
-    [[get_observations<station=belmullet>]]
+    [[get_observations<station=aldergrove>]]
         [[[environment]]]
-            SITE_ID = 3976
+            SITE_ID = 3917
     [[get_observations<station=camborne>]]
         [[[environment]]]
             SITE_ID = 3808

@@ -1,10 +1,24 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors - GNU V3+.
-# This is illustrative code developed for tutorial purposes, it is not
-# intended for scientific use and is not guarantied to be accurate or correct.
+# THIS FILE IS PART OF THE CYLC SUITE ENGINE.
+# Copyright (C) NIWA & British Crown (Met Office) & Contributors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
+# This is illustrative code developed for tutorial purposes, it is not
+# intended for scientific use and is not guarantied to be accurate or correct.s
 """
 Usage:
     get-observations
@@ -14,14 +28,16 @@ Environment Variables:
         we are to fetch results for.
     API_KEY: The DataPoint API key, required for getting live weather data.
         If un-specified then get-observations will fall back to archive data
-        from the suite directory.
+        from the workflow directory.
 
 """
 
 from datetime import datetime
 import json
 import os
-import urllib2
+import re
+import requests
+import urllib3
 
 
 BASE_URL = ('http://datapoint.metoffice.gov.uk/public/data/'
@@ -50,68 +66,116 @@ ORDINATES = {
 }
 
 
-def get_datapoint_data(site_id, time, api_key):
-    """Get weather data from the DataPoint service."""
-    # The URL required to get the data.
-    time = datetime.strptime(time, '%Y%m%dT%H%MZ').strftime('%Y-%m-%dT%H:%MZ')
-    url = BASE_URL.format(time=time, site_id=site_id,
-                          api_key=api_key)
-    # HTTP header to prevent 403 error:
-    hdr = {'User-Agent': ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 '
-                          '(KHTML, like Gecko) Chrome/23.0.1271.64 '
-                          'Safari/537.11'),
-           'Accept': ('text/html,application/xhtml+xml,application/xml;'
-                      'q=0.9,*/*;q=0.8'),
-           'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-           'Accept-Encoding': 'none',
-           'Accept-Language': 'en-US,en;q=0.8',
-           'Connection': 'keep-alive'}
-    req = urllib2.Request(url, headers=hdr)
-    # Get the data and parse it as JSON.
-    print 'Opening URL: %s' % url
-    return json.loads(urllib2.urlopen(req).read())['SiteRep']['DV']['Location']
+class NoDataException(Exception):
+    pass
 
 
-def get_archived_data(site_id, time):
-    """Return archived weather data from the suite directory."""
-    print [os.environ['CYLC_SUITE_DEF_PATH'], 'data', time, site_id + '.json']
-    path = os.path.join(
-        os.environ['CYLC_SUITE_DEF_PATH'], 'data', time, site_id + '.json')
-    print 'Opening File: %s' % path
-    return json.load(file(path))['SiteRep']['DV']['Location']
+def reference_lat_long(site_id):
+    """Extract lat-long from a reference file."""
+    src = os.path.join(os.environ['CYLC_SUITE_RUN_DIR'] + '/etc/met-office-sites.dat')
+    with open(src, 'r') as handle:
+        info = handle.read()
+    siteinfo = re.findall('^{:05d}.*'.format(int(site_id)), info, re.MULTILINE)
+    if not siteinfo:
+        msg = 'Cannot find site with ID {site_id} in reference file {src}'
+        msg = msg.format(site_id=site_id, src=src)
+        raise NoDataException(msg)
+    siteinfo = siteinfo[0].split()
+    lat = siteinfo[3]
+    lon = siteinfo[4]
+    return lat, lon
 
 
-def extract_observations(data):
-    """Extract the relevant observations from the weather data."""
+def synop_grab(site_id, time):
+    """Get obs data from a resonably reliable 3rd Party source.
+
+    n.b. In theory the remote site has some limits on how many requests
+    you throw at it, but this is in the tens of thousands of lines, and
+    this request should get just 1.
+    """
+    # Construct a Request:
+    time = datetime.strptime(time, '%Y%m%dT%H%MZ').strftime('%Y%m%d%H%M')
+    site_str = '{:05d}'.format(int(site_id))
+    url = (
+        'https://www.ogimet.com/cgi-bin/getsynop?block={site}'
+        '&begin={time}&end={time}'
+    )
+    url = url.format(time=time, site=site_str)
+
+    req = requests.get(url)
+    print('Requests Returned: {}'.format(req.text))
+
+    if req.status_code != 200:
+        # If request has failed return False.
+        raise NoDataException(
+            'Request for data Failed for {url}'.format(url=url))
+
+    # See https://allaboutweather.tripod.com/synopcode.htm for an explanation
+    # of what this regex is looking for: Synopcode dd and ff
+    regex_wind = re.compile(
+        r'AAXX [\d\/]{5} [\d\/]{5} [\d\/]{5} [\d\/]'
+        r'(?P<direction>\d\d)(?P<speed>\d\d) 1'
+    )
     try:
-        direction = ORDINATES[data['Period']['Rep']['D']]
-    except KeyError:
-        direction = '0'
-        print 'No wind direction in file so using 0'
+        data = regex_wind.search(req.text).groupdict()
+    except:
+        raise NoDataException(
+            'Request for data failed, raw request was {}'.format(req.text))
 
-    try:
-        speed = data['Period']['Rep']['S']
-    except KeyError:
-        speed = '0'
-        print 'No wind speed in file so using 0'
+    # Parse the direction from 10's of degrees to degrees:
+    data['direction'] = str(int(data['direction']) * 10)
 
-    return [data['lon'],
-            data['lat'],
-            direction,
-            speed]
+    # Convert data in KT to MPH:
+    data['speed'] = str(int(data['speed']) * 1.15078)
+
+    # Get lat and long from MO Data:
+    lat, lon = reference_lat_long(site_id)
+
+    return [lat, lon, data['direction'], data['speed']]
+
+
+def get_nearby_site(site_id, badsites):
+    """Use Pythagoras to find the next nearest site."""
+    lat, lon = reference_lat_long(site_id)
+    src = os.path.join(
+        os.environ['CYLC_SUITE_RUN_DIR'] + '/etc/met-office-sites.dat')
+    with open(src, 'r') as handle:
+        info = handle.read()
+    dist = 100
+    result = 0
+    for site in info.split('\n')[6:]:
+        site = site.split()
+        slat = site[-4]
+        slon = site[-3]
+        x = float(slat) - float(lat)
+        y = float(slon) - float(lon)
+        ndist = (x ** 2 + y ** 2) ** 0.5
+        if ndist < dist and site[0] not in badsites:
+            dist = ndist
+            result = site
+    print('using {} (dist {})'.format(" ".join(result[1:][:-5]), dist))
+
+    return int(result[0]), dist
 
 
 def main(site_id, api_key=None):
     cycle_point = os.environ['CYLC_TASK_CYCLE_POINT']
 
-    if api_key:
-        print 'Attempting to get weather data from DataPoint...'
-        data = get_datapoint_data(site_id, cycle_point, api_key)
-    else:
-        print 'No API key provided, falling back to archived data'
-        data = get_archived_data(site_id, cycle_point)
+    # Try to get the information from SYNOPS.
+    dist = 0.0
+    badsites = []
+    fails = True
+    obs = None
+    while dist < 1 and fails:
+        try:
+            obs = synop_grab(site_id, cycle_point)
+            fails = False
+        except NoDataException:
+            badsites.append('{:05d}'.format(int(site_id)))
+            site_id, dist = get_nearby_site(site_id, badsites)
 
-    obs = extract_observations(data)
+    if fails == True:
+        raise NoDataException('Can\'t get data for any reasonably close site')
 
     # Write observations.
     with open('wind.csv', 'w+') as data_file:
