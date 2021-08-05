@@ -1,0 +1,443 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>rose_prune &mdash; Rose Documentation 2.0b2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/diff_selector.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/grid_table.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/hieroglyph_theme_addons.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/tutorial.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/addons.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/rose-favicon.png"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/js/diff_selector.js"></script>
+        <script src="../../_static/js/minicylc.js"></script>
+        <script src="../../_static/js/spoiler.js"></script>
+        <script src="../../_static/js/addons.js"></script>
+        <script src="../../_static/js/versioning.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Rose Macro API" href="../rose-macro.html" />
+    <link rel="prev" title="rose_bunch" href="rose_bunch.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html">
+          
+
+          
+            
+            <img src="../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0b2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cheat-sheet.html">Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../rose-built-in-applications.html">Rose Built-In Applications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fcm_make.html"><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_ana.html"><code class="docutils literal notranslate"><span class="pre">rose_ana</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_arch.html"><code class="docutils literal notranslate"><span class="pre">rose_arch</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_bunch.html"><code class="docutils literal notranslate"><span class="pre">rose_bunch</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#invocation">Invocation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rose Documentation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../rose-built-in-applications.html">Rose Built-In Applications</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="rose-prune">
+<h1><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code><a class="headerlink" href="#rose-prune" title="Permalink to this headline">¶</a></h1>
+<p>A framework for housekeeping a cycling suite.</p>
+<p>It prunes files and directories generated by suite tasks. It is designed
+to work under <a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> on the host that runs the suite
+daemon.</p>
+<p>The application is normally configured in the <a class="reference internal" href="#rose:conf:rose_prune[prune]" title="rose:conf:rose_prune[prune]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_prune[prune]</span></code></a>
+section in the <a class="reference internal" href="../configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file.</p>
+<p>All settings are expressed as a space delimited list of cycles,
+normally as <a class="reference internal" href="../../glossary.html#term-cycle-point"><span class="xref std std-term">cycle points</span></a> or
+<a class="reference internal" href="../../glossary.html#term-ISO8601-duration"><span class="xref std std-term">offsets</span></a> relative to the current cycle.
+For <a class="reference internal" href="../../glossary.html#term-datetime-cycling"><span class="xref std std-term">datetime cycling</span></a>, the format
+of a cycle point should be an <a class="reference internal" href="../../glossary.html#term-ISO8601-datetime"><span class="xref std std-term">ISO8601 datetime</span></a>, and an
+offset should be an <a class="reference internal" href="../../glossary.html#term-ISO8601-duration"><span class="xref std std-term">ISO8601 duration</span></a>. E.g. <code class="docutils literal notranslate"><span class="pre">-P1DT6H</span></code> is 1 day
+and 6 hours before the current cycle point.</p>
+<p>The cycles of some settings also accept an optional argument followed
+by a colon. In these, the argument should be globs for matching items
+in the directory. If two or more globs are required, they should be
+separated by a space. In which case, either the argument should be
+quoted or the space should be escaped by a backslash.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code> uses Bash <a class="reference external" href="https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching">extglob pattern matching</a> which supports simple
+(e.g. <code class="docutils literal notranslate"><span class="pre">*</span></code>) and extended (e.g. <code class="docutils literal notranslate"><span class="pre">!(foo)</span></code>) pattern matching.</p>
+<p>For more information see the <code class="docutils literal notranslate"><span class="pre">shopt</span></code> documentation for the version
+of bash you have installed (<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">man</span> <span class="pre">shopt</span></code>).</p>
+</div>
+<div class="section" id="invocation">
+<h2>Invocation<a class="headerlink" href="#invocation" title="Permalink to this headline">¶</a></h2>
+<p>In automatic selection mode, this built-in application will be invoked
+automatically if a task has a name that starts with <code class="docutils literal notranslate"><span class="pre">rose_prune*</span></code>.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">rose_prune</span>
+<span class="nv">mode</span><span class="o">=</span><span class="s">rose_prune</span>
+
+<span class="nt">[prune]</span>
+<span class="nv">cycle-format{cycle_year_month}</span><span class="o">=</span><span class="s">CCYYMM</span>
+<span class="nv">prune-remote-logs-at</span><span class="o">=</span><span class="s">-PT6H</span>
+<span class="nv">archive-logs-at</span><span class="o">=</span><span class="s">-P1D</span>
+<span class="nv">prune-server-logs-at</span><span class="o">=</span><span class="s">-P7D</span>
+<span class="nv">prune{work}</span><span class="o">=</span><span class="s">-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H</span>
+<span class="nv">prune{share}</span><span class="o">=</span><span class="s">-P1D:hello-*-at-%(cycle)s.txt -P3M:monthly/%(cycle_year_month)s/</span>
+<span class="nv">prune{share/cycle}</span><span class="o">=</span><span class="s">-PT6H:foo* -PT12H:&#39;bar* *.baz*&#39; -P1D</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<dl class="rose app">
+<dt class="sig sig-object rose" id="rose:app:rose_prune">
+<em class="property"><span class="pre">Rose</span> <span class="pre">App</span> </em><span class="sig-name descname"><span class="pre">rose_prune</span></span><a class="headerlink" href="#rose:app:rose_prune" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">[prune]</span></span><a class="headerlink" href="#rose:conf:rose_prune[prune]" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]cycle-format{key}">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">cycle-format{key}</span></span><em class="property"><span class="pre">=</span> <span class="pre">format</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]cycle-format{key}" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a key to a format string for use in conjunction with a
+<a class="reference internal" href="#rose:conf:rose_prune[prune]prune{item-root}" title="rose:conf:rose_prune[prune]prune{item-root}"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">prune{item-root}=cycle:globs</span></code></a> setting. For example, we may
+have something like <code class="docutils literal notranslate"><span class="pre">cycle-format{cycle_year}=CCYY</span></code> and
+<code class="docutils literal notranslate"><span class="pre">prune{share}=-P1Y:xmas-present-%(cycle_year)s/</span></code>. In Cylc, if the
+current cycle point is <code class="docutils literal notranslate"><span class="pre">20151201T0000Z</span></code>, it will clear out the
+directory <code class="docutils literal notranslate"><span class="pre">share/xmas-present-2014/</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">key</span></code> can be any string that can be used in a <code class="docutils literal notranslate"><span class="pre">%(key)s</span></code>
+substitution, and format should be a a valid <a class="reference internal" href="../command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a>
+print format.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune-remote-logs-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune-remote-logs-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune-remote-logs-at" title="Permalink to this definition">¶</a></dt>
+<dd><p>Re-sync remote job logs at these cycles and remove them from
+remote hosts.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune-server-logs-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune-server-logs-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune-server-logs-at" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove logs on the suite server. Removes both log directories
+and archived logs.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]archive-logs-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">archive-logs-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]archive-logs-at" title="Permalink to this definition">¶</a></dt>
+<dd><p>Archive all job logs at these cycles. Remove remote job logs on
+success.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune{item-root}">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune{item-root}</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle[:globs]</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune{item-root}" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the sub-directories under <code class="docutils literal notranslate"><span class="pre">item-root</span></code> (e.g.
+<a class="reference internal" href="../../glossary.html#term-work-directory"><span class="xref std std-term">work/</span></a> of the specified cycles.
+E.g. In Cylc, if current cycle is <code class="docutils literal notranslate"><span class="pre">20141225T1200Z</span></code>,
+<code class="docutils literal notranslate"><span class="pre">prune{work}=-PT12H</span></code> will clear out <code class="docutils literal notranslate"><span class="pre">work/20141225T0000Z/</span></code>.</p>
+<p>If globs are specified for a cycle, it will attempt to prune only
+items matching <code class="docutils literal notranslate"><span class="pre">CYCLE/GLOBS</span></code> under <code class="docutils literal notranslate"><span class="pre">item-root</span></code>.
+E.g. In Cylc, if current cycle is <code class="docutils literal notranslate"><span class="pre">20141225T1200Z</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">prune{share/cycle}=-PT12H:wild*</span></code> will clear out all items
+matching <code class="docutils literal notranslate"><span class="pre">share/cycle/20141225T0000Z/wild*</span></code>.</p>
+<p>A glob can also be specified as a formatting string containing a
+single substitution <code class="docutils literal notranslate"><span class="pre">%(cycle)s</span></code>. In this mode, the cycle
+string will not be added as a sub-directory of the <code class="docutils literal notranslate"><span class="pre">item-root</span></code>.
+E.g. In Cylc, if current cycle is <code class="docutils literal notranslate"><span class="pre">20141225T1200Z</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">prune{share}=-PT12H:hello-*-at-%(cycle)s.txt</span></code> will clear out
+all items matching <code class="docutils literal notranslate"><span class="pre">share/hello-*-at-20141225T0000Z.txt</span></code>.</p>
+<p>A glob can also be specified as a formatting string containing a
+substitution <code class="docutils literal notranslate"><span class="pre">%(key)s</span></code>, if a
+<a class="reference internal" href="#rose:conf:rose_prune[prune]cycle-format{key}" title="rose:conf:rose_prune[prune]cycle-format{key}"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">cycle-format{key}=format</span></code></a> setting is specified.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune-work-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune-work-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle[:globs]</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune-work-at" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version foo: </span>Equivalent to <code class="docutils literal notranslate"><span class="pre">prune{work}=cycle[:globs]</span> <span class="pre">...</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune-datac-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune-datac-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle[:globs]</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune-datac-at" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version foo: </span>Equivalent to <code class="docutils literal notranslate"><span class="pre">prune{share/cycle}=cycle[:globs]</span> <span class="pre">...</span></code>.</p>
+</div>
+<p>foo</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../rose-macro.html" class="btn btn-neutral float-right" title="Rose Macro API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rose_bunch.html" class="btn btn-neutral float-left" title="rose_bunch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.
+
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.0b2
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.0b2";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/built-in/rose_prune";
+    </script>
+  </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

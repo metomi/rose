@@ -1,0 +1,105 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Building &amp; Testing &mdash; Rose Documentation 2.0b2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/diff_selector.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grid_table.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/hieroglyph_theme_addons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tutorial.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/addons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0b2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/diff_selector.js"></script>
+    <script type="text/javascript" src="../_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="../_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="../_static/js/addons.js"></script>
+    <script type="text/javascript" src="../_static/js/versioning.js"></script>
+    <script type="text/javascript" src="../_static/common.js"></script>
+    
+    <script type="text/javascript" src="../_static/slides.js"></script>
+    <script type="text/javascript" src="../_static/sync.js"></script>
+    <script type="text/javascript" src="../_static/controller.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+    
+    
+    <link rel="shortcut icon" href="../_static/rose-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rose Documentation 2.0b2 documentation" href="../index.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="building-testing">
+
+<h1>Building &amp; Testing<a class="headerlink" href="../../html/developing/building.html#building-testing" title="View HTML">§</a></h1>
+
+<p>The documentation is built using Make.</p>
+<p>Whenever making changes to the sphinx infrastructure use a clean build e.g:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make -C sphinx clean html
+</pre></div>
+</div>
+<p>The following builders are useful for development:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">linkcheck</span></code></dt><dd>Check external links (internal links are checked by a regular build).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">doctest</span></code></dt><dd>Run any doctests contained within documented code
+(e.g. see <a class="reference internal" href="../api/configuration/api.html#module-metomi.rose.config" title="metomi.rose.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metomi.rose.config</span></code></a>).</dd>
+</dl>
+<p>Additionally, if you are not using an editor with a spellchecker you may
+wish to use aspell/ispell/hunspell to check any changed docs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hunspell path/to/changed.rst
+<span class="c1"># or</span>
+aspell check path/to/changed.rst
+</pre></div>
+</div>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>
