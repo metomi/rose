@@ -17,4 +17,4 @@ jobs:
           fetch-depth: 0  # need to fetch all commits to check contributors
 
       - name: Check CONTRIBUTING.md
-        uses: cylc/release-actions/check-shortlog@8b5b36e2d9748dfeeef3e9b9b809dd160df290fc
+        uses: cylc/release-actions/check-shortlog@v1
