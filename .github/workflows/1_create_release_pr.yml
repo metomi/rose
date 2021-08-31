@@ -25,6 +25,9 @@ jobs:
       with:
         ref: ${{ env.BASE_REF }}
 
+    - name: Check CONTRIBUTING.md
+      uses: cylc/release-actions/check-shortlog@v1
+
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
