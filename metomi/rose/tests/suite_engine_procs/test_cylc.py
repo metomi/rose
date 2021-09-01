@@ -31,7 +31,10 @@ from metomi.rose.suite_engine_procs.cylc import CylcProcessor
             {'hosts': ['localhost']}, None, id='platform is local'
         ),
         param(
-            {'hosts': ['my_host']}, 'my_host', id='platform is remote'
+            {
+                'hosts': ['my_host'],
+                'selection': {'method': 'definition order'}
+            }, 'my_host', id='platform is remote'
         ),
         param(None, None, id='Task not in config')
     ]
@@ -46,7 +49,8 @@ def test_get_task_auth(monkeypatch, platform, expect):
         cylc.rose.platform_utils, 'get_platform_from_task_def',
         fake_get_platform
     )
-    assert CylcProcessor().get_task_auth('foo', 'bar') is expect
+    result = CylcProcessor().get_task_auth('foo', 'bar')
+    assert result is expect
 
 
 @pytest.mark.parametrize(
@@ -55,7 +59,10 @@ def test_get_task_auth(monkeypatch, platform, expect):
         param(
             [('1', None)],
             {
-                '1': {'task_1': {'hosts': ['hello']}}
+                '1': {'task_1': {
+                    'hosts': ['hello'],
+                    'selection': {'method': 'definition order'}
+                }}
             },
             ['hello'],
             id='1 cycle:1 host'
@@ -63,7 +70,10 @@ def test_get_task_auth(monkeypatch, platform, expect):
         param(
             [('1', None)],
             {
-                '1': {'task_1': {'hosts': ['hey', 'hi', 'howdy']}}
+                '1': {'task_1': {
+                    'hosts': ['hey', 'hi', 'howdy'],
+                    'selection': {'method': 'definition order'}
+                }}
             },
             ['hey', 'hi', 'howdy'],
             id='1 cycle:3 hosts'
@@ -71,8 +81,14 @@ def test_get_task_auth(monkeypatch, platform, expect):
         param(
             [('1', None), ('2', None)],
             {
-                '1': {'task_1': {'hosts': ['hello']}},
-                '2': {'task_1': {'hosts': ['hello']}}
+                '1': {'task_1': {
+                    'hosts': ['hello'],
+                    'selection': {'method': 'definition order'}
+                }},
+                '2': {'task_1': {
+                    'hosts': ['hello'],
+                    'selection': {'method': 'definition order'}
+                }}
             },
             ['hello'],
             id='2 cycles:1 platform'
@@ -80,8 +96,14 @@ def test_get_task_auth(monkeypatch, platform, expect):
         param(
             [('1', None), ('2', None)],
             {
-                '1': {'task_1': {'hosts': ['hello']}},
-                '2': {'task_1': {'hosts': ['goodbye']}}
+                '1': {'task_1': {
+                    'hosts': ['hello'],
+                    'selection': {'method': 'definition order'}
+                }},
+                '2': {'task_1': {
+                    'hosts': ['goodbye'],
+                    'selection': {'method': 'definition order'}
+                }}
             },
             ['hello', 'goodbye'],
             id='2 cycles:2 platforms'
