@@ -64,8 +64,8 @@ mock_cylc8_install
 TEST_NAME="${TEST_KEY_BASE}-no-run-dir"
 mkdir "${INSTALLED_WORKFLOW_PATH}/_cylc-install"
 mkdir "${INSTALLED_WORKFLOW_PATH}/flow.cylc"
-run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}"
-file_grep "${TEST_NAME}-error" "Placeholder error message" "${TEST_NAME}.err"
+run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" --name="$WORKFLOW_NAME"
+file_grep "${TEST_NAME}-error" "already has a Cylc 8 workflow installed." "${TEST_NAME}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
 
 # We want to over-write a simply installed Cylc 8 workflow with numbered runs.
@@ -76,8 +76,8 @@ rm -fr "$INSTALLED_WORKFLOW_PATH"
 mock_cylc8_install
 mkdir "${INSTALLED_WORKFLOW_PATH}/_cylc-install"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/run1/flow.cylc"
-run_fail "${TEST_KEY_BASE}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}"
-file_grep "${TEST_KEY_BASE}-error" "Placeholder error message" "${TEST_KEY_BASE}.err"
+run_fail "${TEST_KEY_BASE}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" --name="$WORKFLOW_NAME"
+file_grep "${TEST_KEY_BASE}-error" "already has a Cylc 8 workflow installed." "${TEST_KEY_BASE}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
 
 # We want to over-write a simply installed Cylc 8 workflow with named runs.
@@ -89,8 +89,8 @@ mock_cylc8_install
 TEST_NAME="${TEST_KEY_BASE}--run-name"
 mkdir "${INSTALLED_WORKFLOW_PATH}/_cylc-install"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/foo/flow.cylc"
-run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}"
-file_grep "${TEST_NAME}-error" "Placeholder error message" "${TEST_NAME}.err"
+run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" --name="$WORKFLOW_NAME"
+file_grep "${TEST_NAME}-error" "already has a Cylc 8 workflow installed." "${TEST_NAME}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
 
 # We want to over-write a directory containing a Cylc 8 install
@@ -103,8 +103,8 @@ mock_cylc8_install
 TEST_NAME="${TEST_KEY_BASE}-into-parent"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/my_workflow/_cylc-install"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/my_workflow/run1/flow.cylc"
-run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}"
-file_grep "${TEST_NAME}-error" "Placeholder error message" "${TEST_NAME}.err"
+run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" --name="$WORKFLOW_NAME"
+file_grep "${TEST_NAME}-error" "already has a Cylc 8 workflow installed." "${TEST_NAME}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
 
 # We want to rose suite-run install into a subdirectory of a Location with a
@@ -115,10 +115,10 @@ rm -fr "$INSTALLED_WORKFLOW_PATH"
 # |   |-- flow.cylc
 # |-- install/Rose1/suite/here
 mock_cylc8_install
-TEST_NAME="${TEST_KEY_BASE}-into-parent"
+TEST_NAME="${TEST_KEY_BASE}-grandchild"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/_cylc-install"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/run1/flow.cylc"
 run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" \
-    --name "$(basename ${INSTALLED_WORKFLOW_PATH})/baz"
-file_grep "${TEST_NAME}-error" "Placeholder error message" "${TEST_NAME}.err"
+    --name "${INSTALLED_WORKFLOW_PATH}baz"
+file_grep "${TEST_NAME}-error" "already has a Cylc 8 workflow installed." "${TEST_NAME}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
