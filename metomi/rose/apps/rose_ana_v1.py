@@ -22,17 +22,17 @@ import glob
 import inspect
 import os
 import re
-import sys
 import sqlite3
+import sys
 import time
 
 # Rose modules
+from metomi.rose.app_run import BuiltinApp
 import metomi.rose.config
 from metomi.rose.env import env_var_process
 from metomi.rose.popen import RosePopener
-from metomi.rose.reporter import Reporter, Event
+from metomi.rose.reporter import Event, Reporter
 from metomi.rose.resource import ResourceLocator
-from metomi.rose.app_run import BuiltinApp
 
 WARN = -1
 PASS = 0

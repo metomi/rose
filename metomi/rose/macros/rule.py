@@ -24,7 +24,6 @@ import jinja2.exceptions
 import metomi.rose.macro
 import metomi.rose.variable
 
-
 REC_EXPR_IS_THIS_RULE = re.compile(
     r"""(?:^.*[^\w:=]|^)   (?# Break or beginning)
          this              (?# 'this')

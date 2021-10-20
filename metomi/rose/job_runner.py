@@ -17,7 +17,6 @@
 """A multiprocessing runner of jobs with dependencies."""
 
 import asyncio
-
 from metomi.rose.reporter import Event
 
 

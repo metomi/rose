@@ -18,15 +18,15 @@
 
 from collections import OrderedDict
 import re
-from subprocess import check_output, CalledProcessError
+from subprocess import CalledProcessError, check_output
 import sys
 
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
+
 import sphinx
 from sphinx.util.nodes import nested_parse_with_titles
-
 
 # --- Generic regex'es. ---
 

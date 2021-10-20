@@ -16,15 +16,20 @@
 # -----------------------------------------------------------------------------
 """Implements the "rose config" command."""
 
-from metomi.rose.config import (
-    ConfigDumper, ConfigLoader, ConfigNode, ConfigSyntaxError)
-from metomi.rose.env import env_var_process
-from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.reporter import Reporter, Event
-from metomi.rose.resource import ResourceLocator
-import metomi.rose.macro
 import os
 import sys
+
+from metomi.rose.config import (
+    ConfigDumper,
+    ConfigLoader,
+    ConfigNode,
+    ConfigSyntaxError
+)
+from metomi.rose.env import env_var_process
+import metomi.rose.macro
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.reporter import Event, Reporter
+from metomi.rose.resource import ResourceLocator
 
 
 class MetadataNotFoundEvent(Event):

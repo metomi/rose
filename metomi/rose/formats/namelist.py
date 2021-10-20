@@ -16,9 +16,8 @@
 # -----------------------------------------------------------------------------
 """Utilities for parsing namelist files."""
 
-import re
 import io
-
+import re
 
 # ERROR REPORTING:
 ERROR_UPPERCASE = "name should be lowercase"

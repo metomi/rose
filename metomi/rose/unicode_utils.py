@@ -15,8 +15,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import io
 import _io
+import io
 
 ENCODING = "UTF-8"
 

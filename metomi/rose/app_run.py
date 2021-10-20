@@ -28,7 +28,7 @@ from metomi.isodatetime.data import get_timepoint_for_now
 from metomi.isodatetime.parsers import ISO8601SyntaxError
 from metomi.rose.config import ConfigDumper
 from metomi.rose.date import RoseDateTimeOperator
-from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.env import UnboundEnvironmentVariableError, env_var_process
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Event, Reporter

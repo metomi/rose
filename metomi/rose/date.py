@@ -17,15 +17,16 @@
 """Parse and format date and time."""
 
 from datetime import datetime
-from metomi.isodatetime.data import Calendar, Duration, get_timepoint_for_now
-from metomi.isodatetime.dumpers import TimePointDumper
-from metomi.isodatetime.parsers import TimePointParser, DurationParser
 import os
 import re
+import sys
+
+from metomi.isodatetime.data import Calendar, Duration, get_timepoint_for_now
+from metomi.isodatetime.dumpers import TimePointDumper
+from metomi.isodatetime.parsers import DurationParser, TimePointParser
 from metomi.rose.env import UnboundEnvironmentVariableError
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Reporter
-import sys
 
 
 class OffsetValueError(ValueError):

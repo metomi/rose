@@ -23,7 +23,6 @@ Classes:
 
 import sqlalchemy as al
 
-
 LATEST_TABLE_NAME = "latest"
 MAIN_TABLE_NAME = "main"
 META_TABLE_NAME = "meta"

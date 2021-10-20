@@ -16,13 +16,12 @@
 
 from textwrap import dedent
 
-import pytest
-
 from metomi.rose.resource import (
     ROSE_CONF_PATH,
     ROSE_SITE_CONF_PATH,
     ResourceLocator
 )
+import pytest
 
 
 @pytest.fixture(scope='module')

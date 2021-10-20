@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-import os.path
-import pytest
-import metomi.rose.config
 from io import StringIO
+import os.path
+
+import metomi.rose.config
+import pytest
 
 
 def test_init():

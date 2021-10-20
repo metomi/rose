@@ -16,13 +16,14 @@
 # -----------------------------------------------------------------------------
 """Wraps Python's subprocess.Popen."""
 
-import asyncio
 import os
 import re
 import select
 import shlex
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 import sys
+
+import asyncio
 
 from metomi.rose.reporter import Event
 from metomi.rose.resource import ResourceLocator

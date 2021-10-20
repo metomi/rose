@@ -17,10 +17,13 @@
 """Process an env section in node of a metomi.rose.config_tree.ConfigTree."""
 
 import os
+
+from metomi.rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from metomi.rose.env import (
-    env_export, env_var_process, UnboundEnvironmentVariableError)
-from metomi.rose.config_processor import (
-    ConfigProcessError, ConfigProcessorBase)
+    UnboundEnvironmentVariableError,
+    env_export,
+    env_var_process
+)
 
 
 class ConfigProcessorForEnv(ConfigProcessorBase):

@@ -20,7 +20,6 @@ import metomi.rose.config
 import metomi.rose.macro
 import metomi.rose.variable
 
-
 _OPTIONS_KEY = "options"
 _REPORTED_SECTION_KEY = "reported config sect"
 _SECTION_IS_COMPULSORY_KEY = "section is compulsory"

@@ -17,11 +17,10 @@
 """Module to produce Graphviz graphing of Rose configuration metadata."""
 
 import ast
+from functools import cmp_to_key
 import os
 import sys
 import tempfile
-
-from functools import cmp_to_key
 
 import metomi.rose.config
 import metomi.rose.config_tree
@@ -31,7 +30,6 @@ import metomi.rose.macros.trigger
 import metomi.rose.opt_parse
 import metomi.rose.reporter
 import metomi.rose.resource
-
 
 COLOUR_ENABLED = "green"
 COLOUR_IGNORED = "red"

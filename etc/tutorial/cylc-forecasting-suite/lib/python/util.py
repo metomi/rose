@@ -4,9 +4,9 @@
 # -----------------------------------------------------------------------------
 from copy import copy
 import math
-import jinja2
 import sys
 
+import jinja2
 
 R_0 = 6371.  # Radius of the Earth (km).
 

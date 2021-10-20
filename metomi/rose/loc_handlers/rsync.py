@@ -18,10 +18,9 @@
 
 from time import sleep, time
 
-from metomi.rose.popen import RosePopenError
-from metomi.rose.loc_handlers.rsync_remote_check import (
+from metomi.rose.loc_handlers.rsync_remote_check import \
     __file__ as rsync_remote_check_file
-)
+from metomi.rose.popen import RosePopenError
 
 
 class RsyncLocHandler:

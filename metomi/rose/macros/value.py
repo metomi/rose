@@ -21,9 +21,8 @@ import re
 import metomi.rose.env
 import metomi.rose.macro
 import metomi.rose.macros.rule
-import metomi.rose.variable
-
 import metomi.rose.meta_type
+import metomi.rose.variable
 
 REC_CHARACTER = re.compile(r"'(?:[^']|'')*'$")
 

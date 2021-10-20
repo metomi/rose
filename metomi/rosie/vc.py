@@ -18,28 +18,30 @@
 
 import atexit
 from fnmatch import fnmatch
+from io import StringIO
 import os
 import pwd
-import metomi.rose.config
-import metomi.rose.external
-import metomi.rose.metadata_check
-import metomi.rose.reporter
-from metomi.rose.fs_util import FileSystemUtil
-from metomi.rose.macro import add_meta_paths, load_meta_config
-from metomi.rose.macros import DefaultValidators
-from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.popen import RosePopener, RosePopenError
-from metomi.rose.reporter import Event, Reporter
-from metomi.rose.resource import ResourceLocator
-from metomi.rosie.suite_id import (SuiteId,
-                                   SuiteIdOverflowError,
-                                   SuiteIdPrefixError)
 import shutil
-from io import StringIO
 import sys
 from tempfile import mkdtemp, mkstemp
 from urllib.parse import urlparse
 
+import metomi.rose.config
+import metomi.rose.external
+from metomi.rose.fs_util import FileSystemUtil
+from metomi.rose.macro import add_meta_paths, load_meta_config
+from metomi.rose.macros import DefaultValidators
+import metomi.rose.metadata_check
+from metomi.rose.opt_parse import RoseOptionParser
+from metomi.rose.popen import RosePopener, RosePopenError
+import metomi.rose.reporter
+from metomi.rose.reporter import Event, Reporter
+from metomi.rose.resource import ResourceLocator
+from metomi.rosie.suite_id import (
+    SuiteId,
+    SuiteIdOverflowError,
+    SuiteIdPrefixError,
+)
 
 CREATE_INFO_CONFIG_COMMENT = """
 # Make changes ABOVE these lines.

@@ -38,24 +38,23 @@ It also stores macro base classes and macro library functions.
 
 import ast
 import copy
+from functools import cmp_to_key
 import glob
+from importlib.machinery import SourceFileLoader
 import inspect
 import os
 import re
 import sys
 import traceback
-from functools import cmp_to_key
-from importlib.machinery import SourceFileLoader
 
 import metomi.rose.config
+from metomi.rose.config import ConfigNode
 import metomi.rose.config_tree
 import metomi.rose.formats.namelist
 from metomi.rose.opt_parse import RoseOptionParser
 import metomi.rose.reporter
 import metomi.rose.resource
 import metomi.rose.variable
-from metomi.rose.config import ConfigNode
-
 
 ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate", "downgrade", "upgrade",
                                "report"]

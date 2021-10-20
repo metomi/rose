@@ -14,8 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-import json
 from io import StringIO
+import json
 from textwrap import dedent
 
 from metomi.rose.host_select_client import main as host_select

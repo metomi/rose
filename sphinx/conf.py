@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-import sys
 import os
+import sys
 
 import metomi.rose
 from metomi.rose.popen import RosePopener

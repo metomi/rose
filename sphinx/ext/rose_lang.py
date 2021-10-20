@@ -17,7 +17,7 @@
 """An extension providing a pygments lexer for Rose configuration files."""
 
 from pygments.lexer import RegexLexer, bygroups, include
-from pygments.token import (Comment, Name, Text, Operator, String)
+from pygments.token import Comment, Name, Operator, String, Text
 
 
 class RoseLexer(RegexLexer):

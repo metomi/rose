@@ -17,7 +17,6 @@
 """Process "file:*" sections in node of a metomi.rose.config_tree.ConfigTree.
 """
 
-import aiofiles
 from fnmatch import fnmatch
 from glob import glob
 from io import BytesIO
@@ -30,16 +29,14 @@ from tempfile import mkdtemp
 from typing import Any, Optional
 from urllib.parse import urlparse
 
+import aiofiles
 from metomi.rose.checksum import (
     get_checksum,
     get_checksum_func,
     guess_checksum_algorithm
 )
-from metomi.rose.config_processor import (
-    ConfigProcessError,
-    ConfigProcessorBase,
-)
-from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.config_processor import ConfigProcessError, ConfigProcessorBase
+from metomi.rose.env import UnboundEnvironmentVariableError, env_var_process
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.job_runner import JobManager, JobProxy, JobRunner
 from metomi.rose.popen import RosePopener

@@ -17,8 +17,9 @@
 """A handler of file system locations."""
 
 import errno
-from metomi.rose.checksum import get_checksum
 import os
+
+from metomi.rose.checksum import get_checksum
 
 
 class FileSystemLocHandler:

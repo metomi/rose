@@ -17,6 +17,9 @@
 """Implement "rose task-run"."""
 
 import os
+import sys
+import traceback
+
 from metomi.rose.app_run import AppRunner
 from metomi.rose.env import env_export
 from metomi.rose.opt_parse import RoseOptionParser
@@ -24,8 +27,6 @@ from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.run import Runner
 from metomi.rose.task_env import get_prepend_paths
-import sys
-import traceback
 
 
 class TaskAppNotFoundError(Exception):

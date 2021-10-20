@@ -24,7 +24,6 @@ import os
 
 from metomi.rose.resource import ResourceLocator
 
-
 _DEFAULT_DEFAULT_KEY = "md5"
 _DEFAULT_KEY = None
 _HASH_LENGTHS = None

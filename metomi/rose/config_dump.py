@@ -20,6 +20,7 @@
 import filecmp
 import fnmatch
 import os
+from tempfile import NamedTemporaryFile
 
 from metomi.rose import META_CONFIG_NAME
 from metomi.rose.config import ConfigDumper, ConfigLoader
@@ -27,7 +28,6 @@ from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.macro import pretty_format_config
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Event, Reporter
-from tempfile import NamedTemporaryFile
 
 
 class ConfigDumpEvent(Event):

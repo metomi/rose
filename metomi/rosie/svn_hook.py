@@ -20,10 +20,11 @@
 
 import os
 import sys
+from tempfile import TemporaryFile
+
 from metomi.rose.config import ConfigDecodeError, ConfigLoader
 from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
-from tempfile import TemporaryFile
 
 
 class BadChange(Exception):

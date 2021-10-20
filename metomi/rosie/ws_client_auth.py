@@ -20,8 +20,8 @@ import ast
 from getpass import getpass
 import os
 import re
-import socket
 import shlex
+import socket
 import sys
 from urllib.parse import urlparse
 import warnings
@@ -31,7 +31,6 @@ from metomi.rose.env import env_var_process
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
-
 
 try:
     from gi import require_version, pygtkcompat

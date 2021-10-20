@@ -16,7 +16,7 @@
 # -----------------------------------------------------------------------------
 
 import copy
-from typing import Dict, Any
+from typing import Any, Dict
 
 import metomi.rose.config
 import metomi.rose.config_tree

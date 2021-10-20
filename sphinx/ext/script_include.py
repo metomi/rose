@@ -18,7 +18,7 @@
 
 import os
 from shlex import split as sh_split
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 from docutils import nodes
 from docutils.parsers.rst import Directive

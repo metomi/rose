@@ -17,6 +17,7 @@
 """Common option parser for Rose command utilities."""
 
 from optparse import OptionParser
+
 import metomi.rose.resource
 
 

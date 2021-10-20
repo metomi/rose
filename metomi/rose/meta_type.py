@@ -18,7 +18,7 @@
 import ast
 import inspect
 import re
-from typing import Optional, Dict, Any, Type
+from typing import Any, Dict, Optional, Type
 
 import metomi.rose.variable
 

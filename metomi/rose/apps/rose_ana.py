@@ -18,25 +18,25 @@
 
 
 # Standard Python modules
+import abc
+from contextlib import contextmanager
+import fcntl
 import glob
 import inspect
 import os
-import abc
 import re
-import sys
 import sqlite3
+import sys
+import threading
 import time
 import traceback
-import fcntl
-import threading
-from contextlib import contextmanager
 
 # Rose modules
 from metomi.rose import TYPE_LOGICAL_VALUE_TRUE
-from metomi.rose.reporter import Reporter
-from metomi.rose.resource import ResourceLocator
 from metomi.rose.app_run import BuiltinApp
 from metomi.rose.env import env_var_process
+from metomi.rose.reporter import Reporter
+from metomi.rose.resource import ResourceLocator
 
 
 def timestamp():

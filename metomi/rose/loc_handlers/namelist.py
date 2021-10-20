@@ -18,13 +18,13 @@
 name."""
 
 
+from functools import cmp_to_key
 import re
+
 import metomi.rose.config
 from metomi.rose.config_processor import ConfigProcessError
-from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.env import UnboundEnvironmentVariableError, env_var_process
 from metomi.rose.reporter import Event
-from functools import cmp_to_key
-
 
 RE_NAMELIST_GROUP = re.compile(r"\Anamelist:(\w+).*\Z")
 

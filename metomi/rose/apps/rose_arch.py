@@ -20,20 +20,22 @@ import errno
 from glob import glob
 import os
 import re
-from metomi.rose.app_run import (
-    BuiltinApp,
-    ConfigValueError,
-    CompulsoryConfigValueError)
-from metomi.rose.checksum import get_checksum, get_checksum_func
-from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
-from metomi.rose.popen import RosePopenError
-from metomi.rose.reporter import Event, Reporter
-from metomi.rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sqlite3
 import sys
 from tempfile import mkdtemp
 from time import gmtime, strftime, time
+
+from metomi.rose.app_run import (
+    BuiltinApp,
+    CompulsoryConfigValueError,
+    ConfigValueError
+)
+from metomi.rose.checksum import get_checksum, get_checksum_func
+from metomi.rose.env import UnboundEnvironmentVariableError, env_var_process
+from metomi.rose.popen import RosePopenError
+from metomi.rose.reporter import Event, Reporter
+from metomi.rose.scheme_handler import SchemeHandlersManager
 
 
 class RoseArchDuplicateError(ConfigValueError):

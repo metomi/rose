@@ -18,13 +18,14 @@
 
 import os
 from random import shuffle
+import shlex
+
 from metomi.rose.app_run import BuiltinApp, ConfigValueError
 from metomi.rose.date import RoseDateTimeOperator
-from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.env import UnboundEnvironmentVariableError, env_var_process
 from metomi.rose.fs_util import FileSystemEvent
 from metomi.rose.host_select import HostSelector
 from metomi.rose.popen import RosePopenError
-import shlex
 
 
 class RosePruneApp(BuiltinApp):

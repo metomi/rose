@@ -23,22 +23,22 @@ import os
 from random import choice, random, shuffle
 import shlex
 import signal
+from socket import error as SocketError
 from socket import (
     getaddrinfo,
+    getfqdn,
     gethostbyname_ex,
     gethostname,
-    getfqdn,
-    error as SocketError
 )
 import sys
 from time import sleep, time
 import traceback
-from typing import Optional
 
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
-from metomi.rose.reporter import Reporter, Event
+from metomi.rose.reporter import Event, Reporter
 from metomi.rose.resource import ResourceLocator
+from typing import Optional
 
 
 class NoHostError(Exception):

@@ -127,12 +127,11 @@ from sphinx import addnodes
 from sphinx.directives import ObjectDescription
 from sphinx.domains import Domain, ObjType
 from sphinx.roles import XRefRole
-from sphinx.util.nodes import make_refnode
 from sphinx.util import logging
 from sphinx.util.docfields import Field, TypedField
+from sphinx.util.nodes import make_refnode
 
 from metomi.rose import config
-
 
 LOGGER = logging.getLogger(__name__)
 

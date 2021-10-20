@@ -18,18 +18,17 @@
 Convenient functions for searching resource files.
 """
 
+from importlib.machinery import SourceFileLoader
+import inspect
 import os
 from pathlib import Path
-import inspect
 import string
 import sys
-from importlib.machinery import SourceFileLoader
 
 import metomi.rose
 from metomi.rose.config import ConfigLoader, ConfigNode
 import metomi.rose.opt_parse
 from metomi.rose.reporter import Reporter
-
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
 

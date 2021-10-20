@@ -16,10 +16,10 @@
 # -----------------------------------------------------------------------------
 """Module to provide checking facilities for Rose configuration metadata."""
 
+from functools import cmp_to_key, partial
 import os
 import re
 import sys
-from functools import cmp_to_key, partial
 
 import metomi.rose.config
 import metomi.rose.config_tree
@@ -29,7 +29,6 @@ import metomi.rose.macros
 import metomi.rose.opt_parse
 import metomi.rose.reporter
 import metomi.rose.resource
-
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
 INVALID_IMPORT = "Could not import {0}: {1}: {2}"

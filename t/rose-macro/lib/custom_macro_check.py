@@ -17,8 +17,8 @@
 """Class to check if a URL is valid."""
 
 import http.client
-
 import metomi.rose.macro
+
 
 
 class URLChecker(metomi.rose.macro.MacroBase):

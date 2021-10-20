@@ -33,10 +33,11 @@ import re
 import shlex
 from smtplib import SMTP
 import socket
-import sqlalchemy as al
 import sys
 from time import mktime, strptime
 import traceback
+
+import sqlalchemy as al
 
 import metomi.rose.config
 from metomi.rose.opt_parse import RoseOptionParser
@@ -44,8 +45,12 @@ from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
 from metomi.rosie.db import (
-    LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
-from metomi.rosie.svn_hook import RosieSvnHook, InfoFileError
+    LATEST_TABLE_NAME,
+    MAIN_TABLE_NAME,
+    META_TABLE_NAME,
+    OPTIONAL_TABLE_NAME,
+)
+from metomi.rosie.svn_hook import InfoFileError, RosieSvnHook
 
 
 class RosieWriteDAO:

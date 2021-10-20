@@ -16,16 +16,15 @@
 # -----------------------------------------------------------------------------
 """Module that contains upgrade macro functionality."""
 
+from functools import cmp_to_key
 import inspect
 import os
 import sys
-from functools import cmp_to_key
 
 import metomi.rose.config
 import metomi.rose.macro
 import metomi.rose.macros.trigger
 import metomi.rose.reporter
-
 
 BEST_VERSION_MARKER = "* "
 CURRENT_VERSION_MARKER = "= "

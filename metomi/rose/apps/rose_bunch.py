@@ -23,11 +23,9 @@ import shlex
 import sqlite3
 from time import sleep
 
-from metomi.rose.app_run import (
-    BuiltinApp,
-    ConfigValueError)
-from metomi.rose.popen import RosePopenError
+from metomi.rose.app_run import BuiltinApp, ConfigValueError
 import metomi.rose.job_runner
+from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Event
 
 

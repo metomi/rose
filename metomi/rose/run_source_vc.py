@@ -17,8 +17,9 @@
 """Write version control information of sources used in run time."""
 
 import os
-from metomi.rose.popen import RosePopener
 import sys
+
+from metomi.rose.popen import RosePopener
 from metomi.rose.unicode_utils import write_safely
 
 

@@ -18,8 +18,9 @@
 
 import errno
 import os
-from metomi.rose.reporter import Event
 import shutil
+
+from metomi.rose.reporter import Event
 
 
 class FileSystemEvent(Event):

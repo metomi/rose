@@ -17,10 +17,10 @@
 """Implements the "rose config-diff" command."""
 
 import ast
-import re
-import os
-import shlex
 import io
+import os
+import re
+import shlex
 import sys
 import tempfile
 from typing import List, Tuple

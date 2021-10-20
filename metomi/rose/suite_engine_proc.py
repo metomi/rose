@@ -23,7 +23,7 @@ from typing import Optional
 
 from metomi.isodatetime.data import Duration
 from metomi.isodatetime.parsers import DurationParser, ISO8601SyntaxError
-from metomi.rose.date import RoseDateTimeOperator, OffsetValueError
+from metomi.rose.date import OffsetValueError, RoseDateTimeOperator
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.host_select import HostSelector
 from metomi.rose.popen import RosePopener

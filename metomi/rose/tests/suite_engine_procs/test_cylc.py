@@ -17,10 +17,10 @@
 """Tests for functions in the cylc suite engine proc.
 """
 
+import cylc.rose.platform_utils
 import pytest
 from pytest import param
 
-import cylc.rose.platform_utils
 from metomi.rose.suite_engine_procs.cylc import CylcProcessor
 
 

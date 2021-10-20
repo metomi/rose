@@ -6,7 +6,6 @@ import inspect
 import metomi.rose.formats
 import metomi.rose.macro
 
-
 TRANSFORM_FUNC_NAME = "transform_config"
 VALIDATE_FUNC_NAME = "validate_config"
 

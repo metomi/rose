@@ -19,7 +19,7 @@
 import os
 import shlex
 import shutil
-from typing import Optional, List
+from typing import List, Optional
 from uuid import uuid4
 
 from metomi.rose.config_processor import ConfigProcessorsManager

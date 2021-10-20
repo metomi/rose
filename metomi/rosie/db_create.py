@@ -17,19 +17,24 @@
 """Create database files for Rosie web service."""
 
 import os
-import sqlalchemy as al
 import sys
 
+import sqlalchemy as al
+
+from metomi.rose.config import ConfigError
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
-from metomi.rose.reporter import Reporter, Event
+from metomi.rose.reporter import Event, Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rosie.db import (
-    LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
+    LATEST_TABLE_NAME,
+    MAIN_TABLE_NAME,
+    META_TABLE_NAME,
+    OPTIONAL_TABLE_NAME,
+)
 from metomi.rosie.svn_hook import InfoFileError
 from metomi.rosie.svn_post_commit import RosieSvnPostCommitHook
-from metomi.rose.config import ConfigError
 
 
 class RosieDatabaseCreateEvent(Event):

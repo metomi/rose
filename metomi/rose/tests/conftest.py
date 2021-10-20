@@ -18,8 +18,8 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import TemporaryDirectory
 
-import pytest
 from _pytest.monkeypatch import MonkeyPatch
+import pytest
 
 
 @pytest.fixture(scope='module')

@@ -16,17 +16,16 @@
 # -----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
+from glob import glob
 import os
 import pwd
+from random import shuffle
 import re
 import socket
 import sqlite3
 import tarfile
-
-from glob import glob
-from random import shuffle
-from typing import Union, List, Tuple, Any
 from time import sleep
+from typing import Any, List, Tuple, Union
 from uuid import uuid4
 
 from metomi.rose.fs_util import FileSystemEvent
@@ -34,8 +33,9 @@ from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.suite_engine_proc import (
     SuiteEngineProcessor,
-    TaskProps
+    TaskProps,
 )
+
 
 
 class CylcProcessor(SuiteEngineProcessor):

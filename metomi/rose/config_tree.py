@@ -17,14 +17,14 @@
 # -----------------------------------------------------------------------------
 """Rose configuration directory inheritance."""
 
-import os
-from metomi.rose.c3 import mro
-from metomi.rose.config import ConfigNode, ConfigLoader
-import shlex
-from metomi.rose.config import ConfigDumper
 from io import StringIO
+import os
+import shlex
 from shutil import rmtree
 from tempfile import mkdtemp
+
+from metomi.rose.c3 import mro
+from metomi.rose.config import ConfigDumper, ConfigLoader, ConfigNode
 
 
 class BadOptionalConfigurationKeysError(Exception):

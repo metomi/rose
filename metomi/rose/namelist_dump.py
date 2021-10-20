@@ -24,10 +24,10 @@ This contains wrapper functions for the namelist parser and the dumper
 
 import re
 import sys
+
 import metomi.rose.config
 import metomi.rose.formats.namelist
 from metomi.rose.opt_parse import RoseOptionParser
-
 
 RE_NAME_INDEX = re.compile(r"^(.*)\((\d+)\)$")
 STD_FILE_ARG = "-"

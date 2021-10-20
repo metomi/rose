@@ -31,19 +31,20 @@ Sub-classes, for handling API points by inheriting from RosieDiscoService:
 """
 
 from glob import glob
-import jinja2
 import json
 import logging
 import os
 from pathlib import Path
-import pkg_resources
 import pwd
 import signal
 from time import sleep
+import wsgiref
+
+import jinja2
+import pkg_resources
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
-import wsgiref
 
 from metomi.isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 from metomi.rose import __version__ as ROSE_VERSION
@@ -52,7 +53,6 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.resource import ResourceLocator
 import metomi.rosie.db
 from metomi.rosie.suite_id import SuiteId
-
 
 LOG_ROOT_TMPL = os.path.join(
     "~", ".metomi", "%(ns)s-%(util)s-%(host)s-%(port)s")

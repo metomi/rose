@@ -24,9 +24,10 @@ Classes:
 
 import json
 from multiprocessing import Pool
-import requests
 import shlex
 from time import sleep
+
+import requests
 
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter

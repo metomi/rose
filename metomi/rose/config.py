@@ -88,15 +88,15 @@ What about the standard library ConfigParser? Well, it is problematic:
 """
 
 import copy
+from functools import cmp_to_key
 import os.path
 import re
-from metomi.rose.env import env_var_escape
 import shlex
 import sys
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile
-from functools import cmp_to_key
-from metomi.rose.unicode_utils import write_safely
 
+from metomi.rose.env import env_var_escape
+from metomi.rose.unicode_utils import write_safely
 
 CHAR_ASSIGN = "="
 CHAR_COMMENT = "#"

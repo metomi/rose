@@ -40,7 +40,7 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
-from metomi.rose.suite_engine_proc import SuiteEngineProcessor, NoSuiteLogError
+from metomi.rose.suite_engine_proc import NoSuiteLogError, SuiteEngineProcessor
 
 
 class SvnCaller(RosePopener):

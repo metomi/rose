@@ -26,22 +26,29 @@ Ensure that commits conform to the rules of Rosie.
 
 from fnmatch import fnmatch
 import re
+import shlex
+import sys
+import traceback
+
 import metomi.rose
 from metomi.rose.config import ConfigSyntaxError
-from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.macro import (add_meta_paths,
-                               get_reports_as_text,
-                               load_meta_config)
+from metomi.rose.macro import (
+    add_meta_paths,
+    get_reports_as_text,
+    load_meta_config,
+)
 from metomi.rose.macros import DefaultValidators
+from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
 from metomi.rosie.svn_hook import (
-    RosieSvnHook, BadChange, InfoFileError, BadChanges)
-import shlex
-import sys
-import traceback
+    BadChange,
+    BadChanges,
+    InfoFileError,
+    RosieSvnHook,
+)
 
 
 class RosieSvnPreCommitHook(RosieSvnHook):

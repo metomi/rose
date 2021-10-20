@@ -18,13 +18,14 @@
 
 from glob import glob
 import os
+import sys
+import traceback
+
 from metomi.rose.env import EnvExportEvent
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.suite_engine_proc import SuiteEngineProcessor
-import sys
-import traceback
 
 PATH_GLOBS = {
     "PATH": ["share/fcm[_-]make*/*/bin", "work/*/fcm[_-]make*/*/bin"],

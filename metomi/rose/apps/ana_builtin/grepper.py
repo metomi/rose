@@ -39,6 +39,7 @@
 
 import os
 import re
+
 from metomi.rose import TYPE_LOGICAL_VALUE_TRUE
 from metomi.rose.apps.rose_ana import AnalysisTask
 

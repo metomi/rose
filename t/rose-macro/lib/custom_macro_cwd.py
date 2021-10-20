@@ -2,7 +2,6 @@
 
 import os
 
-
 import metomi.rose.macro
 
 

@@ -18,7 +18,7 @@ import errno
 import os
 import unittest
 
-from metomi.rose.popen import RosePopenError, RosePopener
+from metomi.rose.popen import RosePopener, RosePopenError
 
 
 class _TestOSErrorFilename(unittest.TestCase):

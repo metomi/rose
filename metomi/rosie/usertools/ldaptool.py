@@ -24,6 +24,7 @@ try:
 except ImportError:
     pass
 import os
+
 from metomi.rose.resource import ResourceLocator
 
 

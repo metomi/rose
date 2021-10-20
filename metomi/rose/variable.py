@@ -28,7 +28,6 @@ import re
 
 import metomi.rose
 
-
 RE_REAL = r"[\+\-]?\d*\.?\d*(?:[de][\+\-]?\d+)?"
 RE_CAPT_REAL = '(' + RE_REAL + ')'
 
